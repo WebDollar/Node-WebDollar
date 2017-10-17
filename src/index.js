@@ -1,6 +1,7 @@
 console.log("Node WebDollar");
 
-exports.nodeServer = require('./sockets/node/server/node-server.js').server;
+exports.nodeServer = require('./nodes/server/sockets/nodes-server.js').server;
+exports.nodeClientService = require('./nodes/clients/service/nodes-clients-service.js').serviceClients;
 
 exports.helloWord = function() {
     console.log("This is a message from the demo package");

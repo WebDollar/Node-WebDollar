@@ -1,14 +1,13 @@
 var io = require('socket.io');
 
-class NodeServer {
+class NodesServer {
 
     // server : null,
 
     constructor(){
 
-        console.log("NodeServer constructor")
+        console.log("NodeServer constructor");
         this.server = null;
-
     }
 
     startServer(){
@@ -36,6 +35,12 @@ class NodeServer {
         return true;
     }
 
+    startDiscoverOtherNodes(){
+
+
+
+    }
+
 }
 
-exports.server = new NodeServer();
+exports.server = new NodesServer();
