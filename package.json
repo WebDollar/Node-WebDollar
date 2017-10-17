@@ -1,0 +1,27 @@
+{
+  "name": "node-webdollar",
+  "version": "0.0.1",
+  "description": "Node of WebDollar",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebDollar/Node-WebDollar.git"
+  },
+  "keywords": [
+    "Node",
+    "CryptoCurrency",
+    "sockets"
+  ],
+  "author": "WebDollar - Alexandru Ionut Budisteanu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WebDollar/Node-WebDollar/issues"
+  },
+  "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
+  "dependencies": {
+    "socket.io": "^2.0.3"
+  }
+}
