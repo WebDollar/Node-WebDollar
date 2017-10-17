@@ -1,6 +1,6 @@
 var io = require('socket.io');
 
-class NodesServer {
+class NodeServer {
 
     // server : null,
 
@@ -37,10 +37,8 @@ class NodesServer {
 
     startDiscoverOtherNodes(){
 
-
-
     }
 
 }
 
-exports.server = new NodesServer();
+exports.server = new NodeServer();

@@ -1,13 +1,16 @@
-var NodesClient = require ('../sockets/nodes-client.js');
+var NodesClient = require ('../sockets/node-client.js');
 
-class NodesClientsService {
+class NodeClientsService {
 
     // clients : [],
 
     constructor(){
-
         console.log("NodeServiceClients constructor");
         this.clients = []
+    }
+
+    startService(){
+
     }
 
     startDiscoverOtherNodes(){
@@ -15,4 +18,4 @@ class NodesClientsService {
 
 }
 
-exports.serviceClients = new NodesClientsService();
+exports.serviceClients = new NodeClientsService();

@@ -1,6 +1,6 @@
 var ioClient = require('socket.io-client');
 
-class NodesClient {
+class NodeClient {
 
     // client : null,
 
@@ -41,4 +41,4 @@ class NodesClient {
 
 }
 
-exports.client =  NodesClient;
+exports.client =  NodeClient;
