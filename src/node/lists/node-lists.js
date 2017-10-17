@@ -36,22 +36,40 @@ class NodeLists {
         return null;
     }
 
-    checkAddClientSocket(socket){
-        if (this.searchNodeSocketAddress(socket) === null) {
-            this.clientSockets.push(socket);
-            return true;
-        }
+    checkAddSocket(socket, bClient, bServer){
+
+        if (bClient)
+            if (this.searchNodeSocketAddress(socket) === null) {
+                this.clientSockets.push(socket);
+                return true;
+            }
+
+        if (bServer)
+            if (this.searchNodeSocketAddress(socket) === null) {
+                this.serverSockets.push(socket);
+                return true;
+            }
+
         else socket.disconnect();
         return false;
     }
 
-    checkAddServerSocket(socket){
-        if (this.searchNodeSocketAddress(socket) === null) {
-            this.serverSockets.push(socket);
-            return true;
-        }
-        else socket.disconnect();
-        return false;
+    //Removing socket from the list (the connection was terminated)
+    disconnectSocket(socket, bClient, bServer){
+
+        if ((socket.helloValidated|| false)===false) return false;
+
+        if (bClient)
+            for (let i=0; i<this.clientSockets.length; i++)
+                if (this.clientSockets[i].address === socket.address){
+                    delete this.clientSockets[i];
+                }
+
+        if (bServer)
+            for (let i=0; i<this.serverSockets.length; i++)
+                if (this.serverSockets[i].address === socket.address){
+                    delete this.serverSockets[i];
+                }
     }
 
 }

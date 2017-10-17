@@ -1,4 +1,5 @@
 import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
+import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../sockets.js';
 
 exports.sendHello = function (socket, initializeEvent){
     // Waiting for Protocol Confirmation
@@ -11,8 +12,11 @@ exports.sendHello = function (socket, initializeEvent){
         if ((response.hasOwnProperty("version"))&&(response.version <= nodeVersionCompatibility)){
 
             //check if it is a unique connection, add it to the list
-            let result = NodeLists.checkAddServerSocket(socket);
-            if (result){
+            let result = NodeList.searchNodeSocketAddress(socket.address);
+
+            if (result !== null){
+
+                socket.helloValidated = true;
                 initializeEvent(socket);
                 return true;
             }

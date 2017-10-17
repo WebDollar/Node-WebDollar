@@ -1,7 +1,8 @@
 let io = require('socket.io');
-import {NodeLists} from './../../lists/node-lists.js';
 
+import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
 import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
+import {NodeLists} from './../../lists/node-lists.js';
 import {sendHello} from './../../../common/sockets/node/protocol.js';
 
 /*
@@ -38,12 +39,13 @@ class NodeServer {
                 let address = socket.handshake.address;
                 console.log('New connection from ' + address.address + ':' + address.port);
 
+                socket.address = address;
                 sendHello(socket, this.initializeSocket);
 
             });
 
             subscribeSocketObservable(server, "disconnect").subscribe(socket => {
-
+                NodeLists.disconnectSocket(socket);
             });
 
             server.listen(8320);
@@ -62,6 +64,8 @@ class NodeServer {
 
 
     initializeSocket(socket){
+
+        NodeLists.checkAddSocket(socket, false, true);
 
     }
 

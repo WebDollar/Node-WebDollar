@@ -2,8 +2,8 @@ let ioClient = require('socket.io-client');
 
 import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
 import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
-
 import {NodeLists} from './../../lists/node-lists.js';
+import {sendHello} from './../../../common/sockets/node/protocol.js';
 
 class NodeClient {
 
@@ -25,22 +25,22 @@ class NodeClient {
         {
             this.socket = ioClient(address);
 
-            this.socket.address = address;
 
             subscribeSocketObservable(this.socket, "connection").subscribe(response => {
 
                 console.log("Client connected");
+                this.socket.address = address;
+                sendHello(this.socket, this.initializeSocket);
 
             });
 
             subscribeSocketObservable(this.socket, "disconnect").subscribe(response => {
 
                 console.log("Client connected");
+                NodeLists.disconnectSocket(this.socket);
 
             });
 
-
-            this.sendHello(this.socket, this.initializeSocket);
 
         }
         catch(Exception){
@@ -53,6 +53,8 @@ class NodeClient {
     }
 
     initializeSocket(){
+
+        NodeLists.checkAddSocket(this.socket, true, false);
 
     }
 
