@@ -4,8 +4,10 @@ import {NodeDiscoveryService} from './discovery/node-discovery-service.js';
 
 class NodeClientsService {
 
-    //nodeClients = []
-    //nodeDiscoveryService = null
+    /*
+        nodeClients = []                //list of the current nodeClients
+        nodeDiscoveryService = null     //Node Discovery Service
+    */
 
     constructor(){
         console.log("NodeServiceClients constructor");
@@ -19,7 +21,19 @@ class NodeClientsService {
     }
 
 
-    searchNodeByAddress(address){
+    connectNewNode(address){
+        address = address.toLowerCase();
+
+        //search if the new node was already connected in the past
+        let nodeClient = this.searchNodeClientByAddress(address);
+        if (nodeClient !== null) return nodeClient;
+
+        //
+
+    }
+
+
+    searchNodeClientByAddress(address){
 
         address = address.toLowerCase();
 
@@ -27,6 +41,8 @@ class NodeClientsService {
             if (this.nodeClients[i].address.toLowerCase() === address){
                 return this.nodeClients[i];
             }
+
+        return null;
     }
 
 

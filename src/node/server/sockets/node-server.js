@@ -2,16 +2,21 @@ let io = require('socket.io');
 
 class NodeServer {
 
-    // server : null,
+    /*
+        nodeServer : null,        //Node IO Server Socket
+        nodeServerSockets = []      //list of current node
+    */
 
     constructor(){
 
         console.log("NodeServer constructor");
-        this.server = null;
+        this.nodeServer = null;
+        this.nodeServerSockets = [];
     }
 
     startServer(){
 
+        this.nodeServer = null;
         try
         {
             var server = io();
@@ -24,7 +29,7 @@ class NodeServer {
 
             server.listen(8320);
 
-            this.server = server;
+            this.nodeServer = server;
         }
         catch(Exception){
             console.log("Error Starting Node Server ", Exception.toString());
@@ -35,9 +40,7 @@ class NodeServer {
         return true;
     }
 
-    startDiscoverOtherNodes(){
 
-    }
 
 }
 

@@ -20,12 +20,12 @@ class NodeDiscoveryService {
 
     }
 
-    discoverFallbackNodes(){
+    async discoverFallbackNodes(){
         console.log("DISCOVERING OTHER NODES");
 
-        this.downloadFallBackList("http://skyhub.me/webdollars.json");
-        this.downloadFallBackList("http://visionbot.net/webdollars.json");
-        this.downloadFallBackList("http://budisteanu.net/webdollars.json");
+        await this.downloadFallBackList("http://skyhub.me/webdollars.json");
+        await this.downloadFallBackList("http://visionbot.net/webdollars.json");
+        await this.downloadFallBackList("http://budisteanu.net/webdollars.json");
 
         if ((this.nodeClientsService !== null)&&(this.nodeClientsService.nodeClients !== null)&&(this.nodeClientsService.nodeClients.length < 5)){
             let that = this;
@@ -51,7 +51,10 @@ class NodeDiscoveryService {
 
                     if ((nodes !== null)&&(Array.isArray(nodes))){
 
-                        console.log("NODES", nodes);
+                        console.log("NEW NODES", nodes);
+
+                        for (let i=0; i<nodes.length; i++)
+                            this.nodeClientsService.connectNewNode(nodes[i]);
 
                     }
                 }
