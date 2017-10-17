@@ -5,36 +5,52 @@ import { Observable, Subscribable } from 'rxjs/Observable';
 
 class NodeClient {
 
-    // client : null,
+    // socket : null,
 
     constructor(){
 
         console.log("NodeClient constructor");
-        this.client = null;
+
+        this.socket = null;
+        this.onConnect = null;
+        this.onDisconnect = null;
     }
 
     connectTo(address){
 
         try
         {
-            var client = ioClient(address);
+            let client = ioClient(address);
 
-            client.on('connection', function(){
+            this.socket = client;
+
+            this.subscribeSocketObservable("connection").subscribe(response => {
+
                 console.log("Client connected");
 
                 if (typeof this.onConnect !== 'undefined')
                     this.onConnect(client);
+
             });
 
-            client.on('disconnect', function(){
-                console.log("Client disconnected");
+            this.subscribeSocketObservable("disconnect").subscribe(response => {
+
+                console.log("Client connected");
+
+                if (typeof this.onConnect !== 'undefined')
+                    this.onConnect(client);
+
             });
 
-            client.emit("HelloNode", {
+
+            this.sendRequestWaitOnce("HelloNode",{
                 version:constGlobal.nodeVersion,
+            }).then(response =>{
+
+                console.log("RECEIVED HELLO NODE BACK", response);
+
             });
 
-            this.client = client;
         }
         catch(Exception){
             console.log("Error Connecting Node to ",address);
@@ -54,22 +70,20 @@ class NodeClient {
     */
 
     sendRequest(request, requestData) {
-        return this.client.emit( request, requestData);
+        return this.socket.emit( request, requestData);
     }
 
 
     /*
-        Sending the Request and Obtain the Promise to Wait Async
+        Sending the Request and return the Promise to Wait Async
     */
-
-
-    sendRequestGetData(request, requestData) {
+    sendRequestWaitOnce(request, requestData) {
 
         return new Promise((resolve) => {
 
             this.sendRequest(request, requestData);
 
-            this.client.once(request, function (resData) {
+            this.socket.once(request, function (resData) {
 
                 resolve(resData);
 
@@ -81,14 +95,14 @@ class NodeClient {
     /*
      Sending Request and Obtain the Observable Object
      */
-    sendRequestObservable(request, requestData) {
+    sendRequestSubscribe(request, requestData) {
 
         let result = this.sendRequest(request, requestData);
 
-        return this.setSocketReadObservable(request);
+        return this.subscribeSocketObservable(request);
     }
 
-    setSocketReadObservable(request) {
+    subscribeSocketObservable(request) {
 
         //let observable = new Observable < Object > (observer => {
         let observable = Observable.create(observer => {
