@@ -1,5 +1,5 @@
 import {NodeClient} from '../../sockets/node-client.js';
-import {nodeProtocol} from '../../../../consts/const_global.js';
+import {nodeProtocol, nodeFallBackInterval} from '../../../../consts/const_global.js';
 
 const axios = require('axios');
 
@@ -29,31 +29,41 @@ class NodeDiscoveryService {
 
         if ((this.nodeClientsService !== null)&&(this.nodeClientsService.nodeClients !== null)&&(this.nodeClientsService.nodeClients.length < 5)){
             let that = this;
-            setTimeout(function(){return that.discoverFallbackNodes()}, 5000)
+            setTimeout(function(){return that.discoverFallbackNodes()}, nodeFallBackInterval)
         }
     }
 
-    downloadFallBackList(address){
+    async downloadFallBackList(address){
 
-        axios.get(address).then(response => {
-                console.log(response.data);
+        try{
+            let response = await axios.get(address);
+            console.log(response.data);
+
+            if (response.type === 'json'){
+
+                let nodes =  [];
+                let name = '';
 
                 let data = response.data;
                 if (data.hasOwnProperty('protocol')&&(data['protocol'] === nodeProtocol)){
-                    let name = data.name||'';
-                    let nodes = data.nodes||[];
+                    name = data.name||'';
+                    nodes = data.nodes||[];
 
                     if ((nodes !== null)&&(Array.isArray(nodes))){
 
-
+                        console.log("NODES", nodes);
 
                     }
                 }
 
-            })
-            .catch(error => {
-                console.log("ERROR downloading list", error.toString());
-            });
+                return nodes;
+            }
+        }
+        catch(Exception){
+            console.log("ERROR downloading list: ", address);
+            console.log(Exception.toString());
+            return null;
+        }
     }
 
 

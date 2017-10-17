@@ -1,8 +1,9 @@
+require("babel-polyfill");
+
 console.log("Node WebDollar");
 
-
-import {NodeServer} from './node/server/sockets/node-server.js';
-import {NodeClientsService} from './node/clients/service/node-clients-service.js';
+let NodeServer = require('./node/server/sockets/node-server.js').NodeServer;
+let NodeClientsService = require('./node/clients/service/node-clients-service.js').NodeClientsService;
 
 exports.NodeServer = NodeServer;
 exports.NodeClientsService = NodeClientsService;
