@@ -1,27 +1,26 @@
-var NodesClient = require ('../sockets/node-client.js');
+import {NodeClient} from '../sockets/node-client.js';
+import {NodeDiscoveryService} from './discovery/node-discovery-service.js';
+
 
 class NodeClientsService {
 
-    // clients : [],
+    //nodeClients = []
+    //nodeDiscoveryService = null
 
     constructor(){
         console.log("NodeServiceClients constructor");
-        this.clients = []
+
+        this.nodeClients = [];
+        this.nodeDiscoveryService = new NodeDiscoveryService(this)
     }
 
     startService(){
 
-
-        var that = this;
-        setInterval(function(){return that.discoverOtherNodes()}, 5000);
+        this.nodeDiscoveryService.startDiscovery();
 
     }
 
-    discoverOtherNodes(){
 
-        console.log("DISCOVERING OTHER NODES");
-
-    }
 
 }
 

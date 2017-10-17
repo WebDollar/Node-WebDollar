@@ -117,4 +117,4 @@ class NodeClient {
 
 }
 
-exports.client =  NodeClient;
+exports.NodeClient =  NodeClient;
