@@ -11,9 +11,16 @@ class NodeClientsService {
 
     startService(){
 
+
+        var that = this;
+        setInterval(function(){return that.discoverOtherNodes()}, 5000);
+
     }
 
-    startDiscoverOtherNodes(){
+    discoverOtherNodes(){
+
+        console.log("DISCOVERING OTHER NODES");
+
     }
 
 }
