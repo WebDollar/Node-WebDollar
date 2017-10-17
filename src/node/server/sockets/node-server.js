@@ -41,4 +41,4 @@ class NodeServer {
 
 }
 
-exports.server = new NodeServer();
+exports.NodeServer = new NodeServer();

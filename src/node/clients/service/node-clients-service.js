@@ -15,13 +15,21 @@ class NodeClientsService {
     }
 
     startService(){
-
         this.nodeDiscoveryService.startDiscovery();
-
     }
 
+
+    searchNodeByAddress(address){
+
+        address = address.toLowerCase();
+
+        for (let i=0; i<this.nodeClients.length; i++)
+            if (this.nodeClients[i].address.toLowerCase() === address){
+                return this.nodeClients[i];
+            }
+    }
 
 
 }
 
-exports.serviceClients = new NodeClientsService();
+exports.NodeClientsService = new NodeClientsService();

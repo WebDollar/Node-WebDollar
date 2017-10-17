@@ -1,0 +1,9 @@
+{
+  "protocol": "WebDollar",
+  "name": "fallback nodes",
+  "nodes": [
+    "skyhub.me",
+    "visionbot.net",
+    "92.222.85.90",
+  ]
+}

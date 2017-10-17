@@ -1,6 +1,7 @@
-var index = require('./index.js');
+
+import {NodeServer, NodeClientsService} from './index.js';
 
 console.log("TESTING MODE");
 
-index.nodeServer.startServer();
-index.nodeClientsService.startService();
+NodeServer.startServer();
+NodeClientsService.startService();
