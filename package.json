@@ -4,7 +4,8 @@
   "description": "Node of WebDollar",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "test": "node src/test.js",
+    "start": "node src/index.js"
   },
   "repository": {
     "type": "git",
