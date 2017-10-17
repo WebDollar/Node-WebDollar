@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
+    "rxjs": "^5.4.3",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3"
   },

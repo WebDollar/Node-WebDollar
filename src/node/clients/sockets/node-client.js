@@ -1,5 +1,7 @@
-var ioClient = require('socket.io-client');
-var constGlobal = require('../../../consts/const_global.js');
+let ioClient = require('socket.io-client');
+let constGlobal = require('../../../consts/const_global.js');
+
+import { Observable, Subscribable } from 'rxjs/Observable';
 
 class NodeClient {
 
@@ -47,51 +49,53 @@ class NodeClient {
 
     }
 
+    /*
+        FUNCTIONS
+    */
+
+    sendRequest(request, requestData) {
+        return this.client.emit( request, requestData);
+    }
+
 
     /*
- Sending the Request and Obtain the Promise to Wait Async
- */
-    sendRequestGetData(sRequestName, sRequestData, receivingSuffix) {
+        Sending the Request and Obtain the Promise to Wait Async
+    */
 
-        if (typeof receivingSuffix === 'undefined') receivingSuffix = '';
+
+    sendRequestGetData(request, requestData) {
 
         return new Promise((resolve) => {
 
-            this.sendRequest(sRequestName, sRequestData);
+            this.sendRequest(request, requestData);
 
-        this.socket.once(constants.SERVICE_WEBSOCK_API + sRequestName + (receivingSuffix !== '' ? '/'+receivingSuffix : ''), function (resData) {
+            this.client.once(request, function (resData) {
 
-            /*console.log('SOCKET RECEIVED: ');
-             console.log(resData);*/
+                resolve(resData);
 
-            resolve(resData);
+            });
 
         });
-
-    });
     }
 
     /*
      Sending Request and Obtain the Observable Object
      */
-    sendRequestObservable(sRequestName, sRequestData) {
+    sendRequestObservable(request, requestData) {
 
-        var result = this.sendRequest(sRequestName, sRequestData);
+        let result = this.sendRequest(request, requestData);
 
-        return this.setSocketReadObservable(sRequestName);
+        return this.setSocketReadObservable(request);
     }
 
-    setSocketReadObservable(sRequestName) {
-
-        if ((sRequestName !== "connect") && (sRequestName !== "disconnect") && (sRequestName !== 'connect_failed')&&(sRequestName !== 'connect_error'))
-            sRequestName = constants.SERVICE_WEBSOCK_API + sRequestName;
+    setSocketReadObservable(request) {
 
         //let observable = new Observable < Object > (observer => {
         let observable = Observable.create(observer => {
-            this.socket.on(sRequestName, (data) => {
-            observer.next(data);
-    });
-    });
+                this.socket.on(request, (data) => {
+                observer.next(data);
+            });
+        });
 
         //console.log("OBSERVABLE for "+sRequestName,observable,);
         return observable;
