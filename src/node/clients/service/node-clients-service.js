@@ -1,14 +1,12 @@
 import {NodeClient} from '../sockets/node-client.js';
 import {NodeDiscoveryService} from './discovery/node-discovery-service.js';
+import {NodeLists} from './../../lists/node-lists.js';
 
 
 class NodeClientsService {
 
     /*
-        nodeClients = []                //list of the current nodeClients
         nodeDiscoveryService = null     //Node Discovery Service
-
-        nodeServer = None
     */
 
     constructor(){
@@ -29,29 +27,11 @@ class NodeClientsService {
         address = address.toLowerCase();
 
         //search if the new node was already connected in the past
-        let nodeClient = this.searchNodeClientByAddress(address);
+        let nodeClient = NodeLists.searchNodeSocketAddress(address);
         if (nodeClient !== null) return nodeClient;
 
-        //
+        nodeClient = new NodeClient(address);
 
-    }
-
-
-    searchNodeClientByAddress(address, searchOther){
-
-        searchOther = searchOther ||false;
-        address = address.toLowerCase();
-
-        for (let i=0; i<this.nodeClients.length; i++)
-            if (this.nodeClients[i].address.toLowerCase() === address){
-                return this.nodeClients[i];
-            }
-
-        //check for avoiding double connections
-        if ((searchOther) && (this.nodeServer !== null))
-            return this.nodeServer.searchNodeServerSocketByAddress(address, false);
-
-        return null;
     }
 
 

@@ -1,35 +1,35 @@
 let ioClient = require('socket.io-client');
-let constGlobal = require('../../../consts/const_global.js');
 
+import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
 import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
+
+import {NodeLists} from './../../lists/node-lists.js';
 
 class NodeClient {
 
     // socket : null,
 
-    constructor(){
+    constructor(address){
 
         console.log("NodeClient constructor");
 
         this.socket = null;
-        this.onConnect = null;
-        this.onDisconnect = null;
+
+        if (typeof address === 'undefined')
+            this.connectTo(address);
     }
 
     connectTo(address){
 
         try
         {
-            let client = ioClient(address);
+            this.socket = ioClient(address);
 
-            this.socket = client;
+            this.socket.address = address;
 
             subscribeSocketObservable(this.socket, "connection").subscribe(response => {
 
                 console.log("Client connected");
-
-                if (typeof this.onConnect !== 'undefined')
-                    this.onConnect(client);
 
             });
 
@@ -37,19 +37,10 @@ class NodeClient {
 
                 console.log("Client connected");
 
-                if (typeof this.onConnect !== 'undefined')
-                    this.onConnect(client);
-
             });
 
 
-            sendRequestWaitOnce(this.socket, "HelloNode",{
-                version:constGlobal.nodeVersion,
-            }).then(response =>{
-
-                console.log("RECEIVED HELLO NODE BACK", response);
-
-            });
+            this.sendHello(this.socket, this.initializeSocket);
 
         }
         catch(Exception){
@@ -61,7 +52,7 @@ class NodeClient {
         return true;
     }
 
-    startDiscoverOtherNodes(){
+    initializeSocket(){
 
     }
 

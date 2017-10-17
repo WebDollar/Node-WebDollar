@@ -1,5 +1,8 @@
 let io = require('socket.io');
+import {NodeLists} from './../../lists/node-lists.js';
+
 import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
+import {sendHello} from './../../../common/sockets/node/protocol.js';
 
 /*
     TUTORIAL
@@ -13,16 +16,12 @@ class NodeServer {
 
     /*
         nodeServer : null,        //Node IO Server Socket
-        nodeServerSockets = []      //list of current node
-
-        nodeClientsService = null
     */
 
     constructor(){
 
         console.log("NodeServer constructor");
         this.nodeServer = null;
-        this.nodeServerSockets = [];
 
         this.nodeClientsService = null;
     }
@@ -35,10 +34,15 @@ class NodeServer {
         {
             let server = io();
 
-            server.on('connection', function(socket){
-
-                var address = socket.handshake.address;
+            subscribeSocketObservable(server, "connection").subscribe(socket => {
+                let address = socket.handshake.address;
                 console.log('New connection from ' + address.address + ':' + address.port);
+
+                sendHello(socket, this.initializeSocket);
+
+            });
+
+            subscribeSocketObservable(server, "disconnect").subscribe(socket => {
 
             });
 
@@ -56,28 +60,9 @@ class NodeServer {
     }
 
 
-    setNodeClientsService(nodeClientsService){
-        if (nodeClientsService !== null){
-            this.nodeClientsService = nodeClientsService;
-            nodeClientsService.nodeServer = this;
-        }
-    }
 
-    searchNodeServerSocketByAddress(address, searchOther){
+    initializeSocket(socket){
 
-        searchOther = searchOther || false;
-        address = address.toLowerCase();
-
-        for (let i=0; i<this.nodeServerSockets.length; i++)
-            if (this.nodeServerSockets[i].address.toLowerCase() === address){
-                return this.nodeServerSockets[i];
-            }
-
-        //check for avoiding double connections
-        if ((searchOther) && (this.nodeClientsService !== null))
-            return this.nodeClientsService.searchNodeClientByAddress(address, false);
-
-        return null;
     }
 
 

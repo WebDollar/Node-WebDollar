@@ -1,10 +1,12 @@
 import {NodeServer} from './../node/server/sockets/node-server.js';
 import {NodeClientsService} from './../node/clients/service/node-clients-service.js';
 
-let nodeServer = new NodeServer();
-let nodeClientsService = new NodeClientsService();
+import {NodeLists} from './lists/node-lists.js';
 
-nodeServer.setNodeClientsService(NodeClientsService);
+let nodeServer = new NodeServer(NodeLists);
+let nodeClientsService = new NodeClientsService(NodeLists);
+
+//nodeServer.setNodeClientsService(NodeClientsService);
 
 
 exports.NodeServer = nodeServer;
