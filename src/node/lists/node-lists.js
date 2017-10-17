@@ -1,4 +1,8 @@
+import {GeolocationLists} from './geolocation-lists/geolocation-lists.js';
 
+/*
+    The List is populated with Node Sockets only if the sockets pass the Hello Message
+ */
 
 class NodeLists {
 
@@ -41,12 +45,14 @@ class NodeLists {
         if (bClient)
             if (this.searchNodeSocketAddress(socket) === null) {
                 this.clientSockets.push(socket);
+                GeolocationLists.includeAddress(socket.address);
                 return true;
             }
 
         if (bServer)
             if (this.searchNodeSocketAddress(socket) === null) {
                 this.serverSockets.push(socket);
+                GeolocationLists.includeAddress(socket.address);
                 return true;
             }
 
