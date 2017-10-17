@@ -7,13 +7,17 @@ class NodeClientsService {
     /*
         nodeClients = []                //list of the current nodeClients
         nodeDiscoveryService = null     //Node Discovery Service
+
+        nodeServer = None
     */
 
     constructor(){
         console.log("NodeServiceClients constructor");
 
         this.nodeClients = [];
-        this.nodeDiscoveryService = new NodeDiscoveryService(this)
+        this.nodeDiscoveryService = new NodeDiscoveryService(this);
+
+        this.nodeServer = null;
     }
 
     startService(){
@@ -33,8 +37,9 @@ class NodeClientsService {
     }
 
 
-    searchNodeClientByAddress(address){
+    searchNodeClientByAddress(address, searchOther){
 
+        searchOther = searchOther ||false;
         address = address.toLowerCase();
 
         for (let i=0; i<this.nodeClients.length; i++)
@@ -42,10 +47,14 @@ class NodeClientsService {
                 return this.nodeClients[i];
             }
 
+        //check for avoiding double connections
+        if ((searchOther) && (this.nodeServer !== null))
+            return this.nodeServer.searchNodeServerSocketByAddress(address, false);
+
         return null;
     }
 
 
 }
 
-exports.NodeClientsService = new NodeClientsService();
+exports.NodeClientsService = NodeClientsService;
