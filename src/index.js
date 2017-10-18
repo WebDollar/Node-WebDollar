@@ -1,7 +1,8 @@
 require("babel-polyfill");
 
+console.log(""); console.log(""); console.log("");
 console.log("Node WebDollar");
-
+console.log(""); console.log(""); console.log("");
 
 let Node = require('./node/Node.js');
 

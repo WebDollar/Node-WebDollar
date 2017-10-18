@@ -37,14 +37,18 @@ class NodeDiscoveryService {
 
         try{
             let response = await axios.get(address);
-            console.log(response.data);
 
-            if (response.type === 'json'){
+            let data = response.data;
+
+            if (typeof data === 'string') data = JSON.parse(data);
+
+            //console.log(data, typeof data);
+
+            if (typeof data === 'object'){
 
                 let nodes =  [];
                 let name = '';
 
-                let data = response.data;
                 if (data.hasOwnProperty('protocol')&&(data['protocol'] === nodeProtocol)){
                     name = data.name||'';
                     nodes = data.nodes||[];
@@ -63,8 +67,7 @@ class NodeDiscoveryService {
             }
         }
         catch(Exception){
-            console.log("ERROR downloading list: ", address);
-            console.log(Exception.toString());
+            console.log("ERROR downloading list: ", address, Exception.toString());
             return null;
         }
     }
