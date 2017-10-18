@@ -26,13 +26,13 @@ class NodeLists {
 
         if (searchClientSockets)
             for (let i=0; i<this.clientSockets.length; i++)
-                if (this.clientSockets[i].address.toLowerCase() === address){
+                if (this.clientSockets[i].request.connection.remoteAddress.toLowerCase() === address){
                     return this.clientSockets[i];
                 }
 
         if (searchServerSockets)
             for (let i=0; i<this.serverSockets.length; i++)
-                if (this.serverSockets[i].address.toLowerCase() === address){
+                if (this.serverSockets[i].request.connection.remoteAddress.toLowerCase() === address){
                     return this.serverSockets[i];
                 }
 
@@ -45,14 +45,14 @@ class NodeLists {
         if (bClient)
             if (this.searchNodeSocketAddress(socket) === null) {
                 this.clientSockets.push(socket);
-                GeoLocationLists.includeAddress(socket.address);
+                GeoLocationLists.includeAddress(socket.request.connection.remoteAddress);
                 return true;
             }
 
         if (bServer)
             if (this.searchNodeSocketAddress(socket) === null) {
                 this.serverSockets.push(socket);
-                GeoLocationLists.includeAddress(socket.address);
+                GeoLocationLists.includeAddress(socket.request.connection.remoteAddress);
                 return true;
             }
 
@@ -67,13 +67,13 @@ class NodeLists {
 
         if (bClient)
             for (let i=0; i<this.clientSockets.length; i++)
-                if (this.clientSockets[i].address === socket.address){
+                if (this.clientSockets[i].request.connection.remoteAddress === socket.request.connection.remoteAddress){
                     delete this.clientSockets[i];
                 }
 
         if (bServer)
             for (let i=0; i<this.serverSockets.length; i++)
-                if (this.serverSockets[i].address === socket.address){
+                if (this.serverSockets[i].request.connection.remoteAddress === socket.request.connection.remoteAddress){
                     delete this.serverSockets[i];
                 }
     }

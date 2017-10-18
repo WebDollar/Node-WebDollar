@@ -1,4 +1,4 @@
-
+import {NodeClient} from './../../clients/sockets/node-client.js';
 import {NodeLists} from './../node-lists.js';
 
 
@@ -52,16 +52,40 @@ class NodeClientsWaitlist {
         return false;
     }
 
-    async connectNewNode(address){
+
+    async startConnecting(){
+
+        await this.connectNewNodeWaitlist();
+
+    }
+
+    async connectNewNodeWaitlist(){
+
+        let nextNode = this.getFirstNodeFromWaitlist();
+        if (nextNode !== null){
+            await this.connectToNewNode(nextNode);
+        }
+
+        let that = this;
+        setTimeout(function(){return that.connectNewNodeWaitlist() }, 3000);
+    }
+
+    async connectToNewNode(address){
+
         address = (address||'').toLowerCase();
 
         //search if the new node was already connected in the past
-        let nodeClient = NodeLists.searchNodeSocketAddress(address, true, true);
+        let nodeClient = NodeLists.searchNodeSocketAddress(address);
         if (nodeClient !== null) return nodeClient;
 
         nodeClient = new NodeClient();
 
-        await nodeClient.connectTo(address)
+        try{
+            await nodeClient.connectTo(address);
+        }
+        catch (Exception){
+            console.log("Error connecting to new node waitlist", Exception.toString())
+        }
 
     }
 

@@ -9,19 +9,17 @@ class NodeClient {
 
     // socket : null,
 
-    constructor(address){
+    constructor(){
 
         //console.log("NodeClient constructor");
 
         this.socket = null;
-
-        if (typeof address !== 'undefined')
-            this.connectTo(address);
     }
 
     connectTo(address){
 
         let that = this;
+
         return new Promise(function(resolve) {
 
             try
@@ -45,8 +43,7 @@ class NodeClient {
 
                 subscribeSocketObservable(that.socket, "connection").subscribe(response => {
 
-                    console.log("Client connected ", address);
-                    that.socket.address = address;
+                    console.log("Client connected to ", that.socket.request.connection.remoteAddress, ":", that.socket.request.connection.remotePort);
                     sendHello(that.socket, that.initializeSocket);
 
                     resolve(true);
@@ -55,7 +52,7 @@ class NodeClient {
 
                 subscribeSocketObservable(that.socket, "connect_error").subscribe(response => {
 
-                    console.log("Client error connecting", address);
+                    console.log("Client error connecting", that.socket.request.connection.remoteAddress);
                     NodeLists.disconnectSocket(that.socket);
 
                     resolve(false);

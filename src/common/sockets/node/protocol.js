@@ -12,7 +12,7 @@ exports.sendHello = function (socket, initializeEvent){
         if ((response.hasOwnProperty("version"))&&(response.version <= nodeVersionCompatibility)){
 
             //check if it is a unique connection, add it to the list
-            let result = NodeList.searchNodeSocketAddress(socket.address);
+            let result = NodeList.searchNodeSocketAddress(socket.request.connection.remoteAddress);
 
             if (result !== null){
 

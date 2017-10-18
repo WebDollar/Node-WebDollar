@@ -19,7 +19,7 @@ class GeoLocationLists {
     async includeAddress(socket){
 
         //in case the location has been set before  (avoiding double insertion)
-        if ((typeof socket.location !== 'undefined') && (socket.location !== null) && (this.searchGeoLocationByAddress(socket.address) !== null)) return socket.location;
+        if ((typeof socket.location !== 'undefined') && (socket.location !== null) && (this.searchGeoLocationByAddress(socket.request.connection.remoteAddress) !== null)) return socket.location;
 
         let location = await this.getLocationFromAddress(address);
         location.continent = location.continent || '--';

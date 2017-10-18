@@ -4,19 +4,19 @@ import { Observable, Subscribable } from 'rxjs/Observable';
        FUNCTIONS
    */
 
-exports.sendRequest = function (socket, request, requestData) {
+let sendRequest = function (socket, request, requestData) {
     return socket.emit( request, requestData);
-}
-
+};
 
 /*
     Sending the Request and return the Promise to Wait Async
 */
-exports.sendRequestWaitOnce = function  (request, requestData) {
+
+let sendRequestWaitOnce = function  (socket, request, requestData) {
 
     return new Promise((resolve) => {
 
-        this.sendRequest(request, requestData);
+        sendRequest(request, requestData);
 
         socket.once(request, function (resData) {
 
@@ -25,22 +25,21 @@ exports.sendRequestWaitOnce = function  (request, requestData) {
         });
 
     });
-}
-
+};
 /*
  Sending Request and Obtain the Observable Object
  */
-exports.sendRequestSubscribe = function (socket, request, requestData) {
+let sendRequestSubscribe = function (socket, request, requestData) {
 
-    let result = this.sendRequest(socket, request, requestData);
+    let result = sendRequest(socket, request, requestData);
 
-    return this.subscribeSocketObservable(socket, request);
-}
+    return subscribeSocketObservable(socket, request);
+};
 
 /*
     Subscribe and Return the observable
  */
-exports.subscribeSocketObservable = function (socket, request) {
+let subscribeSocketObservable = function (socket, request) {
 
     //let observable = new Observable < Object > (observer => {
     let observable = Observable.create(observer => {
@@ -50,4 +49,15 @@ exports.subscribeSocketObservable = function (socket, request) {
     });
 
     return observable;
-}
+};
+
+
+
+exports.sendRequest = sendRequest;
+exports.sendRequestWaitOnce = sendRequestWaitOnce;
+exports.sendRequestSubscribe = sendRequestSubscribe;
+exports.subscribeSocketObservable = subscribeSocketObservable;
+
+
+
+

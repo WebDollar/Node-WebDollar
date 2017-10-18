@@ -20,35 +20,11 @@ class NodeClientsService {
 
     startService(){
         NodeDiscoveryService.startDiscovery();
-
-        this.connectNewNodeWaitlist();
-    }
-
-
-    async connectNewNodeWaitlist(){
-
-        let nextNode = NodeClientsWaitlist.getFirstNodeFromWaitlist();
-        if (nextNode !== null){
-            await this.connectToNewNode(nextNode);
-        }
-
-        let that = this;
-        setTimeout(function(){return that.connectNewNodeWaitlist() }, 3000);
-    }
-
-    async connectToNewNode(address){
-
-        address = (address||'').toLowerCase();
-
-        //search if the new node was already connected in the past
-        let nodeClient = NodeLists.searchNodeSocketAddress(address);
-        if (nodeClient !== null) return nodeClient;
-
-        nodeClient = new NodeClient();
-
-        await nodeClient.connectTo(address);
+        NodeClientsWaitlist.startConnecting();
 
     }
+
+
 
 
 }

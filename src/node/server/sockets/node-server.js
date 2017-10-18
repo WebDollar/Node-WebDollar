@@ -34,16 +34,15 @@ class NodeServer {
             let server = io();
 
             subscribeSocketObservable(server, "connection").subscribe(socket => {
-                let address = socket.handshake.address;
-                console.log('New connection from ' + address.address + ':' + address.port);
 
-                socket.address = address;
+
+                console.log('New connection from ' + socket.request.connection.remoteAddress + ':' + socket.request.connection.remotePort);
                 sendHello(socket, this.initializeSocket);
 
             });
 
             subscribeSocketObservable(server, "error").subscribe(socket => {
-                copnsole.log("Socket Error: ", socket.address);
+                console.log("Socket Error: ", socket.request.connection.remoteAddress||'');
             });
 
             server.listen(nodePort);
@@ -66,7 +65,7 @@ class NodeServer {
         NodeLists.checkAddSocket(socket, false, true);
 
         subscribeSocketObservable(this.nodeServer, "disconnect").subscribe(socket => {
-            console.log("Socket disconnected", socket.address);
+            console.log("Socket disconnected", socket.request.connection.remoteAddress);
             NodeLists.disconnectSocket(socket);
         });
 
