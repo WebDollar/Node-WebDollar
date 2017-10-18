@@ -15,7 +15,7 @@ class NodeClient {
 
         this.socket = null;
 
-        if (typeof address === 'undefined')
+        if (typeof address !== 'undefined')
             this.connectTo(address);
     }
 
@@ -23,6 +23,7 @@ class NodeClient {
 
         try
         {
+            console.log("connecting... to address", address+":"+nodePort);
             this.socket = ioClient(address+":"+nodePort);
 
 

@@ -49,9 +49,15 @@ class NodeDiscoveryService {
                 let nodes =  [];
                 let name = '';
 
-                if (data.hasOwnProperty('protocol')&&(data['protocol'] === nodeProtocol)){
+                //console.log(data);
+                //console.log((data.hasOwnProperty('protocol')));
+                //console.log(((data['protocol'] === nodeProtocol)));
+
+                if ((data.hasOwnProperty('protocol'))&&(data['protocol'] === nodeProtocol)){
                     name = data.name||'';
                     nodes = data.nodes||[];
+
+                    console.log("FallBack Nodes ",nodes);
 
                     if ((nodes !== null)&&(Array.isArray(nodes))){
 
