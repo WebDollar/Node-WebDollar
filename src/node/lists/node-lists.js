@@ -70,7 +70,7 @@ class NodeLists {
     //Removing socket from the list (the connection was terminated)
     disconnectSocket(socket, bClient, bServer){
 
-        console.log("disconnectSocket", socket.helloValidated);
+        //console.log("disconnectSocket", socket.helloValidated);
 
         if ((socket.helloValidated|| false)===false) return false;
         if (typeof bClient === 'undefined') bClient = true;

@@ -23,7 +23,7 @@ class NodeClientsWaitlist {
             return false;
         }
 
-        console.log("nodeClientsWaitlist[]", this.nodeClientsWaitlist);
+        //console.log("nodeClientsWaitlist[]", this.nodeClientsWaitlist);
         this.nodeClientsWaitlist.push(new WaitlistObject(address));
 
     }
