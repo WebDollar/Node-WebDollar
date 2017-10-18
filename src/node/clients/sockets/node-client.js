@@ -26,6 +26,7 @@ class NodeClient {
             try
             {
                 if (address.length < 3){
+                    console.log("rejecting address",address);
                     resolve(false);
                     return false;
                 }
