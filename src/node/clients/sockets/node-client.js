@@ -31,6 +31,15 @@ class NodeClient {
                     address += ":"+nodePort;
                 }
 
+                if (address.indexOf("http://") === -1 ){
+                    address = "http://"+address;
+                }
+
+                if (address.length < 4){
+                    resolve(false);
+                    return false;
+                }
+
                 console.log("connecting... to address", address);
                 that.socket = ioClient(address);
 

@@ -58,11 +58,11 @@ class NodeDiscoveryService {
                     name = data.name||'';
                     nodes = data.nodes||[];
 
-                    console.log("FallBack Nodes ",nodes);
+                    //console.log("FallBack Nodes ",nodes);
 
                     if ((nodes !== null)&&(Array.isArray(nodes))){
 
-                        console.log("NEW NODES", nodes);
+                        //console.log("NEW NODES", nodes);
 
                         for (let i=0; i<nodes.length; i++)
                             await NodeClientsWaitlist.addNewNodeToWaitlist(nodes[i]);
