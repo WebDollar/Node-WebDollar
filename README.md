@@ -6,12 +6,18 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 ![JS Version](https://d3nmt5vlzunoa1.cloudfront.net/webstorm/files/2015/05/js-version.png "Javascript ECMAScript 6 config")
 
-# Testing in console
+# Installing
+
+```
+npm install
+```
+
+## Testing in console
 ```
 npm test
 ```
 
-# Building
+## Building Dist
 ```
 npm run build
 ```
