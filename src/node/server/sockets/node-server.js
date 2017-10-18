@@ -23,8 +23,6 @@ class NodeServer {
 
         console.log("NodeServer constructor");
         this.nodeServer = null;
-
-        this.nodeClientsService = null;
     }
 
     startServer(){
@@ -77,4 +75,4 @@ class NodeServer {
 
 }
 
-exports.NodeServer =  NodeServer;
+exports.NodeServer = new NodeServer();

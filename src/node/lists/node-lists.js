@@ -22,7 +22,7 @@ class NodeLists {
 
         if (typeof searchClientSockets === 'undefined') searchClientSockets = true;
         if (typeof searchServerSockets === 'undefined') searchServerSockets = true;
-        address = address.toLowerCase();
+        address = (address||'').toLowerCase();
 
         if (searchClientSockets)
             for (let i=0; i<this.clientSockets.length; i++)

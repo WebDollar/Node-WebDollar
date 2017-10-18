@@ -1,5 +1,7 @@
 import {NodeClient} from '../../sockets/node-client.js';
 import {nodeProtocol, nodeFallBackInterval} from '../../../../consts/const_global.js';
+import {NodeClientsService} from './../node-clients-service.js';
+import {NodeClientsWaitlist} from '../../../lists/waitlist/node-clients-waitlist.js';
 
 const axios = require('axios');
 
@@ -7,11 +9,10 @@ class NodeDiscoveryService {
 
     // nodeClientsService = null
 
-    constructor(nodeClientsService){
+    constructor(){
 
         console.log("NodeDiscover constructor");
 
-        this.nodeClientsService = nodeClientsService;
     }
 
     startDiscovery(){
@@ -27,7 +28,7 @@ class NodeDiscoveryService {
         await this.downloadFallBackList("http://visionbot.net/webdollars.json");
         await this.downloadFallBackList("http://budisteanu.net/webdollars.json");
 
-        if ((this.nodeClientsService !== null)&&(this.nodeClientsService.nodeClients !== null)&&(this.nodeClientsService.nodeClients.length < 5)){
+        if ((NodeClientsService.nodeClients !== null)&&(NodeClientsService.nodeClients.length < 5)){
             let that = this;
             setTimeout(function(){return that.discoverFallbackNodes()}, nodeFallBackInterval)
         }
@@ -64,7 +65,7 @@ class NodeDiscoveryService {
                         console.log("NEW NODES", nodes);
 
                         for (let i=0; i<nodes.length; i++)
-                            await this.nodeClientsService.connectNewNode(nodes[i]);
+                            await NodeClientsWaitlist.addNewNodeToWaitlist(nodes[i]);
 
                     }
                 }
@@ -82,5 +83,5 @@ class NodeDiscoveryService {
 
 }
 
-exports.NodeDiscoveryService = NodeDiscoveryService;
+exports.NodeDiscoveryService = new NodeDiscoveryService();
 

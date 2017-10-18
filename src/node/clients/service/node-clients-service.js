@@ -1,6 +1,7 @@
 import {NodeClient} from '../sockets/node-client.js';
 import {NodeDiscoveryService} from './discovery/node-discovery-service.js';
 import {NodeLists} from './../../lists/node-lists.js';
+import {NodeClientsWaitlist} from '../../lists/waitlist/node-clients-waitlist.js';
 
 
 class NodeClientsService {
@@ -13,18 +14,31 @@ class NodeClientsService {
         console.log("NodeServiceClients constructor");
 
         this.nodeClients = [];
-        this.nodeDiscoveryService = new NodeDiscoveryService(this);
 
         this.nodeServer = null;
     }
 
     startService(){
-        this.nodeDiscoveryService.startDiscovery();
+        NodeDiscoveryService.startDiscovery();
+
+        this.connectNewNodeWaitlist();
     }
 
 
-    async connectNewNode(address){
-        address = address.toLowerCase();
+    async connectNewNodeWaitlist(){
+
+        let nextNode = NodeClientsWaitlist.getFirstNodeFromWaitlist();
+        if (nextNode !== null){
+            await this.connectToNewNode(nextNode);
+        }
+
+        let that = this;
+        setTimeout(function(){return that.connectNewNodeWaitlist() }, 3000);
+    }
+
+    async connectToNewNode(address){
+
+        address = (address||'').toLowerCase();
 
         //search if the new node was already connected in the past
         let nodeClient = NodeLists.searchNodeSocketAddress(address);
@@ -32,11 +46,11 @@ class NodeClientsService {
 
         nodeClient = new NodeClient();
 
-        await nodeClient.connectTo(address)
+        await nodeClient.connectTo(address);
 
     }
 
 
 }
 
-exports.NodeClientsService = NodeClientsService;
+exports.NodeClientsService = new NodeClientsService();
