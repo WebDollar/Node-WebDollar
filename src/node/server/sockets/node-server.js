@@ -44,11 +44,6 @@ class NodeServer {
 
             });
 
-            subscribeSocketObservable(server, "disconnect").subscribe(socket => {
-                console.log("Socket disconnected", socket.address);
-                NodeLists.disconnectSocket(socket);
-            });
-
             subscribeSocketObservable(server, "error").subscribe(socket => {
                 copnsole.log("Socket Error: ", socket.address);
             });
@@ -71,6 +66,11 @@ class NodeServer {
     initializeSocket(socket){
 
         NodeLists.checkAddSocket(socket, false, true);
+
+        subscribeSocketObservable(this.nodeServer, "disconnect").subscribe(socket => {
+            console.log("Socket disconnected", socket.address);
+            NodeLists.disconnectSocket(socket);
+        });
 
     }
 

@@ -41,4 +41,8 @@ http://www.noip.com/support/knowledgebase/installing-the-linux-dynamic-update-cl
 #### Tutorial how to make NO-IP as start-up service in Linux
 https://askubuntu.com/questions/903411/how-do-i-set-up-no-ip-as-a-proper-service
 
+#### Firewall
+sudo iptables -A INPUT -p tcp --dport 12320 -j ACCEPT
+
 If you are under a **router/firewall**, you need to port forward the port used by the Nodes **12320**
+

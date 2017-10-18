@@ -23,14 +23,16 @@ class NodeClientsService {
     }
 
 
-    connectNewNode(address){
+    async connectNewNode(address){
         address = address.toLowerCase();
 
         //search if the new node was already connected in the past
         let nodeClient = NodeLists.searchNodeSocketAddress(address);
         if (nodeClient !== null) return nodeClient;
 
-        nodeClient = new NodeClient(address);
+        nodeClient = new NodeClient();
+
+        await nodeClient.connectTo(address)
 
     }
 

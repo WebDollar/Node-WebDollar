@@ -21,51 +21,61 @@ class NodeClient {
 
     connectTo(address){
 
-        try
-        {
-            // in case the port is not included
-            if (address.indexOf(":") === -1){
-                address += ":"+nodePort;
+        let that = this;
+        return new Promise(function(resolve) {
+
+            try
+            {
+                // in case the port is not included
+                if (address.indexOf(":") === -1){
+                    address += ":"+nodePort;
+                }
+
+                console.log("connecting... to address", address);
+                that.socket = ioClient(address);
+
+                subscribeSocketObservable(that.socket, "connection").subscribe(response => {
+
+                    console.log("Client connected ", address);
+                    that.socket.address = address;
+                    sendHello(that.socket, that.initializeSocket);
+
+                    resolve(true);
+
+                });
+
+                subscribeSocketObservable(that.socket, "connect_error").subscribe(response => {
+
+                    console.log("Client error connecting", address);
+                    NodeLists.disconnectSocket(that.socket);
+
+                    resolve(false);
+
+                });
+
+
+            }
+            catch(Exception){
+                console.log("Error Connecting Node to ", address," ", Exception.toString());
+                resolve(false);
             }
 
-            console.log("connecting... to address", address);
-            this.socket = ioClient(address);
+            resolve(true);
 
-            subscribeSocketObservable(this.socket, "connection").subscribe(response => {
+        });
 
-                console.log("Client connected ", address);
-                this.socket.address = address;
-                sendHello(this.socket, this.initializeSocket);
-
-            });
-
-            subscribeSocketObservable(this.socket, "disconnect").subscribe(response => {
-
-                console.log("Client disconnected ",  address);
-                NodeLists.disconnectSocket(this.socket);
-
-            });
-
-            subscribeSocketObservable(this.socket, "connect_error").subscribe(response => {
-
-                console.log("Client error connecting", address);
-                NodeLists.disconnectSocket(this.socket);
-
-            });
-
-
-        }
-        catch(Exception){
-            console.log("Error Connecting Node to ",address," ", Exception.toString());
-            return false;
-        }
-
-        return true;
     }
 
-    initializeSocket(){
+    initializeSocket(socket){
 
-        NodeLists.checkAddSocket(this.socket, true, false);
+        NodeLists.checkAddSocket(socket, true, false);
+
+        subscribeSocketObservable(socket, "disconnect").subscribe(response => {
+
+            console.log("Client disconnected ",  address);
+            NodeLists.disconnectSocket(socket);
+
+        });
 
     }
 

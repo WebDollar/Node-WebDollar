@@ -64,7 +64,7 @@ class NodeDiscoveryService {
                         console.log("NEW NODES", nodes);
 
                         for (let i=0; i<nodes.length; i++)
-                            this.nodeClientsService.connectNewNode(nodes[i]);
+                            await this.nodeClientsService.connectNewNode(nodes[i]);
 
                     }
                 }
