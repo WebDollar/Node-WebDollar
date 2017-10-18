@@ -23,7 +23,12 @@ npm install
 npm test
 ```
 
-Obs. In case there you get an error with some missing packages, run ```npm install name_missing_package```
+##### Missing Packages
+Obs. In case there you get an error message about some missing packages like the following one:
+
+```Error: Cannot find module 'rxjs/Observable'```
+
+just, run ```npm install name_missing_package```
 
 ## Building Dist
 ```
