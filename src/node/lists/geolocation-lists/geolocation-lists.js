@@ -1,17 +1,19 @@
 const axios = require('axios');
 import {getContinentFromCountry} from './continents.js';
 
-class GeolocationLists {
+class GeoLocationLists {
 
     /*
-        geolocationContinentsLists = []
+        geoLocationContinentsLists = []
+        countGeoLocationContinentsLists = 0
      */
 
     constructor(){
 
         console.log("GeoLocations constructor");
 
-        this.geolocationContinentsLists = [];
+        this.geoLocationContinentsLists = [];
+        this.countGeoLocationContinentsLists = 0;
     }
 
     async includeAddress(socket){
@@ -24,13 +26,14 @@ class GeolocationLists {
 
         socket.location = location;
 
-        this.geolocationContinentsLists[location.continent] = address;
+        this.geoLocationContinentsLists[location.continent] = address;
+        this.countGeoLocationContinentsLists += 1;
 
     }
 
     searchGeoLocationByAddress(address){
-        for (let continent in this.geolocationContinentsLists)
-            if (this.geolocationContinentsLists[continent] === address)
+        for (let continent in this.geoLocationContinentsLists)
+            if (this.geoLocationContinentsLists[continent] === address)
                 return continent;
 
         return null;
@@ -86,6 +89,8 @@ class GeolocationLists {
         }
     }
 
+
+
 }
 
-exports.GeolocationLists =  new GeolocationLists();
+exports.GeoLocationLists =  new GeoLocationLists();

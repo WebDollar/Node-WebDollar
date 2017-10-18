@@ -1,5 +1,6 @@
-import {NodeServer} from './../node/server/sockets/node-server.js';
-import {NodeClientsService} from './../node/clients/service/node-clients-service.js';
+import {NodeServer} from './server/sockets/node-server.js';
+import {NodeClientsService} from './clients/service/node-clients-service.js';
+import {NodeStats} from './stats/node-stats.js';
 
 import {NodeLists} from './lists/node-lists.js';
 
