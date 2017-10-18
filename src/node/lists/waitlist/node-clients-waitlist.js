@@ -36,6 +36,8 @@ class NodeClientsWaitlist {
 
     addNewNodeToWaitlist(address){
 
+        address = (address||'').toLowerCase();
+
         if (this.searchNodeWaitlist(address)){
             return false;
         }

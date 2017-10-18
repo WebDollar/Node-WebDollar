@@ -22,17 +22,21 @@ class NodeLists {
 
         if (typeof searchClientSockets === 'undefined') searchClientSockets = true;
         if (typeof searchServerSockets === 'undefined') searchServerSockets = true;
+
+        //in case address is a Socket
+        if (typeof address === 'object') address = address.address||'';
+
         address = (address||'').toLowerCase();
 
         if (searchClientSockets)
             for (let i=0; i<this.clientSockets.length; i++)
-                if (this.clientSockets[i].request.connection.remoteAddress.toLowerCase() === address){
+                if (this.clientSockets[i].address === address){
                     return this.clientSockets[i];
                 }
 
         if (searchServerSockets)
             for (let i=0; i<this.serverSockets.length; i++)
-                if (this.serverSockets[i].request.connection.remoteAddress.toLowerCase() === address){
+                if (this.serverSockets[i].address === address){
                     return this.serverSockets[i];
                 }
 
@@ -40,23 +44,26 @@ class NodeLists {
         return null;
     }
 
-    checkAddSocket(socket, bClient, bServer){
+    addUniqueSocket(socket, bClient, bServer){
+
+        bClient = bClient || false;
+        bServer = bServer || false;
 
         if (bClient)
             if (this.searchNodeSocketAddress(socket) === null) {
                 this.clientSockets.push(socket);
-                GeoLocationLists.includeAddress(socket.address);
+                GeoLocationLists.includeSocket(socket);
                 return true;
             }
 
         if (bServer)
             if (this.searchNodeSocketAddress(socket) === null) {
                 this.serverSockets.push(socket);
-                GeoLocationLists.includeAddress(socket.address);
+                GeoLocationLists.includeSocket(socket);
                 return true;
             }
 
-        else socket.disconnect();
+        socket.disconnect();
         return false;
     }
 
@@ -67,15 +74,13 @@ class NodeLists {
 
         if (bClient)
             for (let i=0; i<this.clientSockets.length; i++)
-                if (this.clientSockets[i].request.connection.remoteAddress === socket.address){
+                if (this.clientSockets[i].address === socket.address)
                     delete this.clientSockets[i];
-                }
 
         if (bServer)
             for (let i=0; i<this.serverSockets.length; i++)
-                if (this.serverSockets[i].request.connection.remoteAddress === socket.address){
+                if (this.serverSockets[i].address === socket.address)
                     delete this.serverSockets[i];
-                }
     }
 
 }

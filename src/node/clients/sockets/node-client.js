@@ -43,14 +43,14 @@ class NodeClient {
 
                 subscribeSocketObservable(socket, "connect").subscribe(response => {
 
-                    socket.address = socket.io.opts.hostname;
+                    socket.address = (socket.io.opts.hostname||'').toLowerCase();
                     socket.port = socket.io.opts.port;
 
-                    console.log("Client connected to ", address);
-                    sendHello(socket, that.initializeSocket);
+                    console.log("Client connected to ", socket.address);
+                    if (sendHello(socket))
+                        that.initializeSocket(socket);
 
                     resolve(true);
-
                 });
 
                 subscribeSocketObservable(socket, "connect_error").subscribe(response => {
@@ -84,11 +84,11 @@ class NodeClient {
 
     initializeSocket(socket){
 
-        NodeLists.checkAddSocket(socket, true, false);
+        let isUnique = NodeLists.addUniqueSocket(socket, true, false);
 
         subscribeSocketObservable(socket, "disconnect").subscribe(response => {
 
-            console.log("Client disconnected ",  address);
+            console.log("Client disconnected ",  socket.address);
             NodeLists.disconnectSocket(socket);
 
         });

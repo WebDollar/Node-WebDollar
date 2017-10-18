@@ -16,19 +16,31 @@ class GeoLocationLists {
         this.countGeoLocationContinentsLists = 0;
     }
 
-    async includeAddress(socket){
-
-        //in case the location has been set before  (avoiding double insertion)
-        if ((typeof socket.location !== 'undefined') && (socket.location !== null) && (this.searchGeoLocationByAddress(socket.address) !== null)) return socket.location;
+    async includeAddress(address){
 
         let location = await this.getLocationFromAddress(address);
+        if (location === null){
+            console.log("LOCATION was not been able to get");
+            return null;
+        }
         location.continent = location.continent || '--';
-
-        socket.location = location;
 
         this.geoLocationContinentsLists[location.continent] = address;
         this.countGeoLocationContinentsLists += 1;
 
+        return location;
+    }
+
+    async includeSocket(socket){
+
+        if (socket === null) return null;
+
+        //in case the location has been set before  (avoiding double insertion)
+        if ((typeof socket.location !== 'undefined') && (socket.location !== null) && (this.searchGeoLocationByAddress(socket.address) !== null)) return socket.location;
+
+        let location = this.includeAddress(socket.address);
+        socket.location = location;
+        return location;
     }
 
     searchGeoLocationByAddress(address){
@@ -48,6 +60,8 @@ class GeoLocationLists {
                 let countryCode = '';
                 let country = '';
                 let continent = '--';
+
+                //console.log("location data", data);
 
                 if (data.hasOwnProperty(country)){
                     country = data.country;
@@ -78,9 +92,13 @@ class GeoLocationLists {
         try{
             let response = await axios.get(address);
 
-            if (response.type === 'json'){
-                return response.data;
-            }
+            let data = response.data;
+
+            if (typeof data === 'string') data = JSON.parse(data);
+
+            if (typeof data === 'object') return data;
+
+            return null;
         }
         catch(Exception){
             console.log("ERROR downloading list: ", address);

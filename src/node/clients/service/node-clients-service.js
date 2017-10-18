@@ -8,14 +8,13 @@ class NodeClientsService {
 
     /*
         nodeDiscoveryService = null     //Node Discovery Service
+        this.nodeClients = []
     */
 
     constructor(){
         console.log("NodeServiceClients constructor");
 
         this.nodeClients = [];
-
-        this.nodeServer = null;
     }
 
     startService(){

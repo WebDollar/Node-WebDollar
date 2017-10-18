@@ -1,4 +1,5 @@
 exports.nodeVersion = "0.0.1";
+exports.nodeVersionCompatibility = "1.0";
 exports.nodeProtocol = "WebDollar";
 exports.nodeFallBackInterval =  10000; //miliseconds
 exports.nodePort =  12320; //port
