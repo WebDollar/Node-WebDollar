@@ -33,7 +33,7 @@ class NodeClient {
 
             subscribeSocketObservable(this.socket, "connection").subscribe(response => {
 
-                console.log("Client connected");
+                console.log("Client connected ", address);
                 this.socket.address = address;
                 sendHello(this.socket, this.initializeSocket);
 
@@ -41,7 +41,14 @@ class NodeClient {
 
             subscribeSocketObservable(this.socket, "disconnect").subscribe(response => {
 
-                console.log("Client disconnected");
+                console.log("Client disconnected ",  address);
+                NodeLists.disconnectSocket(this.socket);
+
+            });
+
+            subscribeSocketObservable(this.socket, "connect_error").subscribe(response => {
+
+                console.log("Client error connecting", address);
                 NodeLists.disconnectSocket(this.socket);
 
             });

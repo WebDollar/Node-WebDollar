@@ -45,7 +45,12 @@ class NodeServer {
             });
 
             subscribeSocketObservable(server, "disconnect").subscribe(socket => {
+                console.log("Socket disconnected", socket.address);
                 NodeLists.disconnectSocket(socket);
+            });
+
+            subscribeSocketObservable(server, "error").subscribe(socket => {
+                copnsole.log("Socket Error: ", socket.address);
             });
 
             server.listen(nodePort);
