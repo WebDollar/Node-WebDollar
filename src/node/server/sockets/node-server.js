@@ -35,8 +35,10 @@ class NodeServer {
 
             subscribeSocketObservable(server, "connection").subscribe(socket => {
 
+                socket.address = socket.request.connection.remoteAddress;
+                socket.port = socket.request.connection.remotePort;
 
-                console.log('New connection from ' + socket.request.connection.remoteAddress + ':' + socket.request.connection.remotePort);
+                console.log('New connection from ' + socket.address + ':' + socket.port);
                 sendHello(socket, this.initializeSocket);
 
             });

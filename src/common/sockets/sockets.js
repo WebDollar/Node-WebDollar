@@ -5,7 +5,12 @@ import { Observable, Subscribable } from 'rxjs/Observable';
    */
 
 let sendRequest = function (socket, request, requestData) {
-    return socket.emit( request, requestData);
+    console.log("sendRequest",request, requestData);
+
+    if (typeof socket.emit === 'function')
+        return socket.emit( request, requestData);
+    else
+        return socket.send( request, requestData);
 };
 
 /*
@@ -16,7 +21,7 @@ let sendRequestWaitOnce = function  (socket, request, requestData) {
 
     return new Promise((resolve) => {
 
-        sendRequest(request, requestData);
+        sendRequest(socket, request, requestData);
 
         socket.once(request, function (resData) {
 

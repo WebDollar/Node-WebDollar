@@ -45,14 +45,14 @@ class NodeLists {
         if (bClient)
             if (this.searchNodeSocketAddress(socket) === null) {
                 this.clientSockets.push(socket);
-                GeoLocationLists.includeAddress(socket.request.connection.remoteAddress);
+                GeoLocationLists.includeAddress(socket.address);
                 return true;
             }
 
         if (bServer)
             if (this.searchNodeSocketAddress(socket) === null) {
                 this.serverSockets.push(socket);
-                GeoLocationLists.includeAddress(socket.request.connection.remoteAddress);
+                GeoLocationLists.includeAddress(socket.address);
                 return true;
             }
 
@@ -67,13 +67,13 @@ class NodeLists {
 
         if (bClient)
             for (let i=0; i<this.clientSockets.length; i++)
-                if (this.clientSockets[i].request.connection.remoteAddress === socket.request.connection.remoteAddress){
+                if (this.clientSockets[i].request.connection.remoteAddress === socket.address){
                     delete this.clientSockets[i];
                 }
 
         if (bServer)
             for (let i=0; i<this.serverSockets.length; i++)
-                if (this.serverSockets[i].request.connection.remoteAddress === socket.request.connection.remoteAddress){
+                if (this.serverSockets[i].request.connection.remoteAddress === socket.address){
                     delete this.serverSockets[i];
                 }
     }
