@@ -4,7 +4,7 @@ import {getContinentFromCountry} from './continents.js';
 class GeoLocationLists {
 
     /*
-        geoLocationContinentsLists = []
+        geoLocationContinentsLists = {}
         countGeoLocationContinentsLists = 0
      */
 
@@ -12,7 +12,9 @@ class GeoLocationLists {
 
         console.log("GeoLocations constructor");
 
-        this.geoLocationContinentsLists = [];
+        this.geoLocationContinentsLists = {};
+        this.geoLocationLists = [];
+
         this.countGeoLocationContinentsLists = 0;
     }
 
@@ -25,8 +27,7 @@ class GeoLocationLists {
         }
         location.continent = location.continent || '--';
 
-        this.geoLocationContinentsLists[location.continent] = address;
-        this.countGeoLocationContinentsLists += 1;
+        this.addGeoLocationContinentByAddress(address, location);
 
         return location;
     }
@@ -36,22 +37,43 @@ class GeoLocationLists {
         if (socket === null) return null;
 
         //in case the location has been set before  (avoiding double insertion)
-        if ((typeof socket.location !== 'undefined') && (socket.location !== null) && (this.searchGeoLocationByAddress(socket.address) !== null)) return socket.location;
+        if ((typeof socket.location !== 'undefined') && (socket.location !== null)) return socket.location;
 
-        let location = this.includeAddress(socket.address);
+        let location = await this.includeAddress(socket.address);
         socket.location = location;
         return location;
     }
 
-    searchGeoLocationByAddress(address){
+    addGeoLocationContinentByAddress(address, location){
+
+        //console.log(this.geoLocationContinentsLists); console.log(address);
+
+        if (this.searchGeoLocationContinentByAddress(address) === null) {
+
+            if (typeof this.geoLocationContinentsLists[location.continent] === 'undefined') this.geoLocationContinentsLists[location.continent] = []
+            this.geoLocationContinentsLists[location.continent].push(address);
+            this.countGeoLocationContinentsLists += 1;
+        }
+
+        return location.continent;
+    }
+
+    searchGeoLocationContinentByAddress(address){
+
         for (let continent in this.geoLocationContinentsLists)
-            if (this.geoLocationContinentsLists[continent] === address)
-                return continent;
+            for (let i=0; i<this.geoLocationContinentsLists[continent].length; i++) {
+                let addressInContinent = this.geoLocationContinentsLists[continent][i];
+                if (addressInContinent === address)
+                    return continent;
+            }
 
         return null;
     }
 
     async getLocationFromAddress(address){
+
+        if (typeof this.geoLocationLists[address] !== 'undefined')
+            return this.geoLocationLists[address];
 
         try{
             let data = await this.downloadFile("http://ip-api.com/json/"+address);
