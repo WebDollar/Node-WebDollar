@@ -44,7 +44,7 @@ class NodeDiscoveryService {
 
             //console.log(data, typeof data);
 
-            if (typeof data === 'object'){
+            if ((typeof data === 'object') && (data !== null)){
 
                 let nodes =  [];
                 let name = '';

@@ -11,7 +11,7 @@ class NodeClient {
 
     constructor(address){
 
-        console.log("NodeClient constructor");
+        //console.log("NodeClient constructor");
 
         this.socket = null;
 
@@ -23,9 +23,13 @@ class NodeClient {
 
         try
         {
-            console.log("connecting... to address", address+":"+nodePort);
-            this.socket = ioClient(address+":"+nodePort);
+            // in case the port is not included
+            if (address.indexOf(":") === -1){
+                address += ":"+nodePort;
+            }
 
+            console.log("connecting... to address", address);
+            this.socket = ioClient(address);
 
             subscribeSocketObservable(this.socket, "connection").subscribe(response => {
 
@@ -37,7 +41,7 @@ class NodeClient {
 
             subscribeSocketObservable(this.socket, "disconnect").subscribe(response => {
 
-                console.log("Client connected");
+                console.log("Client disconnected");
                 NodeLists.disconnectSocket(this.socket);
 
             });
@@ -45,8 +49,7 @@ class NodeClient {
 
         }
         catch(Exception){
-            console.log("Error Connecting Node to ",address);
-            console.log(" Exception", Exception.toString());
+            console.log("Error Connecting Node to ",address," ", Exception.toString());
             return false;
         }
 
