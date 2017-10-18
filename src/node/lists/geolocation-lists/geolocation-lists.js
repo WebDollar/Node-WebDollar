@@ -14,13 +14,27 @@ class GeolocationLists {
         this.geolocationContinentsLists = [];
     }
 
-    async includeAddress(address){
+    async includeAddress(socket){
+
+        //in case the location has been set before  (avoiding double insertion)
+        if ((typeof socket.location !== 'undefined') && (socket.location !== null) && (this.searchGeoLocationByAddress(socket.address) !== null)) return socket.location;
 
         let location = await this.getLocationFromAddress(address);
-        this.geolocationContinentsLists[location.continent||'--'] = address;
+        location.continent = location.continent || '--';
+
+        socket.location = location;
+
+        this.geolocationContinentsLists[location.continent] = address;
 
     }
 
+    searchGeoLocationByAddress(address){
+        for (let continent in this.geolocationContinentsLists)
+            if (this.geolocationContinentsLists[continent] === address)
+                return continent;
+
+        return null;
+    }
 
     async getLocationFromAddress(address){
 

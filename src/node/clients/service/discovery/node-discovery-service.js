@@ -23,7 +23,7 @@ class NodeDiscoveryService {
     async discoverFallbackNodes(){
         console.log("DISCOVERING OTHER NODES");
 
-        await this.downloadFallBackList("http://skyhub.me/webdollars.json");
+        await this.downloadFallBackList("http://skyhub.me/public/webdollars.json");
         await this.downloadFallBackList("http://visionbot.net/webdollars.json");
         await this.downloadFallBackList("http://budisteanu.net/webdollars.json");
 
