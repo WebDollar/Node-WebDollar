@@ -47,8 +47,9 @@ class NodeClient {
                     socket.port = socket.io.opts.port;
 
                     console.log("Client connected to ", socket.address);
-                    if (sendHello(socket))
+                    sendHello(socket).then( (answer)=>{
                         that.initializeSocket(socket);
+                    });
 
                     resolve(true);
                 });

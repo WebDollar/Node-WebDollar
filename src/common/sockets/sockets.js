@@ -5,7 +5,7 @@ import { Observable, Subscribable } from 'rxjs/Observable';
    */
 
 let sendRequest = function (socket, request, requestData) {
-    console.log("sendRequest",request, requestData);
+    //console.log("sendRequest",request, requestData);
 
     if (typeof socket.emit === 'function')
         return socket.emit( request, requestData);

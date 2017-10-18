@@ -15,8 +15,13 @@ exports.sendHello = async function (socket ){
         //check if it is a unique connection, add it to the list
         let result = NodeLists.searchNodeSocketAddress(socket.address);
 
+        // console.log("sendHello clientSockets", NodeLists.clientSockets);
+        // console.log("sendHello serverSockets", NodeLists.serverSockets);
+        // console.log("sendHello", result);
+
         if (result === null){
             socket.helloValidated = true;
+            console.log("hello validated");
             return true;
         }
     }

@@ -70,17 +70,32 @@ class NodeLists {
     //Removing socket from the list (the connection was terminated)
     disconnectSocket(socket, bClient, bServer){
 
+        console.log("disconnectSocket", socket.helloValidated);
+
         if ((socket.helloValidated|| false)===false) return false;
+        if (typeof bClient === 'undefined') bClient = true;
+        if (typeof bServer === 'undefined') bServer = true;
 
         if (bClient)
-            for (let i=0; i<this.clientSockets.length; i++)
-                if (this.clientSockets[i].address === socket.address)
+            for (let i=this.clientSockets.length-1; i>=0; i--)
+                if (this.clientSockets[i] === socket) {
+                    console.log('deleting client socket ',i, socket.address);
+                    socket.disconnect();
                     delete this.clientSockets[i];
+                    this.serverSockets.splice(i, 1);
+                    return true;
+                }
 
         if (bServer)
-            for (let i=0; i<this.serverSockets.length; i++)
-                if (this.serverSockets[i].address === socket.address)
+            for (let i=this.serverSockets.length-1; i>=0; i--)
+                if (this.serverSockets[i] === socket) {
+                    console.log('deleting server socket ',i, socket.address);
+                    socket.disconnect();
                     delete this.serverSockets[i];
+                    this.serverSockets.splice(i, 1);
+                    return true;
+                }
+        return false;
     }
 
 }
