@@ -1,6 +1,6 @@
 let ioClient = require('socket.io-client');
 
-import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
+import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../consts/const_global.js';
 import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
 import {NodeLists} from './../../lists/node-lists.js';
 import {sendHello} from './../../../common/sockets/node/protocol.js';
@@ -23,7 +23,7 @@ class NodeClient {
 
         try
         {
-            this.socket = ioClient(address);
+            this.socket = ioClient(address+":"+nodePort);
 
 
             subscribeSocketObservable(this.socket, "connection").subscribe(response => {

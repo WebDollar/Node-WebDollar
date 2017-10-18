@@ -1,6 +1,6 @@
 let io = require('socket.io');
 
-import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
+import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../consts/const_global.js';
 import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
 import {NodeLists} from './../../lists/node-lists.js';
 import {sendHello} from './../../../common/sockets/node/protocol.js';
@@ -48,7 +48,7 @@ class NodeServer {
                 NodeLists.disconnectSocket(socket);
             });
 
-            server.listen(8320);
+            server.listen(nodePort);
 
             this.nodeServer = server;
         }
