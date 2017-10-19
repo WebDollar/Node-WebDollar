@@ -70,9 +70,11 @@ class NodeLists {
     //Removing socket from the list (the connection was terminated)
     disconnectSocket(socket, bClient, bServer){
 
-        //console.log("disconnectSocket", socket.helloValidated);
 
-        if ((socket.helloValidated|| false)===false) return false;
+        if ((socket.helloValidated|| false)===false) {
+            console.log("disconnectSocket rejected by invalid helloValidated", socket.helloValidated);
+            return false;
+        }
         if (typeof bClient === 'undefined') bClient = true;
         if (typeof bServer === 'undefined') bServer = true;
 
@@ -80,7 +82,7 @@ class NodeLists {
             for (let i=this.clientSockets.length-1; i>=0; i--)
                 if (this.clientSockets[i] === socket) {
                     console.log('deleting client socket ',i, socket.address);
-                    this.serverSockets.splice(i, 1);
+                    this.clientSockets.splice(i, 1);
                     socket.disconnect();
                     return true;
                 }
@@ -93,6 +95,7 @@ class NodeLists {
                     socket.disconnect();
                     return true;
                 }
+
         return false;
     }
 

@@ -42,8 +42,7 @@ class NodeClient {
 
                 //console.log(socket);
 
-                subscribeSocketObservable(socket, "connect").subscribe(response => {
-
+                socket.once("connect", response=>{
                     socket.address = (socket.io.opts.hostname||'').toLowerCase();
                     socket.port = socket.io.opts.port;
 
@@ -55,15 +54,14 @@ class NodeClient {
                     resolve(true);
                 });
 
-                subscribeSocketObservable(socket, "connect_error").subscribe(response => {
-
+                socket.once("connect_error", response =>{
                     console.log("Client error connecting", address);
-                    NodeLists.disconnectSocket(that.socket);
+                    //NodeLists.disconnectSocket(that.socket);
 
                     resolve(false);
                 });
-                subscribeSocketObservable(that.socket, "connect_failed").subscribe(response => {
 
+                socket.once("connect_failed", response =>{
                     console.log("Client error connecting (connect_failed) ", address);
                     NodeLists.disconnectSocket(socket);
 
@@ -88,7 +86,7 @@ class NodeClient {
 
         let isUnique = NodeLists.addUniqueSocket(socket, true, false);
 
-        subscribeSocketObservable(socket, "disconnect").subscribe(response => {
+        socket.once("disconnect", response => {
 
             console.log("Client disconnected ",  socket.address);
             NodeLists.disconnectSocket(socket);

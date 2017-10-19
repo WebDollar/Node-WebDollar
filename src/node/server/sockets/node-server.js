@@ -34,7 +34,7 @@ class NodeServer {
             let server = io();
             this.nodeServer = server;
 
-            subscribeSocketObservable(server, "connection").subscribe(socket => {
+            server.on("connection", socket => {
 
                 socket.address = (socket.request.connection.remoteAddress||'').toLowerCase();
                 socket.port = socket.request.connection.remotePort;
@@ -45,10 +45,6 @@ class NodeServer {
                 });
 
 
-            });
-
-            subscribeSocketObservable(server, "error").subscribe(socket => {
-                console.log("Socket Error: ", socket.request.connection.remoteAddress||'');
             });
 
             server.listen(nodePort);
@@ -70,7 +66,7 @@ class NodeServer {
         let isUnique = NodeLists.addUniqueSocket(socket, false, true);
 
 
-        subscribeSocketObservable(socket, "disconnect").subscribe( answer => {
+        socket.once("disconnect", answer => {
             console.log("Socket disconnected", socket.address);
             NodeLists.disconnectSocket(socket);
         });

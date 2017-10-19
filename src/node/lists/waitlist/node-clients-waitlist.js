@@ -56,12 +56,14 @@ class NodeClientsWaitlist {
             if ((nextNode.checkLastTimeChecked(nodeWaitlistTryReconnectAgain))&&(nextNode.blocked===false)&&(NodeLists.searchNodeSocketAddress(nextNode, true, true) === null)){
 
                 nextNode.blocked = true;
-                nextNode.checked = true;
+
+                //console.log("connectNewNodeWaitlist ",nextNode.address);
 
                 this.connectToNewNode(nextNode.address).then( (connected)=>{
+                    nextNode.checked = true;
                     nextNode.blocked = false;
                     nextNode.connected = connected;
-                    this.nodeClientsWaitlist[i].refreshLastTimeChecked();
+                    nextNode.refreshLastTimeChecked();
                 });
 
             }
