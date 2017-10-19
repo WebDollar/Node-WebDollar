@@ -80,9 +80,8 @@ class NodeLists {
             for (let i=this.clientSockets.length-1; i>=0; i--)
                 if (this.clientSockets[i] === socket) {
                     console.log('deleting client socket ',i, socket.address);
-                    socket.disconnect();
-                    delete this.clientSockets[i];
                     this.serverSockets.splice(i, 1);
+                    socket.disconnect();
                     return true;
                 }
 
@@ -90,9 +89,8 @@ class NodeLists {
             for (let i=this.serverSockets.length-1; i>=0; i--)
                 if (this.serverSockets[i] === socket) {
                     console.log('deleting server socket ',i, socket.address);
-                    socket.disconnect();
-                    delete this.serverSockets[i];
                     this.serverSockets.splice(i, 1);
+                    socket.disconnect();
                     return true;
                 }
         return false;

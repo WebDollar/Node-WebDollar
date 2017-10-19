@@ -46,8 +46,6 @@ class GeoLocationLists {
 
     addGeoLocationContinentByAddress(address, location){
 
-        //console.log(this.geoLocationContinentsLists); console.log(address);
-
         if (this.searchGeoLocationContinentByAddress(address) === null) {
 
             if (typeof this.geoLocationContinentsLists[location.continent] === 'undefined') this.geoLocationContinentsLists[location.continent] = []
@@ -55,17 +53,20 @@ class GeoLocationLists {
             this.countGeoLocationContinentsLists += 1;
         }
 
+        console.log(this.geoLocationContinentsLists); console.log(address);
+
         return location.continent;
     }
 
     searchGeoLocationContinentByAddress(address){
 
         for (let continent in this.geoLocationContinentsLists)
-            for (let i=0; i<this.geoLocationContinentsLists[continent].length; i++) {
-                let addressInContinent = this.geoLocationContinentsLists[continent][i];
-                if (addressInContinent === address)
-                    return continent;
-            }
+            if (this.geoLocationContinentsLists.hasOwnProperty(continent))
+                for (let i=0; i<this.geoLocationContinentsLists[continent].length; i++) {
+                    let addressInContinent = this.geoLocationContinentsLists[continent][i];
+                    if (addressInContinent === address)
+                        return continent;
+                }
 
         return null;
     }
