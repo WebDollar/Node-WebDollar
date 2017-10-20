@@ -48,7 +48,7 @@ class NodePropagationProtocol {
 
     }
 
-    propagateNewAddress(addresses){
+    propagateNewAddresses(addresses){
 
         if (typeof addresses === 'string') addresses = [addresses];
 
