@@ -3,7 +3,8 @@ let io = require('socket.io');
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../consts/const_global.js';
 import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
 import {NodeLists} from './../../lists/node-lists.js';
-import {sendHello} from './../../../common/sockets/node/protocol.js';
+import {NodeProtocol} from '../../../common/sockets/node/node-protocol.js';
+import {NodePropagationProtocol} from '../../../common/sockets/node/node-propagation-protocol.js';
 
 /*
     TUTORIAL
@@ -40,7 +41,7 @@ class NodeServer {
                 socket.port = socket.request.connection.remotePort;
 
                 console.log('New connection from ' + socket.address + ':' + socket.port);
-                sendHello(socket).then((answer)=>{
+                NodeProtocol.sendHello(socket).then((answer)=>{
                     this.initializeSocket(socket);
                 });
 
@@ -70,6 +71,8 @@ class NodeServer {
             console.log("Socket disconnected", socket.address);
             NodeLists.disconnectSocket(socket);
         });
+
+        NodePropagationProtocol.initializeSocketForPropagation(socket);
 
     }
 

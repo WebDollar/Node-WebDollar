@@ -26,7 +26,7 @@ class ContinentAddressObject  {
     matchAddress(address){
 
         try{
-            if (typeof address == 'string') address = ipaddr.parse(address);
+            if (typeof address === 'string') address = ipaddr.parse(address);
         } catch (Exception){
 
         }

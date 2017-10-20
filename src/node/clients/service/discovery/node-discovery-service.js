@@ -65,7 +65,7 @@ class NodeDiscoveryService {
                         //console.log("NEW NODES", nodes);
 
                         for (let i=0; i<nodes.length; i++)
-                            await NodeClientsWaitlist.addNewNodeToWaitlist(nodes[i]);
+                            NodeClientsWaitlist.addNewNodeToWaitlist(nodes[i]);
 
                     }
                 }

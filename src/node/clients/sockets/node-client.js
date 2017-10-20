@@ -3,7 +3,8 @@ import * as io from 'socket.io-client';
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../consts/const_global.js';
 import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
 import {NodeLists} from './../../lists/node-lists.js';
-import {sendHello} from './../../../common/sockets/node/protocol.js';
+import {NodeProtocol} from '../../../common/sockets/node/node-protocol.js';
+import {NodePropagationProtocol} from '../../../common/sockets/node/node-propagation-protocol.js';
 
 class NodeClient {
 
@@ -47,7 +48,7 @@ class NodeClient {
                     socket.port = socket.io.opts.port;
 
                     console.log("Client connected to ", socket.address);
-                    sendHello(socket).then( (answer)=>{
+                    NodeProtocol.sendHello(socket).then( (answer)=>{
                         that.initializeSocket(socket);
                     });
 
@@ -92,6 +93,8 @@ class NodeClient {
             NodeLists.disconnectSocket(socket);
 
         });
+
+        NodePropagationProtocol.initializeSocketForPropagation(socket);
 
     }
 
