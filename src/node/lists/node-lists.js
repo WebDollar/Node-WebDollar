@@ -99,6 +99,11 @@ class NodeLists {
         return false;
     }
 
+    //return the JOIN of the clientSockets and serverSockets
+    joinLists(){
+        return this.clientSockets.concat(this.serverSockets);
+    }
+
 }
 
 exports.NodeLists =  new NodeLists();

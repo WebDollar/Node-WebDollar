@@ -1,7 +1,7 @@
-import {NodeClient} from '../../../node/clients/sockets/node-client.js';
 import {nodeProtocol, nodeFallBackInterval} from '../../../consts/const_global.js';
-import {NodeClientsService} from '../../../node/clients/service/node-clients-service.js';
+
 import {NodeClientsWaitlist} from '../../../node/lists/waitlist/node-clients-waitlist.js';
+import {NodeProtocol} from './node-protocol.js';
 
 class NodePropagationProtocol {
 
@@ -48,7 +48,13 @@ class NodePropagationProtocol {
 
     }
 
-    propagade
+    propagateNewAddress(addresses){
+
+        if (typeof addresses === 'string') addresses = [addresses];
+
+        NodeProtocol.broadcastMessageAllSockets("node_propagation", {instruction: "new-address", addresses: addresses });
+
+    }
 
 
 
