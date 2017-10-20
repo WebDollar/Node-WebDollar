@@ -1,4 +1,5 @@
 const axios = require('axios');
+const ipaddr = require('ipaddr.js');
 import {getContinentFromCountry} from './continents.js';
 import {ContinentAddressObject} from './continent-address-object.js';
 
@@ -68,9 +69,9 @@ class GeoLocationLists {
         for (let continent in this.geoLocationContinentsLists)
             if (this.geoLocationContinentsLists.hasOwnProperty(continent))
                 for (let i=0; i<this.geoLocationContinentsLists[continent].length; i++) {
-                    let addressInContinent = this.geoLocationContinentsLists[continent][i].address;
-                    if (addressInContinent === address)
-                        return continent;
+
+                if (this.geoLocationContinentsLists[continent][i].matchAddress(address))
+                    return continent;
                 }
 
         return null;
@@ -91,15 +92,14 @@ class GeoLocationLists {
 
                 //console.log("location data", data);
 
-                if (data.hasOwnProperty(country)){
+                if (data.hasOwnProperty('country')){
                     country = data.country;
                 }
 
-                if (data.hasOwnProperty(countryCode)){
+                if (data.hasOwnProperty('countryCode')){
                     countryCode = data.countryCode;
 
-                    if (continent === '--')
-                        continent = getContinentFromCountry(countryCode);
+                    continent = getContinentFromCountry(countryCode);
                 }
 
                 return {
@@ -143,7 +143,7 @@ class GeoLocationLists {
 
                 let listString = '';
                 for (let i = 0; i < this.geoLocationContinentsLists[continent].length; i++) {
-                    listString += this.geoLocationContinentsLists[continent][i].address+ "   ,   ";
+                    listString += this.geoLocationContinentsLists[continent][i].toString()+ "   ,   ";
                 }
 
                 console.log("continent", continent, " : ",listString);
