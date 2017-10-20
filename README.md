@@ -35,6 +35,14 @@ just, run ```npm install name_missing_package```
 npm run build
 ```
 
+We use browserify
+
+```
+npm install -g browerfiy
+browserify dist/index.js > dist_bundle/bundle.js
+npm install bufferutil utf-8-validate
+```
+
 ### No-IP solution for FallBack
 http://www.noip.com/support/knowledgebase/installing-the-linux-dynamic-update-client-on-ubuntu/
 

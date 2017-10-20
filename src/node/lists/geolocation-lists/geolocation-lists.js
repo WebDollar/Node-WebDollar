@@ -1,5 +1,6 @@
 const axios = require('axios');
 import {getContinentFromCountry} from './continents.js';
+import {ContinentAddressObject} from './continent-address-object.js';
 
 class GeoLocationLists {
 
@@ -48,12 +49,16 @@ class GeoLocationLists {
 
         if (this.searchGeoLocationContinentByAddress(address) === null) {
 
-            if (typeof this.geoLocationContinentsLists[location.continent] === 'undefined') this.geoLocationContinentsLists[location.continent] = []
-            this.geoLocationContinentsLists[location.continent].push(address);
+            if (typeof this.geoLocationContinentsLists[location.continent] === 'undefined') this.geoLocationContinentsLists[location.continent] = [];
+
+            let continentAddressObject = new ContinentAddressObject(address);
+            continentAddressObject.refreshLastTimeChecked();
+
+            this.geoLocationContinentsLists[location.continent].push(continentAddressObject);
             this.countGeoLocationContinentsLists += 1;
         }
 
-        console.log(this.geoLocationContinentsLists); console.log(address);
+        this.printGeoLocationContinentsLists();
 
         return location.continent;
     }
@@ -63,7 +68,7 @@ class GeoLocationLists {
         for (let continent in this.geoLocationContinentsLists)
             if (this.geoLocationContinentsLists.hasOwnProperty(continent))
                 for (let i=0; i<this.geoLocationContinentsLists[continent].length; i++) {
-                    let addressInContinent = this.geoLocationContinentsLists[continent][i];
+                    let addressInContinent = this.geoLocationContinentsLists[continent][i].address;
                     if (addressInContinent === address)
                         return continent;
                 }
@@ -131,6 +136,19 @@ class GeoLocationLists {
     }
 
 
+    printGeoLocationContinentsLists(){
+
+        for (let continent in this.geoLocationContinentsLists)
+            if (this.geoLocationContinentsLists.hasOwnProperty(continent)) {
+
+                let listString = '';
+                for (let i = 0; i < this.geoLocationContinentsLists[continent].length; i++) {
+                    listString += this.geoLocationContinentsLists[continent][i].address+ "   ,   ";
+                }
+
+                console.log("continent", continent, " : ",listString);
+            }
+    }
 
 }
 

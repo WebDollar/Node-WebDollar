@@ -4,7 +4,7 @@
   "description": "Node of WebDollar",
   "main": "index.js",
   "scripts": {
-    "build": "babel --presets es2017 src -d dist",
+    "build": "babel --presets es2017 src -d dist && browserify dist/index.js > dist_bundle/bundle.js",
     "test": "npm run build && node dist/test.js"
   },
   "repository": {
@@ -24,9 +24,11 @@
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
     "axios": "^0.16.2",
+    "bufferutil": "^3.0.2",
     "rxjs": "^5.4.3",
     "socket.io": "^2.0.3",
-    "socket.io-client": "^2.0.3"
+    "socket.io-client": "^2.0.3",
+    "utf-8-validate": "^3.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
