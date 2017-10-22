@@ -37,7 +37,7 @@ class NodeServer {
             try {
                 console.log(io);
                 server = io();
-                server.use(p2p);
+                //server.use(p2p);
             } catch(Exception){
                 console.log("Error Importing io() library", Exception.toString());
             }

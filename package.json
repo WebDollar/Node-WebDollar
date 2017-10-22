@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "babel --presets es2017 src -d dist && browserify dist/index.js > dist_bundle/bundle.js",
+    "build_frontend": "browserify src/index.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/Node-WebDollar-bundle.js -t [ babelify --presets [ es2017 ] ]",
     "test": "npm run build && node dist/test.js"
   },
   "repository": {
@@ -24,12 +25,14 @@
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
     "axios": "^0.16.2",
+    "babelify": "^7.3.0",
     "browserify": "^14.5.0",
     "bufferutil": "^3.0.2",
     "ipaddr.js": "^1.5.4",
     "rxjs": "^5.4.3",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
+    "socket.io-p2p": "^2.2.0",
     "utf-8-validate": "^3.0.3"
   },
   "devDependencies": {
