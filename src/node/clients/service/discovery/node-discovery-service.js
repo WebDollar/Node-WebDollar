@@ -37,7 +37,15 @@ class NodeDiscoveryService {
     async downloadFallBackList(address){
 
         try{
-            let response = await axios.get(address);
+            let response = await axios.create({
+                baseURL: address,
+                timeout: 10000,
+                withCredentials: true,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            });
 
             let data = response.data;
 

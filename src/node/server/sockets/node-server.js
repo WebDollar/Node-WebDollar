@@ -1,4 +1,5 @@
 let io = require('socket.io');
+let p2p = require('socket.io-p2p');
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../consts/const_global.js';
 import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
@@ -32,7 +33,14 @@ class NodeServer {
 
         try
         {
-            let server = io();
+            let server = null;
+            try {
+                console.log(io);
+                server = io();
+                server.use(p2p);
+            } catch(Exception){
+                console.log("Error Importing io() library", Exception.toString());
+            }
             this.nodeServer = server;
 
             server.on("connection", socket => {
@@ -48,7 +56,12 @@ class NodeServer {
 
             });
 
-            server.listen(nodePort);
+            try {
+                console.log(server);
+                server.listen(nodePort);
+            } catch(Exception){
+                console.log("Error Calling server.listen", Exception.toString());
+            }
 
         }
         catch(Exception){
