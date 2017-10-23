@@ -1,5 +1,5 @@
 import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
-import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../sockets.js';
+import {sendRequest} from './../sockets.js';
 import {NodeLists} from './../../../node/lists/node-lists.js';
 
 

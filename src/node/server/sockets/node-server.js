@@ -1,8 +1,7 @@
 let io = require('socket.io');
-let p2p = require('socket.io-p2p');
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../consts/const_global.js';
-import {sendRequest, sendRequestWaitOnce, sendRequestSubscribe, subscribeSocketObservable} from './../../../common/sockets/sockets.js';
+import {sendRequest} from './../../../common/sockets/sockets.js';
 import {NodeLists} from './../../lists/node-lists.js';
 import {NodeProtocol} from '../../../common/sockets/node/node-protocol.js';
 import {NodePropagationProtocol} from '../../../common/sockets/node/node-propagation-protocol.js';
@@ -25,6 +24,7 @@ class NodeServer {
 
         console.log("NodeServer constructor");
         this.nodeServer = null;
+
     }
 
      startServer(){
@@ -37,7 +37,7 @@ class NodeServer {
             try {
                 console.log(io);
                 server = io();
-                //server.use(p2p);
+
             } catch(Exception){
                 console.log("Error Importing io() library", Exception.toString());
             }
@@ -85,10 +85,21 @@ class NodeServer {
             NodeLists.disconnectSocket(socket);
         });
 
-        NodePropagationProtocol.initializeSocketForPropagation(socket);
+        this.initializeWebRTCSignals(socket);
 
+        NodePropagationProtocol.initializeSocketForPropagation(socket);
     }
 
+
+    initializeWebRTCSignals(socket){
+        socket.on("pools/signal/initialize", answer =>{
+
+        });
+
+        socket.on("pools/signal/join", answer =>{
+
+        });
+    }
 
 }
 

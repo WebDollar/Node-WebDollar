@@ -16,6 +16,10 @@ exports.helloWord = function() {
     console.log("This is a message from the demo package");
 };
 
+module.exports = {
+    NodeServer : Node.NodeServer,
+    NodeClientsService : Node.NodeClientsService,
+};
 
 // var mymodule = (function() { console.log("This is a message from the demo package"); })();
 //
