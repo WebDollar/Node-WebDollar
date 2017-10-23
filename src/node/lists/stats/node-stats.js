@@ -1,8 +1,6 @@
-let ioClient = require('socket.io-client');
-
-import {nodeStatusInterval} from '../../consts/const_global.js';
-import {NodeLists} from './../lists/node-lists.js';
-import {GeoLocationLists} from './../lists/geolocation-lists/geolocation-lists.js';
+import {nodeStatusInterval} from '../../../consts/const_global.js';
+import {NodeLists} from '../node-lists.js';
+import {GeoLocationLists} from '../geolocation-lists/geolocation-lists.js';
 
 class NodeStats {
 

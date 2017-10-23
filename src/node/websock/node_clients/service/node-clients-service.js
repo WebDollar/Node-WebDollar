@@ -1,7 +1,7 @@
 import {NodeClient} from '../sockets/node-client.js';
 import {NodeDiscoveryService} from './discovery/node-discovery-service.js';
-import {NodeLists} from './../../lists/node-lists.js';
-import {NodeClientsWaitlist} from '../../lists/waitlist/node-clients-waitlist.js';
+import {NodeLists} from '../../../lists/node-lists.js';
+import {NodeClientsWaitlist} from '../../../lists/waitlist/node-clients-waitlist.js';
 
 
 class NodeClientsService {

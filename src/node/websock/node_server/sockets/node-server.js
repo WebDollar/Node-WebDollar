@@ -1,10 +1,10 @@
 let io = require('socket.io');
 
-import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../consts/const_global.js';
-import {sendRequest} from './../../../common/sockets/sockets.js';
-import {NodeLists} from './../../lists/node-lists.js';
-import {NodeProtocol} from '../../../common/sockets/node/node-protocol.js';
-import {NodePropagationProtocol} from '../../../common/sockets/node/node-propagation-protocol.js';
+import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
+import {sendRequest} from '../../../../common/sockets/sockets.js';
+import {NodeLists} from '../../../lists/node-lists.js';
+import {NodeProtocol} from '../../../../common/sockets/node/node-protocol.js';
+import {NodePropagationProtocol} from '../../../../common/sockets/node/node-propagation-protocol.js';
 
 /*
     TUTORIAL
@@ -35,7 +35,7 @@ class NodeServer {
         {
             let server = null;
             try {
-                console.log(io);
+                console.log(typeof io);
                 server = io();
 
             } catch(Exception){
@@ -53,14 +53,13 @@ class NodeServer {
                     this.initializeSocket(socket);
                 });
 
-
             });
 
             try {
                 console.log(server);
                 server.listen(nodePort);
             } catch(Exception){
-                console.log("Error Calling server.listen", Exception.toString());
+                console.log("Error Calling node_server.listen", Exception.toString());
             }
 
         }
@@ -92,6 +91,7 @@ class NodeServer {
 
 
     initializeWebRTCSignals(socket){
+
         socket.on("pools/signal/initialize", answer =>{
 
         });

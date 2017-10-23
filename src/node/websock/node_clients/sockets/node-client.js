@@ -1,10 +1,10 @@
 import * as io from 'socket.io-client';
 
-import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../consts/const_global.js';
-import {sendRequest} from './../../../common/sockets/sockets.js';
-import {NodeLists} from './../../lists/node-lists.js';
-import {NodeProtocol} from '../../../common/sockets/node/node-protocol.js';
-import {NodePropagationProtocol} from '../../../common/sockets/node/node-propagation-protocol.js';
+import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
+import {sendRequest} from '../../../../common/sockets/sockets.js';
+import {NodeLists} from '../../../lists/node-lists.js';
+import {NodeProtocol} from '../../../../common/sockets/node/node-protocol.js';
+import {NodePropagationProtocol} from '../../../../common/sockets/node/node-propagation-protocol.js';
 
 class NodeClient {
 
@@ -95,7 +95,6 @@ class NodeClient {
         });
 
         NodePropagationProtocol.initializeSocketForPropagation(socket);
-
     }
 
 

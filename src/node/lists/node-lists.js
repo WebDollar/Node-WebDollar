@@ -90,7 +90,7 @@ class NodeLists {
         if (bServer)
             for (let i=this.serverSockets.length-1; i>=0; i--)
                 if (this.serverSockets[i] === socket) {
-                    console.log('deleting server socket ',i, socket.address);
+                    console.log('deleting node_server socket ',i, socket.address);
                     this.serverSockets.splice(i, 1);
                     socket.disconnect();
                     return true;
