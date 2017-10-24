@@ -1,7 +1,7 @@
 import {GeoLocationLists} from './geolocation-lists/geolocation-lists.js';
 
 /*
-    The List is populated with Node Sockets only if the sockets pass the Hello Message
+    The List is populated with Node Sockets only if the socket pass the Hello Message
  */
 
 class NodeLists {

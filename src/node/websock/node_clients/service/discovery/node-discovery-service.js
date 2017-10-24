@@ -1,4 +1,4 @@
-import {NodeClient} from '../../sockets/node-client.js';
+import {NodeClient} from '../../socket/node-client.js';
 import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_global.js';
 import {NodeClientsService} from '../node-clients-service.js';
 import {NodeClientsWaitlist} from '../../../../lists/waitlist/node-clients-waitlist.js';

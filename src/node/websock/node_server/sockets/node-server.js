@@ -10,7 +10,7 @@ import {NodePropagationProtocol} from '../../../../common/sockets/node/node-prop
     TUTORIAL
 
     socket.emit('request', {); // emit an event to the socket
-    io.emit('broadcast', {); // emit an event to all connected sockets
+    io.emit('broadcast', {); // emit an event to all connected socket
     socket.on('reply', function(){  }); // listen to the event
  */
 

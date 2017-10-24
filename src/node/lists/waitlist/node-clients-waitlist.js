@@ -1,4 +1,4 @@
-import {NodeClient} from '../../websock/node_clients/sockets/node-client.js';
+import {NodeClient} from '../../websock/node_clients/socket/node-client.js';
 import {NodeLists} from './../node-lists.js';
 import {WaitlistObject} from './wailist-object.js';
 import {nodeWaitlistTryReconnectAgain, nodeWaitlistInterval} from '../../../consts/const_global.js';
