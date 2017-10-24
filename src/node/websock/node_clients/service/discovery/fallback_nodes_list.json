@@ -3,16 +3,16 @@
   "name": "fallback nodes",
   "nodes": [
     {
-      "addr": "webdollar.ddns.net",
+      "addr": "webdollar.ddns.net"
     },
     {
-      "addr": "webdollar.io",
+      "addr": "webdollar.io"
     },
     {
-      "addr":"skyhub.me",
+      "addr":"skyhub.me"
     },
     {
-      "addr":"visionbot.net",
+      "addr":"visionbot.net"
     },
     {
       "addr":"92.222.85.90"
