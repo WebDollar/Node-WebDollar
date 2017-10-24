@@ -2,6 +2,7 @@ import * as io from 'socket.io-client';
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
 import {sendRequest} from '../../../../common/sockets/sockets.js';
+import {SocketAddress} from '../../../../common/sockets/socket-address.js';
 import {NodeLists} from '../../../lists/node-lists.js';
 import {NodeProtocol} from '../../../../common/sockets/node/node-protocol.js';
 import {NodePropagationProtocol} from '../../../../common/sockets/node/node-propagation-protocol.js';
@@ -44,10 +45,11 @@ class NodeClient {
                 //console.log(socket);
 
                 socket.once("connect", response=>{
-                    socket.address = (socket.io.opts.hostname||'').toLowerCase();
-                    socket.port = socket.io.opts.port;
 
-                    console.log("Client connected to ", socket.address);
+                    socket.address = SocketAddress(socket, socket.io.opts.hostname,  socket.io.opts.port);
+
+                    console.log("Client connected to ", socket.address.toString());
+
                     NodeProtocol.sendHello(socket).then( (answer)=>{
                         that.initializeSocket(socket);
                     });

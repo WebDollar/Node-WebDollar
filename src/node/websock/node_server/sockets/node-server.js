@@ -4,6 +4,7 @@ import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../const
 import {sendRequest} from '../../../../common/sockets/sockets.js';
 import {NodeLists} from '../../../lists/node-lists.js';
 import {NodeProtocol} from '../../../../common/sockets/node/node-protocol.js';
+import {SocketAddress} from '../../../../common/sockets/socket-address.js';
 import {NodePropagationProtocol} from '../../../../common/sockets/node/node-propagation-protocol.js';
 
 /*
@@ -45,11 +46,11 @@ class NodeServer {
 
             server.on("connection", socket => {
 
-                socket.address = (socket.request.connection.remoteAddress||'').toLowerCase();
-                socket.port = socket.request.connection.remotePort;
+                socket.address = SocketAddress(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort);
 
-                console.log('New connection from ' + socket.address + ':' + socket.port);
-                NodeProtocol.sendHello(socket).then((answer)=>{
+                console.log('New connection from ' + socket.address.toString() + ':' + socket.address.port);
+
+                NodeProtocol.sendHello(socket).then( (answer)=>{
                     this.initializeSocket(socket);
                 });
 

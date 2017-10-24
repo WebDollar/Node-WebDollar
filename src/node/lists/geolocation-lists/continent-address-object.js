@@ -18,6 +18,7 @@ class ContinentAddressObject  {
         } catch (Exception){
             this.address = address;
         }
+
         this.addressString = this.address.toString();
 
         this.lastTimeChecked = 0;

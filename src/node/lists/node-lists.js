@@ -6,104 +6,88 @@ import {GeoLocationLists} from './geolocation-lists/geolocation-lists.js';
 
 class NodeLists {
 
-    // clientSockets : [],
-    // serverSockets : [],
-    // webPeers : [],
+    // nodes = []
 
     constructor(){
 
         console.log("NodeLists constructor");
 
-        this.clientSockets = [];
-        this.serverSockets = [];
-        this.webPeers = [];
+        this.nodes = [];
     }
 
 
-    searchNodeSocketAddress(address, searchClientSockets, searchServerSockets){
+    searchNodeSocketAddress(address, type){
 
-        if (typeof searchClientSockets === 'undefined') searchClientSockets = true;
-        if (typeof searchServerSockets === 'undefined') searchServerSockets = true;
+        if (typeof type === 'undefined') type = 'all';
 
         //in case address is a Socket
         if (typeof address === 'object') address = address.address||'';
 
         address = (address||'').toLowerCase();
 
-        if (searchClientSockets)
-            for (let i=0; i<this.clientSockets.length; i++)
-                if (this.clientSockets[i].address === address){
-                    return this.clientSockets[i];
-                }
-
-        if (searchServerSockets)
-            for (let i=0; i<this.serverSockets.length; i++)
-                if (this.serverSockets[i].address === address){
-                    return this.serverSockets[i];
-                }
-
+        for (let i=0; i<this.nodes.length; i++)
+            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].address === address)){
+                return this.nodes[i];
+            }
 
         return null;
     }
 
-    addUniqueSocket(socket, bClient, bServer){
+    addUniqueSocket(socket, type){
 
-        bClient = bClient || false;
-        bServer = bServer || false;
+        if (type === 'undefined'){
+            throw ("type is necessary");
+        }
 
-        if (bClient)
-            if (this.searchNodeSocketAddress(socket) === null) {
-                this.clientSockets.push(socket);
-                GeoLocationLists.includeSocket(socket);
-                return true;
-            }
+        socket.type = type;
 
-        if (bServer)
-            if (this.searchNodeSocketAddress(socket) === null) {
-                this.serverSockets.push(socket);
-                GeoLocationLists.includeSocket(socket);
-                return true;
-            }
+        if (this.searchNodeSocketAddress(socket) === null) {
+            this.nodes.push(socket);
+            GeoLocationLists.includeSocket(socket);
+            return true;
+        }
 
         socket.disconnect();
         return false;
     }
 
     //Removing socket from the list (the connection was terminated)
-    disconnectSocket(socket, bClient, bServer){
+    disconnectSocket(socket, type){
 
 
         if ((socket.helloValidated|| false)===false) {
             console.log("disconnectSocket rejected by invalid helloValidated", socket.helloValidated);
             return false;
         }
-        if (typeof bClient === 'undefined') bClient = true;
-        if (typeof bServer === 'undefined') bServer = true;
 
-        if (bClient)
-            for (let i=this.clientSockets.length-1; i>=0; i--)
-                if (this.clientSockets[i] === socket) {
-                    console.log('deleting client socket ',i, socket.address);
-                    this.clientSockets.splice(i, 1);
-                    socket.disconnect();
-                    return true;
-                }
+        if (typeof type === 'undefined') type = 'all';
 
-        if (bServer)
-            for (let i=this.serverSockets.length-1; i>=0; i--)
-                if (this.serverSockets[i] === socket) {
-                    console.log('deleting node_server socket ',i, socket.address);
-                    this.serverSockets.splice(i, 1);
-                    socket.disconnect();
-                    return true;
-                }
+        for (let i=this.nodes.length-1; i>=0; i--)
+            if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i] === socket)) {
+                console.log('deleting client socket ',i, socket.address);
+                this.nodes.splice(i, 1);
+                socket.disconnect();
+                return true;
+            }
 
         return false;
     }
 
     //return the JOIN of the clientSockets and serverSockets
-    joinLists(){
-        return this.clientSockets.concat(this.serverSockets);
+    getNodes(type){
+
+        if (typeof type === 'undefined') type = 'all';
+
+        let list = [];
+
+        for (let i=0; i<this.nodes.length; i++)
+            if (this.nodes[i].type === type || type  === "all") {
+
+                list.push( this.nodes[i] );
+
+            }
+
+        return list;
     }
 
 }

@@ -6,8 +6,9 @@ import {NodeLists} from './../../../node/lists/node-lists.js';
 class NodeProtocol {
 
     async sendHello (socket ){
+
         // Waiting for Protocol Confirmation
-        let response = await sendRequestWaitOnce(socket, "HelloNode",{
+        let response = await sendRequestWaitOnce(socket, "HelloNode", {
             version: nodeVersion,
         });
 
@@ -35,7 +36,8 @@ class NodeProtocol {
 
     broadcastMessageAllSockets (request, data){
 
-        let sockets = NodeLists.joinLists();
+        let sockets = NodeLists.getNodes();
+
         for (let i=0; i < sockets.length; i++)
             sockets[i].emit(request, data)
 
