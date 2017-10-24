@@ -15,7 +15,7 @@ class NodeWaitlist {
         console.log("NodeServiceClients constructor");
 
         this.waitlist = [];
-        this.stated = false;
+        this.started = false;
     }
 
     addNewNodeToWaitlist(address, port){
@@ -57,6 +57,8 @@ class NodeWaitlist {
         /*
             Connect to all nodes
         */
+
+        console.log(this.waitlist);
 
         for (let i=0; i < this.waitlist.length; i++){
 

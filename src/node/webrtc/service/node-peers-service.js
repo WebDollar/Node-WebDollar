@@ -6,14 +6,8 @@ import {NodeWaitlist} from '../../lists/waitlist/node-waitlist.js';
 
 class NodePeersService {
 
-    /*
-        this.nodePeers = []
-    */
-
     constructor(){
         console.log("NodePeersService constructor");
-
-        this.nodePeers = [];
     }
 
     startService(){

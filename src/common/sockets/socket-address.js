@@ -1,4 +1,5 @@
 const ipaddr = require('ipaddr.js');
+import {nodePort} from './../../consts/const_global.js';
 
 class SocketAddress {
 
@@ -10,8 +11,14 @@ class SocketAddress {
         return true;
     }
 
+    /*
+        Create a Socket Address in case the address is just a simple "address"
+     */
     static createSocketAddress(sckAddress, port){
+        if (typeof nodePort === 'undefined') port = nodePort;
         if (SocketAddress.checkIsSocketAddress(sckAddress)) return sckAddress;
+
+        return new SocketAddress(sckAddress, port);
     }
 
 

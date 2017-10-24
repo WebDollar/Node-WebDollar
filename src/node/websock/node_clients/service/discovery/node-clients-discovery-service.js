@@ -21,8 +21,8 @@ class NodeDiscoveryService {
     }
 
     async discoverFallbackNodes(){
-        //console.log("DISCOVERING OTHER NODES");
 
+        await this.downloadFallBackList("http://webdollar.io/public/webdollars.json");
         await this.downloadFallBackList("http://skyhub.me/public/webdollars.json");
         await this.downloadFallBackList("http://visionbot.net/webdollars.json");
         await this.downloadFallBackList("http://budisteanu.net/webdollars.json");
@@ -71,8 +71,13 @@ class NodeDiscoveryService {
 
                         //console.log("NEW NODES", nodes);
 
-                        for (let i=0; i<nodes.length; i++)
-                            NodeWaitlist.addNewNodeToWaitlist(nodes[i]);
+                        for (let i=0; i<nodes.length; i++) {
+
+                            let nodeAddress = nodes[i].addr||'';
+                            let nodePort = nodes[i].port||'';
+
+                            NodeWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort);
+                        }
 
                     }
                 }
