@@ -1,7 +1,8 @@
 const axios = require('axios');
 const ipaddr = require('ipaddr.js');
-import {getContinentFromCountry} from './continents.js';
-import {ContinentAddressObject} from './continent-address-object.js';
+import {getContinentFromCountry} from './data/continents.js';
+import {GeoLocationAddressObject} from './geolocation-address-object.js';
+import {SocketAddress} from './../../../common/sockets/socket-address';
 
 class GeoLocationLists {
 
@@ -20,16 +21,20 @@ class GeoLocationLists {
         this.countGeoLocationContinentsLists = 0;
     }
 
-    async includeAddress(address){
+    async includeAddress(address, port){
 
-        let location = await this.getLocationFromAddress(address);
+        let sckAddress = SocketAddress.createSocketAddress(address, port);
+
+        let location = await this.getLocationFromAddress(sckAddress);
+
         if (location === null){
             console.log("LOCATION was not been able to get");
             return null;
         }
+
         location.continent = location.continent || '--';
 
-        this.addGeoLocationContinentByAddress(address, location);
+        this.addGeoLocationContinentByAddress(sckAddress, location);
 
         return location;
     }
@@ -41,21 +46,21 @@ class GeoLocationLists {
         //in case the location has been set before  (avoiding double insertion)
         if ((typeof socket.location !== 'undefined') && (socket.location !== null)) return socket.location;
 
-        let location = await this.includeAddress(socket.address);
+        let location = await this.includeAddress(socket.sckAddress);
         socket.location = location;
         return location;
     }
 
-    addGeoLocationContinentByAddress(address, location){
+    addGeoLocationContinentByAddress(sckAddress, location){
 
         if (this.searchGeoLocationContinentByAddress(address) === null) {
 
             if (typeof this.geoLocationContinentsLists[location.continent] === 'undefined') this.geoLocationContinentsLists[location.continent] = [];
 
-            let continentAddressObject = new ContinentAddressObject(address);
-            continentAddressObject.refreshLastTimeChecked();
+            let geoLocationAddressObject = new GeoLocationAddressObject(sckAddress, undefined, location);
+            geoLocationAddressObject.refreshLastTimeChecked();
 
-            this.geoLocationContinentsLists[location.continent].push(continentAddressObject);
+            this.geoLocationContinentsLists[location.continent].push(geoLocationAddressObject);
             this.countGeoLocationContinentsLists += 1;
         }
 

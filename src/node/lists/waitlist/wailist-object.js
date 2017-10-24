@@ -1,8 +1,8 @@
 class WaitlistObject {
 
-    constructor(address){
+    constructor(sckAddress){
 
-        this.address = address;
+        this.sckAddress = sckAddress;
         this.blocked = false;
         this.checked = false;
 

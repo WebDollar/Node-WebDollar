@@ -26,7 +26,7 @@ class NodePropagationProtocol {
                 }
              */
 
-            console.log("NodePropagation",  socket.address);
+            console.log("NodePropagation",  socket.sckAddress.toString());
 
             let instruction = response.instruction||'';
             switch (instruction){

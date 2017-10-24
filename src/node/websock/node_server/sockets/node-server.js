@@ -46,9 +46,9 @@ class NodeServer {
 
             server.on("connection", socket => {
 
-                socket.address = SocketAddress(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort);
+                socket.sckAddress = SocketAddress(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort);
 
-                console.log('New connection from ' + socket.address.toString() + ':' + socket.address.port);
+                console.log('New connection from ' + socket.sckAddress.toString() + ':' + socket.sckAddress.port);
 
                 NodeProtocol.sendHello(socket).then( (answer)=>{
                     this.initializeSocket(socket);
@@ -81,7 +81,7 @@ class NodeServer {
 
 
         socket.once("disconnect", answer => {
-            console.log("Socket disconnected", socket.address);
+            console.log("Socket disconnected", socket.sckAddress.toString());
             NodeLists.disconnectSocket(socket);
         });
 

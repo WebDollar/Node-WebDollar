@@ -46,9 +46,9 @@ class NodeClient {
 
                 socket.once("connect", response=>{
 
-                    socket.address = SocketAddress(socket, socket.io.opts.hostname,  socket.io.opts.port);
+                    socket.sckAddress = SocketAddress(socket, socket.io.opts.hostname,  socket.io.opts.port);
 
-                    console.log("Client connected to ", socket.address.toString());
+                    console.log("Client connected to ", socket.sckAddress.toString());
 
                     NodeProtocol.sendHello(socket).then( (answer)=>{
                         that.initializeSocket(socket);
@@ -91,7 +91,7 @@ class NodeClient {
 
         socket.once("disconnect", response => {
 
-            console.log("Client disconnected ",  socket.address);
+            console.log("Client disconnected ",  socket.sckAddress.toString() );
             NodeLists.disconnectSocket(socket);
 
         });

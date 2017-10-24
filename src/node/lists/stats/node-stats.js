@@ -16,13 +16,12 @@ class NodeStats {
 
     printStats(){
 
-        let clientSockets = NodeLists.clientSockets.length;
-        let serverSockets = NodeLists.serverSockets.length;
+        let clientSockets = NodeLists.getNodes("client").length;
+        let serverSockets = NodeLists.getNodes("server").length;
+        let webPeers = NodeLists.getNodes("webpeer").length;
 
-        console.log(" connected to: ", clientSockets," , from: ", serverSockets, " GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists);
-
+        console.log(" connected to: ", clientSockets," , from: ", serverSockets, " web peers", webPeers,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists);
     }
-
 }
 
 exports.NodeStats = new NodeStats();

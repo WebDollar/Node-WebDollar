@@ -33,7 +33,7 @@ class NodeClientsWaitlist {
     searchNodeWaitlist(address){
 
         for (let i=0; i<this.nodeClientsWaitlist.length; i++)
-            if (this.nodeClientsWaitlist[i].address === address)
+            if (this.nodeClientsWaitlist[i].sckAddress.matchAddress(address) )
                 return true;
 
         return false;
@@ -62,9 +62,9 @@ class NodeClientsWaitlist {
 
                 nextNode.blocked = true;
 
-                //console.log("connectNewNodeWaitlist ",nextNode.address);
+                //console.log("connectNewNodeWaitlist ", nextNode.sckAddress.toString() );
 
-                this.connectToNewNode(nextNode.address).then( (connected)=>{
+                this.connectToNewNode(nextNode.sckAddress).then( (connected)=>{
                     nextNode.checked = true;
                     nextNode.blocked = false;
                     nextNode.connected = connected;

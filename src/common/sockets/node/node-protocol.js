@@ -17,7 +17,7 @@ class NodeProtocol {
         if ((response.hasOwnProperty("version"))&&(response.version <= nodeVersionCompatibility)){
 
             //check if it is a unique connection, add it to the list
-            let result = NodeLists.searchNodeSocketAddress(socket.address);
+            let result = NodeLists.searchNodeSocketAddress(socket.sckAddress);
 
             // console.log("sendHello clientSockets", NodeLists.clientSockets);
             // console.log("sendHello serverSockets", NodeLists.serverSockets);

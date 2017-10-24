@@ -2,8 +2,20 @@ const ipaddr = require('ipaddr.js');
 
 class SocketAddress {
 
+    static checkIsSocketAddress(sckAddress){
+        if (typeof sckAddress !== 'object') return false;
 
-    constructor(socket, address, port){
+        if (! (sckAddress.hasOwnProperty("address") && sckAddress.hasOwnProperty("addressString") && sckAddress.hasOwnProperty("port"))) return false;
+
+        return true;
+    }
+
+    static createSocketAddress(sckAddress, port){
+        if (SocketAddress.checkIsSocketAddress(sckAddress)) return sckAddress;
+    }
+
+
+    constructor(address, port){
 
         if (typeof address === 'undefined') address = '';
         if (typeof address === 'string') address = address.toLowerCase();
@@ -26,8 +38,8 @@ class SocketAddress {
     matchAddress(address){
 
         //maybe it is a socket
-        if (typeof address === "object" && address.hasOwnProperty("address") )
-            address = address.address;
+        if (typeof address === "object" && address.hasOwnProperty("sckAddress") )
+            address = address.sckAddress;
 
         try{
             if (typeof address === 'string') address = ipaddr.parse(address);

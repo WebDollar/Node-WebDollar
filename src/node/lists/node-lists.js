@@ -1,4 +1,5 @@
 import {GeoLocationLists} from './geolocation-lists/geolocation-lists.js';
+import {SocketAddress} from './../../common/sockets/socket-address.js';
 
 /*
     The List is populated with Node Sockets only if the socket pass the Hello Message
@@ -16,17 +17,20 @@ class NodeLists {
     }
 
 
-    searchNodeSocketAddress(address, type){
+    searchNodeSocketAddress(sckAddress, type){
 
         if (typeof type === 'undefined') type = 'all';
 
         //in case address is a Socket
-        if (typeof address === 'object') address = address.address||'';
+        if (typeof address === 'object' &&  address.hasOwnProperty("sckAddress") )
+            sckAddress = sckAddress.address||'';
 
-        address = (address||'').toLowerCase();
+        if (typeof sckAddress ===  'string'){
+            sckAddress = new SocketAddress(sckAddress)
+        }
 
         for (let i=0; i<this.nodes.length; i++)
-            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].address === address)){
+            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].sckAddress.matchAddress(sckAddress))){
                 return this.nodes[i];
             }
 
@@ -64,7 +68,7 @@ class NodeLists {
 
         for (let i=this.nodes.length-1; i>=0; i--)
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i] === socket)) {
-                console.log('deleting client socket ',i, socket.address);
+                console.log('deleting client socket ',i, socket.sckAddress.toString());
                 this.nodes.splice(i, 1);
                 socket.disconnect();
                 return true;
