@@ -8,6 +8,7 @@ class NodeLists {
 
     // clientSockets : [],
     // serverSockets : [],
+    // webPeers : [],
 
     constructor(){
 
@@ -15,6 +16,7 @@ class NodeLists {
 
         this.clientSockets = [];
         this.serverSockets = [];
+        this.webPeers = [];
     }
 
 

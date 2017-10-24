@@ -9,24 +9,22 @@
 let wrtc = require('wrtc');
 let Peer = require('simple-peer');
 
-class NodePeerClient {
+class NodeWebPeer {
 
     /*
-        this.webrtc_peer = None
+        this.web_peer = None
     */
 
     constructor(initiator){
 
         console.log("Peer Client constructor");
 
-        let peer = new Peer(
+        this.peer = new Peer(
             {
                 initiator: initiator,
                 trickle: false,
                 wrtc: wrtc,
             });
-
-        this.peer = peer;
 
         this.initializePeer();
 
@@ -66,7 +64,6 @@ class NodePeerClient {
 
 
 
-
 }
 
-exports.NodePeerClient = NodePeerClient;
+exports.NodeWebPeer = NodeWebPeer;

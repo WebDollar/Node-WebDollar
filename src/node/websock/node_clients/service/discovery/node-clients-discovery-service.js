@@ -7,8 +7,6 @@ const axios = require('axios');
 
 class NodeDiscoveryService {
 
-    // nodeClientsService = null
-
     constructor(){
 
         console.log("NodeDiscover constructor");

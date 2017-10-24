@@ -7,12 +7,14 @@ class NodeClientsWaitlist {
 
     /*
         nodeClientsWaitlist = []     //Addresses where it should connect too
+        stated = false;
     */
 
     constructor(){
         console.log("NodeServiceClients constructor");
 
         this.nodeClientsWaitlist = [];
+        this.stated = false;
     }
 
     addNewNodeToWaitlist(address){
@@ -40,7 +42,10 @@ class NodeClientsWaitlist {
 
     async startConnecting(){
 
-        this.connectNewNodeWaitlist();
+        if (this.started === false) {
+            this.started = true;
+            this.connectNewNodeWaitlist();
+        }
 
     }
 
