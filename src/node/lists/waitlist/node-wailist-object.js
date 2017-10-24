@@ -1,4 +1,4 @@
-class WaitlistObject {
+class NodeWaitlistObject {
 
     constructor(sckAddress){
 
@@ -28,4 +28,4 @@ class WaitlistObject {
 
 }
 
-exports.WaitlistObject = WaitlistObject;
+exports.NodeWaitlistObject = NodeWaitlistObject;

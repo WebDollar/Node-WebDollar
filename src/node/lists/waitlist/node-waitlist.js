@@ -1,39 +1,42 @@
 import {NodeClient} from '../../websock/node_clients/socket/node-client.js';
 import {NodeLists} from './../node-lists.js';
-import {WaitlistObject} from './wailist-object.js';
+import {WaitlistObject} from './node-wailist-object.js';
+import {SocketAddress} from './../../../common/sockets/socket-address.js';
 import {nodeWaitlistTryReconnectAgain, nodeWaitlistInterval} from '../../../consts/const_global.js';
 
-class NodeClientsWaitlist {
+class NodeWaitlist {
 
     /*
-        nodeClientsWaitlist = []     //Addresses where it should connect too
+        waitlist = []     //Addresses where it should connect too
         stated = false;
     */
 
     constructor(){
         console.log("NodeServiceClients constructor");
 
-        this.nodeClientsWaitlist = [];
+        this.waitlist = [];
         this.stated = false;
     }
 
-    addNewNodeToWaitlist(address){
+    addNewNodeToWaitlist(address, port){
 
-        address = (address||'').toLowerCase();
+        let sckAddress = SocketAddress.createSocketAddress(address, port);
 
-        if (this.searchNodeWaitlist(address)){
+        if (this.searchNodeWaitlist(sckAddress)){
             return false;
         }
 
-        //console.log("nodeClientsWaitlist[]", this.nodeClientsWaitlist);
-        this.nodeClientsWaitlist.push(new WaitlistObject(address));
+        //console.log("waitlist[]", this.waitlist);
+        this.waitlist.push(new WaitlistObject(sckAddress));
 
     }
 
-    searchNodeWaitlist(address){
+    searchNodeWaitlist(address, port){
 
-        for (let i=0; i<this.nodeClientsWaitlist.length; i++)
-            if (this.nodeClientsWaitlist[i].sckAddress.matchAddress(address) )
+        let sckAddress = SocketAddress.createSocketAddress(address, port);
+
+        for (let i=0; i<this.waitlist.length; i++)
+            if (this.waitlist[i].sckAddress.matchAddress(sckAddress) )
                 return true;
 
         return false;
@@ -55,16 +58,16 @@ class NodeClientsWaitlist {
             Connect to all nodes
         */
 
-        for (let i=0; i < this.nodeClientsWaitlist.length; i++){
+        for (let i=0; i < this.waitlist.length; i++){
 
-            let nextNode = this.nodeClientsWaitlist[i];
-            if ((nextNode.checkLastTimeChecked(nodeWaitlistTryReconnectAgain))&&(nextNode.blocked===false)&&(NodeLists.searchNodeSocketAddress(nextNode, true, true) === null)){
+            let nextNode = this.waitlist[i];
+            if (nextNode.checkLastTimeChecked(nodeWaitlistTryReconnectAgain) && nextNode.blocked===false && NodeLists.searchNodeSocketAddress(nextNode, 'all') === null){
 
                 nextNode.blocked = true;
 
                 //console.log("connectNewNodeWaitlist ", nextNode.sckAddress.toString() );
 
-                this.connectToNewNode(nextNode.sckAddress).then( (connected)=>{
+                this.connectNowToNewNode(nextNode.sckAddress).then( (connected)=>{
                     nextNode.checked = true;
                     nextNode.blocked = false;
                     nextNode.connected = connected;
@@ -79,18 +82,16 @@ class NodeClientsWaitlist {
         setTimeout(function(){return that.connectNewNodeWaitlist() }, nodeWaitlistInterval);
     }
 
-    async connectToNewNode(address){
-
-        address = (address||'').toLowerCase();
+    async connectNowToNewNode(sckAddress){
 
         //search if the new node was already connected in the past
-        let nodeClient = NodeLists.searchNodeSocketAddress(address);
+        let nodeClient = NodeLists.searchNodeSocketAddress(sckAddress, 'all');
         if (nodeClient !== null) return nodeClient;
 
         nodeClient = new NodeClient();
 
         try{
-            return await nodeClient.connectTo(address);
+            return await nodeClient.connectTo(sckAddress);
         }
         catch (Exception){
             console.log("Error connecting to new node waitlist", Exception.toString())
@@ -102,4 +103,4 @@ class NodeClientsWaitlist {
 
 }
 
-exports.NodeClientsWaitlist = new NodeClientsWaitlist();
+exports.NodeWaitlist = new NodeWaitlist();

@@ -21,6 +21,12 @@ class NodeClient {
     connectTo(address, port){
 
         if (typeof port === 'undefined') port = nodePort;
+
+        let sckAddress = SocketAddress.createSocketAddress(address, port);
+
+        address = sckAddress.address.toString();
+        port = sckAddress.port;
+
         let that = this;
 
         return new Promise(function(resolve) {

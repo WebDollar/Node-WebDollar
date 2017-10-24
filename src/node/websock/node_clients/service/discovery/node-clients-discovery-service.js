@@ -1,7 +1,8 @@
 import {NodeClient} from '../../socket/node-client.js';
 import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_global.js';
 import {NodeClientsService} from '../node-clients-service.js';
-import {NodeClientsWaitlist} from '../../../../lists/waitlist/node-clients-waitlist.js';
+import {NodeWaitlist} from '../../../../lists/waitlist/node-waitlist.js';
+import {NodeLists} from '../../../../lists/node-lists';
 
 const axios = require('axios');
 
@@ -26,7 +27,7 @@ class NodeDiscoveryService {
         await this.downloadFallBackList("http://visionbot.net/webdollars.json");
         await this.downloadFallBackList("http://budisteanu.net/webdollars.json");
 
-        if ((NodeClientsService.nodeClients !== null)&&(NodeClientsService.nodeClients.length < 5)){
+        if ((NodeLists.nodes !== null)&&(NodeLists.nodes.length < 5)){
             let that = this;
             setTimeout(function(){return that.discoverFallbackNodes()}, nodeFallBackInterval)
         }
@@ -71,7 +72,7 @@ class NodeDiscoveryService {
                         //console.log("NEW NODES", nodes);
 
                         for (let i=0; i<nodes.length; i++)
-                            NodeClientsWaitlist.addNewNodeToWaitlist(nodes[i]);
+                            NodeWaitlist.addNewNodeToWaitlist(nodes[i]);
 
                     }
                 }

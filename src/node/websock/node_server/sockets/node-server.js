@@ -57,7 +57,7 @@ class NodeServer {
             });
 
             try {
-                console.log(server);
+                console.log(typeof server);
                 server.listen(nodePort);
             } catch(Exception){
                 console.log("Error Calling node_server.listen", Exception.toString());
