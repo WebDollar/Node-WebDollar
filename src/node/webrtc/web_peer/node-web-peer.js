@@ -80,7 +80,7 @@ class NodeWebPeer {
         }
 
         this.peer.on("disconnect", ()=>{
-            console.log("Peer disconnected", socket.sckAddress.getAddress());
+            console.log("Peer disconnected", socket.node.sckAddress.getAddress());
             NodeLists.disconnectSocket(this.peer);
         })
 

@@ -83,13 +83,13 @@ class NodeServer {
 
 
         socket.once("disconnect", answer => {
-            console.log("Socket disconnected", socket.sckAddress.getAddress());
+            console.log("Socket disconnected", socket.node.sckAddress.getAddress());
             NodeLists.disconnectSocket(socket);
         });
 
-        this.initializeWebRTCSignals(socket);
+        socket.node.protocol.propagation.initializePropagation();
 
-        NodePropagationProtocol.initializeSocketForPropagation(socket);
+        this.initializeWebRTCSignals(socket);
     }
 
 

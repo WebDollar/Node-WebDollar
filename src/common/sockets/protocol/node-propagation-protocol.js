@@ -14,7 +14,7 @@ class NodePropagationProtocol {
 
     initializeSocketForPropagation(node){
 
-        this.on("node_propagation", response => {
+        node.on("node_propagation", response => {
 
             /*
                 sample data

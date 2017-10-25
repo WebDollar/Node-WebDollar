@@ -105,10 +105,12 @@ class NodeClient {
 
         socket.once("disconnect", response => {
 
-            console.log("Client disconnected ",  socket.sckAddress.toString() );
+            console.log("Client disconnected ",  socket.node.sckAddress.toString() );
             NodeLists.disconnectSocket(socket);
 
         });
+
+        socket.node.protocol.propagation.initializePropagation();
     }
 
 

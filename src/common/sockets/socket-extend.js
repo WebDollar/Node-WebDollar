@@ -12,6 +12,7 @@ class SocketExtend{
 
         socket.node = {};
 
+        socket.node.on = (name, callback ) => { socket.on(name, callback) } ;
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port);
 
         socket.node.sendRequest = (request, requestData) => { return this.sendRequest(socket, request, requestData) };
@@ -27,9 +28,8 @@ class SocketExtend{
     }
 
     sendRequest (socket, request, requestData) {
-        //console.log("sendRequest",request, requestData);
 
-        console.log("sendRequest ############### ", socket, request, requestData);
+        //console.log("sendRequest ############### ", socket, request, requestData);
 
         if (typeof socket.emit === 'function')  return socket.emit( request, requestData );
         else return socket.send( request, requestData);
