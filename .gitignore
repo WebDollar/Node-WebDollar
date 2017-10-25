@@ -9,3 +9,5 @@ dist_bundle/bundle_terminal\.js
 dist_bundle/Node-WebDollar-bundle\.js
 
 dist_bundle/bundle\.js
+
+dist_bundle/bundle_dist\.js
