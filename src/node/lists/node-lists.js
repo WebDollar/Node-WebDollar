@@ -1,5 +1,6 @@
 import {GeoLocationLists} from './geolocation-lists/geolocation-lists.js';
 import {SocketAddress} from './../../common/sockets/socket-address.js';
+import {NodeListObject} from './node-list-object.js';
 
 /*
     The List is populated with Node Sockets only if the socket pass the Hello Message
@@ -37,11 +38,14 @@ class NodeLists {
             throw ("type is necessary");
         }
 
-        socket.type = type;
+        socket.node.type = type;
 
         if (this.searchNodeSocketAddress(socket) === null) {
             this.nodes.push(socket);
-            GeoLocationLists.includeSocket(socket);
+
+            let object = NodeListObject(socket, type);
+            GeoLocationLists.includeSocket(object);
+
             return true;
         }
 

@@ -7,7 +7,7 @@ class NodeProtocol {
 
         // Waiting for Protocol Confirmation
 
-        console.log(node);
+        //console.log(node);
 
         let response = await node.sendRequestWaitOnce("HelloNode", {
             version: nodeVersion,
