@@ -74,7 +74,7 @@ class SocketAddress {
 
             if (typeof this.address === 'object') return this.address.toNormalizedString() + (includePort ? ':' + this.port : '');
 
-            return this.address.toString() + (includePort ? this.port : '');
+            return this.address.toString() + (includePort ? ':'+this.port : '');
 
         } catch(Exception){
             console.log("getAddress exception", this.address);
