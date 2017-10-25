@@ -50,6 +50,8 @@ class NodeClient {
                 }
                 this.socket = socket;
 
+                SocketExtend.extendSocket(socket, "address" );
+                console.log("soooocket", socket.node.protocol.sendHello());
 
                 //console.log(socket);
 
