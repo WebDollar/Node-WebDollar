@@ -41,10 +41,10 @@ class GeoLocationLists {
 
     async includeSocket(socket){
 
-        if (socket === null) return null;
+        if (typeof socket === 'undefined' || socket === null) return null;
 
         //in case the location has been set before  (avoiding double insertion)
-        if ((typeof socket.node.location !== 'undefined') && (socket.node.location !== null)) return socket.node.location;
+        if (typeof socket.node !== 'undefined' && typeof socket.node.location !== 'undefined' && socket.node.location !== null) return socket.node.location;
 
         let location = await this.includeAddress(socket.node.sckAddress);
         socket.node.location = location;

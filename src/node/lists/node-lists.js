@@ -25,7 +25,7 @@ class NodeLists {
         sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
         for (let i=0; i<this.nodes.length; i++)
-            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].node.sckAddress.matchAddress(sckAddress))){
+            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress))){
                 return this.nodes[i];
             }
 
@@ -44,6 +44,7 @@ class NodeLists {
 
             let object = new NodeListObject(socket, type);
             this.nodes.push(object);
+
             GeoLocationLists.includeSocket(socket);
 
             return true;
