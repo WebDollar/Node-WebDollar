@@ -21,11 +21,11 @@ class GeoLocationLists {
         this.countGeoLocationContinentsLists = 0;
     }
 
-    async includeAddress(address, port){
+    async includeAddress(sckAddress, port){
 
-        let sckAddress = SocketAddress.createSocketAddress(address, port);
+        sckAddress = SocketAddress.createSocketAddress(sckAddress, port);
 
-        let location = await this.getLocationFromAddress(sckAddress);
+        let location = await this._getLocationFromAddress(sckAddress);
 
         if (location === null){
             console.log("LOCATION was not been able to get");
@@ -34,7 +34,11 @@ class GeoLocationLists {
 
         location.continent = location.continent || '--';
 
-        this.addGeoLocationContinentByAddress(sckAddress, location);
+        console.log('########### 1');
+
+        this._addGeoLocationContinentByAddress(sckAddress, location);
+
+        console.log('########### 2');
 
         return location;
     }
@@ -51,9 +55,12 @@ class GeoLocationLists {
         return location;
     }
 
-    addGeoLocationContinentByAddress(sckAddress, location){
+    _addGeoLocationContinentByAddress(sckAddress, location){
 
-        if (this.searchGeoLocationContinentByAddress(address) === null) {
+        sckAddress = SocketAddress.createSocketAddress(sckAddress);
+
+
+        if (this._searchGeoLocationContinentByAddress(sckAddress) === null) {
 
             if (typeof this.geoLocationContinentsLists[location.continent] === 'undefined') this.geoLocationContinentsLists[location.continent] = [];
 
@@ -69,26 +76,29 @@ class GeoLocationLists {
         return location.continent;
     }
 
-    searchGeoLocationContinentByAddress(address){
+    _searchGeoLocationContinentByAddress(sckAddress){
 
         for (let continent in this.geoLocationContinentsLists)
             if (this.geoLocationContinentsLists.hasOwnProperty(continent))
                 for (let i=0; i<this.geoLocationContinentsLists[continent].length; i++) {
 
-                if (this.geoLocationContinentsLists[continent][i].matchAddress(address))
+                if (this.geoLocationContinentsLists[continent][i].matchAddress(sckAddress))
                     return continent;
                 }
 
         return null;
     }
 
-    async getLocationFromAddress(address){
+    async _getLocationFromAddress(sckAddress){
+
+        let address = sckAddress;
+        if (typeof sckAddress === 'object' && sckAddress.constructor.name === "SocketAddress")  address = sckAddress.getAddress();
 
         if (typeof this.geoLocationLists[address] !== 'undefined')
             return this.geoLocationLists[address];
 
         try{
-            let data = await this.downloadFile("http://ip-api.com/json/"+address);
+            let data = await this._downloadFile("http://ip-api.com/json/"+address);
             if (data !== null){
 
                 let countryCode = '';
@@ -121,7 +131,7 @@ class GeoLocationLists {
 
     }
 
-    async downloadFile(address){
+    async _downloadFile(address){
         try{
             let response = await axios.get(address);
 

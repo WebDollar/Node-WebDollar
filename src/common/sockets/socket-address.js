@@ -82,9 +82,13 @@ class SocketAddress {
         return this.address;
     }
 
-    getAddress(){
-        if (typeof this.address === 'object')  return this.address.toNormalizedString();
-        return this.address.toString();
+    getAddress(includePort){
+
+        if (typeof includePort === 'undefined') includePort = true;
+
+        if (typeof this.address === 'object')  return this.address.toNormalizedString() + (includePort ? this.port : '');
+
+        return this.address.toString() + (includePort ? this.port : '');
     }
 
 }
