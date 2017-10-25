@@ -4,7 +4,10 @@ import {nodePort} from './../../consts/const_global.js';
 class SocketAddress {
 
     static checkIsSocketAddress(sckAddress){
-        if (typeof sckAddress !== 'object') return false;
+
+        console.log("checkIsSocketAddress", sckAddress);
+
+        if (typeof sckAddress !== 'object' || sckAddress === null) return false;
 
         if (! (sckAddress.hasOwnProperty("address") && sckAddress.hasOwnProperty("addressString") && sckAddress.hasOwnProperty("port"))) return false;
 
@@ -14,11 +17,11 @@ class SocketAddress {
     /*
         Create a Socket Address in case the address is just a simple "address"
      */
-    static createSocketAddress(sckAddress, port){
-        if (typeof nodePort === 'undefined') port = nodePort;
-        if (SocketAddress.checkIsSocketAddress(sckAddress)) return sckAddress;
+    static createSocketAddress(address, port){
+        if ( typeof port === 'undefined' || port === '') port = nodePort;
+        if (SocketAddress.checkIsSocketAddress(address)) return address;
 
-        return new SocketAddress(sckAddress, port);
+        return new SocketAddress(address, port);
     }
 
 
