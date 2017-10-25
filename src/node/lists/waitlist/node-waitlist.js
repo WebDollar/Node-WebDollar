@@ -1,6 +1,6 @@
 import {NodeClient} from '../../websock/node_clients/socket/node-client.js';
 import {NodeLists} from './../node-lists.js';
-import {NodeWaitlistObject} from './node-wailist-object.js';
+import {NodeWaitlistObject} from './node-waitlist-object.js';
 import {SocketAddress} from './../../../common/sockets/socket-address.js';
 import {nodeWaitlistTryReconnectAgain, nodeWaitlistInterval} from '../../../consts/const_global.js';
 
@@ -20,22 +20,25 @@ class NodeWaitlist {
 
     addNewNodeToWaitlist(address, port){
 
-        console.log("addNewNodeToWaitlist", address, port);
-
         let sckAddress = SocketAddress.createSocketAddress(address, port);
+
+        //console.log("addNewNodeToWaitlist", sckAddress);
 
         if (this.searchNodeWaitlist(sckAddress)){
             return false;
         }
 
-        //console.log("waitlist[]", this.waitlist);
-        this.waitlist.push(new NodeWaitlistObject(sckAddress));
+        let waitlistObject = new NodeWaitlistObject(sckAddress);
+        this.waitlist.push(waitlistObject);
 
+        //console.log("waitlist[]", this.waitlist);
+
+        return waitlistObject;
     }
 
     searchNodeWaitlist(address, port){
 
-        let sckAddress = SocketAddress.createSocketAddress(address, port);
+        let sckAddress = SocketAddress.createSocketAddress( address, port );
 
         for (let i=0; i<this.waitlist.length; i++)
             if (this.waitlist[i].sckAddress.matchAddress(sckAddress) )

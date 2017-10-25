@@ -9,7 +9,6 @@ class NodeWaitlistObject {
         this.connected = false;
 
         this.lastTimeChecked = 0;
-
     }
 
     refreshLastTimeChecked(){

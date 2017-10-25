@@ -27,6 +27,8 @@ class SocketAddress {
         if (typeof address === 'undefined') address = '';
         if (typeof address === 'string') address = address.toLowerCase();
 
+        if (typeof port === 'undefined') port = nodePort;
+
         try {
             if (typeof address === 'string')
                 address = ipaddr.parse(address);
@@ -48,6 +50,11 @@ class SocketAddress {
         if (typeof address === "object" && address.hasOwnProperty("sckAddress") )
             address = address.sckAddress;
 
+        //maybe address is actually a SocketAddress
+        if (typeof address === 'object' && address.constructor.name === "SocketAddress")
+            address = address.address;
+
+        //converting address string to ipaddr
         try{
             if (typeof address === 'string') address = ipaddr.parse(address);
         } catch (Exception){
