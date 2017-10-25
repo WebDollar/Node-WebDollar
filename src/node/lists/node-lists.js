@@ -41,10 +41,10 @@ class NodeLists {
         socket.node.type = type;
 
         if (this.searchNodeSocketAddress(socket) === null) {
-            this.nodes.push(socket);
 
-            let object = NodeListObject(socket, type);
-            GeoLocationLists.includeSocket(object);
+            let object = new NodeListObject(socket, type);
+            this.nodes.push(object);
+            GeoLocationLists.includeSocket(socket);
 
             return true;
         }
