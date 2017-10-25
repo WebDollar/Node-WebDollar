@@ -8,15 +8,13 @@ class NodePropagationProtocol {
     // nodeClientsService = null
 
     constructor(){
-
         console.log("NodePropagation constructor");
-
     }
 
 
-    initializeSocketForPropagation(socket){
+    initializeSocketForPropagation(){
 
-        socket.once("node_propagation", response => {
+        this.on("node_propagation", response => {
 
             /*
                 sample data
@@ -26,7 +24,7 @@ class NodePropagationProtocol {
                 }
              */
 
-            console.log("NodePropagation",  socket.sckAddress.toString());
+            console.log("NodePropagation",  this.node.sckAddress.getAddress());
 
             let instruction = response.instruction||'';
             switch (instruction){

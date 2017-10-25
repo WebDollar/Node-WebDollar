@@ -15,11 +15,13 @@ class GeoLocationAddressObject  {
 
     constructor(sckAddress, port, location){
 
+        if (typeof location === 'undefined') location = {}
+
         sckAddress = SocketAddress.createSocketAddress(sckAddress, port);
         this.sckAddress = sckAddress;
 
         this.lastTimeChecked = 0;
-        this.location = {};
+        this.location = location;
     }
 
 

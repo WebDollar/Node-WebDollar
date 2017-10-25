@@ -1,11 +1,10 @@
 import * as io from 'socket.io-client';
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
-import {sendRequest} from '../../../../common/sockets/sockets.js';
-import {SocketAddress} from '../../../../common/sockets/socket-address.js';
+import {SocketExtend} from '../../../../common/sockets/socket-extend';
+import {SocketAddress} from '../../../../common/sockets/socket-address';
 import {NodeLists} from '../../../lists/node-lists.js';
-import {NodeProtocol} from '../../../../common/sockets/node/node-protocol.js';
-import {NodePropagationProtocol} from '../../../../common/sockets/node/node-propagation-protocol.js';
+import {NodeProtocol} from '../../../../common/sockets/protocol/node-protocol.js';
 
 class NodeClient {
 
@@ -26,9 +25,7 @@ class NodeClient {
         address = sckAddress.getAddress();
         port = sckAddress.port;
 
-        let that = this;
-
-        return new Promise(function(resolve) {
+        return new Promise( (resolve) => {
 
             try
             {
@@ -51,19 +48,19 @@ class NodeClient {
                     console.log("Error Connecting Node to ", address," ", Exception.toString());
                     resolve(false);
                 }
-                that.socket = socket;
+                this.socket = socket;
 
 
                 //console.log(socket);
 
                 socket.once("connect", response=>{
 
-                    socket.sckAddress = SocketAddress.createSocketAddress(socket.io.opts.hostname||sckAddress.getAddress(),  socket.io.opts.port||sckAddress.port);
+                    SocketExtend.extendSocket(socket, socket.io.opts.hostname||sckAddress.getAddress(),  socket.io.opts.port||sckAddress.port );
 
-                    console.log("Client connected to ", socket.sckAddress.getAddress());
+                    console.log("Client connected to ", socket.node.sckAddress.getAddress() );
 
-                    NodeProtocol.sendHello(socket).then( (answer)=>{
-                        that.initializeSocket(socket);
+                    socket.node.protocol.sendHello().then( (answer)=>{
+                        this.initializeSocket(socket);
                     });
 
                     resolve(true);
@@ -71,7 +68,7 @@ class NodeClient {
 
                 socket.once("connect_error", response =>{
                     console.log("Client error connecting", address);
-                    //NodeLists.disconnectSocket(that.socket);
+                    //NodeLists.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
@@ -107,8 +104,6 @@ class NodeClient {
             NodeLists.disconnectSocket(socket);
 
         });
-
-        NodePropagationProtocol.initializeSocketForPropagation(socket);
     }
 
 

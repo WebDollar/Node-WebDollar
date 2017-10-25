@@ -24,7 +24,7 @@ class NodeLists {
         sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
         for (let i=0; i<this.nodes.length; i++)
-            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].sckAddress.matchAddress(sckAddress))){
+            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].node.sckAddress.matchAddress(sckAddress))){
                 return this.nodes[i];
             }
 
@@ -62,7 +62,7 @@ class NodeLists {
 
         for (let i=this.nodes.length-1; i>=0; i--)
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i] === socket)) {
-                console.log('deleting client socket ',i, socket.sckAddress.toString());
+                console.log('deleting client socket ',i, socket.node.sckAddress.toString());
                 this.nodes.splice(i, 1);
                 socket.disconnect();
                 return true;

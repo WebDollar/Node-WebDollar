@@ -92,7 +92,7 @@ class NodeWaitlist {
 
     async connectNowToNewNode(sckAddress){
 
-        //search if the new node was already connected in the past
+        //search if the new protocol was already connected in the past
         let nodeClient = NodeLists.searchNodeSocketAddress(sckAddress, 'all');
         if (nodeClient !== null) return nodeClient;
 
@@ -102,7 +102,7 @@ class NodeWaitlist {
             return await nodeClient.connectTo(sckAddress);
         }
         catch (Exception){
-            console.log("Error connecting to new node waitlist", Exception.toString())
+            console.log("Error connecting to new protocol waitlist", Exception.toString())
         }
 
         return false;

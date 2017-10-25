@@ -1,11 +1,10 @@
 let io = require('socket.io');
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
-import {sendRequest} from '../../../../common/sockets/sockets.js';
+import {SocketExtend} from '../../../../common/sockets/socket-extend.js';
 import {NodeLists} from '../../../lists/node-lists.js';
-import {NodeProtocol} from '../../../../common/sockets/node/node-protocol.js';
-import {SocketAddress} from '../../../../common/sockets/socket-address.js';
-import {NodePropagationProtocol} from '../../../../common/sockets/node/node-propagation-protocol.js';
+import {NodeProtocol} from '../../../../common/sockets/protocol/node-protocol.js';
+import {NodePropagationProtocol} from '../../../../common/sockets/protocol/node-propagation-protocol.js';
 
 /*
     TUTORIAL
@@ -46,11 +45,11 @@ class NodeServer {
 
             server.on("connection", socket => {
 
-                socket.sckAddress = SocketAddress.createSocketAddress(socket.request.connection.remoteAddress, socket.request.connection.remotePort);
+                SocketExtend.extendSocket(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort);
 
-                console.log('New connection from ' + socket.sckAddress.toString() + ':' + socket.sckAddress.port);
+                console.log('New connection from ' + socket.node.sckAddress.toString() + ':' + socket.node.sckAddress.port);
 
-                NodeProtocol.sendHello(socket).then( (answer)=>{
+                socket.node.protocol.sendHello().then( (answer)=>{
                     this.initializeSocket(socket);
                 });
 

@@ -44,10 +44,10 @@ class GeoLocationLists {
         if (socket === null) return null;
 
         //in case the location has been set before  (avoiding double insertion)
-        if ((typeof socket.location !== 'undefined') && (socket.location !== null)) return socket.location;
+        if ((typeof socket.node.location !== 'undefined') && (socket.node.location !== null)) return socket.node.location;
 
-        let location = await this.includeAddress(socket.sckAddress);
-        socket.location = location;
+        let location = await this.includeAddress(socket.node.sckAddress);
+        socket.node.location = location;
         return location;
     }
 

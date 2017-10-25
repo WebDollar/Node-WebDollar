@@ -1,14 +1,13 @@
 import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
-import {sendRequest} from './../sockets.js';
 import {NodeLists} from './../../../node/lists/node-lists.js';
 
 
 class NodeProtocol {
 
-    async sendHello (socket ){
+    async sendHello () {
 
         // Waiting for Protocol Confirmation
-        let response = await sendRequestWaitOnce(socket, "HelloNode", {
+        let response = await this.node.sendRequestWaitOnce("HelloNode", {
             version: nodeVersion,
         });
 
@@ -17,14 +16,14 @@ class NodeProtocol {
         if ((response.hasOwnProperty("version"))&&(response.version <= nodeVersionCompatibility)){
 
             //check if it is a unique connection, add it to the list
-            let result = NodeLists.searchNodeSocketAddress(socket.sckAddress);
+            let result = NodeLists.searchNodeSocketAddress(this.node.sckAddress);
 
             // console.log("sendHello clientSockets", NodeLists.clientSockets);
             // console.log("sendHello serverSockets", NodeLists.serverSockets);
             // console.log("sendHello", result);
 
             if (result === null){
-                socket.helloValidated = true;
+                this.node.helloValidated = true;
                 console.log("hello validated");
                 return true;
             }
