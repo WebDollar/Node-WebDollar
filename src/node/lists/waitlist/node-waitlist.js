@@ -20,7 +20,7 @@ class NodeWaitlist {
 
     addNewNodeToWaitlist(address, port){
 
-        address = "127.0.0.1";
+        //address = "127.0.0.1";
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
