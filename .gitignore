@@ -3,4 +3,5 @@
 node_modules/
 dist/
 package-lock.json
-dist_bundle/
+
+dist_bundle/bundle_terminal\.js
