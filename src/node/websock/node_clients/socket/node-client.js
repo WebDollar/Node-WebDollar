@@ -22,7 +22,7 @@ class NodeClient {
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
 
-        address = sckAddress.getAddress();
+        address = sckAddress.getAddress(false);
         port = sckAddress.port;
 
         return new Promise( (resolve) => {

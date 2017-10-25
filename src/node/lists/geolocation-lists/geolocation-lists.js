@@ -52,6 +52,7 @@ class GeoLocationLists {
 
         let location = await this.includeAddress(socket.node.sckAddress);
         socket.node.location = location;
+        
         return location;
     }
 
@@ -92,7 +93,7 @@ class GeoLocationLists {
     async _getLocationFromAddress(sckAddress){
 
         let address = sckAddress;
-        if (typeof sckAddress === 'object' && sckAddress.constructor.name === "SocketAddress")  address = sckAddress.getAddress();
+        if (typeof sckAddress === 'object' && sckAddress.constructor.name === "SocketAddress")  address = sckAddress.getAddress(false);
 
         if (typeof this.geoLocationLists[address] !== 'undefined')
             return this.geoLocationLists[address];
