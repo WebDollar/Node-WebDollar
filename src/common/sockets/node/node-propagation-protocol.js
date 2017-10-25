@@ -61,4 +61,3 @@ class NodePropagationProtocol {
 }
 
 exports.NodePropagationProtocol = new NodePropagationProtocol();
-

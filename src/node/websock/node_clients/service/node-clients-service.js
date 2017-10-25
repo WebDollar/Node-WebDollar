@@ -14,7 +14,6 @@ class NodeClientsService {
     startService(){
         NodeDiscoveryService.startDiscovery();
         NodeWaitlist.startConnecting();
-
     }
 
 

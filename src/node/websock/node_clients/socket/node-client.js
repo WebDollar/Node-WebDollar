@@ -23,7 +23,7 @@ class NodeClient {
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
 
-        address = sckAddress.toString();
+        address = sckAddress.getAddress();
         port = sckAddress.port;
 
         let that = this;
@@ -43,7 +43,14 @@ class NodeClient {
                 if (address.indexOf("http://") === -1 )  address = "http://"+address;
 
                 console.log("connecting... to address", address);
-                let socket = io.connect(address, {});
+
+                let socket = null;
+                try {
+                    socket = io.connect(address, {});
+                }  catch (Exception){
+                    console.log("Error Connecting Node to ", address," ", Exception.toString());
+                    resolve(false);
+                }
                 that.socket = socket;
 
 
@@ -51,7 +58,7 @@ class NodeClient {
 
                 socket.once("connect", response=>{
 
-                    socket.sckAddress = SocketAddress(socket.io.opts.hostname,  socket.io.opts.port);
+                    socket.sckAddress = SocketAddress(socket.io.opts.hostname||sckAddress.getAddress(),  socket.io.opts.port||sckAddress.port);
 
                     console.log("Client connected to ", socket.sckAddress.toString());
 
@@ -80,7 +87,7 @@ class NodeClient {
 
             }
             catch(Exception){
-                console.log("Error Connecting Node to ", address," ", Exception.toString());
+                console.log("Error Raised when connecting Node to ", address," ", Exception.toString());
                 resolve(false);
             }
 

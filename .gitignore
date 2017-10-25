@@ -5,3 +5,7 @@ dist/
 package-lock.json
 
 dist_bundle/bundle_terminal\.js
+
+dist_bundle/Node-WebDollar-bundle\.js
+
+dist_bundle/bundle\.js

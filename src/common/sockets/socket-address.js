@@ -78,6 +78,11 @@ class SocketAddress {
         return this.address;
     }
 
+    getAddress(){
+        if (typeof this.address === 'object')  return this.address.toNormalizedString();
+        return this.address.toString();
+    }
+
 }
 
 exports.SocketAddress = SocketAddress;
