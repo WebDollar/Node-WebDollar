@@ -12,7 +12,7 @@ class NodePropagationProtocol {
     }
 
 
-    initializeSocketForPropagation(){
+    initializeSocketForPropagation(node){
 
         this.on("node_propagation", response => {
 

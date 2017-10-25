@@ -14,23 +14,25 @@ class SocketExtend{
 
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port);
 
-        socket.node.sendRequest = this.sendRequest;
-        socket.node.sendRequestWaitOnce = this.sendRequestWaitOnce;
+        socket.node.sendRequest = (request, requestData) => { return this.sendRequest(socket, request, requestData) };
+        socket.node.sendRequestWaitOnce = (request, requestData) => {return this.sendRequestWaitOnce(socket, request, requestData) };
 
         socket.node.protocol = {};
         socket.node.protocol.helloValidated = false;
-        socket.node.protocol.sendHello = NodeProtocol.sendHello;
-        socket.node.protocol.broadcastMessageAllSockets = NodeProtocol.broadcastMessageAllSockets;
+        socket.node.protocol.sendHello = () => { return NodeProtocol.sendHello(socket.node)  };
+        socket.node.protocol.broadcastMessageAllSockets = (request, data) => { return NodeProtocol.broadcastMessageAllSockets(socket.node, request, data) };
 
         socket.node.protocol.propagation = {};
-        socket.node.protocol.propagation.initializePropagation = NodePropagationProtocol.initializeSocketForPropagation;
+        socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket.node) };
     }
 
-    sendRequest (request, requestData) {
+    sendRequest (socket, request, requestData) {
         //console.log("sendRequest",request, requestData);
 
-        if (typeof this.emit === 'function')  return this.emit( request, requestData );
-        else return this.send( request, requestData);
+        console.log("sendRequest ############### ", socket, request, requestData);
+
+        if (typeof socket.emit === 'function')  return socket.emit( request, requestData );
+        else return socket.send( request, requestData);
     }
 
 
@@ -38,13 +40,13 @@ class SocketExtend{
         Sending the Request and return the Promise to Wait Async
     */
 
-    sendRequestWaitOnce (request, requestData) {
+    sendRequestWaitOnce (socket, request, requestData) {
 
         return new Promise((resolve) => {
 
-            this.sendRequest(request, requestData);
+            this.sendRequest(socket, request, requestData);
 
-            this.once(request, function (resData) {
+            socket.once(request, function (resData) {
                 resolve(resData);
             });
         });

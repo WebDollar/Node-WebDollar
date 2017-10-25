@@ -53,7 +53,7 @@ class NodeLists {
     disconnectSocket(socket, type){
 
 
-        if ((socket.helloValidated|| false)===false) {
+        if ((socket.node.protocol.helloValidated|| false)===false) {
             console.log("disconnectSocket rejected by invalid helloValidated", socket.helloValidated);
             return false;
         }
