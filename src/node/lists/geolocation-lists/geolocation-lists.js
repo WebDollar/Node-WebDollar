@@ -102,7 +102,7 @@ class GeoLocationLists {
                 let country = '';
                 let continent = '--';
 
-                //console.log("location data", data);
+                //console.log("location data", address, data);
 
                 if (data.hasOwnProperty('country')){
                     country = data.country;
