@@ -65,6 +65,8 @@ class NodeLists {
 
         if (typeof type === 'undefined') type = 'all';
 
+        console.log("disconnecting", socket, this.nodes);
+
         for (let i=this.nodes.length-1; i>=0; i--)
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].sckAddress === socket.node.sckAddress && socket.node.sckAddress !== null)) {
                 console.log('deleting client socket ',i, socket.node.sckAddress.toString());
@@ -73,6 +75,7 @@ class NodeLists {
                 return true;
             }
 
+        console.log("Disconnecting Socket ",socket.node.sckAddress.getAddress()," but it was not validated before...");
         return false;
     }
 
