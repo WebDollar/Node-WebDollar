@@ -40,7 +40,7 @@ class GeoLocationAddressObject  {
     }
 
     toString(){
-        return this.sckAddress.toString();
+        return this.sckAddress.getAddress();
     }
 
 }

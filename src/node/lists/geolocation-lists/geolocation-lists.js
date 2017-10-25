@@ -34,11 +34,7 @@ class GeoLocationLists {
 
         location.continent = location.continent || '--';
 
-        console.log('########### 1');
-
         this._addGeoLocationContinentByAddress(sckAddress, location);
-
-        console.log('########### 2');
 
         return location;
     }
@@ -52,7 +48,7 @@ class GeoLocationLists {
 
         let location = await this.includeAddress(socket.node.sckAddress);
         socket.node.location = location;
-        
+
         return location;
     }
 
@@ -83,7 +79,7 @@ class GeoLocationLists {
             if (this.geoLocationContinentsLists.hasOwnProperty(continent))
                 for (let i=0; i<this.geoLocationContinentsLists[continent].length; i++) {
 
-                if (this.geoLocationContinentsLists[continent][i].matchAddress(sckAddress))
+                if (this.geoLocationContinentsLists[continent][i].sckAddress.matchAddress(sckAddress))
                     return continent;
                 }
 

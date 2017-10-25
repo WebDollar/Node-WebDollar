@@ -47,7 +47,7 @@ class NodeServer {
 
                 SocketExtend.extendSocket(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort);
 
-                console.log('New connection from ' + socket.node.sckAddress.toString() + ':' + socket.node.sckAddress.port);
+                console.log('New connection from ' + socket.node.sckAddress.getAddress(true));
 
                 socket.node.protocol.sendHello().then( (answer)=>{
                     this.initializeSocket(socket);

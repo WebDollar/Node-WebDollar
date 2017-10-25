@@ -20,7 +20,7 @@ class SocketAddress {
     static createSocketAddress(address, port){
 
         //in case address is actually a Socket
-        if (typeof address === "object" && address !== null && address.hasOwnProperty("sckAddress")) address = address.sckAddress;
+        if (typeof address === "object" && address !== null && address.hasOwnProperty("node") && address.node.hasOwnProperty("sckAddress")) address = address.node.sckAddress;
 
         if (SocketAddress.checkIsSocketAddress(address)) return address;
 
