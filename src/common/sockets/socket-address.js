@@ -5,11 +5,11 @@ class SocketAddress {
 
     static checkIsSocketAddress(sckAddress){
 
-        console.log("checkIsSocketAddress", sckAddress);
+        //console.log("checkIsSocketAddress", sckAddress);
 
         if (typeof sckAddress !== 'object' || sckAddress === null) return false;
 
-        if (! (sckAddress.hasOwnProperty("address") && sckAddress.hasOwnProperty("addressString") && sckAddress.hasOwnProperty("port"))) return false;
+        if (! (sckAddress.constructor.name === "SocketAddress" )) return false;
 
         return true;
     }
@@ -18,9 +18,13 @@ class SocketAddress {
         Create a Socket Address in case the address is just a simple "address"
      */
     static createSocketAddress(address, port){
-        if ( typeof port === 'undefined' || port === '') port = nodePort;
+
+        //in case address is actually a Socket
+        if (typeof address === "object" && address !== null && address.hasOwnProperty("sckAddress")) address = address.sckAddress;
+
         if (SocketAddress.checkIsSocketAddress(address)) return address;
 
+        if ( typeof port === 'undefined' || port === '') port = nodePort;
         return new SocketAddress(address, port);
     }
 

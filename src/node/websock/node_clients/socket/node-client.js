@@ -58,9 +58,9 @@ class NodeClient {
 
                 socket.once("connect", response=>{
 
-                    socket.sckAddress = SocketAddress(socket.io.opts.hostname||sckAddress.getAddress(),  socket.io.opts.port||sckAddress.port);
+                    socket.sckAddress = SocketAddress.createSocketAddress(socket.io.opts.hostname||sckAddress.getAddress(),  socket.io.opts.port||sckAddress.port);
 
-                    console.log("Client connected to ", socket.sckAddress.toString());
+                    console.log("Client connected to ", socket.sckAddress.getAddress());
 
                     NodeProtocol.sendHello(socket).then( (answer)=>{
                         that.initializeSocket(socket);

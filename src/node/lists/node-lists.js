@@ -21,13 +21,7 @@ class NodeLists {
 
         if (typeof type === 'undefined') type = 'all';
 
-        //in case address is a Socket
-        if (typeof address === 'object' &&  address.hasOwnProperty("sckAddress") )
-            sckAddress = sckAddress.address||'';
-
-        if (typeof sckAddress ===  'string'){
-            sckAddress = new SocketAddress(sckAddress)
-        }
+        sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
         for (let i=0; i<this.nodes.length; i++)
             if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].sckAddress.matchAddress(sckAddress))){

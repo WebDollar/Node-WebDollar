@@ -46,7 +46,7 @@ class NodeServer {
 
             server.on("connection", socket => {
 
-                socket.sckAddress = SocketAddress(socket.request.connection.remoteAddress, socket.request.connection.remotePort);
+                socket.sckAddress = SocketAddress.createSocketAddress(socket.request.connection.remoteAddress, socket.request.connection.remotePort);
 
                 console.log('New connection from ' + socket.sckAddress.toString() + ':' + socket.sckAddress.port);
 
