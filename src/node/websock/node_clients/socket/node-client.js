@@ -52,7 +52,7 @@ class NodeClient {
 
                 socket.once("connect", response=>{
 
-                    socket.sckAddress = SocketAddress(socket, socket.io.opts.hostname,  socket.io.opts.port);
+                    socket.sckAddress = SocketAddress(socket.io.opts.hostname,  socket.io.opts.port);
 
                     console.log("Client connected to ", socket.sckAddress.toString());
 

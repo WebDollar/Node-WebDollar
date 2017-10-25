@@ -63,7 +63,8 @@ class NodeWaitlist {
             Connect to all nodes
         */
 
-        console.log(this.waitlist);
+        console.log("Waitlist length", this.waitlist.length);
+        //console.log(this.waitlist);
 
         for (let i=0; i < this.waitlist.length; i++){
 
