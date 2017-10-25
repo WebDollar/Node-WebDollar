@@ -24,8 +24,6 @@ class SocketExtend{
 
         socket.node.protocol.propagation = {};
         socket.node.protocol.propagation.initializePropagation = NodePropagationProtocol.initializeSocketForPropagation;
-
-        socket.node.protocol.SocketAddress.createSocketAddress(socket.io.opts.hostname||sckAddress.getAddress(),  socket.io.opts.port||sckAddress.port);
     }
 
     sendRequest (request, requestData) {

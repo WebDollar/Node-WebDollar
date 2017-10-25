@@ -96,7 +96,10 @@ class NodeClient {
 
     initializeSocket(socket){
 
-        let isUnique = NodeLists.addUniqueSocket(socket, true, false);
+        //it is not unique... then I have to disconnect
+        if (NodeLists.addUniqueSocket(socket, "client") === false){
+            return false;
+        }
 
         socket.once("disconnect", response => {
 

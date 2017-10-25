@@ -76,11 +76,14 @@ class NodeServer {
 
     initializeSocket(socket){
 
-        let isUnique = NodeLists.addUniqueSocket(socket, false, true);
+         //it is not unique... then I have to disconnect
+        if (NodeLists.addUniqueSocket(socket, "server") === false){
+            return false;
+        }
 
 
         socket.once("disconnect", answer => {
-            console.log("Socket disconnected", socket.sckAddress.toString());
+            console.log("Socket disconnected", socket.sckAddress.getAddress());
             NodeLists.disconnectSocket(socket);
         });
 
