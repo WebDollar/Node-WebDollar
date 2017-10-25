@@ -66,7 +66,7 @@ class NodeLists {
         if (typeof type === 'undefined') type = 'all';
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i] === socket)) {
+            if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].sckAddress === socket.node.sckAddress && socket.node.sckAddress !== null)) {
                 console.log('deleting client socket ',i, socket.node.sckAddress.toString());
                 this.nodes.splice(i, 1);
                 socket.disconnect();
