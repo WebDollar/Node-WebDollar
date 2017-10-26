@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build_terminal": "babel --presets es2017 src -d dist && browserify dist/build_terminal.js > dist_bundle/bundle_terminal.js",
-    "build_browser": "browserify src/build.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/Node-WebDollar-bundle.js -t [ babelify --presets [ es2017 ] ]",
-    "test": "npm run build_terminal && node dist/build_terminal.js"
+    "build_browser": "browserify src/build_browser.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/Node-WebDollar-bundle.js -t [ babelify --presets [ es2017 ] ]",
+    "test_browser": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ]",
+    "test": "npm run build_terminal && PARAM=6000 node dist/build_terminal.js  "
   },
   "repository": {
     "type": "git",

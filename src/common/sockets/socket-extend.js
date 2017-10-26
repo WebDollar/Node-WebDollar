@@ -2,6 +2,8 @@ import { Observable, Subscribable } from 'rxjs/Observable';
 
 import {NodeProtocol} from './protocol/node-protocol';
 import {NodePropagationProtocol} from './protocol/node-propagation-protocol';
+import {NodeSignalingProtocol} from './protocol/node-signaling-protocol';
+import {NodeLists} from '../../node/lists/node-lists.js';
 import {SocketAddress} from './socket-address';
 
 // Extending Socket / Simple Peer
@@ -17,14 +19,16 @@ class SocketExtend{
 
         socket.node.sendRequest = (request, requestData) => { return this.sendRequest(socket, request, requestData) };
         socket.node.sendRequestWaitOnce = (request, requestData) => {return this.sendRequestWaitOnce(socket, request, requestData) };
+        socket.node.broadcastRequest = (request, data, type) => { return this.broadcastRequest(socket, request, data, type) };
 
         socket.node.protocol = {};
         socket.node.protocol.helloValidated = false;
         socket.node.protocol.sendHello = () => { return NodeProtocol.sendHello(socket.node)  };
-        socket.node.protocol.broadcastMessageAllSockets = (request, data) => { return NodeProtocol.broadcastMessageAllSockets(socket.node, request, data) };
 
         socket.node.protocol.propagation = {};
         socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket.node) };
+
+        socket.node.protocol.propagation.initializeSignalsAccepting = () => { return NodeSignalingProtocol.initializeSocketSignalsAccepting(socket.node) };
     }
 
     sendRequest (socket, request, requestData) {
@@ -67,9 +71,21 @@ class SocketExtend{
     }
 
 
+    broadcastRequest (socket, request, data, type){
+
+        let sockets = NodeLists.getNodes(type);
+
+        for (let i=0; i < sockets.length; i++)
+            if (sockets[i] !== socket)
+                this.sendRequest(sockets[i], request, data);
+
+    }
+
+
 }
 
 
 exports.SocketExtend = new SocketExtend();
+
 
 

@@ -29,11 +29,6 @@ class NodeWebPeer {
                 wrtc: wrtc,
             });
 
-        this.initializePeer();
-
-    }
-
-    initializePeer(){
 
         this.peer.on('error', err => { console.log('error', err) } );
 
@@ -75,10 +70,13 @@ class NodeWebPeer {
 
 
     initializePeer(){
+
         //it is not unique... then I have to disconnect
         if (NodeLists.addUniqueSocket(this.peer, "peer") === false){
             return false;
         }
+
+        this.peer.node.protocol.propagation.initializeSignalsAccepting();
 
         this.peer.on("disconnect", ()=>{
             console.log("Peer disconnected", socket.node.sckAddress.getAddress());

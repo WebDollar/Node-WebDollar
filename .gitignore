@@ -11,3 +11,5 @@ dist_bundle/Node-WebDollar-bundle\.js
 dist_bundle/bundle\.js
 
 dist_bundle/bundle_dist\.js
+
+dist_bundle/browser/bundle_browser\.js

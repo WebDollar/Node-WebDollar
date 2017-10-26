@@ -5,6 +5,7 @@ if((typeof window !== 'undefined' && !window._babelPolyfill) ||
 
 console.log(""); console.log(""); console.log("");
 console.log("Node WebDollar");
+console.log(process.env.PARAM);
 console.log(""); console.log(""); console.log("");
 
 let Node = require('./node/Node.js');

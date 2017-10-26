@@ -35,14 +35,6 @@ class NodeProtocol {
 
     }
 
-    broadcastMessageAllSockets (node, request, data){
-
-        let sockets = NodeLists.getNodes();
-
-        for (let i=0; i < sockets.length; i++)
-            sockets[i].emit(request, data)
-
-    }
 
 }
 

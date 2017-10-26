@@ -93,21 +93,9 @@ class NodeServer {
         });
 
         socket.node.protocol.propagation.initializePropagation();
-
-        this.initializeWebRTCSignals(socket);
+        socket.node.protocol.propagation.initializeSignalsAccepting();
     }
 
-
-    initializeWebRTCSignals(socket){
-
-        socket.on("pools/signal/initialize", answer =>{
-
-        });
-
-        socket.on("pools/signal/join", answer =>{
-
-        });
-    }
 
 }
 

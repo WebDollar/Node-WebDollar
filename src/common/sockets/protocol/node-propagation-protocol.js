@@ -5,8 +5,6 @@ import {NodeProtocol} from './node-protocol.js';
 
 class NodePropagationProtocol {
 
-    // nodeClientsService = null
-
     constructor(){
         console.log("NodePropagation constructor");
     }
