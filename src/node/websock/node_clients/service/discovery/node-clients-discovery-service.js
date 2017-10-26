@@ -1,8 +1,7 @@
-import {NodeClient} from '../../socket/node-client.js';
 import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_global.js';
-import {NodeClientsService} from '../node-clients-service.js';
 import {NodeWaitlist} from '../../../../lists/waitlist/node-waitlist.js';
 import {NodeLists} from '../../../../lists/node-lists';
+import {FallBackObject} from './fallback-object';
 
 const axios = require('axios');
 
@@ -13,46 +12,43 @@ class NodeDiscoveryService {
         console.log("NodeDiscover constructor");
 
         this.fallbackLists = [
-            {"url":"https://www.jasonbase.com/things/E1p1"},
 
+            new FallBackObject("https://www.jasonbase.com/things/E1p1"),
+            new FallBackObject("https://api.myjson.com/bins/xi1hr"),
+            new FallBackObject("http://skyhub.me/public/webdollars.json"),
+            new FallBackObject("http://visionbot.net/webdollars.json"),
+            new FallBackObject("http://budisteanu.net/webdollars.json"),
 
-            // {"url":"https://api.myjson.com/bins/xi1hr"},
-            // {"url":"http://skyhub.me/public/webdollars.json"}, {"url":"http://visionbot.net/webdollars.json"}, {"url":"http://budisteanu.net/webdollars.json"}
         ];
 
     }
 
     startDiscovery(){
 
-        this.discoverFallbackNodes();
+        this._discoverFallbackNodes();
 
     }
 
-    async discoverFallbackNodes(){
+    async _discoverFallbackNodes(){
 
         if (NodeLists.nodes !== null && NodeLists.nodes.length < 5 ){
 
             for (let i=0; i<this.fallbackLists.length; i++)
-                if (typeof this.fallbackLists[i].checked === 'undefined')
+                if ( this.fallbackLists[i].checked === false && this.fallbackLists[i].checkLastTimeChecked(nodeFallBackInterval) )
                 {
-                    await this._downloadFallBackList(i);
+                    await this._downloadFallBackList(this.fallbackLists[i]);
                 }
-            //await this.downloadFallBackList("https://api.myjson.com/bins/xi1hr");
-            //await this.downloadFallBackList("https://www.jasonbase.com/things/E1p1");
-            // await this.downloadFallBackList("http://skyhub.me/public/webdollars.json");
-            // await this.downloadFallBackList("http://visionbot.net/webdollars.json");
-            // await this.downloadFallBackList("http://budisteanu.net/webdollars.json");
         }
 
-        setTimeout(()=>{return this.discoverFallbackNodes()}, nodeFallBackInterval)
+        console.log(this.fallbackLists);
+        setTimeout(()=>{return this._discoverFallbackNodes()}, 3000)
 
     }
 
-    async _downloadFallBackList(fallbackListsIndex){
+    async _downloadFallBackList(fallbackItem){
 
-        if (fallbackListsIndex >= this.fallbackLists.length ) return false;
-
-        let address = this.fallbackLists[fallbackListsIndex].url;
+        fallbackItem.refreshLastTimeChecked();
+        let url = fallbackItem.url;
 
         try{
 
@@ -60,7 +56,7 @@ class NodeDiscoveryService {
                 method:'get',
                 timeout: 10000,
                 withCredentials: true,
-                url: address,
+                url: url,
                 headers: {
                     "Access-Control-Allow-Origin": "*",
                     'Accept': 'application/json',
@@ -75,11 +71,10 @@ class NodeDiscoveryService {
 
             if (typeof data === 'string') data = JSON.parse(data);
 
-            //console.log(data, typeof data);
 
             if ((typeof data === 'object') && (data !== null)){
 
-                this.fallbackLists[fallbackListsIndex].checked = true;
+                fallbackItem.checked = true;
 
                 let nodes =  [];
                 let name = '';
@@ -119,7 +114,9 @@ class NodeDiscoveryService {
             }
         }
         catch(Exception){
-            console.log("ERROR downloading list: ", address, Exception.toString());
+            console.log("ERROR downloading list: ", url, Exception.toString());
+            fallbackItem.errorTrials++;
+
             return null;
         }
     }

@@ -7,4 +7,4 @@ exports.nodeStatusInterval =  5*1000; //miliseconds
 
 
 exports.nodeWaitlistTryReconnectAgain =  60*1000; //miliseconds
-exports.nodeWaitlistInterval =  10*1000; //miliseconds
+exports.nodeWaitlistInterval =  5*1000; //miliseconds

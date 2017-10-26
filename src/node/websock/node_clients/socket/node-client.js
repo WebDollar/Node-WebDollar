@@ -4,7 +4,7 @@ import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../const
 import {SocketExtend} from '../../../../common/sockets/socket-extend';
 import {SocketAddress} from '../../../../common/sockets/socket-address';
 import {NodeLists} from '../../../lists/node-lists.js';
-import {NodeProtocol} from '../../../../common/sockets/protocol/node-protocol.js';
+import {NodeWaitlist} from '../../../lists/waitlist/node-waitlist.js';
 
 class NodeClient {
 
@@ -43,14 +43,19 @@ class NodeClient {
 
                 let socket = null;
                 try {
-                    socket = io.connect(address, {});
+
+                    // params described in the documentation https://socket.io/docs/client-api#manager
+                    socket = io.connect(address, {
+                        reconnection: false, //no reconnection because it is managed automatically by the WaitList
+                    });
+
                 }  catch (Exception){
                     console.log("Error Connecting Node to ", address," ", Exception.toString());
                     resolve(false);
+                    return false;
                 }
                 this.socket = socket;
 
-                //console.log(socket);
 
                 socket.once("connect", response=>{
 
@@ -60,9 +65,10 @@ class NodeClient {
 
                     socket.node.protocol.sendHello().then( (answer)=>{
                         this.initializeSocket(socket);
+
+                        resolve(true);
                     });
 
-                    resolve(true);
                 });
 
                 socket.once("connect_error", response =>{

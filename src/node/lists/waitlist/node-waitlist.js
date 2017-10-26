@@ -18,15 +18,23 @@ class NodeWaitlist {
         this.started = false;
     }
 
+
+    async startConnecting(){
+
+        if (this.started === false) {
+            this.started = true;
+            this._connectNewNodeWaitlist();
+        }
+
+    }
+
     addNewNodeToWaitlist(address, port){
 
         //address = "127.0.0.1";
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
-        //console.log("addNewNodeToWaitlist", sckAddress);
-
-        if (this.searchNodeWaitlist(sckAddress)){
+        if (this.searchNodeWaitlist(sckAddress) !== null){
             return false;
         }
 
@@ -44,26 +52,16 @@ class NodeWaitlist {
 
         for (let i=0; i<this.waitlist.length; i++)
             if (this.waitlist[i].sckAddress.matchAddress(sckAddress) )
-                return true;
+                return this.waitlist[i];
 
-        return false;
+        return null;
     }
 
 
-    async startConnecting(){
-
-        if (this.started === false) {
-            this.started = true;
-            this.connectNewNodeWaitlist();
-        }
-
-    }
-
-    connectNewNodeWaitlist(){
-
-        /*
-            Connect to all nodes
-        */
+    /*
+        Connect to all nodes
+    */
+    _connectNewNodeWaitlist(){
 
         console.log("Waitlist length", this.waitlist.length);
         //console.log(this.waitlist);
@@ -71,13 +69,13 @@ class NodeWaitlist {
         for (let i=0; i < this.waitlist.length; i++){
 
             let nextNode = this.waitlist[i];
-            if ( nextNode.checkLastTimeChecked(nodeWaitlistTryReconnectAgain) && nextNode.blocked===false && NodeLists.searchNodeSocketAddress(nextNode, 'all') === null){
+            if ( nextNode.checkLastTimeChecked(nodeWaitlistTryReconnectAgain) && nextNode.blocked===false && nextNode.connecting===false && NodeLists.searchNodeSocketAddress(nextNode, 'all') === null){
 
                 nextNode.blocked = true;
 
                 //console.log("connectNewNodeWaitlist ", nextNode.sckAddress.toString() );
 
-                this.connectNowToNewNode(nextNode.sckAddress).then( (connected)=>{
+                this._connectNowToNewNode(nextNode).then( (connected)=>{
                     nextNode.checked = true;
                     nextNode.blocked = false;
                     nextNode.connected = connected;
@@ -88,25 +86,35 @@ class NodeWaitlist {
 
         }
 
-        let that = this;
-        setTimeout(function(){return that.connectNewNodeWaitlist() }, nodeWaitlistInterval);
+
+        setTimeout(()=>{return this._connectNewNodeWaitlist() }, nodeWaitlistInterval);
     }
 
-    async connectNowToNewNode(sckAddress){
+    async _connectNowToNewNode(nextNode){
+
+        nextNode.connecting = true;
 
         //search if the new protocol was already connected in the past
-        let nodeClient = NodeLists.searchNodeSocketAddress(sckAddress, 'all');
+        let nodeClient = NodeLists.searchNodeSocketAddress(nextNode.sckAddress, 'all');
         if (nodeClient !== null) return nodeClient;
 
-        nodeClient = new NodeClient();
+        if (nextNode.socket !== null) nodeClient = nextNode.socket;
+        else nodeClient = new NodeClient();
 
         try{
-            return await nodeClient.connectTo(sckAddress);
+            let answer = await nodeClient.connectTo(nextNode.sckAddress);
+
+            if (answer)  nextNode.socketConnected(nodeClient);
+            else nextNode.socketErrorConnected();
+
+            nextNode.connecting = false;
+            return answer;
         }
         catch (Exception){
             console.log("Error connecting to new protocol waitlist", Exception.toString())
         }
 
+        nextNode.connecting = false;
         return false;
     }
 
