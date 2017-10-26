@@ -107,6 +107,16 @@ class NodeLists {
         return list;
     }
 
+
+    removeDisconnectedSockets(){
+        for (let i=this.nodes.length-1; i>=0; i--)
+            if (this.nodes[i].socket.disconnected){
+                this.nodes.splice(i,1);
+            }
+
+        setTimeout(()=>{this.removeDisconnectedSockets()}, 2000);
+    }
+
 }
 
 exports.NodeLists =  new NodeLists();

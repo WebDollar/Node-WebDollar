@@ -53,6 +53,11 @@ class NodeServer {
                     this.initializeSocket(socket);
                 });
 
+                socket.once("disconnect", () => {
+                    console.log("Socket disconnected"); console.log( socket.node.sckAddress.getAddress() );
+                    NodeLists.disconnectSocket(socket);
+                });
+
             });
 
             try {
@@ -82,12 +87,6 @@ class NodeServer {
         }
 
         console.log(colors.white('Socket Initialized ' + socket.node.sckAddress.getAddress(true)));
-
-
-        socket.once("disconnect", answer => {
-            console.log("Socket disconnected"); console.log( socket.node.sckAddress.getAddress() );
-            NodeLists.disconnectSocket(socket);
-        });
 
 
         socket.node.protocol.propagation.initializePropagation();

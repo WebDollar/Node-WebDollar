@@ -75,7 +75,7 @@ class NodeClient {
                 socket.once("connect_error", (response) =>{
 
                     console.log("Client error connecting", address);
-                    NodeLists.disconnectSocket(this.socket);
+                    //NodeLists.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
@@ -86,6 +86,15 @@ class NodeClient {
 
                     resolve(false);
                 });
+
+                socket.once("disconnect", () => {
+
+                    console.log("################## disconnect socket")
+                    console.log("Client disconnected "); console.log( this.socket.node.sckAddress.getAddress() );
+                    NodeLists.disconnectSocket(this.socket);
+
+                });
+
 
                 socket.connect();
 
@@ -104,21 +113,14 @@ class NodeClient {
     initializeSocket(){
 
         //it is not unique... then I have to disconnect
+
         if (NodeLists.addUniqueSocket(this.socket, "client") === false){
             return false;
         }
 
         console.log(colors.white('Socket Initialized ' + this.socket.node.sckAddress.getAddress(true)));
 
-        socket.once("disconnect", (response) => {
-
-            console.log("Client disconnected "); console.log( this.socket.node.sckAddress.getAddress() );
-            NodeLists.disconnectSocket(this.socket);
-
-        });
-
-
-        socket.node.protocol.propagation.initializePropagation();
+        this.socket.node.protocol.propagation.initializePropagation();
     }
 
 

@@ -22,7 +22,7 @@ class NodeWaitlistObject {
 
         let time = new Date().getTime();
 
-        if ( (time - this.lastTimeChecked) >= nodeTryReconnectAgain + this.errorTrial*1000 )
+        if ( (time - this.lastTimeChecked) >= nodeTryReconnectAgain + this.errorTrial*5000 )
             return true;
 
         return false;
