@@ -2,6 +2,8 @@ import {GeoLocationLists} from './geolocation-lists/geolocation-lists.js';
 import {SocketAddress} from './../../common/sockets/socket-address.js';
 import {NodeListObject} from './node-list-object.js';
 
+const colors = require('colors/safe');
+
 /*
     The List is populated with Node Sockets only if the socket pass the Hello Message
  */
@@ -50,7 +52,7 @@ class NodeLists {
             return true;
         }
 
-        console.log("%c Already connected to "+socket.node.sckAddress.getAddress(true), 'color: red' );
+        console.log(colors.red( "Already connected to "+socket.node.sckAddress.getAddress(true)));
         socket.disconnect(true);
         return false;
     }
@@ -70,14 +72,14 @@ class NodeLists {
 
         for (let i=this.nodes.length-1; i>=0; i--)
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress))) {
-                console.log('deleting client socket ',i, socket.node.sckAddress.toString());
+                console.log(colors.green('deleting client socket '+ i+ socket.node.sckAddress.toString()));
                 this.nodes.splice(i, 1);
 
                 socket.disconnect(true);
                 return true;
             }
 
-        console.log("Disconnecting Socket but it was not validated before...", socket); console.log(socket.node.sckAddress.getAddress());
+        console.log(colors.red("Disconnecting Socket but it was not validated before...")); console.log(socket.node.sckAddress.getAddress());
         return false;
     }
 
