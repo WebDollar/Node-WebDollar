@@ -1,4 +1,5 @@
 import * as io from 'socket.io-client';
+const colors = require('colors/safe');
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
 import {SocketExtend} from '../../../../common/sockets/socket-extend';
@@ -61,7 +62,7 @@ class NodeClient {
 
                     SocketExtend.extendSocket(socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port );
 
-                    console.log("Client connected to ", socket.node.sckAddress.getAddress() );
+                    console.log(colors.blue("Client connected to " + socket.node.sckAddress.getAddress(true) ));
 
                     socket.node.protocol.sendHello().then( (answer)=>{
                         this.initializeSocket(socket);
@@ -105,6 +106,8 @@ class NodeClient {
         if (NodeLists.addUniqueSocket(socket, "client") === false){
             return false;
         }
+
+        console.log(colors.aqua('Socket Initialized ' + socket.node.sckAddress.getAddress(true)));
 
         socket.once("disconnect", (response) => {
 

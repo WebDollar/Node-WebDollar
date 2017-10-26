@@ -1,4 +1,5 @@
 let io = require('socket.io');
+const colors = require('colors/safe');
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
 import {SocketExtend} from '../../../../common/sockets/socket-extend.js';
@@ -47,7 +48,7 @@ class NodeServer {
 
                 SocketExtend.extendSocket(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort);
 
-                console.log('New connection from ' + socket.node.sckAddress.getAddress(true));
+                console.log(colors.blue('New connection from ' + socket.node.sckAddress.getAddress(true)));
 
                 socket.node.protocol.sendHello().then( (answer)=>{
                     this.initializeSocket(socket);
@@ -80,6 +81,8 @@ class NodeServer {
         if (NodeLists.addUniqueSocket(socket, "server") === false){
             return false;
         }
+
+        console.log(colors.aqua('Socket Initialized ' + socket.node.sckAddress.getAddress(true)));
 
 
         socket.once("disconnect", answer => {

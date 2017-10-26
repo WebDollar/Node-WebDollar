@@ -72,7 +72,7 @@ class NodeLists {
 
         for (let i=this.nodes.length-1; i>=0; i--)
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress))) {
-                console.log(colors.green('deleting client socket '+ i+ socket.node.sckAddress.toString()));
+                console.log(colors.green('deleting client socket '+ i+" "+ socket.node.sckAddress.toString()));
                 this.nodes.splice(i, 1);
 
                 socket.disconnect(true);
@@ -80,6 +80,7 @@ class NodeLists {
             }
 
         console.log(colors.red("Disconnecting Socket but it was not validated before...")); console.log(socket.node.sckAddress.getAddress());
+        socket.disconnect(true);
         return false;
     }
 
