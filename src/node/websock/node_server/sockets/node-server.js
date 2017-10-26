@@ -36,7 +36,6 @@ class NodeServer {
         {
             let server = null;
             try {
-                console.log(typeof io);
                 server = io();
 
             } catch(Exception){

@@ -36,11 +36,14 @@ class NodeLists {
 
     addUniqueSocket(socket, type){
 
-        if (type === 'undefined'){
-            throw ("type is necessary");
-        }
-
+        if (type === 'undefined') throw ("type is necessary");
         socket.node.type = type;
+
+        if ((socket.node.protocol.helloValidated|| false) === false) {
+            console.log(colors.red("Error - addUniqueSocket rejected by invalid helloValidated"), socket.node.protocol.helloValidated);
+            socket.disconnect(true);
+            return false;
+        }
 
         if (this.searchNodeSocketAddress(socket) === null) {
 
@@ -62,7 +65,8 @@ class NodeLists {
 
 
         if ((socket.node.protocol.helloValidated|| false)===false) {
-            console.log("disconnectSocket rejected by invalid helloValidated", socket.node.protocol.helloValidated);
+            console.log(colors.red("Error - disconnectSocket rejected by invalid helloValidated"),socket.node.protocol.helloValidated);
+            socket.disconnect(true);
             return false;
         }
 
@@ -71,7 +75,7 @@ class NodeLists {
         //console.log("disconnecting", socket, this.nodes);
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress))) {
+            if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket === socket )) {
                 console.log(colors.green('deleting client socket '+ i+" "+ socket.node.sckAddress.toString()));
                 this.nodes.splice(i, 1);
 

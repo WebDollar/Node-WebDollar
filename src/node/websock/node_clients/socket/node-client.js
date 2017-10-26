@@ -73,8 +73,9 @@ class NodeClient {
                 });
 
                 socket.once("connect_error", (response) =>{
+
                     console.log("Client error connecting", address);
-                    //NodeLists.disconnectSocket(this.socket);
+                    NodeLists.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
@@ -116,12 +117,6 @@ class NodeClient {
 
         });
 
-        socket.once("close", (response) => {
-
-            console.log("Client closed "); console.log( socket.node.sckAddress.getAddress() );
-            NodeLists.disconnectSocket(socket);
-
-        });
 
         socket.node.protocol.propagation.initializePropagation();
     }
