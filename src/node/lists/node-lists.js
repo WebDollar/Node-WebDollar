@@ -50,8 +50,8 @@ class NodeLists {
             return true;
         }
 
-        console.log("ERROR!!! Already connected to ",socket);
-        socket.disconnect();
+        console.log("%c Already connected to "+socket.node.sckAddress.getAddress(true), 'color: red' );
+        socket.disconnect(true);
         return false;
     }
 
