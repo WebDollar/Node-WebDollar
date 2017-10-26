@@ -65,7 +65,7 @@ class NodeLists {
 
         if (typeof type === 'undefined') type = 'all';
 
-        console.log("disconnecting", socket, this.nodes);
+        //console.log("disconnecting", socket, this.nodes);
 
         for (let i=this.nodes.length-1; i>=0; i--)
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.getAddress(false) === socket.node.sckAddress.getAddress(false) )) {

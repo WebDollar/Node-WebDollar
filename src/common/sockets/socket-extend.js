@@ -31,8 +31,22 @@ class SocketExtend{
 
         //console.log("sendRequest ############### ", socket, request, requestData);
 
-        if (typeof socket.emit === 'function')  return socket.emit( request, requestData );
-        else return socket.send( request, requestData);
+        if (typeof socket.emit === 'function')  return socket.emit( request, requestData ); //socket io
+        else
+        if (typeof socket.send === 'function')  return socket.send( request, requestData ); // socket
+        else
+        if (typeof socket.signal === 'function') { //webrtc peer
+            try{
+                requestData = JSON.parse(requestData);
+
+            } catch (Exception){
+                console.log("ERRROR! Couldn't convert JSON data ", requestData)
+            }
+            return socket.signal( request, requestData )
+        }
+
+        console.log("ERROR!! Couldn't sendRequest ", socket, request, requestData);
+
     }
 
 

@@ -41,10 +41,11 @@ class NodeWebPeer {
             console.log('SIGNAL', JSON.stringify(data));
         });
 
-        this.peer.on('connect', (data) => {
+        this.peer.on('connect', () => {
+
             console.log('CONNECT');
 
-            SocketExtend.extendSocket(this.peer, "address",  0 );
+            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort );
 
             this.peer.node.protocol.sendHello().then( (answer)=>{
                 this.initializePeer();
