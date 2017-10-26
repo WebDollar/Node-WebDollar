@@ -59,7 +59,7 @@ class NodeClient {
 
                 socket.once("connect", (response) =>{
 
-                    SocketExtend.extendSocket(socket, socket.io.opts.hostname||sckAddress.getAddress(),  socket.io.opts.port||sckAddress.port );
+                    SocketExtend.extendSocket(socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port );
 
                     console.log("Client connected to ", socket.node.sckAddress.getAddress() );
 
@@ -108,14 +108,14 @@ class NodeClient {
 
         socket.once("disconnect", (response) => {
 
-            console.log("Client disconnected ",  socket.node.sckAddress.getAddress() );
+            console.log("Client disconnected "); console.log( socket.node.sckAddress.getAddress() );
             NodeLists.disconnectSocket(socket);
 
         });
 
         socket.once("close", (response) => {
 
-            console.log("Client closed ",  socket.node.sckAddress.getAddress() );
+            console.log("Client closed "); console.log( socket.node.sckAddress.getAddress() );
             NodeLists.disconnectSocket(socket);
 
         });

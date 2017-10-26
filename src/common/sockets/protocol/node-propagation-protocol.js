@@ -22,7 +22,7 @@ class NodePropagationProtocol {
                 }
              */
 
-            console.log("NodePropagation",  this.node.sckAddress.getAddress());
+            console.log("NodePropagation",  node.sckAddress.getAddress());
 
             let instruction = response.instruction||'';
             switch (instruction){

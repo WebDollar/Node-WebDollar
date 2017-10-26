@@ -83,7 +83,7 @@ class NodeServer {
 
 
         socket.once("disconnect", answer => {
-            console.log("Socket disconnected", socket.node.sckAddress.getAddress());
+            console.log("Socket disconnected"); console.log( socket.node.sckAddress.getAddress() );
             NodeLists.disconnectSocket(socket);
         });
 

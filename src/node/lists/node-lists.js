@@ -50,7 +50,7 @@ class NodeLists {
             return true;
         }
 
-        console.log("ERROR!!! Already connected to ",socket.sckAddress.getAddress(true) );
+        console.log("ERROR!!! Already connected to ",socket);
         socket.disconnect();
         return false;
     }
@@ -60,7 +60,7 @@ class NodeLists {
 
 
         if ((socket.node.protocol.helloValidated|| false)===false) {
-            console.log("disconnectSocket rejected by invalid helloValidated", socket.helloValidated);
+            console.log("disconnectSocket rejected by invalid helloValidated", socket.node.protocol.helloValidated);
             return false;
         }
 
@@ -77,7 +77,7 @@ class NodeLists {
                 return true;
             }
 
-        console.log("Disconnecting Socket ",socket.node.sckAddress.getAddress()," but it was not validated before...");
+        console.log("Disconnecting Socket but it was not validated before...", socket); console.log(socket.node.sckAddress.getAddress());
         return false;
     }
 
