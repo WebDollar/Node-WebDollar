@@ -17,6 +17,7 @@ exports.helloWord = function() {
 module.exports = {
     NodeServer : Node.NodeServer,
     NodeClientsService : Node.NodeClientsService,
+    NodeWebPeersService : Node.NodeWebPeersService,
 };
 
 // var mymodule = (function() { console.log("This is a message from the demo package"); })();

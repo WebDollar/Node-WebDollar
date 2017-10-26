@@ -12,14 +12,13 @@ class NodeDiscoveryService {
 
         console.log("NodeDiscover constructor");
 
-        this.axiosInstance = axios.create({
-            timeout: 10000,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            responseType:'json'
-        });
+        this.fallbackLists = [
+            {"url":"https://www.jasonbase.com/things/E1p1"},
+
+
+            // {"url":"https://api.myjson.com/bins/xi1hr"},
+            // {"url":"http://skyhub.me/public/webdollars.json"}, {"url":"http://visionbot.net/webdollars.json"}, {"url":"http://budisteanu.net/webdollars.json"}
+        ];
 
     }
 
@@ -32,32 +31,55 @@ class NodeDiscoveryService {
     async discoverFallbackNodes(){
 
         if (NodeLists.nodes !== null && NodeLists.nodes.length < 5 ){
-            await this.downloadFallBackList("http://webdollar.io/public/webdollars.json");
-            await this.downloadFallBackList("http://skyhub.me/public/webdollars.json");
-            await this.downloadFallBackList("http://visionbot.net/webdollars.json");
-            await this.downloadFallBackList("http://budisteanu.net/webdollars.json");
+
+            for (let i=0; i<this.fallbackLists.length; i++)
+                if (typeof this.fallbackLists[i].checked === 'undefined')
+                {
+                    await this._downloadFallBackList(i);
+                }
+            //await this.downloadFallBackList("https://api.myjson.com/bins/xi1hr");
+            //await this.downloadFallBackList("https://www.jasonbase.com/things/E1p1");
+            // await this.downloadFallBackList("http://skyhub.me/public/webdollars.json");
+            // await this.downloadFallBackList("http://visionbot.net/webdollars.json");
+            // await this.downloadFallBackList("http://budisteanu.net/webdollars.json");
         }
 
-        let that = this;
-        setTimeout(function(){return that.discoverFallbackNodes()}, nodeFallBackInterval)
+        setTimeout(()=>{return this.discoverFallbackNodes()}, nodeFallBackInterval)
 
     }
 
-    async downloadFallBackList(address){
+    async _downloadFallBackList(fallbackListsIndex){
+
+        if (fallbackListsIndex >= this.fallbackLists.length ) return false;
+
+        let address = this.fallbackLists[fallbackListsIndex].url;
 
         try{
 
-            let response = await this.axiosInstance.get(address);
+            let response = await axios({
+                method:'get',
+                timeout: 10000,
+                withCredentials: true,
+                url: address,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                responseType: 'json',
+            });
 
             let data = response.data;
 
-            //console.log(data);
+            console.log(data);
 
             if (typeof data === 'string') data = JSON.parse(data);
 
             //console.log(data, typeof data);
 
             if ((typeof data === 'object') && (data !== null)){
+
+                this.fallbackLists[fallbackListsIndex].checked = true;
 
                 let nodes =  [];
                 let name = '';

@@ -4,10 +4,10 @@ import {NodeLists} from '../../lists/node-lists.js';
 import {NodeWaitlist} from '../../lists/waitlist/node-waitlist.js';
 
 
-class NodePeersService {
+class NodeWebPeersService {
 
     constructor(){
-        console.log("NodePeersService constructor");
+        console.log("NodeWebPeersService constructor");
     }
 
     startService(){
@@ -19,4 +19,4 @@ class NodePeersService {
 
 }
 
-exports.NodePeersService = new NodePeersService();
+exports.NodeWebPeersService = new NodeWebPeersService();

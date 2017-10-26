@@ -32,12 +32,15 @@
     "bufferutil": "^3.0.2",
     "fs": "0.0.1-security",
     "ipaddr.js": "^1.5.4",
+    "jsonp": "^0.2.1",
+    "node-jsonp": "^1.0.2",
     "rxjs": "^5.4.3",
     "socket.io": "^2.0.3",
     "socket.io-browserify": "^0.9.6",
     "socket.io-client": "^2.0.3",
     "socket.io-p2p": "^2.2.0",
-    "utf-8-validate": "^3.0.3"
+    "utf-8-validate": "^3.0.3",
+    "wrtc": "0.0.62"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
