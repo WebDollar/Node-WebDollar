@@ -113,6 +113,13 @@ class NodeClient {
 
         });
 
+        socket.once("close", (response) => {
+
+            console.log("Client closed ",  socket.node.sckAddress.getAddress() );
+            NodeLists.disconnectSocket(socket);
+
+        });
+
         socket.node.protocol.propagation.initializePropagation();
     }
 

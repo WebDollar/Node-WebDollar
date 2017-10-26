@@ -72,7 +72,9 @@ class NodeLists {
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress))) {
                 console.log('deleting client socket ',i, socket.node.sckAddress.toString());
                 this.nodes.splice(i, 1);
-                socket.disconnect();
+
+                socket.disconnect(true);
+                socket.close();
                 return true;
             }
 
