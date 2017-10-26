@@ -39,8 +39,9 @@ class NodeLists {
         if (type === 'undefined') throw ("type is necessary");
         socket.node.type = type;
 
-        if ((socket.node.protocol.helloValidated|| false) === false) {
-            console.log(colors.red("Error - addUniqueSocket rejected by invalid helloValidated"), socket.node.protocol.helloValidated);
+        if (!socket.hasOwnProperty("node")|| !(socket.node.protocol.helloValidated|| false)) {
+            console.log(colors.red("Error - addUniqueSocket rejected by invalid helloValidated"));
+            if (socket.hasOwnProperty("node")) console.log(socket.node.protocol.helloValidated);
             socket.disconnect(true);
             return false;
         }
@@ -64,8 +65,9 @@ class NodeLists {
     disconnectSocket(socket, type){
 
 
-        if ((socket.node.protocol.helloValidated|| false)===false) {
-            console.log(colors.red("Error - disconnectSocket rejected by invalid helloValidated"),socket.node.protocol.helloValidated);
+        if (!socket.hasOwnProperty("node")|| !(socket.node.protocol.helloValidated|| false)) {
+            console.log(colors.red("Error - disconnectSocket rejected by invalid helloValidated"));
+            if (socket.hasOwnProperty("node")) console.log(socket.node.protocol.helloValidated);
             socket.disconnect(true);
             return false;
         }

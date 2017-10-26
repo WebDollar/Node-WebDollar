@@ -81,7 +81,7 @@ class NodeServer {
             return false;
         }
 
-        console.log(colors.aqua('Socket Initialized ' + socket.node.sckAddress.getAddress(true)));
+        console.log(colors.white('Socket Initialized ' + socket.node.sckAddress.getAddress(true)));
 
 
         socket.once("disconnect", answer => {

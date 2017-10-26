@@ -82,7 +82,7 @@ class NodeClient {
 
                 socket.once("connect_failed", (response) =>{
                     console.log("Client error connecting (connect_failed) ", address);
-                    NodeLists.disconnectSocket(socket);
+                    NodeLists.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
@@ -101,19 +101,19 @@ class NodeClient {
 
     }
 
-    initializeSocket(socket){
+    initializeSocket(){
 
         //it is not unique... then I have to disconnect
-        if (NodeLists.addUniqueSocket(socket, "client") === false){
+        if (NodeLists.addUniqueSocket(this.socket, "client") === false){
             return false;
         }
 
-        console.log(colors.aqua('Socket Initialized ' + socket.node.sckAddress.getAddress(true)));
+        console.log(colors.white('Socket Initialized ' + this.socket.node.sckAddress.getAddress(true)));
 
         socket.once("disconnect", (response) => {
 
-            console.log("Client disconnected "); console.log( socket.node.sckAddress.getAddress() );
-            NodeLists.disconnectSocket(socket);
+            console.log("Client disconnected "); console.log( this.socket.node.sckAddress.getAddress() );
+            NodeLists.disconnectSocket(this.socket);
 
         });
 
