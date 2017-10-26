@@ -87,10 +87,6 @@ class NodeServer {
             NodeLists.disconnectSocket(socket);
         });
 
-        socket.once("close", answer => {
-            console.log("Socket closed ", socket.node.sckAddress.getAddress());
-            NodeLists.disconnectSocket(socket);
-        });
 
         socket.node.protocol.propagation.initializePropagation();
         socket.node.protocol.propagation.initializeSignalsAccepting();

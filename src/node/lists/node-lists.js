@@ -74,7 +74,6 @@ class NodeLists {
                 this.nodes.splice(i, 1);
 
                 socket.disconnect(true);
-                socket.close();
                 return true;
             }
 
