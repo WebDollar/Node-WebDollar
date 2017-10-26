@@ -57,7 +57,7 @@ class NodeClient {
                 this.socket = socket;
 
 
-                socket.once("connect", response=>{
+                socket.once("connect", (response) =>{
 
                     SocketExtend.extendSocket(socket, socket.io.opts.hostname||sckAddress.getAddress(),  socket.io.opts.port||sckAddress.port );
 
@@ -71,14 +71,14 @@ class NodeClient {
 
                 });
 
-                socket.once("connect_error", response =>{
+                socket.once("connect_error", (response) =>{
                     console.log("Client error connecting", address);
                     //NodeLists.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
 
-                socket.once("connect_failed", response =>{
+                socket.once("connect_failed", (response) =>{
                     console.log("Client error connecting (connect_failed) ", address);
                     NodeLists.disconnectSocket(socket);
 
@@ -106,7 +106,7 @@ class NodeClient {
             return false;
         }
 
-        socket.once("disconnect", response => {
+        socket.once("disconnect", (response) => {
 
             console.log("Client disconnected ",  socket.node.sckAddress.getAddress() );
             NodeLists.disconnectSocket(socket);

@@ -23,6 +23,7 @@ class NodeStats {
         let waitlistCount = NodeWaitlist.waitlist.length;
 
         console.log(" connected to: ", clientSockets," , from: ", serverSockets, " web peers", webPeers," Waitlist:",waitlistCount,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists);
+        console.log(NodeLists.getNodes("client"), NodeLists.getNodes("server"))
     }
 }
 

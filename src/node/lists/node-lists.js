@@ -50,6 +50,7 @@ class NodeLists {
             return true;
         }
 
+        console.log("ERROR!!! Already connected to ",socket.sckAddress.getAddress(true) );
         socket.disconnect();
         return false;
     }
@@ -68,7 +69,7 @@ class NodeLists {
         //console.log("disconnecting", socket, this.nodes);
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.getAddress(false) === socket.node.sckAddress.getAddress(false) )) {
+            if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress))) {
                 console.log('deleting client socket ',i, socket.node.sckAddress.toString());
                 this.nodes.splice(i, 1);
                 socket.disconnect();

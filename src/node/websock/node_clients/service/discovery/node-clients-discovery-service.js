@@ -40,7 +40,6 @@ class NodeDiscoveryService {
                 }
         }
 
-        console.log(this.fallbackLists);
         setTimeout(()=>{return this._discoverFallbackNodes()}, 3000)
 
     }
