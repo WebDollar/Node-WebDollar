@@ -3,7 +3,7 @@ const colors = require('colors/safe');
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
 import {SocketExtend} from '../../../../common/sockets/socket-extend.js';
-import {NodeLists} from '../../../lists/node-lists.js';
+import {NodesList} from '../../../lists/nodes-list.js';
 import {NodeProtocol} from '../../../../common/sockets/protocol/node-protocol.js';
 import {NodePropagationProtocol} from '../../../../common/sockets/protocol/node-propagation-protocol.js';
 
@@ -55,7 +55,7 @@ class NodeServer {
 
                 socket.once("disconnect", () => {
                     console.log("Socket disconnected"); console.log( socket.node.sckAddress.getAddress() );
-                    NodeLists.disconnectSocket(socket);
+                    NodesList.disconnectSocket(socket);
                 });
 
             });
@@ -82,7 +82,7 @@ class NodeServer {
     initializeSocket(socket){
 
         //it is not unique... then I have to disconnect
-        if (NodeLists.addUniqueSocket(socket, "server") === false){
+        if (NodesList.addUniqueSocket(socket, "server") === false){
             return false;
         }
 

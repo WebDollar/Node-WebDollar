@@ -1,9 +1,9 @@
 import {nodeStatusInterval} from '../../../consts/const_global.js';
-import {NodeLists} from '../node-lists.js';
+import {NodesList} from '../nodes-list.js';
 import {GeoLocationLists} from '../geolocation-lists/geolocation-lists.js';
-import {NodeWaitlist} from '../waitlist/node-waitlist';
+import {NodesWaitlist} from '../waitlist/nodes-waitlist';
 
-class NodeStats {
+class NodesStats {
 
     // socket : null,
 
@@ -17,14 +17,14 @@ class NodeStats {
 
     printStats(){
 
-        let clientSockets = NodeLists.getNodes("client").length;
-        let serverSockets = NodeLists.getNodes("server").length;
-        let webPeers = NodeLists.getNodes("webpeer").length;
-        let waitlistCount = NodeWaitlist.waitlist.length;
+        let clientSockets = NodesList.getNodes("client").length;
+        let serverSockets = NodesList.getNodes("server").length;
+        let webPeers = NodesList.getNodes("webpeer").length;
+        let waitlistCount = NodesWaitlist.waitlist.length;
 
         console.log(" connected to: ", clientSockets," , from: ", serverSockets, " web peers", webPeers," Waitlist:",waitlistCount,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists);
-        //console.log(NodeLists.getNodes("client"), NodeLists.getNodes("server"))
+        //console.log(NodesList.getNodes("client"), NodesList.getNodes("server"))
     }
 }
 
-exports.NodeStats = new NodeStats();
+exports.NodesStats = new NodesStats();

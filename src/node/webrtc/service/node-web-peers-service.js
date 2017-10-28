@@ -1,7 +1,7 @@
 import {NodeWebPeer} from '../web_peer/node-web-peer.js';
-import {NodePeersDiscoveryService} from './discovery/node-peers-discovery-service.js';
-import {NodeLists} from '../../lists/node-lists.js';
-import {NodeWaitlist} from '../../lists/waitlist/node-waitlist.js';
+import {NodeWebPeersDiscoveryService} from './discovery/node-web-peers-discovery-service.js';
+import {NodesList} from '../../lists/nodes-list.js';
+import {NodesWaitlist} from '../../lists/waitlist/nodes-waitlist.js';
 
 
 class NodeWebPeersService {
@@ -12,8 +12,8 @@ class NodeWebPeersService {
 
     startService(){
 
-        NodePeersDiscoveryService.startDiscovery();
-        NodeWaitlist.startConnecting();
+        NodeWebPeersDiscoveryService.startDiscovery();
+        NodesWaitlist.startConnecting();
     }
 
 

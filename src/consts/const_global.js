@@ -6,5 +6,5 @@ exports.nodePort =  12320; //port
 exports.nodeStatusInterval =  5*1000; //miliseconds
 
 
-exports.nodeWaitlistTryReconnectAgain =  60*1000; //miliseconds
-exports.nodeWaitlistInterval =  5*1000; //miliseconds
+exports.nodesWaitlistTryReconnectAgain =  60*1000; //miliseconds
+exports.nodesWaitlistInterval =  5*1000; //miliseconds

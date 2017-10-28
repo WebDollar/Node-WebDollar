@@ -1,6 +1,6 @@
 import {nodeProtocol, nodeFallBackInterval} from '../../../consts/const_global.js';
 
-import {NodeWaitlist} from '../../../node/lists/waitlist/node-waitlist.js';
+import {NodesWaitlist} from '../../../node/lists/waitlist/nodes-waitlist.js';
 import {NodeProtocol} from './node-protocol.js';
 
 class NodePropagationProtocol {
@@ -33,7 +33,7 @@ class NodePropagationProtocol {
 
                         for (let i=0; i<addresses.length; i++){
                             let address = addresses[i];
-                            NodeWaitlist.addNewNodeToWaitlist(address);
+                            NodesWaitlist.addNewNodeToWaitlist(address);
                         }
                     }
 

@@ -1,7 +1,7 @@
 import {NodeClient} from '../socket/node-client.js';
 import {NodeDiscoveryService} from './discovery/node-clients-discovery-service.js';
-import {NodeLists} from '../../../lists/node-lists.js';
-import {NodeWaitlist} from '../../../lists/waitlist/node-waitlist.js';
+import {NodesList} from '../../../lists/nodes-list.js';
+import {NodesWaitlist} from '../../../lists/waitlist/nodes-waitlist.js';
 
 
 class NodeClientsService {
@@ -13,7 +13,7 @@ class NodeClientsService {
 
     startService(){
         NodeDiscoveryService.startDiscovery();
-        NodeWaitlist.startConnecting();
+        NodesWaitlist.startConnecting();
     }
 
 

@@ -1,6 +1,6 @@
 import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_global.js';
-import {NodeWaitlist} from '../../../../lists/waitlist/node-waitlist.js';
-import {NodeLists} from '../../../../lists/node-lists';
+import {NodesWaitlist} from '../../../../lists/waitlist/nodes-waitlist.js';
+import {NodesList} from '../../../../lists/nodes-list';
 import {FallBackObject} from './fallback-object';
 
 const axios = require('axios');
@@ -31,7 +31,7 @@ class NodeDiscoveryService {
 
     async _discoverFallbackNodes(){
 
-        if (NodeLists.nodes !== null && NodeLists.nodes.length < 5 ){
+        if (NodesList.nodes !== null && NodesList.nodes.length < 5 ){
 
             for (let i=0; i<this.fallbackLists.length; i++)
                 if ( this.fallbackLists[i].checked === false && this.fallbackLists[i].checkLastTimeChecked(nodeFallBackInterval) )
@@ -103,7 +103,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[i];
                             }
 
-                            NodeWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort);
+                            NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort);
                         }
 
                     }

@@ -4,8 +4,8 @@ const colors = require('colors/safe');
 import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
 import {SocketExtend} from '../../../../common/sockets/socket-extend';
 import {SocketAddress} from '../../../../common/sockets/socket-address';
-import {NodeLists} from '../../../lists/node-lists.js';
-import {NodeWaitlist} from '../../../lists/waitlist/node-waitlist.js';
+import {NodesList} from '../../../lists/nodes-list.js';
+import {NodesWaitlist} from '../../../lists/waitlist/nodes-waitlist.js';
 
 class NodeClient {
 
@@ -75,14 +75,14 @@ class NodeClient {
                 socket.once("connect_error", (response) =>{
 
                     console.log("Client error connecting", address);
-                    //NodeLists.disconnectSocket(this.socket);
+                    //NodesList.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
 
                 socket.once("connect_failed", (response) =>{
                     console.log("Client error connecting (connect_failed) ", address);
-                    NodeLists.disconnectSocket(this.socket);
+                    NodesList.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
@@ -91,7 +91,7 @@ class NodeClient {
 
                     console.log("################## disconnect socket")
                     console.log("Client disconnected "); console.log( this.socket.node.sckAddress.getAddress() );
-                    NodeLists.disconnectSocket(this.socket);
+                    NodesList.disconnectSocket(this.socket);
 
                 });
 
@@ -114,7 +114,7 @@ class NodeClient {
 
         //it is not unique... then I have to disconnect
 
-        if (NodeLists.addUniqueSocket(this.socket, "client") === false){
+        if (NodesList.addUniqueSocket(this.socket, "client") === false){
             return false;
         }
 

@@ -1,6 +1,6 @@
 import {nodeProtocol, nodeFallBackInterval} from '../../../consts/const_global.js';
 
-import {NodeWaitlist} from '../../../node/lists/waitlist/node-waitlist.js';
+import {NodesWaitlist} from '../../../node/lists/waitlist/nodes-waitlist.js';
 import {NodeProtocol} from './node-protocol.js';
 
 class NodeSignalingProtocol {
@@ -12,7 +12,13 @@ class NodeSignalingProtocol {
     }
 
 
-    initializeSocketSignalsAccepting(node){
+    initializeSocketSignalingService(node){
+
+        node.on("signals/register-web-peer-for-accepting-connections", (data) =>{
+
+            node.protocol.signaling.clients.push()
+
+        });
 
         node.on("signals/initialize", answer =>{
 

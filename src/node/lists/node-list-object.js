@@ -4,7 +4,7 @@ const ipaddr = require('ipaddr.js');
     TUTORIAL BASED ON https://www.npmjs.com/package/ipaddr.js/
  */
 
-class NodeListObject {
+class NodesListObject {
 
     constructor(socket, type){
 
@@ -19,4 +19,4 @@ class NodeListObject {
 
 
 
-exports.NodeListObject = NodeListObject;
+exports.NodesListObject = NodesListObject;

@@ -3,7 +3,7 @@ import { Observable, Subscribable } from 'rxjs/Observable';
 import {NodeProtocol} from './protocol/node-protocol';
 import {NodePropagationProtocol} from './protocol/node-propagation-protocol';
 import {NodeSignalingProtocol} from './protocol/node-signaling-protocol';
-import {NodeLists} from '../../node/lists/node-lists.js';
+import {NodesList} from '../../node/lists/nodes-list.js';
 import {SocketAddress} from './socket-address';
 
 // Extending Socket / Simple Peer
@@ -28,7 +28,8 @@ class SocketExtend{
         socket.node.protocol.propagation = {};
         socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket.node) };
 
-        socket.node.protocol.propagation.initializeSignalsAccepting = () => { return NodeSignalingProtocol.initializeSocketSignalsAccepting(socket.node) };
+        socket.node.protocol.signaling = {};
+        socket.node.protocol.signaling.initializeSocketSignalingService = () => { return NodeSignalingProtocol.initializeSocketSignalingService(socket.node) };
     }
 
     sendRequest (socket, request, requestData) {
@@ -44,7 +45,7 @@ class SocketExtend{
                 requestData = JSON.parse(requestData);
 
             } catch (Exception){
-                console.log("ERRROR! Couldn't convert JSON data ", requestData)
+                console.log("ERROR! Couldn't convert JSON data ", requestData)
             }
             return socket.signal( request, requestData )
         }
@@ -73,11 +74,11 @@ class SocketExtend{
 
     broadcastRequest (socket, request, data, type){
 
-        let sockets = NodeLists.getNodes(type);
+        let nodes = NodesList.getNodes(type);
 
-        for (let i=0; i < sockets.length; i++)
-            if (sockets[i] !== socket)
-                this.sendRequest(sockets[i], request, data);
+        for (let i=0; i < nodes.length; i++)
+            if (nodes[i].socket !== socket)
+                this.sendRequest(nodes[i].socket, request, data);
 
     }
 

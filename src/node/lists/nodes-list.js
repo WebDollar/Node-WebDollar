@@ -1,6 +1,6 @@
 import {GeoLocationLists} from './geolocation-lists/geolocation-lists.js';
 import {SocketAddress} from './../../common/sockets/socket-address.js';
-import {NodeListObject} from './node-list-object.js';
+import {NodesListObject} from './node-list-object.js';
 
 const colors = require('colors/safe');
 
@@ -8,15 +8,17 @@ const colors = require('colors/safe');
     The List is populated with Node Sockets only if the socket pass the Hello Message
  */
 
-class NodeLists {
+class NodesList {
 
-    // nodes = []
+    // nodes = []               - storing the connected sockets
+    // events = []              - used for callbacks
 
     constructor(){
 
-        console.log("NodeLists constructor");
+        console.log("NodesList constructor");
 
         this.nodes = [];
+        this.events = [];
     }
 
 
@@ -46,10 +48,17 @@ class NodeLists {
             return false;
         }
 
+        // avoiding double connections
         if (this.searchNodeSocketAddress(socket) === null) {
 
-            let object = new NodeListObject(socket, type);
+            // it is a unique connection, I should register this connection
+
+            let object = new NodesListObject(socket, type);
             this.nodes.push(object);
+
+            let eventsList = this.getEvents("connected");
+            for (let j=0; j<eventsList.length; j++)
+                eventsList[j].callback(null, object);
 
             GeoLocationLists.includeSocket(socket);
 
@@ -98,11 +107,14 @@ class NodeLists {
         let list = [];
 
         for (let i=0; i<this.nodes.length; i++)
-            if (this.nodes[i].type === type || type  === "all") {
 
-                list.push( this.nodes[i] );
-
+            if (typeof type === 'string') { // in case type is just a simple string
+                if (type === this.nodes[i].type || type === "all")
+                    list.push(this.nodes[i]);
             }
+            else if (Array.isArray(type)) //in case type is an Array
+                if (this.nodes[i].type in type)
+                    list.push(this.nodes[i]);
 
         return list;
     }
@@ -117,6 +129,29 @@ class NodeLists {
         setTimeout(()=>{this.removeDisconnectedSockets()}, 2000);
     }
 
+    /*
+        EVENTS - Callbacks
+     */
+
+    registerEvents(eventName, params, callback){
+
+        this.events.push({
+            name: eventName,
+            params: params,
+            callback: callback,
+        })
+    }
+
+    getEvents(eventName){
+
+        let list = [];
+        for (let i=0; i<this.events.length; i++)
+            if (this.events[i].name === eventName)
+                list.push(this.events[i]);
+
+        return list;
+    }
+
 }
 
-exports.NodeLists =  new NodeLists();
+exports.NodesList =  new NodesList();

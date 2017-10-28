@@ -1,5 +1,5 @@
 import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
-import {NodeLists} from './../../../node/lists/node-lists.js';
+import {NodesList} from '../../../node/lists/nodes-list.js';
 
 class NodeProtocol {
 
@@ -18,10 +18,10 @@ class NodeProtocol {
         if ((response.hasOwnProperty("version"))&&(response.version <= nodeVersionCompatibility)){
 
             //check if it is a unique connection, add it to the list
-            let result = NodeLists.searchNodeSocketAddress(node.sckAddress);
+            let result = NodesList.searchNodeSocketAddress(node.sckAddress);
 
-            // console.log("sendHello clientSockets", NodeLists.clientSockets);
-            // console.log("sendHello serverSockets", NodeLists.serverSockets);
+            // console.log("sendHello clientSockets", NodesList.clientSockets);
+            // console.log("sendHello serverSockets", NodesList.serverSockets);
             // console.log("sendHello", result);
 
             if (result === null){

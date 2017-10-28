@@ -10,7 +10,7 @@ let wrtc = require('wrtc');
 let Peer = require('simple-peer');
 
 import {SocketExtend} from './../../../common/sockets/socket-extend'
-import {NodeLists} from './../../lists/node-lists';
+import {NodesList} from '../../lists/nodes-list';
 
 class NodeWebPeer {
 
@@ -72,7 +72,7 @@ class NodeWebPeer {
     initializePeer(){
 
         //it is not unique... then I have to disconnect
-        if (NodeLists.addUniqueSocket(this.peer, "peer") === false){
+        if (NodesList.addUniqueSocket(this.peer, "peer") === false){
             return false;
         }
 
@@ -80,7 +80,7 @@ class NodeWebPeer {
 
         this.peer.on("disconnect", ()=>{
             console.log("Peer disconnected", socket.node.sckAddress.getAddress());
-            NodeLists.disconnectSocket(this.peer);
+            NodesList.disconnectSocket(this.peer);
         })
 
     }
