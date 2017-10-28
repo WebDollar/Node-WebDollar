@@ -19,6 +19,8 @@ class NodesList {
 
         this.nodes = [];
         this.events = [];
+
+        this.removeDisconnectedSockets();
     }
 
 
@@ -74,7 +76,7 @@ class NodesList {
     disconnectSocket(socket, type){
 
 
-        if (!socket.hasOwnProperty("node")|| !(socket.node.protocol.helloValidated|| false)) {
+        if (!socket.hasOwnProperty("node") || !(socket.node.protocol.helloValidated|| false)) {
             console.log(colors.red("Error - disconnectSocket rejected by invalid helloValidated"));
             if (socket.hasOwnProperty("node")) console.log(socket.node.protocol.helloValidated);
             socket.disconnect(true);
@@ -121,10 +123,10 @@ class NodesList {
 
 
     removeDisconnectedSockets(){
+
         for (let i=this.nodes.length-1; i>=0; i--)
-            if (this.nodes[i].socket.disconnected){
+            if (this.nodes[i].socket.disconnected)
                 this.nodes.splice(i,1);
-            }
 
         setTimeout(()=>{this.removeDisconnectedSockets()}, 2000);
     }

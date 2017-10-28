@@ -89,7 +89,7 @@ class NodeClient {
 
                 socket.once("disconnect", () => {
 
-                    console.log("################## disconnect socket")
+                    console.log("################## disconnect socket");
                     console.log("Client disconnected "); console.log( this.socket.node.sckAddress.getAddress() );
                     NodesList.disconnectSocket(this.socket);
 

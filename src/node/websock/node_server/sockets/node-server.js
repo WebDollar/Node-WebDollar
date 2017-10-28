@@ -90,7 +90,7 @@ class NodeServer {
 
 
         socket.node.protocol.propagation.initializePropagation();
-        socket.node.protocol.signaling.propagation.initializeSocketSignalingService();
+        socket.node.protocol.signaling.initializeSocketSignalingService();
     }
 
 

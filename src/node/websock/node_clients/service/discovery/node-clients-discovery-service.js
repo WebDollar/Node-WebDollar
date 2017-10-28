@@ -66,7 +66,7 @@ class NodeDiscoveryService {
 
             let data = response.data;
 
-            console.log(data);
+            //console.log(data);
 
             if (typeof data === 'string') data = JSON.parse(data);
 
