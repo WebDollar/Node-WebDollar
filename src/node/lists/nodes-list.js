@@ -22,7 +22,7 @@ class NodesList {
     }
 
 
-    searchNodeSocketAddress(sckAddress, type){
+    searchNodeSocketByAddress(sckAddress, type){
 
         if (typeof type === 'undefined') type = 'all';
 
@@ -36,27 +36,27 @@ class NodesList {
         return null;
     }
 
-    addUniqueSocket(socket, type){
+    registerUniqueSocket(socket, type){
 
         if (type === 'undefined') throw ("type is necessary");
         socket.node.type = type;
 
         if (!socket.hasOwnProperty("node")|| !(socket.node.protocol.helloValidated|| false)) {
-            console.log(colors.red("Error - addUniqueSocket rejected by invalid helloValidated"));
+            console.log(colors.red("Error - registerUniqueSocket rejected by invalid helloValidated"));
             if (socket.hasOwnProperty("node")) console.log(socket.node.protocol.helloValidated);
             socket.disconnect(true);
             return false;
         }
 
         // avoiding double connections
-        if (this.searchNodeSocketAddress(socket) === null) {
+        if (this.searchNodeSocketByAddress(socket) === null) {
 
             // it is a unique connection, I should register this connection
 
             let object = new NodesListObject(socket, type);
             this.nodes.push(object);
 
-            let eventsList = this.getEvents("connected");
+            let eventsList = this._getEvents("connected");
             for (let j=0; j<eventsList.length; j++)
                 eventsList[j].callback(null, object);
 
@@ -133,7 +133,7 @@ class NodesList {
         EVENTS - Callbacks
      */
 
-    registerEvents(eventName, params, callback){
+    registerEvent(eventName, params, callback){
 
         this.events.push({
             name: eventName,
@@ -142,7 +142,7 @@ class NodesList {
         })
     }
 
-    getEvents(eventName){
+    _getEvents(eventName){
 
         let list = [];
         for (let i=0; i<this.events.length; i++)

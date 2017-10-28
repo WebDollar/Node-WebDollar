@@ -82,7 +82,7 @@ class NodeServer {
     initializeSocket(socket){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.addUniqueSocket(socket, "server") === false){
+        if (NodesList.registerUniqueSocket(socket, "server") === false){
             return false;
         }
 
@@ -90,7 +90,7 @@ class NodeServer {
 
 
         socket.node.protocol.propagation.initializePropagation();
-        socket.node.protocol.propagation.initializeSignalsAccepting();
+        socket.node.protocol.signaling.propagation.initializeSocketSignalingService();
     }
 
 

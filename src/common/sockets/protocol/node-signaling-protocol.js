@@ -2,6 +2,7 @@ import {nodeProtocol, nodeFallBackInterval} from '../../../consts/const_global.j
 
 import {NodesWaitlist} from '../../../node/lists/waitlist/nodes-waitlist.js';
 import {NodeProtocol} from './node-protocol.js';
+import {SignalingRoomList} from './../../../node/lists/signaling-room/signaling-room-list'
 
 class NodeSignalingProtocol {
 
@@ -16,7 +17,7 @@ class NodeSignalingProtocol {
 
         node.on("signals/register-web-peer-for-accepting-connections", (data) =>{
 
-            node.protocol.signaling.clients.push()
+            SignalingRoomList.registerSocketToSignalingRoomList(node.getSocket(), data);
 
         });
 

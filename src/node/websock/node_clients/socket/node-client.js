@@ -114,7 +114,7 @@ class NodeClient {
 
         //it is not unique... then I have to disconnect
 
-        if (NodesList.addUniqueSocket(this.socket, "client") === false){
+        if (NodesList.registerUniqueSocket(this.socket, "client") === false){
             return false;
         }
 

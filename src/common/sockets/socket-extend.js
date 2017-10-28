@@ -14,6 +14,8 @@ class SocketExtend{
 
         socket.node = {};
 
+        socket.node.getSocket = () => { return socket};
+
         socket.node.on = (name, callback ) => { socket.on(name, callback) } ;
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port);
 

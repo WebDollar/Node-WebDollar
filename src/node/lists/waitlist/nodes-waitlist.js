@@ -69,7 +69,7 @@ class NodesWaitlist {
         for (let i=0; i < this.waitlist.length; i++){
 
             let nextNode = this.waitlist[i];
-            if ( nextNode.checkLastTimeChecked(nodesWaitlistTryReconnectAgain) && nextNode.blocked===false && nextNode.connecting===false && NodesList.searchNodeSocketAddress(nextNode, 'all') === null){
+            if ( nextNode.checkLastTimeChecked(nodesWaitlistTryReconnectAgain) && nextNode.blocked===false && nextNode.connecting===false && NodesList.searchNodeSocketByAddress(nextNode, 'all') === null){
 
                 nextNode.blocked = true;
 
@@ -95,7 +95,7 @@ class NodesWaitlist {
         nextNode.connecting = true;
 
         //search if the new protocol was already connected in the past
-        let nodeClient = NodesList.searchNodeSocketAddress(nextNode.sckAddress, 'all');
+        let nodeClient = NodesList.searchNodeSocketByAddress(nextNode.sckAddress, 'all');
         if (nodeClient !== null) return nodeClient;
 
         if (nextNode.socket !== null) nodeClient = nextNode.socket;

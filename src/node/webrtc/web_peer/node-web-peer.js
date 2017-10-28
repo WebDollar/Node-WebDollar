@@ -72,11 +72,11 @@ class NodeWebPeer {
     initializePeer(){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.addUniqueSocket(this.peer, "peer") === false){
+        if (NodesList.registerUniqueSocket(this.peer, "peer") === false){
             return false;
         }
 
-        this.peer.node.protocol.propagation.initializeSignalsAccepting();
+        this.peer.node.protocol.propagation.initializeSocketSignalingService();
 
         this.peer.on("disconnect", ()=>{
             console.log("Peer disconnected", socket.node.sckAddress.getAddress());
