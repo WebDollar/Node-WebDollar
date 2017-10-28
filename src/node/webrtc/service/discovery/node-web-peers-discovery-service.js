@@ -8,21 +8,24 @@ class NodeWebPeersDiscoveryService {
 
     constructor(){
 
-        console.log("NodeDiscover constructor");
+        console.log("NodeWebPeersDiscoveryService constructor");
 
     }
 
     startDiscovery(){
 
-        //if a new client || or || webpeer is established then, I should register for accepting WebPeer connections
-        NodesList.registerEvent("connected", {type: []}, this.newSocketRegisterAcceptingWebPeers);
+        //if a new client || or || web peer is established then, I should register for accepting WebPeer connections
+        NodesList.registerEvent("connected", {type: ["webpeer", "client"]}, this.newSocketRegisterAcceptWebPeers);
 
     }
 
-    newSocketRegisterAcceptingWebPeers(err, nodesListObject){
+    newSocketRegisterAcceptWebPeers(err, nodesListObject){
 
-        if (nodesListObject.type === "webpeer" || nodesListObject.type === "client")
-            nodesListObject.socket.node.sendRequest("signals/register-web-peer-for-accepting-connections", {});
+        if (nodesListObject.type === "webpeer" || nodesListObject.type === "client") {
+
+            let params = {};
+            nodesListObject.socket.node.sendRequest("signals/register/accept-web-peer-connections", {params: params});
+        }
 
     }
 

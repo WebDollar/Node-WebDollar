@@ -29,10 +29,13 @@ class NodeWebPeer {
                 wrtc: wrtc,
             });
 
+        this.peer.signal = null;
 
         this.peer.on('error', err => { console.log('error', err) } );
 
         this.peer.on('signal', data => {
+
+            this.peer.signal = data;
             console.log('SIGNAL', JSON.stringify(data));
         });
 
@@ -76,7 +79,7 @@ class NodeWebPeer {
             return false;
         }
 
-        this.peer.node.protocol.signaling.initializeSocketSignalingService();
+        this.peer.node.protocol.signaling.server.initializeSignalingServerService();
 
         this.peer.on("disconnect", ()=>{
             console.log("Peer disconnected", socket.node.sckAddress.getAddress());

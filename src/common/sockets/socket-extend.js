@@ -2,7 +2,8 @@ import { Observable, Subscribable } from 'rxjs/Observable';
 
 import {NodeProtocol} from './protocol/node-protocol';
 import {NodePropagationProtocol} from './protocol/node-propagation-protocol';
-import {NodeSignalingProtocol} from './protocol/node-signaling-protocol';
+import {NodeSignalingServerProtocol} from './protocol/signaling/node-signaling-server-protocol';
+import {NodeSignalingClientProtocol} from './protocol/signaling/node-signaling-client-protocol';
 import {NodesList} from '../../node/lists/nodes-list.js';
 import {SocketAddress} from './socket-address';
 
@@ -31,7 +32,10 @@ class SocketExtend{
         socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket.node) };
 
         socket.node.protocol.signaling = {};
-        socket.node.protocol.signaling.initializeSocketSignalingService = () => { return NodeSignalingProtocol.initializeSocketSignalingService(socket.node) };
+        socket.node.protocol.signaling.server = {};
+        socket.node.protocol.signaling.client = {};
+        socket.node.protocol.signaling.server.initializeSignalingServerService = () => { return NodeSignalingServerProtocol.initializeSignalingServerService(socket) };
+        socket.node.protocol.signaling.server.initializeSignalingClientService = () => { return NodeSignalingClientProtocol.initializeSignalingClientService(socket) };
     }
 
     sendRequest (socket, request, requestData) {
