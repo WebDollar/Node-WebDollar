@@ -17,11 +17,15 @@ class NodeSignalingClientProtocol {
     initializeSignalingClientService(webPeer){
 
 
-        webPeer.on("signals/generate-signal", data =>{
+        webPeer.on("signals/signal/generate-initiator-signal", data =>{
 
         });
 
-        webPeer.on("signals/signal/join", data =>{
+        webPeer.on("signals/signal/generate-answer-signal", data =>{
+
+        });
+
+        webPeer.on("signals/signal/join-answer-signal", data =>{
 
         });
 
