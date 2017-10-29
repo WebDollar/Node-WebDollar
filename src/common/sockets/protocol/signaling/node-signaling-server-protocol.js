@@ -71,22 +71,28 @@ class NodeSignalingServerProtocol {
 
                     if (previousEstablishedConnection === null){
 
-                        this._registerPreviousEstablishedConnection(webPeer1, webPeer2,)
+                        this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
                         webPeer1.socket.sendRequestWaitOnce("signals/signal/generate-initiator-signal", {address: webPeer2.socket.node.sckAddress.getAddress() }).then ((answer)=>{
 
                             if ( (answer.accepted||false) === true) {
+
+                                this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.answerSignalGenerating );
+
                                 webPeer2.socket.sendRequestWaitOnce("signals/signal/generate-answer-signal", {
                                     signal: answer.signal,
                                     address: webPeer1.socket.node.sckAddress.getAddress()
                                 }).then ((answer)=>{
 
+                                    this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.peerConnectionEstablishing );
+
                                     webPeer1.socket.sendRequestWaitOnce("signals/signal/join-answer-signal").then( (answer)=>{
 
                                         if ((answer.established||false) === true){
 
-                                            let signalingConnectionObject = new NodeSignalingConnectionObject(webPeer1, webPeer2);
-                                            webPeer1.socket.node.protocol.signaling.connections.push(signalingConnectionObject)
+                                            let establishedConnection = this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.peerConnectionEstablished );
+                                            establishedConnection.refreshLastTimeConnected();
+
                                         }
 
                                     });
@@ -122,23 +128,23 @@ class NodeSignalingServerProtocol {
         return null;
     }
 
-    _registerPreviousEstablishedConnection(webPeer1, webPeer2, status , skipReverse){
+    _registerPreviousEstablishedConnection(webPeer1, webPeer2, status ){
 
         if (webPeer1 === null || webPeer2 === null) return null;
 
-        let connection = this._searchPreviousEstablishedConnection(webPeer1, webPeer2, true);
+        let connection = this._searchPreviousEstablishedConnection(webPeer1, webPeer2);
+
         if (connection === null){
 
             let previousEstablishedConnection = new NodeSignalingConnectionObject(webPeer1, webPeer2, status);
+
             webPeer1.socket.node.protocol.signaling.connections.push(previousEstablishedConnection);
+            webPeer2.socket.node.protocol.signaling.connections.push(previousEstablishedConnection);
 
         } else {
             //it was established before, now I only change the status
             connection.status = status;
         }
-
-        if (typeof skipReverse === 'undefined' || skipReverse === false)
-            return this._registerPreviousEstablishedConnection(webPeer2, webPeer1, true);
 
         return connection;
     }
