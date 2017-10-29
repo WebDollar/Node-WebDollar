@@ -1,11 +1,19 @@
+NodeSignalingConnectionObject.ConnectionStatus = {
+    initiatorSignalGenerated : 0,
+    answerSignalGenerated: 1,
+    connectionEstablished : 2
+};
+
 class NodeSignalingConnectionObject {
 
-    constructor(webPeer1, webPeer2){
+    constructor(webPeer1, webPeer2, status){
 
         this.webPeer1 = webPeer1;
         this.webPeer2 = webPeer2;
+        this.status = status;
 
         this.established = false;
+        this.connectingNow = false;
 
         this.lastTimeChecked = 0;
     }
@@ -27,3 +35,4 @@ class NodeSignalingConnectionObject {
 }
 
 exports.NodeSignalingConnectionObject = NodeSignalingConnectionObject;
+exports.NodeSignalingConnectionObject.ConnectionStatus = NodeSignalingConnectionObject.ConnectionStatus;

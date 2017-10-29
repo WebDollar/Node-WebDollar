@@ -57,6 +57,7 @@ class NodeSignalingServerProtocol {
             if ( (NodesList[i].socket.node.protocol.signaling.acceptingConnections||false) === true)
                 listAcceptingWebPeerConnections.push(NodesList[i].socket);
 
+
         //mixing users
         for (let i=0; i<listAcceptingWebPeerConnections.length; i++) {
 
@@ -66,15 +67,11 @@ class NodeSignalingServerProtocol {
 
                 if (webPeer1.socket !== webPeer2.socket) {
 
-                    //previous established connection
-                    let previousEstablishedConnection = false;
-                    for (let q = 0; q < webPeer1.socket.node.protocol.signaling.connections.length; q++)
-                        if (webPeer1.socket.node.protocol.signaling.connections[q] === webPeer2){
-                            previousEstablishedConnection = true;
-                            break;
-                        }
+                    let previousEstablishedConnection = this._searchPreviousEstablishedConnection(webPeer1, webPeer2);
 
-                    if (previousEstablishedConnection === false){
+                    if (previousEstablishedConnection === null){
+
+                        this._registerPreviousEstablishedConnection(webPeer1, webPeer2,)
 
                         webPeer1.socket.sendRequestWaitOnce("signals/signal/generate-initiator-signal", {address: webPeer2.socket.node.sckAddress.getAddress() }).then ((answer)=>{
 
@@ -107,6 +104,43 @@ class NodeSignalingServerProtocol {
 
 
         setTimeout(()=>{this.connectWebPeersInterval()}, 2000);
+    }
+
+    _searchPreviousEstablishedConnection(webPeer1, webPeer2, skipReverse){
+
+        //previous established connection
+        for (let i = 0; i < webPeer1.socket.node.protocol.signaling.connections.length; i++)
+            if (webPeer1.socket.node.protocol.signaling.connections[i] === webPeer2){
+
+                return webPeer1.socket.node.protocol.signaling.connections[i];
+
+            }
+
+        if (typeof skipReverse === 'undefined' || skipReverse === false)
+            return this._searchPreviousEstablishedConnection(webPeer2, webPeer1, true);
+
+        return null;
+    }
+
+    _registerPreviousEstablishedConnection(webPeer1, webPeer2, status , skipReverse){
+
+        if (webPeer1 === null || webPeer2 === null) return null;
+
+        let connection = this._searchPreviousEstablishedConnection(webPeer1, webPeer2, true);
+        if (connection === null){
+
+            let previousEstablishedConnection = new NodeSignalingConnectionObject(webPeer1, webPeer2, status);
+            webPeer1.socket.node.protocol.signaling.connections.push(previousEstablishedConnection);
+
+        } else {
+            //it was established before, now I only change the status
+            connection.status = status;
+        }
+
+        if (typeof skipReverse === 'undefined' || skipReverse === false)
+            return this._registerPreviousEstablishedConnection(webPeer2, webPeer1, true);
+
+        return connection;
     }
 
 }
