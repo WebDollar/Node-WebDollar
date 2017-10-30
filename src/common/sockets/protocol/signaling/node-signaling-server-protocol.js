@@ -11,6 +11,8 @@ class NodeSignalingServerProtocol {
     constructor(){
 
         this.started = false;
+        this.lastConnectionsId = 0;
+
         console.log("NodeSignalingServerProtocol constructor");
     }
 
@@ -20,7 +22,7 @@ class NodeSignalingServerProtocol {
 
     initializeSignalingServerService(socket){
 
-        socket.on("signals/register/accept-web-peer-connections", (data) =>{
+        socket.on("signals/server/register/accept-web-peer-connections", (data) =>{
 
             //SignalingRoomList.registerSocketToSignalingRoomList(socket, data.params || {});
 
@@ -31,11 +33,11 @@ class NodeSignalingServerProtocol {
 
         });
 
-        socket.on("signals/signal/initiator-signal", data =>{
+        socket.on("signals/server/initiator-signal", data =>{
 
         });
 
-        socket.on("signals/signal/answer-signal", data =>{
+        socket.on("signals/server/answer-signal", data =>{
 
         });
 
@@ -71,22 +73,22 @@ class NodeSignalingServerProtocol {
 
                     if (previousEstablishedConnection === null){
 
-                        this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.initiatorSignalGenerating );
+                        let connection = this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
-                        webPeer1.socket.sendRequestWaitOnce("signals/signal/generate-initiator-signal", {address: webPeer2.socket.node.sckAddress.getAddress() }).then ((answer)=>{
+                        webPeer1.socket.sendRequestWaitOnce("signals/client/generate-initiator-signal", {id: connection.id, address: webPeer2.socket.node.sckAddress.getAddress() }, connection.id ).then ((answer)=>{
 
                             if ( (answer.accepted||false) === true) {
 
                                 this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.answerSignalGenerating );
 
-                                webPeer2.socket.sendRequestWaitOnce("signals/signal/generate-answer-signal", {
+                                webPeer2.socket.sendRequestWaitOnce("signals/client/generate-answer-signal", {
                                     signal: answer.signal,
                                     address: webPeer1.socket.node.sckAddress.getAddress()
                                 }).then ((answer)=>{
 
                                     this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.peerConnectionEstablishing );
 
-                                    webPeer1.socket.sendRequestWaitOnce("signals/signal/join-answer-signal").then( (answer)=>{
+                                    webPeer1.socket.sendRequestWaitOnce("signals/client/join-answer-signal").then( (answer)=>{
 
                                         if ((answer.established||false) === true){
 
@@ -136,7 +138,7 @@ class NodeSignalingServerProtocol {
 
         if (connection === null){
 
-            let previousEstablishedConnection = new NodeSignalingConnectionObject(webPeer1, webPeer2, status);
+            let previousEstablishedConnection = new NodeSignalingConnectionObject(webPeer1, webPeer2, status, ++this.lastConnectionsId);
 
             webPeer1.socket.node.protocol.signaling.connections.push(previousEstablishedConnection);
             webPeer2.socket.node.protocol.signaling.connections.push(previousEstablishedConnection);

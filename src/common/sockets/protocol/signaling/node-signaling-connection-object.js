@@ -16,12 +16,12 @@ class NodeSignalingConnectionObject {
         webPeer1 - initiator
         webPeer2 -
      */
-
-    constructor(webPeer1, webPeer2, status){
+    constructor(webPeer1, webPeer2, status, id ){
 
         this.webPeer1 = webPeer1;
         this.webPeer2 = webPeer2;
         this.status = status;
+        this.id = id;
 
         this.established = false;
         this.connectingNow = false;

@@ -21,7 +21,7 @@ class SocketExtend{
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port);
 
         socket.node.sendRequest = (request, requestData) => { return this.sendRequest(socket, request, requestData) };
-        socket.node.sendRequestWaitOnce = (request, requestData) => {return this.sendRequestWaitOnce(socket, request, requestData) };
+        socket.node.sendRequestWaitOnce = (request, requestData, answerPrefix) => {return this.sendRequestWaitOnce(socket, request, requestData, answerPrefix) };
         socket.node.broadcastRequest = (request, data, type) => { return this.broadcastRequest(socket, request, data, type) };
 
         socket.node.protocol = {};
@@ -65,7 +65,9 @@ class SocketExtend{
         Sending the Request and return the Promise to Wait Async
     */
 
-    sendRequestWaitOnce (socket, request, requestData) {
+    sendRequestWaitOnce (socket, request, requestData, answerPrefix) {
+
+        if (typeof answerPrefix === 'undefined') request += '/'+answerPrefix;
 
         return new Promise((resolve) => {
 

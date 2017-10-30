@@ -3,6 +3,7 @@ import {nodeProtocol, nodeFallBackInterval} from '../../../../consts/const_globa
 import {NodesWaitlist} from '../../../../node/lists/waitlist/nodes-waitlist.js';
 import {NodeProtocol} from './../node-protocol.js';
 import {SignalingRoomList} from './../../../../node/lists/signaling-room/signaling-room-list'
+import {NodeWebPeer} from './../../../../node/webrtc/web_peer/node-web-peer'
 
 class NodeSignalingClientProtocol {
 
@@ -14,18 +15,23 @@ class NodeSignalingClientProtocol {
         Signaling Server Service
      */
 
-    initializeSignalingClientService(webPeer){
+    initializeSignalingClientService(socket){
 
 
-        webPeer.on("signals/signal/generate-initiator-signal", data =>{
+        socket.on("signals/client/generate-initiator-signal", async (data) => {
+
+            let webPeer = new NodeWebPeer(true);
+            await webPeer.peer.signal;
+
+            webPeer.sendRequest("signals/client/generate-initiator-signal/"+data.id, JSON.stringify( webPeer.peer.signal ))
 
         });
 
-        webPeer.on("signals/signal/generate-answer-signal", data =>{
+        socket.on("signals/client/generate-answer-signal", data =>{
 
         });
 
-        webPeer.on("signals/signal/join-answer-signal", data =>{
+        socket.on("signals/client/join-answer-signal", data =>{
 
         });
 

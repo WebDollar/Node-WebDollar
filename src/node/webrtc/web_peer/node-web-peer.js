@@ -15,7 +15,8 @@ import {NodesList} from '../../lists/nodes-list';
 class NodeWebPeer {
 
     /*
-        this.web_peer = None
+        peer = None
+        peer.signal can be a promise
     */
 
     constructor(initiator){
@@ -29,15 +30,22 @@ class NodeWebPeer {
                 wrtc: wrtc,
             });
 
-        this.peer.signal = null;
+        if (initiator) {
+            this.signal = new Promise ( (resolve) => {
+                this.peer.on('signal', data => {
+
+                    //this.peer.signal = data;
+                    console.log('SIGNAL', JSON.stringify(data));
+
+                    resolve(data)
+
+                });
+            });
+        } else {
+            this.signal = null;
+        }
 
         this.peer.on('error', err => { console.log('error', err) } );
-
-        this.peer.on('signal', data => {
-
-            this.peer.signal = data;
-            console.log('SIGNAL', JSON.stringify(data));
-        });
 
         this.peer.on('connect', () => {
 
