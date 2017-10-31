@@ -36,6 +36,8 @@ class NodeSignalingServerProtocol {
     startConnectingWebPeers(){
 
         if (this.started === true) return;
+
+        this.started = true;
         this.connectWebPeersInterval();
     }
 
@@ -47,20 +49,30 @@ class NodeSignalingServerProtocol {
             if ( (NodesList.nodes[i].socket.node.protocol.signaling.server.acceptingConnections||false) === true )
                 listAcceptingWebPeerConnections.push(NodesList.nodes[i].socket);
 
+        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("listAcceptingWebPeerConnections", listAcceptingWebPeerConnections);
+
         //mixing users
         for (let i=0; i<listAcceptingWebPeerConnections.length; i++) {
 
             let client1 = listAcceptingWebPeerConnections[i];
+
             for (let j = 0; j < listAcceptingWebPeerConnections.length; j++){
+
                 let client2 = listAcceptingWebPeerConnections[j];
 
-                if ( client1.socket !== client2.socket ) {
+                // Step 0 , finding two different clients
+                // clients are already already with socket
+                if ( client1 !== client2 ) {
 
                     let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
+
+                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection );
 
                     if (previousEstablishedConnection === null){
 
                         let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
+
+                        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 1 - generate-initiator-signal  ", connection.id  );
 
                         // Step1, send the request to generate the INITIATOR SIGNAL
                         client1.node.sendRequestWaitOnce("signals/client/generate-initiator-signal", {
@@ -71,6 +83,8 @@ class NodeSignalingServerProtocol {
                             if ( (initiatorAnswer.accepted||false) === true) {
 
                                 SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating );
+
+                                if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 - generate-answer-signal  ", connection.id );
 
                                 // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
                                 client2.node.sendRequestWaitOnce("signals/client/generate-answer-signal", {
@@ -83,14 +97,18 @@ class NodeSignalingServerProtocol {
 
                                         SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablishing );
 
+                                        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 3 - join-answer-signal  ", connection.id, answer );
+
                                         // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
                                         client1.node.sendRequestWaitOnce("signals/client/join-answer-signal",{
                                             id: connection.id,
                                             initiatorSignal: initiatorAnswer.initiatorSignal,
                                             answerSignal: answer.answerSignal,
-                                        }, connection.id).then( (answer)=>{
+                                        }, connection.id).then( (result)=>{
 
-                                            if ((answer.established||false) === true){
+                                            if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 4 - join-answer-signal  ", connection.id, result );
+
+                                            if ((result.established||false) === true){
 
                                                 SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished );
                                                 connection.refreshLastTimeConnected();
