@@ -19,12 +19,12 @@ class SignalingClientList {
         this.events = [];
     }
 
-    registerWebPeerSignalingClientListBySignal(signal, initiator) {
+    registerWebPeerSignalingClientListBySignal(signalToSearch, initiator) {
 
         let signalingClientPeerObject = null;
 
-        if (typeof signal === 'undefined' || signal === null) signalingClientPeerObject = null;
-        else signalingClientPeerObject = this.searchWebPeerSignalingClientList(signal);
+        if (typeof signalToSearch === 'undefined' || signalToSearch === null) signalingClientPeerObject = null;
+        else signalingClientPeerObject = this.searchWebPeerSignalingClientList(signalToSearch);
 
         if (signalingClientPeerObject === null){
 

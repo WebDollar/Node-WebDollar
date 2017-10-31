@@ -26,13 +26,14 @@ class NodeSignalingClientProtocol {
 
             console.log("###################### signals/client/generate-initiator-signal/"+data.id, webPeer.peer.signalData, typeof webPeer.peer.signalData);
 
-            await webPeer.peer.signalData;
+            await webPeer.createSignal(undefined);
+            let signal = webPeer.peer.signalData;
 
-            console.log("###################### signals/client/generate-initiator-signal/"+data.id, webPeer.peer.signalData, typeof webPeer.peer.signalData);
+            console.log("###################### signals/client/generate-initiator-signal/"+data.id, signal, typeof signal);
 
             socket.node.sendRequest("signals/client/generate-initiator-signal/" + data.id, {
                 accepted: true,
-                initiatorSignal: webPeer.peer.signalData,
+                initiatorSignal: signal,
             });
 
         });
@@ -48,12 +49,13 @@ class NodeSignalingClientProtocol {
             console.log("################# signals/client/generate-answer-signal",  webPeer, data.initiatorSignal);
 
             await webPeer.createSignal(data.initiatorSignal);
+            let signal = webPeer.peer.signalData;
 
             console.log("################# signals/client/generate-answer-signal",  webPeer);
 
             socket.node.sendRequest("signals/client/generate-answer-signal/" + data.id, {
                 accepted: true,
-                answerSignal: JSON.stringify(webPeer.peer.signalData)
+                answerSignal: JSON.stringify(signal)
             });
 
         });
@@ -69,7 +71,7 @@ class NodeSignalingClientProtocol {
 
             let timeoutId = setTimeout(() => {
                 socket.sendRequest("signals/client/join-answer-signal/" + data.id, {established: false,});
-            }, 5000);
+            }, 30000);
 
             webPeer.peer.once("connect", () => {
 

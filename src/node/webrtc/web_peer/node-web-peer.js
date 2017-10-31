@@ -35,10 +35,6 @@ class NodeWebPeer {
         this.socket =  this.peer;
         this.peer.signalData = null;
 
-        if (initiator) {
-            this.createSignal(undefined);
-        }
-
         this.peer.on('error', err => { console.log('error', err) } );
 
         this.peer.on('connect', () => {
@@ -75,23 +71,27 @@ class NodeWebPeer {
 
     createSignal(inputSignal){
 
+        this.peer.signalData = null;
+
+        console.log("inputSignal ##$$$ ", inputSignal, typeof inputSignal);
         if (typeof inputSignal !== "undefined" ) {
             if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
+
             this.peer.signal(inputSignal);
         }
 
-        this.peer.signalData = new Promise ( (resolve) => {
-            this.peer.on('signal', data => {
+        return new Promise ( (resolve) => {
+            this.peer.once('signal', (data) => {
 
-                //this.peer.signal = data;
-                console.log('SIGNAL', JSON.stringify(data));
 
-                resolve(data)
+                //console.log('SIGNAL', JSON.stringify(data));
+
+                this.peer.signalData = data;
+                resolve(this.peer.signalData)
 
             });
         });
 
-        return this.peer.signalData;
     }
 
 
