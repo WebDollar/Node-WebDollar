@@ -49,7 +49,7 @@ class NodeSignalingServerProtocol {
             if ( (NodesList.nodes[i].socket.node.protocol.signaling.server.acceptingConnections||false) === true )
                 listAcceptingWebPeerConnections.push(NodesList.nodes[i].socket);
 
-        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("listAcceptingWebPeerConnections", listAcceptingWebPeerConnections);
+        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("listAcceptingWebPeerConnections", listAcceptingWebPeerConnections.length );
 
         //mixing users
         for (let i=0; i<listAcceptingWebPeerConnections.length; i++) {
@@ -80,11 +80,13 @@ class NodeSignalingServerProtocol {
                             address: client2.node.sckAddress.getAddress()
                         }, connection.id ).then ( (initiatorAnswer)=>{
 
+                            if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 - generate-answer-signal  data ", initiatorAnswer );
+
                             if ( (initiatorAnswer.accepted||false) === true) {
 
                                 connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating );
 
-                                if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 - generate-answer-signal  ", connection.id );
+                                if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 - generate-answer-signal  ", connection.id, initiatorAnswer );
 
                                 // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
                                 client2.node.sendRequestWaitOnce("signals/client/generate-answer-signal", {

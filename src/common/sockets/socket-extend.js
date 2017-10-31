@@ -72,7 +72,10 @@ class SocketExtend{
 
             this.sendRequest(socket, request, requestData);
 
-            if ( answerPrefix === 'string' && answerPrefix.length > 0 ) request += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
+            if ( answerPrefix === 'string' && answerPrefix.length > 0 ) {
+                request += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
+                console.log("sendRequestWaitOnce ", request);
+            }
 
             socket.once(request, function (resData) {
                 resolve(resData);
