@@ -68,11 +68,11 @@ class SocketExtend{
 
     sendRequestWaitOnce (socket, request, requestData, answerPrefix) {
 
-        if (typeof answerPrefix === 'undefined') request += '/'+answerPrefix;
-
         return new Promise((resolve) => {
 
             this.sendRequest(socket, request, requestData);
+
+            if ( answerPrefix === 'string' && answerPrefix.length > 0 ) request += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
 
             socket.once(request, function (resData) {
                 resolve(resData);
