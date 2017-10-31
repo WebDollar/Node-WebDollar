@@ -68,15 +68,14 @@ class SocketExtend{
 
     sendRequestWaitOnce (socket, request, requestData, answerPrefix) {
 
+        if (typeof answerPrefix !== 'undefined') answerPrefix = String(answerPrefix); //in case it is a number
+
         return new Promise((resolve) => {
 
             this.sendRequest(socket, request, requestData);
 
-            console.log("sendRequestWaitOnce ", answerPrefix, typeof  answerPrefix);
-            if ( answerPrefix === 'string' && answerPrefix.length > 0 ) {
+            if ( answerPrefix === 'string' && answerPrefix.length > 0 )
                 request += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
-                console.log("sendRequestWaitOnce ", request);
-            }
 
             socket.once(request, function (resData) {
                 resolve(resData);
