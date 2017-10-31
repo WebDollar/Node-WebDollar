@@ -35,6 +35,8 @@ class SignalingServerRoomList {
             this.list.push(roomConnectionObject);
             this.list.push(roomConnectionObject);
 
+            return roomConnectionObject;
+
         } else {
             //it was established before, now I only change the status
             connection.status = status;
