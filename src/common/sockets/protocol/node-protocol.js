@@ -18,13 +18,13 @@ class NodeProtocol {
         if ((response.hasOwnProperty("version"))&&(response.version <= nodeVersionCompatibility)){
 
             //check if it is a unique connection, add it to the list
-            let result = NodesList.searchNodeSocketByAddress(node.sckAddress);
+            let previousConnection = NodesList.searchNodeSocketByAddress(node.sckAddress);
 
             // console.log("sendHello clientSockets", NodesList.clientSockets);
             // console.log("sendHello serverSockets", NodesList.serverSockets);
             // console.log("sendHello", result);
 
-            if (result === null){
+            if (previousConnection === null  || (process.env.ALLOW_DOUBLE_CONNECTIONS||'false') === 'true' ){
                 node.protocol.helloValidated = true;
                 console.log("hello validated");
                 return true;

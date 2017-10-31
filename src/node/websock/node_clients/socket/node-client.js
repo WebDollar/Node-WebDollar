@@ -120,7 +120,7 @@ class NodeClient {
             return false;
         }
 
-        console.log(colors.white('Socket Initialized ' + this.socket.node.sckAddress.getAddress(true)));
+        console.log(colors.white('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true)));
 
         this.socket.node.protocol.propagation.initializePropagation();
 
