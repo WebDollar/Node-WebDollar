@@ -44,7 +44,7 @@ class NodeSignalingServerProtocol {
         let listAcceptingWebPeerConnections = [] ;
 
         for (let i=0; i<NodesList.nodes.length; i++)
-            if ( (NodesList[i].socket.node.protocol.signaling.server.acceptingConnections||false) === true)
+            if ( (NodesList[i].socket.node.protocol.signaling.server.acceptingConnections||false) === true )
                 listAcceptingWebPeerConnections.push(NodesList[i].socket);
 
         //mixing users
@@ -54,7 +54,7 @@ class NodeSignalingServerProtocol {
             for (let j = 0; j < listAcceptingWebPeerConnections.length; j++){
                 let webPeer2 = listAcceptingWebPeerConnections[j];
 
-                if (webPeer1.socket !== webPeer2.socket) {
+                if ( webPeer1.socket !== webPeer2.socket ) {
 
                     let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(webPeer1, webPeer2);
 

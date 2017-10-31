@@ -40,7 +40,7 @@ class NodeWebPeer {
 
         this.peer.on('connect', () => {
 
-            console.log('CONNECT');
+            console.log('WEBRTC PEER CONNECTED', this.peer);
 
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort );
 

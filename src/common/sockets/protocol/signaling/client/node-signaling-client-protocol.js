@@ -25,7 +25,7 @@ class NodeSignalingClientProtocol {
             let webPeer = webPeerSignalingClientListObject.webPeer;
             await webPeer.peer.signal;
 
-            webPeer.sendRequest("signals/client/generate-initiator-signal/" + data.id, {
+            webPeer.peer.node.sendRequest("signals/client/generate-initiator-signal/" + data.id, {
                 accepted: true,
                 initiatorSignal: JSON.stringify(webPeer.peer.signal)
             });
@@ -41,7 +41,7 @@ class NodeSignalingClientProtocol {
             let webPeer = webPeerSignalingClientListObject.webPeer;
             await webPeer.createSignal(data.initiatorSignal);
 
-            webPeer.sendRequest("signals/client/generate-answer-signal/" + data.id, {
+            webPeer.peer.node.sendRequest("signals/client/generate-answer-signal/" + data.id, {
                 accepted: true,
                 answerSignal: JSON.stringify(webPeer.peer.signal)
             });
@@ -65,7 +65,7 @@ class NodeSignalingClientProtocol {
 
                 clearTimeout(timeoutId);
 
-                socket.sendRequest("signals/client/join-answer-signal/" + data.id, {established: true,});
+                socket.node.sendRequest("signals/client/join-answer-signal/" + data.id, {established: true,});
             })
 
 
@@ -76,7 +76,7 @@ class NodeSignalingClientProtocol {
 
     subscribeClientToSignalingServer(socket, params){
 
-        socket.sendRequest("signals/server/register/accept-web-peer-connections", {params: params} );
+        socket.node.sendRequest("signals/server/register/accept-web-peer-connections", {params: params} );
 
     }
 

@@ -66,6 +66,8 @@ class NodeClient {
                     console.log(colors.blue("Client connected to " + socket.node.sckAddress.getAddress(true) ));
 
                     socket.node.protocol.sendHello().then( (answer)=>{
+
+
                         this.initializeSocket(socket);
 
                         resolve(true);
