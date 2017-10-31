@@ -29,7 +29,7 @@ class SignalingClientList {
         if (signalingClientPeerObject === null){
 
             let webPeer = new NodeWebPeer(initiator);
-            let signalingClientPeerObject = new SignalingClientPeerObject(webPeer);
+            signalingClientPeerObject = new SignalingClientPeerObject(webPeer);
 
             this.list.push(signalingClientPeerObject);
         }

@@ -15,19 +15,24 @@ class NodeSignalingClientProtocol {
 
     initializeSignalingClientService(socket, params) {
 
-
         socket.on("signals/client/generate-initiator-signal", async (data) => {
 
             let addressToConnect = data.address;
 
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, true);
 
-            let webPeer = webPeerSignalingClientListObject.webPeer;
-            await webPeer.peer.signal;
 
-            webPeer.peer.node.sendRequest("signals/client/generate-initiator-signal/" + data.id, {
+            let webPeer = webPeerSignalingClientListObject.webPeer;
+
+            console.log("###################### signals/client/generate-initiator-signal/"+data.id, webPeer.peer.signalData, typeof webPeer.peer.signalData);
+
+            await webPeer.peer.signalData;
+
+            console.log("###################### signals/client/generate-initiator-signal/"+data.id, webPeer.peer.signalData, typeof webPeer.peer.signalData);
+
+            socket.node.sendRequest("signals/client/generate-initiator-signal/" + data.id, {
                 accepted: true,
-                initiatorSignal: JSON.stringify(webPeer.peer.signal)
+                initiatorSignal: webPeer.peer.signalData,
             });
 
         });
@@ -39,11 +44,16 @@ class NodeSignalingClientProtocol {
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, false);
 
             let webPeer = webPeerSignalingClientListObject.webPeer;
+
+            console.log("################# signals/client/generate-answer-signal",  webPeer, data.initiatorSignal);
+
             await webPeer.createSignal(data.initiatorSignal);
 
-            webPeer.peer.node.sendRequest("signals/client/generate-answer-signal/" + data.id, {
+            console.log("################# signals/client/generate-answer-signal",  webPeer);
+
+            socket.node.sendRequest("signals/client/generate-answer-signal/" + data.id, {
                 accepted: true,
-                answerSignal: JSON.stringify(webPeer.peer.signal)
+                answerSignal: JSON.stringify(webPeer.peer.signalData)
             });
 
         });
