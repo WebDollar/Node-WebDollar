@@ -16,6 +16,8 @@ class NodeWebPeer {
 
     /*
         peer = None
+        socket = None
+
         peer.signal can be a promise
     */
 
@@ -29,6 +31,8 @@ class NodeWebPeer {
                 trickle: false,
                 wrtc: wrtc,
             });
+
+        this.socket =  this.peer;
 
         if (initiator) {
             this.createSignal(undefined);

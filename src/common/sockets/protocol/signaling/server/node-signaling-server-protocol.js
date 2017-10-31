@@ -50,41 +50,41 @@ class NodeSignalingServerProtocol {
         //mixing users
         for (let i=0; i<listAcceptingWebPeerConnections.length; i++) {
 
-            let webPeer1 = listAcceptingWebPeerConnections[i];
+            let client1 = listAcceptingWebPeerConnections[i];
             for (let j = 0; j < listAcceptingWebPeerConnections.length; j++){
-                let webPeer2 = listAcceptingWebPeerConnections[j];
+                let client2 = listAcceptingWebPeerConnections[j];
 
-                if ( webPeer1.socket !== webPeer2.socket ) {
+                if ( client1.socket !== client2.socket ) {
 
-                    let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(webPeer1, webPeer2);
+                    let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
                     if (previousEstablishedConnection === null){
 
-                        let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
+                        let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
                         // Step1, send the request to generate the INITIATOR SIGNAL
-                        webPeer1.socket.sendRequestWaitOnce("signals/client/generate-initiator-signal", {
+                        client1.node.sendRequestWaitOnce("signals/client/generate-initiator-signal", {
                             id: connection.id,
-                            address: webPeer2.socket.node.sckAddress.getAddress()
+                            address: client2.node.sckAddress.getAddress()
                         }, connection.id ).then ( (initiatorAnswer)=>{
 
                             if ( (initiatorAnswer.accepted||false) === true) {
 
-                                SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating );
+                                SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating );
 
                                 // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
-                                webPeer2.socket.sendRequestWaitOnce("signals/client/generate-answer-signal", {
+                                client2.node.sendRequestWaitOnce("signals/client/generate-answer-signal", {
                                     id: connection.id,
                                     initiatorSignal: initiatorAnswer.initiatorSignal,
-                                    address: webPeer1.socket.node.sckAddress.getAddress()
+                                    address: client1.node.sckAddress.getAddress()
                                 }, connection.id).then ((answer)=>{
 
                                     if ( (answer.accepted||false) === true) {
 
-                                        SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablishing );
+                                        SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablishing );
 
                                         // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
-                                        webPeer1.socket.sendRequestWaitOnce("signals/client/join-answer-signal",{
+                                        client1.node.sendRequestWaitOnce("signals/client/join-answer-signal",{
                                             id: connection.id,
                                             initiatorSignal: initiatorAnswer.initiatorSignal,
                                             answerSignal: answer.answerSignal,
@@ -92,12 +92,12 @@ class NodeSignalingServerProtocol {
 
                                             if ((answer.established||false) === true){
 
-                                                SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished );
+                                                SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished );
                                                 connection.refreshLastTimeConnected();
 
                                             } else {
                                                 //not connected
-                                                SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished);
+                                                SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished);
                                             }
 
                                         });

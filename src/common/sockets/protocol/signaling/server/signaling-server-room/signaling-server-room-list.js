@@ -22,15 +22,15 @@ class SignalingServerRoomList {
         this.events = [];
     }
 
-    registerSignalingServerRoomConnection(webPeer1, webPeer2, status) {
+    registerSignalingServerRoomConnection(client1, client2, status) {
 
-        if (webPeer1 === null || webPeer2 === null) return null;
+        if (client1 === null || client2 === null) return null;
 
-        let connection = this.searchSignalingServerRoomConnection(webPeer1, webPeer2);
+        let connection = this.searchSignalingServerRoomConnection(client1, client2);
 
         if (connection === null) {
 
-            let roomConnectionObject = new SignalingServerRoomConnectionObject(webPeer1, webPeer2, status, ++this.lastConnectionsId);
+            let roomConnectionObject = new SignalingServerRoomConnectionObject(client1, client2, status, ++this.lastConnectionsId);
 
             this.list.push(roomConnectionObject);
             this.list.push(roomConnectionObject);
@@ -43,18 +43,18 @@ class SignalingServerRoomList {
         return connection;
     }
 
-    searchSignalingServerRoomConnection(webPeer1, webPeer2, skipReverse){
+    searchSignalingServerRoomConnection(client1, client2, skipReverse){
 
         //previous established connection
         for (let i = 0; i < this.list.length; i++)
-            if ( (this.list[i].webPeer1 === webPeer1 && this.list[i].webPeer2 === webPeer2) || (this.list[i].webPeer1 === webPeer2 && this.list[i].webPeer2 === webPeer1) ){
+            if ( (this.list[i].client1 === client1 && this.list[i].client2 === client2) || (this.list[i].client1 === client2 && this.list[i].client2 === client1) ){
 
                 return this.list[i];
 
             }
 
         if (typeof skipReverse === 'undefined' || skipReverse === false)
-            return this.searchSignalingServerRoomConnection(webPeer2, webPeer1, true);
+            return this.searchSignalingServerRoomConnection(client2, client1, true);
 
         return null;
     }
