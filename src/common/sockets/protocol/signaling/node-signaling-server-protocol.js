@@ -75,14 +75,20 @@ class NodeSignalingServerProtocol {
 
                         let connection = this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
-                        webPeer1.socket.sendRequestWaitOnce("signals/client/generate-initiator-signal", {id: connection.id, address: webPeer2.socket.node.sckAddress.getAddress() }, connection.id ).then ((answer)=>{
+                        // Step1, send the request to generate the INITIATOR SIGNAL
+                        webPeer1.socket.sendRequestWaitOnce("signals/client/generate-initiator-signal", {
+                            id: connection.id,
+                            address: webPeer2.socket.node.sckAddress.getAddress()
+                        }, connection.id ).then ( (initiatorAnswer)=>{
 
-                            if ( (answer.accepted||false) === true) {
+                            if ( (initiatorAnswer.accepted||false) === true) {
 
                                 this._registerPreviousEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.answerSignalGenerating );
 
+                                // Step 2, send the Initiator Signal to the 2nd Weep to get ANSWER SIGNAL
                                 webPeer2.socket.sendRequestWaitOnce("signals/client/generate-answer-signal", {
-                                    signal: answer.signal,
+                                    id: connection.id,
+                                    signal: initiatorAnswer.initiatorSignal,
                                     address: webPeer1.socket.node.sckAddress.getAddress()
                                 }).then ((answer)=>{
 

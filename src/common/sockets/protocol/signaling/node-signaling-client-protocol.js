@@ -20,14 +20,24 @@ class NodeSignalingClientProtocol {
 
         socket.on("signals/client/generate-initiator-signal", async (data) => {
 
+            let addressToConnect = data.address;
+
             let webPeer = new NodeWebPeer(true);
             await webPeer.peer.signal;
 
-            webPeer.sendRequest("signals/client/generate-initiator-signal/"+data.id, JSON.stringify( webPeer.peer.signal ))
+            webPeer.sendRequest("signals/client/generate-initiator-signal/"+data.id, {
+                accepted:true,
+                initiatorSignal: JSON.stringify( webPeer.peer.signal )
+            });
 
         });
 
         socket.on("signals/client/generate-answer-signal", data =>{
+
+            let addressToConnect = data.address;
+
+            let webPeer = new NodeWebPeer(false);
+            webPeer.
 
         });
 
