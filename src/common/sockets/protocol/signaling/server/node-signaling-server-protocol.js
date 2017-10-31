@@ -44,7 +44,7 @@ class NodeSignalingServerProtocol {
         let listAcceptingWebPeerConnections = [] ;
 
         for (let i=0; i<NodesList.nodes.length; i++)
-            if ( (NodesList.nodes[i].socket.socket.node.protocol.signaling.server.acceptingConnections||false) === true )
+            if ( (NodesList.nodes[i].socket.node.protocol.signaling.server.acceptingConnections||false) === true )
                 listAcceptingWebPeerConnections.push(NodesList.nodes[i].socket);
 
         //mixing users
