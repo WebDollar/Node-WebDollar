@@ -35,7 +35,7 @@ class SocketExtend{
         socket.node.protocol.signaling.server = {};
         socket.node.protocol.signaling.client = {};
         socket.node.protocol.signaling.server.initializeSignalingServerService = () => { return NodeSignalingServerProtocol.initializeSignalingServerService(socket) };
-        socket.node.protocol.signaling.server.initializeSignalingClientService = () => { return NodeSignalingClientProtocol.initializeSignalingClientService(socket) };
+        socket.node.protocol.signaling.client.initializeSignalingClientService = () => { return NodeSignalingClientProtocol.initializeSignalingClientService(socket) };
     }
 
     sendRequest (socket, request, requestData) {

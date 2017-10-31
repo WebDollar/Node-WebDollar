@@ -1,4 +1,4 @@
-NodeSignalingConnectionObject.ConnectionStatus = {
+NodeSignalingServerRoomConnectionObject.ConnectionStatus = {
 
     initiatorSignalGenerating: 0,
     initiatorSignalGenerated : 1,
@@ -10,7 +10,7 @@ NodeSignalingConnectionObject.ConnectionStatus = {
     peerConnectionEstablished : 5,
 };
 
-class NodeSignalingConnectionObject {
+class NodeSignalingServerRoomConnectionObject {
 
     /*
         webPeer1 - initiator
@@ -50,5 +50,5 @@ class NodeSignalingConnectionObject {
 
 }
 
-exports.NodeSignalingConnectionObject = NodeSignalingConnectionObject;
-exports.NodeSignalingConnectionObject.ConnectionStatus = NodeSignalingConnectionObject.ConnectionStatus;
+exports.NodeSignalingServerRoomConnectionObject = NodeSignalingServerRoomConnectionObject;
+exports.NodeSignalingServerRoomConnectionObject.ConnectionStatus = NodeSignalingServerRoomConnectionObject.ConnectionStatus;

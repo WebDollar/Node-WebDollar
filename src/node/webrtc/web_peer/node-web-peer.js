@@ -31,16 +31,7 @@ class NodeWebPeer {
             });
 
         if (initiator) {
-            this.signal = new Promise ( (resolve) => {
-                this.peer.on('signal', data => {
-
-                    //this.peer.signal = data;
-                    console.log('SIGNAL', JSON.stringify(data));
-
-                    resolve(data)
-
-                });
-            });
+            this.createSignal(undefined);
         } else {
             this.signal = null;
         }
@@ -77,6 +68,22 @@ class NodeWebPeer {
         if (typeof message === 'undefined') message = JSON.parse(message);
 
         this.peer.signal(message)
+    }
+
+    createSignal(inputSignal){
+
+        if (typeof inputSignal !== "undefined" ) this.signal(inputSignal);
+
+        this.signal = new Promise ( (resolve) => {
+            this.peer.on('signal', data => {
+
+                //this.peer.signal = data;
+                console.log('SIGNAL', JSON.stringify(data));
+
+                resolve(data)
+
+            });
+        });
     }
 
 
