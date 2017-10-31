@@ -75,7 +75,7 @@ class NodeWebPeer {
         if (typeof inputSignal !== "undefined" ) this.signal(inputSignal);
 
         this.signal = new Promise ( (resolve) => {
-            this.peer.on('signal', data => {
+            this.peer.once('signal', data => {
 
                 //this.peer.signal = data;
                 console.log('SIGNAL', JSON.stringify(data));
@@ -84,6 +84,8 @@ class NodeWebPeer {
 
             });
         });
+
+        return this.signal();
     }
 
 

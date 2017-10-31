@@ -3,6 +3,7 @@ import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_gl
 import {NodesList} from '../../../../../node/lists/nodes-list';
 
 import {SignalingServerRoomList} from './signaling-server-room/signaling-server-room-list'
+import {SignalingServerRoomConnectionObject} from './signaling-server-room/signaling-server-room-connection-object'
 
 class NodeSignalingServerProtocol {
 
@@ -24,16 +25,7 @@ class NodeSignalingServerProtocol {
 
             if (typeof socket.node.protocol.signaling.server.acceptingConnections === 'undefined') { //check it is for the first time
                 socket.node.protocol.signaling.server.acceptingConnections = true;
-                socket.node.protocol.signaling.server.roomList = new SignalingServerRoomList();
             }
-
-        });
-
-        socket.on("signals/server/initiator-signal", data =>{
-
-        });
-
-        socket.on("signals/server/answer-signal", data =>{
 
         });
 
@@ -55,7 +47,6 @@ class NodeSignalingServerProtocol {
             if ( (NodesList[i].socket.node.protocol.signaling.server.acceptingConnections||false) === true)
                 listAcceptingWebPeerConnections.push(NodesList[i].socket);
 
-
         //mixing users
         for (let i=0; i<listAcceptingWebPeerConnections.length; i++) {
 
@@ -65,11 +56,11 @@ class NodeSignalingServerProtocol {
 
                 if (webPeer1.socket !== webPeer2.socket) {
 
-                    let previousEstablishedConnection = this._searchEstablishedConnection(webPeer1, webPeer2);
+                    let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(webPeer1, webPeer2);
 
                     if (previousEstablishedConnection === null){
 
-                        let connection = this._registerEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.initiatorSignalGenerating );
+                        let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
                         // Step1, send the request to generate the INITIATOR SIGNAL
                         webPeer1.socket.sendRequestWaitOnce("signals/client/generate-initiator-signal", {
@@ -79,7 +70,7 @@ class NodeSignalingServerProtocol {
 
                             if ( (initiatorAnswer.accepted||false) === true) {
 
-                                this._registerEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.answerSignalGenerating );
+                                SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating );
 
                                 // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
                                 webPeer2.socket.sendRequestWaitOnce("signals/client/generate-answer-signal", {
@@ -90,7 +81,7 @@ class NodeSignalingServerProtocol {
 
                                     if ( (answer.accepted||false) === true) {
 
-                                        this._registerEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.peerConnectionEstablishing );
+                                        SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablishing );
 
                                         // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
                                         webPeer1.socket.sendRequestWaitOnce("signals/client/join-answer-signal",{
@@ -101,9 +92,12 @@ class NodeSignalingServerProtocol {
 
                                             if ((answer.established||false) === true){
 
-                                                let establishedConnection = this._registerEstablishedConnection(webPeer1, webPeer2, NodeSignalingConnectionObject.ConnectionStatus.peerConnectionEstablished );
-                                                establishedConnection.refreshLastTimeConnected();
+                                                SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished );
+                                                connection.refreshLastTimeConnected();
 
+                                            } else {
+                                                //not connected
+                                                SignalingServerRoomList.registerSignalingServerRoomConnection(webPeer1, webPeer2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished);
                                             }
 
                                         });

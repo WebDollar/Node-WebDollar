@@ -1,5 +1,5 @@
 import {SocketAddress} from './../../../../../../common/sockets/socket-address.js';
-import {NodeSignalingServerRoomConnectionObject} from './signaling-server-room-connection-object';
+import {SignalingServerRoomConnectionObject} from './signaling-server-room-connection-object';
 
 const colors = require('colors/safe');
 
@@ -26,11 +26,11 @@ class SignalingServerRoomList {
 
         if (webPeer1 === null || webPeer2 === null) return null;
 
-        let connection = this._searchSignalingServerRoomConnection(webPeer1, webPeer2);
+        let connection = this.searchSignalingServerRoomConnection(webPeer1, webPeer2);
 
         if (connection === null) {
 
-            let roomConnectionObject = new NodeSignalingServerRoomConnectionObject(webPeer1, webPeer2, status, ++this.lastConnectionsId);
+            let roomConnectionObject = new SignalingServerRoomConnectionObject(webPeer1, webPeer2, status, ++this.lastConnectionsId);
 
             this.list.push(roomConnectionObject);
             this.list.push(roomConnectionObject);
@@ -43,18 +43,18 @@ class SignalingServerRoomList {
         return connection;
     }
 
-    _searchSignalingServerRoomConnection(webPeer1, webPeer2, skipReverse){
+    searchSignalingServerRoomConnection(webPeer1, webPeer2, skipReverse){
 
         //previous established connection
-        for (let i = 0; i < webPeer1.socket.node.protocol.signaling.server.roomList.list.length; i++)
-            if (webPeer1.socket.node.protocol.signaling.server.roomList.list[i].socket === webPeer2){
+        for (let i = 0; i < this.list.length; i++)
+            if ( (this.list[i].webPeer1 === webPeer1 && this.list[i].webPeer2 === webPeer2) || (this.list[i].webPeer1 === webPeer2 && this.list[i].webPeer2 === webPeer1) ){
 
-                return webPeer1.socket.node.protocol.signaling.server.list[i];
+                return this.list[i];
 
             }
 
         if (typeof skipReverse === 'undefined' || skipReverse === false)
-            return this._searchSignalingServerRoomConnection(webPeer2, webPeer1, true);
+            return this.searchSignalingServerRoomConnection(webPeer2, webPeer1, true);
 
         return null;
     }
@@ -85,4 +85,4 @@ class SignalingServerRoomList {
 
 }
 
-exports.SignalingServerRoomList = SignalingServerRoomList;
+exports.SignalingServerRoomList = new SignalingServerRoomList();

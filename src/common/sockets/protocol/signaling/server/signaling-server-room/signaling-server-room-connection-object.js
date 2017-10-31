@@ -1,4 +1,4 @@
-NodeSignalingServerRoomConnectionObject.ConnectionStatus = {
+SignalingServerRoomConnectionObject.ConnectionStatus = {
 
     initiatorSignalGenerating: 0,
     initiatorSignalGenerated : 1,
@@ -8,9 +8,10 @@ NodeSignalingServerRoomConnectionObject.ConnectionStatus = {
 
     peerConnectionEstablishing: 4,
     peerConnectionEstablished : 5,
+    peerConnectionNotEstablished : 6,
 };
 
-class NodeSignalingServerRoomConnectionObject {
+class SignalingServerRoomConnectionObject {
 
     /*
         webPeer1 - initiator
@@ -38,17 +39,8 @@ class NodeSignalingServerRoomConnectionObject {
         this.lastTimeConnected = new Date().getTime();
     }
 
-    checkLastTimeChecked(nodeTryReconnectAgain){
-
-        let time = new Date().getTime();
-
-        if ( (time - this.lastTimeChecked) >= ( nodeTryReconnectAgain + this.errorTrials*1000 ))
-            return true;
-
-        return false;
-    }
 
 }
 
-exports.NodeSignalingServerRoomConnectionObject = NodeSignalingServerRoomConnectionObject;
-exports.NodeSignalingServerRoomConnectionObject.ConnectionStatus = NodeSignalingServerRoomConnectionObject.ConnectionStatus;
+exports.SignalingServerRoomConnectionObject = SignalingServerRoomConnectionObject;
+exports.SignalingServerRoomConnectionObject.ConnectionStatus = SignalingServerRoomConnectionObject.ConnectionStatus;

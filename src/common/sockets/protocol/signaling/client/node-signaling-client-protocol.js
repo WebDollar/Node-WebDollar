@@ -1,8 +1,6 @@
 import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_global.js';
 
-import {NodesWaitlist} from '../../../../../node/lists/waitlist/nodes-waitlist.js';
-import {NodeProtocol} from './../../node-protocol.js';
-import {SignalingRoomList} from './../../../../../node/lists/signaling-room/signaling-room-list'
+import {SignalingClientList} from './signaling-client-list/signaling-client-list'
 import {NodeWebPeer} from './../../../../../node/webrtc/web_peer/node-web-peer'
 
 class NodeSignalingClientProtocol {
@@ -22,7 +20,9 @@ class NodeSignalingClientProtocol {
 
             let addressToConnect = data.address;
 
-            let webPeer = new NodeWebPeer(true);
+            let webPeerSignalingClientListObject =  SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, true);
+
+            let webPeer = webPeerSignalingClientListObject.webPeer;
             await webPeer.peer.signal;
 
             webPeer.sendRequest("signals/client/generate-initiator-signal/"+data.id, {
@@ -36,8 +36,9 @@ class NodeSignalingClientProtocol {
 
             let addressToConnect = data.address;
 
-            let webPeer = new NodeWebPeer(false);
+            let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, false);
 
+            let webPeer = webPeerSignalingClientListObject.webPeer;
             await webPeer.createSignal( data.initiatorSignal );
 
             webPeer.sendRequest("signals/client/generate-answer-signal/"+data.id, {
@@ -47,18 +48,25 @@ class NodeSignalingClientProtocol {
 
         });
 
-        socket.on("signals/client/join-answer-signal", data =>{
+        socket.on("signals/client/join-answer-signal", async  (data) =>{
 
             let addressToConnect = data.address;
 
-            let webPeer = new NodeWebPeer(false);
+            let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(data.initiatorSignal, false);
+            let webPeer = webPeerSignalingClientListObject.webPeer;
 
-            await webPeer.createSignal( data.initiatorSignal );
+            await webPeer.createSignal( data.answerSignal );
 
-            webPeer.sendRequest("signals/client/generate-answer-signal/"+data.id, {
-                accepted:true,
-                answerSignal: JSON.stringify( webPeer.peer.signal )
-            });
+            let timeoutId = setTimeout(()=>{
+                socket.sendRequest("signals/client/join-answer-signal/"+data.id, { established: false, });
+            }, 5000);
+
+            webPeer.peer.once("connect", ()=>{
+
+                clearTimeout(timeoutId);
+
+                socket.sendRequest("signals/client/join-answer-signal/"+data.id, { established:true, });
+            })
 
 
         });
