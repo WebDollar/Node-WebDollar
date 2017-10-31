@@ -10,6 +10,7 @@ class NodeWebPeersService {
         console.log("NodeWebPeersService constructor");
     }
 
+
     startService(){
 
         NodeWebPeersDiscoveryService.startDiscovery();

@@ -9,7 +9,9 @@ class NodeClientsService {
 
     constructor(){
         console.log("NodeServiceClients constructor");
+
     }
+
 
     startService(){
         NodeDiscoveryService.startDiscovery();

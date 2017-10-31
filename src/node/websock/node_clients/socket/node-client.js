@@ -5,6 +5,7 @@ import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../const
 import {SocketExtend} from '../../../../common/sockets/socket-extend';
 import {SocketAddress} from '../../../../common/sockets/socket-address';
 import {NodesList} from '../../../lists/nodes-list.js';
+import {NodeClientsService} from '../service/node-clients-service';
 import {NodesWaitlist} from '../../../lists/waitlist/nodes-waitlist.js';
 
 class NodeClient {
@@ -120,6 +121,7 @@ class NodeClient {
         console.log(colors.white('Socket Initialized ' + this.socket.node.sckAddress.getAddress(true)));
 
         this.socket.node.protocol.propagation.initializePropagation();
+
     }
 
 

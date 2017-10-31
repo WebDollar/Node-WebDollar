@@ -24,7 +24,11 @@ class NodeWebPeersDiscoveryService {
         if (nodesListObject.type === "webpeer" || nodesListObject.type === "client") {
 
             let params = {};
-            nodesListObject.socket.node.sendRequest("signals/server/register/accept-web-peer-connections", {params: params});
+
+
+            //client Signaling for WebRTC
+            nodesListObject.socket.node.protocol.signaling.client.initializeSignalingClientService(params);
+
         }
 
     }

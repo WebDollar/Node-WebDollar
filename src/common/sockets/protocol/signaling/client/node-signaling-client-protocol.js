@@ -13,71 +13,70 @@ class NodeSignalingClientProtocol {
         Signaling Server Service
      */
 
-    initializeSignalingClientService(socket){
+    initializeSignalingClientService(socket, params) {
 
 
         socket.on("signals/client/generate-initiator-signal", async (data) => {
 
             let addressToConnect = data.address;
 
-            let webPeerSignalingClientListObject =  SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, true);
+            let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, true);
 
             let webPeer = webPeerSignalingClientListObject.webPeer;
             await webPeer.peer.signal;
 
-            webPeer.sendRequest("signals/client/generate-initiator-signal/"+data.id, {
-                accepted:true,
-                initiatorSignal: JSON.stringify( webPeer.peer.signal )
+            webPeer.sendRequest("signals/client/generate-initiator-signal/" + data.id, {
+                accepted: true,
+                initiatorSignal: JSON.stringify(webPeer.peer.signal)
             });
 
         });
 
-        socket.on("signals/client/generate-answer-signal", async (data) =>{
+        socket.on("signals/client/generate-answer-signal", async (data) => {
 
             let addressToConnect = data.address;
 
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, false);
 
             let webPeer = webPeerSignalingClientListObject.webPeer;
-            await webPeer.createSignal( data.initiatorSignal );
+            await webPeer.createSignal(data.initiatorSignal);
 
-            webPeer.sendRequest("signals/client/generate-answer-signal/"+data.id, {
-                accepted:true,
-                answerSignal: JSON.stringify( webPeer.peer.signal )
+            webPeer.sendRequest("signals/client/generate-answer-signal/" + data.id, {
+                accepted: true,
+                answerSignal: JSON.stringify(webPeer.peer.signal)
             });
 
         });
 
-        socket.on("signals/client/join-answer-signal", async  (data) =>{
+        socket.on("signals/client/join-answer-signal", async (data) => {
 
             let addressToConnect = data.address;
 
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(data.initiatorSignal, false);
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
-            await webPeer.createSignal( data.answerSignal );
+            await webPeer.createSignal(data.answerSignal);
 
-            let timeoutId = setTimeout(()=>{
-                socket.sendRequest("signals/client/join-answer-signal/"+data.id, { established: false, });
+            let timeoutId = setTimeout(() => {
+                socket.sendRequest("signals/client/join-answer-signal/" + data.id, {established: false,});
             }, 5000);
 
-            webPeer.peer.once("connect", ()=>{
+            webPeer.peer.once("connect", () => {
 
                 clearTimeout(timeoutId);
 
-                socket.sendRequest("signals/client/join-answer-signal/"+data.id, { established:true, });
+                socket.sendRequest("signals/client/join-answer-signal/" + data.id, {established: true,});
             })
 
 
         });
 
+        this.subscribeClientToSignalingServer(socket, params);
     }
 
+    subscribeClientToSignalingServer(socket, params){
 
-
-    registerSignal(signal){
-
-        node.protocol.broadcastMessageAllSockets("node_propagation", {instruction: "new-address", addresses: addresses });
+        socket.sendRequest("signals/server/register/accept-web-peer-connections", {params: params} );
 
     }
 
