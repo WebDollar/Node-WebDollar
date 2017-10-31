@@ -1,4 +1,4 @@
-SignalingServerRoomConnectionObject.ConnectionStatus = {
+let ConnectionStatus = {
 
     initiatorSignalGenerating: 0,
     initiatorSignalGenerated : 1,
@@ -10,6 +10,7 @@ SignalingServerRoomConnectionObject.ConnectionStatus = {
     peerConnectionEstablished : 5,
     peerConnectionNotEstablished : 6,
 };
+
 
 class SignalingServerRoomConnectionObject {
 
@@ -39,8 +40,7 @@ class SignalingServerRoomConnectionObject {
         this.lastTimeConnected = new Date().getTime();
     }
 
-
 }
 
 exports.SignalingServerRoomConnectionObject = SignalingServerRoomConnectionObject;
-exports.SignalingServerRoomConnectionObject.ConnectionStatus = SignalingServerRoomConnectionObject.ConnectionStatus;
+exports.SignalingServerRoomConnectionObject.ConnectionStatus = ConnectionStatus;
