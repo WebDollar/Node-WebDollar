@@ -19,16 +19,16 @@ class SignalingClientList {
         this.events = [];
     }
 
-    registerWebPeerSignalingClientListBySignal(signalToSearch, initiator) {
+    registerWebPeerSignalingClientListBySignal(signalToSearch) {
 
         let signalingClientPeerObject = null;
 
-        if (typeof signalToSearch === 'undefined' || signalToSearch === null) signalingClientPeerObject = null;
+        if (typeof signalToSearch === 'undefined') signalingClientPeerObject = null;
         else signalingClientPeerObject = this.searchWebPeerSignalingClientList(signalToSearch);
 
         if (signalingClientPeerObject === null){
 
-            let webPeer = new NodeWebPeer(initiator);
+            let webPeer = new NodeWebPeer();
             signalingClientPeerObject = new SignalingClientPeerObject(webPeer);
 
             this.list.push(signalingClientPeerObject);
@@ -42,10 +42,12 @@ class SignalingClientList {
         if (data === null) return null;
 
         //previous established connection
-        for (let i = 0; i < this.list.length; i++)
-            if ( this.list[i].webPeer  === data || this.list[i].webPeer.signal === data ){
+        for (let i = 0; i < this.list.length; i++) {
+            //console.log("searchWebPeerSignalingClientList", this.list[i].webPeer.peer.signalData, data, JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(data));
+            if (this.list[i].webPeer === data || (this.list[i].webPeer.peer !== null && JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(data))) {
                 return this.list[i];
             }
+        }
 
 
         return null;

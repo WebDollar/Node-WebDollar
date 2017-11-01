@@ -93,8 +93,12 @@ class NodesList {
         for (let i=this.nodes.length-1; i>=0; i--)
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket === socket )) {
                 console.log(colors.green('deleting client socket '+ i+" "+ socket.node.sckAddress.toString()));
-                this.nodes.splice(i, 1);
 
+                let eventsList = this._getEvents("disconnected");
+                for (let j=0; j<eventsList.length; j++)
+                    eventsList[j].callback(null, this.nodes[i]);
+
+                this.nodes.splice(i, 1);
                 socket.disconnect(true);
                 return true;
             }

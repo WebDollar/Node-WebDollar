@@ -45,16 +45,13 @@ class SocketExtend{
 
         if (typeof socket.emit === 'function')  return socket.emit( request, requestData ); //socket io
         else
-        if (typeof socket.send === 'function')  return socket.send( request, requestData ); // socket
-        else
-        if (typeof socket.signal === 'function') { //webrtc peer
-            try{
-                requestData = JSON.parse(requestData);
+        if (typeof socket.send === 'function'){
 
-            } catch (Exception){
-                console.log("ERROR! Couldn't convert JSON data ", requestData)
-            }
-            return socket.signal( request, requestData )
+            if (typeof socket.signal === 'function')
+                return socket.send( {request: request, data:requestData} ); // Simple Peer WebRTC
+            else
+                return socket.send( request, requestData ); // Simple Peer WebRTC - socket
+
         }
 
         console.log("ERROR!! Couldn't sendRequest ", socket, request, requestData);

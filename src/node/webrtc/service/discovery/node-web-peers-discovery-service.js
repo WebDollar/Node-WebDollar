@@ -25,7 +25,6 @@ class NodeWebPeersDiscoveryService {
 
             let params = {};
 
-
             //client Signaling for WebRTC
             nodesListObject.socket.node.protocol.signaling.client.initializeSignalingClientService(params);
 

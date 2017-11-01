@@ -17,7 +17,7 @@ class FallBackObject {
 
         let time = new Date().getTime();
 
-        if ( (time - this.lastTimeChecked) >= ( nodeTryReconnectAgain + this.errorTrials*1000 ))
+        if ( (time - this.lastTimeChecked) >= ( nodeTryReconnectAgain + this.errorTrials*5000 ))
             return true;
 
         return false;

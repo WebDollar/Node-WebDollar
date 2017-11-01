@@ -21,19 +21,29 @@ class NodeWebPeer {
         peer.signal can be a promise
     */
 
-    constructor(initiator){
+    constructor(){
 
         console.log("Peer Client constructor");
+
+        this.peer = null;
+
+    }
+
+    createPeer(initiator){
 
         this.peer = new Peer(
             {
                 initiator: initiator,
-                trickle: false,
+                trickle: (initiator ? true : false),
                 wrtc: wrtc,
             });
 
         this.socket =  this.peer;
         this.peer.signalData = null;
+
+        let initiatorSignal = null;
+        if (initiator)
+            initiatorSignal= this.createSignal();
 
         this.peer.on('error', err => { console.log('error', err) } );
 
@@ -57,9 +67,10 @@ class NodeWebPeer {
         });
 
         this.peer.on('data', (data) => {
-            console.log('data: ' + data)
-        })
+            console.log('data: ' , data)
+        });
 
+        return initiatorSignal;
     }
 
     signalSend(message){
@@ -73,14 +84,7 @@ class NodeWebPeer {
 
         this.peer.signalData = null;
 
-        console.log("inputSignal ##$$$ ", inputSignal, typeof inputSignal);
-        if (typeof inputSignal !== "undefined" ) {
-            if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
-
-            this.peer.signal(inputSignal);
-        }
-
-        return new Promise ( (resolve) => {
+        let promise = new Promise ( (resolve) => {
             this.peer.once('signal', (data) => {
 
 
@@ -91,6 +95,16 @@ class NodeWebPeer {
 
             });
         });
+
+        if (typeof inputSignal !== "undefined" ) {
+            if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
+
+            //console.log("inputSignal ##$$#$$$$$$ ", inputSignal, typeof inputSignal);
+            this.peer.signal(inputSignal);
+        }
+
+
+        return promise;
 
     }
 

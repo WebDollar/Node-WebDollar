@@ -1,5 +1,6 @@
 import {SocketAddress} from './../../../../../../common/sockets/socket-address.js';
 import {SignalingServerRoomConnectionObject} from './signaling-server-room-connection-object';
+import {NodesList} from '../../../../../../node/lists/nodes-list';
 
 const colors = require('colors/safe');
 
@@ -12,7 +13,7 @@ class SignalingServerRoomList {
     // signalingRoom = []               - storing the connected sockets
     // events = []                      - used for callbacks
 
-    constructor(){
+    constructor() {
 
         console.log("SignalingRoomList constructor");
 
@@ -20,6 +21,8 @@ class SignalingServerRoomList {
 
         this.list = [];
         this.events = [];
+
+        NodesList.registerEvent("disconnected", {type: ["webpeer", "client"]}, this._removeDisconnectedSignalingServerRoomConnections);
     }
 
     registerSignalingServerRoomConnection(client1, client2, status) {
@@ -45,11 +48,11 @@ class SignalingServerRoomList {
         return connection;
     }
 
-    searchSignalingServerRoomConnection(client1, client2, skipReverse){
+    searchSignalingServerRoomConnection(client1, client2, skipReverse) {
 
         //previous established connection
         for (let i = 0; i < this.list.length; i++)
-            if ( (this.list[i].client1 === client1 && this.list[i].client2 === client2) || (this.list[i].client1 === client2 && this.list[i].client2 === client1) ){
+            if ((this.list[i].client1 === client1 && this.list[i].client2 === client2) || (this.list[i].client1 === client2 && this.list[i].client2 === client1)) {
 
                 return this.list[i];
 
@@ -62,11 +65,20 @@ class SignalingServerRoomList {
     }
 
 
+    _removeDisconnectedSignalingServerRoomConnections(nodesListObject) {
+
+        for (let i = this.list.length-1; i >= 0 ; i--)
+            if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){
+                this.list.splice(i, 1);
+            }
+    }
+
+
     /*
         EVENTS - Callbacks
      */
 
-    registerEvent(eventName, params, callback){
+    registerEvent(eventName, params, callback) {
 
         this.events.push({
             name: eventName,
@@ -75,15 +87,16 @@ class SignalingServerRoomList {
         })
     }
 
-    getEvents(eventName){
+    getEvents(eventName) {
 
         let list = [];
-        for (let i=0; i<this.events.length; i++)
+        for (let i = 0; i < this.events.length; i++)
             if (this.events[i].name === eventName)
                 list.push(this.events[i]);
 
         return list;
     }
+
 
 }
 
