@@ -22,7 +22,7 @@ class NodeSignalingClientProtocol {
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined);
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
-            console.log("###################### signals/client/generate-initiator-signal/"+data.id, webPeer.peer, typeof webPeer);
+            console.log("###################### signals/client/generate-initiator-signal/"+data.id, webPeer.peer);
 
             await webPeer.createPeer(true);
             //await webPeer.createSignal(undefined);
@@ -49,7 +49,7 @@ class NodeSignalingClientProtocol {
             await webPeer.createSignal(data.initiatorSignal);
             let signal = webPeer.peer.signalData;
 
-            console.log("################# signals/client/generate-answer-signal",  signal);
+            console.log("################# signals/client/generate-answer-signal",  signal, data.id);
 
             socket.node.sendRequest("signals/client/generate-answer-signal/" + data.id, {
                 accepted: true,

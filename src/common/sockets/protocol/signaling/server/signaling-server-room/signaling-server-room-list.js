@@ -22,7 +22,7 @@ class SignalingServerRoomList {
         this.list = [];
         this.events = [];
 
-        NodesList.registerEvent("disconnected", {type: ["webpeer", "client"]}, this._removeDisconnectedSignalingServerRoomConnections);
+        NodesList.registerEvent("disconnected", {type: ["webpeer", "client"]}, (err, result ) => { this._removeDisconnectedSignalingServerRoomConnections.call(err, result ) });
     }
 
     registerSignalingServerRoomConnection(client1, client2, status) {
@@ -65,7 +65,7 @@ class SignalingServerRoomList {
     }
 
 
-    _removeDisconnectedSignalingServerRoomConnections(nodesListObject) {
+    _removeDisconnectedSignalingServerRoomConnections(err, nodesListObject) {
 
         for (let i = this.list.length-1; i >= 0 ; i--)
             if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){

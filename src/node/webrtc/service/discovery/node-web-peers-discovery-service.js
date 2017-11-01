@@ -15,7 +15,7 @@ class NodeWebPeersDiscoveryService {
     startDiscovery(){
 
         //if a new client || or || web peer is established then, I should register for accepting WebPeer connections
-        NodesList.registerEvent("connected", {type: ["webpeer", "client"]}, this.newSocketRegisterAcceptWebPeers);
+        NodesList.registerEvent("connected", {type: ["webpeer", "client"]}, (err, result) => { this.newSocketRegisterAcceptWebPeers(err, result) } );
 
     }
 
