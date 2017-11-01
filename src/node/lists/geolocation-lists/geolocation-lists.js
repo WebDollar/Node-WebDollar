@@ -1,8 +1,8 @@
 const axios = require('axios');
 const ipaddr = require('ipaddr.js');
-import {getContinentFromCountry} from './data/continents.js';
 import {GeoLocationAddressObject} from './geolocation-address-object.js';
 import {SocketAddress} from './../../../common/sockets/socket-address';
+import {GeoHelper} from 'geo-helpers/geo-helper';
 
 class GeoLocationLists {
 
@@ -25,7 +25,7 @@ class GeoLocationLists {
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress, port);
 
-        let location = await this._getLocationFromAddress(sckAddress);
+        let location = await GeoHelper.getLocationFromAddress(sckAddress);
 
         if (location === null){
             console.log("LOCATION was not been able to get");
@@ -85,68 +85,6 @@ class GeoLocationLists {
 
         return null;
     }
-
-    async _getLocationFromAddress(sckAddress){
-
-        let address = sckAddress;
-        if (typeof sckAddress === 'object' && sckAddress.constructor.name === "SocketAddress")  address = sckAddress.getAddress(false);
-
-        if (typeof this.geoLocationLists[address] !== 'undefined')
-            return this.geoLocationLists[address];
-
-        try{
-            let data = await this._downloadFile("http://ip-api.com/json/"+address);
-            if (data !== null){
-
-                let countryCode = '';
-                let country = '';
-                let continent = '--';
-
-                //console.log("location data", address, data);
-
-                if (data.hasOwnProperty('country')){
-                    country = data.country;
-                }
-
-                if (data.hasOwnProperty('countryCode')){
-                    countryCode = data.countryCode;
-
-                    continent = getContinentFromCountry(countryCode);
-                }
-
-                return {
-                    country: country,
-                    countryCode: countryCode,
-                    continent: continent,
-                };
-            }
-        }
-        catch(Exception){
-            console.log(Exception.toString());
-            return null;
-        }
-
-    }
-
-    async _downloadFile(address){
-        try{
-            let response = await axios.get(address);
-
-            let data = response.data;
-
-            if (typeof data === 'string') data = JSON.parse(data);
-
-            if (typeof data === 'object') return data;
-
-            return null;
-        }
-        catch(Exception){
-            console.log("ERROR downloading list: ", address);
-            console.log(Exception.toString());
-            return null;
-        }
-    }
-
 
     printGeoLocationContinentsLists(){
 

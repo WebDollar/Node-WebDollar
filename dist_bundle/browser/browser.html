@@ -4,10 +4,48 @@
 
     <script src="bundle_browser.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="browser.css">
+
 </head>
 
 <body>
 
     <h1>Testing Browser Node-WebDollar</h1>
+
+    Peers
+    <div id="map"></div>
+
+    <script>
+        function initMap() {
+            console.log("INITIALIZATION GOOGLE MAP");
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 2,
+                center:  {lat: -25.363, lng: 131.044}
+            });
+
+
+        }
+    </script>
+
+    <script  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3RtAgqpzLTzj5zKs3z-83RUDZYmvlsCc&callback=initMap">
+    </script>
+
+    <script>
+        console.log(NodeClientsService);
+
+        NodesList.registerEvent("connected", {type: ["all"]}, function (err, nodeListObject) {
+            var uluru = {lat: -25.363, lng: 131.044};
+            var marker = new google.maps.Marker({
+                position: uluru,
+                map: map
+            });
+        } );
+
+        NodesList.registerEvent("disconnected", {type: ["all"]}, function (err, nodeListObject) {
+
+        });
+
+    </script>
 
 </body>

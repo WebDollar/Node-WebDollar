@@ -18,7 +18,15 @@ module.exports = {
     NodeServer : Node.NodeServer,
     NodeClientsService : Node.NodeClientsService,
     NodeWebPeersService : Node.NodeWebPeersService,
+    NodesStats : Node.NodesStats,
+    NodesList : Node.NodesList,
 };
+
+window.NodeServer = Node.NodeServer;
+window.NodeClientsService = Node.NodeClientsService;
+window.NodeWebPeersService = Node.NodeWebPeersService;
+window.NodesStats = Node.NodesStats;
+window.NodesList = Node.NodesList;
 
 // var mymodule = (function() { console.log("This is a message from the demo package"); })();
 //

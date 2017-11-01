@@ -1,5 +1,6 @@
 const ipaddr = require('ipaddr.js');
 import {nodePort} from './../../consts/const_global.js';
+import {GeoHelper} from './../../node/lists/geolocation-lists/geo-helpers/geo-helper';
 
 class SocketAddress {
 
@@ -50,6 +51,7 @@ class SocketAddress {
         this.addressString = address.toString();
         this.address = address;
         this.port = port;
+        this.geoLocation = null;
     }
 
     matchAddress(address){
@@ -79,6 +81,13 @@ class SocketAddress {
         } catch(Exception){
             console.log("getAddress exception", this.address);
         }
+    }
+
+    getGeoLocation(){
+        if (this.geoLocation !== null) return (this.geoLocation); //already computed
+
+        return GeoHelper.getLocationFromAddress(this);
+
     }
 
 }
