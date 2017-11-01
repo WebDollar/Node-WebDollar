@@ -1,0 +1,60 @@
+import {NodeWebPeer} from './node-web-peer';
+
+exports.testNodeWebPeer = async function (){
+
+    let webpeer = new NodeWebPeer();
+
+    webpeer.createPeer(true);
+    console.log("SIGNAL", await webpeer.createSignal());
+
+};
+
+exports.testWebPeer = async function (initiator){
+
+    if (typeof initiator === 'undefined') initiator = true;
+
+
+    if (typeof window === 'undefined') window = global;
+
+    if (typeof location === 'undefined') location = global.location||{};
+
+    var wrtc = require('wrtc');
+
+    console.log("inititator",location.hash , initiator);
+
+    var Peer = require('simple-peer')
+
+    var p = new Peer(
+        {
+            initiator: initiator,
+            trickle: false,
+            wrtc: wrtc,
+        });
+
+    p.on('error', function (err) { console.log('error', err) })
+
+    p.on('signal', function (data) {
+        console.log('SIGNAL', JSON.stringify(data));
+        document.querySelector('#outgoing').textContent = JSON.stringify(data)
+    });
+
+    let index = Math.floor(Math.random()*100);
+
+    p.on('connect', function (data) {
+
+        console.log('CONNECT', data, p);
+
+        setInterval(function() {
+            if ((typeof p !== 'undefined')&& ( p !== null)) {
+                console.log(p);
+                p.send('whatever' + index + " ___ " + Math.random())
+            }
+        }, 500);
+
+    })
+
+    p.on('data', function (data) {
+        console.log('data: ' + data)
+    });
+
+};

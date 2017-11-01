@@ -34,7 +34,7 @@ class NodeWebPeer {
         this.peer = new Peer(
             {
                 initiator: initiator,
-                trickle: (initiator ? true : false),
+                trickle: false,
                 wrtc: wrtc,
             });
 
@@ -43,7 +43,7 @@ class NodeWebPeer {
 
         let initiatorSignal = null;
         if (initiator)
-            initiatorSignal= this.createSignal();
+            initiatorSignal = this.createSignal(undefined);
 
         this.peer.on('error', err => { console.log('error', err) } );
 
@@ -70,6 +70,10 @@ class NodeWebPeer {
             console.log('data: ' , data)
         });
 
+        // this.peer.on('signal', function (data) {
+        //     console.log('SIGNAL_NEW', JSON.stringify(data));
+        // });
+
         return initiatorSignal;
     }
 
@@ -88,7 +92,7 @@ class NodeWebPeer {
             this.peer.once('signal', (data) => {
 
 
-                //console.log('SIGNAL', JSON.stringify(data));
+                console.log('SIGNAL###', JSON.stringify(data));
 
                 this.peer.signalData = data;
                 resolve(this.peer.signalData)

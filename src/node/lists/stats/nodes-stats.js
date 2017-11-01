@@ -10,8 +10,11 @@ class NodesStats {
     constructor(){
 
         let that = this;
-        setInterval(function (){ return that.printStats() }, nodeStatusInterval)
 
+        NodesList.registerEvent("connected", {type: ["all"]}, (err, result) => { this._recalculateStats(err, result) } );
+        NodesList.registerEvent("disconnected", {type: ["all"]}, (err, result ) => { this._recalculateStats(err, result ) });
+
+        //setInterval(function (){ return that.printStats() }, nodeStatusInterval)
     }
 
 
@@ -24,6 +27,10 @@ class NodesStats {
 
         console.log(" connected to: ", clientSockets," , from: ", serverSockets, " web peers", webPeers," Waitlist:",waitlistCount,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists);
         //console.log(NodesList.getNodes("client"), NodesList.getNodes("server"))
+    }
+
+    _recalculateStats(){
+
     }
 }
 
