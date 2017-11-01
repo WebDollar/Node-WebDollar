@@ -80,7 +80,7 @@ class NodeSignalingServerProtocol {
                             address: client2.node.sckAddress.getAddress()
                         }, connection.id ).then ( (initiatorAnswer) =>{
 
-                            if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 before - generate-answer-signal  data ", initiatorAnswer );
+                            if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 before - generate-answer-signal  data ", initiatorAnswer, connection.id );
 
                             if ( (initiatorAnswer.accepted||false) === true) {
 
