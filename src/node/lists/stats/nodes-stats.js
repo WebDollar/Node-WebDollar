@@ -9,27 +9,33 @@ class NodesStats {
 
     constructor(){
 
-        let that = this;
+        this.statsClients = 0;
+        this.statsServer = 0;
+        this.statsWebPeers = 0;
+        this.statsWaitlist = 0;
 
         NodesList.registerEvent("connected", {type: ["all"]}, (err, result) => { this._recalculateStats(err, result) } );
         NodesList.registerEvent("disconnected", {type: ["all"]}, (err, result ) => { this._recalculateStats(err, result ) });
 
-        //setInterval(function (){ return that.printStats() }, nodeStatusInterval)
+        NodesWaitlist.registerEvent("new-node-waitlist", {type: ["all"]}, (err, result ) => { this._recalculateStats(err, result ) });
+
+        setInterval( () => { return this._printStats() }, nodeStatusInterval)
     }
 
 
-    printStats(){
+    _printStats(){
 
-        let clientSockets = NodesList.getNodes("client").length;
-        let serverSockets = NodesList.getNodes("server").length;
-        let webPeers = NodesList.getNodes("webpeer").length;
-        let waitlistCount = NodesWaitlist.waitlist.length;
-
-        console.log(" connected to: ", clientSockets," , from: ", serverSockets, " web peers", webPeers," Waitlist:",waitlistCount,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists);
-        //console.log(NodesList.getNodes("client"), NodesList.getNodes("server"))
+        console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Waitlist:",this.statsWaitlist,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists);
     }
 
-    _recalculateStats(){
+    _recalculateStats(err, object){
+
+        this.statsClients = NodesList.getNodes("client").length;
+        this.statsServer = NodesList.getNodes("server").length;
+        this.statsWebPeers = NodesList.getNodes("webpeer").length;
+        this.statsWaitlist = NodesWaitlist.waitlist.length;
+
+        this._printStats();
 
     }
 }

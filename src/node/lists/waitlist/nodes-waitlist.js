@@ -8,6 +8,7 @@ class NodesWaitlist {
 
     /*
         waitlist = []     //Addresses where it should connect too
+        events = []
         stated = false;
     */
 
@@ -15,6 +16,7 @@ class NodesWaitlist {
         console.log("NodeServiceClients constructor");
 
         this.waitlist = [];
+        this.events = [];
         this.started = false;
     }
 
@@ -41,7 +43,7 @@ class NodesWaitlist {
         let waitlistObject = new NodesWaitlistObject(sckAddress);
         this.waitlist.push(waitlistObject);
 
-        //console.log("waitlist[]", this.waitlist);
+        this._callEvent("new-node-waitlist", null, waitlistObject);
 
         return waitlistObject;
     }
@@ -116,6 +118,36 @@ class NodesWaitlist {
 
         nextNode.connecting = false;
         return false;
+    }
+
+
+    /*
+        EVENTS - Callbacks
+     */
+
+    registerEvent(eventName, params, callback){
+
+        this.events.push({
+            name: eventName,
+            params: params,
+            callback: callback,
+        })
+    }
+
+    _getEvents(eventName){
+
+        let list = [];
+        for (let i=0; i<this.events.length; i++)
+            if (this.events[i].name === eventName)
+                list.push(this.events[i]);
+
+        return list;
+    }
+
+    _callEvent(eventName, err, param){
+        let eventsList = this._getEvents(eventName);
+        for (let j=0; j<eventsList.length; j++)
+            eventsList[j].callback(err, param);
     }
 
 

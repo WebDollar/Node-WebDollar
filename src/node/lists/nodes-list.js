@@ -60,9 +60,7 @@ class NodesList {
             let object = new NodesListObject(socket, type);
             this.nodes.push(object);
 
-            let eventsList = this._getEvents("connected");
-            for (let j=0; j<eventsList.length; j++)
-                eventsList[j].callback(null, object);
+            this._callEvent("connected", null, object);
 
             GeoLocationLists.includeSocket(socket);
 
@@ -94,9 +92,7 @@ class NodesList {
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket === socket )) {
                 console.log(colors.green('deleting client socket '+ i+" "+ socket.node.sckAddress.toString()));
 
-                let eventsList = this._getEvents("disconnected");
-                for (let j=0; j<eventsList.length; j++)
-                    eventsList[j].callback(null, this.nodes[i]);
+                this._callEvent("disconnected", null, this.nodes[i]);
 
                 this.nodes.splice(i, 1);
                 socket.disconnect(true);
@@ -159,6 +155,12 @@ class NodesList {
                 list.push(this.events[i]);
 
         return list;
+    }
+
+    _callEvent(eventName, err, param){
+        let eventsList = this._getEvents(eventName);
+        for (let j=0; j<eventsList.length; j++)
+            eventsList[j].callback(err, param);
     }
 
 }
