@@ -73,9 +73,9 @@ class NetworkMap {
 
             if (markerIndex !== -1) {
 
-                map.removeOverlay(this.markers[markerIndex].marker);
-                map.removeOverlay(this.markers[markerIndex].curveMarker);
-                map.removeOverlay(this.markers[markerIndex].infoWindow);
+                this.markers[markerIndex].marker.setMap(null);
+                this.markers[markerIndex].curveMarker.setMap(null);
+                this.markers[markerIndex].infoWindow.setMap(null);
 
                 this.markers.splice(markerIndex, 1);
             }
