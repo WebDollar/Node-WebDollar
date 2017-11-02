@@ -69,12 +69,13 @@ class SocketExtend{
 
         return new Promise((resolve) => {
 
+            let requestAnswer = request;
             if ( typeof answerPrefix === 'string' && answerPrefix.length > 0 ) {
-                request += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
+                requestAnswer += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
                 console.log("sendRequestWaitOnce", request)
             }
 
-            socket.once(request, function (resData) {
+            socket.once(requestAnswer, function (resData) {
                 resolve(resData);
             });
 
