@@ -85,7 +85,10 @@ class NodesWaitlist {
         for (let i=0; i < this.waitlist.length; i++){
 
             let nextNode = this.waitlist[i];
-            if ( nextNode.checkLastTimeChecked(nodesWaitlistTryReconnectAgain) && nextNode.blocked===false && nextNode.connecting===false && NodesList.searchNodeSocketByAddress(nextNode, 'all') === null){
+
+
+
+            if ( nextNode.checkLastTimeChecked(nodesWaitlistTryReconnectAgain) && nextNode.blocked===false && nextNode.connecting===false && nextNode.checkIsConnected() === null ){
 
                 nextNode.blocked = true;
 
