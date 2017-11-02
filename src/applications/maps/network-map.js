@@ -194,7 +194,7 @@ class NetworkMap {
 
         let  projection = map.getProjection();
 
-        if (projection === 'undefined'){
+        if (typeof projection === 'undefined'){
             console.log("NetworkMap - PROJECT is not defined");
             return false;
         }

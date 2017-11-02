@@ -41,11 +41,30 @@ class NodeWebPeer {
                         SUNT/TURN servers list https://gist.github.com/yetithefoot/7592580
                      */
                     iceServers: [
-                        {url:'stun:stun.l.google.com:19302'},
-                        {url:'stun:stun1.l.google.com:19302'},
-                        {url:'stun:stun2.l.google.com:19302'},
-                        {url:'stun:stun3.l.google.com:19302'},
-                        {url:'stun:stun4.l.google.com:19302'},
+                            {
+                                urls: "stun:numb.viagenie.ca",
+                                username: "pasaseh@ether123.net",
+                                credential: "12345678"
+                            },
+                            {
+                                "urls": "turn:numb.viagenie.ca",
+                                username: "pasaseh@ether123.net",
+                                credential: "12345678"
+                            }
+                        ]
+
+                        // {url:'stun:stun.l.google.com:19302'},
+                        // {url:'stun:stun1.l.google.com:19302'},
+                        // {url:'stun:stun2.l.google.com:19302'},
+                        // {url:'stun:stun3.l.google.com:19302'},
+                        // {url:'stun:stun4.l.google.com:19302'},
+                        // { urls: 'stun:stun.stunprotocol.org' },
+                        //     { urls: [
+                        //         'stun:stun.gmx.de',
+                        //         'stun:stun.gmx.net'
+                        //     ]
+                        // }
+
                         // {url:'stun:stun01.sipphone.com'},
                         // {url:'stun:stun.ekiga.net'},
                         // {url:'stun:stun.fwdnet.net'},

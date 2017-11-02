@@ -79,7 +79,7 @@ class NodesWaitlist {
     */
     _connectNewNodesWaitlist(){
 
-        console.log("Waitlist length", this.waitlist.length);
+        //console.log("Waitlist length", this.waitlist.length);
         //console.log(this.waitlist);
 
         for (let i=0; i < this.waitlist.length; i++){
