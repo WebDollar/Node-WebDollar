@@ -52,7 +52,6 @@ class NodeWebPeer {
                                 username: "pasaseh@ether123.net",
                                 credential: "12345678"
                             }
-                        ],
 
                         // {url:'stun:stun.l.google.com:19302'},
                         // {url:'stun:stun1.l.google.com:19302'},
