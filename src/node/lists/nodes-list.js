@@ -18,6 +18,8 @@ class NodesList {
         console.log("NodesList constructor");
 
         this.nodes = [];
+        this.nodesTotal = 0;
+
         this.events = [];
 
         this.removeDisconnectedSockets();
@@ -41,7 +43,9 @@ class NodesList {
     registerUniqueSocket(socket, type){
 
         if (type === 'undefined') throw ("type is necessary");
+
         socket.node.type = type;
+        socket.node.index = ++this.nodesTotal;
 
         if (!socket.hasOwnProperty("node") || !(socket.node.protocol.helloValidated || false)) {
 

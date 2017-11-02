@@ -8,15 +8,28 @@ class GeoHelper {
     constructor(){
     }
 
-    async getLocationFromAddress(address){
+    async getLocationFromAddress(address, skipSocketAddress){
 
-        let sckAddress = SocketAddress.createSocketAddress(address);
-        address = sckAddress.getAddress(false);
+        if (typeof skipSocketAddress === 'undefined') skipSocketAddress = false;
 
-        if (typeof sckAddress.geoLocation !== 'undefined' && sckAddress.geoLocation !== null)
-            return sckAddress.geoLocation;
+        let sckAddress = null;
+
+        if (!skipSocketAddress) {
+            sckAddress = SocketAddress.createSocketAddress(address);
+            address = sckAddress.getAddress(false);
+
+            if (typeof sckAddress.geoLocation !== 'undefined' && sckAddress.geoLocation !== null)
+                return sckAddress.geoLocation;
+        }
 
         try{
+
+            let localIP = false;
+            if (address.indexOf("192.168") === 0){ // local ip - private network
+                address = "";
+                localIP = true;
+            }
+
             let data = await this.downloadFile("http://ip-api.com/json/"+address);
             if (data !== null){
 
@@ -39,15 +52,17 @@ class GeoHelper {
                 let geoLocation = {
                     country: country,
                     city: data.city,
-                    lat: data.latitude||data.lat,
-                    lng: data.longitude||data.lng||data.lon,
+                    lat: (data.latitude||data.lat||22.2120780) + (localIP ? -1 + 2*Math.random() : 0),
+                    lng: (data.longitude||data.lng||data.lon||-40.1109744) + (localIP ? -1 + 2*Math.random() : 0),
                     isp: data.isp,
                     timezone: data.timezone,
                     countryCode: countryCode,
                     continent: continent,
                 };
 
-                sckAddress.geoLocation = geoLocation;
+                if (!skipSocketAddress)
+                    sckAddress.geoLocation = geoLocation;
+
                 return geoLocation;
             }
         }
