@@ -74,7 +74,7 @@ class NodeSignalingServerProtocol {
                     if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection !== null ? previousEstablishedConnection.id : 'no-id') );
 
                     if (previousEstablishedConnection === null ||
-                        (previousEstablishedConnection.checkLastTimeChecked(20000) && previousEstablishedConnection.status === SignalingServerRoomList.ConnectionStatus.peerConnectionNotEstablished ) ){
+                        (previousEstablishedConnection.checkLastTimeChecked(20000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished ) ){
 
                         let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
