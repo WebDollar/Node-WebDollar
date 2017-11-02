@@ -36,6 +36,7 @@ class NodeWebPeer {
                 initiator: initiator,
                 trickle: false,
                 reconnectTimer: 100,
+                iceTransportPolicy: 'relay',
                 wrtc: wrtc,
                 config: {
                     /*
