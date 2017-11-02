@@ -20,11 +20,11 @@ class NodesWaitlistObject {
         this.lastTimeChecked = new Date().getTime();
     }
 
-    checkLastTimeChecked(nodeTryReconnectAgain){
+    checkLastTimeChecked(timeTryReconnectAgain){
 
         let time = new Date().getTime();
 
-        if ( (time - this.lastTimeChecked) >= nodeTryReconnectAgain + this.errorTrial*5000 )
+        if ( (time - this.lastTimeChecked) >= timeTryReconnectAgain + this.errorTrial*5000 )
             return true;
 
         return false;

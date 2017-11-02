@@ -25,6 +25,8 @@ class SignalingServerRoomConnectionObject {
         this.status = status;
         this.id = id;
 
+        this.errorTrials = 0;
+
         this.established = false;
         this.connectingNow = false;
 
@@ -34,6 +36,16 @@ class SignalingServerRoomConnectionObject {
 
     refreshLastTimeChecked(){
         this.lastTimeChecked = new Date().getTime();
+    }
+
+    checkLastTimeChecked(timeTryReconnectAgain){
+
+        let time = new Date().getTime();
+
+        if ( (time - this.lastTimeChecked) >= ( timeTryReconnectAgain + this.errorTrials*5000 ))
+            return true;
+
+        return false;
     }
 
     refreshLastTimeConnected(){

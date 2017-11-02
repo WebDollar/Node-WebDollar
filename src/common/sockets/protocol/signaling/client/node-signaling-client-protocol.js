@@ -74,10 +74,17 @@ class NodeSignalingClientProtocol {
             webPeer.peer.once("connect", () => {
 
                 console.log("%%%%%%%%%%%% connection established");
-
                 clearTimeout(timeoutId);
 
                 socket.node.sendRequest("signals/client/join-answer-signal/" + data.id, {established: true,});
+            });
+
+            webPeer.peer.once("error", ()=>{
+
+                console.log("%%%%%%% connection NOT established");
+                clearTimeout(timeoutId);
+
+                socket.node.sendRequest("signals/client/join-answer-signal/" + data.id, {established: false,});
             });
 
             await webPeer.createSignal(data.answerSignal);

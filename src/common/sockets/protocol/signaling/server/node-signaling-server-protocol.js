@@ -54,21 +54,27 @@ class NodeSignalingServerProtocol {
         //mixing users
         for (let i=0; i<listAcceptingWebPeerConnections.length; i++) {
 
-            let client1 = listAcceptingWebPeerConnections[i];
-
             for (let j = 0; j < listAcceptingWebPeerConnections.length; j++){
-
-                let client2 = listAcceptingWebPeerConnections[j];
 
                 // Step 0 , finding two different clients
                 // clients are already already with socket
-                if ( client1 !== client2 ) {
+                if ( listAcceptingWebPeerConnections[i] !== listAcceptingWebPeerConnections[j] ) {
+
+                    //shuffling them, the sockets to change the orders
+                    let client1, client2 = null;
+
+                    if (Math.random() > 0.5) {
+                        client1 = listAcceptingWebPeerConnections[i]; client2 = listAcceptingWebPeerConnections[j];
+                    } else {
+                        client1 = listAcceptingWebPeerConnections[j]; client2 = listAcceptingWebPeerConnections[i];
+                    }
 
                     let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
                     if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection !== null ? previousEstablishedConnection.id : 'no-id') );
 
-                    if (previousEstablishedConnection === null){
+                    if (previousEstablishedConnection === null ||
+                        (previousEstablishedConnection.checkLastTimeChecked(20000) && previousEstablishedConnection.status === SignalingServerRoomList.ConnectionStatus.peerConnectionNotEstablished ) ){
 
                         let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
@@ -116,6 +122,8 @@ class NodeSignalingServerProtocol {
                                             } else {
                                                 //not connected
                                                 SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished);
+
+                                                previousEstablishedConnection.refreshLastTimeChecked();
                                             }
 
                                         });
