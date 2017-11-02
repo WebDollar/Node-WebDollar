@@ -20,16 +20,16 @@ class NetworkMap {
                 icon: 'http://maps.google.com/mapfiles/ms/micons/red.png',
             },
             myself: {
-                icon: 'http://maps.gstatic.com/mapfiles/cb/man_arrow-0.png',
+                icon: 'http://pic2.iranshao.com/emoji/qq/4.gif',
             },
             fullNodeServer: {
-                icon: 'http://icons.iconarchive.com/icons/blackvariant/button-ui-system-apps/32/Terminal-icon.png',
+                icon: 'http://icons.iconarchive.com/icons/blackvariant/button-ui-system-apps/16/Terminal-icon.png',
             },
             webPeer: {
-                icon: 'https://addons.cdn.mozilla.net/user-media/addon_icons/674/674247-32.png?modified=1499170820',
+                icon: 'http://icons.iconarchive.com/icons/dtafalonso/android-lollipop/16/Browser-icon.png',
             },
             clientSocket: {
-                icon: 'http://icons.iconarchive.com/icons/simplefly/simple-green/32/plug-electricity-icon.png',
+                icon: 'http://icons.iconarchive.com/icons/simplefly/simple-green/16/plug-electricity-icon.png',
             }
         };
 
@@ -217,8 +217,6 @@ class NetworkMap {
 
                 let zoom = map.getZoom(),
                     scale = Math.max( 1 / (Math.pow(2, -zoom)), 0.1);
-
-                console.log("@@@@@@@@@@@ scale", scale);
 
                 let symbol = {
                     path: pathDef,
