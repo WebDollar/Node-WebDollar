@@ -24,18 +24,12 @@ let exportObject = {
 };
 
 module.exports =  exportObject;
-global.window.NodeWebDollar = exportObject;
-
-
 //browser minimized script
-if (typeof window !== 'undefined') {
-    window.NodeServer = Node.NodeServer;
-    window.NodeClientsService = Node.NodeClientsService;
-    window.NodeWebPeersService = Node.NodeWebPeersService;
-    window.NodesStats = Node.NodesStats;
-    window.NodesList = Node.NodesList;
-    window.NetworkMap = Node.NetworkMap;
-}
+if (typeof global.window !== 'undefined')
+    global.window.NodeWebDollar = exportObject;
+if (typeof window !== 'undefined')
+    window.NodeWebDollar = exportObject;
+
 
 // var mymodule = (function() { console.log("This is a message from the demo package"); })();
 //
