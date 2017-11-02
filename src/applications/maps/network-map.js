@@ -59,7 +59,7 @@ class NetworkMap {
 
             let geoLocation = await nodeListObject.socket.node.sckAddress.getGeoLocation();
 
-            console.log("geoLocation",geoLocation);
+            //console.log("geoLocation",geoLocation);
 
             this._addMarker(map, geoLocation, nodeListObject.socket);
 

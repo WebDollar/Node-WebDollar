@@ -19,6 +19,8 @@ class NodeSignalingClientProtocol {
 
             let addressToConnect = data.address;
 
+            console.log("###################### signals/client/generate-initiator-signal/"+data.id);
+
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined);
             let webPeer = webPeerSignalingClientListObject.webPeer;
 

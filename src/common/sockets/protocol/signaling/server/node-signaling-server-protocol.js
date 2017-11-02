@@ -72,7 +72,7 @@ class NodeSignalingServerProtocol {
 
                         let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
-                        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 1 - generate-initiator-signal  ", (connection === null ? null : connection.id)  );
+                        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 1 - generate-initiator-signal  ", (connection === null ? null : connection.id) , { id: connection.id,  address: client2.node.sckAddress.getAddress() } );
 
                         // Step1, send the request to generate the INITIATOR SIGNAL
                         client1.node.sendRequestWaitOnce("signals/client/generate-initiator-signal", {
