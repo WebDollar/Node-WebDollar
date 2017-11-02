@@ -61,7 +61,7 @@ class NetworkMap {
 
             console.log("geoLocation",geoLocation);
 
-            this._addMarker( geoLocation, nodeListObject.socket);
+            this._addMarker(map, geoLocation, nodeListObject.socket);
 
         } );
 
@@ -76,7 +76,7 @@ class NetworkMap {
 
         });
 
-        this._showMyself();
+        this._showMyself(map);
     }
 
     _getInfoWindowContent(geoLocation, socket){
@@ -106,7 +106,7 @@ class NetworkMap {
 
     }
 
-    _addMarker(geoLocation, socket){
+    _addMarker(map, geoLocation, socket){
 
         if (typeof google === 'undefined' || typeof google.maps === 'undefined'){
             alert('GOOGLE MAPS LIBRARY IS NOT REGISTERED');
@@ -129,6 +129,7 @@ class NetworkMap {
         let marker = new google.maps.Marker({
             position: position,
             map: map,
+            clickable: true,
             icon: (this.icons.hasOwnProperty(feature) ? this.icons[feature].icon : this.icons['general']),
         });
 
@@ -145,12 +146,122 @@ class NetworkMap {
 
         this.markers.push(marker);
 
+        this._updateCurvesMarker(map);
+
     }
 
-    async _showMyself(){
+    async _showMyself(map){
         let geoLocation = await GeoHelper.getLocationFromAddress('', true);
 
-        this._addMarker( geoLocation, 'myself');
+        this._addMarker(map, geoLocation, 'myself');
+    }
+
+    initializePolylines(map){
+
+
+        this._updateCurvesMarker(map);
+        google.maps.event.addListener(map, 'projection_changed', () => {this._updateCurvesMarker(map) });
+        google.maps.event.addListener(map, 'zoom_changed', () => {this._updateCurvesMarker(map)});
+
+        // google.maps.event.addListener(markerP1, 'position_changed', updateCurveMarker);
+    }
+
+    _updateCurvesMarker(map) {
+
+        /*
+            TUTORIAL - BASED ON http://jsfiddle.net/medmunds/sd10up9t/
+         */
+
+        let markerMyself = null;
+        for (let i=0; i<this.markers.length; i++)
+            if (this.markers[i].socket === "myself"){
+                markerMyself = this.markers[i];
+                break;
+            }
+
+        if (markerMyself === null){
+            return false;
+        }
+
+
+
+        let  projection = map.getProjection();
+
+        let pos1 = markerMyself.getPosition(); // latlng
+        let p1 = projection.fromLatLngToPoint(pos1); // xy
+
+        let Point = google.maps.Point;
+
+        const curvature = 0.2; // how curvy to make the arc
+
+        for (let i=0; i<this.markers.length; i++)
+            if (this.markers[i] !== markerMyself){
+                let marker = this.markers[i];
+
+                let pos2 = marker.getPosition();
+                let p2 = projection.fromLatLngToPoint(pos2);
+
+
+                // Calculate the arc.
+                // To simplify the math, these points
+                // are all relative to p1:
+                let e = new Point(p2.x - p1.x, p2.y - p1.y), // endpoint (p2 relative to p1)
+                    m = new Point(e.x / 2, e.y / 2), // midpoint
+                    o = new Point(e.y, -e.x), // orthogonal
+                    c = new Point( // curve control point
+                        m.x + curvature * o.x,
+                        m.y + curvature * o.y);
+
+                let pathDef = 'M 0,0 ' +
+                    'q ' + c.x + ',' + c.y + ' ' + e.x + ',' + e.y;
+
+                let zoom = map.getZoom(),
+                    scale = Math.max( 1 / (Math.pow(2, -zoom)), 0.1);
+
+                console.log("@@@@@@@@@@@ scale", scale);
+
+                let symbol = {
+                    path: pathDef,
+                    scale: scale,
+                    strokeWeight: 2,
+                    fillColor: 'none'
+                };
+
+                if (!marker.curveMarker)
+                    marker.curveMarker = new google.maps.Marker({
+                        position: pos1,
+                        clickable: false,
+                        icon: symbol,
+                        zIndex: 0, // behind the other markers
+                        map: map
+                    });
+                else
+
+                    marker.curveMarker.setOptions({
+                        position: pos1,
+                        icon: symbol,
+                    });
+
+
+            }
+
+
+
+
+        // if (!curveMarker) {
+        //     curveMarker = new Marker({
+        //         position: pos1,
+        //         clickable: false,
+        //         icon: symbol,
+        //         zIndex: 0, // behind the other markers
+        //         map: map
+        //     });
+        // } else {
+        //     curveMarker.setOptions({
+        //         position: pos1,
+        //         icon: symbol,
+        //     });
+        // }
     }
 
 }
