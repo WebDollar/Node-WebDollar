@@ -43,12 +43,12 @@ class SocketExtend{
 
         //console.log("sendRequest ############### ", socket, request, requestData);
 
-        if (typeof socket.emit === 'function')  return socket.emit( request, requestData ); //socket io
+        if (typeof socket.emit === 'function')  return socket.emit( request, requestData ); //socket io and Simple-Peer WebRTC
         else
         if (typeof socket.send === 'function'){
 
             if (typeof socket.signal === 'function')
-                return socket.send( {request: request, data:requestData} ); // Simple Peer WebRTC
+                return socket.send({request: request, data: requestData});
             else
                 return socket.send( request, requestData ); // Simple Peer WebRTC - socket
 
@@ -69,8 +69,6 @@ class SocketExtend{
 
         return new Promise((resolve) => {
 
-            this.sendRequest(socket, request, requestData);
-
             if ( typeof answerPrefix === 'string' && answerPrefix.length > 0 ) {
                 request += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
                 console.log("sendRequestWaitOnce", request)
@@ -79,6 +77,9 @@ class SocketExtend{
             socket.once(request, function (resData) {
                 resolve(resData);
             });
+
+            this.sendRequest(socket, request, requestData);
+
         });
     }
 

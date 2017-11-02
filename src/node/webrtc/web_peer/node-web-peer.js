@@ -38,6 +38,8 @@ class NodeWebPeer {
                 wrtc: wrtc,
             });
 
+        this.peer.disconnect = () => { this.peer.destroy() }
+
         this.socket =  this.peer;
         this.peer.signalData = null;
 
@@ -56,13 +58,6 @@ class NodeWebPeer {
             this.peer.node.protocol.sendHello().then( (answer)=>{
                 this.initializePeer();
             });
-
-            // setInterval(function() {
-            //     if ((typeof this.peer !== 'undefined')&& ( this.peer !== null)) {
-            //         console.log(this.peer);
-            //         this.peer.send('whatever' + index + " ___ " + Math.random())
-            //     }
-            // }, 500);
 
         });
 
@@ -91,8 +86,7 @@ class NodeWebPeer {
         let promise = new Promise ( (resolve) => {
             this.peer.once('signal', (data) => {
 
-
-                console.log('SIGNAL###', JSON.stringify(data));
+                //console.log('SIGNAL###', JSON.stringify(data));
 
                 this.peer.signalData = data;
                 resolve(this.peer.signalData)
@@ -116,13 +110,13 @@ class NodeWebPeer {
     initializePeer(){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(this.peer, "peer") === false){
+        if (NodesList.registerUniqueSocket(this.peer, "webpeer") === false){
             return false;
         }
 
         this.peer.node.protocol.signaling.server.initializeSignalingServerService();
 
-        this.peer.on("disconnect", ()=>{
+        this.peer.on("close", ()=>{
             console.log("Peer disconnected", socket.node.sckAddress.getAddress());
             NodesList.disconnectSocket(this.peer);
         })

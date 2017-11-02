@@ -14,6 +14,18 @@ class NetworkMap {
 
     }
 
+    createMap(id){
+
+        let map = new google.maps.Map(document.getElementById(id), {
+            zoom: 2,
+            center:  {lat: 0, lng: 0}
+        });
+
+        window.map = map;
+
+        return map;
+    }
+
     initialize(map){
 
         if (typeof google === 'undefined' || typeof google.maps === 'undefined'){
@@ -64,6 +76,7 @@ class NetworkMap {
     }
 
     _getInfoWindowContent(geoLocation, socket){
+
         return (
             '<div id="content">'+
                 '<div id="siteNotice">'+

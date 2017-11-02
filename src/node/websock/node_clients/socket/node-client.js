@@ -67,7 +67,6 @@ class NodeClient {
 
                     socket.node.protocol.sendHello().then( (answer)=>{
 
-
                         this.initializeSocket(socket);
 
                         resolve(true);

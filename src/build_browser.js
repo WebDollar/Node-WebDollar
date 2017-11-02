@@ -3,6 +3,8 @@ import {testWebPeer, testNodeWebPeer} from './node/webrtc/web_peer/test-node-web
 
 console.log("BROWSER MODE");
 
+process.env.ALLOW_DOUBLE_CONNECTIONS = 'true';
+
 NodeClientsService.startService();
 NodeWebPeersService.startService();
 

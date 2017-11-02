@@ -3,12 +3,14 @@ import {NodesList} from '../../../node/lists/nodes-list.js';
 
 class NodeProtocol {
 
+    /*
+        HELLO PROTOCOL
+     */
     async sendHello (node) {
-
-        // Waiting for Protocol Confirmation
 
         //console.log(node);
 
+        // Waiting for Protocol Confirmation
         let response = await node.sendRequestWaitOnce("HelloNode", {
             version: nodeVersion,
         });
@@ -28,6 +30,8 @@ class NodeProtocol {
                 node.protocol.helloValidated = true;
                 console.log("hello validated");
                 return true;
+            } else {
+                console.log("hello not validated because double connection");
             }
         }
         //delete socket;
