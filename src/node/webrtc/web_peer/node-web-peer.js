@@ -35,7 +35,7 @@ class NodeWebPeer {
                 initiator: initiator,
                 trickle: false,
                 reconnectTimer: 100,
-                iceTransportPolicy: 'relay',
+                //iceTransportPolicy: 'relay',
                 config: {
                     /*
                         SUNT/TURN servers list https://gist.github.com/yetithefoot/7592580
