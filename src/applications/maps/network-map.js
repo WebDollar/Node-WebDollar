@@ -26,6 +26,7 @@ class NetworkMap {
             let geoLocation = await nodeListObject.socket.node.sckAddress.getGeoLocation();
 
             console.log("geoLocation",geoLocation);
+            console.log("map",map);
 
             let position = {lat: geoLocation.lat, lng: geoLocation.lng};
 
@@ -36,6 +37,10 @@ class NetworkMap {
 
             let infoWindow = new google.maps.InfoWindow({
                 content: this._getInfoWindowContent(geoLocation, nodeListObject.socket),
+            });
+
+            marker.addListener('click', function() {
+                infoWindow.open(map, marker);
             });
 
             marker.socket = nodeListObject.socket;
@@ -63,10 +68,12 @@ class NetworkMap {
             '<div id="content">'+
                 '<div id="siteNotice">'+
                 '</div>'+
-                    '<h1 id="firstHeading" class="firstHeading">'+socket.node.type+' '+socket.node.sckAddress.getAddress(false)+'</h1>'+
+                    '<h1 class="firstHeading" style="padding-bottom: 0">'+socket.node.sckAddress.getAddress(false)+'</h1>'+
+                    '<h2 class="secondHeading">'+socket.node.type+'</h2>'+
                     '<div id="bodyContent">'+
                         '<p>Connected to <b>'+geoLocation.city+', '+geoLocation.country+'</b> <br/>'+
-                            geoLocation.org+
+                            geoLocation.isp + '<br/> <br/>'+
+                            geoLocation.lat + '    '+ geoLocation.lng+ '<br/>'+
                         '</p>'+
                 '</div>'+
             '</div>');

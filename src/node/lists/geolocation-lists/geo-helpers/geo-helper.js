@@ -13,7 +13,7 @@ class GeoHelper {
         let sckAddress = SocketAddress.createSocketAddress(address);
         address = sckAddress.getAddress(false);
 
-        if (typeof sckAddress.geoLocation !== 'undefined')
+        if (typeof sckAddress.geoLocation !== 'undefined' && sckAddress.geoLocation !== null)
             return sckAddress.geoLocation;
 
         try{
@@ -40,8 +40,8 @@ class GeoHelper {
                     country: country,
                     city: data.city,
                     lat: data.latitude||data.lat,
-                    lng: data.longitude||data.lng||data.lat,
-                    org: data.org,
+                    lng: data.longitude||data.lng||data.lon,
+                    isp: data.isp,
                     timezone: data.timezone,
                     countryCode: countryCode,
                     continent: continent,
