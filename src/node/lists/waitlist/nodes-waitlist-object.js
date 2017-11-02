@@ -41,14 +41,17 @@ class NodesWaitlistObject {
         this.errorTrial++;
     }
 
-    checkIsConnected(){
+    checkIsConnected() {
         //checking if I had been connected in the past
 
-        for (let i=0; i<this.sckAddresses.length; i++)
-            if (NodesList.searchNodeSocketByAddress(this.sckAddresses[i], 'all') !== null)
-                return this.sckAddresses[i];
+        for (let i = 0; i < this.sckAddresses.length; i++) {
+            let socket = NodesList.searchNodeSocketByAddress(this.sckAddresses[i], 'all')
+            if (socket !== null)
+                return socket;
+        }
 
         return null;
+    }
 
 }
 
