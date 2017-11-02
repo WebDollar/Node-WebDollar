@@ -116,13 +116,11 @@ class NodeSignalingServerProtocol {
 
                                             if ((result.established||false) === true){
 
-                                                SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished );
+                                                //connected
                                                 connection.refreshLastTimeConnected();
 
                                             } else {
                                                 //not connected
-                                                SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished);
-
                                                 previousEstablishedConnection.refreshLastTimeChecked();
                                             }
 
