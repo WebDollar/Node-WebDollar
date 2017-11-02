@@ -1,8 +1,8 @@
 class NodesWaitlistObject {
 
-    constructor(sckAddress){
+    constructor(sckAddresses){
 
-        this.sckAddress = sckAddress;
+        this.sckAddresses = sckAddresses;
         this.socket = null;
 
         this.blocked = false;

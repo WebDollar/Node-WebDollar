@@ -103,7 +103,8 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[i];
                             }
 
-                            NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort);
+                            if (nodeAddress !== '')
+                                NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort);
                         }
 
                     }
