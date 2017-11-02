@@ -13,7 +13,8 @@ class NodeDiscoveryService {
 
         this.fallbackLists = [
 
-            new FallBackObject("https://www.jasonbase.com/things/E1p1"),
+            new FallBackObject("https://www.jasonbase.com/things/RPY5"),
+
             new FallBackObject("https://api.myjson.com/bins/xi1hr"),
             new FallBackObject("http://skyhub.me/public/webdollars.json"),
             new FallBackObject("http://visionbot.net/webdollars.json"),
@@ -90,20 +91,20 @@ class NodeDiscoveryService {
 
                     if (Array.isArray(nodes) ){
 
-                        //console.log("NEW NODES", nodes);
+                        console.log("NEW NODES", nodes);
 
                         for (let i=0; i<nodes.length; i++) {
 
-                            let nodeAddress = ''; let nodePort = undefined;
+                            let nodeAddress = '', nodePort = undefined;
 
                             if (typeof nodes[i] === "object") {
                                 nodeAddress = nodes[i].addr || '';
-                                nodePort = nodes[i].port || '';
+                                nodePort = nodes[i].port;
                             } else{
-                                nodeAddress = nodes[i];
+                                nodeAddress = nodes[i]; //a simple string Address
                             }
 
-                            if (nodeAddress !== '')
+                            if ( (typeof nodeAddress === "string" && nodeAddress !== '') || ( typeof nodeAddress === "object" && Array.isArray(nodeAddress)) )
                                 NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort);
                         }
 

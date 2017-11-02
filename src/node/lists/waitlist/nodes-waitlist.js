@@ -32,31 +32,29 @@ class NodesWaitlist {
 
     addNewNodeToWaitlist(addresses, port){
 
-        if (addresses === '' || addresses === null || addresses===[]) return false;
+        if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[]))) return false;
 
-        if (!Array.isArray(addresses)) addresses = [address];
+        if (typeof addresses === "string" || !Array.isArray(addresses)) addresses = [addresses];
 
         //address = "127.0.0.1";
-        if (Array.isArray(addresses)){
 
-            let sckAddresses = [];
-            for (let i=0; i<addresses.length; i++){
+        let sckAddresses = [];
+        for (let i=0; i<addresses.length; i++){
 
-                let sckAddress = SocketAddress.createSocketAddress(address, port);
+            let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
-                if (this.searchNodesWaitlist(sckAddress) === null){
-                    sckAddresses.push(sckAddress);
-                }
-
+            if (this.searchNodesWaitlist(sckAddress) === null){
+                sckAddresses.push(sckAddress);
             }
-            
-            if (sckAddresses.length > 0){
-                let waitlistObject = new NodesWaitlistObject(sckAddresses);
-                this.waitlist.push(waitlistObject);
 
-                this._callEvent("new-node-waitlist", null, waitlistObject);
-                return waitlistObject;
-            }
+        }
+
+        if (sckAddresses.length > 0){
+            let waitlistObject = new NodesWaitlistObject(sckAddresses);
+            this.waitlist.push(waitlistObject);
+
+            this._callEvent("new-node-waitlist", null, waitlistObject);
+            return waitlistObject;
         }
         
         return null;
@@ -67,7 +65,7 @@ class NodesWaitlist {
         let sckAddress = SocketAddress.createSocketAddress( address, port );
 
         for (let i=0; i<this.waitlist.length; i++)
-            for (let j=0; j<this.waitlist.sckAddresses.length; j++)
+            for (let j=0; j<this.waitlist[i].sckAddresses.length; j++)
                 if (this.waitlist[i].sckAddresses[j].matchAddress(sckAddress) )
                     return this.waitlist[i];
 
