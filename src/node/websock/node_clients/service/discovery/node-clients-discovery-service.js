@@ -91,7 +91,7 @@ class NodeDiscoveryService {
 
                     if (Array.isArray(nodes) ){
 
-                        console.log("NEW NODES", nodes);
+                        //console.log("NEW NODES", nodes);
 
                         for (let i=0; i<nodes.length; i++) {
 

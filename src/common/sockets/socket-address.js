@@ -79,7 +79,7 @@ class SocketAddress {
             return this.address.toString() + (includePort ? ':'+this.port : '');
 
         } catch(Exception){
-            console.log("getAddress exception", this.address);
+            console.log("getAddress exception", Exception.toString(), this.address);
         }
     }
 

@@ -43,13 +43,14 @@ class NodesWaitlist {
 
             let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
-            if (this.searchNodesWaitlist(sckAddress) === null){
+            if (this._searchNodesWaitlist(sckAddress) === null){
                 sckAddresses.push(sckAddress);
             }
 
         }
 
         if (sckAddresses.length > 0){
+
             let waitlistObject = new NodesWaitlistObject(sckAddresses);
             this.waitlist.push(waitlistObject);
 
@@ -60,7 +61,7 @@ class NodesWaitlist {
         return null;
     }
 
-    searchNodesWaitlist(address, port){
+    _searchNodesWaitlist(address, port){
 
         let sckAddress = SocketAddress.createSocketAddress( address, port );
 
