@@ -187,6 +187,11 @@ class NetworkMap {
 
         let  projection = map.getProjection();
 
+        if (projection === 'undefined'){
+            console.log("NetworkMap - PROJECT is not defined");
+            return false;
+        }
+
         let pos1 = markerMyself.getPosition(); // latlng
         let p1 = projection.fromLatLngToPoint(pos1); // xy
 

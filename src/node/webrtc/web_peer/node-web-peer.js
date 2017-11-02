@@ -117,7 +117,7 @@ class NodeWebPeer {
         this.peer.node.protocol.signaling.server.initializeSignalingServerService();
 
         this.peer.on("close", ()=>{
-            console.log("Peer disconnected", socket.node.sckAddress.getAddress());
+            console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
             NodesList.disconnectSocket(this.peer);
         })
 
