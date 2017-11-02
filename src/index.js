@@ -14,7 +14,7 @@ exports.helloWord = function() {
     console.log("This is a message from the demo package");
 };
 
-module.exports = {
+let exportObject = {
     NodeServer : Node.NodeServer,
     NodeClientsService : Node.NodeClientsService,
     NodeWebPeersService : Node.NodeWebPeersService,
@@ -22,6 +22,10 @@ module.exports = {
     NodesList : Node.NodesList,
     NetworkMap : Node.NetworkMap,
 };
+
+module.exports =  exportObject;
+global.window.NodeWebDollar = exportObject;
+
 
 //browser minimized script
 if (typeof window !== 'undefined') {
