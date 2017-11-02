@@ -144,7 +144,8 @@ class NodesList {
             name: eventName,
             params: params,
             callback: callback,
-        })
+        });
+        return this.events[this.events.length-1];
     }
 
     _getEvents(eventName){

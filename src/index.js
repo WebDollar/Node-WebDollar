@@ -20,6 +20,7 @@ module.exports = {
     NodeWebPeersService : Node.NodeWebPeersService,
     NodesStats : Node.NodesStats,
     NodesList : Node.NodesList,
+    NetworkMap : Node.NetworkMap,
 };
 
 window.NodeServer = Node.NodeServer;
@@ -27,6 +28,7 @@ window.NodeClientsService = Node.NodeClientsService;
 window.NodeWebPeersService = Node.NodeWebPeersService;
 window.NodesStats = Node.NodesStats;
 window.NodesList = Node.NodesList;
+window.NetworkMap = Node.NetworkMap;
 
 // var mymodule = (function() { console.log("This is a message from the demo package"); })();
 //

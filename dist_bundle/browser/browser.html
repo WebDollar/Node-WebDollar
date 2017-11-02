@@ -34,17 +34,7 @@
     <script>
         console.log(NodeClientsService);
 
-        NodesList.registerEvent("connected", {type: ["all"]}, function (err, nodeListObject) {
-            var uluru = {lat: -25.363, lng: 131.044};
-            var marker = new google.maps.Marker({
-                position: uluru,
-                map: map
-            });
-        } );
-
-        NodesList.registerEvent("disconnected", {type: ["all"]}, function (err, nodeListObject) {
-
-        });
+        NetworkMap.initialize(document.getElementById('map'));
 
     </script>
 

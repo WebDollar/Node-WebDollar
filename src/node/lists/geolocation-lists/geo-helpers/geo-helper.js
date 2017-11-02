@@ -39,8 +39,8 @@ class GeoHelper {
                 let geoLocation = {
                     country: country,
                     city: data.city,
-                    latitude: data.latitude||data.lat,
-                    longitude: data.longitude||data.lng||data.lat,
+                    lat: data.latitude||data.lat,
+                    lng: data.longitude||data.lng||data.lat,
                     org: data.org,
                     timezone: data.timezone,
                     countryCode: countryCode,

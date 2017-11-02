@@ -2,7 +2,7 @@ const axios = require('axios');
 const ipaddr = require('ipaddr.js');
 import {GeoLocationAddressObject} from './geolocation-address-object.js';
 import {SocketAddress} from './../../../common/sockets/socket-address';
-import {GeoHelper} from 'geo-helpers/geo-helper';
+import {GeoHelper} from './geo-helpers/geo-helper';
 
 class GeoLocationLists {
 
