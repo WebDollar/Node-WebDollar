@@ -52,8 +52,8 @@ class GeoHelper {
                 let geoLocation = {
                     country: country,
                     city: data.city,
-                    lat: (data.latitude||data.lat||22.2120780) + (localIP ? 0.0001* (-1 + 2*Math.random() ) : 0),
-                    lng: (data.longitude||data.lng||data.lon||-40.1109744) + (localIP ? 0.0001*(-1 + 2*Math.random()) : 0),
+                    lat: (data.latitude||data.lat||22.2120780) + (localIP ? 0.001* (-1 + 2*Math.random() ) : 0),
+                    lng: (data.longitude||data.lng||data.lon||-40.1109744) + (localIP ? 0.001*(-1 + 2*Math.random()) : 0),
                     isp: data.isp,
                     timezone: data.timezone,
                     countryCode: countryCode,
