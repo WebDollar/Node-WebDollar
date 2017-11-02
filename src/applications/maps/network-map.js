@@ -71,8 +71,14 @@ class NetworkMap {
 
             let markerIndex = this._findMarkerIndexBySocket(nodeListObject.socket);
 
-            if (markerIndex !== -1)
-                this.markers.splice(markerIndex,1);
+            if (markerIndex !== -1) {
+
+                map.removeOverlay(this.markers[markerIndex].marker);
+                map.removeOverlay(this.markers[markerIndex].curveMarker);
+                map.removeOverlay(this.markers[markerIndex].infoWindow);
+
+                this.markers.splice(markerIndex, 1);
+            }
 
         });
 
@@ -248,23 +254,6 @@ class NetworkMap {
 
             }
 
-
-
-
-        // if (!curveMarker) {
-        //     curveMarker = new Marker({
-        //         position: pos1,
-        //         clickable: false,
-        //         icon: symbol,
-        //         zIndex: 0, // behind the other markers
-        //         map: map
-        //     });
-        // } else {
-        //     curveMarker.setOptions({
-        //         position: pos1,
-        //         icon: symbol,
-        //     });
-        // }
     }
 
 }
