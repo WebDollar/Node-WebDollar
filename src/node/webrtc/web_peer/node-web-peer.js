@@ -6,7 +6,6 @@
 // TUTORIAL BASED ON
 // https://github.com/feross/simple-peer
 
-let wrtc = require('wrtc');
 let Peer = require('simple-peer');
 
 import {SocketExtend} from './../../../common/sockets/socket-extend'
@@ -31,13 +30,12 @@ class NodeWebPeer {
 
     createPeer(initiator){
 
-        this.peer = new Peer(
+        let webPeerParams =
             {
                 initiator: initiator,
-                trickle: true,
+                trickle: false,
                 reconnectTimer: 100,
                 iceTransportPolicy: 'relay',
-                wrtc: wrtc,
                 config: {
                     /*
                         SUNT/TURN servers list https://gist.github.com/yetithefoot/7592580
@@ -75,7 +73,16 @@ class NodeWebPeer {
                         // {url:'stun:stun.schlund.de'},
                     ]
                 }
-            });
+            };
+
+        if (typeof window === 'undefined'){
+            for (let i=0; i<1000; i++) console.log("!!!!! wrtc assigned")
+
+            const wrtc = require('wrtc');
+            webPeerParams.wrtc = wrtc;
+        }
+
+        this.peer = new Peer(webPeerParams);
 
         this.peer.disconnect = () => { this.peer.destroy() }
 
