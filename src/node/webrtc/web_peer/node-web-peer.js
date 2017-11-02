@@ -34,7 +34,7 @@ class NodeWebPeer {
         this.peer = new Peer(
             {
                 initiator: initiator,
-                trickle: false,
+                trickle: true,
                 reconnectTimer: 100,
                 iceTransportPolicy: 'relay',
                 wrtc: wrtc,
