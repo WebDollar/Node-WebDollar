@@ -35,7 +35,13 @@ just, run ```npm install name_missing_package```
 ### Building Dist for Browser (browserify)
 
 ```
-npm run build build_browser
+npm run build_browser
+```
+
+#### Building Dist for Browser TEST
+
+```
+npm run test_browser
 ```
 
 ### Running Server in Node.js

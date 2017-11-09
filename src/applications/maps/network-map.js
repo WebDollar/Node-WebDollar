@@ -1,5 +1,6 @@
 import {NodesList} from './../../node/lists/nodes-list';
 import {GeoHelper} from './../../node/lists/geolocation-lists/geo-helpers/geo-helper';
+import NetworkMapStypeLight from './styles/network-map-style-light';
 
 class NetworkMap {
 
@@ -35,12 +36,16 @@ class NetworkMap {
 
     }
 
-    createMap(id){
+    createMap(id, style){
+
+        if (typeof style === 'undefined')
+            style  = NetworkMapStypeLight.style;
 
         let map = new google.maps.Map(document.getElementById(id), {
             zoom: 2,
             center:  {lat: 0, lng: 0},
-            mapTypeId: 'roadmap'
+            mapTypeId: 'roadmap',
+            styles: style,
         });
 
         window.map = map;
@@ -173,9 +178,9 @@ class NetworkMap {
         // google.maps.event.addListener(markerP1, 'position_changed', updateCurveMarker);
     }
 
-    _updateCurvesMarker(map, showArcs) {
+    _updateCurvesMarker(map, showOldArcs) {
 
-        if (typeof showArcs === 'undefined') showArcs = false;
+        if (typeof showOldArcs === 'undefined') showOldArcs = false;
 
         /*
             TUTORIAL - BASED ON http://jsfiddle.net/medmunds/sd10up9t/
@@ -214,7 +219,7 @@ class NetworkMap {
 
                 let pos2 = marker.getPosition();
 
-                if (showArcs){
+                if (showOldArcs){
 
                     let p2 = projection.fromLatLngToPoint(pos2);
 
@@ -281,7 +286,6 @@ class NetworkMap {
                         marker.linePoly.setOptions({
                             position: polyPath,
                         });
-
 
                 }
 
