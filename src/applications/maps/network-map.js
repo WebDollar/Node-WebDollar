@@ -173,7 +173,9 @@ class NetworkMap {
         // google.maps.event.addListener(markerP1, 'position_changed', updateCurveMarker);
     }
 
-    _updateCurvesMarker(map) {
+    _updateCurvesMarker(map, showArcs) {
+
+        if (typeof showArcs === 'undefined') showArcs = false;
 
         /*
             TUTORIAL - BASED ON http://jsfiddle.net/medmunds/sd10up9t/
@@ -211,46 +213,77 @@ class NetworkMap {
                 let marker = this.markers[i];
 
                 let pos2 = marker.getPosition();
-                let p2 = projection.fromLatLngToPoint(pos2);
+
+                if (showArcs){
+
+                    let p2 = projection.fromLatLngToPoint(pos2);
+
+                    // Calculate the arc.
+                    // To simplify the math, these points
+                    // are all relative to p1:
+                    let e = new Point(p2.x - p1.x, p2.y - p1.y), // endpoint (p2 relative to p1)
+                        m = new Point(e.x / 2, e.y / 2), // midpoint
+                        o = new Point(e.y, -e.x), // orthogonal
+                        c = new Point( // curve control point
+                            m.x + curvature * o.x,
+                            m.y + curvature * o.y);
+
+                    let pathDef = 'M 0,0 ' +
+                        'q ' + c.x + ',' + c.y + ' ' + e.x + ',' + e.y;
+
+                    let zoom = map.getZoom(),
+                        scale = Math.max( 1 / (Math.pow(2, -zoom)), 0.1);
+
+                    let symbol = {
+                        path: pathDef,
+                        scale: scale,
+                        strokeWeight: 2,
+                        fillColor: 'none'
+                    };
+
+                    if (!marker.curveMarker)
+                        marker.curveMarker = new google.maps.Marker({
+                            position: pos1,
+                            clickable: false,
+                            icon: symbol,
+                            zIndex: 0, // behind the other markers
+                            map: map
+                        });
+                    else
+
+                        marker.curveMarker.setOptions({
+                            position: pos1,
+                            icon: symbol,
+                        });
+
+                //line polyline
+                } else {
+
+                    let polyPath = [
+                        {lat: pos1.lat(), lng: pos1.lng()},
+                        {lat: pos2.lat(), lng: pos2.lng()},
+                    ];
+
+                    if (!marker.linePoly) { //creating for the first time a linePoly
+
+                        marker.linePoly = new google.maps.Polyline({
+                            path: polyPath,
+                            geodesic: true,
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 1.0,
+                            strokeWeight: 2
+                        });
+
+                        marker.linePoly.setMap(map);
+
+                    } else
+
+                        marker.linePoly.setOptions({
+                            position: polyPath,
+                        });
 
 
-                // Calculate the arc.
-                // To simplify the math, these points
-                // are all relative to p1:
-                let e = new Point(p2.x - p1.x, p2.y - p1.y), // endpoint (p2 relative to p1)
-                    m = new Point(e.x / 2, e.y / 2), // midpoint
-                    o = new Point(e.y, -e.x), // orthogonal
-                    c = new Point( // curve control point
-                        m.x + curvature * o.x,
-                        m.y + curvature * o.y);
-
-                let pathDef = 'M 0,0 ' +
-                    'q ' + c.x + ',' + c.y + ' ' + e.x + ',' + e.y;
-
-                let zoom = map.getZoom(),
-                    scale = Math.max( 1 / (Math.pow(2, -zoom)), 0.1);
-
-                let symbol = {
-                    path: pathDef,
-                    scale: scale,
-                    strokeWeight: 2,
-                    fillColor: 'none'
-                };
-
-                if (!marker.curveMarker)
-                    marker.curveMarker = new google.maps.Marker({
-                        position: pos1,
-                        clickable: false,
-                        icon: symbol,
-                        zIndex: 0, // behind the other markers
-                        map: map
-                    });
-                else
-
-                    marker.curveMarker.setOptions({
-                        position: pos1,
-                        icon: symbol,
-                    });
+                }
 
 
             }

@@ -31,8 +31,17 @@ Obs. In case there you get an error message about some missing packages like the
 just, run ```npm install name_missing_package```
 
 ## Building Dist
+
+### Building Dist for Browser (browserify)
+
 ```
-npm run build
+npm run build build_browser
+```
+
+### Running Server in Node.js
+
+```
+test_double_connections
 ```
 
 We use browserify
