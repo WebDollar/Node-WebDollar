@@ -46,31 +46,30 @@ class NodeWebPeer {
                                 username: "pasaseh@ether123.net",
                                 credential: "12345678"
                             },
-                            {
-                                "urls": "turn:numb.viagenie.ca",
-                                username: "pasaseh@ether123.net",
-                                credential: "12345678"
-                            }
+                            {urls: "turn:192.155.84.88", "username": "easyRTC", "credential": "easyRTC@pass"},
+                            {urls: "turn:192.155.84.88?transport=tcp", "username": "easyRTC", "credential": "easyRTC@pass"},
+                            {urls: "turn:192.155.86.24:443", "credential": "easyRTC@pass", "username": "easyRTC"},
+                            {urls: "turn:192.155.86.24:443?transport=tcp", "credential": "easyRTC@pass", "username": "easyRTC"},
 
-                        // {url:'stun:stun.l.google.com:19302'},
-                        // {url:'stun:stun1.l.google.com:19302'},
-                        // {url:'stun:stun2.l.google.com:19302'},
-                        // {url:'stun:stun3.l.google.com:19302'},
-                        // {url:'stun:stun4.l.google.com:19302'},
-                        // { urls: 'stun:stun.stunprotocol.org' },
-                        //     { urls: [
-                        //         'stun:stun.gmx.de',
-                        //         'stun:stun.gmx.net'
-                        //     ]
-                        // }
+                            // {url:'stun:stun.l.google.com:19302'},
+                            // {url:'stun:stun1.l.google.com:19302'},
+                            // {url:'stun:stun2.l.google.com:19302'},
+                            // {url:'stun:stun3.l.google.com:19302'},
+                            // {url:'stun:stun4.l.google.com:19302'},
+                            // { urls: 'stun:stun.stunprotocol.org' },
+                            //     { urls: [
+                            //         'stun:stun.gmx.de',
+                            //         'stun:stun.gmx.net'
+                            //     ]
+                            // }
 
-                        // {url:'stun:stun01.sipphone.com'},
-                        // {url:'stun:stun.ekiga.net'},
-                        // {url:'stun:stun.fwdnet.net'},
-                        // {url:'stun:stun.ideasip.com'},
-                        // {url:'stun:stun.iptel.org'},
-                        // {url:'stun:stun.rixtelecom.se'},
-                        // {url:'stun:stun.schlund.de'},
+                            // {url:'stun:stun01.sipphone.com'},
+                            // {url:'stun:stun.ekiga.net'},
+                            // {url:'stun:stun.fwdnet.net'},
+                            // {url:'stun:stun.ideasip.com'},
+                            // {url:'stun:stun.iptel.org'},
+                            // {url:'stun:stun.rixtelecom.se'},
+                            // {url:'stun:stun.schlund.de'},
                     ]
                 }
             };
