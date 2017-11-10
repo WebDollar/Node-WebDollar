@@ -46,7 +46,7 @@ class SignalingClientList {
         //previous established connection
         for (let i = 0; i < this.list.length; i++) {
             //console.log("searchWebPeerSignalingClientList", this.list[i].webPeer.peer.signalData, data, JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(data));
-            if (this.list[i].webPeer === data || (this.list[i].webPeer.peer !== null && JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(data))) {
+            if (this.list[i].webPeer === data || (this.list[i].webPeer.peer !== null && (JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(data)) || (JSON.stringify(this.list[i].webPeer.peer.signalInitiatorData) === JSON.stringify(data)))) {
                 return this.list[i];
             }
         }

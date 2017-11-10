@@ -62,9 +62,9 @@ class NodeWebPeerRTC {
         // from the browser console.
 
         const wrtc = require("wrtc");
-        let RTCPeerConnection = wrtc.RTCPeerConnection;
-        let RTCSessionDescription = wrtc.RTCSessionDescription;
-        let RTCIceCandidate = wrtc.RTCIceCandidate;
+        var RTCPeerConnection = wrtc.RTCPeerConnection;
+        var RTCSessionDescription = wrtc.RTCSessionDescription;
+        var RTCIceCandidate = wrtc.RTCIceCandidate;
 
         this.peer =  new RTCPeerConnection(config, pcConstraint);
 
@@ -79,6 +79,8 @@ class NodeWebPeerRTC {
         this.peer.signalData = null;
 
 
+        this.peer.signalInitiatorData = null;
+
         if (initiator) {
 
             this.peer.dataChannel = this.peer.createDataChannel('chat');
@@ -86,8 +88,11 @@ class NodeWebPeerRTC {
 
             console.log("offer set");
         } else {
+
             // If user is not the offerer let wait for a data channel
             this.peer.ondatachannel = event => {
+
+                console.log("this.peer.ondatachannel =>" ,event.channel);
                 this.peer.dataChannel = event.channel;
                 this.setupDataChannel();
             }
@@ -143,6 +148,8 @@ class NodeWebPeerRTC {
                             desc,
                             () => {
                                 this.peer.signalData = {"sdp": this.peer.localDescription};
+                                this.peer.signalInitiatorData = this.peer.signalData;
+
                                 resolve(  this.peer.signalData )
                             },
                             (error) => {
@@ -186,7 +193,7 @@ class NodeWebPeerRTC {
                     if (this.peer.remoteDescription.type === 'offer') {
                         console.log('Answering offer');
 
-                        this.peer.answer = true;
+                        this.peer.signalInitiatorData = inputSignal;
 
                         this.peer.createAnswer(
                             (desc)=>{
@@ -210,10 +217,14 @@ class NodeWebPeerRTC {
                 }, error => console.error(error));
             } else if (inputSignal.candidate) {
 
-                console.log("inputSignal.candidate",inputSignal.candidate);
                 // Add the new ICE candidate to our connections remote description
-                this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
-                resolve({result:"iceCandidate successfully introduced"});
+                try {
+                    console.log("inputSignal.candidate", inputSignal.candidate);
+                    this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
+                    resolve({result: "iceCandidate successfully introduced"});
+                } catch (Exception){
+                    console.log("iceCandidate error", inputSignal.candidate);
+                }
             }
 
         });
@@ -225,8 +236,9 @@ class NodeWebPeerRTC {
     // Hook up data channel event handlers
     setupDataChannel() {
         this.checkDataChannelState();
-        this.peer.dataChannel.onopen = this.checkDataChannelState;
-        this.peer.dataChannel.onclose = this.checkDataChannelState;
+        this.peer.dataChannel.onopen = ()=>{alert('2'); this.checkDataChannelState()};
+        this.peer.dataChannel.onclose = ()=>{alert('3'); this.checkDataChannelState()};
+
         this.peer.dataChannel.onmessage = (event) => {
 
             console.log("DATA RECEIVED# ################", JSON.parse(event.data));
@@ -235,6 +247,7 @@ class NodeWebPeerRTC {
     }
 
     checkDataChannelState() {
+
         console.log('WebRTC channel state is:', this.peer.dataChannel.readyState);
 
         if (this.peer.dataChannel.readyState === 'open') {

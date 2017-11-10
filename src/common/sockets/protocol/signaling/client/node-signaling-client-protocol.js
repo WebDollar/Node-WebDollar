@@ -43,10 +43,13 @@ class NodeSignalingClientProtocol {
 
             let addressToConnect = data.address;
 
-            let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined);
+            let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(data.initiatorSignal);
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
-            webPeer.createPeer(false);
+            //arrived earlier than  /receive-initiator-signal
+            if (webPeer.peer === null) {
+                webPeer.createPeer(false);
+            }
 
             await webPeer.createSignal(data.initiatorSignal);
             let signal = webPeer.peer.signalData;
@@ -64,10 +67,18 @@ class NodeSignalingClientProtocol {
 
             let addressToConnect = data.address;
 
-            let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined);
+            let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(data.initiatorSignal);
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
-            webPeer.createPeer(false);
+            //arrived earlier than  /receive-initiator-signal
+            if (webPeer.peer === null){
+                webPeer.createPeer(false);
+                webPeer.peer.signalInitiatorData = data.initiatorSignal;
+            }
+
+            console.log("receive-ice-candidate");
+            console.log(SignalingClientList.list, SignalingClientList.list.length);
+            console.log(data.initiatorSignal, webPeer);
 
             await webPeer.createSignal(data.iceCandidate);
             let signal = webPeer.peer.signalData;
@@ -85,6 +96,10 @@ class NodeSignalingClientProtocol {
         socket.on("signals/client/initiator/join-answer-signal", async (data) => {
 
             let addressToConnect = data.address;
+
+            console.log("join-answer-signal");
+            console.log(SignalingClientList.list);
+            console.log(data.initiatorSignal);
 
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(data.initiatorSignal);
             let webPeer = webPeerSignalingClientListObject.webPeer;
@@ -111,6 +126,7 @@ class NodeSignalingClientProtocol {
                 socket.node.sendRequest("signals/client/initiator/join-answer-signal" + data.id, {established: false,});
             });
 
+            console.log("#$$$$$$$$$$ ANSWER ", webPeer);
             await webPeer.createSignal(data.answerSignal);
 
         });
