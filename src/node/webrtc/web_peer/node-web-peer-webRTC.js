@@ -46,6 +46,8 @@ class NodeWebPeerRTC {
         console.log("Peer WebRTC Client constructor");
 
         this.peer = null;
+        this.peer.eventSubscribers = []; //to simulate .on and .once
+        this.peer.eventSubscribersIndex = 0;
 
     }
 
@@ -66,14 +68,12 @@ class NodeWebPeerRTC {
         let RTCSessionDescription = wrtc.RTCSessionDescription;
         let RTCIceCandidate = wrtc.RTCIceCandidate;
 
-
         this.peer =  new RTCPeerConnection(config, pcConstraint);
 
-        console.log('Created webRTC peer');
+        this.enableEventsHandling();
 
-        if (typeof window === 'undefined'){
-            for (let i=0; i<5000; i++) console.log("!!!!! Error!!! wrtc assigned")
-        }
+
+        console.log('Created webRTC peer');
 
         this.peer.disconnect = () => { this.peer.destroy() }
 
@@ -85,7 +85,6 @@ class NodeWebPeerRTC {
 
             this.peer.dataChannel = this.peer.createDataChannel('chat');
             this.setupDataChannel();
-
 
             console.log("offer set");
         } else {
@@ -239,8 +238,15 @@ class NodeWebPeerRTC {
 
     checkDataChannelState() {
         console.log('WebRTC channel state is:', this.peer.dataChannel.readyState);
+
         if (this.peer.dataChannel.readyState === 'open') {
             console.log('WebRTC data channel is now open');
+            this.callEvents("connect", {});
+        }
+
+        if (this.peer.dataChannel.readyState === 'close') {
+            console.log('WebRTC data channel is now closed');
+            this.callEvents("disconnect", {});
         }
     }
 
@@ -260,6 +266,59 @@ class NodeWebPeerRTC {
         })
 
     }
+
+    /*
+        EVENTS HANDLING for
+        .on
+        .once
+        .off
+
+     */
+
+    enableEventsHandling(){
+        this.peer.on = (eventName, callback) =>{
+            return this.subscribeEvent(eventName, callback, "on");
+        };
+
+        this.peer.once = (eventName, callback) =>{
+            return this.subscribeEvent(eventName, callback, "once");
+        };
+        this.peer.off = (index) =>{
+            return this.unscribeEvent(index);
+        };
+    }
+
+    subscribeEvent(eventName, callback, type){
+
+        this.peer.eventSubscribers.push({eventName: eventName, callback: callback, type: type, index: this.peer.eventSubscribersIndex++}) ;
+
+        return this.peer.eventSubscribersIndex;
+    }
+
+    unscribeEvent(index){
+        for (let i=0; i< this.peer.eventSubscribers.length; i++)
+            if (this.peer.eventSubscribers[i].index === index){
+                this.peer.eventSubscribers.splice(i, 1);
+                return true;
+            }
+
+        return false;
+    }
+
+    callEvents(eventName, data){
+
+        for (let i=0; i<this.peer.eventSubscribers.length; i++)
+            if (this.peer.eventSubscribers[i].eventName === eventName){
+                this.peer.eventSubscribers[i].callback(data);
+            }
+
+        //deleting once events...
+        for (let i=this.peer.eventSubscribers.length-1; i>=0; i--)
+            if ((this.peer.eventSubscribers[i].eventName === eventName) && (this.peer.eventSubscribers[i].type === "once"))
+                this.peer.eventSubscribers.splice(i,1);
+
+    }
+
 }
 
 
