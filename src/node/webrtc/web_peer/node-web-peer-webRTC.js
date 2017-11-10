@@ -4,12 +4,6 @@
 
 
 // TUTORIAL BASED ON
-// https://github.com/feross/simple-peer
-
-var wrtc = require("wrtc");
-RTCPeerConnection = wrtc.RTCPeerConnection;
-RTCSessionDescription = wrtc.RTCSessionDescription;
-RTCIceCandidate = wrtc.RTCIceCandidate;
 
 
 import {SocketExtend} from './../../../common/sockets/socket-extend'
@@ -66,6 +60,12 @@ class NodeWebPeerRTC {
         // For SCTP, reliable and ordered is true by default.
         // Add localConnection to global scope to make it visible
         // from the browser console.
+
+        const wrtc = require("wrtc");
+        let RTCPeerConnection = wrtc.RTCPeerConnection;
+        let RTCSessionDescription = wrtc.RTCSessionDescription;
+        let RTCIceCandidate = wrtc.RTCIceCandidate;
+
 
         this.peer =  new RTCPeerConnection(config, pcConstraint);
 
