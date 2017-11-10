@@ -106,7 +106,7 @@ class NodeSignalingServerProtocol {
                                         if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 3 - join-answer-signal  ", connection.id, answer );
 
                                         // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
-                                        client1.node.sendRequestWaitOnce("signals/client/join-answer-signal",{
+                                        client1.node.sendRequestWaitOnce("signals/client/initiator/join-answer-signal",{
                                             id: connection.id,
                                             initiatorSignal: initiatorAnswer.initiatorSignal,
                                             answerSignal: answer.answerSignal,

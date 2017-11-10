@@ -89,10 +89,10 @@ class NodeSignalingClientProtocol {
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(data.initiatorSignal);
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
-            console.log("################# signals/client/join-answer-signal",  webPeer, data.initiatorSignal, data.answerSignal);
+            console.log("################# signals/client/initiator/join-answer-signal",  webPeer, data.initiatorSignal, data.answerSignal);
 
             let timeoutId = setTimeout(() => {
-                socket.sendRequest("signals/client/join-answer-signal/" + data.id, {established: false,});
+                socket.sendRequest("signals/client/initiator/join-answer-signal" + data.id, {established: false,});
             }, 30000);
 
             webPeer.peer.once("connect", () => {
@@ -100,7 +100,7 @@ class NodeSignalingClientProtocol {
                 console.log("%%%%%%%%%%%% connection established");
                 clearTimeout(timeoutId);
 
-                socket.node.sendRequest("signals/client/join-answer-signal/" + data.id, {established: true,});
+                socket.node.sendRequest("signals/client/initiator/join-answer-signal" + data.id, {established: true,});
             });
 
             webPeer.peer.once("error", ()=>{
@@ -108,7 +108,7 @@ class NodeSignalingClientProtocol {
                 console.log("%%%%%%% connection NOT established");
                 clearTimeout(timeoutId);
 
-                socket.node.sendRequest("signals/client/join-answer-signal/" + data.id, {established: false,});
+                socket.node.sendRequest("signals/client/initiator/join-answer-signal" + data.id, {established: false,});
             });
 
             await webPeer.createSignal(data.answerSignal);
