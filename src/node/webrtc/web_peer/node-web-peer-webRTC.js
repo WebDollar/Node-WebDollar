@@ -23,10 +23,12 @@ const config = {
 
     iceServers: [
         {
-            urls: "stun:numb.viagenie.ca",
-            username: "pasaseh@ether123.net",
-            credential: "12345678"
+            urls: 'stun:stun.l.google.com:19302',
         },
+        {urls: "turn:192.155.84.88", "username": "easyRTC", "credential": "easyRTC@pass"},
+        {urls: "turn:192.155.84.88?transport=tcp", "username": "easyRTC", "credential": "easyRTC@pass"},
+        {urls: "turn:192.155.86.24:443", "credential": "easyRTC@pass", "username": "easyRTC"},
+        {urls: "turn:192.155.86.24:443?transport=tcp", "credential": "easyRTC@pass", "username": "easyRTC"},
         {
             urls: "turn:numb.viagenie.ca",
             username: "pasaseh@ether123.net",
@@ -36,7 +38,7 @@ const config = {
     ]
 }
 
-class NodeWebPeer {
+class NodeWebPeerRTC {
 
     /*
         peer = None
@@ -65,22 +67,19 @@ class NodeWebPeer {
         // Add localConnection to global scope to make it visible
         // from the browser console.
 
-
         this.peer =  new RTCPeerConnection(config, pcConstraint);
 
-        //localConnection.setConfiguration(servers);
+        console.log('Created webRTC peer');
 
-        console.log('Created local peer connection object localConnection');
-
-        this.peer.sendChannel = this.peer.createDataChannel('sendDataChannel', dataConstraint);
+        // 'onicecandidate' notifies us whenever an ICE agent needs to deliver a
+        // message to the other peer through the signaling server
+        this.peer.onicecandidate = event => {
+            if (event.candidate) {
+                sendSignalingMessage({'candidate': event.candidate});
+            }
+        };
 
         console.log('Created send data channel');
-
-        this.peer.onicecandidate = function(e) {
-            onIceCandidate(this.peer, e);
-        };
-        this.peer.sendChannel.onopen = onSendChannelStateChange;
-        this.peer.sendChannel.onclose = onSendChannelStateChange;
 
         if (typeof window === 'undefined'){
             for (let i=0; i<5000; i++) console.log("!!!!! Error!!! wrtc assigned")
@@ -91,10 +90,32 @@ class NodeWebPeer {
         this.socket =  this.peer;
         this.peer.signalData = null;
 
-        let initiatorSignal = null;
+        this.peer.onicecandidate = (event) => {
+            if (event.candidate) {
+                console.log("onicecandidate",event.candidate);
+                return event.candidate;
+            }
+        };
 
-        if (initiator)
-            initiatorSignal = this.createSignal(undefined);
+
+        if (initiator) {
+            // If user is offerer let them create a negotiation offer and set up the data channel
+
+            this.peer.dataChannel = this.peer.createDataChannel('chat');
+            this.setupDataChannel();
+
+            console.log("offer set");
+        } else {
+            // If user is not the offerer let wait for a data channel
+            this.peer.ondatachannel = event => {
+                this.peer.dataChannel = event.channel;
+                this.setupDataChannel();
+            }
+        }
+
+
+
+
 
         // this.peer.on('error', err => { console.log('error', err) } );
         //
@@ -114,7 +135,6 @@ class NodeWebPeer {
         //     console.log('data: ' , data)
         // });
 
-        return initiatorSignal;
     }
 
 
@@ -123,36 +143,80 @@ class NodeWebPeer {
         this.peer.signalData = null;
 
 
-
         let promise = new Promise ( (resolve) => {
 
+            // emitter
+            if ( !inputSignal ) {
+                this.peer.onnegotiationneeded = () => {
 
-            this.peer.createOffer()
+                    this.peer.createOffer(
 
-                .then( (data)=>{
-                    this.peer.signalData = data;
-                    this.peer.setLocalDescription(data);
-                    resolve(this.peer.signalData)
-                })
+                        (desc)=>{
+                            this.peer.setLocalDescription(
+                                desc,
+                                () => resolve(  {"sdp": this.peer.localDescription} ),
+                                (error) => {
+                                    console.error("errrrro 4", error);
+                                    resolve(null)
+                                }
+                            );
+                        },
+                        (error) => {
+                            console.error("errro 5",error)
+                            resolve(null);
+                        });
+                };
+            }
+            //answer
+            else {
+                if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
 
-                .catch((error)=>{
-                    resolve(null);
-                    console.log('Failed to create session description: ' + error.toString());
-                });
+                if (inputSignal.sdp) {
+                    // This is called after receiving an offer or answer from another peer
+                    this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), () => {
+                        console.log('pc.remoteDescription.type', this.peer.remoteDescription.type);
+                        // When receiving an offer lets answer it
+                        if (this.peer.remoteDescription.type === 'offer') {
+                            console.log('Answering offer');
+                            this.peer.createAnswer(
+                                () => resolve(  {"sdp": this.peer.localDescription} ),
+                                error => console.error(error));
+                        }
+                    }, error => console.error(error));
+                } else if (inputSignal.candidate)
+                // Add the new ICE candidate to our connections remote description
+                    this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
+
+            }
+
+
 
 
         });
 
-        if (typeof inputSignal !== "undefined" ) {
-            if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
-
-            //console.log("inputSignal ##$$#$$$$$$ ", inputSignal, typeof inputSignal);
-            this.peer.signal(inputSignal);
-        }
 
 
         return promise;
 
+    }
+
+    // Hook up data channel event handlers
+    setupDataChannel() {
+        this.checkDataChannelState();
+        dataChannel.onopen = this.checkDataChannelState;
+        dataChannel.onclose = this.checkDataChannelState;
+        dataChannel.onmessage = (event) => {
+
+            console.log("DATA RECEIVED# ################", JSON.parse(event.data));
+        }
+
+    }
+
+    checkDataChannelState() {
+        console.log('WebRTC channel state is:', dataChannel.readyState);
+        if (dataChannel.readyState === 'open') {
+            console.log('WebRTC data channel is now open');
+        }
     }
 
 
@@ -176,4 +240,4 @@ class NodeWebPeer {
 
 
 
-exports.NodeWebPeer = NodeWebPeer;
+exports.NodeWebPeerRTC = NodeWebPeerRTC;

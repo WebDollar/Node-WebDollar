@@ -1,7 +1,6 @@
 import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_global.js';
 
 import {SignalingClientList} from './signaling-client-list/signaling-client-list'
-import {NodeWebPeer} from './../../../../../node/webrtc/web_peer/node-web-peer'
 
 class NodeSignalingClientProtocol {
 
@@ -24,8 +23,8 @@ class NodeSignalingClientProtocol {
 
             console.log("###################### signals/client/generate-initiator-signal/"+data.id, webPeer.peer);
 
-            await webPeer.createPeer(true);
-            //await webPeer.createSignal(undefined);
+            webPeer.createPeer(true);
+            await webPeer.createSignal(undefined);
             let signal = webPeer.peer.signalData;
 
             console.log("###################### signals/client/generate-initiator-signal/"+data.id, signal, typeof signal);

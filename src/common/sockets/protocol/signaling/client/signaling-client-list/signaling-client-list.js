@@ -1,5 +1,7 @@
 import {SignalingClientPeerObject} from './signaling-client-peer-object';
-import {NodeWebPeer} from "../../../../../../node/webrtc/web_peer/node-web-peer";
+
+//import {NodeWebPeer} from "../../../../../../node/webrtc/web_peer/node-web-peer";
+import {NodeWebPeerRTC} from "../../../../../../node/webrtc/web_peer/node-web-peer-webRTC";
 
 const colors = require('colors/safe');
 
@@ -28,7 +30,7 @@ class SignalingClientList {
 
         if (signalingClientPeerObject === null){
 
-            let webPeer = new NodeWebPeer();
+            let webPeer = new NodeWebPeerRTC();
             signalingClientPeerObject = new SignalingClientPeerObject(webPeer);
 
             this.list.push(signalingClientPeerObject);

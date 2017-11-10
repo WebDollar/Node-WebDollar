@@ -74,7 +74,7 @@ class NodeClient {
 
                 });
 
-                socket.once("connect_error", (response) =>{
+                socket.on("connect_error", (response) =>{
 
                     console.log("Client error connecting", address);
                     //NodesList.disconnectSocket(this.socket);
@@ -82,7 +82,7 @@ class NodeClient {
                     resolve(false);
                 });
 
-                socket.once("connect_failed", (response) =>{
+                socket.on("connect_failed", (response) =>{
                     console.log("Client error connecting (connect_failed) ", address);
                     NodesList.disconnectSocket(this.socket);
 

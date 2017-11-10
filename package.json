@@ -32,6 +32,7 @@
     "browserify-fs": "^1.0.0",
     "bufferutil": "^3.0.2",
     "colors": "^1.1.2",
+    "easyrtc": "^1.1.0",
     "fs": "0.0.1-security",
     "ipaddr.js": "^1.5.4",
     "jsonp": "^0.2.1",

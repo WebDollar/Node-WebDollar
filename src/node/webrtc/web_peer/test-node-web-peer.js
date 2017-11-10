@@ -4,7 +4,7 @@ exports.testNodeWebPeer = async function (){
 
     let webpeer = new NodeWebPeer();
 
-    webpeer.createPeer(true);
+    webpeer.createPeer();
     console.log("SIGNAL", await webpeer.createSignal());
 
 };
