@@ -21,17 +21,17 @@ class NodeSignalingClientProtocol {
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined);
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
-            console.log("###################### signals/client/generate-initiator-signal/"+data.id, webPeer.peer);
+            console.log("###################### signals/client/initiator/generate-initiator-signal"+data.id, webPeer.peer);
 
             webPeer.createPeer(true);
 
-            await webPeer.createSignalInitiator((iceCandidate)=>{ socket.node.sendRequest("signals/server/new-initiator-ice-candidate/" + data.id, {candidate: iceCandidate} ) });
+            await webPeer.createSignalInitiator( (iceCandidate)=>{ socket.node.sendRequest("signals/server/new-initiator-ice-candidate/" + data.id, {candidate: iceCandidate} ) });
 
             let signal = webPeer.peer.signalData;
 
-            console.log("###################### signals/client/generate-initiator-signal/"+data.id, signal, typeof signal);
+            console.log("###################### signals/client/initiator/generate-initiator-signal/"+data.id, signal, typeof signal);
 
-            socket.node.sendRequest("signals/client/generate-initiator-signal/" + data.id, {
+            socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {
                 accepted: true,
                 initiatorSignal: signal,
             });
@@ -48,7 +48,7 @@ class NodeSignalingClientProtocol {
 
             webPeer.createPeer(false);
 
-            await webPeer.createSignal(data.initiatorSignal, undefined);
+            await webPeer.createSignal(data.initiatorSignal);
             let signal = webPeer.peer.signalData;
 
             console.log("################# signals/client/answer/receive-initiator-signal",  signal, data.id);
@@ -69,12 +69,12 @@ class NodeSignalingClientProtocol {
 
             webPeer.createPeer(false);
 
-            await webPeer.createSignal(data.initiatorSignal, data.candidate);
+            await webPeer.createSignal(data.iceCandidate);
             let signal = webPeer.peer.signalData;
 
-            console.log("################# signals/client/generate-answer-signal",  signal, data.id);
+            console.log("################# signals/client/answer/receive-ice-candidate/",  signal, data.id);
 
-            socket.node.sendRequest("signals/client/generate-answer-signal/" + data.id, {
+            socket.node.sendRequest("signals/client/answer/receive-ice-candidate/" + data.id, {
                 accepted: true,
                 answerSignal: signal
             });

@@ -99,29 +99,6 @@ class NodeSignalingServerProtocol {
                                     address: client1.node.sckAddress.getAddress()
                                 }, connection.id).then((answer)=>{
 
-
-                                });
-
-                                client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, (iceCandidate => {
-
-                                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 - generate-answer-signal  ", connection.id, initiatorAnswer );
-
-                                    client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{
-                                        id: connection.id,
-
-                                        initiatorSignal: initiatorAnswer.initiatorSignal,
-                                        iceCandidate: iceCandidate,
-
-                                        address: client1.node.sckAddress.getAddress()
-                                    });
-
-
-                                }));
-
-
-                                // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
-                                client2.node.on("signals/client/generate-answer-signal/"+connection.id).then ((answer)=>{
-
                                     if ( (answer.accepted||false) === true) {
 
                                         SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablishing );
@@ -149,6 +126,30 @@ class NodeSignalingServerProtocol {
 
                                         });
                                     }
+
+
+                                });
+
+                                client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, (iceCandidate => {
+
+                                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 - generate-answer-signal  ", connection.id, initiatorAnswer );
+
+                                    client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{
+                                        id: connection.id,
+
+                                        initiatorSignal: initiatorAnswer.initiatorSignal,
+                                        iceCandidate: iceCandidate,
+
+                                        address: client1.node.sckAddress.getAddress()
+                                    });
+
+
+                                }));
+
+
+                                // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
+                                client2.node.on("signals/client/generate-answer-signal/"+connection.id).then ((answer)=>{
+
 
                                 });
 

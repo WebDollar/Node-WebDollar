@@ -144,7 +144,10 @@ class NodeWebPeerRTC {
                     (desc)=>{
                         this.peer.setLocalDescription(
                             desc,
-                            () => resolve(  {"sdp": this.peer.localDescription} ),
+                            () => {
+                                this.peer.signalData = {"sdp": this.peer.localDescription};
+                                resolve(  this.peer.signalData )
+                            },
                             (error) => {
                                 console.error("errrrro 4", error);
                                 resolve(null)
@@ -164,7 +167,7 @@ class NodeWebPeerRTC {
     }
 
 
-    createSignal(inputSignal, iceCandidate){
+    createSignal(inputSignal){
 
         this.peer.signalData = null;
 
@@ -173,19 +176,15 @@ class NodeWebPeerRTC {
 
 
             //answer
-
             if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
 
-            if (!iceCandidate){
-
-                //signal already processed in the past
-                if (this.peer.answer === true) inputSignal = iceCandidate;
-            }
 
             if (inputSignal.sdp) {
                 // This is called after receiving an offer or answer from another peer
                 this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), () => {
+
                     console.log('pc.remoteDescription.type', this.peer.remoteDescription.type);
+
                     // When receiving an offer lets answer it
                     if (this.peer.remoteDescription.type === 'offer') {
                         console.log('Answering offer');
@@ -196,7 +195,10 @@ class NodeWebPeerRTC {
                             (desc)=>{
                                 this.peer.setLocalDescription(
                                     desc,
-                                    () => resolve({'sdp': this.peer.localDescription}),
+                                    () => {
+                                        this.peer.signalData = {'sdp': this.peer.localDescription};
+                                        resolve(this.peer.signalData);
+                                    },
                                     (error) => {
                                         console.error("errror 7",error);
                                         resolve(null);
@@ -210,6 +212,8 @@ class NodeWebPeerRTC {
                     }
                 }, error => console.error(error));
             } else if (inputSignal.candidate) {
+
+                console.log("inputSignal.candidate",inputSignal.candidate);
                 // Add the new ICE candidate to our connections remote description
                 this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
                 resolve({result:"iceCandidate successfully introduced"});
