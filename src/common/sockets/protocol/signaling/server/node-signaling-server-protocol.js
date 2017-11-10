@@ -81,7 +81,7 @@ class NodeSignalingServerProtocol {
                         if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 1 - generate-initiator-signal  ", (connection === null ? null : connection.id) , { id: connection.id,  address: client2.node.sckAddress.getAddress() } );
 
                         // Step1, send the request to generate the INITIATOR SIGNAL
-                        client1.node.sendRequestWaitOnce("signals/client/generate-initiator-signal", {
+                        client1.node.sendRequestWaitOnce("signals/client/initiator/generate-initiator-signal", {
                             id: connection.id,
                             address: client2.node.sckAddress.getAddress()
                         }, connection.id ).then ( (initiatorAnswer) =>{
@@ -90,14 +90,37 @@ class NodeSignalingServerProtocol {
 
                                 connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating );
 
-                                if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 - generate-answer-signal  ", connection.id, initiatorAnswer );
-
                                 // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
-                                client2.node.sendRequestWaitOnce("signals/client/generate-answer-signal", {
+
+                                client2.node.sendRequestWaitOnce("signals/client/answer/receive-initiator-signal", {
                                     id: connection.id,
                                     initiatorSignal: initiatorAnswer.initiatorSignal,
+
                                     address: client1.node.sckAddress.getAddress()
-                                }, connection.id).then ((answer)=>{
+                                }, connection.id).then((answer)=>{
+
+
+                                });
+
+                                client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, (iceCandidate => {
+
+                                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 - generate-answer-signal  ", connection.id, initiatorAnswer );
+
+                                    client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{
+                                        id: connection.id,
+
+                                        initiatorSignal: initiatorAnswer.initiatorSignal,
+                                        iceCandidate: iceCandidate,
+
+                                        address: client1.node.sckAddress.getAddress()
+                                    });
+
+
+                                }));
+
+
+                                // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
+                                client2.node.on("signals/client/generate-answer-signal/"+connection.id).then ((answer)=>{
 
                                     if ( (answer.accepted||false) === true) {
 
@@ -128,6 +151,8 @@ class NodeSignalingServerProtocol {
                                     }
 
                                 });
+
+
                             }
 
                         });

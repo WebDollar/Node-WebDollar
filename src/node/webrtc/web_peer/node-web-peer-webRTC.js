@@ -71,16 +71,6 @@ class NodeWebPeerRTC {
 
         console.log('Created webRTC peer');
 
-        // 'onicecandidate' notifies us whenever an ICE agent needs to deliver a
-        // message to the other peer through the signaling server
-        this.peer.onicecandidate = event => {
-            if (event.candidate) {
-                sendSignalingMessage({'candidate': event.candidate});
-            }
-        };
-
-        console.log('Created send data channel');
-
         if (typeof window === 'undefined'){
             for (let i=0; i<5000; i++) console.log("!!!!! Error!!! wrtc assigned")
         }
@@ -90,19 +80,12 @@ class NodeWebPeerRTC {
         this.socket =  this.peer;
         this.peer.signalData = null;
 
-        this.peer.onicecandidate = (event) => {
-            if (event.candidate) {
-                console.log("onicecandidate",event.candidate);
-                return event.candidate;
-            }
-        };
-
 
         if (initiator) {
-            // If user is offerer let them create a negotiation offer and set up the data channel
 
             this.peer.dataChannel = this.peer.createDataChannel('chat');
             this.setupDataChannel();
+
 
             console.log("offer set");
         } else {
@@ -137,75 +120,113 @@ class NodeWebPeerRTC {
 
     }
 
+    createSignalInitiator(callbackSignalingServerSendIceCandidate){
 
-    createSignal(inputSignal){
+        this.peer.onicecandidate = (event) => {
+            if (event.candidate) {
+                console.log("onicecandidate",event.candidate);
+                callbackSignalingServerSendIceCandidate(event.candidate);
+                return event.candidate;
+            }
+        };
 
         this.peer.signalData = null;
 
 
         let promise = new Promise ( (resolve) => {
 
-            // emitter
-            if ( !inputSignal ) {
-                this.peer.onnegotiationneeded = () => {
+            // emitter - signal
+            // If user is offerer let them create a negotiation offer and set up the data channel
+            this.peer.onnegotiationneeded = () => {
 
-                    this.peer.createOffer(
+                this.peer.createOffer(
 
-                        (desc)=>{
-                            this.peer.setLocalDescription(
-                                desc,
-                                () => resolve(  {"sdp": this.peer.localDescription} ),
-                                (error) => {
-                                    console.error("errrrro 4", error);
-                                    resolve(null)
-                                }
-                            );
-                        },
-                        (error) => {
-                            console.error("errro 5",error)
-                            resolve(null);
-                        });
-                };
-            }
-            //answer
-            else {
-                if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
-
-                if (inputSignal.sdp) {
-                    // This is called after receiving an offer or answer from another peer
-                    this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), () => {
-                        console.log('pc.remoteDescription.type', this.peer.remoteDescription.type);
-                        // When receiving an offer lets answer it
-                        if (this.peer.remoteDescription.type === 'offer') {
-                            console.log('Answering offer');
-                            this.peer.createAnswer(
-                                () => resolve(  {"sdp": this.peer.localDescription} ),
-                                error => console.error(error));
-                        }
-                    }, error => console.error(error));
-                } else if (inputSignal.candidate)
-                // Add the new ICE candidate to our connections remote description
-                    this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
-
-            }
-
-
-
-
+                    (desc)=>{
+                        this.peer.setLocalDescription(
+                            desc,
+                            () => resolve(  {"sdp": this.peer.localDescription} ),
+                            (error) => {
+                                console.error("errrrro 4", error);
+                                resolve(null)
+                            }
+                        );
+                    },
+                    (error) => {
+                        console.error("errro 5",error);
+                        resolve(null);
+                    });
+            };
         });
-
 
 
         return promise;
 
     }
 
+
+    createSignal(inputSignal, iceCandidate){
+
+        this.peer.signalData = null;
+
+
+        let promise = new Promise ( (resolve) => {
+
+
+            //answer
+
+            if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
+
+            if (!iceCandidate){
+
+                //signal already processed in the past
+                if (this.peer.answer === true) inputSignal = iceCandidate;
+            }
+
+            if (inputSignal.sdp) {
+                // This is called after receiving an offer or answer from another peer
+                this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), () => {
+                    console.log('pc.remoteDescription.type', this.peer.remoteDescription.type);
+                    // When receiving an offer lets answer it
+                    if (this.peer.remoteDescription.type === 'offer') {
+                        console.log('Answering offer');
+
+                        this.peer.answer = true;
+
+                        this.peer.createAnswer(
+                            (desc)=>{
+                                this.peer.setLocalDescription(
+                                    desc,
+                                    () => resolve({'sdp': this.peer.localDescription}),
+                                    (error) => {
+                                        console.error("errror 7",error);
+                                        resolve(null);
+                                    }
+                                )
+                            },
+                            (error) => {
+                                console.error("errror 6",error);
+                                resolve(null);
+                            });
+                    }
+                }, error => console.error(error));
+            } else if (inputSignal.candidate) {
+                // Add the new ICE candidate to our connections remote description
+                this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
+                resolve({result:"iceCandidate successfully introduced"});
+            }
+
+        });
+
+
+        return promise;
+    }
+
     // Hook up data channel event handlers
     setupDataChannel() {
         this.checkDataChannelState();
-        dataChannel.onopen = this.checkDataChannelState;
-        dataChannel.onclose = this.checkDataChannelState;
-        dataChannel.onmessage = (event) => {
+        this.peer.dataChannel.onopen = this.checkDataChannelState;
+        this.peer.dataChannel.onclose = this.checkDataChannelState;
+        this.peer.dataChannel.onmessage = (event) => {
 
             console.log("DATA RECEIVED# ################", JSON.parse(event.data));
         }
@@ -213,8 +234,8 @@ class NodeWebPeerRTC {
     }
 
     checkDataChannelState() {
-        console.log('WebRTC channel state is:', dataChannel.readyState);
-        if (dataChannel.readyState === 'open') {
+        console.log('WebRTC channel state is:', this.peer.dataChannel.readyState);
+        if (this.peer.dataChannel.readyState === 'open') {
             console.log('WebRTC data channel is now open');
         }
     }
