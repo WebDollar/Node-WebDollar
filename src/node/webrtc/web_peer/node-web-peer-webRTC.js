@@ -46,8 +46,6 @@ class NodeWebPeerRTC {
         console.log("Peer WebRTC Client constructor");
 
         this.peer = null;
-        this.peer.eventSubscribers = []; //to simulate .on and .once
-        this.peer.eventSubscribersIndex = 0;
 
     }
 
@@ -276,6 +274,10 @@ class NodeWebPeerRTC {
      */
 
     enableEventsHandling(){
+
+        this.peer.eventSubscribers = []; //to simulate .on and .once
+        this.peer.eventSubscribersIndex = 0;
+
         this.peer.on = (eventName, callback) =>{
             return this.subscribeEvent(eventName, callback, "on");
         };
@@ -289,6 +291,7 @@ class NodeWebPeerRTC {
     }
 
     subscribeEvent(eventName, callback, type){
+        if (!this.peer ) return  null;
 
         this.peer.eventSubscribers.push({eventName: eventName, callback: callback, type: type, index: this.peer.eventSubscribersIndex++}) ;
 
@@ -296,6 +299,8 @@ class NodeWebPeerRTC {
     }
 
     unscribeEvent(index){
+        if (!this.peer ) return  null;
+
         for (let i=0; i< this.peer.eventSubscribers.length; i++)
             if (this.peer.eventSubscribers[i].index === index){
                 this.peer.eventSubscribers.splice(i, 1);
@@ -306,6 +311,7 @@ class NodeWebPeerRTC {
     }
 
     callEvents(eventName, data){
+        if (!this.peer ) return  null;
 
         for (let i=0; i<this.peer.eventSubscribers.length; i++)
             if (this.peer.eventSubscribers[i].eventName === eventName){
