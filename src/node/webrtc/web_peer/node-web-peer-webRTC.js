@@ -103,6 +103,11 @@ class NodeWebPeerRTC {
 
             console.log('WEBRTC PEER CONNECTED', this.peer);
 
+            let remote = this.processDescription(this.peer.remoteDescription);
+
+            this.peer.remoteAddress = remote.address;
+            this.peer.remotePort = remote.port;
+
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort );
 
             this.peer.node.protocol.sendHello().then( (answer)=>{
@@ -353,7 +358,7 @@ class NodeWebPeerRTC {
         }
 
         if (subStr.length > 0)
-            subStr = subStr.replace(/ /g,'');
+            subStr = subStr.trim();
 
         return subStr;
 
@@ -370,38 +375,64 @@ class NodeWebPeerRTC {
             pos = str.indexOf(text, pos);
             if (pos > 0) pos += text.length
 
-            let subStr = extractCharsUntilInvalid(str, pos, '\n↵');
+            let subStr = this.extractCharsUntilInvalid(str, pos, '\n↵');
             if (subStr !== '') data.push(subStr);
         }
 
         return data;
     }
 
-    process(a){
+    processDescription(description) {
 
-        let str = a.sdp;
+        let str = '';
+        if (description.sdp) {
+            str = description.sdp;
+            if (typeof str === "object" && !str.sdp) str = str.sdp;
+        }
 
-        if (typeof str === "string"){
+        if (description.candidate) str = description.candidate;
+
+        console.log(str);
+
+        if (typeof str === "string") {
 
 
-            let ip4 = extractValueFromDescription(str, "IP4");
-            let ip6 = extractValueFromDescription(str, "IP6");
-            let candidate = extractValueFromDescription(str, "candidate:");
-
-            if (candidate.length > 5) {
-
-            }
+            let ip4 = this.extractValueFromDescription(str, "IP4");
+            let ip6 = this.extractValueFromDescription(str, "IP6");
+            let candidate = this.extractValueFromDescription(str, "candidate:");
 
             console.log("IP4=", ip4);
             console.log("IP6=", ip6);
-            console.log("candidate=",candidate);
+            console.log("candidate=", candidate);
 
+            let address = '';
+
+            if (candidate.length === 1) {
+
+                str = candidate[0];
+                let data = str.split(" ");
+
+                //candidate:1853887674 2 udp 1518280447 47.61.61.61 36768 typ srflx raddr 192.168.0.196 rport 36768 generation 0
+                for (let i = 0; i < data.length; i++)
+                    if (data[i] === "udp" || data[i] === "tcp") {
+                        if (i + 2 < data.length && data[i].length > 5 && data.indexOf(".") > -1) {
+                            address = data[i];
+                            break;
+                        }
+                    }
+
+            }
+
+            if (address === '' && ip6.length > 0)
+                address = ip6[ip6.length - 1];
+
+            if (address === '' && ip4.length > 0)
+                address = ip4[ip4.length - 1];
+
+            return ({address: address, port: undefined,})
 
         }
-
     }
-
-    process(a);
 
 }
 
