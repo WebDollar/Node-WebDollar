@@ -62,9 +62,9 @@ class NodeWebPeerRTC {
         // from the browser console.
 
         const wrtc = require("wrtc");
-        var RTCPeerConnection = wrtc.RTCPeerConnection;
-        var RTCSessionDescription = wrtc.RTCSessionDescription;
-        var RTCIceCandidate = wrtc.RTCIceCandidate;
+        let RTCPeerConnection = wrtc.RTCPeerConnection;
+        let RTCSessionDescription = wrtc.RTCSessionDescription;
+        let RTCIceCandidate = wrtc.RTCIceCandidate;
 
         this.peer =  new RTCPeerConnection(config, pcConstraint);
 
@@ -91,34 +91,30 @@ class NodeWebPeerRTC {
 
             // If user is not the offerer let wait for a data channel
             this.peer.ondatachannel = event => {
-
-                console.log("this.peer.ondatachannel =>" ,event.channel);
                 this.peer.dataChannel = event.channel;
                 this.setupDataChannel();
             }
         }
 
 
+        this.peer.on('error', err => { console.log('error', err) } );
 
+        this.peer.on('connect', () => {
 
+            console.log('WEBRTC PEER CONNECTED', this.peer);
 
-        // this.peer.on('error', err => { console.log('error', err) } );
-        //
-        // this.peer.on('connect', () => {
-        //
-        //     console.log('WEBRTC PEER CONNECTED', this.peer);
-        //
-        //     SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort );
-        //
-        //     this.peer.node.protocol.sendHello().then( (answer)=>{
-        //         this.initializePeer();
-        //     });
-        //
-        // });
-        //
-        // this.peer.on('data', (data) => {
-        //     console.log('data: ' , data)
-        // });
+            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort );
+
+            this.peer.node.protocol.sendHello().then( (answer)=>{
+                this.initializePeer();
+            });
+
+        });
+
+        this.peer.on('data', (data) => {
+            console.log('data: ' , data)
+        });
+
 
     }
 
@@ -337,6 +333,75 @@ class NodeWebPeerRTC {
                 this.peer.eventSubscribers.splice(i,1);
 
     }
+
+
+    /*
+        EXTRACTING DATA from DESCRIPTIONS
+     */
+
+    extractCharsUntilInvalid(str, pos, invalidChars){
+
+        invalidChars = invalidChars||'';
+
+        let subStr = '';
+
+        while (pos > 0 && pos < str.length && invalidChars.indexOf(str[pos]) === -1){
+
+            subStr += str[pos];
+
+            pos ++ ;
+        }
+
+        if (subStr.length > 0)
+            subStr = subStr.replace(/ /g,'');
+
+        return subStr;
+
+    }
+
+    extractValueFromDescription(str, text){
+
+        let pos=-1, ok;
+        let data = [];
+
+        ok = false;
+        while (ok === false || pos > -1){
+            ok = true;
+            pos = str.indexOf(text, pos);
+            if (pos > 0) pos += text.length
+
+            let subStr = extractCharsUntilInvalid(str, pos, '\n↵');
+            if (subStr !== '') data.push(subStr);
+        }
+
+        return data;
+    }
+
+    process(a){
+
+        let str = a.sdp;
+
+        if (typeof str === "string"){
+
+
+            let ip4 = extractValueFromDescription(str, "IP4");
+            let ip6 = extractValueFromDescription(str, "IP6");
+            let candidate = extractValueFromDescription(str, "candidate:");
+
+            if (candidate.length > 5) {
+
+            }
+
+            console.log("IP4=", ip4);
+            console.log("IP6=", ip6);
+            console.log("candidate=",candidate);
+
+
+        }
+
+    }
+
+    process(a);
 
 }
 

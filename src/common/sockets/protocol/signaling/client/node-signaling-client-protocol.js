@@ -49,6 +49,7 @@ class NodeSignalingClientProtocol {
             //arrived earlier than  /receive-initiator-signal
             if (webPeer.peer === null) {
                 webPeer.createPeer(false);
+                webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
 
             await webPeer.createSignal(data.initiatorSignal);
