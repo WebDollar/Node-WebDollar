@@ -81,6 +81,7 @@ class NetworkMap {
                 this.markers[markerIndex].setMap(null);
 
                 if (typeof this.markers[markerIndex].curveMarker !== 'undefined')  this.markers[markerIndex].curveMarker.setMap(null);
+                if (typeof this.markers[markerIndex].linePoly !== 'undefined')  this.markers[markerIndex].linePoly.setMap(null);
                 if (typeof this.markers[markerIndex].infoWindow !== 'undefined') this.markers[markerIndex].infoWindow.setMap(null);
 
                 this.markers.splice(markerIndex, 1);

@@ -8,6 +8,7 @@
 
 import {SocketExtend} from './../../../common/sockets/socket-extend'
 import {NodesList} from '../../lists/nodes-list';
+const colors = require('colors/safe');
 
 const config = {
 
@@ -74,7 +75,7 @@ class NodeWebPeerRTC {
 
         console.log('Created webRTC peer');
 
-        this.peer.disconnect = () => { this.peer.destroy() }
+        //this.peer.disconnect = () => { this.peer.destroy() }
 
         this.socket =  this.peer;
         this.peer.signalData = null;
@@ -245,7 +246,21 @@ class NodeWebPeerRTC {
     setupDataChannel() {
         this.checkDataChannelState();
         this.peer.dataChannel.onopen = ()=>{this.checkDataChannelState()};
-        this.peer.dataChannel.onclose = ()=>{this.checkDataChannelState()};
+        this.peer.dataChannel.onclose = ()=>{alert('closed'); this.checkDataChannelState()};
+        this.peer.dataChannel.onerror = ()=>{alert('error'); this.checkDataChannelState()};
+
+        this.peer.oniceconnectionstatechange = () => {
+
+            if(this.peer.iceConnectionState === 'disconnected') {
+                console.log('iceConnection Disconnected');
+                if (this.peer.connected === true) {
+                    this.peer.connected = false;
+                    console.log(colors.green("WebPeer disconnected ")); console.log( this.peer.node.sckAddress.getAddress() );
+                    NodesList.disconnectSocket(this.peer);
+                    this.callEvents("disconnect", {});
+                }
+            }
+        };
 
         this.peer.dataChannel.onmessage = (event) => {
 
@@ -263,6 +278,7 @@ class NodeWebPeerRTC {
 
     checkDataChannelState() {
 
+        console.log('WebRTC changed:');
         console.log('WebRTC channel state is:', this.peer.dataChannel.readyState);
 
         if (this.peer.dataChannel.readyState === 'open') {
@@ -273,13 +289,10 @@ class NodeWebPeerRTC {
             }
         }
 
-        if (this.peer.dataChannel.readyState === 'close') {
-            console.log('WebRTC data channel is now closed');
-            if (this.peer.connected) {
-                this.peer.connected = false;
-                this.callEvents("disconnect", {});
-            }
-        }
+        // not working
+        // if (this.peer.dataChannel.readyState === 'close') {
+        //
+        // }
     }
 
 
