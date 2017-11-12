@@ -47,10 +47,10 @@ class NodesList {
         socket.node.type = type;
         socket.node.index = ++this.nodesTotal;
 
-        if (!socket.hasOwnProperty("node") || !(socket.node.protocol.helloValidated || false)) {
+        if (!socket.node || !socket.node.protocol || !(socket.node.protocol.helloValidated || false)) {
 
             console.log(colors.red("Error - registerUniqueSocket rejected by invalid helloValidated"));
-            if (socket.hasOwnProperty("node")) console.log(socket.node.protocol.helloValidated);
+            if (socket.node) console.log(socket.node.protocol.helloValidated);
 
             socket.disconnect(true);
             return false;

@@ -127,14 +127,30 @@ class NodeSignalingServerProtocol {
                                         });
                                     }
 
+                                    client2.node.on("signals/server/new-answer-ice-candidate/" + connection.id, (iceCandidate => {
+
+                                        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Answer iceCandidate  ", connection.id, initiatorAnswer );
+
+                                        client1.node.sendRequest("signals/client/receive-ice-candidate",{
+                                            id: connection.id,
+
+                                            initiatorSignal: initiatorAnswer.initiatorSignal,
+                                            iceCandidate: iceCandidate,
+
+                                            address: client1.node.sckAddress.getAddress()
+                                        });
+
+                                    }));
+
+
 
                                 });
 
                                 client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, (iceCandidate => {
 
-                                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2 - generate-answer-signal  ", connection.id, initiatorAnswer );
+                                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Initiator iceCandidate  ", connection.id, initiatorAnswer );
 
-                                    client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{
+                                    client2.node.sendRequest("signals/client/receive-ice-candidate",{
                                         id: connection.id,
 
                                         initiatorSignal: initiatorAnswer.initiatorSignal,
@@ -143,8 +159,9 @@ class NodeSignalingServerProtocol {
                                         address: client1.node.sckAddress.getAddress()
                                     });
 
-
                                 }));
+
+
 
 
                                 // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL

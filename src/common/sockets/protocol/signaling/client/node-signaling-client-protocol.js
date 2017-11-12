@@ -23,12 +23,9 @@ class NodeSignalingClientProtocol {
 
             console.log("###################### signals/client/initiator/generate-initiator-signal"+data.id, webPeer.peer);
 
-            webPeer.createPeer(true);
+            webPeer.createPeer(true, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) });
 
-            let answer = await webPeer.createSignalInitiator(
-                                                                (iceCandidate)=>{
-                                                                    socket.node.sendRequest("signals/server/new-initiator-ice-candidate/" + data.id, {candidate: iceCandidate} )
-                                                                });
+            let answer = await webPeer.createSignalInitiator();
 
             console.log("###################### signals/client/initiator/generate-initiator-signal/"+data.id, answer, typeof answer);
 
@@ -50,7 +47,7 @@ class NodeSignalingClientProtocol {
 
             //arrived earlier than  /receive-initiator-signal
             if (webPeer.peer === null) {
-                webPeer.createPeer(false);
+                webPeer.createPeer(false,  (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) });
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
 
@@ -66,7 +63,7 @@ class NodeSignalingClientProtocol {
 
         });
 
-        socket.on("signals/client/answer/receive-ice-candidate", async (data) => {
+        socket.on("signals/client/receive-ice-candidate", async (data) => {
 
             let addressToConnect = data.address;
 
@@ -75,7 +72,7 @@ class NodeSignalingClientProtocol {
 
             //arrived earlier than  /receive-initiator-signal
             if (webPeer.peer === null){
-                webPeer.createPeer(false);
+                webPeer.createPeer(false, (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) });
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
 
@@ -89,9 +86,9 @@ class NodeSignalingClientProtocol {
             if (answer.result === true) signalAnswer = {accepted: true, answerSignal: answer.signal};
             else signalAnswer = {accepted:false, message: answer.message};
 
-            console.log("################# signals/client/answer/receive-ice-candidate/",  signalAnswer, data.id);
+            console.log("################# signals/client/receive-ice-candidate/",  signalAnswer, data.id);
 
-            socket.node.sendRequest("signals/client/answer/receive-ice-candidate/" + data.id, signalAnswer);
+            socket.node.sendRequest("signals/client/receive-ice-candidate/" + data.id, signalAnswer);
 
         });
 
@@ -145,6 +142,13 @@ class NodeSignalingClientProtocol {
     }
 
 
+    sendInitiatorIceCandidate(socket, connectionId, iceCandidate){
+        socket.node.sendRequest("signals/server/new-initiator-ice-candidate/" + connectionId, {candidate: iceCandidate} )
+    }
+
+    sendAnswerIceCandidate(socket, connectionId, iceCandidate){
+        socket.node.sendRequest("signals/server/new-answerr-ice-candidate/" + connectionId, {candidate: iceCandidate} )
+    }
 
 }
 

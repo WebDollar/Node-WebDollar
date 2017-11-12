@@ -3,7 +3,7 @@
  */
 
 
-// TUTORIAL BASED ON
+// TUTORIAL BASED ON https://www.scaledrone.com/blog/posts/webrtc-chat-tutorial
 
 
 import {SocketExtend} from './../../../common/sockets/socket-extend'
@@ -50,7 +50,7 @@ class NodeWebPeerRTC {
 
     }
 
-    createPeer(initiator){
+    createPeer(initiator, callbackSignalingServerSendIceCandidate){
 
         let pcConstraint = null;
         let dataConstraint = null;
@@ -72,10 +72,19 @@ class NodeWebPeerRTC {
         this.peer.connected = false;
         this.enableEventsHandling();
 
+        this.peer.onicecandidate = (event) => {
+            if (event.candidate) {
+                console.log("onicecandidate",event.candidate);
+                callbackSignalingServerSendIceCandidate(event.candidate);
+                return event.candidate;
+            }
+        };
+
+
 
         console.log('Created webRTC peer');
 
-        //this.peer.disconnect = () => { this.peer.destroy() }
+        this.peer.disconnect = () => {  }
 
         this.socket =  this.peer;
         this.peer.signalData = null;
@@ -117,6 +126,7 @@ class NodeWebPeerRTC {
 
         });
 
+
         this.peer.on('data', (data) => {
             console.log('data: ' , data)
         });
@@ -124,15 +134,7 @@ class NodeWebPeerRTC {
 
     }
 
-    createSignalInitiator(callbackSignalingServerSendIceCandidate){
-
-        this.peer.onicecandidate = (event) => {
-            if (event.candidate) {
-                console.log("onicecandidate",event.candidate);
-                callbackSignalingServerSendIceCandidate(event.candidate);
-                return event.candidate;
-            }
-        };
+    createSignalInitiator(){
 
         this.peer.signalData = null;
 
@@ -181,6 +183,7 @@ class NodeWebPeerRTC {
         let promise = new Promise ( (resolve) => {
 
             if (this.peer.connected === true){
+                console.error("Error - Peer Already connected");
                 resolve({result:false, message: "Already connected"});
                 return;
             }
@@ -231,7 +234,7 @@ class NodeWebPeerRTC {
                     this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
                     resolve({result: true, message:"iceCandidate successfully introduced"});
                 } catch (Exception){
-                    resolve({result:false, message: "iceCandidate error "+error.toString() });
+                    resolve({result:false, message: "iceCandidate error "+ Exception.toString() });
                     console.log("iceCandidate error", inputSignal.candidate);
                 }
             }
@@ -246,7 +249,7 @@ class NodeWebPeerRTC {
     setupDataChannel() {
         this.checkDataChannelState();
         this.peer.dataChannel.onopen = ()=>{this.checkDataChannelState()};
-        this.peer.dataChannel.onclose = ()=>{alert('closed'); this.checkDataChannelState()};
+        this.peer.dataChannel.onclose = ()=>{ this.checkDataChannelState()};
         this.peer.dataChannel.onerror = ()=>{alert('error'); this.checkDataChannelState()};
 
         this.peer.oniceconnectionstatechange = () => {
@@ -255,8 +258,6 @@ class NodeWebPeerRTC {
                 console.log('iceConnection Disconnected');
                 if (this.peer.connected === true) {
                     this.peer.connected = false;
-                    console.log(colors.green("WebPeer disconnected ")); console.log( this.peer.node.sckAddress.getAddress() );
-                    NodesList.disconnectSocket(this.peer);
                     this.callEvents("disconnect", {});
                 }
             }
@@ -289,10 +290,12 @@ class NodeWebPeerRTC {
             }
         }
 
-        // not working
-        // if (this.peer.dataChannel.readyState === 'close') {
-        //
-        // }
+        if (this.peer.dataChannel.readyState === 'close') {
+            if (this.peer.connected){
+                this.peer.connected = false;
+                this.callEvents("disconnect", {});
+            }
+        }
     }
 
 
@@ -305,10 +308,10 @@ class NodeWebPeerRTC {
 
         this.peer.node.protocol.signaling.server.initializeSignalingServerService();
 
-        this.peer.on("close", ()=>{
+        this.peer.on("disconnect", ()=>{
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
             NodesList.disconnectSocket(this.peer);
-        })
+        });
 
     }
 
