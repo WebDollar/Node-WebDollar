@@ -275,8 +275,10 @@ class NodeWebPeerRTC {
 
         if (this.peer.dataChannel.readyState === 'close') {
             console.log('WebRTC data channel is now closed');
-            this.peer.connected = false;
-            this.callEvents("disconnect", {});
+            if (this.peer.connected) {
+                this.peer.connected = false;
+                this.callEvents("disconnect", {});
+            }
         }
     }
 
