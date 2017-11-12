@@ -237,12 +237,19 @@ class NodeWebPeerRTC {
     // Hook up data channel event handlers
     setupDataChannel() {
         this.checkDataChannelState();
-        this.peer.dataChannel.onopen = ()=>{alert('2'); this.checkDataChannelState()};
-        this.peer.dataChannel.onclose = ()=>{alert('3'); this.checkDataChannelState()};
+        this.peer.dataChannel.onopen = ()=>{this.checkDataChannelState()};
+        this.peer.dataChannel.onclose = ()=>{this.checkDataChannelState()};
 
         this.peer.dataChannel.onmessage = (event) => {
 
-            console.log("DATA RECEIVED# ################", JSON.parse(event.data));
+            let data = JSON.parse(event.data);
+
+            let name = data.name;
+            let value = data.value;
+            if (name !== '')
+                this.callEvents(name, value);
+
+            console.log("DATA RECEIVED# ################", data);
         }
 
     }
@@ -302,6 +309,12 @@ class NodeWebPeerRTC {
         this.peer.off = (index) =>{
             return this.unscribeEvent(index);
         };
+        this.peer.send = (name, value) =>{
+
+            let data = {name: name, value: value};
+
+            this.peer.dataChannel.send(JSON.stringify(data));
+        };
     }
 
     subscribeEvent(eventName, callback, type){
@@ -350,7 +363,7 @@ class NodeWebPeerRTC {
 
         let subStr = '';
 
-        while (pos > 0 && pos < str.length && invalidChars.indexOf(str[pos]) === -1){
+        while (pos > -1 && pos < str.length && invalidChars.indexOf(str[pos]) === -1){
 
             subStr += str[pos];
 
@@ -366,17 +379,20 @@ class NodeWebPeerRTC {
 
     extractValueFromDescription(str, text){
 
-        let pos=-1, ok;
+        let pos=-1, ok = false;
         let data = [];
 
-        ok = false;
         while (ok === false || pos > -1){
             ok = true;
-            pos = str.indexOf(text, pos);
-            if (pos > 0) pos += text.length
+            pos = str.indexOf(text, pos+1);
+            if (pos > -1){
+                pos += text.length;
+                let subStr = this.extractCharsUntilInvalid(str, pos, '\n↵');
+                if (subStr !== '') data.push(subStr);
 
-            let subStr = this.extractCharsUntilInvalid(str, pos, '\n↵');
-            if (subStr !== '') data.push(subStr);
+                //console.log("extractValueFromDescription",text, pos, subStr);
+            }
+
         }
 
         return data;
@@ -392,8 +408,6 @@ class NodeWebPeerRTC {
 
         if (description.candidate) str = description.candidate;
 
-        console.log(str);
-
         if (typeof str === "string") {
 
 
@@ -401,25 +415,42 @@ class NodeWebPeerRTC {
             let ip6 = this.extractValueFromDescription(str, "IP6");
             let candidate = this.extractValueFromDescription(str, "candidate:");
 
+            console.log("str", str);
             console.log("IP4=", ip4);
             console.log("IP6=", ip6);
             console.log("candidate=", candidate);
 
             let address = '';
 
-            if (candidate.length === 1) {
+            if (candidate && candidate.length > 0) {
 
-                str = candidate[0];
-                let data = str.split(" ");
+                str = candidate;
+                let data = str;
+
+                let done = false;
 
                 //candidate:1853887674 2 udp 1518280447 47.61.61.61 36768 typ srflx raddr 192.168.0.196 rport 36768 generation 0
-                for (let i = 0; i < data.length; i++)
-                    if (data[i] === "udp" || data[i] === "tcp") {
-                        if (i + 2 < data.length && data[i].length > 5 && data.indexOf(".") > -1) {
-                            address = data[i];
+                for (let i = 0; i < data.length && !done; i++) {
+
+                    let element = data[i].split(" ");
+                    console.log("candiate", data[i], element);
+
+                    if (Array.isArray(element) && element.length > 1) {
+                        for (let j = 0; j < element.length; j++)
+                            if (element[j] === "udp" || element[j] === "tcp")
+                                if (j + 2 < element.length && element[j+2].length > 5 && element[j+2].indexOf(".") > -1) {
+                                    address = element[j+2];
+                                    done = true;
+                                    break;
+                                }
+                    }
+                    else if (data[i] === "udp" || data[i] === "tcp")
+                        if (i + 2 < data.length && data[i+2].length > 5 && data[i+2].indexOf(".") > -1) {
+                            address = data[i+2];
                             break;
                         }
-                    }
+                }
+
 
             }
 
@@ -428,6 +459,8 @@ class NodeWebPeerRTC {
 
             if (address === '' && ip4.length > 0)
                 address = ip4[ip4.length - 1];
+
+            console.log("address",address);
 
             return ({address: address, port: undefined,})
 

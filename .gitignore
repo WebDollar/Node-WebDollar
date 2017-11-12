@@ -13,3 +13,5 @@ dist_bundle/bundle\.js
 dist_bundle/bundle_dist\.js
 
 dist_bundle/browser/bundle_browser\.js
+
+dist_bundle/browser/bundle_terminal\.js
