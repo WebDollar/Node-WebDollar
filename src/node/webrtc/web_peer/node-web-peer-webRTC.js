@@ -68,6 +68,7 @@ class NodeWebPeerRTC {
 
         this.peer =  new RTCPeerConnection(config, pcConstraint);
 
+        this.peer.connected = false;
         this.enableEventsHandling();
 
 
@@ -102,7 +103,6 @@ class NodeWebPeerRTC {
         this.peer.on('connect', () => {
 
             console.log('WEBRTC PEER CONNECTED', this.peer);
-
             let remote = this.processDescription(this.peer.remoteDescription);
 
             this.peer.remoteAddress = remote.address;
@@ -151,17 +151,17 @@ class NodeWebPeerRTC {
                                 this.peer.signalData = {"sdp": this.peer.localDescription};
                                 this.peer.signalInitiatorData = this.peer.signalData;
 
-                                resolve(  this.peer.signalData )
+                                resolve(  {result: true, signal: this.peer.signalData} )
                             },
                             (error) => {
-                                console.error("errrrro 4", error);
-                                resolve(null)
+                                resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +error.toString()});
+                                console.error("Generating Initiator - Error Setting Local Description ", error);
                             }
                         );
                     },
                     (error) => {
-                        console.error("errro 5",error);
-                        resolve(null);
+                        resolve({result:false, message: "Error Creating Offer " +error.toString()});
+                        console.error("Error Creating Offer ", error);
                     });
             };
         });
@@ -178,6 +178,11 @@ class NodeWebPeerRTC {
 
 
         let promise = new Promise ( (resolve) => {
+
+            if (this.peer.connected === true){
+                resolve({result:false, message: "Already connected"});
+                return;
+            }
 
 
             //answer
@@ -202,17 +207,17 @@ class NodeWebPeerRTC {
                                     desc,
                                     () => {
                                         this.peer.signalData = {'sdp': this.peer.localDescription};
-                                        resolve(this.peer.signalData);
+                                        resolve(  {result: true, signal: this.peer.signalData}  );
                                     },
                                     (error) => {
-                                        console.error("errror 7",error);
-                                        resolve(null);
+                                        resolve({result:false, message: "Error Setting Local Description"+error.toString()});
+                                        console.error("Error Setting Local Description",error);
                                     }
                                 )
                             },
                             (error) => {
-                                console.error("errror 6",error);
-                                resolve(null);
+                                resolve({result:false, message: "Error Creating Answer "+error.toString() });
+                                console.error("Error Creating Answer ",error);
                             });
                     }
                 }, error => console.error(error));
@@ -220,10 +225,12 @@ class NodeWebPeerRTC {
 
                 // Add the new ICE candidate to our connections remote description
                 try {
-                    console.log("inputSignal.candidate", inputSignal.candidate);
+                    //console.log("inputSignal.candidate", inputSignal.candidate);
+
                     this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
-                    resolve({result: "iceCandidate successfully introduced"});
+                    resolve({result: true, message:"iceCandidate successfully introduced"});
                 } catch (Exception){
+                    resolve({result:false, message: "iceCandidate error "+error.toString() });
                     console.log("iceCandidate error", inputSignal.candidate);
                 }
             }
@@ -260,11 +267,15 @@ class NodeWebPeerRTC {
 
         if (this.peer.dataChannel.readyState === 'open') {
             console.log('WebRTC data channel is now open');
-            this.callEvents("connect", {});
+            if (!this.peer.connected ) {
+                this.peer.connected = true;
+                this.callEvents("connect", {});
+            }
         }
 
         if (this.peer.dataChannel.readyState === 'close') {
             console.log('WebRTC data channel is now closed');
+            this.peer.connected = false;
             this.callEvents("disconnect", {});
         }
     }
@@ -459,6 +470,9 @@ class NodeWebPeerRTC {
 
             if (address === '' && ip4.length > 0)
                 address = ip4[ip4.length - 1];
+
+            if (address === "0.0.0.0")
+                address = "127.0.0.1";
 
             console.log("address",address);
 
