@@ -465,14 +465,14 @@ class NodeWebPeerRTC {
                     if (Array.isArray(element) && element.length > 1) {
                         for (let j = 0; j < element.length; j++)
                             if (element[j] === "udp" || element[j] === "tcp")
-                                if (j + 2 < element.length && element[j+2].length > 5 && element[j+2].indexOf(".") > -1) {
+                                if (j + 2 < element.length && this.checkValidRemoteAddress(element[j+2])) {
                                     address = element[j+2];
                                     done = true;
                                     break;
                                 }
                     }
                     else if (data[i] === "udp" || data[i] === "tcp")
-                        if (i + 2 < data.length && data[i+2].length > 5 && data[i+2].indexOf(".") > -1) {
+                        if (i + 2 < data.length && this.checkValidRemoteAddress(element[j+2])) {
                             address = data[i+2];
                             break;
                         }
@@ -495,6 +495,21 @@ class NodeWebPeerRTC {
             return ({address: address, port: undefined,})
 
         }
+    }
+
+    checkValidRemoteAddress(ip) {
+
+        //based on this https://www.arin.net/knowledge/address_filters.html
+
+        if (ip.indexOf(".") <= 0) return false; //0.0 , but .0 invalid
+        if (ip.length < 5  ) return false;  // 0.0.0.0
+
+        if (ip.indexOf("192.168.") === 0 || ip.indexOf("10.") === 0) return false;
+
+        for (let i = 17; i <= 31; i++)
+            if (ip.indexOf("172." + i.toString() + ".") === 0) return false;
+
+        return true;
     }
 
 }

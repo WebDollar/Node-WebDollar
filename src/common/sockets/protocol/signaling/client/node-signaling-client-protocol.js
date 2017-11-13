@@ -48,7 +48,7 @@ class NodeSignalingClientProtocol {
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
 
-            console.log("ice candidate", data);
+            console.log("receive-initiator-signal", data);
 
             let answer = await webPeer.createSignal(data.initiatorSignal);
             console.log("################# signals/client/answer/receive-initiator-signal",  answer, data.id);
@@ -147,7 +147,7 @@ class NodeSignalingClientProtocol {
                 socket.node.sendRequest("signals/client/initiator/join-answer-signal" + data.id, {established: false,});
             });
 
-            console.log("#$$$$$$$$$$ ANSWER ", webPeer, data.answerSignal);
+            console.log("#$$$$$$$$$$ ANSWER ", webPeer, data);
             let answer = await webPeer.createSignal(data.answerSignal);
 
         });
