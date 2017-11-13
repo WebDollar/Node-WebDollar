@@ -126,7 +126,8 @@ class NodeSignalingClientProtocol {
             console.log("################# signals/client/initiator/join-answer-signal",  webPeer, data.initiatorSignal, data.answerSignal);
 
             let timeoutId = setTimeout(() => {
-                socket.sendRequest("signals/client/initiator/join-answer-signal" + data.id, {established: false,});
+                console.log("%%%%%%%%%%%% WEBRTC TIMEOUT !!!!");
+                socket.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: false,});
             }, 30000);
 
             let connectId = webPeer.peer.once("connect", () => {
@@ -134,7 +135,7 @@ class NodeSignalingClientProtocol {
                 console.log("%%%%%%%%%%%% WEBRTC connection established");
                 clearTimeout(timeoutId);
 
-                socket.node.sendRequest("signals/client/initiator/join-answer-signal" + data.id, {established: true,});
+                socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: true,});
             });
 
             let disconnectId = webPeer.peer.once("error", ()=>{
@@ -142,7 +143,7 @@ class NodeSignalingClientProtocol {
                 console.log("%%%%%%% WEBRTC connection NOT established");
                 clearTimeout(timeoutId);
 
-                socket.node.sendRequest("signals/client/initiator/join-answer-signal" + data.id, {established: false,});
+                socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: false,});
             });
 
             console.log("#$$$$$$$$$$ ANSWER ", webPeer, data);
