@@ -306,7 +306,7 @@ class NodeWebPeerRTC {
             return false;
         }
 
-        this.peer.node.protocol.signaling.server.initializeSignalingServerService();
+        //this.peer.node.protocol.signaling.server.initializeSignalingServerService();
 
         this.peer.on("disconnect", ()=>{
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());

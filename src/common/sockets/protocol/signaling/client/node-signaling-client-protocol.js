@@ -163,12 +163,12 @@ class NodeSignalingClientProtocol {
 
 
     sendInitiatorIceCandidate(socket, connectionId, iceCandidate){
-        console.log("sendInitiatorIceCandidate", connectionId, iceCandidate);
+        //console.log("sendInitiatorIceCandidate", connectionId, iceCandidate);
         socket.node.sendRequest("signals/server/new-initiator-ice-candidate/" + connectionId, {candidate: iceCandidate} )
     }
 
     sendAnswerIceCandidate(socket, connectionId, iceCandidate){
-        console.log("sendAnswerIceCandidate", connectionId, iceCandidate);
+        //console.log("sendAnswerIceCandidate", connectionId, iceCandidate);
         socket.node.sendRequest("signals/server/new-answer-ice-candidate/" + connectionId, {candidate: iceCandidate} )
     }
 
