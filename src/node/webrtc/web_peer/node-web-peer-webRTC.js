@@ -50,7 +50,7 @@ class NodeWebPeerRTC {
 
     }
 
-    createPeer(initiator, callbackSignalingServerSendIceCandidate){
+    createPeer(initiator, callbackSignalingServerSendIceCandidate, remoteAddress, remotePort){
 
         let pcConstraint = null;
         let dataConstraint = null;
@@ -107,13 +107,14 @@ class NodeWebPeerRTC {
 
         this.peer.on('error', err => { console.log('error', err) } );
 
-        this.peer.on('connect', () => {
+        this.peer.on('connect',async () => {
 
             console.log('WEBRTC PEER CONNECTED', this.peer);
-            let remote = this.processDescription(this.peer.remoteDescription);
 
-            this.peer.remoteAddress = remote.address;
-            this.peer.remotePort = remote.port;
+            let remoteData = this.processDescription(this.peer.remoteDescription);
+
+            if (!this.peer.remoteAddress) this.peer.remoteAddress = remoteData.address;
+            if (!this.peer.remotePort) this.peer.remotePort = remoteData.port;
 
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort );
 

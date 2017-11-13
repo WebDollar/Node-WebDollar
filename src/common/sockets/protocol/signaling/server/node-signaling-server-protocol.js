@@ -83,7 +83,8 @@ class NodeSignalingServerProtocol {
                         // Step1, send the request to generate the INITIATOR SIGNAL
                         client1.node.sendRequestWaitOnce("signals/client/initiator/generate-initiator-signal", {
                             id: connection.id,
-                            address: client2.node.sckAddress.getAddress()
+
+                            remoteAddress: client2.node.sckAddress.getAddress(false)
                         }, connection.id ).then ( (initiatorAnswer) =>{
 
                             if ( (initiatorAnswer.accepted||false) === true) {
@@ -96,7 +97,7 @@ class NodeSignalingServerProtocol {
                                     id: connection.id,
                                     initiatorSignal: initiatorAnswer.initiatorSignal,
 
-                                    address: client1.node.sckAddress.getAddress()
+                                    remoteAddress: client1.node.sckAddress.getAddress(false)
                                 }, connection.id).then((answer)=>{
 
                                     if ( (answer.accepted||false) === true) {
@@ -112,6 +113,8 @@ class NodeSignalingServerProtocol {
                                             id: connection.id,
                                             initiatorSignal: initiatorAnswer.initiatorSignal,
                                             answerSignal: answer.answerSignal,
+
+                                            remoteAddress: client2.node.sckAddress.getAddress(false)
                                         }, connection.id).then( (result)=>{
 
                                             if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 4 - join-answer-signal  ", connection.id, result );
@@ -139,7 +142,7 @@ class NodeSignalingServerProtocol {
                                             initiatorSignal: initiatorAnswer.initiatorSignal,
                                             iceCandidate: iceCandidate,
 
-                                            address: client2.node.sckAddress.getAddress()
+                                            remoteAddress: client2.node.sckAddress.getAddress(false)
                                         });
 
                                     });
@@ -158,7 +161,7 @@ class NodeSignalingServerProtocol {
                                         initiatorSignal: initiatorAnswer.initiatorSignal,
                                         iceCandidate: iceCandidate,
 
-                                        address: client1.node.sckAddress.getAddress()
+                                        remoteAddress: client1.node.sckAddress.getAddress(false)
                                     });
 
                                 });

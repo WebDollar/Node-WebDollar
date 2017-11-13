@@ -16,14 +16,12 @@ class NodeSignalingClientProtocol {
 
         socket.on("signals/client/initiator/generate-initiator-signal", async (data) => {
 
-            let addressToConnect = data.address;
-
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined);
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
             console.log("###################### signals/client/initiator/generate-initiator-signal"+data.id, webPeer.peer);
 
-            webPeer.createPeer(true, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) });
+            webPeer.createPeer(true, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress);
 
             let answer = await webPeer.createSignalInitiator();
 
@@ -44,7 +42,7 @@ class NodeSignalingClientProtocol {
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
             if (webPeer.peer === null) { //arrived earlier than  /receive-initiator-signal
-                webPeer.createPeer(false,  (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) });
+                webPeer.createPeer(false,  (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) },  data.remoteAddress);
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
 
@@ -68,7 +66,7 @@ class NodeSignalingClientProtocol {
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
             if (webPeer.peer === null) { //arrived earlier than  /receive-initiator-signal
-                webPeer.createPeer(false,  (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) });
+                webPeer.createPeer(false,  (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress);
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
 
@@ -95,7 +93,7 @@ class NodeSignalingClientProtocol {
 
             //arrived earlier than  /receive-initiator-signal
             if (webPeer.peer === null){
-                webPeer.createPeer(false, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) });
+                webPeer.createPeer(false, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress);
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
 
