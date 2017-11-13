@@ -30,7 +30,10 @@ class GeoHelper {
                 localIP = true;
             }
 
-            let data = await this.downloadFile("http://ip-api.com/json/"+address);
+            let data = await this.downloadFile("http://ip-api.com/json/"+address, 40*1000);
+            if (data === null)
+                data = await this.downloadFile("http://freegeoip.net/json/"+address, 40*1000);
+
             if (data !== null){
 
                 let countryCode = '';
@@ -39,24 +42,27 @@ class GeoHelper {
 
                 //console.log("location data", address, data);
 
-                if (data.hasOwnProperty('country')){
-                    country = data.country;
-                }
+                if (!data.country) country = data.country;
+                if (!data.country_name) country = data.country_name;
 
-                if (data.hasOwnProperty('countryCode')){
-                    countryCode = data.countryCode;
+                if (!data.countryCode) countryCode = data.countryCode;
+                if (!data.country_code) countryCode = data.countryCode;
 
+                if (countryCode !== '')
                     continent = getContinentFromCountry(countryCode);
-                }
 
                 let geoLocation = {
                     country: country,
+                    countryCode: countryCode,
+                    region: data.regionname||data.region_name||'',
+                    regionCode: data.regioncode||data.region_code||'',
+
                     city: data.city,
                     lat: (data.latitude||data.lat||22.2120780) + (localIP ? 0.05* (-1 + 2*Math.random() ) : 0),
                     lng: (data.longitude||data.lng||data.lon||-40.1109744) + (localIP ? 0.05*(-1 + 2*Math.random()) : 0),
                     isp: data.isp,
-                    timezone: data.timezone,
-                    countryCode: countryCode,
+                    timezone: data.timezone||data.time_zone||'',
+
                     continent: continent,
                 };
 
@@ -73,9 +79,14 @@ class GeoHelper {
 
     }
 
-    async downloadFile(address){
+    async downloadFile(address, timeout){
         try{
-            let response = await axios.get(address);
+            let axiosInstance = axios.create({
+                timeout: timeout,
+            });
+
+            let response = await axiosInstance.get(address);
+            if (response === null) return null;
 
             let data = response.data;
 
