@@ -34,7 +34,7 @@ class SignalingServerRoomConnectionObject {
         this.lastTimeConnected = 0;
     }
 
-    refreshLastTimeChecked(){
+    refreshLastTimeErrorChecked(){
         this.errorTrials++;
         this.status = ConnectionStatus.peerConnectionNotEstablished;
         this.lastTimeChecked = new Date().getTime();

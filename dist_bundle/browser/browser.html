@@ -16,9 +16,9 @@
     <div id="map"></div>
 
     <script>
-        function initMap() {
+        async function initMap() {
             NodeWebDollar.NetworkMap.createMap('map');
-            NodeWebDollar.NetworkMap.initialize(map);
+            await NodeWebDollar.NetworkMap.initialize(map);
             NodeWebDollar.NetworkMap.initializePolylines(map);
         }
     </script>

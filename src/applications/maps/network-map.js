@@ -53,7 +53,7 @@ class NetworkMap {
         return map;
     }
 
-    initialize(map){
+    async initialize(map){
 
         if (typeof google === 'undefined' || typeof google.maps === 'undefined'){
             alert('GOOGLE MAPS LIBRARY IS NOT REGISTERED');
@@ -89,7 +89,7 @@ class NetworkMap {
 
         });
 
-        this._showMyself(map);
+        await this._showMyself(map);
     }
 
     _getInfoWindowContent(geoLocation, socket){
@@ -126,6 +126,8 @@ class NetworkMap {
             return false;
         }
 
+        console.log("marker ", google.maps.Marker, map)
+
         let position = {lat: geoLocation.lat||0, lng: geoLocation.lng||0};
 
         let feature = '';
@@ -159,7 +161,7 @@ class NetworkMap {
 
         this.markers.push(marker);
 
-        this._updateCurvesMarker(map);
+        this._createConnectionsArcs(false, map);
 
     }
 
@@ -172,14 +174,14 @@ class NetworkMap {
     initializePolylines(map){
 
 
-        this._updateCurvesMarker(map);
-        google.maps.event.addListener(map, 'projection_changed', () => {this._updateCurvesMarker(map) });
-        google.maps.event.addListener(map, 'zoom_changed', () => {this._updateCurvesMarker(map)});
+        this._createConnectionsArcs(false, map);
+        google.maps.event.addListener(map, 'projection_changed', () => {this._createConnectionsArcs(true, map) });
+        google.maps.event.addListener(map, 'zoom_changed', () => {this._createConnectionsArcs(true, map)});
 
         // google.maps.event.addListener(markerP1, 'position_changed', updateCurveMarker);
     }
 
-    _updateCurvesMarker(map, showOldArcs) {
+    _createConnectionsArcs(update, map, showOldArcs) {
 
         if (typeof showOldArcs === 'undefined') showOldArcs = false;
 
@@ -194,15 +196,15 @@ class NetworkMap {
                 break;
             }
 
-        if (markerMyself === null){
+        if (markerMyself === null) {
+            console.log("NetworkMap: No Marker Myself");
             return false;
         }
 
 
-
         let  projection = map.getProjection();
 
-        if (typeof projection === 'undefined'){
+        if (!projection){
             console.log("NetworkMap - PROJECT is not defined");
             return false;
         }
@@ -219,6 +221,13 @@ class NetworkMap {
                 let marker = this.markers[i];
 
                 let pos2 = marker.getPosition();
+                let lineColor = 'black';
+
+                switch (marker.socket.node.type){
+                    case 'client': lineColor = 'red'; break;
+                    case 'server' : lineColor = 'red'; break;
+                    case 'webpeer' : lineColor = 'blue'; break;
+                }
 
                 if (showOldArcs){
 
@@ -262,8 +271,8 @@ class NetworkMap {
                             icon: symbol,
                         });
 
-                //line polyline
-                } else {
+                    //line polyline
+                } else if (update === false) {
 
                     let polyPath = [
                         {lat: pos1.lat(), lng: pos1.lng()},
@@ -275,7 +284,7 @@ class NetworkMap {
                         marker.linePoly = new google.maps.Polyline({
                             path: polyPath,
                             geodesic: true,
-                            strokeColor: '#FF0000',
+                            strokeColor: lineColor,
                             strokeOpacity: 1.0,
                             strokeWeight: 2
                         });
@@ -294,6 +303,7 @@ class NetworkMap {
             }
 
     }
+
 
 }
 

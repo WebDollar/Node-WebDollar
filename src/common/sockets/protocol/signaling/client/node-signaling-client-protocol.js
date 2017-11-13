@@ -125,9 +125,9 @@ class NodeSignalingClientProtocol {
 
             console.log("################# signals/client/initiator/join-answer-signal",  webPeer, data.initiatorSignal, data.answerSignal);
 
-            let timeoutId = setTimeout(() => {
+            let timeoutId = setTimeout( () => {
                 console.log("%%%%%%%%%%%% WEBRTC TIMEOUT !!!!");
-                socket.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: false,});
+                socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: false,});
             }, 30000);
 
             let connectId = webPeer.peer.once("connect", () => {

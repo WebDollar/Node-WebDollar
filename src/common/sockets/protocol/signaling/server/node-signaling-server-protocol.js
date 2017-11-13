@@ -71,10 +71,10 @@ class NodeSignalingServerProtocol {
 
                     let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
-                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection !== null ? previousEstablishedConnection.id : 'no-id') );
+                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection ? previousEstablishedConnection.id : 'no-id'), (previousEstablishedConnection ? previousEstablishedConnection.status : 'no status') );
 
                     if (previousEstablishedConnection === null ||
-                        (previousEstablishedConnection.checkLastTimeChecked(20000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished ) ){
+                       (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished ) ){
 
                         let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
@@ -126,7 +126,7 @@ class NodeSignalingServerProtocol {
 
                                             } else {
                                                 //not connected
-                                                previousEstablishedConnection.refreshLastTimeChecked();
+                                                connection.refreshLastTimeErrorChecked();
                                             }
 
                                         });

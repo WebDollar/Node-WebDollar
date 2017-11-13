@@ -221,6 +221,7 @@ class NodeWebPeerRTC {
                             (error) => {
                                 resolve({result:false, message: "Error Creating Answer "+error.toString() });
                                 console.error("Error Creating Answer ",error);
+
                             });
                     }
                 }, error => console.error(error));
