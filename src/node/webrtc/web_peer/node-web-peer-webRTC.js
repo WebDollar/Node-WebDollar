@@ -179,18 +179,19 @@ class NodeWebPeerRTC {
 
         let promise = new Promise ( (resolve) => {
 
-            if (this.peer.connected === true){
-                console.error("Error - Peer Already connected");
-                resolve({result:false, message: "Already connected"});
-                return;
-            }
-
-
             //answer
             if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
 
 
             if (inputSignal.sdp) {
+
+
+                // if (this.peer.connected === true){
+                //     console.error("Error - Peer Already connected");
+                //     resolve({result:false, message: "Already connected"});
+                //     return;
+                // }
+
                 // This is called after receiving an offer or answer from another peer
                 this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), () => {
 
