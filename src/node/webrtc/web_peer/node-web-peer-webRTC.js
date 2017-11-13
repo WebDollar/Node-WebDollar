@@ -76,7 +76,6 @@ class NodeWebPeerRTC {
             if (event.candidate) {
                 console.log("onicecandidate",event.candidate);
                 callbackSignalingServerSendIceCandidate(event.candidate);
-                return event.candidate;
             }
         };
 
@@ -88,8 +87,6 @@ class NodeWebPeerRTC {
 
         this.socket =  this.peer;
         this.peer.signalData = null;
-
-
         this.peer.signalInitiatorData = null;
 
         if (initiator) {

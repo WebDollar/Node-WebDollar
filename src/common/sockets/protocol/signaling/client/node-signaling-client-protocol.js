@@ -40,13 +40,10 @@ class NodeSignalingClientProtocol {
 
         socket.on("signals/client/answer/receive-initiator-signal", async (data) => {
 
-            let addressToConnect = data.address;
-
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(data.initiatorSignal);
             let webPeer = webPeerSignalingClientListObject.webPeer;
 
-            //arrived earlier than  /receive-initiator-signal
-            if (webPeer.peer === null) {
+            if (webPeer.peer === null) { //arrived earlier than  /receive-initiator-signal
                 webPeer.createPeer(false,  (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) });
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
@@ -62,6 +59,30 @@ class NodeSignalingClientProtocol {
 
 
             socket.node.sendRequest("signals/client/answer/receive-initiator-signal/" + data.id, signalAnswer);
+
+        });
+
+        socket.on("signals/client/answer/receive-ice-candidate", async (data) => {
+
+            let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(data.initiatorSignal);
+            let webPeer = webPeerSignalingClientListObject.webPeer;
+
+            if (webPeer.peer === null) { //arrived earlier than  /receive-initiator-signal
+                webPeer.createPeer(false,  (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) });
+                webPeer.peer.signalInitiatorData = data.initiatorSignal;
+            }
+
+            console.log("ice candidate", data);
+
+            let answer = await webPeer.createSignal(data.initiatorSignal);
+            console.log("################# signals/client/answer/receive-ice-candidate",  answer, data.id);
+
+            let signalAnswer = {};
+            if (answer.result === true) signalAnswer = {accepted: true, answerSignal: answer.signal};
+            else signalAnswer = {accepted:false, message: answer.message}
+
+
+            socket.node.sendRequest("signals/client/answer/receive-ice-candidate/" + data.id, signalAnswer);
 
         });
 
