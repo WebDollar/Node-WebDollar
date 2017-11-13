@@ -65,8 +65,7 @@ class SocketAddress {
     }
 
     toString(){
-        if (typeof this.address === 'object')  return this.address.toNormalizedString();
-        return this.address;
+        return this.address.toString();
     }
 
     getAddress(includePort){
@@ -74,7 +73,8 @@ class SocketAddress {
         try {
             if (typeof includePort === 'undefined') includePort = true;
 
-            if (typeof this.address === 'object') return this.address.toNormalizedString() + (includePort ? ':' + this.port : '');
+            if (typeof this.address === 'object')
+                return this.address.toNormalizedString() + (includePort ? ':' + this.port : '');
 
             return this.address.toString() + (includePort ? ':'+this.port : '');
 

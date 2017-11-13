@@ -98,7 +98,7 @@ class NetworkMap {
             '<div id="content">'+
                 '<div id="siteNotice">'+
                 '</div>'+
-                    '<h1 class="firstHeading" style="padding-bottom: 0">'+(socket === 'myself' ? 'YOU' : socket.node.sckAddress.getAddress(false) )+'</h1>'+
+                    '<h1 class="firstHeading" style="padding-bottom: 0">'+(socket === 'myself' ? 'YOU' : socket.node.sckAddress.toString() )+'</h1>'+
                     '<h2 class="secondHeading">'+(socket === 'myself' ? '' : socket.node.type + ' : '+socket.node.index)+'</h2>'+
                     '<div id="bodyContent">'+
                         '<p>Connected to <b>'+geoLocation.city||''+', '+geoLocation.country||''+'</b> <br/>'+
