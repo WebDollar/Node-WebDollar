@@ -9,6 +9,8 @@ let ConnectionStatus = {
     peerConnectionEstablishing: 4,
     peerConnectionEstablished : 5,
     peerConnectionNotEstablished : 6,
+
+    peerConnectionAlreadyConnected: 44,
 };
 
 

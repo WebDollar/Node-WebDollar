@@ -21,7 +21,7 @@ class NodeWebPeersDiscoveryService {
 
     newSocketRegisterAcceptWebPeers(err, nodesListObject){
 
-        if (//nodesListObject.type === "webpeer" ||
+        if (nodesListObject.type === "webpeer" ||   // signaling service on webpeer
             nodesListObject.type === "client") {
 
             let params = {};

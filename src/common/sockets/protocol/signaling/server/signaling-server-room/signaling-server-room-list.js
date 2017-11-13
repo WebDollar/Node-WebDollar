@@ -48,6 +48,10 @@ class SignalingServerRoomList {
         return connection;
     }
 
+    setSignalingServerRoomConnectionStatus(client1, client2, status) {
+        return this.registerSignalingServerRoomConnection(client1, client2, status);
+    }
+
     searchSignalingServerRoomConnection(client1, client2, skipReverse) {
 
         //previous established connection

@@ -76,7 +76,7 @@ class NodeSignalingServerProtocol {
                     if (previousEstablishedConnection === null ||
                        (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished ) ){
 
-                        let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
+                        let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
                         if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 1 - generate-initiator-signal  ", (connection === null ? null : connection.id) , { id: connection.id,  address: client2.node.sckAddress.getAddress() } );
 
@@ -87,6 +87,12 @@ class NodeSignalingServerProtocol {
                             remoteAddress: client2.node.sckAddress.getAddress(false)
                         }, connection.id ).then ( (initiatorAnswer) =>{
 
+                            if ( ((initiatorAnswer.accepted||false) === false) && ((initiatorAnswer.message || '') === "Already connected")) {
+
+                                SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
+
+                            }
+                            else
                             if ( (initiatorAnswer.accepted||false) === true) {
 
                                 SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating );
@@ -100,6 +106,12 @@ class NodeSignalingServerProtocol {
                                     remoteAddress: client1.node.sckAddress.getAddress(false)
                                 }, connection.id).then((answer)=>{
 
+                                    if ( ((answer.accepted||false) === false) && ((answer.message || '') === "Already connected")) {
+
+                                        SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
+
+                                    }
+                                    else
                                     if ( (answer.accepted||false) === true) {
 
                                         if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 2_0 - Answer Signal received  ", connection.id, answer );
@@ -119,14 +131,21 @@ class NodeSignalingServerProtocol {
 
                                             if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 4 - join-answer-signal  ", connection.id, result );
 
-                                            if ((result.established||false) === true){
+                                            if ( ((answer.established||false) === false) && ((answer.message || '') === "Already connected")) {
 
-                                                //connected
-                                                connection.refreshLastTimeConnected();
+                                                SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
 
                                             } else {
-                                                //not connected
-                                                connection.refreshLastTimeErrorChecked();
+
+                                                if ((result.established || false) === true) {
+
+                                                    //connected
+                                                    connection.refreshLastTimeConnected();
+
+                                                } else {
+                                                    //not connected
+                                                    connection.refreshLastTimeErrorChecked();
+                                                }
                                             }
 
                                         });

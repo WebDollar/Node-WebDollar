@@ -1,6 +1,7 @@
 import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_global.js';
 
 import {SignalingClientList} from './signaling-client-list/signaling-client-list'
+import {NodesList} from '../../../../../node/lists/nodes-list.js';
 
 class NodeSignalingClientProtocol {
 
@@ -16,16 +17,21 @@ class NodeSignalingClientProtocol {
 
         socket.on("signals/client/initiator/generate-initiator-signal", async (data) => {
 
+            //search if the new protocol was already connected in the past
+            if (NodesList.searchNodeSocketByAddress(data.remoteAddress, 'all') !== null){ //already connected in the past
+                return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
+            }
+
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined);
             let webPeer = webPeerSignalingClientListObject.webPeer;
-
-            console.log("###################### signals/client/initiator/generate-initiator-signal"+data.id, webPeer.peer);
 
             webPeer.createPeer(true, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress);
 
             let answer = await webPeer.createSignalInitiator();
 
-            console.log("###################### signals/client/initiator/generate-initiator-signal/"+data.id, answer, typeof answer);
+            console.log("###################### signals/client/initiator/generate-initiator-signal/"+data.id, answer, webPeer.peer, typeof answer);
+
+
 
             let signalAnswer = {};
             if (answer.result === true) signalAnswer = {accepted: true, initiatorSignal: answer.signal};
@@ -37,6 +43,11 @@ class NodeSignalingClientProtocol {
 
 
         socket.on("signals/client/answer/receive-initiator-signal", async (data) => {
+
+            //search if the new protocol was already connected in the past
+            if (NodesList.searchNodeSocketByAddress(data.remoteAddress, 'all') !== null){ //already connected in the past
+                return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
+            }
 
             let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(data.initiatorSignal);
             let webPeer = webPeerSignalingClientListObject.webPeer;
@@ -114,7 +125,10 @@ class NodeSignalingClientProtocol {
 
         socket.on("signals/client/initiator/join-answer-signal", async (data) => {
 
-            let addressToConnect = data.address;
+            //search if the new protocol was already connected in the past
+            if (NodesList.searchNodeSocketByAddress(data.remoteAddress, 'all') !== null){ //already connected in the past
+                return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {established:false, message: "Already connected"});
+            }
 
             console.log("join-answer-signal");
             console.log(SignalingClientList.list);
