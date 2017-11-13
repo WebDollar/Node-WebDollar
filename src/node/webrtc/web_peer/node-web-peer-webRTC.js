@@ -113,8 +113,8 @@ class NodeWebPeerRTC {
 
             let remoteData = this.processDescription(this.peer.remoteDescription);
 
-            if (!this.peer.remoteAddress) this.peer.remoteAddress = remoteData.address;
-            if (!this.peer.remotePort) this.peer.remotePort = remoteData.port;
+            this.peer.remoteAddress = remoteAddress||remoteData.address;
+            this.peer.remotePort = remotePort||remoteData.port;
 
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort );
 
