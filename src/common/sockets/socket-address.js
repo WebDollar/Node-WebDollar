@@ -81,12 +81,28 @@ class SocketAddress {
 
             if (typeof this.address === 'object') {
 
+                let initialAddress = this.address.toNormalizedString();
                 let addressString =  '';
+
                 //avoiding ipv4 shows as ipv6
-                if (this.address.isIPv4MappedAddress())
-                    addressString = this.address.toIPv4Address().toString();
-                else
-                    addressString = this.address.toNormalizedString();
+                if (ipaddr.IPv4.isValid(initialAddress)) {
+                    // ipString is IPv4
+                    addressString = initialAddress;
+                } else if (ipaddr.IPv6.isValid(initialAddress)) {
+                    let ip = ipaddr.IPv6.parse(initialAddress);
+                    if (ip.isIPv4MappedAddress()) {
+                        // ip.toIPv4Address().toString() is IPv4
+                        addressString = ip.toIPv4Address().toString();
+                    } else {
+                        // ipString is IPv6
+                        addressString = initialAddress;
+                    }
+                } else {
+                    // ipString is invalid
+                    console.log("getAddress NOT VALID IP !!!!!", this.address);
+                    return "127.0.0.1";
+                }
+
 
                 return addressString + (includePort ? ':' + this.port : '');
             }
