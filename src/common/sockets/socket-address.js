@@ -83,10 +83,10 @@ class SocketAddress {
 
                 let addressString =  '';
                 //avoiding ipv4 shows as ipv6
-                if (addr.isIPv4MappedAddress()) {
-                    addressString = addr.toIPv4Address().toString();
-                } else
-                    addressString = addr.toNormalizedString();
+                if (this.address.isIPv4MappedAddress())
+                    addressString = this.address.toIPv4Address().toString();
+                else
+                    addressString = this.address.toNormalizedString();
 
                 return addressString + (includePort ? ':' + this.port : '');
             }
