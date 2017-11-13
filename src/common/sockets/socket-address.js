@@ -64,17 +64,32 @@ class SocketAddress {
         return ( myAddressString === addressString )
     }
 
+    /*
+        return nice looking ip addresses
+     */
     toString(){
-        return this.address.toString();
+        return this.getAddress(false);
     }
 
+    /*
+        returns ipv6 ip standard
+     */
     getAddress(includePort){
 
         try {
             if (typeof includePort === 'undefined') includePort = true;
 
-            if (typeof this.address === 'object')
-                return this.address.toNormalizedString() + (includePort ? ':' + this.port : '');
+            if (typeof this.address === 'object') {
+
+                let addressString =  '';
+                //avoiding ipv4 shows as ipv6
+                if (addr.isIPv4MappedAddress()) {
+                    addressString = addr.toIPv4Address().toString();
+                } else
+                    addressString = addr.toNormalizedString();
+
+                return addressString + (includePort ? ':' + this.port : '');
+            }
 
             return this.address.toString() + (includePort ? ':'+this.port : '');
 
