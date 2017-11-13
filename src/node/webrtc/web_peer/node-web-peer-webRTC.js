@@ -227,7 +227,7 @@ class NodeWebPeerRTC {
 
                 // Add the new ICE candidate to our connections remote description
                 try {
-                    //console.log("inputSignal.candidate", inputSignal.candidate);
+                    console.log("inputSignal.candidate", inputSignal);
 
                     this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
                     resolve({result: true, message:"iceCandidate successfully introduced"});

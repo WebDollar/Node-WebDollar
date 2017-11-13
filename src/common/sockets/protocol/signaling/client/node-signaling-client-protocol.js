@@ -74,8 +74,8 @@ class NodeSignalingClientProtocol {
 
             console.log("ice candidate", data);
 
-            let answer = await webPeer.createSignal(data.initiatorSignal);
-            console.log("################# signals/client/answer/receive-ice-candidate",  answer, data.id);
+            let answer = await webPeer.createSignal(data.iceCandidate);
+            console.log("################# signals/client/answer/receive-ice-candidate",  data.iceCandidate, answer, data.id);
 
             let signalAnswer = {};
             if (answer.result === true) signalAnswer = {accepted: true, answerSignal: answer.signal};
@@ -107,7 +107,7 @@ class NodeSignalingClientProtocol {
             if (answer.result === true) signalAnswer = {accepted: true, answerSignal: answer.signal};
             else signalAnswer = {accepted:false, message: answer.message};
 
-            console.log("################# signals/client/initiator/receive-ice-candidate/",  signalAnswer, data.id);
+            console.log("################# signals/client/initiator/receive-ice-candidate/",  data.iceCandidate, signalAnswer, data.id);
 
             socket.node.sendRequest("signals/client/initiator/receive-ice-candidate/" + data.id, signalAnswer);
 
