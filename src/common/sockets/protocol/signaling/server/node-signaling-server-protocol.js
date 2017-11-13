@@ -129,7 +129,7 @@ class NodeSignalingServerProtocol {
 
                                     client2.node.on("signals/server/new-answer-ice-candidate/" + connection.id, (iceCandidate => {
 
-                                        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Answer iceCandidate  ", connection.id, initiatorAnswer );
+                                        if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Answer iceCandidate  ", connection.id, iceCandidate );
 
                                         client1.node.sendRequest("signals/client/initiator/receive-ice-candidate",{
                                             id: connection.id,
@@ -148,7 +148,7 @@ class NodeSignalingServerProtocol {
 
                                 client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, (iceCandidate => {
 
-                                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Initiator iceCandidate  ", connection.id, initiatorAnswer );
+                                    if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Initiator iceCandidate  ", connection.id, iceCandidate );
 
                                     client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{
                                         id: connection.id,

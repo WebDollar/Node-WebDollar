@@ -47,9 +47,11 @@ class NodeSignalingClientProtocol {
 
             //arrived earlier than  /receive-initiator-signal
             if (webPeer.peer === null) {
-                webPeer.createPeer(false,  (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) });
+                webPeer.createPeer(false,  (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) });
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
+
+            console.log("ice candidate", data);
 
             let answer = await webPeer.createSignal(data.initiatorSignal);
             console.log("################# signals/client/answer/receive-initiator-signal",  answer, data.id);
@@ -72,9 +74,11 @@ class NodeSignalingClientProtocol {
 
             //arrived earlier than  /receive-initiator-signal
             if (webPeer.peer === null){
-                webPeer.createPeer(false, (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) });
+                webPeer.createPeer(false, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) });
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
+
+            console.log("ice candidate", data);
 
             let answer = await webPeer.createSignal(data.iceCandidate);
 
@@ -139,10 +143,12 @@ class NodeSignalingClientProtocol {
 
 
     sendInitiatorIceCandidate(socket, connectionId, iceCandidate){
+        console.log("sendInitiatorIceCandidate", connectionId, iceCandidate);
         socket.node.sendRequest("signals/server/new-initiator-ice-candidate/" + connectionId, {candidate: iceCandidate} )
     }
 
     sendAnswerIceCandidate(socket, connectionId, iceCandidate){
+        console.log("sendAnswerIceCandidate", connectionId, iceCandidate);
         socket.node.sendRequest("signals/server/new-answer-ice-candidate/" + connectionId, {candidate: iceCandidate} )
     }
 
