@@ -68,6 +68,12 @@ class SignalingServerRoomList {
         return null;
     }
 
+    searchSignalingServerRoomConnectionById(id){
+        for (let i=0; i<this.list.length; i++)
+            if (this.list[i].id === id) return this.list[i];
+
+        return null;
+    }
 
     _removeDisconnectedSignalingServerRoomConnections(err, nodesListObject) {
 

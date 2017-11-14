@@ -50,7 +50,7 @@ class NodeWebPeerRTC {
 
     }
 
-    createPeer(initiator, callbackSignalingServerSendIceCandidate, remoteAddress, remotePort){
+    createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remotePort){
 
         let pcConstraint = null;
         let dataConstraint = null;
@@ -112,6 +112,13 @@ class NodeWebPeerRTC {
             console.log('WEBRTC PEER CONNECTED', this.peer);
 
             let remoteData = this.processDescription(this.peer.remoteDescription);
+
+            /*
+                keeping information about new connection
+             */
+            this.peer.signaling = {};
+            this.peer.signaling.socketSignaling = socketSignaling;
+            this.peer.signaling.connectionId =  signalingServerConnectionId;
 
             this.peer.remoteAddress = remoteAddress||remoteData.address;
             this.peer.remotePort = remotePort||remoteData.port;
@@ -187,11 +194,11 @@ class NodeWebPeerRTC {
             if (inputSignal.sdp) {
 
 
-                // if (this.peer.connected === true){
-                //     console.error("Error - Peer Already connected");
-                //     resolve({result:false, message: "Already connected"});
-                //     return;
-                // }
+                if (this.peer.connected === true){
+                    console.error("Error - Peer Already connected");
+                    resolve({result:false, message: "Already connected in the past"});
+                    return;
+                }
 
                 // This is called after receiving an offer or answer from another peer
                 this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), () => {
@@ -243,6 +250,10 @@ class NodeWebPeerRTC {
 
 
         return promise;
+    }
+
+    async joinAnswer(inputSignal){
+        return await this.createSignal(inputSignal);
     }
 
     // Hook up data channel event handlers
@@ -311,6 +322,9 @@ class NodeWebPeerRTC {
 
         this.peer.on("disconnect", ()=>{
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
+
+            this.peer.signaling.socketSignaling.sendRequest("signals/server/connections/established-connection-was-dropped", {address: this.peer.remoteAddress, connectionId: this.peer.signaling.connectionId} );
+
             NodesList.disconnectSocket(this.peer);
         });
 

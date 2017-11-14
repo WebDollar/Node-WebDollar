@@ -29,6 +29,19 @@ class NodeSignalingServerProtocol {
 
         });
 
+        socket.on("signals/server/connections/established-connection-was-dropped", (data)=>{
+
+            if (!data.connectionId){
+
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+                if (connection  !== null)
+                    SignalingServerRoomList.setSignalingServerRoomConnectionStatus(connection.client1, connection.client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished)
+
+            }
+
+
+        });
+
         this.startConnectingWebPeers();
 
     }
@@ -73,8 +86,9 @@ class NodeSignalingServerProtocol {
 
                     if ((process.env.DEBUG_SIGNALING_SERVER||'false') === 'true' )  console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection ? previousEstablishedConnection.id : 'no-id'), (previousEstablishedConnection ? previousEstablishedConnection.status : 'no status') );
 
-                    if (previousEstablishedConnection === null ||
-                       (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished ) ){
+                    if (previousEstablishedConnection === null
+                        || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished )
+                        || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected )){
 
                         let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
