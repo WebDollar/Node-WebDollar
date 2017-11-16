@@ -5,7 +5,8 @@ function testAddressGenerator(){
 
     let address = new InterfaceBlockchainAddress();
 
-    InterfaceBlockchainAddress.createAddress("123", true);
+    InterfaceBlockchainAddress.getPrivateKey("123", true);
+    InterfaceBlockchainAddress.getPublicKey("123", true);
 
 }
 
