@@ -3,6 +3,10 @@ import {InterfaceBlockchainAddress} from './../../interface-blockchain/addresses
 
 class MiniBlockchainAddress extends  InterfaceBlockchainAddress{
 
-    constructor
+    constructor(){
+
+        super();
+
+    }
 
 }

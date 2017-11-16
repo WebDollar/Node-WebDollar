@@ -40,3 +40,13 @@ if (typeof window !== 'undefined')
 // }
 
 console.log("Node WebDollar End");
+
+
+if ( (process.env.TESTING || 'false') === 'true' ) {
+    const testNodeWebPeer = require ('./node/webrtc/web_peer/test-node-web-peer');
+    //testNodeWebPeer.testWebPeer();
+    //testNodeWebPeer.testNodeWebPeer();
+
+    const testInterfaceBlockchainAddress = require ('./common/blockchain/interface-blockchain/addresses/testing-interface-blockchain-address');
+    testInterfaceBlockchainAddress.testAddressGenerator();
+}
