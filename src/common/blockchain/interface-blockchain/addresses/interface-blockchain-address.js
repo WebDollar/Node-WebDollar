@@ -1,8 +1,7 @@
 const CryptoJS = (require ('cryptojs')).Crypto;
 const bs58 = require('bs58')
-const BigInteger = require('big-integer').BigInteger;
-import {getSECCurveByName} from '../../crypt/eliptic-curves/bitcoin-elliptic-curve';
 import {WebDollarCrypt} from './../../crypt/webdollar-crypt';
+const secp256k1 = require('secp256k1');
 
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
@@ -16,7 +15,7 @@ class InterfaceBlockchainAddress{
 
     }
 
-    static getPrivateKeyAdvanced(salt, showDebug){
+    static _getPrivateKeyAdvanced(salt, showDebug){
 
         //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
         let privateKeyBytes = WebDollarCrypt.getByteRandomValues(32);
@@ -47,10 +46,16 @@ class InterfaceBlockchainAddress{
         if (showDebug)
             console.log("keyWithChecksum", keyWithChecksum, typeof keyWithChecksum) //"801184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD206EC97E"
 
-        let privateKeyWIF = null;
+        let privateKeyWIF = null, privateKey = null;
 
-        if (!useBase64)  privateKeyWIF = bs58.encode(CryptoJS.util.hexToBytes(keyWithChecksum));
-        else privateKeyWIF = WebDollarCrypt.encodeBase64(CryptoJS.util.hexToBytes(keyWithChecksum));
+        if (!useBase64)  {
+            privateKeyWIF = bs58.encode(CryptoJS.util.hexToBytes(keyWithChecksum));
+            privateKey = bs58.encode(CryptoJS.util.hexToBytes(privateKeyHex));
+        }
+        else {
+            privateKeyWIF = WebDollarCrypt.encodeBase64(CryptoJS.util.hexToBytes(keyWithChecksum));
+            privateKey = WebDollarCrypt.encodeBase64(CryptoJS.util.hexToBytes(privateKeyHex));
+        }
 
         if (showDebug)
             console.log("privateKeyWIF", privateKeyWIF) //base58 "5Hx15HFGyep2CfPxsJKe2fXJsCVn5DEiyoeGGF6JZjGbTRnqfiD"
@@ -58,13 +63,21 @@ class InterfaceBlockchainAddress{
 
 
         return {
-            "address": privateKeyWIF,
-            "hex": keyWithChecksum,
+            privateKeyWIF:{
+                "string": privateKeyWIF,
+                "hex": keyWithChecksum,
+            },
+
+            privateKey:{
+                "string": privateKeyHex,
+                "hex": privateKeyHex,
+            }
+
         };
     }
 
-    static getPrivateKey(salt, showDebug){
-        return InterfaceBlockchainAddress.getPrivateKeyAdvanced(salt, showDebug).string;
+    static _getPrivateKey(salt, showDebug){
+        return InterfaceBlockchainAddress._getPrivateKeyAdvanced(salt, showDebug).privateKeyWIF.string;
     }
 
     static getPublicKey(privateKey, privateKeyType, showDebug){
@@ -72,13 +85,14 @@ class InterfaceBlockchainAddress{
         // Tutorial based on https://github.com/cryptocoinjs/secp256k1-node
 
         if (privateKeyType === 'hex' && typeof privateKey === "string")
-            privateKey= new Buffer(privateKey, "hex");
+            privateKey = new Buffer(privateKey, "hex");
 
-        console.log(privateKey, typeof privateKey);
+        if (showDebug)
+            console.log("privateKey", privateKey, typeof privateKey);
 
-        const secp256k1 = require('secp256k1');
 
-        console.log(secp256k1.privateKeyVerify(privateKey));
+
+        console.log("secp256k1.privateKeyVerify", secp256k1.privateKeyVerify(privateKey));
 
         // get the public key in a compressed format
         const pubKey = secp256k1.publicKeyCreate(privateKey);
@@ -88,7 +102,8 @@ class InterfaceBlockchainAddress{
         // sign the message
         // const sigObj = secp256k1.sign(msg, privKey)
 
-        let msg = WebDollarCrypt.getByteRandomValues(32);
+        let msg = new Buffer( WebDollarCrypt.getByteRandomValues(32) );
+
         // sign the message
         const sigObj = secp256k1.sign(msg, privateKey)
 
@@ -99,36 +114,45 @@ class InterfaceBlockchainAddress{
         04d0988bfa799f7d7ef9ab3de97ef481cd0f75d2367ad456607647edde665d6f6
         fbdd594388756a7beaf73b4822bc22d36e9bda7db82df2b8b623673eefc0b7495
         */
+
+//
+//         const { randomBytes } = require('crypto')
+//         const secp256k1 = require('secp256k1')
+//         // generate message to sign
+//         const msg = randomBytes(32)
+//
+// // generate privKey
+//         let privKey
+//         do {
+//             privKey = randomBytes(32)
+//
+//             console.log("nu a mers!!!");
+//         } while (!secp256k1.privateKeyVerify(privKey))
+//
+//         console.log("privKey", privKey, typeof privKey);
+//
+// // get the public key in a compressed format
+//         const pubKey = secp256k1.publicKeyCreate(privKey)
+//
+//         console.log("public key", pubKey, typeof  pubKey)
+//
+// // sign the message
+//         const sigObj = secp256k1.sign(msg, privKey)
+//
+// // verify the signature
+//         console.log(secp256k1.verify(msg, sigObj.signature, pubKey))
+// // => true
     }
 
 
 
 
-    static getPublicKeyOld(inputPrivateKey){
+    static generateAddress(salt){
 
 
-        let curve = getSECCurveByName("secp256k1") //found in bitcoinjs-lib/src/jsbn/sec.js
+        let privateKey = InterfaceBlockchainAddress._getPrivateKeyAdvanced(salt, true);
+        InterfaceBlockchainAddress.getPublicKey(privateKey.privateKey.hex, "hex", true);
 
-        //convert our random array or private key to a Big Integer
-        let privateKeyBN = BigInteger.fromByteArrayUnsigned(inputPrivateKey)
-
-        //This is using the elliptic curve algorithm. For more info checkout https://en.bitcoin.it/wiki/Elliptic_Curve_Digital_Signature_Algorithm
-        //and http://www.certicom.com/index.php/ecc-tutorial
-        //and http://blog.cloudflare.com/a-relatively-easy-to-understand-primer-on-elliptic-curve-cryptography
-        //The elliptic curve used is y^2=x^3+7.
-        let curvePt = curve.getG().multiply(privateKeyBN)
-        let x = curvePt.getX().toBigInteger()
-        let y = curvePt.getY().toBigInteger()
-        let publicKeyBytes = integerToBytes(x,32) //integerToBytes is found in bitcoinjs-lib/src/ecdsa.js
-        publicKeyBytes = publicKeyBytes.concat(integerToBytes(y,32))
-        publicKeyBytes.unshift(0x04)
-        let publicKeyHex = CryptoJS.util.bytesToHex(publicKeyBytes)
-
-        console.log("publicKeyHex", publicKeyHex)
-        /* output:
-        04d0988bfa799f7d7ef9ab3de97ef481cd0f75d2367ad456607647edde665d6f6
-        fbdd594388756a7beaf73b4822bc22d36e9bda7db82df2b8b623673eefc0b7495
-        */
     }
 
     static validateAddress(address){
