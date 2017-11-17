@@ -5,7 +5,7 @@ import {WebDollarCrypt} from './../../crypt/webdollar-crypt';
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
 
-import {PRIVATE_KEY_VERSION_PREFIX, PRIVATE_KEY_CHECK_SUM_LENGTH} from './../../../../consts/const_global';
+import {PRIVATE_KEY_VERSION_PREFIX, PRIVATE_KEY_CHECK_SUM_LENGTH, PRIVATE_KEY_USE_BASE64, PUBLIC_ADDRESS_PREFIX_BASE64, PUBLIC_ADDRESS_PREFIX_BASE58, PUBLIC_ADDRESS_SUFFIX_BASE64, PUBLIC_ADDRESS_SUFFIX_BASE58} from './../../../../consts/const_global';
 
 class InterfaceBlockchainAddress{
 
@@ -15,6 +15,8 @@ class InterfaceBlockchainAddress{
     }
 
     static _generatePrivateKeyAdvanced(salt, showDebug){
+
+        //tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 
         //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
         let privateKeyBytes = WebDollarCrypt.getByteRandomValues(32);
@@ -33,7 +35,7 @@ class InterfaceBlockchainAddress{
 
         //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
         let privateKeyAndVersion = PRIVATE_KEY_VERSION_PREFIX + privateKeyHex
-        let checksum = InterfaceBlockchainAddress.calculateChecksum(privateKeyAndVersion, showDebug);
+        let checksum = InterfaceBlockchainAddress._calculateChecksum(privateKeyAndVersion, showDebug);
 
 
         //append checksum to end of the private key and version
@@ -73,24 +75,28 @@ class InterfaceBlockchainAddress{
         }
 
         let validation = InterfaceBlockchainAddress.validatePrivateKey(privateKey);
-        console.log("VALIDATIOn", validation)
+
+        if (showDebug)
+            console.log("VALIDATIOn", validation)
+
         if (validation.result === false){
             return validation;
         } else{
             privateKey = validation.privateKey;
         }
 
-        if (showDebug)
+        if (showDebug) {
             console.log("privateKey", privateKey, typeof privateKey);
-
-        console.log("secp256k1.privateKeyVerify", secp256k1.privateKeyVerify(privateKey.buffer));
+            console.log("secp256k1.privateKeyVerify", secp256k1.privateKeyVerify(privateKey.buffer));
+        }
 
         // get the public key in a compressed format
         const pubKey = secp256k1.publicKeyCreate(privateKey.buffer);
 
-        console.log("pubKey", pubKey);
+        if (showDebug)
+            console.log("pubKey", pubKey);
 
-        return pubKey;
+        return new WebDollarCryptData(pubKey);
 
         // sign the message
 
@@ -105,15 +111,62 @@ class InterfaceBlockchainAddress{
 
     }
 
-    static verifySignedData(signature, pubKey){
+    static verifySignedData(msg, signature, pubKey){
 
+        if (typeof pubKey !== 'object' || pubKey.constructor.name !== 'WebDollarCryptData' ){
+            console.log("ERROR! ",  pubKey, " is not a WebDollarCryptData")
+            throw 'privateKey must be a WebDollarCryptData';
+        }
+
+        if (typeof signature.signature !== 'undefined') signature = signature.signature;
+
+        return secp256k1.verify(msg, signature, pubKey.buffer);
     }
 
     static signMessage(msg, privateKey){
+
         // sign the message
-        const sigObj = secp256k1.sign(msg, privateKey)
+        const sigObj = secp256k1.sign(msg, privateKey);
+        return sigObj;
     }
 
+    static _generateAddressFromPublicKey(publicKey, showDebug){
+
+        if (typeof publicKey !== 'object' || publicKey.constructor.name !== 'WebDollarCryptData' ){
+            console.log("ERROR! ",  publicKey, " is not a WebDollarCryptData")
+            throw 'publicKey must be a WebDollarCryptData';
+        }
+
+        //could use publicKeyBytesCompressed as well
+        console.log(CryptoJS);
+
+        //bitcoin original
+        //let hash160 = CryptoJS.RIPEMD160(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
+        let hash160 = CryptoJS.SHA256(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
+
+        console.log(hash160) //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
+
+        let version = 0x00 //if using testnet, would use 0x6F or 111.
+        let hashAndBytes = CryptoJS.util.hexToBytes(hash160)
+        hashAndBytes.unshift(version)
+
+        let doubleSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(CryptoJS.SHA256(hashAndBytes)))
+        let addressChecksum = doubleSHA.substr(0,8)
+        console.log(addressChecksum) //26268187
+
+        let unencodedAddress = ( PRIVATE_KEY_USE_BASE64 ? PUBLIC_ADDRESS_PREFIX_BASE64  : PUBLIC_ADDRESS_PREFIX_BASE58 ) + hash160 + addressChecksum + (PRIVATE_KEY_USE_BASE64 ? PUBLIC_ADDRESS_SUFFIX_BASE64 : PUBLIC_ADDRESS_SUFFIX_BASE58);
+
+        if (showDebug)
+            console.log("unencodedAddress", unencodedAddress) //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
+
+        let address = new WebDollarCryptData(unencodedAddress, "hex");
+
+        if (showDebug)
+            console.log("address", address, address.toBase()); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
+
+        return  address;
+
+    }
 
     static generateAddress(salt){
 
@@ -127,7 +180,7 @@ class InterfaceBlockchainAddress{
 
     }
 
-    static calculateChecksum(privateKeyAndVersionHex, showDebug){
+    static _calculateChecksum(privateKeyAndVersionHex, showDebug){
 
         //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
         let firstSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(privateKeyAndVersionHex))
@@ -167,18 +220,18 @@ class InterfaceBlockchainAddress{
 
         }
 
-        console.log("versionDetected", versionDetected, versionDetectedBuffer, privateKey);
+        //console.log("versionDetected", versionDetected, versionDetectedBuffer, privateKey);
 
         //contains CHECKSUM
         let checkSumDetected = false;
 
         if (privateKey.buffer.length === 32 + PRIVATE_KEY_CHECK_SUM_LENGTH / 2) {
 
-            console.log(privateKey, privateKey.buffer.length, 32 + PRIVATE_KEY_CHECK_SUM_LENGTH / 2);
+            //console.log(privateKey, privateKey.buffer.length, 32 + PRIVATE_KEY_CHECK_SUM_LENGTH / 2);
             let privateKeyCheckSum = privateKey.substr(privateKey.buffer.length - PRIVATE_KEY_CHECK_SUM_LENGTH /2)
 
             let privateKeyJustVersionHex = versionDetectedBuffer.toHex() + privateKey.substr(0, privateKey.buffer.length - PRIVATE_KEY_CHECK_SUM_LENGTH /2).toHex();
-            let checksum = InterfaceBlockchainAddress.calculateChecksum(privateKeyJustVersionHex);
+            let checksum = InterfaceBlockchainAddress._calculateChecksum(privateKeyJustVersionHex);
 
             //console.log("checkSum", privateKeyCheckSum, "privateKeyJustVersionHex", privateKeyJustVersionHex);
             //console.log("checkSum2", checksum);

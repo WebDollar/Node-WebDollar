@@ -10,6 +10,9 @@ class WebDollarCryptData {
 
         this.buffer = null;
 
+        if (typeof data === 'object' && data.constructor.name === "Buffer")
+            this.buffer = data;
+        else
         if (type === "hex")
             this.buffer = new Buffer(data, "hex");
         else
@@ -51,7 +54,8 @@ class WebDollarCryptData {
             return bs58.encode(this.toBytes());
         }
         else {
-            return WebDollarCrypt.encodeBase64(this.toBytes());
+
+            return WebDollarCrypt.encodeBase64(this.toUint8Array());
         }
     }
 

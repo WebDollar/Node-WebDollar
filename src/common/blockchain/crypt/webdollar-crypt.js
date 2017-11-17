@@ -15,7 +15,7 @@ class WebDollarCrypt {
                     resultFinal +=  '#';
                     break;
                 case '0':
-                    resultFinal +=  '$';
+                    resultFinal +=  '*';
                     break;
                 case 'I':
                     resultFinal +=  '%';
@@ -27,7 +27,7 @@ class WebDollarCrypt {
                     resultFinal +=  '&';
                     break;
                 case '/':
-                    resultFinal +=  '*';
+                    resultFinal +=  '$';
                     break;
                 default:
                     resultFinal += result[i];
