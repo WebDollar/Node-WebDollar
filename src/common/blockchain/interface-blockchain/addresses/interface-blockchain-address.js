@@ -1,10 +1,13 @@
 const CryptoJS = (require ('cryptojs')).Crypto;
 const bs58 = require('bs58')
 const BigInteger = require('./path/to/biginteger').BigInteger;
+import {getSECCurveByName} from '../../crypt/bitcoin-elliptic-curve';
 import {WebDollarCrypt} from './../../crypt/webdollar-crypt';
 
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
+
+const useBase64 = false;
 
 class InterfaceBlockchainAddress{
 
@@ -54,8 +57,10 @@ class InterfaceBlockchainAddress{
         if (showDebug)
             console.log("keyWithChecksum", keyWithChecksum) //"801184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD206EC97E"
 
-        let privateKeyWIF = bs58.encode(CryptoJS.util.hexToBytes(keyWithChecksum))
-        //let privateKeyWIF = WebDollarCrypt.encodeBase64(Crypto.util.hexToBytes(keyWithChecksum));
+        let privateKeyWIF = null;
+
+        if (!useBase64)  bs58.encode(CryptoJS.util.hexToBytes(keyWithChecksum));
+        else privateKeyWIF = WebDollarCrypt.encodeBase64(CryptoJS.util.hexToBytes(keyWithChecksum));
 
         if (showDebug)
             console.log("privateKeyWIF", privateKeyWIF) //base58 "5Hx15HFGyep2CfPxsJKe2fXJsCVn5DEiyoeGGF6JZjGbTRnqfiD"
