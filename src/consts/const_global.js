@@ -10,3 +10,8 @@ exports.nodesWaitlistTryReconnectAgain =  60*1000; //miliseconds
 exports.nodesWaitlistInterval =  5*1000; //miliseconds
 
 exports.nodesSignalingServerProtocolConnectingWebPeersInterval = 2*1000;
+
+
+exports.PRIVATE_KEY_USE_BASE64 = false;
+exports.PRIVATE_KEY_VERSION_PREFIX = "80";
+exports.PRIVATE_KEY_CHECK_SUM_LENGTH = 8;

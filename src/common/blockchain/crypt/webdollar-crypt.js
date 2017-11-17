@@ -60,6 +60,11 @@ class WebDollarCrypt {
     }
 
 
+    static isHex(h) {
+        let a = parseInt(h,16);
+        return (a.toString(16) ===h.toLowerCase())
+    }
+
 }
 
 exports.WebDollarCrypt = WebDollarCrypt;

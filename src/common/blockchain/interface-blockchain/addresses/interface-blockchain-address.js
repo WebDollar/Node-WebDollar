@@ -6,7 +6,7 @@ const secp256k1 = require('secp256k1');
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
 
-const useBase64 = false;
+import {PRIVATE_KEY_USE_BASE64, PRIVATE_KEY_VERSION_PREFIX, PRIVATE_KEY_CHECK_SUM_LENGTH} from './../../../../consts/const_global';
 
 class InterfaceBlockchainAddress{
 
@@ -15,7 +15,7 @@ class InterfaceBlockchainAddress{
 
     }
 
-    static _getPrivateKeyAdvanced(salt, showDebug){
+    static _generatePrivateKeyAdvanced(salt, showDebug){
 
         //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
         let privateKeyBytes = WebDollarCrypt.getByteRandomValues(32);
@@ -32,13 +32,10 @@ class InterfaceBlockchainAddress{
 
 
 
-
         //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
-        let privateKeyAndVersion = "80" + privateKeyHex
-        let firstSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(privateKeyAndVersion))
-        let secondSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(firstSHA))
-        let checksum = secondSHA.substr(0, 8).toUpperCase()
-        console.log(checksum) //"206EC97E"
+        let privateKeyAndVersion = PRIVATE_KEY_VERSION_PREFIX + privateKeyHex
+        let checksum = InterfaceBlockchainAddress.calculateChecksum(privateKeyAndVersion, showDebug);
+
 
         //append checksum to end of the private key and version
         let keyWithChecksum = privateKeyAndVersion + checksum;
@@ -48,7 +45,7 @@ class InterfaceBlockchainAddress{
 
         let privateKeyWIF = null, privateKey = null;
 
-        if (!useBase64)  {
+        if (!PRIVATE_KEY_USE_BASE64)  {
             privateKeyWIF = bs58.encode(CryptoJS.util.hexToBytes(keyWithChecksum));
             privateKey = bs58.encode(CryptoJS.util.hexToBytes(privateKeyHex));
         }
@@ -69,23 +66,22 @@ class InterfaceBlockchainAddress{
             },
 
             privateKey:{
-                "string": privateKeyHex,
+                "string": privateKey,
                 "hex": privateKeyHex,
             }
 
         };
     }
 
-    static _getPrivateKey(salt, showDebug){
-        return InterfaceBlockchainAddress._getPrivateKeyAdvanced(salt, showDebug).privateKeyWIF.string;
+    static _generatePrivateKey(salt, showDebug){
+        return InterfaceBlockchainAddress._generatePrivateKeyAdvanced(salt, showDebug).privateKeyWIF.string;
     }
 
-    static getPublicKey(privateKey, privateKeyType, showDebug){
+    static _generatePublicKey(privateKey, showDebug){
 
         // Tutorial based on https://github.com/cryptocoinjs/secp256k1-node
 
-        if (privateKeyType === 'hex' && typeof privateKey === "string")
-            privateKey = new Buffer(privateKey, "hex");
+
 
         if (showDebug)
             console.log("privateKey", privateKey, typeof privateKey);
@@ -99,6 +95,8 @@ class InterfaceBlockchainAddress{
 
         console.log("pubKey", pubKey);
 
+        return pubKey;
+
         // sign the message
         // const sigObj = secp256k1.sign(msg, privKey)
 
@@ -108,50 +106,26 @@ class InterfaceBlockchainAddress{
         const sigObj = secp256k1.sign(msg, privateKey)
 
         // verify the signature
-        console.log("secp256k1.verify", secp256k1.verify(msg, sigObj.signature, pubKey))
+        if (showDebug)
+            console.log("secp256k1.verify", secp256k1.verify(msg, sigObj.signature, pubKey))
 
-        /* output:
-        04d0988bfa799f7d7ef9ab3de97ef481cd0f75d2367ad456607647edde665d6f6
-        fbdd594388756a7beaf73b4822bc22d36e9bda7db82df2b8b623673eefc0b7495
-        */
-
-//
-//         const { randomBytes } = require('crypto')
-//         const secp256k1 = require('secp256k1')
-//         // generate message to sign
-//         const msg = randomBytes(32)
-//
-// // generate privKey
-//         let privKey
-//         do {
-//             privKey = randomBytes(32)
-//
-//             console.log("nu a mers!!!");
-//         } while (!secp256k1.privateKeyVerify(privKey))
-//
-//         console.log("privKey", privKey, typeof privKey);
-//
-// // get the public key in a compressed format
-//         const pubKey = secp256k1.publicKeyCreate(privKey)
-//
-//         console.log("public key", pubKey, typeof  pubKey)
-//
-// // sign the message
-//         const sigObj = secp256k1.sign(msg, privKey)
-//
-// // verify the signature
-//         console.log(secp256k1.verify(msg, sigObj.signature, pubKey))
-// // => true
     }
 
+    static verifySignedData(signature, pubKey){
 
+    }
+
+    static signMessage(msg, privateKey){
+        // sign the message
+        const sigObj = secp256k1.sign(msg, privateKey)
+    }
 
 
     static generateAddress(salt){
 
 
-        let privateKey = InterfaceBlockchainAddress._getPrivateKeyAdvanced(salt, true);
-        InterfaceBlockchainAddress.getPublicKey(privateKey.privateKey.hex, "hex", true);
+        let privateKey = InterfaceBlockchainAddress._generatePrivateKeyAdvanced(salt, true);
+        InterfaceBlockchainAddress._generatePublicKey(privateKey.privateKey.hex, true);
 
     }
 
@@ -159,6 +133,50 @@ class InterfaceBlockchainAddress{
 
     }
 
+    static calculateChecksum(privateKeyAndVersion, showDebug){
+        //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
+        let firstSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(privateKeyAndVersion))
+        let secondSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(firstSHA))
+        let checksum = secondSHA.substr(0, PRIVATE_KEY_CHECK_SUM_LENGTH).toUpperCase()
+
+        if (showDebug)
+            console.log("checksum", checksum) //"206EC97E"
+        return checksum;
+    }
+
+    static validatePrivateKey(privateKey){
+
+        if (typeof privateKey === "string") {
+
+
+            //contains CHECKSUM
+            if (privateKey.length === 32 + PRIVATE_KEY_CHECK_SUM_LENGTH) {
+
+                let checkSum = privateKey.substr(privateKey.length - PRIVATE_KEY_CHECK_SUM_LENGTH.length)
+                let checksum = InterfaceBlockchainAddress.calculateChecksum(privateKey);
+
+                if (checksum === checkSum) {
+
+                }
+            }
+
+            //contains VERSION prefix
+            let versionDetected = false;
+            if (privateKey.length === 32 + PRIVATE_KEY_VERSION_PREFIX.length ){
+
+                if (privateKey.indexOf(PRIVATE_KEY_VERSION_PREFIX) === 0){
+                    versionDetected = true;
+                    privateKey = privateKey.substr(PRIVATE_KEY_VERSION_PREFIX.length);
+                }
+
+            }
+
+            if (!versionDetected) return {result:false, message: "PRIVATE KEY  VERSION PREFIX is not recognized"}
+
+            if (WebDollarCrypt.isHex(privateKey))
+                privateKey = new Buffer(privateKey, "hex");
+        }
+    }
 
 
 }
