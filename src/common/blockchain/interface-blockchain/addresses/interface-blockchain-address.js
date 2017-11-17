@@ -1,7 +1,7 @@
 const CryptoJS = (require ('cryptojs')).Crypto;
 const bs58 = require('bs58')
-const BigInteger = require('./path/to/biginteger').BigInteger;
-import {getSECCurveByName} from '../../crypt/bitcoin-elliptic-curve';
+const BigInteger = require('big-integer').BigInteger;
+import {getSECCurveByName} from '../../crypt/eliptic-curves/bitcoin-elliptic-curve';
 import {WebDollarCrypt} from './../../crypt/webdollar-crypt';
 
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript

@@ -9,6 +9,14 @@
 // ----------------
 // X9ECParameters
 
+const BigInteger = require('big-integer');
+
+import {ECCurveFp} from './jsbn/ec';
+const JSBN = require('./jsbn/jsbn');
+const JSBN2 = require('./jsbn/jsbn2');
+
+
+
 // constructor
 function X9ECParameters(curve,g,n,h) {
     this.curve = curve;
