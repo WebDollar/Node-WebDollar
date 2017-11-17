@@ -5,8 +5,8 @@ function testAddressGenerator(){
 
     let address = new InterfaceBlockchainAddress();
 
-    InterfaceBlockchainAddress.getPrivateKey("123", true);
-    InterfaceBlockchainAddress.getPublicKey("123", true);
+    let privateKey = InterfaceBlockchainAddress.getPrivateKeyAdvanced("123", true);
+    InterfaceBlockchainAddress.getPublicKey(privateKey.hex, "hex", true);
 
 }
 

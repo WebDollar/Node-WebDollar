@@ -4,6 +4,8 @@
 
 // Requires jsbn.js and jsbn2.js
 
+const BigInteger = require('big-integer');
+
 // ----------------
 // ECFieldElementFp
 

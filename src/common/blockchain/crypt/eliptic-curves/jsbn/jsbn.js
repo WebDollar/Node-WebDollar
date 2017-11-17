@@ -67,7 +67,7 @@ function am3(i,x,w,j,c,n) {
     }
     return c;
 }
-if(j_lm && (navigator.appName == "Microsoft Internet Explorer")) {
+if(j_lm && (typeof navigator === 'undefined' || navigator.appName == "Microsoft Internet Explorer")) {
     BigInteger.prototype.am = am2;
     dbits = 30;
 }

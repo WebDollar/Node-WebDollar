@@ -39,6 +39,26 @@ class WebDollarCrypt {
     }
 
 
+    static getByteRandomValues(count){
+
+        if (typeof count === 'undefined') count = 32;
+
+        let randArr = new Uint8Array(count) //create a typed array of 32 bytes (256 bits)
+
+        if (typeof window !== 'undefined' && typeof window.crypto !=='undefined') window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
+        else {
+            const getRandomValues = require('get-random-values');
+            getRandomValues(randArr);
+        }
+
+        //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
+        let dataBytes = []
+        for (let i = 0; i < randArr.length; ++i)
+            dataBytes[i] = randArr[i]
+
+        return dataBytes;
+    }
+
 
 }
 

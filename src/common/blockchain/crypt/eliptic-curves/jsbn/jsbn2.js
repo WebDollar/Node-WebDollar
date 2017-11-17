@@ -7,6 +7,8 @@
 // Version 1.1: new BigInteger("0", 10) returns "proper" zero
 // Version 1.2: square() API, isProbablePrime fix
 
+const BigInteger = require('big-integer');
+
 // (public)
 function bnClone() { var r = nbi(); this.copyTo(r); return r; }
 
