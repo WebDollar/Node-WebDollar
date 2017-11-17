@@ -13,5 +13,5 @@ exports.nodesSignalingServerProtocolConnectingWebPeersInterval = 2*1000;
 
 
 exports.PRIVATE_KEY_USE_BASE64 = false;
-exports.PRIVATE_KEY_VERSION_PREFIX = "80";
-exports.PRIVATE_KEY_CHECK_SUM_LENGTH = 8;
+exports.PRIVATE_KEY_VERSION_PREFIX = "80"; //it is in HEX
+exports.PRIVATE_KEY_CHECK_SUM_LENGTH = 8; //in bytes
