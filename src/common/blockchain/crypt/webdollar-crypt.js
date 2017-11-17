@@ -12,7 +12,7 @@ class WebDollarCrypt {
 
             switch (result[i]){
                 case 'O':
-                    resultFinal +=  '#';
+                    resultFinal +=  '&';
                     break;
                 case '0':
                     resultFinal +=  '*';
@@ -24,7 +24,7 @@ class WebDollarCrypt {
                     resultFinal +=  '@';
                     break;
                 case '+':
-                    resultFinal +=  '&';
+                    resultFinal +=  '#';
                     break;
                 case '/':
                     resultFinal +=  '$';

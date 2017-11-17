@@ -5,6 +5,8 @@ import {WebDollarCrypt} from './../../crypt/webdollar-crypt';
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
 
+//video tutorial https://asecuritysite.com/encryption/base58
+
 import {PRIVATE_KEY_VERSION_PREFIX, PRIVATE_KEY_CHECK_SUM_LENGTH, PRIVATE_KEY_USE_BASE64, PUBLIC_ADDRESS_PREFIX_BASE64, PUBLIC_ADDRESS_PREFIX_BASE58, PUBLIC_ADDRESS_SUFFIX_BASE64, PUBLIC_ADDRESS_SUFFIX_BASE58} from './../../../../consts/const_global';
 
 class InterfaceBlockchainAddress{
@@ -138,7 +140,6 @@ class InterfaceBlockchainAddress{
         }
 
         //could use publicKeyBytesCompressed as well
-        console.log(CryptoJS);
 
         //bitcoin original
         //let hash160 = CryptoJS.RIPEMD160(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
@@ -154,15 +155,16 @@ class InterfaceBlockchainAddress{
         let addressChecksum = doubleSHA.substr(0,8)
         console.log(addressChecksum) //26268187
 
-        let unencodedAddress = ( PRIVATE_KEY_USE_BASE64 ? PUBLIC_ADDRESS_PREFIX_BASE64  : PUBLIC_ADDRESS_PREFIX_BASE58 ) + hash160 + addressChecksum + (PRIVATE_KEY_USE_BASE64 ? PUBLIC_ADDRESS_SUFFIX_BASE64 : PUBLIC_ADDRESS_SUFFIX_BASE58);
 
-        if (showDebug)
-            console.log("unencodedAddress", unencodedAddress) //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
+        let unencodedAddress = ( PRIVATE_KEY_USE_BASE64 ? PUBLIC_ADDRESS_PREFIX_BASE64 : PUBLIC_ADDRESS_PREFIX_BASE58 ) + hash160 + addressChecksum + (PRIVATE_KEY_USE_BASE64 ? PUBLIC_ADDRESS_SUFFIX_BASE64 : PUBLIC_ADDRESS_SUFFIX_BASE58);
+
+        // if (showDebug)
+        //     console.log("unencodedAddress", unencodedAddress) //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
 
         let address = new WebDollarCryptData(unencodedAddress, "hex");
 
         if (showDebug)
-            console.log("address", address, address.toBase()); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
+            console.log("address",address.toBase()); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
 
         return  address;
 
