@@ -173,8 +173,15 @@ class InterfaceBlockchainAddress{
     static generateAddress(salt){
 
 
-        let privateKey = InterfaceBlockchainAddress._generatePrivateKeyAdvanced(salt, true);
-        InterfaceBlockchainAddress._generatePublicKey(privateKey.privateKey, true);
+        let privateKey = InterfaceBlockchainAddress._generatePrivateKeyAdvanced(salt, false);
+        let publicKey = InterfaceBlockchainAddress._generatePublicKey(privateKey.privateKey, false);
+        let address = InterfaceBlockchainAddress._generateAddressFromPublicKey(publicKey, false)
+
+        return {
+            address: address,
+            publicKey: publicKey,
+            privateKey: privateKey,
+        };
 
     }
 
