@@ -83,7 +83,7 @@ class NodeDiscoveryService {
                 //console.log((data.hasOwnProperty('protocol')));
                 //console.log(((data['protocol'] === nodeProtocol)));
 
-                if ((data.hasOwnProperty('protocol'))&&(data['protocol'] === nodeProtocol)){
+                if ((data.hasOwnProperty('protocol'))&&(data['protocol'] === consts.NODE_PROTOCOL)){
                     name = data.name||'';
                     nodes = data.nodes||[];
 
