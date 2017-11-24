@@ -307,4 +307,4 @@ class NetworkMap {
 
 }
 
-exports.NetworkMap =  new NetworkMap();
+export default new NetworkMap();

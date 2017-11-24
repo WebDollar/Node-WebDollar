@@ -1,5 +1,5 @@
 import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
-import {NodesWaitlist} from '../../../../lists/waitlist/nodes-waitlist.js';
+import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodesList from 'node/lists/nodes-list'
 import {FallBackObject} from './fallback-object';
 
@@ -126,5 +126,5 @@ class NodeDiscoveryService {
 
 }
 
-exports.NodeDiscoveryService = new NodeDiscoveryService();
+export default new NodeDiscoveryService();
 

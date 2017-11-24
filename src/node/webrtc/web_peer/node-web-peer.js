@@ -8,7 +8,7 @@
 
 let Peer = require('simple-peer');
 
-import {SocketExtend} from './../../../common/sockets/socket-extend'
+import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
 
 class NodeWebPeer {
@@ -164,4 +164,4 @@ class NodeWebPeer {
 
 
 
-exports.NodeWebPeer = NodeWebPeer;
+export default NodeWebPeer;

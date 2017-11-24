@@ -186,4 +186,4 @@ class NodeSignalingClientProtocol {
 
 }
 
-exports.NodeSignalingClientProtocol = new NodeSignalingClientProtocol();
+export default new NodeSignalingClientProtocol();

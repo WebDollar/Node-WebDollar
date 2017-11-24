@@ -1,7 +1,7 @@
 import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
 
-import {NodesWaitlist} from 'node/lists/waitlist/nodes-waitlist';
-import {NodeProtocol} from './node-protocol.js';
+import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
+import NodeProtocol from 'common/sockets/protocol/node-protocol';
 
 class NodePropagationProtocol {
 
@@ -56,4 +56,4 @@ class NodePropagationProtocol {
 
 }
 
-exports.NodePropagationProtocol = new NodePropagationProtocol();
+export default new NodePropagationProtocol();

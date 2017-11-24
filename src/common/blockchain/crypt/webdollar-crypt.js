@@ -67,4 +67,4 @@ class WebDollarCrypt {
 
 }
 
-exports.WebDollarCrypt = WebDollarCrypt;
+export default WebDollarCrypt;

@@ -55,4 +55,4 @@ class NodesWaitlistObject {
 
 }
 
-exports.NodesWaitlistObject = NodesWaitlistObject;
+export default NodesWaitlistObject;

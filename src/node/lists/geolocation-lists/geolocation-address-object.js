@@ -45,4 +45,4 @@ class GeoLocationAddressObject  {
 
 }
 
-exports.GeoLocationAddressObject = GeoLocationAddressObject;
+export default GeoLocationAddressObject;

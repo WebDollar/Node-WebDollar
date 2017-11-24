@@ -1,7 +1,7 @@
 import {nodeStatusInterval} from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
-import {NodesWaitlist} from 'node/lists/waitlist/nodes-waitlist';
+import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 
 class NodesStats {
 
@@ -40,4 +40,4 @@ class NodesStats {
     }
 }
 
-exports.NodesStats = new NodesStats();
+export default new NodesStats();

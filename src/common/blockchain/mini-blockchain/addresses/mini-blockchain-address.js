@@ -1,5 +1,5 @@
 
-import {InterfaceBlockchainAddress} from './../../interface-blockchain/addresses/interface-blockchain-address';
+import InterfaceBlockchainAddress from 'common/blockchain/interface-blockchain/addresses/interface-blockchain-address'
 
 class MiniBlockchainAddress extends  InterfaceBlockchainAddress{
 
@@ -9,4 +9,6 @@ class MiniBlockchainAddress extends  InterfaceBlockchainAddress{
 
     }
 
-}ads
+}
+
+export default MiniBlockchainAddress

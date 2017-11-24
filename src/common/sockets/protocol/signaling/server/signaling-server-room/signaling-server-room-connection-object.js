@@ -60,5 +60,6 @@ class SignalingServerRoomConnectionObject {
 
 }
 
-exports.SignalingServerRoomConnectionObject = SignalingServerRoomConnectionObject;
-exports.SignalingServerRoomConnectionObject.ConnectionStatus = ConnectionStatus;
+SignalingServerRoomConnectionObject.ConnectionStatus = ConnectionStatus;
+
+export default SignalingServerRoomConnectionObject

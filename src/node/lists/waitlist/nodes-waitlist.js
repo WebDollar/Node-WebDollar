@@ -1,6 +1,6 @@
-import {NodeClient} from 'node/websock/node_clients/socket/node-client';
+import NodeClient from 'node/websock/node_clients/socket/node-client'
 import NodesList from 'node/lists/nodes-list'
-import {NodesWaitlistObject} from './nodes-waitlist-object.js';
+import NodesWaitlistObject from './nodes-waitlist-object';
 import SocketAddress from 'common/sockets/socket-address'
 import {nodesWaitlistTryReconnectAgain, nodesWaitlistInterval} from 'consts/const_global'
 
@@ -174,4 +174,4 @@ class NodesWaitlist {
 
 }
 
-exports.NodesWaitlist = new NodesWaitlist();
+export default new NodesWaitlist();

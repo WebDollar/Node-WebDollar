@@ -1,4 +1,4 @@
-import {NodeWebPeer} from './node-web-peer';
+import NodeWebPeer from './node-web-peer';
 
 exports.testNodeWebPeer = async function (){
 

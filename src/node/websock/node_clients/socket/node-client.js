@@ -2,11 +2,11 @@ import * as io from 'socket.io-client';
 const colors = require('colors/safe');
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from 'consts/const_global'
-import {SocketExtend} from '../../../../common/sockets/socket-extend';
+import SocketExtend from 'common/sockets/socket-extend'
 import SocketAddress from 'common/sockets/socket-address'
 import NodesList from 'node/lists/nodes-list'
-import {NodeClientsService} from '../service/node-clients-service';
-import {NodesWaitlist} from '../../../lists/waitlist/nodes-waitlist.js';
+import NodeClientsService from 'node/websock/node_clients/service/node-clients-service'
+import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 
 class NodeClient {
 
@@ -128,4 +128,4 @@ class NodeClient {
 
 }
 
-exports.NodeClient =  NodeClient;
+export default NodeClient;

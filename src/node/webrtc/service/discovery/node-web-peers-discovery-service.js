@@ -1,7 +1,7 @@
-import {NodeWebPeer} from '../../web_peer/node-web-peer.js';
+import NodeWebPeer from 'node/webrtc/web_peer/node-web-peer';
 import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
-import {NodeWebPeersService} from '../node-web-peers-service.js';
-import {NodesWaitlist} from '../../../lists/waitlist/nodes-waitlist.js';
+import NodeWebPeersService from 'node/webrtc/service/node-web-peers-service'
+import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodesList from 'node/lists/nodes-list'
 
 class NodeWebPeersDiscoveryService {
@@ -35,5 +35,5 @@ class NodeWebPeersDiscoveryService {
 
 }
 
-exports.NodeWebPeersDiscoveryService = new NodeWebPeersDiscoveryService();
+export default new NodeWebPeersDiscoveryService();
 

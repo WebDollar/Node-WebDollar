@@ -1,7 +1,7 @@
-import {NodeWebPeer} from '../web_peer/node-web-peer.js';
-import {NodeWebPeersDiscoveryService} from './discovery/node-web-peers-discovery-service.js';
+import NodeWebPeer from 'node/webrtc/web_peer/node-web-peer'
+import NodeWebPeersDiscoveryService from 'node/webrtc/service/discovery/node-web-peers-discovery-service'
 import NodesList from 'node/lists/nodes-list'
-import {NodesWaitlist} from '../../lists/waitlist/nodes-waitlist.js';
+import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 
 
 class NodeWebPeersService {
@@ -20,4 +20,4 @@ class NodeWebPeersService {
 
 }
 
-exports.NodeWebPeersService = new NodeWebPeersService();
+export default new NodeWebPeersService();

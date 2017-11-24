@@ -18,4 +18,4 @@ class SignalingClientPeerObject {
 
 }
 
-exports.SignalingClientPeerObject = SignalingClientPeerObject;
+export default SignalingClientPeerObject;

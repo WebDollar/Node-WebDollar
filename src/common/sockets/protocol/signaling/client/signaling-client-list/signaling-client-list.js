@@ -1,7 +1,7 @@
-import {SignalingClientPeerObject} from './signaling-client-peer-object';
+import SignalingClientPeerObject from './signaling-client-peer-object';
 
-//import {NodeWebPeer} from "node/webrtc/web_peer/node-web-peer";
-import {NodeWebPeerRTC} from "node/webrtc/web_peer/node-web-peer-webRTC";
+//import NodeWebPeer from "node/webrtc/web_peer/node-web-peer";
+import NodeWebPeerRTC from "node/webrtc/web_peer/node-web-peer-webRTC";
 
 const colors = require('colors/safe');
 

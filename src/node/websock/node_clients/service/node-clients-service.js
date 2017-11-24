@@ -1,7 +1,7 @@
-import {NodeClient} from '../socket/node-client.js';
-import {NodeDiscoveryService} from './discovery/node-clients-discovery-service.js';
+import NodeClient from 'node/websock/node_clients/socket/node-client'
+import NodeDiscoveryService from 'node/websock/node_clients/service/discovery/node-clients-discovery-service'
 import NodesList from 'node/lists/nodes-list'
-import {NodesWaitlist} from '../../../lists/waitlist/nodes-waitlist.js';
+import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 
 
 class NodeClientsService {
@@ -23,4 +23,4 @@ class NodeClientsService {
 
 }
 
-exports.NodeClientsService = new NodeClientsService();
+export default new NodeClientsService();

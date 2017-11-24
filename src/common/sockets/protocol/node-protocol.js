@@ -42,4 +42,4 @@ class NodeProtocol {
 
 }
 
-exports.NodeProtocol = new NodeProtocol();
+export default new NodeProtocol();

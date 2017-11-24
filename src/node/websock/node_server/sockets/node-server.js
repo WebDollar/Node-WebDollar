@@ -2,10 +2,11 @@ let io = require('socket.io');
 const colors = require('colors/safe');
 
 import {nodeVersionCompatibility, nodeVersion, nodePort} from 'consts/const_global'
-import {SocketExtend} from '../../../../common/sockets/socket-extend.js';
+import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
-import {NodeProtocol} from '../../../../common/sockets/protocol/node-protocol.js';
-import {NodePropagationProtocol} from '../../../../common/sockets/protocol/node-propagation-protocol.js';
+import NodeProtocol from 'common/sockets/protocol/node-protocol';
+
+import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
 
 /*
     TUTORIAL
@@ -96,4 +97,4 @@ class NodeServer {
 
 }
 
-exports.NodeServer = new NodeServer();
+export default new NodeServer();

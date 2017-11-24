@@ -6,7 +6,7 @@
 // TUTORIAL BASED ON https://www.scaledrone.com/blog/posts/webrtc-chat-tutorial
 
 
-import {SocketExtend} from './../../../common/sockets/socket-extend'
+import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
 const colors = require('colors/safe');
 
@@ -534,4 +534,4 @@ class NodeWebPeerRTC {
 
 
 
-exports.NodeWebPeerRTC = NodeWebPeerRTC;
+export default NodeWebPeerRTC;

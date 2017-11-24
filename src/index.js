@@ -47,6 +47,6 @@ if ( (process.env.TESTING || 'false') === 'true' ) {
     //testNodeWebPeer.testWebPeer();
     //testNodeWebPeer.testNodeWebPeer();
 
-    const testInterfaceBlockchainAddress = require ('./common/blockchain/interface-blockchain/addresses/testing-interface-blockchain-address');
+    const testInterfaceBlockchainAddress = require ('common/blockchain/interface-blockchain/addresses/testing-interface-blockchain-address');
     testInterfaceBlockchainAddress.testAddressGenerator();
 }

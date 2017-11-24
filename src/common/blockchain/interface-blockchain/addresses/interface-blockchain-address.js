@@ -1,7 +1,7 @@
 const CryptoJS = (require ('cryptojs')).Crypto;
-import {WebDollarCryptData} from './../../crypt/webdollar-crypt-data';
+import WebDollarCryptData from 'common/blockchain/crypt/webdollar-crypt-data'
 const secp256k1 = require('secp256k1');
-import {WebDollarCrypt} from './../../crypt/webdollar-crypt';
+import WebDollarCrypt from 'common/blockchain/crypt/webdollar-crypt'
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
 
@@ -268,4 +268,4 @@ class InterfaceBlockchainAddress{
 
 }
 
-exports.InterfaceBlockchainAddress = InterfaceBlockchainAddress;
+export default InterfaceBlockchainAddress;
