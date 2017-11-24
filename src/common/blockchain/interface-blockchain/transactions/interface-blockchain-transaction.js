@@ -1,52 +1,80 @@
+import InterfaceValidateTransaction from './validate-transactions/interface-validate-transaction'
+
 class InterfaceBlockchainTransaction{
 
     /**
      * Transaction Class enables to create a new Transaction
-     * @param fromAddress
-     * @param toAddress
+     * @param from  must be an object {address: object , publicKey: object }
+     * @param to  must be an object {address: object  }
      * @param amount
      * @param currency
      */
-    constructor(fromAddress, toAddress, amount, currency){
 
-        this._setTransactionAddresses(fromAddress, toAddress);
+    constructor(from, to, amount, currency){
+
+        this.from = null;
+        this.to = null;
+        this.amount = null;
+        this.currency = null;
+
+        this._setTransactionAddresses(from, to);
         this._setTransactionValue();
-        this._propagateTransaction();
 
     }
 
-    _setTransactionAddresses(fromAddress, toAddress){
+    _setTransactionAddresses(from, to){
 
-        if (typeof fromAddress === 'undefined' || fromAddress === null )
-            throw 'From Address is not specified';
+        from = from || {}
+        to = to || {}
 
-        if (typeof toAddress === 'undefined' || toAddress === null)
-            throw 'To Address ti not specified';
+        if (!from.address) throw 'From Address is not specified';
+        if (!from.publicKey) throw 'From Public Key is not specified';
+
+        if (!to.address) throw 'To Address is not specified';
+
 
         //validate addresses
 
-        this.fromAddress = fromAddress;
-        this.toAddress = toAddress;
+        this.from = from;
+        this.to = to;
 
     }
 
     _setTransactionValue(amount, currency){
 
-        if (typeof amount === 'undefined' || amount === null)
-            throw ('Amount is not specified')
+        if (!amount) throw ('Amount is not specified')
 
+        if (typeof amount !== 'number' || amount < 0) throw 'Amount is not a valid number';
 
-        if (typeof amount !== 'number')
-            throw 'Amount is not valid'
+        if (!currency) currency = ''
 
-        if (typeof currency === 'undefined') currency = ''
+        this.amount = amount;
+        this.currency = currency;
 
         // Validate the validity of Funds
+        this._validateTransaction()
 
     }
 
     propagateTransaction(){
 
+
+
+    }
+
+    _validateTransaction(silent){
+
+        let ValidateTransactions = new InterfaceValidateTransaction();
+
+        let result = ValidateTransactions.validate(this.from, this.to, this.amount, this.currency)
+
+        if (silent) //to don't show the throw message
+            return result;
+        else
+            if (result === false) throw 'Transaction Validation pas not passed'
+
     }
 
 }
+
+export default InterfaceBlockchainTransaction

@@ -3,4 +3,4 @@ class InterfaceBlockchainTransactionHelper{
 
 }
 
-export default new InterfaceBlockchainTransactionHelper()
+export default InterfaceBlockchainTransactionHelper()
