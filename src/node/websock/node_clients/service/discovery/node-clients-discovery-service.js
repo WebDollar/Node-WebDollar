@@ -1,6 +1,6 @@
-import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_global.js';
+import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
 import {NodesWaitlist} from '../../../../lists/waitlist/nodes-waitlist.js';
-import {NodesList} from '../../../../lists/nodes-list';
+import NodesList from 'node/lists/nodes-list'
 import {FallBackObject} from './fallback-object';
 
 const axios = require('axios');

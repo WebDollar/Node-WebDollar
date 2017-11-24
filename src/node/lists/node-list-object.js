@@ -17,6 +17,4 @@ class NodesListObject {
 
 
 
-
-
-exports.NodesListObject = NodesListObject;
+export default NodesListObject;

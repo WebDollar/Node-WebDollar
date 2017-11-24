@@ -4,8 +4,8 @@ import {NodeProtocol} from './protocol/node-protocol';
 import {NodePropagationProtocol} from './protocol/node-propagation-protocol';
 import {NodeSignalingServerProtocol} from './protocol/signaling/server/node-signaling-server-protocol';
 import {NodeSignalingClientProtocol} from './protocol/signaling/client/node-signaling-client-protocol';
-import {NodesList} from '../../node/lists/nodes-list.js';
-import {SocketAddress} from './socket-address';
+import NodesList from 'node/lists/nodes-list'
+import SocketAddress from 'common/sockets/socket-address'
 
 // Extending Socket / Simple Peer
 

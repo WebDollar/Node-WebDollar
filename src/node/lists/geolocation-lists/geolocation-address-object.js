@@ -1,5 +1,5 @@
 const ipaddr = require('ipaddr.js');
-import {SocketAddress} from './../../../common/sockets/socket-address.js';
+import SocketAddress from 'common/sockets/socket-address'
 
 /*
     TUTORIAL BASED ON https://www.npmjs.com/package/ipaddr.js/

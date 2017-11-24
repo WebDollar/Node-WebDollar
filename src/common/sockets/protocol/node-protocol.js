@@ -1,5 +1,5 @@
-import {nodeVersionCompatibility, nodeVersion} from '../../../consts/const_global.js';
-import {NodesList} from '../../../node/lists/nodes-list.js';
+import {nodeVersionCompatibility, nodeVersion} from 'consts/const_global'
+import NodesList from 'node/lists/nodes-list'
 
 class NodeProtocol {
 

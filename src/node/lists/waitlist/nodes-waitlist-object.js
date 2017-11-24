@@ -1,4 +1,4 @@
-import {NodesList} from '../nodes-list.js';
+import NodesList from 'node/lists/nodes-list'
 
 class NodesWaitlistObject {
 

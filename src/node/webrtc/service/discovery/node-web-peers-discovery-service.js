@@ -1,8 +1,8 @@
 import {NodeWebPeer} from '../../web_peer/node-web-peer.js';
-import {nodeProtocol, nodeFallBackInterval} from '../../../../consts/const_global.js';
+import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
 import {NodeWebPeersService} from '../node-web-peers-service.js';
 import {NodesWaitlist} from '../../../lists/waitlist/nodes-waitlist.js';
-import {NodesList} from '../../../lists/nodes-list';
+import NodesList from 'node/lists/nodes-list'
 
 class NodeWebPeersDiscoveryService {
 

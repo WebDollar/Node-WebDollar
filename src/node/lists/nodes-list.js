@@ -1,6 +1,6 @@
-import {GeoLocationLists} from './geolocation-lists/geolocation-lists.js';
-import {SocketAddress} from './../../common/sockets/socket-address.js';
-import {NodesListObject} from './node-list-object.js';
+import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
+import SocketAddress from 'common/sockets/socket-address'
+import NodesListObject from './node-list-object.js';
 
 const colors = require('colors/safe');
 
@@ -170,4 +170,4 @@ class NodesList {
 
 }
 
-exports.NodesList =  new NodesList();
+export default new NodesList();

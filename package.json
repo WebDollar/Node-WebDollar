@@ -27,6 +27,7 @@
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
     "axios": "^0.16.2",
+    "babel-plugin-module-alias": "^1.6.0",
     "babelify": "^7.3.0",
     "big-integer": "^1.6.25",
     "bignumber.js": "^4.1.0",

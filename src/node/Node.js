@@ -1,10 +1,10 @@
 import {NodeServer} from './websock/node_server/sockets/node-server.js';
 import {NodeClientsService} from './websock/node_clients/service/node-clients-service.js';
 import {NodeWebPeersService} from './webrtc/service/node-web-peers-service';
-import {NodesStats} from './lists/stats/nodes-stats.js';
-import {NodesList} from './lists/nodes-list';
+import {NodesStats} from 'node/lists/stats/nodes-stats';
+import NodesList from 'node/lists/nodes-list'
 
-import {NetworkMap} from './../applications/maps/network-map';
+import {NetworkMap} from 'applications/maps/network-map';
 
 exports.NodeServer = NodeServer;
 exports.NodeClientsService = NodeClientsService;

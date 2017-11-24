@@ -8,7 +8,7 @@ console.log("Node WebDollar");
 console.log(process.env.PARAM);
 console.log(""); console.log(""); console.log("");
 
-let Node = require('./node/Node.js');
+let Node = require('node/Node.js');
 
 exports.helloWord = function() {
     console.log("This is a message from the demo package");
@@ -43,7 +43,7 @@ console.log("Node WebDollar End");
 
 
 if ( (process.env.TESTING || 'false') === 'true' ) {
-    const testNodeWebPeer = require ('./node/webrtc/web_peer/test-node-web-peer');
+    const testNodeWebPeer = require ('node/webrtc/web_peer/test-node-web-peer');
     //testNodeWebPeer.testWebPeer();
     //testNodeWebPeer.testNodeWebPeer();
 

@@ -1,7 +1,7 @@
 const axios = require('axios');
 const ipaddr = require('ipaddr.js');
 import {getContinentFromCountry} from './data/continents.js';
-import {SocketAddress} from './../../../../common/sockets/socket-address';
+import SocketAddress from 'common/sockets/socket-address'
 
 class GeoHelper {
 
@@ -105,4 +105,4 @@ class GeoHelper {
 
 }
 
-exports.GeoHelper =  new GeoHelper();
+export default new GeoHelper();

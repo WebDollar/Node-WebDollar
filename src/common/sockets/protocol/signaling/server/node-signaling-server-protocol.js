@@ -1,6 +1,6 @@
-import {nodeProtocol, nodeFallBackInterval} from '../../../../../consts/const_global.js';
+import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
 
-import {NodesList} from '../../../../../node/lists/nodes-list';
+import NodesList from 'node/lists/nodes-list'
 
 import {SignalingServerRoomList} from './signaling-server-room/signaling-server-room-list'
 import {SignalingServerRoomConnectionObject} from './signaling-server-room/signaling-server-room-connection-object'

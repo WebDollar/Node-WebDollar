@@ -1,10 +1,10 @@
 import * as io from 'socket.io-client';
 const colors = require('colors/safe');
 
-import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
+import {nodeVersionCompatibility, nodeVersion, nodePort} from 'consts/const_global'
 import {SocketExtend} from '../../../../common/sockets/socket-extend';
-import {SocketAddress} from '../../../../common/sockets/socket-address';
-import {NodesList} from '../../../lists/nodes-list.js';
+import SocketAddress from 'common/sockets/socket-address'
+import NodesList from 'node/lists/nodes-list'
 import {NodeClientsService} from '../service/node-clients-service';
 import {NodesWaitlist} from '../../../lists/waitlist/nodes-waitlist.js';
 

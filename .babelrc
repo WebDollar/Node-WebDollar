@@ -1,3 +1,12 @@
 {
-  "presets": ["env","es2017"]
+  "presets": ["es2017","env"],
+  "plugins": [
+    ["module-alias", [
+      {"src": "./src/applications",  "expose": "applications"},
+      {"src": "./src/node", "expose":"node"},
+      {"src": "./src/consts", "expose":"consts"},
+      {"src": "./src/node", "expose":"node"},
+      {"src": "./src", "expose":"src"}
+    ]]
+  ]
 }

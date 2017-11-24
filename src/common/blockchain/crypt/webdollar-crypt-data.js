@@ -2,7 +2,7 @@ const CryptoJS = (require ('cryptojs')).Crypto;
 const bs58 = require('bs58')
 
 import {WebDollarCrypt} from './webdollar-crypt';
-import {PRIVATE_KEY_USE_BASE64} from './../../../consts/const_global';
+import {PRIVATE_KEY_USE_BASE64} from 'consts/const_global'
 
 class WebDollarCryptData {
 

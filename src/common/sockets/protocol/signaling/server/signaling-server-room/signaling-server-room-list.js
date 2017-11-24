@@ -1,6 +1,6 @@
-import {SocketAddress} from './../../../../../../common/sockets/socket-address.js';
+import SocketAddress from 'common/sockets/socket-address'
 import {SignalingServerRoomConnectionObject} from './signaling-server-room-connection-object';
-import {NodesList} from '../../../../../../node/lists/nodes-list';
+import NodesList from 'node/lists/nodes-list'
 
 const colors = require('colors/safe');
 

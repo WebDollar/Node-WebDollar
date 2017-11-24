@@ -1,6 +1,6 @@
-import {nodeProtocol, nodeFallBackInterval} from '../../../consts/const_global.js';
+import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
 
-import {NodesWaitlist} from '../../../node/lists/waitlist/nodes-waitlist.js';
+import {NodesWaitlist} from 'node/lists/waitlist/nodes-waitlist';
 import {NodeProtocol} from './node-protocol.js';
 
 class NodePropagationProtocol {

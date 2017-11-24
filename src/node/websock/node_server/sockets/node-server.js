@@ -1,9 +1,9 @@
 let io = require('socket.io');
 const colors = require('colors/safe');
 
-import {nodeVersionCompatibility, nodeVersion, nodePort} from '../../../../consts/const_global.js';
+import {nodeVersionCompatibility, nodeVersion, nodePort} from 'consts/const_global'
 import {SocketExtend} from '../../../../common/sockets/socket-extend.js';
-import {NodesList} from '../../../lists/nodes-list.js';
+import NodesList from 'node/lists/nodes-list'
 import {NodeProtocol} from '../../../../common/sockets/protocol/node-protocol.js';
 import {NodePropagationProtocol} from '../../../../common/sockets/protocol/node-propagation-protocol.js';
 

@@ -1,6 +1,6 @@
-import {NodesList} from './../../node/lists/nodes-list';
-import {GeoHelper} from './../../node/lists/geolocation-lists/geo-helpers/geo-helper';
-import NetworkMapStypeLight from './styles/network-map-style-light';
+import NodesList from 'node/lists/nodes-list'
+import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper'
+import NetworkMapStyleLight from './styles/network-map-style-light';
 
 class NetworkMap {
 
@@ -39,7 +39,7 @@ class NetworkMap {
     createMap(id, style){
 
         if (typeof style === 'undefined')
-            style  = NetworkMapStypeLight.style;
+            style  = NetworkMapStyleLight.style;
 
         let map = new google.maps.Map(document.getElementById(id), {
             zoom: 2,

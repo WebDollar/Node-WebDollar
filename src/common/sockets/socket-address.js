@@ -1,6 +1,6 @@
 const ipaddr = require('ipaddr.js');
-import {nodePort} from './../../consts/const_global.js';
-import {GeoHelper} from './../../node/lists/geolocation-lists/geo-helpers/geo-helper';
+import {nodePort} from 'consts/const_global'
+import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper'
 
 class SocketAddress {
 
@@ -123,4 +123,4 @@ class SocketAddress {
 
 }
 
-exports.SocketAddress = SocketAddress;
+export default SocketAddress;

@@ -1,7 +1,7 @@
-import {nodeStatusInterval} from '../../../consts/const_global.js';
-import {NodesList} from '../nodes-list.js';
-import {GeoLocationLists} from '../geolocation-lists/geolocation-lists.js';
-import {NodesWaitlist} from '../waitlist/nodes-waitlist';
+import {nodeStatusInterval} from 'consts/const_global'
+import NodesList from 'node/lists/nodes-list'
+import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
+import {NodesWaitlist} from 'node/lists/waitlist/nodes-waitlist';
 
 class NodesStats {
 
