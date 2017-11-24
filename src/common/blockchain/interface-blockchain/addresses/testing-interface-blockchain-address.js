@@ -1,15 +1,15 @@
 
 import InterfaceBlockchainAddress from 'common/blockchain/interface-blockchain/addresses/interface-blockchain-address'
-import InterfaceBlockchainAddressFunctions from 'common/blockchain/interface-blockchain/addresses/interface-blockchain-address-functions'
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/interface-blockchain-address-helper'
 
 class TestingInterfaceBlockchainAddress{
 
     testAddressGenerator(){
 
-        let privateKey = InterfaceBlockchainAddressFunctions._generatePrivateKeyAdvanced("123", true);
-        let publicKey = InterfaceBlockchainAddressFunctions._generatePublicKey(privateKey.privateKeyWIF, true);
+        let privateKey = InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced("123", true);
+        let publicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey.privateKeyWIF, true);
 
-        let address = InterfaceBlockchainAddressFunctions._generateAddressFromPublicKey(publicKey, true);
+        let address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, true);
 
 
 
@@ -17,7 +17,7 @@ class TestingInterfaceBlockchainAddress{
         console.log(privateKey, publicKey, address)
 
         let blockchainAddress = new InterfaceBlockchainAddress();
-        blockchainAddress.createAddress();
+        blockchainAddress.createNewAddress();
 
         blockchainAddress._toStringDebug()
 

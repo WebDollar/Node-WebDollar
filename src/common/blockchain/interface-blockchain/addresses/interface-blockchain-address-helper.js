@@ -9,7 +9,7 @@ import WebDollarCrypt from 'common/blockchain/crypt/webdollar-crypt'
 
 import consts from 'consts/const_global'
 
-class InterfaceBlockchainAddressFunctions{
+class InterfaceBlockchainAddressHelper{
 
 
     constructor (){
@@ -37,7 +37,7 @@ class InterfaceBlockchainAddressFunctions{
 
         //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
         let privateKeyAndVersion = consts.PRIVATE_KEY_VERSION_PREFIX + privateKeyHex
-        let checksum = InterfaceBlockchainAddressFunctions._calculateChecksum(privateKeyAndVersion, showDebug);
+        let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(privateKeyAndVersion, showDebug);
 
 
         //append checksum to end of the private key and version
@@ -64,7 +64,7 @@ class InterfaceBlockchainAddressFunctions{
     }
 
     static _generatePrivateKey(salt, showDebug){
-        return InterfaceBlockchainAddressFunctions._generatePrivateKeyAdvanced(salt, showDebug).privateKeyWIF.string;
+        return InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, showDebug).privateKeyWIF.string;
     }
 
     static _generatePublicKey(privateKey, showDebug){
@@ -76,7 +76,7 @@ class InterfaceBlockchainAddressFunctions{
             throw 'privateKey must be a WebDollarCryptData';
         }
 
-        let validation = InterfaceBlockchainAddressFunctions.validatePrivateKey(privateKey);
+        let validation = InterfaceBlockchainAddressHelper.validatePrivateKey(privateKey);
 
         if (showDebug)
             console.log("VALIDATIOn", validation)
@@ -174,9 +174,9 @@ class InterfaceBlockchainAddressFunctions{
 
     static generateAddress(salt){
 
-        let privateKey = InterfaceBlockchainAddressFunctions._generatePrivateKeyAdvanced(salt, false);
-        let publicKey = InterfaceBlockchainAddressFunctions._generatePublicKey(privateKey.privateKey, false);
-        let address = InterfaceBlockchainAddressFunctions._generateAddressFromPublicKey(publicKey, false)
+        let privateKey = InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, false);
+        let publicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey.privateKey, false);
+        let address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, false)
 
         return {
             address: address,
@@ -241,7 +241,7 @@ class InterfaceBlockchainAddressFunctions{
             let privateKeyCheckSum = privateKey.substr(privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2)
 
             let privateKeyJustVersionHex = versionDetectedBuffer.toHex() + privateKey.substr(0, privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2).toHex();
-            let checksum = InterfaceBlockchainAddressFunctions._calculateChecksum(privateKeyJustVersionHex);
+            let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(privateKeyJustVersionHex);
 
             //console.log("checkSum", privateKeyCheckSum, "privateKeyJustVersionHex", privateKeyJustVersionHex);
             //console.log("checkSum2", checksum);
@@ -269,4 +269,4 @@ class InterfaceBlockchainAddressFunctions{
 
 }
 
-export default InterfaceBlockchainAddressFunctions;
+export default InterfaceBlockchainAddressHelper;

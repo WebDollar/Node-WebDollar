@@ -1,4 +1,4 @@
-import InterfaceBlockchainAddressFunctions from './interface-blockchain-address-functions'
+import InterfaceBlockchainAddressHelper from './interface-blockchain-address-helper'
 
 class InterfaceBlockchainAddress{
 
@@ -12,14 +12,14 @@ class InterfaceBlockchainAddress{
 
     }
 
-    createAddress(salt){
+    createNewAddress(salt){
 
 
         if (this.address !== null){
             console.log("WARNING! You overwrite the initial address")
         }
 
-        let result = InterfaceBlockchainAddressFunctions.generateAddress(salt);
+        let result = InterfaceBlockchainAddressHelper.generateAddress(salt);
 
         this.address = result.address;
         this.publicKey = result.publicKey;
