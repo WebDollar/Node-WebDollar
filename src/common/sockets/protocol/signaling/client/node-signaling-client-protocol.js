@@ -1,4 +1,4 @@
-import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
+import consts from 'consts/const_global'
 
 import {SignalingClientList} from './signaling-client-list/signaling-client-list'
 import NodesList from 'node/lists/nodes-list'

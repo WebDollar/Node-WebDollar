@@ -1,4 +1,4 @@
-import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
+import consts from 'consts/const_global'
 
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodeProtocol from 'common/sockets/protocol/node-protocol';

@@ -1,4 +1,4 @@
-import {nodeStatusInterval} from 'consts/const_global'
+import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
@@ -19,7 +19,7 @@ class NodesStats {
 
         NodesWaitlist.registerEvent("new-node-waitlist", {type: ["all"]}, (err, result ) => { this._recalculateStats(err, result ) });
 
-        setInterval( () => { return this._printStats() }, nodeStatusInterval)
+        setInterval( () => { return this._printStats() }, consts.NODE_STATUS_INTERVAL)
     }
 
 

@@ -6,6 +6,7 @@
       {"src": "./src/node", "expose":"node"},
       {"src": "./src/consts", "expose":"consts"},
       {"src": "./src/node", "expose":"node"},
+      {"src": "./src/common", "expose":"common"},
       {"src": "./src", "expose":"src"}
     ]]
   ]

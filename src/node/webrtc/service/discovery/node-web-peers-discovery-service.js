@@ -1,5 +1,5 @@
 import NodeWebPeer from 'node/webrtc/web_peer/node-web-peer';
-import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
+import consts from 'consts/const_global'
 import NodeWebPeersService from 'node/webrtc/service/node-web-peers-service'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodesList from 'node/lists/nodes-list'

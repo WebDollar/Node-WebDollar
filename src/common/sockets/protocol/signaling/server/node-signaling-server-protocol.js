@@ -1,4 +1,4 @@
-import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
+import consts from 'consts/const_global'
 
 import NodesList from 'node/lists/nodes-list'
 

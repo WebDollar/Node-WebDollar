@@ -1,4 +1,4 @@
-import {nodeProtocol, nodeFallBackInterval} from 'consts/const_global'
+import consts from 'consts/const_global'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodesList from 'node/lists/nodes-list'
 import {FallBackObject} from './fallback-object';
@@ -35,7 +35,7 @@ class NodeDiscoveryService {
         if (NodesList.nodes !== null && NodesList.nodes.length < 5 ){
 
             for (let i=0; i<this.fallbackLists.length; i++)
-                if ( this.fallbackLists[i].checked === false && this.fallbackLists[i].checkLastTimeChecked(nodeFallBackInterval) )
+                if ( this.fallbackLists[i].checked === false && this.fallbackLists[i].checkLastTimeChecked(consts.NODE_FALLBACK_INTERVAL) )
                 {
                     await this._downloadFallBackList(this.fallbackLists[i]);
                 }

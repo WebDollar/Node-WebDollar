@@ -1,4 +1,4 @@
-import {nodeVersionCompatibility, nodeVersion} from 'consts/const_global'
+import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
 
 class NodeProtocol {
@@ -12,12 +12,12 @@ class NodeProtocol {
 
         // Waiting for Protocol Confirmation
         let response = await node.sendRequestWaitOnce("HelloNode", {
-            version: nodeVersion,
+            version: consts.NODE_VERSION,
         });
 
         console.log("RECEIVED HELLO NODE BACK", response, typeof response);
 
-        if ((response.hasOwnProperty("version"))&&(response.version <= nodeVersionCompatibility)){
+        if ((response.hasOwnProperty("version"))&&(response.version <= consts.NODE_VERSION_COMPATIBILITY)){
 
             //check if it is a unique connection, add it to the list
             let previousConnection = NodesList.searchNodeSocketByAddress(node.sckAddress);

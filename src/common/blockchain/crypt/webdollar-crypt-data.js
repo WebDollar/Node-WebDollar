@@ -2,7 +2,7 @@ const CryptoJS = (require ('cryptojs')).Crypto;
 const bs58 = require('bs58')
 
 import WebDollarCrypt from './webdollar-crypt';
-import {PRIVATE_KEY_USE_BASE64} from 'consts/const_global'
+import consts from 'consts/const_global'
 
 class WebDollarCryptData {
 
@@ -50,7 +50,7 @@ class WebDollarCryptData {
     }
 
     toBase(){
-        if (!PRIVATE_KEY_USE_BASE64)  {
+        if (!consts.PRIVATE_KEY_USE_BASE64)  {
             return bs58.encode(this.toBytes());
         }
         else {

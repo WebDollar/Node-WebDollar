@@ -1,7 +1,7 @@
 let io = require('socket.io');
 const colors = require('colors/safe');
 
-import {nodeVersionCompatibility, nodeVersion, nodePort} from 'consts/const_global'
+import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
 import NodeProtocol from 'common/sockets/protocol/node-protocol';
@@ -63,7 +63,7 @@ class NodeServer {
 
             try {
                 console.log(typeof server);
-                server.listen(nodePort);
+                server.listen(consts.NODE_PORT);
             } catch(Exception){
                 console.log("Error Calling node_server.listen", Exception.toString());
             }

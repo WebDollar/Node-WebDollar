@@ -7,7 +7,7 @@ import WebDollarCrypt from 'common/blockchain/crypt/webdollar-crypt'
 
 //video tutorial https://asecuritysite.com/encryption/base58
 
-import {PRIVATE_KEY_VERSION_PREFIX, PRIVATE_KEY_CHECK_SUM_LENGTH, PRIVATE_KEY_USE_BASE64, PUBLIC_ADDRESS_PREFIX_BASE64, PUBLIC_ADDRESS_PREFIX_BASE58, PUBLIC_ADDRESS_SUFFIX_BASE64, PUBLIC_ADDRESS_SUFFIX_BASE58} from './../../../../consts/const_global';
+import consts from 'consts/const_global'
 
 class InterfaceBlockchainAddress{
 
@@ -36,7 +36,7 @@ class InterfaceBlockchainAddress{
 
 
         //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
-        let privateKeyAndVersion = PRIVATE_KEY_VERSION_PREFIX + privateKeyHex
+        let privateKeyAndVersion = consts.PRIVATE_KEY_VERSION_PREFIX + privateKeyHex
         let checksum = InterfaceBlockchainAddress._calculateChecksum(privateKeyAndVersion, showDebug);
 
 
@@ -156,7 +156,9 @@ class InterfaceBlockchainAddress{
         console.log(addressChecksum) //26268187
 
 
-        let unencodedAddress = ( PRIVATE_KEY_USE_BASE64 ? PUBLIC_ADDRESS_PREFIX_BASE64 : PUBLIC_ADDRESS_PREFIX_BASE58 ) + hash160 + addressChecksum + (PRIVATE_KEY_USE_BASE64 ? PUBLIC_ADDRESS_SUFFIX_BASE64 : PUBLIC_ADDRESS_SUFFIX_BASE58);
+        let unencodedAddress = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_PREFIX_BASE64 : consts.PUBLIC_ADDRESS_PREFIX_BASE58 )
+                                 + hash160
+                                 + addressChecksum + (consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58);
 
         // if (showDebug)
         //     console.log("unencodedAddress", unencodedAddress) //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
@@ -194,7 +196,7 @@ class InterfaceBlockchainAddress{
         //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
         let firstSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(privateKeyAndVersionHex))
         let secondSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(firstSHA))
-        let checksum = secondSHA.substr(0, PRIVATE_KEY_CHECK_SUM_LENGTH).toUpperCase()
+        let checksum = secondSHA.substr(0, consts.PRIVATE_KEY_CHECK_SUM_LENGTH).toUpperCase()
 
         if (showDebug)
             console.log("checksum", checksum) //"206EC97E"
@@ -216,15 +218,15 @@ class InterfaceBlockchainAddress{
         let versionDetected = false;
         let versionDetectedBuffer = '';
 
-        if (privateKey.buffer.length > 32 + PRIVATE_KEY_VERSION_PREFIX.length ){
+        if (privateKey.buffer.length > 32 + consts.PRIVATE_KEY_VERSION_PREFIX.length ){
 
             //console.log("Buffer.IndexOf", privateKey.buffer.indexOf( Buffer.from(PRIVATE_KEY_VERSION_PREFIX, "hex") ))
 
-            if (privateKey.buffer.indexOf( Buffer.from(PRIVATE_KEY_VERSION_PREFIX, "hex") ) === 0){
+            if (privateKey.buffer.indexOf( Buffer.from(consts.PRIVATE_KEY_VERSION_PREFIX, "hex") ) === 0){
                 versionDetected = true;
 
-                versionDetectedBuffer = privateKey.substr(0, PRIVATE_KEY_VERSION_PREFIX.length/2);
-                privateKey = privateKey.substr(PRIVATE_KEY_VERSION_PREFIX.length/2);
+                versionDetectedBuffer = privateKey.substr(0, consts.PRIVATE_KEY_VERSION_PREFIX.length/2);
+                privateKey = privateKey.substr(consts.PRIVATE_KEY_VERSION_PREFIX.length/2);
             }
 
         }
@@ -234,12 +236,12 @@ class InterfaceBlockchainAddress{
         //contains CHECKSUM
         let checkSumDetected = false;
 
-        if (privateKey.buffer.length === 32 + PRIVATE_KEY_CHECK_SUM_LENGTH / 2) {
+        if (privateKey.buffer.length === 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2) {
 
-            //console.log(privateKey, privateKey.buffer.length, 32 + PRIVATE_KEY_CHECK_SUM_LENGTH / 2);
-            let privateKeyCheckSum = privateKey.substr(privateKey.buffer.length - PRIVATE_KEY_CHECK_SUM_LENGTH /2)
+            //console.log(privateKey, privateKey.buffer.length, 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2);
+            let privateKeyCheckSum = privateKey.substr(privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2)
 
-            let privateKeyJustVersionHex = versionDetectedBuffer.toHex() + privateKey.substr(0, privateKey.buffer.length - PRIVATE_KEY_CHECK_SUM_LENGTH /2).toHex();
+            let privateKeyJustVersionHex = versionDetectedBuffer.toHex() + privateKey.substr(0, privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2).toHex();
             let checksum = InterfaceBlockchainAddress._calculateChecksum(privateKeyJustVersionHex);
 
             //console.log("checkSum", privateKeyCheckSum, "privateKeyJustVersionHex", privateKeyJustVersionHex);
@@ -248,7 +250,7 @@ class InterfaceBlockchainAddress{
             if (checksum.toUpperCase() === privateKeyCheckSum.toHex().toUpperCase()) {
                 checkSumDetected = true;
 
-                privateKey = privateKey.substr(0, privateKey.buffer.length - PRIVATE_KEY_CHECK_SUM_LENGTH/2)
+                privateKey = privateKey.substr(0, privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2)
             }
         }
 

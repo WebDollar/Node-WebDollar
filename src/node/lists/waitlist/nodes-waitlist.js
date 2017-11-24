@@ -2,7 +2,7 @@ import NodeClient from 'node/websock/node_clients/socket/node-client'
 import NodesList from 'node/lists/nodes-list'
 import NodesWaitlistObject from './nodes-waitlist-object';
 import SocketAddress from 'common/sockets/socket-address'
-import {nodesWaitlistTryReconnectAgain, nodesWaitlistInterval} from 'consts/const_global'
+import consts from 'consts/const_global'
 
 class NodesWaitlist {
 
@@ -88,7 +88,7 @@ class NodesWaitlist {
 
 
 
-            if ( nextNode.checkLastTimeChecked(nodesWaitlistTryReconnectAgain) && nextNode.blocked===false && nextNode.connecting===false && nextNode.checkIsConnected() === null ){
+            if ( nextNode.checkLastTimeChecked(consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN) && nextNode.blocked===false && nextNode.connecting===false && nextNode.checkIsConnected() === null ){
 
                 nextNode.blocked = true;
 
@@ -106,7 +106,7 @@ class NodesWaitlist {
         }
 
 
-        setTimeout(()=>{return this._connectNewNodesWaitlist() }, nodesWaitlistInterval);
+        setTimeout(()=>{return this._connectNewNodesWaitlist() }, consts.NODES_WAITLIST_INTERVAL);
     }
 
     async _connectNowToNewNode(nextNode){

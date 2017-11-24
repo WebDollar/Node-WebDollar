@@ -1,5 +1,5 @@
 const ipaddr = require('ipaddr.js');
-import {nodePort} from 'consts/const_global'
+import consts from 'consts/const_global'
 import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper'
 
 class SocketAddress {
@@ -26,7 +26,7 @@ class SocketAddress {
 
         if (SocketAddress.checkIsSocketAddress(address)) return address;
 
-        if ( typeof port === 'undefined' || port === '') port = nodePort;
+        if ( typeof port === 'undefined' || port === '') port = consts.NODE_PORT;
         return new SocketAddress(address, port);
     }
 
@@ -36,7 +36,7 @@ class SocketAddress {
         if (typeof address === 'undefined') address = '';
         if (typeof address === 'string') address = address.toLowerCase();
 
-        if (typeof port === 'undefined') port = nodePort;
+        if (typeof port === 'undefined') port = consts.NODE_PORT;
 
         try {
             if (typeof address === 'string')
