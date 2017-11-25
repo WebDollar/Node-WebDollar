@@ -77,7 +77,7 @@ class NodeWebPeer {
             };
 
         if (typeof window === 'undefined'){
-            for (let i=0; i<5000; i++) console.log("!!!!! Error!!! wrtc assigned")
+            for (let i=0; i<500; i++) console.log("!!!!! Error!!! wrtc assigned")
 
             const wrtc = require('wrtc');
             webPeerParams.wrtc = wrtc;
