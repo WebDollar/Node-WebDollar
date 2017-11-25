@@ -65,6 +65,15 @@ class WebDollarCrypt {
         return (a.toString(16) ===h.toLowerCase())
     }
 
+    /**
+     * Hashing using Argon2
+     */
+    static hash(){
+
+        A
+
+    }
+
 }
 
 export default WebDollarCrypt;

@@ -43,10 +43,10 @@ console.log("Node WebDollar End");
 
 
 if ( !process.env.TESTING ) {
-    const testNodeWebPeer = require ('./tests/blockchain/Node-Web-Peer.test');
+    const testNodeWebPeer = require ('./tests/node/Node-Web-Peer.test');
     //testNodeWebPeer.testWebPeer();
     //testNodeWebPeer.testNodeWebPeer();
 
-    const testInterfaceBlockchainAddress = require ('./tests/blockchain/Interface-Blockchain-Address.test').default;
+    const testInterfaceBlockchainAddress = require ('./tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test').default;
     testInterfaceBlockchainAddress.testAddressGenerator();
 }

@@ -26,6 +26,7 @@ In case your receive some errors, try ```sudo apt-get -f install```
 ```
 brew install gcc
 sudo apt-get install clang
+npm install -g node-gyp
 env CXX=g++-5 npm install
 env CXX=g++-5 npm install argon2
 ```

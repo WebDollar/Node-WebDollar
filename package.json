@@ -9,11 +9,10 @@
     "start_browser": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ]",
     "start_double_connections": "npm run build_terminal && ALLOW_DOUBLE_CONNECTIONS=true DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
     "start": "npm run build_terminal && TESTING=true node dist/build_terminal.js  ",
-
-
-    "test": "npm run build_terminal && mocha dist/tests/main.test.js",
-    "coverage": "npm run build_terminal  && instanbul cover _mocha dist/tests/main.test.js -x *.test.js",
-    "show_coverage": "open coverage/lcvov-report/index.html"
+    "test": "npm run build_terminal && mocha dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",
+    "show_mocha_report": "xdg-open mochawesome-report/mochawesome.html || open mochawesome-report/mochawesome.html",
+    "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
+    "show_coverage": "xdg-open coverage/lcov-report/index.html || open coverage/lcov-report/index.html"
   },
   "repository": {
     "type": "git",
@@ -32,6 +31,7 @@
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
     "argon2": "^0.16.2",
+    "argon2-browser": "^1.1.0",
     "axios": "^0.16.2",
     "babel-plugin-module-alias": "^1.6.0",
     "babelify": "^7.3.0",
@@ -68,6 +68,7 @@
     "babel-preset-es2017": "^6.24.1",
     "babelify": "^7.3.0",
     "istanbul": "^0.4.5",
-    "mocha": "^4.0.1"
+    "mocha": "^4.0.1",
+    "mochawesome": "^2.3.1"
   }
 }
