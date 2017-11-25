@@ -12,7 +12,7 @@ class NodePropagationProtocol {
 
     initializeSocketForPropagation(node){
 
-        node.on("node_propagation", response => {
+        node.on("propagation/nodes", response => {
 
             /*
                 sample data
@@ -44,11 +44,17 @@ class NodePropagationProtocol {
 
     }
 
-    propagateNewAddresses(addresses){
+    propagateNewNodeAddresses(addresses){
 
         if (typeof addresses === 'string') addresses = [addresses];
 
-        NodeProtocol.broadcastMessageAllSockets("node_propagation", {instruction: "new-address", addresses: addresses });
+        NodeProtocol.broadcastRequest("propagation/nodes", {instruction: "new-address", addresses: addresses });
+
+    }
+
+    propagateNewPendingTransaction(transaction){
+
+        NodeProtocol.broadcastRequest("propagation/transactions/pending", {instruction: "new-transaction",  transaction: transaction.toJSON() } );
 
     }
 

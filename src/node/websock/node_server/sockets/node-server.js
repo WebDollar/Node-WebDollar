@@ -4,7 +4,7 @@ const colors = require('colors/safe');
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
-import NodeProtocol from 'common/sockets/protocol/node-protocol';
+import NodeProtocol from 'common/sockets/protocol/node-protocol'
 
 import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
 

@@ -1,4 +1,5 @@
 import InterfaceValidateTransaction from './validate-transactions/interface-validate-transaction'
+import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
 
 class InterfaceBlockchainTransaction{
 
@@ -8,17 +9,23 @@ class InterfaceBlockchainTransaction{
      * @param to  must be an object {address: object  }
      * @param amount
      * @param currency
+     * @param pending
+     *
      */
 
-    constructor(from, to, amount, currency){
+    constructor(from, to, amount, currency, pending){
 
         this.from = null;
         this.to = null;
         this.amount = null;
         this.currency = null;
+        this.pending = pending||false;
 
         this._setTransactionAddresses(from, to);
-        this._setTransactionValue();
+        this._setTransactionValue(amount, currency);
+
+        if (!pending)
+            this._propagateTransaction()
 
     }
 
@@ -56,9 +63,9 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    propagateTransaction(){
+    _propagateTransaction(){
 
-
+        NodePropagationProtocol.propagateNewPendingTransaction(this)
 
     }
 
@@ -73,6 +80,22 @@ class InterfaceBlockchainTransaction{
         else
             if (result === false) throw 'Transaction Validation pas not passed'
 
+    }
+
+    toString(){
+
+    }
+
+    toJSON(){
+        return {
+            from: {
+                address: this.from.address,
+                publicKey: this.from.publicKey.toHex(),
+            },
+            to: this.to, //address,
+            amount: this.amount,
+            currency: this.currency,
+        }
     }
 
 }

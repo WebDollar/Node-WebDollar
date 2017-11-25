@@ -20,7 +20,7 @@ class SocketExtend{
 
         socket.node.sendRequest = (request, requestData) => { return this.sendRequest(socket, request, requestData) };
         socket.node.sendRequestWaitOnce = (request, requestData, answerPrefix) => {return this.sendRequestWaitOnce(socket, request, requestData, answerPrefix) };
-        socket.node.broadcastRequest = (request, data, type) => { return this.broadcastRequest(socket, request, data, type) };
+        socket.node.broadcastRequest = (request, data, type) => { return NodeProtocol.broadcastRequest(request, data, type, socket) };
 
         socket.node.protocol = {};
         socket.node.protocol.helloValidated = false;
@@ -83,15 +83,6 @@ class SocketExtend{
     }
 
 
-    broadcastRequest (socket, request, data, type){
-
-        let nodes = NodesList.getNodes(type);
-
-        for (let i=0; i < nodes.length; i++)
-            if (nodes[i].socket !== socket)
-                this.sendRequest(nodes[i].socket, request, data);
-
-    }
 
 
 }

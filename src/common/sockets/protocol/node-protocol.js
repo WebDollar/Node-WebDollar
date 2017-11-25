@@ -40,6 +40,17 @@ class NodeProtocol {
     }
 
 
+    static broadcastRequest (request, data, type, exceptSocket){
+
+        let nodes = NodesList.getNodes(type);
+
+        for (let i=0; i < nodes.length; i++)
+            if (!exceptSocket || nodes[i].socket !== exceptSocket)
+                nodes[i].socket.node.sendRequest(request, data);
+
+    }
+
+
 }
 
 export default new NodeProtocol();
