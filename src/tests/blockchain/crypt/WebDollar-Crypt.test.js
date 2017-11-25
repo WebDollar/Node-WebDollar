@@ -1,5 +1,7 @@
 var assert = require('assert')
+
 import WebDollarCrypt from 'common/blockchain/crypt/WebDollar-Crypt'
+import TestsHelper from 'tests/tests.helper'
 
 describe('WebDollar crypt', ()=>{
 
@@ -19,39 +21,45 @@ describe('WebDollar crypt', ()=>{
         const count = Math.floor(Math.random()*200);
         let bytes = WebDollarCrypt.getByteRandomValues(count)
 
-        assert(bytes.length, 50, 'getByteRandomValues should return ',count,' elements')
+        assert(bytes.length === count, 'getByteRandomValues should return '+count+' elements')
 
     })
 
-    it('hash function ', async ()=>{
+    it('hash Proof Of Work function ', async ()=>{
 
-        const message1 = makeid();
+        const message1 = TestsHelper.makeid();
         const message1_copy = message1;
 
-        const message2 = makeid();
+        const message2 = TestsHelper.makeid();
 
         let hash1 = await WebDollarCrypt.hashPOW(message1)
         let hash1_copy = await WebDollarCrypt.hashPOW(message1_copy)
         let hash2 = await WebDollarCrypt.hashPOW(message2)
 
-        console.log(hash1);
-        console.log(hash1_copy);
+        console.log(hash1, typeof hash1);
+        console.log(hash1_copy, typeof hash1_copy);
+        console.log(hash2, typeof hash2);
 
-        assert(typeof hash1 === 'object' && Buffer.isBuffer(hash1) , "Hash1 is not Buffer");
-        assert(typeof hash1_copy === 'string' && Buffer.isBuffer(hash1_copy), "Hash1 is not Buffer");
-        assert(typeof hash2 === 'string' && Buffer.isBuffer(hash2) === "Buffer", "Hash1 is not Buffer");
 
-        assert(hash1 === hash1_copy, "Hash1 and Hash1_copy are not Equal");
-        assert(hash1 !== hash2, "Hash1 and Hash2 are not Different");
+        assert(typeof hash1 === 'object' && Buffer.isBuffer(hash1), "Hash1 is not Buffer");
+        assert(typeof hash1_copy === 'object' && Buffer.isBuffer(hash1_copy), "Hash1_copy is not Buffer");
+        assert(typeof hash2 === 'object' && Buffer.isBuffer(hash2), "Hash2 is not Buffer");
 
+        assert(await WebDollarCrypt.verifyHashPOW(hash1, message1), "Hash1 is not good");
+        assert(await WebDollarCrypt.verifyHashPOW(hash1_copy, message1_copy) , "Hash1_copy is not good");
+        assert(await WebDollarCrypt.verifyHashPOW(hash2, message2) , "Hash2 is not good");
+
+        assert(! await WebDollarCrypt.verifyHashPOW(hash1, message2), "Hash1 is not good because message2 "+message2);
+        assert(! await WebDollarCrypt.verifyHashPOW(hash1_copy, message2), "Hash1_copy is not good because message2 "+message2);
+        assert(! await WebDollarCrypt.verifyHashPOW(hash2, message1), "Hash2 is not good because message1 "+message1);
     })
 
-    it('hash function string ', async ()=>{
+    it('hash Proof Of Work function string ', async ()=>{
 
-        const message1 = makeid();
+        const message1 = TestsHelper.makeid();
         const message1_copy = message1;
 
-        const message2 = makeid();
+        const message2 = TestsHelper.makeid();
 
         let hash1 = await WebDollarCrypt.hashPOWString(message1)
         let hash1_copy = await WebDollarCrypt.hashPOWString(message1_copy)
@@ -61,26 +69,21 @@ describe('WebDollar crypt', ()=>{
         console.log(hash1_copy);
 
         assert(typeof hash1 === 'string', "Hash1 is not String");
-        assert(typeof hash1_copy === 'string', "Hash1 is not String");
-        assert(typeof hash2 === 'string', "Hash1 is not String");
+        assert(typeof hash1_copy === 'string', "Hash1_copy is not String");
+        assert(typeof hash2 === 'string', "Hash2 is not String");
 
-        assert(hash1 === hash1_copy, "Hash1 and Hash1_copy are not Equal");
-        assert(hash1 !== hash2, "Hash1 and Hash2 are not Different");
+        assert(await WebDollarCrypt.verifyHashPOW(hash1, message1), "Hash1 is not good");
+        assert(await WebDollarCrypt.verifyHashPOW(hash1_copy, message1_copy) , "Hash1_copy is not good");
+        assert(await WebDollarCrypt.verifyHashPOW(hash2, message2) , "Hash2 is not good");
+
+        assert(! await WebDollarCrypt.verifyHashPOW(hash1, message2), "Hash1 is not good because message2 "+message2);
+        assert(! await WebDollarCrypt.verifyHashPOW(hash1_copy, message2), "Hash1_copy is not good because message2 "+message2);
+        assert(! await WebDollarCrypt.verifyHashPOW(hash2, message1), "Hash2 is not good because message1 "+message1);
+
 
     })
 
 })
 
 
-function makeid(count) {
 
-  if (typeof count === 'undefined') count = Math.floor(Math.random()*100)
-
-  var text = "";
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (var i = 0; i < count; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-  return text;
-}

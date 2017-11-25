@@ -1,18 +1,6 @@
 const CryptoJS = (require ('cryptojs')).Crypto;
 
-let Argon2 = null;
-if (typeof window !== 'undefined') {
-
-    //tutorial based on https://github.com/ranisalt/node-argon2
-    Argon2 = require('argon2-browser');
-}
-else {
-
-    //tutorial based on https://www.npmjs.com/package/argon2
-    Argon2 = require('argon2')
-}
-
-const HASH_ARGON2_OPTIONS = { timeCost: 4, memoryCost: 13, parallelism: 2, type: Argon2.argon2d }
+import Argon2 from 'common/crypto/Argon2/Argon2'
 
 
 class WebDollarCrypt {
@@ -86,14 +74,9 @@ class WebDollarCrypt {
      * @param buffer
      * @returns {Promise.<Buffer>}
      */
-    static async hashPOW(data, buffer){
+    static async hashPOW(data, salt, returnBuffer){
 
         try{
-
-            let hash = await Argon2.hash(data, {
-                raw: (typeof buffer === 'undefined' ? true : buffer),
-                options : HASH_ARGON2_OPTIONS,
-            })
 
             return hash;
 
@@ -108,27 +91,21 @@ class WebDollarCrypt {
      * @param data
      * @returns {Promise.<String>}
      */
-    static async hashPOWString(data){
+    static async hashPOWString(data, salt){
 
-        return WebDollarCrypt.hash(data, false)
+        return WebDollarCrypt.hashPOW(data, salt, false)
 
     }
 
     static async verifyHashPOW(hash, data){
 
         try{
-            
-            Argon2.verify(hash, data).then(match => {
-          if (match) {
-            // password match
-          } else {
-            // password did not match
-          }
-        }).catch(err => {
-          // internal failure
-        });
+
+            return await Argon2.verify(hash, data);
 
         } catch (Exception){
+
+            throw 'Argon2 is not supported. '+Exception.toString()
 
         }
 
