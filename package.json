@@ -9,8 +9,10 @@
     "start_browser": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ]",
     "start_double_connections": "npm run build_terminal && ALLOW_DOUBLE_CONNECTIONS=true DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
     "start": "npm run build_terminal && TESTING=true node dist/build_terminal.js  ",
+
     "test": "npm run build_terminal && mocha dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",
     "show_mocha_report": "xdg-open mochawesome-report/mochawesome.html || open mochawesome-report/mochawesome.html",
+
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
     "show_coverage": "xdg-open coverage/lcov-report/index.html || open coverage/lcov-report/index.html"
   },
