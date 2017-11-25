@@ -17,6 +17,21 @@ git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
 npm install
 ```
 
+3. Installing Argon2 node.js
+```
+sudo apt install linuxbrew-wrapper 
+```
+In case your receive some errors, try ```sudo apt-get -f install```
+ 
+```
+brew install gcc
+sudo apt-get install clang
+env CXX=g++-5 npm install
+env CXX=g++-5 npm install argon2
+```
+
+tutorial based on https://github.com/ranisalt/node-argon2/issues/29
+
 
 ## Testing in console
 ```

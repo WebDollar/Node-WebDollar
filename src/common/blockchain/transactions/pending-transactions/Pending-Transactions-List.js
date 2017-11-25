@@ -29,7 +29,7 @@ class PendingTransactionsList{
 
     }
 
-    removePendingTransaction(transaction){
+    removePendingTransaction (transaction){
 
         let index = this.findTransaction(transaction);
 

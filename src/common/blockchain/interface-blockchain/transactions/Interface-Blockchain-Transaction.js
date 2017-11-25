@@ -1,4 +1,4 @@
-import InterfaceValidateTransaction from './validate-transactions/interface-validate-transaction'
+import InterfaceValidateTransaction from './validate-transactions/Interface-Validate-Transaction'
 import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
 import PendingTransactionsList from 'common/blockchain/transactions/pending-transactions/Pending-Transactions-List'
 

@@ -1,4 +1,4 @@
-import NodeClient from 'node/websock/node_clients/socket/node-client'
+import NodeClient from 'node/sockets/node_clients/socket/node-client'
 import NodesList from 'node/lists/nodes-list'
 import NodesWaitlistObject from './nodes-waitlist-object';
 import SocketAddress from 'common/sockets/socket-address'

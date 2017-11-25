@@ -1,5 +1,5 @@
-import NodeClient from 'node/websock/node_clients/socket/node-client'
-import NodeDiscoveryService from 'node/websock/node_clients/service/discovery/node-clients-discovery-service'
+import NodeClient from 'node/sockets/node_clients/socket/node-client'
+import NodeDiscoveryService from 'node/sockets/node_clients/service/discovery/node-clients-discovery-service'
 import NodesList from 'node/lists/nodes-list'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 

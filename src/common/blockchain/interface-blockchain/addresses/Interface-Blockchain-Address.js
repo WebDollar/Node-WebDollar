@@ -1,4 +1,4 @@
-import InterfaceBlockchainAddressHelper from './interface-blockchain-address-helper'
+import InterfaceBlockchainAddressHelper from './Interface-Blockchain-Address-Helper'
 
 class InterfaceBlockchainAddress{
 

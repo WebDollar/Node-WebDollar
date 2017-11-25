@@ -6,9 +6,14 @@
   "scripts": {
     "build_terminal": "babel --presets es2017 src -d dist && browserify dist/build_terminal.js > dist_bundle/bundle_terminal.js",
     "build_browser": "browserify src/build_browser.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/Node-WebDollar-bundle.js -t [ babelify --presets [ es2017 ] ]",
-    "test_browser": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ]",
-    "test_double_connections": "npm run build_terminal && ALLOW_DOUBLE_CONNECTIONS=true DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
-    "test": "npm run build_terminal && PARAM=6000 TESTING=true node dist/build_terminal.js  "
+    "start_browser": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ]",
+    "start_double_connections": "npm run build_terminal && ALLOW_DOUBLE_CONNECTIONS=true DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
+    "start": "npm run build_terminal && TESTING=true node dist/build_terminal.js  ",
+
+
+    "test": "npm run build_terminal && mocha dist/tests/main.test.js",
+    "coverage": "npm run build_terminal  && instanbul cover _mocha dist/tests/main.test.js -x *.test.js",
+    "show_coverage": "open coverage/lcvov-report/index.html"
   },
   "repository": {
     "type": "git",
@@ -26,6 +31,7 @@
   },
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
+    "argon2": "^0.16.2",
     "axios": "^0.16.2",
     "babel-plugin-module-alias": "^1.6.0",
     "babelify": "^7.3.0",
@@ -60,6 +66,8 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-es2017": "^6.24.1",
-    "babelify": "^7.3.0"
+    "babelify": "^7.3.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^4.0.1"
   }
 }

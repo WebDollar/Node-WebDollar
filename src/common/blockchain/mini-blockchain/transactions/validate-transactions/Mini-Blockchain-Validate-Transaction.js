@@ -1,5 +1,5 @@
 
-import InterfaceValidateTransaction from 'common/blockchain/interface-blockchain/transactions/validate-transactions/interface-validate-transaction'
+import InterfaceValidateTransaction from 'common/blockchain/interface-blockchain/transactions/validate-transactions/Interface-Validate-Transaction'
 
 class MiniBlockchainTransaction extends  InterfaceValidateTransaction{
 
