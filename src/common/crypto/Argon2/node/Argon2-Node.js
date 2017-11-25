@@ -52,13 +52,29 @@ class Argon2Node {
 
         let myHash;
 
-        if (Buffer.isBuffer(initialHash))
-            myHash = this.hash(data);
-        else
-        if (typeof initialHash === 'string')
-            myHash = this.hashString(data);
+        if (Buffer.isBuffer(initialHash)) {
+            myHash = await this.hash(data);
 
-        return myHash === initialHash
+            console.log("verify", myHash, initialHash)
+
+            if (myHash.length !== initialHash.length)
+                return false;
+
+            for (let i=0; i<initialHash.length; i++)
+                if (initialHash[i] !== myHash[i])
+                    return false;
+
+            return true;
+
+        }
+        else
+        if (typeof initialHash === 'string') {
+            myHash = await this.hashString(data);
+
+            return myHash === initialHash;
+        }
+
+        return false;
 
     }
 

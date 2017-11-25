@@ -20,17 +20,17 @@ describe('Argon2', ()=>{
         console.log(hash1_copy);
         console.log(hash2);
 
-        // assert(typeof hash1 === 'string', "Hash1 is not String");
-        // assert(typeof hash1_copy === 'string', "Hash1_copy is not String");
-        // assert(typeof hash2 === 'string', "Hash2 is not String");
-        //
-        // assert(await WebDollarCrypt.verifyHashPOW(hash1, message1), "Hash1 is not good");
-        // assert(await WebDollarCrypt.verifyHashPOW(hash1_copy, message1_copy) , "Hash1_copy is not good");
-        // assert(await WebDollarCrypt.verifyHashPOW(hash2, message2) , "Hash2 is not good");
-        //
-        // assert(! await WebDollarCrypt.verifyHashPOW(hash1, message2), "Hash1 is not good because message2 "+message2);
-        // assert(! await WebDollarCrypt.verifyHashPOW(hash1_copy, message2), "Hash1_copy is not good because message2 "+message2);
-        // assert(! await WebDollarCrypt.verifyHashPOW(hash2, message1), "Hash2 is not good because message1 "+message1);
+        assert(typeof hash1 === 'object' && Buffer.isBuffer(hash1), "Hash1 is not Buffer");
+        assert(typeof hash1_copy === 'object' && Buffer.isBuffer(hash1_copy), "Hash1_copy is not Buffer");
+        assert(typeof hash2 === 'object' && Buffer.isBuffer(hash2), "Hash2 is not Buffer");
+
+        assert(await Argon2.verify(hash1, message1), "Hash1 is not good");
+        assert(await Argon2.verify(hash1_copy, message1_copy) , "Hash1_copy is not good");
+        assert(await Argon2.verify(hash2, message2) , "Hash2 is not good");
+
+        assert(! await Argon2.verify(hash1, message2), "Hash1 is not good because message2 "+message2);
+        assert(! await Argon2.verify(hash1_copy, message2), "Hash1_copy is not good because message2 "+message2);
+        assert(! await Argon2.verify(hash2, message1), "Hash2 is not good because message1 "+message1);
 
 
     })
