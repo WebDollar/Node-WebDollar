@@ -36,9 +36,9 @@ describe('WebDollar crypt', ()=>{
         let hash1_copy = await WebDollarCrypt.hashPOW(message1_copy)
         let hash2 = await WebDollarCrypt.hashPOW(message2)
 
-        console.log(hash1, typeof hash1);
-        console.log(hash1_copy, typeof hash1_copy);
-        console.log(hash2, typeof hash2);
+        console.log("POW buffer ",hash1, typeof hash1);
+        console.log("POW buffer ",hash1_copy, typeof hash1_copy);
+        console.log("POW buffer ",hash2, typeof hash2);
 
 
         assert(typeof hash1 === 'object' && Buffer.isBuffer(hash1), "Hash1 is not Buffer");
@@ -61,9 +61,9 @@ describe('WebDollar crypt', ()=>{
 
         const message2 = TestsHelper.makeid();
 
-        let hash1 = await WebDollarCrypt.hashPOWString(message1)
-        let hash1_copy = await WebDollarCrypt.hashPOWString(message1_copy)
-        let hash2 = await WebDollarCrypt.hashPOWString(message2)
+        let hash1 = await WebDollarCrypt.hashPOW_String(message1)
+        let hash1_copy = await WebDollarCrypt.hashPOW_String(message1_copy)
+        let hash2 = await WebDollarCrypt.hashPOW_String(message2)
 
         console.log(hash1);
         console.log(hash1_copy);

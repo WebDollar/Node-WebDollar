@@ -1,17 +1,19 @@
 const argon2 = require('argon2');
+//const argon2 = require('./node-argon2-master/');
 
-const HASH_ARGON2_OPTIONS = { timeCost: 4, memoryCost: 13, parallelism: 2, type: argon2.argon2d }
+                             //WebDollar_make_$
+const HASH_ARGON2_OPTIONS = { salt: Buffer.from(['W','e','b','D','o','l','l','a','r','_','m','a','k','e','_','$']), timeCost: 4, memoryCost: 13, parallelism: 2, type: argon2.argon2d, hashLength: 32 }
 
 class Argon2Node {
 
-    async hash(data, salt){
+    async hash(data){
 
         try{
 
-            let hash = await argon2.hash(data, salt, {
-                raw: false,
-                options : HASH_ARGON2_OPTIONS,
-            })
+            let options = HASH_ARGON2_OPTIONS;
+            options.raw = true;
+
+            let hash = await argon2.hash(data, options)
 
             return hash;
 
@@ -24,14 +26,16 @@ class Argon2Node {
 
     }
 
-    async hashString(data, salt){
+    async hashString(data){
 
         try{
 
-            let hash = await argon2.hash(data, salt, {
-                raw: true,
-                options : HASH_ARGON2_OPTIONS,
-            })
+            let options = HASH_ARGON2_OPTIONS;
+            options.raw = false;
+
+            let hash = await argon2.hash(data, options)
+
+            hash = hash.substr(-HASH_ARGON2_OPTIONS.hashLength)
 
             return hash;
 
@@ -44,7 +48,17 @@ class Argon2Node {
 
     }
 
-    async verify(){
+    async verify(initialHash, data){
+
+        let myHash;
+
+        if (Buffer.isBuffer(initialHash))
+            myHash = this.hash(data);
+        else
+        if (typeof initialHash === 'string')
+            myHash = this.hashString(data);
+
+        return myHash === initialHash
 
     }
 

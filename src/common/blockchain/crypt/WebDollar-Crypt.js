@@ -74,15 +74,9 @@ class WebDollarCrypt {
      * @param buffer
      * @returns {Promise.<Buffer>}
      */
-    static async hashPOW(data, salt, returnBuffer){
+    static hashPOW(data){
 
-        try{
-
-            return hash;
-
-        } catch (Exception){
-            throw 'Argon2 is not supported. ' + Exception.toString()
-        }
+       return Argon2.hash(data)
 
     }
 
@@ -91,23 +85,20 @@ class WebDollarCrypt {
      * @param data
      * @returns {Promise.<String>}
      */
-    static async hashPOWString(data, salt){
+    static hashPOW_String(data){
 
-        return WebDollarCrypt.hashPOW(data, salt, false)
+        return Argon2.hashString(data)
 
     }
 
-    static async verifyHashPOW(hash, data){
+    /**
+     * Verify the Hash using Argon2
+     * @param hash
+     * @param data
+     */
+    static verifyHashPOW(hash, data){
 
-        try{
-
-            return await Argon2.verify(hash, data);
-
-        } catch (Exception){
-
-            throw 'Argon2 is not supported. '+Exception.toString()
-
-        }
+        return Argon2.verify(hash, data);
 
     }
 
