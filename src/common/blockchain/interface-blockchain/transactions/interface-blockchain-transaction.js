@@ -1,5 +1,6 @@
 import InterfaceValidateTransaction from './validate-transactions/interface-validate-transaction'
 import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
+import PendingTransactionsList from 'common/blockchain/transactions/pending-transactions/Pending-Transactions-List'
 
 class InterfaceBlockchainTransaction{
 
@@ -24,8 +25,9 @@ class InterfaceBlockchainTransaction{
         this._setTransactionAddresses(from, to);
         this._setTransactionValue(amount, currency);
 
-        if (!pending)
-            this._propagateTransaction()
+        if (!pending) {
+            PendingTransactionsList.includePendingTransaction(this);
+        }
 
     }
 
