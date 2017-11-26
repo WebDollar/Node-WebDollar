@@ -22,4 +22,4 @@ class Argon2Browser{
 
 }
 
-export default Argon2Browser
+export default new Argon2Browser()

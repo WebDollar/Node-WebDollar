@@ -55,7 +55,7 @@ class Argon2Node {
         if (Buffer.isBuffer(initialHash)) {
             myHash = await this.hash(data);
 
-            console.log("verify", myHash, initialHash)
+            //console.log("verify", myHash, initialHash)
 
             if (myHash.length !== initialHash.length)
                 return false;

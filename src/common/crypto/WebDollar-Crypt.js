@@ -1,5 +1,7 @@
 let crypto = null;
 
+import Argon2 from 'common/crypto/Argon2/Argon2'
+
 if (typeof window !== 'undefined') {
 
     //tutorial based on
@@ -76,8 +78,10 @@ class WebDollarCrypt {
     static bytesToHex(bytes){
 
         let result = '';
-        for (let i=0; i<bytes.length; i++)
-            result += bytes[i].toString(16)
+        for (let i=0; i<bytes.length; i++) {
+            let hex = bytes[i].toString(16)
+            result += (hex.length === 1 ? '0' : '') + hex ;
+        }
 
         return result;
     }

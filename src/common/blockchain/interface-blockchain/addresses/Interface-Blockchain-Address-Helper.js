@@ -30,9 +30,7 @@ class InterfaceBlockchainAddressHelper{
         let privateKeyHex = WebDollarCrypt.bytesToHex(privateKeyBytes).toUpperCase()
 
         if (showDebug)
-            console.log("privateKeyHex", privateKeyHex) //1184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD
-
-
+            console.log("privateKeyHex", privateKeyHex, "length", privateKeyHex.length) //1184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD
 
         //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
         let privateKeyAndVersion = consts.PRIVATE_KEY_VERSION_PREFIX + privateKeyHex
@@ -142,21 +140,25 @@ class InterfaceBlockchainAddressHelper{
 
         //bitcoin original
         //let hash160 = CryptoJS.RIPEMD160(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
-        let hash160 = WebDollarCrypt.SHA256(WebDollarCrypt.SHA256(publicKey.toBytes()))
 
-        console.log(WebDollarCrypt.bytesToHex(hash160)) //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
+        let hash160 =  new WebDollarCryptData( WebDollarCrypt.SHA256(WebDollarCrypt.SHA256(publicKey.buffer)) )
+
+        if (showDebug)
+            console.log("hash160 hex", hash160.toString('hex') ) //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
 
         let version = 0x00 //if using testnet, would use 0x6F or 111.
-        let hashAndBytes = hash160
+        let hashAndBytes = hash160.toBytes()
         hashAndBytes.unshift(version)
 
-        let doubleSHA = WebDollarCrypt.SHA256(WebDollarCrypt.SHA256(hashAndBytes))
+        let doubleSHA = WebDollarCrypt.SHA256(WebDollarCrypt.SHA256(new Buffer(hashAndBytes, "hex") )).toString('hex')
         let addressChecksum = doubleSHA.substr(0,8)
-        console.log(addressChecksum) //26268187
+
+        if (showDebug)
+            console.log("addressChecksum", addressChecksum) //26268187
 
 
         let unencodedAddress = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_PREFIX_BASE64 : consts.PUBLIC_ADDRESS_PREFIX_BASE58 )
-                                 + hash160
+                                 + hash160.toString('hex')
                                  + addressChecksum + (consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58);
 
         // if (showDebug)
@@ -189,15 +191,20 @@ class InterfaceBlockchainAddressHelper{
 
     }
 
-    static _calculateChecksum(privateKeyAndVersionHex, showDebug){
+    static _calculateChecksum(privateKeyAndVersion, showDebug){
 
         //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
-        let firstSHA = WebDollarCrypt.SHA256(privateKeyAndVersionHex)
+
+        if (!Buffer.isBuffer(privateKeyAndVersion) && typeof privateKeyAndVersion === 'string')
+            privateKeyAndVersion = Buffer.from(privateKeyAndVersion, 'hex');
+
+        let firstSHA = WebDollarCrypt.SHA256(privateKeyAndVersion)
         let secondSHA = WebDollarCrypt.SHA256(firstSHA)
         let checksum = secondSHA.toString('hex').substr(0, consts.PRIVATE_KEY_CHECK_SUM_LENGTH).toUpperCase()
 
         if (showDebug)
             console.log("checksum", checksum) //"206EC97E"
+
         return checksum;
     }
 
@@ -239,11 +246,16 @@ class InterfaceBlockchainAddressHelper{
             //console.log(privateKey, privateKey.buffer.length, 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2);
             let privateKeyCheckSum = privateKey.substr(privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2)
 
-            let privateKeyJustVersionHex = versionDetectedBuffer.toHex() + privateKey.substr(0, privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2).toHex();
+            let privateKeyWithoutCheckSum = privateKey.substr(0, privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2);
+
+            //versionDetectedBuffer + privateKeyWithoutCheckSum;
+            let privateKeyJustVersionHex = Buffer.concat([versionDetectedBuffer.buffer, privateKeyWithoutCheckSum.buffer]);
+            
+
             let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(privateKeyJustVersionHex);
 
-            //console.log("checkSum", privateKeyCheckSum, "privateKeyJustVersionHex", privateKeyJustVersionHex);
-            //console.log("checkSum2", checksum);
+            // console.log("checkSum", privateKeyCheckSum, "privateKeyJustVersionHex", privateKeyJustVersionHex);
+            // console.log("checkSum2", checksum);
 
             if (checksum.toUpperCase() === privateKeyCheckSum.toHex().toUpperCase()) {
                 checkSumDetected = true;
@@ -256,10 +268,10 @@ class InterfaceBlockchainAddressHelper{
         if (privateKey.buffer.length !== 32){
 
             if (!checkSumDetected)
-                return {result:false, message: "PRIVATE KEY  CHECK SUM is not right"};
+                throw "PRIVATE KEY  CHECK SUM is not right"
 
             if (!versionDetected)
-                return {result:false, message: "PRIVATE KEY  VERSION PREFIX is not recognized"}
+                throw "PRIVATE KEY  VERSION PREFIX is not recognized"
         }
         return {result: true, privateKey: privateKey};
 

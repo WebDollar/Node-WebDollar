@@ -3,13 +3,24 @@ const bs58 = require('bs58')
 import WebDollarCrypt from './WebDollar-Crypt';
 import consts from 'consts/const_global'
 
+
+
 class WebDollarCryptData {
+
+    static isWebDollarCryptData(object){
+
+        if (typeof object !== 'object' || object === null || object.constructor.name !== 'WebDollarCryptData')
+            return false;
+
+        return true;
+
+    }
 
     constructor (data, type){
 
         this.buffer = null;
 
-        if (typeof data === 'object' && data.constructor.name === "Buffer")
+        if (data !== 'null' && Buffer.isBuffer(data))
             this.buffer = data;
         else
         if (type === "hex")
@@ -28,8 +39,8 @@ class WebDollarCryptData {
         return this.buffer.toString('hex');
     }
 
-    toString(){
-        return this.buffer.toString();
+    toString(param){
+        return this.buffer.toString(param);
     }
 
     toBytes(){

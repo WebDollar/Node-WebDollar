@@ -29,14 +29,14 @@ class InterfaceBlockchainAddress{
 
     toString(){
 
-        console.log(this.address)
+        return this.address.toString()
 
     }
 
 
     _toStringDebug(){
 
-        console.log("address", this.address, "public key", this.publicKey, "private key", this.privateKey )
+        return "address" + this.address.toString() + (this.publicKey !== null ? "public key" + this.publicKey.toString() : '') + (this.privateKey !== null ? "private key" + this.privateKey.toString() : '')
     }
 
 
