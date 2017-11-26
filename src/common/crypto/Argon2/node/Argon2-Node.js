@@ -1,8 +1,8 @@
 const argon2 = require('argon2');
+import consts from 'consts/const_global'
 //const argon2 = require('./node-argon2-master/');
 
-                             //WebDollar_make_$
-const HASH_ARGON2_OPTIONS = { salt: Buffer.from(['W','e','b','D','o','l','l','a','r','_','m','a','k','e','_','$']), timeCost: 4, memoryCost: 13, parallelism: 2, type: argon2.argon2d, hashLength: 32 }
+const HASH_ARGON2_OPTIONS = { salt: consts.HASH_ARGON2_PARAMS.saltBuffer, timeCost: consts.HASH_ARGON2_PARAMS.time, memoryCost: consts.HASH_ARGON2_PARAMS.memPower, parallelism: consts.HASH_ARGON2_PARAMS.parallelism, type: consts.HASH_ARGON2_PARAMS.type, hashLength: consts.HASH_ARGON2_PARAMS.hashLen }
 
 class Argon2Node {
 
