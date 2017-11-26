@@ -1,3 +1,7 @@
+/*
+    original source https://github.com/antelle/argon2-browser/blob/master/docs/js/main.js
+ */
+
 function loadScript(src, onload, onerror) {
     var el = document.createElement("script");
     el.src = src;
@@ -7,12 +11,13 @@ function loadScript(src, onload, onerror) {
 }
 
 var worker;
-function calcWorker(method) {
+
+function calcWorker(method, arg) {
     clearLog();
     if (worker) {
         if (worker.method === method) {
             log('Using loaded worker');
-            worker.postMessage({ calc: method, arg: getArg() });
+            worker.postMessage({ calc: method, arg: arg });
             return;
         } else {
             worker.terminate();
@@ -26,13 +31,13 @@ function calcWorker(method) {
         log(e.data.msg);
         if (!loaded) {
             loaded = true;
-            worker.postMessage({ calc: method, arg: getArg() });
+            worker.postMessage({ calc: method, arg: arg });
         }
     };
 }
 
 var pnaclTs;
-function calcPNaCl() {
+function calcPNaCl(arg) {
     window.Module = null;
     clearLog();
 
@@ -46,7 +51,7 @@ function calcPNaCl() {
 
     pnaclTs = performance.now();
     if (moduleEl) {
-        moduleEl.postMessage(getArg());
+        moduleEl.postMessage(arg);
         return;
     }
 
@@ -63,7 +68,7 @@ function calcPNaCl() {
         log('PNaCl module loaded in ' + Math.round(performance.now() - pnaclTs) + 'ms');
         log('Calculating hash....');
         pnaclTs = performance.now();
-        moduleEl.postMessage(getArg());
+        moduleEl.postMessage(arg);
     }, true);
     listener.addEventListener('message', function(e) {
         var encoded = e.data.encoded;
@@ -81,18 +86,6 @@ function calcPNaCl() {
 
     listener.appendChild(moduleEl);
     moduleEl.offsetTop; // required by PNaCl
-}
-
-function getArg() {
-    return {
-        pass: document.getElementById('txtPassword').value || 'password',
-        salt: document.getElementById('txtSalt').value || 'somesalt',
-        time: +(document.getElementById('txtIt').value || 1),
-        mem: +(document.getElementById('txtMem').value || 1024),
-        hashLen: +(document.getElementById('txtLen').value || 32),
-        parallelism: +(document.getElementById('txtPar').value || 1),
-        type: document.getElementById('inlineRadio1').checked ? 1 : 0,
-    };
 }
 
 var logTs = 0;

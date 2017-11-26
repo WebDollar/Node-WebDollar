@@ -1,3 +1,7 @@
+/*
+    original source https://github.com/antelle/argon2-browser/blob/master/docs/js/worker.js
+ */
+
 'use strict';
 
 var calcHashArg;
@@ -7,10 +11,10 @@ self.onmessage = function(e) {
     calcHashArg = e.data.arg;
     switch (e.data.calc) {
         case 'asm':
-            calcAsmJs();
+            calcAsmJs(calcHashArg);
             break;
         case 'wasm':
-            calcWasm();
+            calcWasm(calcHashArg);
             break;
     }
 };

@@ -1,3 +1,6 @@
+/*
+    original source https://github.com/antelle/argon2-browser/blob/master/docs/js/calc.js
+ */
 'use strict';
 
 var global = typeof window === 'undefined' ? self : window;
@@ -14,7 +17,7 @@ function calc(fn) {
     }
 }
 
-function calcAsmJs() {
+function calcAsmJs(arg) {
     clearLog();
 
     log('Testing Argon2 using asm.js...');
@@ -39,22 +42,22 @@ function calcAsmJs() {
         log('Error loading script');
     });
 
-    // calcBinaryen('asmjs');
+    // calcBinaryen(arg, 'asmjs');
 }
 
-function calcWasm() {
-    calcBinaryen('native-wasm');
+function calcWasm(arg) {
+    calcBinaryen(arg,'native-wasm');
 }
 
-function calcBinaryenSexpr() {
-    calcBinaryen('interpret-s-expr');
+function calcBinaryenSexpr(arg) {
+    calcBinaryen(arg,'interpret-s-expr');
 }
 
-function calcBinaryenBin() {
-    calcBinaryen('interpret-binary');
+function calcBinaryenBin(arg) {
+    calcBinaryen(arg, 'interpret-binary');
 }
 
-function calcBinaryen(method) {
+function calcBinaryen(arg, method) {
     clearLog();
 
     if (!global.WebAssembly) {
@@ -62,7 +65,7 @@ function calcBinaryen(method) {
         return;
     }
 
-    const mem = getArg().mem;
+    const mem = arg.mem;
 
     log('Testing Argon2 using Binaryen ' + method);
     if (global.Module && global.Module.wasmJSMethod === method && global.Module._argon2_hash) {
@@ -120,8 +123,7 @@ function calcBinaryen(method) {
     xhr.send(null);
 }
 
-function calcHash() {
-    var arg = getArg();
+function calcHash(arg) {
     if (!Module._argon2_hash) {
         return log('Error');
     }

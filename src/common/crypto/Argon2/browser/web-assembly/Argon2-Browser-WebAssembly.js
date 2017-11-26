@@ -16,6 +16,51 @@ class Argon2BrowserWebAssembly{
 
     }
 
+    _calculateHashWorker(method, data){
+
+        let params = HASH_ARGON2_OPTIONS;
+        params.pass = data
+
+        return calcWorker(method, params)
+    }
+
+    _calculateHash(method, data){
+        let params = HASH_ARGON2_OPTIONS;
+        params.pass = data
+
+        return calc(method, params)
+    }
+
+    calcAsmJs(data){
+        this._calculateHash(calcAsmJs, data)
+    }
+
+    calcWasm(data){
+        this._calculateHash(calcWasm, data)
+    }
+
+    calcBinaryenSexpr(data){
+        this._calculateHash(calcBinaryenSexpr, data)
+    }
+
+    calcBinaryenBin(data){
+        this._calculateHash(calcBinaryenBin, data)
+    }
+
+    calcPNaCl(data){
+        this._calculateHash(calcPNaCl, data)
+    }
+
+    calcWorkerAsm(data){
+        this._calculateHashWorker('asm', data)
+    }
+
+    calcWorkerWasm(data){
+        this._calculateHashWorker('wasm', data)
+    }
+
+
+
     async hash(data){
 
         try{
