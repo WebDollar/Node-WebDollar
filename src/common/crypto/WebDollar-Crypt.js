@@ -1,13 +1,24 @@
-const CryptoJS = (require ('cryptojs')).Crypto;
+let crypto = null;
 
-import Argon2 from 'common/crypto/Argon2/Argon2'
+if (typeof window !== 'undefined') {
+
+    //tutorial based on
+    crypto = require('crypto-browserify')
+}
+else {
+
+    //tutorial based on
+    crypto = require('crypto')
+}
+
+
 
 
 class WebDollarCrypt {
 
     static encodeBase64(bytes) {
 
-        let result = CryptoJS.util.bytesToBase64(bytes);
+        let result = new Buffer(bytes).toString('base64');
 
         let resultFinal = "";
 
@@ -62,10 +73,31 @@ class WebDollarCrypt {
         return dataBytes;
     }
 
+    static bytesToHex(bytes){
+
+        let result = '';
+        for (let i=0; i<bytes.length; i++)
+            result += bytes[i].toString(16)
+
+        return result;
+    }
+
 
     static isHex(h) {
         let a = parseInt(h,16);
         return (a.toString(16) ===h.toLowerCase())
+    }
+
+    static SHA256(bytes){
+        let sha256 = crypto.createHash('sha256'); //sha256
+        sha256.update(bytes)
+        return sha256.digest()
+    }
+
+    static RIPEMD160(bytes){
+        let ripemd160 = crypto.createHash('ripemd160'); // RIPEMD160
+        ripemd160.update(bytes)
+        return ripemd160.digest()
     }
 
     /**

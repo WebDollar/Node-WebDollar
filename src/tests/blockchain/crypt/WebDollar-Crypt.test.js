@@ -1,6 +1,6 @@
 var assert = require('assert')
 
-import WebDollarCrypt from 'common/blockchain/crypt/WebDollar-Crypt'
+import WebDollarCrypt from 'common/crypto/WebDollar-Crypt'
 import TestsHelper from 'tests/tests.helper'
 
 describe('WebDollar crypt', ()=>{

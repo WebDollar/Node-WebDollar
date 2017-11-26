@@ -4,6 +4,8 @@ import NodeWebPeersService from 'node/webrtc/service/node-web-peers-service'
 import NodesStats from 'node/lists/stats/nodes-stats'
 import NodesList from 'node/lists/nodes-list'
 
+import TestingMocha from 'tests/main.test'
+
 import NetworkMap from 'applications/maps/network-map';
 
 exports.NodeServer = NodeServer;
@@ -12,3 +14,4 @@ exports.NodeWebPeersService = NodeWebPeersService;
 exports.NodesStats = NodesStats;
 exports.NodesList = NodesList;
 exports.NetworkMap = NetworkMap;
+exports.TestingMocha = TestingMocha;

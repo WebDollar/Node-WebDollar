@@ -21,12 +21,16 @@ let exportObject = {
     NodesStats : Node.NodesStats,
     NodesList : Node.NodesList,
     NetworkMap : Node.NetworkMap,
+
+    TestingMocha: Node.TestingMocha,
 };
 
 module.exports =  exportObject;
+
 //browser minimized script
 if (typeof global.window !== 'undefined')
     global.window.NodeWebDollar = exportObject;
+
 if (typeof window !== 'undefined')
     window.NodeWebDollar = exportObject;
 

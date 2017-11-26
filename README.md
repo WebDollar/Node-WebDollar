@@ -31,7 +31,14 @@ env CXX=g++-5 npm install
 env CXX=g++-5 npm install argon2
 ```
 
-tutorial based on https://github.com/ranisalt/node-argon2/issues/29
+Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
+
+you need to make a small change at the `node_modules/argon2/index.js` after line 45 `crypto.randomBytes`
+```
+// Added by Alexandru Ionut Budisteanu
+if (typeof options.salt !== 'undefined')
+  salt = options.salt;
+```
 
 
 ## Testing in console

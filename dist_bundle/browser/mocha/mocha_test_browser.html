@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mocha Tests</title>
+    <link href="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.css" rel="stylesheet" />
+  </head>
+  <body>
+
+    <h1>Mocha Tests in Browser</h1>
+
+    <div id="mocha"></div>
+
+    <script src="https://cdn.rawgit.com/jquery/jquery/2.1.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/Automattic/expect.js/0.3.1/index.js"></script>
+    <script src="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/4.1.2/chai.js"></script>
+
+
+
+
+    <script>mocha.setup('bdd')</script>
+
+    <!-- load code you want to test here -->
+
+    <script src="./../bundle_browser.js"></script>
+
+
+
+    <!-- load your test files here -->
+
+    <script>
+        window.onload = function() {
+             mocha.run()
+        };
+    </script>
+
+
+  </body>
+</html>

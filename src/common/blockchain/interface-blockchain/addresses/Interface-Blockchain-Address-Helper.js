@@ -1,7 +1,6 @@
-const CryptoJS = (require ('cryptojs')).Crypto;
-import WebDollarCryptData from 'common/blockchain/crypt/Webdollar-Crypt-Data'
+import WebDollarCryptData from 'common/crypto/Webdollar-Crypt-Data'
 const secp256k1 = require('secp256k1');
-import WebDollarCrypt from 'common/blockchain/crypt/WebDollar-Crypt'
+import WebDollarCrypt from 'common/crypto/WebDollar-Crypt'
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
 
@@ -28,7 +27,7 @@ class InterfaceBlockchainAddressHelper{
         //var privateKeyBytes = Crypto.util.hexToBytes("1184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD")
 
         //hex string of our private key
-        let privateKeyHex = CryptoJS.util.bytesToHex(privateKeyBytes).toUpperCase()
+        let privateKeyHex = WebDollarCrypt.bytesToHex(privateKeyBytes).toUpperCase()
 
         if (showDebug)
             console.log("privateKeyHex", privateKeyHex) //1184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD
@@ -143,15 +142,15 @@ class InterfaceBlockchainAddressHelper{
 
         //bitcoin original
         //let hash160 = CryptoJS.RIPEMD160(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
-        let hash160 = CryptoJS.SHA256(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
+        let hash160 = WebDollarCrypt.SHA256(WebDollarCrypt.SHA256(publicKey.toBytes()))
 
-        console.log(hash160) //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
+        console.log(WebDollarCrypt.bytesToHex(hash160)) //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
 
         let version = 0x00 //if using testnet, would use 0x6F or 111.
-        let hashAndBytes = CryptoJS.util.hexToBytes(hash160)
+        let hashAndBytes = hash160
         hashAndBytes.unshift(version)
 
-        let doubleSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(CryptoJS.SHA256(hashAndBytes)))
+        let doubleSHA = WebDollarCrypt.SHA256(WebDollarCrypt.SHA256(hashAndBytes))
         let addressChecksum = doubleSHA.substr(0,8)
         console.log(addressChecksum) //26268187
 
@@ -193,9 +192,9 @@ class InterfaceBlockchainAddressHelper{
     static _calculateChecksum(privateKeyAndVersionHex, showDebug){
 
         //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
-        let firstSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(privateKeyAndVersionHex))
-        let secondSHA = CryptoJS.SHA256(CryptoJS.util.hexToBytes(firstSHA))
-        let checksum = secondSHA.substr(0, consts.PRIVATE_KEY_CHECK_SUM_LENGTH).toUpperCase()
+        let firstSHA = WebDollarCrypt.SHA256(privateKeyAndVersionHex)
+        let secondSHA = WebDollarCrypt.SHA256(firstSHA)
+        let checksum = secondSHA.toString('hex').substr(0, consts.PRIVATE_KEY_CHECK_SUM_LENGTH).toUpperCase()
 
         if (showDebug)
             console.log("checksum", checksum) //"206EC97E"

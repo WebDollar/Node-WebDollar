@@ -1,4 +1,3 @@
-const CryptoJS = (require ('cryptojs')).Crypto;
 const bs58 = require('bs58')
 
 import WebDollarCrypt from './WebDollar-Crypt';

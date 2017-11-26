@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build_terminal": "babel --presets es2017 src -d dist && browserify dist/build_terminal.js > dist_bundle/bundle_terminal.js",
-    "build_browser": "browserify src/build_browser.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/Node-WebDollar-bundle.js -t [ babelify --presets [ es2017 ] ]",
-    "start_browser": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ]",
+    "build_brower_test": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ]",
+    "build_browser": "browserify src/build_browser.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/Node-WebDollar-bundle.js -t [ babelify --presets [ es2017 ] ] && npm run build_brower_test",
     "start_double_connections": "npm run build_terminal && ALLOW_DOUBLE_CONNECTIONS=true DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
     "start": "npm run build_terminal && TESTING=true node dist/build_terminal.js  ",
     "test": "npm run build_terminal && mocha dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",
