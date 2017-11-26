@@ -35,22 +35,5 @@ if (typeof window !== 'undefined')
     window.NodeWebDollar = exportObject;
 
 
-// var mymodule = (function() { console.log("This is a message from the demo package"); })();
-//
-// if (module && module.exports) {
-//     module.exports = mymodule;
-// } else {
-//     window.mymodule = mymodule;
-// }
-
 console.log("Node WebDollar End");
 
-
-if ( !process.env.TESTING ) {
-    const testNodeWebPeer = require ('./tests/node/Node-Web-Peer.test');
-    //testNodeWebPeer.testWebPeer();
-    //testNodeWebPeer.testNodeWebPeer();
-
-    const testInterfaceBlockchainAddress = require ('./tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test').default;
-    testInterfaceBlockchainAddress.testAddressGenerator();
-}

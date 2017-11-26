@@ -13,10 +13,7 @@ class Argon2Node {
             let options = HASH_ARGON2_OPTIONS;
             options.raw = true;
 
-            let hash = await argon2.hash(data, options)
-
-            return hash;
-
+            return await argon2.hash(data, options)
 
         } catch (Exception){
             console.log("Argon2 exception ", Exception.message, Exception.code)
@@ -45,36 +42,6 @@ class Argon2Node {
 
             throw Exception
         }
-
-    }
-
-    async verify(initialHash, data){
-
-        let myHash;
-
-        if (Buffer.isBuffer(initialHash)) {
-            myHash = await this.hash(data);
-
-            //console.log("verify", myHash, initialHash)
-
-            if (myHash.length !== initialHash.length)
-                return false;
-
-            for (let i=0; i<initialHash.length; i++)
-                if (initialHash[i] !== myHash[i])
-                    return false;
-
-            return true;
-
-        }
-        else
-        if (typeof initialHash === 'string') {
-            myHash = await this.hashString(data);
-
-            return myHash === initialHash;
-        }
-
-        return false;
 
     }
 
