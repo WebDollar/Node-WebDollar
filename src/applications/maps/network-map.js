@@ -43,7 +43,7 @@ class NetworkMap {
 
         let map = new google.maps.Map(document.getElementById(id), {
             zoom: 2,
-            center:  {lat: 0, lng: 0},
+            center:  {lat: 37.390487, lng: 29.308516},
             mapTypeId: 'roadmap',
             styles: style,
         });
@@ -72,6 +72,7 @@ class NetworkMap {
         this._createFakeMarker(map, {country: 'Mexico', lat: 19.409722, lng: -98.991313}, 2200);
         this._createFakeMarker(map, {country: 'USA', lat: 31.124374, lng: -97.531948}, 2200);
         this._createFakeMarker(map, {country: 'South Korea', lat: 37.542154, lng: 126.988170}, 3400);
+        this._createFakeMarker(map, {country: 'Buenos Aires', lat: -34.534501, lng:-58.438049}, 3400);
 
     }
 
