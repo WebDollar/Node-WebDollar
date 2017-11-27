@@ -53,6 +53,39 @@ class NetworkMap {
         return map;
     }
 
+    createTestConnections(map){
+
+        this._createFakeMarker(map, {country: 'USA', lat: 37.980388, lng:-92.539714 }, 2000);
+        this._createFakeMarker(map, {country: 'USA', lat: 36.828015, lng:-119.458796 }, 3100);
+        this._createFakeMarker(map, {country: 'Brazil', lat: -10.252334, lng:-55.143146}, 4200);
+        this._createFakeMarker(map, {country: 'Germany', lat: 51.809770, lng:8.688927}, 2000);
+        this._createFakeMarker(map, {country: 'France', lat: 44.745281, lng:2.080051}, 1500);
+        this._createFakeMarker(map, {country: 'Russia', lat: 56.875767, lng:41.410924}, 3500);
+        this._createFakeMarker(map, {country: 'India', lat: 17.001243, lng:78.807492}, 2500);
+        this._createFakeMarker(map, {country: 'UK', lat: 53.376271, lng:-0.660215}, 1500);
+        this._createFakeMarker(map, {country: 'China', lat: 29.832851, lng: 120.072671}, 5000);
+        this._createFakeMarker(map, {country: 'South Africa', lat: -29.256599, lng: 24.324561}, 5000);
+        this._createFakeMarker(map, {country: 'Portugal', lat: 38.989770, lng: -7.430283}, 5100);
+        this._createFakeMarker(map, {country: 'Australia', lat: -34.041968, lng: 150.994123}, 5200);
+        this._createFakeMarker(map, {country: 'Saint Petersburg', lat: 59.884495, lng: 30.434003}, 5100);
+        this._createFakeMarker(map, {country: 'Saudi', lat: 24.759399, lng: 46.640036}, 4800);
+        this._createFakeMarker(map, {country: 'Mexico', lat: 19.409722, lng: -98.991313}, 2200);
+        this._createFakeMarker(map, {country: 'USA', lat: 31.124374, lng: -97.531948}, 2200);
+        this._createFakeMarker(map, {country: 'South Korea', lat: 37.542154, lng: 126.988170}, 3400);
+
+    }
+
+    _createFakeMarker(map, coordinates, timeOut){
+
+        setTimeout( ()=>{
+
+            console.log('_createFakeMarker', coordinates);
+            this._addMarker(map, coordinates, "fake");
+
+        }, timeOut)
+
+    }
+
     async initialize(map){
 
         if (typeof google === 'undefined' || typeof google.maps === 'undefined'){
@@ -94,15 +127,20 @@ class NetworkMap {
 
     _getInfoWindowContent(geoLocation, socket){
 
+        let address = '';
+        if (socket === 'myself') address = 'YOU';
+        else  if (socket === 'fake') address = geoLocation.country;
+        else address = socket.node.sckAddress.toString();
+
         return (
             '<div id="content">'+
                 '<div id="siteNotice">'+
                 '</div>'+
-                    '<h1 class="firstHeading" style="padding-bottom: 0">'+(socket === 'myself' ? 'YOU' : socket.node.sckAddress.toString() )+'</h1>'+
-                    '<h2 class="secondHeading">'+(socket === 'myself' ? '' : socket.node.type + ' : '+socket.node.index)+'</h2>'+
+                    '<h1 class="firstHeading" style="padding-bottom: 0">'+ address +'</h1>'+
+                    '<h2 class="secondHeading">'+( (socket === 'myself' || socket === "fake" ) ? '' : socket.node.type + ' : '+socket.node.index)+'</h2>'+
                     '<div id="bodyContent">'+
-                        '<p>Connected to <b>'+geoLocation.city||''+', '+geoLocation.country||''+'</b> <br/>'+
-                            geoLocation.isp + '<br/> <br/>'+
+                        '<p>Connected to <b>'+ (geoLocation.city||'')+', '+geoLocation.country||''+'</b> <br/>'+
+                            geoLocation.isp||'' + '<br/> <br/>'+
                             (geoLocation.lat||'undefined') + '    '+ (geoLocation.lng||'undefined')+ '<br/>'+
                         '</p>'+
                 '</div>'+
@@ -126,13 +164,15 @@ class NetworkMap {
             return false;
         }
 
-        console.log("marker ", google.maps.Marker, map)
+        //console.log("marker ", google.maps.Marker, map)
 
         let position = {lat: geoLocation.lat||0, lng: geoLocation.lng||0};
 
         let feature = '';
 
         if (socket === 'myself') feature = 'myself';
+        else
+        if (socket === 'fake') feature = 'webPeer';
         else
         if (socket !== null)
             switch (socket.node.type){
@@ -171,6 +211,7 @@ class NetworkMap {
         this._addMarker(map, geoLocation, 'myself');
     }
 
+
     initializePolylines(map){
 
 
@@ -204,7 +245,7 @@ class NetworkMap {
 
         let  projection = map.getProjection();
 
-        if (!projection){
+        if (!projection) {
             console.log("NetworkMap - PROJECT is not defined");
             return false;
         }
@@ -223,6 +264,8 @@ class NetworkMap {
                 let pos2 = marker.getPosition();
                 let lineColor = 'black';
 
+                if (marker.socket === "fake") lineColor = "navy";
+                else
                 switch (marker.socket.node.type){
                     case 'client': lineColor = 'red'; break;
                     case 'server' : lineColor = 'red'; break;
