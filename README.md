@@ -23,10 +23,14 @@ sudo apt install linuxbrew-wrapper
 ```
 In case your receive some errors, try ```sudo apt-get -f install```
  
+To check the version `gcc --version`
+In case the GCC is not installed, install gcc `brew install gcc`
 ```
-brew install gcc
 sudo apt-get install clang
 npm install -g node-gyp
+```
+`gcc --version` will help you to find the Version. It worked on gcc 5 and gcc 6
+``` 
 env CXX=g++-5 npm install
 env CXX=g++-5 npm install argon2
 ```

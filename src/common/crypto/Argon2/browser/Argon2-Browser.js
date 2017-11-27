@@ -1,6 +1,8 @@
 const argon2 = require('argon2-browser').argon2;
 import consts from 'consts/const_global'
 
+import Argon2BrowserWebAssembly from './web-assembly/Argon2-Browser-WebAssembly'
+
 /*
     TUTORIAL BASED ON https://github.com/antelle/argon2-browser/blob/master/docs/test.html
  */
@@ -18,6 +20,24 @@ class Argon2Browser{
     }
 
     async hash(data){
+        let result;
+
+        result = Argon2BrowserWebAssembly.hash(data);
+        if (result !== null) return result;
+
+        return this.hashJavascript(data);
+    }
+
+    async hashString(data){
+        let result;
+
+        result = Argon2BrowserWebAssembly.hashString(data)
+        if (result !== null) return result;
+
+        return this.hashJavascriptString()
+    }
+
+    async hashJavascript(data){
 
         try{
 
@@ -37,7 +57,7 @@ class Argon2Browser{
 
     }
 
-    async hashString(data){
+    async hashJavascriptString(data){
 
         try{
 

@@ -2,6 +2,10 @@
     original source https://github.com/antelle/argon2-browser/blob/master/docs/js/main.js
  */
 
+/*
+    Changed to Accept Arguments
+ */
+
 function loadScript(src, onload, onerror) {
     var el = document.createElement("script");
     el.src = src;
