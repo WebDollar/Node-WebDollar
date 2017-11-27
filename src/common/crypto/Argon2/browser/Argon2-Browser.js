@@ -5,6 +5,11 @@ import Argon2BrowserWebAssembly from './web-assembly/Argon2-Browser-WebAssembly'
 
 /*
     TUTORIAL BASED ON https://github.com/antelle/argon2-browser/blob/master/docs/test.html
+
+    last update:
+
+    14 Nov 2017
+    https://github.com/antelle/argon2-browser/commit/2d37df355b76e7f1c261571393ad5350e8753a0b
  */
 
 

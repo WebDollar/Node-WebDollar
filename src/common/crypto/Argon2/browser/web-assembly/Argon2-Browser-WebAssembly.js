@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
 
-require('./antelle/calc.js')
-require('./antelle/main.js')
+let Argon2WebAssemblyCalc = require('./antelle/calc.js')
+let Argon2WebAssemblyMain = require('./antelle/main.js')
 //require('antelle/worker.js')
 
 /*
@@ -20,67 +20,43 @@ class Argon2BrowserWebAssembly{
         Simple Hash
      */
 
-    _calculateHash(method, data){
-        let params = HASH_ARGON2_OPTIONS;
-        params.pass = data
+    _calculateHash(method, params){
 
         try {
-            return calc(method, params)
+            return Argon2WebAssemblyCalc.calc(method, params)
         } catch (Exception){
             console.log('_calculateHashWorker raised exception', Exception.toString())
             return null;
         }
     }
 
-    calcAsmJs(data){
-        this._calculateHash(calcAsmJs, data)
-    }
-
-    calcWasm(data){
-        this._calculateHash(calcWasm, data)
-    }
-
-    calcBinaryenSexpr(data){
-        this._calculateHash(calcBinaryenSexpr, data)
-    }
-
-    calcBinaryenBin(data){
-        this._calculateHash(calcBinaryenBin, data)
-    }
-
-    calcPNaCl(data){
-        this._calculateHash(calcPNaCl, data)
-    }
-
-    calcBest(){
+    calcBest(params){
         let result ;
 
-        result = calcAsmJs(data);
+        result = this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs,params);
         if (result !== null) return result;
 
-        result = calcWasm(data);
+        result = this._calculateHash(Argon2WebAssemblyCalc.calcWasm,params);
         if (result !== null) return result;
 
-        result = calcBinaryenSexpr(data);
+        result = this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenSexpr, params);
         if (result !== null) return result;
 
-        result = calcBinaryenBin(data);
+        result = this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenBin, params);
         if (result !== null) return result;
 
-        result = calcPNaCl(data);
+        result = this._calculateHash(Argon2WebAssemblyMain.calcPNaCl, params);
         return result;
     }
 
     /*
         Workers
      */
-    _calculateHashWorker(method, data){
+    _calculateHashWorker(method, params){
 
-        let params = HASH_ARGON2_OPTIONS;
-        params.pass = data
 
         try {
-            return calcWorker(method, params)
+            return Argon2WebAssemblyCalc.calcWorker(method, params)
         } catch (Exception){
             console.log('_calculateHashWorker raised exception', Exception.toString())
             return null;
@@ -114,6 +90,8 @@ class Argon2BrowserWebAssembly{
 
             let result = await this.calcBest(params);
 
+            if (result !== null) throw("Argon2 returned empty");
+
             console.log("ARgon2Browser", result.hash);
             return new Buffer(result.hash);
 
@@ -132,7 +110,9 @@ class Argon2BrowserWebAssembly{
             let params = HASH_ARGON2_OPTIONS;
             params.pass = data
 
-            let result = await this.calcBest.hash( params );
+            let result = await this.calcBest( params );
+
+            if (result !== null) throw("Argon2 returned empty");
 
             let hash = result.encoded.substr(-HASH_ARGON2_OPTIONS.hashLength)
 

@@ -117,3 +117,11 @@ function clearLog() {
     logTs = performance.now();
     document.getElementById('txtRes').value = '';
 }
+
+
+exports.clearLog = clearLog;
+exports.leftPad = leftPad;
+exports.log = log;
+exports.calcPNaCl = calcPNaCl;
+exports.loadScript = loadScript;
+exports.calcWorker = calcWorker;

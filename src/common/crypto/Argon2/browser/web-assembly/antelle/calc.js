@@ -6,13 +6,14 @@
 var global = typeof window === 'undefined' ? self : window;
 var root = typeof window === 'undefined' ? '../' : '';
 
-function calc(fn) {
+function calc(fn, arg) {
     return function(e) {
         e.preventDefault();
         try {
-            fn();
+            return fn(fn, arg);
         } catch (e) {
             log('Error: ' + e);
+            return null;
         }
     }
 }
@@ -20,29 +21,35 @@ function calc(fn) {
 function calcAsmJs(arg) {
     clearLog();
 
-    log('Testing Argon2 using asm.js...');
-    if (global.Module && !global.Module.wasmJSMethod) {
-        log('Calculating hash....');
-        setTimeout(calcHash, 10);
-        return;
-    }
+    return new Promise( (resolve) => {
 
-    global.Module = {
-        print: log,
-        printErr: log,
-        setStatus: log
-    };
-    var ts = now();
-    log('Loading script...');
-    loadScript(root + 'dist/argon2-asm.min.js', function() {
-        log('Script loaded in ' + Math.round(now() - ts) + 'ms');
-        log('Calculating hash....');
-        setTimeout(calcHash, 10);
-    }, function() {
-        log('Error loading script');
+        log('Testing Argon2 using asm.js...');
+        if (global.Module && !global.Module.wasmJSMethod) {
+            log('Calculating hash....');
+            setTimeout( ()=>{ resolve ( calcHash(arg) ) }, 10);
+            return;
+        }
+
+        global.Module = {
+            print: log,
+            printErr: log,
+            setStatus: log
+        };
+        var ts = now();
+        log('Loading script...');
+        loadScript(root + 'dist/argon2-asm.min.js', function () {
+            log('Script loaded in ' + Math.round(now() - ts) + 'ms');
+            log('Calculating hash....');
+
+            setTimeout( ()=>{ resolve(calcHash(arg)) }, 10);
+            
+        }, function () {
+            log('Error loading script');
+        });
+
+        // calcBinaryen(arg, 'asmjs');
+
     });
-
-    // calcBinaryen(arg, 'asmjs');
 }
 
 function calcWasm(arg) {
@@ -70,7 +77,7 @@ function calcBinaryen(arg, method) {
     log('Testing Argon2 using Binaryen ' + method);
     if (global.Module && global.Module.wasmJSMethod === method && global.Module._argon2_hash) {
         log('Calculating hash....');
-        setTimeout(calcHash, 10);
+        setTimeout(calcHash(arg), 10);
         return;
     }
 
@@ -107,7 +114,7 @@ function calcBinaryen(arg, method) {
     xhr.responseType = 'arraybuffer';
     xhr.onload = function() {
         global.Module.wasmBinary = xhr.response;
-        global.Module.postRun = calcHash;
+        global.Module.postRun = calcHash(arg);
         var ts = now();
         log('Wasm loaded, loading script...');
         loadScript(root + 'dist/argon2.min.js', function() {
@@ -127,6 +134,9 @@ function calcHash(arg) {
     if (!Module._argon2_hash) {
         return log('Error');
     }
+
+    let result = null;
+
     log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
     var dt = now();
     var t_cost = arg && arg.time || 10;
@@ -156,9 +166,19 @@ function calcHash(arg) {
         for (var i = hash; i < hash + hashlen; i++) {
             hashArr.push(Module.HEAP8[i]);
         }
-        log('Encoded: ' + Module.Pointer_stringify(encoded));
-        log('Hash: ' + hashArr.map(function(b) { return ('0' + (0xFF & b).toString(16)).slice(-2); }).join(''));
-        log('Elapsed: ' + Math.round(elapsed) + 'ms');
+
+        result = {
+            hash: hashArr.map(function(b) { return ('0' + (0xFF & b).toString(16)).slice(-2); }).join('')
+            encoded:Module.Pointer_stringify(encoded),
+            elapsed: elapsed
+        };
+
+        log('Encoded: ' + result.encoded);
+        log('Hash: ' + result.hash);
+        log('Elapsed: ' + result.elapsed);
+
+
+
     } else {
         try {
             if (!err) {
@@ -174,8 +194,19 @@ function calcHash(arg) {
         Module._free(hash);
         Module._free(encoded);
     } catch (e) { }
+
+    return result;
 }
 
 function now() {
     return global.performance ? performance.now() : Date.now();
 }
+
+exports.now = now;
+exports.calcHash = calcHash;
+exports.calcBinaryen = calcBinaryen;
+exports.calcBinaryenBin = calcBinaryenBin;
+exports.calcBinaryenSexpr = calcBinaryenSexpr;
+exports.calcWasm = calcWasm;
+exports.calcAsmJs = calcAsmJs;
+exports.calc = calc;
