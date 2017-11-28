@@ -4,6 +4,7 @@
 
 /*
     Changed to Accept Arguments
+    Changed to Class Instance
  */
 
 class Argon2BrowserAntelleMain{

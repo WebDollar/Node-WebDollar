@@ -1,18 +1,21 @@
 /*
     original source https://github.com/antelle/argon2-browser/blob/master/docs/js/calc.js
+
+    Change to Class
  */
 'use strict';
 
 import Argon2BrowserAntelleMain from './main'
 
 var global = typeof window === 'undefined' ? self : window;
-var root = typeof window === 'undefined' ? '../' : '';
+//var root = typeof window === 'undefined' ? '../' : '';
+var root = "http://antelle.net/argon2-browser/"
 
 class Argon2BrowserWebAssemblyCalc{
 
     calc(fn, arg) {
         try {
-            return fn(fn, arg);
+            return fn.call(this, arg);
         } catch (e) {
             log('Error: ' + e);
             return null;
@@ -25,6 +28,7 @@ class Argon2BrowserWebAssemblyCalc{
         return new Promise( (resolve) => {
 
             Argon2BrowserAntelleMain.log('Testing Argon2 using asm.js...');
+
             if (global.Module && !global.Module.wasmJSMethod) {
                 Argon2BrowserAntelleMain.log('Calculating hash....');
                 setTimeout( ()=>{ resolve ( this.calcHash(arg) ) }, 10);
@@ -38,7 +42,8 @@ class Argon2BrowserWebAssemblyCalc{
             };
             var ts = this.now();
             Argon2BrowserAntelleMain.log('Loading script...');
-            loadScript(root + 'dist/argon2-asm.min.js', () => {
+
+            Argon2BrowserAntelleMain.loadScript(root + 'dist/argon2-asm.min.js', () => {
                 Argon2BrowserAntelleMain.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                 Argon2BrowserAntelleMain.log('Calculating hash....');
 
@@ -48,21 +53,21 @@ class Argon2BrowserWebAssemblyCalc{
                 Argon2BrowserAntelleMain.log('Error loading script');
             });
 
-            // calcBinaryen(arg, 'asmjs');
+            // this.calcBinaryen(arg, 'asmjs');
 
         });
     }
 
     calcWasm(arg) {
-        calcBinaryen(arg,'native-wasm');
+        this.calcBinaryen(arg,'native-wasm');
     }
 
     calcBinaryenSexpr(arg) {
-        calcBinaryen(arg,'interpret-s-expr');
+        this.calcBinaryen(arg,'interpret-s-expr');
     }
 
     calcBinaryenBin(arg) {
-        calcBinaryen(arg, 'interpret-binary');
+        this.calcBinaryen(arg, 'interpret-binary');
     }
 
     calcBinaryen(arg, method) {
@@ -119,10 +124,10 @@ class Argon2BrowserWebAssemblyCalc{
             xhr.responseType = 'arraybuffer';
             xhr.onload = function() {
                 global.Module.wasmBinary = xhr.response;
-                global.Module.postRun = calcHash(arg);
+                global.Module.postRun = this.calcHash(arg);
                 var ts = this.now();
                 Argon2BrowserAntelleMain.log('Wasm loaded, loading script...');
-                loadScript(root + 'dist/argon2.min.js', function() {
+                Argon2BrowserAntelleMain.loadScript(root + 'dist/argon2.min.js', function() {
                     Argon2BrowserAntelleMain.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                     Argon2BrowserAntelleMain.log('Calculating hash....');
                 }, function() {
@@ -139,14 +144,17 @@ class Argon2BrowserWebAssemblyCalc{
     }
 
     calcHash(arg) {
+        console.log('calcHash 1')
         if (!Module._argon2_hash) {
             return Argon2BrowserAntelleMain.log('Error');
         }
 
         let result = null;
-
+        console.log('calcHash 2')
         Argon2BrowserAntelleMain.log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
+        console.log('calcHash 3')
         var dt = this.now();
+        console.log('calcHash 4')
         var t_cost = arg && arg.time || 10;
         var m_cost = arg && arg.mem || 1024;
         var parallelism = arg && arg.parallelism || 1;
@@ -207,7 +215,7 @@ class Argon2BrowserWebAssemblyCalc{
     }
 
     now() {
-        return global.performance ? performance.now() : Date.now();
+        return typeof global.performance !== 'undefined' ? performance.now() : Date.now();
     }
 
 
