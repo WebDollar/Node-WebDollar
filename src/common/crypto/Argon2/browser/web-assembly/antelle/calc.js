@@ -2,8 +2,9 @@
     original source https://github.com/antelle/argon2-browser/blob/master/docs/js/calc.js
 
     Change to Class
+    Adopted to Return Promises
+    Removed setTimeOut... because we need it to be synchronized through promises
  */
-'use strict';
 
 import Argon2BrowserAntelleMain from './main'
 
@@ -13,7 +14,7 @@ var root = "http://antelle.net/argon2-browser/"
 
 class Argon2BrowserWebAssemblyCalc{
 
-    calc(fn, arg) {
+    calcHash(fn, arg) {
         try {
             return fn.call(this, arg);
         } catch (e) {
@@ -77,7 +78,10 @@ class Argon2BrowserWebAssemblyCalc{
         return new Promise ((resolve)=>{
 
             if (!global.WebAssembly) {
+
                 Argon2BrowserAntelleMain.log('Your browser doesn\'t support WebAssembly, please try it in Chrome Canary or Firefox Nightly with WASM flag enabled');
+
+                resolve(null); // return
                 return;
             }
 

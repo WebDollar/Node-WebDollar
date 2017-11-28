@@ -96,3 +96,9 @@ sudo iptables -A INPUT -p tcp --dport 12320 -j ACCEPT
 
 If you are under a **router/firewall**, you need to port forward the port used by the Nodes **12320**
 
+
+# To do:
+
+Mining Argon2 Web Worker using **WebWorkify**
+
+https://github.com/browserify/webworkify

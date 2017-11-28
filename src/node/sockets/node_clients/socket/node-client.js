@@ -23,6 +23,10 @@ class NodeClient {
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
+        if (sckAddress.isLocalHost() ){
+            //localhost, quite useless to connect to the localhost
+            return false;
+        }
 
         address = sckAddress.getAddress(false);
         port = sckAddress.port;
@@ -32,13 +36,13 @@ class NodeClient {
             try
             {
                 if (address.length < 3){
-                    console.log("rejecting address",address);
+                    console.log("rejecting address... invalid ",address);
                     resolve(false);
                     return false;
                 }
 
                 // in case the port is not included
-                if (address.indexOf(":") === -1)  address += ":"+port;
+                if (address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
                 if (address.indexOf("http://") === -1 )  address = "http://"+address;
 
                 console.log("connecting... to address", address);
@@ -61,6 +65,8 @@ class NodeClient {
 
                 socket.once("connect", (response) =>{
 
+                    //Connection Established
+
                     SocketExtend.extendSocket(socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port );
 
                     console.log(colors.blue("Client connected to " + socket.node.sckAddress.getAddress(true) ));
@@ -74,7 +80,7 @@ class NodeClient {
 
                 });
 
-                socket.on("connect_error", (response) =>{
+                socket.once("connect_error", (response) =>{
 
                     console.log("Client error connecting", address);
                     //NodesList.disconnectSocket(this.socket);
@@ -82,7 +88,7 @@ class NodeClient {
                     resolve(false);
                 });
 
-                socket.on("connect_failed", (response) =>{
+                socket.once("connect_failed", (response) =>{
                     console.log("Client error connecting (connect_failed) ", address);
                     NodesList.disconnectSocket(this.socket);
 
@@ -90,6 +96,8 @@ class NodeClient {
                 });
 
                 socket.once("disconnect", () => {
+
+                    //disconnect over the time, so it was connected before
 
                     console.log(colors.green("Client disconnected ")); console.log( this.socket.node.sckAddress.getAddress() );
                     NodesList.disconnectSocket(this.socket);

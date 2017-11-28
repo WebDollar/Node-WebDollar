@@ -100,7 +100,7 @@ class SocketAddress {
                 } else {
                     // ipString is invalid
                     console.log("getAddress NOT VALID IP !!!!!", this.address);
-                    return "127.0.0.1";
+                    throw("NO VALID IP");
                 }
 
 
@@ -111,6 +111,7 @@ class SocketAddress {
 
         } catch(Exception){
             console.log("getAddress exception", Exception.toString(), this.address);
+            throw("EXCEPTION getAddress")
         }
     }
 
@@ -118,6 +119,32 @@ class SocketAddress {
         if (this.geoLocation !== null) return (this.geoLocation); //already computed
 
         return GeoHelper.getLocationFromAddress(this);
+
+    }
+
+    isLocalHost(){
+
+        try{
+
+            let address = this.getAddress(false);
+
+            if (address.indexOf("127.0.0.1") >= 0 || address.indexOf("localhost") >= 0)
+                return true;
+
+            if (address.indexOf("::1" >= 0))
+                return true;
+
+            if (address.indexOf("::" >= 0))
+                return true;
+
+            return false;
+
+        } catch (Exception){
+
+            console.log("isLocalHost exception", Exception.toString(), this.address);
+            throw("EXCEPTION isLocalHost")
+
+        }
 
     }
 

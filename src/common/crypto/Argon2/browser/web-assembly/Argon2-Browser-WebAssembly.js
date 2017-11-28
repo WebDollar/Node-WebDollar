@@ -23,7 +23,7 @@ class Argon2BrowserWebAssembly{
     async _calculateHash(method, params){
 
         try {
-            return await Argon2WebAssemblyCalc.calc(method, params)
+            return await Argon2WebAssemblyCalc.calcHash(method, params)
         } catch (Exception){
             console.log('_calculateHashWorker raised exception', Exception.toString())
             return null;
