@@ -5,8 +5,16 @@ if((typeof window !== 'undefined' && !window._babelPolyfill) ||
 
 console.log(""); console.log(""); console.log("");
 console.log("Node WebDollar");
-console.log(process.env.PARAM);
+console.log(process.env);
 console.log(""); console.log(""); console.log("");
+
+//fixing string parameters...
+if (process.env !== 'undefined' && process.env !== null)
+    for (let i=0; i<process.env.length; i++)
+        if (typeof process.env[i]  === 'string')
+            if (process.env[i].toLowerCase() === 'true') process.env[i] = true;
+            else if (process.env[i].toLowerCase() === 'false') process.env[i] = false;
+
 
 let Node = require('node/Node.js');
 

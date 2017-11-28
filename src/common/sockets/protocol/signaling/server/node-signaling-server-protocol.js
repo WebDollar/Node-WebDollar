@@ -62,7 +62,7 @@ class NodeSignalingServerProtocol {
             if ( (NodesList.nodes[i].socket.node.protocol.signaling.server.acceptingConnections||false) === true )
                 listAcceptingWebPeerConnections.push(NodesList.nodes[i].socket);
 
-        if (process.env.DEBUG_SIGNALING_SERVER)  console.log("listAcceptingWebPeerConnections", listAcceptingWebPeerConnections.length );
+        if (process.env.DEBUG_SIGNALING_SERVER === true)  console.log("listAcceptingWebPeerConnections", listAcceptingWebPeerConnections.length );
 
         //mixing users
         for (let i=0; i<listAcceptingWebPeerConnections.length; i++) {
@@ -84,7 +84,7 @@ class NodeSignalingServerProtocol {
 
                     let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
-                    if (!process.env.DEBUG_SIGNALING_SERVER)  console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection ? previousEstablishedConnection.id : 'no-id'), (previousEstablishedConnection ? previousEstablishedConnection.status : 'no status') );
+                    if (process.env.DEBUG_SIGNALING_SERVER === true)  console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection ? previousEstablishedConnection.id : 'no-id'), (previousEstablishedConnection ? previousEstablishedConnection.status : 'no status') );
 
                     if (previousEstablishedConnection === null
                         || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished )
@@ -92,7 +92,7 @@ class NodeSignalingServerProtocol {
 
                         let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
-                        if (!process.env.DEBUG_SIGNALING_SERVER)  console.log("Step 1 - generate-initiator-signal  ", (connection === null ? null : connection.id) , { id: connection.id,  address: client2.node.sckAddress.getAddress() } );
+                        if (process.env.DEBUG_SIGNALING_SERVER)  console.log("Step 1 - generate-initiator-signal  ", (connection === null ? null : connection.id) , { id: connection.id,  address: client2.node.sckAddress.getAddress() } );
 
                         // Step1, send the request to generate the INITIATOR SIGNAL
                         client1.node.sendRequestWaitOnce("signals/client/initiator/generate-initiator-signal", {

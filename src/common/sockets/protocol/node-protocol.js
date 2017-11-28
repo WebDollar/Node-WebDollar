@@ -26,7 +26,7 @@ class NodeProtocol {
             // console.log("sendHello serverSockets", NodesList.serverSockets);
             // console.log("sendHello", result);
 
-            if (previousConnection === null  || process.env.ALLOW_DOUBLE_CONNECTIONS){
+            if ( previousConnection === null  || process.env.ALLOW_DOUBLE_CONNECTIONS){
                 node.protocol.helloValidated = true;
                 console.log("hello validated");
                 return true;
