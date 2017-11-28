@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
 
-let Argon2WebAssemblyCalc = require('./antelle/calc.js')
-let Argon2WebAssemblyMain = require('./antelle/main.js')
+import Argon2WebAssemblyCalc from './antelle/calc.js'
+import Argon2WebAssemblyMain from './antelle/main.js'
 //require('antelle/worker.js')
 
 /*
@@ -20,10 +20,10 @@ class Argon2BrowserWebAssembly{
         Simple Hash
      */
 
-    _calculateHash(method, params){
+    async _calculateHash(method, params){
 
         try {
-            return Argon2WebAssemblyCalc.calc(method, params)
+            return await Argon2WebAssemblyCalc.calc(method, params)
         } catch (Exception){
             console.log('_calculateHashWorker raised exception', Exception.toString())
             return null;
@@ -92,7 +92,7 @@ class Argon2BrowserWebAssembly{
 
             if (result !== null) throw("Argon2 returned empty");
 
-            console.log("ARgon2Browser", result.hash);
+            console.log("ARgon2Browser", result);
             return new Buffer(result.hash);
 
         } catch (Exception){
@@ -114,6 +114,7 @@ class Argon2BrowserWebAssembly{
 
             if (result !== null) throw("Argon2 returned empty");
 
+            console.log("ARgon2Browser", result);
             let hash = result.encoded.substr(-HASH_ARGON2_OPTIONS.hashLength)
 
             //console.log("ARgon2Browser", result.encoded, hash);
