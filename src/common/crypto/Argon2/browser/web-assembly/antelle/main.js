@@ -124,7 +124,10 @@ class Argon2BrowserAntelleMain{
 
         this.logTs = performance.now();
 
-        document.getElementById('txtRes').value = '';
+        let txtRes  = document.getElementById('txtRes')
+
+        if (txtRes !== null)
+            txtRes.value = '';
     }
 
     log(msg) {
@@ -137,7 +140,8 @@ class Argon2BrowserAntelleMain{
         var elapsedSec = (elapsedMs / 1000).toFixed(3);
         var elapsed = this.leftPad(elapsedSec, 6);
 
-        txtRes.value += (txtRes.value ? '\n' : '') + '[' + elapsed + '] ' + msg;
+        if (txtRes !== null)
+            txtRes.value += (txtRes.value ? '\n' : '') + '[' + elapsed + '] ' + msg;
     }
 
 

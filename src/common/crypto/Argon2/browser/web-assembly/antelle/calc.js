@@ -31,7 +31,7 @@ class Argon2BrowserWebAssemblyCalc{
 
             if (global.Module && !global.Module.wasmJSMethod) {
                 Argon2BrowserAntelleMain.log('Calculating hash....');
-                setTimeout( ()=>{ resolve ( this.calcHash(arg) ) }, 10);
+                resolve ( this.calcHash(arg) )
                 return;
             }
 
@@ -47,7 +47,7 @@ class Argon2BrowserWebAssemblyCalc{
                 Argon2BrowserAntelleMain.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                 Argon2BrowserAntelleMain.log('Calculating hash....');
 
-                setTimeout( ()=>{ resolve(this.calcHash(arg)) }, 10);
+                resolve(this.calcHash(arg))
 
             }, () => {
                 Argon2BrowserAntelleMain.log('Error loading script');
@@ -86,7 +86,7 @@ class Argon2BrowserWebAssemblyCalc{
             Argon2BrowserAntelleMain.log('Testing Argon2 using Binaryen ' + method);
             if (global.Module && global.Module.wasmJSMethod === method && global.Module._argon2_hash) {
                 Argon2BrowserAntelleMain.log('Calculating hash....');
-                setTimeout( () => {resolve (this.calcHash(arg)) }, 10);
+                resolve (this.calcHash(arg))
                 return;
             }
 
@@ -144,17 +144,17 @@ class Argon2BrowserWebAssemblyCalc{
     }
 
     calcHash(arg) {
-        console.log('calcHash 1')
+
         if (!Module._argon2_hash) {
             return Argon2BrowserAntelleMain.log('Error');
         }
 
         let result = null;
-        console.log('calcHash 2')
+
         Argon2BrowserAntelleMain.log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
-        console.log('calcHash 3')
+
         var dt = this.now();
-        console.log('calcHash 4')
+
         var t_cost = arg && arg.time || 10;
         var m_cost = arg && arg.mem || 1024;
         var parallelism = arg && arg.parallelism || 1;
@@ -184,7 +184,7 @@ class Argon2BrowserWebAssemblyCalc{
             }
 
             result = {
-                hash: hashArr.map(function(b) { return ('0' + (0xFF & b).toString(16)).slice(-2); }).join(''),
+                hash: hashArr,
                 encoded:Module.Pointer_stringify(encoded),
                 elapsed: elapsed
             };

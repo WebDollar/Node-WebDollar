@@ -27,6 +27,9 @@ describe('WebDollar crypt', ()=>{
 
     it('hash Proof Of Work function ', async ()=>{
 
+        //this.timeout(15000);
+
+
         const message1 = TestsHelper.makeid();
         const message1_copy = message1;
 
@@ -52,9 +55,14 @@ describe('WebDollar crypt', ()=>{
         assert(! await WebDollarCrypt.verifyHashPOW(hash1, message2), "Hash1 is not good because message2 "+message2);
         assert(! await WebDollarCrypt.verifyHashPOW(hash1_copy, message2), "Hash1_copy is not good because message2 "+message2);
         assert(! await WebDollarCrypt.verifyHashPOW(hash2, message1), "Hash2 is not good because message1 "+message1);
+
+
+        console.log("WebDollarCrypt worked 3")
     })
 
     it('hash Proof Of Work function string ', async ()=>{
+
+        //this.timeout(15000);
 
         const message1 = TestsHelper.makeid();
         const message1_copy = message1;
@@ -65,8 +73,9 @@ describe('WebDollar crypt', ()=>{
         let hash1_copy = await WebDollarCrypt.hashPOW_String(message1_copy)
         let hash2 = await WebDollarCrypt.hashPOW_String(message2)
 
-        console.log(hash1);
-        console.log(hash1_copy);
+        console.log("hash1 string", hash1);
+        console.log("hash1_copy string", hash1_copy);
+        console.log("hash2 string", hash2);
 
         assert(typeof hash1 === 'string', "Hash1 is not String");
         assert(typeof hash1_copy === 'string', "Hash1_copy is not String");

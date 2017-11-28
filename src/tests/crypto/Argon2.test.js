@@ -16,9 +16,9 @@ describe('Argon2', ()=>{
         let hash1_copy = await Argon2.hash(message1_copy)
         let hash2 = await Argon2.hash(message2)
 
-        console.log(hash1);
-        console.log(hash1_copy);
-        console.log(hash2);
+        console.log("argon2 hash1", hash1);
+        console.log("argon2 hash1_copy", hash1_copy);
+        console.log("argon2 hash2", hash2);
 
         assert(typeof hash1 === 'object' && Buffer.isBuffer(hash1), "Hash1 is not Buffer");
         assert(typeof hash1_copy === 'object' && Buffer.isBuffer(hash1_copy), "Hash1_copy is not Buffer");

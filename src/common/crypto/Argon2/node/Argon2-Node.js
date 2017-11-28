@@ -30,9 +30,9 @@ class Argon2Node {
             let options = HASH_ARGON2_OPTIONS;
             options.raw = false;
 
-            let hash = await argon2.hash(data, options)
+            let encoded = await argon2.hash(data, options)
 
-            hash = hash.substr(-HASH_ARGON2_OPTIONS.hashLength)
+            let hash = encoded.substr(encoded.lastIndexOf("$")+1 )
 
             return hash;
 
