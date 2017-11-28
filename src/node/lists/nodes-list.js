@@ -57,7 +57,7 @@ class NodesList {
         }
 
         // avoiding double connections                              unless it is allowed to double connections
-        if ( this.searchNodeSocketByAddress(socket) === null || !process.env.ALLOW_DOUBLE_CONNECTIONS) {
+        if ( this.searchNodeSocketByAddress(socket) === null || process.env.ALLOW_DOUBLE_CONNECTIONS) {
 
             // it is a unique connection, I should register this connection
 
