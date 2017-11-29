@@ -2,28 +2,34 @@ import InterfaceValidateTransaction from './validate-transactions/Interface-Vali
 import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
 import PendingTransactionsList from 'common/blockchain/transactions/pending-transactions/Pending-Transactions-List'
 
+import InterfaceValidateTransactionHelper from 'validate-transactions/helpers/Interface-Validate-Transaction-helper'
+
 class InterfaceBlockchainTransaction{
+
+    /*
+        from: [ {address: object, publicKey: object, } ]
+        to: [ {address: object, amount: number, currency: object } ]
+     */
 
     /**
      * Transaction Class enables to create a new Transaction
-     * @param from  must be an object {address: object , publicKey: object }
-     * @param to  must be an object {address: object  }
-     * @param amount
-     * @param currency
+     * @param from  must be an Array[ object {address: object , publicKey: object } ]
+     * @param to  must be an Array [ object {address: object , amount, currency } }
      * @param pending
      *
      */
 
-    constructor(from, to, amount, currency, pending){
+    constructor(from, to, pending){
 
         this.from = null;
         this.to = null;
-        this.amount = null;
-        this.currency = null;
         this.pending = pending||false;
 
-        this._setTransactionAddresses(from, to);
-        this._setTransactionValue(amount, currency);
+        this._setTransactionAddressesFrom(from);
+        this._setTransactionAddressesTo(to);
+
+        // Validate the validity of Funds
+        this._validateTransaction()
 
         if (!pending) {
             PendingTransactionsList.includePendingTransaction(this);
@@ -31,38 +37,22 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    _setTransactionAddresses(from, to){
+    _setTransactionAddressesFrom(from){
 
-        from = from || {}
-        to = to || {}
+        from = InterfaceValidateTransactionHelper.validateFrom(from);
 
-        if (!from.address) throw 'From Address is not specified';
-        if (!from.publicKey) throw 'From Public Key is not specified';
+        //validate the ballance of from Addresses
 
-        if (!to.address) throw 'To Address is not specified';
+        this.from = from;
+    }
 
+    _setTransactionAddressesTo(to){
+
+        to = InterfaceValidateTransactionHelper.validateTo(to);
 
         //validate addresses
 
-        this.from = from;
         this.to = to;
-
-    }
-
-    _setTransactionValue(amount, currency){
-
-        if (!amount) throw ('Amount is not specified')
-
-        if (typeof amount !== 'number' || amount < 0) throw 'Amount is not a valid number';
-
-        if (!currency) currency = ''
-
-        this.amount = amount;
-        this.currency = currency;
-
-        // Validate the validity of Funds
-        this._validateTransaction()
-
     }
 
     _propagateTransaction(){
@@ -75,7 +65,7 @@ class InterfaceBlockchainTransaction{
 
         let ValidateTransactions = new InterfaceValidateTransaction();
 
-        let result = ValidateTransactions.validate(this.from, this.to, this.amount, this.currency)
+        let result = ValidateTransactions.validate(this.from, this.to)
 
         if (silent) //to don't show the throw message
             return result;
