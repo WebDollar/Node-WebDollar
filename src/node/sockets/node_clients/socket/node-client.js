@@ -23,8 +23,9 @@ class NodeClient {
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
-        if (sckAddress.isLocalHost() ){
-            //localhost, quite useless to connect to the localhost
+        if (sckAddress.isLocalHost() ){ //localhost, quite useless to connect to the localhost
+
+            console.log('localhost connection, rejected', address)
             return false;
         }
 

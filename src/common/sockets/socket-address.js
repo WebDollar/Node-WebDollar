@@ -131,10 +131,10 @@ class SocketAddress {
             if (address.indexOf("127.0.0.1") >= 0 || address.indexOf("localhost") >= 0)
                 return true;
 
-            if (address.indexOf("::1" >= 0))
+            if (address.indexOf("::1") >= 0)
                 return true;
 
-            if (address.indexOf("::" >= 0))
+            if (address.indexOf("::") >= 0)
                 return true;
 
             return false;
