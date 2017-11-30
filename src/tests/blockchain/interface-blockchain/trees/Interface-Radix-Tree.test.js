@@ -3,7 +3,7 @@ var assert = require('assert')
 
 
 import InterfaceRadixTree from 'common/blockchain/interface-blockchain/trees/radix-tree/Interface-Radix-Tree'
-import WebDollarCryptData from 'common/crypto/Webdollar-Crypt-Data'
+import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
 describe('interfaceRadixTree', () => {
 

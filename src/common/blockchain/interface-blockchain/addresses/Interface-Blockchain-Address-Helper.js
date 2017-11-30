@@ -1,6 +1,6 @@
-import WebDollarCryptData from 'common/crypto/Webdollar-Crypt-Data'
+import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 const secp256k1 = require('secp256k1');
-import WebDollarCrypt from 'common/crypto/WebDollar-Crypt'
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
 
@@ -20,14 +20,14 @@ class InterfaceBlockchainAddressHelper{
         //tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 
         //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
-        let privateKeyBytes = WebDollarCrypt.getByteRandomValues(32);
+        let privateKeyBytes = WebDollarCrypto.getByteRandomValues(32);
 
         //if you want to follow the step-by-step results in this article, comment the
         //previous code and uncomment the following
         //var privateKeyBytes = Crypto.util.hexToBytes("1184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD")
 
         //hex string of our private key
-        let privateKeyHex = WebDollarCrypt.bytesToHex(privateKeyBytes).toUpperCase()
+        let privateKeyHex = WebDollarCrypto.bytesToHex(privateKeyBytes).toUpperCase()
 
         if (showDebug)
             console.log("privateKeyHex", privateKeyHex, "length", privateKeyHex.length) //1184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD
@@ -43,8 +43,8 @@ class InterfaceBlockchainAddressHelper{
         if (showDebug)
             console.log("keyWithChecksum", keyWithChecksum, typeof keyWithChecksum) //"801184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD206EC97E"
 
-        let privateKeyWIF = new WebDollarCryptData(keyWithChecksum, "hex");
-        let privateKey = new WebDollarCryptData(privateKeyHex, "hex");
+        let privateKeyWIF = new WebDollarCryptoData(keyWithChecksum, "hex");
+        let privateKey = new WebDollarCryptoData(privateKeyHex, "hex");
 
 
         if (showDebug) {
@@ -68,9 +68,9 @@ class InterfaceBlockchainAddressHelper{
 
         // Tutorial based on https://github.com/cryptocoinjs/secp256k1-node
 
-        if (typeof privateKey !== 'object' || privateKey.constructor.name !== 'WebDollarCryptData' ){
-            console.log("ERROR! ",  privateKey, " is not a WebDollarCryptData")
-            throw 'privateKey must be a WebDollarCryptData';
+        if (typeof privateKey !== 'object' || ! privateKey instanceof WebDollarCryptoData){
+            console.log("ERROR! ",  privateKey, " is not a WebDollarCryptoData")
+            throw 'privateKey must be a WebDollarCryptoData';
         }
 
         let validation = InterfaceBlockchainAddressHelper.validatePrivateKey(privateKey);
@@ -95,11 +95,11 @@ class InterfaceBlockchainAddressHelper{
         if (showDebug)
             console.log("pubKey", pubKey);
 
-        return new WebDollarCryptData(pubKey);
+        return new WebDollarCryptoData(pubKey);
 
         // sign the message
 
-        let msg = new Buffer( WebDollarCrypt.getByteRandomValues(32) );
+        let msg = new Buffer( WebDollarCrypto.getByteRandomValues(32) );
 
         // sign the message
         const sigObj = secp256k1.sign(msg, privateKey.buffer)
@@ -112,9 +112,9 @@ class InterfaceBlockchainAddressHelper{
 
     static verifySignedData(msg, signature, pubKey){
 
-        if (typeof pubKey !== 'object' || pubKey.constructor.name !== 'WebDollarCryptData' ){
-            console.log("ERROR! ",  pubKey, " is not a WebDollarCryptData")
-            throw 'privateKey must be a WebDollarCryptData';
+        if (typeof pubKey !== 'object' || pubKey.constructor.name !== 'WebDollarCryptoData' ){
+            console.log("ERROR! ",  pubKey, " is not a WebDollarCryptoData")
+            throw 'privateKey must be a WebDollarCryptoData';
         }
 
         if (typeof signature.signature !== 'undefined') signature = signature.signature;
@@ -131,9 +131,9 @@ class InterfaceBlockchainAddressHelper{
 
     static _generateAddressFromPublicKey(publicKey, showDebug){
 
-        if (typeof publicKey !== 'object' || publicKey.constructor.name !== 'WebDollarCryptData' ){
-            console.log("ERROR! ",  publicKey, " is not a WebDollarCryptData")
-            throw 'publicKey must be a WebDollarCryptData';
+        if (typeof publicKey !== 'object' || publicKey.constructor.name !== 'WebDollarCryptoData' ){
+            console.log("ERROR! ",  publicKey, " is not a WebDollarCryptoData")
+            throw 'publicKey must be a WebDollarCryptoData';
         }
 
         //could use publicKeyBytesCompressed as well
@@ -141,7 +141,7 @@ class InterfaceBlockchainAddressHelper{
         //bitcoin original
         //let hash160 = CryptoJS.RIPEMD160(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
 
-        let hash160 =  new WebDollarCryptData( WebDollarCrypt.SHA256(WebDollarCrypt.SHA256(publicKey.buffer)) )
+        let hash160 =  new WebDollarCryptoData( WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(publicKey.buffer)) )
 
         if (showDebug)
             console.log("hash160 hex", hash160.toString('hex') ) //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
@@ -150,7 +150,7 @@ class InterfaceBlockchainAddressHelper{
         let hashAndBytes = hash160.toBytes()
         hashAndBytes.unshift(version)
 
-        let doubleSHA = WebDollarCrypt.SHA256(WebDollarCrypt.SHA256(new Buffer(hashAndBytes, "hex") )).toString('hex')
+        let doubleSHA = WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(new Buffer(hashAndBytes, "hex") )).toString('hex')
         let addressChecksum = doubleSHA.substr(0,8)
 
         if (showDebug)
@@ -164,7 +164,7 @@ class InterfaceBlockchainAddressHelper{
         // if (showDebug)
         //     console.log("unencodedAddress", unencodedAddress) //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
 
-        let address = new WebDollarCryptData(unencodedAddress, "hex");
+        let address = new WebDollarCryptoData(unencodedAddress, "hex");
 
         if (showDebug)
             console.log("address",address.toBase()); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
@@ -198,8 +198,8 @@ class InterfaceBlockchainAddressHelper{
         if (!Buffer.isBuffer(privateKeyAndVersion) && typeof privateKeyAndVersion === 'string')
             privateKeyAndVersion = Buffer.from(privateKeyAndVersion, 'hex');
 
-        let firstSHA = WebDollarCrypt.SHA256(privateKeyAndVersion)
-        let secondSHA = WebDollarCrypt.SHA256(firstSHA)
+        let firstSHA = WebDollarCrypto.SHA256(privateKeyAndVersion)
+        let secondSHA = WebDollarCrypto.SHA256(firstSHA)
         let checksum = secondSHA.toString('hex').substr(0, consts.PRIVATE_KEY_CHECK_SUM_LENGTH).toUpperCase()
 
         if (showDebug)
@@ -215,8 +215,8 @@ class InterfaceBlockchainAddressHelper{
      */
     static validatePrivateKey(privateKey){
 
-        if (typeof privateKey !== 'object' || privateKey.constructor.name !== 'WebDollarCryptData' ){
-            throw ('privateKey must be a WebDollarCryptData');
+        if (typeof privateKey !== 'object' || ! privateKey instanceof WebDollarCryptoData ){
+            throw ('privateKey must be a WebDollarCryptoData');
         }
 
         //contains VERSION prefix

@@ -7,7 +7,8 @@ if (typeof describe !== 'undefined') {
 
 
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test')
-    require ('tests/blockchain/crypt/WebDollar-Crypt.test')
+    require ('tests/blockchain/interface-blockchain/trees/Interface-Radix-Tree.test')
+    require ('tests/blockchain/crypto/WebDollar-Crypto.test')
     require ('tests/crypto/Argon2.test')
 
 

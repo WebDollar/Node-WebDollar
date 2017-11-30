@@ -7,7 +7,7 @@
         https://www.cs.usfca.edu/~galles/visualization/RadixTree.html   - animated demo
  */
 
-import WebDollarCryptData from "common/crypto/Webdollar-Crypt-Data";
+import WebDollarCryptoData from "common/crypto/Webdollar-Crypto-Data";
 import InterfaceRadixTreeNode from "./Interface-Radix-Tree-Node"
 import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
 
@@ -26,9 +26,11 @@ class InterfaceRadixTree {
      */
     radixAdd(input, value){
 
-        input = WebDollarCryptData.createWebDollarCryptData(input)
+        input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
         let nodeCurrent = this.radixRoot;
+
+        console.log("input.buffer", input.buffer)
 
         let i=0;
         while (i < input.buffer.length) {
@@ -86,7 +88,7 @@ class InterfaceRadixTree {
      */
     radixDelete(input){
 
-        input = WebDollarCryptData.createWebDollarCryptData(input)
+        input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
         let searchResult = this.radixSearch(input);
 
@@ -125,7 +127,7 @@ class InterfaceRadixTree {
      */
     radixSearch(input){
 
-        input = WebDollarCryptData.createWebDollarCryptData(input)
+        input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
         let nodeCurrent = this.radixRoot;
 
@@ -183,3 +185,5 @@ class InterfaceRadixTree {
     }
 
 }
+
+export default InterfaceRadixTree

@@ -16,42 +16,53 @@ else {
 
 
 
-class WebDollarCrypt {
+class WebDollarCrypto {
 
+    /**
+     *
+     * @param bytes
+     * return string
+     */
     static encodeBase64(bytes) {
+
 
         let result = new Buffer(bytes).toString('base64');
 
-        let resultFinal = "";
-
         for (let i = 0; i < result.length; i++) {
 
-            switch (result[i]){
-                case 'O':
-                    resultFinal +=  '&';
-                    break;
-                case '0':
-                    resultFinal +=  '*';
-                    break;
-                case 'I':
-                    resultFinal +=  '%';
-                    break;
-                case 'l':
-                    resultFinal +=  '@';
-                    break;
-                case '+':
-                    resultFinal +=  '#';
-                    break;
-                case '/':
-                    resultFinal +=  '$';
-                    break;
-                default:
-                    resultFinal += result[i];
-                    break;
-            }
+            if (result[i] === 'O') result[i] =  '&'; else
+            if (result[i] === '0') result[i] =  '*'; else
+            if (result[i] === 'I') result[i] =  '%'; else
+            if (result[i] === 'l') result[i] =  '@'; else
+            if (result[i] === '+') result[i] =  '#'; else
+            if (result[i] === '/') result[i] =  '$';
+
         }
 
-        return resultFinal;
+        return result;
+    }
+
+    /**
+     *
+     * @param str
+     * @returns {Buffer}
+     */
+    static decodeBase64(str) {
+
+        for (let i = 0; i < str.length; i++) {
+
+            if (str[i] === '&') str[i] =  'O'; else
+            if (str[i] === '*') str[i] =  '0'; else
+            if (str[i] === '%') str[i] =  'I'; else
+            if (str[i] === '@') str[i] =  'l'; else
+            if (str[i] === '#') str[i] =  '+'; else
+            if (str[i] === '$') str[i] =  '/';
+
+        }
+
+        let result = new Buffer(str, 'base64');
+
+        return result;
     }
 
 
@@ -140,4 +151,4 @@ class WebDollarCrypt {
 
 }
 
-export default WebDollarCrypt;
+export default WebDollarCrypto;

@@ -1,34 +1,34 @@
 const bs58 = require('bs58')
 
-import WebDollarCrypt from './WebDollar-Crypt';
+import WebDollarCrypto from './WebDollar-Crypto';
 import consts from 'consts/const_global'
 
 Buffer.isBuffer()
 
-class WebDollarCryptData {
+class WebDollarCryptoData {
 
-    static isWebDollarCryptData(object){
+    static isWebDollarCryptoData(object){
 
-        if (typeof object !== 'object' || object === null || object.constructor.name !== 'WebDollarCryptData')
+        if (typeof object !== 'object' || object === null || ! object instanceof WebDollarCryptoData )
             return false;
 
         return true;
 
     }
 
-    static createWebDollarCryptData(object){
+    static createWebDollarCryptoData(object){
 
-        //if it s WebDollarCryptData, then return it
-        if (WebDollarCryptData.isWebDollarCryptData(object)) return object;
+        //if it s WebDollarCryptoData, then return it
+        if (WebDollarCryptoData.isWebDollarCryptoData(object)) return object;
 
         //if it is a Buffer
-        if (Buffer.isBuffer(object)) return new WebDollarCryptData(object, "buffer");
+        if (Buffer.isBuffer(object)) return new WebDollarCryptoData(object, "buffer");
 
         //if it is byte array
-        if (Array.isArray(object)) return new WebDollarCryptData(object, "base");
+        if (Array.isArray(object)) return new WebDollarCryptoData(object, "byte");
 
         //if it is string, it must be a Base string
-        if (typeof object === "string") return new WebDollarCryptData(object, "base");
+        if (typeof object === "string") return new WebDollarCryptoData(object, "base");
 
     }
 
@@ -46,8 +46,12 @@ class WebDollarCryptData {
             this.buffer = new Buffer(data);
         else
         if (type === "base"){
-            console.log("NOT IMPLENTED YET");
-        }
+            throw("NOT IMPLENTED YET");
+        } else
+        if (type === "ascii")
+            this.buffer = new Buffer(data, "ascii");
+        if (type === "utf-8")
+            this.buffer = new Buffer(data, "utf-8");
 
     }
 
@@ -76,12 +80,20 @@ class WebDollarCryptData {
     }
 
     toBase(){
-        if (!consts.PRIVATE_KEY_USE_BASE64)  {
-            return bs58.encode(this.toBytes());
+        if (consts.PRIVATE_KEY_USE_BASE64)  {
+            return WebDollarCrypto.encodeBase64(this.toUint8Array());
         }
         else {
+            return bs58.encode(this.toBytes());
+        }
+    }
 
-            return WebDollarCrypt.encodeBase64(this.toUint8Array());
+    decodeBase64(){
+        if (consts.PRIVATE_KEY_USE_BASE64)  {
+            return WebDollarCrypto.decodeBase64(this.toUint8Array());
+        }
+        else {
+            return bs58.decode(this.toBytes());
         }
     }
 
@@ -94,7 +106,7 @@ class WebDollarCryptData {
         for (let i=index; i<Math.min(index+count, this.buffer.length); i++)
             array.push(this.buffer[i]);
 
-        return new WebDollarCryptData( array, "byte");
+        return new WebDollarCryptoData( array, "byte");
 
     }
 
@@ -121,4 +133,4 @@ class WebDollarCryptData {
 
 }
 
-export default WebDollarCryptData;
+export default WebDollarCryptoData;

@@ -4,7 +4,7 @@ import PendingTransactionsList from 'common/blockchain/transactions/pending-tran
 
 import InterfaceBlockchainTransactionFrom from './Interface-Blockchain-Transaction-From'
 import InterfaceBlockchainTransactionTo from './Interface-Blockchain-Transaction-To'
-import WebDollarCrypt from "common/crypto/WebDollar-Crypt";
+import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 
 class InterfaceBlockchainTransaction{
 
@@ -50,7 +50,7 @@ class InterfaceBlockchainTransaction{
     }
 
     _calculateTransactionId(){
-        this.txId = WebDollarCrypt.SHA256( this.toJSON(true, true) );
+        this.txId = WebDollarCrypto.SHA256( this.toJSON(true, true) );
     }
 
     _setTransactionAddressFrom(from){
