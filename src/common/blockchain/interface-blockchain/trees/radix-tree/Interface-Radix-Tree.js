@@ -53,7 +53,7 @@ class InterfaceRadixTree {
 
                     match = input.longestMatch(nodeCurrent.edges[j].label, i);
 
-                    console.log("match", match);
+                    //console.log("match", match);
 
                     if (match !== null){   //we found  a match in the edge
 
@@ -75,7 +75,7 @@ class InterfaceRadixTree {
 
                             // Adding thew new nodeChild with current Value
                             let nodeChild = new InterfaceRadixTreeNode(nodeMatch, value, []);
-                            nodeMatch.edges.push(new InterfaceRadixTreeEdge(input.substr(i), nodeChild));
+                            nodeMatch.edges.push(new InterfaceRadixTreeEdge(input.substr(i+match.buffer.length), nodeChild));
 
                             nodeCurrent = nodeChild;
 
@@ -84,6 +84,7 @@ class InterfaceRadixTree {
 
 
                         } else {
+                            i += nodeCurrent.edges[j].label.buffer.length;
                             nodeCurrent = nodeCurrent.edges[j].targetNode;
                         }
                         childFound = true;
@@ -101,13 +102,15 @@ class InterfaceRadixTree {
 
                 // no more Children...
                 let nodeChild = new InterfaceRadixTreeNode(nodeCurrent, value, []);
-                nodeCurrent.edges.push(new InterfaceRadixTreeEdge(input.substr(i), nodeChild));
+                nodeCurrent.edges.push(new InterfaceRadixTreeEdge( input.substr(i), nodeChild));
                 nodeCurrent = nodeChild;
+
+                console.log("input.substr", input.substr(i));
 
                 break; //done
             }
 
-            i++;
+
         }
 
         //nodeCurrent will be the last child added in the list
@@ -223,8 +226,36 @@ class InterfaceRadixTree {
 
         console.log("RADIX BFS Levels", result.length);
 
-        for (let i=0; i< result.length; i++)
-            console.log("RADIX BFS Level: ",i , "count", result[i].length)
+        for (let i=0; i< result.length; i++) {
+
+            let data = [];
+
+            result[i].forEach( (node, index) => {
+
+                let value = node.value === null  ? 'null' : node.value.toString()
+                let edges = [];
+
+                node.edges.forEach ((edge, index)=>{
+                   edges.push( edge.label.toString() )
+                });
+
+                data.push( {value: value, edges: edges} );
+            });
+
+
+            let dataString = "values { ";
+            data.forEach( (element) =>{
+                dataString += element.value.toString()+" | ";
+            });
+
+            dataString += "} edges { ";
+            data.forEach( (element) =>{
+                dataString += element.edges.toString() + " | ";
+            });
+            dataString += "} ";
+
+            console.log("RADIX BFS Level: ", i, "count", result[i].length, dataString )
+        }
     }
 
 }
