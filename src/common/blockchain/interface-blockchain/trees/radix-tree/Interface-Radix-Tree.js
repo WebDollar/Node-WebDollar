@@ -53,22 +53,25 @@ class InterfaceRadixTree {
 
                     match = input.longestMatch(nodeCurrent.edges[j].label, i);
 
+                    console.log("match", match);
+
                     if (match !== null){   //we found  a match in the edge
 
                         //the match is smaller
                         if (match.buffer.length < nodeCurrent.edges[j].label.buffer.length){
 
-                            let nodeEdge = nodeCurrent.edges[j].targetNode;
-                            let nodeMatch = new InterfaceRadixTreeNode(nodeCurrent.parent, null, [] );
+                            let edge = nodeCurrent.edges[j];
 
-                            // We remove nodeEdge
+                            // We remove edge j
                             nodeCurrent.edges.splice(j,1);
 
-                            // Adding the new nodeMatch
-                            nodeCurrent.edges.push( nodeMatch )
+                            // Adding the new nodeMatch by edge Match
+                            let nodeMatch = new InterfaceRadixTreeNode(nodeCurrent.parent, null, [] );
+                            nodeCurrent.edges.push( new InterfaceRadixTreeEdge( match, nodeMatch ));
 
                             // Adding the new nodeEdge to the nodeMatch
-                            nodeMatch.edges.push(nodeCurrent, )
+                            nodeMatch.edges.push( new InterfaceRadixTreeEdge( edge.label.substr(match.buffer.length), edge.targetNode), )
+                            edge.targetNode.parent = nodeMatch;
 
                             // Adding thew new nodeChild with current Value
                             let nodeChild = new InterfaceRadixTreeNode(nodeMatch, value, []);
@@ -212,6 +215,16 @@ class InterfaceRadixTree {
         }
 
         return result;
+    }
+
+    printBFS(){
+
+        let result = this.BFS();
+
+        console.log("RADIX BFS Levels", result.length);
+
+        for (let i=0; i< result.length; i++)
+            console.log("RADIX BFS Level: ",i , "count", result[i].length)
     }
 
 }

@@ -21,8 +21,7 @@ describe('interfaceRadixTree', () => {
         radix.radixAdd( new WebDollarCryptoData("rubicon", "ascii"), new WebDollarCryptoData("rubicon", "ascii") );
         radix.radixAdd( new WebDollarCryptoData("rubicundus", "ascii"), new WebDollarCryptoData("rubicundus", "ascii") );
 
-        let result = radix.BFS();
-        console.log("RADIX BFS", result);
+        radix.printBFS();
 
     });
 

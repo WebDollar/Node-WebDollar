@@ -103,14 +103,16 @@ class WebDollarCryptoData {
 
     }
 
-    longestMatch(buffer2, startIndex){
+    longestMatch(cryptoData2, startIndex){
+
+        if (! WebDollarCryptoData.isWebDollarCryptoData(cryptoData2)) return null;
 
         if (typeof startIndex === 'undefined') startIndex = 0;
 
         let i =0;
-        while (i + startIndex < this.buffer.length && i < buffer2.length ) {
+        while (i + startIndex < this.buffer.length && i < cryptoData2.buffer.length ) {
 
-            if (this.buffer[i + startIndex] !== buffer2[i]) //no more match
+            if (this.buffer[i + startIndex] !== cryptoData2.buffer[i]) //no more match
                 break;
 
             i++;
