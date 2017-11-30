@@ -98,6 +98,27 @@ class WebDollarCryptData {
 
     }
 
+    longestMatch(buffer2, startIndex){
+
+        if (typeof startIndex === 'undefined') startIndex = 0;
+
+        let i =0;
+        while (i + startIndex < this.buffer.length && i < buffer2.length ) {
+
+            if (this.buffer[i + startIndex] !== buffer2[i]) //no more match
+                break;
+
+            i++;
+        }
+
+        if (i !== 0){ //we have a match
+            return this.substr(startIndex, i);
+        }
+
+        return  null;
+
+    }
+
 }
 
 export default WebDollarCryptData;

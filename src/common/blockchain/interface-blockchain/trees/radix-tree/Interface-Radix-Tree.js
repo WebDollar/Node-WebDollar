@@ -30,28 +30,49 @@ class InterfaceRadixTree {
 
         let nodeCurrent = this.radixRoot;
 
-        for (let i=0; i<input.buffer.length; i++){
+        let i=0;
+        while (i < input.buffer.length) {
 
-            //searching for existence of input[i] in nodeCurrent list
+            //searching for existence of input[i...] in nodeCurrent list
 
             let childFound = false;
-            for (let j=0; j<nodeCurrent.edges.length; j++)
-                //we found the targetNode of label input[i]
-                if (nodeCurrent.edges[j].label === input.buffer[i] ) {
-                    nodeCurrent = nodeCurrent.edges[j].targetNode;
-                    childFound = true;
-                    break;
+
+            let isDataNode = false; // including multiple not-finished nodes
+            while (!isDataNode) { //
+
+                for (let j = 0; j < nodeCurrent.edges.length; j++){
+
+                    let match = input.longestMatch(nodeCurrent.edges[j].label, i);
+
+                    if (match !== null){   //we found  a match in the edge
+                        nodeCurrent = nodeCurrent.edges[j].targetNode;
+                        childFound = true;
+                        break;
+                    }
                 }
 
-            if (!childFound){
-                //creating a new node
-                let nodeChild = new InterfaceRadixTreeNode(nodeCurrent,  i === (input.buffer.length-1) ? value : null, [] );
+                isDataNode = nodeCurrent.value !== null;
+            }
 
-                nodeCurrent.edges.push( new InterfaceRadixTreeEdge(input.buffer[i], nodeChild));
+            if (!childFound) { //child not found, let's create a new Child
+
+                // no more Children...
+                if (nodeCurrent.edges.length === 0) {
+
+                    let nodeChild = new InterfaceRadixTreeNode(nodeCurrent, value, []);
+                    nodeCurrent.edges.push(new InterfaceRadixTreeEdge(input.substr(i), nodeChild));
+                    break; //done
+                }
+
+                //creating a new node
+                let nodeChild = new InterfaceRadixTreeNode(nodeCurrent, i === (input.buffer.length - 1) ? value : null, []);
+
+                nodeCurrent.edges.push(new InterfaceRadixTreeEdge(input.buffer[i], nodeChild));
 
                 nodeCurrent = nodeChild;
             }
 
+            i++;
         }
 
         //nodeCurrent will be the last child added in the list
