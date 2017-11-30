@@ -2,7 +2,9 @@ import InterfaceValidateTransaction from './validate-transactions/Interface-Vali
 import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
 import PendingTransactionsList from 'common/blockchain/transactions/pending-transactions/Pending-Transactions-List'
 
-import InterfaceValidateTransactionHelper from 'validate-transactions/helpers/Interface-Validate-Transaction-helper'
+import InterfaceBlockchainTransactionFrom from './Interface-Blockchain-Transaction-From'
+import InterfaceBlockchainTransactionTo from './Interface-Blockchain-Transaction-To'
+import WebDollarCrypt from "../../../crypto/WebDollar-Crypt";
 
 class InterfaceBlockchainTransaction{
 
@@ -11,25 +13,31 @@ class InterfaceBlockchainTransaction{
      * Transaction Class enables to create a new Transaction
      * @param from  must be an Array[ object {address: object , publicKey: object } ]
      * @param to  must be an Array [ object {address: object , amount, currency } }
+     * @param digitalSignature - using Elliptic Curve to digital sign the transaction
+     * @param nonce - usually null
+     * @param txId - usually null
      * @param pending
      *
      */
 
-    constructor(from, to, digitalSignature, txId, pending){
+    constructor(from, to, digitalSignature, nonce, txId, pending){
 
         this.from = null;
         this.to = null;
 
         this.digitalSignature = digitalSignature
         this.txId = txId
+        this.nonce = nonce;
 
         this.pending = pending||false;
 
-        this._setTransactionAddressesFrom(from);
+        this._setTransactionAddressFrom(from);
         this._setTransactionAddressesTo(to);
 
         // Validate the validity of Funds
         this._validateTransaction()
+
+        if (this.nonce === null) this._calculateNonce();
 
         if (!pending) {
             PendingTransactionsList.includePendingTransaction(this);
@@ -37,22 +45,30 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    _setTransactionAddressesFrom(from){
+    _calculateNonce(){
+        this.nonce = Math.floor(Math.random() * 1000000);
+    }
 
-        from = InterfaceValidateTransactionHelper.validateFrom(from);
+    _calculateTransactionId(){
+        this.txId = WebDollarCrypt.SHA256( this.toJSON(true, true) );
+    }
 
-        //validate the ballance of from Addresses
+    _setTransactionAddressFrom(from){
 
-        this.from = from;
+        from = InterfaceBlockchainTransactionFrom.validateFrom(from);
+
+        //validate the ballance of from.address
+
+        this.from = InterfaceBlockchainTransactionFrom(from.address, from.currency);
     }
 
     _setTransactionAddressesTo(to){
 
-        to = InterfaceValidateTransactionHelper.validateTo(to);
+        to = InterfaceBlockchainTransactionTo.validateTo(to);
 
         //validate addresses
 
-        this.to = to;
+        this.to = InterfaceBlockchainTransactionTo(to.addresses, to.fee, to.currency );
     }
 
     _propagateTransaction(){
@@ -78,16 +94,20 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    toJSON(){
-        return {
-            from: {
-                address: this.from.address,
-                publicKey: this.from.publicKey.toHex(),
-            },
-            to: this.to, //address,
-            amount: this.amount,
-            currency: this.currency,
+    toJSON(dontIncludeTxId, dontIncludePending){
+
+        let result = {
+            from: this.from.toJSON(),
+            to: this.to.toJSON(), //address,
+            digitalSignature: this.digitalSignature,
+            nonce: this.nonce,
         }
+
+        if (!dontIncludeTxId ) result.txId = this.txId;
+        if (!dontIncludePending ) result.pending = this.pending;
+
+        return result;
+
     }
 
 }

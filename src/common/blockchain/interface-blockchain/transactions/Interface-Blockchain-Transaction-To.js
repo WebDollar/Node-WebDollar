@@ -5,7 +5,7 @@ class InterfaceBlockchainTransactionTo{
 
         addresses: [ { publicAddress: Addr1, amount: amount}, ... ]
         fee: amount
-        currency: Object,
+        currency: TokenObject,
 
      */
 
@@ -17,10 +17,18 @@ class InterfaceBlockchainTransactionTo{
 
     }
 
+    toJSON(){
+        return {
+            addresses: this.addresses,
+            fee: this.fee,
+            currency: this.currency,
+        }
+    }
+
     /**
      * Validate To
-     * @param to: object { address: [], fee: object, currency: Object ]
-     * @returns {*|Array}
+     * @param to: object { addresses: [], fee: number, positive, currency: TokenObject ]
+     * @returns  to
      */
     static validateTo(to){
 
@@ -39,10 +47,12 @@ class InterfaceBlockchainTransactionTo{
 
         })
 
-        if (!to.currency || to.currency === null) throw 'To.currency is not specified';
         if (!to.fee || typeof to.fee !== "number") throw 'To.fee is not specified';
 
         if (to.fee < 0) throw "To.fee is an invalid number";
+
+        if (!to.currency || to.currency === null) throw 'To.currency is not specified';
+        //Validate to.currency
 
         return to;
     }
