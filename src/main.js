@@ -2,13 +2,14 @@ import Blockchain from 'blockchain/Blockchain';
 import Node from 'node/Node';
 
 import TestingMocha from 'tests/main.test'
+import Applications from 'applications/Applications'
 
-import NetworkMap from 'applications/maps/network-map';
+
 
 export default {
     Node: Node,
     Blockchain: Blockchain,
-    NetworkMap: NetworkMap,
+    Applications: Applications,
     TestingMocha: TestingMocha,
 };
 
