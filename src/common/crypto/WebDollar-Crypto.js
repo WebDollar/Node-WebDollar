@@ -25,21 +25,22 @@ class WebDollarCrypto {
      */
     static encodeBase64(bytes) {
 
-
         let result = new Buffer(bytes).toString('base64');
 
+        let newStr = '';
         for (let i = 0; i < result.length; i++) {
 
-            if (result[i] === 'O') result[i] =  '&'; else
-            if (result[i] === '0') result[i] =  '*'; else
-            if (result[i] === 'I') result[i] =  '%'; else
-            if (result[i] === 'l') result[i] =  '@'; else
-            if (result[i] === '+') result[i] =  '#'; else
-            if (result[i] === '/') result[i] =  '$';
+            if (result[i] === 'O') newStr +=  '&'; else
+            if (result[i] === '0') newStr +=  '*'; else
+            if (result[i] === 'I') newStr +=  '%'; else
+            if (result[i] === 'l') newStr +=  '@'; else
+            if (result[i] === '+') newStr +=  '#'; else
+            if (result[i] === '/') newStr +=  '$';
+            else newStr += result[i];
 
         }
 
-        return result;
+        return newStr;
     }
 
     /**
@@ -49,18 +50,21 @@ class WebDollarCrypto {
      */
     static decodeBase64(str) {
 
+        if (typeof str !== "string") throw "input is not string for base decoding" + typeof str;
+
+        let newStr = '';
         for (let i = 0; i < str.length; i++) {
 
-            if (str[i] === '&') str[i] =  'O'; else
-            if (str[i] === '*') str[i] =  '0'; else
-            if (str[i] === '%') str[i] =  'I'; else
-            if (str[i] === '@') str[i] =  'l'; else
-            if (str[i] === '#') str[i] =  '+'; else
-            if (str[i] === '$') str[i] =  '/';
-
+            if (str[i] === '&') newStr +=  'O'; else
+            if (str[i] === '*') newStr +=  '0'; else
+            if (str[i] === '%') newStr +=  'I'; else
+            if (str[i] === '@') newStr +=  'l'; else
+            if (str[i] === '#') newStr +=  '+'; else
+            if (str[i] === '$') newStr +=  '/';
+            else newStr += str[i];
         }
 
-        let result = new Buffer(str, 'base64');
+        let result = new Buffer(newStr, 'base64');
 
         return result;
     }

@@ -32,6 +32,7 @@ describe('testAddressGenerator', () => {
     it ('should return address', ()=>{
         address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, true);
 
+        console.log("should return address", address);
         assert(WebDollarCryptoData.isWebDollarCryptoData(address), 'Address is not an object');
     })
 

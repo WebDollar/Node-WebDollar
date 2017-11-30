@@ -9,11 +9,13 @@ class WebDollarCryptoData {
 
     static isWebDollarCryptoData(object){
 
-        if (typeof object !== 'object' || object === null || ! object instanceof WebDollarCryptoData )
+        if (typeof object !== 'object' || object === null )
             return false;
 
-        return true;
+        if (object instanceof WebDollarCryptoData)
+            return true;
 
+        return false;
     }
 
     static createWebDollarCryptoData(object){
@@ -45,9 +47,9 @@ class WebDollarCryptoData {
         if (type === "byte")
             this.buffer = new Buffer(data);
         else
-        if (type === "base"){
-            throw("NOT IMPLENTED YET");
-        } else
+        if (type === "base")
+            this.buffer = new Buffer(WebDollarCrypto.decodeBase64(data));
+        else
         if (type === "ascii")
             this.buffer = new Buffer(data, "ascii");
         if (type === "utf-8")
@@ -85,15 +87,6 @@ class WebDollarCryptoData {
         }
         else {
             return bs58.encode(this.toBytes());
-        }
-    }
-
-    decodeBase64(){
-        if (consts.PRIVATE_KEY_USE_BASE64)  {
-            return WebDollarCrypto.decodeBase64(this.toUint8Array());
-        }
-        else {
-            return bs58.decode(this.toBytes());
         }
     }
 

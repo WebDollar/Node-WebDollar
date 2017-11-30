@@ -8,14 +8,21 @@ describe('WebDollar crypt', ()=>{
     it('encodeBase64 - should return encoded', async ()=>{
 
         let bytes = WebDollarCrypto.getByteRandomValues(Math.floor(Math.random() * 100));
-        let result = WebDollarCrypto.encodeBase64(bytes);
+        let encoded = WebDollarCrypto.encodeBase64(bytes);
 
-        console.log("REEESULT" , result)
-        assert(typeof result === 'string', 'encodeBase64 is not STRING')
+        assert(typeof encoded === 'string', 'encodeBase64 is not STRING')
 
-        let decoded = WebDollarCrypto.decodeBase64(result);
+        let decoded = WebDollarCrypto.decodeBase64(encoded);
 
+        let match = true;
 
+        assert(bytes.length === decoded.length, "encoded and decoded don't have same length");
+
+        for (let i=0; i<bytes.length; i++)
+            if ( bytes[i] !== decoded[i] )
+                match = false;
+
+        assert(match, "encoded and decoded don't match");
 
     })
 

@@ -161,8 +161,8 @@ class InterfaceBlockchainAddressHelper{
                                  + hash160.toString('hex')
                                  + addressChecksum + (consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58);
 
-        // if (showDebug)
-        //     console.log("unencodedAddress", unencodedAddress) //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
+        if (showDebug)
+            console.log("unencodedAddress", unencodedAddress) //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
 
         let address = new WebDollarCryptoData(unencodedAddress, "hex");
 
