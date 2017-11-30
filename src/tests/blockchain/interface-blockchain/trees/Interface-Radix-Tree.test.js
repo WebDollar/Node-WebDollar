@@ -9,6 +9,7 @@ describe('interfaceRadixTree', () => {
 
 
     let radix = null;
+
     it('creating radix tree', ()=>{
 
         radix = new InterfaceRadixTree();

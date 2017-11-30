@@ -42,43 +42,66 @@ class InterfaceRadixTree {
             //searching for existence of input[i...] in nodeCurrent list
 
             let childFound = false;
+            let match = null;
 
-            let isDataNode = false; // including multiple not-finished nodes
-            while (!isDataNode && nodeCurrent !== null) { //
+            let skipOptimization = true; // including multiple not-finished nodes
+            while (skipOptimization && childFound === false && nodeCurrent !== null) { //
+
+                let nodePrevious = nodeCurrent;
 
                 for (let j = 0; j < nodeCurrent.edges.length; j++){
 
-                    let match = input.longestMatch(nodeCurrent.edges[j].label, i);
+                    match = input.longestMatch(nodeCurrent.edges[j].label, i);
 
                     if (match !== null){   //we found  a match in the edge
-                        nodeCurrent = nodeCurrent.edges[j].targetNode;
+
+                        //the match is smaller
+                        if (match.buffer.length < nodeCurrent.edges[j].label.buffer.length){
+
+                            let nodeEdge = nodeCurrent.edges[j].targetNode;
+                            let nodeMatch = new InterfaceRadixTreeNode(nodeCurrent.parent, null, [] );
+
+                            // We remove nodeEdge
+                            nodeCurrent.edges.splice(j,1);
+
+                            // Adding the new nodeMatch
+                            nodeCurrent.edges.push( nodeMatch )
+
+                            // Adding the new nodeEdge to the nodeMatch
+                            nodeMatch.edges.push(nodeCurrent, )
+
+                            // Adding thew new nodeChild with current Value
+                            let nodeChild = new InterfaceRadixTreeNode(nodeMatch, value, []);
+                            nodeMatch.edges.push(new InterfaceRadixTreeEdge(input.substr(i), nodeChild));
+
+                            nodeCurrent = nodeChild;
+
+                            // Marking that it is done
+                            i = input.buffer.length+1;
+
+
+                        } else {
+                            nodeCurrent = nodeCurrent.edges[j].targetNode;
+                        }
                         childFound = true;
                         break;
+
                     }
                 }
 
                 //in case it got stuck in the root
-                if (nodeCurrent === this.root) isDataNode = true;
-                else
-                isDataNode = nodeCurrent.value !== null;
+                if (nodePrevious !== nodeCurrent) skipOptimization = true;
+                else skipOptimization = false;
             }
 
-            if (!childFound) { //child not found, let's create a new Child
+            if (!childFound) { //child not found, let's create a new Child with the remaining input [i...]
 
                 // no more Children...
-                if (nodeCurrent.edges.length === 0) {
-
-                    let nodeChild = new InterfaceRadixTreeNode(nodeCurrent, value, []);
-                    nodeCurrent.edges.push(new InterfaceRadixTreeEdge(input.substr(i), nodeChild));
-                    break; //done
-                }
-
-                //creating a new node
-                let nodeChild = new InterfaceRadixTreeNode(nodeCurrent, i === (input.buffer.length - 1) ? value : null, []);
-
-                nodeCurrent.edges.push(new InterfaceRadixTreeEdge(input.buffer[i], nodeChild));
-
+                let nodeChild = new InterfaceRadixTreeNode(nodeCurrent, value, []);
+                nodeCurrent.edges.push(new InterfaceRadixTreeEdge(input.substr(i), nodeChild));
                 nodeCurrent = nodeChild;
+
+                break; //done
             }
 
             i++;
