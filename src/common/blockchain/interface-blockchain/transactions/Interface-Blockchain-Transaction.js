@@ -4,7 +4,7 @@ import PendingTransactionsList from 'common/blockchain/transactions/pending-tran
 
 import InterfaceBlockchainTransactionFrom from './Interface-Blockchain-Transaction-From'
 import InterfaceBlockchainTransactionTo from './Interface-Blockchain-Transaction-To'
-import WebDollarCrypt from "../../../crypto/WebDollar-Crypt";
+import WebDollarCrypt from "common/crypto/WebDollar-Crypt";
 
 class InterfaceBlockchainTransaction{
 

@@ -39,7 +39,12 @@ class InterfaceBlockchainAddress{
         return "address" + this.address.toString() + (this.publicKey !== null ? "public key" + this.publicKey.toString() : '') + (this.privateKey !== null ? "private key" + this.privateKey.toString() : '')
     }
 
-
+    getAddressAndPrivateKey(){
+        return {
+            address: this.address,
+            privateKey: this.privateKey,
+        }
+    }
 
 
 }

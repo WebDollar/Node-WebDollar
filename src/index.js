@@ -30,6 +30,8 @@ let exportObject = {
     NodesList : Node.NodesList,
     NetworkMap : Node.NetworkMap,
 
+    Wallet: Node.Wallet,
+
     TestingMocha: Node.TestingMocha,
 };
 
@@ -37,10 +39,10 @@ module.exports =  exportObject;
 
 //browser minimized script
 if (typeof global.window !== 'undefined')
-    global.window.NodeWebDollar = exportObject;
+    global.window.WebDollar = exportObject;
 
 if (typeof window !== 'undefined')
-    window.NodeWebDollar = exportObject;
+    window.WebDollar = exportObject;
 
 
 console.log("Node WebDollar End");

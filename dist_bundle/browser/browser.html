@@ -17,9 +17,10 @@
 
     <script>
         async function initMap() {
-            NodeWebDollar.NetworkMap.createMap('map');
-            await NodeWebDollar.NetworkMap.initialize(map);
-            NodeWebDollar.NetworkMap.initializePolylines(map);
+
+            WebDollar.NetworkMap.createMap('map');
+            await WebDollar.NetworkMap.initialize(map);
+            WebDollar.NetworkMap.initializePolylines(map);
 
             //NodeWebDollar.NetworkMap.createTestConnections(map);
         }

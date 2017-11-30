@@ -6,6 +6,8 @@ import NodesList from 'node/lists/nodes-list'
 
 import TestingMocha from 'tests/main.test'
 
+import Blockchain from 'blockchain/Blockchain';
+
 import NetworkMap from 'applications/maps/network-map';
 
 exports.NodeServer = NodeServer;
@@ -14,4 +16,5 @@ exports.NodeWebPeersService = NodeWebPeersService;
 exports.NodesStats = NodesStats;
 exports.NodesList = NodesList;
 exports.NetworkMap = NetworkMap;
+exports.Blockchain = Blockchain;
 exports.TestingMocha = TestingMocha;
