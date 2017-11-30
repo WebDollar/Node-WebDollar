@@ -7,7 +7,7 @@ class BlockchainWallets{
         let blockchainAddress = new MiniBlockchainAddress();
         blockchainAddress.createNewAddress();
 
-        return blockchainAddress.getAddressAndPrivateKey();
+        return blockchainAddress;
     }
 
 }

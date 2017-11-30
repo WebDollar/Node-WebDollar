@@ -1,10 +1,10 @@
-import {NodeClientsService, NodeWebPeersService} from './index.js';
+import {Node} from './index.js';
 
 console.log("BROWSER MODE");
 
 process.env.ALLOW_DOUBLE_CONNECTIONS = true;
 
-NodeClientsService.startService();
-NodeWebPeersService.startService();
+Node.NodeClientsService.startService();
+Node.NodeWebPeersService.startService();
 
 

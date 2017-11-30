@@ -4,17 +4,18 @@ import NodeWebPeersService from 'node/webrtc/service/node-web-peers-service'
 import NodesStats from 'node/lists/stats/nodes-stats'
 import NodesList from 'node/lists/nodes-list'
 
-import TestingMocha from 'tests/main.test'
 
-import Blockchain from 'blockchain/Blockchain';
+class Node{
 
-import NetworkMap from 'applications/maps/network-map';
+    constructor(){
+        this.NodeServer = NodeServer;
+        this.NodeClientsService = NodeClientsService;
+        this.NodeWebPeersService = NodeWebPeersService;
+        this.NodesStats = NodesStats;
+        this.NodesList = NodesList;
+    }
+}
 
-exports.NodeServer = NodeServer;
-exports.NodeClientsService = NodeClientsService;
-exports.NodeWebPeersService = NodeWebPeersService;
-exports.NodesStats = NodesStats;
-exports.NodesList = NodesList;
-exports.NetworkMap = NetworkMap;
-exports.Blockchain = Blockchain;
-exports.TestingMocha = TestingMocha;
+export default new Node();
+
+

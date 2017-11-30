@@ -16,24 +16,9 @@ if (process.env !== 'undefined' && process.env !== null)
             else if (process.env[i].toLowerCase() === 'false') process.env[i] = false;
 
 
-let Node = require('node/Node.js');
+let Main = require('./main.js').default;
 
-exports.helloWord = function() {
-    console.log("This is a message from the demo package");
-};
-
-let exportObject = {
-    NodeServer : Node.NodeServer,
-    NodeClientsService : Node.NodeClientsService,
-    NodeWebPeersService : Node.NodeWebPeersService,
-    NodesStats : Node.NodesStats,
-    NodesList : Node.NodesList,
-    NetworkMap : Node.NetworkMap,
-
-    Wallet: Node.Wallet,
-
-    TestingMocha: Node.TestingMocha,
-};
+let exportObject = Main;
 
 module.exports =  exportObject;
 
