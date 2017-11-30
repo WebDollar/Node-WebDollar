@@ -12,13 +12,13 @@ describe('interfaceRadixTree', () => {
     it('creating radix tree', ()=>{
 
         radix = new InterfaceRadixTree();
-        radix.radixAdd("romane", "romane");
-        radix.radixAdd("romanus", "romanus");
-        radix.radixAdd("romulus", "romulus");
-        radix.radixAdd("rubens", "rubens");
-        radix.radixAdd("ruber", "ruber");
-        radix.radixAdd("rubicon", "rubicon");
-        radix.radixAdd("rubicundus", "rubicundus");
+        radix.radixAdd( new WebDollarCryptoData("romane", "ascii"), new WebDollarCryptoData("romane", "ascii") );
+        radix.radixAdd( new WebDollarCryptoData("romanus", "ascii"), new WebDollarCryptoData("romanus", "ascii") );
+        radix.radixAdd( new WebDollarCryptoData("romulus", "ascii"), new WebDollarCryptoData("romulus", "ascii") );
+        radix.radixAdd( new WebDollarCryptoData("rubens", "ascii"), new WebDollarCryptoData("rubens", "ascii") );
+        radix.radixAdd( new WebDollarCryptoData("ruber", "ascii"), new WebDollarCryptoData("ruber", "ascii") );
+        radix.radixAdd( new WebDollarCryptoData("rubicon", "ascii"), new WebDollarCryptoData("rubicon", "ascii") );
+        radix.radixAdd( new WebDollarCryptoData("rubicundus", "ascii"), new WebDollarCryptoData("rubicundus", "ascii") );
 
         let result = radix.BFS();
         console.log("RADIX BFS", result);

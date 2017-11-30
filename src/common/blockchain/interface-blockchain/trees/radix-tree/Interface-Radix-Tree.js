@@ -1,10 +1,14 @@
 /*
-    Used to Radix Tree a Buffer (CryptoWebDollarData)
+    Used to Radix Tree (Patricia Tree) a Buffer (CryptoWebDollarData)
+
+    Radix Tree is an optimized Trie especially for very log texts
 
     Tutorials:
         https://en.wikipedia.org/wiki/Radix_tree
 
         https://www.cs.usfca.edu/~galles/visualization/RadixTree.html   - animated demo
+
+
  */
 
 import WebDollarCryptoData from "common/crypto/Webdollar-Crypto-Data";
@@ -16,7 +20,7 @@ class InterfaceRadixTree {
 
     constructor(){
 
-        this.radixRoot = new InterfaceRadixTreeNode(null, null, [] );
+        this.root = new InterfaceRadixTreeNode(null, null, [] );
 
     }
 
@@ -28,7 +32,7 @@ class InterfaceRadixTree {
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
-        let nodeCurrent = this.radixRoot;
+        let nodeCurrent = this.root;
 
         console.log("input.buffer", input.buffer)
 
@@ -40,7 +44,7 @@ class InterfaceRadixTree {
             let childFound = false;
 
             let isDataNode = false; // including multiple not-finished nodes
-            while (!isDataNode) { //
+            while (!isDataNode && nodeCurrent !== null) { //
 
                 for (let j = 0; j < nodeCurrent.edges.length; j++){
 
@@ -53,6 +57,9 @@ class InterfaceRadixTree {
                     }
                 }
 
+                //in case it got stuck in the root
+                if (nodeCurrent === this.root) isDataNode = true;
+                else
                 isDataNode = nodeCurrent.value !== null;
             }
 
@@ -83,7 +90,7 @@ class InterfaceRadixTree {
     }
 
     /**
-     *
+     * Delete Node from the Radix Tree
      * @param input
      */
     radixDelete(input){
@@ -129,7 +136,7 @@ class InterfaceRadixTree {
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
-        let nodeCurrent = this.radixRoot;
+        let nodeCurrent = this.root;
 
         for (let i=0; i<input.buffer.length; i++){
 
@@ -157,7 +164,7 @@ class InterfaceRadixTree {
     //BreadFirstSearch
     BFS(node, level) {
 
-        if (typeof node === "undefined") node = this.radixRoot;
+        if (typeof node === "undefined") node = this.root;
         if (typeof level === "undefined") level =  0;
 
         let queue = [ {node: node, level: level} ];
