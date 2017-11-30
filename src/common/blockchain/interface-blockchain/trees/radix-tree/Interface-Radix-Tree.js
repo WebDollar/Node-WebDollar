@@ -152,4 +152,34 @@ class InterfaceRadixTree {
         return {result: true, index: input.buffer.length, edgeIndex: j, node: nodeCurrent};
     }
 
+    //BreadFirstSearch
+    BFS(node, level) {
+
+        if (typeof node === "undefined") node = this.radixRoot;
+        if (typeof level === "undefined") level =  0;
+
+        let queue = [ {node: node, level: level} ];
+        let result = [];
+
+        let i =0;
+        while (i < queue.length){
+
+            let node = queue[i].node;
+            let level = queue[i].level;
+
+            if (!result[level]) result[level] = [];
+
+            result[level].push(node)
+
+            for (let j=0; j<node.edges.length; j++)
+                if (node.edges[j].targetNode !== null){
+                    queue.push( {node: node.edges[j].targetNode, level: level+1 })
+                }
+
+            i++;
+        }
+
+        return result;
+    }
+
 }

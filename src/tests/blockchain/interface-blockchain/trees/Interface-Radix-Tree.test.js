@@ -20,6 +20,9 @@ describe('interfaceRadixTree', () => {
         radix.radixAdd("rubicon", "rubicon");
         radix.radixAdd("rubicundus", "rubicundus");
 
+        let result = radix.BFS();
+        console.log("RADIX BFS", result);
+
     });
 
 
