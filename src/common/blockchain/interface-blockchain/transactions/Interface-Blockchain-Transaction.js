@@ -6,10 +6,6 @@ import InterfaceValidateTransactionHelper from 'validate-transactions/helpers/In
 
 class InterfaceBlockchainTransaction{
 
-    /*
-        from: [ {address: object, publicKey: object, } ]
-        to: [ {address: object, amount: number, currency: object } ]
-     */
 
     /**
      * Transaction Class enables to create a new Transaction
@@ -19,10 +15,14 @@ class InterfaceBlockchainTransaction{
      *
      */
 
-    constructor(from, to, pending){
+    constructor(from, to, digitalSignature, txId, pending){
 
         this.from = null;
         this.to = null;
+
+        this.digitalSignature = digitalSignature
+        this.txId = txId
+
         this.pending = pending||false;
 
         this._setTransactionAddressesFrom(from);
