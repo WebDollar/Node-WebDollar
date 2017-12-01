@@ -66,7 +66,9 @@ class InterfaceRadixTree {
                             nodeCurrent.edges.splice(j,1);
 
                             // Adding the new nodeMatch by edge Match
-                            let nodeMatch = new InterfaceRadixTreeNode(nodeCurrent.parent, null, [] );
+                            //console.log("nodeCurrent.parent", nodeCurrent.parent);
+
+                            let nodeMatch = new InterfaceRadixTreeNode(nodeCurrent, null, [] );
                             nodeCurrent.edges.push( new InterfaceRadixTreeEdge( match, nodeMatch ));
 
                             // Adding the new nodeEdge to the nodeMatch
@@ -128,32 +130,104 @@ class InterfaceRadixTree {
 
         let searchResult = this.radixSearch(input);
 
-        if (searchResult.result === false || searchResult.node === null) return false;
+        //console.log("searchResult", searchResult)
+        if (typeof searchResult.node === "undefined" || searchResult.node === null) return false;
 
         //it is the last element, we should delete it
-        if ( searchResult.index === input.buffer.length-1){
-            let nodeChild = searchResult.node;
-            let nodeParent = searchResult.node.parent;
+        let finished = false;
 
-            nodeChild.value = null;
+        let node = searchResult.node;
+        node.value = null;
+
+        while ( !finished && node !== null){
+
+            let nodeParent = node.parent;
+
+            finished = true;
 
             //remove empty parent nodes
-            while (nodeChild !== null && nodeParent !== null && nodeChild.edges.length === 0){
+            if ( node !== null && node.value === null && nodeParent !== null && node.edges.length === 0){
 
                 //removing edge to child from parent
+
+                //console.log("node simplu before", node, node.parent);
+
                 for (let i=0; i<nodeParent.edges.length; i++)
-                    if (nodeParent[i].targetNode === nodeChild) {
+                    if (nodeParent.edges[i].targetNode === node) {
                         nodeParent.edges.splice(i, 1);
                         break;
                     }
 
-                nodeChild = nodeParent;
+                // remove special kind of prefixes nodes
+                if ( nodeParent.parent !== null && nodeParent.value === null  && nodeParent.edges.length === 1 ){
+
+                    let edge = nodeParent.edges[0];
+                    node = nodeParent.edges[0].targetNode;
+                    let grandParent = nodeParent.parent;
+
+                    //console.log("grandParent", grandParent, node);
+
+                    //replace grand parent edge child
+                    for (let i=0; i<grandParent.edges.length; i++)
+                        if (grandParent.edges[i].targetNode === nodeParent){
+
+                            grandParent.edges[i].label = new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ grandParent.edges[i].label.buffer, edge.label.buffer  ] ));
+                            grandParent.edges[i].targetNode = node;
+
+                            node.parent = grandParent;
+
+                            //console.log("grandParent deletion", node, nodeParent);
+                            break;
+                        }
+
+                } else {
+                    node = nodeParent;
+                }
+
+                finished = false;
+                nodeParent = node.parent;
+
+                //console.log("node simplu after", node, node.parent);
             }
 
-            return true;
+
+            if (node !== null && node.value === null && node.edges.length > 0){
+
+                //console.log("node..... ", nodeParent, node.value, node.edges)
+
+                let bDeleted = false;
+                for (let i=node.edges.length-1; i>=0; i--)
+                    if (node.edges[i].targetNode.value === null && node.edges[i].targetNode.edges.length === 0 ) {
+                        node.edges.splice(i, 1);
+                        bDeleted = true;
+                    }
+
+                if (bDeleted){
+                    node = node.parent;
+                    nodeParent = node.parent;
+                    finished = false;
+
+                    //console.log("node deleted", node.value, node.edges)
+                }
+            }
+
+            if (node !== null && nodeParent !== null && node.value === null && node.edges.length === 0 && node !== this.root ){
+
+                //console.log("node22..... ", node.value, node.edges)
+
+                for (let i=nodeParent.edges.length-1; i>=0; i--)
+                    if (nodeParent.edges[i].targetNode === node) {
+                        nodeParent.edges.splice(i, 1);
+                        finished = false;
+                        node = node.parent;
+                        nodeParent = node.parent;
+                        break;
+                    }
+            }
+
         }
 
-        return false;
+        return true;
     }
 
 
@@ -177,6 +251,8 @@ class InterfaceRadixTree {
             for (let j = 0; j < nodeCurrent.edges.length; j++){
 
                 let match = input.longestMatch( nodeCurrent.edges[j].label, i );
+
+                //console.log("matchFound", nodeCurrent.edges[j].label.toString(), " in ", input.toString(), " i= ",i, match === null ? "null" : match.toString() );
 
                 if (match !== null && match.buffer.length === nodeCurrent.edges[j].label.buffer.length) {   //we found  a match in the edge
 
