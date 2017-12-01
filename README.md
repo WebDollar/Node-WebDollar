@@ -17,14 +17,17 @@ git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
 npm install
 ```
 
-## In case you will get errors for node-gyp
+## In case you will get errors for **node-gyp**
+
+In case your will get errors from node-gyp especially for **Argon2** or **webrtc** 
 
 #### Windows
 3. open a Command Prompt with **Administrator rights**
 
 ```
-npm install --global --production windows-build-tools
-
+cd C:\..............\Node-WebDollar\
+npm install --global --production windows-build-tools                                    
+npm install
 ```
 
 #### Linux
