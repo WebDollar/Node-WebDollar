@@ -34,7 +34,7 @@ class InterfaceRadixTree {
 
         let nodeCurrent = this.root;
 
-        console.log("input.buffer", input.buffer)
+        // console.log("input.buffer", input.buffer)
 
         let i=0;
         while (i < input.buffer.length) {
@@ -167,27 +167,34 @@ class InterfaceRadixTree {
 
         let nodeCurrent = this.root;
 
-        for (let i=0; i<input.buffer.length; i++){
+        let i=0;
+        while (i < input.buffer.length) {
 
-            //searching for existence of input[i] in nodeCurrent list
+            // searching for existence of input[i...] in nodeCurrent list
 
             let childFound = false;
-            for (let j=0; j<nodeCurrent.edges.length; j++)
-                //we found the targetNode of label input[i]
-                if (nodeCurrent.edges[j].label === input.buffer[i] ) {
+
+            for (let j = 0; j < nodeCurrent.edges.length; j++){
+
+                let match = input.longestMatch( nodeCurrent.edges[j].label, i );
+
+                if (match !== null && match.buffer.length === nodeCurrent.edges[j].label.buffer.length) {   //we found  a match in the edge
+
                     nodeCurrent = nodeCurrent.edges[j].targetNode;
+
+                    i += match.buffer.length;
+
                     childFound = true;
                     break;
                 }
 
-            if (!childFound){
-                return {result: false, index: -1, node: null};
             }
 
+            if (!childFound) //child not found, we should search no more
+                return {result: false }
         }
 
-        //nodeCurrent will be the last child added in the list
-        return {result: true, index: input.buffer.length, edgeIndex: j, node: nodeCurrent};
+        return { result: (nodeCurrent.value !== null), node: nodeCurrent, value: nodeCurrent.value }
     }
 
     //BreadFirstSearch

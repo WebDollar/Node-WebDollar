@@ -8,14 +8,26 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 # Installing
 
-1. Cloning Repository 
+## 1. Cloning Repository 
 ```
 git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
 ```
-2. Installing modules 
+## 2. Installing modules 
 ```
 npm install
 ```
+
+## In case you will get errors for node-gyp
+
+#### Windows
+3. open a Command Prompt with **Administrator rights**
+
+```
+npm install --global --production windows-build-tools
+
+```
+
+#### Linux
 
 3. Installing Argon2 node.js
 ```
@@ -25,10 +37,12 @@ In case your receive some errors, try ```sudo apt-get -f install```
  
 To check the version `gcc --version`
 In case the GCC is not installed, install gcc `brew install gcc`
+
 ```
 sudo apt-get install clang
 npm install -g node-gyp
 ```
+
 `gcc --version` will help you to find the Version. It worked on gcc 5 and gcc 6
 ``` 
 env CXX=g++-5 npm install
@@ -46,14 +60,17 @@ if (typeof options.salt !== 'undefined')
 
 
 ## Testing in console
+Mocha Tests
 ```
-npm test
+npm test                                       
+npm run show_mocha_report                
 ```
 
-##### Missing Packages
+
+#### Missing Packages or Errors
 Obs. In case there you get an error message about some missing packages like the following one:
 
-```Error: Cannot find module 'rxjs/Observable'```
+``` Error: Cannot find module 'name_missing_package' ```
 
 just, run ```npm install name_missing_package```
 
@@ -65,16 +82,19 @@ just, run ```npm install name_missing_package```
 npm run build_browser
 ```
 
-#### Building Dist for Browser TEST
+#### Building Dist for Browser TEST (dist_bundle/browser/browser.html)
 
 ```
 npm run test_browser
 ```
 
+open web page `dist_bundle/browser/browser.html`
+
 ### Running Server in Node.js
 
 ```
-test_double_connections
+npm run start_double_connections
+npm run start
 ```
 
 We use browserify
@@ -83,16 +103,18 @@ We use browserify
 npm install -g browerfiy
 browserify dist/index.js > dist_bundle/bundle.js
 npm install bufferutil utf-8-validate
-```
+``` 
 
-### No-IP solution for FallBack
+### No-IP solution for FallBack server
 http://www.noip.com/support/knowledgebase/installing-the-linux-dynamic-update-client-on-ubuntu/
 
-#### Tutorial how to make NO-IP as start-up service in Linux
+Tutorial how to make NO-IP as start-up service in Linux
 https://askubuntu.com/questions/903411/how-do-i-set-up-no-ip-as-a-proper-service
 
-#### Firewall
-sudo iptables -A INPUT -p tcp --dport 12320 -j ACCEPT
+#### Firewall acceptable
+
+Unix
+`sudo iptables -A INPUT -p tcp --dport 12320 -j ACCEPT`
 
 If you are under a **router/firewall**, you need to port forward the port used by the Nodes **12320**
 
