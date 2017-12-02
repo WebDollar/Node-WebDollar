@@ -22,7 +22,7 @@ describe('interfaceRadixTree', () => {
             radix.add( new WebDollarCryptoData(str, "ascii"), new WebDollarCryptoData(str, "ascii") );
         })
 
-        let result = radix.BFS();
+        let result = radix.levelSearch();
 
         assert(result.length === 5, "Radix Tree has to many levels")
         assert(result[0].length === 1, "Radix Tree Level 0 has different nodes")
@@ -34,7 +34,7 @@ describe('interfaceRadixTree', () => {
         // for (let i =0; i<result[4].length; i++)
         //     console.log(i, result[4][i].value.toString(), result[4][i].parent );
 
-        radix.printBFS();
+        radix.printLevelSearch();
 
     });
 
@@ -60,16 +60,16 @@ describe('interfaceRadixTree', () => {
             let deleteResult =radix.delete(  new WebDollarCryptoData(str, "ascii") );
             assert(deleteResult === true, "delete "+str+" didn't work");
 
-            radix.printBFS();``
+            radix.printLevelSearch();``
 
             let searchResult = radix.search ( new WebDollarCryptoData(str, "ascii") );
             assert (!searchResult.result, "result "+str+" was actually found...");
 
         });
 
-        let result = radix.BFS();
+        let result = radix.levelSearch();
 
-        radix.printBFS();
+        radix.printLevelSearch();
 
         assert (result.length === 1, "result is not 1 level");
         assert (result[0].length === 1, "root is not empty");

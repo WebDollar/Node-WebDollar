@@ -63,6 +63,88 @@ class InterfaceTree{
 
     }
 
+
+    //Level Search
+    levelSearch(node, level) {
+
+        if (typeof node === "undefined") node = this.root;
+        if (typeof level === "undefined") level =  0;
+
+        let queue = [ {node: node, level: level} ];
+        let result = [];
+
+        let i =0;
+        while (i < queue.length){
+
+            let node = queue[i].node;
+            let level = queue[i].level;
+
+            if (!result[level]) result[level] = [];
+
+            result[level].push(node)
+
+            for (let j=0; j<node.edges.length; j++)
+                if (node.edges[j].targetNode !== null){
+                    queue.push( {node: node.edges[j].targetNode, level: level+1 })
+                }
+
+            i++;
+        }
+
+        return result;
+    }
+
+    BFS(node, level) {
+
+        let searchResult = this.levelSearch(node, level);
+
+        let BFSResult = [];
+        for (let i=0; i<searchResult.length; i++)
+            for (let j=0; j<searchResult[i].length; j++)
+                BFSResult.push( searchResult[i][j] );
+
+        return BFSResult;
+    }
+
+
+    printLevelSearch(){
+
+        let result = this.levelSearch();
+
+        console.log("BFS Levels", result.length);
+
+        for (let i=0; i< result.length; i++) {
+
+            let data = [];
+
+            result[i].forEach( (node, index) => {
+
+                let value = node.value === null  ? 'null' : node.value.toString()
+                let edges = [];
+
+                node.edges.forEach ((edge, index)=>{
+                    edges.push( edge.label.toString() )
+                });
+
+                data.push( {value: value, edges: edges} );
+            });
+
+
+            let dataString = "values { ";
+            data.forEach( (element) =>{
+                dataString += element.value.toString()+" | ";
+            });
+
+            dataString += "} edges { ";
+            data.forEach( (element) =>{
+                dataString += element.edges.toString() + " | ";
+            });
+            dataString += "} ";
+
+            console.log("BFS Level: ", i, "count", result[i].length, dataString )
+        }
+    }
+
     save(){
     }
 

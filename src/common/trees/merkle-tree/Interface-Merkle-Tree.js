@@ -10,11 +10,37 @@ import InterfaceTree from 'common/trees/Interface-Tree'
 class InterfaceMerkleTree extends InterfaceTree{
 
     /**
+     * When an Operation is done to a done, let's calculate its hash
+     * @param node
+     */
+    changedNode(node){
+        this.refreshHash(node);
+    }
+
+    /**
+     * Validate the Merkle Tree if the Hashes were calculated correctly
+     * @param node
+     * @returns {*}
+     */
+    validateTree(node){
+
+        let list = this.levelSearch();
+        for (let i=list.length-1; i >= 0; i--)
+            for (let j=list[i].length-1; j >=0; j-- ) {
+                let result = this.validateHash(list[i][j])
+
+                if (!result) return false;
+            }
+
+        return result;
+    }
+
+    /**
      * check the hash of node ... it must have an initial hash
      * @param node
      * @returns {boolean}
      */
-    verifyHash(node){
+    validateHash(node){
 
         //validate to up
 
@@ -95,7 +121,7 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         if (node === null || typeof node === 'undefined') throw "Couldn't compute hash because Node is empty";
 
-        let result  = this.verifyHash(node)
+        let result  = this.validateHash(node)
 
         // no changes...
         if (result) return result;
