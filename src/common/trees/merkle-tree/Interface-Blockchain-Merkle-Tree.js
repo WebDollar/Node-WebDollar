@@ -23,7 +23,7 @@ class InterfaceBlockchainMerkleTree{
 
     }
 
-        toJSON(){
+    toJSON(){
 
     }
 

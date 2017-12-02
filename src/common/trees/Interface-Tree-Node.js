@@ -1,5 +1,5 @@
 
-class InterfaceRadixTreeNode{
+class InterfaceTreeNode {
 
     // parent : Node
     // value : data
@@ -18,4 +18,4 @@ class InterfaceRadixTreeNode{
 
 }
 
-export default InterfaceRadixTreeNode;
+export default InterfaceTreeNode;

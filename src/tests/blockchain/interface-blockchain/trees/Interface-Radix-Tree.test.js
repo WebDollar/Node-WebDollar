@@ -2,7 +2,7 @@
 var assert = require('assert')
 
 
-import InterfaceRadixTree from 'common/blockchain/interface-blockchain/trees/radix-tree/Interface-Radix-Tree'
+import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
 describe('interfaceRadixTree', () => {
@@ -19,7 +19,7 @@ describe('interfaceRadixTree', () => {
         //Based on this tutorial https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Patricia_trie.svg/350px-Patricia_trie.svg.png
 
         radixTestingArray.forEach( (str)=>{
-            radix.radixAdd( new WebDollarCryptoData(str, "ascii"), new WebDollarCryptoData(str, "ascii") );
+            radix.add( new WebDollarCryptoData(str, "ascii"), new WebDollarCryptoData(str, "ascii") );
         })
 
         let result = radix.BFS();
@@ -41,13 +41,13 @@ describe('interfaceRadixTree', () => {
     it ( "search radix tree", () =>{
 
         radixTestingArray.forEach( (str)=>{
-            let result = radix.radixSearch( new WebDollarCryptoData(str, "ascii") );
+            let result = radix.search( new WebDollarCryptoData(str, "ascii") );
 
             assert (result.result === true, "result "+str+" was not found");
         });
 
-        let result8 = radix.radixSearch ( new WebDollarCryptoData("rubicundusxx", "ascii") );
-        let result9 = radix.radixSearch ( new WebDollarCryptoData("ruberr", "ascii") );
+        let result8 = radix.search ( new WebDollarCryptoData("rubicundusxx", "ascii") );
+        let result9 = radix.search ( new WebDollarCryptoData("ruberr", "ascii") );
 
         assert (result8.result === false, "result8 was found");
         assert (result9.result === false, "result9 was found");
@@ -57,12 +57,12 @@ describe('interfaceRadixTree', () => {
 
         radixTestingArray.forEach( (str)=>{
 
-            let deleteResult =radix.radixDelete(  new WebDollarCryptoData(str, "ascii") );
+            let deleteResult =radix.delete(  new WebDollarCryptoData(str, "ascii") );
             assert(deleteResult === true, "delete "+str+" didn't work");
 
-            radix.printBFS();
+            radix.printBFS();``
 
-            let searchResult = radix.radixSearch ( new WebDollarCryptoData(str, "ascii") );
+            let searchResult = radix.search ( new WebDollarCryptoData(str, "ascii") );
             assert (!searchResult.result, "result "+str+" was actually found...");
 
         });

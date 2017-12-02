@@ -4,31 +4,44 @@
     Radix Tree is an optimized Trie especially for very log texts
 
     Tutorials:
+
         https://en.wikipedia.org/wiki/Radix_tree
 
         https://www.cs.usfca.edu/~galles/visualization/RadixTree.html   - animated demo
-
-
  */
 
 import WebDollarCryptoData from "common/crypto/Webdollar-Crypto-Data";
+
 import InterfaceRadixTreeNode from "./Interface-Radix-Tree-Node"
 import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
 
+import InterfaceTree from "common/trees/Interface-Tree"
 
-class InterfaceRadixTree {
+
+class InterfaceRadixTree extends InterfaceTree{
 
     constructor(){
 
-        this.root = new InterfaceRadixTreeNode(null, null, [] );
+        super();
 
+        this.root = this.createNode(null, null, [] );
+        console.log("this.root", this.root);
+
+    }
+
+    createNode(){
+        return new InterfaceRadixTreeNode(arguments[0], arguments[1], arguments[3]);
+    }
+
+    createEdge(){
+        return new InterfaceRadixTreeEdge(arguments[0], arguments[1]);
     }
 
     /**
      * Adding an input to the Radix Tree
      * @param element can be a Base String, Buffer or CryptoWebDollarData
      */
-    radixAdd(input, value){
+    add(input, value){
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
@@ -68,16 +81,16 @@ class InterfaceRadixTree {
                             // Adding the new nodeMatch by edge Match
                             //console.log("nodeCurrent.parent", nodeCurrent.parent);
 
-                            let nodeMatch = new InterfaceRadixTreeNode(nodeCurrent, null, [] );
-                            nodeCurrent.edges.push( new InterfaceRadixTreeEdge( match, nodeMatch ));
+                            let nodeMatch = this.createNode( nodeCurrent, null, [] );
+                            nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
 
                             // Adding the new nodeEdge to the nodeMatch
-                            nodeMatch.edges.push( new InterfaceRadixTreeEdge( edge.label.substr(match.buffer.length), edge.targetNode), )
+                            nodeMatch.edges.push( this.createEdge( edge.label.substr(match.buffer.length), edge.targetNode), )
                             edge.targetNode.parent = nodeMatch;
 
                             // Adding thew new nodeChild with current Value
-                            let nodeChild = new InterfaceRadixTreeNode(nodeMatch, value, []);
-                            nodeMatch.edges.push(new InterfaceRadixTreeEdge(input.substr(i+match.buffer.length), nodeChild));
+                            let nodeChild = this.createNode( nodeMatch, value, []);
+                            nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
 
                             nodeCurrent = nodeChild;
 
@@ -103,8 +116,8 @@ class InterfaceRadixTree {
             if (!childFound) { //child not found, let's create a new Child with the remaining input [i...]
 
                 // no more Children...
-                let nodeChild = new InterfaceRadixTreeNode(nodeCurrent, value, []);
-                nodeCurrent.edges.push(new InterfaceRadixTreeEdge( input.substr(i), nodeChild));
+                let nodeChild = this.createNode(nodeCurrent, value, []);
+                nodeCurrent.edges.push( this.createEdge( input.substr(i), nodeChild));
                 nodeCurrent = nodeChild;
 
                 console.log("input.substr", input.substr(i));
@@ -124,11 +137,11 @@ class InterfaceRadixTree {
      * Delete Node from the Radix Tree
      * @param input
      */
-    radixDelete(input){
+    delete(input){
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
-        let searchResult = this.radixSearch(input);
+        let searchResult = this.search(input);
 
         //console.log("searchResult", searchResult)
         if (typeof searchResult.node === "undefined" || searchResult.node === null) return false;
@@ -235,7 +248,7 @@ class InterfaceRadixTree {
      * Searching an input in the Radix Tree
      * @param input
      */
-    radixSearch(input){
+    search(input){
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
