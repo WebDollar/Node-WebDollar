@@ -25,7 +25,8 @@ class InterfaceRadixTree extends InterfaceTree{
         super();
 
         this.root = this.createNode(null, null, [] );
-        console.log("this.root", this.root);
+
+        // console.log("this.root", this.root);
 
     }
 

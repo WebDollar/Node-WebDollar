@@ -1,3 +1,5 @@
+import WebDollarCryptoData from "./Webdollar-Crypto-Data";
+
 let crypto = null;
 
 import Argon2 from 'common/crypto/Argon2/Argon2'
@@ -108,15 +110,23 @@ class WebDollarCrypto {
     }
 
     static SHA256(bytes){
+
+        if (WebDollarCryptoData.isWebDollarCryptoData(bytes)) bytes = bytes.toBytes();
+
         let sha256 = crypto.createHash('sha256'); //sha256
         sha256.update(bytes)
-        return sha256.digest()
+
+        return new WebDollarCryptoData.createWebDollarCryptoData( sha256.digest() )
     }
 
     static RIPEMD160(bytes){
+
+        if (WebDollarCryptoData.isWebDollarCryptoData(bytes)) bytes = bytes.toBytes();
+
         let ripemd160 = crypto.createHash('ripemd160'); // RIPEMD160
         ripemd160.update(bytes)
-        return ripemd160.digest()
+
+        return new WebDollarCryptoData.createWebDollarCryptoData( ripemd160.digest() )
     }
 
     /**

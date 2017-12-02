@@ -17,6 +17,20 @@ class InterfaceTree{
         return new InterfaceTreeEdge(arguments[0]);
     }
 
+    save(){
+    }
+
+    load(){
+    }
+
+    toJSON(){
+
+    }
+
+    toString(){
+
+    }
+
 }
 
 export default InterfaceTree
