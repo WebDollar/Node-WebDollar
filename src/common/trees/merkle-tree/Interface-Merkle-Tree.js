@@ -3,24 +3,37 @@ import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
 import InterfaceTree from 'common/trees/Interface-Tree'
 
-class InterfaceBlockchainMerkleTree extends InterfaceTree{
+/*
+    it extends the Tree Node with hash {sha256: WebDollarCryptoData }
+ */
+
+class InterfaceMerkleTree extends InterfaceTree{
 
     /**
      * check the hash of node ... it must have an initial hash
      * @param node
      * @returns {boolean}
      */
-    verifyHashNode(node){
+    verifyHash(node){
 
         //validate to up
-        let initialHash = node.hash.buffer.toBytes();
 
-        this.computeHash(node);
+        let initialHash = null;
 
-        if (node.hash.buffer.length !== initialHash.length) return false;
+        if (node.hash !== null && typeof node.hash !== 'undefined' && node.hash.hash256 !== null && typeof node.has.hash256 !== 'undefined') {
+            initialHash = {};
+            initialHash.sha256 = node.hash.sha256.toBytes();
+        }
 
-        for (let i=0; i<node.hash.buffer.length; i++)
-            if (node.hash.buffer[i] !== initialHash[i] ) return false;
+        this._computeHash(node);
+
+        if (initialHash === null && node.hash !== null) return false; // different hash
+        if (initialHash.sha256 === null && node.sha256.hash !== null) return false; // different hash
+
+        if (node.hash.sha256.buffer.length !== initialHash.sha256.length) return false;
+
+        for (let i=0; i<node.hash.sha256.buffer.length; i++)
+            if (node.hash.sha256.buffer[i] !== initialHash.sha256[i] ) return false;
 
         return true;
 
@@ -40,42 +53,49 @@ class InterfaceBlockchainMerkleTree extends InterfaceTree{
             if (node.value === null) throw ("Leaf nodes has not value");
 
             let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( node.value ) )
-            node.hash = sha256;
+            node.hash = {sha256: sha256};
 
             return node.hash;
 
         } else
         if (node.edges.length > 0){
 
-            let hashConcat = null;//it will be a WebDollarCryptoData
+            let hashConcat = {sha256: null};//it will be a WebDollarCryptoData
 
             for (let i=0; i < node.edges.length; i++){
 
                 // the hash was not calculated ....
                 if (node.edges[i].targetNode.hash === null || typeof node.edges[i].targetNode.hash === "undefined" || !WebDollarCryptoData.isWebDollarCryptoData(node.edges[i].targetNode.hash))
-                    this.computeHash(node.edges[i].targetNode);
+                    this._computeHash(node.edges[i].targetNode);
 
-                if (i === 0)
-                    hashConcat = node.edges[i].targetNode.hash;
-                else
-                    hashConcat.buffer = Buffer.concat( [hashSum.buffer, node.edges[i].targetNode.hash.buffer ] );
+                if (i === 0) {
+                    hashConcat.sha256 = node.edges[i].targetNode.hash.sha256;
+                }
+                else {
+                    hashConcat.sha256.buffer = Buffer.concat([hashConcat.sha256.buffer, node.edges[i].targetNode.hash.sha256.buffer]);
+                }
 
             }
 
-            //Let's hash
+            // Let's hash
             let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( hashConcat ) )
-            node.hash = sha256;
+            node.hash = {sha256: sha256};
 
             return node.hash;
         }
 
     }
 
+    /**
+     * Recalculate the hash of a node if it is different and propagate the change to the root
+     * @param node
+     * @returns {boolean}
+     */
     refreshHash(node){
 
         if (node === null || typeof node === 'undefined') throw "Couldn't compute hash because Node is empty";
 
-        let result  = this.verifyHashNode(node)
+        let result  = this.verifyHash(node)
 
         // no changes...
         if (result) return result;
@@ -93,4 +113,4 @@ class InterfaceBlockchainMerkleTree extends InterfaceTree{
 
 }
 
-export default InterfaceBlockchainMerkleTree
+export default InterfaceMerkleTree
