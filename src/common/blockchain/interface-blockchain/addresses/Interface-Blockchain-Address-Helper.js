@@ -141,7 +141,7 @@ class InterfaceBlockchainAddressHelper{
         //bitcoin original
         //let hash160 = CryptoJS.RIPEMD160(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
 
-        let hash160 =  new WebDollarCryptoData( WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(publicKey.buffer)) )
+        let hash160 =  WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(publicKey.buffer))
 
         if (showDebug)
             console.log("hash160 hex", hash160.toString('hex') ) //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"

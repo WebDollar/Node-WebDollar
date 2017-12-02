@@ -40,10 +40,10 @@ describe('WebDollar crypt', ()=>{
         //this.timeout(15000);
 
 
-        const message1 = TestsHelper.makeid();
+        const message1 = TestsHelper.makeId();
         const message1_copy = message1;
 
-        const message2 = TestsHelper.makeid();
+        const message2 = TestsHelper.makeId();
 
         let hash1 = await WebDollarCrypto.hashPOW(message1)
         let hash1_copy = await WebDollarCrypto.hashPOW(message1_copy)
@@ -74,10 +74,10 @@ describe('WebDollar crypt', ()=>{
 
         //this.timeout(15000);
 
-        const message1 = TestsHelper.makeid();
+        const message1 = TestsHelper.makeId();
         const message1_copy = message1;
 
-        const message2 = TestsHelper.makeid();
+        const message2 = TestsHelper.makeId();
 
         let hash1 = await WebDollarCrypto.hashPOW_String(message1)
         let hash1_copy = await WebDollarCrypto.hashPOW_String(message1_copy)

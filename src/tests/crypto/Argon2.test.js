@@ -7,10 +7,10 @@ describe('Argon2', ()=>{
 
     it('Argon2 Hash ', async ()=>{
 
-        const message1 = TestsHelper.makeid();
+        const message1 = TestsHelper.makeId();
         const message1_copy = message1;
 
-        const message2 = TestsHelper.makeid();
+        const message2 = TestsHelper.makeId();
 
         let hash1 = await Argon2.hash(message1)
         let hash1_copy = await Argon2.hash(message1_copy)

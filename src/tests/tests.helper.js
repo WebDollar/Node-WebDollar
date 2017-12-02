@@ -1,9 +1,9 @@
 
-export default class{
+class TestsHelper {
 
-    static makeid(count) {
+    makeId(count) {
 
-      if (typeof count === 'undefined') count = Math.floor(Math.random()*100)
+      if (typeof count === 'undefined') count = Math.floor(Math.random()*100 + 30)
 
       var text = "";
       var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -14,5 +14,20 @@ export default class{
       return text;
     }
 
+    makeIds(count, wordCount){
+
+        if (typeof count === 'undefined') count = Math.floor(Math.random()*100 + 30)
+
+        let result = [];
+        for (let i=0; i<count; i++)
+            result.push( this.makeId(wordCount) );
+
+        return result;
+
+    }
+
 
 }
+
+
+export default new TestsHelper()

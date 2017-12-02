@@ -111,7 +111,7 @@ class WebDollarCrypto {
 
     static SHA256(bytes){
 
-        if (WebDollarCryptoData.isWebDollarCryptoData(bytes)) bytes = bytes.toBytes();
+        if (WebDollarCryptoData.isWebDollarCryptoData(bytes)) bytes = bytes.buffer;
 
         let sha256 = crypto.createHash('sha256'); //sha256
         sha256.update(bytes)
@@ -121,7 +121,7 @@ class WebDollarCrypto {
 
     static RIPEMD160(bytes){
 
-        if (WebDollarCryptoData.isWebDollarCryptoData(bytes)) bytes = bytes.toBytes();
+        if (WebDollarCryptoData.isWebDollarCryptoData(bytes)) bytes = bytes.buffer;
 
         let ripemd160 = crypto.createHash('ripemd160'); // RIPEMD160
         ripemd160.update(bytes)

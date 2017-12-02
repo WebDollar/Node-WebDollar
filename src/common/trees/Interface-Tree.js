@@ -25,6 +25,7 @@ class InterfaceTree{
     add(data){
 
         data = WebDollarCryptoData.createWebDollarCryptoData(data);
+
         let node = this.createNode(this.root, data, [])
 
         this.changedNode(node);
