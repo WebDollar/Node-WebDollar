@@ -8,20 +8,28 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 # Installing
 
+## 0. Node.js
+
+Windows just download from URL: https://nodejs.org/en/download/
+
+Linux: tutorial how to install Node.js using NVM (recommended) http://github.com/WebDollar/Node-WebDollar/docs/InstallDebian.md 
+
 ## 1. Cloning Repository 
 ```
 git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
 ```
-## 2. Installing modules 
+## 2. Installing modules
+`cd Node-WebDollar` to enter in the downloaded folder of the repository   
 ```
 npm install
 ```
 
-## In case you will get errors for **node-gyp**
+###In case you will get errors: 
+## 3. **node-gyp**
 
-In case your will get errors from node-gyp especially for **Argon2** or **webrtc** 
+In case your will get errors from **node-gyp** especially for **Argon2** or **webrtc** 
 
-#### Windows
+#### node-gyp on Windows
 3. open a Command Prompt with **Administrator rights**
 
 ```
@@ -30,7 +38,7 @@ npm install --global --production windows-build-tools
 npm install
 ```
 
-#### Linux
+#### node-gyp on Linux
 
 3. Installing Argon2 node.js
 ```
