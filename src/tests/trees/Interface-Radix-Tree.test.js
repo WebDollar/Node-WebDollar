@@ -5,18 +5,17 @@ var assert = require('assert')
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
-describe('interfaceRadixTree', () => {
+describe('Interface Radix Tree', () => {
 
 
     let radix = null;
 
+    //Based on this tutorial https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Patricia_trie.svg/350px-Patricia_trie.svg.png
     let radixTestingArray = ["romane","romanus","romulus","rubens", "ruber" , "rubicon", "rubicundus"];
 
     it('creating radix tree', ()=>{
 
         radix = new InterfaceRadixTree();
-
-        //Based on this tutorial https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Patricia_trie.svg/350px-Patricia_trie.svg.png
 
         radixTestingArray.forEach( (str)=>{
             radix.add( new WebDollarCryptoData(str, "ascii"), new WebDollarCryptoData(str, "ascii") );

@@ -7,9 +7,11 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
     // value : data
     // edges : [ of Edges]
 
-    constructor(parent, edges, value ){
+    constructor(parent, edges, value, leaf){
 
-        super(parent, edges, value)
+        super(parent, edges, value);
+
+        this.leaf = leaf;
 
     }
 

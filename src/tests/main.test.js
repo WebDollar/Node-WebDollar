@@ -9,6 +9,8 @@ if (typeof describe !== 'undefined') {
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test');
 
     require ('tests/trees/Interface-Radix-Tree.test');
+    require ('tests/trees/Interface-Accountant-Radix-Tree.test');
+
     require ('tests/trees/Interface-Merkle-Tree.test');
 
     require ('tests/crypto/WebDollar-Crypto.test');

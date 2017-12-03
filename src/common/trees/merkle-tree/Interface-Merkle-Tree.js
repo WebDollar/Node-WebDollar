@@ -87,7 +87,7 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         if (node.edges.length === 0){ //Lead Node (terminal node)
 
-            if (node.value === null || typeof node === "undefined") throw ("Leaf nodes has not value");
+            if ( !node.leaf  || node.value === null || typeof node === "undefined") throw ("Leaf nodes has not value");
 
 
             let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( node.value ) )
@@ -137,12 +137,10 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         let result = false;
 
-        if (forced === true) result = false; // in case it must recalculate the hash by force
-        else  result  = this.validateHash(node)
+        if ( typeof forced === "undefined" || forced === false ) result  = this.validateHash(node); // in case it must recalculate the hash by force
 
         // no changes...
-        if (result) return result;
-        else {
+        if (!result) {
 
             result = true;
 
@@ -154,7 +152,6 @@ class InterfaceMerkleTree extends InterfaceTree{
         }
 
         return result;
-
     }
 
 
