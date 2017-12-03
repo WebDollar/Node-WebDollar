@@ -24,15 +24,20 @@ class InterfaceMerkleTree extends InterfaceTree{
      */
     validateTree(node){
 
-        let list = this.levelSearch();
+        let list = this.levelSearch(node);
+
         for (let i=list.length-1; i >= 0; i--)
             for (let j=list[i].length-1; j >=0; j-- ) {
-                let result = this.validateHash(list[i][j])
 
-                if (!result) return false;
+                let result = this.validateHash(list[i][j]);
+
+                if (!result) {
+                    console.log("validateTree", i,j, list[i][j], false)
+                    return false;
+                }
             }
 
-        return result;
+        return true;
     }
 
     /**
@@ -46,20 +51,24 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         let initialHash = null;
 
-        if (node.hash !== null && typeof node.hash !== 'undefined' && node.hash.hash256 !== null && typeof node.has.hash256 !== 'undefined') {
+
+        if (node.hash === null || typeof node.hash === 'undefined' || node.hash.sha256 === null || typeof node.hash.sha256 === 'undefined')  return false;
+        else {
             initialHash = {};
-            initialHash.sha256 = node.hash.sha256.toBytes();
+            initialHash.sha256 = node.hash.sha256.toUint8Array();
         }
+
 
         this._computeHash(node);
 
         if (initialHash === null && node.hash !== null) return false; // different hash
-        if (initialHash.sha256 === null && node.sha256.hash !== null) return false; // different hash
+        if (initialHash.sha256 === null && node.hash.sha256 !== null) return false; // different hash
+
 
         if (node.hash.sha256.buffer.length !== initialHash.sha256.length) return false;
 
         for (let i=0; i<node.hash.sha256.buffer.length; i++)
-            if (node.hash.sha256.buffer[i] !== initialHash.sha256[i] ) return false;
+            if (node.hash.sha256.buffer[i] !== initialHash.sha256[i]) return false;
 
         return true;
 
@@ -76,7 +85,8 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         if (node.edges.length === 0){ //Lead Node (terminal node)
 
-            if (node.value === null) throw ("Leaf nodes has not value");
+            if (node.value === null || typeof node === "undefined") throw ("Leaf nodes has not value");
+
 
             let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( node.value ) )
             node.hash = {sha256: sha256};
@@ -95,16 +105,18 @@ class InterfaceMerkleTree extends InterfaceTree{
                     this._computeHash(node.edges[i].targetNode);
 
                 if (i === 0) {
-                    hashConcat.sha256 = node.edges[i].targetNode.hash.sha256;
+                    hashConcat.sha256 = new Buffer ( node.edges[i].targetNode.hash.sha256.buffer);
                 }
                 else {
-                    hashConcat.sha256.buffer = Buffer.concat([hashConcat.sha256.buffer, node.edges[i].targetNode.hash.sha256.buffer]);
+                    hashConcat.sha256 = Buffer.concat( [hashConcat.sha256, node.edges[i].targetNode.hash.sha256.buffer]);
                 }
 
             }
 
+            if (hashConcat.sha256 === null) throw ("Empty node with invalid sha256");
+
             // Let's hash
-            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( hashConcat ) )
+            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( WebDollarCryptoData.createWebDollarCryptoData( hashConcat.sha256 )  ) )
             node.hash = {sha256: sha256};
 
             return node.hash;
@@ -117,11 +129,14 @@ class InterfaceMerkleTree extends InterfaceTree{
      * @param node
      * @returns {boolean}
      */
-    refreshHash(node){
+    refreshHash(node, forced){
 
         if (node === null || typeof node === 'undefined') throw "Couldn't compute hash because Node is empty";
 
-        let result  = this.validateHash(node)
+        let result = false;
+
+        if (forced === true) result = false; // in case it must recalculate the hash by force
+        else  result  = this.validateHash(node)
 
         // no changes...
         if (result) return result;
@@ -130,7 +145,7 @@ class InterfaceMerkleTree extends InterfaceTree{
             this._computeHash(node)
 
             if (node.parent !== null)
-                this.refreshHash(node.parent)
+                this.refreshHash(node.parent, true)
 
         }
 

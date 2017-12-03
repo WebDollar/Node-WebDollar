@@ -55,7 +55,7 @@ describe('interfaceRadixTree', () => {
 
     it ( "delete radix tree", () =>{
 
-        radixTestingArray.forEach( (str)=>{
+        radixTestingArray.forEach( (str, index)=>{
 
             let deleteResult =radix.delete(  new WebDollarCryptoData(str, "ascii") );
             assert(deleteResult === true, "delete "+str+" didn't work");
@@ -64,6 +64,13 @@ describe('interfaceRadixTree', () => {
 
             let searchResult = radix.search ( new WebDollarCryptoData(str, "ascii") );
             assert (!searchResult.result, "result "+str+" was actually found...");
+
+            // the radix sort still, should detect all remaining strings
+
+            for (let j=index+1; j< radixTestingArray.length; j++) {
+                let searchResult = radix.search ( new WebDollarCryptoData( radixTestingArray[j], "ascii") );
+                assert (searchResult.result === true, "result "+str+" was not found after "+str+" was deleted...");
+            }
 
         });
 

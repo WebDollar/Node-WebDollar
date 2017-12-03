@@ -9,33 +9,51 @@ import TestsHelper from 'tests/tests.helper'
 
 describe('interfaceMerkleTree', () => {
 
-    let merkle = null;
+    let merkleTree = null;
 
     let merkleData = TestsHelper.makeIds();
+    let merkleData2 = TestsHelper.makeIds();
 
     it('creating merkle tree', ()=>{
 
-        merkle = new InterfaceMerkleTree();
-
-        //Based on this tutorial https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Patricia_trie.svg/350px-Patricia_trie.svg.png
+        merkleTree = new InterfaceMerkleTree();
 
         merkleData.forEach( (str)=>{
-            merkle.add( new WebDollarCryptoData(str, "ascii") );
+            merkleTree.add( new WebDollarCryptoData(str, "ascii") );
         });
 
-        let result = merkle.levelSearch();
+        let result = merkleTree.levelSearch();
 
         assert(result.length === 2, "Merkle Tree has to many levels")
-        assert(result[0].length === merkleData.length, "Merkle Tree Level 0 has different nodes")
+        assert(result[0].length === 1, "Merkle Tree Level 0 has different nodes")
+        assert(result[1].length === merkleData.length, "Merkle Tree Level 1 has different nodes")
 
-        assert(merkle.validateTree === true, "Merkle Tree is invalid!!!");
+        assert(merkleTree.validateTree() === true, "Merkle Tree is invalid!!!");
 
-        merkleData.printLevelSearch();
+        merkleTree.printLevelSearch();
 
     });
 
-    it ( "search merkle tree", () =>{
+    it ( "creating merkle tree 2nd level", () =>{
 
+        merkleData2.forEach( (str)=>{
+
+            let edgeIndex = merkleTree.root.edges.length;
+            let parent = merkleTree.root.edges[ Math.floor( Math.random() * edgeIndex) ].targetNode;
+
+            merkleTree.add( new WebDollarCryptoData(str, "ascii") , parent);
+        });
+
+        let result = merkleTree.levelSearch();
+
+        assert(result.length === 3, "Merkle Tree has to many levels")
+        assert(result[0].length === 1, "Merkle Tree Level 0 has different nodes")
+        assert(result[1].length === merkleData.length, "Merkle Tree Level 1 has different nodes")
+        assert(result[2].length === merkleData2.length, "Merkle Tree Level 2 has different nodes")
+
+        assert(merkleTree.validateTree() === true, "Merkle Tree is invalid!!!");
+
+        merkleTree.printLevelSearch();
 
     })
 

@@ -22,11 +22,14 @@ class InterfaceTree{
         //no changes in a simple tree
     }
 
-    add(data){
+    add(data, parent){
 
         data = WebDollarCryptoData.createWebDollarCryptoData(data);
 
-        let node = this.createNode(this.root, data, [])
+        if (parent === null || typeof parent ==="undefined") parent = this.root;
+
+        let node = this.createNode( parent , data, [])
+        parent.edges.push( this.createEdge( node ));
 
         this.changedNode(node);
         return node;
@@ -122,12 +125,20 @@ class InterfaceTree{
 
                 let value = node.value === null  ? 'null' : node.value.toString()
                 let edges = [];
+                let hash = null;
 
                 node.edges.forEach ((edge, index)=>{
-                    edges.push( edge.label.toString() )
+                    edges.push( typeof edge.label  !== 'undefined' ? edge.label.toString() : '' )
                 });
 
-                data.push( {value: value, edges: edges} );
+                if (typeof node.hash !== 'undefined') {
+                    hash = node.hash;
+                }
+
+                let dataObject = {value: value, edges: edges};
+                if (hash !== null) dataObject.hash = hash;
+
+                data.push( dataObject );
             });
 
 
@@ -135,6 +146,14 @@ class InterfaceTree{
             data.forEach( (element) =>{
                 dataString += element.value.toString()+" | ";
             });
+
+            if (typeof data[0].hash !== 'undefined') {
+
+                dataString += "} hashes { ";
+                data.forEach((element) => {
+                    dataString += element.hash.sha256.toString("hex") + " | ";
+                });
+            }
 
             dataString += "} edges { ";
             data.forEach( (element) =>{
