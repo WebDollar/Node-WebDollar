@@ -54,7 +54,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         let initialHash = null;
 
 
-        if (node.hash === null || typeof node.hash === 'undefined' || node.hash.sha256 === null || typeof node.hash.sha256 === 'undefined')  return false;
+        if (typeof node.hash === 'undefined' || node.hash === null  || typeof node.hash.sha256 === 'undefined' || node.hash.sha256 === null )  return false;
         else {
             initialHash = {};
             initialHash.sha256 = node.hash.sha256.toUint8Array();

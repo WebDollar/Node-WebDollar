@@ -12,7 +12,8 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
     //createEdge() {} is inherited from Interface Radix Tree
 
     changedNode(node){
-        // validate the balances
+        // recalculate the balances
+        this.refreshAccount(node);
     }
 
     validateAccount(node){
@@ -21,7 +22,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         let initialAmount = null;
 
-        if (node.value === null || typeof node.value === 'undefined' || node.value.amount === null || typeof node.hash.amount === 'undefined')  return false;
+        if (typeof node.value === 'undefined' || node.value === null  || typeof node.value.amount === 'undefined' || node.value.amount === null )  return false;
         else {
             initialAmount = node.value.amount;
         }
@@ -46,19 +47,21 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
             let amount = 0;
             for (let i=0; i<node.edges.length; i++){
 
-                if (typeof node.edges[i].value === "undefined" || node.edges[i].value === null || typeof node.edges[i].value.amount === 'undefined' || node.edges[i].value.amount === null)
+                if (typeof node.edges[i].targetNode.value === "undefined" || node.edges[i].targetNode.value === null || typeof node.edges[i].targetNode.value.amount === 'undefined' || node.edges[i].targetNode.value.amount === null)
                     amount += this._computeAccount(node.edges[i].targetNode);
                 else
-                    amount += node.edges[i].value.amount;
+                    amount += node.edges[i].targetNode.value.amount;
             }
 
             node.value = node.value || {};
             node.value.amount = amount;
         } else {
 
+            console.log("node.value", node.value);
+
             node.value = node.value || {};
 
-            if (typeof node.amount === 'undefined' || node.amount === null)
+            if (typeof node.value.amount === 'undefined' || node.value.amount === null)
                 node.value.amount = 0;
         }
 
