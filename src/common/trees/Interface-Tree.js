@@ -119,11 +119,11 @@ class InterfaceTree{
 
         for (let i=0; i< result.length; i++) {
 
-            let data = [];
+            let data = []; let hasHashses = false;
 
             result[i].forEach( (node, index) => {
 
-                let value = node.value === null  ? 'null' : node.value.toString()
+                let value = node.value === null  ? 'null' : node.value
                 let edges = [];
                 let hash = null;
 
@@ -131,12 +131,15 @@ class InterfaceTree{
                     edges.push( typeof edge.label  !== 'undefined' ? edge.label.toString() : '' )
                 });
 
-                if (typeof node.hash !== 'undefined') {
+                if (typeof node.hash !== 'undefined')
                     hash = node.hash;
-                }
 
                 let dataObject = {value: value, edges: edges};
-                if (hash !== null) dataObject.hash = hash;
+
+                if (hash !== null){
+                    dataObject.hash = hash;
+                    hasHashses = true;
+                }
 
                 data.push( dataObject );
             });
@@ -144,22 +147,27 @@ class InterfaceTree{
 
             let dataString = "values { ";
             data.forEach( (element) =>{
-                dataString += element.value.toString()+" | ";
+
+                dataString += " { "
+                if (Buffer.isBuffer(element.value))
+                    dataString += element.value.toString();
+                else
+                if (typeof element.value === "object" )
+                    dataString += JSON.stringify( element.value );
+                else
+                    dataString += " null";
+
+                dataString += " , "
+                dataString += element.edges.toString() + "} | ";
             });
 
-            if (typeof data[0].hash !== 'undefined') {
 
+            if ( hasHashses ) {
                 dataString += "} hashes { ";
                 data.forEach((element) => {
                     dataString += element.hash.sha256.toString("hex") + " | ";
                 });
             }
-
-            dataString += "} edges { ";
-            data.forEach( (element) =>{
-                dataString += element.edges.toString() + " | ";
-            });
-            dataString += "} ";
 
             console.log("BFS Level: ", i, "count", result[i].length, dataString )
         }

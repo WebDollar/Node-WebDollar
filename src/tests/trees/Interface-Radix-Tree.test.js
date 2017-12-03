@@ -18,7 +18,7 @@ describe('Interface Radix Tree', () => {
         radix = new InterfaceRadixTree();
 
         radixTestingArray.forEach( (str)=>{
-            radix.add( new WebDollarCryptoData(str, "ascii"), new WebDollarCryptoData(str, "ascii") );
+            radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
         })
 
         let result = radix.levelSearch();
