@@ -24,7 +24,7 @@ describe('interfaceMerkleTree', () => {
 
         let result = merkleTree.levelSearch();
 
-        assert(result.length === 2, "Merkle Tree has to many levels")
+        assert(result.length === 2, "Merkle Tree has too many levels")
         assert(result[0].length === 1, "Merkle Tree Level 0 has different nodes")
         assert(result[1].length === merkleData.length, "Merkle Tree Level 1 has different nodes")
 

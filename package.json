@@ -19,11 +19,14 @@
     "url": "git+https://github.com/WebDollar/Node-WebDollar.git"
   },
   "keywords": [
-    "Node",
-    "CryptoCurrency",
-    "sockets"
+    "p2p",
+    "Blockchain",
+    "Digital Currency",
+    "Crypto Currency",
+    "Sockets",
+    "webrtc"
   ],
-  "author": "WebDollar - Alexandru Ionut Budisteanu",
+  "author": "WebDollar",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/WebDollar/Node-WebDollar/issues"

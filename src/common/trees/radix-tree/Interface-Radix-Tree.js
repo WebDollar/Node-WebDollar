@@ -36,22 +36,20 @@ class InterfaceRadixTree extends InterfaceTree{
 
     changedNode(node){
         //no changes in a simple radix tree
+        if (!this.validateNode(node))
+            throw( 'The Radix Tree is no longer valid at the node '+ JSON.stringify(node))
     }
 
-
-    validateTree(node){
+    validateNode(node){
 
         // Leaf nodes should have values
         // Other nodes should not have values
 
         if (typeof node === 'undefined') node = this.root;
 
-        if (node.edges.length > 0) {
+        if (typeof node.edges !== 'undefined' && node.edges !== null && node.edges.length > 0) {
 
             if (node.leaf !== false) return false; //it should not be a leaf
-
-            for (let i = 0; i < node.edges.length; i++)
-                if ( !this.validateTree(node.edges[i].targetNode) ) return false;
 
             return true;
 
@@ -64,6 +62,25 @@ class InterfaceRadixTree extends InterfaceTree{
 
             return true;
         }
+    }
+
+    validateTree(node){
+
+        if (typeof node === 'undefined') node = this.root;
+
+        let result = this.validateNode(node);
+
+        if (result)
+            //more edges, let's check also them
+            if (typeof node.edges !== 'undefined' && node.edges !== null && node.edges.length > 0) {
+
+                for (let i = 0; i < node.edges.length; i++)
+                    if (!this.validateTree(node.edges[i].targetNode)) return false;
+
+            }
+
+        return result;
+
     }
 
     /**

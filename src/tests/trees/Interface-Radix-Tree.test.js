@@ -1,7 +1,7 @@
 
 var assert = require('assert')
 
-
+import TestsHelper from 'tests/Tests.helper'
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
@@ -20,16 +20,16 @@ describe('Interface Radix Tree', () => {
         radixTestingArray.forEach( (str)=>{
             radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
             assert(radix.validateTree() === true, "Radix Tree after "+str+" is not Valid");
-        })
+        });
 
         let result = radix.levelSearch();
 
-        assert(result.length === 5, "Radix Tree has to many levels")
-        assert(result[0].length === 1, "Radix Tree Level 0 has different nodes")
-        assert(result[1].length === 1, "Radix Tree Level 1 has different nodes")
-        assert(result[2].length === 2, "Radix Tree Level 2 has different nodes")
-        assert(result[3].length === 4, "Radix Tree Level 3 has different nodes")
-        assert(result[4].length === 6, "Radix Tree Level 4 has different nodes")
+        assert( result.length === 5, "Radix Tree has to many levels" )
+        assert( result[0].length === 1, "Radix Tree Level 0 has different nodes" )
+        assert( result[1].length === 1, "Radix Tree Level 1 has different nodes" )
+        assert( result[2].length === 2, "Radix Tree Level 2 has different nodes" )
+        assert( result[3].length === 4, "Radix Tree Level 3 has different nodes" )
+        assert( result[4].length === 6, "Radix Tree Level 4 has different nodes" )
 
         // for (let i =0; i<result[4].length; i++)
         //     console.log(i, result[4][i].value.toString(), result[4][i].parent );
@@ -71,7 +71,7 @@ describe('Interface Radix Tree', () => {
 
             for (let j=index+1; j< radixTestingArray.length; j++) {
                 let searchResult = radix.search ( new WebDollarCryptoData( radixTestingArray[j], "ascii") );
-                assert (searchResult.result === true, "result "+str+" was not found after "+str+" was deleted...");
+                assert ( searchResult.result === true, "result "+str+" was not found after "+str+" was deleted..." );
             }
 
         });
@@ -86,7 +86,61 @@ describe('Interface Radix Tree', () => {
     });
 
 
-    it('creating radix tree', ()=>{
+    it('creating radix tree 2 - generalized test', ()=>{
+
+        radixTestingArray = TestsHelper.makeIds(200, 100);
+        radix = new InterfaceRadixTree();
+
+        radixTestingArray.forEach( (str, index)=>{
+
+            radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
+
+            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+
+            assert( radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+
+            radixTestingArray.forEach( (str2, index2)=>{
+
+                let mustFind = false;
+                if (index2 <= index ) mustFind = true;
+                else mustFind = false;
+
+                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
+
+            });
+
+        });
+
+    });
+
+    it('deleting radix tree 2 - generalized test', ()=>{
+
+        radixTestingArray.forEach( (str, index)=>{
+
+            radix.delete( new WebDollarCryptoData(str, "ascii") );
+
+            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+
+            assert( !radix.search(new WebDollarCryptoData(str, "ascii")).result , "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+
+            radixTestingArray.forEach( (str2, index2)=>{
+
+                let mustFind = false;
+                if (index2 <= index ) mustFind = false;
+                else mustFind = true;
+
+                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
+
+            });
+
+        });
+
+        let result = radix.levelSearch();
+
+        radix.printLevelSearch();
+
+        assert (result.length === 1, "result is not 1 level");
+        assert (result[0].length === 1, "root is not empty");
 
     });
 
