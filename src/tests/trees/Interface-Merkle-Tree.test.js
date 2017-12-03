@@ -5,7 +5,7 @@ var assert = require('assert')
 import InterfaceMerkleTree from 'common/trees/merkle-tree/Interface-Merkle-Tree'
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
-import TestsHelper from 'tests/tests.helper'
+import TestsHelper from 'tests/Tests.helper'
 
 describe('interfaceMerkleTree', () => {
 

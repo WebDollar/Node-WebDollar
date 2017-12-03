@@ -10,9 +10,9 @@
     "start_double_connections": "npm run build_terminal && ALLOW_DOUBLE_CONNECTIONS=true DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
     "start": "npm run build_terminal && TESTING=true node dist/build_terminal.js  ",
     "test": "npm run build_terminal && mocha dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",
-    "show_mocha_report": "xdg-open mochawesome-report/mochawesome.html || open mochawesome-report/mochawesome.html",
+    "show_mocha_report": "node src/tests/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
-    "show_coverage": "xdg-open coverage/lcov-report/index.html || open coverage/lcov-report/index.html"
+    "show_coverage": "node src/tests/show-coverage.test.js"
   },
   "repository": {
     "type": "git",
@@ -51,6 +51,7 @@
     "javascript-biginteger": "^0.9.2",
     "jsonp": "^0.2.1",
     "node-jsonp": "^1.0.2",
+    "opn": "^5.1.0",
     "rxjs": "^5.4.3",
     "secp256k1": "^3.3.1",
     "simple-peer": "^8.1.1",

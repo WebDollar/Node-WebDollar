@@ -1,6 +1,6 @@
 var assert = require('assert')
 import Argon2 from 'common/crypto/Argon2/Argon2'
-import TestsHelper from 'tests/tests.helper'
+import TestsHelper from 'tests/Tests.helper'
 
 
 describe('Argon2', ()=>{
