@@ -24,18 +24,15 @@ class InterfaceRadixTree extends InterfaceTree{
 
         super();
 
-        this.root = this.createNode(null, null, [] );
-
-        // console.log("this.root", this.root);
-
+        this.root = this.createNode(null,  [], null );
     }
 
-    createNode(){
-        return new InterfaceRadixTreeNode(arguments[0], arguments[1], arguments[3]);
+    createNode(parent, edges, value){
+        return new InterfaceRadixTreeNode(parent, edges, value);
     }
 
-    createEdge(){
-        return new InterfaceRadixTreeEdge(arguments[0], arguments[1]);
+    createEdge(label, targetNode){
+        return new InterfaceRadixTreeEdge(label, targetNode);
     }
 
     changedNode(node){
@@ -46,7 +43,7 @@ class InterfaceRadixTree extends InterfaceTree{
      * Adding an input to the Radix Tree
      * @param element can be a Base String, Buffer or CryptoWebDollarData
      */
-    add(input, value){
+    add(input, value, amount){
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
@@ -86,7 +83,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             // Adding the new nodeMatch by edge Match
                             //console.log("nodeCurrent.parent", nodeCurrent.parent);
 
-                            let nodeMatch = this.createNode( nodeCurrent, null, [] );
+                            let nodeMatch = this.createNode( nodeCurrent,  [], null );
                             nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
 
                             // Adding the new nodeEdge to the nodeMatch
@@ -94,7 +91,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             edge.targetNode.parent = nodeMatch;
 
                             // Adding thew new nodeChild with current Value
-                            let nodeChild = this.createNode( nodeMatch, value, []);
+                            let nodeChild = this.createNode( nodeMatch, [], value, amount );
                             nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
 
                             nodeCurrent = nodeChild;
@@ -124,7 +121,7 @@ class InterfaceRadixTree extends InterfaceTree{
             if (!childFound) { //child not found, let's create a new Child with the remaining input [i...]
 
                 // no more Children...
-                let nodeChild = this.createNode(nodeCurrent, value, []);
+                let nodeChild = this.createNode(nodeCurrent, [], value, amount );
                 nodeCurrent.edges.push( this.createEdge( input.substr(i), nodeChild));
                 nodeCurrent = nodeChild;
 

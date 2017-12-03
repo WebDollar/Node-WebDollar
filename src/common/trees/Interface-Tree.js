@@ -6,16 +6,16 @@ class InterfaceTree{
 
     constructor(){
 
-        this.root = this.createNode(null, null, []);
+        this.root = this.createNode(null,  [], null );
 
     }
 
-    createNode(){
-        return new InterfaceTreeNode(arguments[0], arguments[1], arguments[2]);
+    createNode(parent, edges, value){
+        return new InterfaceTreeNode(parent, edges, value);
     }
 
-    createEdge(){
-        return new InterfaceTreeEdge(arguments[0]);
+    createEdge(targetNode){
+        return new InterfaceTreeEdge(targetNode);
     }
 
     changedNode(node){
@@ -28,7 +28,7 @@ class InterfaceTree{
 
         if (parent === null || typeof parent ==="undefined") parent = this.root;
 
-        let node = this.createNode( parent , data, [])
+        let node = this.createNode( parent , [], data )
         parent.edges.push( this.createEdge( node ));
 
         this.changedNode(node);

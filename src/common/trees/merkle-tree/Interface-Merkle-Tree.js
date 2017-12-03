@@ -22,9 +22,11 @@ class InterfaceMerkleTree extends InterfaceTree{
      * @param node
      * @returns {*}
      */
-    validateTree(node){
+    validateTree(node, list){
 
-        let list = this.levelSearch(node);
+        //recalculate list, not really necessary if it was provided
+        if (typeof list === 'undefined' || list === null || list === [])
+            list = this.levelSearch(node);
 
         for (let i=list.length-1; i >= 0; i--)
             for (let j=list[i].length-1; j >=0; j-- ) {
@@ -142,12 +144,16 @@ class InterfaceMerkleTree extends InterfaceTree{
         if (result) return result;
         else {
 
+            result = true;
+
             this._computeHash(node)
 
             if (node.parent !== null)
-                this.refreshHash(node.parent, true)
+                result = result && this.refreshHash(node.parent, true)
 
         }
+
+        return result;
 
     }
 

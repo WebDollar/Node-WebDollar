@@ -5,14 +5,15 @@ class InterfaceTreeNode {
     // value : data
     // edges : [ of Edges]
 
-    constructor(parent, value, edges){
+    constructor(parent, edges, value){
 
         if (typeof edges === "undefined") edges = [];
         if (typeof value === "undefined") value = null;
 
         this.parent = parent;
-        this.value = value;
         this.edges = edges;
+
+        this.value = value;
 
     }
 
