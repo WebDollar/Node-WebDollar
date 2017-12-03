@@ -19,6 +19,7 @@ describe('Interface Radix Tree', () => {
 
         radixTestingArray.forEach( (str)=>{
             radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
+            assert(radix.validateTree() === true, "Radix Tree after "+str+" is not Valid");
         })
 
         let result = radix.levelSearch();
@@ -59,7 +60,9 @@ describe('Interface Radix Tree', () => {
             let deleteResult =radix.delete(  new WebDollarCryptoData(str, "ascii") );
             assert(deleteResult === true, "delete "+str+" didn't work");
 
-            radix.printLevelSearch();``
+            radix.printLevelSearch();
+
+            assert(radix.validateTree() === true, "Radix Tree deleted after "+str+" is not Valid");
 
             let searchResult = radix.search ( new WebDollarCryptoData(str, "ascii") );
             assert (!searchResult.result, "result "+str+" was actually found...");
@@ -79,6 +82,11 @@ describe('Interface Radix Tree', () => {
 
         assert (result.length === 1, "result is not 1 level");
         assert (result[0].length === 1, "root is not empty");
+
+    });
+
+
+    it('creating radix tree', ()=>{
 
     });
 

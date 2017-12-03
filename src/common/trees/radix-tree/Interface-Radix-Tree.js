@@ -23,7 +23,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
         super();
 
-        this.root = this.createNode(null,  [], null );
+        this.root = this.createNode(null,  [], null, false );
     }
 
     createNode(parent, edges, value, leaf){
@@ -36,6 +36,34 @@ class InterfaceRadixTree extends InterfaceTree{
 
     changedNode(node){
         //no changes in a simple radix tree
+    }
+
+
+    validateTree(node){
+
+        // Leaf nodes should have values
+        // Other nodes should not have values
+
+        if (typeof node === 'undefined') node = this.root;
+
+        if (node.edges.length > 0) {
+
+            if (node.leaf !== false) return false; //it should not be a leaf
+
+            for (let i = 0; i < node.edges.length; i++)
+                if ( !this.validateTree(node.edges[i].targetNode) ) return false;
+
+            return true;
+
+        } else {
+
+            if (node !== this.root){
+                if (node.leaf !== true) return false; // it should be a leaf
+                if (node.value === null || typeof node.value === 'undefined') return false; //it should have a valid value
+            }
+
+            return true;
+        }
     }
 
     /**

@@ -10,6 +10,10 @@ class InterfaceTree{
 
     }
 
+    validateTree(node, list){
+
+    }
+
     createNode(parent, edges, value){
         return new InterfaceTreeNode(parent, edges, value);
     }
