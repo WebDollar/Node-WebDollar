@@ -17,7 +17,6 @@ import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
 
 import InterfaceTree from "common/trees/Interface-Tree"
 
-
 class InterfaceRadixTree extends InterfaceTree{
 
     constructor(){

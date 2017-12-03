@@ -15,8 +15,23 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         // validate the balances
     }
 
-    add(input, value, amount ){
-        return InterfaceRadixTree.prototype.add(input, value, amount);
+    validateAccount(node){
+
+        //validate to up
+
+        let initialAmount = null;
+
+        if (node.value === null || typeof node.value === 'undefined' || node.value.amount === null || typeof node.hash.amount === 'undefined')  return false;
+        else {
+            initialAmount = node.value.amount;
+        }
+
+        this._computeAccount(node);
+
+        if (initialAmount === null && node.value.amount !== null) return false; // different amount
+        if (initialAmount !== node.value.amount) return false; // different amount
+
+        return true;
     }
 
     /**
@@ -31,18 +46,23 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
             let amount = 0;
             for (let i=0; i<node.edges.length; i++){
 
-                if (typeof node.edges[i].amount === 'undefined' || node.edges[i].amount === null)
+                if (typeof node.edges[i].value === "undefined" || node.edges[i].value === null || typeof node.edges[i].value.amount === 'undefined' || node.edges[i].value.amount === null)
                     amount += this._computeAccount(node.edges[i].targetNode);
                 else
-                    amount += node.edges[i].amount;
+                    amount += node.edges[i].value.amount;
             }
+
+            node.value = node.value || {};
+            node.value.amount = amount;
         } else {
+
+            node.value = node.value || {};
+
             if (typeof node.amount === 'undefined' || node.amount === null)
-                node.amount = 0;
+                node.value.amount = 0;
         }
 
-        return node.amount;
-
+        return node.value.amount;
     }
 
     refreshAccount(node, forced){
