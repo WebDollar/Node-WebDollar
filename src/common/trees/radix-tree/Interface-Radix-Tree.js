@@ -23,7 +23,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
         super();
 
-        this.root = this.createNode(null,  [], null, false );
+        this.root = this.createNode(null,  [], null);
     }
 
     createNode(parent, edges, value){
@@ -49,7 +49,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
         if (typeof node === 'undefined') node = this.root;
 
-        if (typeof node.edges !== 'undefined' && node.edges !== null && node.edges.length > 0) {
+        if ( !node.isLeaf() )  {
 
             if (node.isLeaf() !== false) return false; //it should not be a leaf
 
@@ -60,11 +60,12 @@ class InterfaceRadixTree extends InterfaceTree{
             if (node !== this.root){
 
                 if (node.isLeaf() !== true) return false; // it should be a leaf
-                if (node.value === null || typeof node.value === 'undefined'){
-
-                    console.log("node.value false", node);
+                if (node.value === null || typeof node.value === 'undefined')
                     return false; //it should have a valid value
-                }
+
+            } else
+            if (node === this.root){
+                return true;
             }
 
             return true;
@@ -142,11 +143,13 @@ class InterfaceRadixTree extends InterfaceTree{
                             edge.targetNode.parent = nodeMatch;
 
                             // Adding thew new nodeChild with current Value
-                            let nodeChild = this.createNode( nodeMatch, [], value, true );
+                            let nodeChild = this.createNode( nodeMatch, [], value );
                             nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
 
                             nodeCurrent = nodeChild;
 
+                            // console.log("nodeMatch",nodeMatch);
+                            // console.log("nodeChild",nodeChild);
                             this.changedNode(nodeMatch)
                             this.changedNode(nodeChild)
 
@@ -172,13 +175,15 @@ class InterfaceRadixTree extends InterfaceTree{
             if (!childFound) { //child not found, let's create a new Child with the remaining input [i...]
 
                 // no more Children...
-                let nodeChild = this.createNode(nodeCurrent, [], value, true );
-                nodeCurrent.edges.push( this.createEdge( input.substr(i), nodeChild));
-                nodeCurrent = nodeChild;
 
+                let nodeChild = this.createNode(nodeCurrent, [], value);
+                nodeCurrent.edges.push( this.createEdge( input.substr(i), nodeChild ));
+
+                //console.log("nodeChild2", nodeChild)
                 this.changedNode(nodeChild)
-                //console.log("input.substr", input.substr(i));
 
+
+                nodeCurrent = nodeChild;
                 break; //done
             }
 
@@ -251,7 +256,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             node.parent = grandParent;
 
                             // it is not necessary its parent
-                            console.log("this.changedNode 1");
+                            //console.log("this.changedNode 1");
                             this.changedNode(node);
 
                             //console.log("grandParent deletion", node, nodeParent);
@@ -265,7 +270,7 @@ class InterfaceRadixTree extends InterfaceTree{
                 finished = false;
                 nodeParent = node.parent;
 
-                console.log("this.changedNode 2");
+                //console.log("this.changedNode 2");
                 this.changedNode(node)
 
                 //console.log("node simplu after", node, node.parent);
@@ -302,7 +307,7 @@ class InterfaceRadixTree extends InterfaceTree{
                         node = node.parent;
                         nodeParent = node.parent;
 
-                        console.log("this.changedNode 3");
+                        //console.log("this.changedNode 3");
                         this.changedNode(node);
                         break;
                     }

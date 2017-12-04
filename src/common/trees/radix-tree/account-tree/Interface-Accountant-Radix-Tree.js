@@ -24,7 +24,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     validateNode(node){
 
-        InterfaceRadixTree.prototype.validateNode.call(this, node);
+        return InterfaceRadixTree.prototype.validateNode.call(this, node);
     }
 
     validateAccount(node){

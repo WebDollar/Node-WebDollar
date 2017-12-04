@@ -20,6 +20,7 @@ describe('Interface Accountant Radix Tree', () => {
 
         accountantTree = new InterfaceAccountantRadixTree();
 
+
         accountantData.forEach( (data)=>{
             accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, amount: data.value } );
         });

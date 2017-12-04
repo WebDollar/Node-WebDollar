@@ -19,7 +19,7 @@ class InterfaceTreeNode {
 
     isLeaf(){
 
-        return (this.edges.length === 0)
+        return (typeof this.edges !== 'undefined' && this.edges !== null && this.edges.length === 0)
 
     }
 
