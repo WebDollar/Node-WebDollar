@@ -10,7 +10,7 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 ## 0. Node.js
 
-Windows just download from URL: https://nodejs.org/en/download/
+Windows: just download and install from URL: https://nodejs.org/en/download/
 
 Linux: tutorial how to install Node.js using NVM (recommended) [Install Node.js using NVM](/docs/InstallDebian.md) 
 
@@ -29,18 +29,18 @@ npm install
 
 In case your will get errors from **node-gyp** especially for **Argon2** or **webrtc** 
 
-#### node-gyp on Windows
-3. open a Command Prompt with **Administrator rights**
+#### 3.1 node-gyp on Windows
+open a Command Prompt with **Administrator rights**
 
 ```
-cd C:\..............\Node-WebDollar\
+cd C:\Path\To\Node-WebDollar\
 npm install --global --production windows-build-tools                                    
 npm install
 ```
 
-#### node-gyp on Linux
+#### 3.2 node-gyp on Linux
 
-3. Installing Argon2 node.js
+Installing Argon2 node.js
 ```
 sudo apt install linuxbrew-wrapper 
 ```
