@@ -103,19 +103,15 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
             this._computeAccount(node)
 
-        }
+            if (node.parent !== null) {
 
-        if (node.parent !== null) {
+                if (!this.validateAccount(node.parent))
+                    result = result && this.refreshAccount(node.parent, true)
 
-            // console.log(node.value, " with parent =>", node.parent.value);
-            // console.log(node, " with parent =>", node.parent, "node.parent === this.root", node.parent=== this.root);
-            //
-            // this.printLevelSearch();
-
-            if (!this.validateAccount(node.parent))
-                result = result && this.refreshAccount(node.parent, true)
+            }
 
         }
+
 
         return result;
 
