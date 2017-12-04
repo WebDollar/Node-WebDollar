@@ -68,8 +68,6 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
             node.value.amount = amount;
         } else {
 
-            console.log("node.value", node.value);
-
             node.value = node.value || {};
 
             if (typeof node.value.amount === 'undefined' || node.value.amount === null)

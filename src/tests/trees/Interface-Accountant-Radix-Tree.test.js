@@ -4,6 +4,7 @@ var assert = require('assert')
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import InterfaceAccountantRadixTree from 'common/trees/radix-tree/account-tree/Interface-Accountant-Radix-Tree'
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
+import TestsHelper from 'tests/Tests.helper'
 
 describe('Interface Accountant Radix Tree', () => {
 
@@ -14,7 +15,7 @@ describe('Interface Accountant Radix Tree', () => {
 
     //let randomize accountantData values
     for (let i=0; i<accountantData.length; i++)
-        accountantData[i].value = Math.random()*1000 +  30;
+        accountantData[i].value = TestsHelper.makeRandomNumber();
 
     it('creating Accountant Radix tree', ()=>{
 
@@ -38,13 +39,59 @@ describe('Interface Accountant Radix Tree', () => {
         for (let i=0; i<accountantData.length; i++)
             sum += accountantData[i].value;
 
-        accountantTree.printLevelSearch();
+        console.log("Accountant Tree sums");
+        console.log(sum);
+        console.log(result[0][0].value.amount);
 
-        assert(result[0][0].value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) ");
+        assert(result[0][0].value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ result[0][0].value.amount+ "       " + sum + "       diff: "+  (result[0][0].value.amount-sum).toString() );
 
         accountantTree.printLevelSearch();
 
     });
+
+    it('creating Accountant Radix tree - generalized integer', ()=>{
+
+        accountantTree = new InterfaceAccountantRadixTree();
+        accountantData = TestsHelper.makeSetIdAndNumber(100, true, 10);
+
+        accountantData.forEach( (data)=>{
+            accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, amount: data.value } );
+        });
+
+        let sum = 0;
+        for (let i=0; i<accountantData.length; i++)
+            sum += accountantData[i].value;
+
+        console.log("Accountant Tree sums");
+        console.log(sum);
+        console.log(accountantTree.root.value.amount);
+
+        assert(accountantTree.root.value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ accountantTree.root.value.amount+ "       " + sum + "       diff: "+  (accountantTree.root.value.amount-sum).toString() );
+
+    });
+
+
+    it('creating Accountant Radix tree - generalized', ()=>{
+
+        accountantTree = new InterfaceAccountantRadixTree();
+        accountantData = TestsHelper.makeSetIdAndNumber(100);
+
+        accountantData.forEach( (data)=>{
+            accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, amount: data.value } );
+        });
+
+        let sum = 0;
+        for (let i=0; i<accountantData.length; i++)
+            sum += accountantData[i].value;
+
+        console.log("Accountant Tree sums");
+        console.log(sum);
+        console.log(accountantTree.root.value.amount);
+
+        assert(accountantTree.root.value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ accountantTree.root.value.amount+ "       " + sum + "       diff: "+  (accountantTree.root.value.amount-sum).toString() );
+
+    });
+
 
 });
 
