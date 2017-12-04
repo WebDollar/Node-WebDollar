@@ -13,23 +13,33 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     changedNode(node){
         // recalculate the balances
-        InterfaceRadixTree.prototype.changedNode.call(this, node);
         this.refreshAccount(node);
 
-        if (!this.validateNode(node)) {
-            console.log("Invalid Accountant Tree Node", node)
-            throw( 'The Radix Tree is no longer valid at the node ' + JSON.stringify(node))
-        }
+        InterfaceRadixTree.prototype.changedNode.call(this, node);
     }
 
     validateNode(node){
 
-        return InterfaceRadixTree.prototype.validateNode.call(this, node);
+        let result = InterfaceRadixTree.prototype.validateNode.call(this, node);
+        if (!result ) return false;
+
+        //it should have a valid value
+        console.log("validate 1",node.value);
+        if (node.value === null) return false;
+        if (node.value.amount === null || typeof node.value.amount === 'undefined')  return false;
+        if (node.value.amount < 0) return false;
+        console.log("validate 2",node.value);
+        return true;
+
     }
+    //
+    // validateTree(node){
+    //
+    // }
 
     validateAccount(node){
 
-        //validate to up
+        //validate bottom to up
 
         let initialAmount = null;
 
@@ -40,7 +50,8 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         this._computeAccount(node);
 
-        if (initialAmount === null && node.value.amount !== null) return false; // different amount
+        if (typeof initialAmount !== 'number' || typeof node.value.amount !== 'number') return false;
+        if (initialAmount === null || node.value.amount !== null) return false; // different amount
         if (initialAmount !== node.value.amount) return false; // different amount
 
         return true;
@@ -54,11 +65,11 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         if (node === null || typeof node === 'undefined') throw "Couldn't compute the Amount because Node is empty";
 
-        if (node.edges.length > 0){
+        if ( !node.isLeaf() ){
             let amount = 0;
             for (let i=0; i<node.edges.length; i++){
 
-                if (typeof node.edges[i].targetNode.value === "undefined" || node.edges[i].targetNode.value === null || typeof node.edges[i].targetNode.value.amount === 'undefined' || node.edges[i].targetNode.value.amount === null)
+                if (typeof node.edges[i].targetNode.value === "undefined" || node.edges[i].targetNode.value === null || typeof node.edges[i].targetNode.value.amount !== 'number' || node.edges[i].targetNode.value.amount === null)
                     amount += this._computeAccount(node.edges[i].targetNode);
                 else
                     amount += node.edges[i].targetNode.value.amount;
@@ -70,7 +81,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
             node.value = node.value || {};
 
-            if (typeof node.value.amount === 'undefined' || node.value.amount === null)
+            if (typeof node.value.amount !== 'number' || node.value.amount === null)
                 node.value.amount = 0;
         }
 
@@ -92,7 +103,16 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
             this._computeAccount(node)
 
-            if (node.parent !== null)
+        }
+
+        if (node.parent !== null) {
+
+            // console.log(node.value, " with parent =>", node.parent.value);
+            // console.log(node, " with parent =>", node.parent, "node.parent === this.root", node.parent=== this.root);
+            //
+            // this.printLevelSearch();
+
+            if (!this.validateAccount(node.parent))
                 result = result && this.refreshAccount(node.parent, true)
 
         }

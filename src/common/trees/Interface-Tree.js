@@ -167,7 +167,7 @@ class InterfaceTree{
                 if (typeof node.hash !== 'undefined')
                     hash = node.hash;
 
-                let dataObject = {value: value, edges: edges};
+                let dataObject = {id: node.id, parentId: (node.parent !== null ? node.parent.id : -666), value: value, edges: edges};
 
                 if (hash !== null){
                     dataObject.hash = hash;
@@ -184,6 +184,9 @@ class InterfaceTree{
                 dataString += " { "
 
                 try {
+
+                    dataString += "id: "+element.id + " parentId: "+element.parentId+ "   ";
+
                     if (Buffer.isBuffer(element.value))
                         dataString += element.value.toString();
                     else if (typeof element.value === "object")

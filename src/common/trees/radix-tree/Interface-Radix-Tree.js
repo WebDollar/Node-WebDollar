@@ -38,6 +38,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
         if (!this.validateNode(node)) {
             console.log("Invalid Radix Tree", node)
+            this.printLevelSearch();
             throw( 'The Radix Tree is no longer valid at the node ' + JSON.stringify(node))
         }
     }
@@ -46,8 +47,6 @@ class InterfaceRadixTree extends InterfaceTree{
 
         // Leaf nodes should have values
         // Other nodes should not have values
-
-        if (typeof node === 'undefined') node = this.root;
 
         if ( !node.isLeaf() )  {
 

@@ -24,6 +24,7 @@ describe('Interface Accountant Radix Tree', () => {
 
         accountantData.forEach( (data)=>{
             accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, amount: data.value } );
+            assert(accountantTree.validateParentsAndChildrenEdges() === true, "validateParentsAndChildrenEdges was not passed");
         });
 
         let result = accountantTree.levelSearch();
@@ -66,7 +67,11 @@ describe('Interface Accountant Radix Tree', () => {
         console.log(sum);
         console.log(accountantTree.root.value.amount);
 
+
+        accountantTree.printLevelSearch();
+
         assert(accountantTree.root.value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ accountantTree.root.value.amount+ "       " + sum + "       diff: "+  (accountantTree.root.value.amount-sum).toString() );
+
 
     });
 

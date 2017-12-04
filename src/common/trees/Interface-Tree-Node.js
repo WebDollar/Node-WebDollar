@@ -1,3 +1,5 @@
+var uniqueId = 0;
+
 
 class InterfaceTreeNode {
 
@@ -9,6 +11,8 @@ class InterfaceTreeNode {
 
         if (typeof edges === "undefined") edges = [];
         if (typeof value === "undefined") value = null;
+
+        this.id = uniqueId++;
 
         this.parent = parent;
         this.edges = edges;
