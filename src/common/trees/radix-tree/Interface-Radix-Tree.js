@@ -26,8 +26,8 @@ class InterfaceRadixTree extends InterfaceTree{
         this.root = this.createNode(null,  [], null, false );
     }
 
-    createNode(parent, edges, value, leaf){
-        return new InterfaceRadixTreeNode(parent, edges, value, leaf);
+    createNode(parent, edges, value){
+        return new InterfaceRadixTreeNode(parent, edges, value);
     }
 
     createEdge(label, targetNode){
@@ -35,9 +35,11 @@ class InterfaceRadixTree extends InterfaceTree{
     }
 
     changedNode(node){
-        //no changes in a simple radix tree
-        if (!this.validateNode(node))
-            throw( 'The Radix Tree is no longer valid at the node '+ JSON.stringify(node))
+
+        if (!this.validateNode(node)) {
+            console.log("Invalid Radix Tree", node)
+            throw( 'The Radix Tree is no longer valid at the node ' + JSON.stringify(node))
+        }
     }
 
     validateNode(node){
@@ -49,15 +51,20 @@ class InterfaceRadixTree extends InterfaceTree{
 
         if (typeof node.edges !== 'undefined' && node.edges !== null && node.edges.length > 0) {
 
-            if (node.leaf !== false) return false; //it should not be a leaf
+            if (node.isLeaf() !== false) return false; //it should not be a leaf
 
             return true;
 
         } else {
 
             if (node !== this.root){
-                if (node.leaf !== true) return false; // it should be a leaf
-                if (node.value === null || typeof node.value === 'undefined') return false; //it should have a valid value
+
+                if (node.isLeaf() !== true) return false; // it should be a leaf
+                if (node.value === null || typeof node.value === 'undefined'){
+
+                    console.log("node.value false", node);
+                    return false; //it should have a valid value
+                }
             }
 
             return true;
@@ -199,10 +206,14 @@ class InterfaceRadixTree extends InterfaceTree{
         //it is the last element, we should delete it
         let finished = false;
 
-        let node = searchResult.node;
-        node.value = null;
-        node.leaf = false;
+        if (!searchResult.node.isLeaf()) throw ("couldn't delete because input is not a leaf node");
 
+        let node = searchResult.node;
+
+        node.value = null;
+        node.edges = [];
+
+        // node must be deleted
         while ( !finished && node !== null){
 
             let nodeParent = node.parent;
@@ -210,20 +221,19 @@ class InterfaceRadixTree extends InterfaceTree{
             finished = true;
 
             //remove empty parent nodes
-            if ( node !== null && !node.leaf && nodeParent !== null && node.edges.length === 0){
-
-                //removing edge to child from parent
+            if ( node !== null  && node.value === null && nodeParent !== null && node.isLeaf() && node.edges.length === 0){
 
                 //console.log("node simplu before", node, node.parent);
 
+                //removing edge to current node from my direct parent
                 for (let i=0; i<nodeParent.edges.length; i++)
                     if (nodeParent.edges[i].targetNode === node) {
                         nodeParent.edges.splice(i, 1);
                         break;
                     }
 
-                // remove special kind of prefixes nodes
-                if ( nodeParent.parent !== null && !nodeParent.leaf  && nodeParent.edges.length === 1 ){
+                // remove now useless prefixes nodes
+                if ( nodeParent.parent !== null && !nodeParent.isLeaf()  && nodeParent.edges.length === 1 ){  // my parent has one more node
 
                     let edge = nodeParent.edges[0];
                     node = nodeParent.edges[0].targetNode;
@@ -241,6 +251,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             node.parent = grandParent;
 
                             // it is not necessary its parent
+                            console.log("this.changedNode 1");
                             this.changedNode(node);
 
                             //console.log("grandParent deletion", node, nodeParent);
@@ -254,32 +265,31 @@ class InterfaceRadixTree extends InterfaceTree{
                 finished = false;
                 nodeParent = node.parent;
 
+                console.log("this.changedNode 2");
                 this.changedNode(node)
 
                 //console.log("node simplu after", node, node.parent);
             }
 
 
-            //delete edges to empty codes
-            if (node !== null && !node.leaf && node.edges.length > 0){
+            //delete edges to empty child nodes
+            if (node !== null && !node.isLeaf() && node.edges.length > 0){
 
                 //console.log("node..... ", nodeParent, node.value, node.edges)
 
                 let bDeleted = false;
                 for (let i=node.edges.length-1; i>=0; i--)
-                    if (node.edges[i].targetNode.leaf === false && node.edges[i].targetNode.edges.length === 0 ) {
+                    if (node.edges[i].targetNode.isLeaf() && node.edges[i].targetNode.value === null && node.edges[i].targetNode.edges.length === 0 ) {
                         node.edges.splice(i, 1);
                         bDeleted = true;
                     }
 
-                if (bDeleted){
-                    this.changedNode(node)
-                    finished = false;
-                    //console.log("node deleted", node.value, node.edges)
-                }
+                if (bDeleted) finished = false;
+
+                //console.log("node deleted", node.value, node.edges)
             }
 
-            if (node !== null && nodeParent !== null && !node.leaf && node.edges.length === 0 && node !== this.root ){
+            if (node !== null && nodeParent !== null && node.value === null && node.isLeaf() && node.edges.length === 0 && node !== this.root ){
 
                 //console.log("node22..... ", node.value, node.edges)
 
@@ -292,6 +302,7 @@ class InterfaceRadixTree extends InterfaceTree{
                         node = node.parent;
                         nodeParent = node.parent;
 
+                        console.log("this.changedNode 3");
                         this.changedNode(node);
                         break;
                     }

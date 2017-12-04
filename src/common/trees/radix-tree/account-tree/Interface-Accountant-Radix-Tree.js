@@ -5,15 +5,26 @@ import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
 
 class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
-    createNode(parent, edges, value, amount){
-        return new InterfaceAccountRadixTreeNode(parent, edges, value, amount);
+    createNode(parent, edges, value){
+        return new InterfaceAccountRadixTreeNode(parent, edges, value);
     }
 
     //createEdge() {} is inherited from Interface Radix Tree
 
     changedNode(node){
         // recalculate the balances
+        InterfaceRadixTree.prototype.changedNode.call(this, node);
         this.refreshAccount(node);
+
+        if (!this.validateNode(node)) {
+            console.log("Invalid Accountant Tree Node", node)
+            throw( 'The Radix Tree is no longer valid at the node ' + JSON.stringify(node))
+        }
+    }
+
+    validateNode(node){
+
+        InterfaceRadixTree.prototype.validateNode.call(this, node);
     }
 
     validateAccount(node){

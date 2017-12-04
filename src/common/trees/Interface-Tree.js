@@ -153,13 +153,19 @@ class InterfaceTree{
             data.forEach( (element) =>{
 
                 dataString += " { "
-                if (Buffer.isBuffer(element.value))
-                    dataString += element.value.toString();
-                else
-                if (typeof element.value === "object" )
-                    dataString += JSON.stringify( element.value );
-                else
-                    dataString += " null";
+
+                try {
+                    if (Buffer.isBuffer(element.value))
+                        dataString += element.value.toString();
+                    else if (typeof element.value === "object")
+                        dataString += JSON.stringify(element.value);
+                    else
+                        dataString += " null";
+
+                } catch (exception){
+                    dataString += "invalid";
+                    console.log("interface tree to json, exception" , exception.toString(), element.value);
+                }
 
                 dataString += " , "
                 dataString += element.edges.toString() + "} | ";

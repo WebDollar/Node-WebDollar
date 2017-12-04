@@ -137,12 +137,9 @@ describe('Interface Radix Tree', () => {
 
         let result = radix.levelSearch();
 
-        radix.printLevelSearch();
-
         assert (result.length === 1, "result is not 1 level");
         assert (result[0].length === 1, "root is not empty");
 
     });
-
 });
 

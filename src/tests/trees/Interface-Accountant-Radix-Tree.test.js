@@ -39,7 +39,7 @@ describe('Interface Accountant Radix Tree', () => {
 
         accountantTree.printLevelSearch();
 
-        assert(result[0][0].value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propgated up) ");
+        assert(result[0][0].value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) ");
 
         accountantTree.printLevelSearch();
 

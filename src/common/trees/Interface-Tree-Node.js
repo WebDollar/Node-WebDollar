@@ -17,6 +17,12 @@ class InterfaceTreeNode {
 
     }
 
+    isLeaf(){
+
+        return (this.edges.length === 0)
+
+    }
+
 }
 
 export default InterfaceTreeNode;

@@ -30,7 +30,7 @@ describe('interfaceMerkleTree', () => {
 
         assert(merkleTree.validateTree() === true, "Merkle Tree is invalid!!!");
 
-        merkleTree.printLevelSearch();
+        //merkleTree.printLevelSearch();
 
     });
 
@@ -53,7 +53,7 @@ describe('interfaceMerkleTree', () => {
 
         assert(merkleTree.validateTree() === true, "Merkle Tree is invalid!!!");
 
-        merkleTree.printLevelSearch();
+        //merkleTree.printLevelSearch();
 
     })
 

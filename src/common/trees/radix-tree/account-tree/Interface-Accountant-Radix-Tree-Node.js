@@ -6,10 +6,8 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     constructor(parent, edges, value){
 
-        if (value !== null)
-            if (typeof value.amount === "undefined" || value.amount === null) throw "value.amount is undefined";
-
         super (parent, edges, value);
+
     }
 
 
