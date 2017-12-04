@@ -114,6 +114,35 @@ class InterfaceTree{
         return BFSResult;
     }
 
+    validateParentsAndChildrenEdges(node, parent){
+
+        if (typeof node === 'undefined') node = this.root;
+        if (typeof parent === 'undefined') parent = null;
+
+        if (node.parent !== parent) return false;
+
+        for (let i=0; i<node.edges.length; i++) {
+
+            if (node.edges[i].targetNode.parent !== node)
+                return false;
+
+            if ( ! this.validateParentsAndChildrenEdges(node.edges[i].targetNode, node) )
+                return false;
+        }
+
+        let nodeLevel=-1, parentLevel=-2;
+        let bfs = this.BFS();
+        for (let i=0; i<bfs.length; i++)
+            for (let j=0; j<bfs[i].length; j++)
+                if (bfs[i][j] === node) nodeLevel = i;
+                else if (bfs[i][j] === parent ) parentLevel = i;
+
+        if (node !== this.root && parentLevel !== nodeLevel - 1) return false;
+
+
+        return true;
+    }
+
 
     printLevelSearch(){
 
