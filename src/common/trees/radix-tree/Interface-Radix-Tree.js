@@ -226,7 +226,6 @@ class InterfaceRadixTree extends InterfaceTree{
             finished = true;
 
             //remove empty parent nodes
-            console.log(input.toString(), node, "xxxxx_node",  node.id, "nodeParent id",  nodeParent !== null ? nodeParent.id : '')
 
             if ( node !== null  && node.value === null && nodeParent !== null && nodeParent.edges.length > 0 && !nodeParent.isLeaf() && node.edges.length === 0){
 
@@ -236,38 +235,37 @@ class InterfaceRadixTree extends InterfaceTree{
                 let parentEdge = null;
                 for (let i=0; i<nodeParent.edges.length; i++)
                     if (nodeParent.edges[i].targetNode === node) {
-                        nodeParent.edges.splice(i, 1);
                         parentEdge = nodeParent.edges[i];
+                        nodeParent.edges.splice(i, 1);
                         break;
                     }
 
                 if (parentEdge !== null){
 
                     // remove now useless prefixes nodes
-                    console.log("!nodeParent.isLeaf()",!nodeParent.isLeaf())
-                    console.log(" nodeParent", nodeParent)
-                    console.log(" nodeParent.edges.length===1", nodeParent.edges.length)
+
+                    // prefix slow => slowly
+                    if (!nodeParent.isLeaf() && nodeParent.edges.length === 0 && node._previousEdges.length === 1){
+
+                        nodeParent.edges.push(  this.createEdge( new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ parentEdge.label.buffer,  node._previousEdges[0].label.buffer  ] )), node._previousEdges[0].targetNode) );
+
+                        node = node._previousEdges[0].targetNode;
+
+                        node.parent = nodeParent;
+
+                        this.changedNode(node);
+                        break;
+
+                    } else
+
+
                     if (  !nodeParent.isLeaf()  && nodeParent.edges.length === 1 ){  // my parent has one more node
 
                         console.log("node._previousEdges !== [] ", node._previousEdges !== [] )
                         console.log("node._previousEdges.length === 1 ", node._previousEdges.length)
                         console.log("node._previousEdges ", node._previousEdges)
 
-                        if (node._previousEdges !== [] && node._previousEdges.length === 1){
-
-                            console.log("MERGE1");
-                            nodeParent.edges[0].label = new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ node.parent.edges[0].label.buffer,  node._previousEdges[0].label.buffer  ] ));
-                            console.log("MERGE2");
-                            nodeParent.edges[0].targetNode = node._previousEdges[0].targetNode;
-
-                            node.parent = node;
-                            node = nodeParent;
-
-                            console.log("MERGE3");
-                            this.changedNode(node);
-                            break;
-
-                        } else if (nodeParent.parent !== null){
+                        if (nodeParent.parent !== null){
 
                             let edge = nodeParent.edges[0];
                             node = nodeParent.edges[0].targetNode;
