@@ -99,9 +99,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
             result = true;
 
-            console.log("refreshAccount_before", node.amount, result)
             this._computeAccount(node)
-            console.log("refreshAccount_after", node.amount, result)
 
             if (node.parent !== null) {
 

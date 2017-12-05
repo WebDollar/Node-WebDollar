@@ -215,6 +215,7 @@ class InterfaceRadixTree extends InterfaceTree{
         let node = searchResult.node;
 
         node.value = null;
+        node._previousEdges = node.edges.slice();
         node.edges = [];
 
         // node must be deleted
@@ -225,52 +226,85 @@ class InterfaceRadixTree extends InterfaceTree{
             finished = true;
 
             //remove empty parent nodes
-            if ( node !== null  && node.value === null && nodeParent !== null && !nodeParent.isLeaf() && node.edges.length === 0){
+            console.log(input.toString(), node, "xxxxx_node",  node.id, "nodeParent id",  nodeParent !== null ? nodeParent.id : '')
+
+            if ( node !== null  && node.value === null && nodeParent !== null && nodeParent.edges.length > 0 && !nodeParent.isLeaf() && node.edges.length === 0){
 
                 //console.log("node simplu before", node, node.parent);
 
                 //removing edge to current node from my direct parent
+                let parentEdge = null;
                 for (let i=0; i<nodeParent.edges.length; i++)
                     if (nodeParent.edges[i].targetNode === node) {
                         nodeParent.edges.splice(i, 1);
+                        parentEdge = nodeParent.edges[i];
                         break;
                     }
 
-                // remove now useless prefixes nodes
-                if ( nodeParent.parent !== null && !nodeParent.isLeaf()  && nodeParent.edges.length === 1 ){  // my parent has one more node
+                if (parentEdge !== null){
 
-                    let edge = nodeParent.edges[0];
-                    node = nodeParent.edges[0].targetNode;
-                    let grandParent = nodeParent.parent;
+                    // remove now useless prefixes nodes
+                    console.log("!nodeParent.isLeaf()",!nodeParent.isLeaf())
+                    console.log(" nodeParent", nodeParent)
+                    console.log(" nodeParent.edges.length===1", nodeParent.edges.length)
+                    if (  !nodeParent.isLeaf()  && nodeParent.edges.length === 1 ){  // my parent has one more node
 
-                    //console.log("grandParent", grandParent, node);
+                        console.log("node._previousEdges !== [] ", node._previousEdges !== [] )
+                        console.log("node._previousEdges.length === 1 ", node._previousEdges.length)
+                        console.log("node._previousEdges ", node._previousEdges)
 
-                    //replace grand parent edge child
-                    for (let i=0; i<grandParent.edges.length; i++)
-                        if (grandParent.edges[i].targetNode === nodeParent){
+                        if (node._previousEdges !== [] && node._previousEdges.length === 1){
 
-                            grandParent.edges[i].label = new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ grandParent.edges[i].label.buffer, edge.label.buffer  ] ));
-                            grandParent.edges[i].targetNode = node;
+                            console.log("MERGE1");
+                            nodeParent.edges[0].label = new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ node.parent.edges[0].label.buffer,  node._previousEdges[0].label.buffer  ] ));
+                            console.log("MERGE2");
+                            nodeParent.edges[0].targetNode = node._previousEdges[0].targetNode;
 
-                            node.parent = grandParent;
+                            node.parent = node;
+                            node = nodeParent;
 
-                            // it is not necessary its parent
-                            //console.log("this.changedNode 1");
+                            console.log("MERGE3");
                             this.changedNode(node);
-
-                            //console.log("grandParent deletion", node, nodeParent);
                             break;
+
+                        } else if (nodeParent.parent !== null){
+
+                            let edge = nodeParent.edges[0];
+                            node = nodeParent.edges[0].targetNode;
+                            let grandParent = nodeParent.parent;
+
+                            //replace grand parent edge child
+                            for (let i=0; i<grandParent.edges.length; i++)
+                                if (grandParent.edges[i].targetNode === nodeParent){
+
+                                    grandParent.edges[i].label = new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ grandParent.edges[i].label.buffer, edge.label.buffer  ] ));
+                                    grandParent.edges[i].targetNode = node;
+
+                                    node.parent = grandParent;
+
+                                    // it is not necessary its parent
+                                    //console.log("this.changedNode 1");
+                                    this.changedNode(node);
+
+                                    //console.log("grandParent deletion", node, nodeParent);
+                                    break;
+                                }
                         }
 
-                } else {
-                    node = nodeParent;
+
+                    }
+                    else {
+                        node = nodeParent;
+                    }
+
+                    finished = false;
+                    nodeParent = node.parent;
+
+                    console.log("this.changedNode 2");
+                    this.changedNode(node)
+
+
                 }
-
-                finished = false;
-                nodeParent = node.parent;
-
-                //console.log("this.changedNode 2");
-                this.changedNode(node)
 
                 //console.log("node simplu after", node, node.parent);
             }
