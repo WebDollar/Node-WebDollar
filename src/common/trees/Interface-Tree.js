@@ -157,6 +157,7 @@ class InterfaceTree{
             result[i].forEach( (node, index) => {
 
                 let value = node.value === null  ? 'null' : node.value
+                let amount = node.amount === null  ? 'null' : node.amount
                 let edges = [];
                 let hash = null;
 
@@ -167,7 +168,7 @@ class InterfaceTree{
                 if (typeof node.hash !== 'undefined')
                     hash = node.hash;
 
-                let dataObject = {id: node.id, parentId: (node.parent !== null ? node.parent.id : -666), value: value, edges: edges};
+                let dataObject = {id: node.id, parentId: (node.parent !== null ? node.parent.id : -666), value: value, amount: amount, edges: edges};
 
                 if (hash !== null){
                     dataObject.hash = hash;
@@ -187,19 +188,33 @@ class InterfaceTree{
 
                     dataString += "id: "+element.id + " parentId: "+element.parentId+ "   ";
 
-                    if (Buffer.isBuffer(element.value))
-                        dataString += element.value.toString();
-                    else if (typeof element.value === "object")
-                        dataString += JSON.stringify(element.value);
-                    else
-                        dataString += " null";
+                    if (Buffer.isBuffer(element.value))  dataString += element.value.toString();
+                    else if (typeof element.value === "object")  dataString += JSON.stringify(element.value);
+                    else dataString += " null";
 
                 } catch (exception){
                     dataString += "invalid";
                     console.log("interface tree to json, exception" , exception.toString(), element.value);
                 }
 
-                dataString += " , "
+                dataString += " , ";
+
+                try {
+
+                    if (element.amount !== 'null') {
+                        dataString += " , amount: ";
+
+                        if (Buffer.isBuffer(element.amount)) dataString += element.amount.toString();
+                        else if (typeof element.amount === "object") dataString += JSON.stringify(element.amount);
+                        else dataString += element.amount;
+                    }
+
+                } catch (exception){
+                    dataString += "invalid";
+                    console.log("interface tree to json, exception" , exception.toString(), element.amount);
+                }
+
+                dataString += " , ";
                 dataString += element.edges.toString() + "} | ";
             });
 

@@ -2,12 +2,18 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
 import InterfaceTree from 'common/trees/Interface-Tree'
+import InterfaceMerkleTreeNode from './Interface-Merkle-Tree-Node'
 
 /*
     it extends the Tree Node with hash {sha256: WebDollarCryptoData }
  */
 
 class InterfaceMerkleTree extends InterfaceTree{
+
+    createNode(parent, edges, value, hash){
+        return new InterfaceMerkleTreeNode(parent, edges, value, hash);
+    }
+
 
     /**
      * When an Operation is done to a done, let's calculate its hash
@@ -147,7 +153,8 @@ class InterfaceMerkleTree extends InterfaceTree{
             this._computeHash(node)
 
             if (node.parent !== null)
-                result = result && this.refreshHash(node.parent, true)
+                if (!this.validateHash(node.parent))
+                    result = result && this.refreshHash(node.parent, true)
 
         }
 

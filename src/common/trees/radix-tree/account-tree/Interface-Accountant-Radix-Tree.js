@@ -5,11 +5,10 @@ import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
 
 class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
-    createNode(parent, edges, value){
-        return new InterfaceAccountRadixTreeNode(parent, edges, value);
+    createNode(parent, edges, value, amount){
+        console.log("amount", amount)
+        return new InterfaceAccountRadixTreeNode(parent, edges, value, amount);
     }
-
-    //createEdge() {} is inherited from Interface Radix Tree
 
     changedNode(node){
         // recalculate the balances
@@ -24,15 +23,16 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         if (!result ) return false;
 
         //it should have a valid value
-        console.log("validate 1",node.value);
-        if (node.value === null) return false;
-        if (node.value.amount === null || typeof node.value.amount === 'undefined')  return false;
-        if (node.value.amount < 0) return false;
-        console.log("validate 2",node.value);
+
+        if (node.amount === null || typeof node.amount === 'undefined')  return false;
+        if (node.amount < 0) return false;
+
+
+
         return true;
 
     }
-    //
+
     // validateTree(node){
     //
     // }
@@ -43,16 +43,16 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         let initialAmount = null;
 
-        if (typeof node.value === 'undefined' || node.value === null  || typeof node.value.amount === 'undefined' || node.value.amount === null )  return false;
+        if (typeof node.amount !== 'number' || node.amount === null )  return false;
         else {
-            initialAmount = node.value.amount;
+            initialAmount = node.amount;
         }
 
         this._computeAccount(node);
 
-        if (typeof initialAmount !== 'number' || typeof node.value.amount !== 'number') return false;
-        if (initialAmount === null || node.value.amount !== null) return false; // different amount
-        if (initialAmount !== node.value.amount) return false; // different amount
+        if (typeof initialAmount !== 'number' || typeof node.amount !== 'number') return false;
+        if (initialAmount === null || node.amount !== null) return false; // different amount
+        if (initialAmount !== node.amount) return false; // different amount
 
         return true;
     }
@@ -69,23 +69,20 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
             let amount = 0;
             for (let i=0; i<node.edges.length; i++){
 
-                if (typeof node.edges[i].targetNode.value === "undefined" || node.edges[i].targetNode.value === null || typeof node.edges[i].targetNode.value.amount !== 'number' || node.edges[i].targetNode.value.amount === null)
+                if (typeof node.edges[i].targetNode.value === "undefined" || node.edges[i].targetNode.value === null || typeof node.edges[i].targetNode.amount !== 'number' || node.edges[i].targetNode.amount === null)
                     amount += this._computeAccount(node.edges[i].targetNode);
                 else
-                    amount += node.edges[i].targetNode.value.amount;
+                    amount += node.edges[i].targetNode.amount;
             }
 
-            node.value = node.value || {};
-            node.value.amount = amount;
+            node.amount = 0||amount;
         } else {
 
-            node.value = node.value || {};
-
-            if (typeof node.value.amount !== 'number' || node.value.amount === null)
-                node.value.amount = 0;
+            if (typeof node.amount !== 'number' || node.amount === null)
+                node.amount = 0;
         }
 
-        return node.value.amount;
+        return node.amount;
     }
 
     refreshAccount(node, forced){
@@ -96,12 +93,15 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         if ( typeof forced === "undefined" || forced === false ) result  = this.validateAccount(node); // in case it is not necessary to recalculate the hash by force
 
+
         // no changes...
         if (!result) {
 
             result = true;
 
+            console.log("refreshAccount_before", node.amount, result)
             this._computeAccount(node)
+            console.log("refreshAccount_after", node.amount, result)
 
             if (node.parent !== null) {
 

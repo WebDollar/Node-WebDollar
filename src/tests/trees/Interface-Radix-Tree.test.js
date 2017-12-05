@@ -120,21 +120,21 @@ describe("Interface Radix Tree", () => {
             assert (result.result === true, "result "+str+" was not found");
         });
 
-        let result6 = radix.search( new WebDollarCryptoData("slo", "ascii") );
-        let result7 = radix.search( new WebDollarCryptoData("toastingg", "ascii") );
-
-        assert (result6.result === false, "slo was found");
-        assert (result7.result === false, "toastingg was found");
+        assert ( radix.search( new WebDollarCryptoData("slo", "ascii")).result === false, "slo was found");
+        assert ( radix.search( new WebDollarCryptoData("toastingg", "ascii")).result === false, "toastingg was found");
     })
 	
 	it("delete radix tree 2", () =>{
 
         radixTestingArray.forEach( (str, index)=>{
 
+            console.log("delete radix tree 2", str);
+            radix.printLevelSearch();
+
             let deleteResult = radix.delete( new WebDollarCryptoData(str, "ascii") );
             assert(deleteResult === true, "delete "+str+" didn't work");
 
-            radix.printLevelSearch();
+
 
             assert(radix.validateTree() === true, "Radix Tree deleted after "+str+" is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");

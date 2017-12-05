@@ -15,7 +15,7 @@ describe('Interface Accountant Radix Tree', () => {
 
     //let randomize accountantData values
     for (let i=0; i<accountantData.length; i++)
-        accountantData[i].value = TestsHelper.makeRandomNumber();
+        accountantData[i].value = i; //TestsHelper.makeRandomNumber();
 
     it('creating Accountant Radix tree', ()=>{
 
@@ -23,7 +23,8 @@ describe('Interface Accountant Radix Tree', () => {
 
 
         accountantData.forEach( (data)=>{
-            accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, amount: data.value } );
+            accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, value:data.value}, data.value  );
+            accountantTree.printLevelSearch();
             assert(accountantTree.validateParentsAndChildrenEdges() === true, "validateParentsAndChildrenEdges was not passed");
         });
 
@@ -42,9 +43,11 @@ describe('Interface Accountant Radix Tree', () => {
 
         console.log("Accountant Tree sums");
         console.log(sum);
-        console.log(result[0][0].value.amount);
+        console.log(result[0][0].amount);
 
-        assert(result[0][0].value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ result[0][0].value.amount+ "       " + sum + "       diff: "+  (result[0][0].value.amount-sum).toString() );
+        accountantTree.printLevelSearch();
+
+        assert(result[0][0].amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ result[0][0].amount+ "       " + sum + "       diff: "+  (result[0][0].amount-sum).toString() );
 
         accountantTree.printLevelSearch();
 
@@ -56,7 +59,7 @@ describe('Interface Accountant Radix Tree', () => {
         accountantData = TestsHelper.makeSetIdAndNumber(100, true, 10);
 
         accountantData.forEach( (data)=>{
-            accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, amount: data.value } );
+            accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, value: data.value}, data.value );
         });
 
         let sum = 0;
@@ -65,12 +68,12 @@ describe('Interface Accountant Radix Tree', () => {
 
         console.log("Accountant Tree sums");
         console.log(sum);
-        console.log(accountantTree.root.value.amount);
+        console.log(accountantTree.root.amount);
 
 
         accountantTree.printLevelSearch();
 
-        assert(accountantTree.root.value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ accountantTree.root.value.amount+ "       " + sum + "       diff: "+  (accountantTree.root.value.amount-sum).toString() );
+        assert(accountantTree.root.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ accountantTree.root.amount+ "       " + sum + "       diff: "+  (accountantTree.root.amount-sum).toString() );
 
 
     });
@@ -82,7 +85,7 @@ describe('Interface Accountant Radix Tree', () => {
         accountantData = TestsHelper.makeSetIdAndNumber(100);
 
         accountantData.forEach( (data)=>{
-            accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, amount: data.value } );
+            accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, value:data.value }, data.value  );
         });
 
         let sum = 0;
@@ -91,9 +94,9 @@ describe('Interface Accountant Radix Tree', () => {
 
         console.log("Accountant Tree sums");
         console.log(sum);
-        console.log(accountantTree.root.value.amount);
+        console.log(accountantTree.root.amount);
 
-        assert(accountantTree.root.value.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ accountantTree.root.value.amount+ "       " + sum + "       diff: "+  (accountantTree.root.value.amount-sum).toString() );
+        assert(accountantTree.root.amount === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) "+ accountantTree.root.amount+ "       " + sum + "       diff: "+  (accountantTree.root.amount-sum).toString() );
 
     });
 

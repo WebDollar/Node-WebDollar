@@ -94,7 +94,7 @@ class InterfaceRadixTree extends InterfaceTree{
      * Adding an input to the Radix Tree
      * @param element can be a Base String, Buffer or CryptoWebDollarData
      */
-    add(input, value){
+    add(input, value, param){
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
@@ -134,7 +134,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             // Adding the new nodeMatch by edge Match
                             //console.log("nodeCurrent.parent", nodeCurrent.parent);
 
-                            let nodeMatch = this.createNode( nodeCurrent,  [], null, false);
+                            let nodeMatch = this.createNode( nodeCurrent,  [], null, null);
                             nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
 
                             // Adding the new nodeEdge to the nodeMatch
@@ -142,7 +142,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             edge.targetNode.parent = nodeMatch;
 
                             // Adding thew new nodeChild with current Value
-                            let nodeChild = this.createNode( nodeMatch, [], value );
+                            let nodeChild = this.createNode( nodeMatch, [], value, param );
                             nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
 
                             nodeCurrent = nodeChild;
@@ -175,7 +175,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                 // no more Children...
 
-                let nodeChild = this.createNode(nodeCurrent, [], value);
+                let nodeChild = this.createNode(nodeCurrent, [], value, param);
                 nodeCurrent.edges.push( this.createEdge( input.substr(i), nodeChild ));
 
                 //console.log("nodeChild2", nodeChild)
@@ -225,7 +225,7 @@ class InterfaceRadixTree extends InterfaceTree{
             finished = true;
 
             //remove empty parent nodes
-            if ( node !== null  && node.value === null && nodeParent !== null && node.isLeaf() && node.edges.length === 0){
+            if ( node !== null  && node.value === null && nodeParent !== null && !nodeParent.isLeaf() && node.edges.length === 0){
 
                 //console.log("node simplu before", node, node.parent);
 
@@ -293,7 +293,7 @@ class InterfaceRadixTree extends InterfaceTree{
                 //console.log("node deleted", node.value, node.edges)
             }
 
-            if (node !== null && nodeParent !== null && node.value === null && node.isLeaf() && node.edges.length === 0 && node !== this.root ){
+            if (node !== null && nodeParent !== null && node.value === null && node.edges.length === 0 && node !== this.root ){
 
                 //console.log("node22..... ", node.value, node.edges)
 
