@@ -39,6 +39,7 @@
     "babel-plugin-module-alias": "^1.6.0",
     "babelify": "^7.3.0",
     "big-integer": "^1.6.25",
+    "bignumber": "^1.1.0",
     "bignumber.js": "^4.1.0",
     "browserify": "^14.5.0",
     "browserify-fs": "^1.0.0",

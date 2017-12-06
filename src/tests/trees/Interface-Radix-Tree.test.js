@@ -13,7 +13,7 @@ describe("Interface Radix Tree", () => {
     //Based on this tutorial https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Patricia_trie.svg/350px-Patricia_trie.svg.png
     let radixTestingArray = ["romane","romanus","romulus","rubens", "ruber" , "rubicon", "rubicundus"];
 
-    it("creating radix tree", ()=>{
+    it("creating radix tree romane", ()=>{
 
         radix = new InterfaceRadixTree();
 
@@ -39,7 +39,7 @@ describe("Interface Radix Tree", () => {
 
     });
 
-    it("search radix tree", () =>{
+    it("search radix tree romane", () =>{
 
         radixTestingArray.forEach( (str)=>{
             let result = radix.search( new WebDollarCryptoData(str, "ascii") );
@@ -54,7 +54,7 @@ describe("Interface Radix Tree", () => {
         assert (result9.result === false, "result9 was found");
     })
 
-    it("delete radix tree", () =>{
+    it("delete radix tree romane", () =>{
 
         radixTestingArray.forEach( (str, index)=>{
 
@@ -88,7 +88,7 @@ describe("Interface Radix Tree", () => {
     });
 
 	
-	it("creating radix tree 2", ()=>{
+	it("creating radix tree 2 Oprea", ()=>{
 
 		//Based on https://en.wikipedia.org/wiki/Radix_tree#/media/File:An_example_of_how_to_find_a_string_in_a_Patricia_trie.png
 		radixTestingArray = ["test", "toaster", "toasting", "slow", "slowly"];
@@ -112,7 +112,7 @@ describe("Interface Radix Tree", () => {
 
     });
 
-	it("search radix tree 2", () =>{
+	it("search radix tree 2 Oprea", () =>{
 
         radixTestingArray.forEach( (str)=>{
             let result = radix.search( new WebDollarCryptoData(str, "ascii") );
@@ -190,6 +190,65 @@ describe("Interface Radix Tree", () => {
     });
 
     it("deleting radix tree 3 - generalized test", ()=>{
+
+        radixTestingArray.forEach( (str, index)=>{
+
+            radix.delete( new WebDollarCryptoData(str, "ascii") );
+
+            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+            assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
+
+            assert( !radix.search(new WebDollarCryptoData(str, "ascii")).result , "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+
+            radixTestingArray.forEach( (str2, index2)=>{
+
+                let mustFind = false;
+                if (index2 <= index ) mustFind = false;
+                else mustFind = true;
+
+                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '"+str+"' although it was added successfully");
+
+            });
+
+        });
+
+        let result = radix.levelSearch();
+
+        assert (result.length === 1, "result is not 1 level");
+        assert (result[0].length === 1, "root is not empty");
+
+    });
+
+
+    it("creating radix tree 3 - generalized test different lengths", ()=>{
+
+        radixTestingArray = TestsHelper.makeIds(200, 100, true);
+        radix = new InterfaceRadixTree();
+
+        radixTestingArray.forEach( (str, index)=>{
+
+            radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
+
+            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+            assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
+
+            assert( radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+
+            radixTestingArray.forEach( (str2, index2)=>{
+
+                let mustFind = false;
+                if (index2 <= index ) mustFind = true;
+                else mustFind = false;
+
+                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
+
+            });
+
+        });
+
+    });
+
+    it("deleting radix tree 3 - generalized test  different lengths", ()=>{
 
         radixTestingArray.forEach( (str, index)=>{
 

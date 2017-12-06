@@ -1,3 +1,5 @@
+var BigNumber = require('bignumber.js');
+
 import InterfaceRadixTree from './../Interface-Radix-Tree'
 
 import InterfaceAccountRadixTreeNode from './Interface-Accountant-Radix-Tree-Node'
@@ -6,7 +8,7 @@ import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
 class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     createNode(parent, edges, value, amount){
-        console.log("amount", amount)
+        //console.log("amount", amount)
         return new InterfaceAccountRadixTreeNode(parent, edges, value, amount);
     }
 
@@ -24,8 +26,8 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         //it should have a valid value
 
-        if (node.amount === null || typeof node.amount === 'undefined')  return false;
-        if (node.amount < 0) return false;
+        if (node.isAmountValid() === false)  return false;
+        if (node.amount.lessThan ( 0 ) ) return false;
 
 
 
@@ -33,9 +35,11 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     }
 
-    // validateTree(node){
-    //
-    // }
+    validateTree(node){
+        let result = InterfaceRadixTree.prototype.validateTree.call(this, node);
+
+        if (!result) return false;
+    }
 
     validateAccount(node){
 
@@ -43,16 +47,14 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         let initialAmount = null;
 
-        if (typeof node.amount !== 'number' || node.amount === null )  return false;
-        else {
+        if ( node.isAmountValid() === false)  return false;
+        else
             initialAmount = node.amount;
-        }
 
         this._computeAccount(node);
 
-        if (typeof initialAmount !== 'number' || typeof node.amount !== 'number') return false;
-        if (initialAmount === null || node.amount !== null) return false; // different amount
-        if (initialAmount !== node.amount) return false; // different amount
+        if ( node.isAmountValid() === false ) return false;
+        if ( initialAmount.equals(node.amount) === false ) return false; // different amount
 
         return true;
     }
@@ -65,21 +67,23 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         if (node === null || typeof node === 'undefined') throw "Couldn't compute the Amount because Node is empty";
 
-        if ( !node.isLeaf() ){
-            let amount = 0;
+        if ( node.edges.length > 0 ){
+
+            let amount = new BigNumber(0);
+
             for (let i=0; i<node.edges.length; i++){
 
-                if (typeof node.edges[i].targetNode.value === "undefined" || node.edges[i].targetNode.value === null || typeof node.edges[i].targetNode.amount !== 'number' || node.edges[i].targetNode.amount === null)
-                    amount += this._computeAccount(node.edges[i].targetNode);
+                if (typeof node.edges[i].targetNode.value === "undefined" || node.edges[i].targetNode.value === null || node.edges[i].targetNode.isAmountValid() === false )
+                    amount = amount.plus(this._computeAccount(node.edges[i].targetNode));
                 else
-                    amount += node.edges[i].targetNode.amount;
+                    amount = amount.plus(node.edges[i].targetNode.amount);
             }
 
-            node.amount = 0||amount;
+            node.amount = amount;
         } else {
 
-            if (typeof node.amount !== 'number' || node.amount === null)
-                node.amount = 0;
+            if ( node.isAmountValid() === false )
+                node.amount = new BigNumber(0);
         }
 
         return node.amount;

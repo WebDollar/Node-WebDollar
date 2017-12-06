@@ -98,6 +98,8 @@ class InterfaceRadixTree extends InterfaceTree{
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
+        if (input.buffer.length === 0) throw 'No input';
+
         let nodeCurrent = this.root;
 
         // console.log("input.buffer", input.buffer)
@@ -202,6 +204,8 @@ class InterfaceRadixTree extends InterfaceTree{
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
+        if (input.buffer.length === 0) throw 'No input';
+
         let searchResult = this.search(input);
 
         //console.log("searchResult", searchResult)
@@ -261,9 +265,9 @@ class InterfaceRadixTree extends InterfaceTree{
 
                     if (  !nodeParent.isLeaf()  && nodeParent.edges.length === 1 ){  // my parent has one more node
 
-                        console.log("node._previousEdges !== [] ", node._previousEdges !== [] )
-                        console.log("node._previousEdges.length === 1 ", node._previousEdges.length)
-                        console.log("node._previousEdges ", node._previousEdges)
+                        // console.log("node._previousEdges !== [] ", node._previousEdges !== [] )
+                        // console.log("node._previousEdges.length === 1 ", node._previousEdges.length)
+                        // console.log("node._previousEdges ", node._previousEdges)
 
                         if (nodeParent.parent !== null){
 
@@ -298,7 +302,7 @@ class InterfaceRadixTree extends InterfaceTree{
                     finished = false;
                     nodeParent = node.parent;
 
-                    console.log("this.changedNode 2");
+                    //console.log("this.changedNode 2");
                     this.changedNode(node)
 
 

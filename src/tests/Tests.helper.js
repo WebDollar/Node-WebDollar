@@ -14,15 +14,16 @@ class TestsHelper {
       return text;
     }
 
-    makeIds(count, wordCount){
+    makeIds(count, wordCount, randomLengths){
 
         if (typeof count === 'undefined') count = Math.floor(Math.random()*100 + 30)
+        if (typeof randomLengths === 'undefined') randomLengths = false;
 
         let result = [];
         for (let i=0; i<count; i++) {
 
             let found = true;
-            let word = this.makeId(wordCount);
+            let word = this.makeId( randomLengths ? Math.floor( Math.random()*wordCount+1 ) : wordCount);
 
             //avoid identically words
             while (found){
@@ -31,7 +32,8 @@ class TestsHelper {
                 for (let j=0; j<result.length; j++)
                     if (result[j] === word) {
                         found = true;
-                        word = this.makeId(wordCount);
+                        word = this.makeId( randomLengths ? Math.floor( Math.random()*wordCount+1 ) : wordCount);
+                        break;
                     }
 
             }
