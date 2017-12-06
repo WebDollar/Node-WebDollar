@@ -30,6 +30,16 @@ class InterfaceRadixTree extends InterfaceTree{
         return new InterfaceRadixTreeNode(parent, edges, value);
     }
 
+    exchangeNodes(node1, node2){
+        let aux = node1.value;
+        node1.value = node2.value;
+        node2.value = aux;
+    }
+
+    setNode(node, value){
+        node.value = value;
+    }
+
     createEdge(label, targetNode){
         return new InterfaceRadixTreeEdge(label, targetNode);
     }
@@ -126,41 +136,89 @@ class InterfaceRadixTree extends InterfaceTree{
                     if (match !== null){   //we found  a match in the edge
 
                         //the match is smaller
+
                         if (match.buffer.length < nodeCurrent.edges[j].label.buffer.length){
 
-                            let edge = nodeCurrent.edges[j];
+                            console.log("COSMIN 222, ", match.toString(), nodeCurrent.edges[j].label.buffer.toString(), input.toString() );
 
-                            // We remove edge j
-                            nodeCurrent.edges.splice(j,1);
+                            let originalEdgeLength = nodeCurrent.edges[j].label.buffer.length;
 
-                            // Adding the new nodeMatch by edge Match
-                            //console.log("nodeCurrent.parent", nodeCurrent.parent);
+                            if ( i + originalEdgeLength >  input.buffer.length &&  (i + match.buffer.length) === input.buffer.length ){
 
-                            let nodeMatch = this.createNode( nodeCurrent,  [], null, null);
-                            nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
+                                console.log("ruuuber", input.buffer.toString())
 
-                            // Adding the new nodeEdge to the nodeMatch
-                            nodeMatch.edges.push( this.createEdge( edge.label.substr(match.buffer.length), edge.targetNode), )
-                            edge.targetNode.parent = nodeMatch;
+                                let edge = nodeCurrent.edges[j];
 
-                            // Adding thew new nodeChild with current Value
-                            let nodeChild = this.createNode( nodeMatch, [], value, param );
-                            nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
+                                // We remove edge j
+                                nodeCurrent.edges.splice(j,1);
 
-                            nodeCurrent = nodeChild;
+                                // Adding the new nodeMatch by edge Match
+                                //console.log("nodeCurrent.parent", nodeCurrent.parent);
 
-                            // console.log("nodeMatch",nodeMatch);
-                            // console.log("nodeChild",nodeChild);
-                            this.changedNode(nodeMatch)
-                            this.changedNode(nodeChild)
+                                let nodeMatch = this.createNode( nodeCurrent,  [], value, param);
+                                nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
+
+                                // Adding the new nodeEdge to the nodeMatch
+                                nodeMatch.edges.push( this.createEdge( edge.label.substr(match.buffer.length), edge.targetNode), )
+                                edge.targetNode.parent = nodeMatch;
+
+                                // console.log("nodeMatch",nodeMatch);
+                                // console.log("nodeChild",nodeChild);
+                                this.changedNode(nodeMatch)
+                                this.changedNode(edge.targetNode)
+
+                                nodeCurrent = edge.targetNode;
+
+
+                            } else {
+
+                                let edge = nodeCurrent.edges[j];
+
+                                // We remove edge j
+                                nodeCurrent.edges.splice(j,1);
+
+                                // Adding the new nodeMatch by edge Match
+                                //console.log("nodeCurrent.parent", nodeCurrent.parent);
+
+                                let nodeMatch = this.createNode( nodeCurrent,  [], null, null);
+                                nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
+
+                                // Adding the new nodeEdge to the nodeMatch
+                                nodeMatch.edges.push( this.createEdge( edge.label.substr(match.buffer.length), edge.targetNode), )
+                                edge.targetNode.parent = nodeMatch;
+
+                                // Adding thew new nodeChild with current Value
+                                let nodeChild = this.createNode( nodeMatch, [], value, param );
+                                nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
+
+                                // console.log("nodeMatch",nodeMatch);
+                                // console.log("nodeChild",nodeChild);
+                                this.changedNode(nodeMatch)
+                                this.changedNode(nodeChild)
+
+                                nodeCurrent = nodeChild;
+
+                            }
+
+                            console.log("COOOOSMIIIIN", i, originalEdgeLength, input.buffer.length)
 
                             // Marking that it is done
                             i = input.buffer.length+1;
 
-
                         } else {
                             i += nodeCurrent.edges[j].label.buffer.length;
+
+
                             nodeCurrent = nodeCurrent.edges[j].targetNode;
+
+                            if (i === input.buffer.length){ //the prefix became a solution
+
+                                console.log("LEAF FUNCTIONEAZA");
+
+                                if (nodeCurrent.value !== null) throw ('the node already includes a value....');
+                                else this.setNode(nodeCurrent, value, param);
+
+                            }
                         }
                         childFound = true;
                         break;

@@ -12,6 +12,11 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         return new InterfaceAccountRadixTreeNode(parent, edges, value, amount);
     }
 
+    setNode(node, value, amount){
+        InterfaceRadixTree.prototype.setNode(this, node, value);
+        node.setAmount(amount);
+    }
+
     changedNode(node){
         // recalculate the balances
         this.refreshAccount(node);

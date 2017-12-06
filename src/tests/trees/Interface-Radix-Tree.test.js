@@ -25,6 +25,9 @@ describe("Interface Radix Tree", () => {
 
         let result = radix.levelSearch();
 
+        console.log("rooomanus example")
+        radix.printLevelSearch();
+
         assert( result.length === 5, "Radix Tree has to many levels" )
         assert( result[0].length === 1, "Radix Tree Level 0 has different nodes" )
         assert( result[1].length === 1, "Radix Tree Level 1 has different nodes" )
@@ -219,6 +222,37 @@ describe("Interface Radix Tree", () => {
 
     });
 
+    it("creating radix tree 3 - generalized test different lengths", ()=>{
+
+        //radixTestingArray = [ "slowly", "slowby", "slow" ];
+        //radixTestingArray = [ "sl", "slowly", "slow" ];
+        radixTestingArray = [ "slowly", "slowlb","slom","slow"];
+        radix = new InterfaceRadixTree();
+
+        radixTestingArray.forEach( (str, index)=>{
+
+            radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
+
+            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+            assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
+
+            console.log("radix aaa");
+            radix.printLevelSearch();
+            assert( radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+
+            radixTestingArray.forEach( (str2, index2)=>{
+
+                let mustFind = false;
+                if (index2 <= index ) mustFind = true;
+                else mustFind = false;
+
+                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
+
+            });
+
+        });
+
+    });
 
     it("creating radix tree 3 - generalized test different lengths", ()=>{
 
@@ -265,7 +299,7 @@ describe("Interface Radix Tree", () => {
                 if (index2 <= index ) mustFind = false;
                 else mustFind = true;
 
-                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
+                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '"+str+"' although it was added successfully");
 
             });
 

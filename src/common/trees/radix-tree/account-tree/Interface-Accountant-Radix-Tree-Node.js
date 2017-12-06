@@ -9,6 +9,11 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         super (parent, edges, value);
 
+        this.setAmount(amount);
+    }
+
+    setAmount(amount){
+
         if (typeof amount === "object"  && amount !== null && amount.constructor.name === "BigNumber") this.amount =  amount;
         else {
 
