@@ -40,14 +40,14 @@ class InterfaceRadixTree extends InterfaceTree{
 
     changedNode(node){
 
-        if (!this.validateNode(node)) {
+        if (!this.checkInvalidNode(node)) {
             console.log("Invalid Radix Tree", node)
             this.printLevelSearch();
             throw( 'The Radix Tree is no longer valid at the node ' + JSON.stringify(node))
         }
     }
 
-    validateNode(node){
+    checkInvalidNode(node){
 
         // Leaf nodes should have values
         // Other nodes should not have values

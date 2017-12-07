@@ -19,14 +19,14 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     changedNode(node){
         // recalculate the balances
-        this.refreshAccount(node);
+        this.refreshAccount(node, true);
 
         InterfaceRadixTree.prototype.changedNode.call(this, node);
     }
 
-    validateNode(node){
+    checkInvalidNode(node){
 
-        let result = InterfaceRadixTree.prototype.validateNode.call(this, node);
+        let result = InterfaceRadixTree.prototype.checkInvalidNode.call(this, node);
         if (!result ) return false;
 
         //it should have a valid value
@@ -35,13 +35,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         if (node.amount.lessThan ( 0 ) ) return false;
 
 
-
         return true;
-
-    }
-
-    validateRoot(){
-        return this.validateTree(this.root);
     }
 
     validateTree(node){
@@ -108,7 +102,6 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         if ( typeof forced === "undefined" || forced === false ) result  = this.validateAccount(node); // in case it is not necessary to recalculate the hash by force
 
-
         // no changes...
         if (!result) {
 
@@ -117,10 +110,8 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
             this._computeAccount(node)
 
             if (node.parent !== null) {
-
                 if (!this.validateAccount(node.parent))
                     result = result && this.refreshAccount(node.parent, true)
-
             }
 
         }

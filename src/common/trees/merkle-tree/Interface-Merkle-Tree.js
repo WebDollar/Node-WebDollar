@@ -24,11 +24,6 @@ class InterfaceMerkleTree extends InterfaceTree{
     }
 
 
-    validateRoot(){
-        return this.validateTree(this.root);
-    }
-
-
     /**
      * Validate the Merkle Tree if the Hashes were calculated correctly
      * @param node

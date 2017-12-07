@@ -28,7 +28,9 @@ describe('Interface Accountant Radix Tree', () => {
                 value: data.value
             }, data.value.toString());
 
-            assert(accountantTree.validateRoot() === true, "validate Tree cosminwas not passed at " + index + " because " + JSON.stringify(data));
+            console.log("accountant text", data.value.toString())
+            accountantTree.printLevelSearch();
+            assert(accountantTree.validateRoot() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
         });
 
         let result = accountantTree.levelSearch();
