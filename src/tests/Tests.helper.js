@@ -68,6 +68,34 @@ class TestsHelper {
         return list;
 
     }
+	
+	back_permutations(k, n, radixTestingArray, used, ind, result) {
+		if(k === n) {
+			let tmp = new Array(n);
+			for(let i = 0; i < n; ++i) {
+				tmp[i] = radixTestingArray[ind[i]];
+			}
+			result.push([tmp]);
+			return;
+		}
+		for(let i = 0; i < n; ++i) {
+			if(used[i] === 0) {
+				used[i] = 1;
+				ind[k] = i;
+				this.back_permutations(k + 1, n, radixTestingArray, used, ind, result)
+				used[i] = 0;
+			}
+		}
+	}
+	
+	makePermutations(radixTestingArray) {
+		let used = new Array(radixTestingArray.length);
+		for(let i = 0; i < used.length; ++i)
+			used[i] = 0;
+		let result = [];
+		this.back_permutations(0, used.length, radixTestingArray, used, new Array(used.length), result);
+		return result;
+	}
 
 }
 
