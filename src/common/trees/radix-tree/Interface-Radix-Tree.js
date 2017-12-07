@@ -157,8 +157,8 @@ class InterfaceRadixTree extends InterfaceTree{
 
                             }
 
-                            console.log("nodeCurrent",nodeCurrent.value);
-                            console.log("nodeMatch",nodeMatch.value);
+                            // console.log("nodeCurrent",nodeCurrent.value);
+                            // console.log("nodeMatch",nodeMatch.value);
                             this.changedNode(nodeCurrent)
                             this.changedNode(nodeMatch)
 
@@ -202,7 +202,7 @@ class InterfaceRadixTree extends InterfaceTree{
                 //console.log("nodeChild2", nodeChild)
                 this.changedNode(nodeChild)
 
-                console.log("nodeChild",nodeChild.value);
+                //console.log("nodeChild",nodeChild.value);
 
                 nodeCurrent = nodeChild;
                 break; //done

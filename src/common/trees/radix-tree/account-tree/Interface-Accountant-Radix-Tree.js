@@ -26,14 +26,12 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     checkInvalidNode(node){
 
-        console.log("InterfaceRadixTree.prototype.checkInvalidNode", InterfaceRadixTree.prototype.checkInvalidNode.call(this, node));
-
         let result = InterfaceRadixTree.prototype.checkInvalidNode.call(this, node);
         if (!result ) return false;
 
         //it should have a valid value
 
-        console.log("node.isSumValid()", node.isSumValid(), "node.sum.lessThan ( 0 )", node.sum.lessThan ( 0 ), "node.isLeaf() && (node.isBalanceValid() === false", (node.isLeaf() && (node.isBalanceValid() === false)), "node.isBalanceValid() && node.value.balance.lessThan ( 0 )", node.isBalanceValid() && node.value.balance.lessThan ( 0 ) )
+
         if (node.isSumValid() === false)  return false;
         if (node.sum.lessThan ( 0 ) ) return false;
 
