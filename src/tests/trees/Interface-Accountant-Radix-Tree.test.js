@@ -54,6 +54,45 @@ describe('Interface Accountant Radix Tree', () => {
 
         accountantTree.printLevelSearch();
     });
+    
+    it('creating Accountant Radix tree 2 Oprea', () => {
+        
+        accountantData = [{text: "test", value: 5}, {text: "toaster",value: 2}, {text: "toasting",value: 3}, {text: "slow",value: 16}, {text: "slowly",value: 6}];
+        accountantTree = new InterfaceAccountantRadixTree();
+
+        accountantData.forEach((data, index) => {
+            accountantTree.add(new WebDollarCryptoData(data.text, "ascii"), {
+                text: data.text,
+                value: data.value
+            }, data.value.toString());
+            console.log("Cosmin 555");
+            assert(accountantTree.validateTree() === true, "validate Tree cosminwas not passed at " + index + " because " + JSON.stringify(data));
+            accountantTree.printLevelSearch();
+        });
+
+        let result = accountantTree.levelSearch();
+
+        assert(result.length === 4, "Radix Tree has to many levels");
+        assert(result[0].length === 1, "Radix Tree Level 0 has different nodes");
+        assert(result[1].length === 2, "Radix Tree Level 1 has different nodes");
+        assert(result[2].length === 3, "Radix Tree Level 2 has different nodes");
+        assert(result[3].length === 2, "Radix Tree Level 3 has different nodes");
+
+        let sum = new BigNumber(0);
+        for (let i = 0; i < accountantData.length; i++)
+            sum = sum.plus(new BigNumber(accountantData[i].value.toString()));
+
+        console.log("Accountant Tree sums");
+        console.log(sum);
+        console.log(result[0][0].amount);
+
+        accountantTree.printLevelSearch();
+
+        assert(accountantTree.root.amount.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].amount + "       " + sum + "       diff: " + accountantTree.root.amount.minus(sum).toString());
+
+        accountantTree.printLevelSearch();
+    });
+
 
     it('creating Accountant Radix tree - generalized integer', () => {
 
