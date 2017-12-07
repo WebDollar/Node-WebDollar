@@ -10,8 +10,12 @@ class InterfaceTree{
 
     }
 
+    validateRoot(){
+        return this.validateTree(this.root);
+    }
+
     /**
-     * DFS
+     * valdiate Tree based on DFS (depth first search)
      * @param node
      * @param callback
      * @returns {boolean}
@@ -22,11 +26,14 @@ class InterfaceTree{
 
         for (let i=0; i < node.edges.length; i++) {
 
-            if (node.edges[i].targetNode === null)  throw('Edge target node is Null')
+            if ( typeof node.edges[i].targetNode === 'undefined' || node.edges[i].targetNode === null ){
+                console.log("Edge target node is Null", node, node.edges[i], i)
+                throw('Edge target node is Null')
+            }
             if (node.edges[i].targetNode.parent !== node) throw ('Edge target node parent is different that current node');
 
             if (typeof callback === 'function') {
-                let result = this.validateTree(node.edges[i].targetNode);
+                let result = this.validateTree(node.edges[i].targetNode, callback);
 
                 if (!result) {
                     console.log("validateTree", node)
@@ -37,7 +44,7 @@ class InterfaceTree{
         }
 
         if (typeof callback === 'function'){
-            let result = callback(node);
+            let result = callback.call(this, node);
             if (!result){
                 console.log("validateTree - callback ", node);
                 return false;
@@ -66,7 +73,7 @@ class InterfaceTree{
         if (parent === null || typeof parent ==="undefined") parent = this.root;
 
         let node = this.createNode( parent , [], data )
-        parent.edges.push( this.createEdge( node ));
+        parent.edges.push( this.createEdge( node ) );
 
         this.changedNode(node);
         return node;
@@ -234,7 +241,7 @@ class InterfaceTree{
 
                 try {
 
-                    if (element.amount !== 'null') {
+                    if (element.amount !== 'null' && typeof element.amount !== 'undefined') {
                         dataString += " , amount: ";
 
                         if (Buffer.isBuffer(element.amount)) dataString += element.amount.toString();

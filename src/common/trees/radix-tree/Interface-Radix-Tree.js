@@ -75,24 +75,7 @@ class InterfaceRadixTree extends InterfaceTree{
         }
     }
 
-    validateTree(node){
 
-        if (typeof node === 'undefined') node = this.root;
-
-        let result = this.validateNode(node);
-
-        if (result)
-            //more edges, let's check also them
-            if (typeof node.edges !== 'undefined' && node.edges !== null && node.edges.length > 0) {
-
-                for (let i = 0; i < node.edges.length; i++)
-                    if (!this.validateTree(node.edges[i].targetNode)) return false;
-
-            }
-
-        return result;
-
-    }
 
     /**
      * Adding an input to the Radix Tree

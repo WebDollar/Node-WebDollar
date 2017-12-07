@@ -40,6 +40,10 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     }
 
+    validateRoot(){
+        return this.validateTree(this.root);
+    }
+
     validateTree(node){
 
         let result = InterfaceRadixTree.prototype.validateTree.call(this, node, this.validateAccount);

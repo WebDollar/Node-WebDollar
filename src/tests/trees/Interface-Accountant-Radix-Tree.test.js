@@ -28,7 +28,7 @@ describe('Interface Accountant Radix Tree', () => {
                 value: data.value
             }, data.value.toString());
 
-            assert(accountantTree.validateTree() === true, "validate Tree cosminwas not passed at " + index + " because " + JSON.stringify(data));
+            assert(accountantTree.validateRoot() === true, "validate Tree cosminwas not passed at " + index + " because " + JSON.stringify(data));
         });
 
         let result = accountantTree.levelSearch();
@@ -66,7 +66,7 @@ describe('Interface Accountant Radix Tree', () => {
                 value: data.value
             }, data.value.toString());
 
-            assert(accountantTree.validateTree() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
+            assert(accountantTree.validateRoot() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
         });
 
         let sum = new BigNumber(0);
@@ -101,7 +101,7 @@ describe('Interface Accountant Radix Tree', () => {
                 value: data.value
             }, data.value.toString());
 
-            assert(accountantTree.validateTree() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
+            assert(accountantTree.validateRoot() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
         });
 
         let sum = new BigNumber(0);
