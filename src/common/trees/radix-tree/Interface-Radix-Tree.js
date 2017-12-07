@@ -30,12 +30,6 @@ class InterfaceRadixTree extends InterfaceTree{
         return new InterfaceRadixTreeNode(parent, edges, value);
     }
 
-    exchangeNodes(node1, node2){
-        let aux = node1.value;
-        node1.value = node2.value;
-        node2.value = aux;
-    }
-
     setNode(node, value){
         node.value = value;
     }
@@ -139,13 +133,9 @@ class InterfaceRadixTree extends InterfaceTree{
 
                         if (match.buffer.length < nodeCurrent.edges[j].label.buffer.length){
 
-                            console.log("COSMIN 222, ", match.toString(), nodeCurrent.edges[j].label.buffer.toString(), input.toString() );
-
                             let originalEdgeLength = nodeCurrent.edges[j].label.buffer.length;
 
                             if ( i + originalEdgeLength >  input.buffer.length &&  (i + match.buffer.length) === input.buffer.length ){
-
-                                console.log("ruuuber", input.buffer.toString())
 
                                 let edge = nodeCurrent.edges[j];
 
@@ -200,8 +190,6 @@ class InterfaceRadixTree extends InterfaceTree{
 
                             }
 
-                            console.log("COOOOSMIIIIN", i, originalEdgeLength, input.buffer.length)
-
                             // Marking that it is done
                             i = input.buffer.length+1;
 
@@ -213,10 +201,10 @@ class InterfaceRadixTree extends InterfaceTree{
 
                             if (i === input.buffer.length){ //the prefix became a solution
 
-                                console.log("LEAF FUNCTIONEAZA");
-
                                 if (nodeCurrent.value !== null) throw ('the node already includes a value....');
                                 else this.setNode(nodeCurrent, value, param);
+
+                                this.changedNode(nodeCurrent)
 
                             }
                         }
@@ -294,38 +282,40 @@ class InterfaceRadixTree extends InterfaceTree{
                 //console.log("node simplu before", node, node.parent);
 
                 //removing edge to current node from my direct parent
-                let parentEdge = null;
+                let deletedParentEdge = null;
                 for (let i=0; i<nodeParent.edges.length; i++)
                     if (nodeParent.edges[i].targetNode === node) {
-                        parentEdge = nodeParent.edges[i];
+                        deletedParentEdge = nodeParent.edges[i];
                         nodeParent.edges.splice(i, 1);
                         break;
                     }
 
-                if (parentEdge !== null){
+                if (deletedParentEdge !== null){
 
                     // remove now useless prefixes nodes
 
                     // prefix slow => slowly
-                    if (!nodeParent.isLeaf() && nodeParent.edges.length === 0 && node._previousEdges.length === 1){
+                    if ( node._previousEdges.length === 1 ){
 
-                        nodeParent.edges.push(  this.createEdge( new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ parentEdge.label.buffer,  node._previousEdges[0].label.buffer  ] )), node._previousEdges[0].targetNode) );
+                        nodeParent.edges.push(  this.createEdge( new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ deletedParentEdge.label.buffer,  node._previousEdges[0].label.buffer  ] )), node._previousEdges[0].targetNode) );
 
                         node = node._previousEdges[0].targetNode;
-
                         node.parent = nodeParent;
 
                         this.changedNode(node);
                         break;
 
                     } else
+                    if ( node._previousEdges.length > 1 ){
 
+                        node.edges = node._previousEdges;
+                        nodeParent.edges.push( deletedParentEdge ) ;
 
+                        this.changedNode(node);
+                        break;
+
+                    } else
                     if (  !nodeParent.isLeaf()  && nodeParent.edges.length === 1 ){  // my parent has one more node
-
-                        // console.log("node._previousEdges !== [] ", node._previousEdges !== [] )
-                        // console.log("node._previousEdges.length === 1 ", node._previousEdges.length)
-                        // console.log("node._previousEdges ", node._previousEdges)
 
                         if (nodeParent.parent !== null){
 
@@ -351,7 +341,6 @@ class InterfaceRadixTree extends InterfaceTree{
                                 }
                         }
 
-
                     }
                     else {
                         node = nodeParent;
@@ -370,22 +359,23 @@ class InterfaceRadixTree extends InterfaceTree{
             }
 
 
-            //delete edges to empty child nodes
-            if (node !== null && !node.isLeaf() && node.edges.length > 0){
-
-                //console.log("node..... ", nodeParent, node.value, node.edges)
-
-                let bDeleted = false;
-                for (let i=node.edges.length-1; i>=0; i--)
-                    if (node.edges[i].targetNode.isLeaf() && node.edges[i].targetNode.value === null && node.edges[i].targetNode.edges.length === 0 ) {
-                        node.edges.splice(i, 1);
-                        bDeleted = true;
-                    }
-
-                if (bDeleted) finished = false;
-
-                //console.log("node deleted", node.value, node.edges)
-            }
+            // //delete edges to empty child nodes
+            // if (node !== null && !node.isLeaf() && node.edges.length > 0){
+            //
+            //     //console.log("node..... ", nodeParent, node.value, node.edges)
+            //
+            //     let bDeleted = false;
+            //     for (let i=node.edges.length-1; i>=0; i--)
+            //         if (node.edges[i].targetNode.isLeaf() && node.edges[i].targetNode.value === null && node.edges[i].targetNode.edges.length === 0 ) {
+            //             console.log("target node deleted ", node.edges[i].label.toString())
+            //             node.edges.splice(i, 1);
+            //             bDeleted = true;
+            //         }
+            //
+            //     if (bDeleted) finished = false;
+            //
+            //     console.log("node deleted", node)
+            // }
 
             if (node !== null && nodeParent !== null && node.value === null && node.edges.length === 0 && node !== this.root ){
 

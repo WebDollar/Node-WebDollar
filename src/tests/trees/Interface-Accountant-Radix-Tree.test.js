@@ -23,10 +23,10 @@ describe('Interface Accountant Radix Tree', () => {
         accountantTree = new InterfaceAccountantRadixTree();
 
 
-        accountantData.forEach( (data)=>{
+        accountantData.forEach( (data, index)=>{
             accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, value:data.value}, data.value.toString()  );
-            accountantTree.printLevelSearch();
-            assert(accountantTree.validateParentsAndChildrenEdges() === true, "validateParentsAndChildrenEdges was not passed");
+
+            assert(accountantTree.validateTree() === true, "validate Tree was not passed at "+index+" because "+ JSON.stringify(data) );
         });
 
         let result = accountantTree.levelSearch();
@@ -59,8 +59,10 @@ describe('Interface Accountant Radix Tree', () => {
         accountantTree = new InterfaceAccountantRadixTree();
         accountantData = TestsHelper.makeSetIdAndNumber(100, true, 10000);
 
-        accountantData.forEach( (data)=>{
+        accountantData.forEach( (data, index)=>{
             accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, value: data.value}, data.value.toString() );
+
+            assert(accountantTree.validateTree() === true, "validate Tree was not passed at "+index+" because "+ JSON.stringify(data) );
         });
 
         let sum = new BigNumber(0);
@@ -93,8 +95,10 @@ describe('Interface Accountant Radix Tree', () => {
         for (let i=0; i<accountantData.length; i++)
             accountantData[i].value = i;
 
-        accountantData.forEach( (data)=>{
+        accountantData.forEach( (data, index)=>{
             accountantTree.add( new WebDollarCryptoData(data.text, "ascii"),  {text: data.text, value:data.value }, data.value.toString()  );
+
+            assert(accountantTree.validateTree() === true, "validate Tree was not passed at "+index+" because "+ JSON.stringify(data) );
         });
 
         let sum = new BigNumber(0);

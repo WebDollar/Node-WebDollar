@@ -138,8 +138,6 @@ describe("Interface Radix Tree", () => {
             let deleteResult = radix.delete( new WebDollarCryptoData(str, "ascii") );
             assert(deleteResult === true, "delete "+str+" didn't work");
 
-            radix.printLevelSearch();
-
             assert(radix.validateTree() === true, "Radix Tree deleted after "+str+" is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
@@ -222,7 +220,7 @@ describe("Interface Radix Tree", () => {
 
     });
 
-    it("creating radix tree 3 - generalized test different lengths", ()=>{
+    it("creating radix tree 3 - generalized test different lengths tests", ()=>{
 
         //radixTestingArray = [ "slowly", "slowby", "slow" ];
         //radixTestingArray = [ "sl", "slowly", "slow" ];
@@ -257,6 +255,7 @@ describe("Interface Radix Tree", () => {
     it("creating radix tree 3 - generalized test different lengths", ()=>{
 
         radixTestingArray = TestsHelper.makeIds(200, 100, true);
+        //radixTestingArray = ["a","b","c","bd", "be"]
         radix = new InterfaceRadixTree();
 
         radixTestingArray.forEach( (str, index)=>{
@@ -299,7 +298,12 @@ describe("Interface Radix Tree", () => {
                 if (index2 <= index ) mustFind = false;
                 else mustFind = true;
 
-                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '"+str+"' although it was added successfully");
+                if (radix.search(new WebDollarCryptoData(str2, "ascii")).result !== mustFind) {
+                    console.log("radixx delete3 didn't work for deleting ",index, " str ", str, "and finding ",str2 )
+                    radix.printLevelSearch();
+                }
+
+                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '"+str2+"' although it was added successfully");
 
             });
 
