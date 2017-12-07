@@ -7,15 +7,15 @@ import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
 
 class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
-    createNode(parent, edges, value, amount){
+    createNode(parent, edges, value){
         //console.log("amount", amount)
-        return new InterfaceAccountRadixTreeNode(parent, edges, value, amount);
+        return new InterfaceAccountRadixTreeNode(parent, edges, value);
     }
 
-    setNode(node, value, amount){
-        InterfaceRadixTree.prototype.setNode(this, node, value);
-        node.setAmount(amount);
-    }
+    // setNode(node, value, amount){
+    //     InterfaceRadixTree.prototype.setNode(this, node, value);
+    //     node.setAmount(amount);
+    // }
 
     changedNode(node){
         // recalculate the balances
@@ -26,14 +26,19 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     checkInvalidNode(node){
 
+        console.log("InterfaceRadixTree.prototype.checkInvalidNode", InterfaceRadixTree.prototype.checkInvalidNode.call(this, node));
+
         let result = InterfaceRadixTree.prototype.checkInvalidNode.call(this, node);
         if (!result ) return false;
 
         //it should have a valid value
 
-        if (node.isAmountValid() === false)  return false;
-        if (node.amount.lessThan ( 0 ) ) return false;
+        console.log("node.isSumValid()", node.isSumValid(), "node.sum.lessThan ( 0 )", node.sum.lessThan ( 0 ), "node.isLeaf() && (node.isBalanceValid() === false", (node.isLeaf() && (node.isBalanceValid() === false)), "node.isBalanceValid() && node.value.balance.lessThan ( 0 )", node.isBalanceValid() && node.value.balance.lessThan ( 0 ) )
+        if (node.isSumValid() === false)  return false;
+        if (node.sum.lessThan ( 0 ) ) return false;
 
+        if (node.isLeaf() && (node.isBalanceValid() === false ) ) return false;
+        if (node.isBalanceValid() && node.value.balance.lessThan ( 0 )) return false;
 
         return true;
     }
@@ -50,16 +55,16 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         //validate bottom to up
 
-        let initialAmount = null;
+        let initialSum = null;
 
-        if ( node.isAmountValid() === false)  return false;
+        if ( node.isSumValid() === false)  return false;
         else
-            initialAmount = node.amount;
+            initialSum = node.sum;
 
         this._computeAccount(node);
 
-        if ( node.isAmountValid() === false ) return false;
-        if ( initialAmount.equals(node.amount) === false ) return false; // different amount
+        if ( node.isSumValid() === false ) return false;
+        if ( initialSum.equals(node.sum) === false ) return false; // different sum
 
         return true;
     }
@@ -70,33 +75,38 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
      */
     _computeAccount(node){
 
-        if (node === null || typeof node === 'undefined') throw "Couldn't compute the Amount because Node is empty";
+        if (node === null || typeof node === 'undefined') throw "Couldn't compute the Sum because Node is empty";
+
+
+        let sum;
+
+        if ( node.isBalanceValid()  )
+            sum = node.value.balance;
+        else
+            sum = new BigNumber(0);
+
 
         if ( node.edges.length > 0 ){
 
-            let amount = new BigNumber(0);
-
             for (let i=0; i<node.edges.length; i++){
 
-                if (typeof node.edges[i].targetNode.value === "undefined" || node.edges[i].targetNode.value === null || node.edges[i].targetNode.isAmountValid() === false )
-                    amount = amount.plus(this._computeAccount(node.edges[i].targetNode));
+                if (node.edges[i].targetNode.isSumValid() === false )
+                    sum = sum.plus(this._computeAccount(node.edges[i].targetNode));
                 else
-                    amount = amount.plus(node.edges[i].targetNode.amount);
+                    sum = sum.plus(node.edges[i].targetNode.sum);
             }
 
-            node.amount = amount;
-        } else {
 
-            if ( node.isAmountValid() === false )
-                node.amount = new BigNumber(0);
         }
 
-        return node.amount;
+        node.sum = sum;
+
+        return node.sum;
     }
 
     refreshAccount(node, forced){
 
-        if (node === null || typeof node === 'undefined') throw "Couldn't compute the Amount because Node is empty";
+        if (node === null || typeof node === 'undefined') throw "Couldn't compute the Sum because Node is empty";
 
         let result = false;
 

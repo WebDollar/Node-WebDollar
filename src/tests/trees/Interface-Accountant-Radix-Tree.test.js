@@ -25,8 +25,8 @@ describe('Interface Accountant Radix Tree', () => {
         accountantData.forEach((data, index) => {
             accountantTree.add(new WebDollarCryptoData(data.text, "ascii"), {
                 text: data.text,
-                value: data.value
-            }, data.value.toString());
+                balance: data.value.toString()
+            } );
 
             console.log("accountant text", data.value.toString())
             accountantTree.printLevelSearch();
@@ -48,28 +48,29 @@ describe('Interface Accountant Radix Tree', () => {
 
         console.log("Accountant Tree sums");
         console.log(sum);
-        console.log(result[0][0].amount);
+        console.log(result[0][0].sum);
 
         accountantTree.printLevelSearch();
 
-        assert(accountantTree.root.amount.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].amount + "       " + sum + "       diff: " + accountantTree.root.amount.minus(sum).toString());
+        assert(accountantTree.root.sum.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].sum + "       " + sum + "       diff: " + accountantTree.root.sum.minus(sum).toString());
 
         accountantTree.printLevelSearch();
     });
     
     it('creating Accountant Radix tree 2 Oprea', () => {
         
-        accountantData = [{text: "test", value: 5}, {text: "toaster",value: 2}, {text: "toasting",value: 3}, {text: "slow",value: 16}, {text: "slowly",value: 6}];
+        accountantData = [{text: "test", value: 100}, {text: "toaster",value: 2}, {text: "toasting",value: 3}, {text: "slow",value: 16}, {text: "slowly",value: 6}];
         accountantTree = new InterfaceAccountantRadixTree();
 
         accountantData.forEach((data, index) => {
             accountantTree.add(new WebDollarCryptoData(data.text, "ascii"), {
                 text: data.text,
-                value: data.value
-            }, data.value.toString());
+                balance: data.value.toString()
+            });
             console.log("Cosmin 555");
-            assert(accountantTree.validateTree() === true, "validate Tree cosminwas not passed at " + index + " because " + JSON.stringify(data));
             accountantTree.printLevelSearch();
+            assert(accountantTree.validateRoot() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
+
         });
 
         let result = accountantTree.levelSearch();
@@ -86,11 +87,11 @@ describe('Interface Accountant Radix Tree', () => {
 
         console.log("Accountant Tree sums");
         console.log(sum);
-        console.log(result[0][0].amount);
+        console.log(result[0][0].sum);
 
         accountantTree.printLevelSearch();
 
-        assert(accountantTree.root.amount.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].amount + "       " + sum + "       diff: " + accountantTree.root.amount.minus(sum).toString());
+        assert(accountantTree.root.sum.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].sum + "       " + sum + "       diff: " + accountantTree.root.sum.minus(sum).toString());
 
         accountantTree.printLevelSearch();
     });
@@ -104,8 +105,8 @@ describe('Interface Accountant Radix Tree', () => {
         accountantData.forEach((data, index) => {
             accountantTree.add(new WebDollarCryptoData(data.text, "ascii"), {
                 text: data.text,
-                value: data.value
-            }, data.value.toString());
+                balance: data.value.toString()
+            });
 
             assert(accountantTree.validateRoot() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
         });
@@ -121,11 +122,11 @@ describe('Interface Accountant Radix Tree', () => {
 
         console.log("Sums str", str);
         console.log(sum);
-        console.log(accountantTree.root.amount);
+        console.log(accountantTree.root.sum);
 
         accountantTree.printLevelSearch();
 
-        assert(accountantTree.root.amount.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + accountantTree.root.amount + "       " + sum + "       diff: " + accountantTree.root.amount.minus(sum).toString());
+        assert(accountantTree.root.sum.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + accountantTree.root.sum + "       " + sum + "       diff: " + accountantTree.root.sum.minus(sum).toString());
     });
 
     it('creating Accountant Radix tree - generalized', () => {
@@ -139,8 +140,8 @@ describe('Interface Accountant Radix Tree', () => {
         accountantData.forEach((data, index) => {
             accountantTree.add(new WebDollarCryptoData(data.text, "ascii"), {
                 text: data.text,
-                value: data.value
-            }, data.value.toString());
+                balance: data.value.toString()
+            });
 
             assert(accountantTree.validateRoot() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
         });
@@ -156,8 +157,8 @@ describe('Interface Accountant Radix Tree', () => {
 
         console.log("Sums str", str);
         console.log(sum);
-        console.log(accountantTree.root.amount);
+        console.log(accountantTree.root.sum);
 
-        assert(accountantTree.root.amount.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + accountantTree.root.amount + "       " + sum + "       diff: " + accountantTree.root.amount.minus(sum).toString());
+        assert(accountantTree.root.sum.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + accountantTree.root.sum + "       " + sum + "       diff: " + accountantTree.root.sum.minus(sum).toString());
     });
 });

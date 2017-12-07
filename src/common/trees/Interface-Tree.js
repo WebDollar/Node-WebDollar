@@ -107,7 +107,9 @@ class InterfaceTree{
 
     }
 
-    search(){
+    search(value, starting){
+
+        if (typeof starting === 'undefined' || starting === null) starting = this.root;
 
     }
 
@@ -197,7 +199,7 @@ class InterfaceTree{
             result[i].forEach( (node, index) => {
 
                 let value = node.value === null  ? 'null' : node.value
-                let amount = node.amount === null  ? 'null' : node.amount
+                let sum = node.sum === null  ? 'null' : node.sum
                 let edges = [];
                 let hash = null;
 
@@ -208,7 +210,7 @@ class InterfaceTree{
                 if (typeof node.hash !== 'undefined')
                     hash = node.hash;
 
-                let dataObject = {id: node.id, parentId: (node.parent !== null ? node.parent.id : -666), value: value, amount: amount, edges: edges};
+                let dataObject = {id: node.id, parentId: (node.parent !== null ? node.parent.id : -666), value: value, sum: sum, edges: edges};
 
                 if (hash !== null){
                     dataObject.hash = hash;
@@ -241,17 +243,17 @@ class InterfaceTree{
 
                 try {
 
-                    if (element.amount !== 'null' && typeof element.amount !== 'undefined') {
-                        dataString += " , amount: ";
+                    if (element.sum !== 'null' && typeof element.sum !== 'undefined') {
+                        dataString += " , sum: ";
 
-                        if (Buffer.isBuffer(element.amount)) dataString += element.amount.toString();
-                        else if (typeof element.amount === "object") dataString += JSON.stringify(element.amount);
-                        else dataString += element.amount;
+                        if (Buffer.isBuffer(element.sum)) dataString += element.sum.toString();
+                        else if (typeof element.sum === "object") dataString += JSON.stringify(element.sum);
+                        else dataString += element.sum;
                     }
 
                 } catch (exception){
                     dataString += "invalid";
-                    console.log("interface tree to json, exception" , exception.toString(), element.amount);
+                    console.log("interface tree to json, exception" , exception.toString(), element.sum);
                 }
 
                 dataString += " , ";

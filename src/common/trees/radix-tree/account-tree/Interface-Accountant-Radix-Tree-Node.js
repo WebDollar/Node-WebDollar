@@ -5,34 +5,64 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     // value must contain .amount
 
-    constructor(parent, edges, value, amount){
+    constructor(parent, edges, value, sum){
 
         super (parent, edges, value);
 
-        this.setAmount(amount);
+        this.setSum(sum);
+        this.setValue(value);
     }
 
-    setAmount(amount){
+    setSum(sum){
 
-        if (typeof amount === "object"  && amount !== null && amount.constructor.name === "BigNumber") this.amount =  amount;
+        if (typeof sum === "object"  && sum !== null && sum.constructor.name === "BigNumber") this.sum =  sum;
         else {
 
-            if (typeof amount === 'undefined' || amount === null) amount = 0;
+            if (typeof sum === 'undefined' || sum === null) sum = 0;
 
-            this.amount = new BigNumber(amount);
+            this.sum = new BigNumber(sum);
         }
 
     }
 
-    isAmountValid(){
+    isSumValid(){
 
-        if (typeof this.amount === 'undefined' && this.amount === null) return false;
-        if (typeof this.amount !== "object"  || this.amount.constructor.name !== "BigNumber") return false;
+        if (typeof this.sum === 'undefined' && this.sum=== null) return false;
+        if (typeof this.sum !== "object"  || this.sum.constructor.name !== "BigNumber") return false;
 
         return true;
 
     }
 
+
+    setValue(value){
+
+        if (typeof value === 'object' && value !== null){
+
+            if (typeof value.balance === "object"  && value.balance !== null && value.balance.constructor.name === "BigNumber") { }
+            else {
+
+                if (typeof value.balance === 'undefined' || value.balance === null) value.balance = 0;
+
+                value.balance = new BigNumber(value.balance);
+            }
+
+        }
+
+        this.value = value;
+
+    }
+
+    isBalanceValid(){
+
+        if (typeof this.value !== 'object' || this.value === null) return false;
+
+        if (typeof this.value.balance === 'undefined' && this.value.balance=== null) return false;
+        if (typeof this.value.balance !== "object"  || this.value.balance.constructor.name !== "BigNumber") return false;
+
+        return true;
+
+    }
 
 
 }
