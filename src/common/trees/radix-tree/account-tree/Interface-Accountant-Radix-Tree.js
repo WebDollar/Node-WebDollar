@@ -40,25 +40,10 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     }
 
-    validateTree(node, list){
-        let result = InterfaceRadixTree.prototype.validateTree.call(this, node);
+    validateTree(node){
+
+        let result = InterfaceRadixTree.prototype.validateTree.call(this, node, this.validateAccount);
         if (!result) return false;
-
-
-        //recalculate list, not really necessary if it was provided
-        if (typeof list === 'undefined' || list === null || list === [])
-            list = this.levelSearch(node);
-
-        for (let i=list.length-1; i >= 0; i--)
-            for (let j=list[i].length-1; j >=0; j-- ) {
-
-                let result = this.validateAccount(list[i][j]);
-
-                if (!result) {
-                    console.log("validateTree", i,j, list[i][j], false)
-                    return false;
-                }
-            }
 
         return true;
     }

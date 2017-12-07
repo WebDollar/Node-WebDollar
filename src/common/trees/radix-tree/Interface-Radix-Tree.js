@@ -134,43 +134,32 @@ class InterfaceRadixTree extends InterfaceTree{
                         if (match.buffer.length < nodeCurrent.edges[j].label.buffer.length){
 
                             let originalEdgeLength = nodeCurrent.edges[j].label.buffer.length;
+                            let edge = nodeCurrent.edges[j];
+
+                            // We remove edge j
+                            nodeCurrent.edges.splice(j,1);
+
+                            let nodeMatch = null;
 
                             if ( i + originalEdgeLength >  input.buffer.length &&  (i + match.buffer.length) === input.buffer.length ){
 
-                                let edge = nodeCurrent.edges[j];
-
-                                // We remove edge j
-                                nodeCurrent.edges.splice(j,1);
-
                                 // Adding the new nodeMatch by edge Match
-                                //console.log("nodeCurrent.parent", nodeCurrent.parent);
 
-                                let nodeMatch = this.createNode( nodeCurrent,  [], value, param);
+                                nodeMatch = this.createNode( nodeCurrent,  [], value, param);
                                 nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
                                 nodeMatch.edges.push( this.createEdge( edge.label.substr(match.buffer.length), edge.targetNode), )
                                 edge.targetNode.parent = nodeMatch;
 
-                                // console.log("nodeMatch",nodeMatch);
-                                // console.log("nodeChild",nodeChild);
-                                this.changedNode(nodeMatch)
-                                this.changedNode(edge.targetNode)
-
                                 nodeCurrent = edge.targetNode;
-
 
                             } else {
 
-                                let edge = nodeCurrent.edges[j];
-
-                                // We remove edge j
-                                nodeCurrent.edges.splice(j,1);
 
                                 // Adding the new nodeMatch by edge Match
-                                //console.log("nodeCurrent.parent", nodeCurrent.parent);
 
-                                let nodeMatch = this.createNode( nodeCurrent,  [], null, null);
+                                nodeMatch = this.createNode( nodeCurrent,  [], null, null);
                                 nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
@@ -181,14 +170,14 @@ class InterfaceRadixTree extends InterfaceTree{
                                 let nodeChild = this.createNode( nodeMatch, [], value, param );
                                 nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
 
-                                // console.log("nodeMatch",nodeMatch);
-                                // console.log("nodeChild",nodeChild);
-                                this.changedNode(nodeMatch)
-                                this.changedNode(nodeChild)
-
                                 nodeCurrent = nodeChild;
 
                             }
+
+                            // console.log("nodeMatch",nodeMatch);
+                            // console.log("nodeChild",nodeChild);
+                            this.changedNode(nodeCurrent)
+                            this.changedNode(nodeMatch)
 
                             // Marking that it is done
                             i = input.buffer.length+1;
@@ -205,8 +194,8 @@ class InterfaceRadixTree extends InterfaceTree{
                                 else this.setNode(nodeCurrent, value, param);
 
                                 this.changedNode(nodeCurrent)
-
                             }
+
                         }
                         childFound = true;
                         break;

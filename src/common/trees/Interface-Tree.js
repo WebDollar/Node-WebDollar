@@ -10,8 +10,41 @@ class InterfaceTree{
 
     }
 
-    validateTree(node, list){
+    /**
+     * DFS
+     * @param node
+     * @param callback
+     * @returns {boolean}
+     */
+    validateTree(node, callback){
 
+        if (typeof node === 'undefined' || node === null) throw ('Tree Validation Errror. Node is null');
+
+        for (let i=0; node.edges.length; i++) {
+
+            if (node.edges[i].targetNode === null)  throw('Edge target node is Null')
+            if (node.edges[i].targetNode.parent !== node) throw ('Edge target node parent is different that current node');
+
+            if (typeof callback === 'function') {
+                let result = this.validateTree(node.edges[i].targetNode);
+
+                if (!result) {
+                    console.log("validateTree", node)
+                    return false;
+                }
+
+            }
+        }
+
+        if (typeof callback === 'function'){
+            let result = callback(node);
+            if (!result){
+                console.log("validateTree - callback ", node);
+                return false;
+            }
+        }
+
+        return true;
     }
 
     createNode(parent, edges, value){

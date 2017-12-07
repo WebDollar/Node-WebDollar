@@ -28,22 +28,10 @@ class InterfaceMerkleTree extends InterfaceTree{
      * @param node
      * @returns {*}
      */
-    validateTree(node, list){
+    validateTree(node){
 
-        //recalculate list, not really necessary if it was provided
-        if (typeof list === 'undefined' || list === null || list === [])
-            list = this.levelSearch(node);
-
-        for (let i=list.length-1; i >= 0; i--)
-            for (let j=list[i].length-1; j >=0; j-- ) {
-
-                let result = this.validateHash(list[i][j]);
-
-                if (!result) {
-                    console.log("validateTree", i,j, list[i][j], false)
-                    return false;
-                }
-            }
+        let result = InterfaceTree.prototype.validateTree.call(this, node, this.validateHash);
+        if (!result) return false;
 
         return true;
     }
