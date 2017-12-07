@@ -315,5 +315,70 @@ describe("Interface Radix Tree", () => {
         assert (result[0].length === 1, "root is not empty");
 
     });
+	
+	
+	it("creating/deleting radix tree 4 - generalized permutation backtracking test", ()=>{
+
+		/*For each permutation create a radix tree, then delete all the added words*/
+		radixTestingArray = TestsHelper.makeIds(7, 32, true);
+		let permutations = TestsHelper.makePermutations(radixTestingArray);
+		
+		/*For each permutation*/
+		for(let i = 0, len = permutations.length; i < len; ++i) {
+			let arrayTest = permutations[i];
+			radix = new InterfaceRadixTree();
+			
+			/*Test insertion*/
+			arrayTest.forEach( (str, index)=>{
+
+				radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
+
+				assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+				assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
+
+				assert( radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+
+				arrayTest.forEach( (str2, index2)=>{
+
+					let mustFind = false;
+					if (index2 <= index ) mustFind = true;
+					else mustFind = false;
+
+					assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
+				});
+			});
+			
+			/*Test deletion*/
+			arrayTest.forEach( (str, index)=>{
+
+				radix.delete( new WebDollarCryptoData(str, "ascii") );
+
+				assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+				assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
+
+				assert( !radix.search(new WebDollarCryptoData(str, "ascii")).result , "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+
+				arrayTest.forEach( (str2, index2)=>{
+
+					let mustFind = false;
+					if (index2 <= index ) mustFind = false;
+					else mustFind = true;
+
+					if (radix.search(new WebDollarCryptoData(str2, "ascii")).result !== mustFind) {
+						console.log("radixx delete3 didn't work for deleting ",index, " str ", str, "and finding ",str2 )
+						radix.printLevelSearch();
+					}
+
+					assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '"+str2+"' although it was added successfully");
+
+				});
+				
+				let result = radix.levelSearch();
+
+				assert (result.length === 1, "result is not 1 level");
+				assert (result[0].length === 1, "root is not empty");
+			});
+		}
+    });
 });
 
