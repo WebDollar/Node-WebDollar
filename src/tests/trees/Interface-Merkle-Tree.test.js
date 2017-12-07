@@ -1,4 +1,3 @@
-
 var assert = require('assert')
 
 
@@ -63,4 +62,3 @@ describe('interfaceMerkleTree', () => {
     // });
 
 });
-

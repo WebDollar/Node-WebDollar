@@ -1,4 +1,3 @@
-
 var assert = require('assert')
 
 import TestsHelper from 'tests/Tests.helper'
@@ -7,19 +6,20 @@ import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
 describe("Interface Radix Tree", () => {
 
-
     let radix = null;
 
     //Based on this tutorial https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Patricia_trie.svg/350px-Patricia_trie.svg.png
-    let radixTestingArray = ["romane","romanus","romulus","rubens", "ruber" , "rubicon", "rubicundus"];
+    let radixTestingArray = ["romane", "romanus", "romulus", "rubens", "ruber", "rubicon", "rubicundus"];
 
-    it("creating radix tree romane", ()=>{
+    it("creating radix tree romane", () => {
 
         radix = new InterfaceRadixTree();
 
-        radixTestingArray.forEach( (str)=>{
-            radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
-            assert(radix.validateTree() === true, "Radix Tree after "+str+" is not Valid");
+        radixTestingArray.forEach((str) => {
+            radix.add(new WebDollarCryptoData(str, "ascii"), {
+                address: str
+            });
+            assert(radix.validateTree() === true, "Radix Tree after " + str + " is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
         });
 
@@ -28,55 +28,50 @@ describe("Interface Radix Tree", () => {
         console.log("rooomanus example")
         radix.printLevelSearch();
 
-        assert( result.length === 5, "Radix Tree has to many levels" )
-        assert( result[0].length === 1, "Radix Tree Level 0 has different nodes" )
-        assert( result[1].length === 1, "Radix Tree Level 1 has different nodes" )
-        assert( result[2].length === 2, "Radix Tree Level 2 has different nodes" )
-        assert( result[3].length === 4, "Radix Tree Level 3 has different nodes" )
-        assert( result[4].length === 6, "Radix Tree Level 4 has different nodes" )
-
-        // for (let i =0; i<result[4].length; i++)
-        //     console.log(i, result[4][i].value.toString(), result[4][i].parent );
+        assert(result.length === 5, "Radix Tree has to many levels");
+        assert(result[0].length === 1, "Radix Tree Level 0 has different nodes");
+        assert(result[1].length === 1, "Radix Tree Level 1 has different nodes");
+        assert(result[2].length === 2, "Radix Tree Level 2 has different nodes");
+        assert(result[3].length === 4, "Radix Tree Level 3 has different nodes");
+        assert(result[4].length === 6, "Radix Tree Level 4 has different nodes");
 
         radix.printLevelSearch();
 
     });
 
-    it("search radix tree romane", () =>{
+    it("search radix tree romane", () => {
 
-        radixTestingArray.forEach( (str)=>{
-            let result = radix.search( new WebDollarCryptoData(str, "ascii") );
-
-            assert (result.result === true, "result "+str+" was not found");
+        radixTestingArray.forEach((str) => {
+            let result = radix.search(new WebDollarCryptoData(str, "ascii"));
+            assert(result.result === true, "result " + str + " was not found");
         });
 
-        let result8 = radix.search ( new WebDollarCryptoData("rubicundusxx", "ascii") );
-        let result9 = radix.search ( new WebDollarCryptoData("ruberr", "ascii") );
+        let result8 = radix.search(new WebDollarCryptoData("rubicundusxx", "ascii"));
+        let result9 = radix.search(new WebDollarCryptoData("ruberr", "ascii"));
 
-        assert (result8.result === false, "result8 was found");
-        assert (result9.result === false, "result9 was found");
+        assert(result8.result === false, "result8 was found");
+        assert(result9.result === false, "result9 was found");
     })
 
-    it("delete radix tree romane", () =>{
+    it("delete radix tree romane", () => {
 
-        radixTestingArray.forEach( (str, index)=>{
+        radixTestingArray.forEach((str, index) => {
 
-            let deleteResult =radix.delete(  new WebDollarCryptoData(str, "ascii") );
-            assert(deleteResult === true, "delete "+str+" didn't work");
+            let deleteResult = radix.delete(new WebDollarCryptoData(str, "ascii"));
+            assert(deleteResult === true, "delete " + str + " didn't work");
 
             radix.printLevelSearch();
 
-            assert(radix.validateTree() === true, "Radix Tree deleted after "+str+" is not Valid");
+            assert(radix.validateTree() === true, "Radix Tree deleted after " + str + " is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
-            let searchResult = radix.search ( new WebDollarCryptoData(str, "ascii") );
-            assert (!searchResult.result, "result "+str+" was actually found...");
+            let searchResult = radix.search(new WebDollarCryptoData(str, "ascii"));
+            assert(!searchResult.result, "result " + str + " was actually found...");
 
             // the radix sort still, should detect all remaining strings
-
-            for (let j=index+1; j< radixTestingArray.length; j++) {
-                let searchResult = radix.search ( new WebDollarCryptoData( radixTestingArray[j], "ascii") );
-                assert ( searchResult.result === true, "result "+str+" was not found after "+str+" was deleted..." );
+            for (let j = index + 1; j < radixTestingArray.length; j++) {
+                let searchResult = radix.search(new WebDollarCryptoData(radixTestingArray[j], "ascii"));
+                assert(searchResult.result === true, "result " + str + " was not found after " + str + " was deleted...");
             }
 
         });
@@ -85,69 +80,70 @@ describe("Interface Radix Tree", () => {
 
         radix.printLevelSearch();
 
-        assert (result.length === 1, "result is not 1 level");
-        assert (result[0].length === 1, "root is not empty");
+        assert(result.length === 1, "result is not 1 level");
+        assert(result[0].length === 1, "root is not empty");
 
     });
 
-	
-	it("creating radix tree 2 Oprea", ()=>{
+    it("creating radix tree 2 Oprea", () => {
 
-		//Based on https://en.wikipedia.org/wiki/Radix_tree#/media/File:An_example_of_how_to_find_a_string_in_a_Patricia_trie.png
-		radixTestingArray = ["test", "toaster", "toasting", "slow", "slowly"];
+        //Based on https://en.wikipedia.org/wiki/Radix_tree#/media/File:An_example_of_how_to_find_a_string_in_a_Patricia_trie.png
+        radixTestingArray = ["test", "toaster", "toasting", "slow", "slowly"];
         radix = new InterfaceRadixTree();
 
-        radixTestingArray.forEach( (str)=>{
-            radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
-            assert(radix.validateTree() === true, "Radix Tree after "+str+" is not Valid");
+        radixTestingArray.forEach((str) => {
+            radix.add(new WebDollarCryptoData(str, "ascii"), {
+                address: str
+            });
+            assert(radix.validateTree() === true, "Radix Tree after " + str + " is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
         });
 
         let result = radix.levelSearch();
 
-        assert( result.length === 4, "Radix Tree has to many levels" )
-        assert( result[0].length === 1, "Radix Tree Level 0 has different nodes" )
-        assert( result[1].length === 2, "Radix Tree Level 1 has different nodes" )
-        assert( result[2].length === 3, "Radix Tree Level 2 has different nodes" )
-        assert( result[3].length === 2, "Radix Tree Level 3 has different nodes" )
+        assert(result.length === 4, "Radix Tree has to many levels");
+        assert(result[0].length === 1, "Radix Tree Level 0 has different nodes");
+        assert(result[1].length === 2, "Radix Tree Level 1 has different nodes");
+        assert(result[2].length === 3, "Radix Tree Level 2 has different nodes");
+        assert(result[3].length === 2, "Radix Tree Level 3 has different nodes");
 
         radix.printLevelSearch();
 
     });
 
-	it("search radix tree 2 Oprea", () =>{
+    it("search radix tree 2 Oprea", () => {
 
-        radixTestingArray.forEach( (str)=>{
-            let result = radix.search( new WebDollarCryptoData(str, "ascii") );
+        radixTestingArray.forEach((str) => {
+            let result = radix.search(new WebDollarCryptoData(str, "ascii"));
 
-            assert (result.result === true, "result "+str+" was not found");
+            assert(result.result === true, "result " + str + " was not found");
         });
 
-        assert ( radix.search( new WebDollarCryptoData("slo", "ascii")).result === false, "slo was found");
-        assert ( radix.search( new WebDollarCryptoData("toastingg", "ascii")).result === false, "toastingg was found");
+        assert(radix.search(new WebDollarCryptoData("slo", "ascii")).result === false, "slo was found");
+        assert(radix.search(new WebDollarCryptoData("toastingg", "ascii")).result === false, "toastingg was found");
     })
 
-	it("delete radix tree 2 - Oprea's bug report", () =>{
+    it("delete radix tree 2 - Oprea's bug report", () => {
 
-        radixTestingArray.forEach( (str, index)=>{
+        radixTestingArray.forEach((str, index) => {
 
             console.log("delete radix tree 2", str);
             console.log("--------");
             radix.printLevelSearch();
 
-            let deleteResult = radix.delete( new WebDollarCryptoData(str, "ascii") );
-            assert(deleteResult === true, "delete "+str+" didn't work");
+            let deleteResult = radix.delete(new WebDollarCryptoData(str, "ascii"));
+            assert(deleteResult === true, "delete " + str + " didn't work");
 
-            assert(radix.validateTree() === true, "Radix Tree deleted after "+str+" is not Valid");
+            assert(radix.validateTree() === true, "Radix Tree deleted after " + str + " is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
-            let searchResult = radix.search( new WebDollarCryptoData(str, "ascii") );
-            assert (!searchResult.result, "result "+str+" was actually found...");
+            let searchResult = radix.search(new WebDollarCryptoData(str, "ascii"));
+            assert(!searchResult.result, "result " + str + " was actually found...");
 
             // the radix sort still, should detect all remaining strings
             for (let j = index + 1; j < radixTestingArray.length; j++) {
-                let searchResult = radix.search ( new WebDollarCryptoData( radixTestingArray[j], "ascii") );
-                assert ( searchResult.result === true, "result "+radixTestingArray[j]+" was not found after "+str+" was deleted..." );
+                let searchResult = radix.search(new WebDollarCryptoData(radixTestingArray[j], "ascii"));
+                assert(searchResult.result === true, "result " + radixTestingArray[j] + " was not found after " + str + " was deleted...");
             }
 
         });
@@ -156,33 +152,34 @@ describe("Interface Radix Tree", () => {
 
         radix.printLevelSearch();
 
-        assert (result.length === 1, "result is not 1 level");
-        assert (result[0].length === 1, "root is not empty");
+        assert(result.length === 1, "result is not 1 level");
+        assert(result[0].length === 1, "root is not empty");
 
     });
 
+    it("creating radix tree 3 - generalized test", () => {
 
-    it("creating radix tree 3 - generalized test", ()=>{
-
-		radixTestingArray = TestsHelper.makeIds(200, 100);
+        radixTestingArray = TestsHelper.makeIds(200, 100);
         radix = new InterfaceRadixTree();
 
-        radixTestingArray.forEach( (str, index)=>{
+        radixTestingArray.forEach((str, index) => {
 
-            radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
+            radix.add(new WebDollarCryptoData(str, "ascii"), {
+                address: str
+            });
 
-            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+            assert(radix.validateTree() === true, "Radix Tree 2 after " + str + " is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
-            assert( radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+            assert(radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
 
-            radixTestingArray.forEach( (str2, index2)=>{
+            radixTestingArray.forEach((str2, index2) => {
 
                 let mustFind = false;
-                if (index2 <= index ) mustFind = true;
-                else mustFind = false;
+                if (index2 <= index)
+                    mustFind = true;
 
-                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
+                assert(radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find " + str + " although it was added successfully");
 
             });
 
@@ -190,24 +187,24 @@ describe("Interface Radix Tree", () => {
 
     });
 
-    it("deleting radix tree 3 - generalized test", ()=>{
+    it("deleting radix tree 3 - generalized test", () => {
 
-        radixTestingArray.forEach( (str, index)=>{
+        radixTestingArray.forEach((str, index) => {
 
-            radix.delete( new WebDollarCryptoData(str, "ascii") );
+            radix.delete(new WebDollarCryptoData(str, "ascii"));
 
-            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+            assert(radix.validateTree() === true, "Radix Tree 2 after " + str + " is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
-            assert( !radix.search(new WebDollarCryptoData(str, "ascii")).result , "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+            assert(!radix.search(new WebDollarCryptoData(str, "ascii")).result, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
 
-            radixTestingArray.forEach( (str2, index2)=>{
+            radixTestingArray.forEach((str2, index2) => {
 
-                let mustFind = false;
-                if (index2 <= index ) mustFind = false;
-                else mustFind = true;
+                let mustFind = true;
+                if (index2 <= index) 
+                    mustFind = false;
 
-                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '"+str+"' although it was added successfully");
+                assert(radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '" + str + "' although it was added successfully");
 
             });
 
@@ -215,36 +212,38 @@ describe("Interface Radix Tree", () => {
 
         let result = radix.levelSearch();
 
-        assert (result.length === 1, "result is not 1 level");
-        assert (result[0].length === 1, "root is not empty");
+        assert(result.length === 1, "result is not 1 level");
+        assert(result[0].length === 1, "root is not empty");
 
     });
 
-    it("creating radix tree 3 - generalized test different lengths tests", ()=>{
+    it("creating radix tree 3 - generalized test different lengths tests", () => {
 
         //radixTestingArray = [ "slowly", "slowby", "slow" ];
         //radixTestingArray = [ "sl", "slowly", "slow" ];
-        radixTestingArray = [ "slowly", "slowlb","slom","slow"];
+        radixTestingArray = ["slowly", "slowlb", "slom", "slow"];
         radix = new InterfaceRadixTree();
 
-        radixTestingArray.forEach( (str, index)=>{
+        radixTestingArray.forEach((str, index) => {
 
-            radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
+            radix.add(new WebDollarCryptoData(str, "ascii"), {
+                address: str
+            });
 
-            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+            assert(radix.validateTree() === true, "Radix Tree 2 after " + str + " is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
             console.log("radix aaa");
             radix.printLevelSearch();
-            assert( radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+            assert(radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
 
-            radixTestingArray.forEach( (str2, index2)=>{
+            radixTestingArray.forEach((str2, index2) => {
 
                 let mustFind = false;
-                if (index2 <= index ) mustFind = true;
-                else mustFind = false;
+                if (index2 <= index)
+                    mustFind = true;
 
-                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
+                assert(radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find " + str + " although it was added successfully");
 
             });
 
@@ -252,28 +251,30 @@ describe("Interface Radix Tree", () => {
 
     });
 
-    it("creating radix tree 3 - generalized test different lengths", ()=>{
+    it("creating radix tree 3 - generalized test different lengths", () => {
 
         radixTestingArray = TestsHelper.makeIds(200, 100, true);
         //radixTestingArray = ["a","b","c","bd", "be"]
         radix = new InterfaceRadixTree();
 
-        radixTestingArray.forEach( (str, index)=>{
+        radixTestingArray.forEach((str, index) => {
 
-            radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
+            radix.add(new WebDollarCryptoData(str, "ascii"), {
+                address: str
+            });
 
-            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+            assert(radix.validateTree() === true, "Radix Tree 2 after " + str + " is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
-            assert( radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+            assert(radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
 
-            radixTestingArray.forEach( (str2, index2)=>{
+            radixTestingArray.forEach((str2, index2) => {
 
                 let mustFind = false;
-                if (index2 <= index ) mustFind = true;
-                else mustFind = false;
+                if (index2 <= index) 
+                    mustFind = true;
 
-                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
+                assert(radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find " + str + " although it was added successfully");
 
             });
 
@@ -281,29 +282,29 @@ describe("Interface Radix Tree", () => {
 
     });
 
-    it("deleting radix tree 3 - generalized test  different lengths", ()=>{
+    it("deleting radix tree 3 - generalized test  different lengths", () => {
 
-        radixTestingArray.forEach( (str, index)=>{
+        radixTestingArray.forEach((str, index) => {
 
-            radix.delete( new WebDollarCryptoData(str, "ascii") );
+            radix.delete(new WebDollarCryptoData(str, "ascii"));
 
-            assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
+            assert(radix.validateTree() === true, "Radix Tree 2 after " + str + " is not Valid");
             assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
-            assert( !radix.search(new WebDollarCryptoData(str, "ascii")).result , "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+            assert(!radix.search(new WebDollarCryptoData(str, "ascii")).result, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
 
-            radixTestingArray.forEach( (str2, index2)=>{
+            radixTestingArray.forEach((str2, index2) => {
 
-                let mustFind = false;
-                if (index2 <= index ) mustFind = false;
-                else mustFind = true;
+                let mustFind = true;
+                if (index2 <= index)
+                    mustFind = false;
 
                 if (radix.search(new WebDollarCryptoData(str2, "ascii")).result !== mustFind) {
-                    console.log("radixx delete3 didn't work for deleting ",index, " str ", str, "and finding ",str2 )
+                    console.log("radixx delete3 didn't work for deleting ", index, " str ", str, "and finding ", str2)
                     radix.printLevelSearch();
                 }
 
-                assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '"+str2+"' although it was added successfully");
+                assert(radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '" + str2 + "' although it was added successfully");
 
             });
 
@@ -311,74 +312,72 @@ describe("Interface Radix Tree", () => {
 
         let result = radix.levelSearch();
 
-        assert (result.length === 1, "result is not 1 level");
-        assert (result[0].length === 1, "root is not empty");
+        assert(result.length === 1, "result is not 1 level");
+        assert(result[0].length === 1, "root is not empty");
 
     });
 	
-	
-	it("creating/deleting radix tree 4 - generalized permutation backtracking test", ()=>{
+    it("creating/deleting radix tree 4 - generalized permutation backtracking test", () => {
+        /*For each permutation create a radix tree, then delete all the added words*/
+        radixTestingArray = TestsHelper.makeIds(7, 32, true);
+        let permutations = TestsHelper.makePermutations(radixTestingArray);
 
-		/*For each permutation create a radix tree, then delete all the added words*/
-		radixTestingArray = TestsHelper.makeIds(7, 32, true);
-		let permutations = TestsHelper.makePermutations(radixTestingArray);
-		
-		/*For each permutation*/
-		for(let i = 0, len = permutations.length; i < len; ++i) {
-			let arrayTest = permutations[i];
-			radix = new InterfaceRadixTree();
-			
-			/*Test insertion*/
-			arrayTest.forEach( (str, index)=>{
+        /*For each permutation*/
+        for (let i = 0, len = permutations.length; i < len; ++i) {
+            let arrayTest = permutations[i];
+            radix = new InterfaceRadixTree();
 
-				radix.add( new WebDollarCryptoData(str, "ascii"), { address: str } );
+            /*Test insertion*/
+            arrayTest.forEach((str, index) => {
 
-				assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
-				assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
+                radix.add(new WebDollarCryptoData(str, "ascii"), {
+                    address: str
+                });
 
-				assert( radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+                assert(radix.validateTree() === true, "Radix Tree 2 after " + str + " is not Valid");
+                assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
-				arrayTest.forEach( (str2, index2)=>{
+                assert(radix.search(new WebDollarCryptoData(str, "ascii")).result === true, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
 
-					let mustFind = false;
-					if (index2 <= index ) mustFind = true;
-					else mustFind = false;
+                arrayTest.forEach((str2, index2) => {
 
-					assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find "+str+" although it was added successfully");
-				});
-			});
-			
-			/*Test deletion*/
-			arrayTest.forEach( (str, index)=>{
+                    let mustFind = false;
+                    if (index2 <= index)
+                        mustFind = true;
 
-				radix.delete( new WebDollarCryptoData(str, "ascii") );
+                    assert(radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find " + str + " although it was added successfully");
+                });
+            });
 
-				assert( radix.validateTree() === true, "Radix Tree 2 after "+str+" is not Valid");
-				assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
+            /*Test deletion*/
+            arrayTest.forEach((str, index) => {
 
-				assert( !radix.search(new WebDollarCryptoData(str, "ascii")).result , "Radix Tree2 couldn't find "+index+"   "+str+" although it was added");
+                radix.delete(new WebDollarCryptoData(str, "ascii"));
 
-				arrayTest.forEach( (str2, index2)=>{
+                assert(radix.validateTree() === true, "Radix Tree 2 after " + str + " is not Valid");
+                assert(radix.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
-					let mustFind = false;
-					if (index2 <= index ) mustFind = false;
-					else mustFind = true;
+                assert(!radix.search(new WebDollarCryptoData(str, "ascii")).result, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
 
-					if (radix.search(new WebDollarCryptoData(str2, "ascii")).result !== mustFind) {
-						console.log("radixx delete3 didn't work for deleting ",index, " str ", str, "and finding ",str2 )
-						radix.printLevelSearch();
-					}
+                arrayTest.forEach((str2, index2) => {
 
-					assert( radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '"+str2+"' although it was added successfully");
+                    let mustFind = true;
+                    if (index2 <= index)
+                        mustFind = false;
 
-				});
-				
-				let result = radix.levelSearch();
+                    if (radix.search(new WebDollarCryptoData(str2, "ascii")).result !== mustFind) {
+                        console.log("radixx delete3 didn't work for deleting ", index, " str ", str, "and finding ", str2)
+                        radix.printLevelSearch();
+                    }
 
-				assert (result.length === 1, "result is not 1 level");
-				assert (result[0].length === 1, "root is not empty");
-			});
-		}
+                    assert(radix.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Radix Tree2 couldn't find or not find '" + str2 + "' although it was added successfully");
+                });
+
+                let result = radix.levelSearch();
+
+                assert(result.length === 1, "result is not 1 level");
+                assert(result[0].length === 1, "root is not empty");
+            });
+        }
     });
 });
-
