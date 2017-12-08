@@ -228,18 +228,19 @@ describe('Interface Accountant Radix Tree', () => {
         accountantData = TestsHelper.makeSetIdAndNumber(6, false, 10000);
         let testStrings = [];
         for (let i = 0; i < accountantData.length; ++i)
-            testStrings[i] = accountantData.text;
+            testStrings[i] = accountantData[i].text;
         
         let permutations = TestsHelper.makePermutations(testStrings);
         /*For each permutation*/
+
         for (let i = 0, len = permutations.length; i < len; ++i) {
         
             //let randomize accountantData values
             for (let j = 0; j < permutations[i].length; j++) {
-                accountantData[j].value = TestsHelper.makeRandomNumber();
+                accountantData[j].value = TestsHelper.makeRandomNumber().toString();
                 accountantData[j].text = permutations[i][j];
             }
-        
+
             let result = testAddRadix(accountantData);
             testRadixDelete(result.tree, accountantData);
         }

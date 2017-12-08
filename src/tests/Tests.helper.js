@@ -82,7 +82,7 @@ class TestsHelper {
 			for(let i = 0; i < n; ++i) {
 				tmp[i] = radixTestingArray[ind[i]];
 			}
-			result.push([tmp]);
+			result.push(tmp);
 			return;
 		}
 		for(let i = 0; i < n; ++i) {
