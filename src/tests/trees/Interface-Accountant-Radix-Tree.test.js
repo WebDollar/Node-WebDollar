@@ -237,7 +237,7 @@ describe('Interface Accountant Radix Tree', () => {
         
             //let randomize accountantData values
             for (let j = 0; j < permutations[i].length; j++) {
-                accountantData[j].value = TestsHelper.makeRandomNumber().toString();
+                accountantData[j].value = TestsHelper.makeRandomNumber();
                 accountantData[j].text = permutations[i][j];
             }
 
