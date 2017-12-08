@@ -6,7 +6,7 @@ import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
 import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
 import InterfaceMerkleTree from './../../merkle-tree/Interface-Merkle-Tree'
 
-class InterfaceMerkleRadixTree extends InterfaceRadixTree{
+class InterfaceRadixMerkleTree extends InterfaceRadixTree{
 
     setNode(node, value){
         InterfaceRadixTree.prototype.setNode(this, node);
@@ -40,4 +40,4 @@ class InterfaceMerkleRadixTree extends InterfaceRadixTree{
 
 }
 
-export default InterfaceMerkleRadixTree;
+export default InterfaceRadixMerkleTree;

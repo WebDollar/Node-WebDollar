@@ -96,11 +96,13 @@ class InterfaceTree{
 
             if (nodeParent.edges.length === 0){
                 node = nodeParent;
-            }
+            } else break;
+
+            nodeParent = node.parent;
         }
 
         if (deleted) {
-            this.changedNode(node)
+            this.changedNode(nodeParent)
             return true;
         }
         return false;
@@ -113,14 +115,21 @@ class InterfaceTree{
      * @param nodeStarting
      * @returns {*}
      */
-    search(value, nodeStarting){
+    search(value, node){
 
-        if (typeof nodeStarting === 'undefined' || nodeStarting === null) nodeStarting = this.root;
+        if (typeof value === 'undefined' || value === null) return null;
 
-        if (nodeStarting.value === value) return nodeStarting;
+        if (typeof node === 'undefined' || node === null) node = this.root;
+        //console.log("value1", value, value  instanceof WebDollarCryptoData );
+        value = WebDollarCryptoData.createWebDollarCryptoData(value);
+        //console.log("value2", value, value  instanceof WebDollarCryptoData );
 
-        for (let i=0; i<nodeStarting.edges.length; i++) {
-            let result = this.search(value, nodeStarting.edges[i].targetNode);
+
+        if (typeof node.value !== 'undefined' && node.value !== null && node.value.buffer.equals (value.buffer) ) return node;
+
+
+        for (let i=0; i<node.edges.length; i++) {
+            let result = this.search(value, node.edges[i].targetNode);
 
             if (result !== null) return result;
         }

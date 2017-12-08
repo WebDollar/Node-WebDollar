@@ -44,9 +44,9 @@ let testAddRadix = (accountantData, accountantTree)=>{
     for (let i = 0; i < accountantData.length; i++)
         sum = sum.plus(new BigNumber(accountantData[i].value.toString()));
 
-    console.log("Accountant Tree sums");
-    console.log(sum);
-    console.log(result[0][0].sum);
+    // console.log("Accountant Tree sums");
+    // console.log(sum);
+    // console.log(result[0][0].sum);
 
     assert(accountantTree.root.sum.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].sum + "       " + sum + "       diff: " + accountantTree.root.sum.minus(sum).toString());
 

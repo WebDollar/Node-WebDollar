@@ -10,18 +10,57 @@ let testAddMerkleTree = ( data , tree) => {
 
     if (tree === null || typeof tree === 'undefined') tree = new InterfaceMerkleTree();
 
-    data.forEach( (str)=>{
+    data.forEach( (str, index)=>{
         tree.add( new WebDollarCryptoData(str, "ascii") );
 
         assert(tree.validateRoot() === true, "Merkle Tree is invalid!!!");
+
+        data.forEach( (str2, index2)=> {
+
+            let find = false;
+            if (index2 <= index) find = true;
+
+            assert( tree.search(new WebDollarCryptoData(str2, "ascii")) === find, "When adding "+str.toString()+" couldn't find item" + str2.toString() + " although it added or not")
+        });
     });
 
     let result = tree.levelSearch();
-
     return {tree: tree, levels: result};
 };
 
-let testDeleteMerkleTree = () => {
+let testDeleteMerkleTree = (data, tree) => {
+
+    if (tree === null || typeof tree === 'undefined') tree = new InterfaceMerkleTree();
+
+    while (data.length > 0){
+
+        let index = Math.floor(Math.random()*data.length);
+        let value = data[index];
+
+        console.log('1');
+        let node = tree.search( new WebDollarCryptoData(value, "ascii") );
+
+        assert(node !== null, "Couldn't find item "+value.toString() );
+        console.log('2');
+        assert( tree.delete(node) === true, "Couldn't delete item" );
+        console.log('3');
+        assert(tree.validateRoot() === true, "Merkle Tree is invalid!!!");
+        console.log('4');
+        data.splice(index, 1);
+
+        for (let j=0; j<data.length; j++)
+            assert ( tree.search(  new WebDollarCryptoData( data[j], "ascii")) !== null , "Couldn't find item" + value.toString()+" although it was not deleted")
+
+        console.log('5');
+        console.log(data.length);
+    }
+
+    let result = tree.levelSearch();
+
+    assert(result.length === 1, "result is not 1 level");
+    assert(result[0].length === 1, "root is not empty");
+
+    return {tree: tree, levels: result};
 
 };
 
@@ -68,6 +107,7 @@ describe('interfaceMerkleTree', () => {
 
     it ( "delete merkle tree", () =>{
 
+        testDeleteMerkleTree( merkleData.concat(merkleData2), merkleTree,)
 
     });
 
