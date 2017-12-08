@@ -110,7 +110,11 @@ class InterfaceTree{
         }
 
         if (deleted) {
+
+            if (nodeParent === null || typeof nodeParent === 'undefined') nodeParent = this.root;
+
             this.changedNode(nodeParent)
+
             return true;
         }
         return false;

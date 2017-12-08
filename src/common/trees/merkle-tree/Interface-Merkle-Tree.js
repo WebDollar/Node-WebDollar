@@ -80,6 +80,11 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         if (node === null || typeof node === 'undefined') throw "Couldn't compute hash because Node is empty";
 
+        if (node === this.root && node.edges.length === 0){
+            node.hash = {sha256: WebDollarCryptoData.createWebDollarCryptoData( [0] )};
+            return node.hash;
+        }
+
         if (node.edges.length === 0){ //Leaf Node (terminal node)
 
             if ( node.value === null || typeof node === "undefined") throw ("Leaf nodes has not value");

@@ -37,22 +37,20 @@ let testDeleteMerkleTree = (data, tree) => {
         let index = Math.floor(Math.random()*data.length);
         let value = data[index];
 
-        console.log('1');
+
         let node = tree.search( new WebDollarCryptoData(value, "ascii") );
 
         assert(node !== null, "Couldn't find item "+value.toString() );
-        console.log('2');
+
         assert( tree.delete(node) === true, "Couldn't delete item" );
-        console.log('3');
+
         assert(tree.validateRoot() === true, "Merkle Tree is invalid!!!");
-        console.log('4');
+
         data.splice(index, 1);
 
         for (let j=0; j<data.length; j++)
             assert ( tree.search(  new WebDollarCryptoData( data[j], "ascii")) !== null , "Couldn't find item" + value.toString()+" although it was not deleted")
 
-        console.log('5');
-        console.log(data.length);
     }
 
     let result = tree.levelSearch();
