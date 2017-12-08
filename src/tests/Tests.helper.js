@@ -1,17 +1,23 @@
 
 class TestsHelper {
 
-    makeId(count) {
+    makeId(count, randomLengths) {
 
-      if (typeof count === 'undefined') count = Math.floor(Math.random()*100 + 30)
+        if (typeof count === 'undefined') count = Math.floor(Math.random()*100 + 30 );
 
-      var text = "";
-      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        if (randomLengths === true) randomLengths = Math.floor( Math.random() * count );
 
-      for (var i = 0; i < count; i++)
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
+        if (randomLengths)
+            count = randomLengths + Math.floor( Math.random() * ( count + randomLengths) );
 
-      return text;
+
+        let text = "";
+        let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (let i = 0; i < count; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
     }
 
     makeIds(count, wordCount, randomLengths){
@@ -23,7 +29,7 @@ class TestsHelper {
         for (let i=0; i<count; i++) {
 
             let found = true;
-            let word = this.makeId( randomLengths ? Math.floor( Math.random()*wordCount+1 ) : wordCount);
+            let word = this.makeId( wordCount, randomLengths);
 
             //avoid identically words
             while (found){
@@ -32,7 +38,7 @@ class TestsHelper {
                 for (let j=0; j<result.length; j++)
                     if (result[j] === word) {
                         found = true;
-                        word = this.makeId( randomLengths ? Math.floor( Math.random()*wordCount+1 ) : wordCount);
+                        word = this.makeId( wordCount, randomLengths);
                         break;
                     }
 
@@ -51,11 +57,9 @@ class TestsHelper {
         return Math.random()*biggestNumber +  300;
     }
 
-    makeSetIdAndNumber(count, floor, biggestNumber){
+    makeSetIdAndNumber(count, floor, biggestNumber, wordsCount, randomLengths){
 
-        if (typeof count === 'undefined') count = 10000;
-
-        let list = this.makeIds(count);
+        let list = this.makeIds(count, wordsCount, randomLengths);
 
         for (let i=0; i<list.length; i++) {
             let number = this.makeRandomNumber(biggestNumber);
@@ -66,10 +70,13 @@ class TestsHelper {
         }
 
         return list;
+    }
 
+    makeSetVariableIdAndNumber(count, floor, biggestNumber, wordsCount){
+        return this.makeSetIdAndNumber(count, floor, biggestNumber, wordsCount, true);
     }
 	
-	back_permutations(k, n, radixTestingArray, used, ind, result) {
+	backPermutations(k, n, radixTestingArray, used, ind, result) {
 		if(k === n) {
 			let tmp = new Array(n);
 			for(let i = 0; i < n; ++i) {
@@ -82,7 +89,7 @@ class TestsHelper {
 			if(used[i] === 0) {
 				used[i] = 1;
 				ind[k] = i;
-				this.back_permutations(k + 1, n, radixTestingArray, used, ind, result)
+				this.backPermutations(k + 1, n, radixTestingArray, used, ind, result)
 				used[i] = 0;
 			}
 		}
@@ -93,7 +100,7 @@ class TestsHelper {
 		for(let i = 0; i < used.length; ++i)
 			used[i] = 0;
 		let result = [];
-		this.back_permutations(0, used.length, radixTestingArray, used, new Array(used.length), result);
+		this.backPermutations(0, used.length, radixTestingArray, used, new Array(used.length), result);
 		return result;
 	}
 
