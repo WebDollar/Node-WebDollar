@@ -176,7 +176,8 @@ class InterfaceRadixTree extends InterfaceTree{
                                 if (nodeCurrent.value !== null) throw ('the node already includes a value....');
                                 else this.setNode(nodeCurrent, value, param);
 
-                                //console.log("nodeCurrent_2",nodeCurrent.value);
+                                //console.log("nodeCurrent_2",nodeCurrent.value, nodeCurrent);
+
                                 this.changedNode(nodeCurrent)
                             }
 

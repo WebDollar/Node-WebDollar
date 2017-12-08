@@ -12,13 +12,14 @@ let testAddRadix = (accountantData, accountantTree)=>{
     if (typeof accountantTree === 'undefined' || accountantTree === null)  accountantTree = new InterfaceAccountantRadixTree();
 
     accountantData.forEach((data, index) => {
+
         accountantTree.add(new WebDollarCryptoData(data.text, "ascii"), {
             text: data.text,
             balance: data.value.toString()
-        } );
+        });
 
-        // console.log("accountant text", data.value.toString())
-        // accountantTree.printLevelSearch();
+        //console.log("accountant text", data.value.toString())
+        //accountantTree.printLevelSearch();
         assert(accountantTree.validateRoot() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
         assert(accountantTree.validateParentsAndChildrenEdges() === true, "Accountant Tree Parents and Children Edges don't match");
 
@@ -171,9 +172,25 @@ describe('Interface Accountant Radix Tree', () => {
 
     it('creating & deleting Accountant Radix tree - generalized different with small lengths', () => {
 
-        accountantData = TestsHelper.makeSetVariableIdAndNumber(1000, false, 10000, 6 );
+        accountantData = TestsHelper.makeSetVariableIdAndNumber(100, false, 10000, 2 );
 
-        console.log("small lengths", JSON.stringify(accountantData));
+
+        let result = testAddRadix(accountantData);
+        testRadixDelete(result.tree, accountantData);
+    });
+
+    it('creating & deleting Accountant Radix tree -small test', () => {
+
+        //accountantData = [{text: "name", value: 5}, {text: "dob",value: 2}, {text: "spouse",value: 3}, {text: "nameads",value: 16}, {text: "namsse",value: 6}, {text: "dofab",value: 8}, {text: "spoudse",value: 9}, {text: "occupdsation", value:15}, {text: "dozzzb", value:20}, {text: "spouszze", value: 30}, {text: "occupatdfion", value:40}, {text: "dssob", value:50}, {text: "spossuse", value:60}, {text: "occupssation", value:80}];
+        accountantData = [{text: "ara", value: 5}, {text: "aba",value: 2}, {text: "a",value: 3}];
+
+        let result = testAddRadix(accountantData);
+        testRadixDelete(result.tree, accountantData);
+    });
+
+    it('creating & deleting Accountant Radix tree - ETHEREUM test', () => {
+
+        accountantData = [{text: "name", value: 5}, {text: "dob",value: 2}, {text: "spouse",value: 3}, {text: "nameads",value: 16}, {text: "namsse",value: 6}, {text: "dofab",value: 8}, {text: "spoudse",value: 9}, {text: "occupdsation", value:15}, {text: "dozzzb", value:20}, {text: "spouszze", value: 30}, {text: "occupatdfion", value:40}, {text: "dssob", value:50}, {text: "spossuse", value:60}, {text: "occupssation", value:80}];
 
         let result = testAddRadix(accountantData);
         testRadixDelete(result.tree, accountantData);

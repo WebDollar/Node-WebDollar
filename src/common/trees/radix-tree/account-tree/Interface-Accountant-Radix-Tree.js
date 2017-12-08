@@ -7,15 +7,16 @@ import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
 
 class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
-    createNode(parent, edges, value){
+    createNode(parent, edges, value, sum){
         //console.log("amount", amount)
-        return new InterfaceAccountRadixTreeNode(parent, edges, value);
+        return new InterfaceAccountRadixTreeNode(parent, edges, value, sum);
     }
 
-    // setNode(node, value, amount){
-    //     InterfaceRadixTree.prototype.setNode(this, node, value);
-    //     node.setAmount(amount);
-    // }
+    setNode(node, value, sum){
+        InterfaceRadixTree.prototype.setNode(this, node, sum);
+        node.setValue(value);
+        node.setSum(sum);
+    }
 
     changedNode(node){
         // recalculate the balances
