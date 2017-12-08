@@ -100,7 +100,7 @@ describe('Interface Accountant Radix Tree', () => {
     let accountantTree = null;
     let accountantData = null;
 
-    it('creating Accountant Radix tree - romanus example', () => {
+    it('creating &deleting Accountant Radix tree - romanus example', () => {
 
         //Based on this tutorial https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Patricia_trie.svg/350px-Patricia_trie.svg.png
         accountantData = [{text: "romane", value: 5}, {text: "romanus",value: 2}, {text: "romulus",value: 3}, {text: "rubens",value: 16}, {text: "ruber",value: 6}, {text: "rubicon",value: 8}, {text: "rubicundus",value: 9}];
@@ -119,6 +119,33 @@ describe('Interface Accountant Radix Tree', () => {
         assert(result.levels[4].length === 6, "Accountant Tree Level 4 has different nodes");
 
         testRadixDelete(result.tree, accountantData);
+    });
+    
+    it('creating & deleting Accountant Radix tree - slowly permutations example', () => {
+        
+        let testStrings = ["test", "toaster", "toasting", "slow", "slowly"];
+        accountantData = TestsHelper.makeSetIdAndNumber(testStrings.length, false, 10000);
+
+        let permutations = TestsHelper.makePermutations(testStrings);
+        /*For each permutation*/
+        for (let i = 0, len = permutations.length; i < len; ++i) {
+        
+            //let randomize accountantData values
+            for (let j = 0; j < permutations[i].length; j++) {
+                accountantData[j].value = TestsHelper.makeRandomNumber();
+                accountantData[j].text = permutations[i][j];
+            }
+        
+            let result = testAddRadix(accountantData);
+
+            assert(result.levels.length === 4, "Radix Tree has to many levels" + permutations[i]);
+            assert(result.levels[0].length === 1, "Radix Tree Level 0 has different nodes");
+            assert(result.levels[1].length === 2, "Radix Tree Level 1 has different nodes");
+            assert(result.levels[2].length === 3, "Radix Tree Level 2 has different nodes");
+            assert(result.levels[3].length === 2, "Radix Tree Level 3 has different nodes");
+
+            testRadixDelete(result.tree, accountantData);
+        }
     });
     
     it('creating & deleting Accountant Radix tree 2 Oprea', () => {
@@ -194,6 +221,28 @@ describe('Interface Accountant Radix Tree', () => {
 
         let result = testAddRadix(accountantData);
         testRadixDelete(result.tree, accountantData);
+    });
+    
+    it('creating & deleting Accountant Radix tree - generalized permutations of different with small lengths', () => {
+
+        accountantData = TestsHelper.makeSetIdAndNumber(6, false, 10000);
+        let testStrings = [];
+        for (let i = 0; i < accountantData.length; ++i)
+            testStrings[i] = accountantData.text;
+        
+        let permutations = TestsHelper.makePermutations(testStrings);
+        /*For each permutation*/
+        for (let i = 0, len = permutations.length; i < len; ++i) {
+        
+            //let randomize accountantData values
+            for (let j = 0; j < permutations[i].length; j++) {
+                accountantData[j].value = TestsHelper.makeRandomNumber();
+                accountantData[j].text = permutations[i][j];
+            }
+        
+            let result = testAddRadix(accountantData);
+            testRadixDelete(result.tree, accountantData);
+        }
     });
 
 });
