@@ -324,7 +324,7 @@ describe("Interface Radix Tree", () => {
 
         /*For each permutation*/
         for (let i = 0, len = permutations.length; i < len; ++i) {
-            let arrayTest = permutations[i];
+            let arrayTest = [permutations[i]];
             radix = new InterfaceRadixTree();
 
             /*Test insertion*/
