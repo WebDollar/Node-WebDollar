@@ -7,15 +7,14 @@ import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
 
 class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
-    createNode(parent, edges, value, sum){
+    createNode(parent, edges, value){
         //console.log("amount", amount)
-        return new InterfaceAccountRadixTreeNode(parent, edges, value, sum);
+        return new InterfaceAccountRadixTreeNode(parent, edges, value);
     }
 
-    setNode(node, value, sum){
-        InterfaceRadixTree.prototype.setNode(this, node, sum);
+    setNode(node, value){
+        InterfaceRadixTree.prototype.setNode(this, node);
         node.setValue(value);
-        node.setSum(sum);
     }
 
     changedNode(node){
@@ -27,8 +26,8 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     checkInvalidNode(node){
 
-        let result = InterfaceRadixTree.prototype.checkInvalidNode.call(this, node);
-        if (!result ) return false;
+        if (!InterfaceRadixTree.prototype.checkInvalidNode.call(this, node))
+            return false;
 
         //it should have a valid value
 

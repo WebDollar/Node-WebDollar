@@ -81,7 +81,7 @@ class InterfaceRadixTree extends InterfaceTree{
      * Adding an input to the Radix Tree
      * @param element can be a Base String, Buffer or CryptoWebDollarData
      */
-    add(input, value, param){
+    add(input, value){
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
@@ -128,7 +128,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = this.createNode( nodeCurrent,  [], value, param);
+                                nodeMatch = this.createNode( nodeCurrent,  [], value);
                                 nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
@@ -142,7 +142,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = this.createNode( nodeCurrent,  [], null, null);
+                                nodeMatch = this.createNode( nodeCurrent,  [], null);
                                 nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
@@ -150,7 +150,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                 edge.targetNode.parent = nodeMatch;
 
                                 // Adding thew new nodeChild with current Value
-                                let nodeChild = this.createNode( nodeMatch, [], value, param );
+                                let nodeChild = this.createNode( nodeMatch, [], value);
                                 nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
 
                                 nodeCurrent = nodeChild;
@@ -174,7 +174,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             if (i === input.buffer.length){ //the prefix became a solution
 
                                 if (nodeCurrent.value !== null) throw ('the node already includes a value....');
-                                else this.setNode(nodeCurrent, value, param);
+                                else this.setNode(nodeCurrent, value);
 
                                 //console.log("nodeCurrent_2",nodeCurrent.value, nodeCurrent);
 
@@ -197,7 +197,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                 // no more Children...
 
-                let nodeChild = this.createNode(nodeCurrent, [], value, param);
+                let nodeChild = this.createNode(nodeCurrent, [], value);
                 nodeCurrent.edges.push( this.createEdge( input.substr(i), nodeChild ));
 
                 //console.log("nodeChild2", nodeChild)
