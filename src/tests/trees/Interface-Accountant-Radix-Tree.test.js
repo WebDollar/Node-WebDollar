@@ -7,9 +7,9 @@ import InterfaceAccountantRadixTree from 'common/trees/radix-tree/account-tree/I
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import TestsHelper from 'tests/Tests.helper'
 
-let testAddRadix = (accountantData)=>{
+let testAddRadix = (accountantData, accountantTree)=>{
 
-    let accountantTree = new InterfaceAccountantRadixTree();
+    if (typeof accountantTree === 'undefined' || accountantTree === null)  accountantTree = new InterfaceAccountantRadixTree();
 
     accountantData.forEach((data, index) => {
         accountantTree.add(new WebDollarCryptoData(data.text, "ascii"), {
