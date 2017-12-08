@@ -4,7 +4,7 @@ import TestsHelper from 'tests/Tests.helper'
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
-import InterfaceTreeTestHelperClass from './helpers/Interface-Tree.test.helper';
+import InterfaceTreeTestHelperClass from '../helpers/Interface-Tree.test.helper';
 
 let InterfaceTreeTestHelper = new InterfaceTreeTestHelperClass(InterfaceRadixTree);
 
