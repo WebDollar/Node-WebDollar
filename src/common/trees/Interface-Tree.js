@@ -107,9 +107,25 @@ class InterfaceTree{
 
     }
 
-    search(value, starting){
+    /**
+     * DFS search for "value"
+     * @param value
+     * @param nodeStarting
+     * @returns {*}
+     */
+    search(value, nodeStarting){
 
-        if (typeof starting === 'undefined' || starting === null) starting = this.root;
+        if (typeof nodeStarting === 'undefined' || nodeStarting === null) nodeStarting = this.root;
+
+        if (nodeStarting.value === value) return nodeStarting;
+
+        for (let i=0; i<nodeStarting.edges.length; i++) {
+            let result = this.search(value, nodeStarting.edges[i].targetNode);
+
+            if (result !== null) return result;
+        }
+
+        return null;
 
     }
 

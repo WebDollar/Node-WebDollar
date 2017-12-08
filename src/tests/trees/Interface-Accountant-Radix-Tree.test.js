@@ -169,4 +169,14 @@ describe('Interface Accountant Radix Tree', () => {
         testRadixDelete(result.tree, accountantData);
     });
 
+    it('creating & deleting Accountant Radix tree - generalized different with small lengths', () => {
+
+        accountantData = TestsHelper.makeSetVariableIdAndNumber(1000, false, 10000, 6 );
+
+        console.log("small lengths", JSON.stringify(accountantData));
+
+        let result = testAddRadix(accountantData);
+        testRadixDelete(result.tree, accountantData);
+    });
+
 });

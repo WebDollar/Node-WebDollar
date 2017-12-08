@@ -57,9 +57,9 @@ class TestsHelper {
         return Math.random()*biggestNumber +  300;
     }
 
-    makeSetIdAndNumber(count, floor, biggestNumber, wordsCount, randomLengths){
+    makeSetIdAndNumber(count, floor, biggestNumber, wordCount, randomLengths){
 
-        let list = this.makeIds(count, wordsCount, randomLengths);
+        let list = this.makeIds(count, wordCount, randomLengths);
 
         for (let i=0; i<list.length; i++) {
             let number = this.makeRandomNumber(biggestNumber);
@@ -72,8 +72,8 @@ class TestsHelper {
         return list;
     }
 
-    makeSetVariableIdAndNumber(count, floor, biggestNumber, wordsCount){
-        return this.makeSetIdAndNumber(count, floor, biggestNumber, wordsCount, true);
+    makeSetVariableIdAndNumber(count, floor, biggestNumber, wordCount){
+        return this.makeSetIdAndNumber(count, floor, biggestNumber, wordCount, true);
     }
 	
 	backPermutations(k, n, radixTestingArray, used, ind, result) {
