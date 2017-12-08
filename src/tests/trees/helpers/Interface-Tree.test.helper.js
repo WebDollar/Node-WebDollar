@@ -14,14 +14,15 @@ class InterfaceTreeTestHelper {
         this.className = className;
     }
 
-    testAdd (radixData, radixTree) {
+    testAdd (radixData, radixTree, createValue) {
 
         if (typeof radixTree === 'undefined' || radixTree === null)  radixTree = new this.className();
+        if (typeof createValue === 'undefined') createValue = true;
 
         radixData.forEach((str) => {
-            radixTree.add(new WebDollarCryptoData(str, "ascii"), {
-                address: str
-            });
+            radixTree.add(new WebDollarCryptoData(str, "ascii"), createValue ? {address: str} : undefined );
+
+
             assert(radixTree.validateRoot() === true, "Radix Tree after " + str + " is not Valid");
             assert(radixTree.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
         });

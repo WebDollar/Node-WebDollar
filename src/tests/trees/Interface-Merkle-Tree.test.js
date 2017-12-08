@@ -17,9 +17,13 @@ describe('interfaceMerkleTree', () => {
     let merkleData = TestsHelper.makeIds(100,100, false);
     let merkleData2 = TestsHelper.makeIds(100, 100, false);
 
+
+
     it('creating merkle tree', ()=>{
 
-        let result = InterfaceTreeTestHelper.add(merkleData, merkleTree);
+
+
+        let result = InterfaceTreeTestHelper.testAdd(merkleData, merkleTree, false);
 
 
         assert(result.levels.length === 2, "Merkle Tree has too many levels")
@@ -53,7 +57,7 @@ describe('interfaceMerkleTree', () => {
 
     it ( "delete merkle tree", () =>{
 
-        testDeleteMerkleTree( merkleData.concat(merkleData2), merkleTree,)
+        InterfaceTreeTestHelper.testDelete( merkleTree, merkleData.concat(merkleData2),)
 
     });
 

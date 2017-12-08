@@ -79,7 +79,17 @@ class InterfaceTree{
         return node;
     }
 
-    delete(node){
+    delete(value){
+
+        value = WebDollarCryptoData.createWebDollarCryptoData(value)
+
+        if (value.buffer.length === 0) throw 'No input';
+        let searchResult = this.search(value);
+
+        //console.log("searchResult", searchResult)
+        if (typeof searchResult.node === "undefined" || searchResult.node === null) return false;
+
+        let node = searchResult.node;
 
         node.value = null;
         let deleted = false;
@@ -139,17 +149,17 @@ class InterfaceTree{
 
         if (typeof node.value !== 'undefined' && node.value !== null && node.value.buffer.equals (value.buffer) ) {
             //console.log("l-am gasit", node.value.toString());
-            return node;
+            return { result: true, node: node, value: node.value }
         }
 
 
         for (let i=0; i<node.edges.length; i++) {
             let result = this.search(value, node.edges[i].targetNode);
 
-            if (result !== null) return result;
+            if (result.result !== false) return result;
         }
 
-        return null;
+        return { result: false, node: null, value:null }
 
     }
 
