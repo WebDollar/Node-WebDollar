@@ -4,64 +4,9 @@ import TestsHelper from 'tests/Tests.helper'
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
-let testAddRadix = (radixData, radixTree)=>{
+import InterfaceTreeTestHelperClass from './helpers/Interface-Tree.test.helper';
 
-    if (typeof radixTree === 'undefined' || radixTree === null)  radixTree = new InterfaceRadixTree();
-
-    radixData.forEach((str) => {
-        radixTree.add(new WebDollarCryptoData(str, "ascii"), {
-            address: str
-        });
-        assert(radixTree.validateRoot() === true, "Radix Tree after " + str + " is not Valid");
-        assert(radixTree.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
-    });
-
-    radixData.forEach((str) => {
-        let result = radixTree.search(new WebDollarCryptoData(str, "ascii"));
-        assert(result.result === true, "result " + str + " was not found");
-    });
-
-    let result = radixTree.levelSearch();
-    return {tree: radixTree, levels: result};
-
-};
-
-let testSearchRadix = (radixData, radixTree, needToBeFound)=>{
-
-    radixData.forEach((str) => {
-            let result = radixTree.search(new WebDollarCryptoData(str, "ascii"));
-            assert(result.result === needToBeFound, "result " + str + " was not found");
-    });
-    
-};
-
-let testRadixDelete = (radixTree, radixData) => {
-
-    radixData.forEach((str, index) => {
-
-        let deleteResult = radixTree.delete(new WebDollarCryptoData(str, "ascii"));
-        assert(deleteResult === true, "delete " + str + " didn't work");
-
-        assert(radixTree.validateRoot() === true, "Radix Tree deleted after " + str + " is not Valid");
-        assert(radixTree.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
-
-        let searchResult = radixTree.search(new WebDollarCryptoData(str, "ascii"));
-        assert(!searchResult.result, "result " + str + " was actually found...");
-
-        // the radix sort still, should detect all remaining strings
-        for (let j = index + 1; j < radixData.length; j++) {
-            let searchResult = radixTree.search(new WebDollarCryptoData(radixData[j], "ascii"));
-            assert(searchResult.result === true, "result " + str + " was not found after " + str + " was deleted...");
-        }
-
-    });
-
-    let result = radixTree.levelSearch();
-
-    assert(result.length === 1, "result is not 1 level");
-    assert(result[0].length === 1, "root is not empty");
-
-};
+let InterfaceTreeTestHelper = new InterfaceTreeTestHelperClass(InterfaceRadixTree);
 
 describe("Interface Radix Tree", () => {
 
@@ -74,7 +19,7 @@ describe("Interface Radix Tree", () => {
         //Based on this tutorial https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Patricia_trie.svg/350px-Patricia_trie.svg.png
         radixData = ["romane", "romanus", "romulus", "rubens", "ruber", "rubicon", "rubicundus"];
         
-        result = testAddRadix(radixData);
+        result = InterfaceTreeTestHelper.testAdd(radixData);
 
         assert(result.levels.length === 5, "Radix Tree has to many levels-");
         assert(result.levels[0].length === 1, "Radix Tree Level 0 has different nodes");
@@ -83,7 +28,7 @@ describe("Interface Radix Tree", () => {
         assert(result.levels[3].length === 4, "Radix Tree Level 3 has different nodes");
         assert(result.levels[4].length === 6, "Radix Tree Level 4 has different nodes");
 
-        testRadixDelete(result.tree, radixData);
+        InterfaceTreeTestHelper.testDelete(result.tree, radixData);
 
     });
 
@@ -92,10 +37,10 @@ describe("Interface Radix Tree", () => {
         //Based on this tutorial https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Patricia_trie.svg/350px-Patricia_trie.svg.png
         radixData = ["romane", "romanus", "romulus", "rubens", "ruber", "rubicon", "rubicundus"];
         
-        radixTree = testAddRadix(radixData).tree;
+        radixTree = InterfaceTreeTestHelper.testAdd(radixData).tree;
 
-        testSearchRadix(radixData, radixTree, true);
-        testSearchRadix(["rubicundusxx", "ruberr"], radixTree, false);
+        InterfaceTreeTestHelper.testSearch(radixData, radixTree, true);
+        InterfaceTreeTestHelper.testSearch(["rubicundusxx", "ruberr"], radixTree, false);
     });
 
     it("creating & deleting radix tree 2 Oprea's bug report", () => {
@@ -103,7 +48,7 @@ describe("Interface Radix Tree", () => {
         //Based on https://en.wikipedia.org/wiki/Radix_tree#/media/File:An_example_of_how_to_find_a_string_in_a_Patricia_trie.png
         radixData = ["test", "toaster", "toasting", "slow", "slowly"];
         
-        result = testAddRadix(radixData);
+        result = InterfaceTreeTestHelper.testAdd(radixData);
 
         assert(result.levels.length === 4, "Radix Tree has to many levels");
         assert(result.levels[0].length === 1, "Radix Tree Level 0 has different nodes");
@@ -111,7 +56,7 @@ describe("Interface Radix Tree", () => {
         assert(result.levels[2].length === 3, "Radix Tree Level 2 has different nodes");
         assert(result.levels[3].length === 2, "Radix Tree Level 3 has different nodes");
 
-        testRadixDelete(result.tree, radixData);
+        InterfaceTreeTestHelper.testDelete(result.tree, radixData);
 
     });
 
@@ -119,17 +64,18 @@ describe("Interface Radix Tree", () => {
        
         radixData = ["test", "toaster", "toasting", "slow", "slowly"];
         
-        radixTree = testAddRadix(radixData).tree;
+        radixTree = InterfaceTreeTestHelper.testAdd(radixData).tree;
 
-        testSearchRadix(["slo", "toastingg"], radixTree, false);
+        InterfaceTreeTestHelper.testSearch(["slo", "toastingg"], radixTree, false);
+        InterfaceTreeTestHelper.testDelete(radixTree, radixData);
     })
 
     it("creating & deleting radix tree 3 - generalized test", () => {
 
         radixData = TestsHelper.makeIds(200, 100);
-        result = testAddRadix(radixData);
+        result = InterfaceTreeTestHelper.testAdd(radixData);
 
-        testRadixDelete(result.tree, radixData);
+        InterfaceTreeTestHelper.testDelete(result.tree, radixData);
     });
 
     it("creating & deleting radix tree 3 - test different lengths tests", () => {
@@ -138,9 +84,9 @@ describe("Interface Radix Tree", () => {
         //radixTestingArray = [ "sl", "slowly", "slow" ];
         radixData = ["slowly", "slowlb", "slom", "slow"];
         
-        result = testAddRadix(radixData);
+        result = InterfaceTreeTestHelper.testAdd(radixData);
 
-        testRadixDelete(result.tree, radixData);
+        InterfaceTreeTestHelper.testDelete(result.tree, radixData);
     });
 
     it("creating & deleting radix tree 3 - generalized test different lengths", () => {
@@ -148,9 +94,9 @@ describe("Interface Radix Tree", () => {
         //radixTestingArray = ["a","b","c","bd", "be"]
         radixData = TestsHelper.makeIds(200, 100, true);
         
-        result = testAddRadix(radixData);
+        result = InterfaceTreeTestHelper.testAdd(radixData);
 
-        testRadixDelete(result.tree, radixData);
+        InterfaceTreeTestHelper.testDelete(result.tree, radixData);
     });
   
     it("creating & deleting radix tree 4 - generalized permutation backtracking test", () => {
@@ -162,9 +108,12 @@ describe("Interface Radix Tree", () => {
         for (let i = 0, len = permutations.length; i < len; ++i) {
             radixData = [permutations[i]];
             
-            result = testAddRadix(radixData);
+            result = InterfaceTreeTestHelper.testAdd(radixData);
 
-            testRadixDelete(result.tree, radixData);
+            InterfaceTreeTestHelper.testDelete(result.tree, radixData);
         }
     });
+
+
+
 });

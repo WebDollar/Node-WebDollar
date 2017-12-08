@@ -6,61 +6,9 @@ import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 
 import TestsHelper from 'tests/Tests.helper'
 
-let testAddMerkleTree = ( data , tree) => {
+import InterfaceTreeTestHelperClass from './helpers/Interface-Tree.test.helper'
 
-    if (tree === null || typeof tree === 'undefined') tree = new InterfaceMerkleTree();
-
-    data.forEach( (str, index)=>{
-        tree.add( new WebDollarCryptoData(str, "ascii") );
-
-        assert(tree.validateRoot() === true, "Merkle Tree is invalid!!!");
-
-        data.forEach( (str2, index2)=> {
-
-            let find = false;
-            if (index2 <= index) find = true;
-
-            assert( (tree.search(new WebDollarCryptoData(str2, "ascii")) !== null) === find, "When adding "+str.toString()+" couldn't find item" + str2.toString() + " although it added or not")
-        });
-    });
-
-    let result = tree.levelSearch();
-    return {tree: tree, levels: result};
-};
-
-let testDeleteMerkleTree = (data, tree) => {
-
-    if (tree === null || typeof tree === 'undefined') tree = new InterfaceMerkleTree();
-
-    while (data.length > 0){
-
-        let index = Math.floor(Math.random()*data.length);
-        let value = data[index];
-
-
-        let node = tree.search( new WebDollarCryptoData(value, "ascii") );
-
-        assert(node !== null, "Couldn't find item "+value.toString() );
-
-        assert( tree.delete(node) === true, "Couldn't delete item" );
-
-        assert(tree.validateRoot() === true, "Merkle Tree is invalid!!!");
-
-        data.splice(index, 1);
-
-        for (let j=0; j<data.length; j++)
-            assert ( tree.search(  new WebDollarCryptoData( data[j], "ascii")) !== null , "Couldn't find item" + value.toString()+" although it was not deleted")
-
-    }
-
-    let result = tree.levelSearch();
-
-    assert(result.length === 1, "result is not 1 level");
-    assert(result[0].length === 1, "root is not empty");
-
-    return {tree: tree, levels: result};
-
-};
+let InterfaceTreeTestHelper = new InterfaceTreeTestHelperClass(InterfaceMerkleTree)
 
 describe('interfaceMerkleTree', () => {
 
@@ -71,7 +19,7 @@ describe('interfaceMerkleTree', () => {
 
     it('creating merkle tree', ()=>{
 
-        let result = testAddMerkleTree(merkleData, merkleTree);
+        let result = InterfaceTreeTestHelper.add(merkleData, merkleTree);
 
 
         assert(result.levels.length === 2, "Merkle Tree has too many levels")
