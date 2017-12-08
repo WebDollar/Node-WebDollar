@@ -20,7 +20,7 @@ let testAddMerkleTree = ( data , tree) => {
             let find = false;
             if (index2 <= index) find = true;
 
-            assert( tree.search(new WebDollarCryptoData(str2, "ascii")) === find, "When adding "+str.toString()+" couldn't find item" + str2.toString() + " although it added or not")
+            assert( (tree.search(new WebDollarCryptoData(str2, "ascii")) !== null) === find, "When adding "+str.toString()+" couldn't find item" + str2.toString() + " although it added or not")
         });
     });
 

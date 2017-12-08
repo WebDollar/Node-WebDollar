@@ -87,6 +87,7 @@ class InterfaceTree{
         let nodeParent = node.parent;
         while (nodeParent !== null && node.value === null){
 
+            //delete the edge from parent to deleted child
             for (let i=0; i<nodeParent.edges.length; i++)
                 if (nodeParent.edges[i].targetNode === node){
                     nodeParent.edges.splice(i,1);
@@ -94,7 +95,14 @@ class InterfaceTree{
                     break;
                 }
 
-            if (nodeParent.edges.length === 0){
+            // incase the current node has children, let's move the childrens
+            if (node.edges.length > 0)
+                for (let i=0; i<node.edges.length; i++) {
+                    nodeParent.edges.push(this.createEdge(node.edges[i].targetNode))
+                    node.edges[i].targetNode.parent = nodeParent;
+                }
+
+            if (nodeParent.edges.length === 0 && nodeParent.value === null){ //let's delete also the parent
                 node = nodeParent;
             } else break;
 
@@ -125,7 +133,10 @@ class InterfaceTree{
         //console.log("value2", value, value  instanceof WebDollarCryptoData );
 
 
-        if (typeof node.value !== 'undefined' && node.value !== null && node.value.buffer.equals (value.buffer) ) return node;
+        if (typeof node.value !== 'undefined' && node.value !== null && node.value.buffer.equals (value.buffer) ) {
+            //console.log("l-am gasit", node.value.toString());
+            return node;
+        }
 
 
         for (let i=0; i<node.edges.length; i++) {
