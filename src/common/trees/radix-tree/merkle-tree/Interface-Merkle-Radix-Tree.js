@@ -1,4 +1,3 @@
-const classes = require('extends-classes');
 
 import InterfaceRadixTree from './../Interface-Radix-Tree'
 
