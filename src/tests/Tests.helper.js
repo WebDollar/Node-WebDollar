@@ -1,3 +1,4 @@
+var BigNumber = require('bignumber.js');
 
 class TestsHelper {
 
@@ -16,6 +17,25 @@ class TestsHelper {
 
         for (let i = 0; i < count; i++)
             text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+
+    makeDigitId(count, isNonDecimal) {
+
+        if (typeof count === 'undefined') count = Math.floor(Math.random()*100 + 30 );
+
+        let text = "";
+        let digits = "0123456789";
+
+        let i = 0;
+        if (isNonDecimal === true) {
+            text += digits.charAt(1 + Math.floor(Math.random() * 9));
+            i++;
+        }
+
+        for (; i < count; i++)
+            text += digits.charAt(Math.floor(Math.random() * 10));
 
         return text;
     }
@@ -55,6 +75,37 @@ class TestsHelper {
         if (typeof biggestNumber === 'undefined') biggestNumber = 100000;
 
         return Math.random()*biggestNumber +  300;
+    }
+
+    makeRandomBigNumber(nodDecimalDigits, decimalDigits){
+
+        if (typeof nodDecimalDigits === 'undefined') nodDecimalDigits = 10;
+        if (typeof decimalDigits === 'undefined') decimalDigits = 10;
+
+        let nonDecimalPart = this.makeDigitId(nodDecimalDigits, true);
+
+        if(decimalDigits > 0) {
+            let decimalPart = this.makeDigitId(decimalDigits, false);
+            return new BigNumber(nonDecimalPart + "." + decimalPart);
+        } else {
+            return new BigNumber(nodDecimalDigits);
+        }
+    }
+
+    makeRandomBigNumbersArray(count, isDecimal){
+
+        if (typeof count === 'undefined') count = 10;
+        if (typeof isDecimal === 'undefined') isDecimal = false;
+
+        let result = [];
+        for (let i = 0; i < count; ++i) {
+            if (isDecimal === true)
+                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10));
+            else
+                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), 0);
+        }
+
+        return result;
     }
 
     makeSetIdAndNumber(count, floor, biggestNumber, wordCount, randomLengths){

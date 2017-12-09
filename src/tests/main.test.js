@@ -5,8 +5,9 @@ if((typeof window !== 'undefined' && !window._babelPolyfill) ||
 
 if (typeof describe !== 'undefined') {
 
-
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test');
+
+    require ('tests/big-number/Interface-BigNumber.test');
 
     require ('tests/trees/radix/Interface-Radix-Tree.test');
     require ('tests/trees/radix/accountant/Interface-Accountant-Radix-Tree.test');
