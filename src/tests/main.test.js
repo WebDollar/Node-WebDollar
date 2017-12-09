@@ -14,6 +14,7 @@ if (typeof describe !== 'undefined') {
 
     require ('tests/trees/Interface-Merkle-Tree.test');
     require ('tests/trees/radix/Interface-Merkle-Radix-Tree.test');
+    require ('tests/trees/radix/accountant/merkle-tree/Interface-Merkle-Accountant-Radix-Tree.test');
 
     require ('tests/crypto/WebDollar-Crypto.test');
     require ('tests/crypto/Argon2.test');

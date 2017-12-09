@@ -1,5 +1,5 @@
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
-import InterfaceAccountantRadixTree from 'common/trees/radix-tree/account-tree/Interface-Accountant-Radix-Tree'
+import InterfaceAccountantRadixTree from 'common/trees/radix-tree/accountant-tree/Interface-Accountant-Radix-Tree'
 
 import InterfaceMerkleTree from 'common/trees/merkle-tree/Interface-Merkle-Tree'
 
