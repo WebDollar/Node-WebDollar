@@ -79,25 +79,29 @@ class InterfaceMerkleTree extends InterfaceTree{
     getValueToHash(node){
 
         let value = node.value;
-        if (!WebDollarCryptoData.isWebDollarCryptoData(node.value)&& !Buffer.isBuffer(node.value) && typeof node.value === 'object'){
 
-            let newValue;
-            let i=0;
+        if (!WebDollarCryptoData.isWebDollarCryptoData(node.value)&& !Buffer.isBuffer(node.value) && typeof node.value === 'object')
 
-            for (let property in value){
-                if (!value.hasOwnProperty(property)) continue;
+            if (node.value === null) value = 0;
+            else {
+                let newValue;
+                let i=0;
 
-                if (i === 0)
-                    newValue = WebDollarCryptoData.createWebDollarCryptoData( value[property] , true );
-                else
-                    newValue.concat(value[property]);
+                for (let property in value){
 
-                i++;
+                    if (value.hasOwnProperty(property)) {
+                        if (i === 0)
+                            newValue = WebDollarCryptoData.createWebDollarCryptoData( value[property] , true );
+                        else
+                            newValue.concat(value[property]);
+
+                        i++;
+                    }
+                }
+
+                value = newValue;
             }
 
-            value = newValue;
-
-        }
 
         return WebDollarCryptoData.createWebDollarCryptoData(value, true);
     }

@@ -17,9 +17,6 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
 
     constructor(){
         super();
-
-        console.log(this);
-        console.log(this.validateHash)
     }
 
     setNode(node, value){
@@ -33,11 +30,14 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
     }
 
     validateTree(node, callback){
-        if (!InterfaceRadixTree.prototype.validateTree.call(this, node, callback)); //verifying hash and propagating it
+
+        if (!InterfaceRadixTree.prototype.validateTree.call(this, node, callback)) //verifying hash and propagating it
             return false;
 
-        if (!InterfaceMerkleTree.prototype.validateTree.call(this, node, callback)); //computing hash
+        if (!InterfaceMerkleTree.prototype.validateTree.call(this, node)) //computing hash
             return false;
+
+        return true;
     }
 
     checkInvalidNode(node){
@@ -52,15 +52,15 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
     }
 
     validateHash(node){
-        InterfaceMerkleTree.prototype.validateHash.call(this, node);
+        return InterfaceMerkleTree.prototype.validateHash.call(this, node);
     }
 
     _computeHash(node) {
-        InterfaceMerkleTree.prototype._computeHash.call(this, node);
+        return InterfaceMerkleTree.prototype._computeHash.call(this, node);
     }
 
     refreshHash(node, forced){
-        InterfaceMerkleTree.prototype.refreshHash.call(this, node,forced);
+        return InterfaceMerkleTree.prototype.refreshHash.call(this, node,forced);
     }
 
     getValueToHash(node){

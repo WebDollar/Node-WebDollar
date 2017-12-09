@@ -22,7 +22,6 @@ class InterfaceTreeTestHelper {
         radixData.forEach((str) => {
             radixTree.add(new WebDollarCryptoData(str, "ascii"), createValue ? {address: str} : undefined );
 
-
             assert(radixTree.validateRoot() === true, "Radix Tree after " + str + " is not Valid");
             assert(radixTree.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
         });

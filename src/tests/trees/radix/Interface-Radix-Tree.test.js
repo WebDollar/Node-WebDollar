@@ -106,7 +106,7 @@ describe("Interface Radix Tree", () => {
 
         //For each permutation
         for (let i = 0, len = permutations.length; i < len; ++i) {
-            radixData = [permutations[i]];
+            radixData = permutations[i];
             
             result = InterfaceTreeTestHelper.testAdd(radixData);
 
