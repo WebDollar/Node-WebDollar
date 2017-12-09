@@ -277,7 +277,8 @@ class InterfaceRadixTree extends InterfaceTree{
                         node = node._previousEdges[0].targetNode;
                         node.parent = nodeParent;
 
-                        this.changedNode(node);
+                        console.log("this.changedNode 1_0");
+
                         break;
 
                     } else
@@ -286,7 +287,8 @@ class InterfaceRadixTree extends InterfaceTree{
                         node.edges = node._previousEdges;
                         nodeParent.edges.push( deletedParentEdge ) ;
 
-                        this.changedNode(node);
+                        console.log("this.changedNode 1_1");
+
                         break;
 
                     } else
@@ -308,24 +310,25 @@ class InterfaceRadixTree extends InterfaceTree{
                                     node.parent = grandParent;
 
                                     // it is not necessary its parent
-                                    //console.log("this.changedNode 1");
-                                    this.changedNode(node);
+                                    console.log("this.changedNode 1_2");
 
                                     //console.log("grandParent deletion", node, nodeParent);
                                     break;
                                 }
+
+                            console.log("this.changedNode 1_3");
                         }
 
                     }
                     else {
                         node = nodeParent;
+                        console.log("this.changedNode 1_3");
                     }
 
                     finished = false;
                     nodeParent = node.parent;
 
-                    //console.log("this.changedNode 2");
-                    this.changedNode(node)
+                    console.log("this.changedNode 2");
 
 
                 }
@@ -365,13 +368,19 @@ class InterfaceRadixTree extends InterfaceTree{
                         node = node.parent;
                         nodeParent = node.parent;
 
-                        //console.log("this.changedNode 3");
-                        this.changedNode(node);
+                        console.log("this.changedNode 3");
+
                         break;
                     }
             }
 
         }
+
+
+        console.log("this.printLevelSearch()");
+        this.printLevelSearch();
+        console.log("node", node)
+        this.changedNode(node);
 
         return true;
     }
