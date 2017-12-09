@@ -1,15 +1,9 @@
-import InterfaceRadixTree from './../Interface-Radix-Tree'
+import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
+import InterfaceAccountantRadixTree from 'common/trees/radix-tree/account-tree/Interface-Accountant-Radix-Tree'
 
-import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
-import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
-import InterfaceMerkleTree from './../../merkle-tree/Interface-Merkle-Tree'
+import InterfaceMerkleTree from 'common/trees/merkle-tree/Interface-Merkle-Tree'
 
-/*
-    Multiple inheritance Tutorial based on https://stackoverflow.com/questions/29879267/es6-class-multiple-inheritance
-*/
-const InterfaceMerkleTreeClass = (InterfaceMerkleTree) => class extends InterfaceMerkleTree{ };
-
-class InterfaceRadixMerkleTree extends InterfaceRadixTree {
+class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
 
     constructor(){
         super();
@@ -17,13 +11,17 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
 
     changedNode(node){
 
+        // recalculate the balances
+        this.refreshAccount(node, true);
+
         InterfaceMerkleTree.prototype.changedNode.call(this, node); //computing hash
+
         InterfaceRadixTree.prototype.changedNode.call(this, node); //verifying hash and propagating it
     }
 
     validateTree(node, callback){
 
-        if (!InterfaceRadixTree.prototype.validateTree.call(this, node, callback)) //verifying hash and propagating it
+        if (!InterfaceAccountantRadixTree.prototype.validateTree.call(this, node, callback)) //verifying hash and propagating it
             return false;
 
         if (!InterfaceMerkleTree.prototype.validateTree.call(this, node)) //computing hash
@@ -34,18 +32,19 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
 
     checkInvalidNode(node){
 
-        if (!InterfaceRadixTree.prototype.checkInvalidNode.call(this, node)) return false;
+        if (!InterfaceAccountantRadixTree.prototype.checkInvalidNode.call(this, node)) return false;
 
         return InterfaceMerkleTree.prototype.checkInvalidNode.call(this, node);
     }
 
-    /*
-        inherited
-    */
     validateHash(node){
         return InterfaceMerkleTree.prototype.validateHash.call(this, node);
     }
 
+
+    /*
+        inherited
+     */
     _computeHash(node) {
         return InterfaceMerkleTree.prototype._computeHash.call(this, node);
     }

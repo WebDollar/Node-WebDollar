@@ -83,7 +83,7 @@ describe("Interface Merkle + Radix Tree", () => {
     it("creating & deleting merkle radix tree 4 - generalized permutation backtracking test", () => {
 
         //For each permutation create a radix tree, then delete all the added words
-        let testStrings = TestsHelper.makeIds(5, 32, true);
+        let testStrings = TestsHelper.makeIds(4, 32, true);
         let permutations = TestsHelper.makePermutations(testStrings);
 
         //For each permutation

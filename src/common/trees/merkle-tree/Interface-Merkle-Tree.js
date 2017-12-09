@@ -37,6 +37,14 @@ class InterfaceMerkleTree extends InterfaceTree{
         return true;
     }
 
+    checkInvalidNode(node){
+        //it should have a valid hash
+
+        if (typeof node.hash === 'undefined' || node.hash === null) return false;
+
+        return true;
+    }
+
     /**
      * check the hash of node ... it must have an initial hash
      * @param node
