@@ -6,7 +6,21 @@ import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
 import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
 import InterfaceMerkleTree from './../../merkle-tree/Interface-Merkle-Tree'
 
-class InterfaceRadixMerkleTree extends InterfaceRadixTree{
+/*
+    Multiple inheritance Tutorial based on https://stackoverflow.com/questions/29879267/es6-class-multiple-inheritance
+*/
+
+const InterfaceMerkleTreeClass = (InterfaceMerkleTree) => class extends InterfaceMerkleTree{
+};
+
+class InterfaceRadixMerkleTree extends InterfaceRadixTree {
+
+    constructor(){
+        super();
+
+        console.log(this);
+        console.log(this.validateHash)
+    }
 
     setNode(node, value){
         InterfaceRadixTree.prototype.setNode(this, node);
@@ -35,6 +49,22 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree{
         if (typeof node.hash === 'undefined' || node.hash === null) return false;
 
         return true;
+    }
+
+    validateHash(node){
+        InterfaceMerkleTree.prototype.validateHash.call(this, node);
+    }
+
+    _computeHash(node) {
+        InterfaceMerkleTree.prototype._computeHash.call(this, node);
+    }
+
+    refreshHash(node, forced){
+        InterfaceMerkleTree.prototype.refreshHash.call(this, node,forced);
+    }
+
+    getValueToHash(node){
+        InterfaceMerkleTree.prototype.getValueToHash.call(this, node);
     }
 
 

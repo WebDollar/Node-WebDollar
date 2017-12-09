@@ -126,6 +126,17 @@ class WebDollarCryptoData {
 
     }
 
+    concat(data){
+
+        if (WebDollarCryptoData.isWebDollarCryptoData(data))
+            this.buffer = Buffer.concat( [this.buffer, data.buffer] );
+        else
+        if (Buffer.isBuffer(data))
+            this.buffer = Buffer.concat( [this.buffer, data] );
+
+        return this;
+    }
+
 }
 
 export default WebDollarCryptoData;

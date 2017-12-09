@@ -72,6 +72,15 @@ class InterfaceMerkleTree extends InterfaceTree{
     }
 
     /**
+     * It returns the Value to be hashed
+     * @param node
+     * return WebDollarCryptoData
+     */
+    getValueToHash(node){
+        return WebDollarCryptoData.createWebDollarCryptoData(node.value);
+    }
+
+    /**
      * compute the hash of a given node
      * @param node
      * @returns {*}
@@ -85,15 +94,20 @@ class InterfaceMerkleTree extends InterfaceTree{
             return node.hash;
         }
 
+        // calcuating the value to hash which must be a buffer
+        let valueToHash = this.getValueToHash(node); //getting the node data
+
+        if (typeof valueToHash === 'undefined' || valueToHash === null ) valueToHash = WebDollarCryptoData.createWebDollarCryptoData( []);
+
         if (node.edges.length === 0){ //Leaf Node (terminal node)
 
             if ( node.value === null || typeof node === "undefined") throw ("Leaf nodes has not value");
             if ( node.isLeaf() === false) throw ("Node is not leaf");
 
-            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( node.value ) )
-            node.hash = {sha256: sha256};
+            // Let's hash
 
-            return node.hash;
+            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( valueToHash ) )
+            node.hash = {sha256: sha256};
 
         } else
         if (node.edges.length > 0){
@@ -107,10 +121,10 @@ class InterfaceMerkleTree extends InterfaceTree{
                     this._computeHash(node.edges[i].targetNode);
 
                 if (i === 0) {
-                    hashConcat.sha256 = new Buffer ( node.edges[i].targetNode.hash.sha256.buffer);
+                    hashConcat.sha256 = new WebDollarCryptoData(node.edges[i].targetNode.hash.sha256.buffer);
                 }
                 else {
-                    hashConcat.sha256 = Buffer.concat( [hashConcat.sha256, node.edges[i].targetNode.hash.sha256.buffer]);
+                    hashConcat.sha256.concat ( node.edges[i].targetNode.hash.sha256.buffer );
                 }
 
             }
@@ -118,11 +132,15 @@ class InterfaceMerkleTree extends InterfaceTree{
             if (hashConcat.sha256 === null) throw ("Empty node with invalid sha256");
 
             // Let's hash
-            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( WebDollarCryptoData.createWebDollarCryptoData( hashConcat.sha256 )  ) )
+            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( valueToHash.concat(hashConcat.sha256) )  )
             node.hash = {sha256: sha256};
 
             return node.hash;
         }
+
+
+
+        return node.hash;
 
     }
 
