@@ -10,8 +10,8 @@ import InterfaceMerkleTreeNode from './Interface-Merkle-Tree-Node'
 
 class InterfaceMerkleTree extends InterfaceTree{
 
-    createNode(parent, edges, value, hash){
-        return new InterfaceMerkleTreeNode(parent, edges, value, hash);
+    createNode(parent, edges, value){
+        return new InterfaceMerkleTreeNode(parent, edges, value);
     }
 
 
@@ -77,7 +77,29 @@ class InterfaceMerkleTree extends InterfaceTree{
      * return WebDollarCryptoData
      */
     getValueToHash(node){
-        return WebDollarCryptoData.createWebDollarCryptoData(node.value);
+
+        let value = node.value;
+        if (!WebDollarCryptoData.isWebDollarCryptoData(node.value)&& !Buffer.isBuffer(node.value) && typeof node.value === 'object'){
+
+            let newValue;
+            let i=0;
+
+            for (let property in value){
+                if (!value.hasOwnProperty(property)) continue;
+
+                if (i === 0)
+                    newValue = WebDollarCryptoData.createWebDollarCryptoData( value[property] , true );
+                else
+                    newValue.concat(value[property]);
+
+                i++;
+            }
+
+            value = newValue;
+
+        }
+
+        return WebDollarCryptoData.createWebDollarCryptoData(value, true);
     }
 
     /**
@@ -96,6 +118,8 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         // calcuating the value to hash which must be a buffer
         let valueToHash = this.getValueToHash(node); //getting the node data
+
+        //console.log("valueToHash", valueToHash);
 
         if (typeof valueToHash === 'undefined' || valueToHash === null ) valueToHash = WebDollarCryptoData.createWebDollarCryptoData( []);
 

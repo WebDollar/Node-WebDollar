@@ -18,10 +18,17 @@ class WebDollarCryptoData {
         return false;
     }
 
-    static createWebDollarCryptoData(object){
+    static createWebDollarCryptoData(object, forceToCreate){
 
         //if it s WebDollarCryptoData, then return it
-        if (WebDollarCryptoData.isWebDollarCryptoData(object)) return object;
+        if (WebDollarCryptoData.isWebDollarCryptoData(object)){
+
+            if (forceToCreate)
+                return new WebDollarCryptoData( new Buffer(object.buffer), "buffer" );
+
+
+            return object;
+        }
 
         //if it is a Buffer
         if (Buffer.isBuffer(object)) return new WebDollarCryptoData(object, "buffer");
@@ -38,7 +45,7 @@ class WebDollarCryptoData {
 
         this.buffer = null;
 
-        if ((data !== 'null' && Buffer.isBuffer(data)) || (type==="buffer"))
+        if ((data !== null && Buffer.isBuffer(data)) || (type==="buffer"))
             this.buffer = data;
         else
         if (type === "hex")

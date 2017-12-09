@@ -17,14 +17,29 @@ describe('interfaceMerkleTree', () => {
     let merkleData = TestsHelper.makeIds(100,100, false);
     let merkleData2 = TestsHelper.makeIds(100, 100, false);
 
+    it('creating merkle tree simple test', ()=>{
+
+        let result = InterfaceTreeTestHelper.testAdd(["test"], merkleTree, false);
+
+        ["aa"].forEach( (str)=>{
+
+            let parent = merkleTree.root.edges[ 0 ].targetNode;
+
+            merkleTree.add( new WebDollarCryptoData(str, "ascii") , parent);
+
+            assert(merkleTree.validateRoot() === true, "Merkle Tree is invalid!!!");
+        });
+
+    });
 
 
     it('creating merkle tree', ()=>{
 
-
+        merkleTree = new InterfaceMerkleTree();
 
         let result = InterfaceTreeTestHelper.testAdd(merkleData, merkleTree, false);
 
+        //merkleTree.printLevelSearch();
 
         assert(result.levels.length === 2, "Merkle Tree has too many levels")
         assert(result.levels[0].length === 1, "Merkle Tree Level 0 has different nodes")
@@ -42,6 +57,7 @@ describe('interfaceMerkleTree', () => {
             let parent = merkleTree.root.edges[ Math.floor( Math.random() * edgeIndex) ].targetNode;
 
             merkleTree.add( new WebDollarCryptoData(str, "ascii") , parent);
+
             assert(merkleTree.validateRoot() === true, "Merkle Tree is invalid!!!");
 
         });

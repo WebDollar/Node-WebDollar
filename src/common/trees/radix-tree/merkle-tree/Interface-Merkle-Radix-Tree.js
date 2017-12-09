@@ -1,4 +1,4 @@
-const classes = require('extends-classes');
+
 
 import InterfaceRadixTree from './../Interface-Radix-Tree'
 
@@ -32,11 +32,11 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         InterfaceRadixTree.prototype.changedNode.call(this, node); //verifying hash and propagating it
     }
 
-    validateTree(node){
-        if (!InterfaceRadixTree.prototype.validateTree.call(this, node)); //verifying hash and propagating it
+    validateTree(node, callback){
+        if (!InterfaceRadixTree.prototype.validateTree.call(this, node, callback)); //verifying hash and propagating it
             return false;
 
-        if (!InterfaceMerkleTree.prototype.validateTree.call(this, node)); //computing hash
+        if (!InterfaceMerkleTree.prototype.validateTree.call(this, node, callback)); //computing hash
             return false;
     }
 
@@ -64,7 +64,7 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
     }
 
     getValueToHash(node){
-        InterfaceMerkleTree.prototype.getValueToHash.call(this, node);
+        return InterfaceMerkleTree.prototype.getValueToHash.call(this, node);
     }
 
 

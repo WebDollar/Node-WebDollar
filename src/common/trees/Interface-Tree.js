@@ -45,8 +45,9 @@ class InterfaceTree{
 
         if (typeof callback === 'function'){
             let result = callback.call(this, node);
+
             if (!result){
-                console.log("validateTree - callback ", node);
+                console.log("validateTree failed - callback ", node);
                 return false;
             }
         }
