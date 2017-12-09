@@ -20,7 +20,7 @@ class InterfaceMerkleTree extends InterfaceTree{
      * @param node
      */
     changedNode(node){
-        this.refreshHash(node);
+        this.refreshHash(node, true);
     }
 
 

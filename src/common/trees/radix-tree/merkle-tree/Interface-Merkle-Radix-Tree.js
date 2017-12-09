@@ -23,7 +23,7 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
 
     changedNode(node){
 
-        InterfaceMerkleTree.prototype.refreshHash.call(this, node); //computing hash
+        InterfaceMerkleTree.prototype.changedNode.call(this, node); //computing hash
         InterfaceRadixTree.prototype.changedNode.call(this, node); //verifying hash and propagating it
     }
 
