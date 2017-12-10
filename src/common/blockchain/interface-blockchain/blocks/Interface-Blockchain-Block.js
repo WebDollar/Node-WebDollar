@@ -42,7 +42,7 @@ class InterfaceBlockchainBlock{
     }
 
     load(){
-        
+
     }
 
 }

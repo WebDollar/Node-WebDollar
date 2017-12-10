@@ -1,12 +1,14 @@
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 
+/**
+ * Blockchain contains a chain of blocks based on Proof of Work
+ */
 class InterfaceBlockchain{
 
 
     constructor (){
 
-        this.length = 0;
         this.blocks = [];
 
     }
@@ -22,6 +24,10 @@ class InterfaceBlockchain{
         }
 
         return true;
+    }
+
+    getBlockchainLength(){
+        return this.blocks.length;
     }
 
     toString(){

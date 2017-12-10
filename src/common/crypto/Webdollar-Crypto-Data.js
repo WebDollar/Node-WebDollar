@@ -20,6 +20,8 @@ class WebDollarCryptoData {
 
     static createWebDollarCryptoData(object, forceToCreate){
 
+        //console.log("createWebDollarCryptoData",object);
+
         //if it s WebDollarCryptoData, then return it
         if (WebDollarCryptoData.isWebDollarCryptoData(object)){
 
@@ -30,14 +32,13 @@ class WebDollarCryptoData {
             return object;
         }
 
-        //if it is a Buffer
-        if (Buffer.isBuffer(object)) return new WebDollarCryptoData(object, "buffer");
+       let cryptoData = new WebDollarCryptoData(object);
 
-        //if it is byte array
-        if (Array.isArray(object)) return new WebDollarCryptoData(object, "byte");
+        if (forceToCreate && cryptoData.buffer !== null) {
+            cryptoData.buffer = new Buffer(cryptoData.buffer);
+        }
 
-        //if it is string, it must be a Base string
-        if (typeof object === "string") return new WebDollarCryptoData(object, "base");
+        return cryptoData;
 
     }
 
@@ -51,17 +52,55 @@ class WebDollarCryptoData {
         if (type === "hex")
             this.buffer = new Buffer(data, "hex");
         else
-        if (type === "byte")
-            this.buffer = new Buffer(data);
-        else
         if (type === "base")
-            this.buffer = new Buffer(WebDollarCrypto.decodeBase64(data));
+            this.buffer = new Buffer(WebDollarCrypto.decodeBase64(data)); //if it is string, it must be a Base string
         else
-        if (type === "ascii")
-            this.buffer = new Buffer(data, "ascii");
         if (type === "utf-8")
             this.buffer = new Buffer(data, "utf-8");
+        else
+        if (type === "ascii" || typeof data === "string")
+            this.buffer = new Buffer(data, "ascii");
+        else
+        if (type === "byte" || Array.isArray(data)) //if it is byte array
+            this.buffer = new Buffer(data);
+        else
+        if (type === "object" || typeof data === "object"){
 
+            if (data === null) this.buffer = new Buffer ( [0] );
+            else {
+                let newValue = null;
+                let i = 0;
+
+                //console.log("data object", data, typeof data);
+
+                for (let property in data) {
+
+                    if (data.hasOwnProperty(property)) {
+
+                        //console.log("data[property]", typeof data[property], data[property]);
+                        //console.log("WebDollarCryptoData.createWebDollarCryptoData(data[property], false)", WebDollarCryptoData.createWebDollarCryptoData(data[property], false));
+
+                        if (i === 0)
+                            newValue = WebDollarCryptoData.createWebDollarCryptoData( data[property], true);
+                        else {
+                            if (Buffer.isBuffer(data[property]))
+                                newValue.concat( data[property], false );
+                            else
+                                newValue.concat(WebDollarCryptoData.createWebDollarCryptoData(data[property], false));
+                        }
+
+                        //console.log("newValue", newValue);
+
+                        i++;
+                    }
+                }
+
+                if (newValue !== null)
+                    this.buffer =  newValue.buffer;
+                else this.buffer = new Buffer( [0] );
+            }
+        } else
+        if (typeof data === "number") this.buffer = new Buffer( [data] );
     }
 
     toHex(){
@@ -135,11 +174,10 @@ class WebDollarCryptoData {
 
     concat(data){
 
-        if (WebDollarCryptoData.isWebDollarCryptoData(data))
-            this.buffer = Buffer.concat( [this.buffer, data.buffer] );
-        else
-        if (Buffer.isBuffer(data))
-            this.buffer = Buffer.concat( [this.buffer, data] );
+
+        data = WebDollarCryptoData.createWebDollarCryptoData(data);
+
+        this.buffer = Buffer.concat( [this.buffer, data.buffer] );
 
         return this;
     }

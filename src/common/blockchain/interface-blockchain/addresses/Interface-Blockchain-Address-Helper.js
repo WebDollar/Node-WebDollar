@@ -68,7 +68,7 @@ class InterfaceBlockchainAddressHelper{
 
         // Tutorial based on https://github.com/cryptocoinjs/secp256k1-node
 
-        if (typeof privateKey !== 'object' || ! privateKey instanceof WebDollarCryptoData){
+        if (privateKey === null || typeof privateKey !== 'object' || ! privateKey instanceof WebDollarCryptoData){
             console.log("ERROR! ",  privateKey, " is not a WebDollarCryptoData")
             throw 'privateKey must be a WebDollarCryptoData';
         }
@@ -112,7 +112,7 @@ class InterfaceBlockchainAddressHelper{
 
     static verifySignedData(msg, signature, pubKey){
 
-        if (typeof pubKey !== 'object' || pubKey.constructor.name !== 'WebDollarCryptoData' ){
+        if (pubKey === null || typeof pubKey !== 'object' || pubKey.constructor.name !== 'WebDollarCryptoData' ){
             console.log("ERROR! ",  pubKey, " is not a WebDollarCryptoData")
             throw 'privateKey must be a WebDollarCryptoData';
         }
@@ -215,7 +215,7 @@ class InterfaceBlockchainAddressHelper{
      */
     static validatePrivateKey(privateKey){
 
-        if (typeof privateKey !== 'object' || ! privateKey instanceof WebDollarCryptoData ){
+        if (privateKey === null || typeof privateKey !== 'object' || ! privateKey instanceof WebDollarCryptoData ){
             throw ('privateKey must be a WebDollarCryptoData');
         }
 

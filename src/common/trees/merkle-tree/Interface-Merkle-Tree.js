@@ -85,33 +85,7 @@ class InterfaceMerkleTree extends InterfaceTree{
      * return WebDollarCryptoData
      */
     getValueToHash(node){
-
-        let value = node.value;
-
-        if (!WebDollarCryptoData.isWebDollarCryptoData(node.value)&& !Buffer.isBuffer(node.value) && typeof node.value === 'object')
-
-            if (node.value === null) value = 0;
-            else {
-                let newValue;
-                let i=0;
-
-                for (let property in value){
-
-                    if (value.hasOwnProperty(property)) {
-                        if (i === 0)
-                            newValue = WebDollarCryptoData.createWebDollarCryptoData( value[property] , true );
-                        else
-                            newValue.concat(value[property]);
-
-                        i++;
-                    }
-                }
-
-                value = newValue;
-            }
-
-
-        return WebDollarCryptoData.createWebDollarCryptoData(value, true);
+        return WebDollarCryptoData.createWebDollarCryptoData(node.value, true);
     }
 
     /**
@@ -132,8 +106,6 @@ class InterfaceMerkleTree extends InterfaceTree{
         let valueToHash = this.getValueToHash(node); //getting the node data
 
         //console.log("valueToHash", valueToHash);
-
-        if (typeof valueToHash === 'undefined' || valueToHash === null ) valueToHash = WebDollarCryptoData.createWebDollarCryptoData( []);
 
         if (node.edges.length === 0){ //Leaf Node (terminal node)
 
@@ -168,6 +140,7 @@ class InterfaceMerkleTree extends InterfaceTree{
             if (hashConcat.sha256 === null) throw ("Empty node with invalid sha256");
 
             // Let's hash
+            //console.log("valueToHash222", typeof valueToHash, valueToHash)
             let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( valueToHash.concat(hashConcat.sha256) )  )
             node.hash = {sha256: sha256};
 
