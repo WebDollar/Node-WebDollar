@@ -51,6 +51,7 @@
     "elliptic": "^6.4.0",
     "fs": "0.0.1-security",
     "get-random-values": "^1.2.0",
+    "indexeddb-js": "0.0.14",
     "ipaddr.js": "^1.5.4",
     "javascript-biginteger": "^0.9.2",
     "jsonp": "^0.2.1",

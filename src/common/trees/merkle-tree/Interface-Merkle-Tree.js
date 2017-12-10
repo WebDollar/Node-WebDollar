@@ -163,15 +163,21 @@ class InterfaceMerkleTree extends InterfaceTree{
         if (node === null || typeof node === 'undefined') throw "Couldn't compute hash because Node is empty";
 
         let result = false;
+        let hashAlreadyComputed = false;
 
-        if ( typeof forced === "undefined" || forced === false ) result  = this.validateHash(node); // in case it must recalculate the hash by force
+        if ( typeof forced === "undefined" || forced === false ) {
+            // in case it must recalculate the hash by force
+            hashAlreadyComputed = true;
+            result  = this.validateHash(node);
+        }
 
         // no changes...
         if (!result) {
 
             result = true;
 
-            this._computeHash(node)
+            if (!hashAlreadyComputed)
+                this._computeHash(node)
 
             if (node.parent !== null)
                 if (!this.validateHash(node.parent))
