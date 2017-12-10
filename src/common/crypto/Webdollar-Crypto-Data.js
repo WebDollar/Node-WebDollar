@@ -71,7 +71,10 @@ class WebDollarCryptoData {
                 let newValue = null;
                 let i = 0;
 
-                //console.log("data object", data, typeof data);
+                if (data.constructor.name === "BigNumber") {
+                    data = {s: data.s, e: data.e, c: data.c};
+                    //console.log("data object", data, typeof data);
+                }
 
                 for (let property in data) {
 
