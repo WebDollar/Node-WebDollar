@@ -4,7 +4,7 @@ var sqlite3 = require('sqlite3');
 var engine = new sqlite3.Database(':memory:');
 var scope = indexeddbjs.makeScope('sqlite3', engine);
 
-class InterfaceIndexexDB {
+class InterfaceIndexedDB {
 
     constructor(databaseName) {
         if (databaseName === 'undefined') databaseName = 'MyDatabase';
@@ -35,4 +35,4 @@ class InterfaceIndexexDB {
 
 }
 
-export default InterfaceIndexexDB
+export default InterfaceIndexedDB

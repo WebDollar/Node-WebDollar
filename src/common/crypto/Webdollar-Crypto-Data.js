@@ -3,8 +3,6 @@ const bs58 = require('bs58')
 import WebDollarCrypto from './WebDollar-Crypto';
 import consts from 'consts/const_global'
 
-Buffer.isBuffer()
-
 class WebDollarCryptoData {
 
     static isWebDollarCryptoData(object){
