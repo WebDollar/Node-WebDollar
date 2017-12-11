@@ -1,4 +1,5 @@
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
@@ -55,6 +56,13 @@ class InterfaceBlockchainBlock{
             nonce: this.nonce,
             timeStamp: this.timeStamp,
         }
+
+    }
+
+    hash(){
+
+        let buffer = new Buffer();
+        return WebDollarCrypto.hashPOW(data);
 
     }
 
