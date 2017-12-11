@@ -45,7 +45,7 @@ class InterfaceBlockchainDifficulty{
         let equationTwoPartA =  BigInteger(1).minus( blockTimestamp.minus( prevBlockTimestamp ).divide(10));    // max(1 - (block_timestamp - parent_timestamp) // 10, -99) +
         let equationTwo = equationTwoPartA.greater( -99 ) ? equationTwoPartA : -99;
 
-        console.log("equationTwo", equationTwo);
+        //console.log("equationTwo", equationTwo);
 
         let blockDiff = prevBlockDifficulty.add(  prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
                                                     (equationTwo )
