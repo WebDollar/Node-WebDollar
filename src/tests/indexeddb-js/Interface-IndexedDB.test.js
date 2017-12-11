@@ -1,6 +1,6 @@
 var assert = require('assert')
 
-import InterfaceIndexexDB from 'common/indexeddb-js/Interface-IndexexDB'
+import InterfaceIndexexDB from 'common/indexeddb-js/Interface-IndexedDB'
 
 describe('interfaceIndexedDB', () => {
 
