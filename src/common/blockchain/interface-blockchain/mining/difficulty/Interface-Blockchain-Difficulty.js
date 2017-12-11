@@ -1,4 +1,5 @@
 var BigNumber = require('bignumber.js');
+var BigInteger = require('big-integer');
 
 class InterfaceBlockchainDifficulty{
 
@@ -8,13 +9,21 @@ class InterfaceBlockchainDifficulty{
         // difficulty algorithm is based on blockNumber
 
 
-        if ( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigNumber && blockNumber.greaterThanOrEqualTo(0)))
+        if ( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.greaterThanOrEqualTo(0)))
             return this.calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber);
 
         throw ('invalid block number')
 
     }
 
+    /**
+     * returns the Dificulty as a BigInteger
+     * @param prevBlockDifficulty
+     * @param prevBlockTimestamp
+     * @param blockTimestamp
+     * @param blockNumber
+     * @param includeBombFormula
+     */
     calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber, includeBombFormula){
 
         // difficulty function based on Ethereum
@@ -28,22 +37,22 @@ class InterfaceBlockchainDifficulty{
          */
 
 
-        if (! prevBlockDifficulty instanceof BigNumber) prevBlockDifficulty = BigNumber(prevBlockDifficulty);
-        if (! prevBlockTimestamp instanceof BigNumber) prevBlockTimestamp = BigNumber(prevBlockTimestamp);
-        if (! blockTimestamp instanceof BigNumber) blockTimestamp = BigNumber(blockTimestamp);
-        if (! blockNumber instanceof BigNumber) blockNumber = BigNumber(blockNumber);
+        if (! prevBlockDifficulty instanceof BigInteger) prevBlockDifficulty = BigInteger(prevBlockDifficulty);
+        if (! prevBlockTimestamp instanceof BigInteger) prevBlockTimestamp = BigInteger(prevBlockTimestamp);
+        if (! blockTimestamp instanceof BigInteger) blockTimestamp = BigInteger(blockTimestamp);
+        if (! blockNumber instanceof BigInteger) blockNumber = BigInteger(blockNumber);
 
-        let equationTwoPartA = new BigNumber(1).minus( blockTimestamp.minus( prevBlockTimestamp ).dividedToIntegerBy(10));    // max(1 - (block_timestamp - parent_timestamp) // 10, -99) +
-        let equationTwo = equationTwoPartA.greaterThan( -99 ) ? equationTwoPartA : -99;
+        let equationTwoPartA =  BigInteger(1).minus( blockTimestamp.minus( prevBlockTimestamp ).divide(10));    // max(1 - (block_timestamp - parent_timestamp) // 10, -99) +
+        let equationTwo = equationTwoPartA.greater( -99 ) ? equationTwoPartA : -99;
 
         console.log("equationTwo", equationTwo);
 
-        let blockDiff = prevBlockDifficulty.add(  prevBlockDifficulty.dividedToIntegerBy(2048).times  //parent_diff + parent_diff // 2048 *
+        let blockDiff = prevBlockDifficulty.add(  prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
                                                     (equationTwo )
                                                );
 
         if (includeBombFormula)
-            blockDiff = blockDiff.plus( new BigNumber(2).toPower( blockNumber.dividedToIntegerBy(100000).minus(2)).floor() )  //int(2**((block.number // 100000) - 2))
+            blockDiff = blockDiff.plus(  BigInteger(2).pow( blockNumber.divide(100000).minus(2)) )  //int(2**((block.number // 100000) - 2))
 
         return blockDiff;
 

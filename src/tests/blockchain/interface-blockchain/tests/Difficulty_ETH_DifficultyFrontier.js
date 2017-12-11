@@ -1,6 +1,3 @@
-//based on https://github.com/ethereum/tests/wiki/Difficulty-Tests
-
-
 export default {
 
     DifficultyTest1 : {

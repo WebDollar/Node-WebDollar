@@ -1,4 +1,5 @@
 var BigNumber = require('bignumber.js');
+var BigInteger = require('big-integer');
 var assert = require('assert')
 
 
@@ -18,16 +19,14 @@ describe('test blockchain difficulty', () => {
             if (Difficulty_ETH_DifficultyFrontier.hasOwnProperty(difficultyTest)) {
 
                 let difficulty = Difficulty_ETH_DifficultyFrontier[difficultyTest];
-                let result = InterfaceBlockchainDifficulty.calculateBlockDifficultyETH( new BigNumber(difficulty.parentDifficulty, 16),  new BigNumber(difficulty.parentTimestamp, 16), new BigNumber(difficulty.currentTimestamp, 16), new BigNumber(difficulty.currentBlockNumber, 16), true);
+                let result = InterfaceBlockchainDifficulty.calculateBlockDifficultyETH( BigInteger( difficulty.parentDifficulty.replace("0x",""), 16),  BigInteger(difficulty.parentTimestamp.replace("0x",""), 16), BigInteger(difficulty.currentTimestamp.replace("0x",""), 16), BigInteger(difficulty.currentBlockNumber.replace("0x",0), 16), true);
 
-                let testOutputDifficult = new BigNumber(difficulty.currentDifficulty, 16);
+                let testOutputDifficult = BigInteger(difficulty.currentDifficulty.replace("0x",""), 16);
 
                 //result = result.add(new BigNumber(index)); //the tests also add index,
 
-                if (index === 490)
-                    break;
-
-                assert(result.equals(testOutputDifficult), " difficulty failed test "+index+"    with numbers " + result.toString()+ " vs " + testOutputDifficult.toString())
+                if (index !== 490)
+                    assert(result.equals(testOutputDifficult), " difficulty failed test "+index+"    with numbers " + result.toString()+ " vs " + testOutputDifficult.toString())
             }
 
             index++;
