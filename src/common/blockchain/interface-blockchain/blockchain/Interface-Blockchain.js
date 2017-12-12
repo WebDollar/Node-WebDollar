@@ -12,7 +12,7 @@ class InterfaceBlockchain{
     constructor (){
 
         this.blocks = [];
-        this.difficultyTarget = Interface.difficultyTarget;
+        this.difficultyTarget = BlockchainGenesis.difficultyTarget;
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this )
 

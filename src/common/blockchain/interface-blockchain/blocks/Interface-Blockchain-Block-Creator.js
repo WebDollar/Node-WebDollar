@@ -23,4 +23,4 @@ class InterfaceBlockchainBlockCreator{
 
 }
 
-export default InterfaceBlockchainBlockCreator();
+export default InterfaceBlockchainBlockCreator;

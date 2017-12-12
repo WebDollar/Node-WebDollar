@@ -1,4 +1,5 @@
 const bs58 = require('bs58')
+var BigNumber = require('bignumber.js');
 
 import WebDollarCrypto from './WebDollar-Crypto';
 import consts from 'consts/const_global'
@@ -30,7 +31,7 @@ class WebDollarCryptoData {
             return object;
         }
 
-       let cryptoData = new WebDollarCryptoData(object);
+        let cryptoData = new WebDollarCryptoData(object);
 
         if (forceToCreate && cryptoData.buffer !== null) {
             cryptoData.buffer = new Buffer(cryptoData.buffer);
@@ -59,49 +60,59 @@ class WebDollarCryptoData {
         if (type === "ascii" || typeof data === "string")
             this.buffer = new Buffer(data, "ascii");
         else
-        if (type === "byte" || Array.isArray(data)) //if it is byte array
-            this.buffer = new Buffer(data);
+        if (type === "byte" || Array.isArray(data)) //if it is array
+        {
+            if (data.length > 0 && typeof data[0] === "object" )
+                this.buffer = this.createBufferFromArray(data);
+             else // byte array
+                this.buffer = new Buffer(data);
+        }
         else
         if (type === "object" || typeof data === "object"){
 
             if (data === null) this.buffer = new Buffer ( [0] );
-            else {
-                let newValue = null;
-                let i = 0;
+            else
+                this.buffer = this.createBufferFromArray(data);
 
-                if (data.constructor.name === "BigNumber") {
-                    data = {s: data.s, e: data.e, c: data.c};
-                    //console.log("data object", data, typeof data);
-                }
-
-                for (let property in data) {
-
-                    if (data.hasOwnProperty(property)) {
-
-                        //console.log("data[property]", typeof data[property], data[property]);
-                        //console.log("WebDollarCryptoData.createWebDollarCryptoData(data[property], false)", WebDollarCryptoData.createWebDollarCryptoData(data[property], false));
-
-                        if (i === 0)
-                            newValue = WebDollarCryptoData.createWebDollarCryptoData( data[property], true);
-                        else {
-                            if (Buffer.isBuffer(data[property]))
-                                newValue.concat( data[property], false );
-                            else
-                                newValue.concat(WebDollarCryptoData.createWebDollarCryptoData(data[property], false));
-                        }
-
-                        //console.log("newValue", newValue);
-
-                        i++;
-                    }
-                }
-
-                if (newValue !== null)
-                    this.buffer =  newValue.buffer;
-                else this.buffer = new Buffer( [0] );
-            }
         } else
         if (typeof data === "number") this.buffer = new Buffer( [data] );
+    }
+
+    createBufferFromArray(data){
+
+        let newValue = null;
+        let i = 0;
+
+        if (data instanceof BigNumber) {
+            data = {s: data.s, e: data.e, c: data.c};
+            //console.log("data object", data, typeof data);
+        }
+
+        for (let property in data) {
+
+            if (data.hasOwnProperty(property)) {
+
+                //console.log("data[property]", typeof data[property], data[property]);
+                //console.log("WebDollarCryptoData.createWebDollarCryptoData(data[property], false)", WebDollarCryptoData.createWebDollarCryptoData(data[property], false));
+
+                if (i === 0)
+                    newValue = WebDollarCryptoData.createWebDollarCryptoData( data[property], true);
+                else {
+                    if (Buffer.isBuffer(data[property]))
+                        newValue.concat( data[property], false );
+                    else
+                        newValue.concat(WebDollarCryptoData.createWebDollarCryptoData(data[property], false));
+                }
+
+                //console.log("newValue", newValue);
+
+                i++;
+            }
+        }
+
+        if (newValue !== null) return newValue.buffer;
+        else return new Buffer( [0] );
+
     }
 
     toHex(){

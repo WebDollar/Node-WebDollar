@@ -1,6 +1,7 @@
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
+import consts from 'consts/const_global'
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
@@ -16,9 +17,13 @@ class InterfaceBlockchainBlock{
 
         this.hashPrev = hashPrev||null; // 256-bit hash sha256                                             - 32 bytes, sha256
 
+        if (typeof hashData === 'undefined'){
+            hashData = WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( WebDollarCryptoData.createWebDollarCryptoData(data, true) ));
+        }
+
         this.hashData = hashData||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
-        this.nonce = nonce||null; //	int 64 number (starts at 0)-  int,                              - 8 bytes
+        this.nonce = nonce||null; //	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
 
         if (typeof timeStamp === 'undefined'){
             timeStamp = new Date().getTime() - BlockchainGenesis.timeStamp;
@@ -67,16 +72,24 @@ class InterfaceBlockchainBlock{
 
     }
 
+    /*
+        Concat of Hashes to avoid double computation
+     */
+
     calculateBlockPrefix(){
 
-        this.computedBlockPrefix = Buffer.concat ( [ this.version, this.hashPrev, this.hashData,  this.timeStamp,  ])
+        this.computedBlockPrefix = Buffer.concat ( [ WebDollarCrypto.convertIntToBuffer( this.version, 2),
+                                                     WebDollarCrypto.convertIntToBuffer(this.hashPrev, consts.BLOCKS_POW_LENGTH),
+                                                     WebDollarCrypto.convertIntToBuffer(this.hashData),
+                                                     WebDollarCrypto.convertIntToBuffer(this.timeStamp,4 )
+                                                    ])
 
     }
 
     hash(newNonce){
 
         let buffer;
-        buffer = Buffer.concat ( [ this.computedBlockPrefix, newNonce||this.nonce] );
+        buffer = Buffer.concat ( [ this.computedBlockPrefix, WebDollarCrypto.converIntToBuffer( newNonce||this.nonce , consts.BLOCKS_POW_LENGTH ) ] );
 
         return WebDollarCrypto.hashPOW(buffer);
 

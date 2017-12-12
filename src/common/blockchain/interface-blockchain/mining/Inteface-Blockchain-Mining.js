@@ -3,6 +3,7 @@ var BigInteger = require('big-integer');
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
+import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 
 class InterfaceBlockchainMining{
 
@@ -38,11 +39,11 @@ class InterfaceBlockchainMining{
         let nextBlock;
         if (this.blockchain.getBlockchainLength() === 0){  //Genesis Block
 
-            nextBlock = InterfaceBlockchainBlockCreator.createBlockGenesis();
+            nextBlock = InterfaceBlockchainBlockCreator.createBlockGenesis( BlockchainGenesis.address );
 
         } else { //Fetch Transactions and Create Block
 
-            nextBlock = InterfaceBlockchainBlockCreator.createBlock();
+            nextBlock = InterfaceBlockchainBlockCreator.createBlock( BlockchainGenesis.address );
 
         }
 
