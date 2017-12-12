@@ -1,4 +1,5 @@
 var BigInteger = require('big-integer');
+import consts from 'consts/const_global'
 
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
@@ -15,7 +16,6 @@ class InterfaceBlockchainMining{
         this.minerAddress = minerAddress;
 
         this.nonce = null;
-        this.difficulty = null;
         this.finished = true;
 
     }
@@ -24,7 +24,7 @@ class InterfaceBlockchainMining{
 
         this.finished = false;
 
-        this.mine();
+        this.mineNextBlock(true);
     }
 
     stopMining(){
@@ -36,12 +36,12 @@ class InterfaceBlockchainMining{
     /**
      * mine next block
      */
-    async mine(){
+    async mineNextBlock(showMiningOutput){
 
-        let nextBlock;
+        let nextBlock = this.blockchain.blockCreator.createBlock(this.minerAddress);
 
 
-        await this.mineBlock( this.blockchain.blockCreator.createBlock(this.minerAddress), this.blockchain.difficulty, undefined  );
+        await this.mineBlock( nextBlock, this.blockchain.difficultyTarget, undefined, showMiningOutput  );
 
     }
 
@@ -51,11 +51,14 @@ class InterfaceBlockchainMining{
      * @param difficulty
      * @param initialNonce
      */
-    async mineBlock( block,  difficulty, initialNonce ){
+    async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
 
-        if (typeof difficulty === "undefined" && difficulty !== null && difficulty !== this.difficulty)
-            this.setDifficulty(difficulty);
+
+        if (typeof difficulty !== "undefined" && difficulty !== null) {
+            difficulty = WebDollarCryptoData.createWebDollarCryptoData(difficulty).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
+        }
         else throw 'difficulty not specified';
+
 
         block.calculateBlockHeaderPrefix(); //calculate the Block Header Prefix
 
@@ -63,31 +66,40 @@ class InterfaceBlockchainMining{
 
         if (typeof nonce !== 'number') return 'initial nonce is not a number'
 
+        //calculating the hashes per second
+        let intervalMiningOutput;
+        if (showMiningOutput) {
+            let previousNonce = nonce;
+            intervalMiningOutput = setInterval(() => {
+                console.log((nonce - previousNonce).toString() + " hashes/s");
+                previousNonce = nonce
+            }, 1000);
+        }
+
+
         while (nonce <= 0xFFFFFFFF && !this.finished ){
 
             let hash = await block.hash(nonce);
 
-            console.log('Mining WebDollar Argon2 - nonce', nonce, hash.toString("hex") );
+            //console.log('Mining WebDollar Argon2 - nonce', nonce, hash.toString("hex") );
 
-            if ( hash >= difficulty)
+            // console.log(hash.toString("hex"));
+            // console.log(difficulty.toString("hex"));
+            if ( hash.compare(difficulty) >= 0 ) {
+                let reward = 50;
+                console.log("WebDollar Block mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD" )
                 break;
+            }
 
             nonce++;
 
         }
 
-    }
-
-    setDifficulty(newDifficulty){
-
-        if (newDifficulty instanceof BigInteger){
-
-            this.difficulty = WebDollarCryptoData.createWebDollarCryptoData( newDifficulty).toFixedBuffer( 32 );
-
-        } else
-        this.difficulty = newDifficulty;
+        if (typeof intervalMiningOutput !== 'undefined')
+            clearInterval(intervalMiningOutput);
 
     }
+
 
 
 }
