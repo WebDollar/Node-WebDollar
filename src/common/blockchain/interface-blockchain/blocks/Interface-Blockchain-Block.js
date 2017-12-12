@@ -7,6 +7,7 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 
 class InterfaceBlockchainBlock{
 
+    //everything is buffer
 
     constructor (){
 
@@ -21,6 +22,8 @@ class InterfaceBlockchainBlock{
         this.timeStamp = null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
         this.data = null; // transactions - data
+
+        this.blockPrefix = null;
 
     }
 
@@ -59,10 +62,18 @@ class InterfaceBlockchainBlock{
 
     }
 
-    hash(){
+    calculateBlockPrefix(){
 
-        let buffer = new Buffer();
-        return WebDollarCrypto.hashPOW(data);
+        this.blockPrefix = Buffer.concat ( [ this.version, this.hashPrev, this.hashData,  this.timeStamp,  ])
+
+    }
+
+    hash(newNonce){
+
+        let buffer;
+        buffer = Buffer.concat ( [ this.blockPrefix, newNonce||this.nonce] );
+
+        return WebDollarCrypto.hashPOW(buffer);
 
     }
 

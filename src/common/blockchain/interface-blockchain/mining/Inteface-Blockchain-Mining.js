@@ -7,20 +7,32 @@ class InterfaceBlockchainMining{
     constructor (){
 
         this.nonce = null;
+        this.difficulty = null;
 
     }
 
+    mine( block,  difficulty, initialNonce ){
 
-    mine(block,  initialNonce){
+        if (typeof difficulty === "undefined" && difficulty !== null && difficulty !== this.difficulty)
+            this.setDifficulty(difficulty);
 
         let nonce = initialNonce||0;
 
         while (nonce < 0x100000000){
 
-            block.nonce = nonce;
+            let hash = block.hash(nonce);
+
+            if ( hash >= difficulty)
+                break;
 
 
         }
+
+    }
+
+    setDifficulty(newDifficulty){
+
+        this.difficulty = newDifficulty;
 
     }
 
