@@ -1,10 +1,10 @@
-class InterfaceBlockchainGenesis{
+class BlockchainGenesis{
 
     constructor(){
 
         this.hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex")
 
-        this.timeStamp = new Buffer("5A2FC60F", "hex")
+        this.timeStamp = 0x5A2FC60F;
 
         this.difficultyTarget = new Buffer ( [0xff, 0xff, 0xff] );
     }
@@ -22,4 +22,4 @@ class InterfaceBlockchainGenesis{
 
 }
 
-export default new InterfaceBlockchainGenesis();
+export default new BlockchainGenesis();

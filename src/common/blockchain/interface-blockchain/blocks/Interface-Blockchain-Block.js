@@ -1,5 +1,6 @@
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
+import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
@@ -9,17 +10,21 @@ class InterfaceBlockchainBlock{
 
     //everything is buffer
 
-    constructor (){
+    constructor (version, hashPrev, hashData, timeStamp, nonce, data ){
 
-        this.version = null; // 2 bytes version                                                 - 2 bytes
+        this.version = version||null; // 2 bytes version                                                 - 2 bytes
 
-        this.hashPrev = null; // 256-bit hash sha256                                             - 32 bytes, sha256
+        this.hashPrev = hashPrev||null; // 256-bit hash sha256                                             - 32 bytes, sha256
 
-        this.hashData = null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
+        this.hashData = hashData||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
-        this.nonce = null; //	int 64 number (starts at 0)-  int,                              - 8 bytes
+        this.nonce = nonce||null; //	int 64 number (starts at 0)-  int,                              - 8 bytes
 
-        this.timeStamp = null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
+        if (typeof timeStamp === 'undefined'){
+            timeStamp = new Date().getTime() - BlockchainGenesis.timeStamp;
+        }
+
+        this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
         this.data = null; // transactions - data
 

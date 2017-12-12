@@ -2,11 +2,14 @@ var BigInteger = require('big-integer');
 
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
+import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 
 class InterfaceBlockchainMining{
 
 
-    constructor (){
+    constructor (blockchain){
+
+        this.blockchain = blockchain;
 
         this.nonce = null;
         this.difficulty = null;
@@ -18,12 +21,7 @@ class InterfaceBlockchainMining{
 
         this.finished = false;
 
-        while (this.finished === false){
-
-
-
-        }
-
+        this.mine();
     }
 
     stopMining(){
@@ -32,20 +30,46 @@ class InterfaceBlockchainMining{
 
     }
 
-    mine( block,  difficulty, initialNonce ){
+    /**
+     * mine next block
+     */
+    mine(){
+
+        let nextBlock;
+        if (this.blockchain.getBlockchainLength() === 0){  //Genesis Block
+
+            nextBlock = InterfaceBlockchainBlockCreator.createBlockGenesis();
+
+        } else { //Fetch Transactions and Create Block
+
+            nextBlock = InterfaceBlockchainBlockCreator.createBlock();
+
+        }
+
+        this.mineBlock( this.blockchain.block, this.blockchain.difficulty, undefined  );
+
+    }
+
+    /**
+     * Mine a specific Block
+     * @param block
+     * @param difficulty
+     * @param initialNonce
+     */
+    mineBlock( block,  difficulty, initialNonce ){
 
         if (typeof difficulty === "undefined" && difficulty !== null && difficulty !== this.difficulty)
             this.setDifficulty(difficulty);
+        else throw 'difficulty not specified';
 
         let nonce = initialNonce||0;
 
-        while (nonce < 0x100000000){
+        while (nonce <= 0xFFFFFFFF && !this.finished ){
 
             let hash = block.hash(nonce);
 
             if ( hash >= difficulty)
                 break;
-
 
         }
 
