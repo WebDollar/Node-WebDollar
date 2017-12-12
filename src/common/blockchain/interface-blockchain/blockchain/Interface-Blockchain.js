@@ -20,14 +20,14 @@ class InterfaceBlockchain{
 
         for (let i=0; i<this.blocks.length; i++){
 
-            this.validateBlockInBlockchain(this.blocks[i], i);
+            this.validateBlockchainBlock(this.blocks[i], i);
 
         }
 
         return true;
     }
 
-    validateBlockInBlockchain(block, index){
+    validateBlockchainBlock(block, index){
 
         if (this.blocks[i] instanceof InterfaceBlockchainBlock) throw ('block '+index+' is not an instance of InterfaceBlockchainBlock ');
 

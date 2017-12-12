@@ -10,6 +10,25 @@ class InterfaceBlockchainMining{
 
         this.nonce = null;
         this.difficulty = null;
+        this.finished = true;
+
+    }
+
+    startMining(){
+
+        this.finished = false;
+
+        while (this.finished === false){
+
+
+
+        }
+
+    }
+
+    stopMining(){
+
+        this.finished = true;
 
     }
 
@@ -36,7 +55,7 @@ class InterfaceBlockchainMining{
 
         if (newDifficulty instanceof BigInteger){
 
-            this.difficulty = WebDollarCrypto.convertIntToBuffer( newDifficulty );
+            this.difficulty = WebDollarCrypto.convertIntToBuffer( newDifficulty, 32 );
 
         } else
         this.difficulty = newDifficulty;

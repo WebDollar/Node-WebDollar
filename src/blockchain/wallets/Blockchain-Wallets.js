@@ -1,4 +1,4 @@
-import MiniBlockchainAddress from 'common/blockchain/mini-blockchain/addresses/Mini-Blockchain-Address'
+import MiniBlockchainAddress from 'common/blockchain/mini-blockchain/Mini-Blockchain-Address'
 
 class BlockchainWallets{
 
