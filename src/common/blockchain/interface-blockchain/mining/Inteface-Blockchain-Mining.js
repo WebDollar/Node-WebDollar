@@ -1,3 +1,5 @@
+var BigInteger = require('big-integer');
+
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 
@@ -32,6 +34,11 @@ class InterfaceBlockchainMining{
 
     setDifficulty(newDifficulty){
 
+        if (newDifficulty instanceof BigInteger){
+
+            this.difficulty = WebDollarCrypto.convertIntToBuffer( newDifficulty );
+
+        } else
         this.difficulty = newDifficulty;
 
     }

@@ -1,3 +1,4 @@
+var BigInteger = require('big-integer');
 import WebDollarCryptoData from "./Webdollar-Crypto-Data";
 
 let crypto = null;
@@ -160,6 +161,23 @@ class WebDollarCrypto {
     static verifyHashPOW(hash, data){
 
         return Argon2.verify(hash, data);
+
+    }
+
+    convertIntToBuffer(data, noBits){
+
+        let result = new Buffer(32);
+
+        if (data instanceof BigInteger)
+            for (let i=31; i>0 && data.greater(0); i--) {
+
+                let division = data.divmod(256);
+
+                result[i] = division.remainder;
+                data = division.quotient;
+            }
+
+        return result;
 
     }
 

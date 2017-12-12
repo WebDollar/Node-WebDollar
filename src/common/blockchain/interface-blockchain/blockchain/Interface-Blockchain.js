@@ -1,5 +1,6 @@
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import InterfaceBlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Genesis'
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -10,6 +11,7 @@ class InterfaceBlockchain{
     constructor (){
 
         this.blocks = [];
+        this.difficultyTarget = InterfaceBlockchainGenesis.difficultyTarget;
 
     }
 
@@ -18,12 +20,23 @@ class InterfaceBlockchain{
 
         for (let i=0; i<this.blocks.length; i++){
 
-            if (this.blocks[i] instanceof InterfaceBlockchainBlock) throw ('block '+i+' is not an instance of InterfaceBlockchainBlock ');
+            this.validateBlockInBlockchain(this.blocks[i], i);
 
-            if (this.blocks.validateBlock() === false) return false;
         }
 
         return true;
+    }
+
+    validateBlockInBlockchain(block, index){
+
+        if (this.blocks[i] instanceof InterfaceBlockchainBlock) throw ('block '+index+' is not an instance of InterfaceBlockchainBlock ');
+
+        if (this.blocks.validateBlock(index) === false) return false;
+
+        //validate genesis
+        if (index === 0 )
+            InterfaceBlockchainGenesis.validateGenesis(block)
+
     }
 
     getBlockchainLength(){

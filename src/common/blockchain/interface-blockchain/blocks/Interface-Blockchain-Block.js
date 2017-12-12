@@ -11,23 +11,22 @@ class InterfaceBlockchainBlock{
 
     constructor (){
 
-        this.version = null; // version                                                         - 2 bytes
+        this.version = null; // 2 bytes version                                                 - 2 bytes
 
-        this.hashPrev = null; //256-bit hash sha256                                             - 32 bytes, sha256
+        this.hashPrev = null; // 256-bit hash sha256                                             - 32 bytes, sha256
 
         this.hashData = null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
-        this.nonce = null; //	32-bit number (starts at 0)-  int,                              - 4 bytes
+        this.nonce = null; //	int 64 number (starts at 0)-  int,                              - 8 bytes
 
         this.timeStamp = null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
         this.data = null; // transactions - data
 
-        this.blockPrefix = null;
-
+        this.computedBlockPrefix = null;
     }
 
-    validateBlock(){
+    validateBlock(index){
 
         if (typeof this.version === 'undefined' || this.version === null) throw ('version is empty');
 
@@ -38,7 +37,8 @@ class InterfaceBlockchainBlock{
         if (typeof this.nonce === 'undefined' || this.nonce === null) throw ('nonce is empty');
         if (typeof this.timeStamp === 'undefined' || this.timeStamp === null) throw ('timeStamp is empty');
 
-        if (this.version !== 0x0666) throw ('invalid version');
+        if (index >=0)
+            if (this.version !== 0x01) throw ('invalid version');
 
         return true;
     }
@@ -64,14 +64,14 @@ class InterfaceBlockchainBlock{
 
     calculateBlockPrefix(){
 
-        this.blockPrefix = Buffer.concat ( [ this.version, this.hashPrev, this.hashData,  this.timeStamp,  ])
+        this.computedBlockPrefix = Buffer.concat ( [ this.version, this.hashPrev, this.hashData,  this.timeStamp,  ])
 
     }
 
     hash(newNonce){
 
         let buffer;
-        buffer = Buffer.concat ( [ this.blockPrefix, newNonce||this.nonce] );
+        buffer = Buffer.concat ( [ this.computedBlockPrefix, newNonce||this.nonce] );
 
         return WebDollarCrypto.hashPOW(buffer);
 
