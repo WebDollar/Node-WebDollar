@@ -164,30 +164,7 @@ class WebDollarCrypto {
 
     }
 
-    /**
-     * Convert an Integer, or BigInteger to a Buffer (array) on noBits
-     * @param data
-     * @param noBits
-     * @returns {Buffer}
-     */
-    convertIntToBuffer(data, noBits){
 
-        if (typeof noBits === 'undefined') noBits = 32;
-
-        let result = new Buffer(noBits);
-
-        if (data instanceof BigInteger)
-            for (let i=31; i>0 && data.greater(0); i--) {
-
-                let division = data.divmod(256);
-
-                result[i] = division.remainder;
-                data = division.quotient;
-            }
-
-        return result;
-
-    }
 
 }
 

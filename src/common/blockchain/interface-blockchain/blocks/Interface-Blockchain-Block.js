@@ -76,12 +76,12 @@ class InterfaceBlockchainBlock{
         Concat of Hashes to avoid double computation
      */
 
-    calculateBlockPrefix(){
+    calculateBlockHeaderPrefix(){
 
-        this.computedBlockPrefix = Buffer.concat ( [ WebDollarCrypto.convertIntToBuffer( this.version, 2),
-                                                     WebDollarCrypto.convertIntToBuffer(this.hashPrev, consts.BLOCKS_POW_LENGTH),
-                                                     WebDollarCrypto.convertIntToBuffer(this.hashData),
-                                                     WebDollarCrypto.convertIntToBuffer(this.timeStamp,4 )
+        this.computedBlockPrefix = Buffer.concat ( [ WebDollarCryptoData.createWebDollarCryptoData( this.version).toFixedBuffer(2),
+                                                     WebDollarCryptoData.createWebDollarCryptoData( this.hashPrev ).toFixedBuffer( consts.BLOCKS_POW_LENGTH ),
+                                                     WebDollarCryptoData.createWebDollarCryptoData( this.hashData ).buffer,
+                                                     WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 )
                                                     ])
 
     }
@@ -89,7 +89,7 @@ class InterfaceBlockchainBlock{
     hash(newNonce){
 
         let buffer;
-        buffer = Buffer.concat ( [ this.computedBlockPrefix, WebDollarCrypto.converIntToBuffer( newNonce||this.nonce , consts.BLOCKS_POW_LENGTH ) ] );
+        buffer = Buffer.concat ( [ this.computedBlockPrefix, WebDollarCryptoData.createWebDollarCryptoData( newNonce||this.nonce).toFixedBuffer( consts.BLOCKS_POW_LENGTH ) ] );
 
         return WebDollarCrypto.hashPOW(buffer);
 

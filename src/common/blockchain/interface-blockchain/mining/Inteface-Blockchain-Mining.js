@@ -8,9 +8,11 @@ import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blo
 class InterfaceBlockchainMining{
 
 
-    constructor (blockchain){
+    constructor (blockchain, minerAddress){
 
         this.blockchain = blockchain;
+
+        this.minerAddress = minerAddress;
 
         this.nonce = null;
         this.difficulty = null;
@@ -34,20 +36,12 @@ class InterfaceBlockchainMining{
     /**
      * mine next block
      */
-    mine(){
+    async mine(){
 
         let nextBlock;
-        if (this.blockchain.getBlockchainLength() === 0){  //Genesis Block
 
-            nextBlock = InterfaceBlockchainBlockCreator.createBlockGenesis( BlockchainGenesis.address );
 
-        } else { //Fetch Transactions and Create Block
-
-            nextBlock = InterfaceBlockchainBlockCreator.createBlock( BlockchainGenesis.address );
-
-        }
-
-        this.mineBlock( this.blockchain.block, this.blockchain.difficulty, undefined  );
+        await this.mineBlock( this.blockchain.blockCreator.createBlock(this.minerAddress), this.blockchain.difficulty, undefined  );
 
     }
 
@@ -57,20 +51,28 @@ class InterfaceBlockchainMining{
      * @param difficulty
      * @param initialNonce
      */
-    mineBlock( block,  difficulty, initialNonce ){
+    async mineBlock( block,  difficulty, initialNonce ){
 
         if (typeof difficulty === "undefined" && difficulty !== null && difficulty !== this.difficulty)
             this.setDifficulty(difficulty);
         else throw 'difficulty not specified';
 
+        block.calculateBlockHeaderPrefix(); //calculate the Block Header Prefix
+
         let nonce = initialNonce||0;
+
+        if (typeof nonce !== 'number') return 'initial nonce is not a number'
 
         while (nonce <= 0xFFFFFFFF && !this.finished ){
 
-            let hash = block.hash(nonce);
+            let hash = await block.hash(nonce);
+
+            console.log('Mining WebDollar Argon2 - nonce', nonce, hash.toString("hex") );
 
             if ( hash >= difficulty)
                 break;
+
+            nonce++;
 
         }
 
@@ -80,7 +82,7 @@ class InterfaceBlockchainMining{
 
         if (newDifficulty instanceof BigInteger){
 
-            this.difficulty = WebDollarCrypto.convertIntToBuffer( newDifficulty, 32 );
+            this.difficulty = WebDollarCryptoData.createWebDollarCryptoData( newDifficulty).toFixedBuffer( 32 );
 
         } else
         this.difficulty = newDifficulty;

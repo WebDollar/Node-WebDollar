@@ -1,4 +1,5 @@
 const bs58 = require('bs58')
+var BigInteger = require('big-integer');
 var BigNumber = require('bignumber.js');
 
 import WebDollarCrypto from './WebDollar-Crypto';
@@ -64,18 +65,64 @@ class WebDollarCryptoData {
         {
             if (data.length > 0 && typeof data[0] === "object" )
                 this.buffer = this.createBufferFromArray(data);
-             else // byte array
+            else // byte array
                 this.buffer = new Buffer(data);
         }
         else
         if (type === "object" || typeof data === "object"){
+
+            if (data instanceof BigNumber) { //converting Big Number Format
+
+                data = {s: data.s, e: data.e, c: data.c};
+
+                let newData = [data.s, data.e]
+                for (let i=0; i<data.c.length; i++)
+                    newData.push(data.c[i]);
+
+                data = newData;
+                //console.log("data object", data, typeof data);
+            }
+
+            if (data instanceof BigInteger) {
+
+                //converting number value into a buffer
+
+                let list = [];
+                while (data.greater(0)){
+
+                    let division = data.divmod(256);
+
+                    list.unshift ( division.remainder );
+                    data = division.quotient;
+                }
+
+                this.buffer = new Buffer( [list.length] );
+
+                for (let i=0; i<list.length; i++)
+                    this.buffer[i] = list[i];
+
+            }
 
             if (data === null) this.buffer = new Buffer ( [0] );
             else
                 this.buffer = this.createBufferFromArray(data);
 
         } else
-        if (typeof data === "number") this.buffer = new Buffer( [data] );
+        // if (typeof data === "number") {
+        //     console.log("NUMBER ", data);
+        //     this.buffer = new Buffer( [data] );
+        // }
+        // else
+        if (typeof data === "number"){
+
+            //converting number value into a buffer
+            this.buffer = Buffer(4);
+            this.buffer[0] = (data & 0xff000000);
+            this.buffer[1] = (data & 0x00ff0000);
+            this.buffer[2] = (data & 0x0000ff00);
+            this.buffer[3] = (data & 0x000000ff);
+        }
+
     }
 
     createBufferFromArray(data){
@@ -83,10 +130,7 @@ class WebDollarCryptoData {
         let newValue = null;
         let i = 0;
 
-        if (data instanceof BigNumber) {
-            data = {s: data.s, e: data.e, c: data.c};
-            //console.log("data object", data, typeof data);
-        }
+        //console.log("Data", data);
 
         for (let property in data) {
 
@@ -192,6 +236,23 @@ class WebDollarCryptoData {
         this.buffer = Buffer.concat( [this.buffer, data.buffer] );
 
         return this;
+    }
+
+    /**
+     * Convers buffer to a Fixed Length buffer
+     * @returns {Buffer}
+     */
+    toFixedBuffer(noBits){
+
+        if (this.buffer.length === noBits) return this.buffer; // in case has the same number of bits as output
+
+        let result = new Buffer(noBits);
+
+        for (let i=0; i<this.buffer.length; i++)
+            result[i]= this.buffer[i];
+
+        return result;
+
     }
 
 }
