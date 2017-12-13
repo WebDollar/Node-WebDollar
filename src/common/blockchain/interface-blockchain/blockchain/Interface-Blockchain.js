@@ -35,13 +35,14 @@ class InterfaceBlockchain{
      */
     async includeBlockchainBlock(block){
 
-        let result =  await this.validateBlockchainBlock(block, this.blocks.length ) ; // the block has height === this.blocks.length
+        if (! await this.validateBlockchainBlock(block, this.blocks.length ) ) return false; // the block has height === this.blocks.length
 
         //let's check again the heights
         if (block.myHeight !== this.blocks.length) throw ('heights of a new block is not good... strange');
 
         this.blocks.push(block)
 
+        return true;
     }
 
     async validateBlockchainBlock(block, height){
@@ -59,8 +60,8 @@ class InterfaceBlockchain{
             previousTimeStamp = BlockchainGenesis.timeStamp;
         } else {
             previousDifficultyTarget = this.blocks[height-1].myDifficultyTarget;
-            previousHash = BlockchainGenesis.hashPrev
-            previousTimeStamp = BlockchainGenesis.timeStamp;
+            previousHash = this.blocks[height-1].hash;
+            previousTimeStamp = this.blocks[height-1].timeStamp;
         }
 
         //validate difficulty & hash

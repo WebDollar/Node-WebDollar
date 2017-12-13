@@ -1,3 +1,4 @@
+var BigInteger = require('big-integer');
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
@@ -46,18 +47,18 @@ class InterfaceBlockchainBlock{
 
     async validateBlock(height, previousDifficultyTarget, previousHash){
 
-        if (typeof this.version === 'undefined' || this.version === null || typeof this.version !== 'number') throw ('version is empty');
+        if (this.version === undefined || this.version === null || typeof this.version !== 'number') throw ('version is empty');
 
-        if (typeof this.hash === 'undefined' || this.hash === null || !Buffer.isBuffer(this.hash) ) throw ('hash is empty');
-        if (typeof this.hashPrev === 'undefined' || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw ('hashPrev is empty');
+        if (this.hash === undefined || this.hash === null || !Buffer.isBuffer(this.hash) ) throw ('hash is empty');
+        if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw ('hashPrev is empty');
 
-        if (typeof this.data === 'undefined' || this.data === null  ) throw ('data is empty');
-        if (typeof this.data.minerAddress === 'undefined' || this.data.minerAddress === null  ) throw ('data.minerAddress is empty');
+        if (this.data === undefined || this.data === null  ) throw ('data is empty');
+        if (this.data.minerAddress === 'undefined' || this.data.minerAddress === null  ) throw ('data.minerAddress is empty');
 
-        if (typeof this.hashData === 'undefined' || this.hashData === null || !Buffer.isBuffer(this.hashData)) throw ('hashData is empty');
+        if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData)) throw ('hashData is empty');
 
-        if (typeof this.nonce === 'undefined' || this.nonce === null || typeof this.nonce !== 'number') throw ('nonce is empty');
-        if (typeof this.timeStamp === 'undefined' || this.timeStamp === null || typeof this.timeStamp !== 'number') throw ('timeStamp is empty');
+        if (this.nonce === undefined || this.nonce === null || typeof this.nonce !== 'number') throw ('nonce is empty');
+        if (this.timeStamp === undefined || this.timeStamp === null || typeof this.timeStamp !== 'number') throw ('timeStamp is empty');
 
         //timestamp must be on 4 bytes
         this.timeStamp = Math.floor(this.timeStamp);
@@ -66,7 +67,6 @@ class InterfaceBlockchainBlock{
         if (height >=0)
             if (this.version !== 0x01) throw ('invalid version');
 
-        console.log(height, this.myHeight);
         if (height !== this.myHeight) throw 'height is different';
 
         await this.validateBlockHash(previousHash);
@@ -92,12 +92,19 @@ class InterfaceBlockchainBlock{
 
     }
 
-    validateTargetDifficulty(previousDifficultyTarget){
+    validateTargetDifficulty(prevDifficultyTarget){
 
-        if ( previousDifficultyTarget === null || (!Buffer.isBuffer(previousDifficultyTarget) && !WebDollarCryptoData.isWebDollarCryptoData(previousDifficultyTarget)) ) throw 'previousDifficultyTarget is not given'
 
-        if (! (this.hash.compare( previousDifficultyTarget ) <= 0))
+        if (prevDifficultyTarget instanceof BigInteger) prevDifficultyTarget = WebDollarCryptoData.createWebDollarCryptoData(prevDifficultyTarget).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
+
+        if ( prevDifficultyTarget === null || (!Buffer.isBuffer(prevDifficultyTarget) && !WebDollarCryptoData.isWebDollarCryptoData(prevDifficultyTarget)) ) throw 'previousDifficultyTarget is not given'
+
+        console.log("difficulty", prevDifficultyTarget.toString("hex"));
+
+        if (! (this.hash.compare( prevDifficultyTarget ) <= 0))
             throw "block doesn't match the difficulty target is not ";
+
+        return true;
     }
 
     toString(){

@@ -40,9 +40,13 @@ class InterfaceBlockchainMining{
      */
     async mineNextBlock(showMiningOutput){
 
-        let nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress);
+        while (!this.finished){
+            //mining next blocks
 
-        await this.mineBlock( nextBlock, this.blockchain.difficultyTarget, undefined, showMiningOutput  );
+            let nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress);
+
+            await this.mineBlock( nextBlock, this.blockchain.difficultyTarget, undefined, showMiningOutput  );
+        }
 
     }
 
@@ -88,7 +92,7 @@ class InterfaceBlockchainMining{
             if ( hash.compare(difficulty) <= 0 ) {
 
                 let reward = 50;
-                console.log( colors.green("WebDollar Block mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD") );
+                console.log( colors.green("WebDollar Block ", block.myHeight ," mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD") );
 
                 block.hash = hash;
                 block.nonce = nonce;

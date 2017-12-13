@@ -96,10 +96,12 @@ class WebDollarCryptoData {
                     data = division.quotient;
                 }
 
-                this.buffer = new Buffer( [list.length] );
+                this.buffer = new Buffer( list.length );
 
                 for (let i=0; i<list.length; i++)
                     this.buffer[i] = list[i];
+
+                return;
 
             }
 

@@ -37,7 +37,7 @@ class InterfaceBlockchainBlockCreator{
 
         } else { //Fetch Transactions and Create Block
 
-            return this._createBlockNew( minerAddress||BlockchainGenesis.address, this.blockchain.getBlockchainLastBlock(), this.blockchain.getBlockchainLength() );
+            return this._createBlockNew( this.blockchain.getBlockchainLastBlock(), this.blockchain.getBlockchainLength(), minerAddress||BlockchainGenesis.address  );
 
         }
 
