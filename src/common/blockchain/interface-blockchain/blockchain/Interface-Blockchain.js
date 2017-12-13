@@ -35,7 +35,7 @@ class InterfaceBlockchain{
      */
     includeBlockchainBlock(block){
 
-        let result =  this.validateBlockchainBlock(block, this.blocks.length ) ; // the block has index === this.blocks.length
+        let result =  this.validateBlockchainBlock(block, this.blocks.length ) ; // the block has height === this.blocks.length
 
         //let's check again the heights
         if (block.myHeight !== this.blocks.length) throw ('heights of a new block is not good... strange');
@@ -55,7 +55,7 @@ class InterfaceBlockchain{
         //validate genesis
         let previousDifficultyTarget, previousHash;
 
-        if (index === 0 ) {
+        if (height === 0 ) {
             BlockchainGenesis.validateGenesis(block)
 
             previousDifficultyTarget= BlockchainGenesis.difficultyTarget;

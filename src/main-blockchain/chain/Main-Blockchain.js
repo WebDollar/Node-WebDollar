@@ -1,6 +1,6 @@
 import MiniBlockchain from 'common/blockchain/mini-blockchain/Mini-Blockchain'
 
-class BlockchainChain extends  MiniBlockchain{
+class MainBlockchain extends  MiniBlockchain{
 
     constructor (  ) {
 
@@ -10,4 +10,4 @@ class BlockchainChain extends  MiniBlockchain{
 
 }
 
-export default new BlockchainChain()
+export default MainBlockchain

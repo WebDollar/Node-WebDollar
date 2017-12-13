@@ -1,4 +1,6 @@
 var BigInteger = require('big-integer');
+const colors = require('colors/safe');
+
 import consts from 'consts/const_global'
 
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
@@ -87,7 +89,7 @@ class InterfaceBlockchainMining{
             if ( hash.compare(difficulty) <= 0 ) {
 
                 let reward = 50;
-                console.log( "WebDollar Block mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD" );
+                console.log( colors.green("WebDollar Block mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD") );
 
                 block.hash = hash;
                 block.nonce = nonce;

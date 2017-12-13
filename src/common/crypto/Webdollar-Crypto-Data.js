@@ -257,7 +257,8 @@ class WebDollarCryptoData {
 
     compare(data){
 
-        let data = WebDollarCryptoData.createWebDollarCryptoData(data);
+        if (!Buffer.isBuffer(data))
+            data = WebDollarCryptoData.createWebDollarCryptoData(data);
 
         return this.buffer.compare(data.buffer)
 

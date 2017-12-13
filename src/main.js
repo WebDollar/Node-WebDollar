@@ -1,4 +1,4 @@
-import Blockchain from 'blockchain/Blockchain';
+import Blockchain from 'main-blockchain/Blockchain';
 import Node from 'node/Node';
 
 import TestingMocha from 'tests/main.test'

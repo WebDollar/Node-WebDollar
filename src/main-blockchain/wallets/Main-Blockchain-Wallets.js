@@ -1,6 +1,12 @@
 import MiniBlockchainAddress from 'common/blockchain/mini-blockchain/Mini-Blockchain-Address'
 
-class BlockchainWallets{
+class MainBlockchainWallets{
+
+    constructor(blockchain){
+
+        this.blockchain = blockchain;
+
+    }
 
     createNewAddress(){
 
@@ -12,4 +18,4 @@ class BlockchainWallets{
 
 }
 
-export default new BlockchainWallets()
+export default MainBlockchainWallets

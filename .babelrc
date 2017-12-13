@@ -3,7 +3,7 @@
   "plugins": [
     ["module-alias", [
       {"src": "./src/applications",  "expose": "applications"},
-      {"src": "./src/blockchain",  "expose": "blockchain"},
+      {"src": "./src/main-blockchain",  "expose": "main-blockchain"},
       {"src": "./src/node", "expose":"node"},
       {"src": "./src/consts", "expose":"consts"},
       {"src": "./src/node", "expose":"node"},

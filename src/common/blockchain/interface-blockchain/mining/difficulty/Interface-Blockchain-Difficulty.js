@@ -36,9 +36,22 @@ class InterfaceBlockchainDifficulty{
                        int(2**((block.number // 100000) - 2))                                                -- includeBombFormula
          */
 
+        if (typeof prevBlockDifficulty === "string"){ // it must be hex
+            prevBlockDifficulty.replace("0x","");
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty);
+        } else if (Buffer.isBuffer(prevBlockDifficulty)){
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"));
+        }
 
-        if (! prevBlockDifficulty instanceof BigInteger) prevBlockDifficulty = BigInteger(prevBlockDifficulty);
-        if (! prevBlockTimestamp instanceof BigInteger) prevBlockTimestamp = BigInteger(prevBlockTimestamp);
+
+        if (typeof prevBlockTimestamp === "string"){
+            prevBlockTimestamp.replace("0x",""); //it must be hex
+            prevBlockTimestamp = BigInteger(prevBlockTimestamp);
+        } else if (Buffer.isBuffer(prevBlockDifficulty)){
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"));
+        }
+
+
         if (! blockTimestamp instanceof BigInteger) blockTimestamp = BigInteger(blockTimestamp);
         if (! blockNumber instanceof BigInteger) blockNumber = BigInteger(blockNumber);
 

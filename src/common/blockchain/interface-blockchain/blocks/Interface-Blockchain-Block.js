@@ -20,7 +20,7 @@ class InterfaceBlockchainBlock{
         this.hashPrev = hashPrev||null; // 256-bit hash sha256                                             - 32 bytes, sha256
 
         if (typeof hashData === 'undefined'){
-            hashData = WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( WebDollarCryptoData.createWebDollarCryptoData(data, true) ));
+            hashData = WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( WebDollarCryptoData.createWebDollarCryptoData(data, true) )).buffer;
         }
 
         this.hashData = hashData||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
@@ -28,7 +28,8 @@ class InterfaceBlockchainBlock{
         this.nonce = nonce||null; //	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
 
         if (typeof timeStamp === 'undefined'){
-            timeStamp = new Date().getTime() - BlockchainGenesis.timeStamp;
+
+            timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStamp;
         }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
@@ -53,6 +54,10 @@ class InterfaceBlockchainBlock{
 
         if (typeof this.nonce === 'undefined' || this.nonce === null || typeof this.nonce !== 'number') throw ('nonce is empty');
         if (typeof this.timeStamp === 'undefined' || this.timeStamp === null || typeof this.timeStamp !== 'number') throw ('timeStamp is empty');
+
+        //timestamp must be on 4 bytes
+        this.timeStamp = Math.floor(this.timeStamp);
+        if (this.timeStamp >= 0xFFFFFFFF) throw ('timeStamp is invalid');
 
         if (height >=0)
             if (this.version !== 0x01) throw ('invalid version');

@@ -1,11 +1,9 @@
 import MiniBlockchainMining from 'common/blockchain/mini-blockchain/Mini-Blockchain-Mining'
 
-import BlockchainChain from 'blockchain/chain/BlockchainChain'
+class MainBlockchainMining{
 
-class BlockchainMining{
-
-    constructor(){
-        this.mining = new MiniBlockchainMining(BlockchainChain);
+    constructor(blockchain){
+        this.mining = new MiniBlockchainMining(blockchain);
     }
 
     startMining(){
@@ -22,4 +20,4 @@ class BlockchainMining{
 
 }
 
-export default new BlockchainMining()
+export default  MainBlockchainMining
