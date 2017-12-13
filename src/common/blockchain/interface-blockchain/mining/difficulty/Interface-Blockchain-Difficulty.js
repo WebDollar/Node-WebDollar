@@ -8,7 +8,6 @@ class InterfaceBlockchainDifficulty{
 
         // difficulty algorithm is based on blockNumber
 
-
         if ( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.greaterThanOrEqualTo(0)))
             return this.calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber);
 
@@ -38,22 +37,32 @@ class InterfaceBlockchainDifficulty{
 
         if (typeof prevBlockDifficulty === "string"){ // it must be hex
             prevBlockDifficulty.replace("0x","");
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty);
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty, 16);
         } else if (Buffer.isBuffer(prevBlockDifficulty)){
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"));
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
         }
 
 
         if (typeof prevBlockTimestamp === "string"){
             prevBlockTimestamp.replace("0x",""); //it must be hex
-            prevBlockTimestamp = BigInteger(prevBlockTimestamp);
+            prevBlockTimestamp = BigInteger(prevBlockTimestamp, 16);
         } else if (Buffer.isBuffer(prevBlockDifficulty)){
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"));
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
+        }
+
+        if (typeof blockTimestamp === "string"){
+            blockTimestamp.replace("0x",""); //it must be hex
+            blockTimestamp = BigInteger(blockTimestamp, 16);
+        } else if (Buffer.isBuffer(blockTimestamp)){
+            blockTimestamp = BigInteger(blockTimestamp.toString("hex"), 16);
         }
 
 
-        if (! blockTimestamp instanceof BigInteger) blockTimestamp = BigInteger(blockTimestamp);
-        if (! blockNumber instanceof BigInteger) blockNumber = BigInteger(blockNumber);
+        if (prevBlockTimestamp instanceof BigInteger === false) prevBlockTimestamp = BigInteger(prevBlockTimestamp);
+        if (blockTimestamp instanceof BigInteger === false) blockTimestamp = BigInteger(blockTimestamp);
+        if (blockNumber instanceof BigInteger === false) blockNumber = BigInteger(blockNumber);
+
+        //console.log(blockTimestamp, prevBlockTimestamp)
 
         let equationTwoPartA =  BigInteger(1).minus( blockTimestamp.minus( prevBlockTimestamp ).divide(10));    // max(1 - (block_timestamp - parent_timestamp) // 10, -99) +
         let equationTwo = equationTwoPartA.greater( -99 ) ? equationTwoPartA : -99;

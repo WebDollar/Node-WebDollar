@@ -18,12 +18,12 @@ class InterfaceBlockchain{
 
     }
 
-    validateBlockchain(){
+    async validateBlockchain(){
 
 
         for (let i=0; i<this.blocks.length; i++){
 
-            this.validateBlockchainBlock(this.blocks[i], i);
+            await this.validateBlockchainBlock(this.blocks[i], i);
 
         }
 
@@ -33,40 +33,41 @@ class InterfaceBlockchain{
     /*
         Include a new block at the end of the blockchain, by validating the next block
      */
-    includeBlockchainBlock(block){
+    async includeBlockchainBlock(block){
 
-        let result =  this.validateBlockchainBlock(block, this.blocks.length ) ; // the block has height === this.blocks.length
+        let result =  await this.validateBlockchainBlock(block, this.blocks.length ) ; // the block has height === this.blocks.length
 
         //let's check again the heights
         if (block.myHeight !== this.blocks.length) throw ('heights of a new block is not good... strange');
-
-        //recalculate next target difficulty
-        let prevBlock = this.blocks[block.myHeight-1];
-        this.block = InterfaceBlockchainDifficulty.getDifficulty( prevBlock.myDifficultyTarget, prevBlock.timeStamp, block.timeStamp, block.myHeight);
 
         this.blocks.push(block)
 
     }
 
-    validateBlockchainBlock(block, height){
+    async validateBlockchainBlock(block, height){
 
-        if (!block instanceof InterfaceBlockchainBlock) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
+        if ( block instanceof InterfaceBlockchainBlock === false ) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
 
         //validate genesis
-        let previousDifficultyTarget, previousHash;
+        let previousDifficultyTarget, previousHash, previousTimeStamp;
 
         if (height === 0 ) {
             BlockchainGenesis.validateGenesis(block)
 
             previousDifficultyTarget= BlockchainGenesis.difficultyTarget;
             previousHash = BlockchainGenesis.hashPrev;
+            previousTimeStamp = BlockchainGenesis.timeStamp;
         } else {
             previousDifficultyTarget = this.blocks[height-1].myDifficultyTarget;
             previousHash = BlockchainGenesis.hashPrev
+            previousTimeStamp = BlockchainGenesis.timeStamp;
         }
 
         //validate difficulty & hash
-        if (block.validateBlock(height, previousDifficultyTarget, previousHash) === false) throw ('block validation failed')
+        if (await block.validateBlock(height, previousDifficultyTarget, previousHash) === false) throw ('block validation failed')
+
+        //recalculate next target difficulty
+        block.myDifficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( previousDifficultyTarget, previousTimeStamp, block.timeStamp, block.myHeight);
 
         return true;
 

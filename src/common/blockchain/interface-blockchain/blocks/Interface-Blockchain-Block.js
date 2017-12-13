@@ -34,15 +34,17 @@ class InterfaceBlockchainBlock{
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
-        this.data = null; // transactions - data
+        this.data = data||{}; // transactions - data
 
+
+        //computed data
         this.computedBlockPrefix = null;
 
         this.myDifficultyTarget = null; // difficulty set by me
-        this.myHeight = null; // index set by me
+        this.myHeight = (typeof myHeight === "number" ? myHeight : null); // index set by me
     }
 
-    validateBlock(height, previousDifficultyTarget, previousHash){
+    async validateBlock(height, previousDifficultyTarget, previousHash){
 
         if (typeof this.version === 'undefined' || this.version === null || typeof this.version !== 'number') throw ('version is empty');
 
@@ -50,6 +52,8 @@ class InterfaceBlockchainBlock{
         if (typeof this.hashPrev === 'undefined' || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw ('hashPrev is empty');
 
         if (typeof this.data === 'undefined' || this.data === null  ) throw ('data is empty');
+        if (typeof this.data.minerAddress === 'undefined' || this.data.minerAddress === null  ) throw ('data.minerAddress is empty');
+
         if (typeof this.hashData === 'undefined' || this.hashData === null || !Buffer.isBuffer(this.hashData)) throw ('hashData is empty');
 
         if (typeof this.nonce === 'undefined' || this.nonce === null || typeof this.nonce !== 'number') throw ('nonce is empty');
@@ -62,9 +66,10 @@ class InterfaceBlockchainBlock{
         if (height >=0)
             if (this.version !== 0x01) throw ('invalid version');
 
+        console.log(height, this.myHeight);
         if (height !== this.myHeight) throw 'height is different';
 
-        this.validateHash(previousHash);
+        await this.validateBlockHash(previousHash);
         this.validateTargetDifficulty(previousDifficultyTarget);
 
         return true;
@@ -73,15 +78,17 @@ class InterfaceBlockchainBlock{
     /**
      * it will recheck the validity of the block
      */
-    validateHash(previousHash) {
+    async validateBlockHash(previousHash) {
 
-        let hash = this.computeHash();
+        if (this.computedBlockPrefix === null) this.computedBlockPrefix(); //making sure that the prefix was calculated for calculating the block
 
-        if (hash.equals(this.hash) ) throw "block hash is not right";
+        let hash = await this.computeHash();
+
+        if (!hash.equals(this.hash)) throw "block hash is not right";
 
         if ( previousHash === null || (!Buffer.isBuffer(previousHash) && !WebDollarCryptoData.isWebDollarCryptoData(previousHash)) ) throw 'previous hash is not given'
 
-        if (previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
+        if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
 
     }
 
@@ -89,7 +96,7 @@ class InterfaceBlockchainBlock{
 
         if ( previousDifficultyTarget === null || (!Buffer.isBuffer(previousDifficultyTarget) && !WebDollarCryptoData.isWebDollarCryptoData(previousDifficultyTarget)) ) throw 'previousDifficultyTarget is not given'
 
-        if (this.hash.compare( previousDifficultyTarget ) <= 0)
+        if (! (this.hash.compare( previousDifficultyTarget ) <= 0))
             throw "block doesn't match the difficulty target is not ";
     }
 
@@ -120,10 +127,15 @@ class InterfaceBlockchainBlock{
 
         this.computedBlockPrefix = Buffer.concat ( [ WebDollarCryptoData.createWebDollarCryptoData( this.version).toFixedBuffer(2),
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.hashPrev ).toFixedBuffer( consts.BLOCKS_POW_LENGTH ),
-                                                     WebDollarCryptoData.createWebDollarCryptoData( this.hashData ).buffer,
+                                                     this.convertDataToBuffer(),
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 )
                                                     ])
 
+    }
+
+    convertDataToBuffer(){
+        let buffer = Buffer.concat( [WebDollarCryptoData.createWebDollarCryptoData( this.data.minerAddress ).toFixedBuffer(32)] )
+        return buffer;
     }
 
     computeHash(newNonce){

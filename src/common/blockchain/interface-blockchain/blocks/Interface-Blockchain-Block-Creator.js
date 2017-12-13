@@ -16,17 +16,17 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        return new InterfaceBlockchainBlock( 1, undefined, BlockchainGenesis.hashPrev, undefined, undefined, 0, [minerAddress], 0 );
+        return new InterfaceBlockchainBlock( 1, undefined, BlockchainGenesis.hashPrev, undefined, undefined, 0, {minerAddress: minerAddress, transactions: []}, 0 );
     }
 
     /*
         Generate a new block at the end of Blockchain
      */
-    _createBlockNew(minerAddress){
+    _createBlockNew(prevBlock, height, minerAddress){
 
         //validate miner Address
 
-        return new InterfaceBlockchainBlock( 1, undefined, hashPrev, undefined, undefined, 0, [minerAddress, data], 0 );
+        return new InterfaceBlockchainBlock( 1, undefined, prevBlock.hash, undefined, undefined, 0, {minerAddress: minerAddress, transactions: []}, height);
     }
 
     createBlockNew(minerAddress){

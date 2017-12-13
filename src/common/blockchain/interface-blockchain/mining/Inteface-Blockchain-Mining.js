@@ -42,7 +42,6 @@ class InterfaceBlockchainMining{
 
         let nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress);
 
-
         await this.mineBlock( nextBlock, this.blockchain.difficultyTarget, undefined, showMiningOutput  );
 
     }
@@ -94,7 +93,7 @@ class InterfaceBlockchainMining{
                 block.hash = hash;
                 block.nonce = nonce;
 
-                this.blockchain.includeBlockchainBlock(block);
+                await this.blockchain.includeBlockchainBlock( block );
 
                 break;
             }
