@@ -38,7 +38,7 @@ class InterfaceBlockchainMining{
      */
     async mineNextBlock(showMiningOutput){
 
-        let nextBlock = this.blockchain.blockCreator.createBlock(this.minerAddress);
+        let nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress);
 
 
         await this.mineBlock( nextBlock, this.blockchain.difficultyTarget, undefined, showMiningOutput  );
@@ -79,15 +79,21 @@ class InterfaceBlockchainMining{
 
         while (nonce <= 0xFFFFFFFF && !this.finished ){
 
-            let hash = await block.hash(nonce);
+            let hash = await block.computeHash(nonce);
 
             //console.log('Mining WebDollar Argon2 - nonce', nonce, hash.toString("hex") );
 
-            // console.log(hash.toString("hex"));
-            // console.log(difficulty.toString("hex"));
-            if ( hash.compare(difficulty) >= 0 ) {
+
+            if ( hash.compare(difficulty) <= 0 ) {
+
                 let reward = 50;
-                console.log("WebDollar Block mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD" )
+                console.log( "WebDollar Block mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD" );
+
+                block.hash = hash;
+                block.nonce = nonce;
+
+                this.blockchain.includeBlockchainBlock(block);
+
                 break;
             }
 

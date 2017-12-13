@@ -30,20 +30,45 @@ class InterfaceBlockchain{
         return true;
     }
 
-    validateBlockchainBlock(block, index){
+    /*
+        Include a new block at the end of the blockchain, by validating the next block
+     */
+    includeBlockchainBlock(block){
 
-        if (this.blocks[i] instanceof InterfaceBlockchainBlock) throw ('block '+index+' is not an instance of InterfaceBlockchainBlock ');
+        return this.validateBlockchainBlock(block, this.blocks.length ) ; // the block has index === this.blocks.length
 
-        if (this.blocks.validateBlock(index) === false) return false;
+    }
+
+    validateBlockchainBlock(block, height){
+
+        if (block instanceof InterfaceBlockchainBlock) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
 
         //validate genesis
-        if (index === 0 )
+        let previousDifficultyTarget, previousHash;
+
+        if (index === 0 ) {
             BlockchainGenesis.validateGenesis(block)
+
+            previousDifficultyTarget= BlockchainGenesis.difficultyTarget;
+            previousHash = BlockchainGenesis.hashPrev;
+        } else {
+            previousDifficultyTarget = this.blocks[height-1].myDifficultyTarget;
+            previousHash = BlockchainGenesis.hashPrev
+        }
+
+        //validate difficulty & hash
+        if (block.validateBlock(height, previousDifficultyTarget, previousHash) === false) throw ('block validation failed')
+
+        return true;
 
     }
 
     getBlockchainLength(){
         return this.blocks.length;
+    }
+
+    getBlockchainLastBlock(){
+        return this.blocks[this.blocks.length-1];
     }
 
     toString(){
