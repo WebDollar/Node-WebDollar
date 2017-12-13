@@ -255,6 +255,14 @@ class WebDollarCryptoData {
 
     }
 
+    compare(data){
+
+        let data = WebDollarCryptoData.createWebDollarCryptoData(data);
+
+        return this.buffer.compare(data.buffer)
+
+    }
+
 }
 
 export default WebDollarCryptoData;

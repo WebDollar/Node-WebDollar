@@ -2,7 +2,7 @@ import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
-
+import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchain/mining/difficulty/Interface-Blockchain-Difficulty'
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -35,13 +35,22 @@ class InterfaceBlockchain{
      */
     includeBlockchainBlock(block){
 
-        return this.validateBlockchainBlock(block, this.blocks.length ) ; // the block has index === this.blocks.length
+        let result =  this.validateBlockchainBlock(block, this.blocks.length ) ; // the block has index === this.blocks.length
+
+        //let's check again the heights
+        if (block.myHeight !== this.blocks.length) throw ('heights of a new block is not good... strange');
+
+        //recalculate next target difficulty
+        let prevBlock = this.blocks[block.myHeight-1];
+        this.block = InterfaceBlockchainDifficulty.getDifficulty( prevBlock.myDifficultyTarget, prevBlock.timeStamp, block.timeStamp, block.myHeight);
+
+        this.blocks.push(block)
 
     }
 
     validateBlockchainBlock(block, height){
 
-        if (block instanceof InterfaceBlockchainBlock) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
+        if (!block instanceof InterfaceBlockchainBlock) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
 
         //validate genesis
         let previousDifficultyTarget, previousHash;
