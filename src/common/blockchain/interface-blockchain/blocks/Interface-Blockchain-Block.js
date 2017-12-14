@@ -149,8 +149,14 @@ class InterfaceBlockchainBlock{
         return this.computedBlockPrefix;
     }
 
+    /*
+        convert data to Buffer
+     */
     _convertDataToBuffer(){
-        let buffer = Buffer.concat( [WebDollarCryptoData.createWebDollarCryptoData( this.data.minerAddress ).toFixedBuffer(32)] )
+
+        let buffer = Buffer.concat( [
+                                        WebDollarCryptoData.createWebDollarCryptoData( this.data.minerAddress ).toFixedBuffer(32)
+                                    ] )
         return buffer;
     }
 
@@ -160,7 +166,7 @@ class InterfaceBlockchainBlock{
 
         let buffer = Buffer.concat ( [
                                        this.computedBlockPrefix,
-                                       WebDollarCryptoData.createWebDollarCryptoData( newNonce||this.nonce).toFixedBuffer( consts.BLOCKS_NONCE )
+                                       WebDollarCrypto.convertNumberTo4BytesBuffer( newNonce||this.nonce ),
                                      ] );
 
         return WebDollarCrypto.hashPOW(buffer);
@@ -173,7 +179,7 @@ class InterfaceBlockchainBlock{
         this._computeBlockHeaderPrefix(true);
         let buffer = Buffer.concat( [
                                       this.hash,
-                                      WebDollarCryptoData.createWebDollarCryptoData( this.nonce ).toFixedBuffer( consts.BLOCKS_NONCE ),
+                                      WebDollarCrypto.convertNumberTo4BytesBuffer( this.nonce ),
                                       this.computedBlockPrefix,
                                     ]);
 
@@ -181,7 +187,7 @@ class InterfaceBlockchainBlock{
 
     }
 
-    deserializeBlock(){
+    deserializeBlock(buffer){
 
     }
 

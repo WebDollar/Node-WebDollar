@@ -164,7 +164,16 @@ class WebDollarCrypto {
 
     }
 
+    static convertNumberTo4BytesBuffer(data){
+        //converting number value into a buffer
+        let buffer = Buffer(4);
+        buffer[0] = (data & 0xff000000);
+        buffer[1] = (data & 0x00ff0000);
+        buffer[2] = (data & 0x0000ff00);
+        buffer[3] = (data & 0x000000ff);
 
+        return  buffer;
+    }
 
 }
 

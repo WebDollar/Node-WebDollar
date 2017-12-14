@@ -117,12 +117,8 @@ class WebDollarCryptoData {
         // else
         if (typeof data === "number"){
 
-            //converting number value into a buffer
-            this.buffer = Buffer(4);
-            this.buffer[0] = (data & 0xff000000);
-            this.buffer[1] = (data & 0x00ff0000);
-            this.buffer[2] = (data & 0x0000ff00);
-            this.buffer[3] = (data & 0x000000ff);
+            //converting number value into a buffer on 4 bytes
+            this.buffer = WebDollarCrypto.convertNumberTo4BytesBuffer(data)
         }
 
     }
