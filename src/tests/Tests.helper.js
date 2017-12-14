@@ -154,7 +154,27 @@ class TestsHelper {
 		this.backPermutations(0, used.length, radixTestingArray, used, new Array(used.length), result);
 		return result;
 	}
+    
+    backCartesianProduct(k, maxLength, product, radixTestingArray, result) {
+        let tmp = new Array(k);
+        for(let i = 0; i < k; ++i) {
+            tmp[i] = product[i];
+        }
+        result.push(tmp);
+        if(k === maxLength)
+            return;
+        for(let i = 0; i < maxLength; ++i) {
+            product[k] = radixTestingArray[i];
+            this.backCartesianProduct(k + 1, maxLength, product, radixTestingArray, result);
+        }
+    }
 
+    makeCartesianProduct(radixTestingArray, maxLength) {
+        let result = [];
+        let product = [];
+        this.backCartesianProduct(0, maxLength, product, radixTestingArray, result);
+        return result;
+    }
 }
 
 

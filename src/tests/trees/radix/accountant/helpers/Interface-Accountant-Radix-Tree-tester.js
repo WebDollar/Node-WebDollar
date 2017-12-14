@@ -151,5 +151,18 @@ export default (InterfaceAccountantRadixTreeHelper) => {
             InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData);
         }
     });
+    
+    it('creating & deleting Accountant Radix tree - cartesian product with small lengths', () => {        
+        let testStrings = 'abc';
+        let cartesianProduct = TestsHelper.makeCartesianProduct(testStrings, testStrings.length);
+        accountantData = TestsHelper.makeSetIdAndNumber(cartesianProduct.length, false, 100);
+        
+        for (let i = 0, len = cartesianProduct.length; i < len; ++i) {
+            accountantData[i].value = TestsHelper.makeRandomNumber();
+            accountantData[i].text = cartesianProduct[i];
+        }
+        let result = InterfaceAccountantRadixTreeHelper.testAdd(accountantData);
+        InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData);
+    });
 
 }
