@@ -59,17 +59,16 @@ class InterfaceBlockchainMining{
     async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
 
 
-        if (typeof difficulty !== "undefined" && difficulty !== null) {
+        if (typeof difficulty !== "undefined" && difficulty !== null)
             difficulty = WebDollarCryptoData.createWebDollarCryptoData(difficulty).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
-        }
         else throw 'difficulty not specified';
 
 
         block.calculateBlockHeaderPrefix(); //calculate the Block Header Prefix
 
-        let nonce = initialNonce||0;
+        let nonce = initialNonce||0, solutionFound = false;
 
-        if (typeof nonce !== 'number') return 'initial nonce is not a number'
+        if (typeof nonce !== 'number') return 'initial nonce is not a number';
 
         //calculating the hashes per second
         let intervalMiningOutput;
@@ -98,12 +97,16 @@ class InterfaceBlockchainMining{
                 block.nonce = nonce;
 
                 await this.blockchain.includeBlockchainBlock( block );
+                solutionFound = true;
 
                 break;
             }
 
             nonce++;
+        }
 
+        if (!solutionFound){
+            console.log( colors.red("block ", block.myHeight ," was not mined...") );
         }
 
         if (typeof intervalMiningOutput !== 'undefined')

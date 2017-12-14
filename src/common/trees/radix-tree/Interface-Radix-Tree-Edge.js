@@ -1,4 +1,5 @@
 import InterfaceTreeEdge from 'common/trees/Interface-Tree-Edge'
+import InterfaceRadixTreeNode from 'common/trees/Interface-Tree-Node'
 
 class InterfaceRadixTreeEdge extends InterfaceTreeEdge {
 
@@ -7,9 +8,9 @@ class InterfaceRadixTreeEdge extends InterfaceTreeEdge {
 
     constructor (label, targetNode) {
 
-        if ( targetNode instanceof(InterfaceRadixTreeEdge) === false ) throw "Target Node is not a Radix Node";
+        if ( targetNode instanceof InterfaceRadixTreeNode === false ) throw "Target Node is not a Radix Node";
 
-        super(targetNode)
+        super ( targetNode );
 
         this.label = label;
 

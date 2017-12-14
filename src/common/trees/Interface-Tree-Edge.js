@@ -7,8 +7,8 @@ class InterfaceTreeEdge {
     constructor (targetNode) {
 
         if (targetNode === null) throw "Target Node is null";
-        if ( targetNode instanceof(InterfaceTreeNode) === false ) throw "Target Node is not a Radix Node";
 
+        if ( targetNode instanceof InterfaceTreeNode === false ) throw "Target Node is not a Node";
 
         this.targetNode = targetNode;
 
