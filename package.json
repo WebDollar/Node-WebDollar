@@ -65,6 +65,7 @@
     "socket.io-browserify": "^0.9.6",
     "socket.io-client": "^2.0.3",
     "socket.io-p2p": "^2.2.0",
+    "sqlite3": "^3.1.13",
     "utf-8-validate": "^3.0.3",
     "wrtc": "0.0.62"
   },

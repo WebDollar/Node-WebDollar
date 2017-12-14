@@ -64,7 +64,7 @@ class InterfaceBlockchainMining{
         else throw 'difficulty not specified';
 
 
-        block.calculateBlockHeaderPrefix(); //calculate the Block Header Prefix
+        block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
 
         let nonce = initialNonce||0, solutionFound = false;
 

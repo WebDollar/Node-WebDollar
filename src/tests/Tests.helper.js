@@ -48,8 +48,8 @@ class TestsHelper {
         let result = [];
         for (let i=0; i<count; i++) {
 
-            let found = true;
             let word = this.makeId( wordCount, randomLengths);
+            let found = true;
 
             //avoid identically words
             while (found){

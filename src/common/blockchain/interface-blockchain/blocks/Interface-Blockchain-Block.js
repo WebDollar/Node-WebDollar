@@ -69,8 +69,8 @@ class InterfaceBlockchainBlock{
 
         if (height !== this.myHeight) throw 'height is different';
 
-        await this.validateBlockHash(previousHash);
-        this.validateTargetDifficulty(previousDifficultyTarget);
+        await this._validateBlockHash(previousHash);
+        this._validateTargetDifficulty(previousDifficultyTarget);
 
         return true;
     }
@@ -78,7 +78,7 @@ class InterfaceBlockchainBlock{
     /**
      * it will recheck the validity of the block
      */
-    async validateBlockHash(previousHash) {
+    async _validateBlockHash(previousHash) {
 
         if (this.computedBlockPrefix === null) this.computedBlockPrefix(); //making sure that the prefix was calculated for calculating the block
 
@@ -92,7 +92,7 @@ class InterfaceBlockchainBlock{
 
     }
 
-    validateTargetDifficulty(prevDifficultyTarget){
+    _validateTargetDifficulty(prevDifficultyTarget){
 
 
         if (prevDifficultyTarget instanceof BigInteger) prevDifficultyTarget = WebDollarCryptoData.createWebDollarCryptoData(prevDifficultyTarget).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
@@ -130,27 +130,58 @@ class InterfaceBlockchainBlock{
         Concat of Hashes to avoid double computation
      */
 
-    calculateBlockHeaderPrefix(){
+    _computeBlockHeaderPrefix(skip){
 
-        this.computedBlockPrefix = Buffer.concat ( [ WebDollarCryptoData.createWebDollarCryptoData( this.version).toFixedBuffer(2),
+        //in case I have calculated  the computedBlockPrefix before
+
+        if (skip === true && Buffer.isBuffer(this.computedBlockPrefix) ){
+            return this.computedBlockPrefix;
+        }
+
+        this.computedBlockPrefix = Buffer.concat ( [
+                                                     WebDollarCryptoData.createWebDollarCryptoData( this.version).toFixedBuffer(2),
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.hashPrev ).toFixedBuffer( consts.BLOCKS_POW_LENGTH ),
-                                                     this.convertDataToBuffer(),
+                                                     //data contains addressMiner, transactions history, contracts, etc
+                                                     this._convertDataToBuffer(),
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 )
-                                                    ])
+                                                    ]);
 
+        return this.computedBlockPrefix;
     }
 
-    convertDataToBuffer(){
+    _convertDataToBuffer(){
         let buffer = Buffer.concat( [WebDollarCryptoData.createWebDollarCryptoData( this.data.minerAddress ).toFixedBuffer(32)] )
         return buffer;
     }
 
     computeHash(newNonce){
 
-        let buffer;
-        buffer = Buffer.concat ( [ this.computedBlockPrefix, WebDollarCryptoData.createWebDollarCryptoData( newNonce||this.nonce).toFixedBuffer( consts.BLOCKS_POW_LENGTH ) ] );
+        // hash is hashPow ( block header + nonce )
+
+        let buffer = Buffer.concat ( [
+                                       this.computedBlockPrefix,
+                                       WebDollarCryptoData.createWebDollarCryptoData( newNonce||this.nonce).toFixedBuffer( consts.BLOCKS_NONCE )
+                                     ] );
 
         return WebDollarCrypto.hashPOW(buffer);
+    }
+
+    serializeBlock(){
+
+        // serialize block is ( hash + nonce + header )
+
+        this._computeBlockHeaderPrefix(true);
+        let buffer = Buffer.concat( [
+                                      this.hash,
+                                      WebDollarCryptoData.createWebDollarCryptoData( this.nonce ).toFixedBuffer( consts.BLOCKS_NONCE ),
+                                      this.computedBlockPrefix,
+                                    ]);
+
+        return buffer;
+
+    }
+
+    deserializeBlock(){
 
     }
 

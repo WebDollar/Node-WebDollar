@@ -1,3 +1,5 @@
+import NodeProtocol from 'common/sockets/protocol/node-protocol';
+
 import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
@@ -20,7 +22,6 @@ class InterfaceBlockchain{
 
     async validateBlockchain(){
 
-
         for (let i=0; i<this.blocks.length; i++){
 
             await this.validateBlockchainBlock(this.blocks[i], i);
@@ -40,7 +41,9 @@ class InterfaceBlockchain{
         //let's check again the heights
         if (block.myHeight !== this.blocks.length) throw ('heights of a new block is not good... strange');
 
-        this.blocks.push(block)
+        this.blocks.push(block);
+
+        NodeProtocol.broadcastRequest("blockchain/new-block", {block: block, addresses: addresses });
 
         return true;
     }
@@ -68,7 +71,7 @@ class InterfaceBlockchain{
         if (await block.validateBlock(height, previousDifficultyTarget, previousHash) === false) throw ('block validation failed')
 
         //recalculate next target difficulty
-        block.myDifficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( previousDifficultyTarget, previousTimeStamp, block.timeStamp, block.myHeight);
+        block.myDifficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( previousDifficultyTarget, previousTimeStamp, block.timeStamp, block.myHeight );
 
         return true;
 
