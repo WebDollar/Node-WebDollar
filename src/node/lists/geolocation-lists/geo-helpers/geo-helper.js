@@ -10,7 +10,7 @@ class GeoHelper {
 
     async getLocationFromAddress(address, skipSocketAddress){
 
-        if (typeof skipSocketAddress === 'undefined') skipSocketAddress = false;
+        if ( skipSocketAddress === undefined) skipSocketAddress = false;
 
         let sckAddress = null;
 
@@ -18,7 +18,7 @@ class GeoHelper {
             sckAddress = SocketAddress.createSocketAddress(address);
             address = sckAddress.getAddress(false);
 
-            if (typeof sckAddress.geoLocation !== 'undefined' && sckAddress.geoLocation !== null)
+            if ( sckAddress.geoLocation !== undefined && sckAddress.geoLocation !== null)
                 return sckAddress.geoLocation;
         }
 

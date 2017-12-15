@@ -41,10 +41,10 @@ class GeoLocationLists {
 
     async includeSocket(socket){
 
-        if (typeof socket === 'undefined' || socket === null) return null;
+        if ( socket === undefined || socket === null) return null;
 
         //in case the location has been set before  (avoiding double insertion)
-        if (typeof socket.node !== 'undefined' && typeof socket.node.location !== 'undefined' && socket.node.location !== null) return socket.node.location;
+        if ( socket.node !== undefined &&  socket.node.location !== undefined && socket.node.location !== null) return socket.node.location;
 
         let location = await this.includeAddress(socket.node.sckAddress);
         socket.node.location = location;
@@ -59,7 +59,7 @@ class GeoLocationLists {
 
         if (this._searchGeoLocationContinentByAddress(sckAddress) === null) {
 
-            if (typeof this.geoLocationContinentsLists[location.continent] === 'undefined') this.geoLocationContinentsLists[location.continent] = [];
+            if ( this.geoLocationContinentsLists[location.continent] === undefined) this.geoLocationContinentsLists[location.continent] = [];
 
             let geoLocationAddressObject = new GeoLocationAddressObject(sckAddress, undefined, location);
             geoLocationAddressObject.refreshLastTimeChecked();

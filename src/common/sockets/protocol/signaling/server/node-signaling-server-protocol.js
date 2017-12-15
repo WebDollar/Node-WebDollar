@@ -23,7 +23,7 @@ class NodeSignalingServerProtocol {
 
         socket.on("signals/server/register/accept-web-peer-connections", (data) =>{
 
-            if (typeof socket.node.protocol.signaling.server.acceptingConnections === 'undefined') { //check it is for the first time
+            if ( socket.node.protocol.signaling.server.acceptingConnections === undefined) { //check it is for the first time
                 socket.node.protocol.signaling.server.acceptingConnections = true;
             }
 

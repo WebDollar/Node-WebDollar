@@ -9,8 +9,8 @@ class InterfaceTreeNode {
 
     constructor(parent, edges, value){
 
-        if (typeof edges === "undefined") edges = [];
-        if (typeof value === "undefined") value = null;
+        if (edges === undefined) edges = [];
+        if (value === undefined) value = null;
 
         this.id = uniqueId++;
 

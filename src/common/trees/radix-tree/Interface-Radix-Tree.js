@@ -63,7 +63,7 @@ class InterfaceRadixTree extends InterfaceTree{
             if (node !== this.root){
 
                 if (node.isLeaf() !== true) return false; // it should be a leaf
-                if (node.value === null || typeof node.value === 'undefined')
+                if (node.value === null || node.value === undefined)
                     return false; //it should have a valid value
 
             } else
@@ -230,7 +230,7 @@ class InterfaceRadixTree extends InterfaceTree{
         let searchResult = this.search(input);
 
         //console.log("searchResult", searchResult)
-        if (typeof searchResult.node === "undefined" || searchResult.node === null) return false;
+        if ( searchResult.node === undefined || searchResult.node === null) return false;
 
         //it is the last element, we should delete it
         let finished = false;

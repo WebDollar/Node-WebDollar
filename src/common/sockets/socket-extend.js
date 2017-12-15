@@ -63,7 +63,7 @@ class SocketExtend{
 
     sendRequestWaitOnce (socket, request, requestData, answerPrefix) {
 
-        if (typeof answerPrefix !== 'undefined') answerPrefix = String(answerPrefix); //in case it is a number
+        if ( answerPrefix !== undefined) answerPrefix = String(answerPrefix); //in case it is a number
 
         return new Promise((resolve) => {
 

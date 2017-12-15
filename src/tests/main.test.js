@@ -1,9 +1,9 @@
-if((typeof window !== 'undefined' && !window._babelPolyfill) ||
-    (typeof global !== 'undefined' && !global._babelPolyfill)) {
+if(( typeof window !== 'undefined' && !window._babelPolyfill) ||
+    ( typeof global !== 'undefined' && !global._babelPolyfill)) {
     require('babel-polyfill')
 }
 
-if (typeof describe !== 'undefined') {
+if ( describe !== undefined) {
 
 
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test');

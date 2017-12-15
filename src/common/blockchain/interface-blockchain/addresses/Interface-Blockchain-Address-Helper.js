@@ -117,7 +117,7 @@ class InterfaceBlockchainAddressHelper{
             throw 'privateKey must be a WebDollarCryptoData';
         }
 
-        if (typeof signature.signature !== 'undefined') signature = signature.signature;
+        if ( signature.signature !== undefined) signature = signature.signature;
 
         return secp256k1.verify(msg, signature, pubKey.buffer);
     }

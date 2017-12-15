@@ -192,7 +192,7 @@ class WebDollarCryptoData {
 
     substr(index, count){
 
-        if (typeof count === 'undefined') count = this.buffer.length;
+        if ( count === undefined) count = this.buffer.length;
 
 
         let array = [];
@@ -207,7 +207,7 @@ class WebDollarCryptoData {
 
         if (! WebDollarCryptoData.isWebDollarCryptoData(cryptoData2)) return null;
 
-        if (typeof startIndex === 'undefined') startIndex = 0;
+        if ( startIndex === undefined) startIndex = 0;
 
         let i =0;
         while (i + startIndex < this.buffer.length && i < cryptoData2.buffer.length ) {

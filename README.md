@@ -68,7 +68,7 @@ Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 
 ```
 // Added by Alexandru Ionut Budisteanu
-if (typeof options.salt !== 'undefined')
+if ( options.salt !== undefined)
   salt = options.salt;
 ```
 

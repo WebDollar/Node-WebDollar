@@ -14,7 +14,7 @@ class InterfaceAccountantRadixTreeTestHelper {
 
     testAdd (accountantData, accountantTree) {
 
-        if (typeof accountantTree === 'undefined' || accountantTree === null)  accountantTree = new this.className();
+        if ( accountantTree === undefined || accountantTree === null)  accountantTree = new this.className();
 
         accountantData.forEach((data, index) => {
 

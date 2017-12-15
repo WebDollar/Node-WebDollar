@@ -32,6 +32,11 @@ class InterfaceBlockchainProtocol{
                 if (data.chainLength < data.height ) throw ('chainLength is smaller than block height ?? ');
 
                 if (this.blockchain.blocks.length <= data.chainLength){
+
+                    if (this.blockchain.blocks.length === data.chainLength){
+                        //special condition on timezone
+                    }
+
                     accepted = true;
                 }
 

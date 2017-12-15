@@ -20,7 +20,7 @@ class InterfaceBlockchainBlock{
 
         this.hashPrev = hashPrev||null; // 256-bit hash sha256                                             - 32 bytes, sha256
 
-        if (typeof hashData === 'undefined'){
+        if ( hashData === undefined){
             hashData = WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( WebDollarCryptoData.createWebDollarCryptoData(data, true) )).buffer;
         }
 
@@ -28,7 +28,7 @@ class InterfaceBlockchainBlock{
 
         this.nonce = nonce||null; //	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
 
-        if (typeof timeStamp === 'undefined'){
+        if ( timeStamp === undefined){
 
             timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStamp;
         }
@@ -53,7 +53,7 @@ class InterfaceBlockchainBlock{
         if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw ('hashPrev is empty');
 
         if (this.data === undefined || this.data === null  ) throw ('data is empty');
-        if (this.data.minerAddress === 'undefined' || this.data.minerAddress === null  ) throw ('data.minerAddress is empty');
+        if (this.data.minerAddress === undefined || this.data.minerAddress === null  ) throw ('data.minerAddress is empty');
 
         if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData)) throw ('hashData is empty');
 

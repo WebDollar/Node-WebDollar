@@ -28,7 +28,7 @@ class NodesList {
 
     searchNodeSocketByAddress(sckAddress, type){
 
-        if (typeof type === 'undefined') type = 'all';
+        if (type === undefined) type = 'all';
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
@@ -42,7 +42,7 @@ class NodesList {
 
     registerUniqueSocket(socket, type){
 
-        if (type === 'undefined') throw ("type is necessary");
+        if (type === undefined) throw ("type is necessary");
 
         socket.node.type = type;
         socket.node.index = ++this.nodesTotal;
@@ -88,7 +88,7 @@ class NodesList {
             return false;
         }
 
-        if (typeof type === 'undefined') type = 'all';
+        if (type === undefined) type = 'all';
 
         //console.log("disconnecting", socket, this.nodes);
 
@@ -111,7 +111,7 @@ class NodesList {
     //return the JOIN of the clientSockets and serverSockets
     getNodes(type){
 
-        if (typeof type === 'undefined') type = 'all';
+        if ( type === undefined) type = 'all';
 
         let list = [];
 
