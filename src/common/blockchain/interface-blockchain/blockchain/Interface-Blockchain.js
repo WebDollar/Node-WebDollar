@@ -8,7 +8,7 @@ import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchai
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
-class InterfaceBlockchain{
+class InterfaceBlockchain {
 
 
     constructor (){
@@ -43,7 +43,7 @@ class InterfaceBlockchain{
 
         this.blocks.push(block);
 
-        NodeProtocol.broadcastRequest("blockchain/new-block", {block: block, addresses: addresses });
+        NodeProtocol.broadcastRequest( "blockchain/new-block-header", { height: block.myHeight, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blocks.length });
 
         return true;
     }
