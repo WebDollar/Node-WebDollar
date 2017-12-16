@@ -58,6 +58,8 @@
     "jsonp": "^0.2.1",
     "node-jsonp": "^1.0.2",
     "opn": "^5.1.0",
+    "pouchdb-node": "^6.3.4",
+    "pouchdb-upsert": "^2.2.0",
     "rxjs": "^5.4.3",
     "secp256k1": "^3.3.1",
     "simple-peer": "^8.1.1",
