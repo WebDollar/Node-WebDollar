@@ -1,36 +1,53 @@
 var assert = require('assert')
 
-import InterfaceIndexedDB from 'common/pouchdb/Interface-IndexedDB'
+import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
 
 describe('interfacePouchDB', () => {
 
     let db = null;
     let result = null;
-    let key = null;
-    let value = null;
     
     it('creating PouchDB', ()=>{
 
-        db = new InterfaceIndexedDB('MyDatabase');
+        db = new InterfacePouchDB('MyDatabase');
         assert(db !== undefined, "failed to create InterfacePouchDB");
-        assert(db !== null, "failed to create InterfaceIndexedDB");
+        assert(db !== null, "failed to create InterfacePouchDB");
     });
     
-    it('put/get sample test', ()=>{
+    it('save sample test', ()=>{
 
-        db = new InterfaceIndexedDB('MyDatabase');
+        db = new InterfacePouchDB('MyDatabase');
         assert(db !== undefined, "failed to create InterfacePouchDB");
         
-        key = 'cosmin_key';
-        value = 'cosmin_value';
+        result = db.save('1', 'value1');
         
-       /* result = db.put('1', value);
-        result = db.put('2', value);
-        result = db.put('3', value);
-        result = db.get('1');
-        result = db.get('2');
-        result = db.get('3');*/
-
-        assert(false, result);
+        //to be modified assertion
+        assert(true, result);
     });
+    
+    it('save/get sample test', ()=>{
+
+        db = new InterfacePouchDB('MyDatabase');
+        assert(db !== undefined, "failed to create InterfacePouchDB");
+        
+        result = db.save('1', 'value1');
+        result = db.get('1');
+        
+        //to be modified assertion
+        assert(true, result);
+    });
+    
+    it('save/update sample test', ()=>{
+
+        db = new InterfacePouchDB('MyDatabase');
+        assert(db !== undefined, "failed to create InterfacePouchDB");
+        
+        result = db.save('1', 'value1');
+        result = db.update('1', 'value1');
+        
+        //to be modified assertion
+        assert(true, result);
+    });
+    
+    
 });

@@ -9,7 +9,8 @@ if ( describe !== undefined) {
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test');
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Difficulty.test');
 
-	require ('tests/indexeddb-js/Interface-IndexedDB.test');
+	require ('tests/pouchdb/Interface-IndexedDB.test');
+    require ('tests/pouchdb/Interface-PouchDB.test');
 
     require ('tests/trees/radix/Interface-Radix-Tree.test');
     require ('tests/trees/radix/accountant/Interface-Accountant-Radix-Tree.test');
