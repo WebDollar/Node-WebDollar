@@ -4,7 +4,7 @@ class TestsHelper {
 
     makeId(count, randomLengths) {
 
-        if (typeof count === 'undefined') count = Math.floor(Math.random()*100 + 30 );
+        if ( count === undefined) count = Math.floor(Math.random()*100 + 30 );
 
         if (randomLengths === true) randomLengths = Math.floor( Math.random() * count );
 
@@ -23,7 +23,7 @@ class TestsHelper {
 
     makeDigitId(count, isNonDecimal) {
 
-        if (typeof count === 'undefined') count = Math.floor(Math.random()*100 + 30 );
+        if ( count === undefined) count = Math.floor(Math.random()*100 + 30 );
 
         let text = "";
         let digits = "0123456789";
@@ -42,8 +42,8 @@ class TestsHelper {
 
     makeIds(count, wordCount, randomLengths){
 
-        if (typeof count === 'undefined') count = Math.floor(Math.random()*100 + 30)
-        if (typeof randomLengths === 'undefined') randomLengths = false;
+        if ( count === undefined) count = Math.floor(Math.random()*100 + 30)
+        if ( randomLengths === undefined) randomLengths = false;
 
         let result = [];
         for (let i=0; i<count; i++) {
@@ -72,15 +72,15 @@ class TestsHelper {
 
     makeRandomNumber(biggestNumber){
 
-        if (typeof biggestNumber === 'undefined') biggestNumber = 100000;
+        if ( biggestNumber === undefined) biggestNumber = 100000;
 
         return Math.random()*biggestNumber +  300;
     }
 
     makeRandomBigNumber(nodDecimalDigits, decimalDigits){
 
-        if (typeof nodDecimalDigits === 'undefined') nodDecimalDigits = 10;
-        if (typeof decimalDigits === 'undefined') decimalDigits = 10;
+        if ( nodDecimalDigits === undefined) nodDecimalDigits = 10;
+        if ( decimalDigits === undefined) decimalDigits = 10;
 
         let nonDecimalPart = this.makeDigitId(nodDecimalDigits, true);
 
@@ -94,8 +94,8 @@ class TestsHelper {
 
     makeRandomBigNumbersArray(count, isDecimal){
 
-        if (typeof count === 'undefined') count = 10;
-        if (typeof isDecimal === 'undefined') isDecimal = false;
+        if ( count === undefined) count = 10;
+        if ( isDecimal === undefined) isDecimal = false;
 
         let result = [];
         for (let i = 0; i < count; ++i) {
@@ -156,11 +156,12 @@ class TestsHelper {
 	}
     
     backCartesianProduct(k, maxLength, product, radixTestingArray, result) {
-        let tmp = new Array(k);
+        let tmp = "";
         for(let i = 0; i < k; ++i) {
-            tmp[i] = product[i];
+            tmp += product[i];
         }
-        result.push(tmp);
+        if(tmp !== "")
+            result.push(tmp);
         if(k === maxLength)
             return;
         for(let i = 0; i < maxLength; ++i) {

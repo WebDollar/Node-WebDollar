@@ -1,5 +1,5 @@
-if((typeof window !== 'undefined' && !window._babelPolyfill) ||
-    (typeof global !== 'undefined' && !global._babelPolyfill)) {
+if(( typeof window !== 'undefined' && !window._babelPolyfill) ||
+    ( typeof global !== 'undefined' && !global._babelPolyfill)) {
     require('babel-polyfill')
 }
 
@@ -9,7 +9,7 @@ console.log(process.env);
 console.log(""); console.log(""); console.log("");
 
 //fixing string parameters...
-if (process.env !== 'undefined' && process.env !== null)
+if (process.env !== undefined && process.env !== null)
     for (let i=0; i<process.env.length; i++)
         if (typeof process.env[i]  === 'string')
             if (process.env[i].toLowerCase() === 'true') process.env[i] = true;
@@ -23,10 +23,10 @@ let exportObject = Main;
 module.exports =  exportObject;
 
 //browser minimized script
-if (typeof global.window !== 'undefined')
+if ( typeof global.window !== 'undefined')
     global.window.WebDollar = exportObject;
 
-if (typeof window !== 'undefined')
+if ( typeof window !== 'undefined')
     window.WebDollar = exportObject;
 
 

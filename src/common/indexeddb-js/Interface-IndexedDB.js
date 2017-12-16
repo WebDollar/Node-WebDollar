@@ -5,7 +5,7 @@ class InterfaceIndexedDB {
 
     constructor(databaseName) {
         this.databaseName = databaseName;
-        if(databaseName === 'undefined') 
+        if( databaseName === undefined)
             this.databaseName = 'MyDatabase'; 
         this.db = null;
     }

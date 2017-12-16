@@ -25,7 +25,7 @@ class SignalingClientList {
 
         let signalingClientPeerObject = null;
 
-        if (typeof signalToSearch === 'undefined') signalingClientPeerObject = null;
+        if ( signalToSearch === undefined) signalingClientPeerObject = null;
         else signalingClientPeerObject = this.searchWebPeerSignalingClientList(signalToSearch);
 
         if (signalingClientPeerObject === null){

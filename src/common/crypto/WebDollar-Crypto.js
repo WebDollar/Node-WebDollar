@@ -5,7 +5,7 @@ let crypto = null;
 
 import Argon2 from 'common/crypto/Argon2/Argon2'
 
-if (typeof window !== 'undefined') {
+if ( typeof window !== 'undefined') {
 
     //tutorial based on
     crypto = require('crypto-browserify')
@@ -75,11 +75,11 @@ class WebDollarCrypto {
 
     static getByteRandomValues(count){
 
-        if (typeof count === 'undefined') count = 32;
+        if ( count === undefined) count = 32;
 
         let randArr = new Uint8Array(count) //create a typed array of 32 bytes (256 bits)
 
-        if (typeof window !== 'undefined' && typeof window.crypto !=='undefined') window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
+        if ( typeof window !== 'undefined' &&  window.crypto !==undefined) window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
         else {
             const getRandomValues = require('get-random-values');
             getRandomValues(randArr);
@@ -164,7 +164,16 @@ class WebDollarCrypto {
 
     }
 
+    static convertNumberTo4BytesBuffer(data){
+        //converting number value into a buffer
+        let buffer = Buffer(4);
+        buffer[0] = (data & 0xff000000);
+        buffer[1] = (data & 0x00ff0000);
+        buffer[2] = (data & 0x0000ff00);
+        buffer[3] = (data & 0x000000ff);
 
+        return  buffer;
+    }
 
 }
 

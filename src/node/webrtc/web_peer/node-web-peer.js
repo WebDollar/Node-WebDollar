@@ -76,7 +76,7 @@ class NodeWebPeer {
                 }
             };
 
-        if (typeof window === 'undefined'){
+        if ( window === undefined){
             for (let i=0; i<500; i++) console.log("!!!!! Error!!! wrtc assigned")
 
             const wrtc = require('wrtc');
@@ -131,7 +131,7 @@ class NodeWebPeer {
             });
         });
 
-        if (typeof inputSignal !== "undefined" ) {
+        if (inputSignal !== undefined ) {
             if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
 
             //console.log("inputSignal ##$$#$$$$$$ ", inputSignal, typeof inputSignal);

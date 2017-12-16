@@ -59,9 +59,10 @@ class InterfaceBlockchainMining{
     async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
 
 
-        if (typeof difficulty !== "undefined" && difficulty !== null)
+        if (difficulty === undefined || difficulty === null)
+            throw 'difficulty not specified';
+        else
             difficulty = WebDollarCryptoData.createWebDollarCryptoData(difficulty).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
-        else throw 'difficulty not specified';
 
 
         block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
@@ -109,7 +110,7 @@ class InterfaceBlockchainMining{
             console.log( colors.red("block ", block.myHeight ," was not mined...") );
         }
 
-        if (typeof intervalMiningOutput !== 'undefined')
+        if ( intervalMiningOutput !== undefined)
             clearInterval(intervalMiningOutput);
 
     }

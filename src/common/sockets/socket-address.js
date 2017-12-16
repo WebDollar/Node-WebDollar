@@ -26,17 +26,17 @@ class SocketAddress {
 
         if (SocketAddress.checkIsSocketAddress(address)) return address;
 
-        if ( typeof port === 'undefined' || port === '') port = consts.NODE_PORT;
+        if (  port === undefined || port === '') port = consts.NODE_PORT;
         return new SocketAddress(address, port);
     }
 
 
     constructor(address, port){
 
-        if (typeof address === 'undefined') address = '';
+        if ( address === undefined) address = '';
         if (typeof address === 'string') address = address.toLowerCase();
 
-        if (typeof port === 'undefined') port = consts.NODE_PORT;
+        if ( port === undefined) port = consts.NODE_PORT;
 
         try {
             if (typeof address === 'string')
@@ -77,7 +77,7 @@ class SocketAddress {
     getAddress(includePort){
 
         try {
-            if (typeof includePort === 'undefined') includePort = true;
+            if ( includePort === undefined) includePort = true;
 
             if (typeof this.address === 'object') {
 

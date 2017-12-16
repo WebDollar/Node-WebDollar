@@ -139,30 +139,69 @@ export default (InterfaceAccountantRadixTreeHelper) => {
         let permutations = TestsHelper.makePermutations(testStrings);
         /*For each permutation*/
 
-        for (let i = 0, len = permutations.length; i < len; ++i) {
+        for (let i = 0, N = permutations.length; i < N; ++i) {
 
             //let randomize accountantData values
             for (let j = 0; j < permutations[i].length; j++) {
                 accountantData[j].value = TestsHelper.makeRandomNumber();
                 accountantData[j].text = permutations[i][j];
             }
-
             let result = InterfaceAccountantRadixTreeHelper.testAdd(accountantData);
             InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData);
         }
     });
     
-    it('creating & deleting Accountant Radix tree - cartesian product with small lengths', () => {        
-        let testStrings = 'abc';
-        let cartesianProduct = TestsHelper.makeCartesianProduct(testStrings, testStrings.length);
-        accountantData = TestsHelper.makeSetIdAndNumber(cartesianProduct.length, false, 100);
-        
-        for (let i = 0, len = cartesianProduct.length; i < len; ++i) {
-            accountantData[i].value = TestsHelper.makeRandomNumber();
-            accountantData[i].text = cartesianProduct[i];
-        }
+    it('creating & deleting Accountant Radix tree - Oprea latest bug', () => {
+        //bug reproduces on any node value
+        accountantData = [{text: "bc",value: 3}, {text: "b",value: 16}, {text: "bcc",value: 6}];
+
         let result = InterfaceAccountantRadixTreeHelper.testAdd(accountantData);
         InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData);
+    });
+    
+    it('creating & deleting Accountant Radix tree - cartesian product with small lengths', () => {    
+    
+        let testStrings = 'abc';
+        let cartesianProduct = TestsHelper.makeCartesianProduct(testStrings, testStrings.length);
+        let N = cartesianProduct.length;
+        accountantData = TestsHelper.makeSetIdAndNumber(N, false, 100);
+        
+        for (let i = 0; i < N; ++i) {
+            accountantData[i].value = 10;//TestsHelper.makeRandomNumber();
+            accountantData[i].text = cartesianProduct[i];
+        }
+        //test may fail after bug fixing due to timeout
+        let maxShuffle = 100;
+        while (maxShuffle > 0) {
+            for (let i = 0; i < N; ++i) {
+                let pos1 = Math.floor(Math.random() * N);
+                let pos2 = Math.floor(Math.random() * N);
+                //swap
+                let tmp = accountantData[pos1];
+                accountantData[pos1] = accountantData[pos2];
+                accountantData[pos2] = tmp;
+            }
+            /*
+            let K = 5; used for isolating minimal array lenght of K. We try to find an array of K lenght that fails
+            let tmpAccountantData = TestsHelper.makeSetIdAndNumber(K, false, 100);
+            for (let i = 0; i < K; ++i) {
+                tmpAccountantData[i] = accountantData[i];
+            }
+            
+            console.log('---------------------------------------');
+            for (let i = 0; i < K; ++i) {
+                console.log("{text: " + tmpAccountantData[i].text + ", value: " + tmpAccountantData[i].value + "}, ");
+            }
+            console.log('---------------------------------------');
+            
+            let result = InterfaceAccountantRadixTreeHelper.testAdd(tmpAccountantData);
+            InterfaceAccountantRadixTreeHelper.testDelete(result.tree, tmpAccountantData);
+            */
+            let result = InterfaceAccountantRadixTreeHelper.testAdd(accountantData);
+            InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData);
+            maxShuffle--;
+        }
+
     });
 
 }

@@ -12,14 +12,14 @@ describe('interfaceIndexedDB', () => {
     it('creating indexedDB', ()=>{
 
         db = new InterfaceIndexedDB('MyDatabase');
-        assert(db !== 'undefined', "failed to create InterfaceIndexedDB");
+        assert(db !== undefined, "failed to create InterfaceIndexedDB");
         assert(db !== null, "failed to create InterfaceIndexedDB");
     });
     
     it('put/get sample test', ()=>{
 
         db = new InterfaceIndexedDB('MyDatabase');
-        assert(db !== 'undefined', "failed to create InterfaceIndexedDB");
+        assert(db !== undefined, "failed to create InterfaceIndexedDB");
         
         key = 'cosmin_key';
         value = 'cosmin_value';

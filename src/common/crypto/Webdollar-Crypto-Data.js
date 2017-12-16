@@ -117,12 +117,8 @@ class WebDollarCryptoData {
         // else
         if (typeof data === "number"){
 
-            //converting number value into a buffer
-            this.buffer = Buffer(4);
-            this.buffer[0] = (data & 0xff000000);
-            this.buffer[1] = (data & 0x00ff0000);
-            this.buffer[2] = (data & 0x0000ff00);
-            this.buffer[3] = (data & 0x000000ff);
+            //converting number value into a buffer on 4 bytes
+            this.buffer = WebDollarCrypto.convertNumberTo4BytesBuffer(data)
         }
 
     }
@@ -196,7 +192,7 @@ class WebDollarCryptoData {
 
     substr(index, count){
 
-        if (typeof count === 'undefined') count = this.buffer.length;
+        if ( count === undefined) count = this.buffer.length;
 
 
         let array = [];
@@ -211,7 +207,7 @@ class WebDollarCryptoData {
 
         if (! WebDollarCryptoData.isWebDollarCryptoData(cryptoData2)) return null;
 
-        if (typeof startIndex === 'undefined') startIndex = 0;
+        if ( startIndex === undefined) startIndex = 0;
 
         let i =0;
         while (i + startIndex < this.buffer.length && i < cryptoData2.buffer.length ) {
