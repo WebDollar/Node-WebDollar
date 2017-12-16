@@ -153,13 +153,14 @@ export default (InterfaceAccountantRadixTreeHelper) => {
     
     it('creating & deleting Accountant Radix tree - Oprea latest bug', () => {
         //bug reproduces on any node value
-        accountantData = [{text: "bca", value: 5}, {text: "cab",value: 2}, {text: "bc",value: 3}, {text: "b",value: 16}, {text: "bcc",value: 6}];
+        accountantData = [{text: "bc",value: 3}, {text: "b",value: 16}, {text: "bcc",value: 6}];
 
         let result = InterfaceAccountantRadixTreeHelper.testAdd(accountantData);
         InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData);
     });
     
-    it('creating & deleting Accountant Radix tree - cartesian product with small lengths', () => {        
+    it('creating & deleting Accountant Radix tree - cartesian product with small lengths', () => {    
+    
         let testStrings = 'abc';
         let cartesianProduct = TestsHelper.makeCartesianProduct(testStrings, testStrings.length);
         let N = cartesianProduct.length;
