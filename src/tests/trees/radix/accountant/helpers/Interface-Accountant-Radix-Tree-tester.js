@@ -166,7 +166,7 @@ export default (InterfaceAccountantRadixTreeHelper) => {
     
         let testStrings = 'abc';
         let cartesianProduct = TestsHelper.makeCartesianProduct(testStrings, testStrings.length);
-        let N = cartesianProduct.length;
+        let N = Math.floor(Math.random()*cartesianProduct.length/2);
         accountantData = TestsHelper.makeSetIdAndNumber(N, false, 100);
         
         for (let i = 0; i < N; ++i) {
@@ -176,6 +176,7 @@ export default (InterfaceAccountantRadixTreeHelper) => {
         //test may fail after bug fixing due to timeout
         let maxShuffle = 100;
         while (maxShuffle > 0) {
+
             for (let i = 0; i < N; ++i) {
                 let pos1 = Math.floor(Math.random() * N);
                 let pos2 = Math.floor(Math.random() * N);
@@ -200,6 +201,7 @@ export default (InterfaceAccountantRadixTreeHelper) => {
             let result = InterfaceAccountantRadixTreeHelper.testAdd(tmpAccountantData);
             InterfaceAccountantRadixTreeHelper.testDelete(result.tree, tmpAccountantData);
             */
+
             let result = InterfaceAccountantRadixTreeHelper.testAdd(accountantData);
             InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData);
             maxShuffle--;

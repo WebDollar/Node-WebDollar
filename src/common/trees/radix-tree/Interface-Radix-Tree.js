@@ -252,7 +252,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
             //remove empty parent nodes
 
-            if ( node !== null  && node.value === null && nodeParent !== null && nodeParent.edges.length > 0 && !nodeParent.isLeaf() && node.edges.length === 0){
+            if ( node !== null  && node.value === null && nodeParent !== null && nodeParent.edges.length > 0  && node.edges.length === 0){
 
                 //console.log("node simplu before", node, node.parent);
 
