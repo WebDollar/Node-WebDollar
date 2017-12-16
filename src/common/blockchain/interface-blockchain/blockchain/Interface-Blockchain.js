@@ -39,7 +39,7 @@ class InterfaceBlockchain {
         if (! await this.validateBlockchainBlock(block, this.blocks.length ) ) return false; // the block has height === this.blocks.length
 
         //let's check again the heights
-        if (block.myHeight !== this.blocks.length) throw ('heights of a new block is not good... strange');
+        if (block.myHeight !== this.blocks.length) throw ('heights of a new block is not good... strange');a
 
         this.blocks.push(block);
 

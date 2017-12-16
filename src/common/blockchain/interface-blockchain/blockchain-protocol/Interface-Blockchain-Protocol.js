@@ -21,7 +21,7 @@ class InterfaceBlockchainProtocol{
 
     _initializeNewSocket(err, socket){
 
-        socket.on("blockchain/header/new-block", (data)=>{
+        socket.on("blockchain/header/new-block", async (data)=>{
 
             /*
                 data.height
@@ -30,8 +30,6 @@ class InterfaceBlockchainProtocol{
                 data.hash
              */
 
-
-            let accepted = false;
 
             try{
 
@@ -48,18 +46,24 @@ class InterfaceBlockchainProtocol{
                     return true;
 
                 //hashes are different
-
                 if (this.blockchain.blocks.length <= data.chainLength){
 
                     if (this.blockchain.blocks.length === data.chainLength){
-                        //special condition on timezone
-                    } else {
 
-                        this.forkSolver.discoverFork(socket, data.chainLength)
+                        // most complex hash, let's download him
+                        if (data.hash.compare(this.blockchain.getBlockchainLastBlock().hash)){
+
+                            let block = await socket.sendRequestWaitOnce("blockchain/block/request-block-by-height", {height: data.height}, data.height);
+
+                        }
+
+                    } else { // the socket has a bigger chanin
+
+                        await this.forkSolver.discoverFork(socket, data.chainLength)
 
                     }
 
-                    accepted = true;
+
                 }
 
 
@@ -67,7 +71,7 @@ class InterfaceBlockchainProtocol{
             } catch (exception){
 
                 console.log( colors.red("Socket Error - blockchain/new-block-header", exception.toString()) );
-
+d
             }
 
 

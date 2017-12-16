@@ -153,10 +153,13 @@ export default (InterfaceAccountantRadixTreeHelper) => {
     
     it('creating & deleting Accountant Radix tree - Oprea latest bug', () => {
         //bug reproduces on any node value
-        accountantData = [{text: "bc",value: 3}, {text: "b",value: 16}, {text: "bcc",value: 6}];
+        accountantData = [{text: "bc", value: 5}, {text: "b",value: 2}, {text: "bcc",value: 3}];
+        //accountantData = [{text: "bca", value: 5}, {text: "cab",value: 2}, {text: "bc",value: 3}, {text: "b",value: 16}, {text: "bcc",value: 6}];
 
         let result = InterfaceAccountantRadixTreeHelper.testAdd(accountantData);
-        InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData);
+        console.log("cooooosmiiiiiin");
+
+        InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData, true);
     });
     
     it('creating & deleting Accountant Radix tree - cartesian product with small lengths', () => {    
