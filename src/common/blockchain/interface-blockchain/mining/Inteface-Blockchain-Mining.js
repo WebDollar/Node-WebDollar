@@ -45,7 +45,7 @@ class InterfaceBlockchainMining{
 
             let nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress);
 
-            await this.mineBlock( nextBlock, this.blockchain.difficultyTarget, undefined, showMiningOutput  );
+            await this.mineBlock( nextBlock, this.blockchain.getDifficultyTarget(), undefined, showMiningOutput  );
         }
 
     }

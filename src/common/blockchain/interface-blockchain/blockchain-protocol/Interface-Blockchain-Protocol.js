@@ -46,9 +46,9 @@ class InterfaceBlockchainProtocol{
                     return true;
 
                 //hashes are different
-                if (this.blockchain.blocks.length <= data.chainLength){
+                if (this.blockchain.getBlockchainLength() <= data.chainLength){
 
-                    if (this.blockchain.blocks.length === data.chainLength){
+                    if (this.blockchain.getBlockchainLength() === data.chainLength){
 
                         // most complex hash, let's download him
                         if (data.hash.compare(this.blockchain.getBlockchainLastBlock().hash)){
@@ -85,11 +85,11 @@ d
 
                 if (typeof data.height !== 'number') throw 'data.height is not defined';
 
-                if (this.blockchain.blocks.length < data.height) throw "data.height is higher than I have";
+                if (this.blockchain.getBlockchainLength() < data.height) throw "data.height is higher than I have";
 
                 let block = this.blockchain.blocks[data.height];
 
-                socket.sendRequest( "blockchain/headers/request-block-by-height/"+block.myHeight, { height: block.myHeight, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blockchain.blocks.length });
+                socket.sendRequest( "blockchain/headers/request-block-by-height/"+block.myHeight, { height: block.myHeight, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blockchain.getBlockchainLength() });
 
             } catch (exception){
 

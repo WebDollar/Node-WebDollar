@@ -5,6 +5,8 @@ import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blo
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchain/mining/difficulty/Interface-Blockchain-Difficulty'
+import InterfaceBlockchainFork from './Interface-Blockchain-Fork'
+
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -14,7 +16,7 @@ class InterfaceBlockchain {
     constructor (){
 
         this.blocks = [];
-        this.difficultyTarget = BlockchainGenesis.difficultyTarget;
+        this.forks = [];
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this )
 
@@ -24,7 +26,8 @@ class InterfaceBlockchain {
 
         for (let i=0; i<this.blocks.length; i++){
 
-            await this.validateBlockchainBlock(this.blocks[i], i);
+            if (! await this.validateBlockchainBlock(this.blocks[i], i) ) return false;
+
 
         }
 
@@ -53,16 +56,17 @@ class InterfaceBlockchain {
         if ( block instanceof InterfaceBlockchainBlock === false ) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
 
         //validate genesis
-        let previousDifficultyTarget, previousHash, previousTimeStamp;
+        let previousDifficultyTarget = this.getDifficultyTarget(),
+            previousHash, previousTimeStamp;
+
 
         if (height === 0 ) {
             BlockchainGenesis.validateGenesis(block)
 
-            previousDifficultyTarget= BlockchainGenesis.difficultyTarget;
             previousHash = BlockchainGenesis.hashPrev;
             previousTimeStamp = BlockchainGenesis.timeStamp;
         } else {
-            previousDifficultyTarget = this.blocks[height-1].myDifficultyTarget;
+
             previousHash = this.blocks[height-1].hash;
             previousTimeStamp = this.blocks[height-1].timeStamp;
         }
@@ -83,6 +87,13 @@ class InterfaceBlockchain {
 
     getBlockchainLastBlock(){
         return this.blocks[this.blocks.length-1];
+    }
+
+    getDifficultyTarget(){
+        if (this.blocks.length > 0)
+            return this.blocks[this.blocks.length-1].myDifficultyTarget;
+        else
+            return BlockchainGenesis.difficultyTarget;
     }
 
     toString(){
