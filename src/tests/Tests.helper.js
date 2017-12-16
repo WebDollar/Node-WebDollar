@@ -156,11 +156,12 @@ class TestsHelper {
 	}
     
     backCartesianProduct(k, maxLength, product, radixTestingArray, result) {
-        let tmp = new Array(k);
+        let tmp = "";
         for(let i = 0; i < k; ++i) {
-            tmp[i] = product[i];
+            tmp += product[i];
         }
-        result.push(tmp);
+        if(tmp !== "")
+            result.push(tmp);
         if(k === maxLength)
             return;
         for(let i = 0; i < maxLength; ++i) {
