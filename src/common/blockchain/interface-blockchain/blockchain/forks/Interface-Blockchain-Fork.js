@@ -11,10 +11,16 @@ import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchai
 class InterfaceBlockchainFork {
 
 
-    constructor (blockchain, forkStartingHeight){
+    constructor (blockchain, forkId, sockets, forkStartingHeight){
 
         this.blockchain = blockchain;
 
+        this.forkId = forkId;
+
+        if (!Array.isArray(sockets))
+            sockets = [sockets]
+
+        this.sockets = sockets;
         this.forkStartingHeight = forkStartingHeight||0;
         this.forkBlocks = [];
 
@@ -37,11 +43,18 @@ class InterfaceBlockchainFork {
 
     async validateForkBlock(block, height){
 
+        // transition from blockchain to fork
+        if (height === this.forkStartingHeight){
+
+        } else { // just the fork
+
+        }
+
     }
 
 
     /**
-     * Validate the Fork and Use the fork as main blockchain 
+     * Validate the Fork and Use the fork as main blockchain
      */
     async saveFork(){
 

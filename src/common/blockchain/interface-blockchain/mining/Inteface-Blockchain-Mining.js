@@ -92,7 +92,7 @@ class InterfaceBlockchainMining{
             if ( hash.compare(difficulty) <= 0 ) {
 
                 let reward = 50;
-                console.log( colors.green("WebDollar Block ", block.myHeight ," mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD") );
+                console.log( colors.green("WebDollar Block ", block.height ," mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD") );
 
                 block.hash = hash;
                 block.nonce = nonce;
@@ -107,7 +107,7 @@ class InterfaceBlockchainMining{
         }
 
         if (!solutionFound){
-            console.log( colors.red("block ", block.myHeight ," was not mined...") );
+            console.log( colors.red("block ", block.height ," was not mined...") );
         }
 
         if ( intervalMiningOutput !== undefined)

@@ -89,7 +89,7 @@ d
 
                 let block = this.blockchain.blocks[data.height];
 
-                socket.sendRequest( "blockchain/headers/request-block-by-height/"+block.myHeight, { height: block.myHeight, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blockchain.getBlockchainLength() });
+                socket.sendRequest( "blockchain/headers/request-block-by-height/"+block.height, { height: block.height, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blockchain.getBlockchainLength() });
 
             } catch (exception){
 

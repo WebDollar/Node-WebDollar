@@ -43,6 +43,8 @@ class InterfaceBlockchainProtocolForkSolver{
         //its a fork... starting from position
         if (position > -1){
 
+            this.blockchain.createFork();
+
         }
         //it is a totally new blockchain (maybe genesis was mined)
 

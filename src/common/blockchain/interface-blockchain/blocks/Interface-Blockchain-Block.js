@@ -12,7 +12,7 @@ class InterfaceBlockchainBlock{
 
     //everything is buffer
 
-    constructor (version, hash, hashPrev, hashData, timeStamp, nonce, data, myHeight ){
+    constructor (version, hash, hashPrev, hashData, timeStamp, nonce, data, height ){
 
         this.version = version||null; // 2 bytes version                                                 - 2 bytes
 
@@ -41,8 +41,8 @@ class InterfaceBlockchainBlock{
         //computed data
         this.computedBlockPrefix = null;
 
-        this.myDifficultyTarget = null; // difficulty set by me
-        this.myHeight = (typeof myHeight === "number" ? myHeight : null); // index set by me
+        this.difficultyTarget = null; // difficulty set by me
+        this.height = (typeof height === "number" ? height : null); // index set by me
     }
 
     async validateBlock(height, previousDifficultyTarget, previousHash){
@@ -67,7 +67,7 @@ class InterfaceBlockchainBlock{
         if (height >=0)
             if (this.version !== 0x01) throw ('invalid version');
 
-        if (height !== this.myHeight) throw 'height is different';
+        if (height !== this.height) throw 'height is different';
 
         await this._validateBlockHash(previousHash);
         this._validateTargetDifficulty(previousDifficultyTarget);
