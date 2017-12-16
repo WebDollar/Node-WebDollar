@@ -43,10 +43,20 @@ class InterfaceBlockchainProtocol{
 
                 if (data.chainLength < data.height ) throw ('chainLength is smaller than block height ?? ');
 
+                //in case the hashes are the same, and I have already the block
+                if (this.blockchain.blocks[data.height].hash.equals(data.hash))
+                    return true;
+
+                //hashes are different
+
                 if (this.blockchain.blocks.length <= data.chainLength){
 
                     if (this.blockchain.blocks.length === data.chainLength){
                         //special condition on timezone
+                    } else {
+
+                        this.forkSolver.discoverFork(socket, data.chainLength)
+
                     }
 
                     accepted = true;

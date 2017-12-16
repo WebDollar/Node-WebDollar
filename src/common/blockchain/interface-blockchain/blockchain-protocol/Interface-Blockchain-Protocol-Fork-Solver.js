@@ -12,7 +12,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    async discoverForkBinarySearch(socket, left, right){
+    async _discoverForkBinarySearch(socket, left, right){
         let mid = (left+right)/2;
 
         let blockHeader = await socket.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
@@ -25,15 +25,20 @@ class InterfaceBlockchainProtocolForkSolver{
             else return -1;
         }
 
-        //if the element is not found, search left because it must be there
-        if (! blockHeader.hash.equals ( this.blockchain.blocks[mid] )) return this.discoverForkBinarySearch(socket, left, mid-1);
-        else return this.discoverForkBinarySearch(socket, mid, right);
+        //was not not found, search left because it must be there
+        if (! blockHeader.hash.equals ( this.blockchain.blocks[mid] )) return this._discoverForkBinarySearch(socket, left, mid-1);
+        else
+        //was found, search right because the fork must be there
+            return this._discoverForkBinarySearch(socket, mid, right);
 
     }
 
-    async discoverFork(socket){
+    /*
+        may the fork be with you Otto
+     */
+    async discoverFork(socket, newChainLength){
 
-        let position = await this.discoverForkBinarySearch(socket, 0, this.blockchain.length-1);
+        let position = await this._discoverForkBinarySearch(socket, 0, this.blockchain.length-1);
 
         //its a fork... starting from position
         if (position > -1){
