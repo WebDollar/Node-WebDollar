@@ -58,10 +58,15 @@ class InterfaceBlockchainProtocol {
                         if (data.hash.compare(this.blockchain.getBlockchainLastBlock().hash)) {
 
                             let block = await socket.sendRequestWaitOnce("blockchain/block/request-block-by-height", {height: data.height}, data.height);
+                            if (block !== null) {
+                                await this.blockchain.includeBlockchainBlock(block);
+                                return;
+                            }
 
-                        }
+                        } else
+                            await this.forkSolver.discoverFork(socket, data.chainLength)
 
-                    } else { // the socket has a bigger chanin
+                    } else { // the socket has a bigger chain
 
                         await this.forkSolver.discoverFork(socket, data.chainLength)
 

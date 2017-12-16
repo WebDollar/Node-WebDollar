@@ -30,7 +30,7 @@ class InterfaceBlockchainFork {
 
         for (let i=0; i<this.forkBlocks.length; i++){
 
-            if (! await this.validateForkBlock(this.forkBlocks[i], this.forkStartingHeight + i )) return false;
+            if (! await this.validateForkBlock(this.forkBlocks[i], this.forkStartingHeight + i, i )) return false;
 
         }
 
@@ -41,12 +41,23 @@ class InterfaceBlockchainFork {
 
     }
 
-    async validateForkBlock(block, height){
+    async validateForkBlock(block, height, forkHeight){
 
+
+        if (block.height < this.forkStartingHeight) throw 'block height is smaller than the fork itself';
+        else
         // transition from blockchain to fork
-        if (height === this.forkStartingHeight){
+        if (height === 0 || height === this.forkStartingHeight){
+
+            return await this.blockchain.validateBlockchainBlock(block);
 
         } else { // just the fork
+
+            let prevDifficultyTarget = this.forkBlocks[forkHeight-1].difficultyTarget;
+            let prevHash = this.forkBlocks[forkHeight-1].hash;
+            let prevTimeStamp = this.forkBlocks[forkHeight-1].timeStamp;
+
+            return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp);
 
         }
 

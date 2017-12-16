@@ -18,7 +18,7 @@ class InterfaceBlockchainFork {
 
     createNewFork(sockets, forkStartingHeight){
 
-        let fork = new InterfaceBlockchainFork(this.blockchain, this.forksId++, sockets, forkStartingHeight);
+        let fork = new InterfaceBlockchainFork( this.blockchain, this.forksId++, sockets, forkStartingHeight);
 
         this.forks.push(fork);
 

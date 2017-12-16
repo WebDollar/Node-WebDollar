@@ -26,10 +26,7 @@ class InterfaceBlockchain {
     async validateBlockchain(){
 
         for (let i=0; i<this.blocks.length; i++){
-
             if (! await this.validateBlockchainBlock(this.blocks[i]) ) return false;
-
-
         }
 
         return true;
@@ -52,31 +49,34 @@ class InterfaceBlockchain {
         return true;
     }
 
-    async validateBlockchainBlock( block ){
+    async validateBlockchainBlock( block, prevDifficultyTarget, prevHash, prevTimeStamp ){
 
         if ( block instanceof InterfaceBlockchainBlock === false ) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
 
-        //validate genesis
-        let previousDifficultyTarget = this.getDifficultyTarget(),
-            previousHash, previousTimeStamp;
+        // in case it is not a fork controlled blockchain
+        if (prevDifficultyTarget === undefined){
 
+            prevDifficultyTarget = this.getDifficultyTarget();
 
-        if (block.height === 0 ) {
-            BlockchainGenesis.validateGenesis(block)
+            if (block.height === 0 ) {
+                //validate genesis
+                BlockchainGenesis.validateGenesis(block);
 
-            previousHash = BlockchainGenesis.hashPrev;
-            previousTimeStamp = BlockchainGenesis.timeStamp;
-        } else {
+                prevHash = BlockchainGenesis.hashPrev;
+                prevTimeStamp = BlockchainGenesis.timeStamp;
+            } else {
 
-            previousHash = this.blocks[block.height-1].hash;
-            previousTimeStamp = this.blocks[block.height-1].timeStamp;
+                prevHash = this.blocks[block.height-1].hash;
+                prevTimeStamp = this.blocks[block.height-1].timeStamp;
+            }
+
         }
 
         //validate difficulty & hash
-        if (await block.validateBlock(block.height, previousDifficultyTarget, previousHash) === false) throw ('block validation failed')
+        if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash) === false) throw ('block validation failed')
 
         //recalculate next target difficulty
-        block.difficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( previousDifficultyTarget, previousTimeStamp, block.timeStamp, block.height );
+        block.difficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
 
         return true;
 

@@ -21,12 +21,12 @@ class InterfaceBlockchainProtocolForkSolver{
 
         if (left >= right){
             //it the block actually is the same
-            if (blockHeader.hash.equals( this.blockchain.blocks[mid] )) return mid;
+            if (blockHeader.hash.equals( this.blockchain.blocks[mid].hash )) return mid;
             else return -1;
         }
 
         //was not not found, search left because it must be there
-        if (! blockHeader.hash.equals ( this.blockchain.blocks[mid] )) return this._discoverForkBinarySearch(socket, left, mid-1);
+        if (! blockHeader.hash.equals ( this.blockchain.blocks[mid].hash )) return this._discoverForkBinarySearch(socket, left, mid-1);
         else
         //was found, search right because the fork must be there
             return this._discoverForkBinarySearch(socket, mid, right);
@@ -38,7 +38,19 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async discoverFork(socket, newChainLength){
 
-        let position = await this._discoverForkBinarySearch(socket, 0, this.blockchain.length-1);
+        let position;
+
+        if (this.blockchain.getBlockchainLength() <= newChainLength){
+
+            let blockHeader = await socket.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: this.blockchain.getBlockchainLength()-1 }, this.blockchain.getBlockchainLength()-1 );
+
+            if (blockHeader.hash.equals( this.blockchain.getBlockchainLastBlock().hash ))
+                position = this.blockchain.getBlockchainLength()-1;
+
+        }
+
+        if (position === undefined)
+            position = await this._discoverForkBinarySearch(socket, 0, this.blockchain.getBlockchainLength()-1);
 
         //its a fork... starting from position
         if (position > -1){
