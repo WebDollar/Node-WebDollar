@@ -1,4 +1,6 @@
 import NodesList from 'node/lists/nodes-list'
+import InterfaceBlockchainProtocolForkSolver from 'Interface-Blockchain-Protocol-Fork-Solver'
+
 const colors = require('colors/safe');
 
 /**
@@ -10,14 +12,24 @@ class InterfaceBlockchainProtocol{
 
         this.blockchain = blockchain;
 
+        this.forkSolver = new InterfaceBlockchainProtocolForkSolver(blockchain);
+
         NodesList.registerEvent("connected", {type: ["all"]}, (err, result) => { this._initializeNewSocket(err, result) } );
-        NodesList.registerEvent("disconnected", {type: ["all"]}, (err, result ) => { this._uninitializeNewSocket(err, result ) });
+        NodesList.registerEvent("disconnected", {type: ["all"]}, (err, result ) => { this._uninitializeSocket(err, result ) });
 
     }
 
     _initializeNewSocket(err, socket){
 
-        socket.on("blockchain/new-block-header", (data)=>{
+        socket.on("blockchain/header/new-block", (data)=>{
+
+            /*
+                data.height
+                data.chainLength
+                data.prevHash
+                data.hash
+             */
+
 
             let accepted = false;
 
@@ -48,11 +60,33 @@ class InterfaceBlockchainProtocol{
 
             }
 
-        })
+
+        });
+
+        socket.on("blockchain/headers/request-block-by-height", (data)=>{
+
+            // data.height
+
+            try{
+
+                if (typeof data.height !== 'number') throw 'data.height is not defined';
+
+                if (this.blockchain.blocks.length < data.height) throw "data.height is higher than I have";
+
+                let block = this.blockchain.blocks[data.height];
+
+                socket.sendRequest( "blockchain/headers/request-block-by-height/"+block.myHeight, { height: block.myHeight, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blockchain.blocks.length });
+
+            } catch (exception){
+
+                console.log( colors.red("Socket Error - blockchain/get-block-header", exception.toString()) );
+
+            }
+        });
 
     }
 
-    _uninitializeNewSocket(err, socket){
+    _uninitializeSocket(err, socket){
 
     }
 

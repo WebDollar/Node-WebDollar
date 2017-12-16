@@ -43,7 +43,7 @@ class InterfaceBlockchain {
 
         this.blocks.push(block);
 
-        NodeProtocol.broadcastRequest( "blockchain/new-block-header", { height: block.myHeight, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blocks.length });
+        NodeProtocol.broadcastRequest( "blockchain/header/new-block", { height: block.myHeight, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blocks.length });
 
         return true;
     }
