@@ -1,5 +1,5 @@
 import NodesList from 'node/lists/nodes-list'
-import InterfaceBlockchainProtocolForkSolver from 'Interface-Blockchain-Protocol-Fork-Solver'
+import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
 
 const colors = require('colors/safe');
 
