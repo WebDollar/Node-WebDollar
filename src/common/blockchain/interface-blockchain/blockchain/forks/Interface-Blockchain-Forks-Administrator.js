@@ -4,7 +4,7 @@ import InterfaceBlockchainFork from './Interface-Blockchain-Fork'
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
-class InterfaceBlockchainFork {
+class InterfaceBlockchainForksAdministrator {
 
 
     constructor (blockchain){
@@ -28,4 +28,4 @@ class InterfaceBlockchainFork {
 
 }
 
-export default InterfaceBlockchainFork;
+export default InterfaceBlockchainForksAdministrator;

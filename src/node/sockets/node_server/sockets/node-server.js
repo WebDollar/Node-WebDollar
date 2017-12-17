@@ -37,7 +37,9 @@ class NodeServer {
         {
             let server = null;
             try {
-                server = io();
+                server = io({
+                    maxHttpBufferSize:consts.SOCKET_MAX_SIZE_BYRES,
+                });
 
             } catch(Exception){
                 console.log("Error Importing io() library", Exception.toString());

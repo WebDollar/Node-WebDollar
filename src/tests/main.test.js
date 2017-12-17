@@ -3,7 +3,7 @@ if(( typeof window !== 'undefined' && !window._babelPolyfill) ||
     require('babel-polyfill')
 }
 
-if ( describe !== undefined) {
+if ( typeof describe !== 'undefined') {
 
 
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test');

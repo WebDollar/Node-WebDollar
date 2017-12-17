@@ -54,6 +54,7 @@ class NodeClient {
                     // params described in the documentation https://socket.io/docs/client-api#manager
                     socket = io.connect(address, {
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
+                        maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
                     });
 
                 }  catch (Exception){
