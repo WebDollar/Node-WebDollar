@@ -21,6 +21,7 @@ class InterfaceBlockchain {
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this )
 
+        this.mining = undefined;
     }
 
     async validateBlockchain(){
@@ -35,7 +36,7 @@ class InterfaceBlockchain {
     /*
         Include a new block at the end of the blockchain, by validating the next block
      */
-    async includeBlockchainBlock(block){
+    async includeBlockchainBlock(block, resetMining){
 
         if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
 
@@ -45,6 +46,11 @@ class InterfaceBlockchain {
         this.blocks.push(block);
 
         NodeProtocol.broadcastRequest( "blockchain/header/new-block", { height: block.height, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blocks.length });
+
+        if (resetMining && this.mining !== undefined){
+            //reset mining
+            this.mining.reset();
+        }
 
         return true;
     }

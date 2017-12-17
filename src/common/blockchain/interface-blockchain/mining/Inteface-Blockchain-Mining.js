@@ -25,6 +25,7 @@ class InterfaceBlockchainMining{
     startMining(){
 
         this.finished = false;
+        this.reset = false;
 
         this.mineNextBlock(true);
     }
@@ -82,7 +83,7 @@ class InterfaceBlockchainMining{
         }
 
 
-        while (nonce <= 0xFFFFFFFF && !this.finished ){
+        while (nonce <= 0xFFFFFFFF && !this.finished && !this.reset ){
 
             let hash = await block.computeHash(nonce);
 
@@ -108,6 +109,10 @@ class InterfaceBlockchainMining{
 
         if (!solutionFound){
             console.log( colors.red("block ", block.height ," was not mined...") );
+        }
+
+        if (this.reset){ // it was resetted
+            this.reset = false;
         }
 
         if ( intervalMiningOutput !== undefined)

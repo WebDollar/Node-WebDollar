@@ -1,21 +1,22 @@
 import MiniBlockchainMining from 'common/blockchain/mini-blockchain/Mini-Blockchain-Mining'
 
-class MainBlockchainMining{
+class MainBlockchainMining extends MiniBlockchainMining{
 
     constructor(blockchain){
-        this.mining = new MiniBlockchainMining(blockchain);
+        super(blockchain);
+
+        this.blockchain.mining = this;
     }
 
     startMining(){
         console.log("Mining started");
-        this.mining.startMining();
+        MiniBlockchainMining.prototype.startMining.call(this);
     }
 
-    stop(){
+    stopMining(){
 
         console.log("Mining Stopped");
-        this.mining.stopMining();
-
+        MiniBlockchainMining.prototype.stopMining().call(this);
     }
 
 }
