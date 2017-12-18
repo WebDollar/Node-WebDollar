@@ -22,6 +22,7 @@ consts.PRIVATE_KEY_USE_BASE64 = true;
 consts.PRIVATE_KEY_VERSION_PREFIX = "80"; //it is in HEX
 consts.PRIVATE_KEY_CHECK_SUM_LENGTH = 8; //in bytes
 
+consts.PUBLIC_ADDRESS_LENGTH = 32; //ending BASE64 HEX
 consts.PUBLIC_ADDRESS_PREFIX_BASE64 = "584043fe"; //BASE64 HEX  WEBD$
                                       //WEBD  584043
                                       //WEBD$ 584043FF

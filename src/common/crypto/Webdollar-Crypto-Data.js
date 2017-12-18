@@ -262,6 +262,20 @@ class WebDollarCryptoData {
 
     }
 
+    toInt(){
+
+        if (this.buffer.length === 2){
+            return this.buffer[0]*0xff00 +  this.buffer[1]*0x00ff;
+        } else  if (this.buffer.length === 4){
+            return this.buffer[0]*0xff000000 +  this.buffer[1]*0x00ff0000 + this.buffer[2]*0x0000ff00 + this.buffer[3]*0x000000ff;
+
+        } else if (this.buffer.length === 6){
+            return this.buffer[0]*0xff000000 +  this.buffer[1]*0x00ff00000000 + this.buffer[2]*0x0000ff000000 + this.buffer[3]*0x000000ff0000 + this.buffer[4]*0x00000000ff00 + this.buffer[5]*0x0000000000ff;
+        }
+
+
+    }
+
 }
 
 export default WebDollarCryptoData;

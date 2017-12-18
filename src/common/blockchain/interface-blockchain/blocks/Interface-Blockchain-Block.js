@@ -141,22 +141,34 @@ class InterfaceBlockchainBlock{
         this.computedBlockPrefix = Buffer.concat ( [
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.version).toFixedBuffer(2),
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.hashPrev ).toFixedBuffer( consts.BLOCKS_POW_LENGTH ),
-                                                     //data contains addressMiner, transactions history, contracts, etc
-                                                     this._convertDataToBuffer(),
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 )
+                                                     //data contains addressMiner, transactions history, contracts, etc
+                                                     this._serializeData(),
                                                     ]);
 
         return this.computedBlockPrefix;
     }
 
-    /*
+    /**
         convert data to Buffer
-     */
-    _convertDataToBuffer(){
+     **/
+    _serializeData(){
 
         let buffer = Buffer.concat( [
-                                        WebDollarCryptoData.createWebDollarCryptoData( this.data.minerAddress ).toFixedBuffer(32)
+                                        WebDollarCryptoData.createWebDollarCryptoData( this.data.minerAddress ).toFixedBuffer(consts.PUBLIC_ADDRESS_LENGTH)
                                     ] )
+        return buffer;
+    }
+
+    _deserializeData(buffer){
+
+        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
+
+        let offset = 0;
+        this.data = {};
+
+        this.data.minerAddress = data.substr(offset, offset+=consts.PUBLIC_ADDRESS_LENGTH).buffer;
+
         return buffer;
     }
 
@@ -187,7 +199,25 @@ class InterfaceBlockchainBlock{
 
     }
 
-    deserializeBlock(buffer){
+    deserializeBlock(buffer, height){
+
+        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
+        let offset = 0;
+
+        if (height >= 0){
+
+            this.hash = data.substr(0, offset+=consts.BLOCKS_POW_LENGTH).buffer;
+
+            this.nonce = data.substr(offset, offset+=consts.BLOCKS_NONCE).buffer;
+
+
+            this.version = data.substr(offset, offset+=2).toInt();
+            this.hashPrev = data.substr(offset, offset+=consts.BLOCKS_POW_LENGTH).buffer;
+            this.timeStamp = data.substr(offset, offset+=4).toInt();
+
+            this._deserializeData(data.substr(offset));
+
+        }
 
     }
 

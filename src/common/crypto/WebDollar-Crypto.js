@@ -175,6 +175,7 @@ class WebDollarCrypto {
         return  buffer;
     }
 
+
 }
 
 export default WebDollarCrypto;
