@@ -36,7 +36,7 @@ class InterfaceBlockchainProtocolForkSolver{
     /*
         may the fork be with you Otto
      */
-    async discoverFork(sockets, newChainLength){
+    async discoverAndSolveFork(sockets, newChainLength){
 
         let position;
 
@@ -106,10 +106,18 @@ class InterfaceBlockchainProtocolForkSolver{
 
         }
 
-        if (fork.forkBlocks.length === fork.forkHeight - fork.forkStartingHeight)
-            return true;
-        else
-            return false;
+        //just to be sure
+        clearTimeout(terminateTimeout);
+
+        if (fork.forkBlocks.length === fork.forkHeight - fork.forkStartingHeight) {
+
+            //if the fork is successfully, the save it as the main blockchain
+            if (await fork.saveFork())
+                return true;
+                
+        }
+
+        return false;
 
     }
 

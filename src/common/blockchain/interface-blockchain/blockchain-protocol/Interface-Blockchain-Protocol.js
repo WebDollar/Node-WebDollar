@@ -64,11 +64,11 @@ class InterfaceBlockchainProtocol {
                             }
 
                         } else
-                            await this.forkSolver.discoverFork(socket, data.chainLength)
+                            await this.forkSolver.discoverAndSolveFork(socket, data.chainLength)
 
                     } else { // the socket has a bigger chain
 
-                        await this.forkSolver.discoverFork(socket, data.chainLength)
+                        await this.forkSolver.discoverAndSolveFork(socket, data.chainLength)
 
                     }
 
