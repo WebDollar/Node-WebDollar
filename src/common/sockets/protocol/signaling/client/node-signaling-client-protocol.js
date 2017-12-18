@@ -18,7 +18,7 @@ class NodeSignalingClientProtocol {
         socket.on("signals/client/initiator/generate-initiator-signal", async (data) => {
 
             //search if the new protocol was already connected in the past
-            if (NodesList.searchNodeSocketByAddress(data.remoteAddress, 'all') !== null){ //already connected in the past
+            if (NodesList.searchNodeSocketByAddress(data.remoteAddress, 'all', ["uuid"] ) !== null){ //already connected in the past
                 return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
             }
 
@@ -45,7 +45,7 @@ class NodeSignalingClientProtocol {
         socket.on("signals/client/answer/receive-initiator-signal", async (data) => {
 
             //search if the new protocol was already connected in the past
-            if (NodesList.searchNodeSocketByAddress(data.remoteAddress, 'all') !== null){ //already connected in the past
+            if (NodesList.searchNodeSocketByAddress(data.remoteAddress, 'all', ["uuid"] ) !== null){ //already connected in the past
                 return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
             }
 
@@ -126,7 +126,7 @@ class NodeSignalingClientProtocol {
         socket.on("signals/client/initiator/join-answer-signal", async (data) => {
 
             //search if the new protocol was already connected in the past
-            if (NodesList.searchNodeSocketByAddress(data.remoteAddress, 'all') !== null){ //already connected in the past
+            if (NodesList.searchNodeSocketByAddress(data.remoteAddress, 'all', ["uuid"] ) !== null){ //already connected in the past
                 return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {established:false, message: "Already connected"});
             }
 

@@ -117,7 +117,7 @@ class NodesWaitlist {
         for (let i=0; i<nextNode.sckAddresses.length; i++) {
             
             //search if the new protocol was already connected in the past
-            let nodeClient = NodesList.searchNodeSocketByAddress(nextNode.sckAddresses[i], 'all');
+            let nodeClient = NodesList.searchNodeSocketByAddress(nextNode.sckAddresses[i], 'all', ["id","uuid"]);
             if (nodeClient !== null) return nodeClient;
 
             if (nextNode.socket !== null) nodeClient = nextNode.socket;

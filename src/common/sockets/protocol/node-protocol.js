@@ -7,7 +7,7 @@ class NodeProtocol {
     /*
         HELLO PROTOCOL
      */
-    async sendHello (node, doubleConnectionsValidationTypes) {
+    async sendHello (node, validationDoubleConnectionsTypes) {
 
         //console.log(node);
 
@@ -29,13 +29,13 @@ class NodeProtocol {
             node.sckAddress.uuid = response.uuid;
 
             //check if it is a unique connection, add it to the list
-            let previousConnection = NodesList.searchNodeSocketByAddress(node.sckAddress, "all", doubleConnectionsValidationTypes);
+            let previousConnection = NodesList.searchNodeSocketByAddress(node.sckAddress, "all", validationDoubleConnectionsTypes);
 
             // console.log("sendHello clientSockets", NodesList.clientSockets);
             // console.log("sendHello serverSockets", NodesList.serverSockets);
             // console.log("sendHello", result);
 
-            if ( previousConnection === null  || process.env.ALLOW_DOUBLE_CONNECTIONS){
+            if ( previousConnection === null ){
                 node.protocol.helloValidated = true;
                 console.log("hello validated");
                 return true;

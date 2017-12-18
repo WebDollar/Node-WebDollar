@@ -126,7 +126,7 @@ class NodeWebPeerRTC {
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort );
 
             this.peer.node.protocol.sendHello(["uuid"]).then( (answer)=>{
-                this.initializePeer();
+                this.initializePeer(["uuid"]);
             });
 
         });
@@ -310,10 +310,10 @@ class NodeWebPeerRTC {
     }
 
 
-    initializePeer(){
+    initializePeer(validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(this.peer, "webpeer") === false){
+        if (NodesList.registerUniqueSocket(this.peer, "webpeer", validationDoubleConnectionsTypes) === false){
             return false;
         }
 

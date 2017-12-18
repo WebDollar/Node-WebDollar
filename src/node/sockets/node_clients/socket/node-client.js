@@ -75,7 +75,7 @@ class NodeClient {
 
                     socket.node.protocol.sendHello(["ip","uuid"]).then( (answer)=>{
 
-                        this.initializeSocket(socket);
+                        this.initializeSocket(socket, ["ip","uuid"]);
 
                         resolve(true);
                     });
@@ -121,11 +121,11 @@ class NodeClient {
 
     }
 
-    initializeSocket(){
+    initializeSocket(validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
 
-        if (NodesList.registerUniqueSocket(this.socket, "client") === false){
+        if (NodesList.registerUniqueSocket(this.socket, "client", validationDoubleConnectionsTypes) === false){
             return false;
         }
 

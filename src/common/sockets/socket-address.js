@@ -56,20 +56,20 @@ class SocketAddress {
         this.uuid = uuid;
     }
 
-    matchAddress(address, doubleConnectionsValidationTypes){
+    matchAddress(address, validationDoubleConnectionsTypes){
 
-        if (doubleConnectionsValidationTypes === undefined) doubleConnectionsValidationTypes = ["ip","uuid"]
-        else if (!Array.isArray(doubleConnectionsValidationTypes)) doubleConnectionsValidationTypes = [doubleConnectionsValidationTypes];
+        if (validationDoubleConnectionsTypes === undefined) validationDoubleConnectionsTypes = ["ip","uuid"]
+        else if (!Array.isArray(validationDoubleConnectionsTypes)) validationDoubleConnectionsTypes = [validationDoubleConnectionsTypes];
 
         //maybe it is a socket
         let sckAddress = SocketAddress.createSocketAddress(address);
 
-        if ("uuid" in doubleConnectionsValidationTypes){
+        if ("uuid" in validationDoubleConnectionsTypes){
 
             if (this.uuid !== null && this.uuid === sckAddress.uuid) return true;
 
         } else
-        if ("ip" in doubleConnectionsValidationTypes){
+        if ("ip" in validationDoubleConnectionsTypes){
 
             let myAddressString = this.getAddress(false);
             let addressString = sckAddress.getAddress(false);

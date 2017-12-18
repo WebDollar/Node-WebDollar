@@ -53,7 +53,7 @@ class NodeServer {
                 console.log(colors.blue('New connection from ' + socket.node.sckAddress.getAddress(true)));
 
                 socket.node.protocol.sendHello(["uuid"]).then( (answer)=>{
-                    this.initializeSocket(socket);
+                    this.initializeSocket(socket, ["uuid"]);
                 });
 
                 socket.once("disconnect", () => {
@@ -82,10 +82,10 @@ class NodeServer {
 
 
 
-    initializeSocket(socket){
+    initializeSocket(socket, validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(socket, "server") === false){
+        if (NodesList.registerUniqueSocket(socket, "server", validationDoubleConnectionsTypes) === false){
             return false;
         }
 

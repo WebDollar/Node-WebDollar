@@ -26,21 +26,21 @@ class NodesList {
     }
 
 
-    searchNodeSocketByAddress(sckAddress, type, doubleConnectionsValidationTypes){
+    searchNodeSocketByAddress(sckAddress, type, validationDoubleConnectionsTypes){
 
         if (type === undefined) type = 'all';
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
         for (let i=0; i<this.nodes.length; i++)
-            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress, doubleConnectionsValidationTypes))){
+            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress, validationDoubleConnectionsTypes))){
                 return this.nodes[i];
             }
 
         return null;
     }
 
-    registerUniqueSocket(socket, type){
+    registerUniqueSocket(socket, type, validationDoubleConnectionsTypes){
 
         if (type === undefined) throw ("type is necessary");
 
@@ -57,7 +57,7 @@ class NodesList {
         }
 
         // avoiding double connections                              unless it is allowed to double connections
-        if ( this.searchNodeSocketByAddress(socket) === null || process.env.ALLOW_DOUBLE_CONNECTIONS) {
+        if ( this.searchNodeSocketByAddress(socket, undefined, validationDoubleConnectionsTypes ) === null ) {
 
             // it is a unique connection, I should register this connection
 

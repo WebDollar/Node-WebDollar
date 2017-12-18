@@ -24,7 +24,7 @@ class SocketExtend{
 
         socket.node.protocol = {};
         socket.node.protocol.helloValidated = false;
-        socket.node.protocol.sendHello = (doubleConnectionsValidationTypes) => { return NodeProtocol.sendHello(socket.node, doubleConnectionsValidationTypes)  };
+        socket.node.protocol.sendHello = (validationDoubleConnectionsTypes) => { return NodeProtocol.sendHello(socket.node, validationDoubleConnectionsTypes)  };
 
         socket.node.protocol.propagation = {};
         socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket.node) };
