@@ -31,7 +31,7 @@ class SocketAddress {
     }
 
 
-    constructor(address, port){
+    constructor(address, port, uuid){
 
         if ( address === undefined) address = '';
         if (typeof address === 'string') address = address.toLowerCase();
@@ -52,16 +52,32 @@ class SocketAddress {
         this.address = address;
         this.port = port;
         this.geoLocation = null;
+
+        this.uuid = uuid;
     }
 
-    matchAddress(address){
+    matchAddress(address, doubleConnectionsValidationTypes){
+
+        if (doubleConnectionsValidationTypes === undefined) doubleConnectionsValidationTypes = ["ip","uuid"]
+        else if (!Array.isArray(doubleConnectionsValidationTypes)) doubleConnectionsValidationTypes = [doubleConnectionsValidationTypes];
+
         //maybe it is a socket
         let sckAddress = SocketAddress.createSocketAddress(address);
 
-        let myAddressString = this.getAddress(false);
-        let addressString = sckAddress.getAddress(false);
+        if ("uuid" in doubleConnectionsValidationTypes){
 
-        return ( myAddressString === addressString )
+            if (this.uuid !== null && this.uuid === sckAddress.uuid) return true;
+
+        } else
+        if ("ip" in doubleConnectionsValidationTypes){
+
+            let myAddressString = this.getAddress(false);
+            let addressString = sckAddress.getAddress(false);
+
+            if ( myAddressString === addressString ) return true;
+        }
+
+        return false;
     }
 
     /*

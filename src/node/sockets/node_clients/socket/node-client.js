@@ -73,7 +73,7 @@ class NodeClient {
 
                     console.log(colors.blue("Client connected to " + socket.node.sckAddress.getAddress(true) ));
 
-                    socket.node.protocol.sendHello().then( (answer)=>{
+                    socket.node.protocol.sendHello(["ip","uuid"]).then( (answer)=>{
 
                         this.initializeSocket(socket);
 

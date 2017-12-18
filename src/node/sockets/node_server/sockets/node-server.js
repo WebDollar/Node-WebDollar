@@ -52,7 +52,7 @@ class NodeServer {
 
                 console.log(colors.blue('New connection from ' + socket.node.sckAddress.getAddress(true)));
 
-                socket.node.protocol.sendHello().then( (answer)=>{
+                socket.node.protocol.sendHello(["uuid"]).then( (answer)=>{
                     this.initializeSocket(socket);
                 });
 

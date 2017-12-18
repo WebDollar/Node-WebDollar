@@ -1,3 +1,4 @@
+const colors = require('colors/safe');
 import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
 
@@ -6,21 +7,29 @@ class NodeProtocol {
     /*
         HELLO PROTOCOL
      */
-    async sendHello (node) {
+    async sendHello (node, doubleConnectionsValidationTypes) {
 
         //console.log(node);
 
         // Waiting for Protocol Confirmation
         let response = await node.sendRequestWaitOnce("HelloNode", {
             version: consts.NODE_VERSION,
+            uuid: consts.UUID,
         });
 
         console.log("RECEIVED HELLO NODE BACK", response, typeof response);
 
+        if (!response.hasOwnProperty("uuid")){
+            console.log(colors.red("hello received, but there is not uuid"));
+            return false;
+        }
+
         if ((response.hasOwnProperty("version"))&&(response.version <= consts.NODE_VERSION_COMPATIBILITY)){
 
+            node.sckAddress.uuid = response.uuid;
+
             //check if it is a unique connection, add it to the list
-            let previousConnection = NodesList.searchNodeSocketByAddress(node.sckAddress);
+            let previousConnection = NodesList.searchNodeSocketByAddress(node.sckAddress, "all", doubleConnectionsValidationTypes);
 
             // console.log("sendHello clientSockets", NodesList.clientSockets);
             // console.log("sendHello serverSockets", NodesList.serverSockets);

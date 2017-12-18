@@ -9,7 +9,7 @@ import SocketAddress from 'common/sockets/socket-address'
 
 class SocketExtend{
 
-    extendSocket(socket, address, port){
+    extendSocket(socket, address, port, uuid){
 
         socket.node = {};
 
@@ -24,7 +24,7 @@ class SocketExtend{
 
         socket.node.protocol = {};
         socket.node.protocol.helloValidated = false;
-        socket.node.protocol.sendHello = () => { return NodeProtocol.sendHello(socket.node)  };
+        socket.node.protocol.sendHello = (doubleConnectionsValidationTypes) => { return NodeProtocol.sendHello(socket.node, doubleConnectionsValidationTypes)  };
 
         socket.node.protocol.propagation = {};
         socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket.node) };

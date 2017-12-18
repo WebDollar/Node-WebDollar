@@ -69,6 +69,7 @@
     "socket.io-p2p": "^2.2.0",
     "sqlite3": "^3.1.13",
     "utf-8-validate": "^3.0.3",
+    "uuid": "^3.1.0",
     "wrtc": "0.0.62"
   },
   "devDependencies": {

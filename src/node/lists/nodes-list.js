@@ -26,14 +26,14 @@ class NodesList {
     }
 
 
-    searchNodeSocketByAddress(sckAddress, type){
+    searchNodeSocketByAddress(sckAddress, type, doubleConnectionsValidationTypes){
 
         if (type === undefined) type = 'all';
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
         for (let i=0; i<this.nodes.length; i++)
-            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress))){
+            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress, doubleConnectionsValidationTypes))){
                 return this.nodes[i];
             }
 

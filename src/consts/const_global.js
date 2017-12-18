@@ -1,5 +1,8 @@
+const uuid = require('uuid');
 
 let consts = {}
+
+consts.UUID = uui.idv4();
 
 consts.NODE_VERSION = "0.0.1";
 consts.NODE_VERSION_COMPATIBILITY = "1.0";
