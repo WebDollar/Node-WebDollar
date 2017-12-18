@@ -6,6 +6,8 @@ describe('interfacePouchDB', () => {
 
     let db = null;
     let result = null;
+    let key = null;
+    let value = null;
     
     it('creating PouchDB', ()=>{
 
@@ -14,40 +16,31 @@ describe('interfacePouchDB', () => {
         assert(db !== null, "failed to create InterfacePouchDB");
     });
     
-    it('save sample test', ()=>{
+    it('save/get sample test', () => {
 
+        key = '1';
+        value = 'myValue_1';
         db = new InterfacePouchDB('MyDatabase');
-        assert(db !== undefined, "failed to create InterfacePouchDB");
-        
-        result = db.save('1', 'value1');
-        
-        //to be modified assertion
-        assert(true, result);
+
+        db.save(key, value);
+
+        return db.get(key).then((result) => {
+            assert(result.value === value, 'get: ' + result.value + '!=' + value);
+        });
     });
     
-    it('save/get sample test', ()=>{
+    it('save/delete/get sample test', () => {
 
+        key = '2';
+        value = 'myValue_2';
         db = new InterfacePouchDB('MyDatabase');
-        assert(db !== undefined, "failed to create InterfacePouchDB");
         
-        result = db.save('1', 'value1');
-        result = db.get('1');
+        db.save(key, value);
+        db.del(key);
         
-        //to be modified assertion
-        assert(true, result);
+        return db.get(key).then((result) => {
+            assert(result.value === undefined, 'get: ' + result.value + '!=' + undefined);
+        });
     });
-    
-    it('save/update sample test', ()=>{
-
-        db = new InterfacePouchDB('MyDatabase');
-        assert(db !== undefined, "failed to create InterfacePouchDB");
-        
-        result = db.save('1', 'value1');
-        result = db.update('1', 'value1');
-        
-        //to be modified assertion
-        assert(true, result);
-    });
-    
     
 });
