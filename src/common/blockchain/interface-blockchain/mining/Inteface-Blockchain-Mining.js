@@ -111,7 +111,7 @@ class InterfaceBlockchainMining{
             console.log( colors.red("block ", block.height ," was not mined...") );
         }
 
-        if (this.reset){ // it was resetted
+        if (this.reset){ // it was reseted
             this.reset = false;
         }
 

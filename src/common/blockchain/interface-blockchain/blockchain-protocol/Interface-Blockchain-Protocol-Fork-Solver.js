@@ -36,7 +36,7 @@ class InterfaceBlockchainProtocolForkSolver{
     /*
         may the fork be with you Otto
      */
-    async discoverFork(socket, newChainLength){
+    async discoverFork(sockets, newChainLength){
 
         let position;
 
@@ -55,10 +55,61 @@ class InterfaceBlockchainProtocolForkSolver{
         //its a fork... starting from position
         if (position > -1){
 
-            this.blockchain.createFork();
+           let fork = await this.blockchain.forksAdministrator.createNewFork(sockets, position, newChainLength);
+
+           this.solveFork(fork);
 
         }
         //it is a totally new blockchain (maybe genesis was mined)
+
+    }
+
+    /**
+     * Solve Fork by Downloading  the blocks required in the fork
+     * @param fork
+     * @returns {Promise.<boolean>}
+     */
+    async solveFork(fork){
+
+        let nextBlockHeight = fork.forkStartingHeight;
+
+        let finished = false,
+            socketsCheckedForBlock = [],
+            terminateTimeout;
+
+        while (!finished && (fork.forkBlocks.length < fork.forkHeight - fork.forkStartingHeight) ){
+
+            //set no change, to terminate
+            if (terminateTimeout === undefined)
+                terminateTimeout = setTimeout(()=>{
+                    finished = true;
+                }, 3*60*1000);
+
+            let socket = fork.sockets[ Math.floor(Math.random()*fork.sockets.length) ];
+
+            //in case I didn't check this socket for the same block
+            if (!socketsCheckedForBlock.indexOf(socket)) {
+
+                socketsCheckedForBlock.push(socket);
+
+                socket.sendRequestWaitOnce("blockchain/block/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight).then( async (block)=>{
+
+                    let result = await fork.includeForkBlock(block);
+
+                    //if the block was included correctly
+                    if (result){
+                        clearTimeout(terminateTimeout);
+                    }
+
+                })
+            }
+
+        }
+
+        if (fork.forkBlocks.length === fork.forkHeight - fork.forkStartingHeight)
+            return true;
+        else
+            return false;
 
     }
 

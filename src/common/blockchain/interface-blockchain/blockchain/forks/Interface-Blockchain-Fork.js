@@ -11,7 +11,7 @@ import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchai
 class InterfaceBlockchainFork {
 
 
-    constructor (blockchain, forkId, sockets, forkStartingHeight){
+    constructor (blockchain, forkId, sockets, forkStartingHeight, newChainLength){
 
         this.blockchain = blockchain;
 
@@ -22,7 +22,10 @@ class InterfaceBlockchainFork {
 
         this.sockets = sockets;
         this.forkStartingHeight = forkStartingHeight||0;
+        this.forkHeight = newChainLength||0;
         this.forkBlocks = [];
+
+        this._blocksCopy = [];
 
     }
 
@@ -39,6 +42,9 @@ class InterfaceBlockchainFork {
 
     async includeForkBlock(block){
 
+        if (! await this.validateForkBlock(block, block.height, block.height - this.forkStartingHeight) ) return false;
+
+        this.forkBlocks.push(block);
     }
 
     async validateForkBlock(block, height, forkHeight){
@@ -69,8 +75,46 @@ class InterfaceBlockchainFork {
      */
     async saveFork(){
 
-        await this.validateFork();
+        if (!await this.validateFork()) return false;
         // to do
+
+        let useFork = false;
+
+        if (this.blockchain.getBlockchainLength() < this.forkStartingHeight + this.forkBlocks.length)
+            useFork = true;
+        else
+        if (this.blockchain.getBlockchainLength() === this.forkStartingHeight + this.forkBlocks.length){ //I need to check
+
+        }
+
+        //overwrite the blockchain blocks with the forkBlocks
+        if (useFork){
+
+            this._blocksCopy = [];
+            for (let i=this.forkStartingHeight; i<this.blockchain.getBlockchainLength(); i++)
+                this._blocksCopy.push(this.blockchain.blocks[i]);
+
+            this.blockchain.blocks.splice(this.forkStartingHeight);
+
+            let forkedSuccessfully = true;
+
+            for (let i=0; i<this.forkBlocks.length; i++) {
+                if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i])){
+                    forkedSuccessfully = false;
+                    break;
+                }
+            }
+
+            //rollback
+            if (!forkedSuccessfully){
+                this.blockchain.blocks.splice(this.forkStartingHeight);
+                for (let i=0; i<this._blocksCopy.length; i++)
+                    await this.blockchain.includeBlockchainBlock(this._blocksCopy[i])
+            }
+
+            this.blockchain.resetMining();
+
+        }
 
     }
 

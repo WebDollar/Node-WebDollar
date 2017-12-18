@@ -55,7 +55,7 @@ class InterfaceBlockchainProtocol {
                     if (this.blockchain.getBlockchainLength() === data.chainLength) {
 
                         // most complex hash, let's download him
-                        if (data.hash.compare(this.blockchain.getBlockchainLastBlock().hash)) {
+                        if (data.hash.compare(this.blockchain.getBlockchainLastBlock().hash) < 0) {
 
                             let block = await socket.sendRequestWaitOnce("blockchain/block/request-block-by-height", {height: data.height}, data.height);
                             if (block !== null) {
