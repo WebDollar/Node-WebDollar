@@ -3,15 +3,15 @@ const PouchDB = require('pouchdb-node');
 
 class InterfacePouchDB {
 
-    constructor(databaseName) {
-        this.dbName = (typeof databaseName !== 'undefined' && databaseName !== null ? databaseName : "defaultDB");
+    constructor(databaseName = "defaultDB") {
+        this.dbName = databaseName;
         this.db = new PouchDB(this.dbName);
         this.attachName = 'wallet.bin';
         this.isBrowser = this === window;
     }
 
     createDocument(key, value) {
-        this.deleteAttachmentIfExist(key);
+        this.deleteDocumentAttachmentIfExist(key);
 
         return this.db.put({
             _id: key,
@@ -47,7 +47,7 @@ class InterfacePouchDB {
         return this.db.get(key).then((doc) => {
             return doc.value;
         }).catch((err) => {
-            console.log(err);
+            throw err;
         });
     }
 
@@ -63,22 +63,18 @@ class InterfacePouchDB {
 
     //attachments
 
-    saveAttachment(key, value) {
-        // this.deleteDocumentIfExist(key);
-
+    saveDocumentAttachment(key, value) {
         let attachment = (this.isBrowser) ? new Blob(value, {content_type: 'application/octet-stream'}) : new Buffer(value, {content_type: 'application/octet-stream'});
-
-
         return this.db.putAttachment(key, this.attachName, attachment).then((result) => {
             return result.ok;
         }).catch((err) => {
             //document exists, update it
             if (err.status === 409) {
-                return this.updateAttachment(key, value);
+                return this.updateDocumentAttachment(key, value);
             } else {
                 if (err.status === 404) {
                     //if document not exist, create it and recall attachment
-                    return this.createDocument(key, null).then(() => this.saveAttachment(key, value));
+                    return this.createDocument(key, null).then(() => this.saveDocumentAttachment(key, value));
                 } else {
                     throw err;
                 }
@@ -86,18 +82,17 @@ class InterfacePouchDB {
         });
     }
 
-    getAttachment(key) {
-        return this.db.getAttachment(key, this.attachName).then((blobOrBuffer) => {
+    getDocumentAttachment(key) {
+        return this.db.getDocumentAttachment(key, this.attachName).then((blobOrBuffer) => {
             return blobOrBuffer;
         }).catch((err) => {
             throw err;
         });
     }
 
-    updateAttachment(key, value) {
+    updateDocumentAttachment(key, value) {
         return this.db.get(key).then((doc) => {
             let attachment = (this.isBrowser) ? new Blob(value, {content_type: 'application/octet-stream'}) : new Buffer(value, {content_type: 'application/octet-stream'});
-
             return this.db.putAttachment(doc._id, this.attachName, doc._rev, attachment, 'application/octet-stream').then((result) => {
                 return result.ok;
             }).catch((err) => {
@@ -109,7 +104,7 @@ class InterfacePouchDB {
         });
     }
 
-    deleteAttachment(key) {
+    deleteDocumentAttachment(key) {
         return this.db.get(key).then((doc) => {
             return this.db.removeAttachment(doc._id, this.attachName, doc._rev).then((result) => {
                 return result;
@@ -122,29 +117,29 @@ class InterfacePouchDB {
     }
 
 
-    deleteAttachmentIfExist(key) {
-        return this.getAttachment(key).then((value) => {
-            return this.deleteAttachment(key);
+    deleteDocumentAttachmentIfExist(key) {
+        return this.getDocumentAttachment(key).then((value) => {
+            return this.deleteDocumentAttachment(key);
         }).catch((err) => {
             return false;
         })
     }
 
 
-    //general methods
+    //main methods
 
     save(key, value) {
         if (typeof value === "object") {
             return this.createDocument(key, value);
         } else {
-            return this.saveAttachment(key, value);
+            return this.saveDocumentAttachment(key, value);
         }
     }
 
     get(key) {
         return this.getDocument(key).then(() => {
-            return this.getAttachment(key).then(() => {
-                return this.getAttachment(key);
+            return this.getDocumentAttachment(key).then(() => {
+                return this.getDocumentAttachment(key);
             }).catch(() => {
                 return this.getDocument(key);
             });
