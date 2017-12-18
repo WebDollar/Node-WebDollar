@@ -114,7 +114,7 @@ class InterfaceBlockchainProtocolForkSolver{
             //if the fork is successfully, the save it as the main blockchain
             if (await fork.saveFork())
                 return true;
-                
+
         }
 
         return false;

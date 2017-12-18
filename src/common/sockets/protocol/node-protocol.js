@@ -40,7 +40,7 @@ class NodeProtocol {
     }
 
 
-    static broadcastRequest (request, data, type, exceptSocket){
+    broadcastRequest (request, data, type, exceptSocket){
 
         let nodes = NodesList.getNodes(type);
 

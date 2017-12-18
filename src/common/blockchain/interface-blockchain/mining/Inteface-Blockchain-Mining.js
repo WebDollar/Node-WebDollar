@@ -44,7 +44,13 @@ class InterfaceBlockchainMining{
         while (!this.finished){
             //mining next blocks
 
-            let nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress);
+            let nextBlock;
+
+            try {
+                nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress);
+            } catch (Exception){
+                console.log(colors.red("Error creating next block "+Exception.toString()), nextBlock);
+            }
 
             await this.mineBlock( nextBlock, this.blockchain.getDifficultyTarget(), undefined, showMiningOutput  );
         }
@@ -59,64 +65,70 @@ class InterfaceBlockchainMining{
      */
     async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
 
-
-        if (difficulty === undefined || difficulty === null)
-            throw 'difficulty not specified';
-        else
-            difficulty = WebDollarCryptoData.createWebDollarCryptoData(difficulty).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
-
-
-        block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
-
-        let nonce = initialNonce||0, solutionFound = false;
-
-        if (typeof nonce !== 'number') return 'initial nonce is not a number';
-
-        //calculating the hashes per second
-        let intervalMiningOutput;
-        if (showMiningOutput) {
-            let previousNonce = nonce;
-            intervalMiningOutput = setInterval(() => {
-                console.log((nonce - previousNonce).toString() + " hashes/s");
-                previousNonce = nonce
-            }, 1000);
-        }
+        try{
+            if (difficulty === undefined || difficulty === null)
+                throw 'difficulty not specified';
+            else
+                difficulty = WebDollarCryptoData.createWebDollarCryptoData(difficulty).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
 
 
-        while (nonce <= 0xFFFFFFFF && !this.finished && !this.reset ){
+            block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
 
-            let hash = await block.computeHash(nonce);
+            let nonce = initialNonce||0, solutionFound = false;
 
-            //console.log('Mining WebDollar Argon2 - nonce', nonce, hash.toString("hex") );
+            if (typeof nonce !== 'number') return 'initial nonce is not a number';
 
-
-            if ( hash.compare(difficulty) <= 0 ) {
-
-                let reward = 50;
-                console.log( colors.green("WebDollar Block ", block.height ," mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD") );
-
-                block.hash = hash;
-                block.nonce = nonce;
-
-                await this.blockchain.includeBlockchainBlock( block );
-                solutionFound = true;
-
-                break;
+            //calculating the hashes per second
+            let intervalMiningOutput;
+            if (showMiningOutput) {
+                let previousNonce = nonce;
+                intervalMiningOutput = setInterval(() => {
+                    console.log((nonce - previousNonce).toString() + " hashes/s");
+                    previousNonce = nonce
+                }, 1000);
             }
 
-            nonce++;
-        }
 
-        if (!solutionFound){
-            console.log( colors.red("block ", block.height ," was not mined...") );
-        }
+            while (nonce <= 0xFFFFFFFF && !this.finished && !this.reset ){
 
-        if (this.reset){ // it was reseted
-            this.reset = false;
-        }
+                let hash = await block.computeHash(nonce);
 
-        if ( intervalMiningOutput !== undefined)
-            clearInterval(intervalMiningOutput);
+                //console.log('Mining WebDollar Argon2 - nonce', nonce, hash.toString("hex") );
+
+
+                if ( hash.compare(difficulty) <= 0 ) {
+
+                    let reward = 50;
+                    console.log( colors.green("WebDollar Block ", block.height ," mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD") );
+
+                    block.hash = hash;
+                    block.nonce = nonce;
+
+                    await this.blockchain.includeBlockchainBlock( block );
+                    solutionFound = true;
+
+                    break;
+                }
+
+                nonce++;
+            }
+
+            if (!solutionFound){
+                console.log( colors.red("block ", block.height ," was not mined...") );
+            }
+
+            if (this.reset){ // it was reseted
+                this.reset = false;
+            }
+
+            if ( intervalMiningOutput !== undefined)
+                clearInterval(intervalMiningOutput);
+
+        } catch (Exception){
+
+            console.log(colors.red("Error mining block ", Exception.toString()), block);
+            throw Exception;
+        }
 
     }
 

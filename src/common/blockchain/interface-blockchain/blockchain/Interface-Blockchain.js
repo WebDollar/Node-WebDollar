@@ -38,10 +38,11 @@ class InterfaceBlockchain {
      */
     async includeBlockchainBlock(block, resetMining){
 
+
         if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
 
         //let's check again the heights
-        if (block.height !== this.blocks.length) throw ('heights of a new block is not good... strange');a
+        if (block.height !== this.blocks.length) throw ('heights of a new block is not good... strange');
 
         this.blocks.push(block);
 
