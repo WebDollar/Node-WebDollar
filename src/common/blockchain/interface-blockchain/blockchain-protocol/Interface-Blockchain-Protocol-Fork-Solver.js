@@ -12,21 +12,26 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    async _discoverForkBinarySearch(socket, left, right){
+    async _discoverForkBinarySearch(sockets, left, right){
+
+        let socket = sockets[0];
+
         let mid = (left+right)/2;
 
-        let blockHeader = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
+        let blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
+
+        if (blockHeaderResult.result  || blockHeaderResult.header === undefined) return {position: -1, header: blockHeaderResult.header};
 
         //i have finished the binary search
-
         if (left >= right){
             //it the block actually is the same
-            if (blockHeader.hash.equals( this.blockchain.blocks[mid].hash )) return mid;
-            else return -1;
+            if (blockHeaderResult.header.hash.equals( this.blockchain.blocks[mid].hash )) return {position: mid, header: blockHeaderResult.header };
+            else return {position: -1, header: blockHeaderResult.header};
         }
 
         //was not not found, search left because it must be there
-        if (! blockHeader.hash.equals ( this.blockchain.blocks[mid].hash )) return this._discoverForkBinarySearch(socket, left, mid-1);
+        if (! blockHeaderResult.hash.hash.equals ( this.blockchain.blocks[mid].hash ))
+            return this._discoverForkBinarySearch(socket, left, mid-1);
         else
         //was found, search right because the fork must be there
             return this._discoverForkBinarySearch(socket, mid, right);
@@ -36,31 +41,46 @@ class InterfaceBlockchainProtocolForkSolver{
     /*
         may the fork be with you Otto
      */
-    async discoverAndSolveFork(sockets, newChainLength){
+    async discoverAndSolveFork(sockets, newChainLength, header){
 
-        let position;
+        if (!Array.isArray(sockets)) sockets = [sockets];
+
+        let forkFound = this.blockchain.forksAdministrator.findForkBySockets(sockets);
+        if ( forkFound !== null )
+            return forkFound;
+
+
+        let data = {position: -1, hash: undefined };
         let currentBlockchainLength = this.blockchain.getBlockchainLength();
 
-        if (currentBlockchainLength <= newChainLength){
+        //check if n-2 was ok
+        if (currentBlockchainLength <= newChainLength && currentBlockchainLength-2  >= 0){
 
-            let answer = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
+            let answer = await sockets[0].node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
 
-            if (answer.result === false) {
+            console.log("answer", answer);
+
+            if (answer.result === true) {
                 let blockHeader = answer.block;
 
-                if (blockHeader.hash.equals( this.blockchain.getBlockchainLastBlock().hash ))
-                    position = currentBlockchainLength-2;
+                if (blockHeader.hash.equals( this.blockchain.getBlockchainLastBlock().hash )) {
+                    data = {
+                        position : currentBlockchainLength - 1,
+                        hash: header.hash,
+                    };
+                }
             }
 
         }
 
-        if (position === undefined)
-            position = await this._discoverForkBinarySearch(socket, 0, currentBlockchainLength-1);
+        if (position === undefined) {
+            data = await this._discoverForkBinarySearch(sockets, 0, currentBlockchainLength - 1);
+        }
 
         //its a fork... starting from position
-        if (position > -1){
+        if (data.position > -1){
 
-           let fork = await this.blockchain.forksAdministrator.createNewFork(sockets, position, newChainLength);
+           let fork = await this.blockchain.forksAdministrator.createNewFork(sockets, data.position, newChainLength, data.header);
 
            this.solveFork(fork);
 
@@ -86,7 +106,7 @@ class InterfaceBlockchainProtocolForkSolver{
             socketsCheckedForBlock = [],
             terminateTimeout;
 
-        while (!finished && (fork.forkBlocks.length < fork.forkHeight - fork.forkStartingHeight) ){
+        while (!finished && (fork.forkBlocks.length < fork.forkChainLength - fork.forkStartingHeight) ){
 
             //set no change, to terminate
             if (terminateTimeout === undefined)
@@ -125,7 +145,7 @@ class InterfaceBlockchainProtocolForkSolver{
         //just to be sure
         clearTimeout(terminateTimeout);
 
-        if (fork.forkBlocks.length === fork.forkHeight - fork.forkStartingHeight) {
+        if (fork.forkBlocks.length === fork.forkChainLength - fork.forkStartingHeight) {
 
             //if the fork is successfully, the save it as the main blockchain
             if (await fork.saveFork())

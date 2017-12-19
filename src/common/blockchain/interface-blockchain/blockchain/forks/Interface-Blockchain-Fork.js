@@ -11,7 +11,7 @@ import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchai
 class InterfaceBlockchainFork {
 
 
-    constructor (blockchain, forkId, sockets, forkStartingHeight, newChainLength){
+    constructor (blockchain, forkId, sockets, forkStartingHeight, newChainLength, header){
 
         this.blockchain = blockchain;
 
@@ -22,8 +22,9 @@ class InterfaceBlockchainFork {
 
         this.sockets = sockets;
         this.forkStartingHeight = forkStartingHeight||0;
-        this.forkHeight = newChainLength||0;
+        this.forkChainLength = newChainLength||0;
         this.forkBlocks = [];
+        this.forkHeader = header;
 
         this._blocksCopy = [];
 
@@ -42,13 +43,15 @@ class InterfaceBlockchainFork {
 
     async includeForkBlock(block){
 
-        if (! await this.validateForkBlock(block, block.height, block.height - this.forkStartingHeight) ) return false;
+        if (! await this.validateForkBlock(block, block.height ) ) return false;
 
         this.forkBlocks.push(block);
     }
 
-    async validateForkBlock(block, height, forkHeight){
+    async validateForkBlock(block, height){
 
+        //calcuate the forkHeight
+        let forkHeight = block.height - this.forkStartingHeight;
 
         if (block.height < this.forkStartingHeight) throw 'block height is smaller than the fork itself';
         else
