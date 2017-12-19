@@ -131,13 +131,13 @@ class InterfaceBlockchain {
 
     save(){
         for (let i = 0; i < this.blocks.length; ++i) {
-            this.blocks[i].save(this.dataBase);
+            this.blocks[i].save();
         }
     }
 
     load(){
         for (let i = 0; i < this.blocks.length; ++i) {
-            this.block[i].load(this.dataBase);
+            this.blocks[i].load();
         }
     }
 
