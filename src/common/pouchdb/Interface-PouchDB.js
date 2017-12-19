@@ -7,7 +7,7 @@ class InterfacePouchDB {
         this.dbName = databaseName;
         this.db = new PouchDB(this.dbName);
         this.attachName = 'wallet.bin';
-        this.isBrowser = this === window;
+        this.isBrowser = this.window === this;
     }
 
     createDocument(key, value) {
@@ -83,7 +83,7 @@ class InterfacePouchDB {
     }
 
     getDocumentAttachment(key) {
-        return this.db.getDocumentAttachment(key, this.attachName).then((blobOrBuffer) => {
+        return this.db.get(key, this.attachName).then((blobOrBuffer) => {
             return blobOrBuffer;
         }).catch((err) => {
             throw err;
@@ -129,7 +129,7 @@ class InterfacePouchDB {
     //main methods
 
     save(key, value) {
-        if (typeof value === "object") {
+        if (typeof value === "object" || typeof value === "string") {
             return this.createDocument(key, value);
         } else {
             return this.saveDocumentAttachment(key, value);
