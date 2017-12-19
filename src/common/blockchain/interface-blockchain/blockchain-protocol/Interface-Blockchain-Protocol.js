@@ -99,10 +99,12 @@ class InterfaceBlockchainProtocol {
 
                 if (typeof data.height !== 'number') throw "data.height is not defined";
 
-                if (this.blockchain.getBlockchainLength() < data.height) throw "data.height is higher than I have";
+                if (this.blockchain.getBlockchainLength() < data.height) throw "data.height is higher than I have " + data.height;
 
 
                 let block = this.blockchain.blocks[data.height];
+
+                if (block === undefined) throw "Block not found: "+data.height;
 
                 console.log("blooock", block);
 
@@ -115,6 +117,7 @@ class InterfaceBlockchainProtocol {
                         chainLength: this.blockchain.getBlockchainLength()
                     }
                 });
+
 
             } catch (exception) {
 

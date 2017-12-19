@@ -16,11 +16,11 @@ class InterfaceBlockchainProtocolForkSolver{
 
         let socket = sockets[0];
 
-        let mid = (left+right)/2;
+        let mid = Math.floor( (left+right)/2 );
 
         let blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
 
-        if (blockHeaderResult.result  || blockHeaderResult.header === undefined) return {position: -1, header: blockHeaderResult.header};
+        if (blockHeaderResult.result  || blockHeaderResult.header === undefined) return { position: -1, header: blockHeaderResult.header };
 
         //i have finished the binary search
         if (left >= right){
@@ -73,7 +73,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         }
 
-        if (position === undefined) {
+        if ( (data.position||-1) === -1 ) {
             data = await this._discoverForkBinarySearch(sockets, 0, currentBlockchainLength - 1);
         }
 
@@ -106,7 +106,7 @@ class InterfaceBlockchainProtocolForkSolver{
             socketsCheckedForBlock = [],
             terminateTimeout;
 
-        while (!finished && (fork.forkBlocks.length < fork.forkChainLength - fork.forkStartingHeight) ){
+        while ( !finished && (fork.forkBlocks.length < fork.forkChainLength - fork.forkStartingHeight) ){
 
             //set no change, to terminate
             if (terminateTimeout === undefined)
