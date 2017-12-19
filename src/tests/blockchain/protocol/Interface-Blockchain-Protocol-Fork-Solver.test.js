@@ -19,8 +19,8 @@ function binarySearch(left, right, a, b){
 
     }
 
-    if ( a[mid] !== b[mid] ) return binarySearch(left, mid);
-    else return binarySearch(mid+1, right);
+    if ( a[mid] !== b[mid] ) return binarySearch(left, mid, a,b);
+    else return binarySearch(mid+1, right, a,b);
 
 }
 
@@ -43,7 +43,7 @@ describe('test Interface Blockchain Protocol Fork Solver', () => {
 
         a = [0,0,0,0,1,1,1];
         b = [0,0,0,0,1,1,0];
-        assert(binarySearch(0, a.length-1, a,b) === a.length-1, "test 3 didn't work");
+        assert(binarySearch(0, a.length-1, a,b) === (a.length-1), "test 3 didn't work");
 
         a = [0,1,0,0,1,1,1];
         b = [0,0,0,0,0,0,0];
