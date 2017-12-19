@@ -7,7 +7,8 @@ class InterfacePouchDB {
         this.dbName = databaseName;
         this.db = new PouchDB(this.dbName);
         this.attachName = 'wallet.bin';
-        this.isBrowser = this.window === this;
+        this.isBrowser = typeof window !== 'undefined';
+        console.log(this.isBrowser);
     }
 
     createDocument(key, value) {
