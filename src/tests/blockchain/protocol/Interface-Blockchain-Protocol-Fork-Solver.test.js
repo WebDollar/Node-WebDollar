@@ -7,7 +7,7 @@ import InterfaceBlockchainProtocolForkSolver from 'common/blockchain/interface-b
 
 function binarySearch(left, right, a, b){
 
-    let mid = Math.floor( (left+right)/2 );
+    let mid = Math.trunc( (left+right)/2 );
 
     if (left >= right){
 
@@ -19,8 +19,8 @@ function binarySearch(left, right, a, b){
 
     }
 
-    if ( a[mid] !== b[mid] ) return binarySearch(left, mid, a,b);
-    else return binarySearch(mid+1, right, a,b);
+    if ( a[mid] !== b[mid] ) return binarySearch(left, mid-1, a,b);
+    else return binarySearch(mid, right, a,b);
 
 }
 
