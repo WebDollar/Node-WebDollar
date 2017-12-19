@@ -64,8 +64,17 @@ class NodeServer {
             });
 
             try {
-                console.log(typeof server);
-                server.listen(consts.NODE_PORT);
+                console.log("SERVER typeof", typeof server);
+
+                //multiple ports, but doesn't work
+
+                let port = process.env.SERVER_PORT||consts.NODE_PORT;
+                try{
+                    server.listen (port);
+                } catch (Exception) {
+                    console.log( colors.red("Couldn't open server on port ", port, " try next port") );
+                    server.listen (port+1);
+                }
             } catch(Exception){
                 console.log("Error Calling node_server.listen", Exception.toString());
             }

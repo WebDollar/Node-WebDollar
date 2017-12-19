@@ -28,7 +28,7 @@ class NodesStats {
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Waitlist:",this.statsWaitlist,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists);
     }
 
-    _recalculateStats(err, object){
+    _recalculateStats(err, nodesListObject){
 
         this.statsClients = NodesList.getNodes("client").length;
         this.statsServer = NodesList.getNodes("server").length;

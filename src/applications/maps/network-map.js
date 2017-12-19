@@ -94,21 +94,21 @@ class NetworkMap {
             return false;
         }
 
-        NodesList.registerEvent("connected", {type: ["all"]}, async (err, nodeListObject) => {
+        NodesList.registerEvent("connected", {type: ["all"]}, async (err, nodesListObject) => {
 
-            let geoLocation = await nodeListObject.socket.node.sckAddress.getGeoLocation();
+            let geoLocation = await nodesListObject.socket.node.sckAddress.getGeoLocation();
 
             //console.log("geoLocation",geoLocation);
 
-            this._addMarker(map, geoLocation, nodeListObject.socket);
+            this._addMarker(map, geoLocation, nodesListObject.socket);
 
         } );
 
-        NodesList.registerEvent("disconnected", {type: ["all"]}, async (err, nodeListObject) => {
+        NodesList.registerEvent("disconnected", {type: ["all"]}, async (err, nodesListObject) => {
 
             //deleting the marker
 
-            let markerIndex = this._findMarkerIndexBySocket(nodeListObject.socket);
+            let markerIndex = this._findMarkerIndexBySocket(nodesListObject.socket);
 
             if (markerIndex !== -1) {
 

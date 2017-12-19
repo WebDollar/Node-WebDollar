@@ -23,7 +23,9 @@ class InterfaceBlockchainProtocol {
 
     }
 
-    _initializeNewSocket(err, socket) {
+    _initializeNewSocket(err, nodesListObject) {
+
+        let socket = nodesListObject.socket;
 
         socket.on("blockchain/header/new-block", async (data) => {
 
@@ -154,7 +156,9 @@ class InterfaceBlockchainProtocol {
 
     }
 
-    _uninitializeSocket(err, socket) {
+    _uninitializeSocket(err, nodesListObject) {
+
+        let socket = nodesListObject.socket;
 
     }
 
