@@ -7,7 +7,6 @@ class InterfacePouchDB {
         this.dbName = databaseName;
         this.db = new PouchDB(this.dbName);
         this.attachName = 'wallet.bin';
-        this.isBrowser = typeof window !== 'undefined';
     }
 
     createDocument(key, value) {
@@ -64,7 +63,7 @@ class InterfacePouchDB {
     //attachments
 
     saveDocumentAttachment(key, value) {
-        let attachment = (this.isBrowser) ? new Blob(value, {content_type: 'application/octet-stream'}) : new Buffer(value, {content_type: 'application/octet-stream'});
+        let attachment = new Buffer(value, {content_type: 'application/octet-stream'});
         return this.db.putAttachment(key, this.attachName, attachment).then((result) => {
             return result.ok;
         }).catch((err) => {
@@ -92,7 +91,7 @@ class InterfacePouchDB {
 
     updateDocumentAttachment(key, value) {
         return this.db.get(key).then((doc) => {
-            let attachment = (this.isBrowser) ? new Blob(value, {content_type: 'application/octet-stream'}) : new Buffer(value, {content_type: 'application/octet-stream'});
+            let attachment = new Buffer(value, {content_type: 'application/octet-stream'});
             return this.db.putAttachment(doc._id, this.attachName, doc._rev, attachment, 'application/octet-stream').then((result) => {
                 return result.ok;
             }).catch((err) => {
@@ -129,7 +128,7 @@ class InterfacePouchDB {
     //main methods
 
     save(key, value) {
-        if (Buffer.isBuffer(value) || value instanceof Blob) {
+        if (Buffer.isBuffer(value)) {
             return this.saveDocumentAttachment(key, value);
         } else {
             return this.createDocument(key, value);
