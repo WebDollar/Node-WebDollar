@@ -129,7 +129,7 @@ class InterfacePouchDB {
     //main methods
 
     save(key, value) {
-        if (Buffer.isBuffer(value)) {
+        if (Buffer.isBuffer(value) || value instanceof Blob) {
             return this.saveDocumentAttachment(key, value);
         } else {
             return this.createDocument(key, value);
