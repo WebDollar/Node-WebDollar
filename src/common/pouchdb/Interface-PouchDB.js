@@ -129,7 +129,7 @@ class InterfacePouchDB {
     //main methods
 
     save(key, value) {
-        if (typeof value === "object") {
+        if (typeof value === "object" || typeof value === "string") {
             return this.createDocument(key, value);
         } else {
             return this.saveDocumentAttachment(key, value);
