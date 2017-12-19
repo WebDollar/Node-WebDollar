@@ -36,8 +36,6 @@ class InterfaceBlockchainProtocol {
                 data.header.hash
              */
 
-            console.log("blockchain/header/new-block received", data);
-
 
             try {
 
