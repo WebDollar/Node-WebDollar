@@ -4,6 +4,8 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import consts from 'consts/const_global'
 
+import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
+
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
  */
@@ -221,12 +223,12 @@ class InterfaceBlockchainBlock{
 
     }
 
-    save(){
-
+    save(dataBase){
+        //save current block in dataBase
     }
 
-    load(){
-
+    load(dataBase){
+        //load currend block from dataBase
     }
 
 }

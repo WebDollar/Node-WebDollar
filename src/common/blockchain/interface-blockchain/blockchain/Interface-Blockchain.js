@@ -8,6 +8,8 @@ import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchai
 
 import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
 
+import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
+
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -22,6 +24,8 @@ class InterfaceBlockchain {
         this.blockCreator = new InterfaceBlockchainBlockCreator( this )
 
         this.mining = undefined;
+        
+        this.dataBase = new InterfacePouchDB();
     }
 
     async validateBlockchain(){
@@ -115,11 +119,15 @@ class InterfaceBlockchain {
     }
 
     save(){
-
+        for (let i = 0; i < this.blocks.length; ++i) {
+            this.blocks[i].save(this.dataBase);
+        }
     }
 
     load(){
-
+        for (let i = 0; i < this.blocks.length; ++i) {
+            this.block[i].load(this.dataBase);
+        }
     }
 
 }
