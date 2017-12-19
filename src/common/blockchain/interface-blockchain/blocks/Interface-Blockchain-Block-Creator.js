@@ -1,12 +1,13 @@
 import InterfaceBlockchainBlock from './Interface-Blockchain-Block'
 import BlockchainGenesis from './Blockchain-Genesis'
+import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
 
 class InterfaceBlockchainBlockCreator{
 
     constructor(blockchain){
 
         this.blockchain = blockchain;
-
+        this.db = new InterfacePouchDB();
     }
 
     /*
@@ -16,7 +17,7 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        return new InterfaceBlockchainBlock( 1, undefined, BlockchainGenesis.hashPrev, undefined, undefined, 0, {minerAddress: minerAddress, transactions: []}, 0 );
+        return new InterfaceBlockchainBlock( 1, undefined, BlockchainGenesis.hashPrev, undefined, undefined, 0, {minerAddress: minerAddress, transactions: []}, 0, this.db );
     }
 
     /*
@@ -26,7 +27,7 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        return new InterfaceBlockchainBlock( 1, undefined, prevBlock.hash, undefined, undefined, 0, {minerAddress: minerAddress, transactions: []}, height);
+        return new InterfaceBlockchainBlock( 1, undefined, prevBlock.hash, undefined, undefined, 0, {minerAddress: minerAddress, transactions: []}, height, this.db);
     }
 
     createBlockNew(minerAddress){

@@ -14,7 +14,7 @@ class InterfaceBlockchainBlock{
 
     //everything is buffer
 
-    constructor (version, hash, hashPrev, hashData, timeStamp, nonce, data, height ){
+    constructor (version, hash, hashPrev, hashData, timeStamp, nonce, data, height, db){
 
         this.version = version||null; // 2 bytes version                                                 - 2 bytes
 
@@ -45,6 +45,8 @@ class InterfaceBlockchainBlock{
 
         this.difficultyTarget = null; // difficulty set by me
         this.height = (typeof height === "number" ? height : null); // index set by me
+
+        this.db = db;
     }
 
     async validateBlock(height, previousDifficultyTarget, previousHash){
@@ -209,7 +211,7 @@ class InterfaceBlockchainBlock{
         if (height >= 0){
 
             this.hash = data.substr(0, offset+=consts.BLOCKS_POW_LENGTH).buffer;
-
+            console.log('cosmin hash:' + this.hash);
             this.nonce = data.substr(offset, offset+=consts.BLOCKS_NONCE).buffer;
 
 
@@ -223,12 +225,22 @@ class InterfaceBlockchainBlock{
 
     }
 
-    save(dataBase){
-        //save current block in dataBase
+    save(db = this.db){
+        let key = "block" + this.height;
+        let bufferValue = this.serializeBlock();
+        db.save(key, bufferValue).catch((err) => {
+            throw 'ERROR on SAVE block: ' + err;
+        });
     }
 
-    load(dataBase){
-        //load currend block from dataBase
+    load(db = this.db){
+        let key = "block" + this.height;
+        db.get(key).then((buffer) => {
+            console.log('LOAD done, now deserializing...');
+            this.deserializeBlock(buffer, this.height);
+        }).catch((err) => {
+            throw 'ERROR on LOAD block: ' + err;
+        });
     }
 
 }
