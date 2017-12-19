@@ -16,7 +16,7 @@ describe('interfacePouchDB', () => {
         assert(db !== null, "failed to create InterfacePouchDB");
     });
     
-    it('save/get sample test', () => {
+    it('save/get sample ASCII test', () => {
 
         key = '1';
         value = 'myValue_1';
@@ -31,7 +31,7 @@ describe('interfacePouchDB', () => {
         });
     });
     
-    it('save/remove/get sample test', () => {
+    it('save/remove/get sample ASCII test', () => {
 
         key = '2';
         value = 'myValue_2';
@@ -47,32 +47,92 @@ describe('interfacePouchDB', () => {
         });
     });
     
-    it('save/save/get sample test', () => {
+    it('save/save/get sample ASCII test', () => {
 
         key = '2';
         value = 'myValue_2';
+        let new_value = 'modified_value';
         db = new InterfacePouchDB('MyDatabase');
         
         db.save(key, value);
-        db.save(key, 'modified_value');
+        db.save(key, new_value);
         
         return db.get(key).then((result) => {
-            assert(result.value === 'modified_value', 'get: ' + result.value + 'found after remove');
+            assert(result.value === new_value, 'get: ' + result.value + ' found old value after update');
         }).catch((err) => {
             assert(err.name === 'not_found', err);
         });
     });
     
-    it('remove nonexistent key', () => {
+    it('remove nonexistent ASCII key', () => {
 
         key = '1234';
         db = new InterfacePouchDB('MyDatabase');
         
-
-        db.save(key, 'modified_value');
+        return db.remove(key).then((result) => {
+            assert(false, 'get: ' + result.value + ' succeded to remove nonexisting key');
+        }).catch((err) => {
+            assert(err.name === 'not_found', err);
+        });
+    });
+    
+    //----------------------Buffer-------------------------------------------------------
         
-        return db.db.remove(key).then((result) => {
-            assert(result.value === 'modified_value', 'get: ' + result.value + 'found after remove');
+    it('save/get sample array', () => {
+
+        key = '1';
+        value = new Buffer('744FF0022AA', 'hex');
+        db = new InterfacePouchDB('MyDatabase');
+
+        db.save(key, value);
+
+        return db.get(key).then((result) => {
+            assert(result.value === value, 'get: ' + result.value + '!=' + value);
+        }).catch((err) => {
+            assert(err !== null, err);
+        });
+    });
+        
+    it('save/remove/get sample Buffer', () => {
+
+        key = '2';
+        value = new Buffer('744FF0022AAdasdasdascasd', 'hex');
+        db = new InterfacePouchDB('MyDatabase');
+        
+        db.save(key, value);
+        db.remove(key);
+        
+        return db.get(key).then((result) => {
+            assert(false, 'get: ' + result.value + ' found after remove');
+        }).catch((err) => {
+            assert(err.name === 'not_found', err);
+        });
+    });
+    
+    it('save/save/get sample Buffer test', () => {
+
+        key = '2';
+        value = new Buffer('744F234dasdasdascasd', 'hex');
+        let new_value = new Buffer('744casd', 'hex');
+        db = new InterfacePouchDB('MyDatabase');
+        
+        db.save(key, value);
+        db.save(key, new_value);
+        
+        return db.get(key).then((result) => {
+            assert(result.value === value, 'get: ' + result.value + ' found old value after update');
+        }).catch((err) => {
+            assert(err.name === 'not_found', err);
+        });
+    });
+    
+    it('remove nonexistent Buffer test', () => {
+
+        key = '1234567';
+        db = new InterfacePouchDB('MyDatabase');
+        
+        return db.remove(key).then((result) => {
+            assert(false, 'get: ' + result.value + ' succeded to remove nonexisting key');
         }).catch((err) => {
             assert(err.name === 'not_found', err);
         });
