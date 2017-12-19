@@ -15,7 +15,7 @@ class InterfaceBlockchainProtocolForkSolver{
     async _discoverForkBinarySearch(socket, left, right){
         let mid = (left+right)/2;
 
-        let blockHeader = await socket.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
+        let blockHeader = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
 
         //i have finished the binary search
 
@@ -39,22 +39,23 @@ class InterfaceBlockchainProtocolForkSolver{
     async discoverAndSolveFork(sockets, newChainLength){
 
         let position;
+        let currentBlockchainLength = this.blockchain.getBlockchainLength();
 
-        if (this.blockchain.getBlockchainLength() <= newChainLength){
+        if (currentBlockchainLength <= newChainLength){
 
-            let answer = await socket.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: this.blockchain.getBlockchainLength()-1 }, this.blockchain.getBlockchainLength()-1 );
+            let answer = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
 
             if (answer.result === false) {
                 let blockHeader = answer.block;
 
                 if (blockHeader.hash.equals( this.blockchain.getBlockchainLastBlock().hash ))
-                    position = this.blockchain.getBlockchainLength()-1;
+                    position = currentBlockchainLength-2;
             }
 
         }
 
         if (position === undefined)
-            position = await this._discoverForkBinarySearch(socket, 0, this.blockchain.getBlockchainLength()-1);
+            position = await this._discoverForkBinarySearch(socket, 0, currentBlockchainLength-1);
 
         //its a fork... starting from position
         if (position > -1){
@@ -100,7 +101,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 socketsCheckedForBlock.push(socket);
 
-                socket.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight).then( async (answer)=>{
+                socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight).then( async (answer)=>{
 
                     if (answer.result === true){
 

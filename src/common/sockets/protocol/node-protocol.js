@@ -20,7 +20,7 @@ class NodeProtocol {
         console.log("RECEIVED HELLO NODE BACK", response, typeof response);
 
         if (!response.hasOwnProperty("uuid")){
-            console.log(colors.red("hello received, but there is not uuid"));
+            console.log(colors.red("hello received, but there is not uuid"), response);
             return false;
         }
 
@@ -52,6 +52,8 @@ class NodeProtocol {
     broadcastRequest (request, data, type, exceptSocket){
 
         let nodes = NodesList.getNodes(type);
+
+        console.log("request", "nodes.length", nodes.length, request, data, )
 
         for (let i=0; i < nodes.length; i++)
             if (!exceptSocket || nodes[i].socket !== exceptSocket)

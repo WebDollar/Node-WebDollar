@@ -22,12 +22,12 @@ class InterfaceBlockchainMining{
 
     }
 
-    startMining(){
+    async startMining(){
 
         this.finished = false;
         this.reset = false;
 
-        this.mineNextBlock(true);
+        await this.mineNextBlock(true);
     }
 
     stopMining(){

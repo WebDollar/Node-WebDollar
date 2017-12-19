@@ -46,7 +46,7 @@ class InterfaceBlockchain {
 
         this.blocks.push(block);
 
-        NodeProtocol.broadcastRequest( "blockchain/header/new-block", { height: block.height, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blocks.length });
+        NodeProtocol.broadcastRequest( "blockchain/header/new-block", { height: block.height, prevHash: block.hashPrev, hash: block.hash, chainLength: this.blocks.length } );
 
         if (resetMining && this.mining !== undefined) //reset mining
             this.mining.reset();
