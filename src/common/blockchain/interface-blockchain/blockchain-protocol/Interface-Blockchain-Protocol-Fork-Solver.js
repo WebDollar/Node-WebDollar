@@ -42,10 +42,14 @@ class InterfaceBlockchainProtocolForkSolver{
 
         if (this.blockchain.getBlockchainLength() <= newChainLength){
 
-            let blockHeader = await socket.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: this.blockchain.getBlockchainLength()-1 }, this.blockchain.getBlockchainLength()-1 );
+            let answer = await socket.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: this.blockchain.getBlockchainLength()-1 }, this.blockchain.getBlockchainLength()-1 );
 
-            if (blockHeader.hash.equals( this.blockchain.getBlockchainLastBlock().hash ))
-                position = this.blockchain.getBlockchainLength()-1;
+            if (answer.result === false) {
+                let blockHeader = answer.block;
+
+                if (blockHeader.hash.equals( this.blockchain.getBlockchainLastBlock().hash ))
+                    position = this.blockchain.getBlockchainLength()-1;
+            }
 
         }
 
@@ -59,8 +63,12 @@ class InterfaceBlockchainProtocolForkSolver{
 
            this.solveFork(fork);
 
+           return true;
+
         }
         //it is a totally new blockchain (maybe genesis was mined)
+
+        return false;
 
     }
 
@@ -92,13 +100,20 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 socketsCheckedForBlock.push(socket);
 
-                socket.sendRequestWaitOnce("blockchain/block/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight).then( async (block)=>{
+                socket.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight).then( async (answer)=>{
 
-                    let result = await fork.includeForkBlock(block);
+                    if (answer.result === true){
 
-                    //if the block was included correctly
-                    if (result){
-                        clearTimeout(terminateTimeout);
+                        let block = answer.block;
+                        let result = await fork.includeForkBlock(block);
+
+                        //if the block was included correctly
+                        if (result){
+                            clearTimeout(terminateTimeout);
+                            terminateTimeout = undefined;
+                            nextBlockHeight++;
+                        }
+
                     }
 
                 })

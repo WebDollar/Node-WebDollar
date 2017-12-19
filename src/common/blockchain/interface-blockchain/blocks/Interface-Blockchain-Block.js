@@ -141,7 +141,7 @@ class InterfaceBlockchainBlock{
         this.computedBlockPrefix = Buffer.concat ( [
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.version).toFixedBuffer(2),
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.hashPrev ).toFixedBuffer( consts.BLOCKS_POW_LENGTH ),
-                                                     WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 )
+                                                     WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 ),
                                                      //data contains addressMiner, transactions history, contracts, etc
                                                      this._serializeData(),
                                                     ]);
