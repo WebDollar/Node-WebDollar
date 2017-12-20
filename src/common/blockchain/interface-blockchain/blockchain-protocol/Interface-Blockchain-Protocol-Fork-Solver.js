@@ -1,5 +1,6 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainBlockCreator from "../blocks/Interface-Blockchain-Block-Creator";
+import InterfaceBlockchainFork from "../blockchain/forks/Interface-Blockchain-Fork";
 const colors = require('colors/safe');
 
 /**
@@ -121,6 +122,8 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async solveFork(fork){
 
+        if (fork === null || !(fork instanceof InterfaceBlockchainFork) ) throw ('fork is null');
+
         let nextBlockHeight = fork.forkStartingHeight;
 
         let finished = false,
@@ -161,10 +164,26 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     if (answer.result === true){
 
-                        let block = this.blockchain.blockCreator.createBlockEmpty(nextBlockHeight);
-                        block.deserializeBlock(answer.buffer, nextBlockHeight);
+                        let block;
 
-                        let result = await fork.includeForkBlock(block);
+                        try {
+                            block = this.blockchain.blockCreator.createBlockEmpty(nextBlockHeight);
+                            block.deserializeBlock(answer.block, nextBlockHeight);
+
+                        } catch (Exception){
+                            console.log(colors.red("Error deserializing blocks" + Exception.toString()));
+                            finished = true;
+                            return false;
+                        }
+
+                        let result;
+                        try {
+                            result = await fork.includeForkBlock(block);
+                        } catch (Exception){
+                            console.log(colors.red("Error including block "+nextBlockHeight+" in fork" + Exception.toString()));
+                            finished = true;
+                            return false;
+                        }
 
                         //if the block was included correctly
                         if (result) {

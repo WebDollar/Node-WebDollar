@@ -74,7 +74,7 @@ class InterfaceBlockchain {
         if ( block instanceof InterfaceBlockchainBlock === false ) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
 
         // in case it is not a fork controlled blockchain
-        if (prevDifficultyTarget === undefined){
+        if (prevDifficultyTarget === undefined && prevHash === undefined && prevTimeStamp === undefined){
 
             prevDifficultyTarget = this.getDifficultyTarget();
 

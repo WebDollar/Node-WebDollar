@@ -46,6 +46,8 @@ class InterfaceBlockchainFork {
         if (! await this.validateForkBlock(block, block.height ) ) return false;
 
         this.forkBlocks.push(block);
+
+        return true;
     }
 
     async validateForkBlock(block, height){
@@ -54,21 +56,24 @@ class InterfaceBlockchainFork {
         let forkHeight = block.height - this.forkStartingHeight;
 
         if (block.height < this.forkStartingHeight) throw 'block height is smaller than the fork itself';
-        else
-        // transition from blockchain to fork
-        if (height === 0 || height === this.forkStartingHeight){
 
-            return await this.blockchain.validateBlockchainBlock(block);
+        let prevDifficultyTarget, prevHash, prevTimeStamp;
+
+        // transition from blockchain to fork
+        if (height === 0 || forkHeight === 0) {
+
+            // based on genesis block
 
         } else { // just the fork
 
-            let prevDifficultyTarget = this.forkBlocks[forkHeight-1].difficultyTarget;
-            let prevHash = this.forkBlocks[forkHeight-1].hash;
-            let prevTimeStamp = this.forkBlocks[forkHeight-1].timeStamp;
+            prevDifficultyTarget = this.forkBlocks[forkHeight-1].difficultyTarget;
+            prevHash = this.forkBlocks[forkHeight-1].hash;
+            prevTimeStamp = this.forkBlocks[forkHeight-1].timeStamp;
 
-            return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp);
 
         }
+
+        return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp);
 
     }
 
