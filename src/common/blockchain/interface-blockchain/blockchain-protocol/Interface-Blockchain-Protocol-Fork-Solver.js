@@ -1,4 +1,5 @@
 import NodesList from 'node/lists/nodes-list'
+import InterfaceBlockchainBlockCreator from "../blocks/Interface-Blockchain-Block-Creator";
 const colors = require('colors/safe');
 
 /**
@@ -126,7 +127,14 @@ class InterfaceBlockchainProtocolForkSolver{
             socketsCheckedForBlock = [],
             terminateTimeout;
 
-        while ( !finished && (fork.forkBlocks.length < fork.forkChainLength - fork.forkStartingHeight) ){
+        //interval timer
+        let forkSolverInterval = setInterval(()=>{
+
+            // check if the fork is finished
+            if (finished || (fork.forkStartingHeight + fork.forkBlocks.length >= fork.forkChainLength )) {
+                clearInterval(forkSolverInterval);
+                return;
+            }
 
             //set no change, to terminate
             if (terminateTimeout === undefined)
@@ -147,11 +155,15 @@ class InterfaceBlockchainProtocolForkSolver{
                 socketsCheckedForBlock.push(socket);
                 console.log("nextBlockHeight", nextBlockHeight);
 
-                socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight).then( async (answer)=>{
+                socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight ).then( async (answer)=>{
+
+                    console.log("blockchain/blocks/request-block-by-height/",answer)
 
                     if (answer.result === true){
 
-                        let block = answer.block;
+                        let block = this.blockchain.blockCreator.createBlockEmpty(nextBlockHeight);
+                        block.deserializeBlock(answer.buffer, nextBlockHeight);
+
                         let result = await fork.includeForkBlock(block);
 
                         //if the block was included correctly
@@ -168,7 +180,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 })
             }
 
-        }
+        });
 
         //just to be sure
         clearTimeout(terminateTimeout);

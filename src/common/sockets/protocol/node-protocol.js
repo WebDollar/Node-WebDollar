@@ -53,7 +53,7 @@ class NodeProtocol {
 
         let nodes = NodesList.getNodes(type);
 
-        console.log("request nodes.length", nodes.length, request, data, )
+        //console.log("request nodes.length", nodes.length, request, data, )
 
         for (let i=0; i < nodes.length; i++)
             if (!exceptSocket || nodes[i].socket !== exceptSocket)
