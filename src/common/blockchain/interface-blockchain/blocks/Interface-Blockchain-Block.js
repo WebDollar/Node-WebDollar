@@ -28,8 +28,9 @@ class InterfaceBlockchainBlock{
 
         this.hashData = hashData||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
-        this.nonce = nonce||null; //	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
-
+        this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
+        
+        console.log('constructor=' + this.nonce.toString());
         if ( timeStamp === undefined){
 
             timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStamp;
@@ -210,34 +211,40 @@ class InterfaceBlockchainBlock{
 
         if (height >= 0){
 
-            this.hash = data.substr(0, offset+=consts.BLOCKS_POW_LENGTH).buffer;
-            console.log('cosmin hash:' + this.hash);
-            this.nonce = data.substr(offset, offset+=consts.BLOCKS_NONCE).buffer;
-
-
-            this.version = data.substr(offset, offset+=2).toInt();
-            this.hashPrev = data.substr(offset, offset+=consts.BLOCKS_POW_LENGTH).buffer;
-            this.timeStamp = data.substr(offset, offset+=4).toInt();
+            this.hash = data.substr(0, consts.BLOCKS_POW_LENGTH).buffer;
+            offset+=consts.BLOCKS_POW_LENGTH;
+            
+            this.nonce = data.substr(offset, consts.BLOCKS_NONCE).toInt();
+            offset+=consts.BLOCKS_NONCE;
+            
+            this.version = data.substr(offset, 2).toInt();
+            offset+=2;
+            
+            this.hashPrev = data.substr(offset, consts.BLOCKS_POW_LENGTH).buffer;
+            offset+=consts.BLOCKS_POW_LENGTH;
+            
+            this.timeStamp = data.substr(offset, 4).toInt();
+            offset+=4;
 
             this._deserializeData(data.substr(offset));
-
         }
 
     }
 
     save(db = this.db){
-        let key = "block" + this.height;
+        let key = "block" + this.height;        
         let bufferValue = this.serializeBlock();
+        
         db.save(key, bufferValue).catch((err) => {
             throw 'ERROR on SAVE block: ' + err;
         });
     }
 
-    load(db = this.db){
+    load(db = this.db){    
         let key = "block" + this.height;
+
         db.get(key).then((buffer) => {
-            console.log('LOAD done, now deserializing...');
-            this.deserializeBlock(buffer, this.height);
+            this.deserializeBlock(buffer.value, this.height);
         }).catch((err) => {
             throw 'ERROR on LOAD block: ' + err;
         });

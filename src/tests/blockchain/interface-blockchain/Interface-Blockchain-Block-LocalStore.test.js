@@ -8,31 +8,31 @@ describe('test blockchain save blocks to local storage', () => {
 
     let db = new InterfacePouchDB();
     let version = 1;
-    let hash = new Buffer("7bb3e84e6892c7e95d50b5462806b92be0cbccd31fa", "hex");
+    let hash = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
     let hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
-    let hashData = '1F1tAaz5Nn4xqX';
+    let hashData = new Buffer('1F1tAaz5Nn4xqX', 'hex');
     let timeStamp = 1994;
     let nonce = 1994;
-    let minerAddress = '1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4xqX';
+    let minerAddress = '1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4x';
     let data = {minerAddress: minerAddress, transactions: []};
     let height = 0;
 
     it('save blocks to local storage, sample test', ()=>{
 
         let block = new InterfaceBlockchainBlock( version, hash, hashPrev, hashData, timeStamp, nonce, data, height, db );
-        block.save(db);
-        block.version = 0;
 
+        block.save(db);
+        block.version = -13;
         block.load(db);
 
         assert(block.version === version,'block version differ after load: ' + block.version + '!==' + version);
-      /*  assert(block.hash === hash,'block version differ after load: ' + block.hash + '!==' + hash);
-        assert(block.hashPrev === hashPrev,'block hashPrev differ after load: ' + block.hashPrev + '!==' + hashPrev);
-        assert(block.hashData === hashData,'block hashData differ after load: ' + block.hashData + '!==' + hashData);
+        assert(block.hash.equals(hash),'block version differ after load: ' + block.hash + '!==' + hash);
+        assert(block.hashPrev.equals(hashPrev),'block hashPrev differ after load: ' + block.hashPrev + '!==' + hashPrev);
+        assert(block.hashData.equals(hashData),'block hashData differ after load: ' + block.hashData + '!==' + hashData);
         assert(block.timeStamp === timeStamp,'block timeStamp differ after load: ' + block.timeStamp + '!==' + timeStamp);
         assert(block.nonce === nonce,'block nonce differ after load: ' + block.nonce + '!==' + nonce);
-        assert(block.data === data,'block data differ after load: ' + block.data + '!==' + data);
-        assert(block.height === height,'block height differ after load: ' + block.height + '!==' + height);*/
+        assert(block.data.minerAddress.toString() === data.minerAddress.toString(),'block data.minerAddress differ after load: ' + block.data.minerAddress + '!==' + data.minerAddress);
+        assert(block.height === height,'block height differ after load: ' + block.height + '!==' + height);
     });
 
 });
