@@ -72,7 +72,7 @@ class InterfaceBlockchainProtocol {
 
                 socket.node.sendRequest("blockchain/header/new-block/" + data.height || 0, {
                     result: true,
-                    forkAnswer: result
+                    forkAnswer: (result !== null)
                 });
 
 

@@ -20,13 +20,6 @@ class InterfaceBlockchainForksAdministrator {
 
         let fork;
 
-        fork = this.findForkBySockets(sockets);
-        if (fork !== null) return fork;
-
-        fork = this.findForkByHeader(header);
-        if (fork !== null) return fork;
-
-
         fork = new InterfaceBlockchainFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainLength, header);
 
         this.forks.push(fork);
@@ -61,8 +54,10 @@ class InterfaceBlockchainForksAdministrator {
      */
     findForkByHeader(header){
 
+        if (header === null || header === undefined) return null;
+
         for (let i=0; i<this.forks.length; i++)
-            if (this.forks[i].forkHeader === header || this.forks[i].forkHeader.hash.equals( header.hash ) )
+            if ( this.forks[i].forkHeader !== null && (this.forks[i].forkHeader === header || this.forks[i].forkHeader.hash.equals( header.hash )) )
                 return this.forks[i];
 
         return null;

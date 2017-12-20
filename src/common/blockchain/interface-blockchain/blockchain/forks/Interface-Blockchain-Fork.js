@@ -83,7 +83,10 @@ class InterfaceBlockchainFork {
      */
     async saveFork(){
 
-        if (!await this.validateFork()) return false;
+        if (!await this.validateFork()) {
+            console.log(colors.red("validateFork was not passed"));
+            return false
+        }
         // to do
 
         let useFork = false;
@@ -108,6 +111,7 @@ class InterfaceBlockchainFork {
 
             for (let i=0; i<this.forkBlocks.length; i++) {
                 if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i])){
+                    console.log(colors.green("fork couldn't be included in main Blockchain ",i));
                     forkedSuccessfully = false;
                     break;
                 }
@@ -122,8 +126,14 @@ class InterfaceBlockchainFork {
 
             this.blockchain.resetMining();
 
+            // it was done successfully
+            if (forkedSuccessfully)
+                this.blockchain.forksAdministrator.deleteFork(this);
+
+            return forkedSuccessfully;
         }
 
+        return false;
     }
 
 
