@@ -142,7 +142,7 @@ class InterfaceBlockchainProtocol {
 
                 let block = this.blockchain.blocks[data.height];
 
-                socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + data.height || 0, {
+                socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                     result: true,
                     block: block.serializeBlock()
                 });

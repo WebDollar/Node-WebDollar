@@ -315,6 +315,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                     //console.log("grandParent deletion", node, nodeParent);
                                     break;
                                 }
+
                         } else {
                             node = node.parent;
                             //console.log("this.changedNode 1_3");
@@ -350,7 +351,7 @@ class InterfaceRadixTree extends InterfaceTree{
                         node = node.parent;
                         nodeParent = node.parent;
 
-                        //console.log("this.changedNode 3");
+                        //console.log(" this.changedNode 3 ");
 
                         break;
                     }

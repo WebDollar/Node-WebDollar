@@ -91,10 +91,14 @@ class InterfaceBlockchainProtocolForkSolver{
             data = await this._discoverForkBinarySearch(sockets, 0, currentBlockchainLength - 1);
         }
 
-        //its a fork... starting from position
-        //or I don't have anything
+        //it is a full fork
+        if (currentBlockchainLength === 0 && data.position === -1)
+            data = {position : 0, header: undefined};
 
-        if (data.position > -1 || currentBlockchainLength === 0){
+        //its a fork... starting from position
+        console.log("fork position", data.position, "newChainLength", newChainLength);
+
+        if (data.position > -1 ){
 
            let fork = await this.blockchain.forksAdministrator.createNewFork(sockets, data.position, newChainLength, data.header);
 
@@ -127,17 +131,23 @@ class InterfaceBlockchainProtocolForkSolver{
             //set no change, to terminate
             if (terminateTimeout === undefined)
                 terminateTimeout = setTimeout(()=>{
+                    console.log(colors.red("Fork was not solved in time..."));
                     finished = true;
-                }, 3*60*1000);
+                }, 20*1000);
 
             let socket = fork.sockets[ Math.floor(Math.random()*fork.sockets.length) ];
 
+            //console.log("processsing... fork.sockets.length ", fork.sockets.length);
+
             //in case I didn't check this socket for the same block
-            if (!socketsCheckedForBlock.indexOf(socket)) {
+            if ( socketsCheckedForBlock.indexOf(socket) < 0) {
+
+                //console.log("it worked ", socket);
 
                 socketsCheckedForBlock.push(socket);
+                console.log("nextBlockHeight", nextBlockHeight);
 
-                socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight).then( async (answer)=>{
+                socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight).then( async (answer)=>{
 
                     if (answer.result === true){
 
@@ -145,10 +155,12 @@ class InterfaceBlockchainProtocolForkSolver{
                         let result = await fork.includeForkBlock(block);
 
                         //if the block was included correctly
-                        if (result){
+                        if (result) {
                             clearTimeout(terminateTimeout);
                             terminateTimeout = undefined;
                             nextBlockHeight++;
+
+                            socketsCheckedForBlock = [];
                         }
 
                     }
