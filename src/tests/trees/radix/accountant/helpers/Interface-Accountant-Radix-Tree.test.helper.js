@@ -14,7 +14,7 @@ class InterfaceAccountantRadixTreeTestHelper {
 
     testAdd (accountantData, accountantTree) {
 
-        if (typeof accountantTree === 'undefined' || accountantTree === null)  accountantTree = new this.className();
+        if ( accountantTree === undefined || accountantTree === null)  accountantTree = new this.className();
 
         accountantData.forEach((data, index) => {
 
@@ -61,13 +61,18 @@ class InterfaceAccountantRadixTreeTestHelper {
 
     };
 
-    testDelete (accountantTree, accountantData) {
+    testDelete (accountantTree, accountantData, showDebug) {
 
         accountantData.forEach((data, index) => {
 
             let str = data.text;
 
             accountantTree.delete(new WebDollarCryptoData(str, "ascii"));
+
+            if (showDebug) {
+                console.log("deleted", str);
+                accountantTree.printLevelSearch();
+            }
 
             assert(accountantTree.validateRoot() === true, "Accountant after " + str + " is not Valid");
             assert(accountantTree.validateParentsAndChildrenEdges() === true, "Accountant Tree Parent and Children Edges don't match");

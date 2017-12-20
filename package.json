@@ -7,9 +7,9 @@
     "build_terminal": "babel --presets es2017 src -d dist && browserify dist/build_terminal.js > dist_bundle/bundle_terminal.js",
     "build_brower_test": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ]",
     "build_browser": "browserify src/build_browser.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/Node-WebDollar-bundle.js -t [ babelify --presets [ es2017 ] ] && npm run build_brower_test",
-    "start_double_connections": "npm run build_terminal && ALLOW_DOUBLE_CONNECTIONS=true DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
+    "start_double_connections": "npm run build_terminal DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
     "start": "npm run build_terminal && node dist/build_terminal.js  ",
-    "start_mining": "npm run build_terminal && START_MINING=true node dist/build_terminal.js ",
+    "start_mining": "npm run build_terminal && START_MINING=true SERVER_PORT=6666  node dist/build_terminal.js ",
     "test": "npm run build_terminal && mocha --timeout 10000 dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",
     "show_mocha_report": "node src/tests/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
@@ -58,6 +58,8 @@
     "jsonp": "^0.2.1",
     "node-jsonp": "^1.0.2",
     "opn": "^5.1.0",
+    "pouchdb-node": "^6.3.4",
+    "pouchdb-upsert": "^2.2.0",
     "rxjs": "^5.4.3",
     "secp256k1": "^3.3.1",
     "simple-peer": "^8.1.1",
@@ -67,6 +69,7 @@
     "socket.io-p2p": "^2.2.0",
     "sqlite3": "^3.1.13",
     "utf-8-validate": "^3.0.3",
+    "uuid": "^3.1.0",
     "wrtc": "0.0.62"
   },
   "devDependencies": {

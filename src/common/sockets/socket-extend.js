@@ -9,7 +9,7 @@ import SocketAddress from 'common/sockets/socket-address'
 
 class SocketExtend{
 
-    extendSocket(socket, address, port){
+    extendSocket(socket, address, port, uuid){
 
         socket.node = {};
 
@@ -24,7 +24,7 @@ class SocketExtend{
 
         socket.node.protocol = {};
         socket.node.protocol.helloValidated = false;
-        socket.node.protocol.sendHello = () => { return NodeProtocol.sendHello(socket.node)  };
+        socket.node.protocol.sendHello = (validationDoubleConnectionsTypes) => { return NodeProtocol.sendHello(socket.node, validationDoubleConnectionsTypes)  };
 
         socket.node.protocol.propagation = {};
         socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket.node) };
@@ -63,7 +63,7 @@ class SocketExtend{
 
     sendRequestWaitOnce (socket, request, requestData, answerPrefix) {
 
-        if (typeof answerPrefix !== 'undefined') answerPrefix = String(answerPrefix); //in case it is a number
+        if ( answerPrefix !== undefined) answerPrefix = String(answerPrefix); //in case it is a number
 
         return new Promise((resolve) => {
 

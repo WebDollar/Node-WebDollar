@@ -37,7 +37,9 @@ class NodeServer {
         {
             let server = null;
             try {
-                server = io();
+                server = io({
+                    maxHttpBufferSize:consts.SOCKET_MAX_SIZE_BYRES,
+                });
 
             } catch(Exception){
                 console.log("Error Importing io() library", Exception.toString());
@@ -50,8 +52,8 @@ class NodeServer {
 
                 console.log(colors.blue('New connection from ' + socket.node.sckAddress.getAddress(true)));
 
-                socket.node.protocol.sendHello().then( (answer)=>{
-                    this.initializeSocket(socket);
+                socket.node.protocol.sendHello(["uuid"]).then( (answer)=>{
+                    this.initializeSocket(socket, ["uuid"]);
                 });
 
                 socket.once("disconnect", () => {
@@ -62,8 +64,17 @@ class NodeServer {
             });
 
             try {
-                console.log(typeof server);
-                server.listen(consts.NODE_PORT);
+                console.log("SERVER typeof", typeof server);
+
+                //multiple ports, but doesn't work
+
+                let port = process.env.SERVER_PORT||consts.NODE_PORT;
+                try{
+                    server.listen (port);
+                } catch (Exception) {
+                    console.log( colors.red("Couldn't open server on port ", port, " try next port") );
+                    server.listen (port+1);
+                }
             } catch(Exception){
                 console.log("Error Calling node_server.listen", Exception.toString());
             }
@@ -80,10 +91,10 @@ class NodeServer {
 
 
 
-    initializeSocket(socket){
+    initializeSocket(socket, validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(socket, "server") === false){
+        if (NodesList.registerUniqueSocket(socket, "server", validationDoubleConnectionsTypes) === false){
             return false;
         }
 

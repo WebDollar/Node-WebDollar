@@ -1,15 +1,18 @@
-if((typeof window !== 'undefined' && !window._babelPolyfill) ||
-    (typeof global !== 'undefined' && !global._babelPolyfill)) {
+if(( typeof window !== 'undefined' && !window._babelPolyfill) ||
+    ( typeof global !== 'undefined' && !global._babelPolyfill)) {
     require('babel-polyfill')
 }
 
-if (typeof describe !== 'undefined') {
+if ( typeof describe !== 'undefined') {
 
 
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test');
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Difficulty.test');
+    require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Block-LocalStore.test');
+    require ('tests/blockchain/protocol/Interface-Blockchain-Protocol-Fork-Solver.test');
 
-	require ('tests/indexeddb-js/Interface-IndexedDB.test');
+	require ('tests/pouchdb/Interface-IndexedDB.test');
+    require ('tests/pouchdb/Interface-PouchDB.test');
 
     require ('tests/trees/radix/Interface-Radix-Tree.test');
     require ('tests/trees/radix/accountant/Interface-Accountant-Radix-Tree.test');

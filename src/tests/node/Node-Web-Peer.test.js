@@ -12,12 +12,12 @@ describe('test node WebPeer', async () =>{
 
 describe('test web peer', async ()=> {
 
- if (typeof initiator === 'undefined') initiator = true;
+ if ( initiator === undefined) initiator = true;
 
 
-        if (typeof window === 'undefined') window = global;
+        if ( window === undefined) window = global;
 
-        if (typeof location === 'undefined') location = global.location||{};
+        if ( location === undefined) location = global.location||{};
 
         var wrtc = require('wrtc');
 
@@ -46,7 +46,7 @@ describe('test web peer', async ()=> {
             console.log('CONNECT', data, p);
 
             setInterval(function() {
-                if ((typeof p !== 'undefined')&& ( p !== null)) {
+                if (( p !== undefined)&& ( p !== null)) {
                     console.log(p);
                     p.send('whatever' + index + " ___ " + Math.random())
                 }

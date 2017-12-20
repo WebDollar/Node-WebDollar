@@ -26,23 +26,23 @@ class NodesList {
     }
 
 
-    searchNodeSocketByAddress(sckAddress, type){
+    searchNodeSocketByAddress(sckAddress, type, validationDoubleConnectionsTypes){
 
-        if (typeof type === 'undefined') type = 'all';
+        if (type === undefined) type = 'all';
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
         for (let i=0; i<this.nodes.length; i++)
-            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress))){
+            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress, validationDoubleConnectionsTypes))){
                 return this.nodes[i];
             }
 
         return null;
     }
 
-    registerUniqueSocket(socket, type){
+    registerUniqueSocket(socket, type, validationDoubleConnectionsTypes){
 
-        if (type === 'undefined') throw ("type is necessary");
+        if (type === undefined) throw ("type is necessary");
 
         socket.node.type = type;
         socket.node.index = ++this.nodesTotal;
@@ -57,7 +57,7 @@ class NodesList {
         }
 
         // avoiding double connections                              unless it is allowed to double connections
-        if ( this.searchNodeSocketByAddress(socket) === null || process.env.ALLOW_DOUBLE_CONNECTIONS) {
+        if ( this.searchNodeSocketByAddress(socket, undefined, validationDoubleConnectionsTypes ) === null ) {
 
             // it is a unique connection, I should register this connection
 
@@ -88,7 +88,7 @@ class NodesList {
             return false;
         }
 
-        if (typeof type === 'undefined') type = 'all';
+        if (type === undefined) type = 'all';
 
         //console.log("disconnecting", socket, this.nodes);
 
@@ -111,7 +111,7 @@ class NodesList {
     //return the JOIN of the clientSockets and serverSockets
     getNodes(type){
 
-        if (typeof type === 'undefined') type = 'all';
+        if ( type === undefined) type = 'all';
 
         let list = [];
 

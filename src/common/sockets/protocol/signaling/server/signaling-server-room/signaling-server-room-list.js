@@ -62,7 +62,7 @@ class SignalingServerRoomList {
 
             }
 
-        if (typeof skipReverse === 'undefined' || skipReverse === false)
+        if ( skipReverse === undefined || skipReverse === false)
             return this.searchSignalingServerRoomConnection(client2, client1, true);
 
         return null;

@@ -40,7 +40,7 @@ class InterfaceMerkleTree extends InterfaceTree{
     checkInvalidNode(node){
         //it should have a valid hash
 
-        if (typeof node.hash === 'undefined' || node.hash === null) return false;
+        if ( node.hash === undefined || node.hash === null) return false;
 
         return true;
     }
@@ -57,7 +57,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         let initialHash = null;
 
 
-        if (typeof node.hash === 'undefined' || node.hash === null  || typeof node.hash.sha256 === 'undefined' || node.hash.sha256 === null )  return false;
+        if ( node.hash === undefined || node.hash === null  ||  node.hash.sha256 === undefined || node.hash.sha256 === null )  return false;
         else {
             initialHash = {};
             initialHash.sha256 = node.hash.sha256.toUint8Array();
@@ -95,7 +95,7 @@ class InterfaceMerkleTree extends InterfaceTree{
      */
     _computeHash(node){
 
-        if (node === null || typeof node === 'undefined') throw "Couldn't compute hash because Node is empty";
+        if (node === null ||  node === undefined) throw "Couldn't compute hash because Node is empty";
 
         if (node === this.root && node.edges.length === 0){
             node.hash = {sha256: WebDollarCryptoData.createWebDollarCryptoData( [0] )};
@@ -109,7 +109,7 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         if (node.edges.length === 0){ //Leaf Node (terminal node)
 
-            if ( node.value === null || typeof node === "undefined") throw ("Leaf nodes has not value");
+            if ( node.value === null || node === undefined) throw ("Leaf nodes has not value");
             if ( node.isLeaf() === false) throw ("Node is not leaf");
 
             // Let's hash
@@ -125,7 +125,7 @@ class InterfaceMerkleTree extends InterfaceTree{
             for (let i=0; i < node.edges.length; i++){
 
                 // the hash was not calculated ....
-                if (node.edges[i].targetNode.hash === null || typeof node.edges[i].targetNode.hash === "undefined" || !WebDollarCryptoData.isWebDollarCryptoData(node.edges[i].targetNode.hash))
+                if (node.edges[i].targetNode.hash === null || node.edges[i].targetNode.hash === undefined || !WebDollarCryptoData.isWebDollarCryptoData(node.edges[i].targetNode.hash))
                     this._computeHash(node.edges[i].targetNode);
 
                 if (i === 0) {
@@ -160,12 +160,12 @@ class InterfaceMerkleTree extends InterfaceTree{
      */
     refreshHash(node, forced){
 
-        if (node === null || typeof node === 'undefined') throw "Couldn't compute hash because Node is empty";
+        if (node === null ||  node === undefined) throw "Couldn't compute hash because Node is empty";
 
         let result = false;
         let hashAlreadyComputed = false;
 
-        if ( typeof forced === "undefined" || forced === false ) {
+        if ( forced === undefined || forced === false ) {
             // in case it must recalculate the hash by force
             hashAlreadyComputed = true;
             result  = this.validateHash(node);

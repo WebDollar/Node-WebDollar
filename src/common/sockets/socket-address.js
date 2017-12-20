@@ -26,17 +26,17 @@ class SocketAddress {
 
         if (SocketAddress.checkIsSocketAddress(address)) return address;
 
-        if ( typeof port === 'undefined' || port === '') port = consts.NODE_PORT;
+        if (  port === undefined || port === '') port = consts.NODE_PORT;
         return new SocketAddress(address, port);
     }
 
 
-    constructor(address, port){
+    constructor(address, port, uuid){
 
-        if (typeof address === 'undefined') address = '';
+        if ( address === undefined) address = '';
         if (typeof address === 'string') address = address.toLowerCase();
 
-        if (typeof port === 'undefined') port = consts.NODE_PORT;
+        if ( port === undefined) port = consts.NODE_PORT;
 
         try {
             if (typeof address === 'string')
@@ -52,16 +52,34 @@ class SocketAddress {
         this.address = address;
         this.port = port;
         this.geoLocation = null;
+
+        this.uuid = uuid;
     }
 
-    matchAddress(address){
+    matchAddress(address, validationDoubleConnectionsTypes){
+
+        if (validationDoubleConnectionsTypes === undefined) validationDoubleConnectionsTypes = ["ip","uuid"];
+        else if (!Array.isArray(validationDoubleConnectionsTypes)) validationDoubleConnectionsTypes = [validationDoubleConnectionsTypes];
+
         //maybe it is a socket
         let sckAddress = SocketAddress.createSocketAddress(address);
 
-        let myAddressString = this.getAddress(false);
-        let addressString = sckAddress.getAddress(false);
+        //uuid validation
+        if ( validationDoubleConnectionsTypes.indexOf("uuid") >= 0 ){
 
-        return ( myAddressString === addressString )
+            if (this.uuid !== null && this.uuid === sckAddress.uuid) return true;
+
+        } else
+        //ip validation
+        if ( validationDoubleConnectionsTypes.indexOf("ip") >=0 ){
+
+            let myAddressString = this.getAddress(false);
+            let addressString = sckAddress.getAddress(false);
+
+            if ( myAddressString === addressString ) return true;
+        }
+
+        return false;
     }
 
     /*
@@ -77,7 +95,7 @@ class SocketAddress {
     getAddress(includePort){
 
         try {
-            if (typeof includePort === 'undefined') includePort = true;
+            if ( includePort === undefined) includePort = true;
 
             if (typeof this.address === 'object') {
 

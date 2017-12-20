@@ -18,7 +18,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
         if (typeof sum === "object"  && sum !== null && sum.constructor.name === "BigNumber") this.sum =  sum;
         else {
 
-            if (typeof sum === 'undefined' || sum === null) sum = 0;
+            if ( sum === undefined || sum === null) sum = 0;
 
             this.sum = new BigNumber(sum);
         }
@@ -27,7 +27,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     isSumValid(){
 
-        if (typeof this.sum === 'undefined' && this.sum=== null) return false;
+        if ( this.sum === undefined && this.sum=== null) return false;
         if (typeof this.sum !== "object"  || this.sum.constructor.name !== "BigNumber") return false;
 
         return true;
@@ -42,7 +42,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
             if (typeof value.balance === "object"  && value.balance !== null && value.balance.constructor.name === "BigNumber") { }
             else {
 
-                if (typeof value.balance === 'undefined' || value.balance === null) value.balance = 0;
+                if ( value.balance === undefined || value.balance === null) value.balance = 0;
 
                 value.balance = new BigNumber(value.balance);
             }
@@ -57,7 +57,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         if (typeof this.value !== 'object' || this.value === null) return false;
 
-        if (typeof this.value.balance === 'undefined' && this.value.balance=== null) return false;
+        if ( this.value.balance === undefined && this.value.balance=== null) return false;
         if (typeof this.value.balance !== "object"  || this.value.balance.constructor.name !== "BigNumber") return false;
 
         return true;

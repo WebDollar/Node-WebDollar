@@ -54,6 +54,7 @@ class NodeClient {
                     // params described in the documentation https://socket.io/docs/client-api#manager
                     socket = io.connect(address, {
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
+                        maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
                     });
 
                 }  catch (Exception){
@@ -72,9 +73,9 @@ class NodeClient {
 
                     console.log(colors.blue("Client connected to " + socket.node.sckAddress.getAddress(true) ));
 
-                    socket.node.protocol.sendHello().then( (answer)=>{
+                    socket.node.protocol.sendHello(["ip","uuid"]).then( (answer)=>{
 
-                        this.initializeSocket(socket);
+                        this.initializeSocket(socket, ["ip","uuid"]);
 
                         resolve(true);
                     });
@@ -120,11 +121,11 @@ class NodeClient {
 
     }
 
-    initializeSocket(){
+    initializeSocket(validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
 
-        if (NodesList.registerUniqueSocket(this.socket, "client") === false){
+        if (NodesList.registerUniqueSocket(this.socket, "client", validationDoubleConnectionsTypes) === false){
             return false;
         }
 

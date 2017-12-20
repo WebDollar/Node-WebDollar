@@ -1,6 +1,6 @@
 let Argon2 = null;
 
-if (typeof window !== 'undefined') {
+if ( typeof window !== 'undefined') {
 
     //tutorial based on https://github.com/ranisalt/node-argon2
     Argon2 = require('./browser/Argon2-Browser').default

@@ -4,6 +4,8 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import consts from 'consts/const_global'
 
+import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
+
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
  */
@@ -12,7 +14,7 @@ class InterfaceBlockchainBlock{
 
     //everything is buffer
 
-    constructor (version, hash, hashPrev, hashData, timeStamp, nonce, data, myHeight ){
+    constructor (version, hash, hashPrev, hashData, timeStamp, nonce, data, height, db){
 
         this.version = version||null; // 2 bytes version                                                 - 2 bytes
 
@@ -20,15 +22,15 @@ class InterfaceBlockchainBlock{
 
         this.hashPrev = hashPrev||null; // 256-bit hash sha256                                             - 32 bytes, sha256
 
-        if (typeof hashData === 'undefined'){
+        if ( hashData === undefined){
             hashData = WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( WebDollarCryptoData.createWebDollarCryptoData(data, true) )).buffer;
         }
 
         this.hashData = hashData||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
-        this.nonce = nonce||null; //	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
-
-        if (typeof timeStamp === 'undefined'){
+        this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
+        
+        if ( timeStamp === undefined){
 
             timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStamp;
         }
@@ -41,8 +43,10 @@ class InterfaceBlockchainBlock{
         //computed data
         this.computedBlockPrefix = null;
 
-        this.myDifficultyTarget = null; // difficulty set by me
-        this.myHeight = (typeof myHeight === "number" ? myHeight : null); // index set by me
+        this.difficultyTarget = null; // difficulty set by me
+        this.height = (typeof height === "number" ? height : null); // index set by me
+
+        this.db = db;
     }
 
     async validateBlock(height, previousDifficultyTarget, previousHash){
@@ -53,7 +57,7 @@ class InterfaceBlockchainBlock{
         if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw ('hashPrev is empty');
 
         if (this.data === undefined || this.data === null  ) throw ('data is empty');
-        if (this.data.minerAddress === 'undefined' || this.data.minerAddress === null  ) throw ('data.minerAddress is empty');
+        if (this.data.minerAddress === undefined || this.data.minerAddress === null  ) throw ('data.minerAddress is empty');
 
         if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData)) throw ('hashData is empty');
 
@@ -67,7 +71,7 @@ class InterfaceBlockchainBlock{
         if (height >=0)
             if (this.version !== 0x01) throw ('invalid version');
 
-        if (height !== this.myHeight) throw 'height is different';
+        if (height !== this.height) throw 'height is different';
 
         await this._validateBlockHash(previousHash);
         this._validateTargetDifficulty(previousDifficultyTarget);
@@ -141,22 +145,34 @@ class InterfaceBlockchainBlock{
         this.computedBlockPrefix = Buffer.concat ( [
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.version).toFixedBuffer(2),
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.hashPrev ).toFixedBuffer( consts.BLOCKS_POW_LENGTH ),
+                                                     WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 ),
                                                      //data contains addressMiner, transactions history, contracts, etc
-                                                     this._convertDataToBuffer(),
-                                                     WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 )
+                                                     this._serializeData(),
                                                     ]);
 
         return this.computedBlockPrefix;
     }
 
-    /*
+    /**
         convert data to Buffer
-     */
-    _convertDataToBuffer(){
+     **/
+    _serializeData(){
 
         let buffer = Buffer.concat( [
-                                        WebDollarCryptoData.createWebDollarCryptoData( this.data.minerAddress ).toFixedBuffer(32)
+                                        WebDollarCryptoData.createWebDollarCryptoData( this.data.minerAddress ).toFixedBuffer(consts.PUBLIC_ADDRESS_LENGTH)
                                     ] )
+        return buffer;
+    }
+
+    _deserializeData(buffer){
+
+        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
+
+        let offset = 0;
+        this.data = {};
+
+        this.data.minerAddress = data.substr(offset, offset+=consts.PUBLIC_ADDRESS_LENGTH).buffer;
+
         return buffer;
     }
 
@@ -187,16 +203,50 @@ class InterfaceBlockchainBlock{
 
     }
 
-    deserializeBlock(buffer){
+    deserializeBlock(buffer, height){
+
+        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
+        let offset = 0;
+
+        if (height >= 0){
+
+            this.hash = data.substr(0, consts.BLOCKS_POW_LENGTH).buffer;
+            offset+=consts.BLOCKS_POW_LENGTH;
+            
+            this.nonce = data.substr(offset, consts.BLOCKS_NONCE).toInt();
+            offset+=consts.BLOCKS_NONCE;
+            
+            this.version = data.substr(offset, 2).toInt();
+            offset+=2;
+            
+            this.hashPrev = data.substr(offset, consts.BLOCKS_POW_LENGTH).buffer;
+            offset+=consts.BLOCKS_POW_LENGTH;
+            
+            this.timeStamp = data.substr(offset, 4).toInt();
+            offset+=4;
+
+            this._deserializeData(data.substr(offset));
+        }
 
     }
 
-    save(){
-
+    save(db = this.db){
+        let key = "block" + this.height;        
+        let bufferValue = this.serializeBlock();
+        
+        db.save(key, bufferValue).catch((err) => {
+            throw 'ERROR on SAVE block: ' + err;
+        });
     }
 
-    load(){
+    load(db = this.db){    
+        let key = "block" + this.height;
 
+        db.get(key).then((buffer) => {
+            this.deserializeBlock(buffer.value, this.height);
+        }).catch((err) => {
+            throw 'ERROR on LOAD block: ' + err;
+        });
     }
 
 }

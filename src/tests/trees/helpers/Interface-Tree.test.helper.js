@@ -9,15 +9,15 @@ import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 class InterfaceTreeTestHelper {
 
     constructor (className){
-        if (typeof className === 'undefined') className = IntefaceMerkleRadixTree
+        if ( className === undefined) className = IntefaceMerkleRadixTree
 
         this.className = className;
     }
 
     testAdd (radixData, radixTree, createValue) {
 
-        if (typeof radixTree === 'undefined' || radixTree === null)  radixTree = new this.className();
-        if (typeof createValue === 'undefined') createValue = true;
+        if ( radixTree === undefined || radixTree === null)  radixTree = new this.className();
+        if ( createValue === undefined) createValue = true;
 
         radixData.forEach((str) => {
             radixTree.add(new WebDollarCryptoData(str, "ascii"), createValue ? {address: str} : undefined );

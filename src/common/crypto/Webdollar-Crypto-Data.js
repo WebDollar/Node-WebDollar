@@ -192,7 +192,7 @@ class WebDollarCryptoData {
 
     substr(index, count){
 
-        if (typeof count === 'undefined') count = this.buffer.length;
+        if ( count === undefined) count = this.buffer.length;
 
 
         let array = [];
@@ -207,7 +207,7 @@ class WebDollarCryptoData {
 
         if (! WebDollarCryptoData.isWebDollarCryptoData(cryptoData2)) return null;
 
-        if (typeof startIndex === 'undefined') startIndex = 0;
+        if ( startIndex === undefined) startIndex = 0;
 
         let i =0;
         while (i + startIndex < this.buffer.length && i < cryptoData2.buffer.length ) {
@@ -260,6 +260,17 @@ class WebDollarCryptoData {
 
         return this.buffer.compare(data.buffer)
 
+    }
+
+    toInt(){
+        if (this.buffer.length === 2){
+            return this.buffer[0] | (this.buffer[1] << 8);
+        } else if (this.buffer.length === 4){
+            return this.buffer[0] | (this.buffer[1] << 8) | (this.buffer[2] << 16) | (this.buffer[3] << 24);
+
+        } else if (this.buffer.length === 6){
+            return this.buffer[0] | (this.buffer[1] << 8) | (this.buffer[2] << 16) | (this.buffer[3] << 24) | (this.buffer[4] << 32) | (this.buffer[5] << 40);
+        }
     }
 
 }

@@ -38,7 +38,7 @@ class NetworkMap {
 
     createMap(id, style){
 
-        if (typeof style === 'undefined')
+        if ( style === undefined)
             style  = NetworkMapStyleLight.style;
 
         let map = new google.maps.Map(document.getElementById(id), {
@@ -89,34 +89,34 @@ class NetworkMap {
 
     async initialize(map){
 
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined'){
+        if ( google === undefined ||  google.maps === undefined){
             alert('GOOGLE MAPS LIBRARY IS NOT REGISTERED');
             return false;
         }
 
-        NodesList.registerEvent("connected", {type: ["all"]}, async (err, nodeListObject) => {
+        NodesList.registerEvent("connected", {type: ["all"]}, async (err, nodesListObject) => {
 
-            let geoLocation = await nodeListObject.socket.node.sckAddress.getGeoLocation();
+            let geoLocation = await nodesListObject.socket.node.sckAddress.getGeoLocation();
 
             //console.log("geoLocation",geoLocation);
 
-            this._addMarker(map, geoLocation, nodeListObject.socket);
+            this._addMarker(map, geoLocation, nodesListObject.socket);
 
         } );
 
-        NodesList.registerEvent("disconnected", {type: ["all"]}, async (err, nodeListObject) => {
+        NodesList.registerEvent("disconnected", {type: ["all"]}, async (err, nodesListObject) => {
 
             //deleting the marker
 
-            let markerIndex = this._findMarkerIndexBySocket(nodeListObject.socket);
+            let markerIndex = this._findMarkerIndexBySocket(nodesListObject.socket);
 
             if (markerIndex !== -1) {
 
                 this.markers[markerIndex].setMap(null);
 
-                if (typeof this.markers[markerIndex].curveMarker !== 'undefined')  this.markers[markerIndex].curveMarker.setMap(null);
-                if (typeof this.markers[markerIndex].linePoly !== 'undefined')  this.markers[markerIndex].linePoly.setMap(null);
-                if (typeof this.markers[markerIndex].infoWindow !== 'undefined') this.markers[markerIndex].infoWindow.setMap(null);
+                if ( this.markers[markerIndex].curveMarker !== undefined)  this.markers[markerIndex].curveMarker.setMap(null);
+                if ( this.markers[markerIndex].linePoly !== undefined)  this.markers[markerIndex].linePoly.setMap(null);
+                if ( this.markers[markerIndex].infoWindow !== undefined) this.markers[markerIndex].infoWindow.setMap(null);
 
                 this.markers.splice(markerIndex, 1);
             }
@@ -142,7 +142,7 @@ class NetworkMap {
                     '<div id="bodyContent">'+
                         '<p>Connected to <b>'+ (geoLocation.city||'')+', '+geoLocation.country||''+'</b> <br/>'+
                             geoLocation.isp||'' + '<br/> <br/>'+
-                            (geoLocation.lat||'undefined') + '    '+ (geoLocation.lng||'undefined')+ '<br/>'+
+                            (geoLocation.lat||'0') + '    '+ (geoLocation.lng||'0')+ '<br/>'+
                         '</p>'+
                 '</div>'+
             '</div>');
@@ -160,7 +160,7 @@ class NetworkMap {
 
     _addMarker(map, geoLocation, socket){
 
-        if (typeof google === 'undefined' || typeof google.maps === 'undefined'){
+        if ( google === undefined ||  google.maps === undefined){
             alert('GOOGLE MAPS LIBRARY IS NOT REGISTERED');
             return false;
         }
@@ -225,7 +225,7 @@ class NetworkMap {
 
     _createConnectionsArcs(update, map, showOldArcs) {
 
-        if (typeof showOldArcs === 'undefined') showOldArcs = false;
+        if ( showOldArcs === undefined) showOldArcs = false;
 
         /*
             TUTORIAL - BASED ON http://jsfiddle.net/medmunds/sd10up9t/

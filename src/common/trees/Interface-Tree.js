@@ -22,11 +22,11 @@ class InterfaceTree{
      */
     validateTree(node, callback){
 
-        if (typeof node === 'undefined' || node === null) throw ('Tree Validation Errror. Node is null');
+        if ( node === undefined || node === null) throw ('Tree Validation Errror. Node is null');
 
         for (let i=0; i < node.edges.length; i++) {
 
-            if ( typeof node.edges[i].targetNode === 'undefined' || node.edges[i].targetNode === null ){
+            if (  node.edges[i].targetNode === undefined || node.edges[i].targetNode === null ){
                 console.log("Edge target node is Null", node, node.edges[i], i)
                 throw('Edge target node is Null')
             }
@@ -71,7 +71,7 @@ class InterfaceTree{
 
         data = WebDollarCryptoData.createWebDollarCryptoData(data);
 
-        if (parent === null || typeof parent ==="undefined") parent = this.root;
+        if (parent === null || parent === undefined) parent = this.root;
 
         let node = this.createNode( parent , [], data )
         parent.edges.push( this.createEdge( node ) );
@@ -88,7 +88,7 @@ class InterfaceTree{
         let searchResult = this.search(value);
 
         //console.log("searchResult", searchResult)
-        if (typeof searchResult.node === "undefined" || searchResult.node === null) return false;
+        if ( searchResult.node === undefined || searchResult.node === null) return false;
 
         let node = searchResult.node;
 
@@ -122,7 +122,7 @@ class InterfaceTree{
 
         if (deleted) {
 
-            if (nodeParent === null || typeof nodeParent === 'undefined') nodeParent = this.root;
+            if (nodeParent === null ||  nodeParent === undefined) nodeParent = this.root;
 
             this.changedNode(nodeParent)
 
@@ -140,15 +140,15 @@ class InterfaceTree{
      */
     search(value, node){
 
-        if (typeof value === 'undefined' || value === null) return null;
+        if ( value === undefined || value === null) return null;
 
-        if (typeof node === 'undefined' || node === null) node = this.root;
+        if ( node === undefined || node === null) node = this.root;
         //console.log("value1", value, value  instanceof WebDollarCryptoData );
         value = WebDollarCryptoData.createWebDollarCryptoData(value);
         //console.log("value2", value, value  instanceof WebDollarCryptoData );
 
 
-        if (typeof node.value !== 'undefined' && node.value !== null && node.value.buffer.equals (value.buffer) ) {
+        if ( node.value !== undefined && node.value !== null && node.value.buffer.equals (value.buffer) ) {
             //console.log("l-am gasit", node.value.toString());
             return { result: true, node: node, value: node.value }
         }
@@ -168,8 +168,8 @@ class InterfaceTree{
     //Level Search
     levelSearch(node, level) {
 
-        if (typeof node === "undefined") node = this.root;
-        if (typeof level === "undefined") level =  0;
+        if (node === undefined) node = this.root;
+        if (level === undefined) level =  0;
 
         let queue = [ {node: node, level: level} ];
         let result = [];
@@ -209,8 +209,8 @@ class InterfaceTree{
 
     validateParentsAndChildrenEdges(node, parent){
 
-        if (typeof node === 'undefined') node = this.root;
-        if (typeof parent === 'undefined') parent = null;
+        if ( node === undefined) node = this.root;
+        if ( parent === undefined) parent = null;
 
         if (node.parent !== parent) return false;
 
@@ -255,10 +255,10 @@ class InterfaceTree{
                 let hash = null;
 
                 node.edges.forEach ((edge, index)=>{
-                    edges.push( typeof edge.label  !== 'undefined' ? edge.label.toString() : '' )
+                    edges.push(  edge.label  !== undefined ? edge.label.toString() : '' )
                 });
 
-                if (typeof node.hash !== 'undefined')
+                if ( node.hash !== undefined)
                     hash = node.hash;
 
                 let dataObject = {id: node.id, parentId: (node.parent !== null ? node.parent.id : -666), value: value, sum: sum, edges: edges};
@@ -294,7 +294,7 @@ class InterfaceTree{
 
                 try {
 
-                    if (element.sum !== 'null' && typeof element.sum !== 'undefined') {
+                    if (element.sum !== 'null' &&  element.sum !== undefined) {
                         dataString += " , sum: ";
 
                         if (Buffer.isBuffer(element.sum)) dataString += element.sum.toString();

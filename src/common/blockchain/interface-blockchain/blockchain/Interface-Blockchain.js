@@ -5,27 +5,33 @@ import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blo
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchain/mining/difficulty/Interface-Blockchain-Difficulty'
+
+import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
+
+import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
+
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
-class InterfaceBlockchain{
+class InterfaceBlockchain {
 
 
     constructor (){
 
         this.blocks = [];
-        this.difficultyTarget = BlockchainGenesis.difficultyTarget;
+        this.forksAdministrator = new InterfaceBlockchainForksAdministrator(this);
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this )
 
+        this.mining = undefined;
+        
+        this.dataBase = new InterfacePouchDB();
     }
 
     async validateBlockchain(){
 
         for (let i=0; i<this.blocks.length; i++){
-
-            await this.validateBlockchainBlock(this.blocks[i], i);
-
+            if (! await this.validateBlockchainBlock(this.blocks[i]) ) return false;
         }
 
         return true;
@@ -34,47 +40,70 @@ class InterfaceBlockchain{
     /*
         Include a new block at the end of the blockchain, by validating the next block
      */
-    async includeBlockchainBlock(block){
+    async includeBlockchainBlock(block, resetMining){
 
-        if (! await this.validateBlockchainBlock(block, this.blocks.length ) ) return false; // the block has height === this.blocks.length
+
+        if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
 
         //let's check again the heights
-        if (block.myHeight !== this.blocks.length) throw ('heights of a new block is not good... strange');
+        if (block.height !== this.blocks.length) throw ('heights of a new block is not good... strange');
 
         this.blocks.push(block);
 
-        NodeProtocol.broadcastRequest("blockchain/new-block", {block: block, addresses: addresses });
+        // broadcasting the new block, to everybody else
+        NodeProtocol.broadcastRequest( "blockchain/header/new-block", {
+            height: block.height,
+            chainLength: this.blocks.length,
+            header:{
+                hash: block.hash,
+                hashPrev: block.hashPrev,
+                hashData: block.hashData,
+                nonce: block.nonce,
+
+            }
+        });
+
+        if (resetMining && this.mining !== undefined) //reset mining
+            this.mining.reset();
 
         return true;
     }
 
-    async validateBlockchainBlock(block, height){
+    async validateBlockchainBlock( block, prevDifficultyTarget, prevHash, prevTimeStamp ){
 
         if ( block instanceof InterfaceBlockchainBlock === false ) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
 
-        //validate genesis
-        let previousDifficultyTarget, previousHash, previousTimeStamp;
+        // in case it is not a fork controlled blockchain
+        if (prevDifficultyTarget === undefined){
 
-        if (height === 0 ) {
-            BlockchainGenesis.validateGenesis(block)
+            prevDifficultyTarget = this.getDifficultyTarget();
 
-            previousDifficultyTarget= BlockchainGenesis.difficultyTarget;
-            previousHash = BlockchainGenesis.hashPrev;
-            previousTimeStamp = BlockchainGenesis.timeStamp;
-        } else {
-            previousDifficultyTarget = this.blocks[height-1].myDifficultyTarget;
-            previousHash = this.blocks[height-1].hash;
-            previousTimeStamp = this.blocks[height-1].timeStamp;
+            if (block.height === 0 ) {
+                //validate genesis
+                BlockchainGenesis.validateGenesis(block);
+
+                prevHash = BlockchainGenesis.hashPrev;
+                prevTimeStamp = BlockchainGenesis.timeStamp;
+            } else {
+
+                prevHash = this.blocks[block.height-1].hash;
+                prevTimeStamp = this.blocks[block.height-1].timeStamp;
+            }
+
         }
 
         //validate difficulty & hash
-        if (await block.validateBlock(height, previousDifficultyTarget, previousHash) === false) throw ('block validation failed')
+        if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash) === false) throw ('block validation failed')
 
         //recalculate next target difficulty
-        block.myDifficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( previousDifficultyTarget, previousTimeStamp, block.timeStamp, block.myHeight );
+        block.difficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
 
         return true;
 
+    }
+
+    resetMining(){
+        this.mining.reset();
     }
 
     getBlockchainLength(){
@@ -83,6 +112,13 @@ class InterfaceBlockchain{
 
     getBlockchainLastBlock(){
         return this.blocks[this.blocks.length-1];
+    }
+
+    getDifficultyTarget(){
+        if (this.blocks.length > 0)
+            return this.blocks[this.blocks.length-1].difficultyTarget;
+        else
+            return BlockchainGenesis.difficultyTarget;
     }
 
     toString(){
@@ -94,11 +130,15 @@ class InterfaceBlockchain{
     }
 
     save(){
-
+        for (let i = 0; i < this.blocks.length; ++i) {
+            this.blocks[i].save();
+        }
     }
 
     load(){
-
+        for (let i = 0; i < this.blocks.length; ++i) {
+            this.blocks[i].load();
+        }
     }
 
 }
