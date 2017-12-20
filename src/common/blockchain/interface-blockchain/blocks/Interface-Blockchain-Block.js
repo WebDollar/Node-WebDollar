@@ -30,7 +30,6 @@ class InterfaceBlockchainBlock{
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
-        console.log('constructor=' + this.nonce.toString());
         if ( timeStamp === undefined){
 
             timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStamp;
