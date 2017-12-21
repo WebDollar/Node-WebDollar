@@ -24,7 +24,7 @@ describe('interfacePouchDB', () => {
 
         return db.save(key, value).then((response) => {
             return db.get(key).then((response) => {
-                assert(response.value === value, 'get: ' + response.value + '!=' + value);
+                assert(response === value, 'get: ' + response + '!=' + value);
             }).catch((err) => {
                 assert(false, err);
             });
@@ -40,7 +40,7 @@ describe('interfacePouchDB', () => {
         return db.save(key, value).then((responde) => {
             return db.remove(key).then((response) => {
                 return db.get(key).then((response) => {
-                    assert(false, 'get: ' + response.value + 'found after remove');
+                    assert(false, 'get: ' + response + 'found after remove');
                 }).catch((err) => {
                     assert(err.name === 'not_found', err);
                 });
@@ -59,7 +59,7 @@ describe('interfacePouchDB', () => {
         return db.save(key, value).then((response) => {
             return db.save(key, new_value).then((response) => {
                 return db.get(key).then((response) => {
-                    assert(response.value === new_value, 'get: ' + response.value + ' found old value after update');
+                    assert(response === new_value, 'get: ' + response + ' found old value after update');
                 }).catch((err) => {
                     assert(false, err);
                 });
@@ -73,7 +73,7 @@ describe('interfacePouchDB', () => {
         db = new InterfacePouchDB('MyDatabase');
         
         return db.remove(key).then((response) => {
-            assert(false, 'get: ' + response.value + ' succeded to remove nonexisting key');
+            assert(false, 'get: ' + response + ' succeded to remove nonexisting key');
         }).catch((err) => {
             assert(err.name === 'not_found', err);
         });
@@ -89,7 +89,7 @@ describe('interfacePouchDB', () => {
 
         return db.save(key, value).then((response) => {
             return db.get(key).then((response) => {
-                assert(value.equals(response.value), 'get: ' + response.value + '!=' + value);
+                assert(value.equals(response), 'get: ' + response + '!=' + value);
             }).catch((err) => {
                 assert(false, err);
             });
@@ -105,7 +105,7 @@ describe('interfacePouchDB', () => {
         return db.save(key, value).then((response) => {
             return db.remove(key).then((response) => {
                 return db.get(key).then((response) => {
-                    assert(false, 'get: ' + response.value + ' found after remove');
+                    assert(false, 'get: ' + response + ' found after remove');
                 }).catch((err) => {
                     assert(err.name === 'not_found', err);
                 });
@@ -123,7 +123,7 @@ describe('interfacePouchDB', () => {
         return db.save(key, value).then((response) => {
              return db.save(key, new_value).then((response) => {
                 return db.get(key).then((response) => {
-                    assert(new_value.equals(response.value), 'get: ' + response.value + ' found old value after update');
+                    assert(new_value.equals(response), 'get: ' + response + ' found old value after update');
                 }).catch((err) => {
                     assert(false, err);
                 });
@@ -137,7 +137,7 @@ describe('interfacePouchDB', () => {
         db = new InterfacePouchDB('MyDatabase');
         
         return db.remove(key).then((response) => {
-            assert(false, 'get: ' + response.value + ' succeded to remove nonexisting key');
+            assert(false, 'get: ' + response + ' succeded to remove nonexisting key');
         }).catch((err) => {
             assert(err.name === 'not_found', err);
         });
@@ -151,7 +151,7 @@ describe('interfacePouchDB', () => {
 
         return db.save(key, value).then((response) => {
             return db.get(key).then((response) => {
-                assert(value.equals(response.value), 'buffer are different: ' + response.value + '!=' + value);
+                assert(value.equals(response), 'buffer are different: ' + response + '!=' + value);
             }).catch((err) => {
                 assert(false, err);
             });
@@ -168,7 +168,7 @@ describe('interfacePouchDB', () => {
         return db.save(key, value).then((response) => {
             return db.save(key, new_value).then((response) => {
                 return db.get(key).then((response) => {
-                    assert(new_value.equals(response.value), 'buffer are different: ' + response.value + '!=' + value);
+                    assert(new_value.equals(response), 'buffer are different: ' + response + '!=' + value);
                 }).catch((err) => {
                     assert(false, err);
                 });
