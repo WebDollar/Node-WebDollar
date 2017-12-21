@@ -16,7 +16,7 @@ class InterfacePouchDB {
             _id: key,
             value: value
         }).then((response) => {
-            return response;
+            return true;
         }).catch((err) => {
             //document exists, update it
             if (err.status === 409) {
@@ -36,7 +36,7 @@ class InterfacePouchDB {
                 value: value
             });
         }).then((response) => {
-            return response;
+            return true;
         }).catch((err) => {
             throw err;
         });
@@ -54,7 +54,7 @@ class InterfacePouchDB {
         return this.db.get(key).then((doc) => {
             return this.db.remove(doc._id, doc._rev);
         }).then((result) => {
-            return result;
+            return true;
         }).catch((err) => {
             throw err;
         });
@@ -63,9 +63,10 @@ class InterfacePouchDB {
     //attachments
 
     saveDocumentAttachment(key, value) {
-        let attachment = new Buffer(value, {content_type: 'application/octet-stream'});
+        let buf = Buffer.from(value);
+        let attachment = new Buffer(buf, {content_type: 'application/octet-stream'});
         return this.db.putAttachment(key, this.attachName, attachment).then((result) => {
-            return result.ok;
+            return true;
         }).catch((err) => {
             //document exists, update it
             if (err.status === 409) {
@@ -82,7 +83,7 @@ class InterfacePouchDB {
     }
 
     getDocumentAttachment(key) {
-        return this.db.get(key, this.attachName).then((blobOrBuffer) => {
+        return this.db.getAttachment(key, this.attachName).then((blobOrBuffer) => {
             return blobOrBuffer;
         }).catch((err) => {
             throw err;
@@ -91,9 +92,10 @@ class InterfacePouchDB {
 
     updateDocumentAttachment(key, value) {
         return this.db.get(key).then((doc) => {
-            let attachment = new Buffer(value, {content_type: 'application/octet-stream'});
+            let buf = Buffer.from(value);
+            let attachment = new Buffer(buf, {content_type: 'application/octet-stream'});
             return this.db.putAttachment(doc._id, this.attachName, doc._rev, attachment, 'application/octet-stream').then((result) => {
-                return result.ok;
+                return true;
             }).catch((err) => {
                 throw err;
             });
@@ -106,7 +108,7 @@ class InterfacePouchDB {
     deleteDocumentAttachment(key) {
         return this.db.get(key).then((doc) => {
             return this.db.removeAttachment(doc._id, this.attachName, doc._rev).then((result) => {
-                return result;
+                return true;
             }).catch((err) => {
                 throw err;
             });
@@ -137,7 +139,7 @@ class InterfacePouchDB {
 
     get(key) {
         return this.getDocument(key).then(() => {
-            return this.getDocumentAttachment(key).then(() => {
+            return this.getDocumentAttachment(key).then((doc) => {
                 return this.getDocumentAttachment(key);
             }).catch(() => {
                 return this.getDocument(key);
