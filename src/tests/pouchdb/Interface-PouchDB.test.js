@@ -87,7 +87,7 @@ describe('interfacePouchDB', () => {
         db.save(key, value);
 
         return db.get(key).then((result) => {
-            assert(result.value === value, 'get: ' + result.value + '!=' + value);
+            assert(result.value.equals(value), 'get: ' + result.value + '!=' + value);
         }).catch((err) => {
             assert(err !== null, err);
         });
@@ -120,7 +120,7 @@ describe('interfacePouchDB', () => {
         db.save(key, new_value);
         
         return db.get(key).then((result) => {
-            assert(result.value === value, 'get: ' + result.value + ' found old value after update');
+            assert(result.value.equals(value), 'get: ' + result.value + ' found old value after update');
         }).catch((err) => {
             assert(err.name === 'not_found', err);
         });
@@ -141,14 +141,13 @@ describe('interfacePouchDB', () => {
     it('save/get sample Array', () => {
 
         key = '1';
-        value = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        value = new Buffer([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
         db = new InterfacePouchDB('MyDatabase');
 
         db.save(key, value);
 
         return db.get(key).then((result) => {
-            for(let i = 0; i < result.value.length; ++i)
-                assert(result.value[i] === value[i], 'get: ' + result.value[i] + '!=' + value[i]);
+            assert(resule.value.equals(value), 'buffer are different: ' + result.value + '!=' + value);
         }).catch((err) => {
             assert(err !== null, err);
         });
