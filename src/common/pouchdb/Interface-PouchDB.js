@@ -97,7 +97,7 @@ class InterfacePouchDB {
             }).catch((err) => {
                 throw err;
             });
-
+ 
         }).catch((err) => {
             throw err;
         });
