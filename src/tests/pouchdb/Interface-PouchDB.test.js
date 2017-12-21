@@ -78,7 +78,7 @@ describe('interfacePouchDB', () => {
     
     //----------------------Buffer-------------------------------------------------------
         
-    it('save/get sample array', () => {
+    it('save/get sample Buffer', () => {
 
         key = '1';
         value = new Buffer('744FF0022AA', 'hex');
@@ -137,5 +137,22 @@ describe('interfacePouchDB', () => {
             assert(err.name === 'not_found', err);
         });
     });
+    
+    it('save/get sample Array', () => {
+
+        key = '1';
+        value = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        db = new InterfacePouchDB('MyDatabase');
+
+        db.save(key, value);
+
+        return db.get(key).then((result) => {
+            for(let i = 0; i < result.value.length; ++i)
+                assert(result.value[i] === value[i], 'get: ' + result.value[i] + '!=' + value[i]);
+        }).catch((err) => {
+            assert(err !== null, err);
+        });
+    });
+       
     
 });
