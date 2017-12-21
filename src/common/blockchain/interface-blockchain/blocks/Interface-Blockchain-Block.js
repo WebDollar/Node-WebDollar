@@ -106,7 +106,7 @@ class InterfaceBlockchainBlock{
 
         if ( prevDifficultyTarget === null || (!Buffer.isBuffer(prevDifficultyTarget) && !WebDollarCryptoData.isWebDollarCryptoData(prevDifficultyTarget)) ) throw 'previousDifficultyTarget is not given'
 
-        console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
+        //console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
 
         if (! (this.hash.compare( prevDifficultyTarget ) <= 0))
             throw "block doesn't match the difficulty target is not ";

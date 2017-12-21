@@ -57,6 +57,7 @@ class InterfaceBlockchainFork {
         let forkHeight = block.height - this.forkStartingHeight;
 
         if (block.height < this.forkStartingHeight) throw 'block height is smaller than the fork itself';
+        if (block.height !== height) throw "block height is different than block's height";
 
         let prevDifficultyTarget, prevHash, prevTimeStamp;
 
@@ -68,6 +69,10 @@ class InterfaceBlockchainFork {
         } else if ( forkHeight === 0) {
 
             // based on previous block from blockchain
+
+            prevDifficultyTarget = this.blockchain.blocks[height-1].difficultyTarget;
+            prevHash = this.blockchain.blocks[height-1].hash;
+            prevTimeStamp = this.blockchain.blocks[height-1].timeStamp;
 
         } else { // just the fork
 
