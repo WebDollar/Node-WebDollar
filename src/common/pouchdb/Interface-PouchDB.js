@@ -83,7 +83,7 @@ class InterfacePouchDB {
     }
 
     getDocumentAttachment(key) {
-        return this.db.get(key, this.attachName).then((blobOrBuffer) => {
+        return this.db.getAttachment(key, this.attachName).then((blobOrBuffer) => {
             return blobOrBuffer;
         }).catch((err) => {
             throw err;
@@ -139,7 +139,7 @@ class InterfacePouchDB {
 
     get(key) {
         return this.getDocument(key).then(() => {
-            return this.getDocumentAttachment(key).then(() => {
+            return this.getDocumentAttachment(key).then((doc) => {
                 return this.getDocumentAttachment(key);
             }).catch(() => {
                 return this.getDocument(key);
