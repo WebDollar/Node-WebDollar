@@ -90,14 +90,18 @@ class InterfaceBlockchainProtocolForkSolver{
 
             // in case it was you solved previously && there is something in the blockchain
 
-            if ( (data.position||-1) === -1 && currentBlockchainLength > 0 ) {
+            if ( data.position === -1 && currentBlockchainLength > 0 ) {
                 data = await this._discoverForkBinarySearch(sockets, 0, currentBlockchainLength - 1);
                 //console.log("binary search ", data)
             }
 
-            //it is a full fork
-            if (currentBlockchainLength === 0 && data.position === -1)
-                data = {position : 0, header: null};
+            // it has a ground-new blockchain
+            // very skeptical when the blockchain becomes bigger
+            if (data.position === -1 && currentBlockchainLength < newChainLength){
+                let answer = await sockets[0].node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", { height: 0 }, 0 );
+                if (answer.result === true && answer.header !== undefined)
+                    data = {position: 0, header: answer.header};
+            }
 
             //its a fork... starting from position
             console.log("fork position", data.position, "newChainLength", newChainLength);
