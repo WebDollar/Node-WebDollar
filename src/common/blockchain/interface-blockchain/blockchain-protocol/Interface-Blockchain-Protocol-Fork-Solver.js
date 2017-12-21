@@ -118,6 +118,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 try{
 
+                    for (let i=0; i<1000; i++)
+                        console.log(colors.green("forks " + this.blockchain.forksAdministrator.forks.length) );
+
                     if (fork !== null)
                         this.solveFork(fork);
 
@@ -154,91 +157,94 @@ class InterfaceBlockchainProtocolForkSolver{
             terminateTimeout;
 
         //interval timer
-        let forkSolverInterval = setInterval(()=>{
 
-            // check if the fork is finished
-            if (finished || (fork.forkStartingHeight + fork.forkBlocks.length >= fork.forkChainLength )) {
-                clearInterval(forkSolverInterval);
-                clearTimeout(terminateTimeout);
-                return;
-            }
+        return new Promise((resolve)=>{
 
-            //set no change, to terminate
-            if (terminateTimeout === undefined)
-                terminateTimeout = setTimeout(()=>{
-                    console.log(colors.red("Fork was not solved in time..."));
-                    finished = true;
-                }, 20*1000);
+            let forkSolverInterval = setInterval(async ()=>{
 
-            let socket = fork.sockets[ Math.floor(Math.random()*fork.sockets.length) ];
+                // check if the fork is finished
+                if (finished || (fork.forkStartingHeight + fork.forkBlocks.length >= fork.forkChainLength )) {
+                    clearInterval(forkSolverInterval);
+                    clearTimeout(terminateTimeout);
 
-            //console.log("processsing... fork.sockets.length ", fork.sockets.length);
+                    if (fork.forkBlocks.length === fork.forkChainLength - fork.forkStartingHeight) {
 
-            //in case I didn't check this socket for the same block
-            if ( socketsCheckedForBlock.indexOf(socket) < 0) {
-
-                //console.log("it worked ", socket);
-
-                socketsCheckedForBlock.push(socket);
-                console.log("nextBlockHeight", nextBlockHeight);
-
-                socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight ).then( async (answer)=>{
-
-                    console.log("blockchain/blocks/request-block-by-height/",answer)
-
-                    if (answer.result === true){
-
-                        let block;
-
-                        try {
-                            block = this.blockchain.blockCreator.createBlockEmpty(nextBlockHeight);
-                            block.deserializeBlock(answer.block, nextBlockHeight);
-
-                        } catch (Exception){
-                            console.log(colors.red("Error deserializing blocks" + Exception.toString()));
-                            finished = true;
-                            return false;
-                        }
-
-                        let result;
-                        try {
-                            result = await fork.includeForkBlock(block);
-                        } catch (Exception){
-                            console.log(colors.red("Error including block "+nextBlockHeight+" in fork" + Exception.toString()));
-                            finished = true;
-                            return false;
-                        }
-
-                        //if the block was included correctly
-                        if (result) {
-                            clearTimeout(terminateTimeout);
-                            terminateTimeout = undefined;
-                            nextBlockHeight++;
-
-                            socketsCheckedForBlock = [];
-                        }
+                        //if the fork is successfully, the save it as the main blockchain
+                        if (await fork.saveFork())
+                            resolve(true);
 
                     }
 
-                })
-            }
+                    resolve(false);
+                    return;
+                }
 
+                //set no change, to terminate
+                if (terminateTimeout === undefined)
+                    terminateTimeout = setTimeout(()=>{
+                        console.log(colors.red("Fork was not solved in time..."));
+                        finished = true;
+                    }, 20*1000);
+
+                let socket = fork.sockets[ Math.floor(Math.random()*fork.sockets.length) ];
+
+                //console.log("processsing... fork.sockets.length ", fork.sockets.length);
+
+                //in case I didn't check this socket for the same block
+                if ( socketsCheckedForBlock.indexOf(socket) < 0) {
+
+                    //console.log("it worked ", socket);
+
+                    socketsCheckedForBlock.push(socket);
+                    console.log("nextBlockHeight", nextBlockHeight);
+
+                    socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight ).then( async (answer)=>{
+
+                        //console.log("blockchain/blocks/request-block-by-height/",answer)
+
+                        if (answer.result === true){
+
+                            let block;
+
+                            try {
+                                block = this.blockchain.blockCreator.createBlockEmpty(nextBlockHeight);
+                                block.deserializeBlock(answer.block, nextBlockHeight);
+
+                            } catch (Exception){
+                                console.log(colors.red("Error deserializing blocks" + Exception.toString()));
+                                finished = true;
+                                return false;
+                            }
+
+                            let result;
+                            try {
+                                result = await fork.includeForkBlock(block);
+                            } catch (Exception){
+                                console.log(colors.red("Error including block "+nextBlockHeight+" in fork" + Exception.toString()));
+                                finished = true;
+                                return false;
+                            }
+
+                            //if the block was included correctly
+                            if (result) {
+                                clearTimeout(terminateTimeout);
+                                terminateTimeout = undefined;
+                                nextBlockHeight++;
+
+                                socketsCheckedForBlock = [];
+                            }
+
+                        }
+
+                    })
+                }
+
+
+
+            });
 
 
         });
-
-        //just to be sure
-        clearTimeout(terminateTimeout);
-
-        if (fork.forkBlocks.length === fork.forkChainLength - fork.forkStartingHeight) {
-
-            //if the fork is successfully, the save it as the main blockchain
-            if (await fork.saveFork())
-                return true;
-
-        }
-
-        return false;
 
     }
 

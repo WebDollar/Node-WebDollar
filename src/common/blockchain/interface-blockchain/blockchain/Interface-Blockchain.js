@@ -103,7 +103,8 @@ class InterfaceBlockchain {
     }
 
     resetMining(){
-        this.mining.reset();
+        if (this.mining !== undefined) //reset mining
+            this.mining.reset();
     }
 
     getBlockchainLength(){

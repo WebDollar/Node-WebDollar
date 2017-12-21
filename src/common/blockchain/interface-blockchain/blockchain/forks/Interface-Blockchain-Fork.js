@@ -18,7 +18,7 @@ class InterfaceBlockchainFork {
         this.forkId = forkId;
 
         if (!Array.isArray(sockets))
-            sockets = [sockets]
+            sockets = [sockets];
 
         this.sockets = sockets;
         this.forkStartingHeight = forkStartingHeight||0;

@@ -70,7 +70,7 @@ class SocketExtend{
             let requestAnswer = request;
             if ( typeof answerPrefix === 'string' && answerPrefix.length > 0 ) {
                 requestAnswer += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
-                console.log("sendRequestWaitOnce", request)
+                //console.log("sendRequestWaitOnce", request)
             }
 
             socket.once(requestAnswer, function (resData) {
