@@ -26,7 +26,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
 
-            if (!blockHeaderResult.result || blockHeaderResult.header === undefined) return {position: -1, header: blockHeaderResult.header};
+            if (!blockHeaderResult.result || blockHeaderResult.header === undefined || blockHeaderResult.header.hash === undefined) return {position: -1, header: blockHeaderResult.header};
 
             //i have finished the binary search
             if (left >= right) {
@@ -63,8 +63,7 @@ class InterfaceBlockchainProtocolForkSolver{
         try{
 
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(sockets);
-            if ( forkFound !== null )
-                return forkFound;
+            if ( forkFound !== null ) return forkFound;
 
 
             let data = {position: -1, header: null };
@@ -82,8 +81,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (answer.header.hash.equals( this.blockchain.getBlockchainLastBlock().hash )) {
                         data = {
                             position : currentBlockchainLength - 1,
-                            header: undefined,
-                            //header: answer.header,
+                            header: answer.header,
                         };
                     }
                 }
@@ -94,7 +92,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if ( (data.position||-1) === -1 && currentBlockchainLength > 0 ) {
                 data = await this._discoverForkBinarySearch(sockets, 0, currentBlockchainLength - 1);
-                console.log("binary search ", data)
+                //console.log("binary search ", data)
             }
 
             //it is a full fork
@@ -109,8 +107,6 @@ class InterfaceBlockchainProtocolForkSolver{
                 let fork;
 
                 try {
-                    fork = this.blockchain.forksAdministrator.findForkByHeader(header);
-                    if (fork !== null) return fork;
 
                     fork = await this.blockchain.forksAdministrator.createNewFork(sockets, data.position, newChainLength, data.header);
 
@@ -118,10 +114,13 @@ class InterfaceBlockchainProtocolForkSolver{
                     console.log(colors.red("discoverAndSolveFork - creating a fork raised an exception" + Exception.toString() ), "data", data )
                 }
 
+                if (fork === null)
+                    return null;
+
                 try{
 
-                    for (let i=0; i<1000; i++)
-                        console.log(colors.green("forks " + this.blockchain.forksAdministrator.forks.length) );
+                    // for (let i=0; i<100; i++)
+                    //     console.log(colors.green("forks " + this.blockchain.forksAdministrator.forks.length) );
 
                     if (fork !== null)
                         this.solveFork(fork);
@@ -222,7 +221,7 @@ class InterfaceBlockchainProtocolForkSolver{
                             try {
                                 result = await fork.includeForkBlock(block);
                             } catch (Exception){
-                                console.log(colors.red("Error including block "+nextBlockHeight+" in fork" + Exception.toString()));
+                                console.log(colors.red("Error including block "+nextBlockHeight+" in fork " + Exception.toString()));
                                 finished = true;
                                 return false;
                             }

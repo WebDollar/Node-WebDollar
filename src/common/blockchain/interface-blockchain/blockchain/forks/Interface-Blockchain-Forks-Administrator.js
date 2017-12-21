@@ -13,12 +13,15 @@ class InterfaceBlockchainForksAdministrator {
         this.forks = [];
 
         this.forksId = 0;
-
     }
 
     createNewFork(sockets, forkStartingHeight, forkChainLength, header){
 
         let fork;
+
+        if (this.findForkBySockets(sockets) !== null) return null;
+
+        if (this.findForkByHeader(header) !== null) return null;
 
         fork = new InterfaceBlockchainFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainLength, header);
 

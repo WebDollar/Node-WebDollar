@@ -19,6 +19,8 @@ class InterfaceBlockchain {
     constructor (){
 
         this.blocks = [];
+        this._blocksSempahore = false;
+
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator(this);
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this )
@@ -46,7 +48,7 @@ class InterfaceBlockchain {
         if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
 
         //let's check again the heights
-        if (block.height !== this.blocks.length) throw ('heights of a new block is not good... strange');
+        if (block.height !== this.blocks.length) throw ('height of a new block is not good... '+ block.height + " "+ this.blocks.length);
 
         this.blocks.push(block);
 
@@ -115,6 +117,36 @@ class InterfaceBlockchain {
             return this.blocks[this.blocks.length-1].difficultyTarget;
         else
             return BlockchainGenesis.difficultyTarget;
+    }
+
+    /**
+     * Multiple Forks and Mining are asynchronously, and they can happen in the same time, changing the this.blocks
+     * @param callback
+     * @returns {Promise.<void>}
+     */
+    processBlocksSempahoreCallback(callback){
+
+        return new Promise ((resolve) =>{
+
+            let timer = setInterval( async () => {
+
+                if ( this._blocksSempahore === false ){
+
+                    this._blocksSempahore = true;
+                    clearInterval(timer);
+
+                    try {
+                        let result = await callback();
+                        this._blocksSempahore = false;
+                        resolve(result);
+                        return result;
+                    } catch (exception){
+                        this._blocksSempahore = false;
+                    }
+                }
+            },10);
+        });
+
     }
 
     toString(){

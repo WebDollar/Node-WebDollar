@@ -27,6 +27,7 @@ class InterfaceBlockchainFork {
         this.forkHeader = header;
 
         this._blocksCopy = [];
+        this._blocksSemaphore = false;
 
     }
 
@@ -60,9 +61,13 @@ class InterfaceBlockchainFork {
         let prevDifficultyTarget, prevHash, prevTimeStamp;
 
         // transition from blockchain to fork
-        if (height === 0 || forkHeight === 0) {
+        if (height === 0) {
 
             // based on genesis block
+
+        } else if ( forkHeight === 0) {
+
+            // based on previous block from blockchain
 
         } else { // just the fork
 
@@ -101,37 +106,41 @@ class InterfaceBlockchainFork {
         //overwrite the blockchain blocks with the forkBlocks
         if (useFork){
 
-            this._blocksCopy = [];
-            for (let i=this.forkStartingHeight; i<this.blockchain.getBlockchainLength(); i++)
-                this._blocksCopy.push(this.blockchain.blocks[i]);
+            return await this.blockchain.processBlocksSempahoreCallback( async ()=> {
 
-            this.blockchain.blocks.splice(this.forkStartingHeight);
+                this._blocksCopy = [];
+                for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength(); i++)
+                    this._blocksCopy.push(this.blockchain.blocks[i]);
 
-            let forkedSuccessfully = true;
-
-            for (let i=0; i<this.forkBlocks.length; i++) {
-                if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length-1), this.sockets )){
-                    console.log(colors.green("fork couldn't be included in main Blockchain ",i));
-                    forkedSuccessfully = false;
-                    break;
-                }
-            }
-
-            //rollback
-            if (!forkedSuccessfully){
                 this.blockchain.blocks.splice(this.forkStartingHeight);
-                for (let i=0; i<this._blocksCopy.length; i++)
-                    if (!await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], (i === this._blocksCopy.length-1), this.sockets )){
-                        console.log(colors.green("blockchain couldn't re restored after fork included in main Blockchain ",i));
+
+                let forkedSuccessfully = true;
+
+                for (let i = 0; i < this.forkBlocks.length; i++) {
+                    if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length - 1), this.sockets)) {
+                        console.log(colors.green("fork couldn't be included in main Blockchain ", i));
+                        forkedSuccessfully = false;
                         break;
                     }
-            }
+                }
 
-            // it was done successfully
-            if (forkedSuccessfully)
-                this.blockchain.forksAdministrator.deleteFork(this);
+                //rollback
+                if (!forkedSuccessfully) {
+                    this.blockchain.blocks.splice(this.forkStartingHeight);
+                    for (let i = 0; i < this._blocksCopy.length; i++)
+                        if (!await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], (i === this._blocksCopy.length - 1), this.sockets)) {
+                            console.log(colors.green("blockchain couldn't re restored after fork included in main Blockchain ", i));
+                            break;
+                        }
+                }
 
-            return forkedSuccessfully;
+                // it was done successfully
+                if (forkedSuccessfully)
+                    this.blockchain.forksAdministrator.deleteFork(this);
+
+                return forkedSuccessfully;
+            });
+
         }
 
         return false;

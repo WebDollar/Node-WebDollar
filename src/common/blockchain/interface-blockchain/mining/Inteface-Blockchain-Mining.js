@@ -108,7 +108,10 @@ class InterfaceBlockchainMining{
                     block.hash = hash;
                     block.nonce = nonce;
 
-                    await this.blockchain.includeBlockchainBlock( block );
+                    await this.blockchain.processBlocksSempahoreCallback( ()=>{
+                        return this.blockchain.includeBlockchainBlock( block );
+                    });
+
                     solutionFound = true;
 
                     break;
