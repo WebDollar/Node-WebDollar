@@ -5,7 +5,6 @@ if(( typeof window !== 'undefined' && !window._babelPolyfill) ||
 
 console.log(""); console.log(""); console.log("");
 console.log("Node WebDollar");
-console.log(process.env);
 console.log(""); console.log(""); console.log("");
 
 //fixing string parameters...

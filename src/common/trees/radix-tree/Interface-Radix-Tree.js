@@ -159,8 +159,8 @@ class InterfaceRadixTree extends InterfaceTree{
 
                             // console.log("nodeCurrent",nodeCurrent.value);
                             // console.log("nodeMatch",nodeMatch.value);
-                            this.changedNode(nodeCurrent)
-                            this.changedNode(nodeMatch)
+                            this.changedNode(nodeCurrent);
+                            this.changedNode(nodeMatch);
 
                             // Marking that it is done
                             i = input.buffer.length+1;
@@ -315,6 +315,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                     //console.log("grandParent deletion", node, nodeParent);
                                     break;
                                 }
+
                         } else {
                             node = node.parent;
                             //console.log("this.changedNode 1_3");
@@ -337,25 +338,6 @@ class InterfaceRadixTree extends InterfaceTree{
                 //console.log("node simplu after", node, node.parent);
             }
 
-
-            // //delete edges to empty child nodes
-            // if (node !== null && !node.isLeaf() && node.edges.length > 0){
-            //
-            //     //console.log("node..... ", nodeParent, node.value, node.edges)
-            //
-            //     let bDeleted = false;
-            //     for (let i=node.edges.length-1; i>=0; i--)
-            //         if (node.edges[i].targetNode.isLeaf() && node.edges[i].targetNode.value === null && node.edges[i].targetNode.edges.length === 0 ) {
-            //             console.log("target node deleted ", node.edges[i].label.toString())
-            //             node.edges.splice(i, 1);
-            //             bDeleted = true;
-            //         }
-            //
-            //     if (bDeleted) finished = false;
-            //
-            //     console.log("node deleted", node)
-            // }
-
             if (node !== null && nodeParent !== null && node.value === null && node.edges.length === 0 && node !== this.root ){
 
                 //console.log("node22..... ", node.value, node.edges)
@@ -369,7 +351,7 @@ class InterfaceRadixTree extends InterfaceTree{
                         node = node.parent;
                         nodeParent = node.parent;
 
-                        //console.log("this.changedNode 3");
+                        //console.log(" this.changedNode 3 ");
 
                         break;
                     }

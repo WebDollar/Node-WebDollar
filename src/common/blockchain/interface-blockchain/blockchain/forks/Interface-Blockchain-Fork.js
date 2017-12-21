@@ -18,7 +18,7 @@ class InterfaceBlockchainFork {
         this.forkId = forkId;
 
         if (!Array.isArray(sockets))
-            sockets = [sockets]
+            sockets = [sockets];
 
         this.sockets = sockets;
         this.forkStartingHeight = forkStartingHeight||0;
@@ -46,6 +46,8 @@ class InterfaceBlockchainFork {
         if (! await this.validateForkBlock(block, block.height ) ) return false;
 
         this.forkBlocks.push(block);
+
+        return true;
     }
 
     async validateForkBlock(block, height){
@@ -54,21 +56,24 @@ class InterfaceBlockchainFork {
         let forkHeight = block.height - this.forkStartingHeight;
 
         if (block.height < this.forkStartingHeight) throw 'block height is smaller than the fork itself';
-        else
-        // transition from blockchain to fork
-        if (height === 0 || height === this.forkStartingHeight){
 
-            return await this.blockchain.validateBlockchainBlock(block);
+        let prevDifficultyTarget, prevHash, prevTimeStamp;
+
+        // transition from blockchain to fork
+        if (height === 0 || forkHeight === 0) {
+
+            // based on genesis block
 
         } else { // just the fork
 
-            let prevDifficultyTarget = this.forkBlocks[forkHeight-1].difficultyTarget;
-            let prevHash = this.forkBlocks[forkHeight-1].hash;
-            let prevTimeStamp = this.forkBlocks[forkHeight-1].timeStamp;
+            prevDifficultyTarget = this.forkBlocks[forkHeight-1].difficultyTarget;
+            prevHash = this.forkBlocks[forkHeight-1].hash;
+            prevTimeStamp = this.forkBlocks[forkHeight-1].timeStamp;
 
-            return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp);
 
         }
+
+        return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp);
 
     }
 
@@ -78,7 +83,10 @@ class InterfaceBlockchainFork {
      */
     async saveFork(){
 
-        if (!await this.validateFork()) return false;
+        if (!await this.validateFork()) {
+            console.log(colors.red("validateFork was not passed"));
+            return false
+        }
         // to do
 
         let useFork = false;
@@ -103,6 +111,7 @@ class InterfaceBlockchainFork {
 
             for (let i=0; i<this.forkBlocks.length; i++) {
                 if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i])){
+                    console.log(colors.green("fork couldn't be included in main Blockchain ",i));
                     forkedSuccessfully = false;
                     break;
                 }
@@ -117,8 +126,14 @@ class InterfaceBlockchainFork {
 
             this.blockchain.resetMining();
 
+            // it was done successfully
+            if (forkedSuccessfully)
+                this.blockchain.forksAdministrator.deleteFork(this);
+
+            return forkedSuccessfully;
         }
 
+        return false;
     }
 
 

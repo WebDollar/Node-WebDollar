@@ -84,15 +84,18 @@ class InterfaceBlockchainBlock{
      */
     async _validateBlockHash(previousHash) {
 
-        if (this.computedBlockPrefix === null) this.computedBlockPrefix(); //making sure that the prefix was calculated for calculating the block
+        if (this.computedBlockPrefix === null) this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
-        let hash = await this.computeHash();
-
-        if (!hash.equals(this.hash)) throw "block hash is not right";
-
+        //validate hashPrev
         if ( previousHash === null || (!Buffer.isBuffer(previousHash) && !WebDollarCryptoData.isWebDollarCryptoData(previousHash)) ) throw 'previous hash is not given'
 
         if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
+
+
+        //validate hash
+        let hash = await this.computeHash();
+
+        if (!hash.equals(this.hash)) throw "block hash is not right";
 
     }
 
@@ -171,7 +174,8 @@ class InterfaceBlockchainBlock{
         let offset = 0;
         this.data = {};
 
-        this.data.minerAddress = data.substr(offset, offset+=consts.PUBLIC_ADDRESS_LENGTH).buffer;
+        this.data.minerAddress = data.substr(offset, consts.PUBLIC_ADDRESS_LENGTH).buffer;
+        offset += consts.PUBLIC_ADDRESS_LENGTH;
 
         return buffer;
     }
