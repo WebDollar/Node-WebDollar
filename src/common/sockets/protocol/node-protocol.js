@@ -49,15 +49,46 @@ class NodeProtocol {
     }
 
 
-    broadcastRequest (request, data, type, exceptSocket){
+    /**
+     * boradcast to every sockets except the exceptSockets
+     * @param request
+     * @param data
+     * @param type
+     * @param exceptSockets
+     */
+    broadcastRequest (request, data, type, exceptSockets){
 
         let nodes = NodesList.getNodes(type);
 
+        if (exceptSockets !== undefined && exceptSockets !== null && !Array.isArray(exceptSockets))
+            exceptSockets = [exceptSockets];
+
         //console.log("request nodes.length", nodes.length, request, data, )
 
-        for (let i=0; i < nodes.length; i++)
-            if (!exceptSocket || nodes[i].socket !== exceptSocket)
+        for (let i=0; i < nodes.length; i++) {
+
+            let broadcast = false;
+
+            if (exceptSockets === undefined) broadcast = true;
+            else
+            if (Array.isArray(exceptSockets)){
+
+                //console.log("exceptSockets", exceptSockets);
+
+                let found = false;
+                for (let j=0; j<exceptSockets.length; j++)
+                    if (exceptSockets[j] !== null && nodes[i].socket.node.sckAddress.matchAddress(exceptSockets[j].node.sckAddress)) {
+                        found = true;
+                        break;
+                    }
+
+                if (!found)
+                    broadcast = true;
+            }
+
+            if (broadcast)
                 nodes[i].socket.node.sendRequest(request, data);
+        }
 
     }
 

@@ -31,7 +31,7 @@ class InterfaceBlockchainProtocolForkSolver{
             //i have finished the binary search
             if (left >= right) {
                 //it the block actually is the same
-                if (blockHeaderResult.header.hash.equals(this.blockchain.blocks[mid].hash) === false)
+                if (blockHeaderResult.header.hash.equals(this.blockchain.blocks[mid].hash) )
                     return {position: mid, header: blockHeaderResult.header};
                 else
                     return {position: -1, header: blockHeaderResult.header};
@@ -75,14 +75,15 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 let answer = await sockets[0].node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
 
-                console.log(" !!!! answer", answer);
+                //console.log(" !!!! answer", answer);
 
                 if (answer.result === true && answer.header !== undefined) {
 
                     if (answer.header.hash.equals( this.blockchain.getBlockchainLastBlock().hash )) {
                         data = {
                             position : currentBlockchainLength - 1,
-                            header: answer.header,
+                            header: undefined,
+                            //header: answer.header,
                         };
                     }
                 }
@@ -93,6 +94,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if ( (data.position||-1) === -1 && currentBlockchainLength > 0 ) {
                 data = await this._discoverForkBinarySearch(sockets, 0, currentBlockchainLength - 1);
+                console.log("binary search ", data)
             }
 
             //it is a full fork

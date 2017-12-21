@@ -40,7 +40,7 @@ class InterfaceBlockchain {
     /*
         Include a new block at the end of the blockchain, by validating the next block
      */
-    async includeBlockchainBlock(block, resetMining){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast){
 
 
         if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
@@ -61,10 +61,10 @@ class InterfaceBlockchain {
                 nonce: block.nonce,
 
             }
-        });
+        }, "all", socketsAvoidBroadcast);
 
-        if (resetMining && this.mining !== undefined) //reset mining
-            this.mining.reset();
+        if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
+            this.mining.resetMining();
 
         return true;
     }
@@ -100,11 +100,6 @@ class InterfaceBlockchain {
 
         return true;
 
-    }
-
-    resetMining(){
-        if (this.mining !== undefined) //reset mining
-            this.mining.reset();
     }
 
     getBlockchainLength(){

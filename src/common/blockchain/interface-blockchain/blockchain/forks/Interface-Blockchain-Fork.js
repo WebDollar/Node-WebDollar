@@ -110,7 +110,7 @@ class InterfaceBlockchainFork {
             let forkedSuccessfully = true;
 
             for (let i=0; i<this.forkBlocks.length; i++) {
-                if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i])){
+                if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length-1), this.sockets )){
                     console.log(colors.green("fork couldn't be included in main Blockchain ",i));
                     forkedSuccessfully = false;
                     break;
@@ -121,10 +121,11 @@ class InterfaceBlockchainFork {
             if (!forkedSuccessfully){
                 this.blockchain.blocks.splice(this.forkStartingHeight);
                 for (let i=0; i<this._blocksCopy.length; i++)
-                    await this.blockchain.includeBlockchainBlock(this._blocksCopy[i])
+                    if (!await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], (i === this._blocksCopy.length-1), this.sockets )){
+                        console.log(colors.green("blockchain couldn't re restored after fork included in main Blockchain ",i));
+                        break;
+                    }
             }
-
-            this.blockchain.resetMining();
 
             // it was done successfully
             if (forkedSuccessfully)

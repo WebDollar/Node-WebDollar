@@ -36,6 +36,10 @@ class InterfaceBlockchainMining{
 
     }
 
+    resetMining(){
+        this.reset = true;
+    }
+
     /**
      * mine next block
      */

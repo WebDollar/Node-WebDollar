@@ -62,8 +62,8 @@ class InterfaceBlockchainProtocol {
                 if (( data.height >= 0 && this.blockchain.getBlockchainLength() - 1 >= data.height && this.blockchain.getBlockchainLength() >= data.chainLength )) {
 
                     //in case the hashes are exactly the same, there is no reason why we should download it
-                    if (this.blockchain.blocks[data.height].hash.equals(data.header.hash))
-                        throw "hash provided is lower than mine";
+                    if (this.blockchain.blocks[data.height].hash.equals(data.header.hash) === true)
+                        throw "your block is not new, because I have a valid block at same height ";
 
                 }
 
@@ -104,7 +104,7 @@ class InterfaceBlockchainProtocol {
 
                 if (block === undefined) throw "Block not found: "+data.height;
 
-                console.log("blooock", block);
+                //console.log("blooock", block);
 
                 socket.node.sendRequest("blockchain/headers/request-block-by-height/" + data.height || 0, {
                     result: true,
