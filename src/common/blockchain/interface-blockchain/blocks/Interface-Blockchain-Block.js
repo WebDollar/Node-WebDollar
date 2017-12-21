@@ -9,7 +9,7 @@ import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
  */
-
+let globalBufferValue = null;
 class InterfaceBlockchainBlock{
 
     //everything is buffer
@@ -235,18 +235,36 @@ class InterfaceBlockchainBlock{
     }
 
     save(db = this.db){
-        let key = "block" + this.height;        
+        let key = "block" + this.height;
         let bufferValue = this.serializeBlock();
-        
-        db.save(key, bufferValue).catch((err) => {
+        globalBufferValue = bufferValue;
+    
+        return db.save(key, bufferValue).catch((err) => {
             throw 'ERROR on SAVE block: ' + err;
         });
     }
 
-    load(db = this.db){    
+    load(db = this.db){
         let key = "block" + this.height;
 
-        db.get(key).then((buffer) => {
+        return db.get(key).then((buffer) => {
+            
+            /*console.log('G=' + globalBufferValue + '.');
+            console.log('buf=' + buffer);
+            console.log('D=' + buffer.value + '.');
+            console.log('bug.len=' + buffer.value.length);
+            console.log('glb.len=' + globalBufferValue.toString().length);
+            let str = globalBufferValue.toString();
+            for(let i = 0; i < buffer.value.length; ++i)
+                if(buffer.value[i] !== str[i])
+                    console.log('they differ');*/
+            /*let bufStr = buffer.value.toString();
+            console.log('G length=' + globalBufferValue.length);
+            console.log('B length=' + bufStr.length);
+            for(let i = 0; i < globalBufferValue.length; ++i)
+                console.log(globalBufferValue[i] + ', ' + bufStr[i]);*/
+                
+            
             this.deserializeBlock(buffer.value, this.height);
         }).catch((err) => {
             throw 'ERROR on LOAD block: ' + err;
