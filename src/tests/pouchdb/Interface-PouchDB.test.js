@@ -81,19 +81,25 @@ describe('interfacePouchDB', () => {
     
     //----------------------Buffer-------------------------------------------------------
         
-    it('save/get sample Buffer', () => {
-
+    it('save/get sample Buffer', async () => {
+        let value, key;
+        try{
         key = '1';
-        value = new Buffer('744FF0022AA', 'hex');
+        value = Buffer.from('7440002a', 'hex');
+        console.log(Buffer);
+        }catch(err) {
+            console.log('HEXA:', err);
+        }
         db = new InterfacePouchDB('MyDatabase');
 
-        return db.save(key, value).then((response) => {
-            return db.get(key).then((response) => {
-                assert(value.equals(response), 'get: ' + response + '!=' + value);
-            }).catch((err) => {
-                assert(false, err);
-            });
-        });
+        let response = await db.save(key, value);
+        
+        let response2 = await db.get(key);
+        
+        console.log("response ", typeof response, response);
+        console.log("response2 ", typeof response2, response2);
+        assert(value.equals(response2), 'get: ' + response2.toString("hex") + '!=' + value.toString("hex"));
+          
     });
         
     it('save/remove/get sample Buffer', () => {

@@ -1,5 +1,13 @@
 /* Added by Silviu Bogdan Stroe - https://www.silviu-s.com */
-const PouchDB = require('pouchdb-node');
+
+var toBuffer = require('blob-to-buffer')
+
+let PouchDB;
+ 
+if (typeof window === "undefined")
+     PouchDB = require('pouchdb-node');
+ else
+    PouchDB = require('pouchdb');
 
 class InterfacePouchDB {
 
@@ -63,18 +71,31 @@ class InterfacePouchDB {
     //attachments
 
     saveDocumentAttachment(key, value) {
-        let buf = Buffer.from(value);
-        let attachment = new Buffer(buf, {content_type: 'application/octet-stream'});
+        
+       
+        if ( (typeof value === "object" && value.constructor.name !== "Blob") && !Buffer.isBuffer(value))
+            value = Buffer.from(value);
+        
+        let attachment = value;
+        
+        // we need blob in browser
+        if (typeof window !== "undefined" && Buffer.isBuffer(value))
+            attachment = new Blob( value , { type: 'application/octet-stream' });
+             
+        console.log("aveeem blooog", typeof attachment, attachment);
+
+        //let attachment = new Buffer(buf, {content_type: 'application/octet-stream'});             
+        
         return this.db.putAttachment(key, this.attachName, attachment).then((result) => {
             return true;
         }).catch((err) => {
             //document exists, update it
             if (err.status === 409) {
-                return this.updateDocumentAttachment(key, value);
+                return this.updateDocumentAttachment(key, attachment);
             } else {
                 if (err.status === 404) {
                     //if document not exist, create it and recall attachment
-                    return this.createDocument(key, null).then(() => this.saveDocumentAttachment(key, value));
+                    return this.createDocument(key, null).then(() => this.saveDocumentAttachment(key, attachment));
                 } else {
                     throw err;
                 }
@@ -92,8 +113,20 @@ class InterfacePouchDB {
 
     updateDocumentAttachment(key, value) {
         return this.db.get(key).then((doc) => {
-            let buf = Buffer.from(value);
-            let attachment = new Buffer(buf, {content_type: 'application/octet-stream'});
+            
+                    if ( (typeof value === "object" && value.constructor.name !== "Blob") && !Buffer.isBuffer(value))
+                value = Buffer.from(value);
+
+            
+            let attachment = value;
+            
+            // we need blob in browser
+            if (typeof window !== "undefined" && Buffer.isBuffer(value))
+                attachment = new Blob( value , { type: 'application/octet-stream' });
+
+            
+            
+            
             return this.db.putAttachment(doc._id, this.attachName, doc._rev, attachment, 'application/octet-stream').then((result) => {
                 return true;
             }).catch((err) => {
@@ -131,22 +164,65 @@ class InterfacePouchDB {
 
     save(key, value) {
         if (Buffer.isBuffer(value)) {
+         
             return this.saveDocumentAttachment(key, value);
         } else {
             return this.createDocument(key, value);
         }
     }
+    
+    toBuffer2(ab) {
+        var buffer = new Buffer(ab.byteLength);
+        var view = new Uint8Array(ab);
+        for (var i = 0; i < buffer.length; ++i) {
+            buffer[i] = view[i];
+        }
+        return buffer;
+    }
 
-    get(key) {
-        return this.getDocument(key).then(() => {
-            return this.getDocumentAttachment(key).then((doc) => {
-                return this.getDocumentAttachment(key);
-            }).catch(() => {
-                return this.getDocument(key);
-            });
-        }).catch((err) => {
-            throw err;
-        })
+    async get(key) {
+        
+        try{
+        
+            let doc = await this.getDocument(key);
+            
+            try{
+                let attachment =  await this.getDocumentAttachment(key);
+                
+                console.log("attachment ----------------------- ", typeof attachment, attachment );
+                
+                //we are in browser, we need to convert the blob to buffer
+                if (typeof window !== "undefined") {
+                    
+                    return this.toBuffer2(attachment);
+                    
+                    /*
+                    return new Promise ( (resolve) => {
+                        
+                        toBuffer(attachment, function (err, buffer) {
+                          if (err) throw err
+                          
+                           resolve(buffer);
+                        })
+                                               
+                    });
+                    */
+                    
+                } else                 
+                return attachment;
+                
+            } catch (exception){
+                
+                return await this.getDocument(key);
+                
+            }          
+        
+        } catch (exception){
+            console.log("get exception", exception);
+            throw exception;
+        }
+        
+     
     }
 
     remove(key) {
