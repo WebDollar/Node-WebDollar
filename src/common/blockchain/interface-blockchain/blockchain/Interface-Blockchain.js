@@ -157,16 +157,27 @@ class InterfaceBlockchain {
 
     }
 
-    save(){
-        for (let i = 0; i < this.blocks.length; ++i) {
-            this.blocks[i].save();
+    async save(){
+        for (let i = 0; i < this.blocks.length; ++i){
+            await this.blocks[i].save();
         }
     }
 
-    load(){
-        for (let i = 0; i < this.blocks.length; ++i) {
-            this.blocks[i].load();
+    async load(){
+        for (let i = 0; i < this.blocks.length; ++i){
+            await this.blocks[i].load();
         }
+    }
+    
+    async remove(index, removeFiles = true){
+        
+        if (removeFiles === true) {
+            for (let i = index; i < this.blocks.length; ++i){
+                await this.blocks[i].remove();
+            }
+        }
+        
+        this.blocks.splice(index);
     }
 
 }

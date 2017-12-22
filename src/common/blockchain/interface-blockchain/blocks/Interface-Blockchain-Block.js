@@ -232,25 +232,43 @@ class InterfaceBlockchainBlock{
 
     }
 
-    save(){
+    async save(){
 
         let key = "block" + this.height;
         let bufferValue = this.serializeBlock();
     
-        return this.db.save(key, bufferValue).catch((err) => {
-            throw 'ERROR on SAVE block: ' + err;
-        });
+        try{
+            return (await this.db.save(key, bufferValue));
+        }
+        catch (err){
+            return 'ERROR on SAVE block: ' + err;
+        }
     }
 
-    load(){
+    async load(){
 
         let key = "block" + this.height;
-
-        return this.db.get(key).then((buffer) => {            
+        
+        try{
+            let buffer = await this.db.get(key);
             this.deserializeBlock(buffer, this.height);
-        }).catch((err) => {
-            throw 'ERROR on LOAD block: ' + err;
-        });
+            return true;
+        }
+        catch(err) {
+            return 'ERROR on LOAD block: ' + err;
+        }
+    }
+    
+    async remove() {
+        
+        let key = "block" + this.height;
+        
+        try{
+            return (await this.db.remove(key));
+        }
+        catch(err) {
+            return 'ERROR on REMOVE block: ' + err;
+        }
     }
 
 }
