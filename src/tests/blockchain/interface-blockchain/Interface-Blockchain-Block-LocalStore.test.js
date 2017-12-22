@@ -1,4 +1,4 @@
-import BlockchainGenesis from "../../../common/blockchain/interface-blockchain/blocks/Blockchain-Genesis";
+import BlockchainGenesis from "common/blockchain/interface-blockchain/blocks/Blockchain-Genesis";
 
 var assert = require('assert')
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
