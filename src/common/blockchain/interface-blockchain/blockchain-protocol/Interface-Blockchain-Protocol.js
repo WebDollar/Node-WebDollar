@@ -48,7 +48,7 @@ class InterfaceBlockchainProtocol {
                 if (typeof data.header !== 'object') throw 'header is not specified';
                 if ((typeof data.header.hashPrev === 'string' || Buffer.isBuffer(data.header.hashPrev)) === false) throw 'hashPrev is not specified';
                 if ((typeof data.header.hash === 'string' || Buffer.isBuffer(data.header.hash)) === false) throw 'hash is not specified';
-                if ((typeof data.header.hashData === 'string' || Buffer.isBuffer(data.header.hash)) === false) throw 'hashData is not specified';
+                if ((typeof data.header.data.hashData === 'string' || Buffer.isBuffer(data.header.data.hash)) === false) throw 'hashData is not specified';
                 if ((typeof data.header.nonce === 'number' || Buffer.isBuffer(data.header.nonce)) === false) throw 'nonce is not specified';
 
                 if (data.header.chainLength < data.header.height) throw ('chainLength is smaller than block height ?? ');

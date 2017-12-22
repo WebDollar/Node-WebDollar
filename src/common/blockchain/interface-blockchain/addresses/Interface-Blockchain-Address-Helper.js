@@ -1,4 +1,4 @@
-import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
+import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 const secp256k1 = require('secp256k1');
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript

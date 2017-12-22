@@ -4,7 +4,7 @@ var assert = require('assert')
 
 import InterfaceBlockchainAddress from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address'
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
-import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
+import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 
 
 describe('testAddressGenerator', () => {

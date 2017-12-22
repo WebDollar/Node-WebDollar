@@ -1,5 +1,5 @@
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
-import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
+import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 
 import InterfaceTree from 'common/trees/Interface-Tree'
 import InterfaceMerkleTreeNode from './Interface-Merkle-Tree-Node'

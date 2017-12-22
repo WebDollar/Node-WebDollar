@@ -1,5 +1,6 @@
 import InterfaceBlockchainBlock from './Interface-Blockchain-Block'
 import BlockchainGenesis from './Blockchain-Genesis'
+import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data'
 import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
 
 class InterfaceBlockchainBlockCreator{
@@ -13,32 +14,36 @@ class InterfaceBlockchainBlockCreator{
     /*
         Generate a Genesis Block (no previous block)
      */
-    _createBlockGenesis(minerAddress){
+    _createBlockGenesis(minerAddress, transactions){
 
         //validate miner Address
 
-        return new InterfaceBlockchainBlock( 1, undefined, BlockchainGenesis.hashPrev, undefined, undefined, 0, {minerAddress: minerAddress, transactions: []}, 0, this.db );
+        let data = InterfaceBlockchainBlockData(minerAddress, transactions, undefined);
+
+        return new InterfaceBlockchainBlock( 1, undefined, BlockchainGenesis.hashPrev, undefined, 0, data, 0, this.db );
     }
 
     /*
         Generate a new block at the end of Blockchain
      */
-    _createBlockNew(prevBlock, height, minerAddress){
+    _createBlockNew(prevBlock, height, minerAddress, transactions){
 
         //validate miner Address
 
-        return new InterfaceBlockchainBlock( 1, undefined, prevBlock.hash, undefined, undefined, 0, {minerAddress: minerAddress, transactions: []}, height, this.db);
+        let data = InterfaceBlockchainBlockData(minerAddress, transactions, undefined);
+
+        return new InterfaceBlockchainBlock( 1, undefined, prevBlock.hash, undefined, 0, data, height, this.db);
     }
 
-    createBlockNew(minerAddress){
+    createBlockNew(minerAddress, transactions){
 
         if (this.blockchain.getBlockchainLength() === 0){  //Genesis Block
 
-            return this._createBlockGenesis( minerAddress||BlockchainGenesis.address );
+            return this._createBlockGenesis( minerAddress, transactions );
 
         } else { //Fetch Transactions and Create Block
 
-            return this._createBlockNew( this.blockchain.getBlockchainLastBlock(), this.blockchain.getBlockchainLength(), minerAddress||BlockchainGenesis.address  );
+            return this._createBlockNew( this.blockchain.getBlockchainLastBlock(), this.blockchain.getBlockchainLength(), minerAddress, transactions  );
 
         }
 
@@ -46,7 +51,7 @@ class InterfaceBlockchainBlockCreator{
 
     createBlockEmpty(height){
 
-        return new InterfaceBlockchainBlock( 1, undefined, undefined, undefined, undefined, 0, {}, height, this.db);
+        return new InterfaceBlockchainBlock( 1, undefined, undefined, undefined, 0, {}, height, this.db);
 
     }
 

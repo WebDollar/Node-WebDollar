@@ -4,7 +4,7 @@ var assert = require('assert')
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import IntefaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 
-import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
+import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 
 class InterfaceTreeTestHelper {
 

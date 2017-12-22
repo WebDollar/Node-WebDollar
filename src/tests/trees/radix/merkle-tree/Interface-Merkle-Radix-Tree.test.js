@@ -4,7 +4,7 @@ import TestsHelper from 'tests/Tests.helper'
 
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import InterfaceTreeTestHelperClass from '../../helpers/Interface-Tree.test.helper'
-import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
+import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 
 import InterfaceRadixTreeTestTeser from './../helpers/Interface-Radix-Tree-tester';
 

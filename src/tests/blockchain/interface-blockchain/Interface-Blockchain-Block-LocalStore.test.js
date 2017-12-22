@@ -1,5 +1,3 @@
-import BlockchainGenesis from "common/blockchain/interface-blockchain/blocks/Blockchain-Genesis";
-
 var assert = require('assert')
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
@@ -22,7 +20,7 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
 
     it('save/load/remove block to local storage, sample test', async () => {
 
-        block = new InterfaceBlockchainBlock( version, hash, hashPrev, hashData, timeStamp, nonce, data, height, db );
+        block = new InterfaceBlockchainBlock( version, hash, hashPrev, timeStamp, nonce, data, height, db );
 
         result = await block.save();
         assert(result === true, 'save: ' + result);
@@ -33,7 +31,7 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
         assert(block.version === version,'block version differ after load: ' + block.version + '!==' + version);
         assert(block.hash.equals(hash),'block hash differ after load: ' + block.hash.toString('hex') + '!==' + hash.toString('hex'));
         assert(block.hashPrev.equals(hashPrev),'block hashPrev differ after load: ' + block.hashPrev.toString('hex') + '!==' + hashPrev.toString('hex'));
-        assert(block.hashData.equals(hashData),'block hashData differ after load: ' + block.hashData.toString('hex') + '!==' + hashData.toString('hex'));
+        assert(block.data.hashData.equals(hashData),'block hashData differ after load: ' + block.data.hashData.toString('hex') + '!==' + hashData.toString('hex'));
         assert(block.timeStamp === timeStamp,'block timeStamp differ after load: ' + block.timeStamp + '!==' + timeStamp);
         assert(block.nonce === nonce,'block nonce differ after load: ' + block.nonce + '!==' + nonce);
         assert(block.data.minerAddress.toString() === data.minerAddress.toString(),'block data.minerAddress differ after load: ' + block.data.minerAddress + '!==' + data.minerAddress);
@@ -48,7 +46,7 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
     
     it('remove block from local storage, sample test', async () => {
 
-        block = new InterfaceBlockchainBlock( version, hash, hashPrev, hashData, timeStamp, nonce, data, height, db );
+        block = new InterfaceBlockchainBlock( version, hash, hashPrev, timeStamp, nonce, data, height, db );
         
         result = await block.save();
         assert(result === true, 'save: ' + result);

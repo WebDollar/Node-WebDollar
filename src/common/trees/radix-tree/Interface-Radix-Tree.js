@@ -10,7 +10,7 @@
         https://www.cs.usfca.edu/~galles/visualization/RadixTree.html   - animated demo
  */
 
-import WebDollarCryptoData from "common/crypto/Webdollar-Crypto-Data";
+import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
 
 import InterfaceRadixTreeNode from "./Interface-Radix-Tree-Node"
 import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
