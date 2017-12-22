@@ -157,9 +157,8 @@ export default (InterfaceAccountantRadixTreeHelper) => {
         //accountantData = [{text: "bca", value: 5}, {text: "cab",value: 2}, {text: "bc",value: 3}, {text: "b",value: 16}, {text: "bcc",value: 6}];
 
         let result = InterfaceAccountantRadixTreeHelper.testAdd(accountantData);
-        console.log("cooooosmiiiiiin");
 
-        InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData, true);
+        InterfaceAccountantRadixTreeHelper.testDelete(result.tree, accountantData, false);
     });
     
     it('creating & deleting Accountant Radix tree - cartesian product with small lengths', () => {    

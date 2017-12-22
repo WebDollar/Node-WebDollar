@@ -42,7 +42,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
         if (!this.checkInvalidNode(node)) {
             console.log("Invalid Radix Tree", node)
-            this.printLevelSearch();
+            //this.printLevelSearch();
             throw( 'The Radix Tree is no longer valid at the node ' + JSON.stringify(node))
         }
     }

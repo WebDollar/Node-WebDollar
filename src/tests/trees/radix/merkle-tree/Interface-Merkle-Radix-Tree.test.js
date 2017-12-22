@@ -25,13 +25,13 @@ describe("Interface Merkle + Radix Tree", () => {
         ["romanus"].forEach( (str)=>{
 
             radixTree.add( new WebDollarCryptoData(str, "ascii") , {address: str} );
-            radixTree.printLevelSearch();
+            //radixTree.printLevelSearch();
 
             assert(radixTree.validateRoot() === true, "Merkle Tree is invalid!!!");
 
             radixTree.delete( new WebDollarCryptoData("romane", "ascii"))
 
-            radixTree.printLevelSearch();
+            //radixTree.printLevelSearch();
             assert(radixTree.validateRoot() === true, "Merkle Tree is invalid after deletion!!!");
         });
 

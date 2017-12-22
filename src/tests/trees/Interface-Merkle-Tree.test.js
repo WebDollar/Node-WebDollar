@@ -45,7 +45,6 @@ describe('interfaceMerkleTree', () => {
         assert(result.levels[0].length === 1, "Merkle Tree Level 0 has different nodes")
         assert(result.levels[1].length === merkleData.length, "Merkle Tree Level 1 has different nodes")
 
-        console.log("merkle tree debug");
 
     });
 
