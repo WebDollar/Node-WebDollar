@@ -232,21 +232,21 @@ class InterfaceBlockchainBlock{
 
     }
 
-    save(db = this.db){
+    save(){
 
         let key = "block" + this.height;
         let bufferValue = this.serializeBlock();
     
-        return db.save(key, bufferValue).catch((err) => {
+        return this.db.save(key, bufferValue).catch((err) => {
             throw 'ERROR on SAVE block: ' + err;
         });
     }
 
-    load(db = this.db){
+    load(){
 
         let key = "block" + this.height;
 
-        return db.get(key).then((buffer) => {            
+        return this.db.get(key).then((buffer) => {            
             this.deserializeBlock(buffer, this.height);
         }).catch((err) => {
             throw 'ERROR on LOAD block: ' + err;

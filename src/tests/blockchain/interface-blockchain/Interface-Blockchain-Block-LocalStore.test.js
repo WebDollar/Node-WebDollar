@@ -17,13 +17,14 @@ describe('test blockchain save blocks to local storage', () => {
     let data = {minerAddress: minerAddress, transactions: []};
     let height = 0;
     let block = null;
+
     it('save blocks to local storage, sample test', ()=>{
 
         block = new InterfaceBlockchainBlock( version, hash, hashPrev, hashData, timeStamp, nonce, data, height, db );
 
-        return block.save(db).then((result) => {
+        return block.save().then((result) => {
             
-            return block.load(db).then((result) => {
+            return block.load().then((result) => {
                 
                 assert(block.version === version,'block version differ after load: ' + block.version + '!==' + version);
                 assert(block.hash.equals(hash),'block hash differ after load: ' + block.hash.toString('hex') + '!==' + hash.toString('hex'));
@@ -37,7 +38,7 @@ describe('test blockchain save blocks to local storage', () => {
             });
         
         });
-        
+
     });
 
 });
