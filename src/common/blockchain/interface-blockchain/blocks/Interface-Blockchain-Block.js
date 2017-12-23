@@ -152,7 +152,7 @@ class InterfaceBlockchainBlock {
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.hashPrev ).toFixedBuffer( consts.BLOCKS_POW_LENGTH ),
                                                      WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 ),
                                                      //data contains addressMiner, transactions history, contracts, etc
-                                                     this.data._serializeData(),
+                                                     this.data.serializeData(),
                                                     ]);
 
         return this.computedBlockPrefix;
@@ -208,7 +208,7 @@ class InterfaceBlockchainBlock {
             this.timeStamp = data.substr(offset, 4).toInt();
             offset+=4;
 
-            this.data._deserializeData(data.substr(offset));
+            this.data.deserializeData(data.substr(offset));
         }
 
     }

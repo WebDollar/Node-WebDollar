@@ -59,7 +59,9 @@ class InterfaceBlockchain {
             header:{
                 hash: block.hash,
                 hashPrev: block.hashPrev,
-                data: { hashData: block.hashData },
+                data: {
+                    hashData: block.data.hashData
+                },
                 nonce: block.nonce,
 
             }

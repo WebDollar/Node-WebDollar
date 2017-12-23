@@ -51,7 +51,7 @@ class InterfaceBlockchainBlockCreator{
 
     createBlockEmpty(height){
 
-        return new InterfaceBlockchainBlock( 1, undefined, undefined, undefined, 0, {}, height, this.db);
+        return new InterfaceBlockchainBlock( 1, undefined, undefined, undefined, 0, null, height, this.db);
 
     }
 

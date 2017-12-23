@@ -1,5 +1,6 @@
 var assert = require('assert')
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
 
 describe('test blockchain save/load/remove blocks to/from local storage', () => {
@@ -12,7 +13,7 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
     let timeStamp = 1994;
     let nonce = 1994;
     let minerAddress = '1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4x';
-    let data = {minerAddress: minerAddress, transactions: []};
+    let data = new InterfaceBlockchainBlockData(minerAddress, [], undefined);
     let height = 0;
     let block = null;
     

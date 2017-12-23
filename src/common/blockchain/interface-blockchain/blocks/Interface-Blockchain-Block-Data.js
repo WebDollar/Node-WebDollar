@@ -28,19 +28,25 @@ class InterfaceBlockchainBlockData {
 
         if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData)) throw ('hashData is empty');
 
+        //validate hash
+        let hashData = this.computeHashBlockData();
+
+        if (!hashData.equals(this.hashData)) throw "block.data hashData is not right";
+
+        return true;
     }
 
     computeHashBlockData(){
 
         // sha256 (sha256 ( serialized ))
 
-        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._serializeData() )).buffer;
+        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this.serializeData() )).buffer;
     }
 
     /**
      convert data to Buffer
      **/
-    _serializeData(){
+    serializeData(){
 
         let buffer = Buffer.concat( [
             WebDollarCryptoData.createWebDollarCryptoData( this.minerAddress ).toFixedBuffer(consts.PUBLIC_ADDRESS_LENGTH)
@@ -48,7 +54,7 @@ class InterfaceBlockchainBlockData {
         return buffer;
     }
 
-    _deserializeData(buffer){
+    deserializeData(buffer){
 
         let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
 
