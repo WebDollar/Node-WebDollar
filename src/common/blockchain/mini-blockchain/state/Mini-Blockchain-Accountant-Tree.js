@@ -16,16 +16,16 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     updateAccount(input, value, tokenId){
 
-        input = WebDollarCryptoData.createWebDollarCryptoData(input)
+        input = WebDollarCryptoData.createWebDollarCryptoData(input);
 
-        let searchResult = this.search(input);
+        let node = this.search(input).node;
 
-        // nothing to update
-        if ( searchResult.node === undefined || searchResult.node === null) return false;
+        // in case it doesn't exist, let's create it
+        if ( node === undefined || node === null){
+            node = this.add(input, {balances: [] });
+        }
 
-        if (!searchResult.node.isLeaf()) throw ("couldn't delete because input is not a leaf node");
-
-        let node = searchResult.node;
+        if (!node.isLeaf()) throw ("couldn't delete because input is not a leaf node");
 
         let result = node.updateBalanceToken(value, tokenId);
 
@@ -38,10 +38,19 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         this.changedNode( node );
 
         return result;
-
     }
 
+    listBalances(input){
 
+        input = WebDollarCryptoData.createWebDollarCryptoData(input);
+
+        let node = this.search(input).node;
+
+        if (!node.isLeaf()) return null;
+
+
+
+    }
 
 }
 

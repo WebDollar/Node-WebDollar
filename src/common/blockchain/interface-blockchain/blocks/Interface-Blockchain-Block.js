@@ -77,7 +77,7 @@ class InterfaceBlockchainBlock {
         await this._validateBlockHash(previousHash);
         this._validateTargetDifficulty(previousDifficultyTarget);
 
-        if (this.reward !== BlockchainMiningReward.getReward(this.height) ) throw 'reward is not right';
+        if (this.reward !== BlockchainMiningReward.getReward(this.height) ) throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward(this.height);
 
         return true;
     }
