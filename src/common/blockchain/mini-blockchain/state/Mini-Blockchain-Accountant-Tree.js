@@ -25,7 +25,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             node = this.add(input, {balances: [] });
         }
 
-        if (!node.isLeaf()) throw ("couldn't delete because input is not a leaf node");
+        if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
 
         let result = node.updateBalanceToken(value, tokenId);
 
@@ -46,9 +46,9 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         let node = this.search(input).node;
 
-        if (!node.isLeaf()) return null;
+        if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
 
-
+        return node.getBalances();
 
     }
 

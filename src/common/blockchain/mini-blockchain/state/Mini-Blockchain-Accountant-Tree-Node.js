@@ -4,6 +4,8 @@ import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 import WebDollarCryptoData from "../../../crypto/WebDollar-Crypto-Data";
 
+var BigNumber = require('bignumber.js');
+
 class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     constructor (parent, edges, value){
@@ -28,15 +30,16 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
         tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
 
+        if (!value instanceof BigNumber)
+            value = new BigNumber(value);
+
         let result;
 
         for (let i = 0; i < this.balances.length; i++)
-            if (this.balances[i].id === tokenId) {
-                this.balances[i].amount += value;
-                result = {
-                    tokenId: this.balances[i].id.toString("hex"),
-                    amount: this.balances[i].amount
-                };
+            if (this.balances[i].id.equals( tokenId )) {
+                this.balances[i].amount = this.balances[i].amount.plus(value) ;
+                result = this.balances[i];
+                break;
             }
 
 
@@ -46,12 +49,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
                 id: tokenId,
                 amount: value,
             });
-
-            result = {
-                tokenId: this.balances[this.balances.length-1].id.toString("hex"),
-                amount: this.balances[this.balances.length-1].amount
-            };
-
+            result = this.balances[this.balances.length-1];
         }
 
         if (result === undefined) throw 'token is empty';
@@ -64,7 +62,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         if (this.balances.length === 0)
             return null; //to be deleted
 
-        return result;
+        return {
+            tokenId: result.id,
+            amount: result.amount,
+        };
 
     }
 
@@ -75,8 +76,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
 
         for (let i=0; i<this.balances.length; i++)
-            if (this.balances[i].id === tokenId)
-                return this.balances[i].amount || 0;
+            if (this.balances[i].id.equals( tokenId) )
+                return this.balances[i].amount;
 
         return 0;
 
@@ -90,16 +91,17 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         let list = { };
 
         for (let i=0; i<this.balances.length; i++)
-            list[ this.balances[i].id.toString("hex") ] = this.balances[i].amount;
+            list[ this.balances[i].id.toString() ] = this.balances[i].amount;
 
 
+        return list;
     }
 
     deleteBalancesEmpty(){
 
         let result = false;
         for (let i=this.value.balances.length-1; i>=0; i--)
-            if (this.value.balances[i].amount === 0 || this.value.balances[i] === null) {
+            if (this.value.balances[i].amount.equals(0) || this.value.balances[i] === null) {
                 this.value.balances.splice(i, 1);
                 result = true;
             }
