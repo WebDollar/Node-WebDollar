@@ -53,7 +53,7 @@ class InterfaceBlockchainMining{
             try {
                 nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress);
             } catch (Exception){
-                console.log(colors.red("Error creating next block "+Exception.toString()), nextBlock);
+                console.log(colors.red("Error creating next block "+Exception.toString()), Exception, nextBlock);
             }
 
             await this.mineBlock( nextBlock, this.blockchain.getDifficultyTarget(), undefined, showMiningOutput  );
@@ -75,6 +75,7 @@ class InterfaceBlockchainMining{
             else
                 difficulty = WebDollarCryptoData.createWebDollarCryptoData(difficulty).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
 
+            if (block === undefined || block === null) throw "block is undefined";
 
             block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
 

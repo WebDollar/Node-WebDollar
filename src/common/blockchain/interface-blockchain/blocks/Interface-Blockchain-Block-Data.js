@@ -14,8 +14,8 @@ class InterfaceBlockchainBlockData {
         this.minerAddress = minerAddress;
         this.transactions = transactions||[];
 
-        if ( hashData === undefined){
-            hashData = WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._serializeData() )).buffer;
+        if (hashData === undefined || hashData === null){
+            hashData = this.computeHashBlockData();
         }
 
         this.hashData = hashData;
@@ -24,10 +24,17 @@ class InterfaceBlockchainBlockData {
 
     validateBlockData(){
 
-        if (this.minerAddress === undefined || this.data.minerAddress === null  ) throw ('data.minerAddress is empty');
+        if (this.minerAddress === undefined || this.minerAddress === null  ) throw ('data.minerAddress is empty');
 
         if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData)) throw ('hashData is empty');
 
+    }
+
+    computeHashBlockData(){
+
+        // sha256 (sha256 ( serialized ))
+
+        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._serializeData() )).buffer;
     }
 
     /**
@@ -36,7 +43,7 @@ class InterfaceBlockchainBlockData {
     _serializeData(){
 
         let buffer = Buffer.concat( [
-            WebDollarCryptoData.createWebDollarCryptoData( this.data.minerAddress ).toFixedBuffer(consts.PUBLIC_ADDRESS_LENGTH)
+            WebDollarCryptoData.createWebDollarCryptoData( this.minerAddress ).toFixedBuffer(consts.PUBLIC_ADDRESS_LENGTH)
         ] )
         return buffer;
     }
@@ -48,7 +55,7 @@ class InterfaceBlockchainBlockData {
         let offset = 0;
         this.data = {};
 
-        this.data.minerAddress = data.substr(offset, consts.PUBLIC_ADDRESS_LENGTH).buffer;
+        this.minerAddress = data.substr(offset, consts.PUBLIC_ADDRESS_LENGTH).buffer;
         offset += consts.PUBLIC_ADDRESS_LENGTH;
 
         return buffer;

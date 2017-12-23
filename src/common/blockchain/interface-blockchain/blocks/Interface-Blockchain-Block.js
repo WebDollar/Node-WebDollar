@@ -95,6 +95,11 @@ class InterfaceBlockchainBlock {
 
         if (!hash.equals(this.hash)) throw "block hash is not right";
 
+        if (!await this.data.validateBlockData())
+            return false;
+
+        return true;
+
     }
 
     _validateTargetDifficulty(prevDifficultyTarget){
@@ -134,11 +139,11 @@ class InterfaceBlockchainBlock {
         Concat of Hashes to avoid double computation
      */
 
-    _computeBlockHeaderPrefix(skip){
+    _computeBlockHeaderPrefix(skipPrefix){
 
         //in case I have calculated  the computedBlockPrefix before
 
-        if (skip === true && Buffer.isBuffer(this.computedBlockPrefix) ){
+        if (skipPrefix === true && Buffer.isBuffer(this.computedBlockPrefix) ){
             return this.computedBlockPrefix;
         }
 

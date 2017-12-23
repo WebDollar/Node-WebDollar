@@ -59,7 +59,7 @@ class InterfaceBlockchain {
             header:{
                 hash: block.hash,
                 hashPrev: block.hashPrev,
-                hashData: block.hashData,
+                data: { hashData: block.hashData },
                 nonce: block.nonce,
 
             }
@@ -142,6 +142,7 @@ class InterfaceBlockchain {
                         return result;
                     } catch (exception){
                         this._blocksSempahore = false;
+                        throw exception;
                     }
                 }
             },10);

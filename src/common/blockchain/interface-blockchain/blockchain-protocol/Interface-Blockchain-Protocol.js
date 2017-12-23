@@ -34,6 +34,8 @@ class InterfaceBlockchainProtocol {
                 data.header.chainLength
                 data.header.prevHash
                 data.header.hash
+
+                data.header.data.hashData
              */
 
 
@@ -133,7 +135,6 @@ class InterfaceBlockchainProtocol {
             // data.height
 
             try {
-
 
                 if (typeof data.height !== 'number') throw "data.height is not defined";
 

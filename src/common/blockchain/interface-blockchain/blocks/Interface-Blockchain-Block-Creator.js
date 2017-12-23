@@ -18,7 +18,7 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        let data = InterfaceBlockchainBlockData(minerAddress, transactions, undefined);
+        let data = new InterfaceBlockchainBlockData(minerAddress, transactions, undefined);
 
         return new InterfaceBlockchainBlock( 1, undefined, BlockchainGenesis.hashPrev, undefined, 0, data, 0, this.db );
     }
@@ -30,7 +30,7 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        let data = InterfaceBlockchainBlockData(minerAddress, transactions, undefined);
+        let data = new InterfaceBlockchainBlockData(minerAddress, transactions, undefined);
 
         return new InterfaceBlockchainBlock( 1, undefined, prevBlock.hash, undefined, 0, data, height, this.db);
     }
