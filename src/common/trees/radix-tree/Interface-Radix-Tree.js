@@ -225,8 +225,6 @@ class InterfaceRadixTree extends InterfaceTree{
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
-        if (input.buffer.length === 0) throw 'No input';
-
         let searchResult = this.search(input);
 
         //console.log("searchResult", searchResult)
@@ -377,6 +375,8 @@ class InterfaceRadixTree extends InterfaceTree{
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
+        if (input.buffer.length === 0) throw 'No input';
+
         let nodeCurrent = this.root;
 
         let i=0;
@@ -409,6 +409,30 @@ class InterfaceRadixTree extends InterfaceTree{
         }
 
         return { result: (nodeCurrent.value !== null), node: nodeCurrent, value: nodeCurrent.value }
+    }
+
+    /**
+     * update a node in the radix tree
+     * @param input
+     * @param value
+     * @returns {boolean}
+     */
+    update(input, value){
+
+        input = WebDollarCryptoData.createWebDollarCryptoData(input)
+
+        let searchResult = this.search(input);
+
+        // nothing to update
+        if ( searchResult.node === undefined || searchResult.node === null) return false;
+
+        if (!searchResult.node.isLeaf()) throw ("couldn't delete because input is not a leaf node");
+
+        let node = searchResult.node;
+
+        node.value = value;
+        this.changedNode( node );
+
     }
 
 }

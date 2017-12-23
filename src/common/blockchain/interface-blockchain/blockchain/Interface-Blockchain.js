@@ -5,6 +5,7 @@ import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blo
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchain/mining/difficulty/Interface-Blockchain-Difficulty'
+import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 
 import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
 
@@ -39,12 +40,18 @@ class InterfaceBlockchain {
         return true;
     }
 
-    /*
-        Include a new block at the end of the blockchain, by validating the next block
+    /**
+     * Include a new block at the end of the blockchain, by validating the next block
+        Will save the block in the blockchain, if it is valid
+     * @param block
+     * @param resetMining
+     * @param socketsAvoidBroadcast
+     * @returns {Promise.<boolean>}
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast){
 
 
+        block.reward = BlockchainMiningReward.getReward(this.blocks.length);
         if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
 
         //let's check again the heights

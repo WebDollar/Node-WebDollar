@@ -49,6 +49,11 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         return true;
     }
 
+    /**
+     * Validate an Accountant (node)
+     * @param node
+     * @returns {boolean}
+     */
     validateAccount(node){
 
         //validate bottom to up
@@ -126,6 +131,17 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
 
         return result;
+
+    }
+
+    /**
+     * update the balance of a node and propagate it up
+     * @param input
+     * @param value
+     */
+    update( input, value ){
+
+        //not done
 
     }
 

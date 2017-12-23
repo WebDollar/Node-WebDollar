@@ -13,6 +13,7 @@ class Blockchain{
         this.Mining = new MainBlockchainMining(this.Chain);
         this.Protocol = new MainBlockchainProtocol(this.Chain);
 
+        this.Accountant = this.Chain.Accountant;
 
     }
 

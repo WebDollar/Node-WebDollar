@@ -7,6 +7,7 @@ import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
+import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 
 class InterfaceBlockchainMining{
 
@@ -103,8 +104,9 @@ class InterfaceBlockchainMining{
 
                 if ( hash.compare(difficulty) <= 0 ) {
 
-                    let reward = 50;
-                    console.log( colors.green("WebDollar Block ", block.height ," mined ", nonce, hash.toString("hex"), " reward", reward, "WEBD") );
+                    block.reward = BlockchainMiningReward.getReward(block.height);
+
+                    console.log( colors.green("WebDollar Block ", block.height ," mined ", nonce, hash.toString("hex"), " reward", block.reward, "WEBD") );
 
                     block.hash = hash;
                     block.nonce = nonce;

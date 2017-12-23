@@ -2,6 +2,7 @@ var BigInteger = require('big-integer');
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
+import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 import consts from 'consts/const_global'
 import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data'
 
@@ -47,6 +48,8 @@ class InterfaceBlockchainBlock {
         this.difficultyTarget = null; // difficulty set by me
         this.height = (typeof height === "number" ? height : null); // index set by me
 
+        this.reward = 0;
+
         this.db = db;
     }
 
@@ -73,6 +76,8 @@ class InterfaceBlockchainBlock {
 
         await this._validateBlockHash(previousHash);
         this._validateTargetDifficulty(previousDifficultyTarget);
+
+        if (this.reward !== BlockchainMiningReward.getReward(this.height) ) throw 'reward is not right';
 
         return true;
     }
