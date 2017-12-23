@@ -27,8 +27,17 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         let node = searchResult.node;
 
-        node.value = value;
+        let result = node.updateBalanceToken(value, tokenId);
+
+        // it was deleted
+        if (result === null){
+            this.delete(input);
+            return null;
+        }
+
         this.changedNode( node );
+
+        return result;
 
     }
 
