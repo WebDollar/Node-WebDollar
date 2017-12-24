@@ -3,6 +3,7 @@ var BigInteger = require('big-integer');
 var BigNumber = require('bignumber.js');
 
 import WebDollarCrypto from './WebDollar-Crypto';
+import Serialization from 'common/utils/Serialization';
 import consts from 'consts/const_global'
 
 class WebDollarCryptoData {
@@ -86,23 +87,8 @@ class WebDollarCryptoData {
             if (data instanceof BigInteger) {
 
                 //converting number value into a buffer
-
-                let list = [];
-                while (data.greater(0)){
-
-                    let division = data.divmod(256);
-
-                    list.unshift ( division.remainder );
-                    data = division.quotient;
-                }
-
-                this.buffer = new Buffer( list.length );
-
-                for (let i=0; i<list.length; i++)
-                    this.buffer[i] = list[i];
-
+                this.buffer = Serialization.serializeBigInteger(data);
                 return;
-
             }
 
             if (data === null) this.buffer = new Buffer ( [0] );
@@ -118,7 +104,7 @@ class WebDollarCryptoData {
         if (typeof data === "number"){
 
             //converting number value into a buffer on 4 bytes
-            this.buffer = WebDollarCrypto.convertNumberTo4BytesBuffer(data)
+            this.buffer = Serialization.serializeNumber4Bytes(data)
         }
 
     }
@@ -236,22 +222,7 @@ class WebDollarCryptoData {
         return this;
     }
 
-    /**
-     * Convers buffer to a Fixed Length buffer
-     * @returns {Buffer}
-     */
-    toFixedBuffer(noBits){
 
-        if (this.buffer.length === noBits) return this.buffer; // in case has the same number of bits as output
-
-        let result = new Buffer(noBits);
-
-        for (let i=0; i<this.buffer.length; i++)
-            result[i]= this.buffer[i];
-
-        return result;
-
-    }
 
     compare(data){
 
@@ -263,14 +234,7 @@ class WebDollarCryptoData {
     }
 
     toInt(){
-        if (this.buffer.length === 2){
-            return this.buffer[0] | (this.buffer[1] << 8);
-        } else if (this.buffer.length === 4){
-            return this.buffer[0] | (this.buffer[1] << 8) | (this.buffer[2] << 16) | (this.buffer[3] << 24);
-
-        } else if (this.buffer.length === 6){
-            return this.buffer[0] | (this.buffer[1] << 8) | (this.buffer[2] << 16) | (this.buffer[3] << 24) | (this.buffer[4] << 32) | (this.buffer[5] << 40);
-        }
+        return Serialization.deserializeNumber(this.buffer);
     }
 
 }

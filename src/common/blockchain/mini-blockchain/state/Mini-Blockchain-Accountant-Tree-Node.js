@@ -2,7 +2,8 @@ import InterfaceMerkleAccountantRadixTree from 'common/trees/radix-tree/accounta
 import InterfaceMerkeRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree-Node'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
-import WebDollarCryptoData from "../../../crypto/WebDollar-Crypto-Data";
+import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
+import Serialization from "common/utils/Serialization";
 
 var BigNumber = require('bignumber.js');
 
@@ -107,6 +108,23 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
             }
 
         return true;
+
+    }
+
+
+    serialize(){
+
+        let buffer;
+
+        buffer = Buffer.concat ( [
+                                   Serialization.serializeNumber1Byte(this.value.balances.length),
+                                 ]);
+
+        return Buffer;
+
+    }
+
+    deserialize(){
 
     }
 

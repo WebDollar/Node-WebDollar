@@ -8,6 +8,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     constructor (){
         super();
+
+        this.autoMerklify = false;
     }
 
     createNode(parent, edges, value){

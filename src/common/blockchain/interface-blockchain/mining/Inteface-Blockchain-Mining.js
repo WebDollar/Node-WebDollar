@@ -8,6 +8,7 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
+import Serialization from 'common/utils/Serialization'
 
 class InterfaceBlockchainMining{
 
@@ -73,8 +74,9 @@ class InterfaceBlockchainMining{
         try{
             if (difficulty === undefined || difficulty === null)
                 throw 'difficulty not specified';
-            else
-                difficulty = WebDollarCryptoData.createWebDollarCryptoData(difficulty).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
+
+            if (difficulty instanceof BigInteger)
+                difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
 
             if (block === undefined || block === null) throw "block is undefined";
 
@@ -136,7 +138,7 @@ class InterfaceBlockchainMining{
 
         } catch (Exception){
 
-            console.log(colors.red("Error mining block ", Exception.toString()), block);
+            console.log(colors.red("Error mining block "), Exception.toString(), block);
             throw Exception;
         }
 

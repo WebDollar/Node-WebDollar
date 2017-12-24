@@ -4,7 +4,8 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 import consts from 'consts/const_global'
-import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data'
+import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data';
+import Serialization from "common/utils/Serialization.js";
 
 import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
 
@@ -110,7 +111,8 @@ class InterfaceBlockchainBlock {
     _validateTargetDifficulty(prevDifficultyTarget){
 
 
-        if (prevDifficultyTarget instanceof BigInteger) prevDifficultyTarget = WebDollarCryptoData.createWebDollarCryptoData(prevDifficultyTarget).toFixedBuffer(consts.BLOCKS_POW_LENGTH);
+        if (prevDifficultyTarget instanceof BigInteger)
+            prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
 
         if ( prevDifficultyTarget === null || (!Buffer.isBuffer(prevDifficultyTarget) && !WebDollarCryptoData.isWebDollarCryptoData(prevDifficultyTarget)) ) throw 'previousDifficultyTarget is not given'
 
@@ -153,9 +155,9 @@ class InterfaceBlockchainBlock {
         }
 
         this.computedBlockPrefix = Buffer.concat ( [
-                                                     WebDollarCryptoData.createWebDollarCryptoData( this.version).toFixedBuffer(2),
-                                                     WebDollarCryptoData.createWebDollarCryptoData( this.hashPrev ).toFixedBuffer( consts.BLOCKS_POW_LENGTH ),
-                                                     WebDollarCryptoData.createWebDollarCryptoData( this.timeStamp ).toFixedBuffer( 4 ),
+                                                     Serialization.serializeToFixedBuffer( 2, Serialization.serializeNumber4Bytes( this.version) ),
+                                                     Serialization.serializeToFixedBuffer( consts.BLOCKS_POW_LENGTH , this.hashPrev ),
+                                                     Serialization.serializeToFixedBuffer( 4, Serialization.serializeNumber4Bytes( this.timeStamp )),
                                                      //data contains addressMiner, transactions history, contracts, etc
                                                      this.data.serializeData(),
                                                     ]);
@@ -170,7 +172,7 @@ class InterfaceBlockchainBlock {
 
         let buffer = Buffer.concat ( [
                                        this.computedBlockPrefix,
-                                       WebDollarCrypto.convertNumberTo4BytesBuffer( newNonce||this.nonce ),
+                                       Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );
 
         return WebDollarCrypto.hashPOW(buffer);
@@ -183,7 +185,7 @@ class InterfaceBlockchainBlock {
         this._computeBlockHeaderPrefix(true);
         let buffer = Buffer.concat( [
                                       this.hash,
-                                      WebDollarCrypto.convertNumberTo4BytesBuffer( this.nonce ),
+                                      Serialization.serializeNumber4Bytes( this.nonce ),
                                       this.computedBlockPrefix,
                                     ]);
 
@@ -196,24 +198,29 @@ class InterfaceBlockchainBlock {
         let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
         let offset = 0;
 
-        if (height >= 0){
+        try {
+            if (height >= 0) {
 
-            this.hash = data.substr(0, consts.BLOCKS_POW_LENGTH).buffer;
-            offset+=consts.BLOCKS_POW_LENGTH;
-            
-            this.nonce = data.substr(offset, consts.BLOCKS_NONCE).toInt();
-            offset+=consts.BLOCKS_NONCE;
-            
-            this.version = data.substr(offset, 2).toInt();
-            offset+=2;
-            
-            this.hashPrev = data.substr(offset, consts.BLOCKS_POW_LENGTH).buffer;
-            offset+=consts.BLOCKS_POW_LENGTH;
-            
-            this.timeStamp = data.substr(offset, 4).toInt();
-            offset+=4;
+                this.hash = data.substr(0, consts.BLOCKS_POW_LENGTH).buffer;
+                offset += consts.BLOCKS_POW_LENGTH;
 
-            this.data.deserializeData(data.substr(offset));
+                this.nonce = data.substr(offset, consts.BLOCKS_NONCE).toInt();
+                offset += consts.BLOCKS_NONCE;
+
+                this.version = data.substr(offset, 2).toInt();
+                offset += 2;
+
+                this.hashPrev = data.substr(offset, consts.BLOCKS_POW_LENGTH).buffer;
+                offset += consts.BLOCKS_POW_LENGTH;
+
+                this.timeStamp = data.substr(offset, 4).toInt();
+                offset += 4;
+
+                this.data.deserializeData(data.substr(offset));
+            }
+        } catch (exception){
+            console.log(colors.red("error deserializing a buffer"), exception);
+            throw exception;
         }
 
     }

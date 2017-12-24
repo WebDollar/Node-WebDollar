@@ -6,13 +6,16 @@ import InterfaceMerkleTree from './../../merkle-tree/Interface-Merkle-Tree'
 
 /*
     Multiple inheritance Tutorial based on https://stackoverflow.com/questions/29879267/es6-class-multiple-inheritance
+
+    const InterfaceMerkleTreeClass = (InterfaceMerkleTree) => class extends InterfaceMerkleTree{ };
 */
-const InterfaceMerkleTreeClass = (InterfaceMerkleTree) => class extends InterfaceMerkleTree{ };
 
 class InterfaceRadixMerkleTree extends InterfaceRadixTree {
 
     constructor(){
         super();
+
+        this.autoMerklify = true;
     }
 
     changedNode(node){

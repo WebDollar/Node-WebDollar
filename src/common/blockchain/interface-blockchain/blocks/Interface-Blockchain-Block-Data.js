@@ -1,6 +1,7 @@
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import consts from 'consts/const_global'
+import Serialization from 'common/utils/Serialization'
 
 import BlockchainGenesis from './Blockchain-Genesis'
 
@@ -49,7 +50,7 @@ class InterfaceBlockchainBlockData {
     serializeData(){
 
         let buffer = Buffer.concat( [
-            WebDollarCryptoData.createWebDollarCryptoData( this.minerAddress ).toFixedBuffer(consts.PUBLIC_ADDRESS_LENGTH)
+            Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress )
         ] )
         return buffer;
     }
