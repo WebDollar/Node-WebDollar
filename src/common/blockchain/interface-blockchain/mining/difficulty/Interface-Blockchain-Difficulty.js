@@ -1,4 +1,3 @@
-var BigNumber = require('bignumber.js');
 var BigInteger = require('big-integer');
 
 class InterfaceBlockchainDifficulty{

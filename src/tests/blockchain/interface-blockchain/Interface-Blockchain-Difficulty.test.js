@@ -1,4 +1,3 @@
-var BigNumber = require('bignumber.js');
 var BigInteger = require('big-integer');
 var assert = require('assert')
 

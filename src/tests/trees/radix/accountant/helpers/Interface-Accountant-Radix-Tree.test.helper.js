@@ -1,5 +1,5 @@
 var assert = require('assert')
-var BigNumber = require('bignumber.js');
+var BigDecimal = require('decimal.js');
 
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import IntefaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
@@ -40,14 +40,14 @@ class InterfaceAccountantRadixTreeTestHelper {
 
                 assert(accountantTree.search(new WebDollarCryptoData(str2, "ascii")).result === mustFind, "Accountant Tree couldn't find or not find " + str2 + " although it was added successfully");
 
-            });
+            });""
         });
 
         let result = accountantTree.levelSearch();
 
-        let sum = new BigNumber(0);
+        let sum = new BigDecimal(0);
         for (let i = 0; i < accountantData.length; i++)
-            sum = sum.plus(new BigNumber(accountantData[i].value.toString()));
+            sum = sum.plus(new BigDecimal(accountantData[i].value.toString()));
 
         // console.log("Accountant Tree sums");
         // console.log(sum);

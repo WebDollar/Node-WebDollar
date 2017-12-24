@@ -1,4 +1,4 @@
-var BigNumber = require('bignumber.js');
+var BigDecimal = require('decimal.js');
 
 import InterfaceRadixTree from './../Interface-Radix-Tree'
 
@@ -86,7 +86,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         if ( node.isBalanceValid()  )
             sum = node.value.balance;
         else
-            sum = new BigNumber(0);
+            sum = new BigDecimal(0);
 
 
         if ( node.edges.length > 0 ){

@@ -1,4 +1,3 @@
-var BigNumber = require('bignumber.js');
 var assert = require('assert')
 
 import InterfaceAccountantRadixTreeHelperClass from './helpers/Interface-Accountant-Radix-Tree.test.helper'

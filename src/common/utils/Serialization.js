@@ -1,29 +1,29 @@
-var BigNumber = require('bignumber.js');
+var BigDecimal = require('decimal.js');
 
 class Serialization{
 
     /**
      * Serialize a Big Number object into an optimal Buffer
      */
-    static serializeBigNumber(data){
+    static serializeBigDecimal(data){
         //9999999999.99999999999
         // d: [999, 9999999, 9999999, 9999000]
         // d biggest number is 0x98967F
         // e: 9  - it can also be negative
         // s: 1
 
-        if (! data instanceof BigNumber) throw 'data is not big number';
+        if (! data instanceof BigDecimal) throw 'data is not big decimal';
         if ( data.d.length === 0 ) throw "data is 0 and can't be ";
 
         let buffer = new Buffer( 1 + data.d.length * 3 + 1 );
 
-        buffer[0] = data.e % 256;
-        buffer[1] = data.d.length % 128 + Math.sign(data.e)*128;
+        buffer[0] = Math.abs(data.e) % 128 + (data.e >= 0 ? 0 : 1)*128;
+        buffer[1] = data.d.length % 128 + (data.s >= 0? 0 : 1)*128;
 
         for (let i=0; i<data.d.length; i++) {
-            buffer[2 + (i * 3 + 2)]   = data.d[i] & 0xff;
-            buffer[2 + (i * 3 + 1 )]  = data.d[i] >> 8 & 0xff;
-            buffer[2 + (i * 3 )]      = data.d[i] >> 16 & 0xff;
+            buffer[2 + (i * 3  + 0 )]   = data.d[i] & 0xff;
+            buffer[2 + (i * 3  + 1 )]  = data.d[i] >> 8 & 0xff;
+            buffer[2 + (i * 3  + 2 )]      = data.d[i] >> 16 & 0xff;
         }
 
         return buffer;
@@ -34,22 +34,27 @@ class Serialization{
      */
     static deserializeBigNumber(buffer){
 
-        let bigNumber = {e:0, sign:0, d: []};
+        let bigNumber = {e:0, s:0, d: []};
 
         if (!Buffer.isBuffer(buffer)) throw "Can't deserialize Big Number because it is not a buffer";
 
-        bigNumber.e = buffer[0];
-        let length = buffer[1] % 128;
-        let sign = buffer[1] / 128;
+        bigNumber.e = buffer[0] % 128;
+        bigNumber.e *= Math.floor(buffer[0] / 128) === 0 ? 1 : -1;
 
-        if (sign > 0)  bigNumber.e = - bigNumber.e;
+        let length = buffer[1] % 128;
+        bigNumber.s = Math.floor(buffer[1] / 128) === 0 ? 1 : -1;
 
         for (let i=0; i<length; i++){
-            let nr = buffer[2+i*3] & 0xff + buffer[2+i*3 + 1]  >> 8 & 0xff + buffer[2+i*3 + 2] >> 16 & 0xff;
+            let nr = buffer[2+i*3] | (buffer[2+i*3 + 1] << 8) | (buffer[2+i*3 + 2] << 16);
             bigNumber.d.push(nr);
         }
 
-        return new BigNumber(bigNumber)
+        //console.log("bigNumber", bigNumber);
+        let res = new BigDecimal(0);
+        res.d = bigNumber.d;
+        res.s = bigNumber.s;
+        res.e = bigNumber.e;
+        return res
     }
 
     /**

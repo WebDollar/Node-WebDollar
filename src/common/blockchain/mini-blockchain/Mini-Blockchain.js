@@ -17,11 +17,11 @@ class MiniBlockchain extends  InterfaceBlockchain{
         //inheriting blockchain add
         await InterfaceBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast);
 
-        let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
-        //console.log(result);
-
-        let balances = this.accountantTree.listBalances( block.data.minerAddress )
-        //console.log("balances", balances );
+        // let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
+        // //console.log(result);
+        //
+        // let balances = this.accountantTree.listBalances( block.data.minerAddress )
+        // //console.log("balances", balances );
 
         return result;
 

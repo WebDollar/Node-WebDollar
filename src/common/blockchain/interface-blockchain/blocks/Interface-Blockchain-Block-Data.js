@@ -12,7 +12,12 @@ class InterfaceBlockchainBlockData {
         if (minerAddress === undefined)
             minerAddress = BlockchainGenesis.address;
 
+
+        if (!Buffer.isBuffer(minerAddress))
+            minerAddress = Buffer.from(minerAddress);
+
         this.minerAddress = minerAddress;
+
         this.transactions = transactions||[];
 
         if (hashData === undefined || hashData === null){

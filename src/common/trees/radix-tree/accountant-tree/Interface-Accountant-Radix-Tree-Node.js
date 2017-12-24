@@ -1,5 +1,5 @@
 import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
-var BigNumber = require('bignumber.js');
+var BigDecimal = require('decimal.js');
 
 class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
@@ -15,12 +15,12 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     setSum(sum){
 
-        if (typeof sum === "object"  && sum !== null && sum.constructor.name === "BigNumber") this.sum =  sum;
+        if (typeof sum === "object"  && sum !== null && sum.constructor.name === "Decimal") this.sum =  sum;
         else {
 
             if ( sum === undefined || sum === null) sum = 0;
 
-            this.sum = new BigNumber(sum);
+            this.sum = new BigDecimal(sum);
         }
 
     }
@@ -28,7 +28,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
     isSumValid(){
 
         if ( this.sum === undefined && this.sum=== null) return false;
-        if (typeof this.sum !== "object"  || this.sum.constructor.name !== "BigNumber") return false;
+        if (typeof this.sum !== "object"  || this.sum.constructor.name !== "Decimal") return false;
 
         return true;
 
@@ -39,12 +39,12 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         if (typeof value === 'object' && value !== null){
 
-            if (typeof value.balance === "object"  && value.balance !== null && value.balance.constructor.name === "BigNumber") { }
+            if (typeof value.balance === "object"  && value.balance !== null && value.balance.constructor.name === "Decimal") { }
             else {
 
                 if ( value.balance === undefined || value.balance === null) value.balance = 0;
 
-                value.balance = new BigNumber(value.balance);
+                value.balance = new BigDecimal(value.balance);
             }
 
         }
@@ -58,7 +58,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
         if (typeof this.value !== 'object' || this.value === null) return false;
 
         if ( this.value.balance === undefined && this.value.balance=== null) return false;
-        if (typeof this.value.balance !== "object"  || this.value.balance.constructor.name !== "BigNumber") return false;
+        if (typeof this.value.balance !== "object"  || this.value.balance.constructor.name !== "Decimal") return false;
 
         return true;
 

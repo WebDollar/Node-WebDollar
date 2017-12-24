@@ -5,7 +5,7 @@ import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree"
 import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
 import Serialization from "common/utils/Serialization";
 
-var BigNumber = require('bignumber.js');
+let BigDecimal = require('decimal.js');
 
 class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
@@ -31,8 +31,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
         tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
 
-        if (!value instanceof BigNumber)
-            value = new BigNumber(value);
+        if (!value instanceof BigDecimal)
+            value = new BigDecimal(value);
 
         let result;
 
