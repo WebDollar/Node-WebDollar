@@ -3,6 +3,7 @@ import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interf
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
+import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 
 class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
@@ -52,6 +53,21 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         return node.getBalances();
 
+    }
+
+    /*
+        inherited
+    */
+    _computeHash(node) {
+        return InterfaceMerkleTree.prototype._computeHash.call(this, node);
+    }
+
+    refreshHash(node, forced){
+        return InterfaceMerkleTree.prototype.refreshHash.call(this, node,forced);
+    }
+
+    getValueToHash(node){
+        return node.serialize();
     }
 
 }

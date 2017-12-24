@@ -32,20 +32,22 @@ class Serialization{
     /**
      * Deserialize a Big Number object from an optimal Buffer
      */
-    static deserializeBigDecimal(buffer){
+    static deserializeBigDecimal(buffer, offset ){
+
+        offset = offset || 0;
 
         let bigNumber = {e:0, s:0, d: []};
 
         if (!Buffer.isBuffer(buffer)) throw "Can't deserialize Big Number because it is not a buffer";
 
-        bigNumber.e = buffer[0] % 128;
+        bigNumber.e = buffer[0 + offset ] % 128;
         bigNumber.e *= Math.floor(buffer[0] / 128) === 0 ? 1 : -1;
 
-        let length = buffer[1] % 128;
+        let length = buffer[1 + offset ] % 128;
         bigNumber.s = Math.floor(buffer[1] / 128) === 0 ? 1 : -1;
 
         for (let i=0; i<length; i++){
-            let nr = buffer[2+i*3] | (buffer[2+i*3 + 1] << 8) | (buffer[2+i*3 + 2] << 16);
+            let nr = buffer[2+i*3 + offset ] | (buffer[2+i*3 + 1 + offset ] << 8) | (buffer[2+i*3 + 2 + offset ] << 16);
             bigNumber.d.push(nr);
         }
 
@@ -54,7 +56,11 @@ class Serialization{
         res.d = bigNumber.d;
         res.s = bigNumber.s;
         res.e = bigNumber.e;
-        return res
+
+        return {
+            number: res,
+            newOffset: 2+length*3 + offset,
+        }
     }
 
     /**

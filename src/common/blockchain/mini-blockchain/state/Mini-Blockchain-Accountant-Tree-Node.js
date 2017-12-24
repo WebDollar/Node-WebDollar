@@ -4,6 +4,7 @@ import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
 import Serialization from "common/utils/Serialization";
+import consts from 'consts/const_global'
 
 let BigDecimal = require('decimal.js');
 
@@ -27,7 +28,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     updateBalanceToken(value, tokenId){
 
-        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = 'webd';
+        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = 1;
 
         if (this.balances === undefined || this.balances === null) throw 'balances is null';
 
@@ -52,7 +53,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
                 id: tokenId,
                 amount: value,
             });
-            console.log("this.balances", this.balances);
+
             result = this.balances[this.balances.length-1];
         }
 
@@ -75,7 +76,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     getBalance(tokenId){
 
-        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = 'webd';
+        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = 1;
 
         tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
 
@@ -105,7 +106,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
         let result = false;
         for (let i=this.balances.length-1; i>=0; i--)
-            if (this.balances[i].amount.equals(0) || this.value.balances[i] === null) {
+            if (this.balances[i].amount.equals(0) || this.balances[i] === null) {
                 this.balances.splice(i, 1);
                 result = true;
             }
@@ -114,20 +115,92 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     }
 
+    _serializeBalance(balance){
 
-    serialize(){
-
-        let buffer;
-
-        buffer = Buffer.concat ( [
-                                   Serialization.serializeNumber1Byte(this.balances.length),
-                                 ]);
-
-        return Buffer;
+        return Buffer.concat(
+            [
+                balance.id,
+                Serialization.serializeBigDecimal(balance.amount)
+            ]);
 
     }
 
-    deserialize(){
+    serialize(){
+
+        let buffer, balancesBuffers = [];
+
+        //let serialize webd
+        let iWEBDSerialized = null;
+        for (let i=0; i<this.balances.length; i++)
+            if ((this.balances[i].id.length === 1) && (this.balances[i].id[0]===0)){
+                balancesBuffers.push(this._serializeBalance(this.balances[i]));
+                iWEBDSerialized = i;
+            }
+
+        // in case it was not serialize d and it is empty
+        if ( iWEBDSerialized  === null){
+            let idWEBD = new Buffer(1);
+            idWEBD[0] = 1;
+
+            balancesBuffers.push( this._serializeBalance({id:idWEBD, amount: new BigDecimal(0) }));
+        }
+
+        //let serialize everything else
+        for (let i=0; i<this.balances.length; i++)
+            if (i !== iWEBDSerialized){
+                balancesBuffers.push(this._serializeBalance(this.balances[i]));
+            }
+
+        buffer = Buffer.concat ( [
+                                   Serialization.serializeNumber1Byte(balancesBuffers.length),
+                                   balancesBuffers,
+                                 ]);
+
+        return buffer;
+
+    }
+
+    deserialize(buffer){
+
+        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
+
+        let offset = 0;
+
+        try {
+            if (height >= 0) {
+
+                let length = data.substr(offset, 1).buffer;
+                offset += 1;
+
+                // webd balance
+                let webdId = data.substr(offset,1).buffer;
+                offset += 1;
+
+                if (webdId[0] !== 1) throw "webd token is incorrect";
+                let result = Serialization.deserializeBigDecimal( data, offset );
+
+                this.updateBalanceToken(result.number);
+
+                offset = result.newOffset;
+
+                //rest of tokens , in case there are
+                for (let i=1; i<length; i++){
+                    let tokenId = data.substr(offset,consts.TOKEN_ID_LENGTH).buffer;
+                    offset += consts.TOKEN_ID_LENGTH;
+
+                    result = Serialization.deserializeBigDecimal(data, offset);
+
+                    this.updateBalanceToken(result.number, tokenId)
+
+                    offset = result.newOffset;
+                }
+
+            }
+        } catch (exception){
+            console.log(colors.red("error deserializing tree node"), exception);
+            throw exception;
+        }
+
 
     }
 
