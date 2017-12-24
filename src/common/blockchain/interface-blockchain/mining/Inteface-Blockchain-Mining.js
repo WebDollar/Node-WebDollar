@@ -138,8 +138,9 @@ class InterfaceBlockchainMining{
 
         } catch (Exception){
 
-            console.log(colors.red("Error mining block "), Exception.toString(), block);
+            console.log(colors.red("Error mining block "), Exception, block);
             throw Exception;
+
         }
 
     }

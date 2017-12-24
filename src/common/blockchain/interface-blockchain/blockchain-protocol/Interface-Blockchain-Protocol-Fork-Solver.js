@@ -47,7 +47,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         } catch (Exception){
 
-            console.log(colors.red("_discoverForkBinarySearch raised an exception" + Exception.toString() ), blockHeaderResult)
+            console.log(colors.red("_discoverForkBinarySearch raised an exception" ), Exception, blockHeaderResult)
 
         }
 

@@ -32,7 +32,7 @@ class Serialization{
     /**
      * Deserialize a Big Number object from an optimal Buffer
      */
-    static deserializeBigNumber(buffer){
+    static deserializeBigDecimal(buffer){
 
         let bigNumber = {e:0, s:0, d: []};
 
