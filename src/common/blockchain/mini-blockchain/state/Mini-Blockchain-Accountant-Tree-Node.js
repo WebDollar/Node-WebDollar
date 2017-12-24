@@ -151,10 +151,9 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
                 balancesBuffers.push(this._serializeBalance(this.balances[i]));
             }
 
-        buffer = Buffer.concat ( [
-                                   Serialization.serializeNumber1Byte(balancesBuffers.length),
-                                   balancesBuffers,
-                                 ]);
+        balancesBuffers.unshift(Serialization.serializeNumber1Byte(balancesBuffers.length))
+
+        buffer = Buffer.concat ( balancesBuffers );
 
         return buffer;
 

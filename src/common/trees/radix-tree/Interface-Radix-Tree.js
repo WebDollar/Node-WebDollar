@@ -151,7 +151,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding thew new nodeChild with current Value
                                 let nodeChild = this.createNode( nodeMatch, [], value);
-                                nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
+                                nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild).buffer);
 
                                 nodeCurrent = nodeChild;
 
@@ -198,7 +198,7 @@ class InterfaceRadixTree extends InterfaceTree{
                 // no more Children...
 
                 let nodeChild = this.createNode(nodeCurrent, [], value);
-                nodeCurrent.edges.push( this.createEdge( input.substr(i), nodeChild ));
+                nodeCurrent.edges.push( this.createEdge( input.substr(i), nodeChild ).buffer);
 
                 //console.log("nodeChild2", nodeChild)
                 this.changedNode(nodeChild)
@@ -270,7 +270,7 @@ class InterfaceRadixTree extends InterfaceTree{
                     // prefix slow => slowly
                     if ( node._previousEdges.length === 1 ){
 
-                        nodeParent.edges.push(  this.createEdge( new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ deletedParentEdge.label.buffer,  node._previousEdges[0].label.buffer  ] )), node._previousEdges[0].targetNode) );
+                        nodeParent.edges.push(  this.createEdge( Buffer.concat( [ deletedParentEdge.label.buffer,  node._previousEdges[0].label.buffer  ] )), node._previousEdges[0].targetNode);
 
                         node = node._previousEdges[0].targetNode;
                         node.parent = nodeParent;
@@ -302,7 +302,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             for (let i=0; i<grandParent.edges.length; i++)
                                 if (grandParent.edges[i].targetNode === nodeParent){
 
-                                    grandParent.edges[i].label = new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ grandParent.edges[i].label.buffer, edge.label.buffer  ] ));
+                                    grandParent.edges[i].label = Buffer.concat( [ grandParent.edges[i].label.buffer, edge.label.buffer  ] );
                                     grandParent.edges[i].targetNode = node;
 
                                     node.parent = grandParent;

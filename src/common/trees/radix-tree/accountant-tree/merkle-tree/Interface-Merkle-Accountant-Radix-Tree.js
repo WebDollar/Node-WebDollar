@@ -54,7 +54,7 @@ class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
     }
 
     getValueToHash(node){
-        return InterfaceMerkleTree.prototype.getValueToHash.call(this, node).concat( node.sum );
+        return Buffer.concat ( [InterfaceMerkleTree.prototype.getValueToHash.call(this, node),  node.sum.buffer ]);
     }
 
 

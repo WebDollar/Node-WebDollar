@@ -110,6 +110,14 @@ class WebDollarCrypto {
         return (a.toString(16) ===h.toLowerCase())
     }
 
+    static SHA256Bytes(bytes){
+
+        let sha256 = crypto.createHash('sha256'); //sha256
+        sha256.update(bytes)
+
+        return sha256.digest();
+    }
+
     static SHA256(bytes){
 
         if (WebDollarCryptoData.isWebDollarCryptoData(bytes)) bytes = bytes.buffer;

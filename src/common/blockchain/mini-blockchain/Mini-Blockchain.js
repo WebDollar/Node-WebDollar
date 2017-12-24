@@ -19,10 +19,10 @@ class MiniBlockchain extends  InterfaceBlockchain{
 
         if (!result) return false;
 
-        result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
+        result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined );
         //console.log(result);
 
-        let balances = this.accountantTree.listBalances( block.data.minerAddress )
+        let balances = this.accountantTree.listBalances( block.data.minerAddress );
         //console.log("balances", balances );
 
         return result;
