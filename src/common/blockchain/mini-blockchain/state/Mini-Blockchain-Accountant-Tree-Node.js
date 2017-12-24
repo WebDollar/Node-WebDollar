@@ -29,6 +29,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = 'webd';
 
+        if (this.balances === undefined || this.balances === null) throw 'balances is null';
+
         tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
 
         if (!value instanceof BigDecimal)
@@ -50,6 +52,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
                 id: tokenId,
                 amount: value,
             });
+            console.log("this.balances", this.balances);
             result = this.balances[this.balances.length-1];
         }
 
@@ -101,9 +104,9 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
     deleteBalancesEmpty(){
 
         let result = false;
-        for (let i=this.value.balances.length-1; i>=0; i--)
-            if (this.value.balances[i].amount.equals(0) || this.value.balances[i] === null) {
-                this.value.balances.splice(i, 1);
+        for (let i=this.balances.length-1; i>=0; i--)
+            if (this.balances[i].amount.equals(0) || this.value.balances[i] === null) {
+                this.balances.splice(i, 1);
                 result = true;
             }
 
@@ -117,7 +120,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         let buffer;
 
         buffer = Buffer.concat ( [
-                                   Serialization.serializeNumber1Byte(this.value.balances.length),
+                                   Serialization.serializeNumber1Byte(this.balances.length),
                                  ]);
 
         return Buffer;
