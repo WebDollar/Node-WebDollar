@@ -115,7 +115,7 @@ class InterfaceMerkleTree extends InterfaceTree{
 
             // Let's hash
 
-            let sha256 = WebDollarCrypto.SHA256Bytes( WebDollarCrypto.SHA256Bytes( valueToHash ) )
+            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( valueToHash ) )
             node.hash = {sha256: sha256};
 
         } else
@@ -144,7 +144,7 @@ class InterfaceMerkleTree extends InterfaceTree{
             // console.log("valueToHash222", typeof valueToHash, valueToHash)
             // console.log("hashConcat.sha256 ", typeof hashConcat.sha256 , hashConcat.sha256 )
 
-            let sha256 = WebDollarCrypto.SHA256Bytes( WebDollarCrypto.SHA256Bytes( Buffer.concat ( [valueToHash, hashConcat.sha256 ]  ) ));
+            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( Buffer.concat ( [valueToHash, hashConcat.sha256 ]  ) ));
             node.hash = {sha256: sha256};
 
             return node.hash;

@@ -7,7 +7,7 @@ describe('WebDollar crypt', ()=>{
 
     it('encodeBase64 - should return encoded', async ()=>{
 
-        let bytes = WebDollarCrypto.getByteRandomValues(Math.floor(Math.random() * 100));
+        let bytes = WebDollarCrypto.getBufferRandomValues(Math.floor(Math.random() * 100));
         let encoded = WebDollarCrypto.encodeBase64(bytes);
 
         assert(typeof encoded === 'string', 'encodeBase64 is not STRING')
@@ -26,12 +26,12 @@ describe('WebDollar crypt', ()=>{
 
     })
 
-    it('getByteRandomValues ', ()=>{
+    it('getBufferRandomValues', ()=>{
 
         const count = Math.floor(Math.random()*200);
-        let bytes = WebDollarCrypto.getByteRandomValues(count)
+        let bytes = WebDollarCrypto.getBufferRandomValues(count)
 
-        assert(bytes.length === count, 'getByteRandomValues should return '+count+' elements')
+        assert(bytes.length === count, 'getBufferRandomValues should return '+count+' elements')
 
     })
 

@@ -46,7 +46,7 @@ class InterfaceBlockchainBlockData {
 
         // sha256 (sha256 ( serialized ))
 
-        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this.serializeData() )).buffer;
+        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this.serializeData() ));
     }
 
     /**

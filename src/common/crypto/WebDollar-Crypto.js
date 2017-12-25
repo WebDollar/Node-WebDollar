@@ -75,12 +75,11 @@ class WebDollarCrypto {
         return result;
     }
 
-
-    static getByteRandomValues(count){
+    static getBufferRandomValues(count){
 
         if ( count === undefined) count = 32;
 
-        let randArr = new Uint8Array(count) //create a typed array of 32 bytes (256 bits)
+        let randArr = new Buffer(count) //create a typed array of 32 bytes (256 bits)
 
         if ( typeof window !== 'undefined' &&  window.crypto !==undefined) window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
         else {
@@ -88,13 +87,9 @@ class WebDollarCrypto {
             getRandomValues(randArr);
         }
 
-        //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
-        let dataBytes = []
-        for (let i = 0; i < randArr.length; ++i)
-            dataBytes[i] = randArr[i]
-
-        return dataBytes;
+        return randArr;
     }
+
 
     static bytesToHex(bytes){
 
@@ -113,7 +108,7 @@ class WebDollarCrypto {
         return (a.toString(16) ===h.toLowerCase())
     }
 
-    static SHA256Bytes(bytes){
+    static SHA256(bytes){
 
         let sha256 = crypto.createHash('sha256'); //sha256
         sha256.update(bytes)
@@ -121,24 +116,12 @@ class WebDollarCrypto {
         return sha256.digest();
     }
 
-    static SHA256(bytes){
-
-        if (WebDollarCryptoData.isWebDollarCryptoData(bytes)) bytes = bytes.buffer;
-
-        let sha256 = crypto.createHash('sha256'); //sha256
-        sha256.update(bytes)
-
-        return new WebDollarCryptoData.createWebDollarCryptoData( sha256.digest() )
-    }
-
     static RIPEMD160(bytes){
-
-        if (WebDollarCryptoData.isWebDollarCryptoData(bytes)) bytes = bytes.buffer;
 
         let ripemd160 = crypto.createHash('ripemd160'); // RIPEMD160
         ripemd160.update(bytes)
 
-        return new WebDollarCryptoData.createWebDollarCryptoData( ripemd160.digest() )
+        return ripemd160.digest()
     }
 
     /**
