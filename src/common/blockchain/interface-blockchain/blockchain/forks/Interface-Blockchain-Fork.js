@@ -111,6 +111,8 @@ class InterfaceBlockchainFork {
                 for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength(); i++)
                     this._blocksCopy.push(this.blockchain.blocks[i]);
 
+                this.preFork();
+
                 this.blockchain.blocks.splice(this.forkStartingHeight);
 
                 let forkedSuccessfully = true;
@@ -128,10 +130,12 @@ class InterfaceBlockchainFork {
                     this.blockchain.blocks.splice(this.forkStartingHeight);
                     for (let i = 0; i < this._blocksCopy.length; i++)
                         if (!await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], (i === this._blocksCopy.length - 1), this.sockets)) {
-                            console.log(colors.green("blockchain couldn't re restored after fork included in main Blockchain ", i));
+                            console.log(colors.green("blockchain couldn't restored after fork included in main Blockchain ", i));
                             break;
                         }
                 }
+
+                this.postFork(forkedSuccessfully);
 
                 // it was done successfully
                 if (forkedSuccessfully)
@@ -145,6 +149,11 @@ class InterfaceBlockchainFork {
         return false;
     }
 
+    preFork(){
+    }
+
+    postFork(forkedSuccessfully){
+    }
 
 
 }

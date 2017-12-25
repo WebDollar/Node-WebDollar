@@ -326,6 +326,12 @@ class InterfaceTree{
         }
     }
 
+    cloneTree(){
+        //cloning tutorial based on https://stackoverflow.com/questions/41474986/how-to-clone-a-javascript-es6-class-instance
+        let cloneRoot = Object.assign( Object.create( Object.getPrototypeOf(this.root)), this.root);
+        return cloneRoot;
+    }
+
     save(){
     }
 
