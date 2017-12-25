@@ -7,7 +7,9 @@ import BlockchainGenesis from './Blockchain-Genesis'
 
 class InterfaceBlockchainBlockData {
 
-    constructor(minerAddress, transactions, hashData){
+    constructor(blockchain, minerAddress, transactions, hashData){
+
+        this.blockchain = blockchain;
 
         if (minerAddress === undefined)
             minerAddress = BlockchainGenesis.address;
@@ -20,9 +22,8 @@ class InterfaceBlockchainBlockData {
 
         this.transactions = transactions||[];
 
-        if (hashData === undefined || hashData === null){
+        if (hashData === undefined || hashData === null)
             hashData = this.computeHashBlockData();
-        }
 
         this.hashData = hashData;
 
@@ -45,8 +46,8 @@ class InterfaceBlockchainBlockData {
     computeHashBlockData(){
 
         // sha256 (sha256 ( serialized ))
-
         return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this.serializeData() ));
+
     }
 
     /**
@@ -55,7 +56,8 @@ class InterfaceBlockchainBlockData {
     serializeData(){
 
         let buffer = Buffer.concat( [
-            Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress )
+            Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress ),
+            Serialization.serializeToFixedBuffer( this.hashData, 32 ),
         ] )
         return buffer;
     }
@@ -67,10 +69,13 @@ class InterfaceBlockchainBlockData {
         let offset = 0;
         this.data = {};
 
-        this.minerAddress = BufferExtended.substr(data, offset, consts.PUBLIC_ADDRESS_LENGTH).buffer;
+        this.minerAddress = BufferExtended.substr(data, offset, consts.PUBLIC_ADDRESS_LENGTH);
         offset += consts.PUBLIC_ADDRESS_LENGTH;
 
-        return buffer;
+        this.hashData = BufferExtended.substr(data, offset, 32);
+        offset += 32;
+
+        return offset;
     }
 
     toString(){

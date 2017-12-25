@@ -5,10 +5,10 @@ import MiniBlockchainAccountantTree from './state/Mini-Blockchain-Accountant-Tre
 class MiniBlockchain extends  InterfaceBlockchain{
 
     constructor (){
+
         super();
 
         this.accountantTree = new MiniBlockchainAccountantTree();
-
     }
 
     // operate the mini-blockchain accountant tree

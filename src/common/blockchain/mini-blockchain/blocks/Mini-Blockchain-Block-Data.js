@@ -1,0 +1,58 @@
+import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
+import BufferExtended from 'common/utils/BufferExtended'
+
+class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
+
+    constructor(blockchain, minerAddress, transactions, hashData, hashAccountantTree){
+
+        super(blockchain, minerAddress, transactions, hashData, );
+
+        this.hashAccountantTree = hashAccountantTree;
+
+        //recalculate hashData
+        if (hashData === undefined || hashData === null)
+            this.hashData = this.computeHashBlockData();
+
+    }
+
+
+    validateBlockData(){
+
+        let result = InterfaceBlockchainBlockData.prototype.validateBlockData.call(this );
+        if (result !== false)
+            return false;
+
+        if (this.hashAccountantTree === undefined || this.hashAccountantTree === null || !Buffer.isBuffer(this.hashAccountantTree)) throw ('hashAccountantTree is empty');
+
+        //validate hashAccountantTree
+
+    }
+
+
+    serializeData(){
+        let buffer = InterfaceBlockchainBlockData.prototype.serializeData.call(this);
+
+        return Buffer.concat(
+            [
+                buffer,
+                this.hashAccountantTree
+            ]);
+    }
+
+    deserializeData(buffer){
+
+        let data = buffer;
+
+        let offset = InterfaceBlockchainBlockData.prototype.deserializeData.call(this);
+
+        this.hashAccountantTree = BufferExtended.substr(data, offset, 32);
+        offset += 32;
+
+        return offset;
+
+    }
+
+
+}
+
+export default MiniBlockchainBlockData;

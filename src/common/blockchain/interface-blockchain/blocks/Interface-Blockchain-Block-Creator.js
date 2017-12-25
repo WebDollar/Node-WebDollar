@@ -5,10 +5,10 @@ import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data'
 
 class InterfaceBlockchainBlockCreator{
 
-    constructor(blockchain){
+    constructor(blockchain, db){
 
         this.blockchain = blockchain;
-        this.db = new InterfaceSatoshminDB();
+        this.db = db;
     }
 
     /*
@@ -18,9 +18,9 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        let data = new InterfaceBlockchainBlockData(minerAddress, transactions, undefined);
+        let data = new InterfaceBlockchainBlockData(this.blockchain, minerAddress, transactions, undefined);
 
-        return new InterfaceBlockchainBlock( 1, undefined, BlockchainGenesis.hashPrev, undefined, 0, data, 0, this.db );
+        return new InterfaceBlockchainBlock( this.blockchain,  1, undefined, BlockchainGenesis.hashPrev, undefined, 0, data, 0, this.db );
     }
 
     /*
@@ -30,9 +30,9 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        let data = new InterfaceBlockchainBlockData(minerAddress, transactions, undefined);
+        let data = new InterfaceBlockchainBlockData(this.blockchain, minerAddress, transactions, undefined);
 
-        return new InterfaceBlockchainBlock( 1, undefined, prevBlock.hash, undefined, 0, data, height, this.db);
+        return new InterfaceBlockchainBlock( this.blockchain, 1, undefined, prevBlock.hash, undefined, 0, data, height, this.db);
     }
 
     createBlockNew(minerAddress, transactions){

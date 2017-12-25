@@ -18,13 +18,15 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-    constructor (version, hash, hashPrev, timeStamp, nonce, data, height, db){
+    constructor (blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db){
+
+        this.blockchain = blockchain;
 
         this.version = version||null; // 2 bytes version                                                 - 2 bytes
 
         this.hash = hash||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
-        this.hashPrev = hashPrev||null; // 256-bit hash sha256                                             - 32 bytes, sha256
+        this.hashPrev = hashPrev||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
 
 
 
@@ -39,7 +41,7 @@ class InterfaceBlockchainBlock {
 
 
         if (data === undefined || data === null)
-            data = new InterfaceBlockchainBlockData();
+            data = this.createEmptyBlockData();
 
         this.data = data;
 
@@ -53,6 +55,10 @@ class InterfaceBlockchainBlock {
         this.reward = 0;
 
         this.db = db;
+    }
+
+    createEmptyBlockData(){
+        return new InterfaceBlockchainBlockData(this.blockchain );
     }
 
     async validateBlock(height, previousDifficultyTarget, previousHash){

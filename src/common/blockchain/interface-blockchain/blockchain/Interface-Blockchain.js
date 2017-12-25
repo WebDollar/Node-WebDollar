@@ -24,11 +24,11 @@ class InterfaceBlockchain {
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator(this);
 
-        this.blockCreator = new InterfaceBlockchainBlockCreator( this )
-
         this.mining = undefined;
         
         this.dataBase = new InterfaceSatoshminDB();
+
+        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.dataBase )
     }
 
     async validateBlockchain(){
