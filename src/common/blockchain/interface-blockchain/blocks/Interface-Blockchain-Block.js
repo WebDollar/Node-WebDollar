@@ -4,10 +4,9 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 import consts from 'consts/const_global'
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data';
 import Serialization from "common/utils/Serialization.js";
-
-import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm

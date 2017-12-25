@@ -1,11 +1,11 @@
 var assert = require('assert')
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
-import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
 
 describe('test blockchain save/load/remove blocks to/from local storage', () => {
 
-    let db = new InterfacePouchDB();
+    let db = new InterfaceSatoshminDB();
     let version = 1;
     let hash = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
     let hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
