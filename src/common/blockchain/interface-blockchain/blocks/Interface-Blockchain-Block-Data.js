@@ -27,6 +27,8 @@ class InterfaceBlockchainBlockData {
 
         this.hashData = hashData;
 
+        //computed data
+        this.computedBlockDataPrefix = null;
     }
 
     validateBlockData(){
@@ -46,8 +48,22 @@ class InterfaceBlockchainBlockData {
     computeHashBlockData(){
 
         // sha256 (sha256 ( serialized ))
-        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this.serializeData() ));
+        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockHeaderPrefix() ));
 
+    }
+
+    _computeBlockHeaderPrefix(skipPrefix){
+
+        //in case I have calculated  the computedBlockPrefix before
+
+        if (skipPrefix === true && Buffer.isBuffer(this.computedBlockDataPrefix) )
+            return this.computedBlockDataPrefix;
+
+        this.computedBlockDataPrefix = Buffer.concat ( [
+            Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress ),
+        ]);
+
+        return this.computedBlockDataPrefix;
     }
 
     /**
@@ -55,11 +71,16 @@ class InterfaceBlockchainBlockData {
      **/
     serializeData(){
 
-        let buffer = Buffer.concat( [
-            Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress ),
+        if (!Buffer.isBuffer(this.hashData) || this.hashData.length !== 32)
+            this.hashData = this.computeHashBlockData();
+
+        this._computeBlockHeaderPrefix(true);
+
+        return Buffer.concat( [
+            this.computedBlockDataPrefix,
             Serialization.serializeToFixedBuffer( this.hashData, 32 ),
         ] )
-        return buffer;
+
     }
 
     deserializeData(buffer){

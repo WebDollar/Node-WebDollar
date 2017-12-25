@@ -2,8 +2,10 @@ import NodeProtocol from 'common/sockets/protocol/node-protocol';
 
 
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
+
 import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchain/mining/difficulty/Interface-Blockchain-Difficulty'
 import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 
@@ -28,7 +30,7 @@ class InterfaceBlockchain {
         
         this.dataBase = new InterfaceSatoshminDB();
 
-        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.dataBase )
+        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.dataBase, InterfaceBlockchainBlock, InterfaceBlockchainBlockData)
     }
 
     async validateBlockchain(){

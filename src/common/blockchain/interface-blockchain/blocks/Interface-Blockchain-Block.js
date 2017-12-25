@@ -157,9 +157,8 @@ class InterfaceBlockchainBlock {
 
         //in case I have calculated  the computedBlockPrefix before
 
-        if (skipPrefix === true && Buffer.isBuffer(this.computedBlockPrefix) ){
+        if (skipPrefix === true && Buffer.isBuffer(this.computedBlockPrefix) )
             return this.computedBlockPrefix;
-        }
 
         this.computedBlockPrefix = Buffer.concat ( [
                                                      Serialization.serializeToFixedBuffer( 2, Serialization.serializeNumber4Bytes( this.version) ),
@@ -189,14 +188,16 @@ class InterfaceBlockchainBlock {
 
         // serialize block is ( hash + nonce + header )
 
-        this._computeBlockHeaderPrefix(true);
-        let buffer = Buffer.concat( [
-                                      this.hash,
-                                      Serialization.serializeNumber4Bytes( this.nonce ),
-                                      this.computedBlockPrefix,
-                                    ]);
+        if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKS_POW_LENGTH)
+            this.hash = this.computeHash();
 
-        return buffer;
+        this._computeBlockHeaderPrefix(true);
+
+        return Buffer.concat( [
+                                  this.hash,
+                                  Serialization.serializeNumber4Bytes( this.nonce ),
+                                  this.computedBlockPrefix,
+                                ]);
 
     }
 
