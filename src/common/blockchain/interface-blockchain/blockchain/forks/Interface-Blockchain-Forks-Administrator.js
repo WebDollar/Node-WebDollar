@@ -1,18 +1,20 @@
-import NodeProtocol from 'common/sockets/protocol/node-protocol';
-
 import InterfaceBlockchainFork from './Interface-Blockchain-Fork'
+
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
+
 class InterfaceBlockchainForksAdministrator {
 
 
-    constructor (blockchain){
+    constructor (blockchain, forkClass){
 
         this.blockchain = blockchain;
         this.forks = [];
 
         this.forksId = 0;
+
+        this.forkClass = forkClass || InterfaceBlockchainFork;
     }
 
     createNewFork(sockets, forkStartingHeight, forkChainLength, header){
@@ -23,7 +25,7 @@ class InterfaceBlockchainForksAdministrator {
 
         if (this.findForkByHeader(header) !== null) return null;
 
-        fork = new InterfaceBlockchainFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainLength, header);
+        fork = new this.forkClass( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainLength, header );
 
         this.forks.push(fork);
 

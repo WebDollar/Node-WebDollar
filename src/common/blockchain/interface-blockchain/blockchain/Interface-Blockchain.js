@@ -24,12 +24,11 @@ class InterfaceBlockchain {
         this.blocks = [];
         this._blocksSempahore = false;
 
-        this.forksAdministrator = new InterfaceBlockchainForksAdministrator(this);
-
         this.mining = undefined;
         
         this.dataBase = new InterfaceSatoshminDB();
 
+        this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.dataBase, InterfaceBlockchainBlock, InterfaceBlockchainBlockData)
     }
 

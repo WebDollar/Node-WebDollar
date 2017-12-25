@@ -3,9 +3,6 @@ const colors = require('colors/safe');
 
 import consts from 'consts/const_global'
 
-import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
-import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
-import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 import Serialization from 'common/utils/Serialization'
 

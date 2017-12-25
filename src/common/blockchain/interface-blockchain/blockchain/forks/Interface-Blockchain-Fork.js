@@ -1,9 +1,4 @@
-import NodeProtocol from 'common/sockets/protocol/node-protocol';
 
-import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
-import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
-import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
-import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchain/mining/difficulty/Interface-Blockchain-Difficulty'
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -110,7 +105,7 @@ class InterfaceBlockchainFork {
         //overwrite the blockchain blocks with the forkBlocks
         if (useFork){
 
-            return await this.blockchain.processBlocksSempahoreCallback( async ()=> {
+            return await this.blockchain.processBlocksSempahoreCallback( async () => {
 
                 this._blocksCopy = [];
                 for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength(); i++)

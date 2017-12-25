@@ -7,7 +7,6 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
 
         super(blockchain, minerAddress, transactions, hashData, );
 
-
         if (hashAccountantTree === undefined)
             hashAccountantTree = this.computeAccountantTreeHashBlockData();
 
