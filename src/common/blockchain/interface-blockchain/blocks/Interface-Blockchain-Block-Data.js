@@ -1,4 +1,4 @@
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
+import BufferExtended from "common/utils/BufferExtended"
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import consts from 'consts/const_global'
 import Serialization from 'common/utils/Serialization'
@@ -62,12 +62,12 @@ class InterfaceBlockchainBlockData {
 
     deserializeData(buffer){
 
-        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
+        let data = buffer;
 
         let offset = 0;
         this.data = {};
 
-        this.minerAddress = data.substr(offset, consts.PUBLIC_ADDRESS_LENGTH).buffer;
+        this.minerAddress = BufferExtended.substr(data, offset, consts.PUBLIC_ADDRESS_LENGTH).buffer;
         offset += consts.PUBLIC_ADDRESS_LENGTH;
 
         return buffer;

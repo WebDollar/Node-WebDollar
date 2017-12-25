@@ -16,6 +16,7 @@ import InterfaceRadixTreeNode from "./Interface-Radix-Tree-Node"
 import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
 
 import InterfaceTree from "common/trees/Interface-Tree"
+import BufferExtended from "common/utils/BufferExtended"
 
 class InterfaceRadixTree extends InterfaceTree{
 
@@ -83,16 +84,16 @@ class InterfaceRadixTree extends InterfaceTree{
      */
     add(input, value){
 
-        input = WebDollarCryptoData.createWebDollarCryptoData(input)
+        input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
 
         if (input.buffer.length === 0) throw 'No input';
 
         let nodeCurrent = this.root;
 
-        // console.log("input.buffer", input.buffer)
+        // console.log("input", input)
 
         let i=0;
-        while (i < input.buffer.length) {
+        while (i < input.length) {
 
             //searching for existence of input[i...] in nodeCurrent list
 
@@ -106,7 +107,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                 for (let j = 0; j < nodeCurrent.edges.length; j++){
 
-                    match = input.longestMatch(nodeCurrent.edges[j].label, i);
+                    match = BufferExtended.longestMatch(input, nodeCurrent.edges[j].label, i);
 
                     //console.log("match", match);
 
@@ -114,9 +115,9 @@ class InterfaceRadixTree extends InterfaceTree{
 
                         //the match is smaller
 
-                        if (match.buffer.length < nodeCurrent.edges[j].label.buffer.length){
+                        if (match.length < nodeCurrent.edges[j].label.length){
 
-                            let originalEdgeLength = nodeCurrent.edges[j].label.buffer.length;
+                            let originalEdgeLength = nodeCurrent.edges[j].label.length;
                             let edge = nodeCurrent.edges[j];
 
                             // We remove edge j
@@ -124,7 +125,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                             let nodeMatch = null;
 
-                            if ( i + originalEdgeLength >  input.buffer.length &&  (i + match.buffer.length) === input.buffer.length ){
+                            if ( i + originalEdgeLength >  input.length &&  (i + match.length) === input.length ){
 
                                 // Adding the new nodeMatch by edge Match
 
@@ -132,7 +133,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                 nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this.createEdge( edge.label.substr(match.buffer.length), edge.targetNode), )
+                                nodeMatch.edges.push( this.createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), )
                                 edge.targetNode.parent = nodeMatch;
 
                                 nodeCurrent = edge.targetNode;
@@ -146,12 +147,12 @@ class InterfaceRadixTree extends InterfaceTree{
                                 nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this.createEdge( edge.label.substr(match.buffer.length), edge.targetNode), )
+                                nodeMatch.edges.push( this.createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), )
                                 edge.targetNode.parent = nodeMatch;
 
                                 // Adding thew new nodeChild with current Value
                                 let nodeChild = this.createNode( nodeMatch, [], value);
-                                nodeMatch.edges.push( this.createEdge(input.substr(i+match.buffer.length), nodeChild));
+                                nodeMatch.edges.push( this.createEdge(BufferExtended.substr(input, i+match.length), nodeChild));
 
                                 nodeCurrent = nodeChild;
 
@@ -163,15 +164,15 @@ class InterfaceRadixTree extends InterfaceTree{
                             this.changedNode(nodeMatch);
 
                             // Marking that it is done
-                            i = input.buffer.length+1;
+                            i = input.length+1;
 
                         } else {
-                            i += nodeCurrent.edges[j].label.buffer.length;
+                            i += nodeCurrent.edges[j].label.length;
 
 
                             nodeCurrent = nodeCurrent.edges[j].targetNode;
 
-                            if (i === input.buffer.length){ //the prefix became a solution
+                            if (i === input.length){ //the prefix became a solution
 
                                 if (nodeCurrent.value !== null) throw ('the node already includes a value....');
                                 else this.setNode(nodeCurrent, value);
@@ -198,7 +199,7 @@ class InterfaceRadixTree extends InterfaceTree{
                 // no more Children...
 
                 let nodeChild = this.createNode(nodeCurrent, [], value);
-                nodeCurrent.edges.push( this.createEdge( input.substr(i), nodeChild ));
+                nodeCurrent.edges.push( this.createEdge( BufferExtended.substr(input, i), nodeChild ));
 
                 //console.log("nodeChild2", nodeChild)
                 this.changedNode(nodeChild)
@@ -270,7 +271,7 @@ class InterfaceRadixTree extends InterfaceTree{
                     // prefix slow => slowly
                     if ( node._previousEdges.length === 1 ){
 
-                        nodeParent.edges.push(  this.createEdge( new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ deletedParentEdge.label.buffer,  node._previousEdges[0].label.buffer  ] )), node._previousEdges[0].targetNode) );
+                        nodeParent.edges.push(  this.createEdge( Buffer.concat( [ deletedParentEdge.label,  node._previousEdges[0].label  ] ), node._previousEdges[0].targetNode) );
 
                         node = node._previousEdges[0].targetNode;
                         node.parent = nodeParent;
@@ -302,7 +303,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             for (let i=0; i<grandParent.edges.length; i++)
                                 if (grandParent.edges[i].targetNode === nodeParent){
 
-                                    grandParent.edges[i].label = new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ grandParent.edges[i].label.buffer, edge.label.buffer  ] ));
+                                    grandParent.edges[i].label = new WebDollarCryptoData.createWebDollarCryptoData( Buffer.concat( [ grandParent.edges[i].label, edge.label  ] ));
                                     grandParent.edges[i].targetNode = node;
 
                                     node.parent = grandParent;
@@ -375,12 +376,12 @@ class InterfaceRadixTree extends InterfaceTree{
 
         input = WebDollarCryptoData.createWebDollarCryptoData(input)
 
-        if (input.buffer.length === 0) throw 'No input';
+        if (input.length === 0) throw 'No input';
 
         let nodeCurrent = this.root;
 
         let i=0;
-        while (i < input.buffer.length) {
+        while (i < input.length) {
 
             // searching for existence of input[i...] in nodeCurrent list
 
@@ -388,15 +389,15 @@ class InterfaceRadixTree extends InterfaceTree{
 
             for (let j = 0; j < nodeCurrent.edges.length; j++){
 
-                let match = input.longestMatch( nodeCurrent.edges[j].label, i );
+                let match = BufferExtended.longestMatch( input, nodeCurrent.edges[j].label, i );
 
                 //console.log("matchFound", nodeCurrent.edges[j].label.toString(), " in ", input.toString(), " i= ",i, match === null ? "null" : match.toString() );
 
-                if (match !== null && match.buffer.length === nodeCurrent.edges[j].label.buffer.length) {   //we found  a match in the edge
+                if (match !== null && match.length === nodeCurrent.edges[j].label.length) {   //we found  a match in the edge
 
                     nodeCurrent = nodeCurrent.edges[j].targetNode;
 
-                    i += match.buffer.length;
+                    i += match.length;
 
                     childFound = true;
                     break;
