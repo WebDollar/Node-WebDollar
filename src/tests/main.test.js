@@ -12,6 +12,7 @@ if ( typeof describe !== 'undefined') {
     require ('tests/blockchain/protocol/Interface-Blockchain-Protocol-Fork-Solver.test');
 
     require ('tests/satoshmindb/Interface-SatoshminDB.test');
+    require ('tests/main-blockchain/Main-Blockchain-Wallets.test');
 
     require ('tests/trees/radix/Interface-Radix-Tree.test');
     require ('tests/trees/radix/accountant/Interface-Accountant-Radix-Tree.test');
