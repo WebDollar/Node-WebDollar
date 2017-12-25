@@ -5,7 +5,7 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 import consts from 'consts/const_global'
-import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
+
 import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data';
 import Serialization from "common/utils/Serialization.js";
 import BufferExtend from "common/utils/BufferExtended.js";
@@ -98,7 +98,7 @@ class InterfaceBlockchainBlock {
         if (this.computedBlockPrefix === null) this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
         //validate hashPrev
-        if ( previousHash === null || (!Buffer.isBuffer(previousHash) && !WebDollarCryptoData.isWebDollarCryptoData(previousHash)) ) throw 'previous hash is not given'
+        if ( previousHash === null || !Buffer.isBuffer(previousHash)) throw 'previous hash is not given'
 
         if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
 
@@ -121,7 +121,7 @@ class InterfaceBlockchainBlock {
         if (prevDifficultyTarget instanceof BigInteger)
             prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
 
-        if ( prevDifficultyTarget === null || (!Buffer.isBuffer(prevDifficultyTarget) && !WebDollarCryptoData.isWebDollarCryptoData(prevDifficultyTarget)) ) throw 'previousDifficultyTarget is not given'
+        if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget)) throw 'previousDifficultyTarget is not given'
 
         //console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
 
@@ -203,28 +203,30 @@ class InterfaceBlockchainBlock {
 
     deserializeBlock(buffer, height){
 
-        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
+        if (!Buffer.isBuffer(buffer))
+            buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
+
         let offset = 0;
 
         try {
             if (height >= 0) {
 
-                this.hash = BufferExtend.substr(data, 0, consts.BLOCKS_POW_LENGTH);
+                this.hash = BufferExtend.substr(buffer, 0, consts.BLOCKS_POW_LENGTH);
                 offset += consts.BLOCKS_POW_LENGTH;
 
-                this.nonce = Serialization.deserializeNumber( BufferExtend.substr(data, offset, consts.BLOCKS_NONCE) );
+                this.nonce = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, consts.BLOCKS_NONCE) );
                 offset += consts.BLOCKS_NONCE;
 
-                this.version = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 2) );
+                this.version = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 2) );
                 offset += 2;
 
-                this.hashPrev = BufferExtend.substr(data, offset, consts.BLOCKS_POW_LENGTH);
+                this.hashPrev = BufferExtend.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
                 offset += consts.BLOCKS_POW_LENGTH;
 
-                this.timeStamp = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 4) );
+                this.timeStamp = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 4) );
                 offset += 4;
 
-                offset = this.data.deserializeData(BufferExtend.substr(data, offset));
+                offset = this.data.deserializeData(BufferExtend.substr(buffer, offset));
             }
         } catch (exception){
             console.log(colors.red("error deserializing a buffer"), exception);

@@ -1,5 +1,4 @@
 var BigInteger = require('big-integer');
-import WebDollarCryptoData from "./WebDollar-Crypto-Data";
 
 let crypto = null;
 

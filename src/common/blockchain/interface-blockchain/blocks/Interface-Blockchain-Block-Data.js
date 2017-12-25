@@ -83,15 +83,14 @@ class InterfaceBlockchainBlockData {
 
     deserializeData(buffer){
 
-        let data = buffer;
 
         let offset = 0;
         this.data = {};
 
-        this.minerAddress = BufferExtended.substr(data, offset, consts.PUBLIC_ADDRESS_LENGTH);
+        this.minerAddress = BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);
         offset += consts.PUBLIC_ADDRESS_LENGTH;
 
-        this.hashData = BufferExtended.substr(data, offset, 32);
+        this.hashData = BufferExtended.substr(buffer, offset, 32);
         offset += 32;
 
         return offset;
@@ -99,12 +98,15 @@ class InterfaceBlockchainBlockData {
 
     toString(){
 
-        return JSON.stringify(this.data)
+        return this.minerAddress.toString("hex") + this.hashData.toString("hex")
 
     }
 
     toJSON(){
-        return this.data;
+        return {
+            minerAddress:this.minerAddress,
+            hashData: this.hashData.toString("hex"),
+        };
     }
 
 

@@ -20,7 +20,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     updateAccount(input, value, tokenId){
 
-        input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
+        if (Buffer.isBuffer(input))
+            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
 
         let node = this.search(input).node;
 
@@ -46,7 +47,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     listBalances(input){
 
-        input = WebDollarCryptoData.createWebDollarCryptoData(input);
+        if (Buffer.isBuffer(input))
+            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
 
         let node = this.search(input).node;
 
