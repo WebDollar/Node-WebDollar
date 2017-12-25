@@ -1,4 +1,5 @@
 var BigInteger = require('big-integer');
+const colors = require('colors/safe');
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
@@ -201,19 +202,19 @@ class InterfaceBlockchainBlock {
         try {
             if (height >= 0) {
 
-                this.hash = BufferExtend.substr(data, 0, consts.BLOCKS_POW_LENGTH).buffer;
+                this.hash = BufferExtend.substr(data, 0, consts.BLOCKS_POW_LENGTH);
                 offset += consts.BLOCKS_POW_LENGTH;
 
-                this.nonce = BufferExtend.substr(data, offset, consts.BLOCKS_NONCE).toInt();
+                this.nonce = Serialization.deserializeNumber( BufferExtend.substr(data, offset, consts.BLOCKS_NONCE) );
                 offset += consts.BLOCKS_NONCE;
 
-                this.version = BufferExtend.substr(data, offset, 2).toInt();
+                this.version = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 2) );
                 offset += 2;
 
-                this.hashPrev = BufferExtend.substr(data, offset, consts.BLOCKS_POW_LENGTH).buffer;
+                this.hashPrev = BufferExtend.substr(data, offset, consts.BLOCKS_POW_LENGTH);
                 offset += consts.BLOCKS_POW_LENGTH;
 
-                this.timeStamp = BufferExtend.substr(data, offset, 4).toInt();
+                this.timeStamp = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 4) );
                 offset += 4;
 
                 this.data.deserializeData(BufferExtend.substr(data, offset));

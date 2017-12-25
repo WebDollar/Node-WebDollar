@@ -1,6 +1,7 @@
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 const secp256k1 = require('secp256k1');
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
+import BufferExtended from 'common/utils/BufferExtended';
+
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
 
@@ -43,13 +44,13 @@ class InterfaceBlockchainAddressHelper{
         if (showDebug)
             console.log("keyWithChecksum", keyWithChecksum, typeof keyWithChecksum) //"801184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD206EC97E"
 
-        let privateKeyWIF = new WebDollarCryptoData(keyWithChecksum, "hex");
-        let privateKey = new WebDollarCryptoData(privateKeyHex, "hex");
+        let privateKeyWIF = new Buffer(keyWithChecksum, "hex");
+        let privateKey = new Buffer(privateKeyHex, "hex");
 
 
         if (showDebug) {
-            console.log("privateKeyWIF", privateKeyWIF, "length", privateKeyWIF.buffer.length) //base58 "5Hx15HFGyep2CfPxsJKe2fXJsCVn5DEiyoeGGF6JZjGbTRnqfiD"
-            console.log("privateKey", privateKey, "length", privateKey.buffer.length) //base58 "5Hx15HFGyep2CfPxsJKe2fXJsCVn5DEiyoeGGF6JZjGbTRnqfiD"
+            console.log("privateKeyWIF", privateKeyWIF, "length", privateKeyWIF.length) //base58 "5Hx15HFGyep2CfPxsJKe2fXJsCVn5DEiyoeGGF6JZjGbTRnqfiD"
+            console.log("privateKey", privateKey, "length", privateKey.length) //base58 "5Hx15HFGyep2CfPxsJKe2fXJsCVn5DEiyoeGGF6JZjGbTRnqfiD"
         }
 
 
@@ -68,12 +69,16 @@ class InterfaceBlockchainAddressHelper{
 
         // Tutorial based on https://github.com/cryptocoinjs/secp256k1-node
 
-        if (privateKey === null || typeof privateKey !== 'object' || privateKey instanceof WebDollarCryptoData === false ){
-            console.log("ERROR! ",  privateKey, " is not a WebDollarCryptoData")
-            throw 'privateKey must be a WebDollarCryptoData';
+        if (privateKey === null || !Buffer.isBuffer(privateKey) ){
+            console.log("ERROR! ",  privateKey, " is not a Buffer")
+            throw 'privateKey must be a Buffer';
         }
 
+        console.log("privateKey 222", privateKey);
+
         let validation = InterfaceBlockchainAddressHelper.validatePrivateKey(privateKey);
+
+        console.log("privateKey 333", privateKey);
 
         if (showDebug)
             console.log("VALIDATIOn", validation)
@@ -86,23 +91,23 @@ class InterfaceBlockchainAddressHelper{
 
         if (showDebug) {
             console.log("privateKey", privateKey, typeof privateKey);
-            console.log("secp256k1.privateKeyVerify", secp256k1.privateKeyVerify(privateKey.buffer));
+            console.log("secp256k1.privateKeyVerify", secp256k1.privateKeyVerify(privateKey));
         }
 
         // get the public key in a compressed format
-        const pubKey = secp256k1.publicKeyCreate(privateKey.buffer);
+        const pubKey = secp256k1.publicKeyCreate(privateKey);
 
         if (showDebug)
             console.log("pubKey", pubKey);
 
-        return new WebDollarCryptoData(pubKey);
+        return new Buffer(pubKey);
 
         // sign the message
 
         let msg = new Buffer( WebDollarCrypto.getByteRandomValues(32) );
 
         // sign the message
-        const sigObj = secp256k1.sign(msg, privateKey.buffer)
+        const sigObj = secp256k1.sign(msg, privateKey)
 
         // verify the signature
         if (showDebug)
@@ -112,14 +117,14 @@ class InterfaceBlockchainAddressHelper{
 
     static verifySignedData(msg, signature, pubKey){
 
-        if (pubKey === null || typeof pubKey !== 'object' || pubKey.constructor.name !== 'WebDollarCryptoData' ){
-            console.log("ERROR! ",  pubKey, " is not a WebDollarCryptoData")
-            throw 'privateKey must be a WebDollarCryptoData';
+        if (pubKey === null || !Buffer.isBuffer(pubKey) ){
+            console.log("ERROR! ",  pubKey, " is not a Buffer")
+            throw 'privateKey must be a Buffer';
         }
 
         if ( signature.signature !== undefined) signature = signature.signature;
 
-        return secp256k1.verify(msg, signature, pubKey.buffer);
+        return secp256k1.verify(msg, signature, pubKey);
     }
 
     static signMessage(msg, privateKey){
@@ -131,9 +136,9 @@ class InterfaceBlockchainAddressHelper{
 
     static _generateAddressFromPublicKey(publicKey, showDebug){
 
-        if (typeof publicKey !== 'object' || publicKey.constructor.name !== 'WebDollarCryptoData' ){
-            console.log("ERROR! ",  publicKey, " is not a WebDollarCryptoData")
-            throw 'publicKey must be a WebDollarCryptoData';
+        if (!Buffer.isBuffer(publicKey)){
+            console.log("ERROR! ",  publicKey, " is not a Buffer")
+            throw 'publicKey must be a Buffer';
         }
 
         //could use publicKeyBytesCompressed as well
@@ -141,7 +146,7 @@ class InterfaceBlockchainAddressHelper{
         //bitcoin original
         //let hash160 = CryptoJS.RIPEMD160(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
 
-        let hash160 =  WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(publicKey.buffer))
+        let hash160 =  WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(publicKey))
 
         if (showDebug)
             console.log("hash160 hex", hash160.toString('hex') ) //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
@@ -150,7 +155,7 @@ class InterfaceBlockchainAddressHelper{
         let hashAndBytes = hash160.toBytes()
         hashAndBytes.unshift(version)
 
-        let doubleSHA = WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(new Buffer(hashAndBytes, "hex") )).toString('hex')
+        let doubleSHA = WebDollarCrypto.SHA256Bytes(WebDollarCrypto.SHA256Bytes(new Buffer(hashAndBytes, "hex") )).toString('hex')
         let addressChecksum = doubleSHA.substr(0,8)
 
         if (showDebug)
@@ -164,10 +169,10 @@ class InterfaceBlockchainAddressHelper{
         // if (showDebug)
         //     console.log("unencodedAddress", unencodedAddress) //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
 
-        let address = new WebDollarCryptoData(unencodedAddress, "hex");
+        let address = new Buffer(unencodedAddress, "hex");
 
         if (showDebug)
-            console.log("address",address.toBase()); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
+            console.log("address",BufferExtended.toBase(address)); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
 
         return  address;
 
@@ -215,23 +220,23 @@ class InterfaceBlockchainAddressHelper{
      */
     static validatePrivateKey(privateKey){
 
-        if (privateKey === null || typeof privateKey !== 'object' || privateKey instanceof WebDollarCryptoData === false ){
-            throw ('privateKey must be a WebDollarCryptoData');
+        if (privateKey === null || !Buffer.isBuffer(privateKey) ){
+            throw ('privateKey must be a Buffer');
         }
 
         //contains VERSION prefix
         let versionDetected = false;
         let versionDetectedBuffer = '';
 
-        if (privateKey.buffer.length > 32 + consts.PRIVATE_KEY_VERSION_PREFIX.length ){
+        if (privateKey.length > 32 + consts.PRIVATE_KEY_VERSION_PREFIX.length ){
 
-            //console.log("Buffer.IndexOf", privateKey.buffer.indexOf( Buffer.from(PRIVATE_KEY_VERSION_PREFIX, "hex") ))
+            //console.log("Buffer.IndexOf", privateKey.indexOf( Buffer.from(PRIVATE_KEY_VERSION_PREFIX, "hex") ))
 
-            if (privateKey.buffer.indexOf( Buffer.from(consts.PRIVATE_KEY_VERSION_PREFIX, "hex") ) === 0){
+            if (privateKey.indexOf( Buffer.from(consts.PRIVATE_KEY_VERSION_PREFIX, "hex") ) === 0){
                 versionDetected = true;
 
-                versionDetectedBuffer = privateKey.substr(0, consts.PRIVATE_KEY_VERSION_PREFIX.length/2);
-                privateKey = privateKey.substr(consts.PRIVATE_KEY_VERSION_PREFIX.length/2);
+                versionDetectedBuffer = BufferExtended.substr(privateKey, 0, consts.PRIVATE_KEY_VERSION_PREFIX.length/2 );
+                privateKey = BufferExtended.substr(privateKey, consts.PRIVATE_KEY_VERSION_PREFIX.length/2);
             }
 
         }
@@ -241,15 +246,15 @@ class InterfaceBlockchainAddressHelper{
         //contains CHECKSUM
         let checkSumDetected = false;
 
-        if (privateKey.buffer.length === 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2) {
+        if (privateKey.length === 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2) {
 
-            //console.log(privateKey, privateKey.buffer.length, 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2);
-            let privateKeyCheckSum = privateKey.substr(privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2)
+            //console.log(privateKey, privateKey.length, 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2);
+            let privateKeyCheckSum = BufferExtended.substr(privateKey, privateKey.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2)
 
-            let privateKeyWithoutCheckSum = privateKey.substr(0, privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2);
+            let privateKeyWithoutCheckSum = BufferExtended.substr(privateKey, 0, privateKey.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH /2);
 
             //versionDetectedBuffer + privateKeyWithoutCheckSum;
-            let privateKeyJustVersionHex = Buffer.concat([versionDetectedBuffer.buffer, privateKeyWithoutCheckSum.buffer]);
+            let privateKeyJustVersionHex = Buffer.concat([versionDetectedBuffer, privateKeyWithoutCheckSum]);
             
 
             let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(privateKeyJustVersionHex);
@@ -257,15 +262,15 @@ class InterfaceBlockchainAddressHelper{
             // console.log("checkSum", privateKeyCheckSum, "privateKeyJustVersionHex", privateKeyJustVersionHex);
             // console.log("checkSum2", checksum);
 
-            if (checksum.toUpperCase() === privateKeyCheckSum.toHex().toUpperCase()) {
+            if (checksum.toUpperCase() === privateKeyCheckSum.toString("hex").toUpperCase()) {
                 checkSumDetected = true;
 
-                privateKey = privateKey.substr(0, privateKey.buffer.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2)
+                privateKey = BufferExtended.substr(privateKey, 0, privateKey.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH / 2)
             }
         }
 
 
-        if (privateKey.buffer.length !== 32){
+        if (privateKey.length !== 32){
 
             if (!checkSumDetected)
                 throw "PRIVATE KEY  CHECK SUM is not right"

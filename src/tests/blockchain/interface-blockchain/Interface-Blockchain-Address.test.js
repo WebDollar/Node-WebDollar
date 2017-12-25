@@ -4,7 +4,6 @@ var assert = require('assert')
 
 import InterfaceBlockchainAddress from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address'
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 
 
 describe('testAddressGenerator', () => {
@@ -16,8 +15,8 @@ describe('testAddressGenerator', () => {
         assert (privateKey.privateKeyWIF, "privateKeyWIF doesn't exist")
         assert (privateKey.privateKey, "privateKey doesn't exist")
 
-        assert(WebDollarCryptoData.isWebDollarCryptoData(privateKey.privateKey), 'Private Key privateKey is not an object')
-        assert(WebDollarCryptoData.isWebDollarCryptoData(privateKey.privateKeyWIF), 'Private Key privateKeyWIF is not an object')
+        assert(Buffer.isBuffer(privateKey.privateKey), 'Private Key privateKey is not an object')
+        assert(Buffer.isBuffer(privateKey.privateKeyWIF), 'Private Key privateKeyWIF is not an object')
     });
 
     let publicKey  = null;
@@ -25,7 +24,7 @@ describe('testAddressGenerator', () => {
 
         publicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey.privateKeyWIF, true);
 
-        assert(WebDollarCryptoData.isWebDollarCryptoData(publicKey), 'Public Key is not an object');
+        assert(Buffer.isBuffer(publicKey), 'Public Key is not an object');
     })
 
     let address = null;
@@ -33,7 +32,7 @@ describe('testAddressGenerator', () => {
         address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, true);
 
         console.log("should return address", address);
-        assert(WebDollarCryptoData.isWebDollarCryptoData(address), 'Address is not an object');
+        assert(Buffer.isBuffer(address), 'Address is not an object');
     })
 
     it ('blockchain address', ()=>{
@@ -43,10 +42,10 @@ describe('testAddressGenerator', () => {
 
         console.log("new address", blockchainAddress.address, blockchainAddress.privateKey, blockchainAddress.publicKey)
 
-        assert(WebDollarCryptoData.isWebDollarCryptoData(blockchainAddress.address), "blockChain Address")
-        assert(WebDollarCryptoData.isWebDollarCryptoData(blockchainAddress.publicKey), "blockChain Public Key")
-        assert(WebDollarCryptoData.isWebDollarCryptoData(blockchainAddress.privateKey.privateKeyWIF), "blockChain Private Key WIF")
-        assert(WebDollarCryptoData.isWebDollarCryptoData(blockchainAddress.privateKey.privateKey), "blockChain Private Key")
+        assert(Buffer.isBuffer(blockchainAddress.address), "blockChain Address")
+        assert(Buffer.isBuffer(blockchainAddress.publicKey), "blockChain Public Key")
+        assert(Buffer.isBuffer(blockchainAddress.privateKey.privateKeyWIF), "blockChain Private Key WIF")
+        assert(Buffer.isBuffer(blockchainAddress.privateKey.privateKey), "blockChain Private Key")
 
         let stringDebug = blockchainAddress._toStringDebug()
         let string = blockchainAddress.toString()

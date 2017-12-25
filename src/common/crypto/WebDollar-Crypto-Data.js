@@ -171,12 +171,7 @@ class WebDollarCryptoData {
     }
 
     toBase(){
-        if (consts.PRIVATE_KEY_USE_BASE64)  {
-            return WebDollarCrypto.encodeBase64(this.toUint8Array());
-        }
-        else {
-            return bs58.encode(this.toBytes());
-        }
+        return BufferExtended.toBase(this.buffer);
     }
 
     substr(index, count){

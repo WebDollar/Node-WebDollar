@@ -1,3 +1,7 @@
+import consts from "consts/const_global"
+import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+const bs58 = require('bs58')
+
 class BufferExtended {
 
     substr(buffer, index, count){
@@ -32,6 +36,15 @@ class BufferExtended {
 
         return  null;
 
+    }
+
+    toBase(buffer){
+        if (consts.PRIVATE_KEY_USE_BASE64)  {
+            return WebDollarCrypto.encodeBase64(buffer);
+        }
+        else {
+            return bs58.encode(buffer);
+        }
     }
 
 }

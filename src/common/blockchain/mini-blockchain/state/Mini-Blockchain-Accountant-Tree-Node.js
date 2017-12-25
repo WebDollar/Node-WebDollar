@@ -33,7 +33,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
         if (this.balances === undefined || this.balances === null) throw 'balances is null';
 
-        tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
+        if (!Buffer.isBuffer(tokenId))
+            tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
 
         if (!value instanceof BigDecimal)
             value = new BigDecimal(value);
@@ -79,7 +80,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = 1;
 
-        tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
+        if (!Buffer.isBuffer(tokenId))
+            tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
 
         for (let i=0; i<this.balances.length; i++)
             if (this.balances[i].id.equals( tokenId) )

@@ -1,6 +1,5 @@
 import NodeProtocol from 'common/sockets/protocol/node-protocol';
 
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'

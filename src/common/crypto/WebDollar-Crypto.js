@@ -26,9 +26,12 @@ class WebDollarCrypto {
      * @param bytes
      * return string
      */
-    static encodeBase64(bytes) {
+    static encodeBase64(buffer) {
 
-        let result = new Buffer(bytes).toString('base64');
+        if (!Buffer.isBuffer(buffer))
+            buffer = new Buffer(buffer)
+
+        let result = buffer.toString('base64');
 
         let newStr = '';
         for (let i = 0; i < result.length; i++) {
