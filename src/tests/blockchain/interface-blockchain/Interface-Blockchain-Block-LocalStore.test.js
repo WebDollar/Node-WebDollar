@@ -39,10 +39,10 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
         assert(block.height === height,'block height differ after load: ' + block.height + '!==' + height);
 
         result = await block.remove();
-        assert(result === true, 'load: ' + result);
+        assert(result === true, 'remove: ' + result);
         
         result = await block.remove();
-        assert(result !== true, 'load: ' + result);
+        assert(result !== true, 'remove: ' + result);
     });
     
     it('remove block from local storage, sample test', async () => {
@@ -53,7 +53,7 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
         assert(result === true, 'save: ' + result);
         
         result = await block.remove();
-        assert(result === true, 'load: ' + result);
+        assert(result === true, 'remove: ' + result);
         
         result = block.load();
         assert(result !== true, 'load: block was found after remove. ' + result);

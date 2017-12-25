@@ -107,7 +107,9 @@ class Serialization{
     }
 
     static deserializeNumber(buffer){
-        if (buffer.length === 2){
+        if(buffer.length === 1){
+            return buffer[0];
+        } else if (buffer.length === 2){
             return buffer[0] | (buffer[1] << 8);
         } else if (buffer.length === 4){
             return buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
