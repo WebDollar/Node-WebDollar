@@ -3,7 +3,7 @@ import WebDollarCryptoData from 'common/crypto/Webdollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import consts from 'consts/const_global'
-import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm

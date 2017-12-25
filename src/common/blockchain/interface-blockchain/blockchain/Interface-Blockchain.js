@@ -8,7 +8,7 @@ import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchai
 
 import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
 
-import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -27,7 +27,7 @@ class InterfaceBlockchain {
 
         this.mining = undefined;
         
-        this.dataBase = new InterfacePouchDB();
+        this.dataBase = new InterfaceSatoshminDB();
     }
 
     async validateBlockchain(){

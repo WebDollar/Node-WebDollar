@@ -1,13 +1,13 @@
 import InterfaceBlockchainBlock from './Interface-Blockchain-Block'
 import BlockchainGenesis from './Blockchain-Genesis'
-import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
 class InterfaceBlockchainBlockCreator{
 
     constructor(blockchain){
 
         this.blockchain = blockchain;
-        this.db = new InterfacePouchDB();
+        this.db = new InterfaceSatoshminDB();
     }
 
     /*
