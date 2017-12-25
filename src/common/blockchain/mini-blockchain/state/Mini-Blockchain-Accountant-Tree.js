@@ -11,6 +11,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         super();
 
         this.autoMerklify = true;
+        this.root.hash = {sha256: new Buffer(32) }
     }
 
     createNode(parent, edges, value){

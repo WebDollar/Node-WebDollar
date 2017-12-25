@@ -1,6 +1,5 @@
 
 import BlockchainGenesis from './Blockchain-Genesis'
-import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
 class InterfaceBlockchainBlockCreator{
 
@@ -20,9 +19,9 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        args.unshift (  [this.blockchain, minerAddress, undefined, undefined] );
-        let cls = this.blockDataClass.bind.apply(this.blockDataClass, args );
-        let data = new cls();
+        args.unshift (  this.blockchain, minerAddress, undefined, undefined );
+
+        let data = new this.blockDataClass(...args);
 
         return new this.blockClass( this.blockchain,  1, undefined, BlockchainGenesis.hashPrev, undefined, 0, data, 0, this.db );
     }
@@ -34,9 +33,8 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        args.unshift( [this.blockchain, minerAddress, transactions, undefined] );
-        let cls = this.blockDataClass.bind.apply(this.blockDataClass, args);
-        let data = new cls();
+        args.unshift( this.blockchain, minerAddress, transactions, undefined );
+        let data = new this.blockDataClass(...args);
 
         return new this.blockClass( this.blockchain, 1, undefined, prevBlock.hash, undefined, 0, data, height, this.db);
     }
@@ -49,7 +47,7 @@ class InterfaceBlockchainBlockCreator{
 
         if (this.blockchain.getBlockchainLength() === 0){  //Genesis Block
 
-            return this._createBlockGenesis( minerAddress, transactions, restArgs);
+            return this._createBlockGenesis( minerAddress, restArgs);
 
         } else { //Fetch Transactions and Create Block
 

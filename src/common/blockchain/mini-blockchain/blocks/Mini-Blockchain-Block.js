@@ -7,7 +7,6 @@ class MiniBlockchainBlock extends InterfaceBlockchainBlock {
         return new MiniBlockchainBlockData(this.blockchain );
     }
 
-
 }
 
 export default MiniBlockchainBlock

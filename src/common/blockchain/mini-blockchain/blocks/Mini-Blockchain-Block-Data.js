@@ -3,9 +3,13 @@ import BufferExtended from 'common/utils/BufferExtended'
 
 class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
 
-    constructor(blockchain, minerAddress, transactions, hashData, hashAccountantTree){
+    constructor (blockchain, minerAddress, transactions, hashData, hashAccountantTree){
 
         super(blockchain, minerAddress, transactions, hashData, );
+
+
+        if (hashAccountantTree === undefined)
+            hashAccountantTree = this.computeAccountantTreeHashBlockData();
 
         this.hashAccountantTree = hashAccountantTree;
 
@@ -25,9 +29,17 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
         if (this.hashAccountantTree === undefined || this.hashAccountantTree === null || !Buffer.isBuffer(this.hashAccountantTree)) throw ('hashAccountantTree is empty');
 
         //validate hashAccountantTree
+        let hashAccountantTree = this.computeAccountantTreeHashBlockData();
+
+        if (!hashAccountantTree.equals(this.hashAccountantTree)) throw "block.data hashAccountantTree is not right";
+
+        return true;
 
     }
 
+    computeAccountantTreeHashBlockData(){
+        return this.blockchain.accountantTree.root.hash.sha256;
+    }
 
     serializeData(){
         let buffer = InterfaceBlockchainBlockData.prototype.serializeData.call(this);
@@ -35,7 +47,7 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
         return Buffer.concat(
             [
                 buffer,
-                this.hashAccountantTree
+                this.hashAccountantTree,
             ]);
     }
 

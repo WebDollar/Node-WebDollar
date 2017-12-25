@@ -224,12 +224,14 @@ class InterfaceBlockchainBlock {
                 this.timeStamp = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 4) );
                 offset += 4;
 
-                this.data.deserializeData(BufferExtend.substr(data, offset));
+                offset = this.data.deserializeData(BufferExtend.substr(data, offset));
             }
         } catch (exception){
             console.log(colors.red("error deserializing a buffer"), exception);
             throw exception;
         }
+
+        return offset;
 
     }
 

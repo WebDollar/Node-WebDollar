@@ -14,6 +14,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         super();
 
         this.autoMerklify = true;
+        this.root.hash = {sha256: new Buffer(32) }
     }
 
     createNode(parent, edges, value){
@@ -109,7 +110,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         if (node === null ||  node === undefined) throw "Couldn't compute hash because Node is empty";
 
         if (node === this.root && node.edges.length === 0){
-            node.hash = { sha256: new Buffer(0) };
+            node.hash = { sha256: new Buffer(32) };
             return node.hash;
         }
 

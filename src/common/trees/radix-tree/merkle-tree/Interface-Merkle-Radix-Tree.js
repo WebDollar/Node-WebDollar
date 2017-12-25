@@ -16,6 +16,7 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         super();
 
         this.autoMerklify = true;
+        this.root.hash = {sha256: new Buffer(32) }
     }
 
     changedNode(node){
