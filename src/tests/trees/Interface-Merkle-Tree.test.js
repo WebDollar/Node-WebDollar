@@ -2,7 +2,6 @@ var assert = require('assert')
 
 
 import InterfaceMerkleTree from 'common/trees/merkle-tree/Interface-Merkle-Tree'
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 
 import TestsHelper from 'tests/Tests.helper'
 
@@ -25,7 +24,7 @@ describe('interfaceMerkleTree', () => {
 
             let parent = merkleTree.root.edges[ 0 ].targetNode;
 
-            merkleTree.add( new WebDollarCryptoData(str, "ascii") , parent);
+            merkleTree.add( new Buffer(str, "ascii") , parent);
 
             assert(merkleTree.validateRoot() === true, "Merkle Tree is invalid!!!");
         });
@@ -55,7 +54,7 @@ describe('interfaceMerkleTree', () => {
             let edgeIndex = merkleTree.root.edges.length;
             let parent = merkleTree.root.edges[ Math.floor( Math.random() * edgeIndex) ].targetNode;
 
-            merkleTree.add( new WebDollarCryptoData(str, "ascii") , parent);
+            merkleTree.add( new Buffer(str, "ascii"), parent);
 
             assert(merkleTree.validateRoot() === true, "Merkle Tree is invalid!!!");
 

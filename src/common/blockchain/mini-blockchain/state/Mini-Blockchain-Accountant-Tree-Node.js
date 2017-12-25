@@ -3,6 +3,7 @@ import InterfaceMerkeRadixTree from 'common/trees/radix-tree/merkle-tree/Interfa
 import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree-Node'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
+import BufferExtended from "common/utils/BufferExtended";
 import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
 
@@ -161,18 +162,18 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     deserialize(buffer){
 
-        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
+        let data = buffer;
 
         let offset = 0;
 
         try {
             if (height >= 0) {
 
-                let length = data.substr(offset, 1).buffer;
+                let length = BufferExtended.substr(data, offset, 1);
                 offset += 1;
 
                 // webd balance
-                let webdId = data.substr(offset,1).buffer;
+                let webdId = BufferExtended.substr(data, offset,1);
                 offset += 1;
 
                 if (webdId[0] !== 1) throw "webd token is incorrect";
@@ -184,7 +185,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
                 //rest of tokens , in case there are
                 for (let i=1; i<length; i++){
-                    let tokenId = data.substr(offset,consts.TOKEN_ID_LENGTH).buffer;
+                    let tokenId = BufferExtended.substr(data, offset,consts.TOKEN_ID_LENGTH);
                     offset += consts.TOKEN_ID_LENGTH;
 
                     result = Serialization.deserializeBigDecimal(data, offset);

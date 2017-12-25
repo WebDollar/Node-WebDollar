@@ -1,4 +1,5 @@
 import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
+import Serialization from 'common/utils/Serialization'
 var BigDecimal = require('decimal.js');
 
 class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
@@ -61,6 +62,28 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
         if (typeof this.value.balance !== "object"  || this.value.balance.constructor.name !== "Decimal") return false;
 
         return true;
+
+    }
+
+    serialize(){
+
+        let array = [ ];
+
+        array.push( Serialization.serializeBigDecimal(this.sum) );
+
+        if (this.value !== null )
+            array.push(Serialization.serializeBigDecimal(this.value.balance));
+
+        return Buffer.concat(
+
+            array,
+
+        );
+    }
+
+    deserialize(buffer){
+
+
 
     }
 

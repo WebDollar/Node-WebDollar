@@ -1,5 +1,4 @@
 var assert = require('assert')
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import TestsHelper from 'tests/Tests.helper'
 
 export default (InterfaceRadixTreeHelper, simplified)=>{

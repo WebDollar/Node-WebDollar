@@ -19,7 +19,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     updateAccount(input, value, tokenId){
 
-        input = WebDollarCryptoData.createWebDollarCryptoData(input);
+        input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
 
         let node = this.search(input).node;
 

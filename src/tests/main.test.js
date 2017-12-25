@@ -11,7 +11,7 @@ if ( typeof describe !== 'undefined') {
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Block-LocalStore.test');
     require ('tests/blockchain/protocol/Interface-Blockchain-Protocol-Fork-Solver.test');
 
-    require ('tests/pouchdb/Interface-PouchDB.test');
+    require ('tests/satoshmindb/Interface-SatoshminDB.test');
 
     require ('tests/trees/radix/Interface-Radix-Tree.test');
     require ('tests/trees/radix/accountant/Interface-Accountant-Radix-Tree.test');

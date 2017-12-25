@@ -85,6 +85,9 @@ class InterfaceMerkleTree extends InterfaceTree{
      * return WebDollarCryptoData
      */
     getValueToHash(node){
+        // if (!Buffer.isBuffer(node.value))
+        //     console.log("getValueToHash", node.value);
+
         return WebDollarCryptoData.createWebDollarCryptoData(node.value, true).buffer;
     }
 

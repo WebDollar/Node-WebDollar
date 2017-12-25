@@ -69,7 +69,8 @@ class InterfaceTree{
 
     add(data, parent){
 
-        data = WebDollarCryptoData.createWebDollarCryptoData(data);
+        if (!Buffer.isBuffer(data))
+            data = WebDollarCryptoData.createWebDollarCryptoData(data).buffer
 
         if (parent === null || parent === undefined) parent = this.root;
 
@@ -82,9 +83,10 @@ class InterfaceTree{
 
     delete(value){
 
-        value = WebDollarCryptoData.createWebDollarCryptoData(value)
+        if (!Buffer.isBuffer(value))
+            value = WebDollarCryptoData.createWebDollarCryptoData(value).buffer
 
-        if (value.buffer.length === 0) throw 'No input';
+        if (value.length === 0) throw 'No input';
         let searchResult = this.search(value);
 
         //console.log("searchResult", searchResult)
@@ -143,12 +145,13 @@ class InterfaceTree{
         if ( value === undefined || value === null) return null;
 
         if ( node === undefined || node === null) node = this.root;
-        //console.log("value1", value, value  instanceof WebDollarCryptoData );
-        value = WebDollarCryptoData.createWebDollarCryptoData(value);
-        //console.log("value2", value, value  instanceof WebDollarCryptoData );
+        //console.log("value1", value,  );
+        if (!Buffer.isBuffer(value))
+            value = WebDollarCryptoData.createWebDollarCryptoData(value).buffer
+        //console.log("value2", value, );
 
 
-        if ( node.value !== undefined && node.value !== null && node.value.buffer.equals (value.buffer) ) {
+        if ( node.value !== undefined && node.value !== null && node.value.equals (value) ) {
             //console.log("l-am gasit", node.value.toString());
             return { result: true, node: node, value: node.value }
         }

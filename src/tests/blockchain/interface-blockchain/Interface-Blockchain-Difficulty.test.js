@@ -5,8 +5,6 @@ var assert = require('assert')
 import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchain/mining/difficulty/Interface-Blockchain-Difficulty'
 import Difficulty_ETH_DifficultyHomestead from './tests/Difficulty_ETH_DifficultyHomestead';
 
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
-
 
 describe('test blockchain difficulty', () => {
 

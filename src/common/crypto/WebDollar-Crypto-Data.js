@@ -1,6 +1,9 @@
+import BufferExtended from "../utils/BufferExtended";
+
 const bs58 = require('bs58')
 var BigInteger = require('big-integer');
 var BigNumber = require('bignumber.js');
+var BigDecimal = require('decimal.js');
 
 import WebDollarCrypto from './WebDollar-Crypto';
 import Serialization from 'common/utils/Serialization';
@@ -91,16 +94,16 @@ class WebDollarCryptoData {
                 return;
             }
 
+            if (data instanceof BigDecimal){
+                this.buffer = Serialization.serializeBigDecimal(data);
+                return
+            }
+
             if (data === null) this.buffer = new Buffer ( [0] );
             else
                 this.buffer = this.createBufferFromArray(data);
 
         } else
-        // if (typeof data === "number") {
-        //     console.log("NUMBER ", data);
-        //     this.buffer = new Buffer( [data] );
-        // }
-        // else
         if (typeof data === "number"){
 
             //converting number value into a buffer on 4 bytes
@@ -177,38 +180,14 @@ class WebDollarCryptoData {
     }
 
     substr(index, count){
-
-        if ( count === undefined) count = this.buffer.length;
-
-
-        let array = [];
-        for (let i=index; i<Math.min(index+count, this.buffer.length); i++)
-            array.push(this.buffer[i]);
-
-        return new WebDollarCryptoData( array, "byte");
-
+        return BufferExtended.substr(this.buffer, index, count);
     }
 
     longestMatch(cryptoData2, startIndex){
 
         if (! WebDollarCryptoData.isWebDollarCryptoData(cryptoData2)) return null;
 
-        if ( startIndex === undefined) startIndex = 0;
-
-        let i =0;
-        while (i + startIndex < this.buffer.length && i < cryptoData2.buffer.length ) {
-
-            if (this.buffer[i + startIndex] !== cryptoData2.buffer[i]) //no more match
-                break;
-
-            i++;
-        }
-
-        if (i !== 0){ //we have a match
-            return this.substr(startIndex, i);
-        }
-
-        return  null;
+        return BufferExtended.longestMatch(this.buffer, cryptoData2.buffer, startIndex );
 
     }
 

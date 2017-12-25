@@ -4,10 +4,10 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 import consts from 'consts/const_global'
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data';
 import Serialization from "common/utils/Serialization.js";
-
-import InterfacePouchDB from 'common/pouchdb/Interface-PouchDB'
+import BufferExtend from "common/utils/BufferExtended.js";
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
@@ -195,28 +195,28 @@ class InterfaceBlockchainBlock {
 
     deserializeBlock(buffer, height){
 
-        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer);
+        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
         let offset = 0;
 
         try {
             if (height >= 0) {
 
-                this.hash = data.substr(0, consts.BLOCKS_POW_LENGTH).buffer;
+                this.hash = BufferExtend.substr(data, 0, consts.BLOCKS_POW_LENGTH).buffer;
                 offset += consts.BLOCKS_POW_LENGTH;
 
-                this.nonce = data.substr(offset, consts.BLOCKS_NONCE).toInt();
+                this.nonce = BufferExtend.substr(data, offset, consts.BLOCKS_NONCE).toInt();
                 offset += consts.BLOCKS_NONCE;
 
-                this.version = data.substr(offset, 2).toInt();
+                this.version = BufferExtend.substr(data, offset, 2).toInt();
                 offset += 2;
 
-                this.hashPrev = data.substr(offset, consts.BLOCKS_POW_LENGTH).buffer;
+                this.hashPrev = BufferExtend.substr(data, offset, consts.BLOCKS_POW_LENGTH).buffer;
                 offset += consts.BLOCKS_POW_LENGTH;
 
-                this.timeStamp = data.substr(offset, 4).toInt();
+                this.timeStamp = BufferExtend.substr(data, offset, 4).toInt();
                 offset += 4;
 
-                this.data.deserializeData(data.substr(offset));
+                this.data.deserializeData(BufferExtend.substr(data, offset));
             }
         } catch (exception){
             console.log(colors.red("error deserializing a buffer"), exception);
