@@ -7,6 +7,8 @@ class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
 
     constructor(){
         super();
+
+        this.autoMerklify = true;
     }
 
     changedNode(node){

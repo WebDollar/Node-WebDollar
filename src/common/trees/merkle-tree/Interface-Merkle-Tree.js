@@ -10,6 +10,12 @@ import InterfaceMerkleTreeNode from './Interface-Merkle-Tree-Node'
 
 class InterfaceMerkleTree extends InterfaceTree{
 
+    constructor(){
+        super();
+
+        this.autoMerklify = true;
+    }
+
     createNode(parent, edges, value){
         return new InterfaceMerkleTreeNode(parent, edges, value);
     }
@@ -20,7 +26,9 @@ class InterfaceMerkleTree extends InterfaceTree{
      * @param node
      */
     changedNode(node){
-        this.refreshHash(node, true);
+
+        if (this.autoMerklify)
+            this.refreshHash(node, true);
     }
 
 

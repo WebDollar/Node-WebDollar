@@ -9,11 +9,11 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
     let version = 1;
     let hash = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
     let hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
-    let hashData = new Buffer('1F1tAaz5Nn4xqX', 'hex');
     let timeStamp = 1994;
     let nonce = 1994;
     let minerAddress = '1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4x';
-    let data = new InterfaceBlockchainBlockData(minerAddress, [], undefined);
+    let data = new InterfaceBlockchainBlockData(minerAddress, [], undefined); //it will compute the hashData
+    let hashData = data.hashData;
     let height = 0;
     let block = null;
     

@@ -10,7 +10,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     constructor (){
         super();
 
-        this.autoMerklify = false;
+        this.autoMerklify = true;
     }
 
     createNode(parent, edges, value){
@@ -53,6 +53,37 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         return node.getBalances();
 
+    }
+
+
+
+    changedNode(node){
+
+        // recalculate the balances
+
+        InterfaceMerkleTree.prototype.changedNode.call(this, node); //computing hash
+    }
+
+    validateTree(node, callback){
+
+        // if (!InterfaceAccountantRadixTree.prototype.validateTree.call(this, node, callback)) //verifying hash and propagating it
+        //     return false;
+
+        if (!InterfaceMerkleTree.prototype.validateTree.call(this, node)) //computing hash
+            return false;
+
+        return true;
+    }
+
+    checkInvalidNode(node){
+
+        //if (!InterfaceAccountantRadixTree.prototype.checkInvalidNode.call(this, node)) return false;
+
+        return InterfaceMerkleTree.prototype.checkInvalidNode.call(this, node);
+    }
+
+    validateHash(node){
+        return InterfaceMerkleTree.prototype.validateHash.call(this, node);
     }
 
     /*
