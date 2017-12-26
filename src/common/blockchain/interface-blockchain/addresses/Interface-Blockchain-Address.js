@@ -31,7 +31,7 @@ class InterfaceBlockchainAddress{
 
         this.address = result.address;
         this.publicKey = result.publicKey;
-        this.privateKey = result.privateKey.privateKey;
+        this.privateKey = result.privateKey;
 
     }
     
@@ -41,8 +41,8 @@ class InterfaceBlockchainAddress{
                                       this.address,
                                       Serialization.serializeNumber1Byte(this.publicKey.length),
                                       this.publicKey,
-                                      Serialization.serializeNumber1Byte(this.privateKey.length),
-                                      this.privateKey
+                                      Serialization.serializeNumber1Byte(this.privateKey.privateKey.length),
+                                      this.privateKey.privateKey
                                     ]);
 
         return buffer;
@@ -71,7 +71,7 @@ class InterfaceBlockchainAddress{
             len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 1) );
             offset += 1;
             
-            this.privateKey = BufferExtend.substr(data, offset, len);
+            this.privateKey.privateKey = BufferExtend.substr(data, offset, len);
             offset += len;
 
         } catch (exception){
