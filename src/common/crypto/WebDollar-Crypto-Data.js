@@ -3,7 +3,6 @@ import BufferExtended from "../utils/BufferExtended";
 const bs58 = require('bs58')
 var BigInteger = require('big-integer');
 var BigNumber = require('bignumber.js');
-var BigDecimal = require('decimal.js');
 
 import WebDollarCrypto from './WebDollar-Crypto';
 import Serialization from 'common/utils/Serialization';
@@ -94,8 +93,8 @@ class WebDollarCryptoData {
                 return;
             }
 
-            if (data instanceof BigDecimal){
-                this.buffer = Serialization.serializeBigDecimal(data);
+            if (data instanceof BigNumber){
+                this.buffer = Serialization.serializeBigNumber(data);
                 return
             }
 

@@ -1,6 +1,6 @@
 import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
 import Serialization from 'common/utils/Serialization'
-var BigDecimal = require('decimal.js');
+var BigNumber = require('bignumber.js');
 
 class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
@@ -16,12 +16,12 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     setSum(sum){
 
-        if (typeof sum === "object"  && sum !== null && sum.constructor.name === "Decimal") this.sum =  sum;
+        if (typeof sum === "object"  && sum !== null && sum.constructor.name === "BigNumber") this.sum =  sum;
         else {
 
             if ( sum === undefined || sum === null) sum = 0;
 
-            this.sum = new BigDecimal(sum);
+            this.sum = new BigNumber(sum);
         }
 
     }
@@ -29,7 +29,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
     isSumValid(){
 
         if ( this.sum === undefined && this.sum=== null) return false;
-        if (typeof this.sum !== "object"  || this.sum.constructor.name !== "Decimal") return false;
+        if (typeof this.sum !== "object"  || this.sum.constructor.name !== "BigNumber") return false;
 
         return true;
 
@@ -40,12 +40,12 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         if (typeof value === 'object' && value !== null){
 
-            if (typeof value.balance === "object"  && value.balance !== null && value.balance.constructor.name === "Decimal") { }
+            if (typeof value.balance === "object"  && value.balance !== null && value.balance.constructor.name === "BigNumber") { }
             else {
 
                 if ( value.balance === undefined || value.balance === null) value.balance = 0;
 
-                value.balance = new BigDecimal(value.balance);
+                value.balance = new BigNumber(value.balance);
             }
 
         }
@@ -59,7 +59,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
         if (typeof this.value !== 'object' || this.value === null) return false;
 
         if ( this.value.balance === undefined && this.value.balance=== null) return false;
-        if (typeof this.value.balance !== "object"  || this.value.balance.constructor.name !== "Decimal") return false;
+        if (typeof this.value.balance !== "object"  || this.value.balance.constructor.name !== "BigNumber") return false;
 
         return true;
 
@@ -69,10 +69,10 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         let array = [ ];
 
-        array.push( Serialization.serializeBigDecimal(this.sum) );
+        array.push( Serialization.serializeBigNumber(this.sum) );
 
         if (this.value !== null )
-            array.push(Serialization.serializeBigDecimal(this.value.balance));
+            array.push(Serialization.serializeBigNumber(this.value.balance));
 
         return Buffer.concat(
 

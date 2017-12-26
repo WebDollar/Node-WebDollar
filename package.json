@@ -51,7 +51,6 @@
     "buffer": "^5.0.8",
     "bufferutil": "^3.0.2",
     "colors": "^1.1.2",
-    "decimal.js": "^9.0.1",
     "easyrtc": "^1.1.0",
     "elliptic": "^6.4.0",
     "fs": "0.0.1-security",

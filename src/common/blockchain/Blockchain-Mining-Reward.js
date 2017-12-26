@@ -1,4 +1,4 @@
-const BigDecimal = require('decimal.js');
+const BigNumber = require('bignumber.js');
 
 class BlockchainMiningReward{
 
@@ -7,7 +7,7 @@ class BlockchainMiningReward{
         if (typeof height !== "number") throw ('height is not defined');
 
         if (height >=0)
-            return new BigDecimal(50).dividedBy(height+1);
+            return new BigNumber(50).dividedBy(height+1);
 
     }
 

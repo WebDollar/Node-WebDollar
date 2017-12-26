@@ -7,7 +7,7 @@ import BufferExtended from "common/utils/BufferExtended";
 import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
 
-let BigDecimal = require('decimal.js');
+let BigNumber = require('bignumber.js');
 
 class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
@@ -36,8 +36,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         if (!Buffer.isBuffer(tokenId))
             tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
 
-        if (!value instanceof BigDecimal)
-            value = new BigDecimal(value);
+        if (!value instanceof BigNumber)
+            value = new BigNumber(value);
 
         let result;
 
@@ -123,7 +123,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         return Buffer.concat(
             [
                 balance.id,
-                Serialization.serializeBigDecimal(balance.amount)
+                Serialization.serializeBigNumber(balance.amount)
             ]);
 
     }
@@ -145,7 +145,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
             let idWEBD = new Buffer(1);
             idWEBD[0] = 1;
 
-            balancesBuffers.push( this._serializeBalance({id:idWEBD, amount: new BigDecimal(0) }));
+            balancesBuffers.push( this._serializeBalance({id:idWEBD, amount: new BigNumber(0) }));
         }
 
         //let serialize everything else
@@ -177,7 +177,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
                 offset += 1;
 
                 if (webdId[0] !== 1) throw "webd token is incorrect";
-                let result = Serialization.deserializeBigDecimal( buffer, offset );
+                let result = Serialization.deserializeBigNumber( buffer, offset );
 
                 this.updateBalanceToken(result.number);
 
@@ -188,7 +188,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
                     let tokenId = BufferExtended.substr(buffer, offset,consts.TOKEN_ID_LENGTH);
                     offset += consts.TOKEN_ID_LENGTH;
 
-                    result = Serialization.deserializeBigDecimal(buffer, offset);
+                    result = Serialization.deserializeBigNumber(buffer, offset);
 
                     this.updateBalanceToken(result.number, tokenId);
 

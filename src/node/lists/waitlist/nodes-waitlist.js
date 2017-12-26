@@ -32,11 +32,11 @@ class NodesWaitlist {
 
     addNewNodeToWaitlist(addresses, port){
 
+        addresses = "127.0.0.1";
+
         if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[]))) return false;
 
         if (typeof addresses === "string" || !Array.isArray(addresses)) addresses = [addresses];
-
-        //address = "127.0.0.1";
 
         let sckAddresses = [];
         for (let i=0; i<addresses.length; i++){

@@ -1,4 +1,4 @@
-var BigDecimal = require('decimal.js');
+var BigNumber = require('bignumber.js');
 
 class TestsHelper {
 
@@ -86,9 +86,9 @@ class TestsHelper {
 
         if(decimalDigits > 0) {
             let decimalPart = this.makeDigitId(decimalDigits, false);
-            return new BigDecimal(nonDecimalPart + "." + decimalPart);
+            return new BigNumber(nonDecimalPart + "." + decimalPart);
         } else {
-            return new BigDecimal(nodDecimalDigits);
+            return new BigNumber(nodDecimalDigits);
         }
     }
 

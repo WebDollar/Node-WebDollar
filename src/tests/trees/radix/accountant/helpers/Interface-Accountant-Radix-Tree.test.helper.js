@@ -1,5 +1,5 @@
 var assert = require('assert')
-var BigDecimal = require('decimal.js');
+var BigNumber = require('bignumber.js');
 
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import IntefaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
@@ -43,9 +43,9 @@ class InterfaceAccountantRadixTreeTestHelper {
 
         let result = accountantTree.levelSearch();
 
-        let sum = new BigDecimal(0);
+        let sum = new BigNumber(0);
         for (let i = 0; i < accountantData.length; i++)
-            sum = sum.plus(new BigDecimal(accountantData[i].value.toString()));
+            sum = sum.plus(new BigNumber(accountantData[i].value.toString()));
 
         // console.log("Accountant Tree sums");
         // console.log(sum);

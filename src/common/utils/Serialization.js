@@ -1,18 +1,18 @@
-var BigDecimal = require('decimal.js');
+var BigNumber = require('bignumber.js');
 
 class Serialization{
 
     /**
      * Serialize a Big Number object into an optimal Buffer
      */
-    static serializeBigDecimal(data){
+    static serializeBigNumber(data){
         //9999999999.99999999999
         // d: [999, 9999999, 9999999, 9999000]
         // d biggest number is 0x98967F
         // e: 9  - it can also be negative
         // s: 1
 
-        if (! data instanceof BigDecimal) throw 'data is not big decimal';
+        if (! data instanceof BigNumber) throw 'data is not big decimal';
         if ( data.d.length === 0 ) throw "data is 0 and can't be ";
 
         let buffer = new Buffer( 1 + data.d.length * 3 + 1 );
@@ -32,7 +32,7 @@ class Serialization{
     /**
      * Deserialize a Big Number object from an optimal Buffer
      */
-    static deserializeBigDecimal(buffer, offset ){
+    static deserializeBigNumber(buffer, offset ){
 
         offset = offset || 0;
 
@@ -52,7 +52,7 @@ class Serialization{
         }
 
         //console.log("bigNumber", bigNumber);
-        let res = new BigDecimal(0);
+        let res = new BigNumber(0);
         res.d = bigNumber.d;
         res.s = bigNumber.s;
         res.e = bigNumber.e;

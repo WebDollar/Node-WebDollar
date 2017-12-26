@@ -142,6 +142,8 @@ class SocketAddress {
 
     isLocalHost(){
 
+        return false;
+
         try{
 
             let address = this.getAddress(false);
