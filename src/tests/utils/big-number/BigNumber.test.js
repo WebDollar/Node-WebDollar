@@ -3,7 +3,7 @@ var BigNumber = require('bignumber.js');
 
 import TestsHelper from 'tests/Tests.helper'
 
-describe('interfaceBigNumber', () => {
+describe('BigNumber test', () => {
 
     it('creating big number', ()=>{
 

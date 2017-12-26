@@ -100,9 +100,9 @@ class TestsHelper {
         let result = [];
         for (let i = 0; i < count; ++i) {
             if (isDecimal === true)
-                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*1000), Math.floor(Math.random()*1000));
+                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10));
             else
-                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*1000), 0);
+                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), 0);
         }
 
         return result;
