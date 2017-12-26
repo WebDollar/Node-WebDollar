@@ -3,7 +3,7 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import consts from 'consts/const_global'
 import Serialization from 'common/utils/Serialization'
 
-import BlockchainGenesis from './Blockchain-Genesis'
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class InterfaceBlockchainBlockData {
 

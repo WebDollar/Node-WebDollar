@@ -1,6 +1,6 @@
 var BigInteger = require('big-integer');
 
-class InterfaceBlockchainDifficulty{
+class BlockchainDifficulty{
 
     getDifficulty(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber){
 
@@ -81,4 +81,4 @@ class InterfaceBlockchainDifficulty{
 
 }
 
-export default new InterfaceBlockchainDifficulty();
+export default new BlockchainDifficulty();

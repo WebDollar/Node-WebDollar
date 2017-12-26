@@ -26,13 +26,16 @@ class InterfaceBlockchainTransaction{
         this.to = null;
 
         this.digitalSignature = digitalSignature
-        this.txId = txId
         this.nonce = nonce;
 
         this.pending = pending||false;
 
         this._setTransactionAddressFrom(from);
         this._setTransactionAddressesTo(to);
+
+        if (txId === undefined || txId === null)
+            txId =
+        this.txId = txId
 
         // Validate the validity of Funds
         this._validateTransaction()
@@ -87,6 +90,18 @@ class InterfaceBlockchainTransaction{
             return result;
         else
             if (result === false) throw 'Transaction Validation pas not passed'
+
+    }
+
+    _computeTxId(){
+        let buffer = this.serializeTransaction();
+    }
+
+    serializeTransaction(){
+
+    }
+
+    deserializeTransaction(buffer){
 
     }
 

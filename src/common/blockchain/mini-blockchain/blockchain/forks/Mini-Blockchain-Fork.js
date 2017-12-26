@@ -1,5 +1,5 @@
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
-import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 
 class MiniBlockchainFork extends InterfaceBlockchainFork{
 

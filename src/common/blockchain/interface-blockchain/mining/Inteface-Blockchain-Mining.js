@@ -3,7 +3,7 @@ const colors = require('colors/safe');
 
 import consts from 'consts/const_global'
 
-import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 import Serialization from 'common/utils/Serialization'
 
 class InterfaceBlockchainMining{

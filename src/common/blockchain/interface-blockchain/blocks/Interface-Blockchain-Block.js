@@ -2,8 +2,8 @@ var BigInteger = require('big-integer');
 const colors = require('colors/safe');
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
-import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
-import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 import consts from 'consts/const_global'
 
 import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data';

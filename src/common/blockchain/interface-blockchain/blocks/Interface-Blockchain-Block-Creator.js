@@ -1,5 +1,5 @@
 
-import BlockchainGenesis from './Blockchain-Genesis'
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class InterfaceBlockchainBlockCreator{
 

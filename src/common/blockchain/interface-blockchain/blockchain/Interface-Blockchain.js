@@ -3,11 +3,11 @@ import NodeProtocol from 'common/sockets/protocol/node-protocol';
 
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
-import BlockchainGenesis from 'common/blockchain/interface-blockchain/blocks/Blockchain-Genesis'
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 
-import InterfaceBlockchainDifficulty from 'common/blockchain/interface-blockchain/mining/difficulty/Interface-Blockchain-Difficulty'
-import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
+import BlockchainDifficulty from 'common/blockchain/global/difficulty/Blockchain-Difficulty'
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 
 import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
 
@@ -116,7 +116,7 @@ class InterfaceBlockchain {
         if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash, validationType) === false) throw ('block validation failed');
 
         //recalculate next target difficulty
-        block.difficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
+        block.difficultyTarget = BlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
 
         return true;
 
