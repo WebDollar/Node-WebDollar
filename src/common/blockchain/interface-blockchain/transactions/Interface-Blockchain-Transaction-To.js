@@ -59,6 +59,14 @@ class InterfaceBlockchainTransactionTo{
         return true;
     }
 
+    serializeTo(){
+
+        return Buffer.concat([
+
+        ]);
+
+    }
+
 }
 
 export default InterfaceBlockchainTransactionTo;

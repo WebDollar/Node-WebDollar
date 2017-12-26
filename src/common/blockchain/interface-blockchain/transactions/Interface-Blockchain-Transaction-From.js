@@ -28,7 +28,6 @@ class InterfaceBlockchainTransactionFrom{
 
     /**
      * valdiateFrom object
-     * @param from - must be an object
      * @returns from
      */
     validateFrom(){
@@ -40,6 +39,14 @@ class InterfaceBlockchainTransactionFrom{
         //Validate to.currency
 
         return true;
+    }
+
+    serializeFrom(){
+
+        return Buffer.concat ([
+
+        ]);
+
     }
 
 }

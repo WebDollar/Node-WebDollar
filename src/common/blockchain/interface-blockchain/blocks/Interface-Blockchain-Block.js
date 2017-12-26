@@ -160,9 +160,9 @@ class InterfaceBlockchainBlock {
             return this.computedBlockPrefix;
 
         this.computedBlockPrefix = Buffer.concat ( [
-                                                     Serialization.serializeToFixedBuffer( 2, Serialization.serializeNumber4Bytes( this.version) ),
+                                                     Serialization.serializeNumber2Bytes( this.version),
                                                      Serialization.serializeToFixedBuffer( consts.BLOCKS_POW_LENGTH , this.hashPrev ),
-                                                     Serialization.serializeToFixedBuffer( 4, Serialization.serializeNumber4Bytes( this.timeStamp )),
+                                                     Serialization.serializeNumber4Bytes( this.timeStamp ),
                                                      //data contains addressMiner, transactions history, contracts, etc
                                                      this.data.serializeData(),
                                                     ]);

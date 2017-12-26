@@ -115,10 +115,12 @@ class InterfaceBlockchainTransaction{
 
         return Buffer.concat ([
 
-            Se
+            Serialization.serializeNumber1Byte( this.version),
+            Serialization.serializeNumber2Bytes( this.nonce),
 
+            this.from.serializeFrom(),
+            this.to.serializeTo(),
         ]);
-
     }
 
     deserializeTransaction(buffer){

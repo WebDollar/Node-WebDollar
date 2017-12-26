@@ -123,6 +123,15 @@ class Serialization{
         return buffer;
     }
 
+    serializeNumber2Bytes(data){
+        //converting number value into a buffer
+        let buffer = Buffer(2);
+        buffer[0] = data & 0xff;
+        buffer[1] = data>>8 & 0xff;
+
+        return  buffer;
+    }
+
     serializeNumber4Bytes(data){
         //converting number value into a buffer
         let buffer = Buffer(4);
