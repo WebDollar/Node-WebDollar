@@ -27,4 +27,15 @@ describe('BigNumber test', () => {
         assert(diff2.equals(new BigNumber(0)), diff2 + "!=" + 0);
         assert(diff3.equals(new BigNumber(0)), diff3 + "!=" + 0);
     });
+
+    it('Big Number 1/3+1/3+1/3 === 1', ()=>{
+
+        let a = new BigNumber(1).dividedBy(3);
+        let b = a.plus(a).plus( new BigNumber(1).dividedBy(3));
+
+        console.log("1/3+1/3+1/3", b);
+        assert(b.greaterThan(new BigNumber("0.999999999999") ), "1/3+1/3+1/3 >= 0.999999999999");
+        assert(b.lessThan(new BigNumber("1.0") ), "1/3+1/3+1/3 < 1");
+
+    });
 });
