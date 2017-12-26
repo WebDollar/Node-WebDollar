@@ -41,7 +41,7 @@ class InterfaceBlockchainBlock {
 
 
         if (data === undefined || data === null)
-            data = this.createEmptyBlockData();
+            data = this.blockchain.blockCreator.createEmptyBlockData();
 
         this.data = data;
 
@@ -57,11 +57,8 @@ class InterfaceBlockchainBlock {
         this.db = db;
     }
 
-    createEmptyBlockData(){
-        return new InterfaceBlockchainBlockData(this.blockchain );
-    }
 
-    async validateBlock(blockchain, height, previousDifficultyTarget, previousHash){
+    async validateBlock(height, previousDifficultyTarget, previousHash){
 
         if (this.version === undefined || this.version === null || typeof this.version !== 'number') throw ('version is empty');
 
@@ -77,12 +74,15 @@ class InterfaceBlockchainBlock {
         this.timeStamp = Math.floor(this.timeStamp);
         if (this.timeStamp >= 0xFFFFFFFF) throw ('timeStamp is invalid');
 
-        if (height >=0)
+        if (height >=0) {
+
             if (this.version !== 0x01) throw ('invalid version');
 
-        if (height !== this.height) throw 'height is different';
+        }
 
-        await this._validateBlockHash(blockchain, previousHash);
+        if (height !== this.height) throw 'height is different' + height+ " "+ this.height ;
+
+        await this._validateBlockHash(previousHash);
         this._validateTargetDifficulty(previousDifficultyTarget);
 
         if (this.reward.equals(BlockchainMiningReward.getReward(this.height)) === false ) throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward(this.height);

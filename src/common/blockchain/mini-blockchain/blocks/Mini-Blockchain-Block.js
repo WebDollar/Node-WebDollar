@@ -3,9 +3,6 @@ import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blo
 
 class MiniBlockchainBlock extends InterfaceBlockchainBlock {
 
-    createEmptyBlockData(){
-        return new MiniBlockchainBlockData(this.blockchain );
-    }
 
 }
 

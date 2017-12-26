@@ -57,10 +57,15 @@ class InterfaceBlockchainBlockCreator{
 
     }
 
-    createBlockEmpty(height){
+    createEmptyBlock(height){
 
         return new this.blockClass(this.blockchain, 1, undefined, undefined, undefined, 0, null, height, this.db);
 
+    }
+
+    createEmptyBlockData(){
+
+        return new this.blockDataClass();
     }
 
 

@@ -53,6 +53,7 @@ class InterfaceBlockchain {
 
 
         block.reward = BlockchainMiningReward.getReward(block.height);
+
         if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
 
         //let's check again the heights

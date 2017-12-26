@@ -83,14 +83,14 @@ class MiniBlockchain extends  InterfaceBlockchain{
         //revert back the database
         if (revert.revertNow){
 
-            //revert reward
-            if (revert.reward)
-                this.accountantTree.updateAccount( block.data.minerAddress, block.reward.negated(), undefined );
-
             //revert transactions
             for (let i=revert.transactions.end; i>= revert.transactions.start; i--) {
                 // TO DO
             }
+
+            //revert reward
+            if (revert.reward)
+                this.accountantTree.updateAccount( block.data.minerAddress, block.reward.negated(), undefined );
 
             if (exception !== null)
                 throw exception;

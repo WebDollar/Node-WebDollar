@@ -212,7 +212,7 @@ class InterfaceBlockchainProtocolForkSolver{
                             let block;
 
                             try {
-                                block = this.blockchain.blockCreator.createBlockEmpty(nextBlockHeight);
+                                block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
                                 block.deserializeBlock(answer.block, nextBlockHeight);
 
                             } catch (Exception){
