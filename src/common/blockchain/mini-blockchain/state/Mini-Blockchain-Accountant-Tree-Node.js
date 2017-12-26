@@ -154,7 +154,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
                 balancesBuffers.push(this._serializeBalance(this.balances[i]));
             }
 
-        balancesBuffers.unshift(Serialization.serializeNumber1Byte(balancesBuffers.length))
+        balancesBuffers.unshift(Serialization.serializeNumber1Byte(balancesBuffers.length));
 
         buffer = Buffer.concat ( balancesBuffers );
 
@@ -164,22 +164,20 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     deserialize(buffer){
 
-        let data = buffer;
-
         let offset = 0;
 
         try {
             if (height >= 0) {
 
-                let length = BufferExtended.substr(data, offset, 1);
+                let length = BufferExtended.substr(buffer, offset, 1);
                 offset += 1;
 
                 // webd balance
-                let webdId = BufferExtended.substr(data, offset,1);
+                let webdId = BufferExtended.substr(buffer, offset,1);
                 offset += 1;
 
                 if (webdId[0] !== 1) throw "webd token is incorrect";
-                let result = Serialization.deserializeBigDecimal( data, offset );
+                let result = Serialization.deserializeBigDecimal( buffer, offset );
 
                 this.updateBalanceToken(result.number);
 
@@ -187,12 +185,12 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
                 //rest of tokens , in case there are
                 for (let i=1; i<length; i++){
-                    let tokenId = BufferExtended.substr(data, offset,consts.TOKEN_ID_LENGTH);
+                    let tokenId = BufferExtended.substr(buffer, offset,consts.TOKEN_ID_LENGTH);
                     offset += consts.TOKEN_ID_LENGTH;
 
-                    result = Serialization.deserializeBigDecimal(data, offset);
+                    result = Serialization.deserializeBigDecimal(buffer, offset);
 
-                    this.updateBalanceToken(result.number, tokenId)
+                    this.updateBalanceToken(result.number, tokenId);
 
                     offset = result.newOffset;
                 }

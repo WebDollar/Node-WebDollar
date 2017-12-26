@@ -68,7 +68,8 @@ class InterfaceBlockchain {
                 hash: block.hash,
                 hashPrev: block.hashPrev,
                 data: {
-                    hashData: block.data.hashData
+                    hashData: block.data.hashData,
+                    hashAccountantTree: block.data.hashAccountantTree,
                 },
                 nonce: block.nonce,
 
@@ -105,7 +106,7 @@ class InterfaceBlockchain {
         }
 
         //validate difficulty & hash
-        if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash) === false) throw ('block validation failed')
+        if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash) === false) throw ('block validation failed');
 
         //recalculate next target difficulty
         block.difficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );

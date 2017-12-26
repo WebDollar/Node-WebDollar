@@ -125,7 +125,7 @@ class InterfaceBlockchainFork {
                     }
                 }
 
-                //rollback
+                //revert
                 if (!forkedSuccessfully) {
                     this.blockchain.blocks.splice(this.forkStartingHeight);
                     for (let i = 0; i < this._blocksCopy.length; i++)

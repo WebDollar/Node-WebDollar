@@ -21,7 +21,7 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
 
     validateBlockData(){
 
-        let result = InterfaceBlockchainBlockData.prototype.validateBlockData.call(this );
+        let result = InterfaceBlockchainBlockData.prototype.validateBlockData.call(this,  );
         if (result !== false)
             return false;
 
