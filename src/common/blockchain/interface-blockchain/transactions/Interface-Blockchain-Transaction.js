@@ -1,10 +1,10 @@
-import InterfaceValidateTransaction from './validate-transactions/Interface-Validate-Transaction'
 import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
 import PendingTransactionsList from 'common/blockchain/transactions/pending-transactions/Pending-Transactions-List'
 
 import InterfaceBlockchainTransactionFrom from './Interface-Blockchain-Transaction-From'
 import InterfaceBlockchainTransactionTo from './Interface-Blockchain-Transaction-To'
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+import Serialization from "common/utils/Serialization"
 
 class InterfaceBlockchainTransaction{
 
@@ -20,13 +20,21 @@ class InterfaceBlockchainTransaction{
      *
      */
 
-    constructor(from, to, digitalSignature, nonce, txId, pending){
+    constructor(blockchain, from, to, digitalSignature, nonce, txId, pending){
+
+        this.blockchain  = blockchain;
 
         this.from = null;
         this.to = null;
 
-        this.digitalSignature = digitalSignature
-        this.nonce = nonce;
+        this.digitalSignature = digitalSignature;
+
+        this.version = 0x00; //version
+
+        if (nonce === undefined || nonce === null)
+            nonce = this._computeRandomNonce();
+
+        this.nonce = nonce; //2 bytes
 
         this.pending = pending||false;
 
@@ -34,13 +42,12 @@ class InterfaceBlockchainTransaction{
         this._setTransactionAddressesTo(to);
 
         if (txId === undefined || txId === null)
-            txId =
-        this.txId = txId
+            txId = this._computeTxId();
+
+        this.txId = txId;
 
         // Validate the validity of Funds
         this._validateTransaction()
-
-        if (this.nonce === null) this._calculateNonce();
 
         if (!pending) {
             PendingTransactionsList.includePendingTransaction(this);
@@ -48,56 +55,69 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    _calculateNonce(){
-        this.nonce = Math.floor(Math.random() * 1000000);
-    }
-
-    _calculateTransactionId(){
-        this.txId = WebDollarCrypto.SHA256( this.toJSON(true, true) );
-    }
-
-    _setTransactionAddressFrom(from){
-
-        from = InterfaceBlockchainTransactionFrom.validateFrom(from);
-
-        //validate the ballance of from.address
-
-        this.from = InterfaceBlockchainTransactionFrom(from.address, from.currency);
-    }
-
-    _setTransactionAddressesTo(to){
-
-        to = InterfaceBlockchainTransactionTo.validateTo(to);
-
-        //validate addresses
-
-        this.to = InterfaceBlockchainTransactionTo(to.addresses, to.fee, to.currency );
-    }
-
-    _propagateTransaction(){
-
-        NodePropagationProtocol.propagateNewPendingTransaction(this)
-
-    }
-
-    _validateTransaction(silent){
-
-        let ValidateTransactions = new InterfaceValidateTransaction();
-
-        let result = ValidateTransactions.validate(this.from, this.to)
-
-        if (silent) //to don't show the throw message
-            return result;
-        else
-            if (result === false) throw 'Transaction Validation pas not passed'
-
+    _computeRandomNonce(){
+        return Math.floor(Math.random() * 0xffff);
     }
 
     _computeTxId(){
-        let buffer = this.serializeTransaction();
+        this.txId = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( this.serializeTransaction() ));
+    }
+
+    /**
+     *
+     * @param address requires .publicKey and .address
+     * @param currency
+     */
+    setTransactionAddressFrom(address, currency){
+
+        //validate the ballance of from.address
+        this.from = new InterfaceBlockchainTransactionFrom(address, currency);
+    }
+
+    setTransactionAddressesTo(addresses, fee, currency){
+
+        //validate addresses
+        this.to = new InterfaceBlockchainTransactionTo(addresses, fee, currency );
+    }
+
+    /**
+     * broadcast a the new pending transaction
+     * @private
+     */
+    _propagateTransaction(){
+
+        if (this.pending)
+            NodePropagationProtocol.propagateNewPendingTransaction(this)
+    }
+
+    /**
+     * Validate the Transaction
+     * @param silent
+     * @returns {*}
+     */
+    validateTransaction(){
+
+        if (this.nonce === undefined || this.nonce === null || typeof this.nonce !== 'number') throw ('nonce is empty');
+
+        if (!this.from) throw 'Validation Invalid: From was not specified';
+        if (!this.from.address) throw 'Validation Invalid: from.Address was not specified'
+
+        if (!this.to) throw 'Validation Invalid: To was not specified'
+
+        this.from.validateFrom();
+        this.to.validateTo();
+
+        return true;
+
     }
 
     serializeTransaction(){
+
+        return Buffer.concat ([
+
+            Se
+
+        ]);
 
     }
 

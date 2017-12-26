@@ -1,7 +1,7 @@
 import BufferExtended from "../utils/BufferExtended";
 
-var BigInteger = require('big-integer');
-var BigNumber = require('bignumber.js');
+const BigInteger = require('big-integer');
+const BigNumber = require('bignumber.js');
 
 import WebDollarCrypto from './WebDollar-Crypto';
 import Serialization from 'common/utils/Serialization';

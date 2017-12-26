@@ -31,17 +31,15 @@ class InterfaceBlockchainTransactionFrom{
      * @param from - must be an object
      * @returns from
      */
-    static validateFrom(from){
+    validateFrom(){
 
-        from = from || {}
+        if (!this.address.publicAddress || this.address.publicAddress === null) throw 'From.address.publicAddress is not specified';
+        if (!this.address.publicKey || this.address.publicKey === null) throw 'From.address.publicKey is not specified';
 
-        if (!from.address.publicAddress || from.address.publicAddress === null) throw 'From.address.publicAddress is not specified';
-        if (!from.address.publicKey || from.address.publicKey === null) throw 'From.address.publicKey is not specified';
-
-        if (!from.currency || from.currency === null) throw 'To.currency is not specified';
+        if (!this.currency || this.currency === null) throw 'To.currency is not specified';
         //Validate to.currency
 
-        return from;
+        return true;
     }
 
 }
