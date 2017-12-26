@@ -65,7 +65,7 @@ class InterfaceBlockchainBlockCreator{
 
     createEmptyBlockData(){
 
-        return new this.blockDataClass();
+        return new this.blockDataClass(this.blockchain);
     }
 
 

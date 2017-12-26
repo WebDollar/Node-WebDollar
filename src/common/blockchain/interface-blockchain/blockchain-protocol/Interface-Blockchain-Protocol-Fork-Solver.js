@@ -216,7 +216,7 @@ class InterfaceBlockchainProtocolForkSolver{
                                 block.deserializeBlock(answer.block, nextBlockHeight);
 
                             } catch (Exception){
-                                console.log(colors.red("Error deserializing blocks" + Exception.toString()));
+                                console.log(colors.red("Error deserializing blocks " + Exception.toString()));
                                 finished = true;
                                 return false;
                             }

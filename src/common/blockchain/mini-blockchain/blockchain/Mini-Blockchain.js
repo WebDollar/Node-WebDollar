@@ -31,10 +31,12 @@ class MiniBlockchain extends  InterfaceBlockchain{
 
         let exception = null;
 
+        let result = true;
+
         try{
 
             //updating reward
-            let result = !this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
+            result = !this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
             //console.log(result);
 
             //let balances = this.accountantTree.listBalances( block.data.minerAddress );

@@ -56,7 +56,7 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
 
         let data = buffer;
 
-        let offset = InterfaceBlockchainBlockData.prototype.deserializeData.call(this);
+        let offset = InterfaceBlockchainBlockData.prototype.deserializeData.call(this, buffer);
 
         this.hashAccountantTree = BufferExtended.substr(data, offset, 32);
         offset += 32;
