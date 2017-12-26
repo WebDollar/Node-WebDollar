@@ -38,6 +38,10 @@ class InterfaceBlockchainMining{
         this.reset = true;
     }
 
+    _simulatedNextBlockMining(nextBlock){
+
+    }
+
     /**
      * mine next block
      */
@@ -49,7 +53,17 @@ class InterfaceBlockchainMining{
             let nextBlock;
 
             try {
-                nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress);
+                nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress, []);
+
+                nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
+
+                //simulating the new block and calculate the hashAccountantTree
+                await this.blockchain.processBlocksSempahoreCallback( ()=>{
+                    this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
+                        this._simulatedNextBlockMining(nextBlock);
+                    });
+                });
+
             } catch (Exception){
                 console.log(colors.red("Error creating next block "+Exception.toString()), Exception, nextBlock);
             }
@@ -101,8 +115,6 @@ class InterfaceBlockchainMining{
 
 
                 if ( hash.compare(difficulty) <= 0 ) {
-
-                    block.reward = BlockchainMiningReward.getReward(block.height);
 
                     console.log( colors.green("WebDollar Block ", block.height ," mined ", nonce, hash.toString("hex"), " reward", block.reward, "WEBD") );
 

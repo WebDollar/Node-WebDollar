@@ -1,4 +1,4 @@
-import MiniBlockchain from 'common/blockchain/mini-blockchain/Mini-Blockchain'
+import MiniBlockchain from 'common/blockchain/mini-blockchain/blockchain/Mini-Blockchain'
 
 class MainBlockchain extends  MiniBlockchain{
 

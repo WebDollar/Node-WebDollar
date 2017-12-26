@@ -23,6 +23,23 @@ class InterfaceBlockchainProtocol {
 
     }
 
+    _validateBlockchainHeader(data){
+
+        // validating data
+        if (typeof data.chainLength !== 'number') throw 'chainLength is not specified';
+        if (typeof data.height !== 'number') throw 'height is not specified';
+
+        if (typeof data.header !== 'object') throw 'header is not specified';
+        if ((typeof data.header.hashPrev === 'string' || Buffer.isBuffer(data.header.hashPrev)) === false) throw 'hashPrev is not specified';
+        if ((typeof data.header.hash === 'string' || Buffer.isBuffer(data.header.hash)) === false) throw 'hash is not specified';
+        if ((typeof data.header.nonce === 'number' || Buffer.isBuffer(data.header.nonce)) === false) throw 'nonce is not specified';
+
+        if ((typeof data.header.data.hashData === 'string' || Buffer.isBuffer(data.header.data.hashData)) === false) throw 'hashData is not specified';
+
+        if (data.header.chainLength < data.header.height) throw ('chainLength is smaller than block height ?? ');
+
+    }
+
     _initializeNewSocket(err, nodesListObject) {
 
         let socket = nodesListObject.socket;
@@ -38,22 +55,11 @@ class InterfaceBlockchainProtocol {
                 data.header.data.hashData
              */
 
-
             try {
 
                 let answer = {result: false, message: ""};
 
-                // validating data
-                if (typeof data.chainLength !== 'number') throw 'chainLength is not specified';
-                if (typeof data.height !== 'number') throw 'height is not specified';
-
-                if (typeof data.header !== 'object') throw 'header is not specified';
-                if ((typeof data.header.hashPrev === 'string' || Buffer.isBuffer(data.header.hashPrev)) === false) throw 'hashPrev is not specified';
-                if ((typeof data.header.hash === 'string' || Buffer.isBuffer(data.header.hash)) === false) throw 'hash is not specified';
-                if ((typeof data.header.data.hashData === 'string' || Buffer.isBuffer(data.header.data.hashData)) === false) throw 'hashData is not specified';
-                if ((typeof data.header.nonce === 'number' || Buffer.isBuffer(data.header.nonce)) === false) throw 'nonce is not specified';
-
-                if (data.header.chainLength < data.header.height) throw ('chainLength is smaller than block height ?? ');
+                this._validateBlockchainHeader(data)
 
                 //validate header
                 //TO DO !!!

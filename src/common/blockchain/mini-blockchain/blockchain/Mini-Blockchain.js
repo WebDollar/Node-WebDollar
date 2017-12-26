@@ -18,15 +18,7 @@ class MiniBlockchain extends  InterfaceBlockchain{
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, MiniBlockchainFork );
     }
 
-    /**
-     * operate the mini-blockchain accountant tree
-     * mini-blockchain, will update reward and take in consideration all transactions
-     * @param block
-     * @param resetMining
-     * @param socketsAvoidBroadcast
-     * @returns {Promise.<*>}
-     */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast){
+    async simulateNewBlock(block, revertAutomatically, callback){
 
         let revert = {
             revertNow: false,
@@ -37,7 +29,7 @@ class MiniBlockchain extends  InterfaceBlockchain{
             }
         };
 
-        let exception;
+        let exception = null;
 
         try{
 
@@ -67,7 +59,7 @@ class MiniBlockchain extends  InterfaceBlockchain{
             }
 
             //inheriting blockchain includeBlockchainBlock
-            result = await InterfaceBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast);
+            result = await callback();
 
             if (result === false)
                 throw "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock";
@@ -81,7 +73,7 @@ class MiniBlockchain extends  InterfaceBlockchain{
         }
 
         //revert back the database
-        if (revert.revertNow){
+        if (revert.revertNow || revertAutomatically){
 
             //revert transactions
             for (let i=revert.transactions.end; i>= revert.transactions.start; i--) {
@@ -99,6 +91,23 @@ class MiniBlockchain extends  InterfaceBlockchain{
         }
 
         return result;
+
+    }
+
+    /**
+     * operate the mini-blockchain accountant tree
+     * mini-blockchain, will update reward and take in consideration all transactions
+     * @param block
+     * @param resetMining
+     * @param socketsAvoidBroadcast
+     * @returns {Promise.<*>}
+     */
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast){
+
+        return await this.simulateNewBlock(block, false, async ()=>{
+            return await InterfaceBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast);
+        })
+
     }
 
     getBalances(address){

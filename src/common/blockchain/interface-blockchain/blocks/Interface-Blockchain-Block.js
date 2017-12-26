@@ -228,7 +228,7 @@ class InterfaceBlockchainBlock {
                 offset = this.data.deserializeData(BufferExtend.substr(buffer, offset));
             }
         } catch (exception){
-            console.log(colors.red("error deserializing a buffer"), exception);
+            console.log(colors.red("error deserializing a buffer "), exception);
             throw exception;
         }
 

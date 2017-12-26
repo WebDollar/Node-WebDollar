@@ -41,6 +41,10 @@ class InterfaceBlockchain {
         return true;
     }
 
+    simulateNewBlock(block, revertAutomatically, callback){
+
+    }
+
     /**
      * Include a new block at the end of the blockchain, by validating the next block
         Will save the block in the blockchain, if it is valid
