@@ -10,10 +10,11 @@ describe('test save wallet to local storage', () => {
     let response = null;
     
     it('save/load/remove/load wallet to/from local storage, sample test', async () => {
+
         let blockchainAddress = Blockchain.Wallets.createNewAddress();
         let address = blockchainAddress.address;
         let publicKey = blockchainAddress.publicKey;
-        let privateKey = blockchainAddress.privateKey;
+        let privateKey = blockchainAddress.privateKey.privateKey;
 
         response = await blockchainAddress.save();
         assert(response === true, 'save: ' + response);
@@ -23,7 +24,7 @@ describe('test save wallet to local storage', () => {
         
         assert(blockchainAddress.address.equals(address), 'address differ after load: ' + blockchainAddress.address.toString('hex') + '!==' + address.toString('hex'));
         assert(blockchainAddress.publicKey.equals(publicKey), 'publicKey differ after load: ' + blockchainAddress.publicKey.toString('hex') + '!==' + publicKey.toString('hex'));
-        assert(blockchainAddress.address.equals(address), 'privateKey differ after load: ' + blockchainAddress.privateKey.toString('hex') + '!==' + privateKey.toString('hex'));
+        assert(blockchainAddress.privateKey.privateKey.equals(privateKey), 'privateKey differ after load: ' + blockchainAddress.privateKey.privateKey.toString('hex') + '!==' + privateKey.toString('hex'));
         
         response = await blockchainAddress.remove();
         assert(response === true, 'remove: ' + response);
@@ -34,6 +35,7 @@ describe('test save wallet to local storage', () => {
     });
     
     it('save/save/remove/load/remove/load wallet to/from local storage, sample test', async () => {
+
         let blockchainAddress = Blockchain.Wallets.createNewAddress();
         let address = blockchainAddress.address;
         let publicKey = blockchainAddress.publicKey;
