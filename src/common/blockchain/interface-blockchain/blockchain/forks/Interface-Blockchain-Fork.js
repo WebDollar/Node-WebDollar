@@ -21,7 +21,6 @@ class InterfaceBlockchainFork {
         this.forkHeader = header;
 
         this._blocksCopy = [];
-        this._blocksSemaphore = false;
 
     }
 
@@ -77,7 +76,7 @@ class InterfaceBlockchainFork {
 
         }
 
-        return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp);
+        return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp, "just-blocks" );
 
     }
 
@@ -150,9 +149,11 @@ class InterfaceBlockchainFork {
     }
 
     preFork(){
+
     }
 
     postFork(forkedSuccessfully){
+
     }
 
 

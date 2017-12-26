@@ -1,6 +1,7 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainBlockCreator from "../blocks/Interface-Blockchain-Block-Creator";
 import InterfaceBlockchainFork from "../blockchain/forks/Interface-Blockchain-Fork";
+import BlockchainMiningReward from 'common/blockchain/Blockchain-Mining-Reward'
 const colors = require('colors/safe');
 
 /**
@@ -214,6 +215,8 @@ class InterfaceBlockchainProtocolForkSolver{
                             try {
                                 block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
                                 block.deserializeBlock(answer.block, nextBlockHeight);
+                                block.height = nextBlockHeight;
+                                block.reward = BlockchainMiningReward.getReward(block.height);
 
                             } catch (Exception){
                                 console.log(colors.red("Error deserializing blocks " + Exception.toString()));

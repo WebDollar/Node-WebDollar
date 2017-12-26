@@ -19,7 +19,7 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
     }
 
 
-    validateBlockData(){
+    validateBlockData(validationType){
 
         let result = InterfaceBlockchainBlockData.prototype.validateBlockData.call(this,  );
 
@@ -27,12 +27,15 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
 
         if (this.hashAccountantTree === undefined || this.hashAccountantTree === null || !Buffer.isBuffer(this.hashAccountantTree)) throw ('hashAccountantTree is empty');
 
-        //validate hashAccountantTree
-        let hashAccountantTree = this.computeAccountantTreeHashBlockData();
+        if (validationType !== "just-blocks") {
 
-        console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex") );
+            //validate hashAccountantTree
+            let hashAccountantTree = this.computeAccountantTreeHashBlockData();
 
-        if (!hashAccountantTree.equals(this.hashAccountantTree)) throw "block.data hashAccountantTree is not right";
+            console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex"));
+
+            if (!hashAccountantTree.equals(this.hashAccountantTree)) throw "block.data hashAccountantTree is not right";
+        }
 
         return true;
 

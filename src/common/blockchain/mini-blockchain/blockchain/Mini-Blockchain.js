@@ -37,7 +37,6 @@ class MiniBlockchain extends  InterfaceBlockchain{
 
             //updating reward
             result = !this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
-            //console.log(result);
 
             //let balances = this.accountantTree.listBalances( block.data.minerAddress );
             //console.log("balances", balances );

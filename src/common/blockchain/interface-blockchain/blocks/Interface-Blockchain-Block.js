@@ -58,7 +58,7 @@ class InterfaceBlockchainBlock {
     }
 
 
-    async validateBlock(height, previousDifficultyTarget, previousHash){
+    async validateBlock(height, previousDifficultyTarget, previousHash, validationType){
 
         if (this.version === undefined || this.version === null || typeof this.version !== 'number') throw ('version is empty');
 
@@ -82,7 +82,7 @@ class InterfaceBlockchainBlock {
 
         if (height !== this.height) throw 'height is different' + height+ " "+ this.height ;
 
-        await this._validateBlockHash(previousHash);
+        await this._validateBlockHash(previousHash, validationType);
         this._validateTargetDifficulty(previousDifficultyTarget);
 
         if (this.reward.equals(BlockchainMiningReward.getReward(this.height)) === false ) throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward(this.height);
@@ -93,7 +93,7 @@ class InterfaceBlockchainBlock {
     /**
      * it will recheck the validity of the block
      */
-    async _validateBlockHash(previousHash) {
+    async _validateBlockHash(previousHash, validationType) {
 
         if (this.computedBlockPrefix === null) this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
@@ -108,7 +108,7 @@ class InterfaceBlockchainBlock {
 
         if (!hash.equals(this.hash)) throw "block hash is not right";
 
-        await this.data.validateBlockData();
+        await this.data.validateBlockData(validationType);
 
         return true;
 

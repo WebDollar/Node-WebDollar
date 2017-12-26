@@ -87,7 +87,9 @@ class InterfaceBlockchain {
         return true;
     }
 
-    async validateBlockchainBlock( block, prevDifficultyTarget, prevHash, prevTimeStamp ){
+    async validateBlockchainBlock( block, prevDifficultyTarget, prevHash, prevTimeStamp, validationType ){
+
+        validationType = validationType || "normal";
 
         if ( block instanceof InterfaceBlockchainBlock === false ) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
 
@@ -111,7 +113,7 @@ class InterfaceBlockchain {
         }
 
         //validate difficulty & hash
-        if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash) === false) throw ('block validation failed');
+        if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash, validationType) === false) throw ('block validation failed');
 
         //recalculate next target difficulty
         block.difficultyTarget = InterfaceBlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );

@@ -12,11 +12,14 @@ class MiniBlockchainFork extends InterfaceBlockchainFork{
         //remove transactions and rewards from each blocks
         for (let i = this.blockchain.getBlockchainLength()-1; i>=this.forkStartingHeight; i--) {
             //remove reward
-            this.blockchain.accountantTree.updateAccount(this.blockchain.blocks[i].data.minerAddress, BlockchainMiningReward.getReward(i).negated() );
+            this.blockchain.accountantTree.updateAccount(this.blockchain.blocks[i].data.minerAddress, this.blockchain.blocks[i].reward.negated() );
 
             //remove transactions
             //this.blockchain.blocks[i] =
         }
+
+        console.log("this.blockchain.accountantTree.printLevelSearch");
+        this.blockchain.accountantTree.printLevelSearch();
 
     }
 
