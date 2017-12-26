@@ -1,6 +1,5 @@
 import BufferExtended from "../utils/BufferExtended";
 
-const bs58 = require('bs58')
 var BigInteger = require('big-integer');
 var BigNumber = require('bignumber.js');
 

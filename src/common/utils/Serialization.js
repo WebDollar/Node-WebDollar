@@ -4,26 +4,52 @@ class Serialization{
 
     /**
      * Serialize a Big Number object into an optimal Buffer
+     * based on https://stackoverflow.com/questions/8482309/converting-javascript-integer-to-byte-array-and-back
      */
-    static serializeBigNumber(data){
+    serializeBigNumber(data){
         //9999999999.99999999999
         // d: [999, 9999999, 9999999, 9999000]
-        // d biggest number is 0x98967F
+        // d biggest number is 0x5AF3107A3FFF
         // e: 9  - it can also be negative
         // s: 1
 
         if (! data instanceof BigNumber) throw 'data is not big decimal';
-        if ( data.d.length === 0 ) throw "data is 0 and can't be ";
+        if ( data.c.length === 0 ) throw "data is 0 and can't be ";
 
-        let buffer = new Buffer( 1 + data.d.length * 3 + 1 );
+        let buffer = new Buffer( 1 + 1 + data.c.length*6 );
 
         buffer[0] = Math.abs(data.e) % 128 + (data.e >= 0 ? 0 : 1)*128;
-        buffer[1] = data.d.length % 128 + (data.s >= 0? 0 : 1)*128;
+        buffer[1] = data.c.length % 128 + (data.s >= 0? 0 : 1)*128;
 
-        for (let i=0; i<data.d.length; i++) {
-            buffer[2 + (i * 3  + 0 )]   = data.d[i] & 0xff;
-            buffer[2 + (i * 3  + 1 )]  = data.d[i] >> 8 & 0xff;
-            buffer[2 + (i * 3  + 2 )]      = data.d[i] >> 16 & 0xff;
+        for (let i=0; i<data.c.length; i++) {
+
+            //converting the number to buffer
+            let long = data.c[i], byte;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 1 )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 2 )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 3 )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 4 )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 5 )]  = byte;
+            long = (long - byte) / 256 ;
+
         }
 
         return buffer;
@@ -31,12 +57,13 @@ class Serialization{
 
     /**
      * Deserialize a Big Number object from an optimal Buffer
+     * based on https://stackoverflow.com/questions/8482309/converting-javascript-integer-to-byte-array-and-back
      */
-    static deserializeBigNumber(buffer, offset ){
+    deserializeBigNumber(buffer, offset ){
 
         offset = offset || 0;
 
-        let bigNumber = {e:0, s:0, d: []};
+        let bigNumber = {e:0, s:0, c: []};
 
         if (!Buffer.isBuffer(buffer)) throw "Can't deserialize Big Number because it is not a buffer";
 
@@ -47,19 +74,28 @@ class Serialization{
         bigNumber.s = Math.floor(buffer[1] / 128) === 0 ? 1 : -1;
 
         for (let i=0; i<length; i++){
-            let nr = buffer[2+i*3 + offset ] | (buffer[2+i*3 + 1 + offset ] << 8) | (buffer[2+i*3 + 2 + offset ] << 16);
-            bigNumber.d.push(nr);
+
+            let nr = 0 ;
+
+            nr = buffer[2 + i*6 + 5 + offset ];
+            nr = (nr * 256) + buffer[2 + i*6 + 4 + offset ];
+            nr = (nr * 256) + buffer[2 + i*6 + 3 + offset ];
+            nr = (nr * 256) + buffer[2 + i*6 + 2 + offset ];
+            nr = (nr  * 256) + buffer[2 + i*6 + 1 + offset ];
+            nr = (nr  * 256) + buffer[2 + i*6 + 0 + offset ];
+
+            bigNumber.c.push(nr);
         }
 
         //console.log("bigNumber", bigNumber);
         let res = new BigNumber(0);
-        res.d = bigNumber.d;
+        res.c = bigNumber.c;
         res.s = bigNumber.s;
         res.e = bigNumber.e;
 
         return {
             number: res,
-            newOffset: 2+length*3 + offset,
+            newOffset: 2+length*6 + offset,
         }
     }
 
@@ -67,7 +103,7 @@ class Serialization{
      *
      * @param data
      */
-    static serializeBigInteger(bigInteger){
+    serializeBigInteger(bigInteger){
         //converting number value into a buffer
 
         let list = [];
@@ -87,7 +123,7 @@ class Serialization{
         return buffer;
     }
 
-    static serializeNumber4Bytes(data){
+    serializeNumber4Bytes(data){
         //converting number value into a buffer
         let buffer = Buffer(4);
         buffer[0] = data & 0xff;
@@ -98,7 +134,7 @@ class Serialization{
         return  buffer;
     }
 
-    static serializeNumber1Byte(data){
+    serializeNumber1Byte(data){
         //converting number value into a buffer
         let buffer = Buffer(1);
         buffer[0] = (data & 0xff);
@@ -106,7 +142,7 @@ class Serialization{
         return  buffer;
     }
 
-    static deserializeNumber(buffer){
+    deserializeNumber(buffer){
         if(buffer.length === 1){
             return buffer[0];
         } else if (buffer.length === 2){
@@ -123,7 +159,7 @@ class Serialization{
      * Convers buffer to a Fixed Length buffer
      * @returns {Buffer}
      */
-    static serializeToFixedBuffer(noBits, buffer){
+    serializeToFixedBuffer(noBits, buffer){
 
         if (buffer.length === noBits) return buffer; // in case has the same number of bits as output
 
@@ -138,4 +174,4 @@ class Serialization{
 
 }
 
-export default Serialization;
+export default new Serialization();
