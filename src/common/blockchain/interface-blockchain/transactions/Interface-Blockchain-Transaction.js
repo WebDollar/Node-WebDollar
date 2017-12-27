@@ -1,10 +1,15 @@
+const colors = require('colors/safe');
+
 import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
 import PendingTransactionsList from 'common/blockchain/transactions/pending-transactions/Pending-Transactions-List'
 
 import InterfaceBlockchainTransactionFrom from './Interface-Blockchain-Transaction-From'
 import InterfaceBlockchainTransactionTo from './Interface-Blockchain-Transaction-To'
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
+
 import Serialization from "common/utils/Serialization"
+import BufferExtended from "common/utils/BufferExtended"
 
 class InterfaceBlockchainTransaction{
 
@@ -36,18 +41,18 @@ class InterfaceBlockchainTransaction{
 
         this.nonce = nonce; //2 bytes
 
-        this.pending = pending||false;
+        if (! from instanceof InterfaceBlockchainTransactionFrom)
+            this.from = new InterfaceBlockchainTransactionFrom(from);
 
-        this._setTransactionAddressFrom(from);
-        this._setTransactionAddressesTo(to);
+        if (! to instanceof InterfaceBlockchainTransactionTo)
+            this.to = new InterfaceBlockchainTransactionTo(to);
+
+        this.pending = pending||false;
 
         if (txId === undefined || txId === null)
             txId = this._computeTxId();
 
         this.txId = txId;
-
-        // Validate the validity of Funds
-        this._validateTransaction()
 
         if (!pending) {
             PendingTransactionsList.includePendingTransaction(this);
@@ -71,13 +76,13 @@ class InterfaceBlockchainTransaction{
     setTransactionAddressFrom(address, currency){
 
         //validate the ballance of from.address
-        this.from = new InterfaceBlockchainTransactionFrom(address, currency);
+        this.from = this.from.setFrom(address, currency);
     }
 
-    setTransactionAddressesTo(addresses, fee, currency){
+    setTransactionAddressesTo( addresses, fee ){
 
         //validate addresses
-        this.to = new InterfaceBlockchainTransactionTo(addresses, fee, currency );
+        this.to = this.to.setTo( addresses, fee );
     }
 
     /**
@@ -115,15 +120,42 @@ class InterfaceBlockchainTransaction{
 
         return Buffer.concat ([
 
-            Serialization.serializeNumber1Byte( this.version),
-            Serialization.serializeNumber2Bytes( this.nonce),
+            Serialization.serializeNumber1Byte( this.version ),
+            Serialization.serializeNumber2Bytes( this.nonce ),
+            Serialization.serializeToFixedBuffer( 32, this.digitalSignature ),
 
             this.from.serializeFrom(),
             this.to.serializeTo(),
         ]);
     }
 
-    deserializeTransaction(buffer){
+    deserializeTransaction(buffer, offset){
+
+        offset = offset || 0;
+
+        if (!Buffer.isBuffer(buffer))
+            buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
+
+        try{
+
+            this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+            offset += 1;
+
+            this.nonce =   Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+            offset += 1;
+
+            this.digitalSignature = BufferExtended.substr(buffer, offset, 32);
+            offset += 32;
+
+            this.from.deserializeFrom(buffer, offset);
+            this.to.deserializeFrom(buffer, offset);
+
+        } catch (exception){
+            console.log(colors.red("error deserializing a transaction "), exception);
+            throw exception;
+        }
+
+        return offset;
 
     }
 

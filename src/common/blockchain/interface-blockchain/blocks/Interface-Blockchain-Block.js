@@ -8,7 +8,7 @@ import consts from 'consts/const_global'
 
 import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data';
 import Serialization from "common/utils/Serialization.js";
-import BufferExtend from "common/utils/BufferExtended.js";
+import BufferExtended from "common/utils/BufferExtended.js";
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
@@ -210,25 +210,25 @@ class InterfaceBlockchainBlock {
         try {
             if (height >= 0) {
 
-                this.hash = BufferExtend.substr(buffer, 0, consts.BLOCKS_POW_LENGTH);
+                this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
                 offset += consts.BLOCKS_POW_LENGTH;
 
-                this.nonce = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, consts.BLOCKS_NONCE) );
+                this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, consts.BLOCKS_NONCE) );
                 offset += consts.BLOCKS_NONCE;
 
-                this.version = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 2) );
+                this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) );
                 offset += 2;
 
-                this.hashPrev = BufferExtend.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
+                this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
                 offset += consts.BLOCKS_POW_LENGTH;
 
-                this.timeStamp = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 4) );
+                this.timeStamp = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 4) );
                 offset += 4;
 
-                offset = this.data.deserializeData(BufferExtend.substr(buffer, offset));
+                offset = this.data.deserializeData(BufferExtended.substr(buffer, offset));
             }
         } catch (exception){
-            console.log(colors.red("error deserializing a buffer "), exception);
+            console.log(colors.red("error deserializing a block  "), exception);
             throw exception;
         }
 

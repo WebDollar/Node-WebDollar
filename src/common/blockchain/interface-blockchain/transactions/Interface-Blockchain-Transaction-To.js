@@ -8,11 +8,16 @@ class InterfaceBlockchainTransactionTo{
 
         addresses: [ { address: Addr1,  amount: amount}, ... ]
         fee: amount
-        currency: TokenObject,
 
      */
 
-    constructor (addresses, fee, currency){
+    constructor (addresses, fee){
+
+        this.setTo(addresses, fee);
+
+    }
+
+    setTo(addresses, fee, currency){
 
         if (Array.isArray(addresses))
             addresses = [addresses];
@@ -30,7 +35,6 @@ class InterfaceBlockchainTransactionTo{
 
         this.addresses = addresses;
         this.fee = fee;
-        this.currency = currency;
 
     }
 
@@ -38,7 +42,6 @@ class InterfaceBlockchainTransactionTo{
         return {
             addresses: this.addresses,
             fee: this.fee,
-            currency: this.currency,
         }
     }
 
@@ -64,8 +67,6 @@ class InterfaceBlockchainTransactionTo{
 
         if (this.fee.lessThan(0) ) throw "To.fee is smaller than 0";
 
-        if (!this.currency || this.currency === null) throw 'To.currency is not specified';
-
         //Validate to.currency
 
         return true;
@@ -76,6 +77,10 @@ class InterfaceBlockchainTransactionTo{
         return Buffer.concat([
 
         ]);
+
+    }
+
+    deserializeTo(buffer){
 
     }
 
