@@ -18,8 +18,8 @@ class MiniBlockchainFork extends InterfaceBlockchainFork{
             //this.blockchain.blocks[i] =
         }
 
-        console.log("this.blockchain.accountantTree.printLevelSearch");
-        this.blockchain.accountantTree.printLevelSearch();
+        // console.log("this.blockchain.accountantTree.printLevelSearch");
+        // this.blockchain.accountantTree.printLevelSearch();
 
     }
 
@@ -29,6 +29,7 @@ class MiniBlockchainFork extends InterfaceBlockchainFork{
 
         //rollback to the original Accountant Tree
         this.blockchain.accountantTree.root = this._accountantTreeRoot;
+
     }
 
 }

@@ -102,11 +102,11 @@ class InterfaceBlockchainBlock {
 
         if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
 
-
         //validate hash
         let hash = await this.computeHash();
 
-        if (!hash.equals(this.hash)) throw "block hash is not right";
+
+        if (!hash.equals(this.hash)) throw "block hash is not right" + this.hash.toString("hex") + " "+ hash.toString("hex");
 
         await this.data.validateBlockData(validationType);
 
