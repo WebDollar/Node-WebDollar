@@ -1,5 +1,8 @@
 const BigNumber = require('bignumber.js');
+
 import BufferExtended from "common/utils/BufferExtended"
+import Serialization from "common/utils/Serialization"
+import consts from "consts/const_global"
 
 class InterfaceBlockchainTransactionTo{
 
@@ -17,7 +20,7 @@ class InterfaceBlockchainTransactionTo{
 
     }
 
-    setTo(addresses, fee, currency){
+    setTo(addresses, fee){
 
         if (Array.isArray(addresses))
             addresses = [addresses];
@@ -56,10 +59,11 @@ class InterfaceBlockchainTransactionTo{
 
         this.addresses.forEach ( (toObject, index) =>{
 
-            if (!toObject.address || toObject.address === null) throw 'To.Object Address is not specified';
+            if (!toObject.address || toObject.address === null || !Buffer.isBuffer(toObject.address)) throw 'To.Object Address is not specified';
 
-            if (!toObject.amount || typeof toObject.amount !== "number" ) throw 'To.Object Amount is not specified';
-            if ( toObject.amount < 0) throw "To.Object Amount is an invalid number";
+            if (!toObject.amount || ! toObject.amount instanceof BigNumber ) throw 'To.Object Amount is not specified';
+
+            if ( toObject.amount.lessThan(0) ) throw "To.Object Amount is an invalid number";
 
         });
 
@@ -74,14 +78,45 @@ class InterfaceBlockchainTransactionTo{
 
     serializeTo(){
 
-        return Buffer.concat([
+        let addressesBuffer = [];
+
+        for (let i=0; i<this.addresses.length; i++){
+            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].address ));
+            addressesBuffer.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
+        }
+
+        return Buffer.concat ([
+
+            Serialization.serializeBigNumber( this.fee),
+            Serialization.serializeNumber1Byte( addressesBuffer.length / 2 ),
+            addressesBuffer,
 
         ]);
 
     }
 
-    deserializeTo(buffer){
+    deserializeTo(buffer, offset){
 
+        let reuslt = Serialization.deserializeBigNumber(buffer, offset);
+        this.fee = result.number;
+        offset = result.newOffset;
+
+        let length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+        offset +=1;
+
+        for (let i=0; i<length; i++){
+            let address = {};
+
+            address.address= BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);
+            offset += consts.PUBLIC_ADDRESS_LENGTH;
+
+            let result = Serialization.deserializeBigNumber(buffer, offset);
+            address.amount = result.number;
+
+            offset = result.newOffset;
+        }
+
+        return offset;
     }
 
 }

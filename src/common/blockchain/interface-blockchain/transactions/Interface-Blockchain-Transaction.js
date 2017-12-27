@@ -147,8 +147,8 @@ class InterfaceBlockchainTransaction{
             this.digitalSignature = BufferExtended.substr(buffer, offset, 32);
             offset += 32;
 
-            this.from.deserializeFrom(buffer, offset);
-            this.to.deserializeFrom(buffer, offset);
+            offset = this.from.deserializeFrom(buffer, offset);
+            offset = this.to.deserializeTo(buffer, offset);
 
         } catch (exception){
             console.log(colors.red("error deserializing a transaction "), exception);

@@ -24,6 +24,7 @@ consts.PRIVATE_KEY_CHECK_SUM_LENGTH = 4; //in bytes
 
 consts.PUBLIC_ADDRESS_VERSION = "00"; //ending BASE64 HEX
 consts.PUBLIC_ADDRESS_LENGTH = 32; //ending BASE64 HEX
+consts.PUBLIC_KEY_LENGTH = 32; //ending BASE64 HEX
 
 consts.PUBLIC_ADDRESS_PREFIX_BASE64 = "584043fe"; //BASE64 HEX  WEBD$
                                       //WEBD  584043
