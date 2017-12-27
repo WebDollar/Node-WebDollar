@@ -2,6 +2,7 @@ import InterfaceBlockchainAddressHelper from './Interface-Blockchain-Address-Hel
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import Serialization from "common/utils/Serialization.js";
 import BufferExtend from "common/utils/BufferExtended.js";
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 
 class InterfaceBlockchainAddress{
@@ -84,6 +85,20 @@ class InterfaceBlockchainAddress{
 
         return this.address.toString()
 
+    }
+    
+    encrypt(password) {
+        
+        let encr = WebDollarCrypto.encryptAES(this.privateKey.privateKey, password);
+        this.privateKey.privateKey = Buffer.from(encr);
+        return encr;
+    }
+    
+    decrypt(password) {
+        
+        let decr = WebDollarCrypto.decryptAES(this.privateKey.privateKey, password);
+        this.privateKey.privateKey = Buffer.from(decr);
+        return decr;
     }
     
     async save() {
