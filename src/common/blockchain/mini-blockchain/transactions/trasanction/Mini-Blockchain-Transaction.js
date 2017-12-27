@@ -1,5 +1,5 @@
 
-import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transaction'
+import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction'
 
 class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction{
 

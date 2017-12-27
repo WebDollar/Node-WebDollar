@@ -38,6 +38,10 @@ class InterfaceBlockchainMining{
         this.reset = true;
     }
 
+    selectNextTransactions(){
+        return []
+    }
+
     _simulatedNextBlockMining(nextBlock){
 
     }
@@ -50,10 +54,12 @@ class InterfaceBlockchainMining{
         while (!this.finished){
             //mining next blocks
 
-            let nextBlock;
+            let nextBlock, nextTransactions;
 
             try {
-                nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress, []);
+
+                nextTransactions = this.selectNextTransactions();
+                nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress, nextTransactions );
 
                 nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
 

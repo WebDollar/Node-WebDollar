@@ -61,11 +61,18 @@ class InterfaceBlockchainBlockData {
     }
 
     calculateHashTransactions (){
-        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataTransactions() ));
+        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataTransactionsConcatenate() ));
     }
 
-    _computeBlockDataTransactions(){
-        
+    _computeBlockDataTransactionsConcatenate(){
+
+        let bufferList = [];
+
+        for (let i=0; i<this.transactions.length; i++)
+            bufferList.push( this.transactions[i].serializeTransaction() );
+
+        return Buffer.concat( bufferList )
+
     }
 
     _computeBlockDataHeaderPrefix(){

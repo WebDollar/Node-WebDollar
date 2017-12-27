@@ -1,5 +1,5 @@
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
-import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transaction'
+import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction'
 
 class InterfaceTransactionsUniqueness extends InterfaceRadixTree {
 
@@ -11,13 +11,14 @@ class InterfaceTransactionsUniqueness extends InterfaceRadixTree {
         return this.add(txId, true);
     }
 
-    checkTransactionsUniqueness(txIds){
-        if (Array.isArray(txIds))
+    searchTransactionsUniqueness(txIds){
+
+        if (!Array.isArray(txIds))
             txIds = [txIds];
 
 
         for (let i=0; i<txIds.length; i++){
-            if (this.checkTransactionUniqueness(txIds[i]))
+            if (this.searchTransactionUniqueness(txIds[i]))
                 return true;
         }
 
@@ -25,7 +26,7 @@ class InterfaceTransactionsUniqueness extends InterfaceRadixTree {
 
     }
 
-    checkTransactionUniqueness(txId){
+    searchTransactionUniqueness(txId){
 
         if (txId instanceof InterfaceBlockchainTransaction)
             txId = txId.txId;

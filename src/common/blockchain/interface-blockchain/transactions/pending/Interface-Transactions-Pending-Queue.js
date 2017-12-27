@@ -1,4 +1,4 @@
-class PendingTransactionsList{
+class InterfaceTransactionsPendingQueue {
 
     constructor(){
 
@@ -40,7 +40,6 @@ class PendingTransactionsList{
     }
 
 
-
 }
 
-export default new PendingTransactionsList()
+export default InterfaceTransactionsPendingQueue
