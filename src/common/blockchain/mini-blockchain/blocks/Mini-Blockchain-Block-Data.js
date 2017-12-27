@@ -3,9 +3,9 @@ import BufferExtended from 'common/utils/BufferExtended'
 
 class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
 
-    constructor (blockchain, minerAddress, transactions, hashData, hashAccountantTree){
+    constructor (blockchain, minerAddress, transactions, hashTransactions, hashData, hashAccountantTree){
 
-        super(blockchain, minerAddress, transactions, hashData, );
+        super(blockchain, minerAddress, transactions, hashTransactions, hashData, );
 
         this.hashAccountantTree = hashAccountantTree;
 

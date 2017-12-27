@@ -7,7 +7,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class InterfaceBlockchainBlockData {
 
-    constructor(blockchain, minerAddress, transactions, hashData){
+    constructor(blockchain, minerAddress, transactions, hashTransactions, hashData){
 
         this.blockchain = blockchain;
 
@@ -24,6 +24,11 @@ class InterfaceBlockchainBlockData {
         this.minerAddress = minerAddress;
 
         this.transactions = transactions||[];
+
+        if (hashTransactions === undefined)
+            hashTransactions = this.calculateHashTransactions();
+
+        this.hashTransactions = hashTransactions;
 
         this.hashData = hashData;
 
@@ -55,10 +60,19 @@ class InterfaceBlockchainBlockData {
         return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataHeaderPrefix() ));
     }
 
+    calculateHashTransactions (){
+        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataTransactions() ));
+    }
+
+    _computeBlockDataTransactions(){
+        
+    }
+
     _computeBlockDataHeaderPrefix(){
 
         return Buffer.concat ( [
             Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress ),
+            Serialization.serializeToFixedBuffer( 32, this.hashTransactions ),
         ]);
 
     }
@@ -72,7 +86,7 @@ class InterfaceBlockchainBlockData {
             this.computeHashBlockData();
 
         return Buffer.concat( [
-            Serialization.serializeToFixedBuffer( this.hashData, 32 ),
+            Serialization.serializeToFixedBuffer( 32, this.hashData ),
             this._computeBlockDataHeaderPrefix(),
         ] )
 

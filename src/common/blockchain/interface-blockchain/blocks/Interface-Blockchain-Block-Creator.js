@@ -19,7 +19,7 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        args.unshift (  this.blockchain, minerAddress, undefined, undefined );
+        args.unshift (  this.blockchain, minerAddress, undefined, undefined, undefined );
 
         let data = new this.blockDataClass(...args);
 
@@ -33,7 +33,7 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        args.unshift( this.blockchain, minerAddress, transactions, undefined );
+        args.unshift( this.blockchain, minerAddress, transactions, undefined, undefined );
         let data = new this.blockDataClass(...args);
 
         return new this.blockClass( this.blockchain, 1, undefined, prevBlock.hash, undefined, 0, data, height, this.db);
@@ -51,7 +51,7 @@ class InterfaceBlockchainBlockCreator{
 
         } else { //Fetch Transactions and Create Block
 
-            return this._createBlockNew( this.blockchain.getBlockchainLastBlock(), this.blockchain.getBlockchainLength(), minerAddress, transactions, restArgs );
+            return this._createBlockNew( this.blockchain.getBlockchainLastBlock(), this.blockchain.getBlockchainLength(), minerAddress, transactions,  restArgs );
 
         }
 
