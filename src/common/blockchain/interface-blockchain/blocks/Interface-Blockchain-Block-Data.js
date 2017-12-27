@@ -18,27 +18,28 @@ class InterfaceBlockchainBlockData {
         if (!Buffer.isBuffer(minerAddress))
             minerAddress = Buffer.from(minerAddress);
 
+        if (minerAddress === "string")
+            WebDollarCrypto.fromBase(minerAddress);
+
         this.minerAddress = minerAddress;
 
         this.transactions = transactions||[];
 
-        if (hashData === undefined || hashData === null)
-            hashData = this.computeHashBlockData();
-
         this.hashData = hashData;
 
-        //computed data
-        this.computedBlockDataPrefix = null;
+        if (hashData === undefined || hashData === null)
+            this.calculateHashBlockData();
+
     }
 
     validateBlockData(){
 
-        if (this.minerAddress === undefined || this.minerAddress === null  ) throw ('data.minerAddress is empty');
+        if (this.minerAddress === undefined || this.minerAddress === null || !Buffer.isBuffer(this.minerAddress)  ) throw ('data.minerAddress is empty');
 
         if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData)) throw ('hashData is empty');
 
         //validate hash
-        let hashData = this.computeHashBlockData();
+        let hashData = this.calculateHashBlockData();
 
         if (!hashData.equals(this.hashData)) throw "block.data hashData is not right";
 
@@ -46,22 +47,20 @@ class InterfaceBlockchainBlockData {
     }
 
     computeHashBlockData(){
-        // sha256 (sha256 ( serialized ))
-        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockHeaderPrefix() ));
+        this.hashData = this.calculateHashBlockData();
     }
 
-    _computeBlockHeaderPrefix(skipPrefix){
+    calculateHashBlockData(){
+        // sha256 (sha256 ( serialized ))
+        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataHeaderPrefix() ));
+    }
 
-        //in case I have calculated  the computedBlockPrefix before
+    _computeBlockDataHeaderPrefix(){
 
-        if (skipPrefix === true && Buffer.isBuffer(this.computedBlockDataPrefix) )
-            return this.computedBlockDataPrefix;
-
-        this.computedBlockDataPrefix = Buffer.concat ( [
+        return Buffer.concat ( [
             Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress ),
         ]);
 
-        return this.computedBlockDataPrefix;
     }
 
     /**
@@ -70,13 +69,11 @@ class InterfaceBlockchainBlockData {
     serializeData(){
 
         if (!Buffer.isBuffer(this.hashData) || this.hashData.length !== 32)
-            this.hashData = this.computeHashBlockData();
-
-        this._computeBlockHeaderPrefix(true);
+            this.computeHashBlockData();
 
         return Buffer.concat( [
-            this.computedBlockDataPrefix,
             Serialization.serializeToFixedBuffer( this.hashData, 32 ),
+            this._computeBlockDataHeaderPrefix(),
         ] )
 
     }

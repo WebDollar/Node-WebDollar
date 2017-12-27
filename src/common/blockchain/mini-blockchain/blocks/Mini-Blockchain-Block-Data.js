@@ -7,10 +7,10 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
 
         super(blockchain, minerAddress, transactions, hashData, );
 
-        if (hashAccountantTree === undefined)
-            hashAccountantTree = this.computeAccountantTreeHashBlockData();
-
         this.hashAccountantTree = hashAccountantTree;
+
+        if (this.hashAccountantTree === undefined)
+            this.computeAccountantTreeHashBlockData();
 
         //recalculate hashData
         if (hashData === undefined || hashData === null)
@@ -30,7 +30,7 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
         if (validationType !== "just-blocks") {
 
             //validate hashAccountantTree
-            let hashAccountantTree = this.computeAccountantTreeHashBlockData();
+            let hashAccountantTree = this.calculateAccountantTreeHashBlockData();
 
             console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex"));
 
@@ -41,18 +41,24 @@ class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
 
     }
 
-    computeAccountantTreeHashBlockData(){
+    _computeBlockDataHeaderPrefix(){
+
+        if (!Buffer.isBuffer(this.hashAccountantTree) || this.hashAccountantTree.length !== 32)
+            this.computeAccountantTreeHashBlockData();
+
+        return Buffer.concat (
+            [
+                InterfaceBlockchainBlockData.prototype._computeBlockDataHeaderPrefix.call(this),
+                this.hashAccountantTree,
+            ]);
+    }
+
+    calculateAccountantTreeHashBlockData(){
         return this.blockchain.accountantTree.root.hash.sha256;
     }
 
-    serializeData(){
-        let buffer = InterfaceBlockchainBlockData.prototype.serializeData.call(this);
-
-        return Buffer.concat(
-            [
-                buffer,
-                this.hashAccountantTree,
-            ]);
+    computeAccountantTreeHashBlockData(){
+        this.hashAccountantTree = this.calculateAccountantTreeHashBlockData();
     }
 
     deserializeData(buffer){

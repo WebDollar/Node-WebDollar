@@ -47,6 +47,16 @@ class BufferExtended {
         }
     }
 
+    fromBase(string){
+        if (consts.PRIVATE_KEY_USE_BASE64)  {
+            WebDollarCrypto.decodeBase64(string); //if it is string, it must be a Base string
+        }
+        else {
+
+            return bs58.decode(string);
+        }
+    }
+
 }
 
 export default new BufferExtended();

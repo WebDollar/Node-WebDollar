@@ -1,11 +1,12 @@
 const BigNumber = require('bignumber.js');
+import BufferExtended from "common/utils/BufferExtended"
 
 class InterfaceBlockchainTransactionTo{
 
 
     /*
 
-        addresses: [ { publicAddress: Addr1,  amount: amount}, ... ]
+        addresses: [ { address: Addr1,  amount: amount}, ... ]
         fee: amount
         currency: TokenObject,
 
@@ -15,6 +16,17 @@ class InterfaceBlockchainTransactionTo{
 
         if (Array.isArray(addresses))
             addresses = [addresses];
+
+        for (let i=0; i<addresses.length; i++) {
+            if (typeof addresses[i].address === "string")
+                addresses[i].address = BufferExtended.fromBase(addresses[i].address);
+
+            if (typeof addresses[i].amount === "string" || typeof addresses[i].addresses[i].amount === "number")
+                addresses[i].amount = new BigNumber(addresses[i].amount);
+        }
+
+        if (typeof fee === "string" || typeof fee === "number")
+            fee = new BigNumber(fee);
 
         this.addresses = addresses;
         this.fee = fee;
@@ -44,7 +56,7 @@ class InterfaceBlockchainTransactionTo{
             if (!toObject.address || toObject.address === null) throw 'To.Object Address is not specified';
 
             if (!toObject.amount || typeof toObject.amount !== "number" ) throw 'To.Object Amount is not specified';
-            if (toObject.amount < 0) throw "To.Object Amount is an invalid number";
+            if ( toObject.amount < 0) throw "To.Object Amount is an invalid number";
 
         });
 

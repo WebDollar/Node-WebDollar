@@ -53,7 +53,7 @@ class WebDollarCrypto {
      * @param str
      * @returns {Buffer}
      */
-    static decodeBase64(str) {
+    static  decodeBase64(str) {
 
         if (typeof str !== "string") throw "input is not string for base decoding" + typeof str;
 
