@@ -12,7 +12,7 @@ class NetworkGoogleMaps {
 
         console.log("NetworkMap constructor");
 
-        this.markers = [];
+        this._markers = [];
 
         let iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
         this.icons = {
@@ -114,13 +114,13 @@ class NetworkGoogleMaps {
 
             if (markerIndex !== -1) {
 
-                this.markers[markerIndex].setMap(null);
+                this._markers[markerIndex].setMap(null);
 
-                if ( this.markers[markerIndex].curveMarker !== undefined)  this.markers[markerIndex].curveMarker.setMap(null);
-                if ( this.markers[markerIndex].linePoly !== undefined)  this.markers[markerIndex].linePoly.setMap(null);
-                if ( this.markers[markerIndex].infoWindow !== undefined) this.markers[markerIndex].infoWindow.setMap(null);
+                if ( this._markers[markerIndex].curveMarker !== undefined)  this._markers[markerIndex].curveMarker.setMap(null);
+                if ( this._markers[markerIndex].linePoly !== undefined)  this._markers[markerIndex].linePoly.setMap(null);
+                if ( this._markers[markerIndex].infoWindow !== undefined) this._markers[markerIndex].infoWindow.setMap(null);
 
-                this.markers.splice(markerIndex, 1);
+                this._markers.splice(markerIndex, 1);
             }
 
         });
@@ -152,8 +152,8 @@ class NetworkGoogleMaps {
 
     _findMarkerIndexBySocket(socket){
 
-        for (let i=0; i< this.markers.length; i++ )
-            if (this.markers[i].socket === socket)
+        for (let i=0; i< this._markers.length; i++ )
+            if (this._markers[i].socket === socket)
                 return i;
 
         return -1;
@@ -202,7 +202,7 @@ class NetworkGoogleMaps {
         marker.socket = socket;
         marker.infoWindow = infoWindow;
 
-        this.markers.push(marker);
+        this._markers.push(marker);
 
         this._createConnectionsArcs(false);
 
@@ -234,9 +234,9 @@ class NetworkGoogleMaps {
          */
 
         let markerMyself = null;
-        for (let i=0; i<this.markers.length; i++)
-            if (this.markers[i].socket === "myself"){
-                markerMyself = this.markers[i];
+        for (let i=0; i<this._markers.length; i++)
+            if (this._markers[i].socket === "myself"){
+                markerMyself = this._markers[i];
                 break;
             }
 
@@ -260,9 +260,9 @@ class NetworkGoogleMaps {
 
         const curvature = 0.2; // how curvy to make the arc
 
-        for (let i=0; i<this.markers.length; i++)
-            if (this.markers[i] !== markerMyself){
-                let marker = this.markers[i];
+        for (let i=0; i<this._markers.length; i++)
+            if (this._markers[i] !== markerMyself){
+                let marker = this._markers[i];
 
                 let pos2 = marker.getPosition();
                 let lineColor = 'black';
