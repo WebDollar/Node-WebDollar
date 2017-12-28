@@ -85,6 +85,11 @@ describe('test save wallet to local storage', () => {
 
     });
     
-    
+        
+    it('check if the wallet is created/loaded in MainBlockchainWallets constructor', async () => {
+
+        assert(typeof Blockchain.Wallets.blockchainAddress !== 'undefined', 'Default wallet is not created');
+
+    });
 
 });
