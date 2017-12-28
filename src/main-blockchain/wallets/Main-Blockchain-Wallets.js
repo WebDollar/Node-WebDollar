@@ -16,6 +16,8 @@ class MainBlockchainWallets{
         else
             this.db = db;
         
+        this.password = password;
+        
         if (this.loadWallets() !== true) {
             this.wallets = [this.createNewAddress()];
             this.saveWallets();
@@ -34,10 +36,12 @@ class MainBlockchainWallets{
     serializeWallets() {
         
         let buffer = Serialization.serializeNumber4Bytes(this.wallets.length);
-        
+
         for (let i = 0; i < this.wallets.length; ++i) {
-            let lengthBuffer = Serialization.serializeNumber1Byte(this.wallets[i].length);
+            this.wallets[i].encrypt(this.password);
             let walletBuffer = this.wallets[i].serializeAddress();
+            this.wallets[i].decrypt(this.password);
+            let lengthBuffer = Serialization.serializeNumber2Bytes(walletBuffer.length);
             
             buffer = Buffer.concat([buffer, lengthBuffer, walletBuffer]);
         }
@@ -58,12 +62,14 @@ class MainBlockchainWallets{
             
             this.wallets = [];
             for (let i = 0; i < numWallets; ++i) {
-                len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 1) );
-                offset += 1;
+                len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 2) );
+                offset += 2;
 
                 this.wallets[i] = this.createNewAddress();
                 this.wallets[i].deserializeAddress( BufferExtend.substr(data, offset, len) );
                 offset += len;
+                
+                this.wallets[i].decrypt(this.password);
             }
 
         } catch (exception){
@@ -74,19 +80,19 @@ class MainBlockchainWallets{
     
     async saveWallets() {
 
-        //let value = this.serializeWallets();        
-        //return (await this.db.save(this.walletsFileName, value));
+        let value = this.serializeWallets();        
+        return (await this.db.save(this.walletsFileName, value));
     }
     
     async loadWallets() {
         
         let buffer = await this.db.get(this.walletsFileName);
         
-        if (buffer.status !== 404) {
-            this.deserializeWallets(buffer);
-            return true;
-        }
-        return false;
+        if (typeof buffer.status !== "undefined")
+            return false;
+
+        this.deserializeWallets(buffer);
+        return true;
     }
     
     async removeWallets() {

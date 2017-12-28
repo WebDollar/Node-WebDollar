@@ -88,7 +88,7 @@ describe('test save wallet to local storage', () => {
         
     it('load/store wallet manager', async () => {
 
-        //assert(typeof Blockchain.Wallets.blockchainAddress !== 'undefined', 'Default wallet is not created');
+        assert(typeof Blockchain.Wallets.wallets !== 'undefined', 'Default wallet is not created');
 
     });
 
