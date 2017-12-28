@@ -1,3 +1,5 @@
+import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
+
 class InterfaceTransactionsPendingQueue {
 
     constructor(){
@@ -37,6 +39,10 @@ class InterfaceTransactionsPendingQueue {
 
         this.list.splice(index, 1);
 
+    }
+
+    propagateTransaction(transaction){
+        NodePropagationProtocol.propagateNewPendingTransaction(transaction)
     }
 
 

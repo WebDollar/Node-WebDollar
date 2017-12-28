@@ -1,8 +1,5 @@
 const colors = require('colors/safe');
 
-import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
-import PendingTransactionsList from 'common/blockchain/transactions/pending-transactions/Pending-Transactions-List'
-
 import InterfaceBlockchainTransactionFrom from './Interface-Blockchain-Transaction-From'
 import InterfaceBlockchainTransactionTo from './Interface-Blockchain-Transaction-To'
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
@@ -21,11 +18,11 @@ class InterfaceBlockchainTransaction{
      * @param digitalSignature - using Elliptic Curve to digital sign the transaction
      * @param nonce - usually null
      * @param txId - usually null
-     * @param pending
+     *
      *
      */
 
-    constructor(blockchain, from, to, digitalSignature, nonce, txId, pending){
+    constructor(blockchain, from, to, digitalSignature, nonce, txId){
 
         this.blockchain  = blockchain;
 
@@ -47,16 +44,10 @@ class InterfaceBlockchainTransaction{
         if (! to instanceof InterfaceBlockchainTransactionTo)
             this.to = new InterfaceBlockchainTransactionTo(to);
 
-        this.pending = pending||false;
-
         if (txId === undefined || txId === null)
             txId = this._computeTxId();
 
         this.txId = txId;
-
-        if (!pending) {
-            PendingTransactionsList.includePendingTransaction(this);
-        }
 
     }
 
@@ -85,15 +76,6 @@ class InterfaceBlockchainTransaction{
         this.to = this.to.setTo( addresses, fee );
     }
 
-    /**
-     * broadcast a the new pending transaction
-     * @private
-     */
-    _propagateTransaction(){
-
-        if (this.pending)
-            NodePropagationProtocol.propagateNewPendingTransaction(this)
-    }
 
     /**
      * Validate the Transaction
@@ -163,7 +145,7 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    toJSON(dontIncludeTxId, dontIncludePending){
+    toJSON(dontIncludeTxId){
 
         let result = {
             from: this.from.toJSON(),
@@ -173,7 +155,6 @@ class InterfaceBlockchainTransaction{
         }
 
         if (!dontIncludeTxId ) result.txId = this.txId;
-        if (!dontIncludePending ) result.pending = this.pending;
 
         return result;
 

@@ -1,9 +1,11 @@
-import NetworkMap from 'applications/maps/network-map';
+import NetworkGoogleMaps from 'applications/maps/google-maps/Network-Google-Maps';
+import NetworkNativeMaps from 'applications/maps/native/Network-Native-Maps';
 
 class Applications{
 
     constructor(){
-        this.NetworkMap = NetworkMap;
+        this.NetworkGoogleMaps = NetworkGoogleMaps;
+        this.NetworkNativeMaps = NetworkNativeMaps;
     }
 
 }
