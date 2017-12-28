@@ -2,7 +2,7 @@ import NodesList from 'node/lists/nodes-list'
 import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper'
 import NetworkMapStyleLight from './styles/network-map-style-light';
 
-class NetworkMap {
+class NetworkGoogleMaps {
 
     /*
         markers = []
@@ -50,44 +50,46 @@ class NetworkMap {
 
         window.map = map;
 
+        this._map = map
+
         return map;
     }
 
-    createTestConnections(map){
+    createTestConnections(){
 
-        this._createFakeMarker(map, {country: 'USA', lat: 37.980388, lng:-92.539714 }, 2000);
-        this._createFakeMarker(map, {country: 'USA', lat: 36.828015, lng:-119.458796 }, 3100);
-        this._createFakeMarker(map, {country: 'Brazil', lat: -10.252334, lng:-55.143146}, 4200);
-        this._createFakeMarker(map, {country: 'Germany', lat: 51.809770, lng:8.688927}, 2000);
-        this._createFakeMarker(map, {country: 'France', lat: 44.745281, lng:2.080051}, 1500);
-        this._createFakeMarker(map, {country: 'Russia', lat: 56.875767, lng:41.410924}, 3500);
-        this._createFakeMarker(map, {country: 'India', lat: 17.001243, lng:78.807492}, 2500);
-        this._createFakeMarker(map, {country: 'UK', lat: 53.376271, lng:-0.660215}, 1500);
-        this._createFakeMarker(map, {country: 'China', lat: 29.832851, lng: 120.072671}, 5000);
-        this._createFakeMarker(map, {country: 'South Africa', lat: -29.256599, lng: 24.324561}, 5000);
-        this._createFakeMarker(map, {country: 'Portugal', lat: 38.989770, lng: -7.430283}, 5100);
-        this._createFakeMarker(map, {country: 'Australia', lat: -34.041968, lng: 150.994123}, 5200);
-        this._createFakeMarker(map, {country: 'Saint Petersburg', lat: 59.884495, lng: 30.434003}, 5100);
-        this._createFakeMarker(map, {country: 'Saudi', lat: 24.759399, lng: 46.640036}, 4800);
-        this._createFakeMarker(map, {country: 'Mexico', lat: 19.409722, lng: -98.991313}, 2200);
-        this._createFakeMarker(map, {country: 'USA', lat: 31.124374, lng: -97.531948}, 2200);
-        this._createFakeMarker(map, {country: 'South Korea', lat: 37.542154, lng: 126.988170}, 3400);
-        this._createFakeMarker(map, {country: 'Buenos Aires', lat: -34.534501, lng:-58.438049}, 3400);
+        this._createFakeMarker({country: 'USA', lat: 37.980388, lng:-92.539714 }, 2000);
+        this._createFakeMarker({country: 'USA', lat: 36.828015, lng:-119.458796 }, 3100);
+        this._createFakeMarker({country: 'Brazil', lat: -10.252334, lng:-55.143146}, 4200);
+        this._createFakeMarker({country: 'Germany', lat: 51.809770, lng:8.688927}, 2000);
+        this._createFakeMarker({country: 'France', lat: 44.745281, lng:2.080051}, 1500);
+        this._createFakeMarker({country: 'Russia', lat: 56.875767, lng:41.410924}, 3500);
+        this._createFakeMarker({country: 'India', lat: 17.001243, lng:78.807492}, 2500);
+        this._createFakeMarker({country: 'UK', lat: 53.376271, lng:-0.660215}, 1500);
+        this._createFakeMarker({country: 'China', lat: 29.832851, lng: 120.072671}, 5000);
+        this._createFakeMarker({country: 'South Africa', lat: -29.256599, lng: 24.324561}, 5000);
+        this._createFakeMarker({country: 'Portugal', lat: 38.989770, lng: -7.430283}, 5100);
+        this._createFakeMarker({country: 'Australia', lat: -34.041968, lng: 150.994123}, 5200);
+        this._createFakeMarker({country: 'Saint Petersburg', lat: 59.884495, lng: 30.434003}, 5100);
+        this._createFakeMarker({country: 'Saudi', lat: 24.759399, lng: 46.640036}, 4800);
+        this._createFakeMarker({country: 'Mexico', lat: 19.409722, lng: -98.991313}, 2200);
+        this._createFakeMarker({country: 'USA', lat: 31.124374, lng: -97.531948}, 2200);
+        this._createFakeMarker({country: 'South Korea', lat: 37.542154, lng: 126.988170}, 3400);
+        this._createFakeMarker({country: 'Buenos Aires', lat: -34.534501, lng:-58.438049}, 3400);
 
     }
 
-    _createFakeMarker(map, coordinates, timeOut){
+    _createFakeMarker( coordinates, timeOut){
 
         setTimeout( ()=>{
 
             console.log('_createFakeMarker', coordinates);
-            this._addMarker(map, coordinates, "fake");
+            this._addMarker(coordinates, "fake");
 
         }, timeOut)
 
     }
 
-    async initialize(map){
+    async initialize(){
 
         if ( google === undefined ||  google.maps === undefined){
             alert('GOOGLE MAPS LIBRARY IS NOT REGISTERED');
@@ -100,7 +102,7 @@ class NetworkMap {
 
             //console.log("geoLocation",geoLocation);
 
-            this._addMarker(map, geoLocation, nodesListObject.socket);
+            this._addMarker(geoLocation, nodesListObject.socket);
 
         } );
 
@@ -123,7 +125,7 @@ class NetworkMap {
 
         });
 
-        await this._showMyself(map);
+        await this._showMyself();
     }
 
     _getInfoWindowContent(geoLocation, socket){
@@ -158,7 +160,7 @@ class NetworkMap {
 
     }
 
-    _addMarker(map, geoLocation, socket){
+    _addMarker(geoLocation, socket){
 
         if ( google === undefined ||  google.maps === undefined){
             alert('GOOGLE MAPS LIBRARY IS NOT REGISTERED');
@@ -184,7 +186,7 @@ class NetworkMap {
 
         let marker = new google.maps.Marker({
             position: position,
-            map: map,
+            map: this._map,
             clickable: true,
             icon: (this.icons.hasOwnProperty(feature) ? this.icons[feature].icon : this.icons['general']),
         });
@@ -194,7 +196,7 @@ class NetworkMap {
         });
 
         marker.addListener('click', function() {
-            infoWindow.open(map, marker);
+            infoWindow.open(this._map, marker);
         });
 
         marker.socket = socket;
@@ -202,28 +204,28 @@ class NetworkMap {
 
         this.markers.push(marker);
 
-        this._createConnectionsArcs(false, map);
+        this._createConnectionsArcs(false);
 
     }
 
-    async _showMyself(map){
+    async _showMyself(){
         let geoLocation = await GeoHelper.getLocationFromAddress('', true);
 
-        this._addMarker(map, geoLocation, 'myself');
+        this._addMarker( geoLocation, 'myself');
     }
 
 
-    initializePolylines(map){
+    initializePolylines(){
 
 
-        this._createConnectionsArcs(false, map);
-        google.maps.event.addListener(map, 'projection_changed', () => {this._createConnectionsArcs(true, map) });
-        google.maps.event.addListener(map, 'zoom_changed', () => {this._createConnectionsArcs(true, map)});
+        this._createConnectionsArcs(false);
+        google.maps.event.addListener(this._map, 'projection_changed', () => {this._createConnectionsArcs(true) });
+        google.maps.event.addListener(this._map, 'zoom_changed', () => {this._createConnectionsArcs(true)});
 
         // google.maps.event.addListener(markerP1, 'position_changed', updateCurveMarker);
     }
 
-    _createConnectionsArcs(update, map, showOldArcs) {
+    _createConnectionsArcs(update, showOldArcs) {
 
         if ( showOldArcs === undefined) showOldArcs = false;
 
@@ -244,7 +246,7 @@ class NetworkMap {
         }
 
 
-        let  projection = map.getProjection();
+        let  projection = this._map.getProjection();
 
         if (!projection) {
             console.log("NetworkMap - PROJECT is not defined");
@@ -290,7 +292,7 @@ class NetworkMap {
                     let pathDef = 'M 0,0 ' +
                         'q ' + c.x + ',' + c.y + ' ' + e.x + ',' + e.y;
 
-                    let zoom = map.getZoom(),
+                    let zoom = this._map.getZoom(),
                         scale = Math.max( 1 / (Math.pow(2, -zoom)), 0.1);
 
                     let symbol = {
@@ -306,7 +308,7 @@ class NetworkMap {
                             clickable: false,
                             icon: symbol,
                             zIndex: 0, // behind the other markers
-                            map: map
+                            map: this._map
                         });
                     else
 
@@ -333,7 +335,7 @@ class NetworkMap {
                             strokeWeight: 2
                         });
 
-                        marker.linePoly.setMap(map);
+                        marker.linePoly.setMap(this._map);
 
                     } else
 
@@ -351,4 +353,4 @@ class NetworkMap {
 
 }
 
-export default new NetworkMap();
+export default new NetworkGoogleMaps();
