@@ -13,8 +13,7 @@ import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
-import InterfaceTransactionsUniqueness from "common/blockchain/interface-blockchain/transactions/uniqueness/Interface-Transactions-Uniqueness";
-import InterfaceTransactionsUniqueness from "common/blockchain/interface-blockchain/transactions/uniqueness/Interface-Transactions-Uniqueness";
+import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transactions'
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -29,8 +28,7 @@ class InterfaceBlockchain {
 
         this.mining = undefined;
 
-        this.transactionsUniqueness = new InterfaceTransactionsUniqueness()
-        this.transactionsPendingQueue = new InterfaceTransactionsPendingQueue();
+        this.transactions = new InterfaceBlockchainTransactions();
         
         this.dataBase = new InterfaceSatoshminDB();
 
@@ -64,7 +62,7 @@ class InterfaceBlockchain {
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
 
-        if (this.transactionsUniqueness.searchTransactionsUniqueness(block.data.transactions))
+        if (this.transactions.uniqueness.searchTransactionsUniqueness(block.data.transactions))
             throw "transaction already processed";
 
         if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
