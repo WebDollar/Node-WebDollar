@@ -76,7 +76,7 @@ class InterfaceBlockchainAddress{
             offset += len;
 
         } catch (exception){
-            console.log(colors.red("error deserializing a buffer"), exception);
+            console.log("error deserializing address. ", exception);
             throw exception;
         }
     }
