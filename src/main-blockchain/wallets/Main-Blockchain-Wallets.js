@@ -2,9 +2,20 @@ import MiniBlockchainAddress from 'common/blockchain/mini-blockchain/Mini-Blockc
 
 class MainBlockchainWallets{
 
-    constructor(blockchain){
+    constructor(blockchain, password = 'password'){
 
         this.blockchain = blockchain;
+        
+        if (typeof this.blockchainAddress === 'undefined') {
+            this.blockchainAddress = this.createNewAddress();
+            
+            this.blockchainAddress.encrypt(password);
+            this.blockchainAddress.save();
+            this.blockchainAddress.decrypt(password);
+        } else {
+            this.blockchainAddress.load();
+            this.blockchainAddress.decrypt(password);
+        }
 
     }
 
