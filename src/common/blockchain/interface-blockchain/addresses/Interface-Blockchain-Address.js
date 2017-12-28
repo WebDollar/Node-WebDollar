@@ -74,11 +74,13 @@ class InterfaceBlockchainAddress{
             
             this.privateKey.privateKey = BufferExtend.substr(data, offset, len);
             offset += len;
-
+            
         } catch (exception){
             console.log("error deserializing address. ", exception);
             throw exception;
         }
+        
+        return offset;
     }
 
     toString(){

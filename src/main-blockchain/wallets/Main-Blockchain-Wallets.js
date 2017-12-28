@@ -2,7 +2,7 @@ import MiniBlockchainAddress from 'common/blockchain/mini-blockchain/Mini-Blockc
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import Serialization from "common/utils/Serialization.js";
-import BufferExtend from "common/utils/BufferExtended.js";
+import BufferExtended from "common/utils/BufferExtended.js";
 
 class MainBlockchainWallets{
 
@@ -38,12 +38,8 @@ class MainBlockchainWallets{
         let buffer = Serialization.serializeNumber4Bytes(this.wallets.length);
 
         for (let i = 0; i < this.wallets.length; ++i) {
-            this.wallets[i].encrypt(this.password);
             let walletBuffer = this.wallets[i].serializeAddress();
-            this.wallets[i].decrypt(this.password);
-            let lengthBuffer = Serialization.serializeNumber2Bytes(walletBuffer.length);
-            
-            buffer = Buffer.concat([buffer, lengthBuffer, walletBuffer]);
+            buffer = Buffer.concat([buffer, walletBuffer]);
         }
 
         return buffer;
@@ -53,23 +49,16 @@ class MainBlockchainWallets{
 
         let data = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
         let offset = 0;
-        let len = 0;
 
         try {
 
-            let numWallets = len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 4) );
+            let numWallets = Serialization.deserializeNumber( BufferExtended.substr(data, offset, 4) );
             offset += 4;
             
             this.wallets = [];
             for (let i = 0; i < numWallets; ++i) {
-                len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 2) );
-                offset += 2;
-
                 this.wallets[i] = this.createNewAddress();
-                this.wallets[i].deserializeAddress( BufferExtend.substr(data, offset, len) );
-                offset += len;
-                
-                this.wallets[i].decrypt(this.password);
+                offset += this.wallets[i].deserializeAddress( BufferExtended.substr(buffer, offset) );
             }
 
         } catch (exception){
@@ -79,8 +68,15 @@ class MainBlockchainWallets{
     }
     
     async saveWallets() {
+        
+        for (let i = 0; i < this.wallets.length; ++i)
+            this.wallets[i].encrypt(this.password);
 
-        let value = this.serializeWallets();        
+        let value = this.serializeWallets();  
+
+        for (let i = 0; i < this.wallets.length; ++i)
+            this.wallets[i].decrypt(this.password);
+
         return (await this.db.save(this.walletsFileName, value));
     }
     
@@ -92,6 +88,10 @@ class MainBlockchainWallets{
             return false;
 
         this.deserializeWallets(buffer);
+
+        for (let i = 0; i < this.wallets.length; ++i)
+            this.wallets[i].decrypt(this.password);
+
         return true;
     }
     
