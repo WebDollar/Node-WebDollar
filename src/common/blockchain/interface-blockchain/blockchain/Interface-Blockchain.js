@@ -184,26 +184,43 @@ class InterfaceBlockchain {
     }
 
     async save(){
+
         for (let i = 0; i < this.blocks.length; ++i){
-            await this.blocks[i].save();
+            let response = await this.blocks[i].save();
+
+            if (response !== true)
+                return response;
         }
+        
+        return true;
     }
 
     async load(){
+
         for (let i = 0; i < this.blocks.length; ++i){
-            await this.blocks[i].load();
+            let response = await this.blocks[i].load();
+
+            if (response !== true)
+                return response;
         }
+        
+        return true;
     }
     
     async remove(index, removeFiles = true){
         
         if (removeFiles === true) {
             for (let i = index; i < this.blocks.length; ++i){
-                await this.blocks[i].remove();
+                let response = await this.blocks[i].remove();
+
+                if (response !== true)
+                    return response;
             }
         }
         
         this.blocks.splice(index);
+        
+        return true;
     }
 
 }

@@ -93,7 +93,26 @@ describe('test save wallet to local storage', () => {
         
     it('load/store wallet manager', async () => {
 
-        assert(typeof Blockchain.Wallets.wallets !== 'undefined', 'Default wallet is not created');
+        assert(typeof Blockchain.Wallets.addresses !== 'undefined', 'Default wallet is not created');
+
+    });
+    
+    it('update wallet password', async () => {
+
+        let blockchainAddress = Blockchain.Wallets.addresses[0];
+        let address = blockchainAddress.address;
+        let unencodedAddress = blockchainAddress.unencodedAddress;
+        let publicKey = blockchainAddress.publicKey;
+        let privateKey = blockchainAddress.privateKey.privateKey;
+        
+        Blockchain.Wallets.updatePassword('new_pawwsord');
+        
+        let blockchainAddress2 = Blockchain.Wallets.addresses[0];
+        
+        assert(blockchainAddress2.address.equals(address), 'address differ after load: ' + blockchainAddress2.address.toString('hex') + '!==' + address.toString('hex'));
+        assert(blockchainAddress2.unencodedAddress.equals(unencodedAddress), 'address differ after load: ' + blockchainAddress2.unencodedAddress.toString('hex') + '!==' + unencodedAddress.toString('hex'));
+        assert(blockchainAddress2.publicKey.equals(publicKey), 'publicKey differ after load: ' + blockchainAddress2.publicKey.toString('hex') + '!==' + publicKey.toString('hex'));
+        assert(blockchainAddress2.privateKey.privateKey.equals(privateKey), 'privateKey differ after load: ' + blockchainAddress2.privateKey.privateKey.toString('hex') + '!==' + privateKey.toString('hex'));
 
     });
 

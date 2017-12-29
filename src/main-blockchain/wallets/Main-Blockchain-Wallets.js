@@ -9,7 +9,7 @@ class MainBlockchainWallets{
     constructor(blockchain, password = 'password', db){
 
         this.blockchain = blockchain;
-        this.walletsFileName = 'wallets.bin';
+        this.walletFileName = 'wallet.bin';
         
         if(typeof db === "undefined")
             this.db = new InterfaceSatoshminDB();
@@ -18,9 +18,9 @@ class MainBlockchainWallets{
         
         this.password = password;
         
-        if (this.loadWallets() !== true) {
-            this.wallets = [this.createNewAddress()];
-            this.saveWallets();
+        if (this.loadAddresses() !== true) {
+            this.addresses = [this.createNewAddress()];
+            this.saveAddresses();
         }
 
     }
@@ -33,7 +33,16 @@ class MainBlockchainWallets{
         return blockchainAddress;
     }
     
-    serializeWallets() {
+    updatePassword(newPassword){
+        
+        this.loadAddresses();
+        
+        this.password = newPassword;
+        
+        this.saveAddresses();
+    }
+    
+    serialize() {
         
         let list = [Serialization.serializeNumber4Bytes(this.wallets.length)];
 
@@ -45,20 +54,20 @@ class MainBlockchainWallets{
         return Buffer.concat ([list]);
     }
     
-    deserializeWallets(buffer) {
+    deserialize(buffer) {
 
         let data = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
         let offset = 0;
 
         try {
 
-            let numWallets = Serialization.deserializeNumber( BufferExtended.substr(data, offset, 4) );
+            let numAddresses = Serialization.deserializeNumber( BufferExtended.substr(data, offset, 4) );
             offset += 4;
             
-            this.wallets = [];
-            for (let i = 0; i < numWallets; ++i) {
-                this.wallets[i] = this.createNewAddress();
-                offset += this.wallets[i].deserializeAddress( BufferExtended.substr(buffer, offset) );
+            this.addresses = [];
+            for (let i = 0; i < numAddresses; ++i) {
+                this.addresses[i] = this.createNewAddress();
+                offset += this.addresses[i].deserializeAddress( BufferExtended.substr(buffer, offset) );
             }
 
         } catch (exception){
@@ -67,38 +76,37 @@ class MainBlockchainWallets{
         }
     }
     
-    async saveWallets() {
+    async saveAddresses() {
         
-        for (let i = 0; i < this.wallets.length; ++i)
-            this.wallets[i].encrypt(this.password);
+        for (let i = 0; i < this.addresses.length; ++i)
+            this.addresses[i].encrypt(this.password);
 
-        let value = this.serializeWallets();  
+        let value = this.serialize();  
 
-        for (let i = 0; i < this.wallets.length; ++i)
-            this.wallets[i].decrypt(this.password);
+        for (let i = 0; i < this.addresses.length; ++i)
+            this.addresses[i].decrypt(this.password);
 
         return (await this.db.save(this.walletsFileName, value));
     }
     
-    async loadWallets() {
+    async loadAddresses() {
         
         let buffer = await this.db.get(this.walletsFileName);
         
         if (typeof buffer.status !== "undefined")
             return false;
 
-        this.deserializeWallets(buffer);
+        this.deserialize(buffer);
 
-        for (let i = 0; i < this.wallets.length; ++i)
-            this.wallets[i].decrypt(this.password);
+        for (let i = 0; i < this.addresses.length; ++i)
+            this.addresses[i].decrypt(this.password);
 
         return true;
     }
     
-    async removeWallets() {
-        
-        this.wallets = [];
-        return (await this.db.remove(this.walletsFileName));
+    async remodeAddresses() {
+
+        return (await this.db.remove(this.walletFileName));
     }
 
 }
