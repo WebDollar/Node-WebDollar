@@ -1,3 +1,5 @@
+import MapsTester from "./../Maps.tester"
+
 import NodesList from 'node/lists/nodes-list'
 import CircleMap from "./helpers/Circle-Map";
 import MapModal from "./helpers/Map-Modal";
@@ -125,7 +127,7 @@ class NetworkNativeMaps {
 
         let address = '';
 
-        if (socket === 'myself') address = 'YOU';
+        if (socket === 'myself') address = geoLocation.address;
         else  if (socket === 'fake') address = geoLocation.country;
         else address = socket.node.sckAddress.toString();
 
@@ -145,7 +147,8 @@ class NetworkNativeMaps {
 
         if (socket === "myself" || socket === "fake") status = "YOU";
         else
-        if (socket.node.sckAddress !== null && socket.node.sckAddress )
+        if (typeof socket === "object" && socket.node !== undefined && socket.node.protocol !== undefined && socket.node.protocol.helloValidated ) status = "connected";
+        else status = "not connected";
 
         return {
             status: status,
@@ -172,6 +175,12 @@ class NetworkNativeMaps {
 
     createTestConnections(){
 
+        let mapsTester = new MapsTester(this._addMarker);
+        mapsTester.testConnections();
+
+    }
+
+    _createTestConnectionsManual(){
         let cell1 = this._circleMap.getCellByLocation(66.160507,  -153.369141);
         let cell2 = this._circleMap.getCellByLocation(73.500823,  -21.755973);
         let cell3 = this._circleMap.getCellByLocation(-28.083,  23.044);

@@ -42,11 +42,14 @@ class GeoHelper {
 
                 //console.log("location data", address, data);
 
-                if (!data.country) country = data.country;
-                if (!data.country_name) country = data.country_name;
+                if (data.country !== undefined) country = data.country;
+                if (data.country_name !== undefined) country = data.country_name;
 
-                if (!data.countryCode) countryCode = data.countryCode;
-                if (!data.country_code) countryCode = data.countryCode;
+                if (data.countryCode !== undefined) countryCode = data.countryCode;
+                if (data.country_code !== undefined) countryCode = data.countryCode;
+
+                if (address === '')
+                    if (data.query !== undefined) address = address || data.query;
 
                 if (countryCode !== '')
                     continent = getContinentFromCountry(countryCode);
@@ -64,6 +67,7 @@ class GeoHelper {
                     timezone: data.timezone||data.time_zone||'',
 
                     continent: continent,
+                    address: address,
                 };
 
                 if (!skipSocketAddress)

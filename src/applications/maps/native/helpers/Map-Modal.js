@@ -37,7 +37,7 @@ class MapModal {
     show(desc) {
         this._setNodeType(desc.nodeType);
 
-        this._text.innerHTML = `<b>${desc.status} ${desc.nodeType}</b><br>${desc.country} ${desc.city}<br><small>${desc.addr || '&nbsp;'}</small>`;
+        this._text.innerHTML = `<b>${desc.status} </b><br>${desc.country}, ${desc.city}<br><small>${desc.address || '&nbsp;'}</small>`;
         this._container.style.opacity = 1;
     }
 
