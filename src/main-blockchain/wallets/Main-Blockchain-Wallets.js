@@ -35,14 +35,14 @@ class MainBlockchainWallets{
     
     serializeWallets() {
         
-        let buffer = Serialization.serializeNumber4Bytes(this.wallets.length);
+        let list = [Serialization.serializeNumber4Bytes(this.wallets.length)];
 
         for (let i = 0; i < this.wallets.length; ++i) {
             let walletBuffer = this.wallets[i].serializeAddress();
-            buffer = Buffer.concat([buffer, walletBuffer]);
+            list.push(walletBuffer);
         }
 
-        return buffer;
+        return Buffer.concat ([list]);
     }
     
     deserializeWallets(buffer) {

@@ -4,6 +4,7 @@ import Serialization from "common/utils/Serialization.js";
 import BufferExtend from "common/utils/BufferExtended.js";
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
+import BufferExtended from 'common/utils/BufferExtended';
 
 class InterfaceBlockchainAddress{
 
@@ -39,15 +40,13 @@ class InterfaceBlockchainAddress{
     
     serializeAddress(){
 
-        let buffer = Buffer.concat( [ Serialization.serializeNumber1Byte(this.address.length),
-                                      this.address,
-                                      Serialization.serializeNumber1Byte(this.publicKey.length),
-                                      this.publicKey,
-                                      Serialization.serializeNumber1Byte(this.privateKey.privateKey.length),
-                                      this.privateKey.privateKey
-                                    ]);
-
-        return buffer;
+        return Buffer.concat( [ Serialization.serializeNumber1Byte(this.unencodedAddress),
+                                this.unencodedAddress,
+                                Serialization.serializeNumber1Byte(this.publicKey.length),
+                                this.publicKey,
+                                Serialization.serializeNumber1Byte(this.privateKey.privateKey.length),
+                                this.privateKey.privateKey
+                              ]);
     }
     
     deserializeAddress(buffer){
@@ -61,8 +60,11 @@ class InterfaceBlockchainAddress{
             len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 1) );
             offset += 1;
             
-            this.address = BufferExtend.substr(data, offset, len);
+            this.unencodedAddress = BufferExtend.substr(data, offset, len);
             offset += len;
+
+            //calcuating the address from the unencodedAddress
+            this.address = BufferExtended.toBase(this.unencodedAddress);
 
             len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 1) );
             offset += 1;
