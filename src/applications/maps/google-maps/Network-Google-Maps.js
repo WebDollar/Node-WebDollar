@@ -58,7 +58,7 @@ class NetworkGoogleMaps {
 
     createTestConnections(){
 
-        let mapsTester = new MapsTester(this._addMarker);
+        let mapsTester = new MapsTester(this);
         mapsTester.testConnections();
 
     }

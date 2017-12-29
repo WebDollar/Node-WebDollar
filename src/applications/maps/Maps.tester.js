@@ -1,7 +1,8 @@
 class MapsTester{
 
-    constructor(addMarker){
-        this._addMarker = addMarker;
+    constructor(parent){
+
+        this.parent = parent;
     }
 
     testConnections(){
@@ -32,8 +33,8 @@ class MapsTester{
 
         setTimeout( ()=>{
 
-            console.log('_createFakeMarker', coordinates);
-            this._addMarker(coordinates, "fake");
+            console.log("coordinates", coordinates);
+            this.parent._addMarker(coordinates, "fake");
 
         }, timeOut)
 

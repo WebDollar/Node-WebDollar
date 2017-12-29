@@ -111,13 +111,23 @@ class NetworkNativeMaps {
 
             marker.cell = cell;
 
-            this._circleMap.highlightCell(cell, 'connect-peer', marker.desc);
+            let cellClass;
+
+            if (marker.desc.nodeType === "myself") cellClass = "peer-own"; else
+            if (marker.desc.nodeType === "webPeer") cellClass = "peer-connected-browser"; else {
+
+                if (marker.status === "connected") cellClass = "peer-connected";
+                cellClass = "peer-node";
+
+            }
+
+            this._circleMap.highlightCell(cell, cellClass , marker.desc);
 
             this._cellCounter.incCellCount(cell);
 
             //add links to the myselfMarker
             if (this._markerMyself !== null && this._markerMyself !== undefined && this._markerMyself !== marker)
-                this._circleMap.addLink(cell, this._markerMyself);
+                this._circleMap.addLink(cell, this._markerMyself.cell);
 
         }
     }
@@ -175,7 +185,7 @@ class NetworkNativeMaps {
 
     createTestConnections(){
 
-        let mapsTester = new MapsTester(this._addMarker);
+        let mapsTester = new MapsTester(this);
         mapsTester.testConnections();
 
     }
