@@ -5,7 +5,9 @@ class MainBlockchain extends  MiniBlockchain{
     constructor (  ) {
 
         super();
-
+        
+        if (this.load() !== true)
+            this.save();
     }
 
 }

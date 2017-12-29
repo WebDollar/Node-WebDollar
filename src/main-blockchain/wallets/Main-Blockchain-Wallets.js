@@ -81,7 +81,7 @@ class MainBlockchainWallets{
         for (let i = 0; i < this.addresses.length; ++i)
             this.addresses[i].encrypt(this.password);
 
-        let value = this.serializeWallets();  
+        let value = this.serialize();  
 
         for (let i = 0; i < this.addresses.length; ++i)
             this.addresses[i].decrypt(this.password);
@@ -96,7 +96,7 @@ class MainBlockchainWallets{
         if (typeof buffer.status !== "undefined")
             return false;
 
-        this.deserializeWallets(buffer);
+        this.deserialize(buffer);
 
         for (let i = 0; i < this.addresses.length; ++i)
             this.addresses[i].decrypt(this.password);
