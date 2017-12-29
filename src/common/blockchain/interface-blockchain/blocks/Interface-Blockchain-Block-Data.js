@@ -127,7 +127,9 @@ class InterfaceBlockchainBlockData {
         };
     }
 
-
+    equals(data) {
+        return this.hashData.equals(data.hashData);
+    }
 }
 
 export default InterfaceBlockchainBlockData;
