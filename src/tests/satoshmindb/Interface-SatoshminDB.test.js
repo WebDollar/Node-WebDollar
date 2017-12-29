@@ -11,7 +11,7 @@ describe('interfaceSatoshminDB', () => {
     
     it('creating SatoshminDB', ()=>{
 
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
         assert(db !== undefined, "failed to create InterfaceSatoshminDB");
         assert(db !== null, "failed to create InterfaceSatoshminDB");
     });
@@ -20,7 +20,7 @@ describe('interfaceSatoshminDB', () => {
 
         key = Math.floor(Math.random() * 10000).toString();;
         value = 'myValue_1';
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
 
         response = await db.save(key, value);
         assert(response === true, 'save: ' + response);
@@ -34,7 +34,7 @@ describe('interfaceSatoshminDB', () => {
 
         key = Math.floor(Math.random() * 10000).toString();;
         value = 'myValue_2';
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
         
         response = await db.save(key, value);
         assert(response === true, 'save:' + response);
@@ -52,7 +52,7 @@ describe('interfaceSatoshminDB', () => {
         key = Math.floor(Math.random() * 10000).toString();;
         value = 'myValue_2';
         let new_value = 'modified_value';
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
         
         response = await db.save(key, value);
         assert(response === true, 'save: ' + response);
@@ -68,7 +68,7 @@ describe('interfaceSatoshminDB', () => {
     it('remove nonexistent ASCII test', async () => {
 
         key = '-1234';
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
         
         response = await db.remove(key);
         assert(response.status === 404, 'remove(found nonexisting) :' + response);
@@ -81,7 +81,7 @@ describe('interfaceSatoshminDB', () => {
         let key = Math.floor(Math.random() * 10000).toString();
         let value = Buffer.from('4234aaffccff', 'hex');
         
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
 
         response = await db.save(key, value);
         assert(response === true, 'save: ' + response);
@@ -95,7 +95,7 @@ describe('interfaceSatoshminDB', () => {
 
         key = Math.floor(Math.random() * 10000).toString();;
         value = new Buffer('44FF00234561217fdeca', 'hex');
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
         
         response = await db.save(key, value);
         assert(response === true, 'save: ' + response);
@@ -114,7 +114,7 @@ describe('interfaceSatoshminDB', () => {
         value = new Buffer('744Fagfe4578ab', 'hex');
         let new_value = new Buffer('7444caed', 'hex');
         
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
         
         response = await db.save(key, value);
         assert(response === true, 'save: ' + response);
@@ -131,7 +131,7 @@ describe('interfaceSatoshminDB', () => {
     it('remove nonexistent Buffer test', async () => {
 
         key = '-1234567';
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
         
         response = await db.remove(key);
         assert(response.status === 404, 'get(found after remove) :' + response);
@@ -142,7 +142,7 @@ describe('interfaceSatoshminDB', () => {
 
         key = Math.floor(Math.random() * 10000).toString();;
         value = new Buffer([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
 
         response = await db.save(key, value);
         assert(response === true, 'save: ' + response);
@@ -157,7 +157,7 @@ describe('interfaceSatoshminDB', () => {
         key = Math.floor(Math.random() * 10000).toString();;
         value = 'my string value';
         let new_value = new Buffer([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-        db = new InterfaceSatoshminDB('MyDatabase');
+        db = new InterfaceSatoshminDB();
 
         response = await db.save(key, value);
         assert(response === true, 'save: ' + response);

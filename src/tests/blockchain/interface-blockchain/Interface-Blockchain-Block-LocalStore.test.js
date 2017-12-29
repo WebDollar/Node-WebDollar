@@ -15,7 +15,6 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
     let nonce = 1994;
     let minerAddress = '1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4x';
     let data = new InterfaceBlockchainBlockData(blockchain, minerAddress, [], undefined, undefined); //it will compute the hashData
-    let hashData = data.hashData;
     let height = 0;
     let block = null;
     
@@ -34,7 +33,7 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
         assert(block.version === version,'block version differ after load: ' + block.version + '!==' + version);
         assert(block.hash.equals(hash),'block hash differ after load: ' + block.hash.toString('hex') + '!==' + hash.toString('hex'));
         assert(block.hashPrev.equals(hashPrev),'block hashPrev differ after load: ' + block.hashPrev.toString('hex') + '!==' + hashPrev.toString('hex'));
-        assert(block.data.hashData.equals(hashData),'block hashData differ after load: ' + block.data.hashData.toString('hex') + '!==' + hashData.toString('hex'));
+        assert(block.data.equals(data),'block.data differ after load: ' + block.data.toString() + '!==' + data.toString());
         assert(block.timeStamp === timeStamp,'block timeStamp differ after load: ' + block.timeStamp + '!==' + timeStamp);
         assert(block.nonce === nonce,'block nonce differ after load: ' + block.nonce + '!==' + nonce);
         assert(block.data.minerAddress.toString() === data.minerAddress.toString(),'block data.minerAddress differ after load: ' + block.data.minerAddress + '!==' + data.minerAddress);
