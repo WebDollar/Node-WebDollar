@@ -67,22 +67,8 @@ class NetworkNativeMaps {
 
         let position = {lat: geoLocation.lat||0, lng: geoLocation.lng||0};
 
-        let feature = '';
-
-        if (socket === 'myself') feature = 'myself';
-        else
-        if (socket === 'fake') feature = 'webPeer';
-        else
-        if (socket !== null)
-            switch (socket.node.type){
-                case 'client': feature = 'fullNodeServer'; break;
-                case 'server' : feature = 'clientSocket'; break;
-                case 'webpeer' : feature = 'webPeer'; break;
-            }
-
         let marker = {
             socket: socket,
-            feature: feature,
             pos: position,
             desc: this._getInfoWindowContent(geoLocation, socket),
         };
@@ -90,7 +76,7 @@ class NetworkNativeMaps {
 
         this._markers.push(marker);
 
-        if (socket === "myself") this.highlightConnectedPeer(marker); else
+        if (socket === "myself") this.highlightMe(marker); else
         if (socket === "fake") this.highlightConnectedPeer(marker); else
         this.highlightConnectedPeer(marker)
 
@@ -100,7 +86,7 @@ class NetworkNativeMaps {
 
         this._markerMyself = marker;
 
-        let cell = this._map.getCellByLocation(marker.pos.latitude, marker.pos.longitude);
+        let cell = this._circleMap.getCellByLocation(marker.pos.lat, marker.pos.lng);
         if (cell) {
             marker.cell = cell;
 
@@ -118,7 +104,7 @@ class NetworkNativeMaps {
 
     highlightConnectedPeer(marker){
 
-        let cell = this._map.getCellByLocation(marker.pos.latitude, marker.pos.longitude);
+        let cell = this._circleMap.getCellByLocation(marker.pos.lat, marker.pos.lng);
         if (cell) {
 
             marker.cell = cell;
@@ -143,6 +129,24 @@ class NetworkNativeMaps {
         else  if (socket === 'fake') address = geoLocation.country;
         else address = socket.node.sckAddress.toString();
 
+
+        let nodeType = '';
+
+        if (socket === 'myself') nodeType = 'myself';  else
+        if (socket === 'fake') nodeType = 'webPeer';  else
+        if (socket !== null)
+            switch (socket.node.type){
+                case 'client': nodeType = 'serverSocket'; break;
+                case 'server' : nodeType = 'clientSocket'; break;
+                case 'webpeer' : nodeType = 'webPeer'; break;
+            }
+
+        let status = "node";
+
+        if (socket === "myself" || socket === "fake") status = "YOU";
+        else
+        if (socket.node.sckAddress !== null && socket.node.sckAddress )
+
         return {
             status: status,
             city: geoLocation.city||'',
@@ -151,6 +155,7 @@ class NetworkNativeMaps {
             protocol: (socket === 'myself' || socket === "fake" ) ? '' : socket.node.type + ' : '+socket.node.index,
             isp: geoLocation.isp||'',
             geo: geoLocation,
+            nodeType: nodeType,
         }
 
     }
@@ -171,8 +176,6 @@ class NetworkNativeMaps {
         let cell2 = this._circleMap.getCellByLocation(73.500823,  -21.755973);
         let cell3 = this._circleMap.getCellByLocation(-28.083,  23.044);
         let cell4 = this._circleMap.getCellByLocation(-20.72,  127.10);
-
-        console.log(cell3, cell4);
 
         let data = {
             status: status,
