@@ -35,8 +35,6 @@ class NetworkNativeMaps {
 
             let geoLocation = await nodesListObject.socket.node.sckAddress.getGeoLocation();
 
-            //console.log("geoLocation",geoLocation);
-
             this._addMarker(geoLocation, nodesListObject.socket);
 
         } );
@@ -48,9 +46,7 @@ class NetworkNativeMaps {
             let markerIndex = this._findMarkerIndexBySocket(nodesListObject.socket);
 
             if (markerIndex !== -1) {
-
-
-                this._markers.splice(markerIndex, 1);
+                this._removeMarker(this._markers[markerIndex], nodesListObject.socket)
             }
 
         });
@@ -149,7 +145,7 @@ class NetworkNativeMaps {
 
             if (Math.floor(Math.random()*2) === 0) nodeType = "browser";
             else nodeType = "terminal"
-            
+
         } else
         if (typeof socket === "object" && socket.node !== undefined && socket.node.protocol !== undefined && socket.node.protocol.helloValidated ) {
             address = socket.node.sckAddress.toString();
@@ -193,6 +189,35 @@ class NetworkNativeMaps {
 
     }
 
+    _removeMarker(marker){
+
+        if (marker.cell !== undefined && marker.cell !== null) {
+
+            // Only remove highlight if there are no more peers on this cell.
+            if (this._cellCounter.decCellCount(marker.cell) === 0) {
+                // Either change class if there are still known peers there.
+                if (this._cellCounter.getCellCount(marker.cell) > 0) {
+                    this._circleMap.highlightCell(marker.cell, 'peer-connected-browser', undefined);
+                }
+                // Or remove class at all.
+                else
+                    this._circleMap.unhighlightCell(marker.cell);
+
+                if (this._markerMyself !== marker && this._markerMyself !== null)
+                    this._circleMap.removeLink(this._markerMyself.cell, marker.cell);
+            }
+
+        }
+
+        //delete marker from the list
+        for (let i=0; i<this._markers.length; i++)
+            if (this._markers[i] === marker) {
+                this._markers.splice(i, 1);
+                break;
+            }
+
+    }
+
     createTestConnections(){
 
         let mapsTester = new MapsTester(this);
@@ -222,6 +247,16 @@ class NetworkNativeMaps {
         this._circleMap.highlightCell(cell2, 'own-peer', data);
         this._circleMap.highlightCell(cell3, 'own-peer', data);
         this._circleMap.highlightCell(cell4, 'own-peer', data);
+
+    }
+
+    _findMarkerIndexBySocket(socket){
+
+        for (let i=0; i< this._markers.length; i++ )
+            if (this._markers[i].socket === socket)
+                return i;
+
+        return -1;
 
     }
 

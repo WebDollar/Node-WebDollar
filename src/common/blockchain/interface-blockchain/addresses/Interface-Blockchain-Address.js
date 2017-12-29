@@ -31,6 +31,7 @@ class InterfaceBlockchainAddress{
         let result = InterfaceBlockchainAddressHelper.generateAddress(salt);
 
         this.address = result.address;
+        this.unencodedAddress = result.unencodedAddress;
         this.publicKey = result.publicKey;
         this.privateKey = result.privateKey;
 

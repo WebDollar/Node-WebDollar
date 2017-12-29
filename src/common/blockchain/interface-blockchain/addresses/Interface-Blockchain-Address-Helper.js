@@ -165,7 +165,10 @@ class InterfaceBlockchainAddressHelper{
         if (showDebug)
             console.log("address",BufferExtended.toBase(unencodedAddress)); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
 
-        return  unencodedAddress;
+        return  {
+            unencodedAddress: unencodedAddress,
+            address: BufferExtended.toBase(unencodedAddress),
+        };
 
     }
 
@@ -176,7 +179,8 @@ class InterfaceBlockchainAddressHelper{
         let address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, false)
 
         return {
-            address: address,
+            address: address.address,
+            unencodedAddress: address.unencodedAddress,
             publicKey: publicKey,
             privateKey: privateKey,
         };

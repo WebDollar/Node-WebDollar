@@ -32,7 +32,8 @@ describe('testAddressGenerator', () => {
         address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, true);
 
         console.log("should return address", address);
-        assert(Buffer.isBuffer(address), 'Address is not an object');
+        assert(Buffer.isBuffer(address.unencodedAddress), 'Address is not an object');
+        assert(typeof address.address === "string", 'Address is not an object');
     })
 
     it ('blockchain address', ()=>{
@@ -42,7 +43,8 @@ describe('testAddressGenerator', () => {
 
         console.log("new address", blockchainAddress.address, blockchainAddress.privateKey, blockchainAddress.publicKey)
 
-        assert(Buffer.isBuffer(blockchainAddress.address), "blockChain Address")
+        assert(typeof blockchainAddress.address === "string", "blockChain Address")
+        assert(Buffer.isBuffer(blockchainAddress.unencodedAddress), "blockChain Address")
         assert(Buffer.isBuffer(blockchainAddress.publicKey), "blockChain Public Key")
         assert(Buffer.isBuffer(blockchainAddress.privateKey.privateKeyWIF), "blockChain Private Key WIF")
         assert(Buffer.isBuffer(blockchainAddress.privateKey.privateKey), "blockChain Private Key")
