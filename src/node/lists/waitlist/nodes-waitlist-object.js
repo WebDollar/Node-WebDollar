@@ -1,8 +1,13 @@
 import NodesList from 'node/lists/nodes-list'
 
+NODES_WAITLIST_OBJECT_TYPE = {
+    WEB_RTC_PEER: 0,
+    NODE_PEER_TERMINAL_SERVER: 1,
+};
+
 class NodesWaitlistObject {
 
-    constructor(sckAddresses){
+    constructor(sckAddresses, type){
 
         this.sckAddresses = sckAddresses;
         this.socket = null;
@@ -14,6 +19,8 @@ class NodesWaitlistObject {
 
         this.errorTrial = 0;
         this.lastTimeChecked = 0;
+
+        this.type = type || NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER;
     }
 
     refreshLastTimeChecked(){
@@ -53,6 +60,7 @@ class NodesWaitlistObject {
         return null;
     }
 
-}
+};
 
-export default NodesWaitlistObject;
+exports.NodesWaitlistObject = NodesWaitlistObject;
+exports.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;

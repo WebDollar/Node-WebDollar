@@ -26,14 +26,18 @@ class NodePropagationProtocol {
 
             let instruction = response.instruction||'';
             switch (instruction){
-                case "new-address":
+                case "new-nodes":
 
                     let addresses =  response.addresses || [];
                     if (Array.isArray(addresses)){
 
                         for (let i=0; i<addresses.length; i++){
-                            let address = addresses[i];
-                            NodesWaitlist.addNewNodeToWaitlist(address);
+
+                            let address = addresses[i].addr;
+                            let port = addresses[i].port;
+                            let type = addresses[i].type;
+
+                            NodesWaitlist.addNewNodeToWaitlist(address, port, type);
                         }
                     }
 
@@ -44,11 +48,11 @@ class NodePropagationProtocol {
 
     }
 
-    propagateNewNodeAddresses(addresses){
+    propagateNewNodes(nodes){
 
-        if (typeof addresses === 'string') addresses = [addresses];
+        if (typeof nodes === 'string') nodes = [nodes];
 
-        NodeProtocol.broadcastRequest("propagation/nodes", {instruction: "new-address", addresses: addresses });
+        NodeProtocol.broadcastRequest("propagation/nodes", {instruction: "new-nodes", nodes: nodes });
 
     }
 

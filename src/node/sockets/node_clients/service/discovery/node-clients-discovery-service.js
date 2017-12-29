@@ -1,5 +1,6 @@
 import consts from 'consts/const_global'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
+import { NODES_WAITLIST_OBJECT_TYPE } from 'node/lists/waitlist/nodes-waitlist-object';
 import NodesList from 'node/lists/nodes-list'
 import {FallBackObject} from './fallback-object';
 
@@ -95,7 +96,7 @@ class NodeDiscoveryService {
 
                         for (let i=0; i<nodes.length; i++) {
 
-                            let nodeAddress = '', nodePort = undefined;
+                            let nodeAddress = '', nodePort = undefined, nodeType = NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER;
 
                             if (typeof nodes[i] === "object") {
                                 nodeAddress = nodes[i].addr || '';
@@ -105,7 +106,7 @@ class NodeDiscoveryService {
                             }
 
                             if ( (typeof nodeAddress === "string" && nodeAddress !== '') || ( typeof nodeAddress === "object" && Array.isArray(nodeAddress)) )
-                                NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort);
+                                NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort, nodeType);
                         }
 
                     }
