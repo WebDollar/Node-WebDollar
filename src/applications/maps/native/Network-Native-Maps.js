@@ -98,7 +98,7 @@ class NetworkNativeMaps {
 
             //add links to current nodes
             for (let i = 0; i< this._markers.length; i++)
-                if (this._markers[i] !== marker)
+                if (this._markers[i] !== marker && this._markers[i].status === "connected")
                     this._circleMap.addLink(cell, this._markers[i].cell);
 
         }
@@ -114,20 +114,17 @@ class NetworkNativeMaps {
             let cellClass;
 
             if (marker.desc.nodeType === "myself") cellClass = "peer-own"; else
-            if (marker.desc.nodeType === "webPeer") cellClass = "peer-connected-browser"; else {
-
-                if (marker.status === "connected") cellClass = "peer-connected";
-                cellClass = "peer-node";
-
-            }
+            if (marker.desc.nodeType === "browser") cellClass = "peer-connected-browser";
+            if (marker.desc.nodeType === "terminal") cellClass = "peer-connected-terminal";
 
             this._circleMap.highlightCell(cell, cellClass , marker.desc);
 
             this._cellCounter.incCellCount(cell);
 
             //add links to the myselfMarker
-            if (this._markerMyself !== null && this._markerMyself !== undefined && this._markerMyself !== marker)
-                this._circleMap.addLink(cell, this._markerMyself.cell);
+            if (marker.desc.status === "connected")
+                if (this._markerMyself !== null && this._markerMyself !== undefined && this._markerMyself !== marker)
+                    this._circleMap.addLink(cell, this._markerMyself.cell);
 
         }
     }
@@ -136,29 +133,42 @@ class NetworkNativeMaps {
     _getInfoWindowContent(geoLocation, socket){
 
         let address = '';
-
-        if (socket === 'myself') address = geoLocation.address;
-        else  if (socket === 'fake') address = geoLocation.country;
-        else address = socket.node.sckAddress.toString();
-
-
         let nodeType = '';
-
-        if (socket === 'myself') nodeType = 'myself';  else
-        if (socket === 'fake') nodeType = 'webPeer';  else
-        if (socket !== null)
-            switch (socket.node.type){
-                case 'client': nodeType = 'serverSocket'; break;
-                case 'server' : nodeType = 'clientSocket'; break;
-                case 'webpeer' : nodeType = 'webPeer'; break;
-            }
-
         let status = "node";
 
-        if (socket === "myself" || socket === "fake") status = "YOU";
-        else
-        if (typeof socket === "object" && socket.node !== undefined && socket.node.protocol !== undefined && socket.node.protocol.helloValidated ) status = "connected";
-        else status = "not connected";
+        if (socket === 'myself') {
+            status = "connected";
+            address = geoLocation.address;
+            nodeType = "myself";
+        } else
+        if (socket === 'fake') {
+            address = geoLocation.country;
+
+            if (Math.floor(Math.random()*2) === 0) status = "connected";
+            else  status = "not connected";
+
+            if (Math.floor(Math.random()*2) === 0) nodeType = "browser";
+            else nodeType = "terminal"
+            
+        } else
+        if (typeof socket === "object" && socket.node !== undefined && socket.node.protocol !== undefined && socket.node.protocol.helloValidated ) {
+            address = socket.node.sckAddress.toString();
+            status = "connected";
+
+            switch (socket.node.type){
+                case 'client': nodeType = 'terminal'; break;
+                case 'server' : nodeType = 'terminal'; break;
+                case 'webpeer' : nodeType = 'browser'; break;
+            }
+        }
+        else { //its a waitlist
+            address = socket;
+
+            nodeType = "terminal";
+
+            status = "not connected";
+        }
+
 
         return {
             status: status,
