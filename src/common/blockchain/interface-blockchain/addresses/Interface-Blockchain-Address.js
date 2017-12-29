@@ -40,7 +40,7 @@ class InterfaceBlockchainAddress{
     
     serializeAddress(){
 
-        return Buffer.concat( [ Serialization.serializeNumber1Byte(this.unencodedAddress),
+        return Buffer.concat( [ Serialization.serializeNumber1Byte(this.unencodedAddress.length),
                                 this.unencodedAddress,
                                 Serialization.serializeNumber1Byte(this.publicKey.length),
                                 this.publicKey,

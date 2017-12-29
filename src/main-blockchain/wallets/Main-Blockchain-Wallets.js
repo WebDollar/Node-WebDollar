@@ -15,6 +15,9 @@ class MainBlockchainWallets{
             this.db = new InterfaceSatoshminDB();
         else
             this.db = db;
+
+
+        this.addresses = [];
         
         this.password = password;
         
@@ -44,14 +47,14 @@ class MainBlockchainWallets{
     
     serialize() {
         
-        let list = [Serialization.serializeNumber4Bytes(this.wallets.length)];
+        let list = [Serialization.serializeNumber4Bytes(this.addresses.length)];
 
-        for (let i = 0; i < this.wallets.length; ++i) {
-            let walletBuffer = this.wallets[i].serializeAddress();
+        for (let i = 0; i < this.addresses.length; ++i) {
+            let walletBuffer = this.addresses[i].serializeAddress();
             list.push(walletBuffer);
         }
 
-        return Buffer.concat ([list]);
+        return Buffer.concat (list);
     }
     
     deserialize(buffer) {
@@ -86,12 +89,12 @@ class MainBlockchainWallets{
         for (let i = 0; i < this.addresses.length; ++i)
             this.addresses[i].decrypt(this.password);
 
-        return (await this.db.save(this.walletsFileName, value));
+        return (await this.db.save(this.walletFileName, value));
     }
     
     async loadAddresses() {
         
-        let buffer = await this.db.get(this.walletsFileName);
+        let buffer = await this.db.get(this.walletFileName);
         
         if (typeof buffer.status !== "undefined")
             return false;
