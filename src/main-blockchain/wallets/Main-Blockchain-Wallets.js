@@ -36,13 +36,13 @@ class MainBlockchainWallets{
         return blockchainAddress;
     }
     
-    updatePassword(newPassword){
-        
-        this.loadAddresses();
-        
+    async updatePassword(newPassword){
+
+        await this.loadAddresses();
+
         this.password = newPassword;
         
-        this.saveAddresses();
+        await this.saveAddresses();
     }
     
     serialize() {
