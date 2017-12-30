@@ -18,6 +18,9 @@ class NodesWaitlist {
         this.waitlist = [];
         this.events = [];
         this.started = false;
+
+        this.MAX_CONNECTIONS = 5000;
+        this.MAX_ERROR_TRIALS = 100;
     }
 
 
@@ -82,25 +85,30 @@ class NodesWaitlist {
         //console.log("Waitlist length", this.waitlist.length);
         //console.log(this.waitlist);
 
+        this._deleteUselessWaitlist();
+
         for (let i=0; i < this.waitlist.length; i++){
 
             let nextNode = this.waitlist[i];
 
 
 
-            if ( nextNode.checkLastTimeChecked(consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN) && nextNode.blocked===false && nextNode.connecting===false && nextNode.checkIsConnected() === null ){
+            //connect only to TERMINAL NODES
+            if (nextNode.type === NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER) {
+                if (nextNode.checkLastTimeChecked(consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN) && nextNode.blocked === false && nextNode.connecting === false && nextNode.checkIsConnected() === null) {
 
-                nextNode.blocked = true;
+                    nextNode.blocked = true;
 
-                //console.log("connectNewNodesWaitlist ", nextNode.sckAddresses.toString() );
+                    //console.log("connectNewNodesWaitlist ", nextNode.sckAddresses.toString() );
 
-                this._connectNowToNewNode(nextNode).then( (connected)=>{
-                    nextNode.checked = true;
-                    nextNode.blocked = false;
-                    nextNode.connected = connected;
-                    nextNode.refreshLastTimeChecked();
-                });
+                    this._connectNowToNewNode(nextNode).then((connected) => {
+                        nextNode.checked = true;
+                        nextNode.blocked = false;
+                        nextNode.connected = connected;
+                        nextNode.refreshLastTimeChecked();
+                    });
 
+                }
             }
 
         }
@@ -115,7 +123,7 @@ class NodesWaitlist {
 
         //trying to connect to each sckAddresses
         for (let i=0; i<nextNode.sckAddresses.length; i++) {
-            
+
             //search if the new protocol was already connected in the past
             let nodeClient = NodesList.searchNodeSocketByAddress(nextNode.sckAddresses[i], 'all', ["id","uuid"]);
             if (nodeClient !== null) return nodeClient;
@@ -139,6 +147,27 @@ class NodesWaitlist {
         }
         nextNode.connecting = false;
         return false;
+    }
+
+    /**
+     * It will delete useless waitlist WEB_RTC_PEERs
+     * It will delete addresses that tried way too much
+     * @returns {boolean}
+     */
+    _deleteUselessWaitlist(){
+
+        if (this.waitlist.length < this.MAX_CONNECTIONS)
+            return false;
+
+        for (let i=this.waitlist.length-1; i>=0; i--) {
+
+            if (this.waitlist[i].errorTrial > this.MAX_ERROR_TRIALS ||
+                this.waitlist[i].type === NODES_WAITLIST_OBJECT_TYPE.WEB_RTC_PEER) {
+                this._callEvent("delete-node-waitlist", null, this.waitlist[i]);
+                this.waitlist.splice(i, 1);
+            }
+        }
+
     }
 
 
@@ -173,5 +202,6 @@ class NodesWaitlist {
 
 
 }
+
 
 export default new NodesWaitlist();

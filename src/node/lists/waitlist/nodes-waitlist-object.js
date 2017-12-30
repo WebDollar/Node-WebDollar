@@ -60,7 +60,7 @@ class NodesWaitlistObject {
         return null;
     }
 
-};
+}
 
 exports.NodesWaitlistObject = NodesWaitlistObject;
 exports.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;
