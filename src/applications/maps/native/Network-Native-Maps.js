@@ -48,15 +48,13 @@ class NetworkNativeMaps {
             //deleting the marker
             let markerIndex = this._findMarkerIndexBySocket(nodesListObject.socket);
 
-            if (markerIndex !== -1)
-                this._removeMarker(this._markers[markerIndex], nodesListObject.socket)
-
+            if (markerIndex !== -1) this._removeMarker(this._markers[markerIndex])
         });
 
         //Waitlist p2p
         NodesWaitList.registerEvent("new-node-waitlist", {type: ["all"]}, async (err, nodesWaitListObject)=>{
 
-            let geoLocation = await nodesWaitListObject.sckAddress.getGeoLocation();
+            let geoLocation = await nodesWaitListObject.sckAddresses[0].getGeoLocation();
 
             this._addMarker(geoLocation, nodesWaitListObject);
 
@@ -67,9 +65,7 @@ class NetworkNativeMaps {
             //deleting the marker
             let markerIndex = this._findMarkerIndexBySocket(nodesWaitListObject);
 
-            if (markerIndex !== -1)
-                this._removeMarker(this._markers[markerIndex],)
-
+            if (markerIndex !== -1) this._removeMarker(this._markers[markerIndex])
         });
 
         await this._showMyself();
@@ -106,7 +102,7 @@ class NetworkNativeMaps {
         if (cell) {
             marker.cell = cell;
 
-            this._circleMap.highlightCell(cell, 'own-peer', marker.desc);
+            this._circleMap.highlightCell(cell, 'peer-own', marker.desc);
 
             this._cellCounter.incCellCount(cell);
 
@@ -146,9 +142,7 @@ class NetworkNativeMaps {
 
     _getInfoWindowContent(geoLocation, socket){
 
-        let address = '';
-        let nodeType = '';
-        let status = "node";
+        let address = '', nodeType = '', status = "node", nodeProtocol = '', nodeIndex=0;
 
         if (socket === 'myself') {
             status = "connected";
@@ -174,9 +168,12 @@ class NetworkNativeMaps {
                 case 'server' : nodeType = 'terminal'; break;
                 case 'webpeer' : nodeType = 'browser'; break;
             }
+
+            nodeProtocol = socket.node.type;
+            nodeIndex = socket.node.index;
         }
         else if (socket instanceof NodesWaitListObject ){ //its a waitlist
-            
+
             address = socket;
 
             switch (socket.type){
@@ -185,6 +182,8 @@ class NetworkNativeMaps {
             }
 
             status = "not connected";
+            nodeProtocol = nodeType;
+            nodeIndex = -1;
         }
 
         let position = {lat: geoLocation.lat||0, lng: geoLocation.lng||0};
@@ -194,8 +193,8 @@ class NetworkNativeMaps {
             city: geoLocation.city||'',
             country: geoLocation.country||'',
             address: address,
-            protocol: (socket === 'myself' || socket === "fake" ) ? '' : socket.node.type,
-            index: (socket === 'myself' || socket === "fake" ) ? '' : socket.node.index,
+            protocol: nodeProtocol,
+            index: nodeIndex,
             isp: geoLocation.isp||'',
             pos: position,
             nodeType: nodeType,

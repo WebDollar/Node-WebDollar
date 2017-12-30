@@ -1,6 +1,6 @@
 import NodesList from 'node/lists/nodes-list'
 
-NODES_WAITLIST_OBJECT_TYPE = {
+const NODES_WAITLIST_OBJECT_TYPE = {
     WEB_RTC_PEER: 0,
     NODE_PEER_TERMINAL_SERVER: 1,
 };
