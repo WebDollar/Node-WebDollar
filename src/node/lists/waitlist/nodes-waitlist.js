@@ -1,6 +1,6 @@
 import NodeClient from 'node/sockets/node_clients/socket/node-client'
 import NodesList from 'node/lists/nodes-list'
-import { NodesWaitlistObject, NODES_WAITLIST_OBJECT_TYPE } from './nodes-waitlist-object';
+import { NodesWaitListObject, NODES_WAITLIST_OBJECT_TYPE } from './nodes-waitlist-object';
 import SocketAddress from 'common/sockets/socket-address'
 import consts from 'consts/const_global'
 
@@ -54,11 +54,11 @@ class NodesWaitlist {
 
         if (sckAddresses.length > 0){
 
-            let waitlistObject = new NodesWaitlistObject(sckAddresses, type);
-            this.waitlist.push(waitlistObject);
+            let waitListObject = new NodesWaitListObject(sckAddresses, type);
+            this.waitlist.push(waitListObject);
 
-            this._callEvent("new-node-waitlist", null, waitlistObject);
-            return waitlistObject;
+            this._callEvent("new-node-waitlist", null, waitListObject);
+            return waitListObject;
         }
         
         return null;

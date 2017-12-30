@@ -1,6 +1,10 @@
 import MapsTester from "./../Maps.tester"
 
 import NodesList from 'node/lists/nodes-list'
+
+import NodesWaitList from 'node/lists/waitlist/nodes-waitlist'
+import { NodesWaitListObject, NODES_WAITLIST_OBJECT_TYPE } from 'node/lists/waitlist/nodes-waitlist-object';
+
 import CircleMap from "./helpers/Circle-Map";
 import MapModal from "./helpers/Map-Modal";
 import CellCounter from "./helpers/Cell-Counter";
@@ -42,12 +46,29 @@ class NetworkNativeMaps {
         NodesList.registerEvent("disconnected", {type: ["all"]}, async (err, nodesListObject) => {
 
             //deleting the marker
-
             let markerIndex = this._findMarkerIndexBySocket(nodesListObject.socket);
 
-            if (markerIndex !== -1) {
+            if (markerIndex !== -1)
                 this._removeMarker(this._markers[markerIndex], nodesListObject.socket)
-            }
+
+        });
+
+        //Waitlist p2p
+        NodesWaitList.registerEvent("new-node-waitlist", {type: ["all"]}, async (err, nodesWaitListObject)=>{
+
+            let geoLocation = await nodesWaitListObject.sckAddress.getGeoLocation();
+
+            this._addMarker(geoLocation, nodesWaitListObject);
+
+        });
+
+        NodesWaitList.registerEvent("delete-node-waitlist", {type: ["all"]}, async (err, nodesWaitListObject)=>{
+
+            //deleting the marker
+            let markerIndex = this._findMarkerIndexBySocket(nodesWaitListObject);
+
+            if (markerIndex !== -1)
+                this._removeMarker(this._markers[markerIndex],)
 
         });
 
@@ -63,11 +84,8 @@ class NetworkNativeMaps {
 
     _addMarker(geoLocation, socket){
 
-        let position = {lat: geoLocation.lat||0, lng: geoLocation.lng||0};
-
         let marker = {
             socket: socket,
-            pos: position,
             desc: this._getInfoWindowContent(geoLocation, socket),
         };
 
@@ -84,7 +102,7 @@ class NetworkNativeMaps {
 
         this._markerMyself = marker;
 
-        let cell = this._circleMap.getCellByLocation(marker.pos.lat, marker.pos.lng);
+        let cell = this._circleMap.getCellByLocation(marker.desc.pos.lat, marker.desc.pos.lng);
         if (cell) {
             marker.cell = cell;
 
@@ -102,7 +120,7 @@ class NetworkNativeMaps {
 
     highlightConnectedPeer(marker){
 
-        let cell = this._circleMap.getCellByLocation(marker.pos.lat, marker.pos.lng);
+        let cell = this._circleMap.getCellByLocation(marker.desc.pos.lat, marker.desc.pos.lng);
         if (cell) {
 
             marker.cell = cell;
@@ -157,23 +175,29 @@ class NetworkNativeMaps {
                 case 'webpeer' : nodeType = 'browser'; break;
             }
         }
-        else { //its a waitlist
+        else if (socket instanceof NodesWaitListObject ){ //its a waitlist
+            
             address = socket;
 
-            nodeType = "terminal";
+            switch (socket.type){
+                case NODES_WAITLIST_OBJECT_TYPE.WEB_RTC_PEER: nodeType = 'browser'; break;
+                case NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER: nodeType = 'terminal'; break;
+            }
 
             status = "not connected";
         }
 
+        let position = {lat: geoLocation.lat||0, lng: geoLocation.lng||0};
 
         return {
             status: status,
             city: geoLocation.city||'',
             country: geoLocation.country||'',
             address: address,
-            protocol: (socket === 'myself' || socket === "fake" ) ? '' : socket.node.type + ' : '+socket.node.index,
+            protocol: (socket === 'myself' || socket === "fake" ) ? '' : socket.node.type,
+            index: (socket === 'myself' || socket === "fake" ) ? '' : socket.node.index,
             isp: geoLocation.isp||'',
-            geo: geoLocation,
+            pos: position,
             nodeType: nodeType,
         }
 
