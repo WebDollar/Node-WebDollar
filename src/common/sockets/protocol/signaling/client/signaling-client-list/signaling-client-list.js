@@ -56,28 +56,7 @@ class SignalingClientList {
     }
 
 
-    /*
-        EVENTS - Callbacks
-     */
 
-    registerEvent(eventName, params, callback){
-
-        this.events.push({
-            name: eventName,
-            params: params,
-            callback: callback,
-        })
-    }
-
-    getEvents(eventName){
-
-        let list = [];
-        for (let i=0; i<this.events.length; i++)
-            if (this.events[i].name === eventName)
-                list.push(this.events[i]);
-
-        return list;
-    }
 
 }
 

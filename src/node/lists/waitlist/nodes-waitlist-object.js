@@ -5,7 +5,7 @@ const NODES_WAITLIST_OBJECT_TYPE = {
     NODE_PEER_TERMINAL_SERVER: 1,
 };
 
-class NodesWaitListObject {
+class NodesWaitlistObject {
 
     constructor(sckAddresses, type){
 
@@ -62,5 +62,5 @@ class NodesWaitListObject {
 
 }
 
-exports.NodesWaitListObject = NodesWaitListObject;
+exports.NodesWaitlistObject = NodesWaitlistObject;
 exports.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;

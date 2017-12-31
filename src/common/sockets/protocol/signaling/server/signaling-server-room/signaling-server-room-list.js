@@ -22,7 +22,8 @@ class SignalingServerRoomList {
         this.list = [];
         this.events = [];
 
-        NodesList.registerEvent("disconnected", {type: ["webpeer", "client"]}, (err, result ) => { this._removeDisconnectedSignalingServerRoomConnections(err, result ) });
+        //{type: ["webpeer", "client"]}
+        NodesList.emitter.on("disconnected", (result ) => { this._removeDisconnectedSignalingServerRoomConnections( result ) });
     }
 
     registerSignalingServerRoomConnection(client1, client2, status) {
@@ -75,36 +76,19 @@ class SignalingServerRoomList {
         return null;
     }
 
-    _removeDisconnectedSignalingServerRoomConnections(err, nodesListObject) {
+    _removeDisconnectedSignalingServerRoomConnections(nodesListObject) {
 
-        for (let i = this.list.length-1; i >= 0 ; i--)
-            if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){
-                this.list.splice(i, 1);
-            }
-    }
+        //{type: ["webpeer", "client"]}
 
+        if (nodesListObject.type === "webpeer" ||   // signaling service on webpeer
+            nodesListObject.type === "client") {
 
-    /*
-        EVENTS - Callbacks
-     */
+            for (let i = this.list.length-1; i >= 0 ; i--)
+                if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){
+                    this.list.splice(i, 1);
+                }
 
-    registerEvent(eventName, params, callback) {
-
-        this.events.push({
-            name: eventName,
-            params: params,
-            callback: callback,
-        })
-    }
-
-    getEvents(eventName) {
-
-        let list = [];
-        for (let i = 0; i < this.events.length; i++)
-            if (this.events[i].name === eventName)
-                list.push(this.events[i]);
-
-        return list;
+        }
     }
 
 

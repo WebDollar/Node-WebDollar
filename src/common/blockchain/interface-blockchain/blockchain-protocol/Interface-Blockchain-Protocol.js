@@ -14,11 +14,11 @@ class InterfaceBlockchainProtocol {
 
         this.forkSolver = new InterfaceBlockchainProtocolForkSolver(blockchain);
 
-        NodesList.registerEvent("connected", {type: ["all"]}, (err, result) => {
-            this._initializeNewSocket(err, result)
+        NodesList.emitter.on("connected", (result) => {
+            this._initializeNewSocket(result)
         });
-        NodesList.registerEvent("disconnected", {type: ["all"]}, (err, result) => {
-            this._uninitializeSocket(err, result)
+        NodesList.emitter.on("disconnected", (result) => {
+            this._uninitializeSocket(result)
         });
 
     }
@@ -40,7 +40,7 @@ class InterfaceBlockchainProtocol {
 
     }
 
-    _initializeNewSocket(err, nodesListObject) {
+    _initializeNewSocket(nodesListObject) {
 
         let socket = nodesListObject.socket;
 
@@ -167,7 +167,7 @@ class InterfaceBlockchainProtocol {
 
     }
 
-    _uninitializeSocket(err, nodesListObject) {
+    _uninitializeSocket(nodesListObject) {
 
         let socket = nodesListObject.socket;
 

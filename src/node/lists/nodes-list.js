@@ -3,6 +3,7 @@ import SocketAddress from 'common/sockets/socket-address'
 import NodesListObject from './node-list-object.js';
 
 const colors = require('colors/safe');
+const EventEmitter = require('events');
 
 /*
     The List is populated with Node Sockets only if the socket pass the Hello Message
@@ -16,6 +17,8 @@ class NodesList {
     constructor(){
 
         console.log("NodesList constructor");
+
+        this.emitter = new EventEmitter();
 
         this.nodes = [];
         this.nodesTotal = 0;
@@ -64,7 +67,7 @@ class NodesList {
             let object = new NodesListObject(socket, type);
             this.nodes.push(object);
 
-            this._callEvent("connected", null, object);
+            this.emitter.emit("connected", object);
 
             GeoLocationLists.includeSocket(socket);
 
@@ -96,7 +99,7 @@ class NodesList {
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket === socket )) {
                 console.log(colors.green('deleting client socket '+ i+" "+ socket.node.sckAddress.toString()));
 
-                this._callEvent("disconnected", null, this.nodes[i]);
+                this.emitter.emit("disconnected", this.nodes[i]);
 
                 this.nodes.splice(i, 1);
                 socket.disconnect(true);
@@ -136,36 +139,6 @@ class NodesList {
                 this.nodes.splice(i,1);
 
         setTimeout(()=>{this.removeDisconnectedSockets()}, 2000);
-    }
-
-    /*
-        EVENTS - Callbacks
-     */
-
-    registerEvent(eventName, params, callback){
-
-        this.events.push({
-            name: eventName,
-            params: params,
-            callback: callback,
-        });
-        return this.events[this.events.length-1];
-    }
-
-    _getEvents(eventName){
-
-        let list = [];
-        for (let i=0; i<this.events.length; i++)
-            if (this.events[i].name === eventName)
-                list.push(this.events[i]);
-
-        return list;
-    }
-
-    _callEvent(eventName, err, param){
-        let eventsList = this._getEvents(eventName);
-        for (let j=0; j<eventsList.length; j++)
-            eventsList[j].callback(err, param);
     }
 
 }

@@ -4,6 +4,8 @@ import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import Serialization from "common/utils/Serialization.js";
 import BufferExtended from "common/utils/BufferExtended.js";
 
+const EventEmitter = require('events');
+
 class MainBlockchainWallets{
 
     constructor(blockchain, password = 'password', db){
@@ -11,7 +13,7 @@ class MainBlockchainWallets{
         this.blockchain = blockchain;
         this.walletFileName = 'wallet.bin';
         
-        if(typeof db === "undefined")
+        if(db === undefined)
             this.db = new InterfaceSatoshminDB();
         else
             this.db = db;
@@ -22,11 +24,14 @@ class MainBlockchainWallets{
         this.password = password;
         
         this.loadAddresses().then(async (response) => {
-            if (response !== true) {
-                this.addresses = [this.createNewAddress()];
+            if (response === false || this.addresses.length === 0) {
+                console.log("couldn't load any addresses")
+                this.createNewAddress();
                 await this.saveAddresses();
             }
         });
+
+        this.emitter = new EventEmitter();
 
     }
 
@@ -34,6 +39,10 @@ class MainBlockchainWallets{
 
         let blockchainAddress = new MiniBlockchainAddress();
         blockchainAddress.createNewAddress();
+
+        this.addresses.push(blockchainAddress);
+
+        this.emitter.emit('wallet-address-changes', blockchainAddress );
 
         return blockchainAddress;
     }
@@ -43,6 +52,8 @@ class MainBlockchainWallets{
         await this.loadAddresses();
 
         this.password = newPassword;
+
+        this.emitter.emit('wallet-password-changed', {});
         
         await this.saveAddresses();
     }
@@ -106,12 +117,28 @@ class MainBlockchainWallets{
         for (let i = 0; i < this.addresses.length; ++i)
             this.addresses[i].decrypt(this.password);
 
+        if (this.addresses.length > 0)
+            this.emitter.emit('wallet-changes', this.addresses );
+
         return true;
     }
     
-    async remodeAddresses() {
+    async removeAddresses() {
 
-        return (await this.db.remove(this.walletFileName));
+        this.addresses = [];
+        let answer = await this.db.remove(this.walletFileName);
+
+        this.emitter.emit('wallet-changes', this.addresses);
+
+        return answer;
+    }
+
+    subscribeEvents(eventName, callback){
+
+        this.emitter.on(eventName||"wallet-changes", (data)=>{
+            callback(data);
+        })
+
     }
 
 }

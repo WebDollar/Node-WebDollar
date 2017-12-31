@@ -1,8 +1,9 @@
 import NodeClient from 'node/sockets/node_clients/socket/node-client'
 import NodesList from 'node/lists/nodes-list'
-import { NodesWaitListObject, NODES_WAITLIST_OBJECT_TYPE } from './nodes-waitlist-object';
+import { NodesWaitlistObject, NODES_WAITLIST_OBJECT_TYPE } from './nodes-waitlist-object';
 import SocketAddress from 'common/sockets/socket-address'
 import consts from 'consts/const_global'
+const EventEmitter = require('events');
 
 class NodesWaitlist {
 
@@ -14,6 +15,8 @@ class NodesWaitlist {
 
     constructor(){
         console.log("NodeServiceClients constructor");
+
+        this.emitter = new EventEmitter();
 
         this.waitlist = [];
         this.events = [];
@@ -54,10 +57,10 @@ class NodesWaitlist {
 
         if (sckAddresses.length > 0){
 
-            let waitListObject = new NodesWaitListObject(sckAddresses, type);
+            let waitListObject = new NodesWaitlistObject(sckAddresses, type);
             this.waitlist.push(waitListObject);
 
-            this._callEvent("new-node-waitlist", null, waitListObject);
+            this.emitter.emit("new-node-waitlist", waitListObject);
             return waitListObject;
         }
         
@@ -163,7 +166,7 @@ class NodesWaitlist {
 
             if (this.waitlist[i].errorTrial > this.MAX_ERROR_TRIALS ||
                 this.waitlist[i].type === NODES_WAITLIST_OBJECT_TYPE.WEB_RTC_PEER) {
-                this._callEvent("delete-node-waitlist", null, this.waitlist[i]);
+                this.emitter.emit("delete-node-waitlist", this.waitlist[i]);
                 this.waitlist.splice(i, 1);
             }
         }
@@ -171,40 +174,12 @@ class NodesWaitlist {
     }
 
 
-    /*
-        EVENTS - Callbacks
-     */
-
-    registerEvent(eventName, params, callback){
-
-        this.events.push({
-            name: eventName,
-            params: params,
-            callback: callback,
-        })
-    }
-
-    _getEvents(eventName){
-
-        let list = [];
-        for (let i=0; i<this.events.length; i++)
-            if (this.events[i].name === eventName)
-                list.push(this.events[i]);
-
-        return list;
-    }
-
-    _callEvent(eventName, err, param){
-        let eventsList = this._getEvents(eventName);
-        for (let j=0; j<eventsList.length; j++)
-            eventsList[j].callback(err, param);
-    }
-
 
 }
 
 
 let waitlist = new NodesWaitlist();
 waitlist.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;
+waitlist.NodesWaitlistObject = NodesWaitlistObject;
 
 export default waitlist;
