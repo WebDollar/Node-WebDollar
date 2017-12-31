@@ -97,7 +97,7 @@ describe('test save wallet to local storage', () => {
 
     });
     
-  /*  it('update wallet password', async () => {
+    it('update wallet password', async () => {
 
         let blockchainAddress = Blockchain.Wallets.addresses[0];
         let address = blockchainAddress.address;
@@ -114,6 +114,6 @@ describe('test save wallet to local storage', () => {
         assert(blockchainAddress2.publicKey.equals(publicKey), 'publicKey differ after load: ' + blockchainAddress2.publicKey.toString('hex') + '!==' + publicKey.toString('hex'));
         assert(blockchainAddress2.privateKey.privateKey.equals(privateKey), 'privateKey differ after load: ' + blockchainAddress2.privateKey.privateKey.toString('hex') + '!==' + privateKey.toString('hex'));
 
-    });*/
+    });
 
 });
