@@ -10,6 +10,7 @@ if ( typeof describe !== 'undefined') {
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Difficulty.test');
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Block-LocalStore.test');
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-LocalStore.test');
+    require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Transactions.test');
     require ('tests/blockchain/protocol/Interface-Blockchain-Protocol-Fork-Solver.test');
 
     require ('tests/satoshmindb/Interface-SatoshminDB.test');

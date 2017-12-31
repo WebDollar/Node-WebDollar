@@ -194,7 +194,6 @@ class InterfaceBlockchain {
         let response = await this.db.save(this.blockchainFileName, this.blocks.length);
 
         if (response !== true){
-            console.log('Unable to save the number of blocks');
             return false;
         }
 
@@ -215,7 +214,6 @@ class InterfaceBlockchain {
         if (typeof numBlocks.status !== 'undefined') {
             return false;
         }
-        console.log('numBlocks=', numBlocks);
         
         this.blocks = [];
         for (let i = 0; i < numBlocks; ++i){
