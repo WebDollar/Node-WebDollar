@@ -1,6 +1,5 @@
 import NodeProtocol from 'common/sockets/protocol/node-protocol';
 
-
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
@@ -14,6 +13,10 @@ import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
 import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transactions'
+
+import Serialization from "common/utils/Serialization.js";
+import BufferExtended from "common/utils/BufferExtended.js";
+import consts from 'consts/const_global'
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -30,10 +33,12 @@ class InterfaceBlockchain {
 
         this.transactions = new InterfaceBlockchainTransactions();
         
-        this.dataBase = new InterfaceSatoshminDB();
+        this.db = new InterfaceSatoshminDB();
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
-        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.dataBase, InterfaceBlockchainBlock, InterfaceBlockchainBlockData)
+        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
+        
+        this.blockchainFileName = 'blockchain.bin';
     }
 
     async validateBlockchain(){
@@ -183,7 +188,15 @@ class InterfaceBlockchain {
 
     }
 
-    async save(){
+    async save(){      
+
+        //save the number of blocks
+        let response = await this.db.save(this.blockchainFileName, this.blocks.length);
+
+        if (response !== true){
+            console.log('Unable to save the number of blocks');
+            return false;
+        }
 
         for (let i = 0; i < this.blocks.length; ++i){
             let response = await this.blocks[i].save();
@@ -197,7 +210,16 @@ class InterfaceBlockchain {
 
     async load(){
 
-        for (let i = 0; i < this.blocks.length; ++i){
+        //load the number of blocks
+        let numBlocks = await this.db.get(this.blockchainFileName);
+        if (typeof numBlocks.status !== 'undefined') {
+            return false;
+        }
+        console.log('numBlocks=', numBlocks);
+        
+        this.blocks = [];
+        for (let i = 0; i < numBlocks; ++i){
+            this.blocks[i] = new InterfaceBlockchainBlock( this, 0, new Buffer(consts.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, this.db );
             let response = await this.blocks[i].load();
 
             if (response !== true)
