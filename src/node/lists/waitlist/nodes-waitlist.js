@@ -204,4 +204,7 @@ class NodesWaitlist {
 }
 
 
-export default new NodesWaitlist();
+let waitlist = new NodesWaitlist();
+waitlist.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;
+
+export default waitlist;
