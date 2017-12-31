@@ -15,11 +15,19 @@ if (process.env !== undefined && process.env !== null)
             else if (process.env[i].toLowerCase() === 'false') process.env[i] = false;
 
 
+
 let Main = require('./main.js').default;
 
 let exportObject = Main;
 
+
+
+// Export WebDollar
 module.exports =  exportObject;
+
+/*
+    Export the WebDollar to Browser
+ */
 
 //browser minimized script
 if ( typeof global.window !== 'undefined')
