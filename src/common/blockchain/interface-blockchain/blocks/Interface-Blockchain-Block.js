@@ -22,7 +22,7 @@ class InterfaceBlockchainBlock {
 
         this.blockchain = blockchain;
 
-        this.version = version||null; // 2 bytes version                                                 - 2 bytes
+        this.version = version||0; // 2 bytes version                                                 - 2 bytes
 
         this.hash = hash||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
@@ -273,6 +273,14 @@ class InterfaceBlockchainBlock {
         catch(err) {
             return 'ERROR on REMOVE block: ' + err;
         }
+    }
+    
+    equals(targetBlock){
+        return this.hash.equals(targetBlock.hash) &&
+        this.hashPrev.equals(targetBlock.hashPrev) &&
+        this.height === targetBlock.height &&
+        this.nonce === targetBlock.nonce &&
+        this.version === targetBlock.version;
     }
 
 }

@@ -21,10 +21,12 @@ class MainBlockchainWallets{
         
         this.password = password;
         
-        if (this.loadAddresses() !== true) {
-            this.addresses = [this.createNewAddress()];
-            this.saveAddresses();
-        }
+        this.loadAddresses().then(async (response) => {
+            if (response !== true) {
+                this.addresses = [this.createNewAddress()];
+                await this.saveAddresses();
+            }
+        });
 
     }
 

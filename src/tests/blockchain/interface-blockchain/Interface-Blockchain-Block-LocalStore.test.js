@@ -15,7 +15,7 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
     let nonce = 1994;
     let minerAddress = '1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4x';
     let data = new InterfaceBlockchainBlockData(blockchain, minerAddress, [], undefined, undefined); //it will compute the hashData
-    let height = 0;
+    let height = 1023;
     let block = null;
     
     let result = null;
