@@ -8,16 +8,17 @@
 
 import Argon2BrowserAntelleMain from './main'
 
-var global =  window === undefined ? self : window;
+var global =  typeof window === "undefined" ? self : window;
 //var root =  window === undefined ? '../' : '';
-var root = "http://antelle.net/argon2-browser/"
+var root = "http://antelle.net/argon2-browser/";
 
 class Argon2BrowserWebAssemblyCalc{
 
-    calcHash(fn, arg) {
+    calc(fn, arg) {
         try {
             return fn.call(this, arg);
         } catch (e) {
+            console.log('Error Argon2', e);
             log('Error: ' + e);
             return null;
         }
@@ -219,7 +220,7 @@ class Argon2BrowserWebAssemblyCalc{
     }
 
     now() {
-        return  global.performance !== undefined ? performance.now() : Date.now();
+        return  typeof global.performance !== 'undefined' ? performance.now() : Date.now();
     }
 
 

@@ -23,29 +23,31 @@ class Argon2BrowserWebAssembly{
     async _calculateHash(method, params){
 
         try {
-            return await Argon2WebAssemblyCalc.calcHash(method, params)
+            let answer = await Argon2WebAssemblyCalc.calc(method, params)
+
+            return answer;
         } catch (Exception){
-            console.log('_calculateHashWorker raised exception', Exception.toString())
+            console.log( '_calculateHashWorker raised exception', Exception );
             return null;
         }
     }
 
-    calcBest(params){
-        let result ;
+    async calcBest(params){
+        let result;
 
-        result = this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs,params);
+        result = await this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs,params);
         if (result !== null) return result;
 
-        result = this._calculateHash(Argon2WebAssemblyCalc.calcWasm,params);
+        result = await this._calculateHash(Argon2WebAssemblyCalc.calcWasm,params);
         if (result !== null) return result;
 
-        result = this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenSexpr, params);
+        result = await this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenSexpr, params);
         if (result !== null) return result;
 
-        result = this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenBin, params);
+        result = await this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenBin, params);
         if (result !== null) return result;
 
-        result = this._calculateHash(Argon2WebAssemblyMain.calcPNaCl, params);
+        result = await this._calculateHash(Argon2WebAssemblyMain.calcPNaCl, params);
         return result;
     }
 
