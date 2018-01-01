@@ -1,4 +1,4 @@
-import MainBlockchainWallets from 'main-blockchain/wallets/Main-Blockchain-Wallets'
+import MainBlockchainWallet from 'main-blockchain/wallet/Main-Blockchain-Wallet'
 import MainBlockchain from 'main-blockchain/chain/Main-Blockchain'
 import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining'
 import MainBlockchainProtocol from 'main-blockchain/blockchain-protocol/Main-blockchain-Protocol'
@@ -9,7 +9,7 @@ class Blockchain{
         this.Chain = new MainBlockchain();
         this.blockchain = this.Chain;
 
-        this.Wallets = new MainBlockchainWallets(this.Chain);
+        this.Wallet = new MainBlockchainWallet(this.Chain);
         this.Mining = new MainBlockchainMining(this.Chain);
         this.Protocol = new MainBlockchainProtocol(this.Chain);
 

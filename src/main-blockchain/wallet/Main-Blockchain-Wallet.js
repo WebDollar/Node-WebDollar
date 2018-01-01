@@ -6,7 +6,7 @@ import BufferExtended from "common/utils/BufferExtended.js";
 
 const EventEmitter = require('events');
 
-class MainBlockchainWallets{
+class MainBlockchainWallet{
 
     constructor(blockchain, password = 'password', db){
 
@@ -133,14 +133,7 @@ class MainBlockchainWallets{
         return answer;
     }
 
-    subscribeEvents(eventName, callback){
-
-        this.emitter.on(eventName||"wallet-changes", (data)=>{
-            callback(data);
-        })
-
-    }
 
 }
 
-export default MainBlockchainWallets
+export default MainBlockchainWallet
