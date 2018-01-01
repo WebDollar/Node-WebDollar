@@ -11,7 +11,7 @@ describe('test save wallet to local storage', () => {
     
     it('save/load/remove/load wallet to/from local storage, sample test', async () => {
 
-        let blockchainAddress = Blockchain.Wallets.createNewAddress();
+        let blockchainAddress = Blockchain.Wallet.createNewAddress();
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
@@ -38,7 +38,7 @@ describe('test save wallet to local storage', () => {
     
     it('save/save/remove/load/ wallet to/from local storage, sample test', async () => {
 
-        let blockchainAddress = Blockchain.Wallets.createNewAddress();
+        let blockchainAddress = Blockchain.Wallet.createNewAddress();
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
@@ -61,7 +61,7 @@ describe('test save wallet to local storage', () => {
     
     it('test save/load/remove/load with AES encrypt/decrypt privateKey', async () => {
 
-        let blockchainAddress = Blockchain.Wallets.createNewAddress();
+        let blockchainAddress = Blockchain.Wallet.createNewAddress();
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
@@ -93,21 +93,21 @@ describe('test save wallet to local storage', () => {
         
     it('load/store wallet manager', async () => {
 
-        assert(typeof Blockchain.Wallets.addresses !== 'undefined', 'Default wallet is not created');
+        assert(typeof Blockchain.Wallet.addresses !== 'undefined', 'Default wallet is not created');
 
     });
     
     it('update wallet password', async () => {
 
-        let blockchainAddress = Blockchain.Wallets.addresses[0];
+        let blockchainAddress = Blockchain.Wallet.addresses[0];
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
         let privateKey = blockchainAddress.privateKey.privateKey;
         
-        Blockchain.Wallets.updatePassword('new_pawwsord');
+        Blockchain.Wallet.updatePassword('new_pawwsord');
         
-        let blockchainAddress2 = Blockchain.Wallets.addresses[0];
+        let blockchainAddress2 = Blockchain.Wallet.addresses[0];
         
         assert(blockchainAddress2.address === address, 'address differ after load: ' + blockchainAddress2.address + '!==' + address);
         assert(blockchainAddress2.unencodedAddress.equals(unencodedAddress), 'address differ after load: ' + blockchainAddress2.unencodedAddress.toString('hex') + '!==' + unencodedAddress.toString('hex'));

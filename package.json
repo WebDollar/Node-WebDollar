@@ -5,16 +5,17 @@
   "main": "index.js",
   "scripts": {
     "build_terminal": "babel --presets es2017 src -d dist && browserify dist/build_terminal.js > dist_bundle/bundle_terminal.js",
-    "build_browser_test": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ]",
+    "show_browser_test": "node src/tests/browser/show-browser.test.js",
+    "build_browser_test": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ] && npm run show_browser_test",
     "build_browser": "browserify src/build_browser.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/WebDollar-Node-Protocol-bundle.js -t [ babelify --presets [ es2017 ] ] && npm run build_browser_test",
     "build_browser_user_interface": "browserify src/build_browser.js -o dist_bundle/../../User-Interface-WebDollar/dist_bundle/WebDollar-Protocol-bundle.js -t [ babelify --presets [ es2017 ] ] ",
     "start_double_connections": "npm run build_terminal DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
     "start": "npm run build_terminal && node dist/build_terminal.js  ",
     "start_mining": "npm run build_terminal && START_MINING=true SERVER_PORT=6666  node dist/build_terminal.js ",
     "test": "npm run build_terminal && mocha --timeout 10000 dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",
-    "show_mocha_report": "node src/tests/show-mocha.test.js",
+    "show_mocha_report": "node src/tests/browser/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
-    "show_coverage": "node src/tests/show-coverage.test.js"
+    "show_coverage": "node src/tests/browser/show-coverage.test.js"
   },
   "repository": {
     "type": "git",
@@ -60,6 +61,7 @@
     "ipaddr.js": "^1.5.4",
     "javascript-biginteger": "^0.9.2",
     "jsonp": "^0.2.1",
+    "md5": "^2.2.1",
     "node-jsonp": "^1.0.2",
     "opn": "^5.1.0",
     "pouchdb": "^6.4.1",

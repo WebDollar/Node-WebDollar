@@ -4,6 +4,7 @@ import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import Serialization from "common/utils/Serialization.js";
 import BufferExtended from "common/utils/BufferExtended.js";
 
+const md5 = require('md5');
 const EventEmitter = require('events');
 
 class MainBlockchainWallet{
@@ -42,7 +43,23 @@ class MainBlockchainWallet{
 
         this.addresses.push(blockchainAddress);
 
+        this.emitter.emit('wallet-address-changes', blockchainAddress.address );
+
+        //this.saveAddresses();
+
+        return blockchainAddress;
+    }
+
+    createNewAddressPrivateKey(){
+
+        let blockchainAddress = new MiniBlockchainAddress();
+        blockchainAddress.createNewAddress();
+
+        this.addresses.push(blockchainAddress);
+
         this.emitter.emit('wallet-address-changes', blockchainAddress );
+
+        //this.saveAddresses();
 
         return blockchainAddress;
     }
@@ -133,6 +150,11 @@ class MainBlockchainWallet{
         return answer;
     }
 
+    getAddressPic(address){
+
+        return `https://www.gravatar.com/avatar/${md5(address)}?d=retro&f=y`;
+
+    }
 
 }
 
