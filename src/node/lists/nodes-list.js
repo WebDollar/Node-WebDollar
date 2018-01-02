@@ -67,7 +67,7 @@ class NodesList {
             let object = new NodesListObject(socket, type);
             this.nodes.push(object);
 
-            this.emitter.emit("connected", object);
+            this.emitter.emit("nodes-list/connected", object);
 
             GeoLocationLists.includeSocket(socket);
 
@@ -99,7 +99,7 @@ class NodesList {
             if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket === socket )) {
                 console.log(colors.green('deleting client socket '+ i+" "+ socket.node.sckAddress.toString()));
 
-                this.emitter.emit("disconnected", this.nodes[i]);
+                this.emitter.emit("nodes-list/disconnected", this.nodes[i]);
 
                 this.nodes.splice(i, 1);
                 socket.disconnect(true);

@@ -6,6 +6,7 @@ import MainBlockchainProtocol from 'main-blockchain/blockchain-protocol/Main-blo
 class Blockchain{
 
     constructor(){
+
         this.Chain = new MainBlockchain();
         this.blockchain = this.Chain;
 

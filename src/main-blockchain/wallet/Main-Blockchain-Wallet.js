@@ -43,7 +43,7 @@ class MainBlockchainWallet{
 
         this.addresses.push(blockchainAddress);
 
-        this.emitter.emit('wallet-address-changes', blockchainAddress.address );
+        this.emitter.emit('wallet/address-changes', blockchainAddress.address );
 
         //this.saveAddresses();
 
@@ -57,7 +57,7 @@ class MainBlockchainWallet{
 
         this.addresses.push(blockchainAddress);
 
-        this.emitter.emit('wallet-address-changes', blockchainAddress );
+        this.emitter.emit('wallet/address-changes', blockchainAddress );
 
         //this.saveAddresses();
 
@@ -70,7 +70,7 @@ class MainBlockchainWallet{
 
         this.password = newPassword;
 
-        this.emitter.emit('wallet-password-changed', {});
+        this.emitter.emit('wallet/password-changed', {});
         
         await this.saveAddresses();
     }
@@ -135,7 +135,7 @@ class MainBlockchainWallet{
             this.addresses[i].decrypt(this.password);
 
         if (this.addresses.length > 0)
-            this.emitter.emit('wallet-changes', this.addresses );
+            this.emitter.emit('wallet/changes', this.addresses );
 
         return true;
     }
@@ -145,7 +145,7 @@ class MainBlockchainWallet{
         this.addresses = [];
         let answer = await this.db.remove(this.walletFileName);
 
-        this.emitter.emit('wallet-changes', this.addresses);
+        this.emitter.emit('wallet/changes', this.addresses);
 
         return answer;
     }

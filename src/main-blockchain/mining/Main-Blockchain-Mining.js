@@ -3,12 +3,14 @@ import MiniBlockchainMining from 'common/blockchain/mini-blockchain/Mini-Blockch
 class MainBlockchainMining extends MiniBlockchainMining{
 
     constructor(blockchain){
+
         super(blockchain);
 
         this.blockchain.mining = this;
     }
 
     startMining(){
+
         console.log("Mining started");
         MiniBlockchainMining.prototype.startMining.call(this);
     }
@@ -16,7 +18,7 @@ class MainBlockchainMining extends MiniBlockchainMining{
     stopMining(){
 
         console.log("Mining Stopped");
-        MiniBlockchainMining.prototype.stopMining().call(this);
+        MiniBlockchainMining.prototype.stopMining.call(this);
     }
 
 }

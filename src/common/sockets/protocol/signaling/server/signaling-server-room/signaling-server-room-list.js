@@ -23,7 +23,7 @@ class SignalingServerRoomList {
         this.events = [];
 
         //{type: ["webpeer", "client"]}
-        NodesList.emitter.on("disconnected", (result ) => { this._removeDisconnectedSignalingServerRoomConnections( result ) });
+        NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._removeDisconnectedSignalingServerRoomConnections( result ) });
     }
 
     registerSignalingServerRoomConnection(client1, client2, status) {

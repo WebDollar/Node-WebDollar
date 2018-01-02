@@ -14,10 +14,10 @@ class InterfaceBlockchainProtocol {
 
         this.forkSolver = new InterfaceBlockchainProtocolForkSolver(blockchain);
 
-        NodesList.emitter.on("connected", (result) => {
+        NodesList.emitter.on("nodes-list/connected", (result) => {
             this._initializeNewSocket(result)
         });
-        NodesList.emitter.on("disconnected", (result) => {
+        NodesList.emitter.on("nodes-list/disconnected", (result) => {
             this._uninitializeSocket(result)
         });
 

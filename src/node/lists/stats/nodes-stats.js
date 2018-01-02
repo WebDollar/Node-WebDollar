@@ -14,10 +14,10 @@ class NodesStats {
         this.statsWebPeers = 0;
         this.statsWaitlist = 0;
 
-        NodesList.emitter.on("connected", (result) => { this._recalculateStats(result) } );
-        NodesList.emitter.on("disconnected", (result ) => { this._recalculateStats(result ) });
+        NodesList.emitter.on("nodes-list/connected", (result) => { this._recalculateStats(result) } );
+        NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._recalculateStats(result ) });
 
-        NodesWaitlist.emitter.on("new-node-waitlist", (result ) => { this._recalculateStats(result ) });
+        NodesWaitlist.emitter.on("waitlist/new-node", (result ) => { this._recalculateStats(result ) });
 
         setInterval( () => { return this._printStats() }, consts.NODE_STATUS_INTERVAL)
     }

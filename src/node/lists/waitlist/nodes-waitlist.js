@@ -60,7 +60,7 @@ class NodesWaitlist {
             let waitListObject = new NodesWaitlistObject(sckAddresses, type);
             this.waitlist.push(waitListObject);
 
-            this.emitter.emit("new-node-waitlist", waitListObject);
+            this.emitter.emit("waitlist/new-node", waitListObject);
             return waitListObject;
         }
         
@@ -166,7 +166,7 @@ class NodesWaitlist {
 
             if (this.waitlist[i].errorTrial > this.MAX_ERROR_TRIALS ||
                 this.waitlist[i].type === NODES_WAITLIST_OBJECT_TYPE.WEB_RTC_PEER) {
-                this.emitter.emit("delete-node-waitlist", this.waitlist[i]);
+                this.emitter.emit("waitlist/delete-node", this.waitlist[i]);
                 this.waitlist.splice(i, 1);
             }
         }
