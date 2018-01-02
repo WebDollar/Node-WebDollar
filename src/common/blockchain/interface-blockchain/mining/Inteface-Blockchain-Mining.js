@@ -83,9 +83,6 @@ class InterfaceBlockchainMining{
                 console.log(colors.red("Error creating next block "+Exception.toString()), Exception, nextBlock);
             }
 
-            console.log("difficultyTarget", this.blockchain.getDifficultyTarget());
-            console.log("difficultyTarget blockchain", this.blockchain);
-
             try {
                 await this.mineBlock(nextBlock, this.blockchain.getDifficultyTarget(), undefined, showMiningOutput);
             } catch (exception){

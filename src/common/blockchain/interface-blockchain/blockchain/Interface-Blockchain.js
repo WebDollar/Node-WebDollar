@@ -18,6 +18,8 @@ import Serialization from "common/utils/Serialization.js";
 import BufferExtended from "common/utils/BufferExtended.js";
 import consts from 'consts/const_global'
 
+const colors = require('colors/safe');
+
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */

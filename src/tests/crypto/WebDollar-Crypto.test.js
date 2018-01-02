@@ -40,10 +40,10 @@ describe('WebDollar crypt', ()=>{
         //this.timeout(15000);
 
 
-        const message1 = TestsHelper.makeId();
-        const message1_copy = message1;
+        const message1 = new Buffer ( TestsHelper.makeId(), "ascii");
+        const message1_copy = new Buffer (message1);
 
-        const message2 = TestsHelper.makeId();
+        const message2 = new Buffer( TestsHelper.makeId(), "ascii");
 
         let hash1 = await WebDollarCrypto.hashPOW(message1)
         let hash1_copy = await WebDollarCrypto.hashPOW(message1_copy)

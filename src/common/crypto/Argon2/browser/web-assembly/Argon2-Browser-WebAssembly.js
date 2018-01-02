@@ -20,10 +20,10 @@ class Argon2BrowserWebAssembly{
         Simple Hash
      */
 
-    async _calculateHash(method, params){
+    _calculateHash(method, params){
 
         try {
-            let answer = await Argon2WebAssemblyCalc.calc(method, params)
+            let answer = Argon2WebAssemblyCalc.calc(method, params)
 
             return answer;
         } catch (Exception){
@@ -99,8 +99,6 @@ class Argon2BrowserWebAssembly{
 
         } catch (Exception){
             console.log("Argon2 exception", Exception)
-
-            throw Exception
         }
 
     }
