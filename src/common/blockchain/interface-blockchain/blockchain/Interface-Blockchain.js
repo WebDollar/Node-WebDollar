@@ -222,7 +222,7 @@ class InterfaceBlockchain {
         try {
             for (let i = 0; i < numBlocks; ++i) {
                 let block = new InterfaceBlockchainBlock(this, 0, new Buffer(consts.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, this.db);
-                let response = await this.blocks[i].load();
+                let response = await block.load();
 
                 if (response !== true) {
 

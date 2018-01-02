@@ -136,8 +136,8 @@ class Argon2BrowserWebAssembly{
 
             let hash = result.encoded.substr( result.encoded.lastIndexOf("$")+1 )
 
-            console.log("hash string ", "hash=", hash, "data=",data)
-            console.log("hash string ", result.hash)
+            // console.log("hash string ", "hash=", hash, "data=",data)
+            // console.log("hash string ", result.hash)
 
             return hash
 

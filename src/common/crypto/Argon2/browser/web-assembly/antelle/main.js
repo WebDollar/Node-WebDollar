@@ -131,17 +131,17 @@ class Argon2BrowserAntelleMain{
     }
 
     log(msg) {
-        if (!msg) {
-            return;
-        }
-
-        var txtRes = document.getElementById('txtRes');
-        var elapsedMs = Math.round(performance.now() - this.logTs);
-        var elapsedSec = (elapsedMs / 1000).toFixed(3);
-        var elapsed = this.leftPad(elapsedSec, 6);
-
-        if (txtRes !== null)
-            txtRes.value += (txtRes.value ? '\n' : '') + '[' + elapsed + '] ' + msg;
+        // if (!msg) {
+        //     return;
+        // }
+        //
+        // var txtRes = document.getElementById('txtRes');
+        // var elapsedMs = Math.round(performance.now() - this.logTs);
+        // var elapsedSec = (elapsedMs / 1000).toFixed(3);
+        // var elapsed = this.leftPad(elapsedSec, 6);
+        //
+        // if (txtRes !== null)
+        //     txtRes.value += (txtRes.value ? '\n' : '') + '[' + elapsed + '] ' + msg;
     }
 
 

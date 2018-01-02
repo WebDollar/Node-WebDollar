@@ -101,6 +101,7 @@ class InterfaceBlockchainMining{
     async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
 
         try{
+
             if (difficulty === undefined || difficulty === null) throw 'difficulty not specified';
 
             if (difficulty instanceof BigInteger)
@@ -125,7 +126,7 @@ class InterfaceBlockchainMining{
 
                 let hash = await block.computeHash(this._nonce);
 
-                //console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
+                console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
 
 
                 if ( hash.compare(difficulty) <= 0 ) {

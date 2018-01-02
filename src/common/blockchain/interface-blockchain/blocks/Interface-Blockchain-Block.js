@@ -180,6 +180,7 @@ class InterfaceBlockchainBlock {
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );
 
+        console.log("buffer", buffer);
         return WebDollarCrypto.hashPOW(buffer);
     }
 
