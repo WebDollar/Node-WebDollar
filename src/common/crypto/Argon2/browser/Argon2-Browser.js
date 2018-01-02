@@ -27,7 +27,12 @@ class Argon2Browser{
     async hash(data){
         let result;
 
+        //Argon2BrowserWebAssembly requires string as input
+        if (Buffer.isBuffer(data))
+            data = data.toString();
+
         result = await Argon2BrowserWebAssembly.hash(data);
+
         if (result !== null) return result;
 
         return await this.hashJavascript(data);
@@ -56,7 +61,7 @@ class Argon2Browser{
             return new Buffer(result.hash);
 
         } catch (Exception){
-            console.log("Argon2 exception", Exception)
+            console.log("Argon2 exception hashJavascript", Exception)
 
             throw Exception
         }
@@ -79,7 +84,7 @@ class Argon2Browser{
             return hash
 
         } catch (Exception){
-            console.log("Argon2 exception", Exception)
+            console.log("Argon2 exception hashJavascriptString", Exception)
 
             throw Exception
         }

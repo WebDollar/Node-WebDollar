@@ -16,7 +16,7 @@ class Argon2Node {
             return await argon2.hash(data, options)
 
         } catch (Exception){
-            console.log("Argon2 exception ", Exception.message, Exception.code)
+            console.log("Argon2 exception Argon2-Node.hash", Exception.message, Exception.code)
 
             throw Exception
         }
@@ -38,7 +38,7 @@ class Argon2Node {
 
 
         } catch (Exception){
-            console.log("Argon2 exception ", Exception.message, Exception.code)
+            console.log("Argon2 exception Argon2-Node. hashString", Exception.message, Exception.code)
 
             throw Exception
         }

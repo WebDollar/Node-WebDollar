@@ -12,9 +12,6 @@ const HASH_ARGON2_OPTIONS = { salt: consts.HASH_ARGON2_PARAMS.salt, time: consts
 
 class Argon2BrowserWebAssembly{
 
-    constructor(){
-
-    }
 
     /*
         Simple Hash
@@ -32,23 +29,45 @@ class Argon2BrowserWebAssembly{
         }
     }
 
-    async calcBest(params){
+    async _calcBest(params){
         let result;
 
-        result = await this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs,params);
-        if (result !== null) return result;
+        try {
+            result = await this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs, params);
+            if (result !== null) return result;
+        } catch (ex){
 
-        result = await this._calculateHash(Argon2WebAssemblyCalc.calcWasm,params);
-        if (result !== null) return result;
+        }
 
-        result = await this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenSexpr, params);
-        if (result !== null) return result;
+        try {
+            result = await this._calculateHash(Argon2WebAssemblyCalc.calcWasm, params);
+            if (result !== null) return result;
+        } catch (ex){
 
-        result = await this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenBin, params);
-        if (result !== null) return result;
+        }
 
-        result = await this._calculateHash(Argon2WebAssemblyMain.calcPNaCl, params);
-        return result;
+        try {
+            result = await this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenSexpr, params);
+            if (result !== null) return result;
+        } catch (ex){
+
+        }
+
+        try {
+            result = await this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenBin, params);
+            if (result !== null) return result;
+        } catch (ex){
+
+        }
+
+        console.log("Argon2WebAssemblyMain.calcPNaCl", result);
+        try {
+            result = await this._calculateHash(Argon2WebAssemblyMain.calcPNaCl, params);
+            if (result !== null) return result;
+        } catch (ex){
+
+        }
+        return null;
     }
 
     /*
@@ -90,15 +109,15 @@ class Argon2BrowserWebAssembly{
             let params = HASH_ARGON2_OPTIONS;
             params.pass = data
 
-            let result = await this.calcBest(params);
+            let result = await this._calcBest(params);
 
-            // console.log("ARgon2Browser", result);
             if (result === null) throw("Argon2 returned empty");
 
             return new Buffer(result.hash);
 
         } catch (Exception){
-            console.log("Argon2 exception", Exception)
+            console.log("Argon2 exception hash", Exception)
+            return null;
         }
 
     }
@@ -110,7 +129,7 @@ class Argon2BrowserWebAssembly{
             let params = HASH_ARGON2_OPTIONS;
             params.pass = data
 
-            let result = await this.calcBest( params );
+            let result = await this._calcBest( params );
 
             // console.log("ARgon2Browser String", result);
             if (result === null) throw("Argon2 returned empty");
@@ -123,7 +142,7 @@ class Argon2BrowserWebAssembly{
             return hash
 
         } catch (Exception){
-            console.log("Argon2 exception", Exception)
+            console.log("Argon2 exception hashString", Exception)
 
             throw Exception
         }

@@ -24,7 +24,7 @@ Argon2.verify = async (initialHash, data) => {
     if (Buffer.isBuffer(initialHash)) {
         myHash = await Argon2.hash(data);
 
-        console.log("verify", myHash, initialHash)
+        //console.log("verify", myHash, initialHash)
 
         if (myHash.length !== initialHash.length)
             return false;
