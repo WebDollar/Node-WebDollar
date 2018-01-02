@@ -100,6 +100,8 @@ class InterfaceBlockchainMining{
      */
     async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
 
+        let intervalMiningOutput;
+
         try{
 
             if (difficulty === undefined || difficulty === null) throw 'difficulty not specified';
@@ -112,58 +114,67 @@ class InterfaceBlockchainMining{
             block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
 
             this._nonce = initialNonce||0;
-            let  solutionFound = false;
 
             if (typeof this._nonce !== 'number') return 'initial nonce is not a number';
 
             //calculating the hashes per second
-            let intervalMiningOutput;
+
             if (showMiningOutput)
                 intervalMiningOutput = this.setMiningHashRateInterval();
 
+            this.mine(block, difficulty).then((solutionFound)=>{
 
-            while (this._nonce <= 0xFFFFFFFF && this.started && !this.reset ){
+                if (!solutionFound)
+                    console.log( colors.red("block ", block.height ," was not mined...") );
 
-                let hash = await block.computeHash(this._nonce);
+                if (this.reset) // it was reset
+                    this.reset = false;
 
-                console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
+                if ( intervalMiningOutput !== undefined)
+                    clearInterval(intervalMiningOutput);
 
+            })
 
-                if ( hash.compare(difficulty) <= 0 ) {
-
-                    console.log( colors.green("WebDollar Block ", block.height ," mined ", this._nonce, hash.toString("hex"), " reward", block.reward, "WEBD") );
-
-                    block.hash = hash;
-                    block.nonce = this._nonce;
-
-                    await this.blockchain.processBlocksSempahoreCallback( ()=>{
-                        return this.blockchain.includeBlockchainBlock( block );
-                    });
-
-                    solutionFound = true;
-
-                    break;
-                }
-
-                this._nonce++;
-            }
-
-            if (!solutionFound)
-                console.log( colors.red("block ", block.height ," was not mined...") );
-
-            if (this.reset) // it was reset
-                this.reset = false;
-
-            if ( intervalMiningOutput !== undefined)
-                clearInterval(intervalMiningOutput);
 
         } catch (Exception){
 
             console.log(colors.red("Error mining block "), Exception, block);
+            if (intervalMiningOutput !== undefined) clearInterval(intervalMiningOutput);
             throw Exception;
 
         }
 
+    }
+
+
+    async mine(block, difficulty){
+
+        while (this._nonce <= 0xFFFFFFFF && this.started && !this.reset ){
+
+            let hash = await block.computeHash(this._nonce);
+
+            console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
+
+
+            if ( hash.compare(difficulty) <= 0 ) {
+
+                console.log( colors.green("WebDollar Block ", block.height ," mined ", this._nonce, hash.toString("hex"), " reward", block.reward, "WEBD") );
+
+                block.hash = hash;
+                block.nonce = this._nonce;
+
+                await this.blockchain.processBlocksSempahoreCallback( ()=>{
+                    return this.blockchain.includeBlockchainBlock( block );
+                });
+
+                return true;
+
+            }
+
+            this._nonce++;
+        }
+
+        return false;
     }
 
 

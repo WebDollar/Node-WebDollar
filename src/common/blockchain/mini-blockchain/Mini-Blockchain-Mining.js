@@ -1,5 +1,11 @@
+let InterfaceBlockchainMining;
 
-import InterfaceBlockchainMining from 'common/blockchain/interface-blockchain/mining/Inteface-Blockchain-Mining'
+if (typeof window === 'undefined'){
+    InterfaceBlockchainMining = require ('common/blockchain/interface-blockchain/mining/Interface-Blockchain-Backbone-Mining').default;
+}  else {
+    InterfaceBlockchainMining = require ('common/blockchain/interface-blockchain/mining/Interface-Blockchain-Browser-Mining').default;
+}
+
 
 class MiniBlockchainMining extends  InterfaceBlockchainMining {
 

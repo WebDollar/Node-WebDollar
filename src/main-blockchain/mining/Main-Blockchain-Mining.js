@@ -1,4 +1,6 @@
-import MiniBlockchainMining from 'common/blockchain/mini-blockchain/Mini-Blockchain-Mining'
+
+import MiniBlockchainMining from 'common/blockchain/mini-blockchain/Mini-Blockchain-Mining';
+
 
 class MainBlockchainMining extends MiniBlockchainMining{
 
