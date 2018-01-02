@@ -61,15 +61,15 @@ class Argon2BrowserWebAssemblyCalc{
     }
 
     calcWasm(arg) {
-        this.calcBinaryen(arg,'native-wasm');
+        return this.calcBinaryen(arg,'native-wasm');
     }
 
     calcBinaryenSexpr(arg) {
-        this.calcBinaryen(arg,'interpret-s-expr');
+        return this.calcBinaryen(arg,'interpret-s-expr');
     }
 
     calcBinaryenBin(arg) {
-        this.calcBinaryen(arg, 'interpret-binary');
+        return this.calcBinaryen(arg, 'interpret-binary');
     }
 
     calcBinaryen(arg, method) {
@@ -88,9 +88,9 @@ class Argon2BrowserWebAssemblyCalc{
 
             const mem = arg.mem;
 
-            Argon2BrowserAntelleMain.log('Testing Argon2 using Binaryen ' + method);
+            //Argon2BrowserAntelleMain.log('Testing Argon2 using Binaryen ' + method);
             if (global.Module && global.Module.wasmJSMethod === method && global.Module._argon2_hash) {
-                Argon2BrowserAntelleMain.log('Calculating hash....');
+                //Argon2BrowserAntelleMain.log('Calculating hash....');
                 resolve (this.calcHash(arg))
                 return;
             }
@@ -127,15 +127,16 @@ class Argon2BrowserWebAssemblyCalc{
             var xhr = new XMLHttpRequest();
             xhr.open('GET', root + 'dist/argon2.wasm', true);
             xhr.responseType = 'arraybuffer';
-            xhr.onload = function() {
+            xhr.onload = () => {
                 global.Module.wasmBinary = xhr.response;
                 global.Module.postRun = this.calcHash(arg);
                 var ts = this.now();
                 Argon2BrowserAntelleMain.log('Wasm loaded, loading script...');
-                Argon2BrowserAntelleMain.loadScript(root + 'dist/argon2.min.js', function() {
+                Argon2BrowserAntelleMain.loadScript(root + 'dist/argon2.min.js', () => {
                     Argon2BrowserAntelleMain.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                     Argon2BrowserAntelleMain.log('Calculating hash....');
-                }, function() {
+                    resolve (this.calcHash(arg))
+                }, () => {
                     Argon2BrowserAntelleMain.log('Error loading script');
                 });
             };

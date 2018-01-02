@@ -32,12 +32,6 @@ class Argon2BrowserWebAssembly{
     async _calcBest(params){
         let result;
 
-        try {
-            result = await this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs, params);
-            if (result !== null) return result;
-        } catch (ex){
-
-        }
 
         try {
             result = await this._calculateHash(Argon2WebAssemblyCalc.calcWasm, params);
@@ -45,6 +39,14 @@ class Argon2BrowserWebAssembly{
         } catch (ex){
 
         }
+
+        try {
+            result = await this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs, params);
+            if (result !== null) return result;
+        } catch (ex){
+
+        }
+
 
         try {
             result = await this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenSexpr, params);
@@ -60,13 +62,13 @@ class Argon2BrowserWebAssembly{
 
         }
 
-        console.log("Argon2WebAssemblyMain.calcPNaCl", result);
         try {
             result = await this._calculateHash(Argon2WebAssemblyMain.calcPNaCl, params);
             if (result !== null) return result;
         } catch (ex){
 
         }
+
         return null;
     }
 
@@ -106,8 +108,15 @@ class Argon2BrowserWebAssembly{
 
         try{
 
+
+            //Argon2BrowserWebAssembly requires string as input
+            if (Buffer.isBuffer(data))
+                data = data.toString("base64");
+
             let params = HASH_ARGON2_OPTIONS;
             params.pass = data
+
+            //console.log("params.pass", params.pass);
 
             let result = await this._calcBest(params);
 

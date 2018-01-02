@@ -25,11 +25,8 @@ class Argon2Browser{
     }
 
     async hash(data){
-        let result;
 
-        //Argon2BrowserWebAssembly requires string as input
-        if (Buffer.isBuffer(data))
-            data = data.toString();
+        let result;
 
         result = await Argon2BrowserWebAssembly.hash(data);
 
@@ -53,7 +50,9 @@ class Argon2Browser{
         try{
 
             let params = HASH_ARGON2_OPTIONS;
-            params.pass = data
+            params.pass = data;
+
+
 
             let result = await argon2.hash(params);
 

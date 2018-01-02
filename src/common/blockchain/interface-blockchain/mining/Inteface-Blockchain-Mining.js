@@ -27,19 +27,19 @@ class InterfaceBlockchainMining{
 
     async startMining(){
 
-        this.emitter.emit('mining/status-changed', true);
-
         this.started = true;
         this.reset = false;
+
+
+        this.emitter.emit('mining/status-changed', true);
 
         await this.mineNextBlock(true);
     }
 
     stopMining(){
 
-        this.emitter.emit('mining/status-changed', false);
         this.started = false;
-
+        this.emitter.emit('mining/status-changed', false);
     }
 
     resetMining(){
@@ -171,9 +171,10 @@ class InterfaceBlockchainMining{
         let previousNonce = this._nonce;
 
         return setInterval(() => {
-            this.hashesPerSecond = previousNonce - this._nonce;
+            this.hashesPerSecond = this._nonce - previousNonce ;
+            console.log( this.hashesPerSecond+ " hashes/s");
+
             this.emitter.emit("mining/hash-rate", this.hashesPerSecond );
-            console.log( this.hashesPerSecond.toString() + " hashes/s");
         }, 1000);
     }
 

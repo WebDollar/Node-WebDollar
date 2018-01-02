@@ -28,11 +28,11 @@ class Argon2BrowserAntelleMain{
 
     calcWorker(method, arg) {
 
-        this.clearLog();
+        //this.clearLog();
 
         if (this.worker) {
             if (this.worker.method === method) {
-                this.log('Using loaded worker');
+                //this.log('Using loaded worker');
                 this.worker.postMessage({ calc: method, arg: arg });
                 return;
             } else {
@@ -40,14 +40,14 @@ class Argon2BrowserAntelleMain{
             }
         }
 
-        this.log('Starting worker...');
+        //this.log('Starting worker...');
         this.worker = new Worker('js/worker.js');
         this.worker.method = method;
 
         var loaded = false;
 
         this.worker.onmessage = (e) => {
-            this.log(e.data.msg);
+            //this.log(e.data.msg);
             if (!loaded) {
                 loaded = true;
                 this.worker.postMessage({ calc: method, arg: arg });
@@ -59,13 +59,13 @@ class Argon2BrowserAntelleMain{
     calcPNaCl(arg) {
 
         window.Module = null;
-        this.clearLog();
+        //this.clearLog();
 
         if (!navigator.mimeTypes['application/x-pnacl']) {
-            return this.log('PNaCl is not supported by your browser');
+            throw 'PNaCl is not supported by your browser';
         }
 
-        this.log('Testing Argon2 using PNaCl');
+        //this.log('Testing Argon2 using PNaCl');
 
         var listener = document.getElementById('pnaclListener');
         var moduleEl = document.getElementById('pnacl-argon2');
@@ -76,7 +76,7 @@ class Argon2BrowserAntelleMain{
             return;
         }
 
-        this.log('Loading PNaCl module...');
+        //this.log('Loading PNaCl module...');
 
         moduleEl = document.createElement('embed');
         moduleEl.setAttribute('name', 'argon2');
@@ -87,8 +87,8 @@ class Argon2BrowserAntelleMain{
         moduleEl.setAttribute('type', 'application/x-pnacl');
 
         listener.addEventListener('load', function() {
-            this.log('PNaCl module loaded in ' + Math.round(performance.now() - this.pnaclTs) + 'ms');
-            this.log('Calculating hash....');
+            //this.log('PNaCl module loaded in ' + Math.round(performance.now() - this.pnaclTs) + 'ms');
+            //this.log('Calculating hash....');
             this.pnaclTs = performance.now();
             moduleEl.postMessage(arg);
         }, true);
@@ -97,15 +97,15 @@ class Argon2BrowserAntelleMain{
             var encoded = e.data.encoded;
             var hash = e.data.hash;
             if (e.data.res) {
-                this.log('Error: ' + e.data.res + ': ' + e.data.error);
+                //this.log('Error: ' + e.data.res + ': ' + e.data.error);
             } else {
-                this.log('Encoded: ' + encoded);
-                this.log('Hash: ' + hash);
-                this.log('Elapsed: ' + Math.round(performance.now() - pnaclTs) + 'ms');
+                //this.log('Encoded: ' + encoded);
+                //this.log('Hash: ' + hash);
+                //this.log('Elapsed: ' + Math.round(performance.now() - pnaclTs) + 'ms');
             }
         }, true);
-        listener.addEventListener('error', function() { this.log('Error'); }, true);
-        listener.addEventListener('crash', function() { this.log('Crash'); }, true);
+        listener.addEventListener('error', function() { console.log('Error'); }, true);
+        listener.addEventListener('crash', function() { console.log('Crash'); }, true);
 
         listener.appendChild(moduleEl);
         moduleEl.offsetTop; // required by PNaCl
@@ -122,12 +122,12 @@ class Argon2BrowserAntelleMain{
 
     clearLog() {
 
-        this.logTs = performance.now();
-
-        let txtRes  = document.getElementById('txtRes')
-
-        if (txtRes !== null)
-            txtRes.value = '';
+        // this.logTs = performance.now();
+        //
+        // let txtRes  = document.getElementById('txtRes')
+        //
+        // if (txtRes !== null)
+        //     txtRes.value = '';
     }
 
     log(msg) {
