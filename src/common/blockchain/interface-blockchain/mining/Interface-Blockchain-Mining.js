@@ -23,9 +23,31 @@ class InterfaceBlockchainMining{
         this._nonce = 0;
         this.started = false;
         this.hashesPerSecond = 0;
+        this.workers = 0; // browser webWorkers, backbone cores
+        this.workersList = [];
+
+        this.MAX_WORKERS = 20;
+    }
+
+    async increaseWorkers(number){
+        this.workers += number;
+        if (this.workers > this.MAX_WORKERS) this.workers = this.MAX_WORKERS;
+
+        if (!this.started && this.workers > 0) await this.startMining();
+    }
+
+    async decreaseWorkers(number){
+        this.workers -= number;
+        if (this.workers < 0) {
+            this.workers = 0;
+            this.stopMining();
+        }
     }
 
     async startMining(){
+
+        if (this.workers === 0)
+            this.workers = 1;
 
         this.started = true;
         this.reset = false;
@@ -122,9 +144,20 @@ class InterfaceBlockchainMining{
             if (showMiningOutput)
                 intervalMiningOutput = this.setMiningHashRateInterval();
 
-            this.mine(block, difficulty).then((solutionFound)=>{
+            this.mine(block, difficulty).then( async (answer)=>{
 
-                if (!solutionFound)
+                if (answer.result){
+                    console.log( colors.green("WebDollar Block ", block.height ," mined ", this._nonce, answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
+
+                    block.hash = answer.hash;
+                    block.nonce = this._nonce;
+
+                    await this.blockchain.processBlocksSempahoreCallback( ()=>{
+                        return this.blockchain.includeBlockchainBlock( block );
+                    });
+
+                } else
+                if (!answer.result)
                     console.log( colors.red("block ", block.height ," was not mined...") );
 
                 if (this.reset) // it was reset
@@ -147,34 +180,40 @@ class InterfaceBlockchainMining{
     }
 
 
-    async mine(block, difficulty){
+    /**
+     * Simple Mining with no Workers
+     * @param block
+     * @param difficulty
+     * @returns {Promise.<boolean>}
+     */
+    mine(block, difficulty){
 
-        while (this._nonce <= 0xFFFFFFFF && this.started && !this.reset ){
+        return new Promise( async(resolve)=>{
 
-            let hash = await block.computeHash(this._nonce);
+            while (this._nonce <= 0xFFFFFFFF && this.started && !this.reset ){
 
-            console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
+                let hash = await block.computeHash(this._nonce);
+
+                console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
 
 
-            if ( hash.compare(difficulty) <= 0 ) {
+                if ( hash.compare(difficulty) <= 0 ) {
 
-                console.log( colors.green("WebDollar Block ", block.height ," mined ", this._nonce, hash.toString("hex"), " reward", block.reward, "WEBD") );
+                    resolve({
+                        result:true,
+                        nonce: this._nonce,
+                        hash: hash,
+                    });
 
-                block.hash = hash;
-                block.nonce = this._nonce;
+                }
 
-                await this.blockchain.processBlocksSempahoreCallback( ()=>{
-                    return this.blockchain.includeBlockchainBlock( block );
-                });
-
-                return true;
-
+                this._nonce++;
             }
 
-            this._nonce++;
-        }
+            resolve ({result:false});
 
-        return false;
+        })
+
     }
 
 

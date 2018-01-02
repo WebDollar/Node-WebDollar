@@ -1,4 +1,4 @@
-import InterfaceBlockchainMining from "./Interface-Blockchain-Mining";
+import InterfaceBlockchainMining from "../Interface-Blockchain-Mining";
 
 class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
