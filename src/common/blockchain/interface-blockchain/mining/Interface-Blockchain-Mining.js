@@ -124,6 +124,8 @@ class InterfaceBlockchainMining{
 
         let intervalMiningOutput;
 
+        console.log("mineBlock");
+
         try{
 
             if (difficulty === undefined || difficulty === null) throw 'difficulty not specified';
@@ -144,29 +146,28 @@ class InterfaceBlockchainMining{
             if (showMiningOutput)
                 intervalMiningOutput = this.setMiningHashRateInterval();
 
-            this.mine(block, difficulty).then( async (answer)=>{
+            let answer = await this.mine(block, difficulty);
 
-                if (answer.result){
-                    console.log( colors.green("WebDollar Block ", block.height ," mined ", this._nonce, answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
+            if (answer.result){
+                console.log( colors.green("WebDollar Block ", block.height ," mined ", this._nonce, answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
 
-                    block.hash = answer.hash;
-                    block.nonce = this._nonce;
+                block.hash = answer.hash;
+                block.nonce = this._nonce;
 
-                    await this.blockchain.processBlocksSempahoreCallback( ()=>{
-                        return this.blockchain.includeBlockchainBlock( block );
-                    });
+                await this.blockchain.processBlocksSempahoreCallback( ()=>{
+                    return this.blockchain.includeBlockchainBlock( block );
+                });
 
-                } else
-                if (!answer.result)
-                    console.log( colors.red("block ", block.height ," was not mined...") );
+            } else
+            if (!answer.result)
+                console.log( colors.red("block ", block.height ," was not mined...") );
 
-                if (this.reset) // it was reset
-                    this.reset = false;
+            if (this.reset) // it was reset
+                this.reset = false;
 
-                if ( intervalMiningOutput !== undefined)
-                    clearInterval(intervalMiningOutput);
+            if ( intervalMiningOutput !== undefined)
+                clearInterval(intervalMiningOutput);
 
-            })
 
 
         } catch (Exception){

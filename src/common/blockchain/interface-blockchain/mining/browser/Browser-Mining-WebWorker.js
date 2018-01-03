@@ -1,6 +1,31 @@
+const Argon2WebAssemblyCalc  = require ('common/crypto/Argon2/browser/web-assembly/antelle/calc.js').default;
+
+let Base64FromNumber = function(number) {
+    if (isNaN(Number(number)) || number === null ||
+        number === Number.POSITIVE_INFINITY)
+        throw "The input is not valid";
+    if (number < 0)
+        throw "Can't represent negative numbers now";
+
+    var rixit; // like 'digit', only in some non-decimal radix
+    var residual = Math.floor(number);
+    var result = '';
+    while (true) {
+        rixit = residual % 64
+
+        result = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/".charAt(rixit) + result;
+
+        residual = Math.floor(residual / 64);
+
+        if (residual == 0)
+            break;
+    }
+    return result;
+}
+
 module.exports = function (self) {
 
-    self.addEventListener('message',async (ev) => {
+    self.addEventListener('message',function (ev) {
 
 
         if (ev.data.message === "new-nonces" || ev.data.message === "initialize" ){
@@ -14,72 +39,38 @@ module.exports = function (self) {
 
             let bestHash, bestNonce;
 
-            while (ev.data.count > 0){
+            let params = { salt: 'WebDollar_make_$', time: 2, mem: 1024, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://antelle.github.io/argon2-browser/dist'};
 
-                let hash = await self.block.computeHash(ev.data.nonce);
+            let chain = ()=>{
 
-                if ( bestHash === undefined || hash.compare(bestHash) <= 0 ) {
-                    bestHash = hash;
-                    bestNonce = ev.data.nonce;
-                }
+                if (ev.data.count === 0) return;
 
-                ev.data.nonce ++ ;
-                ev.data.count --;
-            }
+                params.pass = self.block + Base64FromNumber(ev.data.nonce);
+
+                Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((hash)=>{
+
+                    //let hash = await self.block.computeHash(ev.data.nonce);
+
+                    if ( bestHash === undefined || hash > bestHash ) {
+                        bestHash = hash;
+                        bestNonce = ev.data.nonce;
+                    }
+
+                    ev.data.nonce ++ ;
+                    ev.data.count --;
+
+                    chain();
+
+                });
+            };
+
+            chain();
+
 
             self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, });
 
         }
 
-        var startNum = parseInt(ev.data); // ev.data=4 from main.js
-
-        setInterval(function () {
-            var r = startNum / Math.random() - 1;
-            self.postMessage([ startNum, r, gamma(r) ]);
-        }, 500);
     });
 
 };
-
-
-
-
-var calcHashArg;
-
-self.onmessage = function(e) {
-    self.postMessage('calc:' + e.data.calc);
-    calcHashArg = e.data.arg;
-    switch (e.data.calc) {
-        case 'asm':
-            calcAsmJs();
-            break;
-        case 'wasm':
-            calcWasm();
-            break;
-    }
-};
-
-function clearLog() {
-}
-
-function log(msg) {
-    self.postMessage({ msg: msg });
-}
-
-function loadScript(script, callback, errorCallback) {
-    try {
-        importScripts(script);
-    } catch (e) {
-        console.error('Error loading script', script, e);
-        errorCallback(e);
-        return;
-    }
-    callback();
-}
-
-function getArg() {
-    return calcHashArg;
-}
-
-
-self.postMessage({ msg: 'Worker started' });

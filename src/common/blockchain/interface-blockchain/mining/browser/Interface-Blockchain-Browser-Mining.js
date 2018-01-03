@@ -17,7 +17,10 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
 
     createWorker(method) {
 
-        let worker = webWorkify(require('./Browser-Mining-WebWorker'));
+        console.log("creating 1 worker");
+
+        let worker = webWorkify(require('./Browser-Mining-WebWorker.js'));
+        this.workersList.push(worker);
 
         return worker;
     }
@@ -32,6 +35,8 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
     reduceWorkers(){
 
         //be sure we didn't skip anything
+
+        console.log("reduce workers");
 
         this._nonce -= this.WORKER_NONCES_WORK * (this.workersList.length - this.workers);
         if (this._nonce < 0) this._nonce = 0;
@@ -68,6 +73,8 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
                         else
                         if (event.data.message === "results") {
 
+                            console.log("REEESULTS!!!",event.data);
+
                             if (event.data.hash !== undefined && event.data.hash.compare(this.difficulty) <= 0) {
 
                                 this.terminateWorkers();
@@ -81,16 +88,18 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
                                 });
 
                             } else {
-                                worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK})
+                                worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
                                 this._nonce += this.WORKER_NONCES_WORK;
                             }
                         }
 
                     });
-                    worker.postMessage({message: "initialize", block: block, nonce: this._nonce , count: this.WORKER_NONCES_WORK });
+
+                    console.log("worker", worker);
+                    worker.postMessage({message: "initialize", block: block.computedBlockPrefix.toString("base64"), nonce: this._nonce , count: this.WORKER_NONCES_WORK });
                     this._nonce += this.WORKER_NONCES_WORK;
 
-                    this.workersList.push(worker);
+
                 }
 
                 if (this.workersList.length > this.workers)

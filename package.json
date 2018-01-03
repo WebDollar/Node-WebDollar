@@ -50,6 +50,7 @@
     "bs58": "^4.0.1",
     "btoa": "^1.1.2",
     "buffer": "^5.0.8",
+    "bufferutil": "^3.0.3",
     "colors": "^1.1.2",
     "elliptic": "^6.4.0",
     "fs": "0.0.1-security",
@@ -64,7 +65,7 @@
     "secp256k1": "^3.3.1",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
-    "utf-8-validate": "^3.0.3",
+    "utf-8-validate": "^3.0.4",
     "uuid": "^3.1.0",
     "webworkify": "^1.5.0",
     "wrtc": "0.0.62"
