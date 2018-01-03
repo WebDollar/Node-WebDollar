@@ -2,17 +2,22 @@ import InterfaceBlockchainMining from "../Interface-Blockchain-Mining";
 
 const webWorkify = require ('webworkify');
 
+/**
+ * WEBWORKIFY DOCUMENTATION ON https://github.com/browserify/webworkify
+ */
+
 class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
 
     constructor (blockchain, minerAddress){
 
         super(blockchain, minerAddress);
+
+        this.WORKER_NONCES_WORK = 100;
     }
 
     createWorker(method) {
 
         let worker = webWorkify(require('./Browser-Mining-WebWorker'));
-        worker.method = method;
 
         return worker;
     }
@@ -24,6 +29,19 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
         this.workersList = [];
     }
 
+    reduceWorkers(){
+
+        //be sure we didn't skip anything
+
+        this._nonce -= this.WORKER_NONCES_WORK * (this.workersList.length - this.workers);
+        if (this._nonce < 0) this._nonce = 0;
+
+        for (let i=this.workersList.length-1; i>this.workers-1; i++)
+            this.workersList[i].postMessage({message: "terminate"});
+
+        this.workersList.splice(this.workers-1);
+    }
+
 
     mine(block, difficulty){
 
@@ -33,42 +51,50 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
 
             let workersInterval = setInterval(()=>{
 
+                if (this._nonce >= 0xFFFFFFFF) resolve({result:false}); //we didn't find anything
+
                 if (this.workersList.length < this.workers){
 
                     let worker = this.createWorker();
 
-                    worker.onmessage = (event)=>{
+                    worker.addEventListener('message', (event) => {
 
-                        this.hashesPerSecondFuture += event.data.count;
-
+                        // this.hashesPerSecondFuture += event.data.count;
                         //console.log(this.hashesGeneratedBest, event.data.hashesGeneratedBest,this.hashesGeneratedBest > event.data.hashesGeneratedBest);
 
-                        if ( event.data.hash.compare(this.difficulty) <= 0 ) {
-
-                            this.terminateWorkers();
-                            this._nonce = event.data.nonce;
-
-                            resolve({
-                                result:true,
-                                hash: event.data.hash,
-                                nonce: event.data.nonce,
-                            });
+                        if (event.data.message === "error"){
 
                         }
+                        else
+                        if (event.data.message === "results") {
 
-                    };
+                            if (event.data.hash !== undefined && event.data.hash.compare(this.difficulty) <= 0) {
+
+                                this.terminateWorkers();
+
+                                this._nonce = event.data.nonce;
+
+                                resolve({
+                                    result: true,
+                                    hash: event.data.hash,
+                                    nonce: event.data.nonce,
+                                });
+
+                            } else {
+                                worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK})
+                                this._nonce += this.WORKER_NONCES_WORK;
+                            }
+                        }
+
+                    });
+                    worker.postMessage({message: "initialize", block: block, nonce: this._nonce , count: this.WORKER_NONCES_WORK });
+                    this._nonce += this.WORKER_NONCES_WORK;
 
                     this.workersList.push(worker);
                 }
 
-                if (this.workersList.length > this.workers){
-
-                    for (let i=this.workersList.length-1; i>this.workers-1; i++)
-                        workersInterval.postMessage({message: "terminate"});
-
-                    this.workersList.splice(this.workers-1);
-
-                }
+                if (this.workersList.length > this.workers)
+                    this.reduceWorkers();
 
             }, 10)
 
