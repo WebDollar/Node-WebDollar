@@ -35,12 +35,12 @@ class Argon2BrowserWebAssembly{
         let result;
 
 
-        // try {
-        //     result = await this._calculateHash(Argon2WebAssemblyCalc.calcWasm, params);
-        //     if (result !== null) return result;
-        // } catch (ex){
-        //
-        // }
+        try {
+            result = await this._calculateHash(Argon2WebAssemblyCalc.calcWasm, params);
+            if (result !== null) return result;
+        } catch (ex){
+
+        }
 
         try {
             result = await this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs, params);

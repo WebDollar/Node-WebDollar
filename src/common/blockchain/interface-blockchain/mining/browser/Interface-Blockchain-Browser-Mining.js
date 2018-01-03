@@ -1,5 +1,4 @@
 import InterfaceBlockchainMining from "../Interface-Blockchain-Mining";
-import AntelleMain from "./antelle/main";
 
 const webWorkify = require ('webworkify');
 
@@ -61,7 +60,7 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
     }
 
     initializeWorker(worker, block){
-        worker.postMessage({message: "initialize", block: block.computedBlockPrefix.toString("base64"), nonce: this._nonce , count: this.WORKER_NONCES_WORK });
+        worker.postMessage({message: "initialize", block: block.computedBlockPrefix, nonce: this._nonce , count: this.WORKER_NONCES_WORK });
         this._nonce += this.WORKER_NONCES_WORK;
     }
 
@@ -78,7 +77,7 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
             for (let i=0; i<this.workersList.length; i++)
                 this.initializeWorker(this.workersList[i], block);
 
-            let workersInterval = setInterval(()=>{
+            this.workersInterval = setInterval(()=>{
 
                 if (this._nonce >= 0xFFFFFFFF) resolve({result:false}); //we didn't find anything
 
@@ -116,11 +115,15 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
                 console.log("Worker Error");
             } else{
                 for (let i = 0, l=event.data.hash.length; i < l; i++)
-                    if (this.difficulty[i] > event.data.hash[i]) {
+
+
+                    if (this.difficulty[i] < event.data.hash[i]) {
 
                         this.suspendWorkers();
 
                         this._nonce = event.data.nonce;
+
+                        clearTimeout(this.workersInterval);
 
                         if (this.workerResolve !== undefined)
                             this.workerResolve({

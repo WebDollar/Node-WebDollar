@@ -90,7 +90,7 @@ class Argon2BrowserWebAssemblyCalc{
 
             //this.log('Testing Argon2 using Binaryen ' + method);
             if (global.Module && global.Module.wasmJSMethod === method && global.Module._argon2_hash) {
-                this.log('Calculating hash.... WASM optimized');
+                //this.log('Calculating hash.... WASM optimized');
                 resolve (this.calcHash(arg))
                 return;
             }
@@ -157,7 +157,7 @@ class Argon2BrowserWebAssemblyCalc{
 
         let result = null;
 
-        this.log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
+        //this.log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
 
 
         var dt = this.now();
@@ -185,20 +185,21 @@ class Argon2BrowserWebAssemblyCalc{
         }
         var elapsed = this.now() - dt;
         if (res === 0 && !err) {
-            var hashArr = [];
+
+            var hashArr = new Uint8Array(hashlen);
             for (var i = hash; i < hash + hashlen; i++) {
-                hashArr.push(Module.HEAP8[i]);
+                hashArr[i-hash] = 128 + Module.HEAP8[i];
             }
 
             result = {
                 hash: hashArr,
-                encoded:Module.Pointer_stringify(encoded),
+                // encoded:Module.Pointer_stringify(encoded),
                 elapsed: elapsed
             };
 
-            this.log('Encoded: ' + result.encoded);
-            this.log('Hash: ' + result.hash);
-            this.log('Elapsed: ' + result.elapsed);
+            // this.log('Encoded: ' + result.encoded);
+            // this.log('Hash: ' + result.hash);
+            // this.log('Elapsed: ' + result.elapsed);
 
 
 
