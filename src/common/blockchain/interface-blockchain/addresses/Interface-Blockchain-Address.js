@@ -39,6 +39,11 @@ class InterfaceBlockchainAddress{
         this.savePrivateKey(result.privateKey.privateKey);
         this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
     }
+
+    updatePassword(newPassword){
+
+        this.password = newPassword;
+    }
     
     async savePrivateKey(value, password) {
 
@@ -177,7 +182,7 @@ class InterfaceBlockchainAddress{
         
         if (typeof password === 'undefined')
             password = this.password;
-        
+
         let decr = WebDollarCrypto.decryptAES(data, password);
 
         return Buffer.from(decr);
@@ -224,9 +229,13 @@ class InterfaceBlockchainAddress{
 
     }
     
-    _toStringDebug(){
+    async _toStringDebug(){
 
-        return "address" + this.address.toString() + (this.publicKey !== null ? "public key" + this.publicKey.toString() : '') + (this.privateKey !== null ? "private key" + this.privateKey.toString() : '')
+        let privateKey = await this.getPrivateKey();
+        if (typeof privateKey.status !== 'undefined')
+            privateKey = null;
+
+        return "address" + this.address.toString() + (this.publicKey !== null ? "public key" + this.publicKey.toString() : '') + (privateKey !== null ? "private key" + privateKey.toString() : '')
     }
 
     getAddressAndPrivateKey(){
