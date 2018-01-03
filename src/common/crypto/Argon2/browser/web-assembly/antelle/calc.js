@@ -186,6 +186,11 @@ class Argon2BrowserWebAssemblyCalc{
         var elapsed = this.now() - dt;
         if (res === 0 && !err) {
 
+            /**
+             * changed by Alexandru Ionut Budisteanu
+             * to return UInt8Array aka Buffer
+             */
+
             var hashArr = new Uint8Array(hashlen);
             for (var i = hash; i < hash + hashlen; i++) {
                 hashArr[i-hash] = 128 + Module.HEAP8[i];

@@ -57,7 +57,7 @@ module.exports = function (self) {
 
                 params.pass.set(nonceArray, self.block.length);
 
-                log(nonce)
+                //log(nonce)
                 //log(params.pass)
 
                 return new Promise((resolve)=>{
@@ -67,10 +67,9 @@ module.exports = function (self) {
                         //let hash = await self.block.computeHash(ev.data.nonce);
 
                         hash = hash.hash;
-                        log( hash);
-
 
                         // compare lengths - can save a lot of time
+
                         let change = false;
                         if (bestHash === undefined) change = true;
                         else

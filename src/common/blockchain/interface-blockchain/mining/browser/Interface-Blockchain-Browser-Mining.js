@@ -114,10 +114,10 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
             if (event.data.hash === undefined){
                 console.log("Worker Error");
             } else{
+
                 for (let i = 0, l=event.data.hash.length; i < l; i++)
 
-
-                    if (this.difficulty[i] < event.data.hash[i]) {
+                    if (event.data.hash[i] <= this.difficulty[i] ) {
 
                         this.suspendWorkers();
 
@@ -133,6 +133,7 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
                             });
 
                         return;
+
                     } else break;
             }
 
