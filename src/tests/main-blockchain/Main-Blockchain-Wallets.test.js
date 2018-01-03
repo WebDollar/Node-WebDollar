@@ -15,7 +15,7 @@ describe('test save wallet to local storage', () => {
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
-        let privateKey = blockchainAddress.privateKey.privateKey;
+        let privateKey = await blockchainAddress.getPrivateKey();
 
         response = await blockchainAddress.save();
         assert(response === true, 'save: ' + response);
@@ -23,10 +23,15 @@ describe('test save wallet to local storage', () => {
         response = await blockchainAddress.load();
         assert(response === true, 'load: ' + response);
         
-        assert(blockchainAddress.address === address, 'address differ after load: ' + blockchainAddress.address + '!==' + address);
-        assert(blockchainAddress.unencodedAddress.equals(unencodedAddress), 'unencodedAddress differ after load: ' + blockchainAddress.unencodedAddress.toString('hex') + '!==' + address.toString('hex'));
-        assert(blockchainAddress.publicKey.equals(publicKey), 'publicKey differ after load: ' + blockchainAddress.publicKey.toString('hex') + '!==' + publicKey.toString('hex'));
-        assert(blockchainAddress.privateKey.privateKey.equals(privateKey), 'privateKey differ after load: ' + blockchainAddress.privateKey.privateKey.toString('hex') + '!==' + privateKey.toString('hex'));
+        let address2 = blockchainAddress.address;
+        let unencodedAddress2 = blockchainAddress.unencodedAddress;
+        let publicKey2 = blockchainAddress.publicKey;
+        let privateKey2 = await blockchainAddress.getPrivateKey();
+
+        assert(address2 === address, 'address differ after load: ' + address2 + '!==' + address);
+        assert(unencodedAddress2.equals(unencodedAddress), 'unencodedAddress differ after load: ' + unencodedAddress2.toString('hex') + '!==' + address.toString('hex'));
+        assert(publicKey2.equals(publicKey), 'publicKey differ after load: ' + publicKey2.toString('hex') + '!==' + publicKey.toString('hex'));
+        assert(privateKey2.equals(privateKey), 'privateKey differ after load: ' + privateKey2.toString('hex') + '!==' + privateKey.toString('hex'));
         
         response = await blockchainAddress.remove();
         assert(response === true, 'remove: ' + response);
@@ -42,7 +47,7 @@ describe('test save wallet to local storage', () => {
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
-        let privateKey = blockchainAddress.privateKey.privateKey;
+        let privateKey = await blockchainAddress.getPrivateKey();
 
         response = await blockchainAddress.save();
         assert(response === true, 'save: ' + response);
@@ -65,10 +70,10 @@ describe('test save wallet to local storage', () => {
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
-        let privateKey = blockchainAddress.privateKey.privateKey;
+        let privateKey = await blockchainAddress.getPrivateKey();
         let password = 'password';
         
-        blockchainAddress.encrypt(password);
+        //blockchainAddress.encrypt(password);
         
         response = await blockchainAddress.save();
         assert(response === true, 'save: ' + response);
@@ -76,12 +81,16 @@ describe('test save wallet to local storage', () => {
         response = await blockchainAddress.load();
         assert(response === true, 'load: ' + response);
         
-        blockchainAddress.decrypt(password);
-        assert(blockchainAddress.address === address, 'address differ after load: ' + blockchainAddress.address + '!==' + address);
-        assert(blockchainAddress.unencodedAddress.equals(unencodedAddress), 'address differ after load: ' + blockchainAddress.unencodedAddress.toString('hex') + '!==' + unencodedAddress.toString('hex'));
-        assert(blockchainAddress.publicKey.equals(publicKey), 'publicKey differ after load: ' + blockchainAddress.publicKey.toString('hex') + '!==' + publicKey.toString('hex'));
-        assert(blockchainAddress.privateKey.privateKey.equals(privateKey), 'privateKey differ after load: ' + blockchainAddress.privateKey.privateKey.toString('hex') + '!==' + privateKey.toString('hex'));
+        let address2 = blockchainAddress.address;
+        let unencodedAddress2 = blockchainAddress.unencodedAddress;
+        let publicKey2 = blockchainAddress.publicKey;
+        let privateKey2 = await blockchainAddress.getPrivateKey();
 
+        assert(address2 === address, 'address differ after load: ' + address2 + '!==' + address);
+        assert(unencodedAddress2.equals(unencodedAddress), 'unencodedAddress differ after load: ' + unencodedAddress2.toString('hex') + '!==' + address.toString('hex'));
+        assert(publicKey2.equals(publicKey), 'publicKey differ after load: ' + publicKey2.toString('hex') + '!==' + publicKey.toString('hex'));
+        assert(privateKey2.equals(privateKey), 'privateKey differ after load: ' + privateKey2.toString('hex') + '!==' + privateKey.toString('hex'));
+  
         response = await blockchainAddress.remove();
         assert(response === true, 'remove: ' + response);
         
@@ -103,17 +112,22 @@ describe('test save wallet to local storage', () => {
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
-        let privateKey = blockchainAddress.privateKey.privateKey;
+        let privateKey = await blockchainAddress.getPrivateKey();
         
         Blockchain.Wallet.updatePassword('new_pawwsord');
         
         let blockchainAddress2 = Blockchain.Wallet.addresses[0];
         
-        assert(blockchainAddress2.address === address, 'address differ after load: ' + blockchainAddress2.address + '!==' + address);
-        assert(blockchainAddress2.unencodedAddress.equals(unencodedAddress), 'address differ after load: ' + blockchainAddress2.unencodedAddress.toString('hex') + '!==' + unencodedAddress.toString('hex'));
-        assert(blockchainAddress2.publicKey.equals(publicKey), 'publicKey differ after load: ' + blockchainAddress2.publicKey.toString('hex') + '!==' + publicKey.toString('hex'));
-        assert(blockchainAddress2.privateKey.privateKey.equals(privateKey), 'privateKey differ after load: ' + blockchainAddress2.privateKey.privateKey.toString('hex') + '!==' + privateKey.toString('hex'));
+        let address2 = blockchainAddress2.address;
+        let unencodedAddress2 = blockchainAddress2.unencodedAddress;
+        let publicKey2 = blockchainAddress2.publicKey;
+        let privateKey2 = await blockchainAddress2.getPrivateKey();
 
+        assert(address2 === address, 'address differ after load: ' + address2 + '!==' + address);
+        assert(unencodedAddress2.equals(unencodedAddress), 'unencodedAddress differ after load: ' + unencodedAddress2.toString('hex') + '!==' + address.toString('hex'));
+        assert(publicKey2.equals(publicKey), 'publicKey differ after load: ' + publicKey2.toString('hex') + '!==' + publicKey.toString('hex'));
+        assert(privateKey2.equals(privateKey), 'privateKey differ after load: ' + privateKey2.toString('hex') + '!==' + privateKey.toString('hex'));
+  
     });
 
 });

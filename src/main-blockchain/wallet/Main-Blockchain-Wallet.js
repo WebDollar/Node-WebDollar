@@ -26,7 +26,6 @@ class MainBlockchainWallet{
         
         this.loadAddresses().then(async (response) => {
             if (response === false || this.addresses.length === 0) {
-                console.log("couldn't load any addresses")
                 this.createNewAddress();
                 await this.saveAddresses();
             }
@@ -38,7 +37,7 @@ class MainBlockchainWallet{
 
     createNewAddress(){
 
-        let blockchainAddress = new MiniBlockchainAddress();
+        let blockchainAddress = new MiniBlockchainAddress(this.db, this.password);
         blockchainAddress.createNewAddress();
 
         this.addresses.push(blockchainAddress);
@@ -66,13 +65,14 @@ class MainBlockchainWallet{
     
     async updatePassword(newPassword){
 
-        await this.loadAddresses();
+        for (let i = 0; i < this.addresses.length; ++i) {
+            let privateKey = await this.addresses[i].getPrivateKey(this.password);
+            await this.addresses[i].savePrivateKey(privateKey, newPassword);
+        }
 
         this.password = newPassword;
 
         this.emitter.emit('wallet/password-changed', {});
-        
-        await this.saveAddresses();
     }
     
     serialize() {
@@ -110,14 +110,8 @@ class MainBlockchainWallet{
     }
     
     async saveAddresses() {
-        
-        for (let i = 0; i < this.addresses.length; ++i)
-            this.addresses[i].encrypt(this.password);
 
         let value = this.serialize();  
-
-        for (let i = 0; i < this.addresses.length; ++i)
-            this.addresses[i].decrypt(this.password);
 
         return (await this.db.save(this.walletFileName, value));
     }
@@ -130,9 +124,6 @@ class MainBlockchainWallet{
             return false;
 
         this.deserialize(buffer);
-
-        for (let i = 0; i < this.addresses.length; ++i)
-            this.addresses[i].decrypt(this.password);
 
         if (this.addresses.length > 0)
             this.emitter.emit('wallet/changes', this.addresses );
