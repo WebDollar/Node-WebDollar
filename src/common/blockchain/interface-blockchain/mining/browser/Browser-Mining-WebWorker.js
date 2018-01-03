@@ -22,17 +22,17 @@ let Base64FromNumber = function(number) {
             break;
     }
     return result;
-}
+};
 
 let Base64From256 = function(number) {
 
-    let a = Base64FromNumber(number);
+    let a = Base64FromNumber(number).toString();
 
-    if (a.length === 1) return "000"+a;
-    else if (a.length === 2) return "00"+a;
-    else if (a.length === 3) return "0"+a;
-    else if (a.length === 4) return a;
-}
+    while (a.length <= 6)
+        a = a+"0";
+
+    return a;
+};
 
 let loadScriptWorker = function (script, callback, errorCallback) {
     try {
@@ -78,17 +78,18 @@ module.exports = function (self) {
 
                 if (ev.data.count === 0) return new Promise((resolve)=>{resolve(true)});
 
-                let nonceBase64 = Base64From256(nonce & 0xff)+
-                                  Base64From256(nonce>>8 & 0xff)+
-                                  Base64From256(nonce>>16 & 0xff)+
-                                  Base64From256(nonce>>24 & 0xff);
-
+                let nonceBase64 = Base64From256(nonce);
+                                  // (nonce & 0xff)+
+                                  // (nonce>>8 & 0xff)+
+                                  // (nonce>>16 & 0xff)+
+                                  // (nonce>>24 & 0xff);
+                
                 params.pass = this.block+nonceBase64;
 
                 //solution using Uint8Array
                 // params.pass = new Uint8Array(self.block.length + 4);
                 // params.pass.set(self.block);
-                //
+
                 // let nonceArray = new Uint8Array(4);
                 // nonceArray [0] = nonce & 0xff;
                 // nonceArray [1] = nonce>>8 & 0xff;

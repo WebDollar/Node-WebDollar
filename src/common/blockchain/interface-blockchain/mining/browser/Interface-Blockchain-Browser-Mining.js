@@ -1,4 +1,5 @@
 import InterfaceBlockchainMining from "../Interface-Blockchain-Mining";
+import AntelleMain from "./antelle/main";
 
 const webWorkify = require ('webworkify');
 
@@ -70,25 +71,29 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
 
         return new Promise((resolve)=>{
 
-            this.workerResolve = resolve;
+            AntelleMain("wasm");
 
-            for (let i=0; i<this.workersList.length; i++)
-                this.initializeWorker(this.workersList[i], block);
+            // this.workerResolve = resolve;
+            //
+            // for (let i=0; i<this.workersList.length; i++)
+            //     this.initializeWorker(this.workersList[i], block);
+            //
+            // let workersInterval = setInterval(()=>{
+            //
+            //     if (this._nonce >= 0xFFFFFFFF) resolve({result:false}); //we didn't find anything
+            //
+            //     if (this.workersList.length < this.workers){
+            //
+            //         let worker = this.createWorker();
+            //         this.initializeWorker(worker, block);
+            //     }
+            //
+            //     if (this.workersList.length > this.workers)
+            //         this.reduceWorkers();
+            //
+            // }, 10)
 
-            let workersInterval = setInterval(()=>{
 
-                if (this._nonce >= 0xFFFFFFFF) resolve({result:false}); //we didn't find anything
-
-                if (this.workersList.length < this.workers){
-
-                    let worker = this.createWorker();
-                    this.initializeWorker(worker, block);
-                }
-
-                if (this.workersList.length > this.workers)
-                    this.reduceWorkers();
-
-            }, 10)
 
         });
 
