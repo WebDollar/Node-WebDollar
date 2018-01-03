@@ -70,6 +70,15 @@ describe('WebDollar crypt', ()=>{
         console.log("WebDollarCrypto worked 3")
     })
 
+    it('hash Proof Of Work function string TESTS ', async ()=>{
+
+        const message1 = "WEBDOLAR TEST 555 @##%";
+        let hash1 = await WebDollarCrypto.hashPOW_String(message1)
+
+        assert( hash1 === "fa2f5d4e05c910790b1e871bb0dab0314b32ee7c314c8f7dd7fcf0417ecd38a8", "Hash1 "+message1+ " : "+hash1+" vs " +"fa2f5d4e05c910790b1e871bb0dab0314b32ee7c314c8f7dd7fcf0417ecd38a8 is not good");
+
+    });
+
     it('hash Proof Of Work function string ', async ()=>{
 
         //this.timeout(15000);

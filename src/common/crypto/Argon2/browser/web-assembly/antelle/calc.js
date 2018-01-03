@@ -268,4 +268,4 @@ class Argon2BrowserWebAssemblyCalc{
 
 }
 
-export default new Argon2BrowserWebAssemblyCalc()
+export default Argon2BrowserWebAssemblyCalc

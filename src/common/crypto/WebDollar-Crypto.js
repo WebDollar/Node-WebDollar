@@ -1,4 +1,3 @@
-var BigInteger = require('big-integer');
 
 let crypto = null;
 

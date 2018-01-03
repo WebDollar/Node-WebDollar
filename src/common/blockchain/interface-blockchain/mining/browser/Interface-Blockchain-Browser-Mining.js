@@ -2,7 +2,7 @@ import InterfaceBlockchainMining from "../Interface-Blockchain-Mining";
 
 const webWorkify = require ('webworkify');
 
-/**
+/**3
  * WEBWORKIFY DOCUMENTATION ON https://github.com/browserify/webworkify
  */
 
@@ -13,6 +13,7 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
         super(blockchain, minerAddress);
 
         this.WORKER_NONCES_WORK = 100;
+        this.workerResolve = undefined;
     }
 
     createWorker(method) {
@@ -21,6 +22,12 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
 
         let worker = webWorkify(require('./Browser-Mining-WebWorker.js'));
         this.workersList.push(worker);
+
+        console.log("worker", worker);
+
+        worker.addEventListener('message', (event) => {
+            this.puzzleReceived(worker, event);
+        });
 
         return worker;
     }
@@ -52,12 +59,21 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
         this.workersList.splice(this.workers-1);
     }
 
+    initializeWorker(worker, block){
+        worker.postMessage({message: "initialize", block: block.computedBlockPrefix.toString("base64"), nonce: this._nonce , count: this.WORKER_NONCES_WORK });
+        this._nonce += this.WORKER_NONCES_WORK;
+    }
 
     mine(block, difficulty){
 
         this.difficulty = difficulty;
 
         return new Promise((resolve)=>{
+
+            this.workerResolve = resolve;
+
+            for (let i=0; i<this.workersList.length; i++)
+                this.initializeWorker(this.workersList[i], block);
 
             let workersInterval = setInterval(()=>{
 
@@ -66,55 +82,7 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
                 if (this.workersList.length < this.workers){
 
                     let worker = this.createWorker();
-
-                    worker.addEventListener('message', (event) => {
-
-                        // this.hashesPerSecondFuture += event.data.count;
-                        //console.log(this.hashesGeneratedBest, event.data.hashesGeneratedBest,this.hashesGeneratedBest > event.data.hashesGeneratedBest);
-
-                        if (event.data.message === "error"){
-
-                        }
-                        else
-                        if (event.data.message === "results") {
-
-                            console.log("REEESULTS!!!",event.data);
-
-                            if (event.data.hash === undefined){
-                                console.log("Worker Error");
-                            } else{
-                                for (let i = 0, l=event.data.hash.length; i < l; i++)
-                                    if (this.difficulty[i] > event.data.hash[i]) {
-
-                                        this.suspendWorkers();
-
-                                        this._nonce = event.data.nonce;
-
-                                        resolve({
-                                            result: true,
-                                            hash: new Buffer(event.data.hash),
-                                            nonce: event.data.nonce,
-                                        });
-
-                                        return;
-                                    } else break;
-                            }
-
-                            worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
-                            this._nonce += this.WORKER_NONCES_WORK;
-
-                        } else
-                        if (event.data.message === "log") {
-                            console.log("worker", event.data.log);
-                        }
-
-                    });
-
-                    console.log("worker", worker);
-                    worker.postMessage({message: "initialize", block: block.computedBlockPrefix.toString("base64"), nonce: this._nonce , count: this.WORKER_NONCES_WORK });
-                    this._nonce += this.WORKER_NONCES_WORK;
-
-
+                    this.initializeWorker(worker, block);
                 }
 
                 if (this.workersList.length > this.workers)
@@ -123,6 +91,50 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
             }, 10)
 
         });
+
+    }
+
+    puzzleReceived(worker, event){
+
+        // this.hashesPerSecondFuture += event.data.count;
+        //console.log(this.hashesGeneratedBest, event.data.hashesGeneratedBest,this.hashesGeneratedBest > event.data.hashesGeneratedBest);
+
+        if (event.data.message === "error"){
+
+        }
+        else
+        if (event.data.message === "results") {
+
+            console.log("REEESULTS!!!",event.data);
+
+            if (event.data.hash === undefined){
+                console.log("Worker Error");
+            } else{
+                for (let i = 0, l=event.data.hash.length; i < l; i++)
+                    if (this.difficulty[i] > event.data.hash[i]) {
+
+                        this.suspendWorkers();
+
+                        this._nonce = event.data.nonce;
+
+                        if (this.workerResolve !== undefined)
+                            this.workerResolve({
+                                result: true,
+                                hash: new Buffer(event.data.hash),
+                                nonce: event.data.nonce,
+                            });
+
+                        return;
+                    } else break;
+            }
+
+            worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
+            this._nonce += this.WORKER_NONCES_WORK;
+
+        } else
+        if (event.data.message === "log") {
+            console.log("worker", event.data.log);
+        }
 
     }
 

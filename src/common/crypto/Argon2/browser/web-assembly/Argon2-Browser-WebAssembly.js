@@ -1,6 +1,8 @@
 import consts from 'consts/const_global'
 
-import Argon2WebAssemblyCalc from './antelle/calc.js'
+import Argon2WebAssemblyCalcClass from './antelle/calc.js'
+let Argon2WebAssemblyCalc = new Argon2WebAssemblyCalcClass();
+
 import Argon2WebAssemblyMain from './antelle/main.js'
 //require('antelle/worker.js')
 
