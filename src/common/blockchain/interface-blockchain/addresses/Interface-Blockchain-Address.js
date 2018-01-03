@@ -9,21 +9,22 @@ import BufferExtended from 'common/utils/BufferExtended';
 class InterfaceBlockchainAddress{
 
 
-    constructor (db){
+    constructor (db, password = 'password'){
 
         this.address = null;
 
         this.publicKey = null;
-        this.privateKey = null;
         
-        if(typeof db === "undefined")
+        if (typeof db === 'undefined'){
             this.db = new InterfaceSatoshminDB();
-        else
+            this.password = 'password';
+        } else {
             this.db = db;
+            this.password = password;
+        }
     }
 
     createNewAddress(salt){
-
 
         if (this.address !== null){
             console.log("WARNING! You overwrite the initial address")
@@ -34,18 +35,94 @@ class InterfaceBlockchainAddress{
         this.address = result.address;
         this.unencodedAddress = result.unencodedAddress;
         this.publicKey = result.publicKey;
-        this.privateKey = result.privateKey;
 
+        this.savePrivateKey(result.privateKey.privateKey);
+        this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
     }
     
+    async savePrivateKey(value, password) {
+
+        let key = this.address + '_privateKey';
+        value = this.encrypt(value, password);
+        
+        try {
+            return (await this.db.save(key, value));
+        }
+        catch(err) {
+            return 'ERROR on SAVE privateKey: ' + err;
+        }
+    }
+    
+    async getPrivateKey(password) {
+        
+        let key = this.address + '_privateKey';
+        
+        try {
+            let value = await this.db.get(key);            
+            value = this.decrypt(value, password);
+
+            return value;
+        }
+        catch(err) {
+            return 'ERROR on LOAD privateKey: ' + err;
+        }
+    }
+    
+    async removePrivateKey() {
+
+        let key = this.address + '_privateKey';
+        
+        try {
+            return (await this.db.remove(key));
+        }
+        catch(err) {
+            return 'ERROR on REMOVE privateKey: ' + err;
+        }
+    }
+    
+    async savePrivateKeyWIF(value) {
+
+        let key = this.address + '_privateKeyWIF';
+        
+        try {
+            return (await this.db.save(key, value));
+        }
+        catch(err) {
+            return 'ERROR on SAVE privateKeyWIF: ' + err;
+        }
+    }
+    
+    async getPrivateKeyWIF() {
+        
+        let key = this.address + '_privateKeyWIF';
+        
+        try {
+            return (await this.db.get(key));
+        }
+        catch(err) {
+            return 'ERROR on LOAD privateKeyWIF: ' + err;
+        }
+    }
+    
+    async removePrivateKeyWIF() {
+
+        let key = this.address + '_privateKeyWIF';
+        
+        try {
+            return (await this.db.remove(key));
+        }
+        catch(err) {
+            return 'ERROR on REMOVE privateKeyWIF: ' + err;
+        }
+
+    }
+
     serializeAddress(){
 
         return Buffer.concat( [ Serialization.serializeNumber1Byte(this.unencodedAddress.length),
                                 this.unencodedAddress,
                                 Serialization.serializeNumber1Byte(this.publicKey.length),
-                                this.publicKey,
-                                Serialization.serializeNumber1Byte(this.privateKey.privateKey.length),
-                                this.privateKey.privateKey
+                                this.publicKey
                               ]);
     }
     
@@ -72,12 +149,6 @@ class InterfaceBlockchainAddress{
             this.publicKey = BufferExtend.substr(data, offset, len);
             offset += len;
             
-            len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 1) );
-            offset += 1;
-            
-            this.privateKey.privateKey = BufferExtend.substr(data, offset, len);
-            offset += len;
-            
         } catch (exception){
             console.log("error deserializing address. ", exception);
             throw exception;
@@ -92,18 +163,24 @@ class InterfaceBlockchainAddress{
 
     }
     
-    encrypt(password) {
+    encrypt(data, password) {
         
-        let encr = WebDollarCrypto.encryptAES(this.privateKey.privateKey, password);
-        this.privateKey.privateKey = Buffer.from(encr);
-        return encr;
+        if (typeof password === 'undefined')
+            password = this.password;
+        
+        let encr = WebDollarCrypto.encryptAES(data, password);
+        
+        return Buffer.from(encr);
     }
     
-    decrypt(password) {
+    decrypt(data, password) {
         
-        let decr = WebDollarCrypto.decryptAES(this.privateKey.privateKey, password);
-        this.privateKey.privateKey = Buffer.from(decr);
-        return decr;
+        if (typeof password === 'undefined')
+            password = this.password;
+        
+        let decr = WebDollarCrypto.decryptAES(data, password);
+
+        return Buffer.from(decr);
     }
     
     async save() {
