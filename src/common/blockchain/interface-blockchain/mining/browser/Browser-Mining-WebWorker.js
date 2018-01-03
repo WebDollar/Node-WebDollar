@@ -63,29 +63,49 @@ module.exports = function (self) {
 
             let chain = ()=>{
 
-                if (ev.data.count === 0) return;
+                if (ev.data.count === 0) return new Promise((resolve)=>{resolve(true)});
 
                 params.pass = self.block + Base64FromNumber(ev.data.nonce);
 
-                return Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((hash)=>{
+                return new Promise((resolve)=>{
 
-                    //let hash = await self.block.computeHash(ev.data.nonce);
+                    Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcAsmJs, params).then((hash)=>{
 
-                    if ( bestHash === undefined || hash > bestHash ) {
-                        bestHash = hash;
-                        bestNonce = ev.data.nonce;
-                    }
+                        //let hash = await self.block.computeHash(ev.data.nonce);
+                        hash = hash.hash;
 
-                    ev.data.nonce ++ ;
-                    ev.data.count --;
+                        // compare lengths - can save a lot of time
+                        let change = false;
+                        if (bestHash === undefined)
+                            change = true;
+                        else
+                        for (let i = 0, l=bestHash.length; i < l; i++)
+                            if (hash[i] <= bestHash[i]) {
+                                change = true;
+                                break;
+                            }
 
-                    chain();
 
-                });
+                        if ( change ) {
+                            bestHash = hash;
+                            bestNonce = ev.data.nonce;
+                        }
+
+                        ev.data.nonce ++ ;
+                        ev.data.count --;
+
+                        chain().then((answer)=>{
+                            resolve(true);
+                        });
+
+                    });
+
+                })
+
             };
 
             chain().then((answer)=>{
-                //self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, });
+                self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, });
             });
 
 

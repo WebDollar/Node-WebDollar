@@ -32,6 +32,11 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
         this.workersList = [];
     }
 
+    suspendWorkers(){
+        for (let i=0; i<this.workersList.length; i++)
+            this.workersList[i].postMessage({message: "terminate"});
+    }
+
     reduceWorkers(){
 
         //be sure we didn't skip anything
@@ -75,22 +80,29 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
 
                             console.log("REEESULTS!!!",event.data);
 
-                            if (event.data.hash !== undefined && event.data.hash.compare(this.difficulty) <= 0) {
+                            if (event.data.hash === undefined){
+                                console.log("Worker Error");
+                            } else{
+                                for (let i = 0, l=event.data.hash.length; i < l; i++)
+                                    if (this.difficulty[i] > event.data.hash[i]) {
 
-                                this.terminateWorkers();
+                                        this.suspendWorkers();
 
-                                this._nonce = event.data.nonce;
+                                        this._nonce = event.data.nonce;
 
-                                resolve({
-                                    result: true,
-                                    hash: event.data.hash,
-                                    nonce: event.data.nonce,
-                                });
+                                        resolve({
+                                            result: true,
+                                            hash: new Buffer(event.data.hash),
+                                            nonce: event.data.nonce,
+                                        });
 
-                            } else {
-                                worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
-                                this._nonce += this.WORKER_NONCES_WORK;
+                                        return;
+                                    } else break;
                             }
+
+                            worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
+                            this._nonce += this.WORKER_NONCES_WORK;
+
                         } else
                         if (event.data.message === "log") {
                             console.log("worker", event.data.log);

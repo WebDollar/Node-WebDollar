@@ -25,14 +25,14 @@ class Argon2BrowserWebAssemblyCalc{
     }
 
     calcAsmJs(arg) {
-        this.clearLog();
+        //this.clearLog();
 
         return new Promise( (resolve) => {
 
-            this.log('Testing Argon2 using asm.js...');
+           // this.log('Testing Argon2 using asm.js...');
 
             if (global.Module && !global.Module.wasmJSMethod) {
-                this.log('Calculating hash....');
+                //this.log('Calculating hash....');
                 resolve ( this.calcHash(arg) )
                 return;
             }
@@ -43,11 +43,11 @@ class Argon2BrowserWebAssemblyCalc{
                 setStatus: this.log
             };
             var ts = this.now();
-            this.log('Loading script...');
+            //this.log('Loading script...');
 
             this.loadScript(root + 'dist/argon2-asm.min.js', () => {
-                this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
-                this.log('Calculating hash....');
+                //this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
+                //this.log('Calculating hash....');
 
                 resolve(this.calcHash(arg))
 
@@ -160,6 +160,7 @@ class Argon2BrowserWebAssemblyCalc{
         let result = null;
 
         this.log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
+
 
         var dt = this.now();
 

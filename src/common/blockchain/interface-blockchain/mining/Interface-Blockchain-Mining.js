@@ -223,6 +223,7 @@ class InterfaceBlockchainMining{
 
         return setInterval(() => {
             this.hashesPerSecond = this._nonce - previousNonce ;
+            previousNonce = this._nonce;
             console.log( this.hashesPerSecond+ " hashes/s");
 
             this.emitter.emit("mining/hash-rate", this.hashesPerSecond );
