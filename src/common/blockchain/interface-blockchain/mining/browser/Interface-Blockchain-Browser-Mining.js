@@ -91,6 +91,9 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
                                 worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
                                 this._nonce += this.WORKER_NONCES_WORK;
                             }
+                        } else
+                        if (event.data.message === "log") {
+                            console.log("worker", event.data.log);
                         }
 
                     });

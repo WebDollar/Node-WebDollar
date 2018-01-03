@@ -25,34 +25,34 @@ class Argon2BrowserWebAssemblyCalc{
     }
 
     calcAsmJs(arg) {
-        Argon2BrowserAntelleMain.clearLog();
+        this.clearLog();
 
         return new Promise( (resolve) => {
 
-            Argon2BrowserAntelleMain.log('Testing Argon2 using asm.js...');
+            this.log('Testing Argon2 using asm.js...');
 
             if (global.Module && !global.Module.wasmJSMethod) {
-                Argon2BrowserAntelleMain.log('Calculating hash....');
+                this.log('Calculating hash....');
                 resolve ( this.calcHash(arg) )
                 return;
             }
 
             global.Module = {
-                print: Argon2BrowserAntelleMain.log,
-                printErr: Argon2BrowserAntelleMain.log,
-                setStatus: Argon2BrowserAntelleMain.log
+                print: this.log,
+                printErr: this.log,
+                setStatus: this.log
             };
             var ts = this.now();
-            Argon2BrowserAntelleMain.log('Loading script...');
+            this.log('Loading script...');
 
-            Argon2BrowserAntelleMain.loadScript(root + 'dist/argon2-asm.min.js', () => {
-                Argon2BrowserAntelleMain.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
-                Argon2BrowserAntelleMain.log('Calculating hash....');
+            this.loadScript(root + 'dist/argon2-asm.min.js', () => {
+                this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
+                this.log('Calculating hash....');
 
                 resolve(this.calcHash(arg))
 
             }, () => {
-                Argon2BrowserAntelleMain.log('Error loading script');
+                this.log('Error loading script');
             });
 
             // this.calcBinaryen(arg, 'asmjs');
@@ -74,13 +74,13 @@ class Argon2BrowserWebAssemblyCalc{
 
     calcBinaryen(arg, method) {
 
-        Argon2BrowserAntelleMain.clearLog();
+        this.clearLog();
 
         return new Promise ((resolve)=>{
 
             if (!global.WebAssembly) {
 
-                Argon2BrowserAntelleMain.log('Your browser doesn\'t support WebAssembly, please try it in Chrome Canary or Firefox Nightly with WASM flag enabled');
+                this.log('Your browser doesn\'t support WebAssembly, please try it in Chrome Canary or Firefox Nightly with WASM flag enabled');
 
                 resolve(null); // return
                 return;
@@ -88,9 +88,9 @@ class Argon2BrowserWebAssemblyCalc{
 
             const mem = arg.mem;
 
-            //Argon2BrowserAntelleMain.log('Testing Argon2 using Binaryen ' + method);
+            //this.log('Testing Argon2 using Binaryen ' + method);
             if (global.Module && global.Module.wasmJSMethod === method && global.Module._argon2_hash) {
-                //Argon2BrowserAntelleMain.log('Calculating hash....');
+                this.log('Calculating hash.... WASM optimized');
                 resolve (this.calcHash(arg))
                 return;
             }
@@ -103,16 +103,16 @@ class Argon2BrowserWebAssemblyCalc{
             const totalMemory = (2*GB - 64*KB) / 1024 / WASM_PAGE_SIZE;
             const initialMemory = Math.min(Math.max(Math.ceil(mem * 1024 / WASM_PAGE_SIZE), 256) + 256, totalMemory);
 
-            Argon2BrowserAntelleMain.log('Memory: ' + initialMemory + ' pages (' + Math.round(initialMemory * 64) + ' KB)', totalMemory);
+            this.log('Memory: ' + initialMemory + ' pages (' + Math.round(initialMemory * 64) + ' KB)', totalMemory);
             const wasmMemory = new WebAssembly.Memory({
                 initial: initialMemory,
                 maximum: totalMemory
             });
 
             global.Module = {
-                print: Argon2BrowserAntelleMain.log,
-                printErr: Argon2BrowserAntelleMain.log,
-                setStatus: Argon2BrowserAntelleMain.log,
+                print: this.log,
+                printErr: this.log,
+                setStatus: this.log,
                 wasmBinary: null,
                 wasmJSMethod: method,
                 asmjsCodeFile: root + 'dist/argon2-asm.min.asm.js',
@@ -123,7 +123,7 @@ class Argon2BrowserWebAssemblyCalc{
                 TOTAL_MEMORY: initialMemory * WASM_PAGE_SIZE
             };
 
-            Argon2BrowserAntelleMain.log('Loading wasm...');
+            this.log('Loading wasm...');
             var xhr = new XMLHttpRequest();
             xhr.open('GET', root + 'dist/argon2.wasm', true);
             xhr.responseType = 'arraybuffer';
@@ -131,17 +131,19 @@ class Argon2BrowserWebAssemblyCalc{
                 global.Module.wasmBinary = xhr.response;
                 global.Module.postRun = this.calcHash(arg);
                 var ts = this.now();
-                Argon2BrowserAntelleMain.log('Wasm loaded, loading script...');
-                Argon2BrowserAntelleMain.loadScript(root + 'dist/argon2.min.js', () => {
-                    Argon2BrowserAntelleMain.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
-                    Argon2BrowserAntelleMain.log('Calculating hash....');
+                this.log('Wasm loaded, loading script...');
+                this.loadScript(root + 'dist/argon2.min.js', () => {
+                    this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
+                    this.log('Calculating hash....');
+                    this.log("hash", Module);
+                    this.log(this.calcHash(arg));
                     resolve (this.calcHash(arg))
                 }, () => {
-                    Argon2BrowserAntelleMain.log('Error loading script');
+                    this.log('Error loading script');
                 });
             };
             xhr.onerror = function () {
-                Argon2BrowserAntelleMain.log('Error loading wasm');
+                this.log('Error loading wasm');
             };
             xhr.send(null);
 
@@ -152,12 +154,12 @@ class Argon2BrowserWebAssemblyCalc{
     calcHash(arg) {
 
         if (!Module._argon2_hash) {
-            return Argon2BrowserAntelleMain.log('Error');
+            return this.log('Error Calculate Hash');
         }
 
         let result = null;
 
-        Argon2BrowserAntelleMain.log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
+        this.log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
 
         var dt = this.now();
 
@@ -195,9 +197,9 @@ class Argon2BrowserWebAssemblyCalc{
                 elapsed: elapsed
             };
 
-            Argon2BrowserAntelleMain.log('Encoded: ' + result.encoded);
-            Argon2BrowserAntelleMain.log('Hash: ' + result.hash);
-            Argon2BrowserAntelleMain.log('Elapsed: ' + result.elapsed);
+            this.log('Encoded: ' + result.encoded);
+            this.log('Hash: ' + result.hash);
+            this.log('Elapsed: ' + result.elapsed);
 
 
 
@@ -208,7 +210,7 @@ class Argon2BrowserWebAssemblyCalc{
                 }
             } catch (e) {
             }
-            Argon2BrowserAntelleMain.log('Error: ' + res + (err ? ': ' + err : ''));
+            this.log('Error: ' + res + (err ? ': ' + err : ''));
         }
         try {
             Module._free(pwd);
@@ -224,6 +226,43 @@ class Argon2BrowserWebAssemblyCalc{
         return  typeof global.performance !== 'undefined' ? performance.now() : Date.now();
     }
 
+
+    // leftPad(str, len) {
+    //
+    //     str = str.toString();
+    //     while (str.length < len) {
+    //         str = '0' + str;
+    //     }
+    //     return str;
+    // }
+    log(msg){
+        // if (!msg) {
+        //     return;
+        // }
+        //
+        // var txtRes = document.getElementById('txtRes');
+        // var elapsedMs = Math.round(performance.now() - this.logTs);
+        // var elapsedSec = (elapsedMs / 1000).toFixed(3);
+        // var elapsed = this.leftPad(elapsedSec, 6);
+        //
+        // if (txtRes !== null)
+        //     txtRes.value += (txtRes.value ? '\n' : '') + '[' + elapsed + '] ' + msg;
+    }
+    clearLog(){
+        // this.logTs = performance.now();
+        //
+        // let txtRes  = document.getElementById('txtRes')
+        //
+        // if (txtRes !== null)
+        //     txtRes.value = '';
+    }
+    loadScript(src, onload, onerror) {
+        var el = document.createElement("script");
+        el.src = src;
+        el.onload = onload;
+        el.onerror = onerror;
+        document.body.appendChild(el);
+    }
 
 
 }

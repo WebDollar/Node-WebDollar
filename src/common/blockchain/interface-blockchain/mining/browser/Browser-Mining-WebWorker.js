@@ -23,10 +23,30 @@ let Base64FromNumber = function(number) {
     return result;
 }
 
+let loadScriptWorker = function (script, callback, errorCallback) {
+    try {
+        importScripts(script);
+    } catch (e) {
+        console.error('Error loading script', script, e);
+        errorCallback(e);
+        return;
+    }
+    callback();
+};
+
+
+Argon2WebAssemblyCalc.loadScript = loadScriptWorker;
+
 module.exports = function (self) {
 
-    self.addEventListener('message',function (ev) {
+    let log = (msg) => {
+        if (!msg ) return;
+        self.postMessage({message: "log", log: msg});
+    };
+    Argon2WebAssemblyCalc.log = log;
 
+
+    self.addEventListener('message',function (ev) {
 
         if (ev.data.message === "new-nonces" || ev.data.message === "initialize" ){
 
@@ -47,7 +67,7 @@ module.exports = function (self) {
 
                 params.pass = self.block + Base64FromNumber(ev.data.nonce);
 
-                Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((hash)=>{
+                return Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((hash)=>{
 
                     //let hash = await self.block.computeHash(ev.data.nonce);
 
@@ -64,10 +84,10 @@ module.exports = function (self) {
                 });
             };
 
-            chain();
+            chain().then((answer)=>{
+                //self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, });
+            });
 
-
-            self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, });
 
         }
 

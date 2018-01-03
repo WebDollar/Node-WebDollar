@@ -17,15 +17,6 @@ class Argon2BrowserAntelleMain{
 
     }
 
-    loadScript(src, onload, onerror) {
-
-        var el = document.createElement("script");
-        el.src = src;
-        el.onload = onload;
-        el.onerror = onerror;
-        document.body.appendChild(el);
-    }
-
     calcWorker(method, arg) {
 
         //this.clearLog();
@@ -111,14 +102,14 @@ class Argon2BrowserAntelleMain{
         moduleEl.offsetTop; // required by PNaCl
     }
 
-    leftPad(str, len) {
-
-        str = str.toString();
-        while (str.length < len) {
-            str = '0' + str;
-        }
-        return str;
-    }
+    // leftPad(str, len) {
+    //
+    //     str = str.toString();
+    //     while (str.length < len) {
+    //         str = '0' + str;
+    //     }
+    //     return str;
+    // }
 
     clearLog() {
 
