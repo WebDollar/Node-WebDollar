@@ -113,8 +113,8 @@ describe('test save wallet to local storage', () => {
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
         let privateKey = await blockchainAddress.getPrivateKey();
-        
-        Blockchain.Wallet.updatePassword('new_pawwsord');
+
+        await Blockchain.Wallet.updatePassword('new_password');
         
         let blockchainAddress2 = Blockchain.Wallet.addresses[0];
         

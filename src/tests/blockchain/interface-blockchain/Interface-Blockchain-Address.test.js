@@ -41,24 +41,22 @@ describe('testAddressGenerator', () => {
         let blockchainAddress = new InterfaceBlockchainAddress();
         blockchainAddress.createNewAddress();
 
-        console.log("new address", blockchainAddress.address, blockchainAddress.privateKey, blockchainAddress.publicKey)
+        console.log("new address", blockchainAddress.address, blockchainAddress.privateKey, blockchainAddress.publicKey);
 
-        assert(typeof blockchainAddress.address === "string", "blockChain Address")
-        assert(Buffer.isBuffer(blockchainAddress.unencodedAddress), "blockChain Address")
-        assert(Buffer.isBuffer(blockchainAddress.publicKey), "blockChain Public Key")
+        assert(typeof blockchainAddress.address === "string", "blockChain Address");
+        assert(Buffer.isBuffer(blockchainAddress.unencodedAddress), "blockChain Address");
+        assert(Buffer.isBuffer(blockchainAddress.publicKey), "blockChain Public Key");
         
         let privateKey = await blockchainAddress.getPrivateKeyWIF();
         let privateKeyWIF = await blockchainAddress.getPrivateKeyWIF();
-            console.log('PK=',privateKey);
         assert(Buffer.isBuffer(privateKey), "blockChain Private Key");
         assert(Buffer.isBuffer(privateKeyWIF), "blockChain Private Key WIF");
-        
 
-        let stringDebug = blockchainAddress._toStringDebug()
-        let string = blockchainAddress.toString()
+        let stringDebug = await blockchainAddress._toStringDebug();
+        let string = blockchainAddress.toString();
 
-        assert(typeof stringDebug === 'string', "Addresses Debug String returned is not string")
-        assert(typeof string === 'string', "Addresses String returned is not string")
+        assert(typeof stringDebug === 'string', "Addresses Debug String returned is not string");
+        assert(typeof string === 'string', "Addresses String returned is not string");
 
     })
 

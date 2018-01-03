@@ -44,7 +44,7 @@ class MainBlockchainWallet{
 
         this.emitter.emit('wallet/address-changes', blockchainAddress.address );
 
-        //this.saveAddresses();
+        this.saveAddresses();
 
         return blockchainAddress;
     }
@@ -68,6 +68,8 @@ class MainBlockchainWallet{
         for (let i = 0; i < this.addresses.length; ++i) {
             let privateKey = await this.addresses[i].getPrivateKey(this.password);
             await this.addresses[i].savePrivateKey(privateKey, newPassword);
+
+            this.addresses[i].updatePassword(newPassword);
         }
 
         this.password = newPassword;
@@ -124,6 +126,8 @@ class MainBlockchainWallet{
             return false;
 
         this.deserialize(buffer);
+
+        await this.updatePassword(this.password);
 
         if (this.addresses.length > 0)
             this.emitter.emit('wallet/changes', this.addresses );
