@@ -129,15 +129,13 @@ class Argon2BrowserWebAssemblyCalc{
             xhr.responseType = 'arraybuffer';
             xhr.onload = () => {
                 global.Module.wasmBinary = xhr.response;
-                global.Module.postRun = this.calcHash(arg);
+                global.Module.postRun = () => resolve(this.calcHash(arg));
                 var ts = this.now();
                 this.log('Wasm loaded, loading script...');
                 this.loadScript(root + 'dist/argon2.min.js', () => {
                     this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                     this.log('Calculating hash....');
-                    this.log("hash", Module);
-                    this.log(this.calcHash(arg));
-                    resolve (this.calcHash(arg))
+
                 }, () => {
                     this.log('Error loading script');
                 });
@@ -167,7 +165,7 @@ class Argon2BrowserWebAssemblyCalc{
         var t_cost = arg && arg.time || 10;
         var m_cost = arg && arg.mem || 1024;
         var parallelism = arg && arg.parallelism || 1;
-        var pwd = Module.allocate(Module.intArrayFromString(arg && arg.pass || 'password'), 'i8', Module.ALLOC_NORMAL);
+        var pwd = Module.allocate( arg.pass , 'i8', Module.ALLOC_NORMAL);
         var pwdlen = arg && arg.pass ? arg.pass.length : 8;
         var salt = Module.allocate(Module.intArrayFromString(arg && arg.salt || 'somesalt'), 'i8', Module.ALLOC_NORMAL);
         var saltlen = arg && arg.salt ? arg.salt.length : 8;

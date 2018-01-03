@@ -110,11 +110,6 @@ class Argon2BrowserWebAssembly{
 
         try{
 
-
-            //Argon2BrowserWebAssembly requires string as input
-            if (Buffer.isBuffer(data))
-                data = data.toString("base64");
-
             let params = HASH_ARGON2_OPTIONS;
             params.pass = data
 

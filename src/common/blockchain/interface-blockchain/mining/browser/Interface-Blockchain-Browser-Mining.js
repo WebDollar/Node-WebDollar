@@ -71,27 +71,27 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMining{
 
         return new Promise((resolve)=>{
 
-            AntelleMain("wasm");
+            // AntelleMain("wasm");
 
-            // this.workerResolve = resolve;
-            //
-            // for (let i=0; i<this.workersList.length; i++)
-            //     this.initializeWorker(this.workersList[i], block);
-            //
-            // let workersInterval = setInterval(()=>{
-            //
-            //     if (this._nonce >= 0xFFFFFFFF) resolve({result:false}); //we didn't find anything
-            //
-            //     if (this.workersList.length < this.workers){
-            //
-            //         let worker = this.createWorker();
-            //         this.initializeWorker(worker, block);
-            //     }
-            //
-            //     if (this.workersList.length > this.workers)
-            //         this.reduceWorkers();
-            //
-            // }, 10)
+            this.workerResolve = resolve;
+
+            for (let i=0; i<this.workersList.length; i++)
+                this.initializeWorker(this.workersList[i], block);
+
+            let workersInterval = setInterval(()=>{
+
+                if (this._nonce >= 0xFFFFFFFF) resolve({result:false}); //we didn't find anything
+
+                if (this.workersList.length < this.workers){
+
+                    let worker = this.createWorker();
+                    this.initializeWorker(worker, block);
+                }
+
+                if (this.workersList.length > this.workers)
+                    this.reduceWorkers();
+
+            }, 10)
 
 
 

@@ -100,7 +100,7 @@ module.exports = function (self) {
 
                 return new Promise((resolve)=>{
 
-                    Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcAsmJs, params).then((hash)=>{
+                    Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((hash)=>{
 
                         //let hash = await self.block.computeHash(ev.data.nonce);
                         hash = hash.hash;
