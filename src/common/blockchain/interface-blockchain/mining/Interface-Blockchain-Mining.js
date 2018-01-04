@@ -105,8 +105,6 @@ class InterfaceBlockchainMining{
         let intervalMiningOutput;
 
         console.log(" ----------- mineBlock-------------");
-        console.log(" ----------- -------------");
-        console.log(" ----------- -------------");
 
         try{
 

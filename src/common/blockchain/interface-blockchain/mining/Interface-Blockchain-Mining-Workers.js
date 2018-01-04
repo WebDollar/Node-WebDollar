@@ -85,11 +85,11 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                 console.log("Worker Error");
             } else{
 
-                //verify hash
+                //verify block with the worker block
                 let match = true;
-                // for (let i=0; i<this.block.length; i++)
-                //     if (this.block[i] !== event.data.block[i] ) // do not match
-                //         match = false;
+                for (let i=0; i<this.block.length; i++)
+                    if (this.block[i] !== event.data.block[i] ) // do not match
+                        match = false;
 
                 //verify the  bestHash with  the current target
                 if (match)
@@ -117,6 +117,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
             worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
             this._nonce += this.WORKER_NONCES_WORK;
+            this._hashesPerSecond += this.WORKER_NONCES_WORK;
 
         } else
         if (event.data.message === "log") {
