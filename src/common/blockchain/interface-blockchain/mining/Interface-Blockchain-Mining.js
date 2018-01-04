@@ -24,17 +24,13 @@ class InterfaceBlockchainMining{
         this.started = false;
         this.hashesPerSecond = 0;
 
-
-
     }
 
 
     async startMining(){
 
-
         this.started = true;
         this.reset = false;
-
 
         this.emitter.emit('mining/status-changed', true);
 
@@ -52,12 +48,12 @@ class InterfaceBlockchainMining{
         this.emitter.emit('mining/reset', true);
     }
 
-    selectNextTransactions(){
+    _selectNextTransactions(){
         return []
     }
 
+    //overwrite by Mini-Blockchain Mining
     _simulatedNextBlockMining(nextBlock){
-
     }
 
     /**
@@ -72,7 +68,7 @@ class InterfaceBlockchainMining{
 
             try {
 
-                nextTransactions = this.selectNextTransactions();
+                nextTransactions = this._selectNextTransactions();
                 nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress, nextTransactions );
 
                 nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);

@@ -1,6 +1,12 @@
-let Argon2WebAssemblyCalcClass  = require ('common/crypto/Argon2/browser/web-assembly/antelle/calc.js').default;
+import Argon2WebAssemblyCalcClass  from "common/crypto/Argon2/browser/web-assembly/antelle/calc.js";
 let Argon2WebAssemblyCalc = new Argon2WebAssemblyCalcClass();
 
+/**
+ * This will load scripts/WASM files in a web worker
+ * @param script
+ * @param callback
+ * @param errorCallback
+ */
 let loadScriptWorker = function (script, callback, errorCallback) {
     try {
         importScripts(script);
@@ -26,7 +32,12 @@ module.exports = function (self) {
 
     self.addEventListener('message',function (ev) {
 
+        if (ev.data.message === "terminate"){ //JOB TERMINATED
+            self.jobTerminated = true;
+        } else
         if (ev.data.message === "new-nonces" || ev.data.message === "initialize" ){
+
+            self.jobTerminated = false;
 
             if (ev.data.message === "initialize"){
 
@@ -43,7 +54,7 @@ module.exports = function (self) {
 
             let chain = ()=>{
 
-                if (ev.data.count === 0) return new Promise((resolve)=>{resolve(true)});
+                if (ev.data.count === 0 || self.jobTerminated) return new Promise((resolve)=>{resolve(true)});
 
                 //solution using Uint8Array
                 params.pass = new Uint8Array(self.block.length + 4);
@@ -99,7 +110,9 @@ module.exports = function (self) {
             };
 
             chain().then((answer)=>{
-                self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, });
+
+                if (self.jobTerminated === false) //not terminated
+                    self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, });
             });
 
 

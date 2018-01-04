@@ -8,12 +8,8 @@ const webWorkify = require ('webworkify');
 
 class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMiningWorkers{
 
-    constructor (blockchain, minerAddress){
-        super(blockchain, minerAddress);
-    }
-
-    getWorker(){
-        return webWorkify(require('./Browser-Mining-WebWorker.js'));
+    _getWorker(){
+        return webWorkify(require('./Browser-Mining-Web-Worker.js'));
     }
 
 }
