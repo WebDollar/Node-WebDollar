@@ -206,7 +206,7 @@ class InterfaceBlockchainBlock {
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );
 
-        console.log("this.computedBlockPrefix", buffer);
+        //console.log("this.computedBlockPrefix", buffer);
 
         //console.log("buffer", buffer.toString("hex"));
         return WebDollarCrypto.hashPOW(buffer);

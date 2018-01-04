@@ -141,7 +141,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this._workersList.push(worker);
 
-        console.log("worker", worker);
 
         worker.addEventListener('message', (event) => {
             this._puzzleReceived(worker, event);
