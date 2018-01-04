@@ -1,3 +1,5 @@
+import consts from 'consts/const_global'
+
 class BlockchainGenesis{
 
     constructor(){
@@ -18,7 +20,10 @@ class BlockchainGenesis{
         if ( block.timeStamp > 0x000FFFFF) throw "Timestamp is too old "+block.timeStamp.toString();
     }
 
+    getLevel(){
 
+        return consts.BLOCKS_LEVEL_INFINITE;
+    }
 
 }
 
