@@ -47,7 +47,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                 this._processWorkersSempahoreCallback(()=>{
                     this._suspendWorkers();
                     this._suspendMiningWorking();
-                    console.log("am intrat 2222", this._workerResolve);
+
                     this._workerResolve({result:false}); //we didn't find anything
                 });
 
@@ -102,12 +102,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                                 this._suspendMiningWorking();
                                 this._suspendWorkers();
 
-                                console.log("am intrat", this._workerResolve);
-
-                                let workerResolve = this._workerResolve;
-                                this._workerResolve = undefined;
-
-                                workerResolve({
+                                this._workerResolve({
                                     result: true,
                                     hash: new Buffer(event.data.hash),
                                     nonce: event.data.nonce,

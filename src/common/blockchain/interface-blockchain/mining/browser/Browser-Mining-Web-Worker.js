@@ -21,7 +21,7 @@ let loadScriptWorker = function (script, callback, errorCallback) {
 Argon2WebAssemblyCalc.loadScript = loadScriptWorker;
 
 
-let jobTerminated = false; //is not working
+var jobTerminated = false; //is not working
 
 module.exports = function (self) {
 
@@ -34,8 +34,9 @@ module.exports = function (self) {
     self.addEventListener('message',function (ev) {
 
         if (ev.data.message === "terminate"){ //JOB TERMINATED
+            log("message received to TERMINATE..."+jobTerminated);
             jobTerminated = true;
-            //log("message received to TERMINATE...");
+            log("message received to TERMINATE... 222"+jobTerminated);
         } else
         if (ev.data.message === "new-nonces" || ev.data.message === "initialize" ){
 
