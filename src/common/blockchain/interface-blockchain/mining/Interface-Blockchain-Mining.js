@@ -22,7 +22,7 @@ class InterfaceBlockchainMining{
 
         this._nonce = 0;
         this.started = false;
-        this.hashesPerSecond = 0;
+        this._hashesPerSecond = 0;
 
     }
 
@@ -190,6 +190,7 @@ class InterfaceBlockchainMining{
                 }
 
                 this._nonce++;
+                this._hashesPerSecond++;
             }
 
             resolve ({result:false});
@@ -200,14 +201,14 @@ class InterfaceBlockchainMining{
 
 
     setMiningHashRateInterval(){
-        let previousNonce = this._nonce;
 
         return setInterval(() => {
-            this.hashesPerSecond = this._nonce - previousNonce ;
-            previousNonce = this._nonce;
-            console.log( this.hashesPerSecond+ " hashes/s");
+            console.log( this._hashesPerSecond+ " hashes/s");
 
-            this.emitter.emit("mining/hash-rate", this.hashesPerSecond );
+            this.emitter.emit("mining/hash-rate", this._hashesPerSecond );
+
+            this._hashesPerSecond = 0;
+
         }, 1000);
     }
 

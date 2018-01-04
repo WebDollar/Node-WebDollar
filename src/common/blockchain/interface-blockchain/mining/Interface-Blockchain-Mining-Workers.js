@@ -28,30 +28,29 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
             this.workerResolve = resolve;
 
+            //initialize new workers
             for (let i=0; i<this.workersList.length; i++)
                 this._initializeWorker(this.workersList[i], block);
 
             this.workersInterval = setInterval(()=>{
 
-                if (this.workerFinished){ //job finished
-                    clearInterval(this.workersInterval);
-                    return;
-                }
+                if (this.workerFinished) return; //job finished
 
                 if (this._nonce > 0xFFFFFFFF || (this.started === false) || this.reset){
 
-                    resolve({result:false}); //we didn't find anything
                     this._suspendWorkers();
                     this._suspendMiningWorking();
+                    resolve({result:false}); //we didn't find anything
                     return;
                 }
 
+                // create new workers
                 if (this.workersList.length < this.workers){
-
                     let worker = this.createWorker();
                     this._initializeWorker(worker, block);
                 }
 
+                //reduce the number of workers
                 if (this.workersList.length > this.workers)
                     this._reduceWorkers();
 
@@ -77,9 +76,10 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                 console.log("Worker Error");
             } else{
 
+                //verify the  bestHash with  the current target
                 for (let i = 0, l=event.data.hash.length; i < l; i++)
 
-                    if (event.data.hash[i] <= this.difficulty[i] ) {
+                    if (event.data.hash[i] < this.difficulty[i] ) {
 
                         if (this.workerResolve !== undefined && !this.workerFinished) { //not solved by somebody else
 
@@ -100,7 +100,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                         return;
 
-                    } else break;
+                    } else if (event.data.hash[i] > this.difficulty[i] ) break;
             }
 
             worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
@@ -178,6 +178,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
     _initializeWorker(worker, block){
         worker.postMessage({message: "initialize", block: block.computedBlockPrefix, nonce: this._nonce , count: this.WORKER_NONCES_WORK });
         this._nonce += this.WORKER_NONCES_WORK;
+        this._hashesPerSecond += this.WORKER_NONCES_WORK;
     }
 
 

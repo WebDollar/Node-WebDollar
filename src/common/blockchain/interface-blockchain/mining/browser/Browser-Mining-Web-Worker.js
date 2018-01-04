@@ -52,7 +52,7 @@ module.exports = function (self) {
 
             let nonce = ev.data.nonce;
 
-            let chain = ()=>{
+            let chainNext = ()=>{
 
                 if (ev.data.count === 0 || self.jobTerminated) return new Promise((resolve)=>{resolve(true)});
 
@@ -71,9 +71,8 @@ module.exports = function (self) {
                 //log(nonce)
                 //log(params.pass)
 
-                return new Promise((resolve)=>{
-
-                    Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((hash)=>{
+                // https://stackoverflow.com/questions/43780163/javascript-while-loop-where-condition-is-a-promise
+                return Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((hash)=>{
 
                         //let hash = await self.block.computeHash(ev.data.nonce);
 
@@ -82,13 +81,15 @@ module.exports = function (self) {
                         // compare lengths - can save a lot of time
 
                         let change = false;
+
                         if (bestHash === undefined) change = true;
                         else
-                        for (let i = 0, l=bestHash.length; i < l; i++)
-                            if (hash[i] <= bestHash[i]) {
-                                change = true;
-                                break;
-                            } else break;
+                            for (let i = 0, l=bestHash.length; i < l; i++)
+                                if (hash[i] < bestHash[i]) {
+                                    change = true;
+                                    break;
+                                }
+                                else if (hash[i] > bestHash[i]) break;
 
 
                         if ( change ) {
@@ -99,17 +100,13 @@ module.exports = function (self) {
                         nonce ++ ;
                         ev.data.count --;
 
-                        chain().then((answer)=>{
-                            resolve(true);
-                        });
+                        return chainNext();
 
                     });
 
-                })
-
             };
 
-            chain().then((answer)=>{
+            chainNext().then((answer)=>{
 
                 if (self.jobTerminated === false) //not terminated
                     self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, });
