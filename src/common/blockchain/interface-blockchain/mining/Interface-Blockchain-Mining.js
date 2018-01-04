@@ -23,31 +23,14 @@ class InterfaceBlockchainMining{
         this._nonce = 0;
         this.started = false;
         this.hashesPerSecond = 0;
-        this.workers = 0; // browser webWorkers, backbone cores
-        this.workersList = [];
 
-        this.MAX_WORKERS = 20;
+
+
     }
 
-    async increaseWorkers(number){
-        this.workers += number;
-        if (this.workers > this.MAX_WORKERS) this.workers = this.MAX_WORKERS;
-
-        if (!this.started && this.workers > 0) await this.startMining();
-    }
-
-    async decreaseWorkers(number){
-        this.workers -= number;
-        if (this.workers < 0) {
-            this.workers = 0;
-            this.stopMining();
-        }
-    }
 
     async startMining(){
 
-        if (this.workers === 0)
-            this.workers = 1;
 
         this.started = true;
         this.reset = false;
