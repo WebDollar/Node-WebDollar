@@ -18,8 +18,10 @@ let loadScriptWorker = function (script, callback, errorCallback) {
     callback();
 };
 
-
 Argon2WebAssemblyCalc.loadScript = loadScriptWorker;
+
+
+let jobTerminated = false; //is not working
 
 module.exports = function (self) {
 
@@ -29,15 +31,15 @@ module.exports = function (self) {
     };
     Argon2WebAssemblyCalc.log = log;
 
-
     self.addEventListener('message',function (ev) {
 
         if (ev.data.message === "terminate"){ //JOB TERMINATED
-            self.jobTerminated = true;
+            jobTerminated = true;
+            //log("message received to TERMINATE...");
         } else
         if (ev.data.message === "new-nonces" || ev.data.message === "initialize" ){
 
-            self.jobTerminated = false;
+            jobTerminated = false;
 
             if (ev.data.message === "initialize"){
 
@@ -54,7 +56,7 @@ module.exports = function (self) {
 
             let chainNext = ()=>{
 
-                if (ev.data.count === 0 || self.jobTerminated) return new Promise((resolve)=>{resolve(true)});
+                if (ev.data.count === 0 || jobTerminated) return new Promise((resolve)=>{resolve(true)});
 
                 //solution using Uint8Array
                 params.pass = new Uint8Array(self.block.length + 4);
@@ -108,8 +110,10 @@ module.exports = function (self) {
 
             chainNext().then((answer)=>{
 
-                if (self.jobTerminated === false) //not terminated
-                    self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, });
+                if (jobTerminated === false) //not terminated
+                    self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, block: self.block, });
+                else
+                    log("job terminated");
             });
 
 

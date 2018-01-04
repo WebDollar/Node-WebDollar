@@ -106,7 +106,7 @@ class InterfaceBlockchainBlock {
         let hash = await this.computeHash();
 
 
-        if (!hash.equals(this.hash)) throw "block hash is not right " + this.hash.toString("hex") + " "+ hash.toString("hex");
+        if (!hash.equals(this.hash)) throw "block hash is not right ("+this.nonce+")" + this.hash.toString("hex") + " "+ hash.toString("hex") ;
 
         await this.data.validateBlockData(validationType);
 
@@ -179,6 +179,8 @@ class InterfaceBlockchainBlock {
                                        this.computedBlockPrefix,
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );
+
+        console.log("this.computedBlockPrefix", buffer);
 
         //console.log("buffer", buffer.toString("hex"));
         return WebDollarCrypto.hashPOW(buffer);

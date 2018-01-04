@@ -7,58 +7,67 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         super(blockchain, minerAddress);
 
         this.workers = 0; // browser webWorkers, backbone cores
-        this.workersList = [];
-        this.workerFinished = false;
+        this._workersList = [];
+        this._workerFinished = false;
 
         this.WORKERS_MAX = 20;
-
         this.WORKER_NONCES_WORK = 100;
-        this.workerResolve = undefined;
+
+        this._workerResolve = undefined;
+        this._workersSempahore = false;
+
+        this.block = null;
     }
 
 
     mine(block, difficulty){
 
+        if (typeof block === 'object' && block.computedBlockPrefix !== undefined)
+            block = block.computedBlockPrefix;
+
+        this.block = block;
+
         this.difficulty = difficulty;
-        this.workerFinished = false;
 
-        return new Promise((resolve)=>{
+        this._workerFinished = false;
 
-            // AntelleMain("wasm");
 
-            this.workerResolve = resolve;
+        let promiseResolve = new Promise ((resolve)=>{ this._workerResolve = resolve });
 
-            //initialize new workers
-            for (let i=0; i<this.workersList.length; i++)
-                this._initializeWorker(this.workersList[i], block);
+        //initialize new workers
+        for (let i=0; i<this._workersList.length; i++)
+            this._initializeWorker(this._workersList[i], block);
 
-            this.workersInterval = setInterval(()=>{
+        this.workersInterval = setInterval(()=>{
 
-                if (this.workerFinished) return; //job finished
+            if (this._workerFinished) return; //job finished
 
-                if (this._nonce > 0xFFFFFFFF || (this.started === false) || this.reset){
+            if (this._nonce > 0xFFFFFFFF || (this.started === false) || this.reset){
 
+                this._processWorkersSempahoreCallback(()=>{
                     this._suspendWorkers();
                     this._suspendMiningWorking();
-                    resolve({result:false}); //we didn't find anything
-                    return;
-                }
+                    console.log("am intrat 2222", this._workerResolve);
+                    this._workerResolve({result:false}); //we didn't find anything
+                });
 
-                // create new workers
-                if (this.workersList.length < this.workers){
-                    let worker = this.createWorker();
-                    this._initializeWorker(worker, block);
-                }
+                return;
+            }
 
-                //reduce the number of workers
-                if (this.workersList.length > this.workers)
-                    this._reduceWorkers();
+            // create new workers
+            if (this._workersList.length < this.workers){
+                let worker = this.createWorker();
+                this._initializeWorker(worker, block);
+            }
 
-            }, 10)
+            //reduce the number of workers
+            if (this._workersList.length > this.workers)
+                this._reduceWorkers();
+
+        }, 10);
 
 
-
-        });
+        return promiseResolve;
 
     }
 
@@ -76,31 +85,39 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                 console.log("Worker Error");
             } else{
 
+                //verify hash
+                let match = true;
+                for (let i=0; i<this.block.length; i++)
+                    if (this.block[i] !== event.data.block ) // do not match
+                        match = false;
+
                 //verify the  bestHash with  the current target
-                for (let i = 0, l=event.data.hash.length; i < l; i++)
+                if (match)
+                    for (let i = 0, l=event.data.hash.length; i < l; i++)
 
-                    if (event.data.hash[i] < this.difficulty[i] ) {
+                        if (event.data.hash[i] < this.difficulty[i] ) {
 
-                        if (this.workerResolve !== undefined && !this.workerFinished) { //not solved by somebody else
+                            this._processWorkersSempahoreCallback( ()=>{
 
-                            let workerResolve = this.workerResolve;
+                                this._suspendMiningWorking();
+                                this._suspendWorkers();
 
-                            this._suspendMiningWorking();
-                            this._suspendWorkers();
+                                console.log("am intrat", this._workerResolve);
 
-                            this._nonce = event.data.nonce;
+                                let workerResolve = this._workerResolve;
+                                this._workerResolve = undefined;
 
-                            workerResolve({
-                                result: true,
-                                hash: new Buffer(event.data.hash),
-                                nonce: event.data.nonce,
+                                workerResolve({
+                                    result: true,
+                                    hash: new Buffer(event.data.hash),
+                                    nonce: event.data.nonce,
+                                });
+
                             });
 
-                        }
+                            return;
 
-                        return;
-
-                    } else if (event.data.hash[i] > this.difficulty[i] ) break;
+                        } else if (event.data.hash[i] > this.difficulty[i] ) break;
             }
 
             worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
@@ -127,7 +144,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         let worker = this._getWorker();
         if (worker === undefined || worker === null) throw 'No Worker specified';
 
-        this.workersList.push(worker);
+        this._workersList.push(worker);
 
         console.log("worker", worker);
 
@@ -142,19 +159,18 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this._suspendWorkers();
 
-        this.workersList = [];
+        this._workersList = [];
     }
 
     _suspendWorkers(){
-        for (let i=0; i<this.workersList.length; i++)
-            this.workersList[i].postMessage({message: "terminate"});
+        for (let i=0; i<this._workersList.length; i++)
+            this._workersList[i].postMessage({message: "terminate"});
     }
 
     _suspendMiningWorking(){
 
-        this.workerResolve = undefined;
         clearTimeout(this.workersInterval);
-        this.workerFinished = true;
+        this._workerFinished = true;
 
     }
 
@@ -164,19 +180,19 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         console.log("reduce workers");
 
-        this._nonce -= this.WORKER_NONCES_WORK * (this.workersList.length - this.workers);
+        this._nonce -= this.WORKER_NONCES_WORK * (this._workersList.length - this.workers);
         if (this._nonce < 0) this._nonce = 0;
 
         if (this.workers < 0) this.workers = 0; //can not be < 0 workers
 
-        for (let i=this.workersList.length-1; i>this.workers-1; i--)
-            this.workersList[i].postMessage({message: "terminate"});
+        for (let i=this._workersList.length-1; i>this.workers-1; i--)
+            this._workersList[i].postMessage({message: "terminate"});
 
-        this.workersList.splice(this.workers-1);
+        this._workersList.splice(this.workers-1);
     }
 
     _initializeWorker(worker, block){
-        worker.postMessage({message: "initialize", block: block.computedBlockPrefix, nonce: this._nonce , count: this.WORKER_NONCES_WORK });
+        worker.postMessage({message: "initialize", block: block, nonce: this._nonce , count: this.WORKER_NONCES_WORK });
         this._nonce += this.WORKER_NONCES_WORK;
         this._hashesPerSecond += this.WORKER_NONCES_WORK;
     }
@@ -220,7 +236,38 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             this.emitter.emit('mining/workers-changed', this.workers);
         }
 
+
         InterfaceBlockchainMining.prototype.stopMining.call(this);
+
+    }
+
+    _processWorkersSempahoreCallback(callback){
+
+        return new Promise ((resolve) =>{
+
+            let timer = setInterval( async () => {
+
+                if ( this._workersSempahore === false ){
+
+                    this._workersSempahore = true;
+                    clearInterval(timer);
+
+                    try {
+                        // solved by somebody else
+                        if (this._workerResolve === undefined || this._workerFinished) return false;
+
+                        let result = await callback();
+                        this._workersSempahore = false;
+
+                        resolve(result);
+                        return result;
+                    } catch (exception){
+                        this._workersSempahore = false;
+                        throw exception;
+                    }
+                }
+            },10);
+        });
 
     }
 

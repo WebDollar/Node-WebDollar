@@ -87,6 +87,7 @@ class InterfaceBlockchainMining{
             try {
                 await this.mineBlock(nextBlock, this.blockchain.getDifficultyTarget(), undefined, showMiningOutput);
             } catch (exception){
+                console.log("Mining Exception", exception);
                 this.stopMining();
             }
         }
@@ -103,7 +104,9 @@ class InterfaceBlockchainMining{
 
         let intervalMiningOutput;
 
-        console.log("mineBlock");
+        console.log(" ----------- mineBlock-------------");
+        console.log(" ----------- -------------");
+        console.log(" ----------- -------------");
 
         try{
 
@@ -128,12 +131,11 @@ class InterfaceBlockchainMining{
             let answer = await this.mine(block, difficulty);
 
             if (answer.result){
-                console.log( colors.green("WebDollar Block ", block.height ," mined ", this._nonce, answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
-
-                block.hash = answer.hash;
-                block.nonce = answer.nonce;
+                console.log( colors.green("WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
 
                 await this.blockchain.processBlocksSempahoreCallback( ()=>{
+                    block.hash = answer.hash;
+                    block.nonce = answer.nonce;
                     return this.blockchain.includeBlockchainBlock( block );
                 });
 
@@ -174,7 +176,7 @@ class InterfaceBlockchainMining{
 
                 let hash = await block.computeHash(this._nonce);
 
-                console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
+                //console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
 
 
                 if ( hash.compare(difficulty) <= 0 ) {

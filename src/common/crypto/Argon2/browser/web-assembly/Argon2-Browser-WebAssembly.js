@@ -119,7 +119,7 @@ class Argon2BrowserWebAssembly{
 
             if (result === null) throw("Argon2 returned empty");
 
-            console.log("result", result)
+            //console.log("result", result)
 
             return new Buffer(result.hash);
 
