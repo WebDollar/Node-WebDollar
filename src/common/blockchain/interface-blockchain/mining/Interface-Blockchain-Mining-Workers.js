@@ -85,8 +85,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                             let workerResolve = this.workerResolve;
 
-                            this._suspendWorkers();
                             this._suspendMiningWorking();
+                            this._suspendWorkers();
 
                             this._nonce = event.data.nonce;
 
@@ -139,8 +139,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
     }
 
     _terminateWorkers(){
-        for (let i=0; i<this.workersList.length; i++)
-            this.workersList[i].postMessage({message: "terminate"});
+
+        this._suspendWorkers();
 
         this.workersList = [];
     }

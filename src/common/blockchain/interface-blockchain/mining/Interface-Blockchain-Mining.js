@@ -131,7 +131,7 @@ class InterfaceBlockchainMining{
                 console.log( colors.green("WebDollar Block ", block.height ," mined ", this._nonce, answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
 
                 block.hash = answer.hash;
-                block.nonce = this._nonce;
+                block.nonce = answer.nonce;
 
                 await this.blockchain.processBlocksSempahoreCallback( ()=>{
                     return this.blockchain.includeBlockchainBlock( block );
@@ -184,6 +184,8 @@ class InterfaceBlockchainMining{
                         nonce: this._nonce,
                         hash: hash,
                     });
+
+                    return;
 
                 }
 
