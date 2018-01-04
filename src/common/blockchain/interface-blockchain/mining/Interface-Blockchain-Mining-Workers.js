@@ -87,9 +87,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                 //verify hash
                 let match = true;
-                for (let i=0; i<this.block.length; i++)
-                    if (this.block[i] !== event.data.block ) // do not match
-                        match = false;
+                // for (let i=0; i<this.block.length; i++)
+                //     if (this.block[i] !== event.data.block[i] ) // do not match
+                //         match = false;
 
                 //verify the  bestHash with  the current target
                 if (match)
