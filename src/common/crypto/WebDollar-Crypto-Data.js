@@ -55,7 +55,7 @@ class WebDollarCryptoData {
             this.buffer = new Buffer(data, "hex");
         else
         if (type === "base")
-            this.buffer = new Buffer(WebDollarCrypto.decodeBase64(data)); //if it is string, it must be a Base string
+            this.buffer = new Buffer(BufferExtended.fromBase(data)); //if it is string, it must be a Base string
         else
         if (type === "utf-8")
             this.buffer = new Buffer(data, "utf-8");

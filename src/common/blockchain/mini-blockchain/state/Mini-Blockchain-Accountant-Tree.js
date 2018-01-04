@@ -5,6 +5,10 @@ import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 
+import BufferExtended from "common/utils/BufferExtended"
+
+const EventEmitter = require('events');
+
 class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     constructor (){
@@ -12,16 +16,25 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         this.autoMerklify = true;
         this.root.hash = {sha256: new Buffer(32) }
+
+        this.emitter = new EventEmitter();
     }
 
     createNode(parent, edges, value){
         return new MiniBlockchainAccountantTreeNode(parent, edges, value);
     }
 
+    /**
+     *
+     * @param input must be Base or Base String
+     * @param value
+     * @param tokenId
+     * @returns {*}
+     */
     updateAccount(input, value, tokenId){
 
         if (Buffer.isBuffer(input))
-            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
+            input = BufferExtended.fromBase(input);
 
         let node = this.search(input).node;
 
@@ -37,18 +50,26 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         // it was deleted
         if (result === null){
             this.delete(input);
+            this.emitter.emit("balances/changes/"+BufferExtended.toBase(input), result);
             return null;
         }
 
         this.changedNode( node );
 
+        this.emitter.emit("balances/changes/"+BufferExtended.toBase(input), result);
+
         return result;
     }
 
+    /**
+     *
+     * @param input must be Base or Base String
+     * @returns {*}
+     */
     listBalances(input){
 
         if (Buffer.isBuffer(input))
-            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
+            input = BufferExtended.fromBase(input);
 
         let node = this.search(input).node;
 

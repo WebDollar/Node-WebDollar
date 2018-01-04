@@ -2,11 +2,6 @@ import MiniBlockchainProtocol from 'common/blockchain/mini-blockchain/Mini-Block
 
 class MainBlockchainProtocol extends MiniBlockchainProtocol{
 
-    constructor(blockchain){
-
-        super(blockchain);
-
-    }
 
 }
 
