@@ -2,7 +2,6 @@ import InterfaceMerkleAccountantRadixTree from 'common/trees/radix-tree/accounta
 import InterfaceMerkeRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree-Node'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
-import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
 import BufferExtended from "common/utils/BufferExtended";
 import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
@@ -34,7 +33,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         if (this.balances === undefined || this.balances === null) throw 'balances is null';
 
         if (!Buffer.isBuffer(tokenId))
-            tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
+            tokenId = BufferExtended.fromBase(tokenId);
 
         if (!value instanceof BigNumber)
             value = new BigNumber(value);
@@ -81,7 +80,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = 1;
 
         if (!Buffer.isBuffer(tokenId))
-            tokenId = WebDollarCryptoData.createWebDollarCryptoData(tokenId).buffer;
+            tokenId = BufferExtended.fromBase(tokenId);
 
         for (let i=0; i<this.balances.length; i++)
             if (this.balances[i].id.equals( tokenId) )
@@ -99,7 +98,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         let list = { };
 
         for (let i=0; i<this.balances.length; i++)
-            list[ this.balances[i].id.toString() ] = this.balances[i].amount;
+            list[ this.balances[i].id.toString() ] = this.balances[i].amount.toString();
 
 
         return list;
