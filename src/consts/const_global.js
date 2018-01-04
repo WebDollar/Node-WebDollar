@@ -46,5 +46,6 @@ consts.TOKEN_ID_LENGTH = 32;
 
 consts.BLOCKS_MAX_SIZE_BYTES = 1024*1024 * 1; // in bytes
 consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
+consts.BLOCKS_LEVEL_INFINITE = (1 << 30);
 
 export default consts

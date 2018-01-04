@@ -45,7 +45,8 @@ class InterfaceBlockchainBlock {
 
         this.data = data;
 
-
+        this.interlink = [];
+        
         //computed data
         this.computedBlockPrefix = null;
 
@@ -57,6 +58,31 @@ class InterfaceBlockchainBlock {
         this.db = db;
     }
 
+    getId(){
+
+        return this.height;
+    }
+
+    getLevel(){
+
+        let T = this.blockchain.blocks.length;
+        let id = this.getId();
+        
+        //If id <= T/2^µ the block is of level µ => block level is µ max for 2^µ * id <= T
+        return -1;
+    }
+    
+    updateInterlink(prevBlock){
+        
+        for (let i = 0; i < prevBlock.interlink.length; ++i){
+            this.interlink[i] = prevBlock.interlink[i];
+        }
+        
+        /*for (let u = 0; u < prevBlock.getLevel(); ++u){
+            this.interlink[i] = 
+        }*/
+
+    }
 
     async validateBlock(height, previousDifficultyTarget, previousHash, validationType){
 
@@ -279,11 +305,12 @@ class InterfaceBlockchainBlock {
     }
     
     equals(targetBlock){
+
         return this.hash.equals(targetBlock.hash) &&
-        this.hashPrev.equals(targetBlock.hashPrev) &&
-        this.height === targetBlock.height &&
-        this.nonce === targetBlock.nonce &&
-        this.version === targetBlock.version;
+            this.hashPrev.equals(targetBlock.hashPrev) &&
+            this.height === targetBlock.height &&
+            this.nonce === targetBlock.nonce &&
+            this.version === targetBlock.version;
     }
 
 }
