@@ -180,6 +180,39 @@ class Serialization{
         return result;
 
     }
+    
+    /**
+     * Returns the position of most significant bit of 1
+     * Eg: for n = 00000000000000000000000000001010 returns 3
+     * @returns {number}
+     */
+    mostSignificantOneBitPosition(n){
+        
+        let num = 0;
+        
+        if (0xFFFF0000 & n) {
+            n = (0xFFFF0000 & n)>>16;
+            num += 16;
+        }
+        if (0xFF00 & n) {
+            n = (0xFF00 & n) >> 8;
+            num += 8;
+        }
+        if (0xF0 & n) {
+            n = (0xF0 & n) >> 4;
+            num += 4;
+        }
+        if (12 & n) {
+            n = (12 & n) >> 2;
+            num += 2;
+        }
+        if (2 & n) {
+            n = (2 & n) >> 1;
+            num += 1;
+        }
+
+        return 1;
+    }
 
 }
 

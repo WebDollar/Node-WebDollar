@@ -68,8 +68,11 @@ class InterfaceBlockchainBlock {
         let T = this.blockchain.blocks.length;
         let id = this.getId();
         
-        //If id <= T/2^µ the block is of level µ => block level is µ max for 2^µ * id <= T
-        return -1;
+        //If id <= T/2^u the block is of level u => block level is max(u) for 2^u * id <= T
+        let x = Math.trunc(T/id);
+        let u = Serialization.mostSignificantOneBitPosition(x);
+        
+        return u;
     }
     
     updateInterlink(prevBlock){
@@ -78,9 +81,13 @@ class InterfaceBlockchainBlock {
             this.interlink[i] = prevBlock.interlink[i];
         }
         
-        /*for (let u = 0; u < prevBlock.getLevel(); ++u){
-            this.interlink[i] = 
-        }*/
+        let blockLevel = this.getLevel();
+        
+        //add new interlinks for current block
+        //Every block of level u needs a pointer to the previous block with level <= u.
+        for (let u = prevBlock.interlink.length; u < blockLevel; ++u){
+            this.interlink[i] = 0;/*replace with H(ctr′, G(s′, x′, interlink′))*/
+        }
 
     }
 
