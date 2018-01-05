@@ -14,12 +14,8 @@ class InterfaceBlockchainBlockData {
         if (minerAddress === undefined)
             minerAddress = BlockchainGenesis.address;
 
-
         if (!Buffer.isBuffer(minerAddress))
-            minerAddress = Buffer.from(minerAddress);
-
-        if (minerAddress === "string")
-            WebDollarCrypto.fromBase(minerAddress);
+            minerAddress = BufferExtended.fromBase(minerAddress);
 
         this.minerAddress = minerAddress;
 

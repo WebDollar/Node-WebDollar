@@ -50,13 +50,13 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         // it was deleted
         if (result === null){
             this.delete(input);
-            this.emitter.emit("balances/changes/"+BufferExtended.toBase(input), result);
+            this.emitter.emit("balances/changes/"+BufferExtended.toBase(input), null);
             return null;
         }
 
         this.changedNode( node );
 
-        this.emitter.emit("balances/changes/"+BufferExtended.toBase(input), result);
+        this.emitter.emit("balances/changes/"+BufferExtended.toBase(input), node.getBalances() );
 
         return result;
     }

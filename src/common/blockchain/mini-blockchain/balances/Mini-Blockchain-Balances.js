@@ -29,7 +29,7 @@ class MiniBlockchainBalances{
         if (!Buffer.isBuffer(address))
             address = BufferExtended.fromBase(address);
 
-        let subscription = this._blockchain.accountantTree.emitter.on("balances/changed"+address.toString(),callback);
+        let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+address.toString(),callback);
 
         return {
             subscription: subscription,
@@ -39,7 +39,9 @@ class MiniBlockchainBalances{
 
     unsusbribeBalanceChanges(subscription){
 
-        this._blockchain.accountantTree.emitter.off(subscription);
+        if (subscription === undefined || subscription === null) return false;
+
+        subscription();
 
     }
 

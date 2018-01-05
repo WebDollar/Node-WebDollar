@@ -1,5 +1,6 @@
 
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import BufferExtended from "../../../utils/BufferExtended";
 
 class InterfaceBlockchainBlockCreator{
 
@@ -40,6 +41,9 @@ class InterfaceBlockchainBlockCreator{
     }
 
     createBlockNew(minerAddress, transactions){
+
+        if (!Buffer.isBuffer(minerAddress))
+            minerAddress = BufferExtended.fromBase(minerAddress);
 
         let restArgs = [];
         for (let i=2; i<arguments.length; i++ )

@@ -12,7 +12,7 @@ class Blockchain{
         this.blockchain = this.Chain;
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
-        this.Mining = new MainBlockchainMining(this.Chain);
+        this.Mining = new MainBlockchainMining(this.Chain, this.Wallet.getMiningAddress() );
         this.Protocol = new MainBlockchainProtocol(this.Chain);
 
         this.Balances = new MainBlockchainBalances(this.Chain);

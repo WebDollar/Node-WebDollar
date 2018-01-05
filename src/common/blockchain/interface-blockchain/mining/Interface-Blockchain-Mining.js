@@ -1,3 +1,5 @@
+import BufferExtended from "../../../utils/BufferExtended";
+
 var BigInteger = require('big-integer');
 const colors = require('colors/safe');
 const EventEmitter = require('events');
@@ -18,7 +20,7 @@ class InterfaceBlockchainMining{
 
         this.blockchain = blockchain;
 
-        this.minerAddress = minerAddress;
+        this.setMinerAddress(minerAddress);
 
         this._nonce = 0;
         this.started = false;
@@ -212,6 +214,19 @@ class InterfaceBlockchainMining{
         }, 1000);
     }
 
+
+    setMinerAddress(newMinerAddress){
+
+        //console.log("setMinerAddress", newMinerAddress);
+
+        if (!Buffer.isBuffer(newMinerAddress))
+            newMinerAddress = BufferExtended.fromBase(newMinerAddress);
+
+        this.minerAddress = newMinerAddress;
+
+        this.emitter.emit('mining/miner-address-changed', BufferExtended.toBase(this.minerAddress));
+
+    }
 
 }
 

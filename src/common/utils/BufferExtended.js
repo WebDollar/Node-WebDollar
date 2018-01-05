@@ -49,7 +49,7 @@ class BufferExtended {
 
     fromBase(string){
         if (consts.PRIVATE_KEY_USE_BASE64)  {
-            WebDollarCrypto.decodeBase64(string); //if it is string, it must be a Base string
+            return WebDollarCrypto.decodeBase64(string); //if it is string, it must be a Base string
         }
         else {
 

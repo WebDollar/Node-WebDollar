@@ -147,7 +147,19 @@ class MainBlockchainWallet{
 
     getAddressPic(address){
 
+        if (Buffer.isBuffer(address))
+            address = BufferExtended.toBase();
+
         return `https://www.gravatar.com/avatar/${md5(address)}?d=retro&f=y`;
+
+    }
+
+    getMiningAddress(){
+
+        if (this.addresses.length === 0)
+            this.createNewAddress();
+
+        return this.addresses[0].address;
 
     }
 

@@ -4,9 +4,9 @@ import MiniBlockchainMining from 'common/blockchain/mini-blockchain/Mini-Blockch
 
 class MainBlockchainMining extends MiniBlockchainMining{
 
-    constructor(blockchain){
+    constructor(blockchain, minerAddress){
 
-        super(blockchain);
+        super(blockchain, minerAddress);
 
         this.blockchain.mining = this;
     }
