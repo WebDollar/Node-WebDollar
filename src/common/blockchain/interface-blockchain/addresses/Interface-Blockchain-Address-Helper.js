@@ -21,7 +21,7 @@ class InterfaceBlockchainAddressHelper{
         //tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 
         //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
-        let privateKey = WebDollarCrypto.getBufferRandomValues(32);
+        let privateKey = WebDollarCrypto.getBufferRandomValues(consts.PRIVATE_KEY_LENGTH);
 
         //if you want to follow the step-by-step results in this article, comment the
         //previous code and uncomment the following
@@ -31,7 +31,12 @@ class InterfaceBlockchainAddressHelper{
             console.log("privateKeyHex", privateKey.toString("hex"), "length", privateKey.length) //1184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD
         }
 
-        //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
+        /**
+         * Private Key was calculated before
+         * Let's calculate the PrivateKeyWIF (with checksum)
+         */
+
+            //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
         let privateKeyAndVersion = Buffer.concat( [ Buffer.from(consts.PRIVATE_KEY_VERSION_PREFIX, "hex"),  privateKey] );
         let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(privateKeyAndVersion, showDebug);
 
@@ -61,16 +66,23 @@ class InterfaceBlockchainAddressHelper{
         return InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, showDebug).privateKeyWIF.string;
     }
 
-    static _generatePublicKey(privateKey, showDebug){
+    /**
+     * generate PublicKey from PrivateKeyWIF
+     * @param privateKeyWIF
+     * @param showDebug
+     * @returns {{result, privateKey}|*}
+     * @private
+     */
+    static _generatePublicKey(privateKeyWIF, showDebug){
 
         // Tutorial based on https://github.com/cryptocoinjs/secp256k1-node
 
-        if (privateKey === null || !Buffer.isBuffer(privateKey) ){
-            console.log("ERROR! ",  privateKey, " is not a Buffer")
-            throw 'privateKey must be a Buffer';
+        if (privateKeyWIF === null || privateKeyWIF === undefined || !Buffer.isBuffer(privateKeyWIF) ){
+            console.log("ERROR! ",  privateKeyWIF, " is not a Buffer")
+            throw 'privateKeyWIF must be a Buffer';
         }
 
-        let validation = InterfaceBlockchainAddressHelper.validatePrivateKey(privateKey);
+        let validation = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKeyWIF);
 
         if (showDebug)
             console.log("VALIDATIOn", validation)
@@ -78,16 +90,16 @@ class InterfaceBlockchainAddressHelper{
         if (validation.result === false){
             return validation;
         } else{
-            privateKey = validation.privateKey;
+            privateKeyWIF = validation.privateKey;
         }
 
         if (showDebug) {
-            console.log("privateKey", privateKey, typeof privateKey);
-            console.log("secp256k1.privateKeyVerify", secp256k1.privateKeyVerify(privateKey));
+            console.log("privateKeyWIF", privateKeyWIF, typeof privateKeyWIF);
+            console.log("secp256k1.privateKeyVerify", secp256k1.privateKeyVerify(privateKeyWIF));
         }
 
         // get the public key in a compressed format
-        const pubKey = secp256k1.publicKeyCreate(privateKey);
+        const pubKey = secp256k1.publicKeyCreate(privateKeyWIF);
 
         if (showDebug)
             console.log("pubKey", pubKey);
@@ -99,7 +111,7 @@ class InterfaceBlockchainAddressHelper{
         let msg = WebDollarCrypto.getBufferRandomValues(32);
 
         // sign the message
-        const sigObj = secp256k1.sign(msg, privateKey)
+        const sigObj = secp256k1.sign(msg, privateKeyWIF);
 
         // verify the signature
         if (showDebug)
@@ -175,7 +187,7 @@ class InterfaceBlockchainAddressHelper{
     static generateAddress(salt){
 
         let privateKey = InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, false);
-        let publicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey.privateKey, false);
+        let publicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey.privateKeyWIF, false);
         let address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, false)
 
         return {
@@ -187,7 +199,19 @@ class InterfaceBlockchainAddressHelper{
 
     }
 
-    static validateAddress(address){
+    /**
+     * address is usually a Base string and it coins Version+Checksum+Address
+     * @param address
+     */
+    static validateAddressChecksum(address){
+
+        if (typeof address === "string")  //base
+            address = BufferExtended.fromBase(address);
+
+        let result = this.validateAddressWIF(address);
+
+        if (result.result === true) return result.address;
+        else return null;
 
     }
 
@@ -207,47 +231,47 @@ class InterfaceBlockchainAddressHelper{
         return checksum;
     }
 
-    /*
-        it returns the validity of PrivateKey
+    /**
+     * it returns the validity of PrivateKey
 
         and in case privateKey is a WIF, it returns the private key without WIF
-     */
-    static validatePrivateKey(privateKey){
 
-        if (privateKey === null || !Buffer.isBuffer(privateKey) ){
-            throw ('privateKey must be a Buffer');
+     * @param privateKeyWIF
+     * @returns {{result: boolean, privateKey: *}}
+     */
+    static validatePrivateKeyWIF(privateKeyWIF){
+
+        if (privateKeyWIF === null || !Buffer.isBuffer(privateKeyWIF) ){
+            throw ('privateKeyWIF must be a Buffer');
         }
 
         //contains VERSION prefix
         let versionDetected = false;
         let versionDetectedBuffer = '';
 
-        if (privateKey.length > 32 + consts.PRIVATE_KEY_VERSION_PREFIX.length ){
+        if (privateKeyWIF.length === consts.PRIVATE_KEY_LENGTH + consts.PRIVATE_KEY_CHECK_SUM_LENGTH  + consts.PRIVATE_KEY_VERSION_PREFIX.length/2 ){
 
-            //console.log("Buffer.IndexOf", privateKey.indexOf( Buffer.from(PRIVATE_KEY_VERSION_PREFIX, "hex") ))
+            //console.log("Buffer.IndexOf", privateKeyWIF.indexOf( Buffer.from(PRIVATE_KEY_VERSION_PREFIX, "hex") ))
 
-            if (privateKey.indexOf( Buffer.from(consts.PRIVATE_KEY_VERSION_PREFIX, "hex") ) === 0){
+            if (privateKeyWIF.indexOf( Buffer.from(consts.PRIVATE_KEY_VERSION_PREFIX, "hex") ) === 0){
                 versionDetected = true;
 
-                versionDetectedBuffer = BufferExtended.substr(privateKey, 0, consts.PRIVATE_KEY_VERSION_PREFIX.length/2 );
-                privateKey = BufferExtended.substr(privateKey, consts.PRIVATE_KEY_VERSION_PREFIX.length/2);
+                versionDetectedBuffer = BufferExtended.substr(privateKeyWIF, 0, consts.PRIVATE_KEY_VERSION_PREFIX.length/2 );
+                privateKeyWIF = BufferExtended.substr(privateKeyWIF, consts.PRIVATE_KEY_VERSION_PREFIX.length/2);
             }
 
         }
 
-        //console.log("versionDetected", versionDetected, versionDetectedBuffer, privateKey);
-
-        //contains CHECKSUM
         let checkSumDetected = false;
 
-        if (privateKey.length === 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH ) {
+        if (privateKeyWIF.length === consts.PRIVATE_KEY_LENGTH + consts.PRIVATE_KEY_CHECK_SUM_LENGTH ) {
 
-            //console.log(privateKey, privateKey.length, 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH );
-            let privateKeyCheckSum = BufferExtended.substr(privateKey, privateKey.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH )
+            //console.log(privateKeyWIF, privateKeyWIF.length, 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH );
+            let privateKeyWIFCheckSum = BufferExtended.substr(privateKeyWIF, privateKeyWIF.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH )
 
-            let privateKeyWithoutCheckSum = BufferExtended.substr(privateKey, 0, privateKey.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH );
+            let privateKeyWithoutCheckSum = BufferExtended.substr(privateKeyWIF, 0, privateKeyWIF.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH );
 
-            //versionDetectedBuffer + privateKeyWithoutCheckSum;
+            //versionDetectedBuffer + privateKeyWIFWithoutCheckSum;
             let privateKeyJustVersionHex = Buffer.concat([versionDetectedBuffer, privateKeyWithoutCheckSum]);
             
 
@@ -256,23 +280,115 @@ class InterfaceBlockchainAddressHelper{
             // console.log("checkSum", privateKeyCheckSum, "privateKeyJustVersionHex", privateKeyJustVersionHex);
             // console.log("checkSum2", checksum);
 
-            if (checksum.equals(privateKeyCheckSum) ) {
+            if (checksum.equals(privateKeyWIFCheckSum) ) {
                 checkSumDetected = true;
 
-                privateKey = BufferExtended.substr(privateKey, 0, privateKey.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH )
+                privateKeyWIF = BufferExtended.substr(privateKeyWIF, 0, privateKeyWIF.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH )
             }
         }
 
 
-        if (privateKey.length !== 32){
+        if (privateKeyWIF.length !== consts.PRIVATE_KEY_LENGTH){
 
-            if (!checkSumDetected)
-                throw "PRIVATE KEY  CHECK SUM is not right"
+            if (!checkSumDetected) throw "PRIVATE KEY  CHECK SUM is not right"
 
-            if (!versionDetected)
-                throw "PRIVATE KEY  VERSION PREFIX is not recognized"
+            if (!versionDetected) throw "PRIVATE KEY  VERSION PREFIX is not recognized"
         }
-        return {result: true, privateKey: privateKey};
+        return {result: true, privateKey: privateKeyWIF};
+
+    }
+
+
+    /**
+     * it returns the validity of PrivateKey
+
+     and in case privateKey is a WIF, it returns the private key without WIF
+
+     * @param privateKeyWIF
+     * @returns {{result: boolean, privateKey: *}}
+     */
+    static validateAddressWIF(addressWIF){
+
+        console.log("validateAddressWIF", addressWIF);
+        if (addressWIF === null || !Buffer.isBuffer(addressWIF) ){
+            throw ('privateKeyWIF must be a Buffer');
+        }
+
+        //contains VERSION prefix
+        let versionDetected = false;
+        let prefixDetected = false;
+        let suffixDetected = false;
+        let versionDetectedBuffer = '';
+
+        let prefix = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_PREFIX_BASE64 : consts.PUBLIC_ADDRESS_PREFIX_BASE58);
+        let suffix = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58);
+
+        //prefix
+        if ( addressWIF.length === consts.PRIVATE_KEY_LENGTH + consts.PRIVATE_KEY_CHECK_SUM_LENGTH  + consts.PRIVATE_KEY_VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2 ){
+
+            if ( addressWIF.indexOf( Buffer.from(prefix, "hex") ) === 0 ) {
+                prefixDetected = true;
+                addressWIF = BufferExtended.substr(addressWIF, prefix/2);
+            }
+
+        }
+
+        if ( addressWIF.length === consts.PRIVATE_KEY_LENGTH + consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH  + consts.PRIVATE_KEY_VERSION_PREFIX.length/2 + suffix.length/2 ) {
+
+            if ( addressWIF.indexOf( Buffer.from(suffix, "hex") ) === addressWIF.length-1 - suffix/2 ) {
+                suffixDetected = true;
+                addressWIF = BufferExtended.substr(addressWIF, 0, addressWIF.length-1 - suffix/2);
+            }
+
+        }
+
+
+        if (addressWIF.length === consts.PRIVATE_KEY_LENGTH + consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH  + consts.PRIVATE_KEY_VERSION_PREFIX.length/2  ){
+
+            //console.log("Buffer.IndexOf", addressWIF.indexOf( Buffer.from(PRIVATE_KEY_VERSION_PREFIX, "hex") ))
+
+            if (addressWIF.indexOf( Buffer.from(consts.PRIVATE_KEY_VERSION_PREFIX, "hex") ) === 0){
+                versionDetected = true;
+
+                versionDetectedBuffer = BufferExtended.substr(addressWIF, 0, consts.PRIVATE_KEY_VERSION_PREFIX.length/2 );
+                addressWIF = BufferExtended.substr(addressWIF, consts.PRIVATE_KEY_VERSION_PREFIX.length/2);
+            }
+
+        }
+
+
+
+        let checkSumDetected = false;
+
+        if (addressWIF.length === consts.PRIVATE_KEY_LENGTH + consts.PRIVATE_KEY_CHECK_SUM_LENGTH ) {
+
+            let addressWIFCheckSum = BufferExtended.substr(addressWIF, addressWIF.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH )
+
+            let privateKeyWithoutCheckSum = BufferExtended.substr(addressWIF, 0, addressWIF.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH );
+
+            let privateKeyJustVersionHex = Buffer.concat([versionDetectedBuffer, privateKeyWithoutCheckSum]);
+
+            let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(privateKeyJustVersionHex);
+
+            if (checksum.equals(addressWIFCheckSum) ) {
+                checkSumDetected = true;
+
+                addressWIF = BufferExtended.substr(addressWIF, 0, addressWIF.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH )
+            }
+        }
+
+
+        if (addressWIF.length !== consts.PRIVATE_KEY_LENGTH){
+
+            if (!prefixDetected) throw "ADDRESS KEY  PREFIX DETECTED is not right";
+
+            if (!suffixDetected) throw "ADDRESS KEY  SUFFIX DETECTED is not right";
+
+            if (!checkSumDetected) throw "ADDRESS KEY  CHECK SUM is not right";
+
+            if (!versionDetected) throw "ADDRESS KEY  VERSION PREFIX is not recognized";
+        }
+        return {result: true, address: addressWIF};
 
     }
 

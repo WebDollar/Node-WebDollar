@@ -82,6 +82,8 @@ class InterfaceBlockchainMining{
                     });
                 });
 
+
+
             } catch (Exception){
                 console.log(colors.red("Error creating next block "+Exception.toString()), Exception, nextBlock);
             }
@@ -117,7 +119,9 @@ class InterfaceBlockchainMining{
 
             if (block === undefined || block === null) throw "block is undefined";
 
+            console.log("block blockblockblock1111", this.minerAddress);
             block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
+            console.log("block blockblockblock", block.data.minerAddress);
 
             this._nonce = initialNonce||0;
 
@@ -129,6 +133,7 @@ class InterfaceBlockchainMining{
                 intervalMiningOutput = this.setMiningHashRateInterval();
 
             let answer = await this.mine(block, difficulty);
+
 
             if (answer.result){
                 console.log( colors.green("WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD") );

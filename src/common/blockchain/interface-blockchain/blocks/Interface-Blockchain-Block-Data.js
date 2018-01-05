@@ -4,6 +4,7 @@ import consts from 'consts/const_global'
 import Serialization from 'common/utils/Serialization'
 
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
 
 class InterfaceBlockchainBlockData {
 
@@ -14,10 +15,7 @@ class InterfaceBlockchainBlockData {
         if (minerAddress === undefined)
             minerAddress = BlockchainGenesis.address;
 
-        if (!Buffer.isBuffer(minerAddress))
-            minerAddress = BufferExtended.fromBase(minerAddress);
-
-        this.minerAddress = minerAddress;
+        this.setMinerAddress(minerAddress);
 
         this.transactions = transactions||[];
 
@@ -104,7 +102,7 @@ class InterfaceBlockchainBlockData {
         this.hashData = BufferExtended.substr(buffer, offset, 32);
         offset += 32;
 
-        this.minerAddress = BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);
+        this.minerAddress = BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH );
         offset += consts.PUBLIC_ADDRESS_LENGTH;
 
         return offset;
@@ -125,6 +123,20 @@ class InterfaceBlockchainBlockData {
 
     equals(data) {
         return this.hashData.equals(data.hashData);
+    }
+
+    setMinerAddress(minerAddressWIF){
+
+        if (!Buffer.isBuffer(minerAddressWIF))
+            minerAddressWIF = BufferExtended.fromBase(minerAddressWIF);
+
+        let result = InterfaceBlockchainAddressHelper.validateAddressChecksum(minerAddressWIF);
+
+        if (result === null)
+            throw 'Miner address is not a valid WIF';
+
+        this.minerAddress = result;
+
     }
 }
 

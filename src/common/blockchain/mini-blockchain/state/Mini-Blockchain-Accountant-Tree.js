@@ -33,7 +33,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
      */
     updateAccount(input, value, tokenId){
 
-        if (Buffer.isBuffer(input))
+        if (!Buffer.isBuffer(input))
             input = BufferExtended.fromBase(input);
 
         let node = this.search(input).node;
@@ -68,7 +68,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
      */
     listBalances(input){
 
-        if (Buffer.isBuffer(input))
+        if (!Buffer.isBuffer(input))
             input = BufferExtended.fromBase(input);
 
         let node = this.search(input).node;
