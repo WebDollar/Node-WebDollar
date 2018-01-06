@@ -24,20 +24,22 @@ class InterfaceBlockchainAddress{
         }
     }
 
-    async createNewAddress(salt){
+    async createNewAddress(salt, emptyAddress){
 
         if (this.address !== null){
             console.log("WARNING! You overwrite the initial address")
         }
 
-        let result = InterfaceBlockchainAddressHelper.generateAddress(salt);
+        if ((emptyAddress||false) === false){
+            let result = InterfaceBlockchainAddressHelper.generateAddress(salt);
 
-        this.address = result.address;
-        this.unencodedAddress = result.unencodedAddress;
-        this.publicKey = result.publicKey;
+            this.address = result.address;
+            this.unencodedAddress = result.unencodedAddress;
+            this.publicKey = result.publicKey;
 
-        await this.savePrivateKey(result.privateKey.privateKey);
-        await this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
+            await this.savePrivateKey(result.privateKey.privateKey);
+            await this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
+        }
     }
 
     updatePassword(newPassword){

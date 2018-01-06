@@ -222,15 +222,21 @@ class InterfaceBlockchain {
 
         try {
             for (let i = 0; i < numBlocks; ++i) {
-                this.blocks[i] = new InterfaceBlockchainBlock(this, 0, new Buffer(consts.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, this.db);
-                let response = await this.blocks[i].load();
+                let block = new InterfaceBlockchainBlock(this, 0, new Buffer(consts.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, this.db);
+                let response = await block.load();
 
                 if (response !== true) {
 
-                    if (await this.includeBlockchainBlock(this.blocks[i]) === false)
+                    if (await this.includeBlockchainBlock(block) === false)
                         console.log(colors.red("blockchain is invalid at index " + i));
+                    else
+                        console.log(colors.green("blockchain loaded successfully index ", i));
 
                     return response;
+                } else {
+
+                    console.log(colors.red("blockchain LOADING stopped at " + i));
+                    break;
                 }
             }
         } catch (exception){

@@ -124,6 +124,7 @@ class InterfaceBlockchainMining{
         console.log(" ----------- mineBlock-------------");
 
         try{
+            console.log("difficultydifficultydifficulty", difficulty === null);
 
             if (difficulty === undefined || difficulty === null) throw 'difficulty not specified';
 

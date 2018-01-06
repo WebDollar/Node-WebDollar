@@ -29,10 +29,10 @@ class MainBlockchainWallet{
 
     }
 
-    async _justCreateNewAddress(salt){
+    async _justCreateNewAddress(salt, emptyAddress){
 
         let blockchainAddress = new MiniBlockchainAddress(this.db, this.password);
-        await blockchainAddress.createNewAddress();
+        await blockchainAddress.createNewAddress(salt, emptyAddress);
 
         return blockchainAddress;
 
@@ -40,7 +40,7 @@ class MainBlockchainWallet{
 
     async createNewAddress(salt){
 
-        let blockchainAddress = await this._justCreateNewAddress(salt);
+        let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
         this.addresses.push(blockchainAddress);
 
@@ -51,9 +51,9 @@ class MainBlockchainWallet{
         return blockchainAddress;
     }
 
-    async createNewAddressPrivateKey(){
+    async createNewAddressPrivateKey(salt){
 
-        let blockchainAddress = await this._justCreateNewAddress(salt);
+        let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
         this.addresses.push(blockchainAddress);
 
@@ -90,7 +90,7 @@ class MainBlockchainWallet{
         return Buffer.concat (list);
     }
     
-    deserialize(buffer) {
+    async deserialize(buffer) {
 
         let data = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
         let offset = 0;
@@ -102,7 +102,7 @@ class MainBlockchainWallet{
             
             this.addresses = [];
             for (let i = 0; i < numAddresses; ++i) {
-                this.addresses[i] = this._justCreateNewAddress(undefined, false);
+                this.addresses[i] = await this._justCreateNewAddress(undefined, true);
                 offset += this.addresses[i].deserializeAddress( BufferExtended.substr(buffer, offset) );
             }
 
@@ -134,7 +134,7 @@ class MainBlockchainWallet{
             if (typeof buffer.status !== "undefined")
                 resolve(false);
 
-            this.deserialize(buffer);
+            await this.deserialize(buffer);
 
             await this.updatePassword(this.password);
 
