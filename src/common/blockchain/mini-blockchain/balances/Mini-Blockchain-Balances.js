@@ -29,11 +29,12 @@ class MiniBlockchainBalances{
 
         if (!Buffer.isBuffer(addressWIF))
             addressWIF = BufferExtended.fromBase(addressWIF);
-        else addressWIF = InterfaceBlockchainAddressHelper.generateAddressWIF(addressWIF);
+
+        let address = InterfaceBlockchainAddressHelper.validateAddressChecksum(addressWIF);
 
         console.log("subscribeBalanceChanges",addressWIF );
 
-        let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(addressWIF),callback);
+        let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(address),callback);
 
         return {
             subscription: subscription,

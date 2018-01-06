@@ -1,8 +1,5 @@
-import InterfaceMerkleAccountantRadixTree from 'common/trees/radix-tree/accountant-tree/merkle-tree/Interface-Merkle-Accountant-Radix-Tree'
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
-import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 
 import BufferExtended from "common/utils/BufferExtended"
@@ -49,18 +46,23 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         let result = node.updateBalanceToken(value, tokenId);
 
-        let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
 
         // it was deleted
-        if (result === null){
+        if (result === null)
             this.delete(address);
-            this.emitter.emit("balances/changes/"+addressWIF, {address: addressWIF, balance: null});
+
+        //optimization, but it doesn't work in browser
+        //if (this.checkBalanceSubscribed("balances/changes/"+BufferExtended.toBase(address))){
+
+        let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
+        this.emitter.emit("balances/changes/"+BufferExtended.toBase(address), {address: addressWIF, balance: (result !== null ? node.getBalances() : null)} );
+
+        if (result === null)
             return null;
-        }
 
         this.changedNode( node );
 
-        this.emitter.emit("balances/changes/"+addressWIF, {address: addressWIF, balance: node.getBalances()} );
+
 
         return result;
     }
@@ -127,6 +129,17 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     getValueToHash(node){
         return node.serialize();
+    }
+
+    checkBalanceSubscribed(name){
+
+        //not working
+        let list = this.emitter.eventNames();
+
+        for (let i=0; i<list.length; i++)
+            if (list[i] === name) return true;
+
+        return false;
     }
 
 }
