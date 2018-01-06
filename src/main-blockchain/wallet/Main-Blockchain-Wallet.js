@@ -29,10 +29,10 @@ class MainBlockchainWallet{
 
     }
 
-    _justCreateNewAddress(salt){
+    async _justCreateNewAddress(salt){
 
         let blockchainAddress = new MiniBlockchainAddress(this.db, this.password);
-        blockchainAddress.createNewAddress();
+        await blockchainAddress.createNewAddress();
 
         return blockchainAddress;
 
@@ -40,12 +40,11 @@ class MainBlockchainWallet{
 
     async createNewAddress(salt){
 
-        let blockchainAddress = this._justCreateNewAddress(salt);
+        let blockchainAddress = await this._justCreateNewAddress(salt);
 
         this.addresses.push(blockchainAddress);
 
-        if ((silent||false) === false)
-            this.emitter.emit('wallet/address-changes', blockchainAddress.address );
+        this.emitter.emit('wallet/address-changes', blockchainAddress.address );
 
         await this.saveAddresses();
 
@@ -54,12 +53,11 @@ class MainBlockchainWallet{
 
     async createNewAddressPrivateKey(){
 
-        let blockchainAddress = this._justCreateNewAddress(salt);
+        let blockchainAddress = await this._justCreateNewAddress(salt);
 
         this.addresses.push(blockchainAddress);
 
-        if ((silent||false) === false)
-            this.emitter.emit('wallet/address-changes', blockchainAddress );
+        this.emitter.emit('wallet/address-changes', blockchainAddress );
 
         await this.saveAddresses();
 

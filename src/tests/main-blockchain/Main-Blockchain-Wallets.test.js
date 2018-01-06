@@ -11,7 +11,7 @@ describe('test save wallet to local storage', () => {
     
     it('save/load/remove/load wallet to/from local storage, sample test', async () => {
 
-        let blockchainAddress = Blockchain.Wallet.createNewAddress();
+        let blockchainAddress = await Blockchain.Wallet.createNewAddress();
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
@@ -43,7 +43,7 @@ describe('test save wallet to local storage', () => {
     
     it('save/save/remove/load/ wallet to/from local storage, sample test', async () => {
 
-        let blockchainAddress = Blockchain.Wallet.createNewAddress();
+        let blockchainAddress = await Blockchain.Wallet.createNewAddress();
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
@@ -66,7 +66,7 @@ describe('test save wallet to local storage', () => {
     
     it('test save/load/remove/load with AES encrypt/decrypt privateKey', async () => {
 
-        let blockchainAddress = Blockchain.Wallet.createNewAddress();
+        let blockchainAddress = await Blockchain.Wallet.createNewAddress();
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;

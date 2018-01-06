@@ -47,7 +47,7 @@ describe('testAddressGenerator', () => {
         assert(Buffer.isBuffer(blockchainAddress.unencodedAddress), "blockChain Address");
         assert(Buffer.isBuffer(blockchainAddress.publicKey), "blockChain Public Key");
         
-        let privateKey = await blockchainAddress.getPrivateKeyWIF();
+        let privateKey = await blockchainAddress.getPrivateKey();
         let privateKeyWIF = await blockchainAddress.getPrivateKeyWIF();
         assert(Buffer.isBuffer(privateKey), "blockChain Private Key");
         assert(Buffer.isBuffer(privateKeyWIF), "blockChain Private Key WIF");

@@ -1,5 +1,6 @@
 var assert = require('assert')
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 
@@ -13,7 +14,7 @@ describe('test blockchain save/load/remove blocks to/from local storage', () => 
     let hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
     let timeStamp = 1994;
     let nonce = 1994;
-    let minerAddress = '1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4x';
+    let minerAddress = BlockchainGenesis.minerAddress;
     let data = new InterfaceBlockchainBlockData(blockchain, minerAddress, [], undefined, undefined); //it will compute the hashData
     let height = 1023;
     let block = null;

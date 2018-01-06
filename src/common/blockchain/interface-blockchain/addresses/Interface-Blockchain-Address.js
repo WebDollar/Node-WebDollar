@@ -24,7 +24,7 @@ class InterfaceBlockchainAddress{
         }
     }
 
-    createNewAddress(salt){
+    async createNewAddress(salt){
 
         if (this.address !== null){
             console.log("WARNING! You overwrite the initial address")
@@ -36,8 +36,8 @@ class InterfaceBlockchainAddress{
         this.unencodedAddress = result.unencodedAddress;
         this.publicKey = result.publicKey;
 
-        this.savePrivateKey(result.privateKey.privateKey);
-        this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
+        await this.savePrivateKey(result.privateKey.privateKey);
+        await this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
     }
 
     updatePassword(newPassword){
