@@ -26,17 +26,27 @@ class Blockchain{
             if (response === false || this.Wallet.addresses.length === 0)
                 await this.Wallet.createNewAddress(); //it will save automatically
 
-            this.Mining.setMinerAddress(this.Wallet.addresses[0].address);
+            await this.initializeMining();
 
         }).catch( async (exception)=>{
             console.log("exception loading Wallet.Addresses")
 
-            this.Mining.setMinerAddress(await this.Wallet.getMiningAddress() );
+            await this.initializeMining();
         });
 
 
 
 
+    }
+
+
+    async initializeMining(){
+
+        this.Mining.setMinerAddress(await this.Wallet.getMiningAddress() );
+
+        if (process.env.START_MINING){
+            this.Mining.startMining();
+        }
     }
 
 

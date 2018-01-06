@@ -3,6 +3,7 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import Serialization from "common/utils/Serialization.js";
 import BufferExtended from "common/utils/BufferExtended.js";
+const colors = require('colors/safe');
 
 const md5 = require('md5');
 const EventEmitter = require('events');
@@ -120,21 +121,34 @@ class MainBlockchainWallet{
         return (await this.db.save(this.walletFileName, value));
     }
     
-    async loadAddresses() {
+    loadAddresses() {
 
-        let buffer = await this.db.get(this.walletFileName);
+        return new Promise( async (resolve)=>{
 
-        if (typeof buffer.status !== "undefined")
-            return false;
+            //timeout, max 10 seconds to load the database
+            setTimeout(()=>{
+                console.log(colors.red("LOAD ADDRESSES FROZE AND FAILED !!"));
+                resolve(false);
+            }, 10000);
 
-        this.deserialize(buffer);
+            let buffer = await this.db.get(this.walletFileName);
 
-        await this.updatePassword(this.password);
+            if (typeof buffer.status !== "undefined")
+                resolve(false);
 
-        if (this.addresses.length > 0)
-            this.emitter.emit('wallet/changes', this.addresses );
+            this.deserialize(buffer);
 
-        return true;
+            await this.updatePassword(this.password);
+
+            if (this.addresses.length > 0)
+                this.emitter.emit('wallet/changes', this.addresses );
+
+            resolve(true);
+
+
+        })
+
+
     }
     
     async removeAddresses() {

@@ -42,8 +42,12 @@ class InterfaceBlockchainBlockCreator{
 
     createBlockNew(minerAddress, transactions){
 
-        if (!Buffer.isBuffer(minerAddress))
-            minerAddress = BufferExtended.fromBase(minerAddress);
+        try {
+            if (!Buffer.isBuffer(minerAddress))
+                minerAddress = BufferExtended.fromBase(minerAddress);
+        } catch (exception){
+            console.log("error creating a new block invalid minerAddress",  minerAddress, exception);
+        }
 
         let restArgs = [];
         for (let i=2; i<arguments.length; i++ )
