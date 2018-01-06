@@ -1,5 +1,6 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
+import Serialization from "../../../utils/Serialization";
 
 const colors = require('colors/safe');
 
@@ -30,11 +31,19 @@ class InterfaceBlockchainProtocol {
         if (typeof data.height !== 'number') throw 'height is not specified';
 
         if (typeof data.header !== 'object') throw 'header is not specified';
-        if ((typeof data.header.hashPrev === 'string' || Buffer.isBuffer(data.header.hashPrev)) === false) throw 'hashPrev is not specified';
-        if ((typeof data.header.hash === 'string' || Buffer.isBuffer(data.header.hash)) === false) throw 'hash is not specified';
+        if (data.header.hashPrev === undefined ) throw 'header.hashPrev is not specified';
+        if (data.header.hash === undefined) throw 'header.hash is not specified';
+
+        if (typeof data.header.hashPrev === 'string') data.header.hashPrev = Serialization.fromBase(data.header.hashPrev);
+        else data.header.hashPrev = new Buffer(data.header.hashPrev);
+
+        if (typeof data.header.hash === 'string') data.header.hash = Serialization.fromBase(data.header.hash);
+        else data.header.hash = new Buffer(data.header.hash);
+
         if ((typeof data.header.nonce === 'number' || Buffer.isBuffer(data.header.nonce)) === false) throw 'nonce is not specified';
 
-        if ((typeof data.header.data.hashData === 'string' || Buffer.isBuffer(data.header.data.hashData)) === false) throw 'hashData is not specified';
+        if (typeof data.header.data.hashData === 'string') data.header.data.hashData = Serialization.fromBase(data.header.data.hashData);
+        else data.header.data.hashData = new Buffer(data.header.data.hashData);
 
         if (data.header.chainLength < data.header.height) throw ('chainLength is smaller than block height ?? ');
 

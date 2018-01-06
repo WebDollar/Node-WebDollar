@@ -61,7 +61,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         if (result === undefined) throw 'token is empty';
 
         if (result.amount < 0)
-            throw 'balance became negative';
+            throw 'balances became negative';
 
         this.deleteBalancesEmpty();
 
@@ -75,7 +75,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     }
 
-    getBalance(tokenId){
+    getBalances(tokenId){
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = new Buffer([1]);
 
@@ -117,12 +117,12 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     }
 
-    _serializeBalance(balance){
+    _serializeBalances(balances){
 
         return Buffer.concat(
             [
-                balance.id,
-                Serialization.serializeBigNumber(balance.amount)
+                balances.id,
+                Serialization.serializeBigNumber(balances.amount)
             ]);
 
     }
@@ -135,7 +135,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         let iWEBDSerialized = null;
         for (let i=0; i<this.balances.length; i++)
             if ((this.balances[i].id.length === 1) && (this.balances[i].id[0]===0)){
-                balancesBuffers.push(this._serializeBalance(this.balances[i]));
+                balancesBuffers.push(this._serializeBalances(this.balances[i]));
                 iWEBDSerialized = i;
             }
 
@@ -144,13 +144,13 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
             let idWEBD = new Buffer(1);
             idWEBD[0] = 1;
 
-            balancesBuffers.push( this._serializeBalance({id:idWEBD, amount: new BigNumber(0) }));
+            balancesBuffers.push( this._serializeBalances({id:idWEBD, amount: new BigNumber(0) }));
         }
 
         //let serialize everything else
         for (let i=0; i<this.balances.length; i++)
             if (i !== iWEBDSerialized){
-                balancesBuffers.push(this._serializeBalance(this.balances[i]));
+                balancesBuffers.push(this._serializeBalances(this.balances[i]));
             }
 
         balancesBuffers.unshift(Serialization.serializeNumber1Byte(balancesBuffers.length));

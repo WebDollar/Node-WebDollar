@@ -1,4 +1,5 @@
 import InterfaceBlockchainProtocol from 'common/blockchain/interface-blockchain/blockchain-protocol/Interface-Blockchain-Protocol'
+import Serialization from 'common/utils/Serialization'
 
 class MiniBlockchainProtocol extends InterfaceBlockchainProtocol{
 
@@ -6,7 +7,8 @@ class MiniBlockchainProtocol extends InterfaceBlockchainProtocol{
 
         InterfaceBlockchainProtocol.prototype._validateBlockchainHeader.call(this, data);
 
-        if ((typeof data.header.data.hashAccountantTree === 'string' || Buffer.isBuffer(data.header.data.hashAccountantTree)) === false) throw 'hashAccountantTree is not specified';
+        if (typeof data.header.data.hashAccountantTree === 'string') data.header.data.hashAccountantTree = Serialization.fromBase(data.header.data.hashAccountantTree);
+        else data.header.data.hashAccountantTree = new Buffer(data.header.data.hashAccountantTree);
 
     }
 

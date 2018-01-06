@@ -18,7 +18,7 @@ class InterfaceAccountantRadixTreeTestHelper {
 
             accountantTree.add( new Buffer(data.text, "ascii"), {
                 text: data.text,
-                balance: data.value.toString()
+                balances: data.value.toString()
             });
 
             //console.log("accountant text", data.value.toString())

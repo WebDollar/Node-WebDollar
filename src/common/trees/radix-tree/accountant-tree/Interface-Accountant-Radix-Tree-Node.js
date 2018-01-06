@@ -40,12 +40,12 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         if (typeof value === 'object' && value !== null){
 
-            if (typeof value.balance === "object"  && value.balance !== null && value.balance.constructor.name === "BigNumber") { }
+            if (typeof value.balances === "object"  && value.balances !== null && value.balance.constructor.name === "BigNumber") { }
             else {
 
-                if ( value.balance === undefined || value.balance === null) value.balance = 0;
+                if ( value.balances === undefined || value.balances === null) value.balances = 0;
 
-                value.balance = new BigNumber(value.balance);
+                value.balances = new BigNumber(value.balances);
             }
 
         }
@@ -54,12 +54,12 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     }
 
-    isBalanceValid(){
+    isBalancesValid(){
 
         if (typeof this.value !== 'object' || this.value === null) return false;
 
-        if ( this.value.balance === undefined && this.value.balance=== null) return false;
-        if (typeof this.value.balance !== "object"  || this.value.balance.constructor.name !== "BigNumber") return false;
+        if ( this.value.balances === undefined && this.value.balances=== null) return false;
+        if (typeof this.value.balances !== "object"  || this.value.balances.constructor.name !== "BigNumber") return false;
 
         return true;
 
@@ -72,7 +72,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
         array.push( Serialization.serializeBigNumber(this.sum) );
 
         if (this.value !== null )
-            array.push(Serialization.serializeBigNumber(this.value.balance));
+            array.push(Serialization.serializeBigNumber(this.value.balances));
 
         return Buffer.concat(
 

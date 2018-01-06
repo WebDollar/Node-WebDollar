@@ -9,7 +9,7 @@ class MiniBlockchainBalances{
 
     }
 
-    checkBalance(address){
+    checkBalances(address){
 
         if (address === '' || address === undefined || address === null) return null;
 
@@ -23,7 +23,7 @@ class MiniBlockchainBalances{
 
     }
 
-    subscribeBalanceChanges(addressWIF, callback){
+    subscribeBalancesChanges(addressWIF, callback){
 
         if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='') return null;
 
@@ -38,11 +38,11 @@ class MiniBlockchainBalances{
 
         return {
             subscription: subscription,
-            balance: this.checkBalance(addressWIF),
+            balances: this.checkBalances(addressWIF),
         }
     }
 
-    unsusbribeBalanceChanges(subscription){
+    unsusbribeBalancesChanges(subscription){
 
         if (subscription === undefined || subscription === null) return false;
 

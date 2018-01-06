@@ -35,8 +35,8 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         if (node.isSumValid() === false)  return false;
         if (node.sum.lessThan ( 0 ) ) return false;
 
-        if (node.isLeaf() && (node.isBalanceValid() === false ) ) return false;
-        if (node.isBalanceValid() && node.value.balance.lessThan ( 0 )) return false;
+        if (node.isLeaf() && (node.isBalancesValid() === false ) ) return false;
+        if (node.isBalancesValid() && node.value.balances.lessThan ( 0 )) return false;
 
         return true;
     }
@@ -83,8 +83,8 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         let sum;
 
-        if ( node.isBalanceValid()  )
-            sum = node.value.balance;
+        if ( node.isBalancesValid()  )
+            sum = node.value.balances;
         else
             sum = new BigNumber(0);
 
