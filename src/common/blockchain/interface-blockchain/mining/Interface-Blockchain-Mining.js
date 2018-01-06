@@ -234,6 +234,12 @@ class InterfaceBlockchainMining{
 
         //console.log("setMinerAddress", newMinerAddress);
 
+        if (newMinerAddress === undefined || newMinerAddress === ''){
+            this.minerAddress = undefined;
+            this.minerAddressBase = '';
+            return;
+        }
+
         if (!Buffer.isBuffer(newMinerAddress))
             newMinerAddress = BufferExtended.fromBase(newMinerAddress);
 

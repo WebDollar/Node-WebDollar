@@ -23,42 +23,44 @@ class MainBlockchainWallet{
         this.addresses = [];
         
         this.password = password;
-        
-        this.loadAddresses().then(async (response) => {
-            if (response === false || this.addresses.length === 0) {
-                this.createNewAddress();
-                await this.saveAddresses();
-            }
-        });
 
         this.emitter = new EventEmitter();
 
     }
 
-    createNewAddress(){
+    _justCreateNewAddress(salt){
 
         let blockchainAddress = new MiniBlockchainAddress(this.db, this.password);
         blockchainAddress.createNewAddress();
 
+        return blockchainAddress;
+
+    }
+
+    async createNewAddress(salt){
+
+        let blockchainAddress = this._justCreateNewAddress(salt);
+
         this.addresses.push(blockchainAddress);
 
-        this.emitter.emit('wallet/address-changes', blockchainAddress.address );
+        if ((silent||false) === false)
+            this.emitter.emit('wallet/address-changes', blockchainAddress.address );
 
-        this.saveAddresses();
+        await this.saveAddresses();
 
         return blockchainAddress;
     }
 
-    createNewAddressPrivateKey(){
+    async createNewAddressPrivateKey(){
 
-        let blockchainAddress = new MiniBlockchainAddress();
-        blockchainAddress.createNewAddress();
+        let blockchainAddress = this._justCreateNewAddress(salt);
 
         this.addresses.push(blockchainAddress);
 
-        this.emitter.emit('wallet/address-changes', blockchainAddress );
+        if ((silent||false) === false)
+            this.emitter.emit('wallet/address-changes', blockchainAddress );
 
-        //this.saveAddresses();
+        await this.saveAddresses();
 
         return blockchainAddress;
     }
@@ -101,7 +103,7 @@ class MainBlockchainWallet{
             
             this.addresses = [];
             for (let i = 0; i < numAddresses; ++i) {
-                this.addresses[i] = this.createNewAddress();
+                this.addresses[i] = this._justCreateNewAddress(undefined, false);
                 offset += this.addresses[i].deserializeAddress( BufferExtended.substr(buffer, offset) );
             }
 
@@ -119,9 +121,9 @@ class MainBlockchainWallet{
     }
     
     async loadAddresses() {
-        
+
         let buffer = await this.db.get(this.walletFileName);
-        
+
         if (typeof buffer.status !== "undefined")
             return false;
 
@@ -154,10 +156,10 @@ class MainBlockchainWallet{
 
     }
 
-    getMiningAddress(){
+    async getMiningAddress(){
 
         if (this.addresses.length === 0)
-            this.createNewAddress();
+            await this.createNewAddress();
 
         return this.addresses[0].address;
 

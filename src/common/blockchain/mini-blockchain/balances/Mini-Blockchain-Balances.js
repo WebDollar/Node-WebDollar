@@ -25,14 +25,14 @@ class MiniBlockchainBalances{
 
     subscribeBalanceChanges(addressWIF, callback){
 
-        if (addressWIF === '' || addressWIF === undefined || addressWIF === null) return null;
+        if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='') return null;
 
-        if (!Buffer.isBuffer(addressWIF))
+        if (!Buffer.isBuffer(addressWIF) && addressWIF !== '' && addressWIF !== undefined)
             addressWIF = BufferExtended.fromBase(addressWIF);
 
         let address = InterfaceBlockchainAddressHelper.validateAddressChecksum(addressWIF);
 
-        console.log("subscribeBalanceChanges",addressWIF );
+        console.log("subscribeBalanceChanges",BufferExtended.toBase(addressWIF) );
 
         let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(address),callback);
 
@@ -46,7 +46,10 @@ class MiniBlockchainBalances{
 
         if (subscription === undefined || subscription === null) return false;
 
-        subscription();
+        if (typeof subscription === 'function')
+            subscription();
+
+        return true;
 
     }
 
