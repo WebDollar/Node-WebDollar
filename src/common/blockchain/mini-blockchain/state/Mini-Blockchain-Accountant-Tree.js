@@ -49,16 +49,18 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         let result = node.updateBalanceToken(value, tokenId);
 
+        let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
+
         // it was deleted
         if (result === null){
             this.delete(address);
-            this.emitter.emit("balances/changes/"+BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address)), null);
+            this.emitter.emit("balances/changes/"+addressWIF, {address: addressWIF, balance: null});
             return null;
         }
 
         this.changedNode( node );
 
-        this.emitter.emit("balances/changes/"+BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address)), node.getBalances() );
+        this.emitter.emit("balances/changes/"+addressWIF, {address: addressWIF, balance: node.getBalances()} );
 
         return result;
     }

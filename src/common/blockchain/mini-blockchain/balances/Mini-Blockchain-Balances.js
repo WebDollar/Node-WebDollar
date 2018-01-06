@@ -1,4 +1,5 @@
 import BufferExtended from "common/utils/BufferExtended"
+import InterfaceBlockchainAddressHelper from "../../interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 class MiniBlockchainBalances{
 
@@ -22,18 +23,21 @@ class MiniBlockchainBalances{
 
     }
 
-    subscribeBalanceChanges(address, callback){
+    subscribeBalanceChanges(addressWIF, callback){
 
-        if (address === '' || address === undefined || address === null) return null;
+        if (addressWIF === '' || addressWIF === undefined || addressWIF === null) return null;
 
-        if (!Buffer.isBuffer(address))
-            address = BufferExtended.fromBase(address);
+        if (!Buffer.isBuffer(addressWIF))
+            addressWIF = BufferExtended.fromBase(addressWIF);
+        else addressWIF = InterfaceBlockchainAddressHelper.generateAddressWIF(addressWIF);
 
-        let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+address.toString(),callback);
+        console.log("subscribeBalanceChanges",addressWIF );
+
+        let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(addressWIF),callback);
 
         return {
             subscription: subscription,
-            balance: this.checkBalance(address),
+            balance: this.checkBalance(addressWIF),
         }
     }
 

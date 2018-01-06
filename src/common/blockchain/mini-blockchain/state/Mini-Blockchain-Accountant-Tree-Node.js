@@ -98,7 +98,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         let list = { };
 
         for (let i=0; i<this.balances.length; i++)
-            list[ this.balances[i].id.toString() ] = this.balances[i].amount.toString();
+            list[ BufferExtended.toBase(this.balances[i].id) ] = this.balances[i].amount.toString();
 
 
         return list;

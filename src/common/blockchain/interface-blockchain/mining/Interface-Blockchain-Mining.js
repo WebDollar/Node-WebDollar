@@ -20,6 +20,9 @@ class InterfaceBlockchainMining{
 
         this.blockchain = blockchain;
 
+        this.minerAddressBase = '';
+        this.minerAddress = undefined;
+
         this.setMinerAddress(minerAddress);
 
         this._nonce = 0;
@@ -140,9 +143,7 @@ class InterfaceBlockchainMining{
             if (showMiningOutput)
                 intervalMiningOutput = this.setMiningHashRateInterval();
 
-            console.log("block blockblockblock1111", block.data.minerAddress);
             let answer = await this.mine(block, difficulty);
-            console.log("block blockblockblock2222", block.data.minerAddress);
 
             if (answer.result){
                 console.log( colors.green("WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
@@ -237,6 +238,7 @@ class InterfaceBlockchainMining{
             newMinerAddress = BufferExtended.fromBase(newMinerAddress);
 
         this.minerAddress = newMinerAddress;
+        this.minerAddressBase = BufferExtended.toBase(newMinerAddress);
 
         this.emitter.emit('mining/miner-address-changed', BufferExtended.toBase(this.minerAddress));
 

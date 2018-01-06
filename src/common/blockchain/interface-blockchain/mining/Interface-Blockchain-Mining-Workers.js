@@ -101,8 +101,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                                 this._suspendMiningWorking();
                                 this._suspendWorkers();
 
-                                console.log("Mining ####3");
-
                                 this._workerResolve({
                                     result: true,
                                     hash: new Buffer(event.data.hash),

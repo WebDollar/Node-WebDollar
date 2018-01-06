@@ -175,15 +175,22 @@ class InterfaceBlockchainAddressHelper{
         if (!Buffer.isBuffer(address))
             address = BufferExtended.fromBase(address);
 
+        let prefix = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_PREFIX_BASE64 : consts.PUBLIC_ADDRESS_PREFIX_BASE58);
+        let suffix = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58);
+
+        //maybe address is already a
+        if (address.length === consts.PUBLIC_KEY_LENGTH + consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH  + consts.PUBLIC_ADDRESS_VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2)
+            return address;
+
         address = Buffer.concat ( [ Buffer.from(consts.PUBLIC_ADDRESS_VERSION_PREFIX,"hex"), address ]) ; //if using testnet, would use 0x6F or 111.
 
         let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(address, showDebug);
 
         let addressWIF = Buffer.concat([
-            Buffer.from(  consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_PREFIX_BASE64 : consts.PUBLIC_ADDRESS_PREFIX_BASE58 , "hex"),
+            Buffer.from( prefix , "hex"),
             address,
             checksum,
-            Buffer.from( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58, "hex")
+            Buffer.from( suffix, "hex")
         ]);
 
         return addressWIF;
