@@ -1,7 +1,7 @@
-import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
+import PPoWBlockchainBlockData from 'common/blockchain/ppow-blockchain/blocks/PPoW-Blockchain-Block-Data'
 import BufferExtended from 'common/utils/BufferExtended'
 
-class MiniBlockchainBlockData extends  InterfaceBlockchainBlockData {
+class MiniBlockchainBlockData extends  PPoWBlockchainBlockData {
 
     constructor (blockchain, minerAddress, transactions, hashTransactions, hashData, hashAccountantTree){
 

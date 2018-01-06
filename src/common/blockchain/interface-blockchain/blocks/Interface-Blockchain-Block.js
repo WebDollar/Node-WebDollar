@@ -45,7 +45,6 @@ class InterfaceBlockchainBlock {
 
         this.data = data;
 
-        this.interlink = [];
         
         //computed data
         this.computedBlockPrefix = null;
@@ -58,45 +57,6 @@ class InterfaceBlockchainBlock {
         this.db = db;
     }
 
-    getId(){
-
-        return new BigInteger(this.hash.toString('hex'), 32);
-    }
-
-    getLevel(){
-
-        let T = new BigInteger(this.difficultyTarget.toString('hex'), 32);
-        let id = this.getId();
-        
-        //If id <= T/2^u the block is of level u => block level is max(u) for 2^u * id <= T
-        let x = T.divide(id);
-        let u = 0;
-        let pow = new BigInteger(1, 32);
-
-        while(pow.compare(x) <= 0){
-            ++u;
-            pow.mul(2);
-        }
-        --u;
-
-        return u;
-    }
-    
-    updateInterlink(prevBlock){
-        
-        for (let i = 0; i < prevBlock.interlink.length; ++i){
-            this.interlink[i] = prevBlock.interlink[i];
-        }
-        
-        let blockLevel = prevBlock.getLevel();
-        
-        //add new interlinks for current block
-        //Every block of level u needs a pointer to the previous block with level <= u.
-        for (let i = 1; i <= blockLevel; ++i){
-            this.interlink[i] = {height: prevBlock.height, hash: prevBlock.hash};
-        }
-
-    }
 
     async validateBlock(height, previousDifficultyTarget, previousHash, validationType){
 

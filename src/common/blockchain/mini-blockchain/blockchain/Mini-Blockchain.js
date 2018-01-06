@@ -1,5 +1,5 @@
 
-import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockchain/Interface-Blockchain'
+import PPoWBlockchain from 'common/blockchain/ppow-blockchain/blockchain/PPoW-Blockchain'
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import MiniBlockchainBlock from '../blocks/Mini-Blockchain-Block'
 import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
@@ -7,7 +7,7 @@ import MiniBlockchainFork from './forks/Mini-Blockchain-Fork'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import InterfaceBlockchainForksAdministrator from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Forks-Administrator'
 
-class MiniBlockchain extends  InterfaceBlockchain{
+class MiniBlockchain extends  PPoWBlockchain{
 
     constructor (){
 
@@ -107,7 +107,7 @@ class MiniBlockchain extends  InterfaceBlockchain{
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast){
 
         return await this.simulateNewBlock(block, false, async ()=>{
-            return await InterfaceBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast);
+            return await PPoWBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast);
         })
 
     }
