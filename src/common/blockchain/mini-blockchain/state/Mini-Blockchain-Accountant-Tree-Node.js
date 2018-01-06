@@ -28,7 +28,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     updateBalanceToken(value, tokenId){
 
-        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = 1;
+        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = Buffer.from([1]);
 
         if (this.balances === undefined || this.balances === null) throw 'balances is null';
 
@@ -77,7 +77,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     getBalance(tokenId){
 
-        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = 1;
+        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = Buffer.from([1]);
 
         if (!Buffer.isBuffer(tokenId))
             tokenId = BufferExtended.fromBase(tokenId);

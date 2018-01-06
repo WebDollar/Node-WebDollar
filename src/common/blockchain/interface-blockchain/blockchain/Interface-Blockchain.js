@@ -174,6 +174,7 @@ class InterfaceBlockchain {
                         return result;
                     } catch (exception){
                         this._blocksSempahore = false;
+                        console.log("error processBlocksSempahoreCallback", exception);
                         throw exception;
                     }
                 }

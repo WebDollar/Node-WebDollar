@@ -6,6 +6,7 @@ import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 
 import BufferExtended from "common/utils/BufferExtended"
+import InterfaceBlockchainAddressHelper from "../../interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 const EventEmitter = require('events');
 
@@ -31,32 +32,33 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
      * @param tokenId
      * @returns {*}
      */
-    updateAccount(input, value, tokenId){
+    updateAccount(address, value, tokenId){
 
-        if (!Buffer.isBuffer(input))
-            input = BufferExtended.fromBase(input);
+        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        if (address === null) throw "sorry but your address is invalid";
 
-        let node = this.search(input).node;
+        let node = this.search(address).node;
 
         // in case it doesn't exist, let's create it
         if ( node === undefined || node === null){
-            node = this.add(input, {balances: [] });
+            node = this.add(address, {balances: [] });
         }
 
         if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
+
 
         let result = node.updateBalanceToken(value, tokenId);
 
         // it was deleted
         if (result === null){
-            this.delete(input);
-            this.emitter.emit("balances/changes/"+BufferExtended.toBase(input), null);
+            this.delete(address);
+            this.emitter.emit("balances/changes/"+BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address)), null);
             return null;
         }
 
         this.changedNode( node );
 
-        this.emitter.emit("balances/changes/"+BufferExtended.toBase(input), node.getBalances() );
+        this.emitter.emit("balances/changes/"+BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address)), node.getBalances() );
 
         return result;
     }
@@ -66,12 +68,12 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
      * @param input must be Base or Base String
      * @returns {*}
      */
-    listBalances(input){
+    listBalances(address){
 
-        if (!Buffer.isBuffer(input))
-            input = BufferExtended.fromBase(input);
+        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        if (address === null) throw "sorry but your address is invalid";
 
-        let node = this.search(input).node;
+        let node = this.search(address).node;
 
         if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
 

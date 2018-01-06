@@ -31,7 +31,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this._workerFinished = false;
 
-
         let promiseResolve = new Promise ((resolve)=>{ this._workerResolve = resolve });
 
         //initialize new workers
@@ -101,6 +100,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                                 this._suspendMiningWorking();
                                 this._suspendWorkers();
+
+                                console.log("Mining ####3");
 
                                 this._workerResolve({
                                     result: true,

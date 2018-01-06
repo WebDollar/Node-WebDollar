@@ -70,10 +70,19 @@ class InterfaceBlockchainMining{
 
             try {
 
+
                 nextTransactions = this._selectNextTransactions();
                 nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress, nextTransactions );
 
                 nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
+
+
+            } catch (Exception){
+                console.log(colors.red("Error creating next block "+Exception.toString()), Exception, nextBlock);
+            }
+
+            try{
+
 
                 //simulating the new block and calculate the hashAccountantTree
                 await this.blockchain.processBlocksSempahoreCallback( ()=>{
@@ -83,9 +92,8 @@ class InterfaceBlockchainMining{
                 });
 
 
-
             } catch (Exception){
-                console.log(colors.red("Error creating next block "+Exception.toString()), Exception, nextBlock);
+                console.log(colors.red("Error processBlocksSempahoreCallback "+Exception.toString()), Exception, nextBlock);
             }
 
             try {
@@ -94,6 +102,8 @@ class InterfaceBlockchainMining{
                 console.log("Mining Exception", exception);
                 this.stopMining();
             }
+
+
         }
 
     }
@@ -119,9 +129,7 @@ class InterfaceBlockchainMining{
 
             if (block === undefined || block === null) throw "block is undefined";
 
-            console.log("block blockblockblock1111", this.minerAddress);
             block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
-            console.log("block blockblockblock", block.data.minerAddress);
 
             this._nonce = initialNonce||0;
 
@@ -132,8 +140,9 @@ class InterfaceBlockchainMining{
             if (showMiningOutput)
                 intervalMiningOutput = this.setMiningHashRateInterval();
 
+            console.log("block blockblockblock1111", block.data.minerAddress);
             let answer = await this.mine(block, difficulty);
-
+            console.log("block blockblockblock2222", block.data.minerAddress);
 
             if (answer.result){
                 console.log( colors.green("WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD") );

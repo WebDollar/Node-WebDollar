@@ -36,11 +36,11 @@ class MiniBlockchain extends  InterfaceBlockchain{
         try{
 
             //updating reward
+            console.log("block.data.minerAddress", block.data.minerAddress)
             result = !this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
 
-            //let balances = this.accountantTree.listBalances( block.data.minerAddress );
-            //console.log("balances", balances );
-
+            // let balances = this.accountantTree.listBalances( block.data.minerAddress );
+            // console.log("balances", balances );
 
             //reward
             if (result !== null && result !== undefined)
@@ -85,8 +85,10 @@ class MiniBlockchain extends  InterfaceBlockchain{
             if (revert.reward)
                 this.accountantTree.updateAccount( block.data.minerAddress, block.reward.negated(), undefined );
 
-            if (exception !== null)
+            if (exception !== null) {
+                console.log("exception simulateNewBlock ", exception);
                 throw exception;
+            }
 
             return false;
         }

@@ -155,21 +155,7 @@ class InterfaceBlockchainAddressHelper{
         if (showDebug)
             console.log("hash160 hex", hash160.toString('hex') ) //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
 
-        hash160 = Buffer.concat ( [ Buffer.from(consts.PUBLIC_ADDRESS_VERSION_PREFIX,"hex"), hash160 ]) ; //if using testnet, would use 0x6F or 111.
-
-        let doubleSHA = WebDollarCrypto.SHA256(WebDollarCrypto.SHA256( hash160 ));
-        let addressChecksum = BufferExtended.substr(doubleSHA, 0, consts.PRIVATE_KEY_CHECK_SUM_LENGTH);
-
-        if (showDebug)
-            console.log("addressChecksum", addressChecksum.toString("hex") ) //26268187
-
-
-        let unencodedAddress = Buffer.concat([
-                                Buffer.from(  consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_PREFIX_BASE64 : consts.PUBLIC_ADDRESS_PREFIX_BASE58 , "hex"),
-                                hash160,
-                                addressChecksum,
-                                Buffer.from( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58, "hex")
-                               ]);
+        let unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
 
         if (showDebug)
             console.log("unencodedAddress", unencodedAddress.toString("hex")) //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
@@ -182,6 +168,25 @@ class InterfaceBlockchainAddressHelper{
             address: BufferExtended.toBase(unencodedAddress),
         };
 
+    }
+
+    static generateAddressWIF(address, showDebug){
+
+        if (!Buffer.isBuffer(address))
+            address = BufferExtended.fromBase(address);
+
+        address = Buffer.concat ( [ Buffer.from(consts.PUBLIC_ADDRESS_VERSION_PREFIX,"hex"), address ]) ; //if using testnet, would use 0x6F or 111.
+
+        let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(address, showDebug);
+
+        let addressWIF = Buffer.concat([
+            Buffer.from(  consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_PREFIX_BASE64 : consts.PUBLIC_ADDRESS_PREFIX_BASE58 , "hex"),
+            address,
+            checksum,
+            Buffer.from( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58, "hex")
+        ]);
+
+        return addressWIF;
     }
 
     static generateAddress(salt){
@@ -208,7 +213,7 @@ class InterfaceBlockchainAddressHelper{
         if (typeof address === "string")  //base
             address = BufferExtended.fromBase(address);
 
-        let result = this.validateAddressWIF(address);
+        let result = this._validateAddressWIF(address);
 
         if (result.result === true) return result.address;
         else return null;
@@ -273,7 +278,7 @@ class InterfaceBlockchainAddressHelper{
 
             //versionDetectedBuffer + privateKeyWIFWithoutCheckSum;
             let privateKeyJustVersionHex = Buffer.concat([versionDetectedBuffer, privateKeyWithoutCheckSum]);
-            
+
 
             let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(privateKeyJustVersionHex);
 
@@ -304,12 +309,11 @@ class InterfaceBlockchainAddressHelper{
 
      and in case privateKey is a WIF, it returns the private key without WIF
 
-     * @param privateKeyWIF
-     * @returns {{result: boolean, privateKey: *}}
+     * @param addressWIF
+     * @returns {{result: boolean, address: *}}
      */
-    static validateAddressWIF(addressWIF){
+    static _validateAddressWIF(addressWIF){
 
-        console.log("validateAddressWIF", addressWIF);
         if (addressWIF === null || !Buffer.isBuffer(addressWIF) ){
             throw ('privateKeyWIF must be a Buffer');
         }
@@ -377,9 +381,9 @@ class InterfaceBlockchainAddressHelper{
 
         if (addressWIF.length !== consts.PUBLIC_KEY_LENGTH){
 
-            if (!prefixDetected) throw "ADDRESS KEY  PREFIX DETECTED is not right";
+            if (!prefixDetected) throw "ADDRESS KEY  PREFIX  is not right";
 
-            if (!suffixDetected) throw "ADDRESS KEY  SUFFIX DETECTED is not right";
+            if (!suffixDetected) throw "ADDRESS KEY  SUFFIX is not right";
 
             if (!checkSumDetected) throw "ADDRESS KEY  CHECK SUM is not right";
 
