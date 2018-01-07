@@ -32,7 +32,9 @@ class MainBlockchainWallet{
     async _justCreateNewAddress(salt, emptyAddress){
 
         let blockchainAddress = new MiniBlockchainAddress(this.db, this.password);
-        await blockchainAddress.createNewAddress(salt, emptyAddress);
+
+        if (!emptyAddress)
+            await blockchainAddress.createNewAddress(salt);
 
         return blockchainAddress;
 
@@ -131,7 +133,7 @@ class MainBlockchainWallet{
 
             let buffer = await this.db.get(this.walletFileName);
 
-            if (typeof buffer.status !== "undefined")
+            if ( buffer !== null)
                 resolve(false);
 
             await this.deserialize(buffer);

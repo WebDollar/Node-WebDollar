@@ -1,7 +1,16 @@
 import PPoWBlockchainBlockData from 'common/blockchain/ppow-blockchain/blocks/PPoW-Blockchain-Block-Data'
+import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 import BufferExtended from 'common/utils/BufferExtended'
+import consts from "consts/const_global";
 
-class MiniBlockchainBlockData extends  PPoWBlockchainBlockData {
+let inheritBlockData;
+
+if (consts.POPOW_ACTIVATED)
+    inheritBlockData = InterfaceBlockchainBlockData;
+else
+    inheritBlockData = PPoWBlockchainBlockData;
+
+class MiniBlockchainBlockData extends  inheritBlockData {
 
     constructor (blockchain, minerAddress, transactions, hashTransactions, hashData, hashAccountantTree){
 
@@ -21,7 +30,7 @@ class MiniBlockchainBlockData extends  PPoWBlockchainBlockData {
 
     validateBlockData(validationType){
 
-        let result = InterfaceBlockchainBlockData.prototype.validateBlockData.call(this,  );
+        let result = inheritBlockData.prototype.validateBlockData.call(this,  );
 
         if (!result) return false;
 
@@ -48,7 +57,7 @@ class MiniBlockchainBlockData extends  PPoWBlockchainBlockData {
 
         return Buffer.concat (
             [
-                InterfaceBlockchainBlockData.prototype._computeBlockDataHeaderPrefix.call(this),
+                inheritBlockData.prototype._computeBlockDataHeaderPrefix.call(this),
                 this.hashAccountantTree,
             ]);
     }
@@ -65,7 +74,7 @@ class MiniBlockchainBlockData extends  PPoWBlockchainBlockData {
 
         let data = buffer;
 
-        let offset = InterfaceBlockchainBlockData.prototype.deserializeData.call(this, buffer);
+        let offset = inheritBlockData.prototype.deserializeData.call(this, buffer);
 
         this.hashAccountantTree = BufferExtended.substr(data, offset, 32);
         offset += 32;

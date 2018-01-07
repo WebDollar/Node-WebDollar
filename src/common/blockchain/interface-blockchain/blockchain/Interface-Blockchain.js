@@ -214,7 +214,7 @@ class InterfaceBlockchain {
 
         //load the number of blocks
         let numBlocks = await this.db.get(this.blockchainFileName);
-        if (typeof numBlocks.status !== 'undefined') {
+        if (numBlocks === null || (numBlocks.status !== null && numBlocks.status === 404) ) {
             return false;
         }
         

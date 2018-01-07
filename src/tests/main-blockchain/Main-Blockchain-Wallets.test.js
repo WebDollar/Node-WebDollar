@@ -17,6 +17,11 @@ describe('test save wallet to local storage', () => {
         let publicKey = blockchainAddress.publicKey;
         let privateKey = await blockchainAddress.getPrivateKey();
 
+        assert(typeof address === "string", "address is not a string");
+        assert(Buffer.isBuffer(unencodedAddress), "unencodedAddress is not not buffer");
+        assert(Buffer.isBuffer(publicKey), "publicKey is not not buffer");
+        assert(Buffer.isBuffer(privateKey), "privateKey is not not buffer");
+
         response = await blockchainAddress.save();
         assert(response === true, 'save: ' + response);
         

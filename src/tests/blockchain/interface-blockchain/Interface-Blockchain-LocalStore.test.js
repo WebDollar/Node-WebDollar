@@ -25,10 +25,11 @@ describe('test save/load/remove blockchain to/from local storage', () => {
         response = await blockchain.load();
         assert(response === true, 'load: ' + response);
         
-        assert(blockchain.blocks[0].equals(b0), 'load: blocks differ after load');
-        assert(blockchain.blocks[1].equals(b1), 'load: blocks differ after load');
-        assert(blockchain.blocks[2].equals(b2), 'load: blocks differ after load');
-        assert(blockchain.blocks[3].equals(b3), 'load: blocks differ after load');
+        assert(blockchain.blocks.length === 4, 'blockchain should have 4 blocks ' + blockchain.blocks.length);
+        assert(blockchain.blocks[0].equals(b0), 'load: blocks0 differ after load');
+        assert(blockchain.blocks[1].equals(b1), 'load: blocks1 differ after load');
+        assert(blockchain.blocks[2].equals(b2), 'load: blocks2 differ after load');
+        assert(blockchain.blocks[3].equals(b3), 'load: blocks3 differ after load');
 
         assert(blockchain.blocks.length === 4, 'load: blocks.length=' + blockchain.blocks.length);
         

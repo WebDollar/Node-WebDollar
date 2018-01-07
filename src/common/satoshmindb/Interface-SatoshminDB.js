@@ -69,8 +69,12 @@ class InterfacePouchDB {
                     return new Buffer(atob(response._attachments.key.data).toString('hex'), 'hex');
                 }
         } catch (Exception){
-            console.log("error getDocument ", Exception);
-            return Exception;
+
+            if ( Exception.status === 404) return null; //nothing
+            else {
+                console.log("error getDocument ", Exception);
+                throw Exception;
+            }
         }
 
     }
@@ -86,7 +90,9 @@ class InterfacePouchDB {
 
         } catch (err){
             console.log("deleteDocument raised an error", key);
-            return err;
+
+            if (err.status === 404) return null; // not existing
+            else return err;
         }
 
     }
@@ -196,20 +202,37 @@ class InterfacePouchDB {
 
 
     //main methods
-    save(key, value) {
-        if (Buffer.isBuffer(value)) {
-            return this.saveDocumentAttachment(key, value);
-        } else {
-            return this.createDocument(key, value);
+    async save(key, value) {
+        try {
+            if (Buffer.isBuffer(value)) {
+                return await this.saveDocumentAttachment(key, value);
+            } else {
+                return await this.createDocument(key, value);
+            }
+        } catch (exception){
+            console.log("db.save error "+key, exception);
+            return null;
         }
     }
     
-    get(key) {
-        return this.getDocument(key);
+    async get(key) {
+        try {
+            let result = await this.getDocument(key);
+            return result;
+        } catch (exception){
+            console.log("db.get error "+key, exception);
+            return null;
+        }
     }
 
-    remove(key) {
-        return this.deleteDocument(key);
+    async remove(key) {
+        try {
+            let result = await this.deleteDocument(key);
+            return result;
+        } catch (exception){
+            console.log("db.remove error "+key, exception);
+            return null;
+        }
     }
 
 }

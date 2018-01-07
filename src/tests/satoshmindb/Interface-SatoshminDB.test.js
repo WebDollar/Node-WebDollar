@@ -32,7 +32,7 @@ describe('interfaceSatoshminDB', () => {
     
     it('save/remove/get sample ASCII test', async () => {
 
-        key = Math.floor(Math.random() * 10000).toString();;
+        key = Math.floor(Math.random() * 10000).toString();
         value = 'myValue_2';
         db = new InterfaceSatoshminDB();
         
@@ -43,7 +43,7 @@ describe('interfaceSatoshminDB', () => {
         assert(response === true, 'remove: ' + response);
         
         response = await db.get(key);
-        assert(response.status === 404, 'get(found after remove) :' + response);
+        assert(response === null, 'get(found after remove) :' + response);
         
     });
     
@@ -71,7 +71,7 @@ describe('interfaceSatoshminDB', () => {
         db = new InterfaceSatoshminDB();
         
         response = await db.remove(key);
-        assert(response.status === 404, 'remove(found nonexisting) :' + response);
+        assert(response === null, 'remove(found nonexisting) :' + response);
     });
     
     //----------------------Buffer-------------------------------------------------------
@@ -105,7 +105,7 @@ describe('interfaceSatoshminDB', () => {
         assert(response === true, 'remove: ' + response);
         
         response = await db.get(key);
-        assert(response.status === 404, 'get(found after remove) :' + response);
+        assert(response === null, 'get(found after remove) :' + response);
     });
 
     it('save/save/get sample Buffer test', async () => {
@@ -134,7 +134,7 @@ describe('interfaceSatoshminDB', () => {
         db = new InterfaceSatoshminDB();
         
         response = await db.remove(key);
-        assert(response.status === 404, 'get(found after remove) :' + response);
+        assert(response === null, 'get(found after remove) :' + response);
 
     });
     
