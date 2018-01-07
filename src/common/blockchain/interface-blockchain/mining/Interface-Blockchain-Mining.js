@@ -235,7 +235,8 @@ class InterfaceBlockchainMining{
 
         //console.log("setMinerAddress", newMinerAddress);
 
-        if (newMinerAddress === undefined || newMinerAddress === ''){
+        if (newMinerAddress === undefined || newMinerAddress === '' || newMinerAddress === null){
+            console.log(colors.red("No Miner Address defined"));
             this.minerAddress = undefined;
             this.minerAddressBase = '';
             return;

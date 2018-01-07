@@ -62,12 +62,13 @@ class InterfacePouchDB {
         try{
             let response = await this.db.get(key, {attachments: true});
 
-                if (response._attachments === undefined) {
-                    return response.value;
-                } else {
-                    //get attachment
-                    return new Buffer(atob(response._attachments.key.data).toString('hex'), 'hex');
-                }
+            if (response._attachments === undefined) {
+                return response.value;
+            } else {
+                //get attachment
+                return new Buffer(atob(response._attachments.key.data).toString('hex'), 'hex');
+            }
+
         } catch (Exception){
 
             if ( Exception.status === 404) return null; //nothing

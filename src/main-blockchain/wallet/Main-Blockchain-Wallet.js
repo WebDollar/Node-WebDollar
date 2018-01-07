@@ -126,12 +126,14 @@ class MainBlockchainWallet{
         return new Promise( async (resolve)=>{
 
             //timeout, max 10 seconds to load the database
-            setTimeout(()=>{
+            let timeout = setTimeout(()=>{
                 console.log(colors.red("LOAD ADDRESSES FROZE AND FAILED !!"));
                 resolve(false);
             }, 10000);
 
             let buffer = await this.db.get(this.walletFileName);
+
+            clearTimeout(timeout);
 
             if ( buffer !== null)
                 resolve(false);

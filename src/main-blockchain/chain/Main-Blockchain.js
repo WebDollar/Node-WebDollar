@@ -5,12 +5,6 @@ class MainBlockchain extends  MiniBlockchain{
     constructor (  ) {
 
         super();
-        
-        this.load().then(async (response) => {
-            if (response !== true) {
-                await this.save();
-            }
-        });
 
     }
 

@@ -191,10 +191,12 @@ class InterfaceBlockchain {
 
     }
 
-    async save(){      
+    async save(){
 
         //save the number of blocks
+        console.log("save111", this.blockchainFileName, this.blocks.length);
         let response = await this.db.save(this.blockchainFileName, this.blocks.length);
+        console.log("save2222");
 
         if (response !== true){
             return false;
@@ -238,7 +240,7 @@ class InterfaceBlockchain {
                     return response;
 
                 } catch (exception){
-                    console.log(colors.red("blockchain LOADING stopped at " + i), exception);
+                    console.log(colors.red("blockchain LOADING stopped at " + i), exception, block);
                     break;
                 }
 
