@@ -1,7 +1,7 @@
 import InterfaceBlockchainAddressHelper from './Interface-Blockchain-Address-Helper'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
-import Serialization from "common/utils/Serialization.js";
-import BufferExtend from "common/utils/BufferExtended.js";
+import Serialization from "common/utils/Serialization";
+import BufferExtend from "common/utils/BufferExtended";
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import BufferExtended from 'common/utils/BufferExtended';
@@ -124,7 +124,10 @@ class InterfaceBlockchainAddress{
 
     serializeAddress(){
 
-        return Buffer.concat( [ Serialization.serializeNumber1Byte(this.unencodedAddress.length),
+        return Buffer.concat( [
+                                Serialization.serializeNumber1Byte(BufferExtended.fromBase(this.address).length),
+                                BufferExtended.fromBase(this.address),
+                                Serialization.serializeNumber1Byte(this.unencodedAddress.length),
                                 this.unencodedAddress,
                                 Serialization.serializeNumber1Byte(this.publicKey.length),
                                 this.publicKey
@@ -133,30 +136,42 @@ class InterfaceBlockchainAddress{
     
     deserializeAddress(buffer){
 
-        let data = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
+        buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
+
         let offset = 0;
         let len = 0;
 
         try {
-            
-            len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 1) );
+
+            len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
             offset += 1;
+
+            this.address = BufferExtended.toBase( BufferExtend.substr(buffer, offset, len));
+            offset += len;
             
-            this.unencodedAddress = BufferExtend.substr(data, offset, len);
+            len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+            offset += 1;
+
+
+            this.unencodedAddress = BufferExtend.substr(buffer, offset, len);
             offset += len;
 
             //calcuating the address from the unencodedAddress
-            this.address = BufferExtended.toBase(this.unencodedAddress);
+            if (InterfaceBlockchainAddressHelper.validateAddressChecksum(this.address).result === false) throw "address didn't pass the valdiateAddressChecksum "
 
-            len = Serialization.deserializeNumber( BufferExtend.substr(data, offset, 1) );
+            len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
             offset += 1;
-            
-            this.publicKey = BufferExtend.substr(data, offset, len);
+
+            this.publicKey = BufferExtend.substr(buffer, offset, len);
             offset += len;
-            
+
         } catch (exception){
+
             console.log("error deserializing address. ", exception);
+            console.log("this.address", this.address);
+            console.log("this.unencodedAddress", this.unencodedAddress.toString("hex"));
             throw exception;
+
         }
         
         return offset;
@@ -206,13 +221,17 @@ class InterfaceBlockchainAddress{
         let key = this.address.toString('hex');
         
         try {
-            let value = await this.db.get(key);            
+            let value = await this.db.get(key);
+
+            if (value === null) return false;
+
             this.deserializeAddress(value);
 
             return true;
         }
         catch(err) {
-            return 'ERROR on LOAD blockchain address: ' + err;
+            console.log( 'ERROR on LOAD blockchain address: ' , err);
+            return false;
         }
     }
     
@@ -224,7 +243,7 @@ class InterfaceBlockchainAddress{
             return (await this.db.remove(key));
         }
         catch(err) {
-            return 'ERROR on REMOVE blockchain address: ' + err;
+            return 'ERROR on REMOVE blockchain address: ' , err;
         }
 
     }
@@ -236,13 +255,6 @@ class InterfaceBlockchainAddress{
             privateKey = null;
 
         return "address" + this.address.toString() + (this.publicKey !== null ? "public key" + this.publicKey.toString() : '') + (privateKey !== null ? "private key" + privateKey.toString() : '')
-    }
-
-    getAddressAndPrivateKey(){
-        return {
-            address: this.address,
-            privateKey: this.privateKey,
-        }
     }
 
 

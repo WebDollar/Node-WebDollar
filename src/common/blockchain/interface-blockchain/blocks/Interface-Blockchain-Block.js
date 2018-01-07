@@ -180,9 +180,7 @@ class InterfaceBlockchainBlock {
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );
 
-        //console.log("this.computedBlockPrefix", buffer);
 
-        //console.log("buffer", buffer.toString("hex"));
         return WebDollarCrypto.hashPOW(buffer);
     }
 
@@ -203,7 +201,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height){
+    deserializeBlock(buffer){
 
         if (!Buffer.isBuffer(buffer))
             buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
@@ -211,25 +209,27 @@ class InterfaceBlockchainBlock {
         let offset = 0;
 
         try {
-            if (height >= 0) {
 
-                this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
-                offset += consts.BLOCKS_POW_LENGTH;
+            this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
+            offset += consts.BLOCKS_POW_LENGTH;
 
-                this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, consts.BLOCKS_NONCE) );
-                offset += consts.BLOCKS_NONCE;
+            this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, consts.BLOCKS_NONCE) );
+            offset += consts.BLOCKS_NONCE;
 
-                this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) );
-                offset += 2;
 
-                this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
-                offset += consts.BLOCKS_POW_LENGTH;
+            this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) );
+            offset += 2;
 
-                this.timeStamp = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 4) );
-                offset += 4;
 
-                offset = this.data.deserializeData(BufferExtended.substr(buffer, offset));
-            }
+            this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
+            offset += consts.BLOCKS_POW_LENGTH;
+
+
+            this.timeStamp = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 4) );
+            offset += 4;
+
+            offset = this.data.deserializeData(BufferExtended.substr(buffer, offset));
+
         } catch (exception){
             console.log(colors.red("error deserializing a block  "), exception);
             throw exception;
@@ -257,12 +257,21 @@ class InterfaceBlockchainBlock {
         let key = "block" + this.height;
         
         try{
+
             let buffer = await this.db.get(key);
+
+            if (buffer === null) {
+                //console.log(colors.red("block "+this.height+" was not found "+ key));
+                return false;
+            }
+
             this.deserializeBlock(buffer, this.height);
+
             return true;
         }
         catch(err) {
-            return 'ERROR on LOAD block: ' + err;
+            console.log ( 'ERROR on LOAD block: ' + err);
+            return false;
         }
     }
     

@@ -21,7 +21,7 @@ class InterfacePouchDB {
 
     async createDocument(key, value) {
 
-        this.deleteDocumentAttachmentIfExist(key);
+        await this.deleteDocumentAttachmentIfExist(key);
 
         try {
             let response = await this.db.put({_id: key, value: value});
@@ -29,7 +29,7 @@ class InterfacePouchDB {
             return true;
         } catch (err){
             if (err.status === 409)
-                return this.updateDocument(key, value)
+                return await this.updateDocument(key, value)
             else {
                 console.log("createDocument raised exception", key, err);
                 throw err;
@@ -51,7 +51,7 @@ class InterfacePouchDB {
 
             return true;
         } catch (exception){
-            console.log("updateDocument error", exception)
+            console.log("updateDocument error"+key, exception)
             throw err;
         }
 
@@ -89,10 +89,11 @@ class InterfacePouchDB {
             return true;
 
         } catch (err){
-            console.log("deleteDocument raised an error", key);
-
             if (err.status === 404) return null; // not existing
-            else return err;
+            else {
+                console.log("deleteDocument raised an error ", key);
+                return err;
+            }
         }
 
     }
@@ -134,11 +135,11 @@ class InterfacePouchDB {
                         return await this.saveDocumentAttachment(key, value);
                     } catch (exception){
 
-                        console.log('saveDocumentAttachment raised an error', exception);
+                        console.log('saveDocumentAttachment raised an error for key '+key, exception);
                     }
 
                 } else {
-                    console.log('saveDocumentAttachment 222 raised an error', err);
+                    console.log('saveDocumentAttachment 222 raised an error for key '+key, err);
                     throw err;
                 }
             }
@@ -165,13 +166,13 @@ class InterfacePouchDB {
                 });
                 return true;
             } catch (err) {
-                console.log("error updateDocumentAttachment1", err);
+                console.log("error updateDocumentAttachment1 "+key, err);
                 throw err;
             }
 
 
         } catch (err){
-            console.log("error updateDocumentAttachment2", err);
+            console.log("error updateDocumentAttachment2  "+key, err);
             throw err;
         }
     }
@@ -185,7 +186,8 @@ class InterfacePouchDB {
             return true;
 
         } catch (exception){
-           throw err;
+           return false;
+           throw exception;
         }
     }
 
@@ -193,7 +195,7 @@ class InterfacePouchDB {
 
         try{
             let value = await this.getDocument(key);
-            return this.deleteDocumentAttachment(key);
+            return await this.deleteDocumentAttachment(key);
         } catch (err){
             console.log("deleteDocumentAttachmentIfExist raised an error", err);
             return false;

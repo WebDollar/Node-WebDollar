@@ -9,6 +9,8 @@ class BufferExtended {
 
         let length = Math.min(index+count, buffer.length);
 
+        if (length-index <= 0) throw "length-index <= 0..."+ buffer.toString("hex")+"  index "+index+"   length "+length+"  count "+count;
+
         let array = new Buffer(length-index);
 
         for (let i=index; i<length; i++)

@@ -214,7 +214,8 @@ class InterfaceBlockchain {
 
         //load the number of blocks
         let numBlocks = await this.db.get(this.blockchainFileName);
-        if (numBlocks === null || (numBlocks.status !== null && numBlocks.status === 404) ) {
+        if (numBlocks === null ) {
+            console.log(colors.red("numBlocks was not found"));
             return false;
         }
         
@@ -222,10 +223,12 @@ class InterfaceBlockchain {
 
         try {
             for (let i = 0; i < numBlocks; ++i) {
-                let block = new InterfaceBlockchainBlock(this, 0, new Buffer(consts.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, this.db);
-                let response = await block.load();
 
-                if (response !== true) {
+                let block = new InterfaceBlockchainBlock(this, 0, new Buffer(consts.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, this.db);
+                block.height = i;
+
+                try{
+                    await block.load();
 
                     if (await this.includeBlockchainBlock(block) === false)
                         console.log(colors.red("blockchain is invalid at index " + i));
@@ -233,11 +236,12 @@ class InterfaceBlockchain {
                         console.log(colors.green("blockchain loaded successfully index ", i));
 
                     return response;
-                } else {
 
-                    console.log(colors.red("blockchain LOADING stopped at " + i));
+                } catch (exception){
+                    console.log(colors.red("blockchain LOADING stopped at " + i), exception);
                     break;
                 }
+
             }
         } catch (exception){
             console.log(colors.red("blockchain.load raised an exception"), exception);
