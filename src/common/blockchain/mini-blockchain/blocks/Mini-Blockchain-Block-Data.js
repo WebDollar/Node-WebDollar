@@ -68,9 +68,9 @@ class MiniBlockchainBlockData extends  inheritBlockData {
         this.hashAccountantTree = this.calculateAccountantTreeHashBlockData();
     }
 
-    deserializeData(buffer){
+    deserializeData(buffer, offset){
 
-        let offset = inheritBlockData.prototype.deserializeData.call(this, buffer);
+        offset = inheritBlockData.prototype.deserializeData.call(this, buffer, offset);
 
         this.hashAccountantTree = BufferExtended.substr(buffer, offset, 32);
         offset += 32;

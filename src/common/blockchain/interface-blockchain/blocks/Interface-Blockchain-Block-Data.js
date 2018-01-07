@@ -98,8 +98,6 @@ class InterfaceBlockchainBlockData {
         this.minerAddress = BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH );
         offset += consts.PUBLIC_ADDRESS_LENGTH;
 
-        console.log("this.minerAddress",this.minerAddress);
-
         this.hashData = BufferExtended.substr(buffer, offset, 32);
         offset += 32;
 
