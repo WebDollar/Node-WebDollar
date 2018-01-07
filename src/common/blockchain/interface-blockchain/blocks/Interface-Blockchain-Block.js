@@ -201,12 +201,12 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer){
+    deserializeBlock(buffer,offset){
 
         if (!Buffer.isBuffer(buffer))
             buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
 
-        let offset = 0;
+        offset = offset||0;
 
         try {
 
@@ -228,7 +228,7 @@ class InterfaceBlockchainBlock {
             this.timeStamp = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 4) );
             offset += 4;
 
-            offset = this.data.deserializeData(BufferExtended.substr(buffer, offset));
+            offset = this.data.deserializeData(buffer, offset);
 
         } catch (exception){
             console.log(colors.red("error deserializing a block  "), exception);
@@ -242,13 +242,22 @@ class InterfaceBlockchainBlock {
     async save(){
 
         let key = "block" + this.height;
-        let bufferValue = this.serializeBlock();
+
+        let bufferValue;
+
+        try {
+            bufferValue = this.serializeBlock();
+        } catch (exception){
+            console.log(colors.red('ERROR serializing block: '),  err);
+            throw exception;
+        }
     
         try{
             return (await this.db.save(key, bufferValue));
         }
         catch (err){
-            return 'ERROR on SAVE block: ' + err;
+            console.log(colors.red('ERROR on SAVE block: '),  err);
+            throw err;
         }
     }
 
@@ -267,7 +276,6 @@ class InterfaceBlockchainBlock {
 
             console.log("11111");
             this.deserializeBlock(buffer, this.height);
-            console.log("2222");
             //calculate extra parameters
             this.reward = BlockchainMiningReward.getReward(this.height);
             this.difficultyTarget = this.blockchain.getDifficultyTarget();

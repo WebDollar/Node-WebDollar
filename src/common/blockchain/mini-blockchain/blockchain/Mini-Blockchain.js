@@ -23,7 +23,7 @@ class MiniBlockchain extends  inheritBlockchain{
         super(protocol);
 
         this.accountantTree = new MiniBlockchainAccountantTree();
-        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.dataBase, MiniBlockchainBlock, MiniBlockchainBlockData)
+        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData)
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, MiniBlockchainFork );
     }
 
