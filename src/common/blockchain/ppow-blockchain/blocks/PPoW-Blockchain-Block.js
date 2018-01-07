@@ -12,16 +12,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         this.interlink = [{height: -1, blockId: BlockchainGenesis.hashPrev}];
     }
 
-
-    getId(){
-
-        return this.hash;
-    }
-
     getLevel(){
 
         let T = new BigInteger(this.difficultyTarget.toString('hex'), 32);
-        let id = new BigInteger(this.getId().toString('hex'), 32);
+        let id = new BigInteger(this.hash.toString('hex'), 32);
         
         //If id <= T/2^u the block is of level u => block level is max(u) for 2^u * id <= T
         let u = 0;
@@ -37,23 +31,23 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     }
     
     updateInterlink(prevBlock){
-        
-        for (let i = 0; i < prevBlock.interlink.length; ++i){
+
+        // interlink = interlink'
+        for (let i = 0; i < prevBlock.interlink.length; ++i)
             this.interlink[i] = prevBlock.interlink[i];
-        }
         
         let blockLevel = prevBlock.getLevel();
 
         //add new interlinks for current block
         //Every block of level u needs a pointer to the previous block with level <= u.
+
         for (let i = 1; i <= blockLevel; ++i){
-            if (i > this.interlink.length){
-                this.interlink.push( {height: this.height, blockId: prevBlock.getId()} );
-            }
-            let height = this.interlink[i].height;
-            //for each interlink modification of a block the block.hash will be modified
-            let id = this.blockchain[height].getId();
-            this.interlink[i] = {height: height, blockId: id};
+
+            if (i > this.interlink.length)
+                this.interlink.push({});
+
+            this.interlink[i] = {height: this.height, blockId: prevBlock.hash()}; //getId = Hash
+
         }
 
     }
