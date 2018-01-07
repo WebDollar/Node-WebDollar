@@ -5,10 +5,8 @@ import consts from "consts/const_global";
 
 let inheritBlockData;
 
-if (consts.POPOW_ACTIVATED)
-    inheritBlockData = InterfaceBlockchainBlockData;
-else
-    inheritBlockData = PPoWBlockchainBlockData;
+if (consts.POPOW_ACTIVATED) inheritBlockData = PPoWBlockchainBlockData;
+else inheritBlockData = InterfaceBlockchainBlockData;
 
 class MiniBlockchainBlockData extends  inheritBlockData {
 

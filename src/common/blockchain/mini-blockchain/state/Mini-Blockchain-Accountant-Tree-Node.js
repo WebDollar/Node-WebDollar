@@ -1,7 +1,7 @@
 import InterfaceMerkleAccountantRadixTree from 'common/trees/radix-tree/accountant-tree/merkle-tree/Interface-Merkle-Accountant-Radix-Tree'
 import InterfaceMerkeRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
-import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree-Node'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
+import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree-Node'
 import BufferExtended from "common/utils/BufferExtended";
 import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
@@ -35,7 +35,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         if (!Buffer.isBuffer(tokenId))
             tokenId = BufferExtended.fromBase(tokenId);
 
-        if (!value instanceof BigNumber)
+        if (value instanceof BigNumber === false)
             value = new BigNumber(value);
 
         let result;
@@ -60,7 +60,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
         if (result === undefined) throw 'token is empty';
 
-        if (result.amount < 0)
+        if (result.amount.lessThan(0) )
             throw 'balances became negative';
 
         this.deleteBalancesEmpty();
@@ -107,11 +107,13 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
     deleteBalancesEmpty(){
 
         let result = false;
-        for (let i=this.balances.length-1; i>=0; i--)
-            if (this.balances[i].amount.equals(0) || this.balances[i] === null) {
+        for (let i=this.balances.length-1; i>=0; i--) {
+
+            if (this.balances[i] === null || this.balances[i] === undefined || this.balances[i].amount.equals(0)) {
                 this.balances.splice(i, 1);
                 result = true;
             }
+        }
 
         return true;
 
@@ -166,35 +168,33 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
         let offset = 0;
 
         try {
-            if (height >= 0) {
 
-                let length = BufferExtended.substr(buffer, offset, 1);
-                offset += 1;
+            let length = BufferExtended.substr(buffer, offset, 1);
+            offset += 1;
 
-                // webd balance
-                let webdId = BufferExtended.substr(buffer, offset,1);
-                offset += 1;
+            // webd balance
+            let webdId = BufferExtended.substr(buffer, offset,1);
+            offset += 1;
 
-                if (webdId[0] !== 1) throw "webd token is incorrect";
-                let result = Serialization.deserializeBigNumber( buffer, offset );
+            if (webdId[0] !== 1) throw "webd token is incorrect";
+            let result = Serialization.deserializeBigNumber( buffer, offset );
 
-                this.updateBalanceToken(result.number);
+            this.updateBalanceToken(result.number);
+
+            offset = result.newOffset;
+
+            //rest of tokens , in case there are
+            for (let i=1; i<length; i++){
+                let tokenId = BufferExtended.substr(buffer, offset,consts.TOKEN_ID_LENGTH);
+                offset += consts.TOKEN_ID_LENGTH;
+
+                result = Serialization.deserializeBigNumber(buffer, offset);
+
+                this.updateBalanceToken(result.number, tokenId);
 
                 offset = result.newOffset;
-
-                //rest of tokens , in case there are
-                for (let i=1; i<length; i++){
-                    let tokenId = BufferExtended.substr(buffer, offset,consts.TOKEN_ID_LENGTH);
-                    offset += consts.TOKEN_ID_LENGTH;
-
-                    result = Serialization.deserializeBigNumber(buffer, offset);
-
-                    this.updateBalanceToken(result.number, tokenId);
-
-                    offset = result.newOffset;
-                }
-
             }
+
         } catch (exception){
             console.log(colors.red("error deserializing tree node"), exception);
             throw exception;

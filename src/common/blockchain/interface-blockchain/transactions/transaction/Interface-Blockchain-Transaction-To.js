@@ -61,7 +61,7 @@ class InterfaceBlockchainTransactionTo{
 
             if (!toObject.address || toObject.address === null || !Buffer.isBuffer(toObject.address)) throw 'To.Object Address is not specified';
 
-            if (!toObject.amount || ! toObject.amount instanceof BigNumber ) throw 'To.Object Amount is not specified';
+            if (!toObject.amount ||  toObject.amount instanceof BigNumber === false ) throw 'To.Object Amount is not specified';
 
             if ( toObject.amount.lessThan(0) ) throw "To.Object Amount is an invalid number";
 

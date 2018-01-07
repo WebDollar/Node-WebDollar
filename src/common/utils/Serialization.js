@@ -13,7 +13,7 @@ class Serialization{
         // e: 9  - it can also be negative
         // s: 1
 
-        if (! data instanceof BigNumber) throw 'data is not big decimal';
+        if (data instanceof BigNumber === false) throw 'data is not big decimal';
         if ( data.c.length === 0 ) throw "data is 0 and can't be ";
 
         let buffer = new Buffer( 1 + 1 + data.c.length*6 );

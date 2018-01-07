@@ -82,7 +82,7 @@ class InterfaceBlockchain {
         this.blocks.push(block);
 
         if (saveBlock)
-            block.save();
+            await this.saveNewBlock(block);
 
         this.protocol.propagateHeader(block, this.blocks.length, socketsAvoidBroadcast );
 
@@ -182,14 +182,24 @@ class InterfaceBlockchain {
 
     }
 
+    async saveNewBlock(block){
+        console.log("saveNewBlock");
+        if (await this.db.save(this.blockchainFileName, this.blocks.length) !== true){
+            console.log(colors.red("Error saving the blocks.length"));
+            return false;
+        }
+        console.log("saveNewBlock 222");
+        await block.save();
+        console.log("saveNewBlock 333");
+        return true;
+    }
+
     async save(){
 
         //save the number of blocks
-        console.log("save111", this.blockchainFileName, this.blocks.length);
-        let response = await this.db.save(this.blockchainFileName, this.blocks.length);
-        console.log("save2222");
 
-        if (response !== true){
+        if (await this.db.save(this.blockchainFileName, this.blocks.length) !== true){
+            console.log(colors.red("Error saving the blocks.length"));
             return false;
         }
 
@@ -221,7 +231,9 @@ class InterfaceBlockchain {
                 block.height = i;
 
                 try{
-                    await block.load();
+                    console.log("block.load", block.height);
+
+                    if (await block.load() === false) throw "no block to load was found";
 
                     //it will include the block, but it will not ask to save, because it was already saved before
 
@@ -233,7 +245,7 @@ class InterfaceBlockchain {
                     return response;
 
                 } catch (exception){
-                    console.log(colors.red("blockchain LOADING stopped at " + i), exception, block);
+                    console.log(colors.red("blockchain LOADING stopped at " + i), exception);
                     break;
                 }
 

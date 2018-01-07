@@ -261,12 +261,17 @@ class InterfaceBlockchainBlock {
             let buffer = await this.db.get(key);
 
             if (buffer === null) {
-                //console.log(colors.red("block "+this.height+" was not found "+ key));
+                console.log(colors.red("block "+this.height+" was not found "+ key));
                 return false;
             }
 
+            console.log("11111");
             this.deserializeBlock(buffer, this.height);
-
+            console.log("2222");
+            //calculate extra parameters
+            this.reward = BlockchainMiningReward.getReward(this.height);
+            this.difficultyTarget = this.blockchain.getDifficultyTarget();
+            console.log("3333");
             return true;
         }
         catch(err) {

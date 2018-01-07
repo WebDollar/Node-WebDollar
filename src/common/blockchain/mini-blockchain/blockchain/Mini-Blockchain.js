@@ -13,7 +13,7 @@ import consts from "consts/const_global";
 let inheritBlockchain;
 
 if (consts.POPOW_ACTIVATED) inheritBlockchain = PPoWBlockchain;
-else  inheritBlockchain = PPoWBlockchain;
+else  inheritBlockchain = InterfaceBlockchain;
 
 
 class MiniBlockchain extends  inheritBlockchain{
