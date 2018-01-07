@@ -242,8 +242,6 @@ class InterfaceBlockchain {
                     else
                         console.log(colors.green("blockchain loaded successfully index ", i));
 
-                    return response;
-
                 } catch (exception){
                     console.log(colors.red("blockchain LOADING stopped at " + i), exception);
                     break;

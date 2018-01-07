@@ -76,7 +76,7 @@ class InterfaceBlockchainBlock {
 
         if (height >=0) {
 
-            if (this.version !== 0x01) throw ('invalid version');
+            if (this.version !== 0x01) throw ('invalid version '+this.version);
 
         }
 
