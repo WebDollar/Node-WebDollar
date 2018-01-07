@@ -1,5 +1,6 @@
-
 import PPoWBlockchain from 'common/blockchain/ppow-blockchain/blockchain/PPoW-Blockchain'
+import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockchain/Interface-Blockchain'
+
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import MiniBlockchainBlock from '../blocks/Mini-Blockchain-Block'
 import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
@@ -7,11 +8,19 @@ import MiniBlockchainFork from './forks/Mini-Blockchain-Fork'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import InterfaceBlockchainForksAdministrator from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Forks-Administrator'
 
-class MiniBlockchain extends  PPoWBlockchain{
+import consts from "consts/const_global";
 
-    constructor (){
+let inheritBlockchain;
 
-        super();
+if (consts.POPOW_ACTIVATED) inheritBlockchain = PPoWBlockchain;
+else  inheritBlockchain = PPoWBlockchain;
+
+
+class MiniBlockchain extends  inheritBlockchain{
+
+    constructor (protocol){
+
+        super(protocol);
 
         this.accountantTree = new MiniBlockchainAccountantTree();
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.dataBase, MiniBlockchainBlock, MiniBlockchainBlockData)

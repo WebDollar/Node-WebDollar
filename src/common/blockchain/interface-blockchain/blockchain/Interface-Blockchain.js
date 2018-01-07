@@ -14,8 +14,6 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
 import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transactions'
 
-import Serialization from "common/utils/Serialization.js";
-import BufferExtended from "common/utils/BufferExtended.js";
 import consts from 'consts/const_global'
 
 const colors = require('colors/safe');
@@ -26,7 +24,9 @@ const colors = require('colors/safe');
 class InterfaceBlockchain {
 
 
-    constructor (){
+    constructor (protocol){
+
+        this.protocol = protocol;
 
         this.blocks = [];
         this._blocksSempahore = false;
@@ -64,10 +64,12 @@ class InterfaceBlockchain {
      * @param socketsAvoidBroadcast
      * @returns {Promise.<boolean>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
 
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
+
+        if (saveBlock === undefined) saveBlock = true;
 
         if (this.transactions.uniqueness.searchTransactionsUniqueness(block.data.transactions))
             throw "transaction already processed";
@@ -79,21 +81,10 @@ class InterfaceBlockchain {
 
         this.blocks.push(block);
 
-        // broadcasting the new block, to everybody else
-        NodeProtocol.broadcastRequest( "blockchain/header/new-block", {
-            height: block.height,
-            chainLength: this.blocks.length,
-            header:{
-                hash: block.hash,
-                hashPrev: block.hashPrev,
-                data: {
-                    hashData: block.data.hashData,
-                    hashAccountantTree: block.data.hashAccountantTree,
-                },
-                nonce: block.nonce,
+        if (saveBlock)
+            block.save();
 
-            }
-        }, "all", socketsAvoidBroadcast);
+        this.protocol.propagateHeader(block, this.blocks.length, socketsAvoidBroadcast );
 
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
             this.mining.resetMining();
@@ -232,7 +223,9 @@ class InterfaceBlockchain {
                 try{
                     await block.load();
 
-                    if (await this.includeBlockchainBlock(block) === false)
+                    //it will include the block, but it will not ask to save, because it was already saved before
+
+                    if (await this.includeBlockchainBlock(block, undefined, undefined, false) === false)
                         console.log(colors.red("blockchain is invalid at index " + i));
                     else
                         console.log(colors.green("blockchain loaded successfully index ", i));

@@ -6,9 +6,9 @@ import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockcha
 class PPoWBlockchain extends InterfaceBlockchain {
 
 
-    constructor (){
+    constructor (protocol){
 
-        super();
+        super(protocol);
     }
 
 }

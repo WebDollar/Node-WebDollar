@@ -8,14 +8,16 @@ class Blockchain{
 
     constructor(){
 
-        this.Chain = new MainBlockchain();
+        this.Protocol = new MainBlockchainProtocol(this.Chain);
+
+        this.Chain = new MainBlockchain(this.Protocol);
         this.blockchain = this.Chain;
+
+        this.Protocol.blockchain = this.Chain;
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
 
         this.Mining = new MainBlockchainMining(this.Chain, undefined );
-
-        this.Protocol = new MainBlockchainProtocol(this.Chain);
 
         this.Balances = new MainBlockchainBalances(this.Chain);
 

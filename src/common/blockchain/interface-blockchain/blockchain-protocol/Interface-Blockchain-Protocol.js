@@ -1,6 +1,7 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
 import Serialization from "../../../utils/Serialization";
+import NodeProtocol from 'common/sockets/protocol/node-protocol'
 
 const colors = require('colors/safe');
 
@@ -22,6 +23,24 @@ class InterfaceBlockchainProtocol {
             this._uninitializeSocket(result)
         });
 
+    }
+
+    propagateHeader(block, chainLength, socketsAvoidBroadcast){
+        // broadcasting the new block, to everybody else
+        NodeProtocol.broadcastRequest( "blockchain/header/new-block", {
+            height: block.height,
+            chainLength: chainLength,
+            header:{
+                hash: block.hash,
+                hashPrev: block.hashPrev,
+                data: {
+                    hashData: block.data.hashData,
+                    hashAccountantTree: block.data.hashAccountantTree,
+                },
+                nonce: block.nonce,
+
+            }
+        }, "all", socketsAvoidBroadcast);
     }
 
     _validateBlockchainHeader(data){
