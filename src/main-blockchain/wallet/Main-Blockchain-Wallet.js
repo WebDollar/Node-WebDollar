@@ -1,8 +1,8 @@
 import MiniBlockchainAddress from 'common/blockchain/mini-blockchain/Mini-Blockchain-Address'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
-import Serialization from "common/utils/Serialization.js";
-import BufferExtended from "common/utils/BufferExtended.js";
+import Serialization from "common/utils/Serialization";
+import BufferExtended from "common/utils/BufferExtended";
 const colors = require('colors/safe');
 
 const md5 = require('md5');
