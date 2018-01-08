@@ -251,16 +251,16 @@ class InterfaceBlockchainBlock {
         try {
             bufferValue = this.serializeBlock();
         } catch (exception){
-            console.log(colors.red('ERROR serializing block: '),  err);
+            console.log(colors.red('ERROR serializing block: '),  exception);
             throw exception;
         }
     
         try{
             return (await this.db.save(key, bufferValue));
         }
-        catch (err){
-            console.log(colors.red('ERROR on SAVE block: '),  err);
-            throw err;
+        catch (exception){
+            console.log(colors.red('ERROR on SAVE block: '),  exception);
+            throw exception;
         }
     }
 
@@ -282,8 +282,8 @@ class InterfaceBlockchainBlock {
 
             return true;
         }
-        catch(err) {
-            console.log ( 'ERROR on LOAD block: ' + err);
+        catch(exception) {
+            console.log ( 'ERROR on LOAD block: ' + exception);
             return false;
         }
     }
@@ -295,8 +295,8 @@ class InterfaceBlockchainBlock {
         try{
             return (await this.db.remove(key));
         }
-        catch(err) {
-            return 'ERROR on REMOVE block: ' + err;
+        catch(exception) {
+            return 'ERROR on REMOVE block: ' + exception;
         }
     }
     

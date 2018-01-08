@@ -4,7 +4,7 @@ import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockcha
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import consts from 'consts/const_global'
 
-describe('test save/load/remove blockchain to/from local storage', () => {
+describe('test Interface-Blockchain save/load/remove to/from local storage', () => {
 
     let blockchain = null;
     let response = null;
