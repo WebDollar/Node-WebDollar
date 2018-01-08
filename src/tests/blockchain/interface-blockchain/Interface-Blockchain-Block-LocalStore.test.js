@@ -4,7 +4,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 
-describe('test blockchain save/load/remove blocks to/from local storage', () => {
+describe('test Interface-Block save/load/remove to/from local storage', () => {
 
     let blockchain = null;
 
