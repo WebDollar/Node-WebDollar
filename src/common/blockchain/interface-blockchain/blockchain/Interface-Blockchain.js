@@ -56,6 +56,10 @@ class InterfaceBlockchain {
 
     }
 
+    async blockIncluded(block){
+
+    }
+
     /**
      * Include a new block at the end of the blockchain, by validating the next block
         Will save the block in the blockchain, if it is valid
@@ -80,6 +84,8 @@ class InterfaceBlockchain {
         if (block.height !== this.blocks.length) throw ('height of a new block is not good... '+ block.height + " "+ this.blocks.length);
 
         this.blocks.push(block);
+
+        await this.blockIncluded(block);
 
         if (saveBlock)
             await this.saveNewBlock(block);

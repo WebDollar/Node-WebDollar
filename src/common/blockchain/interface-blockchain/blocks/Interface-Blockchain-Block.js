@@ -224,7 +224,6 @@ class InterfaceBlockchainBlock {
             this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) );
             offset += 2;
 
-            console.log("this.version", this.version);
 
             this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKS_POW_LENGTH;

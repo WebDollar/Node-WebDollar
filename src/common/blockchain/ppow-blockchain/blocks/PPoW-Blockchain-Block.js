@@ -36,10 +36,12 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     updateInterlink(prevBlock){
 
         // interlink = interlink'
-        for (let i = 0; i < prevBlock.interlink.length; ++i)
-            this.interlink[i] = prevBlock.interlink[i];
-        
-        let blockLevel = prevBlock.getLevel();
+        if (prevBlock !== null) {
+            for (let i = 0; i < prevBlock.interlink.length; ++i)
+                this.interlink[i] = prevBlock.interlink[i];
+        }
+
+        let blockLevel = (prevBlock !== null)? prevBlock.getLevel() : 0;
 
         //add new interlinks for current block
         //Every block of level u needs a pointer to the previous block with level <= u.

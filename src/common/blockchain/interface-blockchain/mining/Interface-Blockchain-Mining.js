@@ -165,7 +165,11 @@ class InterfaceBlockchainMining{
             if ( intervalMiningOutput !== undefined)
                 clearInterval(intervalMiningOutput);
 
+            /*let output = {hashPrev : block.hashPrev.toString("hex"),
+                nonce : block.nonce,
+                difficultyTarget : block.difficultyTarget.toString()};
 
+            console.log(JSON.stringify(output));*/
 
         } catch (Exception){
 
