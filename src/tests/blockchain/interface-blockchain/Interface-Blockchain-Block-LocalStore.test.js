@@ -9,14 +9,14 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
     let blockchain = null;
 
     let db = new InterfaceSatoshminDB();
-    let version = 1;
+    let version = 0x01;
     let hash = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
     let hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
-    let timeStamp = 1994;
-    let nonce = 1994;
+    let timeStamp = Math.trunc(Math.random() * 100000);
+    let nonce = Math.trunc(Math.random() * 1000);
     let minerAddress = BlockchainGenesis.minerAddress;
     let data = new InterfaceBlockchainBlockData(blockchain, minerAddress, [], undefined, undefined); //it will compute the hashData
-    let height = 1023;
+    let height = Math.trunc(Math.random() * 1000);
     let block = null;
     
     let result = null;

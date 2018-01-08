@@ -109,7 +109,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                                   this.hash,
                                   Serialization.serializeNumber4Bytes( this.nonce ),
                                   this.computedBlockPrefix,
-                                  interlink
+                                  
                                 ]);
 
     }
