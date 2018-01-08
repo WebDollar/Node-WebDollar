@@ -1,15 +1,15 @@
 import consts from 'consts/const_global'
 
-import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
-import PPoWBlockchainBlock from 'common/blockchain/ppow-blockchain/blocks/PPoW-Blockchain-Block'
+import InterfaceBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import PPoWlock from 'common/blockchain/ppow-blockchain/blocks/PPoW-Blockchain-Block'
 
-let inheritBlockchain;
+let inheritBlockchainBlock;
 
-if (consts.POPOW_ACTIVATED) inheritBlockchain = PPoWBlockchainBlock;
-else  inheritBlockchain = InterfaceBlockchainBlock;
+if (consts.POPOW_ACTIVATED) inheritBlockchainBlock = PPoWlock;
+else  inheritBlockchainBlock = InterfaceBlock;
 
 
-class MiniBlockchainBlock extends PPoWBlockchainBlock {
+class MiniBlockchainBlock extends inheritBlockchainBlock {
 
 
 }

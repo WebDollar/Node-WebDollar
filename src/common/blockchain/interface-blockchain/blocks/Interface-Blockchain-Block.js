@@ -188,10 +188,10 @@ class InterfaceBlockchainBlock {
 
         // serialize block is ( hash + nonce + header )
 
+        this._computeBlockHeaderPrefix(true);
+
         if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKS_POW_LENGTH)
             this.hash = this.computeHash();
-
-        this._computeBlockHeaderPrefix(true);
 
         return Buffer.concat( [
                                   this.hash,
@@ -201,12 +201,16 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer,offset){
+    deserializeBlock(buffer,height, reward, difficultyTarget, offset){
 
         if (!Buffer.isBuffer(buffer))
             buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
 
-        offset = offset||0;
+        this.height = height;
+        this.reward = reward;
+        this.difficultyTarget= difficultyTarget;
+
+        if (offset === undefined) offset = 0;
 
         try {
 
@@ -220,6 +224,7 @@ class InterfaceBlockchainBlock {
             this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) );
             offset += 2;
 
+            console.log("this.version", this.version);
 
             this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKS_POW_LENGTH;
@@ -274,12 +279,8 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            console.log("11111");
-            this.deserializeBlock(buffer, this.height);
-            //calculate extra parameters
-            this.reward = BlockchainMiningReward.getReward(this.height);
-            this.difficultyTarget = this.blockchain.getDifficultyTarget();
-            console.log("3333");
+            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockchain.getDifficultyTarget());
+
             return true;
         }
         catch(err) {

@@ -183,14 +183,14 @@ class InterfaceBlockchain {
     }
 
     async saveNewBlock(block){
-        console.log("saveNewBlock");
+
         if (await this.db.save(this.blockchainFileName, this.blocks.length) !== true){
             console.log(colors.red("Error saving the blocks.length"));
             return false;
         }
-        console.log("saveNewBlock 222");
+
         await block.save();
-        console.log("saveNewBlock 333");
+
         return true;
     }
 

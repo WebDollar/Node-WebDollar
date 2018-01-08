@@ -214,9 +214,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                             try {
                                 block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
-                                block.deserializeBlock(answer.block, nextBlockHeight);
-                                block.height = nextBlockHeight;
-                                block.reward = BlockchainMiningReward.getReward(block.height);
+                                block.deserializeBlock(answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget());
+
 
                             } catch (Exception){
                                 console.log(colors.red("Error deserializing blocks " + Exception.toString()));

@@ -134,8 +134,8 @@ class Serialization{
     serializeNumber2Bytes(data){
         //converting number value into a buffer
         let buffer = Buffer(2);
-        buffer[0] = data & 0xff;
-        buffer[1] = data>>8 & 0xff;
+        buffer[1] = data & 0xff;
+        buffer[0] = data>>8 & 0xff;
 
         return  buffer;
     }
@@ -143,10 +143,10 @@ class Serialization{
     serializeNumber4Bytes(data){
         //converting number value into a buffer
         let buffer = Buffer(4);
-        buffer[0] = data & 0xff;
-        buffer[1] = data>>8 & 0xff;
-        buffer[2] = data>>16 & 0xff;
-        buffer[3] = data>>24 & 0xff;
+        buffer[3] = data & 0xff;
+        buffer[2] = data>>8 & 0xff;
+        buffer[1] = data>>16 & 0xff;
+        buffer[0] = data>>24 & 0xff;
 
         return  buffer;
     }
@@ -155,12 +155,12 @@ class Serialization{
         if(buffer.length === 1){
             return buffer[0];
         } else if (buffer.length === 2){
-            return buffer[0] | (buffer[1] << 8);
+            return buffer[1] | (buffer[0] << 8);
         } else if (buffer.length === 4){
-            return buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+            return buffer[3] | (buffer[2] << 8) | (buffer[1] << 16) | (buffer[0] << 24);
 
         } else if (buffer.length === 6){
-            return buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24) | (buffer[4] << 32) | (buffer[5] << 40);
+            return buffer[5] | (buffer[4] << 8) | (buffer[3] << 16) | (buffer[2] << 24) | (buffer[1] << 32) | (buffer[0] << 40);
         }
     }
 
