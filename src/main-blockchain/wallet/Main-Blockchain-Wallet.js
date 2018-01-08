@@ -36,6 +36,8 @@ class MainBlockchainWallet{
         if (!emptyAddress)
             await blockchainAddress.createNewAddress(salt);
 
+        console.log("_justCreateNewAddress", blockchainAddress);
+
         return blockchainAddress;
 
     }
@@ -129,14 +131,17 @@ class MainBlockchainWallet{
             let timeout = setTimeout(()=>{
                 console.log(colors.red("LOAD ADDRESSES FROZE AND FAILED !!"));
                 resolve(false);
-            }, 10000);
+                return false;
+            }, 20000);
 
             let buffer = await this.db.get(this.walletFileName);
 
             clearTimeout(timeout);
 
-            if ( buffer !== null)
+            if ( buffer === null) {
                 resolve(false);
+                return false;
+            }
 
             await this.deserialize(buffer);
 

@@ -63,10 +63,10 @@ module.exports = function (self) {
                 params.pass.set(self.block);
 
                 let nonceArray = new Uint8Array(4);
-                nonceArray [0] = nonce & 0xff;
-                nonceArray [1] = nonce>>8 & 0xff;
-                nonceArray [2] = nonce>>16 & 0xff;
-                nonceArray [3] = nonce>>24 & 0xff;
+                nonceArray [3] = nonce & 0xff;
+                nonceArray [2] = nonce>>8 & 0xff;
+                nonceArray [1] = nonce>>16 & 0xff;
+                nonceArray [0] = nonce>>24 & 0xff;
 
                 params.pass.set(nonceArray, self.block.length);
 

@@ -231,7 +231,6 @@ class InterfaceBlockchain {
                 block.height = i;
 
                 try{
-                    console.log("block.load", block.height);
 
                     if (await block.load() === false) throw "no block to load was found";
 
