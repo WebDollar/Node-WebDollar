@@ -39,7 +39,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
             //validate hashAccountantTree
             let hashAccountantTree = this.calculateAccountantTreeHashBlockData();
 
-            //console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex"));
+            console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex"));
 
             if (!hashAccountantTree.equals(this.hashAccountantTree)) throw "block.data hashAccountantTree is not right";
         }
