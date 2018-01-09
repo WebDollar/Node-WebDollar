@@ -17,6 +17,7 @@ import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockch
 import consts from 'consts/const_global'
 
 const colors = require('colors/safe');
+const EventEmitter = require('events');
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -25,6 +26,8 @@ class InterfaceBlockchain {
 
 
     constructor (protocol){
+
+        this.emitter = new EventEmitter();
 
         this.protocol = protocol;
 
