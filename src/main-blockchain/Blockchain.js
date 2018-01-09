@@ -57,6 +57,9 @@ class Blockchain{
         console.log("initializeMining started", await this.Wallet.getMiningAddress());
         await this.Mining.setMinerAddress(await this.Wallet.getMiningAddress() );
 
+        console.log("initializeMining started2222", process.env.START_MINING, typeof process.env.START_MINING);
+
+
         if (process.env.START_MINING === 'true'){
             this.Mining.startMining();
         }

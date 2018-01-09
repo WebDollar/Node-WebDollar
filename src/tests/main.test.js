@@ -16,6 +16,7 @@ if ( typeof describe !== 'undefined') {
     
     require ('tests/blockchain/ppow-blockchain/PPoW-Blockchain-Block-LocalStore.test');
     require ('tests/blockchain/ppow-blockchain/PPoW-Blockchain-LocalStore.test');
+    require ('tests/blockchain/ppow-blockchain/PPoW-Blockchain-Interlink.test');
     
     require ('tests/main-blockchain/Main-Blockchain-Wallets.test');
 
