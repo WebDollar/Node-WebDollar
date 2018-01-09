@@ -132,7 +132,7 @@ class MainBlockchainWallet{
                 console.log(colors.red("LOAD ADDRESSES FROZE AND FAILED !!"));
                 resolve(false);
                 return false;
-            }, 20000);
+            }, 10000);
 
             let buffer = await this.db.get(this.walletFileName);
 
@@ -143,7 +143,12 @@ class MainBlockchainWallet{
                 return false;
             }
 
-            await this.deserialize(buffer);
+            try {
+                await this.deserialize(buffer);
+            } catch (exception){
+                alert('Wallet was not imported successfully');
+                this.addresses = [];
+            }
 
             await this.updatePassword(this.password);
 

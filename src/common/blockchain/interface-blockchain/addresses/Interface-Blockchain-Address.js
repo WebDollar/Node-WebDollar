@@ -143,15 +143,16 @@ class InterfaceBlockchainAddress{
 
         try {
 
+            //read Address
             len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
             offset += 1;
 
             this.address = BufferExtended.toBase( BufferExtend.substr(buffer, offset, len));
             offset += len;
-            
+
+            //read unencodedAddress
             len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
             offset += 1;
-
 
             this.unencodedAddress = BufferExtend.substr(buffer, offset, len);
             offset += len;
@@ -164,6 +165,7 @@ class InterfaceBlockchainAddress{
 
             this.publicKey = BufferExtend.substr(buffer, offset, len);
             offset += len;
+
 
         } catch (exception){
 

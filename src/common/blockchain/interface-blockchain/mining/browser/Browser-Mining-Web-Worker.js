@@ -21,6 +21,8 @@ let loadScriptWorker = function (script, callback, errorCallback) {
 Argon2WebAssemblyCalc.loadScript = loadScriptWorker;
 
 var jobTerminated = false; //is not working and jobTermianted is not reliable in the Worker....
+var method = undefined;
+var block = undefined;
 
 module.exports = function (self) {
 
@@ -43,8 +45,10 @@ module.exports = function (self) {
 
                 jobTerminated = false;
 
-                if (ev.data.method !== undefined) self.method = ev.data.method;
-                if (ev.data.block !== undefined) self.block = ev.data.block;
+                if (ev.data.method !== undefined) method = ev.data.method;
+                if (ev.data.block !== undefined) block = ev.data.block;
+
+                log({message:"worker initialize", block: block});
 
             }
 
@@ -59,8 +63,8 @@ module.exports = function (self) {
                 if (ev.data.count === 0 || jobTerminated) return new Promise((resolve)=>{resolve(true)});
 
                 //solution using Uint8Array
-                params.pass = new Uint8Array(self.block.length + 4);
-                params.pass.set(self.block);
+                params.pass = new Uint8Array(block.length + 4);
+                params.pass.set(block);
 
                 let nonceArray = new Uint8Array(4);
                 nonceArray [3] = nonce & 0xff;
@@ -68,7 +72,7 @@ module.exports = function (self) {
                 nonceArray [1] = nonce>>16 & 0xff;
                 nonceArray [0] = nonce>>24 & 0xff;
 
-                params.pass.set(nonceArray, self.block.length);
+                params.pass.set(nonceArray, block.length);
 
                 //log(nonce)
                 //log(params.pass)
@@ -76,7 +80,7 @@ module.exports = function (self) {
                 // https://stackoverflow.com/questions/43780163/javascript-while-loop-where-condition-is-a-promise
                 return Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((hash)=>{
 
-                        //let hash = await self.block.computeHash(ev.data.nonce);
+                        //let hash = await block.computeHash(ev.data.nonce);
 
                         hash = hash.hash;
 
@@ -111,7 +115,7 @@ module.exports = function (self) {
             chainNext().then((answer)=>{
 
                 if (jobTerminated === false) //not terminated
-                    self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, block: self.block, });
+                    self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, block: block, });
                 else
                     log("job terminated");
             });
