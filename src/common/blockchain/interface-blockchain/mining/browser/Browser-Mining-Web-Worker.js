@@ -113,7 +113,7 @@ module.exports = function (self) {
                 //log(params.pass)
 
                 // https://stackoverflow.com/questions/43780163/javascript-while-loop-where-condition-is-a-promise
-                return Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((hash)=>{
+                return Argon2WebAssemblyCalc.calc( algorithm , params).then((hash)=>{
 
                         //let hash = await block.computeHash(ev.data.nonce);
 
