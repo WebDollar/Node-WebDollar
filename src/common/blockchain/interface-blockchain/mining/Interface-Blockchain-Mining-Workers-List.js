@@ -67,7 +67,7 @@ class InterfaceBlockchainMiningWorkersList{
         if (this.workers < 0) this.workers = 0; //can not be < 0 workers
 
         for (let i=this._workersList.length-1; i>this.workers-1; i--)
-            this._workersList[i].postMessage({message: "terminate"});
+            this.terminateWorker(this._workersList[i]);
 
         this._workersList.splice(this.workers-1);
     }
@@ -88,8 +88,6 @@ class InterfaceBlockchainMiningWorkersList{
 
     createWorker() {
 
-        console.log("creating 1 worker");
-
         let worker = this.mining._getWorker();
         console.log("worker created",worker);
 
@@ -102,24 +100,30 @@ class InterfaceBlockchainMiningWorkersList{
             this.mining._puzzleReceived(worker, event);
         });
 
-        console.log("_workersList pushed 222",worker);
-
         return worker;
     }
 
+    terminateWorker(worker){
+        this.suspendWorker(worker);
+        worker.terminate()
+    }
 
     terminateWorkers(){
 
-        this.suspendWorkers();
+        for (let i=0; i<this._workersList.length; i++)
+            this.terminateWorker(this._workersList[i]);
 
         this._workersList = [];
     }
 
+    suspendWorker(worker){
+        worker.suspended = true;
+        worker.postMessage({message: "terminate"});
+    }
+
     suspendWorkers(){
-        for (let i=0; i<this._workersList.length; i++) {
-            this._workersList[i].suspended = true;
-            this._workersList[i].postMessage({message: "terminate"});
-        }
+        for (let i=0; i<this._workersList.length; i++)
+            this.suspendWorker(this._workersList[i]);
     }
 
 

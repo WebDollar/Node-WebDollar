@@ -97,26 +97,20 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         if (this.workers.workers === 0)
             await this.setWorkers(1);
-
-
-
     }
 
     async stopMining(){
-
 
         InterfaceBlockchainMining.prototype.stopMining.call(this);
 
         if (this.workers.workers !== 0)
             await this.setWorkers(0);
 
-
+        this.checkFinished();
 
     }
 
-    _puzzleReceived(worker, event){
-
-        if (this._workerFinished) return; //job finished
+    checkFinished(){
 
         if (this._nonce > 0xFFFFFFFF || (this.started === false) || this.reset){
 
@@ -130,6 +124,13 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             });
 
         }
+    }
+
+    _puzzleReceived(worker, event){
+
+        if (this._workerFinished) return; //job finished
+
+        this.checkFinished();
 
         if (event.data.message === "algorithm"){
 
