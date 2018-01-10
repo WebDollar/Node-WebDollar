@@ -14,7 +14,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this.block = null;
 
-        this.WORKER_NONCES_WORK = 100;
+        this.WORKER_NONCES_WORK = 47;
 
         this.workers = new InterfaceBlockchainMiningWorkersList(this);
     }

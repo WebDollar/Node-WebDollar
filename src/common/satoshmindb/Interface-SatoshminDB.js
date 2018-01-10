@@ -52,7 +52,7 @@ class InterfacePouchDB {
             return true;
         } catch (exception){
             console.log("updateDocument error"+key, exception)
-            throw err;
+            throw exception;
         }
 
     }

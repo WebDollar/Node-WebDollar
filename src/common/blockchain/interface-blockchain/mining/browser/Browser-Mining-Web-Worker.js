@@ -79,13 +79,16 @@ module.exports = function (self) {
                 jobTerminated = false;
 
                 if (ev.data.block !== undefined && ev.data.block !== null) block = ev.data.block;
-                //else return;
 
                 log({message:"worker initialize", block: block});
 
             }
 
             if (block === undefined) return; //block is not defined
+            if (algorithm === undefined){
+                log("worker can't mine");
+                return ;
+            }
 
             let bestHash, bestNonce;
 
