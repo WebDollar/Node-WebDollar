@@ -6,8 +6,8 @@ var toBuffer = require('blob-to-buffer')
 let SatoshminDB = require('pouchdb');
 let atob = require('atob');
 let btoa = require('btoa');
+const MainBlockchain = require('../blockchain/interface-blockchain/mining/Interface-Blockchain-Mining');
 
- 
 if (typeof window === "undefined")
     SatoshminDB = require('pouchdb-node');
 
@@ -27,7 +27,7 @@ class InterfacePouchDB {
             let response = await this.db.put({_id: key, value: value});
 
             return true;
-        } catch (err){
+        } catch (err) {
             if (err.status === 409)
                 return await this.updateDocument(key, value)
             else {
@@ -40,7 +40,7 @@ class InterfacePouchDB {
 
     async updateDocument(key, value) {
 
-        try{
+        try {
             let doc = await this.db.get(key);
 
             let response = await this.db.put({
@@ -50,8 +50,8 @@ class InterfacePouchDB {
             });
 
             return true;
-        } catch (exception){
-            console.log("updateDocument error"+key, exception)
+        } catch (exception) {
+            console.log("updateDocument error" + key, exception)
             throw exception;
         }
 
@@ -59,7 +59,7 @@ class InterfacePouchDB {
 
     async getDocument(key) {
 
-        try{
+        try {
             let response = await this.db.get(key, {attachments: true});
 
             if (response._attachments === undefined) {
@@ -69,11 +69,12 @@ class InterfacePouchDB {
                 return new Buffer(atob(response._attachments.key.data).toString('hex'), 'hex');
             }
 
-        } catch (Exception){
+        } catch (Exception) {
 
-            if ( Exception.status === 404) return null; //nothing
+            if (Exception.status === 404) return null; //nothing
             else {
                 console.log("error getDocument ", Exception);
+                this.blockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"})
                 throw Exception;
             }
         }
@@ -89,7 +90,7 @@ class InterfacePouchDB {
 
             return true;
 
-        } catch (err){
+        } catch (err) {
             if (err.status === 404) return null; // not existing
             else {
                 console.log("deleteDocument raised an error ", key);
@@ -104,7 +105,7 @@ class InterfacePouchDB {
         let attachment = value;
         // we need blob in browser
         if (typeof window !== "undefined" && Buffer.isBuffer(value)) {
-            attachment = new Blob([value.toString('hex')]); 
+            attachment = new Blob([value.toString('hex')]);
         } else { //we are in node
             attachment = new Buffer(value.toString('hex'));
         }
@@ -122,7 +123,7 @@ class InterfacePouchDB {
 
             return true;
 
-        } catch (err){
+        } catch (err) {
 
             if (err.status === 409) {
                 return await this.updateDocumentAttachment(key, attachment);
@@ -134,13 +135,13 @@ class InterfacePouchDB {
                         let response = this.createDocument(key, null);
 
                         return await this.saveDocumentAttachment(key, value);
-                    } catch (exception){
+                    } catch (exception) {
 
-                        console.log('saveDocumentAttachment raised an error for key '+key, exception);
+                        console.log('saveDocumentAttachment raised an error for key ' + key, exception);
                     }
 
                 } else {
-                    console.log('saveDocumentAttachment 222 raised an error for key '+key, err);
+                    console.log('saveDocumentAttachment 222 raised an error for key ' + key, err);
                     throw err;
                 }
             }
@@ -167,13 +168,13 @@ class InterfacePouchDB {
                 });
                 return true;
             } catch (err) {
-                console.log("error updateDocumentAttachment1 "+key, err);
+                console.log("error updateDocumentAttachment1 " + key, err);
                 throw err;
             }
 
 
-        } catch (err){
-            console.log("error updateDocumentAttachment2  "+key, err);
+        } catch (err) {
+            console.log("error updateDocumentAttachment2  " + key, err);
             throw err;
         }
     }
@@ -186,18 +187,18 @@ class InterfacePouchDB {
 
             return true;
 
-        } catch (exception){
-           return false;
-           throw exception;
+        } catch (exception) {
+            return false;
+            throw exception;
         }
     }
 
     async deleteDocumentAttachmentIfExist(key) {
 
-        try{
+        try {
             let value = await this.getDocument(key);
             return await this.deleteDocumentAttachment(key);
-        } catch (err){
+        } catch (err) {
             console.log("deleteDocumentAttachmentIfExist raised an error", err);
             return false;
         }
@@ -212,18 +213,20 @@ class InterfacePouchDB {
             } else {
                 return await this.createDocument(key, value);
             }
-        } catch (exception){
-            console.log("db.save error "+key, exception);
+        } catch (exception) {
+            console.log("db.save error " + key, exception);
+            MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"});
             return null;
         }
     }
-    
+
     async get(key) {
         try {
             let result = await this.getDocument(key);
             return result;
-        } catch (exception){
-            console.log("db.get error "+key, exception);
+        } catch (exception) {
+            console.log("db.get error " + key, exception);
+            MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
             return null;
         }
     }
@@ -232,8 +235,9 @@ class InterfacePouchDB {
         try {
             let result = await this.deleteDocument(key);
             return result;
-        } catch (exception){
-            console.log("db.remove error "+key, exception);
+        } catch (exception) {
+            console.log("db.remove error " + key, exception);
+            MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
             return null;
         }
     }
