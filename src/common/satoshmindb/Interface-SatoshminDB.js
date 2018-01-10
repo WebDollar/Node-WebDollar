@@ -74,7 +74,6 @@ class InterfacePouchDB {
             if (Exception.status === 404) return null; //nothing
             else {
                 console.log("error getDocument ", Exception);
-                this.blockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"})
                 throw Exception;
             }
         }
@@ -215,7 +214,8 @@ class InterfacePouchDB {
             }
         } catch (exception) {
             console.log("db.save error " + key, exception);
-            MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"});
+            if (exception.status === 500)
+                MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"});
             return null;
         }
     }
@@ -226,7 +226,8 @@ class InterfacePouchDB {
             return result;
         } catch (exception) {
             console.log("db.get error " + key, exception);
-            MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
+            if (exception.status === 500)
+                MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
             return null;
         }
     }
@@ -237,7 +238,8 @@ class InterfacePouchDB {
             return result;
         } catch (exception) {
             console.log("db.remove error " + key, exception);
-            MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
+            if (exception.status === 500)
+                MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
             return null;
         }
     }
