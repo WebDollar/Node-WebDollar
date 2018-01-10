@@ -124,7 +124,7 @@ class InterfaceBlockchainMining{
         console.log(" ----------- mineBlock-------------");
 
         try{
-            console.log("difficultydifficultydifficulty", difficulty === null);
+            console.log("difficultydifficultydifficulty", difficulty === undefined || difficulty === null);
 
             if (difficulty === undefined || difficulty === null) throw 'difficulty not specified';
 
@@ -165,16 +165,19 @@ class InterfaceBlockchainMining{
             if ( intervalMiningOutput !== undefined)
                 clearInterval(intervalMiningOutput);
 
-            /*let output = {hashPrev : block.hashPrev.toString("hex"),
-                nonce : block.nonce,
-                difficultyTarget : block.difficultyTarget.toString()};
+            // let output = {hashPrev : block.hashPrev.toString("hex"),
+            //     nonce : block.nonce,
+            //     difficultyTarget : block.difficultyTarget.toString()};
+            //
+            // console.log(JSON.stringify(output));
 
-            console.log(JSON.stringify(output));*/
-
+            // let buffer = block.serializeBlock();
+            // block.deserializeBlock(buffer);
 
         } catch (Exception){
 
-            console.log(colors.red("Error mining block "), Exception, block);
+            console.log( colors.red("Error mining block "), Exception, block);
+
             if (intervalMiningOutput !== undefined) clearInterval(intervalMiningOutput);
             throw Exception;
 

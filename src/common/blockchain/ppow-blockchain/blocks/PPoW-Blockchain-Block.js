@@ -65,7 +65,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             return this.computedBlockPrefix;
 
         this.computedBlockPrefix = Buffer.concat ( [
-            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix(skipPrefix),
+            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, skipPrefix),
             this._serializeInterlink(),
         ]);
 
@@ -78,10 +78,12 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         let list = [Serialization.serializeNumber2Bytes(this.interlink.length)];
 
         for (let i = 0; i < this.interlink.length; ++i) {
+
             let heightBuffer = Serialization.serializeNumber4Bytes(this.interlink[i].height);
             let blockIdBuffer = this.interlink[i].blockId;
             list.push(heightBuffer);
             list.push(blockIdBuffer);
+
         }
 
         return Buffer.concat (list);
@@ -96,6 +98,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
             this.interlink = [];
             for (let i = 0; i < numInterlink; ++i) {
+
                 let height = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 4) );
                 offset += 4;
                 
@@ -122,8 +125,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             offset = this._deserializeInterlink(buffer, offset);
 
         } catch (exception){
+
             console.log(colors.red("error deserializing a block  "), exception);
             throw exception;
+
         }
 
         return offset;
