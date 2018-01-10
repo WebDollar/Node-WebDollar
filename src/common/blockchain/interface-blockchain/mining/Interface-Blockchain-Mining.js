@@ -171,6 +171,7 @@ class InterfaceBlockchainMining{
 
             console.log(JSON.stringify(output));*/
 
+
         } catch (Exception){
 
             console.log(colors.red("Error mining block "), Exception, block);
@@ -218,6 +219,8 @@ class InterfaceBlockchainMining{
             resolve ({result:false});
 
         })
+
+
 
     }
 
