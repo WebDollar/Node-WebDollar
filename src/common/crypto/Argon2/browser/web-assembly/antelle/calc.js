@@ -19,7 +19,7 @@ class Argon2BrowserWebAssemblyCalc{
             return fn.call(this, arg);
         } catch (e) {
             console.log('Error Argon2', e);
-            log('Error: ' + e);
+            //log('Error: ' + e);
             return null;
         }
     }
