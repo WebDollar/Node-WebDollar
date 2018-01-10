@@ -49,6 +49,7 @@ describe('test PPoW-Blockchain interlink data structure', () => {
                 let link = block.interlink[i];
                 console.log('height=', link.height);
                 console.log('blockId=', link.blockId);
+                assert(blockchain.blocks[link.height].hash.equals(link.blockId));
             }
         }
 
