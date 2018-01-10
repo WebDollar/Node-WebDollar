@@ -3,7 +3,9 @@ import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blo
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
+import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import consts from 'consts/const_global'
+const colors = require('colors/safe');
 
 class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
@@ -79,14 +81,16 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
             let numInterlink = Serialization.deserializeNumber( BufferExtended.substr(data, offset, 2) );
             offset += 2;
-            
+
             this.interlink = [];
             for (let i = 0; i < numInterlink; ++i) {
-                this.interlink[i].height = Serialization.deserializeNumber( BufferExtended.substr(data, offset, 4) );
+                let height = Serialization.deserializeNumber( BufferExtended.substr(data, offset, 4) );
                 offset += 4;
                 
-                this.interlink[i].blockId = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
+                let blockId = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
                 offset += consts.BLOCKS_POW_LENGTH;
+                
+                this.interlink[i] = {height: height, blockId: blockId};
             }
 
         } catch (exception){
