@@ -18,6 +18,11 @@ class PPoWBlockchain extends InterfaceBlockchain {
         let prevBlock = (N >= 2) ? block.blockchain[N-2] : null;
 
         block.updateInterlink(prevBlock);
+        
+        
+        //let buffer = block.serializeBlock();
+        //block.deserializeBlock(buffer);
+        //console.log('-------SERIALIZED---------------');
     }
 
 }
