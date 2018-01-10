@@ -4,6 +4,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
 import consts from 'consts/const_global'
+const colors = require('colors/safe');
 
 class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
