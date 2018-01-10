@@ -108,7 +108,10 @@ class MainBlockchainWallet{
             for (let i = 0; i < numAddresses; ++i) {
                 this.addresses[i] = await this._justCreateNewAddress(undefined, true);
                 offset += this.addresses[i].deserializeAddress( BufferExtended.substr(buffer, offset) );
+
             }
+
+            return true;
 
         } catch (exception){
             console.log("error deserializing a Wallet. ", exception);

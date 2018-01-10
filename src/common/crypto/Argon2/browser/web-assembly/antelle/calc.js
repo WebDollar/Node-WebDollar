@@ -42,6 +42,7 @@ class Argon2BrowserWebAssemblyCalc{
                 printErr: this.log,
                 setStatus: this.log
             };
+
             var ts = this.now();
             //this.log('Loading script...');
 
@@ -152,7 +153,8 @@ class Argon2BrowserWebAssemblyCalc{
     calcHash(arg) {
 
         if (!Module._argon2_hash) {
-            return this.log('Error Calculate Hash');
+            this.log('Error Calculate Hash');
+            return null;
         }
 
         let result = null;

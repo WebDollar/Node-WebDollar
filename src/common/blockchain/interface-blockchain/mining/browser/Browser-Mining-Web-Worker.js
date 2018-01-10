@@ -23,6 +23,9 @@ Argon2WebAssemblyCalc.loadScript = loadScriptWorker;
 var jobTerminated = false; //is not working and jobTermianted is not reliable in the Worker....
 var method = undefined;
 var block = undefined;
+var ARGON2_PARAM = { salt: 'WebDollar_make_$', time: 2, mem: 1024, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://antelle.github.io/argon2-browser/dist'}
+
+var algorithm = undefined;
 
 module.exports = function (self) {
 
@@ -39,22 +42,54 @@ module.exports = function (self) {
             jobTerminated = true;
 
         } else
+        //it will initialize the PoW Algorithm
+        if (ev.data.message === "initialize-algorithm"){
+
+            let params = ARGON2_PARAM;
+            params.pass = new Uint8Array(10);
+
+            Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcWasm, params).then((answer)=>{
+
+                if (answer === null) { //Web Assembly failed
+
+                    Argon2WebAssemblyCalc.calc(Argon2WebAssemblyCalc.calcAsmJs, params).then((answer)=>{
+
+                        if (answer === null) {
+                            algorithm = null;
+                            self.postMessage({message: "algorithm", answer:"no algorithm supported", });
+                        } else {
+                            algorithm = Argon2WebAssemblyCalc.calcAsmJs;
+                            self.postMessage({message: "algorithm", answer:"ASM.JS supported", });
+                        }
+
+                    });
+
+                } else {
+                    algorithm = Argon2WebAssemblyCalc.calcWasm;
+                    self.postMessage({message: "algorithm", answer:"WebAssembly supported", });
+                }
+
+            });
+
+        } else
         if (ev.data.message === "new-nonces" || ev.data.message === "initialize" ){
 
             if (ev.data.message === "initialize"){
 
                 jobTerminated = false;
 
-                if (ev.data.method !== undefined) method = ev.data.method;
-                if (ev.data.block !== undefined) block = ev.data.block;
+                if (ev.data.block !== undefined && ev.data.block !== null) block = ev.data.block;
+                //else return;
 
                 log({message:"worker initialize", block: block});
 
             }
 
+            if (block === undefined) return; //block is not defined
+
             let bestHash, bestNonce;
 
-            let params = { salt: 'WebDollar_make_$', time: 2, mem: 1024, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://antelle.github.io/argon2-browser/dist'};
+            let params = ARGON2_PARAM;
 
             let nonce = ev.data.nonce;
 
