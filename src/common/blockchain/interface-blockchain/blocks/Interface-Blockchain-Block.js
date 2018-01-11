@@ -52,7 +52,7 @@ class InterfaceBlockchainBlock {
         this.difficultyTarget = null; // difficulty set by me
         this.height = (typeof height === "number" ? height : null); // index set by me
 
-        this.reward = 0;
+        this.reward = undefined;
 
         this.db = db;
     }
@@ -238,7 +238,7 @@ class InterfaceBlockchainBlock {
 
             console.log("this.data.deserializeData",offset)
             offset = this.data.deserializeData(buffer, offset);
-            console.log("this.data.deserializeData after",offset)
+            console.log("this.data.deserializeData after",offset, "from", buffer.length)
 
         } catch (exception){
             console.log(colors.red("error deserializing a block  "), exception);

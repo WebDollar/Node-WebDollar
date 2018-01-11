@@ -93,7 +93,8 @@ class InterfaceBlockchain {
         if (saveBlock)
             await this.saveNewBlock(block);
 
-        this.protocol.propagateHeader(block, this.blocks.length, socketsAvoidBroadcast );
+        if (this.protocol !== undefined)
+            this.protocol.propagateHeader(block, this.blocks.length, socketsAvoidBroadcast );
 
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
             this.mining.resetMining();

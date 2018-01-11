@@ -91,7 +91,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             return this.computedBlockPrefix;
 
         this.computedBlockPrefix = Buffer.concat ( [
-            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, skipPrefix),
+            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, false),
             this._serializeInterlink(),
         ]);
 
