@@ -118,7 +118,7 @@ class InterfaceBlockchain {
                 BlockchainGenesis.validateGenesis(block);
 
                 prevHash = BlockchainGenesis.hashPrev;
-                prevTimeStamp = BlockchainGenesis.timeStamp;
+                prevTimeStamp = 0; //Cosmin Debug BlockchainGenesis.timeStamp;
             } else {
 
                 prevHash = this.blocks[block.height-1].hash;
