@@ -14,12 +14,11 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     async blockIncluded(block){
 
-        let N = block.blockchain.length;
-        let prevBlock = (N >= 2) ? block.blockchain[N-2] : null;
+        let N = this.blocks.length;
+        let prevBlock = (N >= 2) ? this.blocks[N-2] : null;
 
         block.updateInterlink(prevBlock);
-        
-        //console.log(block.serializeBlock().toString());
+
     }
 
 }

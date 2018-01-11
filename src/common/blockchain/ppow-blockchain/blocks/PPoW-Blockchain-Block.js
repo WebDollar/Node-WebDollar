@@ -18,7 +18,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     }
 
     getLevel(){
-
+return 0; //temporary
         let T = new BigInteger(this.difficultyTarget.toString('hex'), 32);
         let id = new BigInteger(this.hash.toString('hex'), 32);
         
@@ -36,14 +36,14 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     }
     
     updateInterlink(prevBlock){
-
+        
+        let blockLevel = 0;
         // interlink = interlink'
-        if (prevBlock !== null) {
+        if (prevBlock) {
             for (let i = 0; i < prevBlock.interlink.length; ++i)
                 this.interlink[i] = prevBlock.interlink[i];
+            blockLevel = prevBlock.getLevel();
         }
-
-        let blockLevel = (prevBlock !== null)? prevBlock.getLevel() : 0;
 
         //add new interlinks for current block
         //Every block of level u needs a pointer to the previous block with level <= u.
@@ -67,12 +67,12 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         }
 
         for (let i = 1; i < this.interlink.length; ++i){
-                let link = this.interlink[i];
-                let linkedBlock = this.blockchain.blocks[link.height];
-                if (!linkedBlock.hash.equals(link.blockId)){
-                    console.log(colors.red("Interlink to Genesis is wrong! "));
-                    return false;
-                }
+            let link = this.interlink[i];
+            let linkedBlock = this.blockchain.blocks[link.height];
+            if (!linkedBlock.hash.equals(link.blockId)){
+                console.log(colors.red("Interlink to Genesis is wrong! "));
+                return false;
+            }
         }
         
         //TODO: verify if interlinks points to blocks with highest difficultyTarget
