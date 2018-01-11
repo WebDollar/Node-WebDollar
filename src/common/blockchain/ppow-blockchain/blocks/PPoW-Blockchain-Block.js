@@ -59,7 +59,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             if (i > this.interlink.length)
                 this.interlink.push({});
 
-            this.interlink[i] = {height: this.height, blockId: prevBlock.hash }; //getId = Hash
+            this.interlink[i] = {height: prevBlock.height, blockId: prevBlock.hash }; //getId = Hash
 
         }
 
