@@ -6,8 +6,9 @@ import PPoWBlockchain from 'common/blockchain/ppow-blockchain/blockchain/PPoW-Bl
 import PPoWBlockchainBlock from 'common/blockchain/ppow-blockchain/blocks/PPoW-Blockchain-Block'
 import MiniBlockcainBlock from 'common/blockchain/mini-blockchain/blocks/Mini-Blockchain-Block'
 import MiniBlockcain from 'common/blockchain/mini-blockchain/blockchain/Mini-Blockchain'
-import consts from 'consts/const_global'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import consts from 'consts/const_global'
 
 describe('test PPoW-Blockchain interlink data structure', () => {
 
@@ -47,12 +48,13 @@ describe('test PPoW-Blockchain interlink data structure', () => {
         //check if links point correctly
         for (let i = 0; i < blockchain.blocks.length; ++i){
             let block = blockchain.blocks[i];
-            console.log('B.height=', block.height, block.interlink.length);
-            for (let j = 0; j < block.interlink.length; ++j){
+            
+            assert(block.interlink[0].height === -1, "Genesis height !== -1, height=" + block.interlink[0].height);
+            assert(block.interlink[0].blockId.equals(BlockchainGenesis.hashPrev), "Genesis hash differ. " + block.interlink[0].blockId + "!==" + BlockchainGenesis.hashPrev);
+            for (let j = 1; j < block.interlink.length; ++j){
                 let link = block.interlink[i];
-                console.log('height=', link.height);
-                console.log('blockId=', link.blockId);
-                assert(blockchain.blocks[link.height].hash.equals(link.blockId));
+                let prevBlock = blockchain.blocks[link.height];
+                assert(prevBlock.hash.equals(link.blockId), "prevHash differ:" + prevBlock.hash + "!==" + link.blockId);
             }
         }
 
