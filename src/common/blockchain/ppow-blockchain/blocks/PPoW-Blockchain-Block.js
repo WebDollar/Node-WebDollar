@@ -18,19 +18,31 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     }
 
     getLevel(){
-return 0; //temporary
-        let T = new BigInteger(this.difficultyTarget.toString('hex'), 32);
-        let id = new BigInteger(this.hash.toString('hex'), 32);
+
+        let T = this.difficultyTarget;
+        let id = new BigInteger(this.hash.toString('hex'), 16);
         
         //If id <= T/2^u the block is of level u => block level is max(u) for 2^u * id <= T
+        // T -> inf => u -> 255
         let u = 0;
-        let pow = new BigInteger(1, 32);
+        let pow = new BigInteger("1", 16);
 
-        while(pow.mul(id).compare(T) <= 0) {
+        console.log('IX =', this.hash.toString('hex'));
+        // console.log(' I=', id.toString());
+        console.log('Tx =', Serialization.serializeBigInteger(T));
+        console.log('Tx2=', Serialization.serializeToFixedBuffer(32, Serialization.serializeBigInteger(T)));
+        // console.log(' T=', T.toString());
+
+        console.log("id", id.toString());
+        console.log(" t", T.toString());
+
+        while(pow.multiply(id).compare(T) <= 0) {
             ++u;
-            pow = pow.mul(2);
+            pow = pow.multiply(23);
         }
         --u;
+        console.log('L=', u);
+        console.log('P=', id.multiply(1 << u).toString());
 
         return u;
     }
@@ -53,7 +65,7 @@ return 0; //temporary
             if (i > this.interlink.length)
                 this.interlink.push({});
 
-            this.interlink[i] = {height: this.height, blockId: prevBlock.hash }; //getId = Hash
+            this.interlink[i] = {height: prevBlock.height, blockId: prevBlock.hash }; //getId = Hash
 
         }
 
