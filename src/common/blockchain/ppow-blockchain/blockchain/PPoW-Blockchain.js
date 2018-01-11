@@ -19,10 +19,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
         block.updateInterlink(prevBlock);
         
-        
-        //let buffer = block.serializeBlock();
-        //block.deserializeBlock(buffer);
-        //console.log('-------SERIALIZED---------------');
+        //console.log(block.serializeBlock().toString());
     }
 
 }
