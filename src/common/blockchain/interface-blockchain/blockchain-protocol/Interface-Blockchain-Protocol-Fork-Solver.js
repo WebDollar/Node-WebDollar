@@ -227,6 +227,7 @@ class InterfaceBlockchainProtocolForkSolver{
                             try {
                                 result = await fork.includeForkBlock(block);
                             } catch (Exception){
+                                console.log(block.serializeBlock().toString("hex"));
                                 console.log(colors.red("Error including block "+nextBlockHeight+" in fork " + Exception.toString()));
                                 finished = true;
                                 return false;

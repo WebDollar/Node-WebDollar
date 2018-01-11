@@ -15,7 +15,7 @@ class Blockchain{
 
         this.emitter = this.blockchain.emitter;
 
-        this.Protocol.blockchain = this.Chain;
+        this.Protocol._setBlockchain(this.blockchain);
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
 

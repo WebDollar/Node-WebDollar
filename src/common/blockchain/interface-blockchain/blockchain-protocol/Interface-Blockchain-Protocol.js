@@ -25,8 +25,14 @@ class InterfaceBlockchainProtocol {
 
     }
 
+    _setBlockchain(blockchain){
+        this.blockchain = blockchain;
+        this.forkSolver.blockchain = blockchain;
+    }
+
     propagateHeader(block, chainLength, socketsAvoidBroadcast){
         // broadcasting the new block, to everybody else
+        console.log("propagate ", block.height);
         NodeProtocol.broadcastRequest( "blockchain/header/new-block", {
             height: block.height,
             chainLength: chainLength,

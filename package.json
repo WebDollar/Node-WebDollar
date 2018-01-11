@@ -9,7 +9,7 @@
     "build_browser_test": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ] && npm run show_browser_test",
     "build_browser": "browserify src/build_browser.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/WebDollar-Protocol-bundle.js -t [ babelify --presets [ es2017 ] ] ",
     "build_browser_user_interface": "browserify src/build_browser.js -o dist_bundle/../../User-Interface-WebDollar/dist_bundle/WebDollar-Protocol-bundle.js -t [ babelify --presets [ es2017 ] ] ",
-    "start_double_connections": "npm run build_terminal DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
+    "start_double_connections": "npm run build_terminal && DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
     "start": "npm run build_terminal && node dist/build_terminal.js  ",
     "start_mining": "npm run build_terminal && START_MINING=true SERVER_PORT=6666  node dist/build_terminal.js ",
     "test": "npm run build_terminal && mocha --timeout 10000 dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",

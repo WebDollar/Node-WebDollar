@@ -171,7 +171,7 @@ class InterfaceBlockchainBlock {
     }
 
 
-    computeHash(newNonce){
+    async computeHash(newNonce){
 
         // hash is hashPow ( block header + nonce )
 
@@ -181,7 +181,7 @@ class InterfaceBlockchainBlock {
                                      ] );
 
 
-        return WebDollarCrypto.hashPOW(buffer);
+        return await WebDollarCrypto.hashPOW(buffer);
     }
 
     serializeBlock(){
