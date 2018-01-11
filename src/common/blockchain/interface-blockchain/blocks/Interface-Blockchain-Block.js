@@ -57,6 +57,9 @@ class InterfaceBlockchainBlock {
         this.db = db;
     }
 
+    async _supplementaryValidation() {
+        return true;
+    }
 
     async validateBlock(height, previousDifficultyTarget, previousHash, validationType){
 
@@ -86,6 +89,8 @@ class InterfaceBlockchainBlock {
         this._validateTargetDifficulty(previousDifficultyTarget);
 
         if (this.reward.equals(BlockchainMiningReward.getReward(this.height)) === false ) throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward(this.height);
+
+        if (this._supplementaryValidation() === false) throw "supplementaryValidation failed";
 
         return true;
     }

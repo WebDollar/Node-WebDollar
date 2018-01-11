@@ -58,6 +58,32 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         }
 
     }
+    
+    _validateInterlink() {
+
+        if (this.interlink[0].height !== -1 || !this.interlink[0].blockId.equals(BlockchainGenesis.hashPrev)){
+            console.log(colors.red("Interlink to Genesis is wrong! "));
+            return false;
+        }
+
+        for (let i = 1; i < this.interlink.length; ++i){
+                let link = this.interlink[i];
+                let linkedBlock = this.blockchain.blocks[link.height];
+                if (!linkedBlock.hash.equals(link.blockId)){
+                    console.log(colors.red("Interlink to Genesis is wrong! "));
+                    return false;
+                }
+        }
+        
+        //TODO: verify if interlinks points to blocks with highest difficultyTarget
+
+        return true;
+    }
+    
+    async _supplementaryValidation() {
+        
+        return this._validateInterlink();
+    }
 
     _computeBlockHeaderPrefix(skipPrefix){
 
