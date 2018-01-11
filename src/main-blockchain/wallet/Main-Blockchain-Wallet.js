@@ -36,7 +36,7 @@ class MainBlockchainWallet{
         if (!emptyAddress)
             await blockchainAddress.createNewAddress(salt);
 
-        console.log("_justCreateNewAddress", blockchainAddress);
+        //console.log("_justCreateNewAddress", blockchainAddress);
 
         return blockchainAddress;
 
