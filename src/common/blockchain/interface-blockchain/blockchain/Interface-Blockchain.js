@@ -88,6 +88,9 @@ class InterfaceBlockchain {
 
         this.blocks.push(block);
 
+        // if (block.height > 0)
+        //     console.log("prevBlock", this.blocks[block.height-1]);
+        //
         await this.blockIncluded(block);
 
         if (saveBlock)

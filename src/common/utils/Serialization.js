@@ -168,11 +168,11 @@ class Serialization{
      * Convers buffer to a Fixed Length buffer
      * @returns {Buffer}
      */
-    serializeToFixedBuffer(noBits, buffer){
+    serializeToFixedBuffer(noBytes, buffer){
 
-        if (buffer.length === noBits) return buffer; // in case has the same number of bits as output
+        if (buffer.length === noBytes) return buffer; // in case has the same number of bits as output
 
-        let result = new Buffer(noBits);
+        let result = new Buffer(noBytes);
 
         for (let i=0; i<buffer.length; i++)
             result[i]= buffer[i];

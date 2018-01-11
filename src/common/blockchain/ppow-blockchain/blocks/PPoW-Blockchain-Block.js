@@ -27,12 +27,18 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         let u = 0;
         let pow = new BigInteger("1", 16);
 
-        console.log('I=', id.toString());
-        console.log('T=', T.toString());
+        console.log('IX =', this.hash.toString('hex'));
+        // console.log(' I=', id.toString());
+        console.log('Tx =', Serialization.serializeBigInteger(T));
+        console.log('Tx2=', Serialization.serializeToFixedBuffer(32, Serialization.serializeBigInteger(T)));
+        // console.log(' T=', T.toString());
+
+        console.log("id", id.toString());
+        console.log(" t", T.toString());
 
         while(pow.multiply(id).compare(T) <= 0) {
             ++u;
-            pow = pow.multiply(2);
+            pow = pow.multiply(23);
         }
         --u;
         console.log('L=', u);
