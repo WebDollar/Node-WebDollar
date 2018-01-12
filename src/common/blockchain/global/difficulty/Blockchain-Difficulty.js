@@ -9,23 +9,23 @@ class BlockchainDifficulty{
 
 
         // difficulty algorithm is based on blockNumber
-        console.log("prevBlockDifficulty", prevBlockDifficulty.length, prevBlockDifficulty);
+        // console.log("prevBlockDifficulty", prevBlockDifficulty.length, prevBlockDifficulty);
 
         if ( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.greaterThanOrEqualTo(0))) {
 
-            if (Buffer.isBuffer(prevBlockDifficulty))
-                console.log(prevBlockDifficulty.toString("hex"));
-            else
-                console.log(prevBlockDifficulty.toString());
-            console.log("prevBlockTimestamp", prevBlockTimestamp.toString(16));
-            console.log("blockTimestamp", blockTimestamp.toString(16));
-            console.log("blockNumber", blockNumber.toString(16));
+            // if (Buffer.isBuffer(prevBlockDifficulty))
+            //     console.log(prevBlockDifficulty.toString("hex"));
+            // else
+            //     console.log(prevBlockDifficulty.toString());
+            // console.log("prevBlockTimestamp", prevBlockTimestamp.toString(16));
+            // console.log("blockTimestamp", blockTimestamp.toString(16));
+            // console.log("blockNumber", blockNumber.toString(16));
 
             let rez = this.calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber);
 
-            console.log("difficulty0",  rez.toString() );
-            console.log("difficulty1",  Serialization.serializeBigInteger( rez ).length, Serialization.serializeBigInteger( rez ) );
-            console.log("difficulty2", Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez )).length, Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez ) ));
+            // console.log("difficulty0",  rez.toString() );
+            // console.log("difficulty1",  Serialization.serializeBigInteger( rez ).length, Serialization.serializeBigInteger( rez ) );
+            // console.log("difficulty2", Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez )).length, Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez ) ));
             return rez;
         }
 

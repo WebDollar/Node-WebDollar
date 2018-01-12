@@ -4,8 +4,8 @@ let consts = {}
 
 consts.UUID = uuid.v4();
 
-consts.NODE_VERSION = "0.0.1";
-consts.NODE_VERSION_COMPATIBILITY = "1.0";
+consts.NODE_VERSION = "0.1";
+consts.NODE_VERSION_COMPATIBILITY = "0.1";
 consts.NODE_PROTOCOL = "WebDollar";
 consts.NODE_FALLBACK_INTERVAL =  10*1000; //miliseconds
 consts.NODE_PORT =  12320; //port
@@ -51,6 +51,6 @@ consts.BLOCKS_MAX_SIZE_BYTES = 1024*1024 * 1; // in bytes
 consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
 consts.BLOCKS_LEVEL_INFINITE = (1 << 30);
 
-consts.POPOW_ACTIVATED = true;
+consts.POPOW_ACTIVATED = false;
 
 export default consts

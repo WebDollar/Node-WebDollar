@@ -24,7 +24,14 @@ class NodeProtocol {
             return false;
         }
 
-        if ((response.hasOwnProperty("version"))&&(response.version <= consts.NODE_VERSION_COMPATIBILITY)){
+        if (response.hasOwnProperty("version")){
+
+            if (response.version > consts.NODE_VERSION_COMPATIBILITY){
+
+                console.log(colors.red("hello received, VERSION is not right"), response.version);
+                return false;
+
+            }
 
             node.sckAddress.uuid = response.uuid;
 
