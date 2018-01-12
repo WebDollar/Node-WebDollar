@@ -64,6 +64,9 @@ class GeoLocationLists {
             let geoLocationAddressObject = new GeoLocationAddressObject(sckAddress, undefined, location);
             geoLocationAddressObject.refreshLastTimeChecked();
 
+            if (this.geoLocationContinentsLists.hasOwnProperty(location.continent))
+                this.geoLocationContinentsLists[location.continent] = [];
+
             this.geoLocationContinentsLists[location.continent].push(geoLocationAddressObject);
             this.countGeoLocationContinentsLists += 1;
         }
@@ -79,8 +82,8 @@ class GeoLocationLists {
             if (this.geoLocationContinentsLists.hasOwnProperty(continent))
                 for (let i=0; i<this.geoLocationContinentsLists[continent].length; i++) {
 
-                if (this.geoLocationContinentsLists[continent][i].sckAddress.matchAddress(sckAddress))
-                    return continent;
+                    if (this.geoLocationContinentsLists[continent][i].sckAddress.matchAddress(sckAddress))
+                        return continent;
                 }
 
         return null;
