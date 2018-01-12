@@ -13,9 +13,8 @@ import consts from 'consts/const_global'
 describe('test PPoW-Blockchain interlink data structure', () => {
 
     let blockchain = null;
-    let response = null;
 
-    it('test blockchain ppow interlink', async () => {
+    it('test creating Interlink data structure', async () => {
 
         blockchain = new MiniBlockcain();
 
@@ -45,13 +44,14 @@ describe('test PPoW-Blockchain interlink data structure', () => {
 
             await blockchain.includeBlockchainBlock(block, undefined, undefined, false);
         }
+    });
 
-        //check if links point correctly
+    it('test links validity', async () => {
+
         for (let i = 0; i < blockchain.blocks.length; ++i){
             let block = blockchain.blocks[i];
 
             console.log('interlink=', block.interlink);
-            
             assert(block.interlink[0].height === -1, "Genesis height !== -1, height=" + block.interlink[0].height);
             assert(block.interlink[0].blockId.equals(BlockchainGenesis.hashPrev), "Genesis hash differ. " + block.interlink[0].blockId.toString('hex') + "!==" + BlockchainGenesis.hashPrev.toString('hex'));
 
@@ -61,7 +61,29 @@ describe('test PPoW-Blockchain interlink data structure', () => {
                 assert(prevBlock.hash.equals(link.blockId), "prevHash differ:" + prevBlock.hash.toString('hex') + "!==" + link.blockId.toString('hex'));
             }
         }
-
     });
+
+   /*it('test validation with Interlink', async () => {
+
+        let sol = [];
+
+        //check if links point correctly
+        for (let i = 0; i < blockchain.blocks.length; ++i){
+            let block = blockchain.blocks[i];
+            sol.push(1);
+
+            for (let j = 0; j < block.interlink.length; ++j){
+                let link = block.interlink[j];
+                let prevBlock = blockchain.blocks[link.height];
+
+                //link must point to a block which has a path to Genesis
+                //assert(sol[] === 1);
+            }
+
+            //each block mush have a path to Genesis
+            assert(sol[i] === 1, "Block doesn't have path to Genesis" + block.interlink );
+        }
+
+    });*/
 
 });

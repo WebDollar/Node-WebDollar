@@ -169,9 +169,6 @@ this.finish++;
             if ( intervalMiningOutput !== undefined)
                 clearInterval(intervalMiningOutput);
 
-            console.log('ser=', block.serializeBlock().toString('hex'));
-if(this.finish === 11)
-    throw "EROARE";
         } catch (Exception){
 
             console.log( colors.red("Error mining block "), Exception, block);

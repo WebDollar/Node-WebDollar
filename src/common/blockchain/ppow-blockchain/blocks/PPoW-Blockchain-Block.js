@@ -77,8 +77,19 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 return false;
             }
         }
-        
-        //TODO: verify if interlinks points to blocks with highest difficultyTarget
+
+        //TODO: verify if interlinks points to blocks with highest difficulty
+/*        let crtLevel = this.getLevel();
+        let lastLink = this.interlink[this.interlink.length-1];
+        let linkLevel = this.blockchain[lastLink.height].getLevel();
+
+        if (linkLevel + 1 < crtLevel) {
+            console.log(colors.red('Interlink level errors'));
+            return false;
+        }*/
+
+        //TODO: Verify proof of proofs
+
 
         return true;
     }
