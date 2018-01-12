@@ -120,6 +120,10 @@ class InterfaceBlockchainMining{
     async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
 
         let intervalMiningOutput;
+if(this.finish === undefined)
+    this.finish = 0;
+this.finish++;
+
 
         console.log(" ----------- mineBlock-------------");
 
@@ -165,18 +169,9 @@ class InterfaceBlockchainMining{
             if ( intervalMiningOutput !== undefined)
                 clearInterval(intervalMiningOutput);
 
-            // let output = {hashPrev : block.hashPrev.toString("hex"),
-            //     nonce : block.nonce,
-            //     difficultyTarget : block.difficultyTarget.toString()};
-            //
-            // console.log(JSON.stringify(output));
-
-            // let buffer = block.serializeBlock();
-            // console.log("buffer", buffer.toString("hex"));
-            // block.deserializeBlock(buffer);
-
-            console.log(block.difficultyTarget.toString());
-
+            console.log('ser=', block.serializeBlock().toString('hex'));
+if(this.finish === 11)
+    throw "EROARE";
         } catch (Exception){
 
             console.log( colors.red("Error mining block "), Exception, block);

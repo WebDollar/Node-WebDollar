@@ -27,18 +27,9 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         let u = 0;
         let pow = new BigInteger("1", 16);
 
-        // console.log('IX =', this.hash.toString('hex'));
-        // // console.log(' I=', id.toString());
-        // console.log('Tx =', Serialization.serializeBigInteger(T));
-        // console.log('Tx2=', Serialization.serializeToFixedBuffer(32, Serialization.serializeBigInteger(T)));
-        // // console.log(' T=', T.toString());
-        //
-        // console.log("id", id.toString());
-        // console.log(" t", T.toString());
-
         while(pow.multiply(id).compare(T) <= 0) {
             ++u;
-            pow = pow.multiply(23);
+            pow = pow.multiply(2);
         }
         --u;
         console.log('L=', u);
@@ -48,7 +39,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     }
     
     updateInterlink(prevBlock){
-        
+
         let blockLevel = 0;
         // interlink = interlink'
         if (prevBlock) {
@@ -131,22 +122,15 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         try {
 
-
-            console.log("offset", offset);
-
             let numInterlink = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
             offset += 1;
-
-            console.log("_deserializeInterlink 1", numInterlink)
 
             this.interlink = [];
             for (let i = 0; i < numInterlink; ++i) {
 
-                console.log("_deserializeInterlink 2")
                 let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
                 offset += 4;
 
-                console.log("_deserializeInterlink 3")
                 let blockId = BufferExtended.substr(buffer, offset, 32);
                 offset += 32;
                 

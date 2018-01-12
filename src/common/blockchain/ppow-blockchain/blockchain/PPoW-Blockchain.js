@@ -17,10 +17,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         let N = this.blocks.length;
         let prevBlock = (N >= 2) ? this.blocks[N-2] : null;
 
-
-
         block.updateInterlink(prevBlock);
-
     }
 
 }
