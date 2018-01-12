@@ -171,11 +171,11 @@ class InterfaceBlockchainMining{
             //
             // console.log(JSON.stringify(output));
 
-            let buffer = block.serializeBlock();
-            console.log("buffer", buffer.toString("hex"));
-
-            console.log("target", difficulty);
+            // let buffer = block.serializeBlock();
+            // console.log("buffer", buffer.toString("hex"));
             // block.deserializeBlock(buffer);
+
+            console.log(block.difficultyTarget.toString());
 
         } catch (Exception){
 
