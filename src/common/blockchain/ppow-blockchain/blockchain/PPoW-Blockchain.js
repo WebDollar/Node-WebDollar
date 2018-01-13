@@ -149,11 +149,14 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
         while ( m < superchain.length ){
 
-            // TODO !!!!!! i tink is not right
+            // TODO !!!!!! maybe it will require an min
 
             const underlyingLength = superchain.last.height - superchain.blocks[superchain.length - m].height + 1; // I think it is without +1
 
-            if (this._localGood(m, underlyingLength , miu) === false)
+            // C'length = m
+            // C.length = underlingLength
+
+            if (this._localGood( Math.min( m, superchain.length ), underlyingLength , miu) === false)
                 return false;
 
             m++;
@@ -250,6 +253,34 @@ class PPoWBlockchain extends InterfaceBlockchain {
     }
 
 
+    /**
+     *
+     * @param superblock - hi
+     * @param regularblock lo
+     */
+    followDown(superblock, regularblock{
+
+        let B = superblock;
+        let aux = [];
+        let miu = superblock.level;
+
+        while ( B.equals( regularblock ) ){
+
+            // B' ← blockById[B.interlink[µ]]
+            let B1 = this.blocks[B.interlink[miu]];
+
+            // if depth[B0] < depth[lo] then
+            if (B1.height < regularblock.height)
+                miu--;
+            else{
+                aux.push(B);
+                B = B1;
+            }
+        }
+
+        return aux;
+
+    }
 
 
 }
