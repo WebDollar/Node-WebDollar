@@ -1,5 +1,7 @@
 import consts from 'consts/const_global'
 import PPoWHelper from './helpers/PPoW-Helper'
+import PPowBlockchainProofs from './PPoW-Blockchain-Proofs'
+import PPowBlockchainLastBlocks from './PPoW-Blockchain-LastBlocks'
 
 class PPoWBlockchainProver{
 
@@ -26,12 +28,14 @@ class PPoWBlockchainProver{
 
         //B ← C[0]
         let B = this.blockchain.blocks[0];
-        let proofs = [];
+
+        // π
+        let proofs = new PPowBlockchainProofs([]);
 
         let length =  this.blockchain.blocks.length;
 
         //for µ = |C[−k].interlink| down to 0 do
-        for (let miu = this.blockchain.blocks[length - consts.POPOW_PARAMS.k].interlink.length -1; miu >=0; i--){
+        for (let miu = this.blockchain.blocks[length - consts.POPOW_PARAMS.k].interlink.length -1; miu >=0; miu--){
 
             //  α ← C[: −k]{B :}↑µ
             let alpha = [];
@@ -47,7 +51,7 @@ class PPoWBlockchainProver{
             for (let i=0; i<alpha.length; i++)
                 proofs.push(alpha[i]);
 
-            if (PPoWHelper.good(alpha, miu)){
+            if (this.blockchain.good(alpha, miu)){
                 B = alpha [ alpha.length - consts.POPOW_PARAMS.m ];
             }
 
@@ -55,7 +59,7 @@ class PPoWBlockchainProver{
         }
 
         // χ ← C[−k : ]
-        let lastBlocks = this.blockchain.blocks.splice(length - consts.POPOW_PARAMS.k);
+        let lastBlocks = new PPowBlockchainLastBlocks( this.blockchain.blocks.splice(length - consts.POPOW_PARAMS.k) );
 
         this.proofs = proofs;
         this.lastBlocks = lastBlocks;

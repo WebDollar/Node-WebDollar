@@ -1,37 +1,7 @@
+import consts from 'consts/const_global'
+
 class PPoWHelper{
 
-    /**
-     * Definition 5 (Locally good superchain).
-     */
-    localGood(){
-        
-    }
-
-    /**
-     * Definition 6 (Superchain quality).
-     */
-    suerchainQuality(){
-    }
-
-    /**
-     * Definition 7 (Multilevel quality)
-     */
-
-    multilevelQuality(){
-
-    }
-
-    /**
-     * Definition 8 (Good superchain)
-     *
-     *  if it has both superquality and multilevel quality with parameters (δ, m)
-     */
-    good(){
-
-        if (this.superQuality() === false) return false;
-        if (this.multilevelQuality() === false) return false;
-
-    }
 
     /**
      * LCA between too proofs
