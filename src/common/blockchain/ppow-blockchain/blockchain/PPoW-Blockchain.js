@@ -49,7 +49,41 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     }
 
+    /**
+     * returns a list of Levels u which have at least m blocks with that level
+     */
+    calculateM(proofs, blockStop){
 
+        let index;
+
+        // Obs M is a counter of how many blocks have the level[i]
+        let M = [0];
+
+        // { b : }
+        if (blockStop !== undefined) {
+            index = proofs.length-1;
+            while (index >= 0) {
+                // { b : }
+                if (proofs[index] === blockStop) break;
+                index--;
+            }
+        } else index = 0;
+
+
+        while (index < proofs.length-1){
+
+            index++;
+
+            // {µ : |π ↑µ {b :}| ≥ m}
+            let miu = proofs[index].level;
+            if (miu > consts.POPOW_PARAMS.m) {
+                if (M[miu] === undefined)  M[miu] = [];
+                M[miu].push(index);
+            }
+
+        }
+
+    }
 
     //Algorithm 4 aka bestArg
     compareProofs(proofs1, proofs2){
@@ -59,22 +93,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
             //M ← {µ : |π↑µ {b :}| ≥ m } ∪ {0}
 
             // Obs M is a counter of how many blocks have the level[i]
-            let M = [0];
+            let M = this.calculateM(proofs, b);
 
-            let index = proofs.length-1;
-            while (index >= 0 ){
-
-                // {µ : |π ↑µ {b :}| ≥ m}
-                let miu = proofs[index].level;
-                if (miu > consts.POPOW_PARAMS.m) {
-
-                    if (M[miu] === undefined)  M[miu] = [];
-                    M[miu].push(miu);
-                }
-
-                // { b : }
-                if (proofs[index] === b) break;
-            }
 
             //return max µ ∈ M {2^µ · | π↑µ {b : }| }
             let max = 0;
@@ -129,7 +149,9 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
         while ( m < superchain.length ){
 
-            const underlyingLength = superchain.last.height - superchain.blocks[superchain.length - m].height + 1;
+            // TODO !!!!!! i tink is not right
+
+            const underlyingLength = superchain.last.height - superchain.blocks[superchain.length - m].height + 1; // I think it is without +1
 
             if (this._localGood(m, underlyingLength , miu) === false)
                 return false;
@@ -163,6 +185,67 @@ class PPoWBlockchain extends InterfaceBlockchain {
         if (this._multilevelQuality(superchain, miu) === false) return false;
 
         return true;
+
+    }
+
+
+    /**
+     * Algorithm 5 The badness prover which generates a succinct certificate of badness
+     * @param proofs
+     */
+    badness(proofs){
+
+        //M ← {µ : |C↑µ | ≥ m} \ {0}
+        let M = this.calculateM(proofs)
+        if (M[0] !== undefined)
+            delete M[0];
+
+        let max = 0;
+        for (let u in M)
+            if (max < u) max = u;
+
+        if (max === 0) throw 'max === 0';
+
+
+        // ρ ← 1/ max(M)
+        let p = 1 / max;
+
+        for (let miu in M){
+
+            // B ∈ C↑µ
+            let C = proofs.blocksGreaterLevel(miu);
+            for (let i=0; i<C.length; i++){
+
+                let C1 = undefined;
+                for (let j=i+1; j<C.length; j++) {
+
+                    // {B :}
+                    C1.push(C[j]);
+
+                    // [: m]
+                    if (C1.length === consts.POPOW_PARAMS.m) break;   // Sliding m-sized window
+
+                }
+
+                //if |C1| = m then
+                if (C1.length === consts.POPOW_PARAMS.m){
+
+                    // C∗ ← C↓↑µ−1
+                    // TODO DEFINE Cstar
+
+                    let Cstar = [];
+
+                    if ( new BigNumber( 2 * C1.length ).lessThan(  new BigNumber(1-consts.POPOW_PARAMS.d).pow(p) * Cstar.length  ) )
+
+                        return Cstar; //Chain is bad
+
+
+                }
+
+            }
+
+        }
+        return null;   // Chain is good
 
     }
 
