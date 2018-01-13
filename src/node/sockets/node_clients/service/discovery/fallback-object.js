@@ -25,4 +25,4 @@ class FallBackObject {
 
 }
 
-exports.FallBackObject = FallBackObject;
+export default FallBackObject;

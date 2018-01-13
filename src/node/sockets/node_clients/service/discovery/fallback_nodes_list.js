@@ -1,4 +1,4 @@
-{
+export default {
   "protocol": "WebDollar",
   "name": "fallback nodes",
   "nodes": [

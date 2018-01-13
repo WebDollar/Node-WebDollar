@@ -26,6 +26,7 @@ class NodesStats {
     _printStats(){
 
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Waitlist:",this.statsWaitlist,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
+
     }
 
     _recalculateStats(nodesListObject){

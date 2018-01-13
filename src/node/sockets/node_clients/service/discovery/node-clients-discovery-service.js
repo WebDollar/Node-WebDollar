@@ -2,7 +2,8 @@ import consts from 'consts/const_global'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import { NODES_WAITLIST_OBJECT_TYPE } from 'node/lists/waitlist/nodes-waitlist-object';
 import NodesList from 'node/lists/nodes-list'
-import {FallBackObject} from './fallback-object';
+import FallBackObject from './fallback-object';
+import FallBackNodesList from './fallback_nodes_list';
 
 const axios = require('axios');
 
@@ -16,12 +17,15 @@ class NodeDiscoveryService {
 
             new FallBackObject("https://www.jasonbase.com/things/RPY5"),
 
-            new FallBackObject("https://api.myjson.com/bins/xi1hr"),
-            new FallBackObject("http://skyhub.me/public/webdollars.json"),
-            new FallBackObject("http://visionbot.net/webdollars.json"),
-            new FallBackObject("http://budisteanu.net/webdollars.json"),
+            //not working
+            // new FallBackObject("https://api.myjson.com/bins/xi1hr"),
+            // new FallBackObject("http://skyhub.me/public/webdollars.json"),
+            // new FallBackObject("http://visionbot.net/webdollars.json"),
+            // new FallBackObject("http://budisteanu.net/webdollars.json"),
 
         ];
+
+        this.processFallbackNodes(FallBackNodesList)
 
     }
 
@@ -66,46 +70,58 @@ class NodeDiscoveryService {
                 responseType: 'json',
             });
 
-            let data = response.data;
+            fallbackItem.checked = true;
 
+            return this.processFallbackNodes(response.data)
+        }
+        catch(Exception){
+            console.log("ERROR downloading list: ", url, Exception.toString());
+            fallbackItem.errorTrials++;
+
+            return null;
+        }
+    }
+
+    processFallbackNodes(data){
+
+        try {
             //console.log(data);
 
             if (typeof data === 'string') data = JSON.parse(data);
 
 
-            if ((typeof data === 'object') && (data !== null)){
+            if ((typeof data === 'object') && (data !== null)) {
 
-                fallbackItem.checked = true;
-
-                let nodes =  [];
+                let nodes = [];
                 let name = '';
 
                 //console.log(data);
                 //console.log((data.hasOwnProperty('protocol')));
                 //console.log(((data['protocol'] === nodeProtocol)));
 
-                if ((data.hasOwnProperty('protocol'))&&(data['protocol'] === consts.NODE_PROTOCOL)){
-                    name = data.name||'';
-                    nodes = data.nodes||[];
+                if ((data.hasOwnProperty('protocol')) && (data['protocol'] === consts.NODE_PROTOCOL)) {
+                    name = data.name || '';
+                    nodes = data.nodes || [];
 
                     //console.log("FallBack Nodes ",nodes);
 
-                    if (Array.isArray(nodes) ){
+                    if (Array.isArray(nodes)) {
 
                         //console.log("NEW NODES", nodes);
 
-                        for (let i=0; i<nodes.length; i++) {
+                        for (let i = 0; i < nodes.length; i++) {
 
-                            let nodeAddress = '', nodePort = undefined, nodeType = NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER;
+                            let nodeAddress = '', nodePort = undefined,
+                                nodeType = NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER;
 
                             if (typeof nodes[i] === "object") {
                                 nodeAddress = nodes[i].addr || '';
                                 nodePort = nodes[i].port;
-                            } else{
+                            } else {
                                 nodeAddress = nodes[i]; //a simple string Address
                             }
 
-                            if ( (typeof nodeAddress === "string" && nodeAddress !== '') || ( typeof nodeAddress === "object" && Array.isArray(nodeAddress)) )
+                            if ((typeof nodeAddress === "string" && nodeAddress !== '') || ( typeof nodeAddress === "object" && Array.isArray(nodeAddress)))
                                 NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort, nodeType);
                         }
 
@@ -114,13 +130,12 @@ class NodeDiscoveryService {
 
                 return nodes;
             }
+        } catch (exception){
+            console.log("error processing fallback list processFallbackNodes", data);
         }
-        catch(Exception){
-            console.log("ERROR downloading list: ", url, Exception.toString());
-            fallbackItem.errorTrials++;
 
-            return null;
-        }
+
+        return null;
     }
 
 

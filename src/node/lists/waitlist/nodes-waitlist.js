@@ -38,7 +38,7 @@ class NodesWaitlist {
 
     addNewNodeToWaitlist(addresses, port, type){
 
-        addresses = "127.0.0.1";
+        // addresses = "127.0.0.1";
 
         if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[]))) return false;
 
@@ -123,6 +123,8 @@ class NodesWaitlist {
     async _connectNowToNewNode(nextNode){
 
         nextNode.connecting = true;
+
+        console.log("nextNode.sckAddresses", nextNode.sckAddresses);
 
         //trying to connect to each sckAddresses
         for (let i=0; i<nextNode.sckAddresses.length; i++) {
