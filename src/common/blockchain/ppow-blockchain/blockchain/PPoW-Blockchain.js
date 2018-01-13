@@ -22,6 +22,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         let prevBlock = (N >= 2) ? this.blocks[N-2] : null;
 
         block.updateInterlink(prevBlock);
+        block.level = block.getLevel(); //computing the level
     }
 
     // Algorithm 2
@@ -96,13 +97,14 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     /**
      * Definition 5 (Locally good superchain).
+     *
      */
-    localGood(proofs, miu){
+    _localGood(superLength, underlyingLength, miu){
 
         //local-goodδ (C', C, µ), if |C0| > (1 − δ) 2^−µ * |C|.
 
         //using big Number
-        if ( new BigNumber(proofs.data.length).greaterThan( (new BigNumber(1).minus(consts.POPOW_PARAMS.d)).mul( new BigNumber(2).pow( - miu ) * this.blocks.length ) )
+        if ( new BigNumber(superLength).greaterThan( (new BigNumber(1).minus(consts.POPOW_PARAMS.d)).mul( new BigNumber(2).pow( - miu ) * underlyingLength ) ))
             return true;
         else
             return false;
@@ -111,15 +113,39 @@ class PPoWBlockchain extends InterfaceBlockchain {
     /**
      * Definition 6 (Superchain quality).
      */
-    superchainQuality(proofs, miu){
+    _superchainQuality(superchain, miu, m){
+
+        if (m < 1) throw ('superchainQuality is not good');
+
+        if (superchain.length < m) return false;
+
+        //m ∈ N states that for all m' ≥ m
+
+        // local-good δ (C↑ µ [−m' :], C↑µ [−m' :]↓ , µ).
+
+        while ( m < superchain.length ){
+
+            const underlyingLength = superchain.last.height - superchain.blocks[superchain.length - m].height + 1;
+
+            if (this._localGood(m, underlyingLength , miu) === false)
+                return false;
+
+            m++;
+        }
+
+        return true;
     }
 
     /**
      * Definition 7 (Multilevel quality)
      */
 
-    multilevelQuality(proofs, miu){
+    _multilevelQuality(superchain, miu){
 
+        //C ∗ = C [−m : ]
+
+        return true;
+        // TBD
     }
 
     /**
@@ -127,14 +153,16 @@ class PPoWBlockchain extends InterfaceBlockchain {
      *
      *  if it has both superquality and multilevel quality with parameters (δ, m)
      */
-    good(proofs, miu){
+    good(superchain, miu){
 
-        if (this.superchainQuality(proofs, miu) === false) return false;
-        if (this.multilevelQuality(proofs, miu) === false) return false;
+        if (this._superchainQuality(superchain, miu) === false) return false;
+        if (this._multilevelQuality(superchain, miu) === false) return false;
 
         return true;
 
     }
+
+
 
 
 }

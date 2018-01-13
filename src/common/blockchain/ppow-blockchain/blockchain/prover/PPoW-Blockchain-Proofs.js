@@ -4,9 +4,34 @@
 
 class PPowBlockchainProofs{
 
-    constructor(blocks){
+    constructor(proofs){
 
-        this.blocks = blocks;
+        this.proofs = proofs;
+
+    }
+
+    // C ↑ µ
+    blocksGreaterLevel(miu){
+
+        let list = [];
+
+        for (let i=0; i<this.proofs.length; i++)
+            if (this.proofs[i].level >= miu)
+                list.push(this.proofs[i]);
+
+        return list;
+    }
+
+    // C ↓ µ
+    blocksLessLevel(miu){
+
+        let list = [];
+
+        for (let i=0; i<this.proofs.length; i++)
+            if (this.proofs[i].level <= miu)
+                list.push(this.proofs[i]);
+
+        return list;
     }
 
 }

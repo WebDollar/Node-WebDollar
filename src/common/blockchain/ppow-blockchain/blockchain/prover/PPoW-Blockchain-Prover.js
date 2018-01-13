@@ -22,8 +22,13 @@ class PPoWBlockchainProver{
 
     }
 
-    //Algorithm 3
-    // will create Proofs ( π χ )
+    /**
+     * Algorithm 3
+     * will create Proofs ( π χ )
+     *
+     * create prover
+     */
+
     createProve(){
 
         //B ← C[0]

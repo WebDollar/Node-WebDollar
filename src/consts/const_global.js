@@ -55,6 +55,7 @@ consts.POPOW_ACTIVATED = false;
 consts.POPOW_PARAMS={
     m: 6,
     k: 6,
+    d: 0.5,
 };
 
 export default consts
