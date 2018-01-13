@@ -2,7 +2,8 @@ import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockcha
 import BlockchainMiningReward from "../../global/Blockchain-Mining-Reward";
 import consts from 'consts/const_global'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-
+import PPoWBlockchainProver from './prover/PPoW-Blockchain-Prover'
+import PPoWHelper from './prover/helpers/PPoW-Helper'
 /**
  * NiPoPoW Blockchain contains a chain of blocks based on Proof of Proofs of Work
  */
@@ -39,65 +40,14 @@ class PPoWBlockchain extends InterfaceBlockchain {
             }
         }
 
-        return predicateQ(proofBest);
+        if (proofBest !== undefined)
+            return predicateQ(proofBest);
 
         return false;
 
     }
 
-    //Algorithm 3
-    // will create Proofs ( π χ )
-    createProve(){
 
-        //B ← C[0]
-        let B = this.blocks[0];
-        let proofs = [];
-
-        let length =  this.blocks.length;
-
-        //for µ = |C[−k].interlink| down to 0 do
-        for (let miu = this.blocks[length - consts.POPOW_PARAMS.k].interlink.length -1; miu >=0; i--){
-
-            //  α ← C[: −k]{B :}↑µ
-            let alpha = [];
-            for (let i = length-1; i>= length - consts.POPOW_PARAMS.k; i++)
-                if (this.blocks[i].height >= B.height &&   //C[: −k]{B :}
-                    this.blocks[i].getLevel() >= miu){
-
-                    alpha.push(this.blocks[i]);
-
-                }
-
-            // π ← π ∪ α
-            for (let i=0; i<alpha.length; i++)
-                proofs.push(alpha[i]);
-
-            if (this.good(alpha, miu)){
-                B = alpha [ alpha.length - consts.POPOW_PARAMS.m ];
-            }
-
-
-        }
-
-    }
-
-    good(){
-        
-    }
-
-    LCA(proofs1, proofs2){
-        //LCA(C1, C2) = (C1 ∩ C2)[−1] π
-
-        for (let i=proofs1.length-1; i > 0; i--)
-            for (let j=proofs2.length-1; j>0; j--){
-                if (proofs1[i] === proofs2[j]){ //found the LCA
-                    return proofs1[i];
-                }
-            }
-
-        return null;
-
-    }
 
     //Algorithm 4 aka bestArg
     compareProofs(proofs1, proofs2){
@@ -109,13 +59,14 @@ class PPoWBlockchain extends InterfaceBlockchain {
             // Obs M is a level
             let M = [0];
 
-            for (let miu = proofs.length-1; miu >= 0; i-- ) {
+            for (let miu = proofs.length-1; miu >= 0; miu-- ) {
 
                 // { b : }
                 if (proofs[miu] === b) //finished,
                     break;
 
-                // {µ : |π↑µ {b :}| ≥ m}
+                // {µ : |π ↑µ {b :}| ≥ m}
+                for (let i=0; i < )
                 if ( proofs[miu].length >= consts.POPOW_PARAMS.m ) M.push( miu );
             }
 
@@ -133,7 +84,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         };
 
         //calculating the interesection
-        let b = this.LCA(proofs1, proofs2);
+        let b = PPoWHelper.LCA(proofs1, proofs2);
 
         //best-argm(πA, b) ≥ best-argm(πB, b)
         return bestArg(proofs1, b) >= bestArg(proofs2, b);
