@@ -45,8 +45,48 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     }
 
+    //Algorithm 3
+    // will create Proofs ( π χ )
+    createProve(){
+
+        //B ← C[0]
+        let B = this.blocks[0];
+        let proofs = [];
+
+        let length =  this.blocks.length;
+
+        //for µ = |C[−k].interlink| down to 0 do
+        for (let miu = this.blocks[length - consts.POPOW_PARAMS.k].interlink.length -1; miu >=0; i--){
+
+            //  α ← C[: −k]{B :}↑µ
+            let alpha = [];
+            for (let i = length-1; i>= length - consts.POPOW_PARAMS.k; i++)
+                if (this.blocks[i].height >= B.height &&   //C[: −k]{B :}
+                    this.blocks[i].getLevel() >= miu){
+
+                    alpha.push(this.blocks[i]);
+
+                }
+
+            // π ← π ∪ α
+            for (let i=0; i<alpha.length; i++)
+                proofs.push(alpha[i]);
+
+            if (this.good(alpha, miu)){
+                B = alpha [ alpha.length - consts.POPOW_PARAMS.m ];
+            }
+
+
+        }
+
+    }
+
+    good(){
+        
+    }
+
     LCA(proofs1, proofs2){
-        //LCA(C1, C2) = (C1 ∩ C2)[−1]
+        //LCA(C1, C2) = (C1 ∩ C2)[−1] π
 
         for (let i=proofs1.length-1; i > 0; i--)
             for (let j=proofs2.length-1; j>0; j--){
