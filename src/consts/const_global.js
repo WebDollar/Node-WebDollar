@@ -52,5 +52,9 @@ consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
 consts.BLOCKS_LEVEL_INFINITE = (1 << 30);
 
 consts.POPOW_ACTIVATED = false;
+consts.POPOW_PARAMS={
+    m: 6,
+    k: 6,
+};
 
 export default consts
