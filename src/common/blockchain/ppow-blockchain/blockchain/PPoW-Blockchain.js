@@ -56,27 +56,31 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
         let bestArg = (proofs, b) => {
 
-            //M ← {µ : |π↑µ {b :}| ≥ m} ∪ {0}
+            //M ← {µ : |π↑µ {b :}| ≥ m } ∪ {0}
 
-            // Obs M is a level
+            // Obs M is a counter of how many blocks have the level[i]
             let M = [0];
 
-            for (let miu = proofs.length-1; miu >= 0; miu-- ) {
-
-                // { b : }
-                if (proofs[miu] === b) //finished,
-                    break;
+            let index = proofs.length-1;
+            while (index >= 0 ){
 
                 // {µ : |π ↑µ {b :}| ≥ m}
-                for (let i=0; i < )
-                if ( proofs[miu].length >= consts.POPOW_PARAMS.m ) M.push( miu );
+                let miu = proofs[index].level;
+                if (miu > consts.POPOW_PARAMS.m) {
+
+                    if (M[miu] === undefined)  M[miu] = [];
+                    M[miu].push(miu);
+                }
+
+                // { b : }
+                if (proofs[index] === b) break;
             }
 
-            //return max µ∈M {2^µ · | π↑µ {b : }| }
+            //return max µ ∈ M {2^µ · | π↑µ {b : }| }
             let max = 0;
             for (let miu in M){
 
-                let formula = 2^miu * proofs[miu].length;
+                let formula = new BigNumber(2).pow(miu).mul(M[miu].length);
                 if ( max < formula )
                     max = formula;
 
