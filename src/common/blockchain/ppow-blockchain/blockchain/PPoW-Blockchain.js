@@ -25,7 +25,9 @@ class PPoWBlockchain extends InterfaceBlockchain {
         block.level = block.getLevel(); //computing the level
     }
 
-    // Algorithm 2
+    /**
+     * Algorithm 2
+      */
     verify(provers){
 
         if (!Array.isArray(provers)) return false;
@@ -43,9 +45,35 @@ class PPoWBlockchain extends InterfaceBlockchain {
         }
 
         if (proofBest !== undefined)
-            return predicateQ(proofBest);
+            return {proofBest: proofBest, Q: predicateQ(proofBest)};
 
         return false;
+
+    }
+
+    /**
+     * Algorithm 8 The verify algorithm for the NIPoPoW infix protocol
+     * @param Provers
+     */
+
+    verifyInfix(Provers){
+
+        let blockById = [];
+
+        for (let prover in Provers)
+            for (let B in prover.proofs.data)
+
+                // blockById[B.id] ← B
+                blockById[B.hash] = B
+
+        let proofBest = this.verify(Provers).proofBest;
+
+        // if |π˜[−1].index| < ` then
+        // TODO who is index ????
+        if (proofBest[proofBest.length-1].interlink.length < l)
+            return null;
+        else
+            return D(ancestors(proofBest[proofBest.length-1], blockById));
 
     }
 
@@ -252,35 +280,6 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     }
 
-
-    /**
-     *
-     * @param superblock - hi
-     * @param regularblock lo
-     */
-    followDown(superblock, regularblock{
-
-        let B = superblock;
-        let aux = [];
-        let miu = superblock.level;
-
-        while ( B.equals( regularblock ) ){
-
-            // B' ← blockById[B.interlink[µ]]
-            let B1 = this.blocks[B.interlink[miu]];
-
-            // if depth[B0] < depth[lo] then
-            if (B1.height < regularblock.height)
-                miu--;
-            else{
-                aux.push(B);
-                B = B1;
-            }
-        }
-
-        return aux;
-
-    }
 
 
 }
