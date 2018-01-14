@@ -61,7 +61,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         let blockById = [];
 
         for (let prover in Provers)
-            for (let B in prover.proofs.data)
+            for (let B in prover.proofs.blocks)
 
                 // blockById[B.id] ← B
                 blockById[B.hash] = B
@@ -73,7 +73,26 @@ class PPoWBlockchain extends InterfaceBlockchain {
         if (proofBest[proofBest.length-1].interlink.length < l)
             return null;
         else
-            return D(ancestors(proofBest[proofBest.length-1], blockById));
+            return this.D(ancestors(proofBest[proofBest.length-1], blockById));
+
+    }
+
+    predicateQ(C){
+
+        // undefined, if |C[: −k]| < l, otherwise:
+        if (C.length - consts.POPOW_PARAMS.k < consts.POPOW_PARAMS.l ) return undefined;
+
+        let CTest = C.splice(C.length-consts.POPOW_PARAMS.k);
+        // TODO
+
+
+        // true, if ∃C1 ⊆ C[: −k] : |C1 | ≤ d ∧ D(C1)
+
+        return false;
+
+    }
+
+    D(){
 
     }
 
