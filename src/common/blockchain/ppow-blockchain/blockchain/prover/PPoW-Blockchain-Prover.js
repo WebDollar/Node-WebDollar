@@ -14,14 +14,6 @@ class PPoWBlockchainProver{
 
     }
 
-    createProofs(proofs){
-
-    }
-
-    createLastBlcoks(lastBlocks){
-
-    }
-
     /**
      * Algorithm 3
      * will create Proofs ( π χ )
@@ -29,26 +21,26 @@ class PPoWBlockchainProver{
      * create prover
      */
 
-    createProve(){
+    createProve(chain){
 
         //B ← C[0]
-        let B = this.blockchain.blocks[0];
+        let B = chain.blocks[0];
 
         // π
         let proofs = new PPowBlockchainProofs([]);
 
-        let length =  this.blockchain.blocks.length;
+        let length =  chain.blocks.length;
 
         //for µ = |C[−k].interlink| down to 0 do
-        for (let miu = this.blockchain.blocks[length - consts.POPOW_PARAMS.k].interlink.length -1; miu >=0; miu--){
+        for (let miu = chain.blocks[length - consts.POPOW_PARAMS.k].interlink.length -1; miu >=0; miu--){
 
             //  α ← C[: −k]{B :}↑µ
             let alpha = [];
             for (let i = length-1; i>= length - consts.POPOW_PARAMS.k; i++)
-                if (this.blockchain.blocks[i].height >= B.height &&   //C[: −k]{B :}
-                    this.blockchain.blocks[i].getLevel() >= miu){
+                if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
+                    chain.blocks[i].getLevel() >= miu){
 
-                    alpha.push(this.blockchain.blocks[i]);
+                    alpha.push(chain.blocks[i]);
 
                 }
 
@@ -56,7 +48,7 @@ class PPoWBlockchainProver{
             for (let i=0; i<alpha.length; i++)
                 proofs.push(alpha[i]);
 
-            if (this.blockchain.good(alpha, miu)){
+            if ( this.blockchain.good(alpha, miu) ){
                 B = alpha [ alpha.length - consts.POPOW_PARAMS.m ];
             }
 
@@ -64,7 +56,7 @@ class PPoWBlockchainProver{
         }
 
         // χ ← C[−k : ]
-        let lastBlocks = new PPowBlockchainLastBlocks( this.blockchain.blocks.splice(length - consts.POPOW_PARAMS.k) );
+        let lastBlocks = new PPowBlockchainLastBlocks( chain.blocks.splice(length - consts.POPOW_PARAMS.k) );
 
         this.proofs = proofs;
         this.lastBlocks = lastBlocks;
@@ -77,7 +69,7 @@ class PPoWBlockchainProver{
      * @param superblock - hi
      * @param regularblock lo
      */
-    followDown(superblock, regularblock{
+    followDown(superblock, regularblock, blockById ){
 
         let B = superblock;
         let aux = [];
@@ -86,15 +78,16 @@ class PPoWBlockchainProver{
         while ( B.equals( regularblock ) ){
 
             // B' ← blockById[B.interlink[µ]]
-            let B1 = this.blocks[B.interlink[miu]];
+            let B1 = blockById[B.interlink[miu].height];
 
             // if depth[B0] < depth[lo] then
             if (B1.height < regularblock.height)
                 miu--;
-            else{
+            else {
                 aux.push(B);
                 B = B1;
             }
+
         }
 
         return aux;
@@ -118,7 +111,7 @@ class PPoWBlockchainProver{
                 //if depth[E] ≥ depth[B1] then
                 if (E.level >= B1.level){
                     // R ← followDown(E, B0, depth)
-                    let R = this.followDown(E, B1);
+                    let R = this.followDown( E, B1, blockById );
 
                     for (let i=0; i <R.length; i++)
                         aux = aux.push(R[i]);

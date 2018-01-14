@@ -83,8 +83,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
         if (C.length - consts.POPOW_PARAMS.k < consts.POPOW_PARAMS.l ) return undefined;
 
         let CTest = C.splice(C.length-consts.POPOW_PARAMS.k);
-        // TODO
 
+        // TODO
 
         // true, if ∃C1 ⊆ C[: −k] : |C1 | ≤ d ∧ D(C1)
 
@@ -184,7 +184,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
     /**
      * Definition 6 (Superchain quality).
      */
-    _superchainQuality(superchain, miu, m){
+    static _superchainQuality(superchain, miu, m){
 
         if (m < 1) throw ('superchainQuality is not good');
 
@@ -216,7 +216,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
      * Definition 7 (Multilevel quality)
      */
 
-    _multilevelQuality(superchain, miu){
+    static _multilevelQuality(superchain, miu){
 
         //C ∗ = C [−m : ]
 
@@ -229,10 +229,10 @@ class PPoWBlockchain extends InterfaceBlockchain {
      *
      *  if it has both superquality and multilevel quality with parameters (δ, m)
      */
-    good(superchain, miu){
+    static good(superchain, miu){
 
-        if (this._superchainQuality(superchain, miu) === false) return false;
-        if (this._multilevelQuality(superchain, miu) === false) return false;
+        if (PPoWBlockchain._superchainQuality(superchain, miu) === false) return false;
+        if (PPoWBlockchain._multilevelQuality(superchain, miu) === false) return false;
 
         return true;
 
@@ -298,8 +298,6 @@ class PPoWBlockchain extends InterfaceBlockchain {
         return null;   // Chain is good
 
     }
-
-
 
 }
 
