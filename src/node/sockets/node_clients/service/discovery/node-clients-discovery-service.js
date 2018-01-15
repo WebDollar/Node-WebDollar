@@ -18,19 +18,20 @@ class NodeDiscoveryService {
             //new FallBackObject("https://www.jasonbase.com/things/RPY5"),
 
             //not working
-            new FallBackObject("https://api.myjson.com/bins/xi1hr"),
+            //new FallBackObject("https://api.myjson.com/bins/xi1hr"),
             // new FallBackObject("http://skyhub.me/public/webdollars.json"),
             // new FallBackObject("http://visionbot.net/webdollars.json"),
             // new FallBackObject("http://budisteanu.net/webdollars.json"),
 
         ];
 
-        this.processFallbackNodes(FallBackNodesList)
+
 
     }
 
     startDiscovery(){
 
+        this.processFallbackNodes(FallBackNodesList)
         this._discoverFallbackNodes(true);
 
     }
@@ -135,7 +136,7 @@ class NodeDiscoveryService {
                 return nodes;
             }
         } catch (exception){
-            console.log("error processing fallback list processFallbackNodes", data);
+            console.log("error processing fallback list processFallbackNodes", data, exception);
         }
 
 

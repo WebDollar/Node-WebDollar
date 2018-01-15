@@ -60,6 +60,16 @@ class NodesWaitlistObject {
         return null;
     }
 
+    toString(){
+
+        let text = "";
+        for (let i=0; i<this.sckAddresses.length; i++)
+            text += this.sckAddresses[i].toString()+ "   ";
+
+        return text;
+
+    }
+
 }
 
 exports.NodesWaitlistObject = NodesWaitlistObject;

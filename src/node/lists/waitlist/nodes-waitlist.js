@@ -14,7 +14,10 @@ class NodesWaitlist {
     */
 
     constructor(){
-        console.log("NodeServiceClients constructor");
+        console.log("NodesWaitlist constructor");
+
+        this.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;
+        this.NodesWaitlistObject = NodesWaitlistObject;
 
         this.emitter = new EventEmitter();
 
@@ -44,12 +47,14 @@ class NodesWaitlist {
 
         if (typeof addresses === "string" || !Array.isArray(addresses)) addresses = [addresses];
 
+        console.log("addresses", addresses)
+
         let sckAddresses = [];
         for (let i=0; i<addresses.length; i++){
 
             let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
-            console.log("addNewNodeToWaitlist2", addresses[i], this._searchNodesWaitlist(sckAddress));
+            //console.log("addNewNodeToWaitlist2", addresses[i], this._searchNodesWaitlist(sckAddress));
 
             if ( this._searchNodesWaitlist(sckAddress) === null){
                 sckAddresses.push(sckAddress);
@@ -89,7 +94,8 @@ class NodesWaitlist {
     _connectNewNodesWaitlist(setTimeOut){
 
         console.log("Waitlist length", this.waitlist.length);
-        console.log(this.waitlist);
+        for (let i=0; i<this.waitlist.length; i++)
+            console.log(this.waitlist[i].toString())
 
         this._deleteUselessWaitlist();
 
@@ -187,8 +193,4 @@ class NodesWaitlist {
 }
 
 
-let waitlist = new NodesWaitlist();
-waitlist.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;
-waitlist.NodesWaitlistObject = NodesWaitlistObject;
-
-export default waitlist;
+export default new NodesWaitlist();
