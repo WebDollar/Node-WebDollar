@@ -2,10 +2,12 @@
  * Copyright (c) Silviu Stroe 2018.
 */
 const bitcoin = require('bitcoinjs-lib');
+import WebDollarCrypto from 'common/crypto/WebDollat-Crypto.js';
 
-class InterfaceBlockchainAddressHelper2 {
+class MultiSig {
 
-    /**
+    /**  users public Keys which are used in generating a multi sig address
+     *
      *
      * @param publicKeys
      * @returns {*}
@@ -19,28 +21,31 @@ class InterfaceBlockchainAddressHelper2 {
      ];
      let address = InterfaceBlockchainAddressHelper2.generateAddress(pubKeys);
      */
-    static generateAddress(publicKeys) {
+    static generateAddress(publicKeys, numKeysRequired=2) {
 
         let pubKeys = publicKeys.map(function (hex) {
             return Buffer.from(hex, 'hex')
         });
 
-        let redeemScript = bitcoin.script.multisig.output.encode(2, pubKeys); // 2 of 3
+        let redeemScript = bitcoin.script.multisig.output.encode(numKeysRequired, pubKeys); // 2 of 3
         let scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(redeemScript));
         let address = bitcoin.address.fromOutputScript(scriptPubKey);
 
-
         return address;
+    }
+
+    static multisigPrivateKey(privateKey){
+        return privateKey;
     }
 
     /**
      * create (and broadcast via 3PBP) a Transaction with a 2-of-4 P2SH(multisig) input
      * https://github.com/bitcoinjs/bitcoinjs-lib/blob/e0f24fdd46e11533a7140e02dc43b04a4cc4522e/test/integration/transactions.js#L115
      */
-    createTransaction() {
+    createTransaction(numKeysRequired) {
 
         let keyPairs = [
-            '91avARGdfge8E4tZfYLoxeJ5sGBdNJQH4kvjJoQFacbgwmaKkrx',
+            '91avARGdfge8E4tZfYLoxeJ5sGBdNJQH4kvjJoQFacbgwmaKkrx', //public keys not public addresses
             '91avARGdfge8E4tZfYLoxeJ5sGBdNJQH4kvjJoQFacbgww7vXtT',
             '91avARGdfge8E4tZfYLoxeJ5sGBdNJQH4kvjJoQFacbgx3cTMqe',
             '91avARGdfge8E4tZfYLoxeJ5sGBdNJQH4kvjJoQFacbgx9rcrL7'
@@ -51,7 +56,7 @@ class InterfaceBlockchainAddressHelper2 {
             return x.getPublicKeyBuffer()
         })
 
-        let redeemScript = bitcoin.script.multisig.output.encode(2, pubKeys)
+        let redeemScript = bitcoin.script.multisig.output.encode(numKeysRequired, pubKeys)
         let scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(redeemScript))
         let address = bitcoin.address.fromOutputScript(scriptPubKey, testnet)
 
@@ -76,27 +81,51 @@ class InterfaceBlockchainAddressHelper2 {
         })
     }
 
-    makeMultisigAddress() {
+    static createPrivateKey(dates){
 
-        var privKeys = [ bitcoin.ECKey.makeRandom(),
-            bitcoin.ECKey.makeRandom(),
-            bitcoin.ECKey.makeRandom() ];
+        var concatDates='';
 
-        var pubKeys = privKeys.map(function(x) { return x.pub });
+        for (var i=0; i<=dates;++i){
 
-        var redeemScript = bitcoin.scripts.multisigOutput(2, pubKeys);
-        var scriptPubKey = bitcoin.scripts.scriptHashOutput(redeemScript.getHash());
-        var address = bitcoin.Address.fromOutputScript(scriptPubKey).toString();
+            concatDates += dates[i];
 
-        var o = {};
-        o.address = address;
-        o.redeemScript = redeemScript.toHex();
-        o.privateKeys = privKeys.map(function(x) { return x.toWIF() });
+        }
 
-        return o;
+        return WebDollarCrypto.SHA256(concatDates);
 
     }
 
+    //
+    // /**
+    //  * the demo generates 3 users' private keys => 3 users public Keys which are used in generating a multi sig address
+    //  *
+    //  * each users privateKey is mapped with multisig address to return the multisig privateKey attached to the user privateKey
+    //  *
+    //  * @returns {{}}
+    //  */
+    // makeMultisigAddress() {
+    //
+    //     var privKeys = [ bitcoin.ECKey.makeRandom(),
+    //         bitcoin.ECKey.makeRandom(),
+    //         bitcoin.ECKey.makeRandom() ];
+    //
+    //     var pubKeys = privKeys.map(function(x) { return x.pub });
+    //
+    //     var redeemScript = bitcoin.scripts.multisigOutput(2, pubKeys);
+    //     var scriptPubKey = bitcoin.scripts.scriptHashOutput(redeemScript.getHash());
+    //     var address = bitcoin.Address.fromOutputScript(scriptPubKey).toString();
+    //
+    //     var o = {};
+    //     o.address = address;
+    //     o.redeemScript = redeemScript.toHex();
+    //     o.privateKeys = privKeys.map(function(x) { return x.toWIF() });
+    //
+    //     return o;
+    //
+    // }
+
+
+
 }
 
-module.exports = InterfaceBlockchainAddressHelper2;
+module.exports = MultiSig;
