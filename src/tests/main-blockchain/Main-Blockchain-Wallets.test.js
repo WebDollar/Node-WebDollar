@@ -1,8 +1,10 @@
+import WebDollarCrypto from "../../common/crypto/WebDollar-Crypto";
+
 var assert = require('assert');
 
 import Blockchain from 'main-blockchain/Blockchain';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
-//import MultiSig from 'common/blockchain/interface-blockchain/MultiSig.js';
+import MultiSig from 'common/blockchain/interface-blockchain/addresses/MultiSig';
 
 describe('test save wallet to local storage', () => {
 
@@ -139,11 +141,32 @@ describe('test save wallet to local storage', () => {
     });
 
 
-    it('test checkMultisig', async () => {
+    it('test create public/private Keys', async () => {
 
-        console.log(MultiSig.createPrivateKey(['datanastere','plm','pllui']));
+        let privateKey1 =  MultiSig.createPrivateKey(['datanastere1','plm','pllui']);
+        let privateKey2 =  MultiSig.createPrivateKey(['datanastere2','plm','pllui']);
+        let privateKey3 =  MultiSig.createPrivateKey(['datanastere1','plm','pllui']);
 
+        let publicKey1 = MultiSig.getPublicKeyFromPrivate(privateKey1);
+        let publicKey2 = MultiSig.getPublicKeyFromPrivate(privateKey2);
+        let publicKey3 = MultiSig.getPublicKeyFromPrivate(privateKey3);
+
+        assert(publicKey1.equals(publicKey3), "Public keys are different");
+        assert(!publicKey1.equals(publicKey2), "Public keys are equal");
     });
 
+    it('test check signature validity', async () => {
+
+        let privateKey =  MultiSig.createPrivateKey(['datanastere1','plm','pllui']);
+        let publicKey = MultiSig.getPublicKeyFromPrivate(privateKey);
+
+        let msg = WebDollarCrypto.getBufferRandomValues(32);
+        let signedMessage = MultiSig.signMessage(msg, privateKey);
+
+        let response = MultiSig.validateSignedMessage(msg, signedMessage, publicKey);
+
+        assert(response === true, "Erroar valdiationg message");
+
+    });
 
 });

@@ -1,8 +1,11 @@
 /*
  * Copyright (c) Silviu Stroe 2018.
 */
-const bitcoin = require('bitcoinjs-lib');
-import WebDollarCrypto from 'common/crypto/WebDollat-Crypto.js';
+const BitcoinJS = require('bitcoinjs-lib');
+var Bigi = require('bigi');
+var Crypto = require('crypto');
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto';
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 
 class MultiSig {
 
@@ -27,9 +30,9 @@ class MultiSig {
             return Buffer.from(hex, 'hex')
         });
 
-        let redeemScript = bitcoin.script.multisig.output.encode(numKeysRequired, pubKeys); // 2 of 3
-        let scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(redeemScript));
-        let address = bitcoin.address.fromOutputScript(scriptPubKey);
+        let redeemScript = BitcoinJS.script.multisig.output.encode(numKeysRequired, pubKeys); // 2 of 3
+        let scriptPubKey = BitcoinJS.script.scriptHash.output.encode(BitcoinJS.crypto.hash160(redeemScript));
+        let address = BitcoinJS.address.fromOutputScript(scriptPubKey);
 
         return address;
     }
@@ -40,7 +43,7 @@ class MultiSig {
 
     /**
      * create (and broadcast via 3PBP) a Transaction with a 2-of-4 P2SH(multisig) input
-     * https://github.com/bitcoinjs/bitcoinjs-lib/blob/e0f24fdd46e11533a7140e02dc43b04a4cc4522e/test/integration/transactions.js#L115
+     * https://github.com/BitcoinJSjs/BitcoinJSjs-lib/blob/e0f24fdd46e11533a7140e02dc43b04a4cc4522e/test/integration/transactions.js#L115
      */
     createTransaction(numKeysRequired) {
 
@@ -50,20 +53,20 @@ class MultiSig {
             '91avARGdfge8E4tZfYLoxeJ5sGBdNJQH4kvjJoQFacbgx3cTMqe',
             '91avARGdfge8E4tZfYLoxeJ5sGBdNJQH4kvjJoQFacbgx9rcrL7'
         ].map(function (wif) {
-            return bitcoin.ECPair.fromWIF(wif, testnet)
-        })
+            return BitcoinJS.ECPair.fromWIF(wif, testnet)
+        });
         let pubKeys = keyPairs.map(function (x) {
             return x.getPublicKeyBuffer()
-        })
+        });
 
-        let redeemScript = bitcoin.script.multisig.output.encode(numKeysRequired, pubKeys)
-        let scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(redeemScript))
-        let address = bitcoin.address.fromOutputScript(scriptPubKey, testnet)
+        let redeemScript = BitcoinJS.script.multisig.output.encode(numKeysRequired, pubKeys)
+        let scriptPubKey = BitcoinJS.script.scriptHash.output.encode(BitcoinJS.crypto.hash160(redeemScript))
+        let address = BitcoinJS.address.fromOutputScript(scriptPubKey, testnet)
 
         testnetUtils.faucet(address, 2e4, function (err, unspent) {
             if (err) return done(err)
 
-            let txb = new bitcoin.TransactionBuilder(testnet)
+            let txb = new BitcoinJS.TransactionBuilder(testnet)
             txb.addInput(unspent.txId, unspent.vout)
             txb.addOutput(testnetUtils.RETURN_ADDRESS, 1e4)
 
@@ -72,7 +75,7 @@ class MultiSig {
 
             let tx = txb.build()
 
-            // build and broadcast to the Bitcoin Testnet network
+            // build and broadcast to the BitcoinJS Testnet network
             testnetUtils.transactions.propagate(tx.toHex(), function (err) {
                 if (err) return done(err)
 
@@ -83,16 +86,30 @@ class MultiSig {
 
     static createPrivateKey(dates){
 
-        var concatDates='';
+        let concatDates = "";
 
-        for (var i=0; i<=dates;++i){
+        for (let i = 0; i <= dates.length; ++i){
 
             concatDates += dates[i];
-
         }
 
-        return WebDollarCrypto.SHA256(concatDates);
+        return WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(concatDates));
 
+    }
+
+    static getPublicKeyFromPrivate(privateKey){
+
+        return  InterfaceBlockchainAddressHelper._generatePublicKey(privateKey);
+    }
+
+    static signMessage(msg, privateKey){
+
+        return  InterfaceBlockchainAddressHelper.signMessage(msg, privateKey);
+    }
+
+    static validateSignedMessage(msg, signature, publicKey) {
+
+        return InterfaceBlockchainAddressHelper.verifySignedData(msg, signature, publicKey);
     }
 
     //
@@ -105,15 +122,15 @@ class MultiSig {
     //  */
     // makeMultisigAddress() {
     //
-    //     var privKeys = [ bitcoin.ECKey.makeRandom(),
-    //         bitcoin.ECKey.makeRandom(),
-    //         bitcoin.ECKey.makeRandom() ];
+    //     var privKeys = [ BitcoinJS.ECKey.makeRandom(),
+    //         BitcoinJS.ECKey.makeRandom(),
+    //         BitcoinJS.ECKey.makeRandom() ];
     //
     //     var pubKeys = privKeys.map(function(x) { return x.pub });
     //
-    //     var redeemScript = bitcoin.scripts.multisigOutput(2, pubKeys);
-    //     var scriptPubKey = bitcoin.scripts.scriptHashOutput(redeemScript.getHash());
-    //     var address = bitcoin.Address.fromOutputScript(scriptPubKey).toString();
+    //     var redeemScript = BitcoinJS.scripts.multisigOutput(2, pubKeys);
+    //     var scriptPubKey = BitcoinJS.scripts.scriptHashOutput(redeemScript.getHash());
+    //     var address = BitcoinJS.Address.fromOutputScript(scriptPubKey).toString();
     //
     //     var o = {};
     //     o.address = address;
