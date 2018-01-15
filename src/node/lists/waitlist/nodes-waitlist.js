@@ -31,7 +31,7 @@ class NodesWaitlist {
 
         if (this.started === false) {
             this.started = true;
-            this._connectNewNodesWaitlist();
+            this._connectNewNodesWaitlist(true);
         }
 
     }
@@ -62,6 +62,8 @@ class NodesWaitlist {
             let waitListObject = new NodesWaitlistObject(sckAddresses, type);
             this.waitlist.push(waitListObject);
 
+            this._tryToConnectNextNode(waitListObject);
+
             this.emitter.emit("waitlist/new-node", waitListObject);
             return waitListObject;
         }
@@ -84,7 +86,7 @@ class NodesWaitlist {
     /*
         Connect to all nodes
     */
-    _connectNewNodesWaitlist(){
+    _connectNewNodesWaitlist(setTimeOut){
 
         //console.log("Waitlist length", this.waitlist.length);
         //console.log(this.waitlist);
@@ -95,30 +97,34 @@ class NodesWaitlist {
 
             let nextNode = this.waitlist[i];
 
-
-
-            //connect only to TERMINAL NODES
-            if (nextNode.type === NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER) {
-                if (nextNode.checkLastTimeChecked(consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN) && nextNode.blocked === false && nextNode.connecting === false && nextNode.checkIsConnected() === null) {
-
-                    nextNode.blocked = true;
-
-                    //console.log("connectNewNodesWaitlist ", nextNode.sckAddresses.toString() );
-
-                    this._connectNowToNewNode(nextNode).then((connected) => {
-                        nextNode.checked = true;
-                        nextNode.blocked = false;
-                        nextNode.connected = connected;
-                        nextNode.refreshLastTimeChecked();
-                    });
-
-                }
-            }
+            this._tryToConnectNextNode(nextNode);
 
         }
 
 
-        setTimeout(()=>{return this._connectNewNodesWaitlist() }, consts.NODES_WAITLIST_INTERVAL);
+        if (setTimeOut === true)
+            setTimeout(()=>{ return this._connectNewNodesWaitlist(setTimeOut) }, consts.NODES_WAITLIST_INTERVAL);
+    }
+
+    _tryToConnectNextNode(nextNode){
+
+        //connect only to TERMINAL NODES
+        if (nextNode.type === NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER) {
+            if (nextNode.checkLastTimeChecked(consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN) && nextNode.blocked === false && nextNode.connecting === false && nextNode.checkIsConnected() === null) {
+
+                nextNode.blocked = true;
+
+                //console.log("connectNewNodesWaitlist ", nextNode.sckAddresses.toString() );
+
+                this._connectNowToNewNode(nextNode).then((connected) => {
+                    nextNode.checked = true;
+                    nextNode.blocked = false;
+                    nextNode.connected = connected;
+                    nextNode.refreshLastTimeChecked();
+                });
+
+            }
+        }
     }
 
     async _connectNowToNewNode(nextNode){

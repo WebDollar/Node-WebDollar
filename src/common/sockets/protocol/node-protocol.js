@@ -72,6 +72,8 @@ class NodeProtocol {
 
         //console.log("request nodes.length", nodes.length, request, data, )
 
+        console.log("nodes.length", nodes.length);
+
         for (let i=0; i < nodes.length; i++) {
 
             let broadcast = false;
@@ -93,8 +95,10 @@ class NodeProtocol {
                     broadcast = true;
             }
 
-            if (broadcast)
+            if (broadcast) {
+                console.log("broadcasting");
                 nodes[i].socket.node.sendRequest(request, data);
+            }
         }
 
     }

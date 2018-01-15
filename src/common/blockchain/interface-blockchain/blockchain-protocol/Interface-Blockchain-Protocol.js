@@ -47,6 +47,10 @@ class InterfaceBlockchainProtocol {
 
             }
         }, "all", socketsAvoidBroadcast);
+
+
+        console.log("WEbDollar Hash", block.serializeBlock().toString("hex"));
+
     }
 
     _validateBlockchainHeader(data){

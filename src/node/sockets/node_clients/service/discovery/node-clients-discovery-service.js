@@ -31,22 +31,27 @@ class NodeDiscoveryService {
 
     startDiscovery(){
 
-        this._discoverFallbackNodes();
+        this._discoverFallbackNodes(true);
 
     }
 
-    async _discoverFallbackNodes(){
+    async _discoverFallbackNodes(setTimeOut){
 
         if (NodesList.nodes !== null && NodesList.nodes.length < 5 ){
 
             for (let i=0; i<this.fallbackLists.length; i++)
                 if ( this.fallbackLists[i].checked === false && this.fallbackLists[i].checkLastTimeChecked(consts.NODE_FALLBACK_INTERVAL) )
                 {
-                    await this._downloadFallBackList(this.fallbackLists[i]);
+                    let answer = await this._downloadFallBackList(this.fallbackLists[i]);
+
+                    if (answer !== null)
+                        return this.processFallbackNodes(answer)
                 }
         }
 
-        setTimeout(()=>{return this._discoverFallbackNodes()}, 3000)
+
+        if (setTimeOut === true)
+            setTimeout(()=>{return this._discoverFallbackNodes(setTimeOut)}, 3000)
 
     }
 
@@ -72,14 +77,14 @@ class NodeDiscoveryService {
 
             fallbackItem.checked = true;
 
-            return this.processFallbackNodes(response.data)
+            return response.data;
         }
         catch(Exception){
             console.log("ERROR downloading list: ", url, Exception.toString());
             fallbackItem.errorTrials++;
-
-            return null;
         }
+
+        return null;
     }
 
     processFallbackNodes(data){
