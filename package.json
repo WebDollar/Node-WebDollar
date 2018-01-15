@@ -1,6 +1,6 @@
 {
   "name": "@webdollar/node-webdollar",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Node of WebDollar",
   "main": "index.js",
   "scripts": {
@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
-    "argon2": "^0.16.2",
+    "argon2": "^0.17.0",
     "argon2-browser": "^1.1.0",
     "atob": "^2.0.3",
     "axios": "^0.16.2",
