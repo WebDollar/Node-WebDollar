@@ -332,10 +332,13 @@ class InterfaceTree{
         return cloneRoot;
     }
 
-    save(){
+
+    serializeTree(){
+        return this.root.serializeNode();
     }
 
-    load(){
+    deserializeTree(buffer, offset){
+        return this.root.deserializeNode(buffer, offset);
     }
 
     toJSON(){

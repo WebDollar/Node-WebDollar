@@ -26,6 +26,14 @@ class InterfaceTreeNode {
         return this.value !== null
     }
 
+    serializeNode(){
+
+    }
+
+    deserializeNode(buffer, offset){
+        return offset;
+    }
+
 }
 
 export default InterfaceTreeNode;

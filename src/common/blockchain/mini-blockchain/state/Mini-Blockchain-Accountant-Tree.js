@@ -142,6 +142,18 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         return false;
     }
 
+    serializeMiniAccountant(){
+
+        return this.serializeTree();
+
+    }
+
+    deserializeMiniAccountant(buffer){
+
+        return this.deserializeTree(buffer);
+
+    }
+
 }
 
 export default MiniBlockchainAccountantTree
