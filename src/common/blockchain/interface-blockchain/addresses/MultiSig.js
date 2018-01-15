@@ -83,15 +83,15 @@ class MultiSig {
 
     static createPrivateKey(dates){
 
-        let concatDates='';
+        let concatDates=dates[0];
 
-        for (let i=0; i<=dates.length;++i){
+        for (let i=1; i<=dates.length;++i){
 
-            concatDates += dates[i];
+            concatDates = WebDollarCrypto.SHA256(concatDates) + dates[i];
 
         }
 
-        return WebDollarCrypto.SHA256(concatDates);
+        return concatDates;
 
     }
 
