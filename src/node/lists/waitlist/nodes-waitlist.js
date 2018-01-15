@@ -88,8 +88,8 @@ class NodesWaitlist {
     */
     _connectNewNodesWaitlist(setTimeOut){
 
-        //console.log("Waitlist length", this.waitlist.length);
-        //console.log(this.waitlist);
+        console.log("Waitlist length", this.waitlist.length);
+        console.log(this.waitlist);
 
         this._deleteUselessWaitlist();
 
@@ -103,7 +103,7 @@ class NodesWaitlist {
 
 
         if (setTimeOut === true)
-            setTimeout(()=>{ return this._connectNewNodesWaitlist(setTimeOut) }, consts.NODES_WAITLIST_INTERVAL);
+            setTimeout(()=>{ return this._connectNewNodesWaitlist( true ) }, consts.NODES_WAITLIST_INTERVAL);
     }
 
     _tryToConnectNextNode(nextNode){

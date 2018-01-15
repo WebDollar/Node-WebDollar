@@ -65,6 +65,8 @@ class NodeProtocol {
      */
     broadcastRequest (request, data, type, exceptSockets){
 
+        if (exceptSockets === "all") return false;
+
         let nodes = NodesList.getNodes(type);
 
         if (exceptSockets !== undefined && exceptSockets !== null && !Array.isArray(exceptSockets))
