@@ -1,4 +1,4 @@
-# Node-WebDollar
+# Node-WebDollar [![Build Status](https://travis-ci.org/WebDollar/Node-WebDollar.svg?branch=master)](https://travis-ci.org/WebDollar/Node-WebDollar)
 
 # Webstorm ES6
 
