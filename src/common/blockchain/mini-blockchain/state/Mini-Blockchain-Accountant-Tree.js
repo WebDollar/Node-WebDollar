@@ -10,6 +10,7 @@ const EventEmitter = require('events');
 class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     constructor (){
+
         super();
 
         this.autoMerklify = true;

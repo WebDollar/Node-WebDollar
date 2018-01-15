@@ -2,7 +2,7 @@ var assert = require('assert');
 
 import Blockchain from 'main-blockchain/Blockchain';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
-import MultiSig from 'common/blockchain/interface-blockchain/MultiSig.js';
+//import MultiSig from 'common/blockchain/interface-blockchain/MultiSig.js';
 
 describe('test save wallet to local storage', () => {
 

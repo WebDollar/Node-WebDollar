@@ -6,14 +6,18 @@ import BufferExtended from "common/utils/BufferExtended";
 import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
+import InterfaceMerkleRadixTreeNode from "common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree-Node"
+import InterfaceRadixTreeEdge from "../../../trees/radix-tree/Interface-Radix-Tree-Edge";
 
 let BigNumber = require('bignumber.js');
 
-class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTree{
+class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     constructor (parent, edges, value){
 
         super(parent, edges);
+
+        console.log("value", value);
 
         if (value !== undefined) {
             value = value || {};
@@ -23,7 +27,6 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTree{
             this.balances = value.balances;
             this.value = value;
         }
-
 
     }
 
@@ -132,7 +135,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTree{
 
     serializeNodeData(){
 
-        let buffer = [InterfaceMerkleRadixTree.prototype.serializeNodeData()],
+        let buffer = [InterfaceMerkleRadixTreeNode.prototype.serializeNodeData()],
             balancesBuffers = [];
 
         //let serialize webd
@@ -165,7 +168,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTree{
 
     deserializeNodeData(buffer, offset){
 
-        offset = InterfaceMerkleRadixTree.prototype.deserializeNodeData(buffer, offset);
+        offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeData(buffer, offset);
 
         try {
 
@@ -176,23 +179,29 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTree{
             let webdId = BufferExtended.substr(buffer, offset,1);
             offset += 1;
 
+            //webd token
             if (webdId[0] !== 1) throw "webd token is incorrect";
             let result = Serialization.deserializeBigNumber( buffer, offset );
 
-            this.updateBalanceToken(result.number);
-
             offset = result.newOffset;
 
-            //rest of tokens , in case there are
-            for (let i=1; i<length; i++){
-                let tokenId = BufferExtended.substr(buffer, offset,consts.TOKEN_ID_LENGTH);
-                offset += consts.TOKEN_ID_LENGTH;
+            if (length > 0 || result.greaterThan(0)) {
 
-                result = Serialization.deserializeBigNumber(buffer, offset);
+                this.balances = [];
 
-                this.updateBalanceToken(result.number, tokenId);
+                this.updateBalanceToken(result.number);
 
-                offset = result.newOffset;
+                //rest of tokens , in case there are
+                for (let i = 1; i < length; i++) {
+                    let tokenId = BufferExtended.substr(buffer, offset, consts.TOKEN_ID_LENGTH);
+                    offset += consts.TOKEN_ID_LENGTH;
+
+                    result = Serialization.deserializeBigNumber(buffer, offset);
+
+                    this.updateBalanceToken(result.number, tokenId);
+
+                    offset = result.newOffset;
+                }
             }
 
         } catch (exception){
@@ -203,6 +212,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTree{
         return offset;
 
     }
+
+
 
 }
 

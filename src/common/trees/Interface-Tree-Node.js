@@ -95,7 +95,7 @@ class InterfaceTreeNode {
     }
 
     createNewNode(){
-        new this.constructor (this,[],null);
+        return new this.constructor (this,[],null);
     }
 
 }
