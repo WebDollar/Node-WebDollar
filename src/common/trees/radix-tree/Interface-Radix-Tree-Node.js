@@ -1,5 +1,5 @@
 import InterfaceTreeNode from 'common/trees/Interface-Tree-Node'
-
+import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
 
 class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
@@ -46,11 +46,15 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                 offset += valueLength;
 
                 let
-                    }
+            }
 
         }
 
         return offset;
+    }
+
+    createEdge(node){
+        return new InterfaceRadixTreeEdge(node, [], null);
     }
 
 }

@@ -13,6 +13,20 @@ class InterfaceTreeEdge {
         this.targetNode = targetNode;
 
     }
+
+    serialzieEdge(){
+        return Buffer.concat ( this.targetNode.serializeNode() );
+    }
+
+    deserializeEdge(buffer, offset, createNewNode){
+
+        let node = createNewNode();
+        offset = node.deserializeNode(buffer, offset, true);
+
+        return offset;
+
+    }
+
 }
 
 
