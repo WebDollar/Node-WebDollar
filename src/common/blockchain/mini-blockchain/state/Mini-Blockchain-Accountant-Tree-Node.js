@@ -129,7 +129,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     }
 
-    serialize(){
+    serializeNodeData(){
 
         let buffer, balancesBuffers = [];
 
@@ -163,9 +163,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     }
 
-    deserialize(buffer){
-
-        let offset = 0;
+    deserializeNodeData(buffer, offset){
 
         try {
 

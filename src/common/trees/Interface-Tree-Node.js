@@ -30,7 +30,7 @@ class InterfaceTreeNode {
         return this.value !== null
     }
 
-    serializeData(){
+    serializeNodeData(){
         buffer.push(Serialization.serializeNumber2Bytes(this.value.length));
         buffer.push(this.value);
     }
@@ -39,13 +39,12 @@ class InterfaceTreeNode {
 
         let buffer = [];
 
-        this.serializeData();
+        this.serializeNodeData();
 
         if (includeEdges) {
 
             buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
             for (let i = 0; i < this.edges.length; i++) {
-
 
                 buffer.push(this.edges[i].serializeEdge() )
 
@@ -56,7 +55,7 @@ class InterfaceTreeNode {
         return Buffer.concat(buffer);
     }
 
-    deserializeData(buffer, offset){
+    deserializeNodeData(buffer, offset){
 
         let valueLength =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
         offset += 1;
@@ -72,7 +71,7 @@ class InterfaceTreeNode {
 
     deserializeNode(buffer, offset, includeEdges){
 
-        offset = this.deserializeData(buffer);
+        offset = this.deserializeNodeData(buffer);
 
         if (includeEdges){
 
@@ -82,7 +81,7 @@ class InterfaceTreeNode {
             for (let i=0; i<length; i++){
 
                 let edge = new this.createNewEdge(null);
-                edge.deserializeEdge(buffer, offset, this.createNewEdge);
+                edge.deserializeEdge(buffer, offset, this.createNewNode);
                 this.edges.push(edge);
             }
 

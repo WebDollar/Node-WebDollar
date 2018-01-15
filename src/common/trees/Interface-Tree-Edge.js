@@ -14,7 +14,7 @@ class InterfaceTreeEdge {
 
     }
 
-    serialzieEdge(){
+    serializeEdge(){
         return Buffer.concat ( this.targetNode.serializeNode() );
     }
 
