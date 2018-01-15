@@ -119,8 +119,10 @@ class InterfaceBlockchainProtocolForkSolver{
                     console.log(colors.red("discoverAndSolveFork - creating a fork raised an exception" + Exception.toString() ), "data", data )
                 }
 
-                if (fork === null)
+                if (fork === null) {
+                    console.log("fork is null");
                     return null;
+                }
 
                 try{
 
@@ -138,6 +140,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
             //it is a totally new blockchain (maybe genesis was mined)
+            console.log("fork is something new");
 
             return null;
 

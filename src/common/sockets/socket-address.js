@@ -67,9 +67,10 @@ class SocketAddress {
         //uuid validation
         if ( validationDoubleConnectionsTypes.indexOf("uuid") >= 0 ){
 
-            if (this.uuid !== null && this.uuid === sckAddress.uuid) return true;
+            if (this.uuid !== null && this.uuid !== undefined && this.uuid === sckAddress.uuid) return true;
 
-        } else
+        }
+
         //ip validation
         if ( validationDoubleConnectionsTypes.indexOf("ip") >=0 ){
 

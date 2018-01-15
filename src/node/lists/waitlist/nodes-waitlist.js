@@ -49,7 +49,9 @@ class NodesWaitlist {
 
             let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
-            if (this._searchNodesWaitlist(sckAddress) === null){
+            console.log("addNewNodeToWaitlist2", addresses[i], this._searchNodesWaitlist(sckAddress));
+
+            if ( this._searchNodesWaitlist(sckAddress) === null){
                 sckAddresses.push(sckAddress);
             }
 
@@ -78,7 +80,6 @@ class NodesWaitlist {
 
         return null;
     }
-
 
     /*
         Connect to all nodes
@@ -124,7 +125,7 @@ class NodesWaitlist {
 
         nextNode.connecting = true;
 
-        console.log("nextNode.sckAddresses", nextNode.sckAddresses);
+        //console.log("nextNode.sckAddresses", nextNode.sckAddresses);
 
         //trying to connect to each sckAddresses
         for (let i=0; i<nextNode.sckAddresses.length; i++) {

@@ -2,8 +2,8 @@ import consts from 'consts/const_global'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import { NODES_WAITLIST_OBJECT_TYPE } from 'node/lists/waitlist/nodes-waitlist-object';
 import NodesList from 'node/lists/nodes-list'
-import FallBackObject from './fallback-object';
-import FallBackNodesList from './fallback_nodes_list';
+import FallBackObject from './fallbacks/fallback-object';
+import FallBackNodesList from './fallbacks/fallback_nodes_list';
 
 const axios = require('axios');
 
@@ -15,10 +15,10 @@ class NodeDiscoveryService {
 
         this.fallbackLists = [
 
-            new FallBackObject("https://www.jasonbase.com/things/RPY5"),
+            //new FallBackObject("https://www.jasonbase.com/things/RPY5"),
 
             //not working
-            // new FallBackObject("https://api.myjson.com/bins/xi1hr"),
+            new FallBackObject("https://api.myjson.com/bins/xi1hr"),
             // new FallBackObject("http://skyhub.me/public/webdollars.json"),
             // new FallBackObject("http://visionbot.net/webdollars.json"),
             // new FallBackObject("http://budisteanu.net/webdollars.json"),
@@ -107,7 +107,7 @@ class NodeDiscoveryService {
 
                     if (Array.isArray(nodes)) {
 
-                        //console.log("NEW NODES", nodes);
+                        console.log("NEW NODES", nodes);
 
                         for (let i = 0; i < nodes.length; i++) {
 
@@ -121,8 +121,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[i]; //a simple string Address
                             }
 
-                            if ((typeof nodeAddress === "string" && nodeAddress !== '') || ( typeof nodeAddress === "object" && Array.isArray(nodeAddress)))
-                                NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort, nodeType);
+                            NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort, nodeType);
                         }
 
                     }
