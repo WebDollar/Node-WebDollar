@@ -65,7 +65,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     }
 
-    serialize(){
+    serializeNode(){
 
         let array = [ ];
 
@@ -81,9 +81,9 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
         );
     }
 
-    deserialize(buffer){
+    deserializeNode(buffer){
 
-
+        // TO DO
 
     }
 

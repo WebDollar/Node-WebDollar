@@ -13,6 +13,46 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
     }
 
+    serializeNode(includeEdges){
+
+        let buffer = [];
+
+        if (includeEdges) {
+
+            buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
+            for (let i = 0; i < this.edges.length; i++) {
+                buffer.push(this.edges[i].value.length);
+                buffer.push(this.edges[i].value);
+                buffer.push(this.edges[i].serializeNode(includeEdges));
+            }
+
+        }
+
+        return Buffer.concat(buffer);
+    }
+
+    deserializeNode(buffer, offset, includeEdges){
+
+        if (includeEdges){
+
+            let length = Serialization.deserializeNumber(buffer[offset]);
+
+            for (let i=0; i<length; i++){
+
+                let valueLength =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+                offset += 1;
+
+                let value =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, valueLength) );
+                offset += valueLength;
+
+                let
+                    }
+
+        }
+
+        return offset;
+    }
+
 }
 
 export default InterfaceRadixTreeNode;

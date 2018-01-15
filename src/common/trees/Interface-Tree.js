@@ -334,11 +334,11 @@ class InterfaceTree{
 
 
     serializeTree(){
-        return this.root.serializeNode();
+        return this.root.serializeNode(true);
     }
 
     deserializeTree(buffer, offset){
-        return this.root.deserializeNode(buffer, offset);
+        return this.root.deserializeNode(buffer, offset, true);
     }
 
     toJSON(){

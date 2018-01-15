@@ -128,7 +128,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     }
 
     getValueToHash(node){
-        return node.serialize();
+        return node.serializeNode();
     }
 
     checkBalanceSubscribed(name){

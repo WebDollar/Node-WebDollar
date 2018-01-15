@@ -13,7 +13,6 @@ class InterfaceRadixTreeEdge extends InterfaceTreeEdge {
         super ( targetNode );
 
         this.label = label;
-
     }
 }
 
