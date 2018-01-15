@@ -2,7 +2,7 @@ var assert = require('assert');
 
 import Blockchain from 'main-blockchain/Blockchain';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
-import MultiSig from 'common/blockchain/interface-blockchain/MultiSig.js';
+import MultiSig from 'common/blockchain/interface-blockchain/addresses/MultiSig';
 
 describe('test save wallet to local storage', () => {
 
@@ -141,7 +141,15 @@ describe('test save wallet to local storage', () => {
 
     it('test checkMultisig', async () => {
 
-        console.log(MultiSig.createPrivateKey(['datanastere','plm','pllui']));
+        let privateKey1 =  MultiSig.createPrivateKey(['datanastere1','plm','pllui']);
+        let privateKey2 =  MultiSig.createPrivateKey(['datanastere2','plm','pllui']);
+        let privateKey3 =  MultiSig.createPrivateKey(['datanastere1','plm','pllui']);
+        let privateKey4 =  MultiSig.createPrivateKey(['datanastere4','plm','pllui']);
+
+        console.log('prKey=' + privateKey1.toString('hex'));
+        console.log('prKey=' + privateKey2.toString('hex'));
+        console.log('prKey=' + privateKey3.toString('hex'));
+        console.log('prKey=' + privateKey4.toString('hex'));
 
     });
 

@@ -2,7 +2,7 @@
  * Copyright (c) Silviu Stroe 2018.
 */
 const bitcoin = require('bitcoinjs-lib');
-import WebDollarCrypto from 'common/crypto/WebDollat-Crypto.js';
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto';
 
 class MultiSig {
 
@@ -51,10 +51,10 @@ class MultiSig {
             '91avARGdfge8E4tZfYLoxeJ5sGBdNJQH4kvjJoQFacbgx9rcrL7'
         ].map(function (wif) {
             return bitcoin.ECPair.fromWIF(wif, testnet)
-        })
+        });
         let pubKeys = keyPairs.map(function (x) {
             return x.getPublicKeyBuffer()
-        })
+        });
 
         let redeemScript = bitcoin.script.multisig.output.encode(numKeysRequired, pubKeys)
         let scriptPubKey = bitcoin.script.scriptHash.output.encode(bitcoin.crypto.hash160(redeemScript))
@@ -83,9 +83,9 @@ class MultiSig {
 
     static createPrivateKey(dates){
 
-        var concatDates='';
+        let concatDates='';
 
-        for (var i=0; i<=dates;++i){
+        for (let i=0; i<=dates.length;++i){
 
             concatDates += dates[i];
 
