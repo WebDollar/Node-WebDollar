@@ -5,10 +5,11 @@ import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree
 import BufferExtended from "common/utils/BufferExtended";
 import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
+import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 
 let BigNumber = require('bignumber.js');
 
-class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
+class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTree{
 
     constructor (parent, edges, value){
 
@@ -131,7 +132,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
     serializeNodeData(){
 
-        let buffer, balancesBuffers = [];
+        let buffer = [InterfaceMerkleRadixTree.prototype.serializeNodeData()],
+            balancesBuffers = [];
 
         //let serialize webd
         let iWEBDSerialized = null;
@@ -157,13 +159,13 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
 
         balancesBuffers.unshift(Serialization.serializeNumber1Byte(balancesBuffers.length));
 
-        buffer = Buffer.concat ( balancesBuffers );
-
-        return buffer;
+        return Buffer.concat ( [buffer, balancesBuffers] );
 
     }
 
     deserializeNodeData(buffer, offset){
+
+        offset = InterfaceMerkleRadixTree.prototype.deserializeNodeData(buffer, offset);
 
         try {
 
@@ -198,6 +200,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceRadixTreeNode{
             throw exception;
         }
 
+        return offset;
 
     }
 
