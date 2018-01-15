@@ -1,5 +1,7 @@
 import InterfaceTreeNode from 'common/trees/Interface-Tree-Node'
 import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
+import Serialization from "common/utils/Serialization";
+import BufferExtended from "common/utils/BufferExtended";
 
 class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
@@ -45,7 +47,6 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                 let value =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, valueLength) );
                 offset += valueLength;
 
-                let
             }
 
         }
