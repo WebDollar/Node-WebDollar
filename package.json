@@ -4,7 +4,6 @@
   "description": "Node of WebDollar",
   "main": "index.js",
   "scripts": {
-    "preinstall": "chmod +x ./requirements.sh && ./requirements.sh",
     "build_terminal": "babel --presets es2017 src -d dist && browserify dist/build_terminal.js > dist_bundle/bundle_terminal.js",
     "show_browser_test": "node src/tests/browser/show-browser.test.js",
     "build_browser_test": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ] && npm run show_browser_test",

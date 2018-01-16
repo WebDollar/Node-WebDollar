@@ -1,5 +1,7 @@
 language: node_js
 sudo: required
+before_install:
+  - npm install -g node-gyp
 node_js:
 - stable
 notifications:
