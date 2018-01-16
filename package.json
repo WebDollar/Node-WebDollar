@@ -12,7 +12,7 @@
     "start_double_connections": "npm run build_terminal && DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
     "start": "npm run build_terminal && node dist/build_terminal.js  ",
     "start_mining": "npm run build_terminal && START_MINING=true SERVER_PORT=6666  node dist/build_terminal.js ",
-    "test": "npm run build_terminal && mocha --timeout 10000 dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",
+    "test": "npm run build_terminal && mocha --exit --timeout 10000 dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",
     "show_mocha_report": "node src/tests/browser/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
     "show_coverage": "node src/tests/browser/show-coverage.test.js"
