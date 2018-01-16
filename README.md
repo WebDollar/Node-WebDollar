@@ -1,5 +1,5 @@
 # Node-WebDollar [![Build Status](https://travis-ci.org/WebDollar/Node-WebDollar.svg)](https://travis-ci.org/WebDollar/Node-WebDollar)
-# Webstorm ES6
+# Webstorm ES6 
 
 Settings => Languages & Frameworks => JavaScript language version and choose **ECMAScript 6**
 
