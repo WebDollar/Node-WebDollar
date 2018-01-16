@@ -24,6 +24,7 @@ class MiniBlockchain extends  inheritBlockchain{
         super(protocol);
 
         this.accountantTree = new MiniBlockchainAccountantTree();
+
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData)
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, MiniBlockchainFork );
     }
@@ -46,6 +47,8 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
             //updating reward
+            console.log("block.data.minerAddress",block.data.minerAddress);
+
             result = !this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
 
             // let balances = this.accountantTree.listBalances( block.data.minerAddress );

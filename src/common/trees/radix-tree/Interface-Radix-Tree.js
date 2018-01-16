@@ -24,7 +24,6 @@ class InterfaceRadixTree extends InterfaceTree{
 
         super();
 
-        this.root = this.createNode(null,  [], null);
     }
 
     createNode(parent, edges, value){
@@ -383,33 +382,39 @@ class InterfaceRadixTree extends InterfaceTree{
 
         let nodeCurrent = this.root;
 
-        let i=0;
-        while (i < input.length) {
+        try {
 
-            // searching for existence of input[i...] in nodeCurrent list
+            let i = 0;
+            while (i < input.length) {
 
-            let childFound = false;
+                // searching for existence of input[i...] in nodeCurrent list
 
-            for (let j = 0; j < nodeCurrent.edges.length; j++){
+                let childFound = false;
 
-                let match = BufferExtended.longestMatch( input, nodeCurrent.edges[j].label, i );
+                for (let j = 0; j < nodeCurrent.edges.length; j++) {
 
-                //console.log("matchFound", nodeCurrent.edges[j].label.toString(), " in ", input.toString(), " i= ",i, match === null ? "null" : match.toString() );
+                    let match = BufferExtended.longestMatch(input, nodeCurrent.edges[j].label, i);
 
-                if (match !== null && match.length === nodeCurrent.edges[j].label.length) {   //we found  a match in the edge
+                    //console.log("matchFound", nodeCurrent.edges[j].label.toString(), " in ", input.toString(), " i= ",i, match === null ? "null" : match.toString() );
 
-                    nodeCurrent = nodeCurrent.edges[j].targetNode;
+                    if (match !== null && match.length === nodeCurrent.edges[j].label.length) {   //we found  a match in the edge
 
-                    i += match.length;
+                        nodeCurrent = nodeCurrent.edges[j].targetNode;
 
-                    childFound = true;
-                    break;
+                        i += match.length;
+
+                        childFound = true;
+                        break;
+                    }
+
                 }
 
+                if (!childFound) //child not found, we should search no more
+                    return {result: false}
             }
 
-            if (!childFound) //child not found, we should search no more
-                return {result: false }
+        } catch (exception){
+            console.log("Radix Search Error", exception);
         }
 
         return { result: (nodeCurrent.value !== null), node: nodeCurrent, value: nodeCurrent.value }
