@@ -84,6 +84,9 @@ class MultiSig {
         })
     }
 
+
+
+
     static createPrivateKey(dates){
 
         let concatDates = "";
