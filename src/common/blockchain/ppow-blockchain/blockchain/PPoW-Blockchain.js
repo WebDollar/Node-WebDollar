@@ -5,6 +5,8 @@ var BigNumber = require('bignumber.js');
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import PPoWBlockchainProver from './prover/PPoW-Blockchain-Prover'
 import PPoWHelper from './prover/helpers/PPoW-Helper'
+import PPowBlockchainProofs from './prover/PPoW-Blockchain-Proofs'
+
 /**
  * NiPoPoW Blockchain contains a chain of blocks based on Proof of Proofs of Work
  */
@@ -24,6 +26,29 @@ class PPoWBlockchain extends InterfaceBlockchain {
         block.updateInterlink(prevBlock);
         block.level = block.getLevel(); //computing the level
     }
+
+    async validateBlockchain() {
+
+    }
+
+    validateChain(proofs, lastBlocks){
+
+        //TODO: Check if another validation is required
+
+        if (!Array.isArray(proofs) || !Array.isArray(lastBlocks))
+            return false;
+
+        for (let i = 0; i < proofs.length; ++i)
+            if (!proofs.blocks[i]._validateInterlink())
+                return false;
+
+        for (let i = 0; i < lastBlocks.length; ++i)
+            if (!lastBlocks.blocks[i]._validateInterlink())
+                return false;
+
+        return true;
+    }
+
 
     /**
      * Algorithm 2
@@ -45,7 +70,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         }
 
         if (proofBest !== undefined)
-            return {proofBest: proofBest, Q: predicateQ(proofBest)};
+            return {proofBest: proofBest, Q: this.predicateQ(proofBest)};
 
         return false;
 
@@ -132,7 +157,10 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     }
 
-    //Algorithm 4 aka bestArg
+    /**
+     * Algorithm 4. Compare 2 proofs. aka bestArg
+     * @param Provers
+     */
     compareProofs(proofs1, proofs2){
 
         let bestArg = (proofs, b) => {
@@ -145,15 +173,17 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
             //return max µ ∈ M {2^µ · | π↑µ {b : }| }
             let max = 0;
-            for (let miu in M){
+            for (let i = 0; i < M.length; ++i)
+                //if there are blocks of level i
+                if (M[i].length > 0){
+                    let miu = i;
 
-                let formula = new BigNumber(2).pow(miu).mul(M[miu].length);
-                if ( max < formula )
-                    max = formula;
+                    let formula = new BigNumber(2).pow(miu).mul(M[miu].length);
+                    if ( max < formula )
+                        max = formula;
+                }
 
-            }
-
-            return max
+            return max;
         };
 
         //calculating the interesection

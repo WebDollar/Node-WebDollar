@@ -13,6 +13,7 @@ class PPoWHelper{
 
         let i1 = proofs1.length - 1;
         let i2 = proofs2.length - 1;
+
         while (i1 >= 0 && i2 >= 0) {
             const block1 = proofs1.blocks[i1];
             const block2 = proofs2.blocks[i2];
@@ -25,8 +26,8 @@ class PPoWHelper{
                 i2--;
             }
         }
-        return null;
 
+        return null;
     }
 
 
