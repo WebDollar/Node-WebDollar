@@ -27,10 +27,6 @@ class PPoWBlockchain extends InterfaceBlockchain {
         block.level = block.getLevel(); //computing the level
     }
 
-    async validateBlockchain() {
-
-    }
-
     validateChain(proofs, lastBlocks){
 
         //TODO: Check if another validation is required

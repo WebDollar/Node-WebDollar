@@ -38,7 +38,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         return u;
     }
-    
+
+    /**
+     * Algorithm 1
+     */
     updateInterlink(prevBlock){
 
         let blockLevel = 0;
