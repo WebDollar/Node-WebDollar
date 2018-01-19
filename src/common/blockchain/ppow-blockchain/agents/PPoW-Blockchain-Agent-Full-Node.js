@@ -1,7 +1,7 @@
 import InterfaceBlockchainAgentFullNode from "common/blockchain/interface-blockchain/agents/Interface-Blockchain-Agent-Full-Node";
 import PPoWBlockchainProtocol from "./../protocol/PPoW-Blockchain-Protocol"
 
-class PPoWBlockchainAgent extends InterfaceBlockchainAgentFullNode{
+class PPoWBlockchainAgentFullNode extends InterfaceBlockchainAgentFullNode{
 
     constructor(blockchain, blockchainProtocolClass){
         super(blockchain, blockchainProtocolClass||PPoWBlockchainProtocol )
@@ -9,4 +9,4 @@ class PPoWBlockchainAgent extends InterfaceBlockchainAgentFullNode{
 
 }
 
-export default PPoWBlockchainAgent;
+export default PPoWBlockchainAgentFullNode;

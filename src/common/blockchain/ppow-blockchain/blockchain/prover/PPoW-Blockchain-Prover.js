@@ -56,7 +56,7 @@ class PPoWBlockchainProver{
 
         // χ ← C[−k : ]
         //After splice chain.blocks will be modified!!! Is it ok????
-        let lastBlocks = new PPowBlockchainLastBlocks( chain.blocks.splice(-consts.POPOW_PARAMS.k) );
+        let lastBlocks = new PPowBlockchainLastBlocks( chain.blocks.slice(-consts.POPOW_PARAMS.k) );
 
         this.proofs = proofs;
         this.lastBlocks = lastBlocks;

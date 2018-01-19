@@ -1,7 +1,7 @@
-import InterfaceBlockchainAgentFullNode from 'common/blockchain/interface-blockchain/agents/Interface-Blockchain-Agent-Full-Node'
+import PPoWBlockchainAgentFullNode from 'common/blockchain/ppow-blockchain/agents/PPoW-Blockchain-Agent-Full-Node'
 import MiniBlockchainProtocol from "./../protocol/Mini-Blockchain-Protocol"
 
-class MiniBlockchainAgentFullNode extends InterfaceBlockchainAgentFullNode{
+class MiniBlockchainAgentFullNode extends PPoWBlockchainAgentFullNode{
 
     constructor(blockchain, blockchainProtocolClass){
         super(blockchain, blockchainProtocolClass||MiniBlockchainProtocol )

@@ -3,7 +3,7 @@ import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Prot
 
 // TODO not fully working for only headers
 
-class InterfaceBlockchainAgentBlockHeader extends InterfaceBlockchainAgent{
+class InterfaceBlockchainAgentBlockHeaders extends InterfaceBlockchainAgent{
 
     createProtocol(){
 
@@ -17,4 +17,4 @@ class InterfaceBlockchainAgentBlockHeader extends InterfaceBlockchainAgent{
 
 }
 
-export default InterfaceBlockchainAgentBlockHeader;
+export default InterfaceBlockchainAgentBlockHeaders;
