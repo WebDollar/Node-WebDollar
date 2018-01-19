@@ -25,11 +25,11 @@ const EventEmitter = require('events');
 class InterfaceBlockchain {
 
 
-    constructor (protocol){
+    constructor (agent){
 
         this.emitter = new EventEmitter();
 
-        this.protocol = protocol;
+        this.agent = agent;
 
         this.blocks = [];
         this._blocksSempahore = false;
@@ -96,8 +96,9 @@ class InterfaceBlockchain {
         if (saveBlock)
             await this.saveNewBlock(block);
 
-        if (this.protocol !== undefined)
-            this.protocol.propagateHeader(block, this.blocks.length, socketsAvoidBroadcast );
+        // propagating a new block in the network
+        if (this.agent !== undefined)
+            this.agent.protocol.propagateHeader(block, this.blocks.length, socketsAvoidBroadcast );
 
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
             this.mining.resetMining();

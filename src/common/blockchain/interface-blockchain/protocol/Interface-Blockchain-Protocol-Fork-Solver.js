@@ -9,9 +9,10 @@ const colors = require('colors/safe');
  */
 class InterfaceBlockchainProtocolForkSolver{
 
-    constructor(blockchain){
+    constructor(blockchain, protocol){
 
         this.blockchain = blockchain;
+        this.protocol = protocol;
 
     }
 
@@ -207,47 +208,54 @@ class InterfaceBlockchainProtocolForkSolver{
                     socketsCheckedForBlock.push(socket);
                     console.log("nextBlockHeight", nextBlockHeight);
 
-                    socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight ).then( async (answer)=>{
+                    let answer;
 
-                        //console.log("blockchain/blocks/request-block-by-height/",answer)
+                    if (this.protocol.acceptBlocks)
+                        answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight );
+                    else  if (this.protocol.acceptBlocks) {
 
-                        if (answer.result === true){
+                        console.log("it is not finished");
+                        answer = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
+                    }
 
-                            let block;
+                    //console.log("blockchain/blocks/request-block-by-height/",answer)
 
-                            try {
-                                block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
-                                block.deserializeBlock(answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget());
+                    if (answer.result === true){
 
+                        let block;
 
-                            } catch (Exception){
-                                console.log(colors.red("Error deserializing blocks " + Exception.toString()));
-                                finished = true;
-                                return false;
-                            }
+                        try {
 
-                            let result;
-                            try {
-                                result = await fork.includeForkBlock(block);
-                            } catch (Exception){
-                                console.log(block.serializeBlock().toString("hex"));
-                                console.log(colors.red("Error including block "+nextBlockHeight+" in fork " + Exception.toString()));
-                                finished = true;
-                                return false;
-                            }
+                            block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
+                            block.deserializeBlock(answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget());
 
-                            //if the block was included correctly
-                            if (result) {
-                                clearTimeout(terminateTimeout);
-                                terminateTimeout = undefined;
-                                nextBlockHeight++;
-
-                                socketsCheckedForBlock = [];
-                            }
-
+                        } catch (Exception){
+                            console.log(colors.red("Error deserializing blocks " + Exception.toString()));
+                            finished = true;
+                            return false;
                         }
 
-                    })
+                        let result;
+                        try {
+                            result = await fork.includeForkBlock(block);
+                        } catch (Exception){
+                            console.log(block.serializeBlock().toString("hex"));
+                            console.log(colors.red("Error including block "+nextBlockHeight+" in fork " + Exception.toString()));
+                            finished = true;
+                            return false;
+                        }
+
+                        //if the block was included correctly
+                        if (result) {
+                            clearTimeout(terminateTimeout);
+                            terminateTimeout = undefined;
+                            nextBlockHeight++;
+
+                            socketsCheckedForBlock = [];
+                        }
+
+                    }
+
                 }
 
 

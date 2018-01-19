@@ -1,7 +1,7 @@
 var assert = require('assert')
 import TestsHelper from 'tests/Tests.helper'
 
-import InterfaceBlockchainProtocolForkSolver from 'common/blockchain/interface-blockchain/blockchain-protocol/Interface-Blockchain-Protocol-Fork-Solver'
+import InterfaceBlockchainProtocolForkSolver from 'common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol-Fork-Solver'
 
 let a,b;
 

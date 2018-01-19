@@ -1,5 +1,9 @@
-import InterfaceBlockchainProtocol from 'common/blockchain/interface-blockchain/blockchain-protocol/Interface-Blockchain-Protocol'
+import InterfaceBlockchainProtocol from 'common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol'
 import Serialization from 'common/utils/Serialization'
+
+/**
+ * MiniBlockchainProtocol only extends the initial Protocol in order to validate the hashAccountantTree
+ */
 
 class MiniBlockchainProtocol extends InterfaceBlockchainProtocol{
 
