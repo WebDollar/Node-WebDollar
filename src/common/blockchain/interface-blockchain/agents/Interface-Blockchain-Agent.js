@@ -7,10 +7,11 @@ import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Prot
 
 class InterfaceBlockchainAgent{
 
-    constructor(blockchain, blockchainProtocolClass){
+    constructor( blockchain, blockchainProtocolClass ){
 
         this.blockchain = blockchain;
         this.blockchainProtocolClass = blockchainProtocolClass;
+
         this.queueRequests = [];
 
         this.createProtocol();
@@ -29,9 +30,12 @@ class InterfaceBlockchainAgent{
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
 
+            // let's ask everybody
             this.queueRequests.push(result.socket);
+            this.protocol.askBlockchain();
 
         });
+
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
 
         });

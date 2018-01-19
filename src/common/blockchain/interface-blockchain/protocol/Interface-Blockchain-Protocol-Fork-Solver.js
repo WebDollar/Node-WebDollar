@@ -58,7 +58,7 @@ class InterfaceBlockchainProtocolForkSolver{
     /*
         may the fork be with you Otto
      */
-    async discoverAndSolveFork(sockets, newChainLength, header){
+    async discoverAndSolveFork(sockets, newChainLength){
 
         if (!Array.isArray(sockets)) sockets = [sockets];
 

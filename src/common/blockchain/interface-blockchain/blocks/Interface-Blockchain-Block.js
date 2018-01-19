@@ -6,7 +6,6 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 import consts from 'consts/const_global'
 
-import InterfaceBlockchainBlockData from './Interface-Blockchain-Block-Data';
 import Serialization from "common/utils/Serialization.js";
 import BufferExtended from "common/utils/BufferExtended.js";
 
@@ -312,6 +311,25 @@ class InterfaceBlockchainBlock {
             this.height === targetBlock.height &&
             this.nonce === targetBlock.nonce &&
             this.version === targetBlock.version;
+    }
+
+    getBlockHeader(){
+
+        return {
+            height: this.height,
+            chainLength: this.blockchain.length,
+            header: {
+                hash: this.hash,
+                hashPrev: this.hashPrev,
+                data: {
+                    hashData: this.data.hashData,
+                    hashAccountantTree: this.data.hashAccountantTree,
+                },
+
+                nonce: this.nonce,
+            }
+
+        }
     }
 
 }

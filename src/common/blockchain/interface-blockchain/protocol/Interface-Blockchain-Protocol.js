@@ -43,20 +43,7 @@ class InterfaceBlockchainProtocol {
     propagateHeader(block, chainLength, socketsAvoidBroadcast){
         // broadcasting the new block, to everybody else
 
-        NodeProtocol.broadcastRequest( "blockchain/header/new-block", {
-            height: block.height,
-            chainLength: chainLength,
-            header:{
-                hash: block.hash,
-                hashPrev: block.hashPrev,
-                data: {
-                    hashData: block.data.hashData,
-                    hashAccountantTree: block.data.hashAccountantTree,
-                },
-                nonce: block.nonce,
-
-            }
-        }, "all", socketsAvoidBroadcast);
+        NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeader(), "all", socketsAvoidBroadcast);
 
 
         //console.log("WEbDollar Hash", block.serializeBlock().toString("hex"));
@@ -92,6 +79,29 @@ class InterfaceBlockchainProtocol {
 
         let socket = nodesListObject.socket;
 
+        // sending the last block using the protocol
+        if (this.acceptBlockHeaders)
+            socket.on("get/blockchain/header/last-block", async (data)=>{
+
+                try {
+
+                    if (this.blockchain.blocks.length > 0)
+                        socket.node.sendRequest("get/blockchain/header/last-block",
+                            this.blockchain[this.blockchain.blocks.length-1].getBlockHeader(),);
+
+                } catch (exception) {
+
+                    console.log(colors.red("Socket Error - blockchain/header/last-block", exception.toString()));
+
+                    socket.node.sendRequest( "blockchain/header/last-block", {
+                        result: false,
+                        message: exception.toString()
+                    });
+
+                }
+
+            });
+
         if (this.acceptBlockHeaders)
             socket.on("blockchain/header/new-block", async (data) => {
 
@@ -106,14 +116,13 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
-                    let answer = {result: false, message: ""};
-
                     this._validateBlockchainHeader(data)
 
                     //validate header
-                    //TO DO !!!
+                    //TODO !!!
 
-                    let result = false;
+                    if (data.height <= 0)
+                        throw "your block is invalid";
 
                     //in case the hashes are the same, and I have already the block
                     if (( data.height >= 0 && this.blockchain.getBlockchainLength() - 1 >= data.height && this.blockchain.getBlockchainLength() >= data.chainLength )) {
@@ -124,8 +133,7 @@ class InterfaceBlockchainProtocol {
 
                     }
 
-                    result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header)
-
+                    let result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header)
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: true,
@@ -222,6 +230,47 @@ class InterfaceBlockchainProtocol {
     _uninitializeSocket(nodesListObject) {
 
         let socket = nodesListObject.socket;
+
+    }
+
+    async askBlockchain(socket){
+
+        let data = await socket.node.sendRequestWaitOnce("get/blockchain/header/last-block");
+
+        try {
+
+            this._validateBlockchainHeader(data);
+
+            //validate header
+            //TODO !!!
+
+            //in case the hashes are the same, and I have already the block
+            if (( data.height >= 0 && this.blockchain.getBlockchainLength() - 1 >= data.height && this.blockchain.getBlockchainLength() >= data.chainLength )) {
+
+                //in case the hashes are exactly the same, there is no reason why we should download it
+                if (this.blockchain.blocks[data.height].hash.equals(data.header.hash) === true)
+                    throw "your block is not new, because I have a valid block at same height ";
+
+            }
+
+            let result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header)
+
+            socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
+                result: true,
+                forkAnswer: (result !== null)
+            });
+
+
+        } catch (exception) {
+
+            console.log(colors.red("Socket Error - blockchain/new-block-header", exception.toString()));
+
+            socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
+                result: false,
+                message: exception.toString()
+            });
+        }
+
 
     }
 
