@@ -32,7 +32,7 @@ class InterfaceBlockchainProtocol {
     }
 
     createForkSolver(){
-        this.forkSolver = new InterfaceBlockchainProtocolForkSolver(blockchain, this);
+        this.forkSolver = new InterfaceBlockchainProtocolForkSolver(this.blockchain, this);
     }
 
     _setBlockchain(blockchain){
@@ -253,7 +253,7 @@ class InterfaceBlockchainProtocol {
 
             }
 
-            let result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header)
+            let result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header);
 
             socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                 result: true,

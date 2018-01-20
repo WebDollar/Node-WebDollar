@@ -44,6 +44,12 @@ class InterfaceBlockchainAgent{
 
     }
 
+    _setBlockchain(newBlockchain){
+
+        this.blockchain = newBlockchain;
+        this.protocol._setBlockchain(newBlockchain);
+    }
+
 }
 
 export default InterfaceBlockchainAgent;

@@ -1,8 +1,10 @@
+import InterfaceBlockchainProtocol from "common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol"
+
 class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
-    constructor(){
+    constructor(blockchain, initialization){
 
-        super();
+        super(blockchain, initialization);
 
     }
 
