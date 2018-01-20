@@ -82,10 +82,11 @@ class PPoWBlockchain extends InterfaceBlockchain {
         let blockById = [];
 
         for (let prover in Provers)
-            for (let B in prover.proofs.blocks)
-
+            for (let i = 0; i < prover.proofs.blocks.length; ++i) {
+                let B = prover.proofs.blocks[i];
                 // blockById[B.id] ← B
-                blockById[B.hash] = B
+                blockById[B.hash] = B;
+            }
 
         let proofBest = this.verify(Provers).proofBest;
 
@@ -125,11 +126,12 @@ class PPoWBlockchain extends InterfaceBlockchain {
         let index;
 
         // Obs M is a counter of how many blocks have the level[i]
+        // M[id] === undefined if there is no block of level id
         let M = [0];
 
         // { b : }
         if (blockStop !== undefined) {
-            index = proofs.length-1;
+            index = proofs.length - 1;
             while (index >= 0) {
                 // { b : }
                 if (proofs[index] === blockStop) break;
@@ -138,7 +140,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         } else index = 0;
 
 
-        while (index < proofs.length-1){
+        while (index < proofs.length - 1){
 
             index++;
 
@@ -272,13 +274,12 @@ class PPoWBlockchain extends InterfaceBlockchain {
     badness(proofs){
 
         //M ← {µ : |C↑µ | ≥ m} \ {0}
-        let M = this.calculateM(proofs)
+        let M = this.calculateM(proofs);
         if (M[0] !== undefined)
             delete M[0];
 
-        let max = 0;
-        for (let u in M)
-            if (max < u) max = u;
+        let max;
+        for (max = M.length - 1; M[max] !== undefined && max >= 0; --max);
 
         if (max === 0) throw 'max === 0';
 
@@ -286,14 +287,16 @@ class PPoWBlockchain extends InterfaceBlockchain {
         // ρ ← 1/ max(M)
         let p = 1 / max;
 
-        for (let miu in M){
+        for (let miu = 0; miu < M.length; miu++){
+            if (M[miu] === undefined)
+                continue;
 
             // B ∈ C↑µ
             let C = proofs.blocksGreaterLevel(miu);
-            for (let i=0; i<C.length; i++){
+            for (let i = 0; i < C.length; i++){
 
                 let C1 = undefined;
-                for (let j=i+1; j<C.length; j++) {
+                for (let j = i + 1; j < C.length; j++) {
 
                     // {B :}
                     C1.push(C[j]);
@@ -321,8 +324,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
             }
 
         }
-        return null;   // Chain is good
 
+        return null;   // Chain is good
     }
 
 }
