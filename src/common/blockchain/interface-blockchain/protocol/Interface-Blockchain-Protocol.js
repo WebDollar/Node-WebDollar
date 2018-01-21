@@ -10,17 +10,21 @@ const colors = require('colors/safe');
  */
 class InterfaceBlockchainProtocol {
 
-    constructor(blockchain, initialization) {
+    constructor(blockchain) {
 
         this.blockchain = blockchain;
 
         this.acceptBlockHeaders = true;
         this.acceptBlocks = true;
 
-        if (initialization !== undefined)
-            initialization();
-
         this.createForkSolver();
+
+    }
+
+    initialize(params){
+
+        this.acceptBlockHeaders = params.indexOf("acceptBlockHeaders");
+        this.acceptBlocks = params.indexOf("acceptBlocks");
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._initializeNewSocket(result)
@@ -28,7 +32,6 @@ class InterfaceBlockchainProtocol {
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
             this._uninitializeSocket(result)
         });
-
     }
 
     createForkSolver(){

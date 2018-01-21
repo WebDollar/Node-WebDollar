@@ -2,14 +2,12 @@ import MainBlockchainWallet from 'main-blockchain/wallet/Main-Blockchain-Wallet'
 import MainBlockchain from 'main-blockchain/chain/Main-Blockchain'
 import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining'
 import MainBlockchainProtocol from 'main-blockchain/blockchain-protocol/Main-Blockchain-Protocol'
-import MainBlockchainAgent from 'main-blockchain/agent/Main-Blockchain-Agent'
+import MainBlockchainAgent from 'main-blockchain/agents/Main-Blockchain-Agent'
 import MainBlockchainBalances from "main-blockchain/balances/Main-Blockchain-Balances";
 
 class Blockchain{
 
     constructor(){
-
-
 
     }
 
@@ -17,7 +15,7 @@ class Blockchain{
 
         this.Agent = MainBlockchainAgent.createAgent(agentName, null);
 
-        this.Chain = new MainBlockchain();
+        this.Chain = new MainBlockchain(this.Agent);
         this.blockchain = this.Chain;
 
         this.emitter = this.blockchain.emitter;
@@ -66,6 +64,8 @@ class Blockchain{
 
         //loading the blockchain
         await this.loadBlockchain();
+
+        await this.Agent.startAgent();
 
         await this.startMining();
 

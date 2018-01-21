@@ -7,12 +7,9 @@ class InterfaceBlockchainAgentBlockHeaders extends InterfaceBlockchainAgent{
 
     createProtocol(){
 
-        this.protocol = new (this.blockchainProtocolClass||InterfaceBlockchainProtocol) (this.blockchain, ()=>{
+        this.protocol = new (this.blockchainProtocolClass||InterfaceBlockchainProtocol) (this.blockchain);
 
-            this.protocol.acceptBlockHeaders = true;
-            this.protocol.acceptBlocks = false
-
-        });
+        this.protocol.initialize(["acceptBlockHeaders"]);
     }
 
 }

@@ -28,11 +28,11 @@ class InterfaceBlockchainAgent{
 
     async startAgent(){
 
-        NodesList.emitter.on("nodes-list/connected", (result) => {
+        NodesList.emitter.on("nodes-list/connected", async (result) => {
 
             // let's ask everybody
             this.queueRequests.push(result.socket);
-            this.protocol.askBlockchain();
+            await this.protocol.askBlockchain();
 
         });
 
