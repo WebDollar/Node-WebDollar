@@ -98,7 +98,7 @@ class NodeServer {
             return false;
         }
 
-        console.log(colors.white('Socket Client Initialized ' + socket.node.sckAddress.getAddress(true)));
+        console.log(colors.white('Socket Server Initialized ' + socket.node.sckAddress.getAddress(true)));
 
 
         socket.node.protocol.propagation.initializePropagation();

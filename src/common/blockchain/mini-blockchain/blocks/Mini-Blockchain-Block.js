@@ -12,9 +12,10 @@ else  inheritBlockchainBlock = InterfaceBlock;
 class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     getBlockHeader(){
+
         let result = inheritBlockchainBlock.prototype.getBlockHeader.call(this);
 
-        result.headers.data.hashAccountantTree = this.data.hashAccountantTree;
+        result.header.data.hashAccountantTree = this.data.hashAccountantTree;
 
         return result;
     }
