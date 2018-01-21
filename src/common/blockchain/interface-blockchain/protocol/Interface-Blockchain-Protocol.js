@@ -244,7 +244,9 @@ class InterfaceBlockchainProtocol {
 
         try {
 
-            this._validateBlockchainHeader(data);
+            if (data.result !== true) throw "last block is not valid";
+
+            this._validateBlockchainHeader(data.header);
 
             //validate header
             //TODO !!!

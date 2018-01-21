@@ -17,6 +17,11 @@ class NodeSignalingClientProtocol {
 
         socket.on("signals/client/initiator/generate-initiator-signal", async (data) => {
 
+            if (data.remoteUUID === undefined){
+                console.log(colors.red("data.remoteUUID 1"), data.remoteUUID);
+                return false;
+            }
+
             //search if the new protocol was already connected in the past
             if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null){ //already connected in the past
                 return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
@@ -45,6 +50,11 @@ class NodeSignalingClientProtocol {
 
 
         socket.on("signals/client/answer/receive-initiator-signal", async (data) => {
+
+            if (data.remoteUUID === undefined){
+                console.log(colors.red("data.remoteUUID 2"), data.remoteUUID);
+                return false;
+            }
 
             //search if the new protocol was already connected in the past
             if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null){ //already connected in the past
@@ -77,6 +87,11 @@ class NodeSignalingClientProtocol {
 
         socket.on("signals/client/answer/receive-ice-candidate", async (data) => {
 
+            if (data.remoteUUID === undefined){
+                console.log(colors.red("data.remoteUUID 3"), data.remoteUUID);
+                return false;
+            }
+
             console.log("data.remoteUUID 3", data.remoteUUID);
 
             let webPeerSignalingClientListObject = SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal);
@@ -103,6 +118,11 @@ class NodeSignalingClientProtocol {
         });
 
         socket.on("signals/client/initiator/receive-ice-candidate", async (data) => {
+
+            if (data.remoteUUID === undefined){
+                console.log(colors.red("data.remoteUUID 4"), data.remoteUUID);
+                return false;
+            }
 
             console.log("data.remoteUUID 4", data.remoteUUID);
 
@@ -133,6 +153,11 @@ class NodeSignalingClientProtocol {
 
 
         socket.on("signals/client/initiator/join-answer-signal", async (data) => {
+
+            if (data.remoteUUID === undefined){
+                console.log(colors.red("data.remoteUUID 5"), data.remoteUUID);
+                return false;
+            }
 
             //search if the new protocol was already connected in the past
             if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null){ //already connected in the past
