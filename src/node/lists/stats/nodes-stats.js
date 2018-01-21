@@ -28,14 +28,14 @@ class NodesStats {
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Waitlist:",this.statsWaitlist,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
 
         let string1 = "";
-        let clients = NodesList.getNodes("client")
+        let clients = NodesList.getNodes("client");
         for (let i=0; i<clients.length; i++)
-            string1 += '('+clients[i].socket.sckAddress.address+' , '+clients[i].socket.sckAddress.uuid+')   ';
+            string1 += '('+clients[i].socket.node.sckAddress.address+' , '+clients[i].socket.node.sckAddress.uuid+')   ';
 
         let string2 = "";
-        let server = NodesList.getNodes("server")
+        let server = NodesList.getNodes("server");
         for (let i=0; i<server.length; i++)
-            string2 += '('+server[i].socket.sckAddress.address+' , '+server[i].socket.sckAddress.uuid+')   ';
+            string2 += '(' + server[i].socket.node.sckAddress.address + ' , ' + server[i].socket.node.sckAddress.uuid + ')   ';
 
         console.log("clients: ",string1);
         console.log("server: ",string2);

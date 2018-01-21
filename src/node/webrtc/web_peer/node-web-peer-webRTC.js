@@ -284,7 +284,7 @@ class NodeWebPeerRTC {
             if (name !== '')
                 this.callEvents(name, value);
 
-            console.log("DATA RECEIVED# ################", data);
+            //console.log("DATA RECEIVED# ################", data);
         }
 
     }

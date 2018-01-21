@@ -1,3 +1,4 @@
+const colors = require('colors/safe');
 import consts from 'consts/const_global'
 
 import NodesList from 'node/lists/nodes-list'
@@ -60,7 +61,10 @@ class NodeSignalingServerProtocol {
 
         for (let i=0; i<NodesList.nodes.length; i++)
             if ( (NodesList.nodes[i].socket.node.protocol.signaling.server.acceptingConnections||false) === true )
-                listAcceptingWebPeerConnections.push(NodesList.nodes[i].socket);
+                if (NodesList.nodes[i].socket.node.sckAddress.uuid !== undefined)
+                    listAcceptingWebPeerConnections.push(NodesList.nodes[i].socket);
+                else
+                    console.log(colors.red("uuid is empty", NodesList.nodes[i].socket.node.sckAddress));
 
         if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("listAcceptingWebPeerConnections", listAcceptingWebPeerConnections.length );
 
@@ -198,7 +202,8 @@ class NodeSignalingServerProtocol {
                                         initiatorSignal: initiatorAnswer.initiatorSignal,
                                         iceCandidate: iceCandidate,
 
-                                        remoteAddress: client1.node.sckAddress.getAddress(false)
+                                        remoteAddress: client1.node.sckAddress.getAddress(false),
+                                        remoteUUID: client1.node.sckAddress.uuid,
                                     });
 
                                 });
