@@ -89,8 +89,10 @@ class InterfaceBlockchainProtocol {
                 try {
 
                     if (this.blockchain.blocks.length > 0)
-                        socket.node.sendRequest("get/blockchain/header/last-block",
-                            this.blockchain[this.blockchain.blocks.length-1].getBlockHeader(),);
+                        socket.node.sendRequest("get/blockchain/header/last-block/answer", {
+                            result: true,
+                            header: this.blockchain[this.blockchain.blocks.length-1].getBlockHeader()
+                        });
 
                 } catch (exception) {
 
@@ -238,7 +240,7 @@ class InterfaceBlockchainProtocol {
 
     async askBlockchain(socket){
 
-        let data = await socket.node.sendRequestWaitOnce("get/blockchain/header/last-block");
+        let data = await socket.node.sendRequestWaitOnce("get/blockchain/header/last-block", undefined, "answer");
 
         try {
 
@@ -266,12 +268,8 @@ class InterfaceBlockchainProtocol {
 
         } catch (exception) {
 
-            console.log(colors.red("Socket Error - blockchain/new-block-header", exception.toString()));
+            console.log(colors.red("Socket Error - get/blockchain/header/last-block", exception.toString()));
 
-            socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
-                result: false,
-                message: exception.toString()
-            });
         }
 
 
