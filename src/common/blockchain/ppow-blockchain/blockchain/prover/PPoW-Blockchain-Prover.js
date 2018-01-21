@@ -32,11 +32,11 @@ class PPoWBlockchainProver{
         let chainLength =  chain.blocks.length;
 
         //for µ = |C[−k].interlink| down to 0 do
-        for (let miu = chain.blocks[chainLength - consts.POPOW_PARAMS.k].interlink.length - 1; miu >= 0; miu--){
+        for (let miu = chain.blocks[chainLength - consts.POPOW_PARAMS.k].interlink.length - 1; miu >= 0; --miu){
 
             //  α ← C[: −k]{B :}↑µ
             let alpha = [];
-            for (let i = chainLength - 1; i >= chainLength - consts.POPOW_PARAMS.k; --i)
+            for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
                 if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
                     chain.blocks[i].getLevel() >= miu){
 
@@ -44,7 +44,7 @@ class PPoWBlockchainProver{
                 }
 
             // π ← π ∪ α
-            for (let i = 0; i < alpha.length; i++)
+            for (let i = 0; i < alpha.length; ++i)
                 proofs.push(alpha[i]);
 
             //if goodδ,m(C, α, µ)
@@ -55,7 +55,6 @@ class PPoWBlockchainProver{
         }
 
         // χ ← C[−k : ]
-        //After splice chain.blocks will be modified!!! Is it ok????
         let lastBlocks = new PPowBlockchainLastBlocks( chain.blocks.slice(-consts.POPOW_PARAMS.k) );
 
         this.proofs = proofs;

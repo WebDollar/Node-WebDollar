@@ -18,7 +18,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         this.level = 0;
     }
 
-    getLevel(){
+    getLevel(computeLevel = true){
+
+        if (!computeLevel && this.level !== undefined)
+            return this.level;
 
         let T = this.difficultyTarget;
         let id = new BigInteger(this.hash.toString('hex'), 16);
@@ -35,6 +38,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         --u;
         console.log('L=', u);
         console.log('P=', id.multiply(1 << u).toString());
+
+        this.level = u;
 
         return u;
     }
