@@ -27,6 +27,17 @@ class NodesStats {
 
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Waitlist:",this.statsWaitlist,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
 
+        let string1 = "";
+        for (let i=0; i<this.statsClients.length; i++)
+            string1 += '('+this.statsClients[i].socket.sckAddress.address+' , '+this.statsClients[i].socket.sckAddress.uuid+')   ';
+
+        let string2 = "";
+        for (let i=0; i<this.statsServer.length; i++)
+            string2 += '('+this.statsServer[i].socket.sckAddress.address+' , '+this.statsServer[i].socket.sckAddress.uuid+')   ';
+
+        console.log("clients: ",string1);
+        console.log("server: ",string2);
+
     }
 
     _recalculateStats(nodesListObject){

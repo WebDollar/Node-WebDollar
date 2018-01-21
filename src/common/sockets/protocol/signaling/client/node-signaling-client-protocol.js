@@ -1,3 +1,4 @@
+const colors = require('colors/safe');
 import consts from 'consts/const_global'
 
 import {SignalingClientList} from './signaling-client-list/signaling-client-list'
