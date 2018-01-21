@@ -4,7 +4,7 @@ class PPoWHelper{
 
 
     /**
-     * LCA between too proofs
+     * LCA between too proofs. Each proof contains a blocks array
      */
 
     LCA(proofs1, proofs2){
@@ -14,6 +14,7 @@ class PPoWHelper{
         let i1 = proofs1.length - 1;
         let i2 = proofs2.length - 1;
 
+        //Find LCA on path to Genesis
         while (i1 >= 0 && i2 >= 0) {
             const block1 = proofs1.blocks[i1];
             const block2 = proofs2.blocks[i2];
