@@ -34,6 +34,7 @@ class SignalingClientList {
             signalingClientPeerObject = new SignalingClientPeerObject(webPeer);
 
             this.list.push(signalingClientPeerObject);
+
         }
 
         return signalingClientPeerObject;
@@ -54,8 +55,6 @@ class SignalingClientList {
 
         return null;
     }
-
-
 
 
 }

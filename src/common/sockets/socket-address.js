@@ -18,7 +18,7 @@ class SocketAddress {
     /*
         Create a Socket Address in case the address is just a simple "address"
      */
-    static createSocketAddress(address, port){
+    static createSocketAddress(address, port, uuid){
 
         //in case address is actually a Socket
         if (typeof address === "object" && address !== null && address.hasOwnProperty("node") && address.node.hasOwnProperty("sckAddress")) address = address.node.sckAddress;
@@ -27,7 +27,7 @@ class SocketAddress {
         if (SocketAddress.checkIsSocketAddress(address)) return address;
 
         if (  port === undefined || port === '') port = consts.NODE_PORT;
-        return new SocketAddress(address, port);
+        return new SocketAddress(address, port, uuid);
     }
 
 

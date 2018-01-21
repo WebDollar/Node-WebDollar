@@ -16,7 +16,7 @@ class SocketExtend{
         socket.node.getSocket = () => { return socket};
 
         socket.node.on = (name, callback ) => { socket.on(name, callback) } ;
-        socket.node.sckAddress = SocketAddress.createSocketAddress(address, port);
+        socket.node.sckAddress = SocketAddress.createSocketAddress(address, port, uuid);
 
         socket.node.sendRequest = (request, requestData) => { return this.sendRequest(socket, request, requestData) };
         socket.node.sendRequestWaitOnce = (request, requestData, answerPrefix) => {return this.sendRequestWaitOnce(socket, request, requestData, answerPrefix) };

@@ -50,7 +50,7 @@ class NodeWebPeerRTC {
 
     }
 
-    createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remotePort){
+    createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort){
 
         let pcConstraint = null;
         let dataConstraint = null;
@@ -121,9 +121,10 @@ class NodeWebPeerRTC {
             this.peer.signaling.connectionId =  signalingServerConnectionId;
 
             this.peer.remoteAddress = remoteAddress||remoteData.address;
+            this.peer.remoteUUID = remoteUUID||remoteData.uuid;
             this.peer.remotePort = remotePort||remoteData.port;
 
-            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort );
+            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID );
 
             this.peer.node.protocol.sendHello(["uuid"]).then( (answer)=>{
                 this.initializePeer(["uuid"]);
@@ -323,7 +324,7 @@ class NodeWebPeerRTC {
         this.peer.on("disconnect", ()=>{
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
 
-            this.peer.signaling.socketSignaling.sendRequest("signals/server/connections/established-connection-was-dropped", {address: this.peer.remoteAddress, connectionId: this.peer.signaling.connectionId} );
+            this.peer.signaling.socketSignaling.node.sendRequest("signals/server/connections/established-connection-was-dropped", {address: this.peer.remoteAddress, connectionId: this.peer.signaling.connectionId} );
 
             NodesList.disconnectSocket(this.peer);
         });

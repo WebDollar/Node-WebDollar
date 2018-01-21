@@ -98,7 +98,8 @@ class NodeSignalingServerProtocol {
                         client1.node.sendRequestWaitOnce("signals/client/initiator/generate-initiator-signal", {
                             id: connection.id,
 
-                            remoteAddress: client2.node.sckAddress.getAddress(false)
+                            remoteAddress: client2.node.sckAddress.getAddress(false),
+                            remoteUUID: client2.node.sckAddress.uuid,
                         }, connection.id ).then ( (initiatorAnswer) =>{
 
                             if ( ((initiatorAnswer.accepted||false) === false) && ((initiatorAnswer.message || '') === "Already connected")) {
@@ -117,7 +118,8 @@ class NodeSignalingServerProtocol {
                                     id: connection.id,
                                     initiatorSignal: initiatorAnswer.initiatorSignal,
 
-                                    remoteAddress: client1.node.sckAddress.getAddress(false)
+                                    remoteAddress: client1.node.sckAddress.getAddress(false),
+                                    remoteUUID: client1.node.sckAddress.uuid,
                                 }, connection.id).then((answer)=>{
 
                                     if ( ((answer.accepted||false) === false) && ((answer.message || '') === "Already connected")) {
@@ -140,7 +142,8 @@ class NodeSignalingServerProtocol {
                                             initiatorSignal: initiatorAnswer.initiatorSignal,
                                             answerSignal: answer.answerSignal,
 
-                                            remoteAddress: client2.node.sckAddress.getAddress(false)
+                                            remoteAddress: client2.node.sckAddress.getAddress(false),
+                                            emoteUUID: client2.node.sckAddress.uuid,
                                         }, connection.id).then( (result)=>{
 
                                             if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("Step 4 - join-answer-signal  ", connection.id, result );
@@ -175,7 +178,8 @@ class NodeSignalingServerProtocol {
                                             initiatorSignal: initiatorAnswer.initiatorSignal,
                                             iceCandidate: iceCandidate,
 
-                                            remoteAddress: client2.node.sckAddress.getAddress(false)
+                                            remoteAddress: client2.node.sckAddress.getAddress(false),
+                                            remoteUUID: client2.node.sckAddress.uuid,
                                         });
 
                                     });

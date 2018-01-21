@@ -32,7 +32,7 @@ class InterfaceBlockchainAgent{
 
             // let's ask everybody
             this.queueRequests.push(result.socket);
-            await this.protocol.askBlockchain();
+            await this.protocol.askBlockchain(result.socket);
 
         });
 
