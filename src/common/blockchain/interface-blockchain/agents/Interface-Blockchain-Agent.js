@@ -17,11 +17,9 @@ class InterfaceBlockchainAgent{
 
     createProtocol(){
 
-        this.protocol = new (this.blockchainProtocolClass||InterfaceBlockchainProtocol) (this.blockchain, ()=>{
+        this.protocol = new (this.blockchainProtocolClass||InterfaceBlockchainProtocol) (this.blockchain);
 
-            this.protocol.fullNode = true;
-
-        });
+        this.protocol.initialize(["acceptBlockHeaders"]);
 
         this.requestBlockchainForNewPeer();
     }

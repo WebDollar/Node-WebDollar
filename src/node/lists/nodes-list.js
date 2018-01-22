@@ -83,7 +83,7 @@ class NodesList {
     disconnectSocket(socket, type){
 
 
-        if (!socket.hasOwnProperty("node") || !(socket.node.protocol.helloValidated|| false)) {
+        if (!socket.hasOwnProperty("node") ) {
 
             //console.log(colors.red("Error - disconnectSocket rejected by invalid helloValidated"));
             //if (socket.hasOwnProperty("node")) console.log("hello validated value",socket.node.protocol.helloValidated);
@@ -96,7 +96,7 @@ class NodesList {
         //console.log("disconnecting", socket, this.nodes);
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if ((this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket === socket )) {
+            if ((this.nodes[i].type === type || type  === "all") && ((this.nodes[i].socket === socket ) || (this.nodes[i].socket.sckAddress.uuid === socket.sckAddress.uuid  ) )) {
                 console.log(colors.green('deleting client socket '+ i+" "+ socket.node.sckAddress.toString()));
 
                 this.emitter.emit("nodes-list/disconnected", this.nodes[i]);
