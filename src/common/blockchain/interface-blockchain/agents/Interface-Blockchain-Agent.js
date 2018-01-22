@@ -24,55 +24,68 @@ class InterfaceBlockchainAgent{
             this.protocol.fullNode = true;
 
         });
+
+        this.requestBlockchainForNewPeer();
+    }
+
+    requestBlockchainForNewPeer(){
+
+        NodesList.emitter.on("nodes-list/connected", async (result) => {
+
+            // let's ask everybody
+            this.queueRequests.push(result.socket);
+            await this.protocol.askBlockchain( result.socket );
+
+            result.socket.node.protocol.agent.startedAgentDone = true;
+
+            //check if start Agent is finished
+            if (this.startAgentResolver !== undefined) {
+
+                let done = true;
+                for (let i = 0; i < NodesList.nodes.length; i++)
+                    if (NodesList[i].socket.level <= 3 && NodesList[i].socket.node.protocol.agent.startedAgentDone === false) {
+                        done = false;
+                    }
+
+                if (done === true) {
+
+                    clearTimeout(this.startAgentTimeOut);
+
+                    let resolver = this.startAgentResolver;
+                    this.startAgentResolver = undefined;
+
+                    resolver({
+                        result: true,
+                        message: "Start Agent worked successfully",
+                    });
+
+                }
+
+            }
+
+        });
+
+        NodesList.emitter.on("nodes-list/disconnected", (result) => {
+
+        });
+
     }
 
     startAgent(){
 
         return new Promise((resolve)=>{
 
-            let timeOut = setTimeout(()=>{
+            this.startAgentResolver = resolve;
 
+            this.startAgentTimeOut = setTimeout(()=>{
+
+                this.startAgentResolver = undefined;
                 resolve({
                     result: false,
                     message: "Start Agent Timeout",
                 });
 
-            }, 30000);
-
-
-            let emitterConnected = NodesList.emitter.on("nodes-list/connected", async (result) => {
-
-                // let's ask everybody
-                this.queueRequests.push(result.socket);
-                await this.protocol.askBlockchain( result.socket );
-
-                result.socket.node.protocol.agent.startedAgentDone = true;
-
-                //check if start Agent is finished
-                let done = true;
-                for (let i=0; i<NodesList.nodes.length; i++)
-                    if (NodesList[i].socket.level <= 3 && NodesList[i].socket.node.protocol.agent.startedAgentDone === false){
-                        done = false;
-                    }
-
-                if (done === true){
-                        
-                    clearTimeout(timeOut);
-                    if (emitterDisconnected !== undefined) emitterDisconnected();
-                    if (emitterConnected !== undefined) emitterDisconnected();
-
-                    resolve({
-                        result: true,
-                        message: "Start Agent worked successfully",
-                    });
-                }
-
-            });
-
-            let emitterDisconnected = NodesList.emitter.on("nodes-list/disconnected", (result) => {
-
-            });
-
+            }, 20000);
 
         })
 
