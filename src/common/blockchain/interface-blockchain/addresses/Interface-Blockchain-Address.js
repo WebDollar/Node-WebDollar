@@ -122,7 +122,15 @@ class InterfaceBlockchainAddress{
 
     }
 
-    serializeAddress(){
+    serializeAddress(serializePrivateKey = false){
+
+        let privateKeyArray = [];
+
+        if (serializePrivateKey) {
+            let privateKey = this.getPrivateKey();
+            Serialization.serializeNumber1Byte(privateKey.length);
+            privateKeyArray.push(privateKey);
+        }
 
         return Buffer.concat( [
                                 Serialization.serializeNumber1Byte(BufferExtended.fromBase(this.address).length),
@@ -131,10 +139,10 @@ class InterfaceBlockchainAddress{
                                 this.unencodedAddress,
                                 Serialization.serializeNumber1Byte(this.publicKey.length),
                                 this.publicKey
-                              ]);
+                              ].concat(privateKeyArray));
     }
     
-    deserializeAddress(buffer){
+    async deserializeAddress(buffer, deserializePrivateKey = false){
 
         buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
 
@@ -165,6 +173,16 @@ class InterfaceBlockchainAddress{
 
             this.publicKey = BufferExtend.substr(buffer, offset, len);
             offset += len;
+
+            if (deserializePrivateKey){
+                len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+                offset += 1;
+
+                let privateKey = BufferExtend.substr(buffer, offset, len);
+                offset += len;
+
+                await this.savePrivateKey(privateKey);
+            }
 
 
         } catch (exception){
