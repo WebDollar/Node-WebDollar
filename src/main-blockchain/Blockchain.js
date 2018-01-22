@@ -9,11 +9,7 @@ class Blockchain{
 
     constructor(){
 
-    }
-
-    async createBlockchain(agentName){
-
-        this.Agent = MainBlockchainAgent.createAgent(agentName, null);
+        this.Agent = MainBlockchainAgent.createAgent("headers-node", null);
 
         this.Chain = new MainBlockchain(this.Agent);
         this.blockchain = this.Chain;
@@ -29,6 +25,14 @@ class Blockchain{
         this.Balances = new MainBlockchainBalances(this.Chain);
 
         this.Accountant = this.Chain.Accountant;
+
+    }
+
+    async createBlockchain(agentName){
+
+        this.Agent = MainBlockchainAgent.createAgent(agentName, null);
+
+        this.blockchain._setAgent(agentName);
 
         await this.initializeBlockchain();
     }

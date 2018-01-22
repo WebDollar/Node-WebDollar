@@ -46,6 +46,11 @@ class InterfaceBlockchain {
         this.blockchainFileName = 'blockchain.bin';
     }
 
+    _setAgent(newAgent){
+
+        this.agent = newAgent;
+    }
+
     async validateBlockchain(){
 
         for (let i=0; i<this.blocks.length; i++){

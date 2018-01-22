@@ -3,6 +3,8 @@ if(( typeof window !== 'undefined' && !window._babelPolyfill) ||
     require('babel-polyfill')
 }
 
+const {describe, it, timeout} = require('mocha');
+
 if ( typeof describe !== 'undefined') {
 
 

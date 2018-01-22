@@ -13,9 +13,9 @@ import PPowBlockchainProofs from './prover/PPoW-Blockchain-Proofs'
 class PPoWBlockchain extends InterfaceBlockchain {
 
 
-    constructor (protocol){
+    constructor (agent){
 
-        super(protocol);
+        super(agent);
     }
 
     async blockIncluded(block){

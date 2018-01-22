@@ -19,9 +19,9 @@ else  inheritBlockchain = InterfaceBlockchain;
 
 class MiniBlockchain extends  inheritBlockchain{
 
-    constructor (protocol){
+    constructor (agent){
 
-        super(protocol);
+        super(agent);
 
         this.accountantTree = new MiniBlockchainAccountantTree();
 
