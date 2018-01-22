@@ -135,29 +135,29 @@ class NodesWaitlist {
         }
     }
 
-    async _connectNowToNewNode(nextNode){
+    async _connectNowToNewNode(nextWaitListObject){
 
-        nextNode.connecting = true;
+        nextWaitListObject.connecting = true;
 
         //console.log("nextNode.sckAddresses", nextNode.sckAddresses);
 
         //trying to connect to each sckAddresses
-        for (let i=0; i<nextNode.sckAddresses.length; i++) {
+        for (let i=0; i<nextWaitListObject.sckAddresses.length; i++) {
 
             //search if the new protocol was already connected in the past
-            let nodeClient = NodesList.searchNodeSocketByAddress(nextNode.sckAddresses[i], 'all', ["id","uuid"]);
+            let nodeClient = NodesList.searchNodeSocketByAddress(nextWaitListObject.sckAddresses[i], 'all', ["id","uuid"]);
             if (nodeClient !== null) return nodeClient;
 
-            if (nextNode.socket !== null) nodeClient = nextNode.socket;
+            if (nextWaitListObject.socket !== null) nodeClient = nextWaitListObject.socket;
             else nodeClient = new NodeClient();
 
             try {
-                let answer = await nodeClient.connectTo(nextNode.sckAddresses[i]);
+                let answer = await nodeClient.connectTo(nextWaitListObject.sckAddresses[i], undefined, nextWaitListObject.level+1);
 
-                if (answer) nextNode.socketConnected(nodeClient);
-                else nextNode.socketErrorConnected();
+                if (answer) nextWaitListObject.socketConnected(nodeClient);
+                else nextWaitListObject.socketErrorConnected();
 
-                nextNode.connecting = false;
+                nextWaitListObject.connecting = false;
                 return answer;
             }
             catch (Exception) {
@@ -165,7 +165,7 @@ class NodesWaitlist {
             }
 
         }
-        nextNode.connecting = false;
+        nextWaitListObject.connecting = false;
         return false;
     }
 

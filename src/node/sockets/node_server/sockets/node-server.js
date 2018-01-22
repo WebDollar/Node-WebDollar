@@ -48,7 +48,7 @@ class NodeServer {
 
             server.on("connection", socket => {
 
-                SocketExtend.extendSocket(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort);
+                SocketExtend.extendSocket(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort, undefined, 1);
 
                 console.log(colors.blue('New connection from ' + socket.node.sckAddress.getAddress(true)));
 

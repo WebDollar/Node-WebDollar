@@ -26,21 +26,24 @@ class InterfaceBlockchainAgent{
         });
     }
 
-    async startAgent(){
+    startAgent(){
 
-        NodesList.emitter.on("nodes-list/connected", async (result) => {
+        return new Promise((resolve)=>{
 
-            // let's ask everybody
-            this.queueRequests.push(result.socket);
-            await this.protocol.askBlockchain(result.socket);
+            NodesList.emitter.on("nodes-list/connected", async (result) => {
 
-        });
+                // let's ask everybody
+                this.queueRequests.push(result.socket);
+                await this.protocol.askBlockchain( result.socket );
 
-        NodesList.emitter.on("nodes-list/disconnected", (result) => {
+            });
 
-        });
+            NodesList.emitter.on("nodes-list/disconnected", (result) => {
 
-        return true;
+            });
+
+
+        })
 
     }
 

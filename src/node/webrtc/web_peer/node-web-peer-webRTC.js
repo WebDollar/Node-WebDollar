@@ -50,7 +50,7 @@ class NodeWebPeerRTC {
 
     }
 
-    createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort){
+    createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
 
         let pcConstraint = null;
         let dataConstraint = null;
@@ -124,7 +124,7 @@ class NodeWebPeerRTC {
             this.peer.remoteUUID = remoteUUID||remoteData.uuid;
             this.peer.remotePort = remotePort||remoteData.port;
 
-            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID );
+            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, level+1 );
 
             this.peer.node.protocol.sendHello(["uuid"]).then( (answer)=>{
                 this.initializePeer(["uuid"]);

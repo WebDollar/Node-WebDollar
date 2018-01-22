@@ -9,9 +9,13 @@ import SocketAddress from 'common/sockets/socket-address'
 
 class SocketExtend{
 
-    extendSocket(socket, address, port, uuid){
+    extendSocket(socket, address, port, uuid, level){
 
-        socket.node = {};
+        socket.level = level;
+
+        socket.node = {
+            level: level,
+        };
 
         socket.node.getSocket = () => { return socket};
 

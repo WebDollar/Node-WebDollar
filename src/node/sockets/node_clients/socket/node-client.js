@@ -19,7 +19,7 @@ class NodeClient {
         this.socket = null;
     }
 
-    connectTo(address, port){
+    connectTo(address, port, level){
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
@@ -69,7 +69,7 @@ class NodeClient {
 
                     //Connection Established
 
-                    SocketExtend.extendSocket(socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port );
+                    SocketExtend.extendSocket( socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
 
                     console.log(colors.blue("Client connected to " + socket.node.sckAddress.getAddress(true) ));
 
