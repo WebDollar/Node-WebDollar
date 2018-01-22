@@ -12,8 +12,6 @@ class InterfaceBlockchainAgent{
         this.blockchain = blockchain;
         this.blockchainProtocolClass = blockchainProtocolClass;
 
-        this.queueRequests = [];
-
         this.createProtocol();
     }
 
@@ -33,8 +31,12 @@ class InterfaceBlockchainAgent{
         NodesList.emitter.on("nodes-list/connected", async (result) => {
 
             // let's ask everybody
-            this.queueRequests.push(result.socket);
-            await this.protocol.askBlockchain( result.socket );
+
+            try {
+                let result = await this.protocol.askBlockchain(result.socket);
+            } catch (exception){
+
+            }
 
             result.socket.node.protocol.agent.startedAgentDone = true;
 
@@ -47,7 +49,7 @@ class InterfaceBlockchainAgent{
                         done = false;
                     }
 
-                if (done === true) {
+                if (done === true && this.startAgentResolver !== undefined) {
 
                     clearTimeout(this.startAgentTimeOut);
 
