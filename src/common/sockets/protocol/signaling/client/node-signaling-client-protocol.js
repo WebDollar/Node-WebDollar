@@ -134,8 +134,8 @@ class NodeSignalingClientProtocol {
                 return false;
             }
 
-            if (data.answerSignal === undefined){
-                console.log(colors.red("data.answerSignal 4"), data.answerSignal);
+            if (data.iceCandidate === undefined){
+                console.log(colors.red("data.iceCandidate 4"), data.answerSignal);
                 return false;
             }
 
