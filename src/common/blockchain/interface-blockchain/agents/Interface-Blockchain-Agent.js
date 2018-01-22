@@ -30,15 +30,46 @@ class InterfaceBlockchainAgent{
 
         return new Promise((resolve)=>{
 
-            NodesList.emitter.on("nodes-list/connected", async (result) => {
+            let timeOut = setTimeout(()=>{
+
+                resolve({
+                    result: false,
+                    message: "Start Agent Timeout",
+                });
+
+            }, 30000);
+
+
+            let emitterConnected = NodesList.emitter.on("nodes-list/connected", async (result) => {
 
                 // let's ask everybody
                 this.queueRequests.push(result.socket);
                 await this.protocol.askBlockchain( result.socket );
 
+                result.socket.node.protocol.agent.startedAgentDone = true;
+
+                //check if start Agent is finished
+                let done = true;
+                for (let i=0; i<NodesList.nodes.length; i++)
+                    if (NodesList[i].socket.level <= 3 && NodesList[i].socket.node.protocol.agent.startedAgentDone === false){
+                        done = false;
+                    }
+
+                if (done === true){
+                        
+                    clearTimeout(timeOut);
+                    if (emitterDisconnected !== undefined) emitterDisconnected();
+                    if (emitterConnected !== undefined) emitterDisconnected();
+
+                    resolve({
+                        result: true,
+                        message: "Start Agent worked successfully",
+                    });
+                }
+
             });
 
-            NodesList.emitter.on("nodes-list/disconnected", (result) => {
+            let emitterDisconnected = NodesList.emitter.on("nodes-list/disconnected", (result) => {
 
             });
 

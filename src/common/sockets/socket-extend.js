@@ -45,6 +45,9 @@ class SocketExtend{
 
         socket.node.protocol.signaling.client = {};
         socket.node.protocol.signaling.client.initializeSignalingClientService = (params) => { return NodeSignalingClientProtocol.initializeSignalingClientService(socket, params) };
+
+        socket.node.protocol.agent = {};
+        socket.node.protocol.agent.startedAgentDone = false;
     }
 
     sendRequest (socket, request, requestData) {
