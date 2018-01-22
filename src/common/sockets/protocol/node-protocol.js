@@ -26,7 +26,7 @@ class NodeProtocol {
 
         if (response.hasOwnProperty("version")){
 
-            if (response.version > consts.NODE_VERSION_COMPATIBILITY){
+            if (response.version <= consts.NODE_VERSION_COMPATIBILITY){
 
                 console.log(colors.red("hello received, VERSION is not right"), response.version);
                 return false;

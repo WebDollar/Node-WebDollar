@@ -4,7 +4,7 @@ let consts = {}
 
 consts.UUID = uuid.v4();
 
-consts.NODE_VERSION = "0.1";
+consts.NODE_VERSION = "0.2";
 consts.NODE_VERSION_COMPATIBILITY = "0.1";
 consts.NODE_PROTOCOL = "WebDollar";
 consts.NODE_FALLBACK_INTERVAL =  10*1000; //miliseconds

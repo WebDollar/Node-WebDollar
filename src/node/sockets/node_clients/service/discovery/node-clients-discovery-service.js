@@ -17,14 +17,14 @@ class NodeDiscoveryService {
         this.fallbackLists = [
 
             //not working
-            "https://api.myjson.com/bins/xi1hr",
+            "https://www.jasonbase.com/things/RPY5",
 
         ];
 
         //CORS problem
         if (typeof window === "undefined"){ // in the browser
 
-            this.fallbackLists.push("https://www.jasonbase.com/things/RPY5");
+            this.fallbackLists.push("https://api.myjson.com/bins/xi1hr");
             this.fallbackLists.push("http://skyhub.me/public/webdollars.json");
             this.fallbackLists.push("http://visionbot.net/webdollars.json");
             this.fallbackLists.push("http://budisteanu.net/webdollars.json");
