@@ -39,7 +39,7 @@ class NodesWaitlist {
 
     }
 
-    addNewNodeToWaitlist(addresses, port, type){
+    addNewNodeToWaitlist(addresses, port, type, level){
 
         // addresses = "127.0.0.1";
 
@@ -47,7 +47,7 @@ class NodesWaitlist {
 
         if (typeof addresses === "string" || !Array.isArray(addresses)) addresses = [addresses];
 
-        console.log("addresses", addresses)
+        console.log("addresses", addresses);
 
         let sckAddresses = [];
         for (let i=0; i<addresses.length; i++){
@@ -64,7 +64,7 @@ class NodesWaitlist {
 
         if (sckAddresses.length > 0){
 
-            let waitListObject = new NodesWaitlistObject(sckAddresses, type);
+            let waitListObject = new NodesWaitlistObject(sckAddresses, type, level);
             this.waitlist.push(waitListObject);
 
             this._tryToConnectNextNode(waitListObject);
@@ -112,21 +112,23 @@ class NodesWaitlist {
             setTimeout(()=>{ return this._connectNewNodesWaitlist( true ) }, consts.NODES_WAITLIST_INTERVAL);
     }
 
-    _tryToConnectNextNode(nextNode){
+    _tryToConnectNextNode(nextWaitListObject){
 
         //connect only to TERMINAL NODES
-        if (nextNode.type === NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER) {
-            if (nextNode.checkLastTimeChecked(consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN) && nextNode.blocked === false && nextNode.connecting === false && nextNode.checkIsConnected() === null) {
+        if (nextWaitListObject.type === NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER) {
 
-                nextNode.blocked = true;
+            if (nextWaitListObject.checkLastTimeChecked(consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN) && nextWaitListObject.blocked === false &&
+                nextWaitListObject.connecting === false && nextWaitListObject.checkIsConnected() === null) {
+
+                nextWaitListObject.blocked = true;
 
                 //console.log("connectNewNodesWaitlist ", nextNode.sckAddresses.toString() );
 
-                this._connectNowToNewNode(nextNode).then((connected) => {
-                    nextNode.checked = true;
-                    nextNode.blocked = false;
-                    nextNode.connected = connected;
-                    nextNode.refreshLastTimeChecked();
+                this._connectNowToNewNode(nextWaitListObject).then((connected) => {
+                    nextWaitListObject.checked = true;
+                    nextWaitListObject.blocked = false;
+                    nextWaitListObject.connected = connected;
+                    nextWaitListObject.refreshLastTimeChecked();
                 });
 
             }
@@ -184,6 +186,7 @@ class NodesWaitlist {
                 this.emitter.emit("waitlist/delete-node", this.waitlist[i]);
                 this.waitlist.splice(i, 1);
             }
+
         }
 
     }

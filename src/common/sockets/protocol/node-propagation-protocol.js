@@ -37,7 +37,7 @@ class NodePropagationProtocol {
                             let port = addresses[i].port;
                             let type = addresses[i].type;
 
-                            NodesWaitlist.addNewNodeToWaitlist(address, port, type);
+                            NodesWaitlist.addNewNodeToWaitlist(address, port, type, node.level+1);
                         }
                     }
 

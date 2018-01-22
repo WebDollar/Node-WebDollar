@@ -7,7 +7,7 @@ const NODES_WAITLIST_OBJECT_TYPE = {
 
 class NodesWaitlistObject {
 
-    constructor(sckAddresses, type){
+    constructor(sckAddresses, type, level){
 
         this.sckAddresses = sckAddresses;
         this.socket = null;
@@ -19,6 +19,8 @@ class NodesWaitlistObject {
 
         this.errorTrial = 0;
         this.lastTimeChecked = 0;
+
+        this.level = level||0;
 
         this.type = type || NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER;
     }

@@ -125,7 +125,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[i]; //a simple string Address
                             }
 
-                            NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort, nodeType);
+                            NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort, nodeType, 1);
                         }
 
                     }

@@ -131,7 +131,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     //     console.log(colors.green("forks " + this.blockchain.forksAdministrator.forks.length) );
 
                     if (fork !== null)
-                        this.solveFork(fork);
+                        await this.solveFork(fork);
 
                     return fork;
 
@@ -147,6 +147,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         } catch (Exception){
             console.log(colors.red("discoverAndSolveFork raised an exception" + Exception.toString() ) )
+            return null;
         }
 
     }
@@ -232,7 +233,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         } catch (Exception){
                             console.log(colors.red("Error deserializing blocks " + Exception.toString()));
                             finished = true;
-                            return false;
+                            resolve(false);
                         }
 
                         let result;
