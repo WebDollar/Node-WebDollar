@@ -7,6 +7,7 @@ const colors = require('colors/safe');
 
 const md5 = require('md5');
 const EventEmitter = require('events');
+const FileSystem = require('fs');
 
 class MainBlockchainWallet{
 
@@ -82,19 +83,19 @@ class MainBlockchainWallet{
         this.emitter.emit('wallet/password-changed', {});
     }
     
-    serialize() {
+    serialize(serializePrivateKey = false) {
         
         let list = [Serialization.serializeNumber4Bytes(this.addresses.length)];
 
         for (let i = 0; i < this.addresses.length; ++i) {
-            let walletBuffer = this.addresses[i].serializeAddress();
+            let walletBuffer = this.addresses[i].serializeAddress(serializePrivateKey);
             list.push(walletBuffer);
         }
 
         return Buffer.concat (list);
     }
     
-    async deserialize(buffer) {
+    async deserialize(buffer, deserializePrivateKey = false) {
 
         let data = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
         let offset = 0;
@@ -107,7 +108,7 @@ class MainBlockchainWallet{
             this.addresses = [];
             for (let i = 0; i < numAddresses; ++i) {
                 this.addresses[i] = await this._justCreateNewAddress(undefined, true);
-                offset += this.addresses[i].deserializeAddress( BufferExtended.substr(buffer, offset) );
+                offset += await this.addresses[i].deserializeAddress( BufferExtended.substr(buffer, offset), deserializePrivateKey );
 
             }
 
@@ -192,6 +193,35 @@ class MainBlockchainWallet{
 
         return this.addresses[0].address;
 
+    }
+
+    export(filePath){
+
+        return FileSystem.open(filePath, 'w', function(err, fd) {
+
+            if (err) {
+                throw 'could not open file: ' + err;
+            }
+
+            let walletBuffer = this.serialize(true);
+
+            FileSystem.write(fd, walletBuffer, 0, walletBuffer.length, null, function(err) {
+                if (err) {
+                    throw 'Error exporting wallet: ' + err;
+                }
+                FileSystem.close(fd, function() {
+                    console.log('Wallet exported successfully!');
+                    return true;
+                });
+            });
+        });
+    }
+
+    async import(filePath){
+
+        let buffer =  FileSystem.readFile(filePath, 'utf8');
+
+        return (await this.deserialize(buffer, true));
     }
 
 }
