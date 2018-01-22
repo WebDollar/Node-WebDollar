@@ -96,7 +96,7 @@ class NodesList {
         //console.log("disconnecting", socket, this.nodes);
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if ((this.nodes[i].type === type || type  === "all") && ((this.nodes[i].socket === socket ) || (this.nodes[i].socket.sckAddress.uuid === socket.sckAddress.uuid  ) )) {
+            if ((this.nodes[i].type === type || type  === "all") && ((this.nodes[i].socket === socket ) || (this.nodes[i].socket.node.sckAddress.uuid === socket.node.sckAddress.uuid  ) )) {
                 console.log(colors.green('deleting client socket '+ i+" "+ socket.node.sckAddress.toString()));
 
                 this.emitter.emit("nodes-list/disconnected", this.nodes[i]);
