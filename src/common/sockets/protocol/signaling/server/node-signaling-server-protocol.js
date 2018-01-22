@@ -148,7 +148,7 @@ class NodeSignalingServerProtocol {
                                             answerSignal: answer.answerSignal,
 
                                             remoteAddress: client2.node.sckAddress.getAddress(false),
-                                            emoteUUID: client2.node.sckAddress.uuid,
+                                            remoteUUID: client2.node.sckAddress.uuid,
                                         }, connection.id).then( (result)=>{
 
                                              if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("Step 4 - join-answer-signal  ", connection.id, result );
