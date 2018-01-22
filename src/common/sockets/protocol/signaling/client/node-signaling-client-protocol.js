@@ -38,7 +38,8 @@ class NodeSignalingClientProtocol {
 
             console.log("###################### signals/client/initiator/generate-initiator-signal/"+data.id, answer, webPeer.peer, typeof answer);
 
-
+            if (answer.signal === undefined)
+                console.log("WEBRTC 1 is not supported !!!! being the initiator");
 
             let signalAnswer = {};
             if (answer.result === true) signalAnswer = {accepted: true, initiatorSignal: answer.signal};
@@ -74,6 +75,9 @@ class NodeSignalingClientProtocol {
 
             let answer = await webPeer.createSignal(data.initiatorSignal);
             console.log("################# signals/client/answer/receive-initiator-signal",  answer, data.id);
+
+            if (answer.signal === undefined)
+                console.log("WEBRTC 2 is not supported !!!!", data.initiatorSignal);
 
             let signalAnswer = {};
             if (answer.result === true) signalAnswer = {accepted: true, answerSignal: answer.signal};
@@ -111,6 +115,9 @@ class NodeSignalingClientProtocol {
             let answer = await webPeer.createSignal(data.iceCandidate);
             console.log("################# signals/client/answer/receive-ice-candidate",  data.iceCandidate, answer, data.id);
 
+            if (answer.signal === undefined)
+                console.log("WEBRTC 3 is not supported !!!!", data.iceCandidate);
+
             let signalAnswer = {};
             if (answer.result === true) signalAnswer = {accepted: true, answerSignal: answer.signal};
             else signalAnswer = {accepted:false, message: answer.message}
@@ -124,6 +131,11 @@ class NodeSignalingClientProtocol {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
                 console.log(colors.red("data.remoteUUID 4"), data.remoteUUID);
+                return false;
+            }
+
+            if (data.answerSignal === undefined){
+                console.log(colors.red("data.answerSignal 4"), data.answerSignal);
                 return false;
             }
 

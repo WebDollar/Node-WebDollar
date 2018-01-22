@@ -11,6 +11,7 @@ let ConnectionStatus = {
     peerConnectionNotEstablished : 6,
 
     peerConnectionAlreadyConnected: 44,
+    peerConnectionError: 66,
 };
 
 

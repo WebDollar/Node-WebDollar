@@ -13,17 +13,26 @@ class NodeDiscoveryService {
 
         console.log("NodeDiscover constructor");
 
+        //in common
         this.fallbackLists = [
 
-            //new FallBackObject("https://www.jasonbase.com/things/RPY5"),
-
             //not working
-            new FallBackObject("https://api.myjson.com/bins/xi1hr"),
-            // new FallBackObject("http://skyhub.me/public/webdollars.json"),
-            // new FallBackObject("http://visionbot.net/webdollars.json"),
-            // new FallBackObject("http://budisteanu.net/webdollars.json"),
+            "https://api.myjson.com/bins/xi1hr",
 
         ];
+
+        //CORS problem
+        if (typeof window === "undefined"){ // in the browser
+
+            this.fallbackLists.push("https://www.jasonbase.com/things/RPY5");
+            this.fallbackLists.push("http://skyhub.me/public/webdollars.json");
+            this.fallbackLists.push("http://visionbot.net/webdollars.json");
+            this.fallbackLists.push("http://budisteanu.net/webdollars.json");
+
+        }
+
+        for (let i=0; i<this.fallbackLists.length; i++)
+            this.fallbackLists[i] = new FallBackObject(this.fallbackLists[i]);
 
     }
 
