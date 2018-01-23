@@ -91,7 +91,7 @@ class InterfaceBlockchainProtocol {
                     if (this.blockchain.blocks.length > 0)
                         answer = {
                             result: true,
-                            header: this.blockchain.blocks[this.blockchain.blocks.length-1].getBlockHeader()
+                            data: this.blockchain.blocks[this.blockchain.blocks.length-1].getBlockHeader()
                         };
                     else
                         answer = { result: false,  message: "no blocks"};
@@ -244,8 +244,6 @@ class InterfaceBlockchainProtocol {
 
     async askBlockchain(socket){
 
-        console.log("get/blockchain/header/last-block1", undefined);
-
         let data = await socket.node.sendRequestWaitOnce("get/blockchain/header/last-block", undefined, "answer");
 
         console.log("get/blockchain/header/last-block2", data);
@@ -259,7 +257,9 @@ class InterfaceBlockchainProtocol {
 
             if (data.result !== true) throw "last block is not valid";
 
-            this._validateBlockchainHeader(data.header);
+            data = data.data;
+
+            this._validateBlockchainHeader(data);
 
             //validate header
             //TODO !!!
@@ -284,7 +284,7 @@ class InterfaceBlockchainProtocol {
 
         } catch (exception) {
 
-            console.log(colors.red("Socket Error - get/blockchain/header/last-block", exception.toString()));
+            console.log(colors.red("Socket Error - get/blockchain/header/last-block"), exception);
             return false;
         }
 
