@@ -284,7 +284,7 @@ class InterfaceBlockchainProtocol {
 
         } catch (exception) {
 
-            console.log(colors.red("Socket Error - get/blockchain/header/last-block", exception.toString()), data);
+            console.log(colors.red("Socket Error - get/blockchain/header/last-block", exception.toString()));
             return false;
         }
 

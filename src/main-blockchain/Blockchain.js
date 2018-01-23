@@ -32,7 +32,7 @@ class Blockchain{
 
         this.Agent = MainBlockchainAgent.createAgent(agentName, this.blockchain);
 
-        this.blockchain._setAgent(agentName);
+        this.blockchain._setAgent(this.Agent);
 
         await this.initializeBlockchain();
     }

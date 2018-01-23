@@ -317,13 +317,13 @@ class InterfaceBlockchainBlock {
 
         return {
             height: this.height,
-            chainLength: this.blockchain.length,
+            chainLength: this.blockchain.blocks.length,
             header: {
                 hash: this.hash,
                 hashPrev: this.hashPrev,
                 data: {
                     hashData: this.data.hashData,
-                    hashAccountantTree: this.data.hashAccountantTree,
+                    hashTransactions: this.data.hashTransactions,
                 },
 
                 nonce: this.nonce,

@@ -56,7 +56,7 @@ class InterfaceBlockchainAgent{
 
                 //in case the agent is done and at least 4 nodes were tested
                 if (done === true && this.startAgentResolver !== undefined &&
-                    NodesList.nodes.length > 4 && this.agentQueueCount > 4) {
+                    NodesList.nodes.length >= 2 && this.agentQueueCount >= 2) {
 
                     clearTimeout(this.startAgentTimeOut);
 
