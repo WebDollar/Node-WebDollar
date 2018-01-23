@@ -48,7 +48,6 @@ class InterfaceBlockchainProtocol {
 
         NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeader(), "all", socketsAvoidBroadcast);
 
-
         //console.log("WEbDollar Hash", block.serializeBlock().toString("hex"));
 
     }
@@ -153,7 +152,7 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - blockchain/new-block-header", exception.toString()));
+                    console.log(colors.red("Socket Error - blockchain/new-block-header", exception.toString()), data);
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: false,
@@ -285,7 +284,7 @@ class InterfaceBlockchainProtocol {
 
         } catch (exception) {
 
-            console.log(colors.red("Socket Error - get/blockchain/header/last-block", exception.toString()));
+            console.log(colors.red("Socket Error - get/blockchain/header/last-block", exception.toString()), data);
             return false;
         }
 
