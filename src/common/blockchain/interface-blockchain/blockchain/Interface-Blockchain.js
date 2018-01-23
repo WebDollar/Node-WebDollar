@@ -102,8 +102,7 @@ class InterfaceBlockchain {
             await this.saveNewBlock(block);
 
         // propagating a new block in the network
-        if (this.agent !== undefined)
-            this.agent.protocol.propagateHeader(block, this.blocks.length, socketsAvoidBroadcast );
+        this.propagateBlocks(block.height, socketsAvoidBroadcast)
 
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
             this.mining.resetMining();
@@ -298,6 +297,15 @@ class InterfaceBlockchain {
     // aka tail
     get first() {
         return this.blocks[this.blocks.length -1];
+    }
+
+    propagateBlocks(height, socketsAvoidBroadcast){
+
+        if (this.agent !== undefined) {
+
+            for (let i=height; i<this.blocks.length-1; i++)
+                this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
+        }
     }
 
 }

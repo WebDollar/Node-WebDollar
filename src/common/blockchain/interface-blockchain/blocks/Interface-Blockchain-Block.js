@@ -238,7 +238,7 @@ class InterfaceBlockchainBlock {
             offset = this.data.deserializeData(buffer, offset);
 
         } catch (exception){
-            console.log(colors.red("error deserializing a block  "), exception);
+            console.log(colors.red("error deserializing a block  "), exception, buffer);
             throw exception;
         }
 

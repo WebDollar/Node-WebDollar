@@ -178,7 +178,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         } catch (exception){
 
-            console.log(colors.red("error deserializing a block  "), exception);
+            console.log(colors.red("error deserializing a block  "), exception, buffer);
             throw exception;
 
         }

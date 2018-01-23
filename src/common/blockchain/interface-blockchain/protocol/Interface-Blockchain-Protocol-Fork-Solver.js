@@ -229,10 +229,10 @@ class InterfaceBlockchainProtocolForkSolver{
                         try {
 
                             block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
-                            block.deserializeBlock(answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget());
+                            block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget() );
 
                         } catch (Exception){
-                            console.log(colors.red("Error deserializing blocks " + Exception.toString()));
+                            console.log(colors.red("Error deserializing blocks " ), Exception.toString());
                             finished = true;
                             resolve(false);
                         }
@@ -240,12 +240,16 @@ class InterfaceBlockchainProtocolForkSolver{
                         let result;
 
                         try {
+
                             result = await fork.includeForkBlock(block);
+
                         } catch (Exception){
-                            console.log(block.serializeBlock().toString("hex"));
-                            console.log(colors.red("Error including block "+nextBlockHeight+" in fork " + Exception.toString()));
+
+                            console.log( block.serializeBlock().toString("hex") );
+                            console.log( colors.red("Error including block "+nextBlockHeight+" in fork " + Exception.toString()) );
                             finished = true;
                             return false;
+
                         }
 
                         //if the block was included correctly
