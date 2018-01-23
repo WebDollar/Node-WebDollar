@@ -303,7 +303,7 @@ class InterfaceBlockchain {
 
         if (this.agent !== undefined) {
 
-            for (let i=height; i<this.blocks.length-1; i++)
+            for (let i=height; i<this.blocks.length; i++)
                 this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
         }
     }
