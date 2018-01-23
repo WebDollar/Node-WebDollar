@@ -93,9 +93,9 @@ class NodesWaitlist {
     */
     _connectNewNodesWaitlist(setTimeOut){
 
-        console.log("Waitlist length", this.waitlist.length);
-        for (let i=0; i<this.waitlist.length; i++)
-            console.log(this.waitlist[i].toString())
+        // console.log("Waitlist length", this.waitlist.length);
+        // for (let i=0; i<this.waitlist.length; i++)
+        //     console.log(this.waitlist[i].toString())
 
         this._deleteUselessWaitlist();
 
