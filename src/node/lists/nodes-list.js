@@ -107,7 +107,7 @@ class NodesList {
                 return true;
             }
 
-        console.log(colors.red("Disconnecting Socket but it was not validated before...")); console.log(socket.node.sckAddress.getAddress());
+        console.log("Disconnecting Socket but it was not validated before...", socket.node.sckAddress.getAddress());
         socket.disconnect(true);
         return false;
     }
