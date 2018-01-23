@@ -1,6 +1,7 @@
+const colors = require('colors/safe');
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
-
+import MiniBlockchainProtocol from "common/blockchain/mini-blockchain/protocol/Mini-Blockchain-Protocol"
 /**
  * An Agent is a class that force your machine to synchronize to the network based on the protocol you use it
  */
@@ -10,18 +11,19 @@ class InterfaceBlockchainAgent{
     constructor( blockchain, blockchainProtocolClass ){
 
         this.blockchain = blockchain;
-        this.blockchainProtocolClass = blockchainProtocolClass;
+        if ( blockchainProtocolClass === undefined) blockchainProtocolClass = InterfaceBlockchainProtocol;
 
-        this.createProtocol();
-    }
+        this.protocol = new blockchainProtocolClass(this.blockchain);
+        this.initializeProtocol();
 
-    createProtocol(){
-
-        this.protocol = new (this.blockchainProtocolClass||InterfaceBlockchainProtocol) (this.blockchain);
-
-        this.protocol.initialize(["acceptBlockHeaders"]);
+        this.agentQueueCount = 0;
 
         this.requestBlockchainForNewPeer();
+    }
+
+    initializeProtocol(){
+
+        this.protocol.initialize(["acceptBlockHeaders"]);
     }
 
     requestBlockchainForNewPeer(){
@@ -31,28 +33,37 @@ class InterfaceBlockchainAgent{
             // let's ask everybody
 
             try {
-                let result = await this.protocol.askBlockchain(result.socket);
-            } catch (exception){
 
+                let answerBlockchain = await this.protocol.askBlockchain(result.socket);
+
+            } catch (exception){
+                console.log(colors.red("Error asking for Blockchain"));
             }
 
             result.socket.node.protocol.agent.startedAgentDone = true;
+            this.agentQueueCount++;
 
             //check if start Agent is finished
             if (this.startAgentResolver !== undefined) {
 
                 let done = true;
                 for (let i = 0; i < NodesList.nodes.length; i++)
-                    if (NodesList[i].socket.level <= 3 && NodesList[i].socket.node.protocol.agent.startedAgentDone === false) {
+                    if (NodesList.nodes[i].socket.level <= 3 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
                         done = false;
+                        console.log("not done", NodesList.nodes[i]);
+                        break;
                     }
 
-                if (done === true && this.startAgentResolver !== undefined) {
+                //in case the agent is done and at least 4 nodes were tested
+                if (done === true && this.startAgentResolver !== undefined &&
+                    NodesList.nodes.length > 4 && this.agentQueueCount > 4) {
 
                     clearTimeout(this.startAgentTimeOut);
 
                     let resolver = this.startAgentResolver;
                     this.startAgentResolver = undefined;
+
+                    console.log(colors.green("Synchronization done"));
 
                     resolver({
                         result: true,
@@ -62,6 +73,7 @@ class InterfaceBlockchainAgent{
                 }
 
             }
+
 
         });
 
@@ -80,6 +92,9 @@ class InterfaceBlockchainAgent{
             this.startAgentTimeOut = setTimeout(()=>{
 
                 this.startAgentResolver = undefined;
+
+                console.log( colors.green("Synchronization done FAILED") );
+
                 resolve({
                     result: false,
                     message: "Start Agent Timeout",

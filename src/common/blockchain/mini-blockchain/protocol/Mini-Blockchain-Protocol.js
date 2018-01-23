@@ -1,11 +1,17 @@
 import InterfaceBlockchainProtocol from 'common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol'
 import Serialization from 'common/utils/Serialization'
+import consts from "consts/const_global";
+import PPoWBlockchainProtocol from "common/blockchain/ppow-blockchain/protocol/PPoW-Blockchain-Protocol"
 
 /**
  * MiniBlockchainProtocol only extends the initial Protocol in order to validate the hashAccountantTree
  */
 
-class MiniBlockchainProtocol extends InterfaceBlockchainProtocol{
+let inheritProtocol;
+if (consts.POPOW_ACTIVATED) inheritProtocol = PPoWBlockchainProtocol;
+else inheritProtocol = InterfaceBlockchainProtocol;
+
+class MiniBlockchainProtocol extends inheritProtocol{
 
     _validateBlockchainHeader(data){
 
