@@ -28,7 +28,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
 
-            if (!blockHeaderResult.result || blockHeaderResult.header === undefined || blockHeaderResult.header.hash === undefined) return {position: -1, header: blockHeaderResult.header};
+            if (blockHeaderResult === null || blockHeaderResult === undefined || !blockHeaderResult.result || blockHeaderResult.header === undefined || blockHeaderResult.header.hash === undefined) return {position: -1, header: blockHeaderResult.header};
 
             //i have finished the binary search
             if (left >= right) {
@@ -78,7 +78,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 //console.log(" !!!! answer", answer);
 
-                if (answer.result === true && answer.header !== undefined) {
+                if (answer !== undefined && answer !== null && answer.result === true && answer.header !== undefined) {
 
                     if (answer.header.hash.equals( this.blockchain.getBlockchainLastBlock().hash )) {
                         data = {
@@ -101,7 +101,7 @@ class InterfaceBlockchainProtocolForkSolver{
             // very skeptical when the blockchain becomes bigger
             if (data.position === -1 && currentBlockchainLength < newChainLength){
                 let answer = await sockets[0].node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", { height: 0 }, 0 );
-                if (answer.result === true && answer.header !== undefined)
+                if (answer !== null && answer !== undefined && answer.result === true && answer.header !== undefined)
                     data = {position: 0, header: answer.header};
             }
 
@@ -221,7 +221,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     //console.log("blockchain/blocks/request-block-by-height/",answer)
 
-                    if (answer.result === true){
+                    if (answer!== undefined && answer !== null && answer.result === true){
 
                         let block;
 
