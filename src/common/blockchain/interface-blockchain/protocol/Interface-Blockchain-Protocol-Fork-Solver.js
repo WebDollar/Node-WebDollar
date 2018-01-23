@@ -213,13 +213,13 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     if (this.protocol.acceptBlocks)
                         answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight );
-                    else  if (this.protocol.acceptBlocks) {
+                    else  if (this.protocol.acceptBlockHeaders) {
 
                         console.log("it is not finished");
                         answer = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
                     }
 
-                    //console.log("blockchain/blocks/request-block-by-height/",answer)
+                    console.log("blockchain/blocks/request-block-by-height/",answer)
 
                     if (answer!== undefined && answer !== null && answer.result === true){
 
