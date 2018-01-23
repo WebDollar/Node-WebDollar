@@ -94,7 +94,7 @@ class InterfaceBlockchainProtocol {
                             header: this.blockchain[this.blockchain.blocks.length-1].getBlockHeader()
                         };
                     else
-                        answer = { result: false,  message: "no blocks"}
+                        answer = { result: false,  message: "no blocks"};
 
                     socket.node.sendRequest("get/blockchain/header/last-block/answer", answer );
 
@@ -130,7 +130,7 @@ class InterfaceBlockchainProtocol {
                     //validate header
                     //TODO !!!
 
-                    if (data.height <= 0)
+                    if (data.height < 0)
                         throw "your block is invalid";
 
                     //in case the hashes are the same, and I have already the block

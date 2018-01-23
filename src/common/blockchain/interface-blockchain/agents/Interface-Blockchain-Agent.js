@@ -85,6 +85,8 @@ class InterfaceBlockchainAgent{
 
     startAgent(){
 
+        console.log(colors.yellow("startAgent was started"));
+
         return new Promise((resolve)=>{
 
             this.startAgentResolver = resolve;

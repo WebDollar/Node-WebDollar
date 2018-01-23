@@ -7,6 +7,8 @@ Node.NodeServer.startServer();
 Node.NodeClientsService.startService();
 
 
+Blockchain.createBlockchain("full-node");
+
 //it doesn't work
 // Blockchain.createBlockchain("full-node").then((answer)=>{
 //

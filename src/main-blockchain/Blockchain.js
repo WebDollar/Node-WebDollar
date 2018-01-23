@@ -39,6 +39,7 @@ class Blockchain{
 
     async initializeBlockchain(){
 
+
         //loading the Wallet
         this.emitter.emit('blockchain/status', {message: "Wallet Loading"});
         try{
