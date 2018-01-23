@@ -1,6 +1,6 @@
 
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-import BufferExtended from "../../../utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 class InterfaceBlockchainBlockCreator{
 

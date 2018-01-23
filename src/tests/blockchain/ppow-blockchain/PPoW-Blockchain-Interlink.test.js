@@ -1,4 +1,4 @@
-import InterfaceBlockchainBlock from "../../../common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block";
+import InterfaceBlockchainBlock from "common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block";
 
 var assert = require('assert')
 

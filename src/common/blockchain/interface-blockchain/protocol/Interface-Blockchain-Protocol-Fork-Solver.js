@@ -1,5 +1,4 @@
 import NodesList from 'node/lists/nodes-list'
-import InterfaceBlockchainBlockCreator from "../blocks/Interface-Blockchain-Block-Creator";
 import InterfaceBlockchainFork from "../blockchain/forks/Interface-Blockchain-Fork";
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 const colors = require('colors/safe');

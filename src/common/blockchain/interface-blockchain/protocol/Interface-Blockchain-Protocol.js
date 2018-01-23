@@ -248,10 +248,6 @@ class InterfaceBlockchainProtocol {
 
         console.log("get/blockchain/header/last-block2", data);
         console.log("get/blockchain/header/last-block2", data);
-        console.log("get/blockchain/header/last-block2", data);
-        console.log("get/blockchain/header/last-block2", data);
-        console.log("get/blockchain/header/last-block2", data);
-        console.log("get/blockchain/header/last-block2", data);
 
         try {
 
