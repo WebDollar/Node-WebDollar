@@ -3,12 +3,20 @@ import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
 import MiniBlockchainProtocol from "common/blockchain/mini-blockchain/protocol/Mini-Blockchain-Protocol"
 /**
+ *
+ * Agent 47   - The place I was raised, they didn't give us names. They gave us numbers. Mine was 47.
+ *
+ *
  * An Agent is a class that force your machine to synchronize to the network based on the protocol you use it
  */
 
 class InterfaceBlockchainAgent{
 
     constructor( blockchain, blockchainProtocolClass ){
+
+        this.AGENT_TIME_OUT = 10000;
+        this.AGENT_QUEUE_COUNT_MAX = 2;
+        this.NODES_LIST_MINIM_LENGTH = 2;
 
         this.blockchain = blockchain;
         if ( blockchainProtocolClass === undefined) blockchainProtocolClass = InterfaceBlockchainProtocol;
@@ -56,7 +64,7 @@ class InterfaceBlockchainAgent{
 
                 //in case the agent is done and at least 4 nodes were tested
                 if (done === true && this.startAgentResolver !== undefined &&
-                    NodesList.nodes.length >= 2 && this.agentQueueCount >= 2) {
+                    NodesList.nodes.length >= this.NODES_LIST_MINIM_LENGTH && this.agentQueueCount >= this.AGENT_QUEUE_COUNT_MAX) {
 
                     clearTimeout(this.startAgentTimeOut);
 
@@ -102,7 +110,7 @@ class InterfaceBlockchainAgent{
                     message: "Start Agent Timeout",
                 });
 
-            }, 20000);
+            }, this.AGENT_TIME_OUT);
 
         })
 

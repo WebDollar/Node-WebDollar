@@ -6,8 +6,8 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 import consts from 'consts/const_global'
 
-import Serialization from "common/utils/Serialization.js";
-import BufferExtended from "common/utils/BufferExtended.js";
+import Serialization from "common/utils/Serialization";
+import BufferExtended from "common/utils/BufferExtended";
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
@@ -110,7 +110,7 @@ class InterfaceBlockchainBlock {
         let hash = await this.computeHash();
 
 
-        if (!hash.equals(this.hash)) throw "block hash is not right ("+this.nonce+")" + this.hash.toString("hex") + " "+ hash.toString("hex") ;
+        if (!hash.equals(this.hash)) throw "block hash is not right ("+this.nonce+")" + this.hash.toString("hex") + " "+ hash.toString("hex") + Buffer.concat ( [this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce )] ).toString("hex") ;
 
         await this.data.validateBlockData(validationType);
 
@@ -205,7 +205,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer,height, reward, difficultyTarget, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, offset){
 
         if (!Buffer.isBuffer(buffer))
             buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
@@ -282,7 +282,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockchain.getDifficultyTarget());
+            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockchain.getDifficultyTarget() );
 
             return true;
         }

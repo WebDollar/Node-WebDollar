@@ -91,7 +91,7 @@ class InterfaceBlockchainProtocol {
                     if (this.blockchain.blocks.length > 0)
                         answer = {
                             result: true,
-                            header: this.blockchain[this.blockchain.blocks.length-1].getBlockHeader()
+                            header: this.blockchain.blocks[this.blockchain.blocks.length-1].getBlockHeader()
                         };
                     else
                         answer = { result: false,  message: "no blocks"};
