@@ -23,8 +23,8 @@ class InterfaceBlockchainProtocol {
 
     initialize(params){
 
-        this.acceptBlockHeaders = params.indexOf("acceptBlockHeaders");
-        this.acceptBlocks = params.indexOf("acceptBlocks");
+        this.acceptBlockHeaders = params.indexOf("acceptBlockHeaders") >= 0;
+        this.acceptBlocks = params.indexOf("acceptBlocks") >= 0;
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._initializeNewSocket(result)
