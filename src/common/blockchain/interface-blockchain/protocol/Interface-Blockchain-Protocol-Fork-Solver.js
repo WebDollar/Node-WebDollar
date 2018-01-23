@@ -211,8 +211,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     let answer;
 
+                    console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
                     if (this.protocol.acceptBlocks)
                         answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight );
+
                     else  if (this.protocol.acceptBlockHeaders) {
 
                         console.log("it is not finished");
@@ -237,6 +239,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         }
 
                         let result;
+
                         try {
                             result = await fork.includeForkBlock(block);
                         } catch (Exception){
