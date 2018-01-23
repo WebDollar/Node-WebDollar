@@ -27,7 +27,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
 
-            if (blockHeaderResult === null || blockHeaderResult === undefined || !blockHeaderResult.result || blockHeaderResult.header === undefined || blockHeaderResult.header.hash === undefined) return {position: -1, header: blockHeaderResult.header};
+            if (blockHeaderResult === null || blockHeaderResult === undefined || blockHeaderResult.result !== true || blockHeaderResult.header === undefined || blockHeaderResult.header.hash === undefined)
+                return {position: -1, header: blockHeaderResult.header};
 
             //i have finished the binary search
             if (left >= right) {
@@ -116,7 +117,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     fork = await this.blockchain.forksAdministrator.createNewFork(sockets, data.position, newChainLength, data.header);
 
                 } catch (Exception){
-                    console.log(colors.red("discoverAndSolveFork - creating a fork raised an exception" + Exception.toString() ), "data", data )
+                    console.log(colors.red("discoverAndSolveFork - creating a fork raised an exception" ), Exception, "data", data )
                 }
 
                 if (fork === null) {
@@ -210,7 +211,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     let answer;
 
-                    console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
+                    //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
+
                     if (this.protocol.acceptBlocks)
                         answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight );
 
@@ -219,8 +221,6 @@ class InterfaceBlockchainProtocolForkSolver{
                         console.log("it is not finished");
                         answer = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
                     }
-
-                    console.log("blockchain/blocks/request-block-by-height/",answer)
 
                     if (answer!== undefined && answer !== null && answer.result === true){
 
