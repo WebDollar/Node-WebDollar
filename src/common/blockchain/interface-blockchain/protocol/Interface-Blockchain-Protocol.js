@@ -251,7 +251,7 @@ class InterfaceBlockchainProtocol {
 
         try {
 
-            if (data.result !== true) throw "last block is not valid";
+            if (data === null || data.result !== true) throw "last block is not valid";
 
             data = data.data;
 

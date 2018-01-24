@@ -24,6 +24,7 @@ class InterfaceBlockchainAgent{
         this.protocol = new blockchainProtocolClass(this.blockchain);
         this.initializeProtocol();
 
+        this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
 
         this.requestBlockchainForNewPeer();
@@ -40,9 +41,13 @@ class InterfaceBlockchainAgent{
 
             // let's ask everybody
 
+            clearTimeout(this.startAgentTimeOut);
+
             try {
 
+                this.agentQueueProcessing.push(true);
                 let answerBlockchain = await this.protocol.askBlockchain(result.socket);
+                this.agentQueueProcessing.splice(this.agentQueueProcessing.length-1);
 
             } catch (exception){
                 console.log(colors.red("Error asking for Blockchain"));
@@ -52,7 +57,9 @@ class InterfaceBlockchainAgent{
             this.agentQueueCount++;
 
             //check if start Agent is finished
-            if (this.startAgentResolver !== undefined) {
+
+            console.log("this.agentQueueProcessing.length", this.agentQueueProcessing.length);
+            if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0 ) {
 
                 let done = true;
                 for (let i = 0; i < NodesList.nodes.length; i++)
@@ -66,7 +73,7 @@ class InterfaceBlockchainAgent{
                 if (done === true && this.startAgentResolver !== undefined &&
                     NodesList.nodes.length >= this.NODES_LIST_MINIM_LENGTH && this.agentQueueCount >= this.AGENT_QUEUE_COUNT_MAX) {
 
-                    clearTimeout(this.startAgentTimeOut);
+                    if (this.startAgentResolver === undefined) return;
 
                     let resolver = this.startAgentResolver;
                     this.startAgentResolver = undefined;
@@ -78,9 +85,29 @@ class InterfaceBlockchainAgent{
                         message: "Start Agent worked successfully",
                     });
 
+                } else{
+
+                    //it is not done, maybe timeout
+
+                    this.startAgentTimeOut = setTimeout( ()=>{
+
+                        if (this.startAgentResolver === undefined) return;
+
+                        let resolver = this.startAgentResolver;
+                        this.startAgentResolver = undefined;
+
+                        console.log( colors.green("Synchronization done FAILED") );
+
+                        resolver({
+                            result: false,
+                            message: "Start Agent Timeout",
+                        });
+
+                    }, this.AGENT_TIME_OUT);
                 }
 
             }
+
 
 
         });
@@ -99,18 +126,6 @@ class InterfaceBlockchainAgent{
 
             this.startAgentResolver = resolve;
 
-            this.startAgentTimeOut = setTimeout(()=>{
-
-                this.startAgentResolver = undefined;
-
-                console.log( colors.green("Synchronization done FAILED") );
-
-                resolve({
-                    result: false,
-                    message: "Start Agent Timeout",
-                });
-
-            }, this.AGENT_TIME_OUT);
 
         })
 

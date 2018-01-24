@@ -74,23 +74,33 @@ class SocketExtend{
         Sending the Request and return the Promise to Wait Async
     */
 
-    sendRequestWaitOnce (socket, request, requestData, answerPrefix) {
+    sendRequestWaitOnce (socket, request, requestData, answerPrefix, timeOutInterval=10000) {
 
         if ( answerPrefix !== undefined) answerPrefix = String(answerPrefix); //in case it is a number
 
         return new Promise((resolve) => {
 
             let requestAnswer = request;
+            let timeoutId;
+
             if ( typeof answerPrefix === 'string' && answerPrefix.length > 0 ) {
                 requestAnswer += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
                 //console.log("sendRequestWaitOnce", request)
             }
 
-            socket.once(requestAnswer, function (resData) {
+            let onceId = socket.once(requestAnswer, function (resData) {
                 resolve(resData);
+
+                if (timeoutId !== undefined) clearTimeout(timeoutId);
             });
 
             this.sendRequest(socket, request, requestData);
+
+            if (timeOutInterval !== undefined)
+                timeoutId = setTimeout(()=>{
+                    socket.off(onceId);
+                    resolve(null)
+                }, timeOutInterval);
 
         });
     }

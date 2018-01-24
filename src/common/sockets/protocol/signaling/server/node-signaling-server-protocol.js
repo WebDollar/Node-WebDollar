@@ -106,11 +106,11 @@ class NodeSignalingServerProtocol {
                             remoteUUID: client2.node.sckAddress.uuid,
                         }, connection.id ).then ( (initiatorAnswer) =>{
 
+                            if ( initiatorAnswer === null || initiatorAnswer.initiatorSignal === undefined )
+                                SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
+                            else
                             if ( ((initiatorAnswer.accepted||false) === false) && ((initiatorAnswer.message || '') === "Already connected"))
                                 SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
-                            else
-                            if ( initiatorAnswer.initiatorSignal === undefined )
-                                SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
                             else
 
                             if ( (initiatorAnswer.accepted||false) === true) {
@@ -127,11 +127,11 @@ class NodeSignalingServerProtocol {
                                     remoteUUID: client1.node.sckAddress.uuid,
                                 }, connection.id).then((answer)=>{
 
+                                    if ( answer === null || answer === undefined || answer.answerSignal === undefined )
+                                        SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
+                                    else
                                     if ( ((answer.accepted||false) === false) && ((answer.message || '') === "Already connected"))
                                         SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
-                                    else
-                                    if ( answer.answerSignal === undefined )
-                                        SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
                                     else
                                     if ( (answer.accepted||false) === true) {
 
@@ -153,6 +153,9 @@ class NodeSignalingServerProtocol {
 
                                              if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("Step 4 - join-answer-signal  ", connection.id, result );
 
+                                             if ( result === null || result === undefined )
+                                                SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
+                                             else
                                              if ( ((answer.established||false) === false) && ((answer.message || '') === "Already connected"))
                                                 SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
                                              else {

@@ -52,7 +52,7 @@ class NodesList {
 
         if (!socket.node || !socket.node.protocol || !(socket.node.protocol.helloValidated || false)) {
 
-            console.log("Error - registerUniqueSocket rejected by invalid helloValidated", (socket.node !== undefined ? socket.node.protocol.helloValidated : undefined) );
+            console.log("Error - registerUniqueSocket rejected by invalid helloValidated", ( socket.node !== undefined ? socket.node.protocol.helloValidated : undefined ) );
 
             socket.disconnect(true);
             return false;
