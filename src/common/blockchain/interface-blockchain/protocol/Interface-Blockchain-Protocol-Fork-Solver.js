@@ -159,7 +159,7 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async solveFork(fork){
 
-        if (fork === null || !(fork instanceof InterfaceBlockchainFork) ) throw ('fork is null');
+        if (fork === null || fork === undefined || !(fork instanceof InterfaceBlockchainFork) ) throw ('fork is null');
 
         let nextBlockHeight = fork.forkStartingHeight;
 
@@ -245,8 +245,14 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         } catch (Exception){
 
-                            console.log( block.serializeBlock().toString("hex") );
-                            console.log( colors.red("Error including block "+nextBlockHeight+" in fork " + Exception.toString()) );
+                            console.log( colors.red("Error including block "+nextBlockHeight+" in fork " ), Exception );
+
+                            try {
+                                console.log(block.serializeBlock().toString("hex"));
+                            } catch (exception){
+                                console.log(colors.red("Error serializing fork block"), block);
+                            }
+
                             finished = true;
                             return false;
 
