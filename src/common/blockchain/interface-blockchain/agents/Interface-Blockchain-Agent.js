@@ -44,6 +44,7 @@ class InterfaceBlockchainAgent{
             // let's ask everybody
 
             clearTimeout(this.startAgentTimeOut);
+            this.startAgentTimeOut = undefined;
 
             try {
 
@@ -61,7 +62,7 @@ class InterfaceBlockchainAgent{
             //check if start Agent is finished
 
             console.log("this.agentQueueProcessing.length", this.agentQueueProcessing.length);
-            console.log("this.startAgentResolver", this.startAgentResolver);
+            console.log("this.startAgentResolver", this.startAgentResolver.length);
             if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0 ) {
 
                 let done = true;
