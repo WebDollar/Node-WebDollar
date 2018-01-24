@@ -122,14 +122,13 @@ class InterfaceBlockchainAddress{
 
     }
 
-    serializeAddress(serializePrivateKey = false){
+    async serializeAddress(serializePrivateKey = false){
 
         let privateKeyArray = [];
 
         if (serializePrivateKey) {
-            let privateKey = this.getPrivateKey();
-            Serialization.serializeNumber1Byte(privateKey.length);
-            privateKeyArray.push(privateKey);
+            let privateKey = await this.getPrivateKey();
+            privateKeyArray = [Serialization.serializeNumber1Byte(privateKey.length), privateKey];
         }
 
         return Buffer.concat( [
@@ -139,7 +138,7 @@ class InterfaceBlockchainAddress{
                                 this.unencodedAddress,
                                 Serialization.serializeNumber1Byte(this.publicKey.length),
                                 this.publicKey
-                              ].concat(privateKeyArray));
+                              ].concat(privateKeyArray) );
     }
     
     async deserializeAddress(buffer, deserializePrivateKey = false){
@@ -184,7 +183,6 @@ class InterfaceBlockchainAddress{
                 await this.savePrivateKey(privateKey);
             }
 
-
         } catch (exception){
 
             console.log("error deserializing address. ", exception);
@@ -226,7 +224,7 @@ class InterfaceBlockchainAddress{
     async save() {
         
         let key = this.address.toString('hex');
-        let value = this.serializeAddress();
+        let value = await this.serializeAddress();
         
         try {
             return (await this.db.save(key, value));
@@ -245,7 +243,7 @@ class InterfaceBlockchainAddress{
 
             if (value === null) return false;
 
-            this.deserializeAddress(value);
+            await this.deserializeAddress(value);
 
             return true;
         }

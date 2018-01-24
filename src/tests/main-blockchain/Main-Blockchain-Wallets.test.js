@@ -9,46 +9,41 @@ import MultiSig from 'common/blockchain/interface-blockchain/addresses/MultiSig'
 describe('test save wallet to local storage', () => {
 
     let response = null;
-    
+
     it('save/load/remove/load wallet to/from local storage, sample test', async () => {
 
-        console.log("000000001111");
         let blockchainAddress = await Blockchain.Wallet.createNewAddress();
-        console.log("00000000122222");
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
-        console.log("000000003333333");
         let privateKey = await blockchainAddress.getPrivateKey();
 
-        console.log("11111");
         assert(typeof address === "string", "address is not a string");
         assert(Buffer.isBuffer(unencodedAddress), "unencodedAddress is not not buffer");
         assert(Buffer.isBuffer(publicKey), "publicKey is not not buffer");
         assert(Buffer.isBuffer(privateKey), "privateKey is not not buffer");
-        console.log("222222");
+
         response = await blockchainAddress.save();
         assert(response === true, 'save: ' + response);
-        console.log("333333");
+
         response = await blockchainAddress.load();
         assert(response === true, 'load: ' + response);
-        console.log("444444");
+
         let address2 = blockchainAddress.address;
         let unencodedAddress2 = blockchainAddress.unencodedAddress;
         let publicKey2 = blockchainAddress.publicKey;
         let privateKey2 = await blockchainAddress.getPrivateKey();
-        console.log("555555");
+
         assert(address2 === address, 'address differ after load: ' + address2 + '!==' + address);
         assert(unencodedAddress2.equals(unencodedAddress), 'unencodedAddress differ after load: ' + unencodedAddress2.toString('hex') + '!==' + unencodedAddress.toString('hex'));
         assert(publicKey2.equals(publicKey), 'publicKey differ after load: ' + publicKey2.toString('hex') + '!==' + publicKey.toString('hex'));
         assert(privateKey2.equals(privateKey), 'privateKey differ after load: ' + privateKey2.toString('hex') + '!==' + privateKey.toString('hex'));
-        console.log("6666666");
+
         response = await blockchainAddress.remove();
         assert(response === true, 'remove: ' + response);
-        console.log("777777");
+
         response = await blockchainAddress.load();
         assert(response !== true, 'load: ' + response);
-        console.log("88888");
     });
 
     it('save/save/remove/load/ wallet to/from local storage, sample test', async () => {
@@ -140,12 +135,41 @@ describe('test save wallet to local storage', () => {
 
     });
 
+    it('test export/import wallet', async () => {
+
+        let wallet = await Blockchain.Wallet;
+
+        response = await Blockchain.Wallet.export("wallet.bin");
+        assert(response === true, "Error exporting wallet! : " + response + ".");
+
+        response = await Blockchain.Wallet.import("wallet.bin");
+        assert(response === true, "Error importing wallet!");
+
+        assert(wallet.addresses.length == Blockchain.Wallet.addresses.length, "Wallet addresses number differ");
+
+        for (let i = 0; i < wallet.addresses.length; ++i) {
+            let address = wallet.addresses[i].address;
+            let unencodedAddress = wallet.addresses[i].unencodedAddress;
+            let publicKey = wallet.addresses[i].publicKey;
+            let privateKey = await wallet.addresses[i].getPrivateKey();
+
+            let address2 = Blockchain.Wallet.addresses[i].address;
+            let unencodedAddress2 = Blockchain.Wallet.addresses[i].unencodedAddress;
+            let publicKey2 = Blockchain.Wallet.addresses[i].publicKey;
+            let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
+
+            assert(address2 === address, 'address differ after load: ' + address2 + '!==' + address);
+            assert(unencodedAddress2.equals(unencodedAddress), 'unencodedAddress differ after load: ' + unencodedAddress2.toString('hex') + '!==' + address.toString('hex'));
+            assert(publicKey2.equals(publicKey), 'publicKey differ after load: ' + publicKey2.toString('hex') + '!==' + publicKey.toString('hex'));
+            assert(privateKey2.equals(privateKey), 'privateKey differ after load: ' + privateKey2.toString('hex') + '!==' + privateKey.toString('hex'));
+        }
+    });
 
     it('test create public/private Keys', async () => {
 
-        let privateKey1 =  MultiSig.createPrivateKey(['datanastere1','plm','pllui']);
-        let privateKey2 =  MultiSig.createPrivateKey(['datanastere2','plm','pllui']);
-        let privateKey3 =  MultiSig.createPrivateKey(['datanastere1','plm','pllui']);
+        let privateKey1 =  MultiSig.createPrivateKey(['datanastere1','val','pllui']);
+        let privateKey2 =  MultiSig.createPrivateKey(['datanastere2','val','pllui']);
+        let privateKey3 =  MultiSig.createPrivateKey(['datanastere1','val','pllui']);
 
         let publicKey1 = MultiSig.getPublicKeyFromPrivate(privateKey1);
         let publicKey2 = MultiSig.getPublicKeyFromPrivate(privateKey2);
@@ -165,7 +189,7 @@ describe('test save wallet to local storage', () => {
 
         let response = MultiSig.validateSignedMessage(msg, signedMessage, publicKey);
 
-        assert(response === true, "Erroar valdiationg message");
+        assert(response === true, "Error validating message");
 
     });
 
