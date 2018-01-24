@@ -83,26 +83,37 @@ class MiniBlockchain extends  inheritBlockchain{
             exception = ex;
             revert.revertNow = true;
 
+            console.log("MiniBlockchain simulateNewBlock 1 raised an exception", ex);
+
         }
 
-        //revert back the database
-        if (revert.revertNow || revertAutomatically){
+        try{
 
-            //revert transactions
-            for (let i=revert.transactions.end; i>= revert.transactions.start; i--) {
-                // TO DO
+            //revert back the database
+            if (revert.revertNow || revertAutomatically){
+
+                //revert transactions
+                for (let i=revert.transactions.end; i>= revert.transactions.start; i--) {
+                    // TO DO
+                }
+
+                //revert reward
+                if (revert.reward)
+                    this.accountantTree.updateAccount( block.data.minerAddress, block.reward.negated(), undefined );
+
+                if (exception !== null) {
+                    console.log("exception simulateNewBlock ", exception);
+                    throw exception;
+                }
+
+                return false;
             }
 
-            //revert reward
-            if (revert.reward)
-                this.accountantTree.updateAccount( block.data.minerAddress, block.reward.negated(), undefined );
 
-            if (exception !== null) {
-                console.log("exception simulateNewBlock ", exception);
-                throw exception;
-            }
+        } catch (exception){
 
-            return false;
+            console.log("MiniBlockchain simulateNewBlock 2 raised an exception", exception)
+
         }
 
         return result;
