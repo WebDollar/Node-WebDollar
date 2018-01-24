@@ -28,6 +28,8 @@ class InterfaceBlockchainAgent{
         this.agentQueueCount = 0;
 
         this.requestBlockchainForNewPeer();
+
+        this.initializeStartAgent();
     }
 
     initializeProtocol(){
@@ -59,6 +61,7 @@ class InterfaceBlockchainAgent{
             //check if start Agent is finished
 
             console.log("this.agentQueueProcessing.length", this.agentQueueProcessing.length);
+            console.log("this.startAgentResolver", this.startAgentResolver);
             if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0 ) {
 
                 let done = true;
@@ -118,17 +121,16 @@ class InterfaceBlockchainAgent{
 
     }
 
-    startAgent(){
+    initializeStartAgent(){
+        this.startAgentPromise = new Promise((resolve)=>{
+            this.startAgentResolver = resolve;
+        })
+    }
 
+    startAgent(){
         console.log(colors.yellow("startAgent was started"));
 
-        return new Promise((resolve)=>{
-
-            this.startAgentResolver = resolve;
-
-
-        })
-
+        return this.startAgentPromise;
     }
 
     _setBlockchain(newBlockchain){
