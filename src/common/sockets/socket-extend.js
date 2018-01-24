@@ -88,17 +88,20 @@ class SocketExtend{
                 //console.log("sendRequestWaitOnce", request)
             }
 
-            let onceId = socket.once(requestAnswer, function (resData) {
+            let requestFunction = (resData) => {
                 resolve(resData);
 
                 if (timeoutId !== undefined) clearTimeout(timeoutId);
-            });
+            };
+
+            let onceId = socket.once(requestAnswer, requestFunction );
 
             this.sendRequest(socket, request, requestData);
 
             if (timeOutInterval !== undefined)
                 timeoutId = setTimeout(()=>{
-                    socket.off(onceId);
+                    socket.removeListener(requestAnswer, requestFunction);
+                    //socket.off(onceId);
                     resolve(null)
                 }, timeOutInterval);
 

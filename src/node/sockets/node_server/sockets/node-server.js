@@ -57,7 +57,7 @@ class NodeServer {
                 });
 
                 socket.once("disconnect", () => {
-                    console.log("Socket disconnected"); console.log( socket.node.sckAddress.getAddress() );
+                    console.log("Socket disconnected", socket.node.sckAddress.getAddress());
                     NodesList.disconnectSocket(socket);
                 });
 

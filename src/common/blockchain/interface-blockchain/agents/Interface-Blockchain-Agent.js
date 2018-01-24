@@ -29,7 +29,7 @@ class InterfaceBlockchainAgent{
 
         this.requestBlockchainForNewPeer();
 
-        this.initializeStartAgent();
+        this._initializeStartAgent();
     }
 
     initializeProtocol(){
@@ -88,26 +88,9 @@ class InterfaceBlockchainAgent{
                         message: "Start Agent worked successfully",
                     });
 
-                } else{
-
+                } else
                     //it is not done, maybe timeout
-
-                    this.startAgentTimeOut = setTimeout( ()=>{
-
-                        if (this.startAgentResolver === undefined) return;
-
-                        let resolver = this.startAgentResolver;
-                        this.startAgentResolver = undefined;
-
-                        console.log( colors.green("Synchronization done FAILED") );
-
-                        resolver({
-                            result: false,
-                            message: "Start Agent Timeout",
-                        });
-
-                    }, this.AGENT_TIME_OUT);
-                }
+                    this._setStartAgentTimeOut();
 
             }
 
@@ -121,16 +104,43 @@ class InterfaceBlockchainAgent{
 
     }
 
-    initializeStartAgent(){
+    _initializeStartAgent(){
+
         this.startAgentPromise = new Promise((resolve)=>{
             this.startAgentResolver = resolve;
-        })
+        });
+
+        this._setStartAgentTimeOut();
+
     }
 
     startAgent(){
         console.log(colors.yellow("startAgent was started"));
 
         return this.startAgentPromise;
+    }
+
+    _setStartAgentTimeOut(){
+
+        if (this.startAgentTimeOut !== undefined) return;
+
+        this.startAgentTimeOut = setTimeout( ()=>{
+
+            if (this.startAgentResolver === undefined) return;
+
+            let resolver = this.startAgentResolver;
+            this.startAgentResolver = undefined;
+
+            console.log( colors.green("Synchronization done FAILED") );
+
+            this.startAgentTimeOut = undefined;
+
+            resolver({
+                result: false,
+                message: "Start Agent Timeout",
+            });
+
+        }, this.AGENT_TIME_OUT);
     }
 
     _setBlockchain(newBlockchain){
