@@ -81,10 +81,12 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (answer !== undefined && answer !== null && answer.result === true && answer.header !== undefined) {
 
                     if (answer.header.hash.equals( this.blockchain.getBlockchainLastBlock().hash )) {
+
                         data = {
                             position : currentBlockchainLength - 1,
                             header: answer.header,
                         };
+
                     }
                 }
 
@@ -130,8 +132,11 @@ class InterfaceBlockchainProtocolForkSolver{
                     // for (let i=0; i<100; i++)
                     //     console.log(colors.green("forks " + this.blockchain.forksAdministrator.forks.length) );
 
-                    if (fork !== null)
-                        await this.solveFork(fork);
+                    if (fork !== null) {
+                        console.log("solveFork1");
+                        return await this.solveFork(fork);
+                        console.log("solveFork2");
+                    }
 
                     return fork;
 
@@ -191,11 +196,11 @@ class InterfaceBlockchainProtocolForkSolver{
                 }
 
                 //set no change, to terminate
-                if (terminateTimeout === undefined)
-                    terminateTimeout = setTimeout(()=>{
-                        console.log(colors.red("Fork was not solved in time..."));
-                        finished = true;
-                    }, 20*1000);
+                // if ( terminateTimeout === undefined)
+                //     terminateTimeout = setTimeout(()=>{
+                //         console.log(colors.red("Fork was not solved in time..."));
+                //         finished = true;
+                //     }, 20*1000);
 
                 let socket = fork.sockets[ Math.floor(Math.random()*fork.sockets.length) ];
 
@@ -248,7 +253,7 @@ class InterfaceBlockchainProtocolForkSolver{
                             console.log( colors.red("Error including block "+nextBlockHeight+" in fork " ), Exception );
 
                             try {
-                                console.log(block.serializeBlock().toString("hex"));
+                                console.log( block.serializeBlock().toString("hex") );
                             } catch (exception){
                                 console.log(colors.red("Error serializing fork block"), block);
                             }

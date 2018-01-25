@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
-    "argon2": "^0.17.0",
+    "argon2": "^0.16.0",
     "argon2-browser": "^1.1.0",
     "atob": "^2.0.3",
     "axios": "^0.16.2",

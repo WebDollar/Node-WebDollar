@@ -50,6 +50,7 @@ class InterfaceBlockchainAgent{
 
                 this.agentQueueProcessing.push(true);
                 let answerBlockchain = await this.protocol.askBlockchain(result.socket);
+                console.log("answerBlockchain");
                 this.agentQueueProcessing.splice(this.agentQueueProcessing.length-1);
 
             } catch (exception){
@@ -61,13 +62,17 @@ class InterfaceBlockchainAgent{
 
             //check if start Agent is finished
 
-            console.log("this.agentQueueProcessing.length", this.agentQueueProcessing.length);
-            console.log("this.startAgentResolver", this.startAgentResolver.length);
+            console.log( "this.agentQueueProcessing.length", this.agentQueueProcessing.length );
+            console.log( "this.startAgentResolver", this.startAgentResolver !== undefined );
+            console.log( "this.startAgentTimeOut", this.startAgentTimeOut );
+
+
             if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0 ) {
 
                 let done = true;
                 for (let i = 0; i < NodesList.nodes.length; i++)
                     if (NodesList.nodes[i].socket.level <= 3 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
+
                         done = false;
                         console.log("not done", NodesList.nodes[i]);
                         break;
@@ -122,6 +127,8 @@ class InterfaceBlockchainAgent{
     }
 
     _setStartAgentTimeOut(){
+
+        console.log("_setStartAgentTimeOut");
 
         if (this.startAgentTimeOut !== undefined) return;
 
