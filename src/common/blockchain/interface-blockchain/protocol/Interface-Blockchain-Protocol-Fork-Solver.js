@@ -162,9 +162,9 @@ class InterfaceBlockchainProtocolForkSolver{
      * @param fork
      * @returns {Promise.<boolean>}
      */
-    async solveFork(fork){
+    async solveFork(fork) {
 
-        if (fork === null || fork === undefined || !(fork instanceof InterfaceBlockchainFork) ) throw ('fork is null');
+        if (fork === null || fork === undefined || !(fork instanceof InterfaceBlockchainFork)) throw ('fork is null');
 
         let nextBlockHeight = fork.forkStartingHeight;
 
@@ -173,83 +173,95 @@ class InterfaceBlockchainProtocolForkSolver{
 
         //interval timer
 
-        return new Promise( async (resolve)=>{
+        return new Promise(async (resolve) => {
 
-            let socket = fork.sockets[ Math.floor(Math.random()*fork.sockets.length) ];
+            let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
             //console.log("processsing... fork.sockets.length ", fork.sockets.length);
 
             let answer = null;
 
             //in case I didn't check this socket for the same block
-            if ( socketsCheckedForBlock.indexOf(socket) < 0) {
+            while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength ) {
 
-                //console.log("it worked ", socket);
+                if (socketsCheckedForBlock.indexOf(socket) < 0) {
 
-                socketsCheckedForBlock.push(socket);
-                console.log("nextBlockHeight", nextBlockHeight);
+                    //console.log("it worked ", socket);
 
-                let answer;
+                    socketsCheckedForBlock.push(socket);
+                    console.log("nextBlockHeight", nextBlockHeight);
 
-                //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
+                    let answer;
 
-                if (this.protocol.acceptBlocks)
-                    answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
-                else
-                if (this.protocol.acceptBlockHeaders) {
+                    //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
-                    console.log("it is not finished");
-                    answer = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
-                }
+                    if (this.protocol.acceptBlocks)
+                        answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
+                    else if (this.protocol.acceptBlockHeaders) {
 
-                if (answer !== undefined && answer !== null && answer.result === true) {
-
-                    let block;
-
-                    try {
-
-                        block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
-                        block.deserializeBlock(answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget());
-
-                    } catch (Exception) {
-                        console.log(colors.red("Error deserializing blocks "), Exception.toString());
-                        resolve(false);
-                        return false;
+                        console.log("it is not finished");
+                        answer = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
                     }
 
-                    let result;
+                    if (answer !== undefined && answer !== null && answer.result === true) {
 
-                    try {
-
-                        result = await fork.includeForkBlock(block);
-
-                    } catch (Exception) {
-
-                        console.log(colors.red("Error including block " + nextBlockHeight + " in fork "), Exception);
+                        let block;
 
                         try {
-                            console.log(block.serializeBlock().toString("hex"));
-                        } catch (exception) {
-                            console.log(colors.red("Error serializing fork block"), block);
+
+                            block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
+                            block.deserializeBlock(answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget());
+
+                        } catch (Exception) {
+                            console.log(colors.red("Error deserializing blocks "), Exception.toString());
+                            resolve(false);
+                            return false;
                         }
 
-                        resolve(false);
-                        return false;
+                        let result;
 
-                    }
+                        try {
 
-                    //if the block was included correctly
-                    if (result) {
+                            result = await fork.includeForkBlock(block);
 
-                        nextBlockHeight++;
-                        socketsCheckedForBlock = [];
+                        } catch (Exception) {
+
+                            console.log(colors.red("Error including block " + nextBlockHeight + " in fork "), Exception);
+
+                            try {
+                                console.log(block.serializeBlock().toString("hex"));
+                            } catch (exception) {
+                                console.log(colors.red("Error serializing fork block"), block);
+                            }
+
+                            resolve(false);
+                            return false;
+
+                        }
+
+                        //if the block was included correctly
+                        if (result) {
+
+                            nextBlockHeight++;
+                            socketsCheckedForBlock = [];
+                        }
+
                     }
 
                 }
+
 
             }
 
-    });
+            if (fork.forkStartingHeight + fork.forkBlocks.length >= fork.forkChainLength ) {
+                resolve(true);
+                return true;
+            }
+
+
+
+        });
+    }
 
 }
 
