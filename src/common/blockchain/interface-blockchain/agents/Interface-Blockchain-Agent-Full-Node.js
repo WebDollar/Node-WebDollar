@@ -3,7 +3,7 @@ import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Prot
 
 class InterfaceBlockchainAgentFullNode extends InterfaceBlockchainAgent{
 
-    initializeProtocol(){
+    _initializeProtocol(){
 
         this.protocol.initialize(["acceptBlockHeaders", "acceptBlocks" ]);
     }

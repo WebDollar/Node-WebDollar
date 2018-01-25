@@ -5,7 +5,7 @@ import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Prot
 
 class InterfaceBlockchainAgentBlockHeaders extends InterfaceBlockchainAgent{
 
-    initializeProtocol(){
+    _initializeProtocol(){
 
         this.protocol.initialize(["acceptBlockHeaders"]);
     }

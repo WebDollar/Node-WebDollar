@@ -12,7 +12,7 @@ import MiniBlockchainProtocol from "common/blockchain/mini-blockchain/protocol/M
 
 class InterfaceBlockchainAgent{
 
-    constructor( blockchain, blockchainProtocolClass ){
+    constructor( blockchain, blockchainProtocolClass){
 
         this.AGENT_TIME_OUT = 10000;
         this.AGENT_QUEUE_COUNT_MAX = 2;
@@ -22,99 +22,102 @@ class InterfaceBlockchainAgent{
         if ( blockchainProtocolClass === undefined) blockchainProtocolClass = InterfaceBlockchainProtocol;
 
         this.protocol = new blockchainProtocolClass(this.blockchain);
-        this.initializeProtocol();
+        this._initializeProtocol();
 
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
-
-        this.requestBlockchainForNewPeer();
-
-        this._initializeStartAgent();
     }
 
-    initializeProtocol(){
+    _initializeProtocol(){
 
         this.protocol.initialize(["acceptBlockHeaders"]);
     }
 
-    requestBlockchainForNewPeer(){
+    async _requestBlockchainForNewPeer(result) {
 
-        NodesList.emitter.on("nodes-list/connected", async (result) => {
+        // let's ask everybody
 
-            // let's ask everybody
+        clearTimeout(this.startAgentTimeOut);
+        this.startAgentTimeOut = undefined;
 
-            clearTimeout(this.startAgentTimeOut);
-            this.startAgentTimeOut = undefined;
+        try {
 
-            try {
+            this.agentQueueProcessing.push(true);
+            let answerBlockchain = await this.protocol.askBlockchain(result.socket);
+            console.log("answerBlockchain");
+            this.agentQueueProcessing.splice(this.agentQueueProcessing.length - 1);
 
-                this.agentQueueProcessing.push(true);
-                let answerBlockchain = await this.protocol.askBlockchain(result.socket);
-                console.log("answerBlockchain");
-                this.agentQueueProcessing.splice(this.agentQueueProcessing.length-1);
+        } catch (exception) {
+            console.log(colors.red("Error asking for Blockchain"));
+        }
 
-            } catch (exception){
-                console.log(colors.red("Error asking for Blockchain"));
-            }
+        result.socket.node.protocol.agent.startedAgentDone = true;
+        this.agentQueueCount++;
 
-            result.socket.node.protocol.agent.startedAgentDone = true;
-            this.agentQueueCount++;
+        //check if start Agent is finished
 
-            //check if start Agent is finished
-
-            console.log( "this.agentQueueProcessing.length", this.agentQueueProcessing.length );
-            console.log( "this.startAgentResolver", this.startAgentResolver !== undefined );
-            console.log( "this.startAgentTimeOut", this.startAgentTimeOut );
+        console.log("this.agentQueueProcessing.length", this.agentQueueProcessing.length);
+        console.log("this.startAgentResolver", this.startAgentResolver !== undefined);
+        console.log("this.startAgentTimeOut", this.startAgentTimeOut);
 
 
-            if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0 ) {
+        if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0) {
 
-                let done = true;
-                for (let i = 0; i < NodesList.nodes.length; i++)
-                    if (NodesList.nodes[i].socket.level <= 3 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
+            let done = true;
+            for (let i = 0; i < NodesList.nodes.length; i++)
+                if (NodesList.nodes[i].socket.level <= 3 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
 
-                        done = false;
-                        console.log("not done", NodesList.nodes[i]);
-                        break;
-                    }
+                    done = false;
+                    console.log("not done", NodesList.nodes[i]);
+                    break;
+                }
 
-                //in case the agent is done and at least 4 nodes were tested
-                if (done === true && this.startAgentResolver !== undefined &&
-                    NodesList.nodes.length >= this.NODES_LIST_MINIM_LENGTH && this.agentQueueCount >= this.AGENT_QUEUE_COUNT_MAX) {
+            //in case the agent is done and at least 4 nodes were tested
+            if (done === true && this.startAgentResolver !== undefined &&
+                NodesList.nodes.length >= this.NODES_LIST_MINIM_LENGTH && this.agentQueueCount >= this.AGENT_QUEUE_COUNT_MAX) {
 
-                    if (this.startAgentResolver === undefined) return;
+                if (this.startAgentResolver === undefined) return;
 
-                    let resolver = this.startAgentResolver;
-                    this.startAgentResolver = undefined;
+                let resolver = this.startAgentResolver;
+                this.startAgentResolver = undefined;
 
-                    console.log(colors.green("Synchronization done"));
+                console.log(colors.green("Synchronization done"));
 
-                    resolver({
-                        result: true,
-                        message: "Start Agent worked successfully",
-                    });
+                resolver({
+                    result: true,
+                    message: "Start Agent worked successfully",
+                });
 
-                } else
-                    //it is not done, maybe timeout
-                    this._setStartAgentTimeOut();
-
-            }
+            } else
+            //it is not done, maybe timeout
+                this._setStartAgentTimeOut();
 
 
+        }
+    }
 
-        });
+    async _requestBlockchainForNewPeers(){
+
+        NodesList.emitter.on("nodes-list/connected", this._requestBlockchainForNewPeer );
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
 
         });
 
+
+        for (let i=0; i<NodesList.nodes.length; i++){
+            await this._requestBlockchainForNewPeer(NodesList.nodes[i]);
+        }
+
     }
 
-    _initializeStartAgent(){
+    initializeStartAgent(){
 
         this.startAgentPromise = new Promise((resolve)=>{
             this.startAgentResolver = resolve;
         });
+
+        this._requestBlockchainForNewPeers();
 
         this._setStartAgentTimeOut();
 

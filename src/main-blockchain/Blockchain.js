@@ -70,6 +70,7 @@ class Blockchain{
         //loading the blockchain
         await this.loadBlockchain();
 
+        this.Agent.initializeStartAgent();
         let resultAgentStarted = await this.Agent.startAgent();
 
         await this.startMining();
