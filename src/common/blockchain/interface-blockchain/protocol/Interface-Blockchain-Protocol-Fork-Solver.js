@@ -25,7 +25,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let mid = Math.trunc((left + right) / 2);
 
-            blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
+            blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: mid}, mid);
 
             if (blockHeaderResult === null || blockHeaderResult === undefined || blockHeaderResult.result !== true || blockHeaderResult.header === undefined || blockHeaderResult.header.hash === undefined ||  !Buffer.isBuffer(blockHeaderResult.header.hash) )
                 return {position: -1, header: (blockHeaderResult !== null ? null : blockHeaderResult.header) };
@@ -76,7 +76,7 @@ class InterfaceBlockchainProtocolForkSolver{
             //check if n-2 was ok, but I need at least 1 block
             if (currentBlockchainLength <= newChainLength && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
 
-                let answer = await sockets[0].node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
+                let answer = await sockets[0].node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
 
                 //console.log(" !!!! answer", answer);
 
@@ -104,7 +104,7 @@ class InterfaceBlockchainProtocolForkSolver{
             // it has a ground-new blockchain
             // very skeptical when the blockchain becomes bigger
             if (data.position === -1 && currentBlockchainLength < newChainLength){
-                let answer = await sockets[0].node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", { height: 0 }, 0 );
+                let answer = await sockets[0].node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: 0 }, 0 );
                 if (answer !== null && answer !== undefined && answer.result === true && answer.header !== undefined)
                     data = {position: 0, header: answer.header};
             }
@@ -198,21 +198,16 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
-                        let answerBlock;
-                        if (this.protocol.acceptBlocks) {
+                        let header;
+                        if (this.protocol.acceptBlocks)
+                            header = false;
+                        else if (this.protocol.acceptBlockHeaders)
+                            header = true;
 
-                            answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
-                            answerBlock = answer.block;
 
-                        }
-                        else if (this.protocol.acceptBlockHeaders) {
+                        answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, requestHeader: header}, nextBlockHeight);
 
-                            console.log("it is not finished");
-                            answer = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
-                            answerBlock = answer.header;
-                        }
-
-                        if (answer !== undefined && answer !== null && answer.result === true && answer.block) {
+                        if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
 
                             let block;
 
@@ -223,7 +218,7 @@ class InterfaceBlockchainProtocolForkSolver{
                                 if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
                                     block.data._validateHeader = true; //avoiding to store the transactions
 
-                                block.deserializeBlock( answerBlock, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget() );
+                                block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget() );
 
                             } catch (Exception) {
                                 console.log(colors.red("Error deserializing blocks "), Exception, answerBlock);

@@ -1,7 +1,8 @@
 /* Added by Silviu Bogdan Stroe - https://www.silviu-s.com */
 /* Edited by Cosmin-Dumitru Oprea */
 
-var toBuffer = require('blob-to-buffer')
+var toBuffer = require('blob-to-buffer');
+const colors = require('colors/safe');
 
 let SatoshminDB = require('pouchdb');
 let atob = require('atob');
@@ -220,16 +221,35 @@ class InterfacePouchDB {
         }
     }
 
-    async get(key) {
-        try {
-            let result = await this.getDocument(key);
-            return result;
-        } catch (exception) {
-            console.log("db.get error " + key, exception);
-            if (exception.status === 500)
-                MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
-            return null;
-        }
+    get(key, timeout=10000) {
+
+        return new Promise((resolve)=>{
+
+            //timeout, max 10 seconds to load the database
+            let timeoutInterval = setTimeout(()=>{
+                console.log(colors.red("get failed !!" + key));
+                resolve(null);
+            }, timeout);
+
+            this.getDocument(key).then((answer)=>{
+
+                clearTimeout(timeoutInterval);
+                resolve(answer);
+
+            }).catch((exception)=>{
+
+                clearTimeout(timeoutInterval);
+                console.log(colors.red("db.get error " + key), exception);
+
+                if (exception.status === 500)
+                    MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
+
+                resolve(null);
+            });
+
+        })
+
+
     }
 
     async remove(key) {

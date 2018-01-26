@@ -127,42 +127,26 @@ class MainBlockchainWallet{
         return (await this.db.save(this.walletFileName, value));
     }
     
-    loadAddresses() {
+    async loadAddresses() {
 
-        return new Promise( async (resolve)=>{
+        let buffer = await this.db.get(this.walletFileName);
 
-            //timeout, max 10 seconds to load the database
-            let timeout = setTimeout(()=>{
-                console.log(colors.red("LOAD ADDRESSES FROZE AND FAILED !!"));
-                resolve(false);
-                return false;
-            }, 10000);
+        if ( buffer === null || buffer === undefined)
+            return false;
 
-            let buffer = await this.db.get(this.walletFileName);
+        try {
+            await this.deserialize(buffer);
+        } catch (exception){
+            alert('Wallet was not imported successfully');
+            this.addresses = [];
+        }
 
-            clearTimeout(timeout);
+        await this.updatePassword(this.password);
 
-            if ( buffer === null) {
-                resolve(false);
-                return false;
-            }
+        if (this.addresses.length > 0)
+            this.emitter.emit('wallet/changes', this.addresses );
 
-            try {
-                await this.deserialize(buffer);
-            } catch (exception){
-                alert('Wallet was not imported successfully');
-                this.addresses = [];
-            }
-
-            await this.updatePassword(this.password);
-
-            if (this.addresses.length > 0)
-                this.emitter.emit('wallet/changes', this.addresses );
-
-            resolve(true);
-
-
-        })
+        return true;
 
 
     }

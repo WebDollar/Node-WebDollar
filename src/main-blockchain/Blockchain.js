@@ -50,7 +50,10 @@ class Blockchain{
                 this.emitter.emit('blockchain/status', {message: "Wallet Loaded Successfully"});
 
             if (response === false || this.Wallet.addresses.length === 0) {
+
+                console.log("create this.Wallet.createNewAddress");
                 await this.Wallet.createNewAddress(); //it will save automatically
+                console.log("create this.Wallet.createNewAddress done");
 
                 this.emitter.emit('blockchain/status', {message: "Wallet Creating New Wallet"});
             }

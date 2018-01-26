@@ -164,7 +164,7 @@ class InterfaceBlockchainProtocol {
             });
 
         if (this.acceptBlockHeaders)
-            socket.on("blockchain/headers/request-block-by-height", (data) => {
+            socket.on("blockchain/headers-info/request-header-info-by-height", (data) => {
 
                 // data.height
 
@@ -181,7 +181,7 @@ class InterfaceBlockchainProtocol {
 
                     //console.log("blooock", block);
 
-                    socket.node.sendRequest("blockchain/headers/request-block-by-height/" + data.height || 0, {
+                    socket.node.sendRequest("blockchain/headers-info/request-header-info-by-height/" + data.height || 0, {
                         result: true,
                         header: {
                             height: block.height,
@@ -194,8 +194,8 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - blockchain/headers/request-block-by-height", exception.toString()));
-                    socket.node.sendRequest("blockchain/headers/request-block-by-height/" + data.height || 0, {
+                    console.log(colors.red("Socket Error - blockchain/headers-info/request-header-info-by-height", exception.toString()));
+                    socket.node.sendRequest("blockchain/headers-info/request-header-info-by-height/" + data.height || 0, {
                         result: false,
                         message: exception.toString()
                     });
@@ -208,6 +208,7 @@ class InterfaceBlockchainProtocol {
             socket.on("blockchain/blocks/request-block-by-height", (data) => {
 
                 // data.height
+                // data.requestHeader
 
                 try {
 
@@ -220,7 +221,7 @@ class InterfaceBlockchainProtocol {
 
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                         result: true,
-                        block: block.serializeBlock()
+                        block: block.serializeBlock(data.requestHeader || false)
                     });
 
                 } catch (exception) {
