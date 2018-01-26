@@ -155,7 +155,7 @@ class InterfaceBlockchainBlock {
         Concat of Hashes to avoid double computation
      */
 
-    _computeBlockHeaderPrefix(skipPrefix){
+    _computeBlockHeaderPrefix(skipPrefix, requestHeader){
 
         //in case I have calculated  the computedBlockPrefix before
 
@@ -167,7 +167,7 @@ class InterfaceBlockchainBlock {
                                                      Serialization.serializeToFixedBuffer( consts.BLOCKS_POW_LENGTH , this.hashPrev ),
                                                      Serialization.serializeNumber4Bytes( this.timeStamp ),
                                                      //data contains addressMiner, transactions history, contracts, etc
-                                                     this.data.serializeData(),
+                                                     this.data.serializeData(requestHeader),
                                                     ]);
 
         return this.computedBlockPrefix;
@@ -187,11 +187,11 @@ class InterfaceBlockchainBlock {
         return await WebDollarCrypto.hashPOW(buffer);
     }
 
-    serializeBlock(){
+    serializeBlock(requestHeader){
 
         // serialize block is ( hash + nonce + header )
 
-        this._computeBlockHeaderPrefix(true);
+        this._computeBlockHeaderPrefix(true, requestHeader);
 
         if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKS_POW_LENGTH)
             this.hash = this.computeHash();

@@ -198,14 +198,14 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
-                        let header;
+                        let onlyheader;
                         if (this.protocol.acceptBlocks)
-                            header = false;
+                            onlyheader = false;
                         else if (this.protocol.acceptBlockHeaders)
-                            header = true;
+                            onlyheader = true;
 
 
-                        answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, requestHeader: header}, nextBlockHeight);
+                        answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyheader: onlyheader}, nextBlockHeight);
 
                         if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
 
@@ -216,9 +216,9 @@ class InterfaceBlockchainProtocolForkSolver{
                                 block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
 
                                 if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
-                                    block.data._validateHeader = true; //avoiding to store the transactions
+                                    block.data._onlyHeader = true; //avoiding to store the transactions
 
-                                block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget() );
+                                block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget(), onlyheader );
 
                             } catch (Exception) {
                                 console.log(colors.red("Error deserializing blocks "), Exception, answerBlock);

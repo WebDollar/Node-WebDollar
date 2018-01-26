@@ -5,6 +5,7 @@ import Serialization from 'common/utils/Serialization'
 
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
+import InterfaceBlockchainTransaction from "../transactions/transaction/Interface-Blockchain-Transaction";
 
 class InterfaceBlockchainBlockData {
 
@@ -12,7 +13,7 @@ class InterfaceBlockchainBlockData {
 
         this.blockchain = blockchain;
 
-        this._validateHeader = true;
+        this._onlyHeader = false;
 
         if (minerAddress === undefined)
             minerAddress = BlockchainGenesis.address;
@@ -58,7 +59,7 @@ class InterfaceBlockchainBlockData {
 
     calculateHashTransactions (){
 
-        if (!this._validateHeader)
+        if (this._onlyHeader)
             return this.hashTransactions;
         else
             return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataTransactionsConcatenate() ));
@@ -68,21 +69,34 @@ class InterfaceBlockchainBlockData {
 
         let bufferList = [];
 
-        if (this._validateHeader) // no transactions in headerBlocks
-            for (let i=0; i<this.transactions.length; i++)
-                bufferList.push( this.transactions[i].serializeTransaction() );
-        else
-            return Buffer.from(0);
+        if (this._onlyHeader) // no transactions in headerBlocks
+            return this.hashTransactions;
+
+        for (let i=0; i<this.transactions.length; i++)
+            bufferList.push( this.transactions[i].serializeTransaction() );
 
         return Buffer.concat( bufferList )
 
     }
 
-    _computeBlockDataHeaderPrefix(){
+    _serializeTransactions(onlyHeader = false){
+
+        let list = [ Serialization.serializeToFixedBuffer( 32, this.hashTransactions ) ];
+
+        if ( !onlyHeader  && !this._onlyHeader ) {
+            list.push(Serialization.serializeNumber4Bytes(this.transactions.length));
+            for (let i = 0; i < this.transactions.length; i++)
+                list.push(this.transactions[i].serializeTransaction());
+        }
+
+        return Buffer.concat(list);
+    }
+
+    _computeBlockDataHeaderPrefix(onlyHeader){
 
         return Buffer.concat ( [
             Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress ),
-            Serialization.serializeToFixedBuffer( 32, this.hashTransactions ),
+            this._serializeTransactions(onlyHeader),
         ]);
 
     }
@@ -90,19 +104,19 @@ class InterfaceBlockchainBlockData {
     /**
      convert data to Buffer
      **/
-    serializeData(){
+    serializeData(onlyHeader = false){
 
         if (!Buffer.isBuffer(this.hashData) || this.hashData.length !== 32)
             this.computeHashBlockData();
 
         return Buffer.concat( [
             Serialization.serializeToFixedBuffer( 32, this.hashData ),
-            this._computeBlockDataHeaderPrefix(),
+            this._computeBlockDataHeaderPrefix(onlyHeader),
         ] )
 
     }
 
-    deserializeData(buffer, offset){
+    deserializeData(buffer, offset, onlyHeader = false){
 
         this.hashData = BufferExtended.substr(buffer, offset, 32);
         offset += 32;
@@ -110,8 +124,25 @@ class InterfaceBlockchainBlockData {
         this.minerAddress = BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH );
         offset += consts.PUBLIC_ADDRESS_LENGTH;
 
+        offset = this._deserializeTransactions(buffer, offset, onlyHeader);
+
+        return offset;
+    }
+
+    _deserializeTransactions(buffer, offset, onlyHeader = false){
+
         this.hashTransactions = BufferExtended.substr(buffer, offset, 32 );
         offset += 32;
+
+        if (!onlyHeader && !this._onlyHeader) {
+            let length = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 4));
+            offset += 4;
+
+            for (let i = 0; i < length; i++) {
+                let transaction = new InterfaceBlockchainTransaction(this.blockchain, undefined, undefined, undefined, undefined, undefined);
+                offset = transaction.deserializeTransaction(buffer, offset);
+            }
+        }
 
         return offset;
     }

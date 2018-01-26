@@ -208,7 +208,7 @@ class InterfaceBlockchainProtocol {
             socket.on("blockchain/blocks/request-block-by-height", (data) => {
 
                 // data.height
-                // data.requestHeader
+                // data.onlyheader
 
                 try {
 
@@ -221,7 +221,7 @@ class InterfaceBlockchainProtocol {
 
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                         result: true,
-                        block: block.serializeBlock(data.requestHeader || false)
+                        block: block.serializeBlock(data.onlyheader || false)
                     });
 
                 } catch (exception) {
