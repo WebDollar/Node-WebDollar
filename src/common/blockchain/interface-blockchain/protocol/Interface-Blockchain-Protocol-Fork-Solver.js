@@ -28,7 +28,7 @@ class InterfaceBlockchainProtocolForkSolver{
             blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers/request-block-by-height", {height: mid}, mid);
 
             if (blockHeaderResult === null || blockHeaderResult === undefined || blockHeaderResult.result !== true || blockHeaderResult.header === undefined || blockHeaderResult.header.hash === undefined)
-                return {position: -1, header: blockHeaderResult.header};
+                return {position: -1, header: (blockHeaderResult !== null ? null : blockHeaderResult.header) };
 
             //i have finished the binary search
             if (left >= right) {
@@ -50,6 +50,8 @@ class InterfaceBlockchainProtocolForkSolver{
         } catch (Exception){
 
             console.log(colors.red("_discoverForkBinarySearch raised an exception" ), Exception, blockHeaderResult)
+
+            return {position: -1, header: null};
 
         }
 
