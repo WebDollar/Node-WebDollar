@@ -39,6 +39,7 @@ class InterfaceBlockchainAgent{
 
         clearTimeout(this.startAgentTimeOut);
         this.startAgentTimeOut = undefined;
+        console.log("this.startAgentTimeOut cleared");
 
         try {
 
@@ -113,7 +114,7 @@ class InterfaceBlockchainAgent{
 
     initializeStartAgent(){
 
-        this.startAgentPromise = new Promise((resolve)=>{
+        this._startAgentPromise = new Promise((resolve)=>{
             this.startAgentResolver = resolve;
         });
 
@@ -126,7 +127,7 @@ class InterfaceBlockchainAgent{
     startAgent(){
         console.log(colors.yellow("startAgent was started"));
 
-        return this.startAgentPromise;
+        return this._startAgentPromise;
     }
 
     _setStartAgentTimeOut(){

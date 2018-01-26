@@ -26,6 +26,8 @@ class InterfaceBlockchainBlockData {
 
         this.hashData = hashData;
 
+        this._validateHeader = true;
+
         if (hashData === undefined || hashData === null)
             this.calculateHashBlockData();
 
@@ -55,15 +57,20 @@ class InterfaceBlockchainBlockData {
     }
 
     calculateHashTransactions (){
-        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataTransactionsConcatenate() ));
+
+        if (!this._validateHeader)
+            return this.hashTransactions;
+        else
+            return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataTransactionsConcatenate() ));
     }
 
     _computeBlockDataTransactionsConcatenate(){
 
         let bufferList = [];
 
-        for (let i=0; i<this.transactions.length; i++)
-            bufferList.push( this.transactions[i].serializeTransaction() );
+        if (this._validateHeader) // no transactions in headerBlocks
+            for (let i=0; i<this.transactions.length; i++)
+                bufferList.push( this.transactions[i].serializeTransaction() );
 
         return Buffer.concat( bufferList )
 

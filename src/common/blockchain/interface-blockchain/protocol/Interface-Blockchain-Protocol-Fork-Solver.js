@@ -210,6 +210,10 @@ class InterfaceBlockchainProtocolForkSolver{
                         try {
 
                             block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
+
+                            if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
+                                block.data._validateHeader = true; //avoiding to store the transactions
+
                             block.deserializeBlock(answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget());
 
                         } catch (Exception) {
@@ -254,8 +258,13 @@ class InterfaceBlockchainProtocolForkSolver{
             }
 
             if (fork.forkStartingHeight + fork.forkBlocks.length >= fork.forkChainLength ) {
-                resolve(true);
-                return true;
+                if (await fork.saveFork()) {
+                    resolve(true);
+                    return true;
+                } else {
+                    resolve(false);
+                    return false;
+                }
             }
 
 

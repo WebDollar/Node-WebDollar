@@ -27,8 +27,6 @@ class InterfaceBlockchainBlock {
 
         this.hashPrev = hashPrev||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
 
-
-
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
         if ( timeStamp === undefined){
@@ -54,6 +52,7 @@ class InterfaceBlockchainBlock {
         this.reward = undefined;
 
         this.db = db;
+
     }
 
     async _supplementaryValidation() {
