@@ -14,6 +14,9 @@ class InterfaceBlockchainAgent{
 
     constructor( blockchain, blockchainProtocolClass){
 
+        this.agentQueueProcessing = [];
+        this.agentQueueCount = 0;
+
         this.AGENT_TIME_OUT = 10000;
         this.AGENT_QUEUE_COUNT_MAX = 2;
         this.NODES_LIST_MINIM_LENGTH = 2;
@@ -24,8 +27,7 @@ class InterfaceBlockchainAgent{
         this.protocol = new blockchainProtocolClass(this.blockchain);
         this._initializeProtocol();
 
-        this.agentQueueProcessing = [];
-        this.agentQueueCount = 0;
+
     }
 
     _initializeProtocol(){
@@ -39,7 +41,6 @@ class InterfaceBlockchainAgent{
 
         clearTimeout(this.startAgentTimeOut);
         this.startAgentTimeOut = undefined;
-        console.log("this.startAgentTimeOut cleared");
 
         try {
 
@@ -49,18 +50,13 @@ class InterfaceBlockchainAgent{
             this.agentQueueProcessing.splice(this.agentQueueProcessing.length - 1);
 
         } catch (exception) {
-            console.log(colors.red("Error asking for Blockchain"));
+            console.log(colors.red("Error asking for Blockchain"), exception);
         }
 
         result.socket.node.protocol.agent.startedAgentDone = true;
         this.agentQueueCount++;
 
         //check if start Agent is finished
-
-        console.log("this.agentQueueProcessing.length", this.agentQueueProcessing.length);
-        console.log("this.startAgentResolver", this.startAgentResolver !== undefined);
-        console.log("this.startAgentTimeOut", this.startAgentTimeOut);
-
 
         if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0) {
 
@@ -99,28 +95,31 @@ class InterfaceBlockchainAgent{
 
     async _requestBlockchainForNewPeers(){
 
-        NodesList.emitter.on("nodes-list/connected", this._requestBlockchainForNewPeer );
+        this.agentQueueProcessing = [];
+        this.agentQueueCount = 0;
+
+        NodesList.emitter.on("nodes-list/connected", (result) => { this._requestBlockchainForNewPeer(result) } );
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
 
         });
 
 
-        for (let i=0; i<NodesList.nodes.length; i++){
+        for (let i=0; i<NodesList.nodes.length; i++)
             await this._requestBlockchainForNewPeer(NodesList.nodes[i]);
-        }
 
     }
 
-    initializeStartAgent(){
+    async initializeStartAgent(){
 
         this._startAgentPromise = new Promise((resolve)=>{
             this.startAgentResolver = resolve;
         });
 
-        this._requestBlockchainForNewPeers();
 
         this._setStartAgentTimeOut();
+
+        await this._requestBlockchainForNewPeers();
 
     }
 
