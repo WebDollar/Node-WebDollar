@@ -12,6 +12,8 @@ class InterfaceBlockchainBlockData {
 
         this.blockchain = blockchain;
 
+        this._validateHeader = true;
+
         if (minerAddress === undefined)
             minerAddress = BlockchainGenesis.address;
 
@@ -25,8 +27,6 @@ class InterfaceBlockchainBlockData {
         this.hashTransactions = hashTransactions;
 
         this.hashData = hashData;
-
-        this._validateHeader = true;
 
         if (hashData === undefined || hashData === null)
             this.calculateHashBlockData();
@@ -71,6 +71,8 @@ class InterfaceBlockchainBlockData {
         if (this._validateHeader) // no transactions in headerBlocks
             for (let i=0; i<this.transactions.length; i++)
                 bufferList.push( this.transactions[i].serializeTransaction() );
+        else
+            return Buffer.from(0);
 
         return Buffer.concat( bufferList )
 
