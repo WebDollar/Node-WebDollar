@@ -82,7 +82,7 @@ class NodesList {
     disconnectSocket(socket, type){
 
 
-        if (!socket.hasOwnProperty("node") ) {
+        if (socket !== null && !socket.hasOwnProperty("node") ) {
 
             //console.log(colors.red("Error - disconnectSocket rejected by invalid helloValidated"));
             //if (socket.hasOwnProperty("node")) console.log("hello validated value",socket.node.protocol.helloValidated);

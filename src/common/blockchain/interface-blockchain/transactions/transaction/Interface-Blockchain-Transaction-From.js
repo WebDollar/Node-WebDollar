@@ -25,7 +25,7 @@ class InterfaceBlockchainTransactionFrom{
     setFrom(address, currency){
 
         // in case address is actually an object {address: {publicAddress:adr, publicKey: adr}, currency: object }
-        if (typeof address === "object" && address.hasOwnProperty("address") && address.hasOwnProperty("currency")){
+        if (typeof address === "object" && address !== undefined && address.hasOwnProperty("address") && address.hasOwnProperty("currency")){
             currency = address.currency;
             address = address.address;
         }

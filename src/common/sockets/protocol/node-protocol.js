@@ -19,7 +19,7 @@ class NodeProtocol {
 
         console.log("RECEIVED HELLO NODE BACK", response, typeof response);
 
-        if (!response.hasOwnProperty("uuid")){
+        if (response === null || !response.hasOwnProperty("uuid")){
             console.log(colors.red("hello received, but there is not uuid"), response);
             return false;
         }
