@@ -170,7 +170,6 @@ class Serialization{
      */
     serializeToFixedBuffer(noBytes, buffer){
 
-        if (buffer === undefined || buffer === null) return new Buffer(noBytes);
         if (buffer.length === noBytes) return buffer; // in case has the same number of bits as output
 
         let result = new Buffer(noBytes);
