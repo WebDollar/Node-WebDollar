@@ -1,22 +1,29 @@
 /* Added by Silviu Bogdan Stroe - https://www.silviu-s.com */
 /* Edited by Cosmin-Dumitru Oprea */
 
-var toBuffer = require('blob-to-buffer');
 const colors = require('colors/safe');
 
-let SatoshminDB = require('pouchdb');
+let pounchdb;
 let atob = require('atob');
 let btoa = require('btoa');
 const MainBlockchain = require('main-blockchain/Blockchain');
 
-if (typeof window === "undefined")
-    SatoshminDB = require('pouchdb-node');
 
-class InterfacePouchDB {
+if (process.env.BROWSER)
+    pounchdb = require('pouchdb').default;
+else
+    pounchdb  = require('pouchdb-node').default;
+
+class InterfaceSatoshminDB {
 
     constructor(databaseName = "defaultDB") {
         this.dbName = databaseName;
-        this.db = new SatoshminDB(this.dbName);
+
+        try {
+            this.db = new pounchdb(this.dbName);
+        } catch (exception){
+            console.log("InterfaceSatoshminDB exception", pounchdb)
+        }
         this.attachName = 'wallet.bin';
     }
 
@@ -104,7 +111,7 @@ class InterfacePouchDB {
 
         let attachment = value;
         // we need blob in browser
-        if (typeof window !== "undefined" && Buffer.isBuffer(value)) {
+        if (process.env.BROWSER && Buffer.isBuffer(value)){
             attachment = new Blob([value.toString('hex')]);
         } else { //we are in node
             attachment = new Buffer(value.toString('hex'));
@@ -266,4 +273,4 @@ class InterfacePouchDB {
 
 }
 
-export default InterfacePouchDB;
+export default InterfaceSatoshminDB;

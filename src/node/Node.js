@@ -1,4 +1,8 @@
-import NodeServer from 'node/sockets/node_server/sockets/node-server';
+var NodeServer;
+
+if (!process.env.BROWSER)
+    NodeServer = require('node/sockets/node_server/sockets/node-server').default;
+
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodeClientsService from 'node/sockets/node_clients/service/node-clients-service'
 import NodeWebPeersService from 'node/webrtc/service/node-web-peers-service'

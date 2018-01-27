@@ -22,7 +22,7 @@ class NodeDiscoveryService {
         ];
 
         //CORS problem
-        if (typeof window === "undefined"){ // in the browser
+        if (!process.env.BROWSER){ // in the browser
 
             this.fallbackLists.push("https://api.myjson.com/bins/xi1hr");
             this.fallbackLists.push("http://skyhub.me/public/webdollars.json");

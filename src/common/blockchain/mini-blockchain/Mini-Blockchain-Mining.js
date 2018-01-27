@@ -1,6 +1,6 @@
 let InterfaceBlockchainMining;
 
-if (typeof window === 'undefined'){
+if (!process.env.BROWSER){
     InterfaceBlockchainMining = require ('common/blockchain/interface-blockchain/mining/backbone/Interface-Blockchain-Backbone-Mining').default;
 }  else {
     InterfaceBlockchainMining = require ('common/blockchain/interface-blockchain/mining/browser/Interface-Blockchain-Browser-Mining').default;

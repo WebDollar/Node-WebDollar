@@ -3,7 +3,7 @@ let crypto = null;
 
 import Argon2 from 'common/crypto/Argon2/Argon2'
 
-if ( typeof window !== 'undefined') {
+if (process.env.BROWSER){
 
     //tutorial based on
     crypto = require('crypto-browserify')
@@ -79,11 +79,12 @@ class WebDollarCrypto {
 
         let randArr = new Buffer(count) //create a typed array of 32 bytes (256 bits)
 
-        if ( typeof window !== 'undefined' &&  window.crypto !==undefined) window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
-        else {
+        // if ( typeof window !== 'undefined' &&  window.crypto !==undefined)
+        //     window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
+        // else {
             const getRandomValues = require('get-random-values');
             getRandomValues(randArr);
-        }
+        // }
 
         return randArr;
     }

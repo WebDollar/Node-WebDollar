@@ -19,7 +19,7 @@ class Argon2Browser{
 
     constructor(){
 
-        if ( typeof window !== 'undefined')
+        if (process.env.BROWSER)
             window.argon2 = argon2;
 
     }

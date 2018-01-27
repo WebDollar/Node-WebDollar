@@ -21,7 +21,15 @@ const config = merge(base, {
     },
     externals: nodeExternals({
 
-    })
+    }),
+
+    plugins: [
+        new webpack.DefinePlugin({
+            "process.env": {
+                BROWSER: 'false'
+            }
+        })
+    ]
 
 });
 

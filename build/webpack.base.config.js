@@ -1,6 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
-
+const CompressionPlugin = require("compression-webpack-plugin")
 
 const isProd = process.env.NODE_ENV === 'production'
 //const isAnalyze = process.argv.includes('--analyze') || process.argv.includes('--analyse');
@@ -44,13 +44,19 @@ module.exports = {
                     presets: ['es2017', "env"],
                 }
             },
+
+            {
+                test: /test\.js$/,
+                use: 'mocha-loader',
+                exclude: /node_modules/,
+            }
         ]
 
     },
 
     plugins:
         isProd
-            ? []
+            ? [new CompressionPlugin( {} )]
             : []
 
 }
