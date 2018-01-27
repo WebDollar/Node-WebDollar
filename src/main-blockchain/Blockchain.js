@@ -26,6 +26,10 @@ class Blockchain{
 
         this.Accountant = this.Chain.Accountant;
 
+        this.onLoaded = new Promise((resolve)=>{
+            this._onLoadedResolver = resolve;
+        })
+
     }
 
     async createBlockchain(agentName){
@@ -80,8 +84,9 @@ class Blockchain{
 
         this.emitter.emit('blockchain/status', {message: "Blockchain Ready to Mine"});
 
-
         this.emitter.emit('blockchain/status-webdollar', {message: "Ready"});
+
+        this._onLoadedResolver("Ready");
 
     }
 

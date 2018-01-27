@@ -26,3 +26,5 @@ defaultDB/
 wallet\.bin
 
 dist_bundle/terminal-bundle\.js
+
+dist_bundle/terminal-mocha-bundle\.js

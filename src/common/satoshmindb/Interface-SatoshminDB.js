@@ -12,7 +12,7 @@ const MainBlockchain = require('main-blockchain/Blockchain');
 if (process.env.BROWSER)
     pounchdb = require('pouchdb').default;
 else
-    pounchdb  = require('pouchdb-node').default;
+    pounchdb  = require('pouchdb-node');
 
 class InterfaceSatoshminDB {
 

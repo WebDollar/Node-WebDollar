@@ -2,8 +2,9 @@ if(( typeof window !== 'undefined' && !window._babelPolyfill) ||
     ( typeof global !== 'undefined' && !global._babelPolyfill)) {
     require('babel-polyfill')
 }
-//
-// const {describe, it, timeout} = require('mocha');
+
+import Blockchain from 'main-blockchain/Blockchain'
+
 
 if ( typeof describe !== 'undefined') {
 
@@ -34,10 +35,11 @@ if ( typeof describe !== 'undefined') {
     require ('tests/crypto/WebDollar-Crypto.test');
     require ('tests/crypto/Argon2.test');
 
-	require ('tests/utils/big-number/BigNumber.test');
-	require ('tests/utils/serialization/Serialization.test');
+    require ('tests/utils/big-number/BigNumber.test');
+    require ('tests/utils/serialization/Serialization.test');
 
     // require ('tests/blockchain/Node-Web-Peer.test')
 
 
 }
+

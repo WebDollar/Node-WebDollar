@@ -44,12 +44,6 @@ module.exports = {
                     presets: ['es2017', "env"],
                 }
             },
-
-            {
-                test: /test\.js$/,
-                use: 'mocha-loader',
-                exclude: /node_modules/,
-            }
         ]
 
     },
