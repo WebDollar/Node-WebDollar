@@ -8,6 +8,10 @@ let inheritBlockData;
 if (consts.POPOW_ACTIVATED) inheritBlockData = PPoWBlockchainBlockData;
 else inheritBlockData = InterfaceBlockchainBlockData;
 
+/**
+ * It overrides the inheritedBlockData to introduce the Accountant Tree Hash
+ */
+
 class MiniBlockchainBlockData extends  inheritBlockData {
 
     constructor (blockchain, minerAddress, transactions, hashTransactions, hashData, hashAccountantTree){
@@ -48,14 +52,14 @@ class MiniBlockchainBlockData extends  inheritBlockData {
 
     }
 
-    _computeBlockDataHeaderPrefix(){
+    _computeBlockDataHeaderPrefix(onlyHeader = false){
 
         if (!Buffer.isBuffer(this.hashAccountantTree) || this.hashAccountantTree.length !== 32)
             this.computeAccountantTreeHashBlockData();
 
         return Buffer.concat (
             [
-                inheritBlockData.prototype._computeBlockDataHeaderPrefix.call(this),
+                inheritBlockData.prototype._computeBlockDataHeaderPrefix.call(this, onlyHeader),
                 this.hashAccountantTree,
             ]);
     }
@@ -68,9 +72,9 @@ class MiniBlockchainBlockData extends  inheritBlockData {
         this.hashAccountantTree = this.calculateAccountantTreeHashBlockData();
     }
 
-    deserializeData(buffer, offset){
+    deserializeData(buffer, offset, onlyHeader = false){
 
-        offset = inheritBlockData.prototype.deserializeData.call(this, buffer, offset);
+        offset = inheritBlockData.prototype.deserializeData.call(this, buffer, offset, onlyHeader);
 
         this.hashAccountantTree = BufferExtended.substr(buffer, offset, 32);
         offset += 32;

@@ -152,7 +152,7 @@ class InterfaceBlockchainTransaction{
             to: this.to.toJSON(), //address,
             digitalSignature: this.digitalSignature,
             nonce: this.nonce,
-        }
+        };
 
         if (!dontIncludeTxId ) result.txId = this.txId;
 

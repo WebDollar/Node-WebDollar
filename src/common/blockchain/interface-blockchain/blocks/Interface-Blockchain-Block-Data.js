@@ -54,7 +54,7 @@ class InterfaceBlockchainBlockData {
 
     calculateHashBlockData(){
         // sha256 (sha256 ( serialized ))
-        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataHeaderPrefix() ));
+        return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataHeaderPrefix(true) ));
     }
 
     calculateHashTransactions (){
@@ -92,7 +92,10 @@ class InterfaceBlockchainBlockData {
         return Buffer.concat(list);
     }
 
-    _computeBlockDataHeaderPrefix(onlyHeader){
+    _computeBlockDataHeaderPrefix(onlyHeader = false){
+
+        if (this.hashTransactions === undefined || this.hashTransactions === null)
+            this.hashTransactions = this.calculateHashTransactions();
 
         return Buffer.concat ( [
             Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress ),
