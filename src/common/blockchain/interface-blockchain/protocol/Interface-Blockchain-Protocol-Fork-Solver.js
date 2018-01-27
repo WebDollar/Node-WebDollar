@@ -237,7 +237,7 @@ class InterfaceBlockchainProtocolForkSolver{
                                 console.log(colors.red("Error including block " + nextBlockHeight + " in fork "), Exception);
 
                                 try {
-                                    console.log(block.serializeBlock().toString("hex"));
+                                    console.log("block.serialization ", block.serializeBlock().toString("hex"));
                                 } catch (exception) {
                                     console.log(colors.red("Error serializing fork block"), block);
                                 }
