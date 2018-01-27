@@ -75,7 +75,7 @@ describe('WebDollar crypt', ()=>{
         const message1 = "WEBDOLAR TEST 555 @##%";
         let hash1 = await WebDollarCrypto.hashPOW_String(message1)
 
-        assert( hash1 === "fa2f5d4e05c910790b1e871bb0dab0314b32ee7c314c8f7dd7fcf0417ecd38a8", "Hash1 "+message1+ " : "+hash1+" vs " +"fa2f5d4e05c910790b1e871bb0dab0314b32ee7c314c8f7dd7fcf0417ecd38a8 is not good");
+        assert( hash1 === "f9b33b64876b8220d9b7fb3a3ffe4f18ccf13f22447a8f3705df3a4d64d51513", "Hash1 "+message1+ " : "+hash1+" vs " +"f9b33b64876b8220d9b7fb3a3ffe4f18ccf13f22447a8f3705df3a4d64d51513 is not good");
 
     });
 

@@ -3,10 +3,9 @@ import PPoWBlockchainBlock from 'common/blockchain/ppow-blockchain/blocks/PPoW-B
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import PPoWBlockchainBlockData from 'common/blockchain/ppow-blockchain/blocks/PPoW-Blockchain-Block-Data'
+import Blockchain from 'main-blockchain/Blockchain';
 
 describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
-
-    let blockchain = null;
 
     let db = new InterfaceSatoshminDB();
     let version = 0x01;
@@ -17,7 +16,7 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
     let timeStamp = Math.trunc(Math.random() * 100000);
     let nonce = Math.trunc(Math.random() * 1000);
     let minerAddress = BlockchainGenesis.minerAddress;
-    let data = new PPoWBlockchainBlockData(blockchain, minerAddress, [], undefined, undefined); //it will compute the hashData
+    let data = new PPoWBlockchainBlockData(Blockchain.blockchain, minerAddress, [], undefined, undefined); //it will compute the hashData
     let height = Math.trunc(Math.random() * 100000);
     let block = null;
     let h1 = 0, h2 = 1;
@@ -28,7 +27,7 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
         
         let interlink = [{height: h1, blockId: interlinkHash1}, {height: h2, blockId: interlinkHash2}];
         
-        block = new PPoWBlockchainBlock( blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
+        block = new PPoWBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
         block.interlink = interlink;
         
         response = await block.save();
@@ -62,7 +61,7 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
 
         let interlink = [{height: h1, blockId: interlinkHash1}, {height: h2, blockId: interlinkHash2}];
         
-        block = new PPoWBlockchainBlock( blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
+        block = new PPoWBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
         block.interlink = interlink;
         
         response = await block.save();

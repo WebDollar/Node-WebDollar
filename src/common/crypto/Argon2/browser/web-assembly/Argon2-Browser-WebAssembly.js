@@ -4,6 +4,7 @@ import Argon2WebAssemblyCalcClass from './antelle/calc.js'
 let Argon2WebAssemblyCalc = new Argon2WebAssemblyCalcClass();
 
 import Argon2WebAssemblyMain from './antelle/main.js'
+import BufferExtended from "../../../../utils/BufferExtended";
 //require('antelle/worker.js')
 
 /*
@@ -142,12 +143,14 @@ class Argon2BrowserWebAssembly{
             // console.log("ARgon2Browser String", result);
             if (result === null) throw("Argon2 returned empty");
 
-            let hash = result.encoded.substr( result.encoded.lastIndexOf("$")+1 )
+            return Buffer.from(result.hash).toString("hex");
+
+            //let hash = result.encoded.substr( result.encoded.lastIndexOf("$")+1 )
 
             // console.log("hash string ", "hash=", hash, "data=",data)
             // console.log("hash string ", result.hash)
 
-            return hash
+            // return hash
 
         } catch (Exception){
             console.log("Argon2 exception hashString", Exception)

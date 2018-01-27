@@ -52,10 +52,7 @@ class InterfaceBlockchainAddress{
 
         let key = this.address + '_privateKey';
 
-        console.log("key1", key)
         value = this.encrypt(value, password);
-        console.log("key2", password)
-        console.log("db", this.db)
 
         try {
             let result = await this.db.save(key, value);

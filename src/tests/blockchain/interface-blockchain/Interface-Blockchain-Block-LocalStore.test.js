@@ -3,10 +3,10 @@ import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blo
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
+import Blockchain from 'main-blockchain/Blockchain';
 
 describe('test Interface-Block save/load/remove to/from local storage', () => {
 
-    let blockchain = null;
 
     let db = new InterfaceSatoshminDB();
     let version = 0x01;
@@ -15,7 +15,7 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
     let timeStamp = Math.trunc(Math.random() * 100000);
     let nonce = Math.trunc(Math.random() * 1000);
     let minerAddress = BlockchainGenesis.minerAddress;
-    let data = new InterfaceBlockchainBlockData(blockchain, minerAddress, [], undefined, undefined); //it will compute the hashData
+    let data = new InterfaceBlockchainBlockData(Blockchain.blockchain, minerAddress, [], undefined, undefined); //it will compute the hashData
     let height = Math.trunc(Math.random() * 1000);
     let block = null;
     
@@ -23,7 +23,7 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
 
     it('save/load/remove block to local storage, sample test', async () => {
 
-        block = new InterfaceBlockchainBlock( blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
+        block = new InterfaceBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
 
         result = await block.save();
         assert(result === true, 'save: ' + result);
@@ -49,7 +49,7 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
     
     it('remove block from local storage, sample test', async () => {
 
-        block = new InterfaceBlockchainBlock( blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
+        block = new InterfaceBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
         
         result = await block.save();
         assert(result === true, 'save: ' + result);

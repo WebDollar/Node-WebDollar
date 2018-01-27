@@ -20,7 +20,8 @@ const config = merge(base, {
                 use: 'mocha-loader',
                 exclude: /node_modules/,
             }
-        ]
+        ],
+        noParse: /(lie|pouchdb)\.js$/
     },
 
     plugins: [

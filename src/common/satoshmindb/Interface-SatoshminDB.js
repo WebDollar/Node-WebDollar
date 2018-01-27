@@ -119,7 +119,11 @@ class InterfaceSatoshminDB {
             attachment = new Buffer(value.toString('hex'));
         }
 
+
         try {
+
+            await this.createDocument(key, null);
+
             let result = await this.db.put({
                 _id: key,
                 _attachments: {
@@ -133,6 +137,7 @@ class InterfaceSatoshminDB {
             return true;
 
         } catch (err) {
+
 
             if (err.status === 409) {
                 return await this.updateDocumentAttachment(key, attachment);
@@ -221,7 +226,7 @@ class InterfaceSatoshminDB {
 
             //timeout, max 10 seconds to load the database
             let timeoutInterval = setTimeout(()=>{
-                console.log(colors.red("save failed !!" + key));
+                console.log(colors.red("save failed !!"+ key), value);
                 resolve(null);
             }, timeout);
 

@@ -50,7 +50,7 @@ module.exports = {
 
     plugins:
         isProd
-            ? [new CompressionPlugin( {} )]
+            ? [new CompressionPlugin( {} ),  new webpack.optimize.UglifyJsPlugin ]
             : []
 
 }
