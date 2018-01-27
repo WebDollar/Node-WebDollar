@@ -24,3 +24,5 @@ MyDatabase/
 defaultDB/
 
 wallet\.bin
+
+dist_bundle/terminal-bundle\.js

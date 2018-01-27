@@ -59,4 +59,4 @@ class SignalingClientList {
 
 }
 
-exports.SignalingClientList = new SignalingClientList();
+export default new SignalingClientList();

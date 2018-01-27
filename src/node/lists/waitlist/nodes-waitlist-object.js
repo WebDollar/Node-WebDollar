@@ -74,5 +74,6 @@ class NodesWaitlistObject {
 
 }
 
-exports.NodesWaitlistObject = NodesWaitlistObject;
-exports.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;
+NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;
+
+export default NodesWaitlistObject;

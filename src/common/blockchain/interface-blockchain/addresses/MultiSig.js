@@ -148,4 +148,4 @@ class MultiSig {
 
 }
 
-module.exports = MultiSig;
+export default MultiSig;

@@ -4,13 +4,13 @@
   "description": "Node of WebDollar",
   "main": "index.js",
   "scripts": {
-    "build_terminal": "babel --presets es2017 src -d dist && browserify dist/build_terminal.js > dist_bundle/bundle_terminal.js",
+    "build_terminal": "webpack --config build/webpack.terminal.config.js",
     "show_browser_test": "node src/tests/browser/show-browser.test.js",
     "build_browser_test": "browserify src/build_browser.js -o dist_bundle/browser/bundle_browser.js -t [ babelify --presets [ es2017 ] ] && npm run show_browser_test",
     "build_browser": "browserify src/build_browser.js -o dist_bundle/../../vue-Frontend/public/WebDollar-dist/WebDollar-Protocol-bundle.js -t [ babelify --presets [ es2017 ] ] ",
     "build_browser_user_interface": "browserify src/build_browser.js -o dist_bundle/../../User-Interface-WebDollar/dist_bundle/WebDollar-Protocol-bundle.js -t [ babelify --presets [ es2017 ] ] ",
     "start_double_connections": "npm run build_terminal && DEBUG_SIGNALING_SERVER=true  node dist/build_terminal.js  ",
-    "start": "npm run build_terminal && node dist/build_terminal.js  ",
+    "start": "npm run build_terminal && node dist_bundle/terminal-bundle.js  ",
     "start_mining": "npm run build_terminal && START_MINING=true SERVER_PORT=6666  node dist/build_terminal.js ",
     "test_node": "npm run build_terminal && START_TESTING=true node dist/build_terminal.js ",
     "test": "npm run build_terminal && mocha --exit --timeout 10000 dist/tests/main.test.js --reporter mochawesome && npm run show_mocha_report",
@@ -65,6 +65,7 @@
     "opn": "^5.1.0",
     "pouchdb": "^6.4.1",
     "pouchdb-node": "^6.3.4",
+    "save": "^2.3.2",
     "schnorr": "0.0.2",
     "secp256k1": "^3.3.1",
     "socket.io": "^2.0.3",
@@ -76,11 +77,15 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.0",
     "babel-preset-es2017": "^6.24.1",
     "babelify": "^7.3.0",
     "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
-    "mochawesome": "^2.3.1"
+    "mochawesome": "^2.3.1",
+    "webpack": "^3.10.0",
+    "webpack-merge": "^4.1.1",
+    "webpack-node-externals": "^1.6.0"
   }
 }

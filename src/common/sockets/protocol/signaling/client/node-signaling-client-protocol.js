@@ -1,7 +1,7 @@
 const colors = require('colors/safe');
 import consts from 'consts/const_global'
 
-import {SignalingClientList} from './signaling-client-list/signaling-client-list'
+import SignalingClientList from './signaling-client-list/signaling-client-list'
 import NodesList from 'node/lists/nodes-list'
 
 class NodeSignalingClientProtocol {

@@ -266,4 +266,4 @@ class InterfacePouchDB {
 
 }
 
-module.exports = InterfacePouchDB;
+export default InterfacePouchDB;

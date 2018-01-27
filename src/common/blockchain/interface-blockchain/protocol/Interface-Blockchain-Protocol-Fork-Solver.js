@@ -215,10 +215,11 @@ class InterfaceBlockchainProtocolForkSolver{
 
                                 block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
 
+                                console.log("this.protocol.acceptBlocks",this.protocol.acceptBlocks, "this.protocol.acceptBlockHeaders", this.protocol.acceptBlockHeaders);
                                 if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
                                     block.data._onlyHeader = true; //avoiding to store the transactions
 
-                                console.log("this.protocol.acceptBlocks",this.protocol.acceptBlocks, "this.protocol.acceptBlockHeaders", this.protocol.acceptBlockHeaders);
+
                                 block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget());
 
                             } catch (Exception) {
