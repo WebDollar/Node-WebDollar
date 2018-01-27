@@ -30,7 +30,7 @@ class InterfaceBlockchainBlockData {
         this.hashData = hashData;
 
         if (hashData === undefined || hashData === null)
-            this.calculateHashBlockData();
+            this.computeHashBlockData();
 
     }
 
@@ -68,9 +68,6 @@ class InterfaceBlockchainBlockData {
     _computeBlockDataTransactionsConcatenate(){
 
         let bufferList = [];
-
-        if (this._onlyHeader) // no transactions in headerBlocks
-            return this.hashTransactions;
 
         for (let i=0; i<this.transactions.length; i++)
             bufferList.push( this.transactions[i].serializeTransaction() );

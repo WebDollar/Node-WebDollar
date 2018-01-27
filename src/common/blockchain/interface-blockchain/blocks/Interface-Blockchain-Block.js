@@ -167,7 +167,7 @@ class InterfaceBlockchainBlock {
                                                      Serialization.serializeToFixedBuffer( consts.BLOCKS_POW_LENGTH , this.hashPrev ),
                                                      Serialization.serializeNumber4Bytes( this.timeStamp ),
                                                      //data contains addressMiner, transactions history, contracts, etc
-                                                     //this.data.serializeData(requestHeader),
+                                                     this.data.serializeData(requestHeader),
                                                     ]);
 
         return this.computedBlockPrefix;
