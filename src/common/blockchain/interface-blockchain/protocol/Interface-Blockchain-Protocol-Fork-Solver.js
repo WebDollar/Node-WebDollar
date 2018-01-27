@@ -198,14 +198,14 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
-                        let onlyheader;
+                        let onlyHeader;
                         if (this.protocol.acceptBlocks)
-                            onlyheader = false;
+                            onlyHeader = false;
                         else if (this.protocol.acceptBlockHeaders)
-                            onlyheader = true;
+                            onlyHeader = true;
 
 
-                        answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyheader: onlyheader}, nextBlockHeight);
+                        answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
 
                         if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
 
@@ -218,7 +218,7 @@ class InterfaceBlockchainProtocolForkSolver{
                                 if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
                                     block.data._onlyHeader = true; //avoiding to store the transactions
 
-                                block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget(), onlyheader );
+                                block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget(), onlyHeader );
 
                             } catch (Exception) {
                                 console.log(colors.red("Error deserializing blocks "), Exception, answerBlock);

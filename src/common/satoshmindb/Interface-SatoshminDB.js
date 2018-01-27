@@ -7,7 +7,7 @@ const colors = require('colors/safe');
 let SatoshminDB = require('pouchdb');
 let atob = require('atob');
 let btoa = require('btoa');
-const MainBlockchain = require('../blockchain/interface-blockchain/mining/Interface-Blockchain-Mining');
+const MainBlockchain = require('main-blockchain/Blockchain');
 
 if (typeof window === "undefined")
     SatoshminDB = require('pouchdb-node');
