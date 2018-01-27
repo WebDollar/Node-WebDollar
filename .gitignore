@@ -28,3 +28,5 @@ wallet\.bin
 dist_bundle/terminal-bundle\.js
 
 dist_bundle/terminal-mocha-bundle\.js
+
+dist_bundle/browser/mocha/browser-mocha-bundle\.js

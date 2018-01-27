@@ -6,15 +6,15 @@
   "scripts": {
     "build_terminal": "webpack --config build/webpack.terminal.config.js",
     "build_browser": "webpack --config build/webpack.browser.config.js",
-    "build_browser_test": "cross-env WEBPACK_TYPE=browser_test MOCHA_TESTS=enabled webpack  --config build/webpack.browser.config.js && npm run show_browser_test",
     "build_browser_user_interface": "cross-env WEBPACK_TYPE=user_interface webpack --config build/webpack.browser.config.js ",
     "show_browser_test": "node src/tests/browser/show-browser.test.js",
     "start": "npm run build_terminal && node dist_bundle/terminal-bundle.js  ",
     "start_mining": "npm run build_terminal && START_MINING=true SERVER_PORT=6666  node dist_bundle/terminal-bundle.js ",
     "test": "webpack --config build/tests/webpack.terminal.test.config.js && mocha --exit --timeout 10000 dist_bundle/terminal-mocha-bundle.js --reporter mochawesome && npm run show_mocha_report",
+    "test_browser": "webpack --config build/tests/webpack.browser.test.config.js && npm run show_browser_test",
     "show_mocha_report": "node src/tests/browser/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
-    "show_coverage": "node src/tests/browser/show-coverage.test.js",
+    "show_coverage": "node src/tests/browser/show-coverage.test.js"
 
   },
   "repository": {

@@ -39,6 +39,7 @@ describe('testAddressGenerator', () => {
     it ('blockchain address', async ()=>{
 
         let blockchainAddress = new InterfaceBlockchainAddress();
+        console.log("new address1");
         await blockchainAddress.createNewAddress();
 
         console.log("new address", blockchainAddress.address, blockchainAddress.privateKey, blockchainAddress.publicKey);

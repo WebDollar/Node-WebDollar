@@ -36,8 +36,11 @@ class InterfaceBlockchainAddress{
         this.unencodedAddress = result.unencodedAddress;
         this.publicKey = result.publicKey;
 
+        console.log("savePrivateKey...");
         await this.savePrivateKey(result.privateKey.privateKey);
+        console.log("savePrivateKey...2");
         await this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
+        console.log("savePrivateKey...3");
     }
 
     updatePassword(newPassword){
@@ -48,10 +51,16 @@ class InterfaceBlockchainAddress{
     async savePrivateKey(value, password) {
 
         let key = this.address + '_privateKey';
+
+        console.log("key1", key)
         value = this.encrypt(value, password);
-        
+        console.log("key2", password)
+        console.log("db", this.db)
+
         try {
-            return (await this.db.save(key, value));
+            let result = await this.db.save(key, value);
+            console.log("reesult save", result);
+            return  result;
         }
         catch(err) {
             return 'ERROR on SAVE privateKey: ' + err;

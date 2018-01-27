@@ -17,6 +17,7 @@ else
 class InterfaceSatoshminDB {
 
     constructor(databaseName = "defaultDB") {
+
         this.dbName = databaseName;
 
         try {
@@ -24,6 +25,7 @@ class InterfaceSatoshminDB {
         } catch (exception){
             console.log("InterfaceSatoshminDB exception", pounchdb)
         }
+
         this.attachName = 'wallet.bin';
     }
 
@@ -213,19 +215,33 @@ class InterfaceSatoshminDB {
 
 
     //main methods
-    async save(key, value) {
-        try {
-            if (Buffer.isBuffer(value)) {
-                return await this.saveDocumentAttachment(key, value);
-            } else {
-                return await this.createDocument(key, value);
+    save(key, value, timeout=10000) {
+
+        return new Promise(async (resolve)=>{
+
+            //timeout, max 10 seconds to load the database
+            let timeoutInterval = setTimeout(()=>{
+                console.log(colors.red("save failed !!" + key));
+                resolve(null);
+            }, timeout);
+
+            try {
+                if (Buffer.isBuffer(value))
+                    resolve(await this.saveDocumentAttachment(key, value));
+                else
+                    resolve(await this.createDocument(key, value));
+
+                clearTimeout(timeoutInterval);
+            } catch (exception) {
+                console.log("db.save error " + key, exception);
+                if (exception.status === 500)
+                    MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"});
+
+                resolve(null);
+                return null;
             }
-        } catch (exception) {
-            console.log("db.save error " + key, exception);
-            if (exception.status === 500)
-                MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"});
-            return null;
-        }
+
+        })
     }
 
     get(key, timeout=10000) {
