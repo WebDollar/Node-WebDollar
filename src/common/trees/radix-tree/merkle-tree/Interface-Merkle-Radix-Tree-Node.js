@@ -18,24 +18,30 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
 
     }
 
-    serializeNodeData(){
+    serializeNodeData(includeEdges, includeHashes){
 
-        return Buffer.concat ( [
-            this.hash.sha256,
-            InterfaceRadixTreeNode.prototype.serializeNodeData.call(this),
-        ]);
+        let list = [ this.hash.sha256 ];
+
+        if (includeHashes)
+            list.push(InterfaceRadixTreeNode.prototype.serializeNodeData.apply(this, arguments));
+
+        return Buffer.concat ( list );
 
     }
 
 
-    deserializeNodeData(buffer, offset){
+    deserializeNodeData(buffer, offset, includeEdges, includeHashes){
 
-        let hashSha256 =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 32) );
-        offset += 32;
+        if (includeHashes) {
 
-        this.hash = {sha256: hashSha256};
+            let hashSha256 = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 32));
+            offset += 32;
 
-        offset = InterfaceRadixTreeNode.prototype.deserializeNodeData.call(this, buffer, offset);
+            this.hash = {sha256: hashSha256};
+
+        }
+
+        offset = InterfaceRadixTreeNode.prototype.deserializeNodeData.apply(this, arguments);
 
         return offset;
     }

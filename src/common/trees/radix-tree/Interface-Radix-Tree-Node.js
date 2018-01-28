@@ -39,7 +39,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
         }
     }
 
-    deserializeNode(buffer, offset, includeEdges){
+    deserializeNode(buffer, offset, includeEdges, includeHashes){
 
         try {
 

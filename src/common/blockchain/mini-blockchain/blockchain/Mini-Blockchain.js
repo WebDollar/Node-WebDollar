@@ -170,11 +170,13 @@ class MiniBlockchain extends  inheritBlockchain{
     async load(){
 
         let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
-        let result = await finalAccountantTree.loadMiniAccountant();
+        let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
 
         result =  result && await inheritBlockchain.prototype.load.call(this);
 
         //check the accountant Tree if matches
+        console.log("this.accountantTree", this.accountantTree.root);
+        console.log("finalAccountantTree", finalAccountantTree.root);
         result = result && finalAccountantTree.matches(this.accountantTree);
 
         if (result === false){

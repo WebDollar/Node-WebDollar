@@ -40,7 +40,7 @@ class InterfaceTreeNode {
         try {
             let buffer = [];
 
-            this.serializeNodeData();
+            this.serializeNodeData.apply(arguments);
 
             if (includeEdges) {
 
@@ -77,10 +77,10 @@ class InterfaceTreeNode {
 
     }
 
-    deserializeNode(buffer, offset, includeEdges){
+    deserializeNode(buffer, offset, includeEdges, includeHashes){
 
         try {
-            offset = this.deserializeNodeData(buffer);
+            offset = this.deserializeNodeData.apply(this, arguments);
 
             if (includeEdges) {
 

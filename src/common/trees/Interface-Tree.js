@@ -338,8 +338,9 @@ class InterfaceTree{
         return this.root.serializeNode(true);
     }
 
-    deserializeTree(buffer, offset){
-        return this.root.deserializeNode(buffer, offset, true);
+    deserializeTree(buffer, offset, includeHashes){
+        console.log("deserializeTree", this.root);
+        return this.root.deserializeNode(buffer, offset, true, includeHashes);
     }
 
     toJSON(){
@@ -354,13 +355,14 @@ class InterfaceTree{
         return await this.db.save(key, this.serializeTree());
     }
 
-    async loadTree(key, buffer, offset){
+    async loadTree(key, buffer, offset, includeHashes){
 
         if (buffer === undefined)
             buffer = await this.db.get(key);
 
+        console.log("loadMiniAccountant", buffer);
 
-        return await this.deserializeTree(buffer, offset||0);
+        return await this.deserializeTree(buffer, offset||0, includeHashes);
     }
 
     matches(tree){

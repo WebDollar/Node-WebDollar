@@ -1,6 +1,6 @@
 import InterfaceTreeNode from 'common/trees/Interface-Tree-Node'
-import Serialization from "../../utils/Serialization";
-
+import Serialization from "common/utils/Serialization";
+import BufferExtended from "common/utils/BufferExtended"
 
 class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
@@ -21,8 +21,8 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
         return Buffer.concat ( [
             this.hash.sha256,
-            InterfaceTreeNode.prototype.serializeNodeData.call(this),
-            ]);
+            InterfaceTreeNode.prototype.serializeNodeData.apply(this),
+        ]);
 
     }
 
@@ -32,9 +32,9 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
         let hashSha256 =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 32) );
         offset += 32;
 
-        this.hash = {sha256: hashSha256}
+        this.hash = {sha256: hashSha256};
 
-        offset = InterfaceTreeNode.prototype.deserializeNodeData.call(this, buffer, offset);
+        offset = InterfaceTreeNode.prototype.deserializeNodeData.apply( this, arguments );
 
         return offset;
     }

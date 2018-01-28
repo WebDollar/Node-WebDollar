@@ -5,6 +5,10 @@ import InterfaceRadixTree from './../Interface-Radix-Tree'
 import InterfaceAccountRadixTreeNode from './Interface-Accountant-Radix-Tree-Node'
 import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
 
+
+/**
+ * OBSOLETE
+ */
 class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     createNode(parent, edges, value){

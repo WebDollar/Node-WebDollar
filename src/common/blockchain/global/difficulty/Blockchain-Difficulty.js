@@ -1,5 +1,5 @@
-import Serialization from "../../../utils/Serialization";
-import BufferExtended from "../../../utils/BufferExtended";
+import Serialization from "common/utils/Serialization";
+import BufferExtended from "common/utils/BufferExtended"
 
 var BigInteger = require('big-integer');
 

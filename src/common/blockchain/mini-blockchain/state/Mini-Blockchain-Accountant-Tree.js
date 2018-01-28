@@ -161,9 +161,9 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         return false;
     }
 
-    async loadMiniAccountant(buffer, offset){
+    async loadMiniAccountant(buffer, offset, includeHashes){
 
-        let result = this.loadTree("accountantTree", buffer, offset);
+        let result = await this.loadTree("accountantTree", buffer, offset, includeHashes);
 
         return result !== false;
 
