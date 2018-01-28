@@ -5,6 +5,7 @@ import BufferExtend from "common/utils/BufferExtended";
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import BufferExtended from 'common/utils/BufferExtended';
+const FileSystem = require('fs');
 
 class InterfaceBlockchainAddress{
 
@@ -14,7 +15,7 @@ class InterfaceBlockchainAddress{
         this.address = null;
 
         this.publicKey = null;
-        
+
         if (typeof db === 'undefined'){
             this.db = new InterfaceSatoshminDB();
             this.password = 'password';
@@ -36,18 +37,53 @@ class InterfaceBlockchainAddress{
         this.unencodedAddress = result.unencodedAddress;
         this.publicKey = result.publicKey;
 
-        console.log("savePrivateKey...");
         await this.savePrivateKey(result.privateKey.privateKey);
-        console.log("savePrivateKey...2");
         await this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
-        console.log("savePrivateKey...3");
     }
 
     updatePassword(newPassword){
 
         this.password = newPassword;
     }
-    
+
+    /**
+     *
+     * @param data to be encrypted
+     * @param password used for AES encrypt
+     * @returns data encrypted with AES
+     */
+    encrypt(data, password) {
+
+        if (typeof password === 'undefined')
+            password = this.password;
+
+        let encr = WebDollarCrypto.encryptAES(data, password);
+
+        return Buffer.from(encr);
+    }
+
+    /**
+     *
+     * @param data
+     * @param password
+     * @returns {*}
+     */
+    decrypt(data, password) {
+
+        if (typeof password === 'undefined')
+            password = this.password;
+
+        let decr = WebDollarCrypto.decryptAES(data, password);
+
+        return Buffer.from(decr);
+    }
+
+    /**
+     * Save privateKey encrypted to local database
+     * @param value privateKey's value
+     * @param password Encrypt privateKey with AES using password
+     * @returns database response
+     */
     async savePrivateKey(value, password) {
 
         let key = this.address + '_privateKey';
@@ -63,13 +99,18 @@ class InterfaceBlockchainAddress{
             return 'ERROR on SAVE privateKey: ' + err;
         }
     }
-    
+
+    /**
+     *
+     * @param password is used to decrypt privateKey from database
+     * @returns privateKey's value decrypted
+     */
     async getPrivateKey(password) {
-        
+
         let key = this.address + '_privateKey';
-        
+
         try {
-            let value = await this.db.get(key);            
+            let value = await this.db.get(key);
             value = this.decrypt(value, password);
 
             return value;
@@ -78,11 +119,15 @@ class InterfaceBlockchainAddress{
             return 'ERROR on LOAD privateKey: ' + err;
         }
     }
-    
+
+    /**
+     * Removes privateKey from database
+     * @returns database result
+     */
     async removePrivateKey() {
 
         let key = this.address + '_privateKey';
-        
+
         try {
             return (await this.db.remove(key));
         }
@@ -90,11 +135,17 @@ class InterfaceBlockchainAddress{
             return 'ERROR on REMOVE privateKey: ' + err;
         }
     }
-    
+
+    /**
+     * Save privateKeyWIF encrypted to local database
+     * @param value privateKey's value
+     * @param password Encrypt privateKeyWIF with AES using password
+     * @returns database response
+     */
     async savePrivateKeyWIF(value) {
 
         let key = this.address + '_privateKeyWIF';
-        
+
         try {
             return (await this.db.save(key, value));
         }
@@ -102,11 +153,14 @@ class InterfaceBlockchainAddress{
             return 'ERROR on SAVE privateKeyWIF: ' + err;
         }
     }
-    
+
+    /**
+     * @returns privateKeyWIF's value decrypted
+     */
     async getPrivateKeyWIF() {
-        
+
         let key = this.address + '_privateKeyWIF';
-        
+
         try {
             return (await this.db.get(key));
         }
@@ -114,11 +168,15 @@ class InterfaceBlockchainAddress{
             return 'ERROR on LOAD privateKeyWIF: ' + err;
         }
     }
-    
+
+    /**
+     * Removes privateKeyWIF from database
+     * @returns database result
+     */
     async removePrivateKeyWIF() {
 
         let key = this.address + '_privateKeyWIF';
-        
+
         try {
             return (await this.db.remove(key));
         }
@@ -126,6 +184,57 @@ class InterfaceBlockchainAddress{
             return 'ERROR on REMOVE privateKeyWIF: ' + err;
         }
 
+    }
+
+    /**
+     * @param fileName stores the path for privateKey file
+     * @returns {Promise<void>}
+     */
+    exportPrivateKey(fileName){
+
+        return new Promise(resolve => {
+
+            FileSystem.open(fileName, 'w', async (err, fd) => {
+
+                if (err){
+                    resolve(false);
+                    return;
+                }
+
+                let privateKeyBuffer = await this.getPrivateKey();
+
+                FileSystem.write(fd, privateKeyBuffer, 0, privateKeyBuffer.length, null, function (err) {
+
+                    if (err){
+                        resolve(false);
+                        return;
+                    }
+
+                    FileSystem.close(fd, function () {
+                        resolve(true);
+                    });
+                });
+            });
+        });
+    }
+
+    /**
+     * Imports privateKey from @param fileName and saves it to local database
+     * @param fileName is the source file for import
+     * @returns {Promise<void>}
+     */
+    importPrivateKey(fileName){
+
+        return new Promise(resolve => {
+
+            let readStream = FileSystem.createReadStream(fileName);
+
+            readStream.on('data', async (buffer) => {
+
+                resolve(await this.savePrivateKey(buffer));
+            });
+
+        });
     }
 
     async serializeAddress(serializePrivateKey = false){
@@ -146,7 +255,7 @@ class InterfaceBlockchainAddress{
                                 this.publicKey
                               ].concat(privateKeyArray) );
     }
-    
+
     async deserializeAddress(buffer, deserializePrivateKey = false){
 
         buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
@@ -197,41 +306,15 @@ class InterfaceBlockchainAddress{
             throw exception;
 
         }
-        
+
         return offset;
     }
 
-    toString(){
-
-        return this.address.toString()
-
-    }
-    
-    encrypt(data, password) {
-        
-        if (typeof password === 'undefined')
-            password = this.password;
-        
-        let encr = WebDollarCrypto.encryptAES(data, password);
-        
-        return Buffer.from(encr);
-    }
-    
-    decrypt(data, password) {
-        
-        if (typeof password === 'undefined')
-            password = this.password;
-
-        let decr = WebDollarCrypto.decryptAES(data, password);
-
-        return Buffer.from(decr);
-    }
-    
     async save() {
-        
+
         let key = this.address.toString('hex');
         let value = await this.serializeAddress();
-        
+
         try {
             return (await this.db.save(key, value));
         }
@@ -239,11 +322,11 @@ class InterfaceBlockchainAddress{
             return 'ERROR on SAVE blockchain address: ' + err;
         }
     }
-    
+
     async load() {
-        
+
         let key = this.address.toString('hex');
-        
+
         try {
             let value = await this.db.get(key);
 
@@ -258,11 +341,11 @@ class InterfaceBlockchainAddress{
             return false;
         }
     }
-    
+
     async remove() {
 
         let key = this.address.toString('hex');
-        
+
         try {
             return (await this.db.remove(key));
         }
@@ -271,7 +354,7 @@ class InterfaceBlockchainAddress{
         }
 
     }
-    
+
     async _toStringDebug(){
 
         let privateKey = await this.getPrivateKey();
@@ -279,6 +362,12 @@ class InterfaceBlockchainAddress{
             privateKey = null;
 
         return "address" + this.address.toString() + (this.publicKey !== null ? "public key" + this.publicKey.toString() : '') + (privateKey !== null ? "private key" + privateKey.toString() : '')
+    }
+
+    toString(){
+
+        return this.address.toString()
+
     }
 
 

@@ -3,6 +3,8 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
+import consts from "../../consts/const_global";
+import BufferExtend from "../../common/utils/BufferExtended";
 const colors = require('colors/safe');
 
 const md5 = require('md5');
@@ -15,7 +17,7 @@ class MainBlockchainWallet{
 
         this.blockchain = blockchain;
         this.walletFileName = 'wallet.bin';
-        
+
         if(db === undefined)
             this.db = new InterfaceSatoshminDB();
         else
@@ -23,7 +25,7 @@ class MainBlockchainWallet{
 
 
         this.addresses = [];
-        
+
         this.password = password;
 
         this.emitter = new EventEmitter();
@@ -68,7 +70,7 @@ class MainBlockchainWallet{
 
         return blockchainAddress;
     }
-    
+
     async updatePassword(newPassword){
 
         for (let i = 0; i < this.addresses.length; ++i) {
@@ -82,7 +84,7 @@ class MainBlockchainWallet{
 
         this.emitter.emit('wallet/password-changed', {});
     }
-    
+
     async serialize(serializePrivateKey = false) {
 
         let list = [Serialization.serializeNumber4Bytes(this.addresses.length)];
@@ -94,7 +96,7 @@ class MainBlockchainWallet{
 
         return Buffer.concat (list);
     }
-    
+
     async deserialize(buffer, deserializePrivateKey = false) {
 
         let data = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
@@ -104,7 +106,7 @@ class MainBlockchainWallet{
 
             let numAddresses = Serialization.deserializeNumber( BufferExtended.substr(data, offset, 4) );
             offset += 4;
-            
+
             this.addresses = [];
             for (let i = 0; i < numAddresses; ++i) {
                 this.addresses[i] = await this._justCreateNewAddress(undefined, true);
@@ -119,14 +121,14 @@ class MainBlockchainWallet{
             throw exception;
         }
     }
-    
+
     async saveAddresses() {
 
         let value = await this.serialize();
 
         return (await this.db.save(this.walletFileName, value));
     }
-    
+
     async loadAddresses() {
 
         let buffer = await this.db.get(this.walletFileName);
@@ -150,7 +152,7 @@ class MainBlockchainWallet{
 
 
     }
-    
+
     async removeAddresses() {
 
         this.addresses = [];
@@ -179,7 +181,7 @@ class MainBlockchainWallet{
 
     }
 
-    export(filePath){
+    exportAddresses(filePath){
 
         return new Promise(resolve => {
 
@@ -190,9 +192,16 @@ class MainBlockchainWallet{
                     return;
                 }
 
-                let walletBuffer = await this.serialize(true);
+                let list = [ Serialization.serializeNumber1Byte(this.addresses.length) ];
 
-                FileSystem.write(fd, walletBuffer, 0, walletBuffer.length, null, function (err) {
+                for (let i = 0; i < this.addresses.length; ++i) {
+                    list.push( Serialization.serializeNumber1Byte(this.addresses[i].address.length) );
+                    list.push( Buffer.from(this.addresses[i].address) );
+                }
+
+                let buffer = Buffer.concat(list);
+
+                FileSystem.write(fd, buffer, 0, buffer.length, null, function (err) {
 
                     if (err){
                         resolve(false);
@@ -208,7 +217,7 @@ class MainBlockchainWallet{
 
     }
 
-    import(filePath){
+    importAddresses(filePath){
 
         return new Promise(resolve => {
 
@@ -216,7 +225,25 @@ class MainBlockchainWallet{
 
             readStream.on('data', async (buffer) => {
 
-                resolve(await this.deserialize(buffer, true));
+                //Deserialize public addresses and push back to addresses array
+                let offset = 0;
+
+                let numAddresses = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+                offset += 1;
+
+                for (let i = 0; i < numAddresses; ++i) {
+
+                    let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+                    offset += 1;
+
+                    let blockchainAddress = await this._justCreateNewAddress();
+                    blockchainAddress.address = BufferExtend.substr(buffer, offset, len);
+                    offset += len;
+
+                    this.addresses.push(blockchainAddress);
+                }
+
+                resolve(true);
             });
 
         });
