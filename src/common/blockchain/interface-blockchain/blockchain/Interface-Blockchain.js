@@ -88,6 +88,7 @@ class InterfaceBlockchain {
 
         if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
 
+
         //let's check again the heights
         if (block.height !== this.blocks.length) throw ('height of a new block is not good... '+ block.height + " "+ this.blocks.length);
 
@@ -96,6 +97,7 @@ class InterfaceBlockchain {
         // if (block.height > 0)
         //     console.log("prevBlock", this.blocks[block.height-1]);
         //
+
         await this.blockIncluded(block);
 
         if (saveBlock)
@@ -103,6 +105,7 @@ class InterfaceBlockchain {
 
         // propagating a new block in the network
         this.propagateBlocks(block.height, socketsAvoidBroadcast)
+
 
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
             this.mining.resetMining();
@@ -215,20 +218,21 @@ class InterfaceBlockchain {
     async save(){
 
         //save the number of blocks
+        let result = false;
 
         if (await this.db.save(this.blockchainFileName, this.blocks.length) !== true){
             console.log(colors.red("Error saving the blocks.length"));
-            return false;
-        }
+        } else
 
-        for (let i = 0; i < this.blocks.length; ++i){
-            let response = await this.blocks[i].save();
+            for (let i = 0; i < this.blocks.length; ++i){
+                let response = await this.blocks[i].save();
 
-            if (response !== true)
-                return response;
-        }
-        
-        return true;
+                if (response !== true) {
+                    break;
+                }
+            }
+
+        return result;
     }
 
     async load(){

@@ -1,3 +1,4 @@
+const colors = require('colors/safe');
 import PPoWBlockchain from 'common/blockchain/ppow-blockchain/blockchain/PPoW-Blockchain'
 import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockchain/Interface-Blockchain'
 
@@ -47,7 +48,7 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
             //updating reward
-            console.log("block.data.minerAddress",block.data.minerAddress);
+            //console.log("block.data.minerAddress",block.data.minerAddress);
 
             result = !this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
 
@@ -129,7 +130,7 @@ class MiniBlockchain extends  inheritBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
 
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
@@ -138,7 +139,7 @@ class MiniBlockchain extends  inheritBlockchain{
             return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast);
         });
 
-        if (result){
+        if (result && saveBlock){
             result = await this.accountantTree.saveMiniAccountant();
         }
 
@@ -153,22 +154,32 @@ class MiniBlockchain extends  inheritBlockchain{
     }
 
 
-    save(){
+    async save(){
 
-        let result = this.accountantTree.saveMiniAccountant();
+        let result = await this.accountantTree.saveMiniAccountant();
 
-        result = result && inheritBlockchain.prototype.save.call(this);
+        result = result && await inheritBlockchain.prototype.save.call(this);
 
         return result;
-
     }
 
-    load(){
+    /**
+     * Load blocks and check the Accountant Tree
+     * @returns boolean
+     */
+    async load(){
 
+        let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
+        let result = await finalAccountantTree.loadMiniAccountant();
 
-        let result = this.accountantTree.loadMiniAccountant();
+        result =  result && await inheritBlockchain.prototype.load.call(this);
 
-        result = result && inheritBlockchain.prototype.load.call(this);
+        //check the accountant Tree if matches
+        result = result && finalAccountantTree.matches(this.accountantTree);
+
+        if (result === false){
+            console.log(colors.red("finalAccountantTree doesn't match"))
+        }
 
         return result;
 

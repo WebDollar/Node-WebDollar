@@ -357,10 +357,17 @@ class InterfaceTree{
     async loadTree(key, buffer, offset){
 
         if (buffer === undefined)
-            buffer = await this.db.load(key);
+            buffer = await this.db.get(key);
 
 
         return await this.deserializeTree(buffer, offset||0);
+    }
+
+    matches(tree){
+        let result = this.validateRoot();
+        result = result && tree.validateRoot();
+
+        return result;
     }
 
 }

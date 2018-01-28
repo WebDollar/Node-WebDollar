@@ -203,6 +203,20 @@ class InterfaceMerkleTree extends InterfaceTree{
         return result;
     }
 
+    /**
+     * Verify two trees and its hashes
+     * @param tree
+     * @returns boolean
+     */
+    matches(tree){
+
+        let result = this.validateRoot();
+        result = result && tree.validateRoot();
+
+        result = result && this.root.hash.sha256.equals(tree.root.hash.sha256);
+
+        return result;
+    }
 
 }
 

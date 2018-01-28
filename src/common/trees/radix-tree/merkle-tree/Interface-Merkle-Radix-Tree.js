@@ -62,6 +62,9 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         return InterfaceMerkleTree.prototype.getValueToHash.call(this, node);
     }
 
+    matches(tree){
+        return InterfaceMerkleTree.prototype.matches.call(this,tree);
+    }
 
 }
 
