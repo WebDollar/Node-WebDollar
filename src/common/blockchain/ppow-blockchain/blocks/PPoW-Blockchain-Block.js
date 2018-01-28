@@ -24,7 +24,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             return this.level;
 
         let T = this.difficultyTarget;
-        let id = new BigInteger(this.hash.toString("hex"), 16);
+        let id = new BigInteger(this.hash.toString('hex'), 16);
         
         //If id <= T/2^u the block is of level u => block level is max(u) for 2^u * id <= T
         // T -> inf => u -> 255
@@ -187,7 +187,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         } catch (exception){
 
-            console.log(colors.red("Error deserialize a block.  "), exception, buffer);
+            console.log(colors.red("error deserialize a block  "), exception, buffer);
             throw exception;
 
         }

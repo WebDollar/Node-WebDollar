@@ -135,34 +135,27 @@ describe('test save wallet to local storage', () => {
 
     });
 
-    it('test export/import wallet', async () => {
+    it('test export/import wallet addresses', async () => {
 
-        let wallet = await Blockchain.Wallet;
+        let addresses = Blockchain.Wallet.addresses;
 
-        response = await Blockchain.Wallet.export("wallet.bin");
-        assert(response === true, "Error exporting wallet! : " + response + ".");
+        response = await Blockchain.Wallet.exportAddresses("addresses.bin");
+        assert(response === true, "Error exporting addresses! : " + response + ".");
+        Blockchain.Wallet.addresses = [];
 
-        response = await Blockchain.Wallet.import("wallet.bin");
-        assert(response === true, "Error importing wallet!");
+        response = await Blockchain.Wallet.importAddresses("addresses.bin");
+        assert(response === true, "Error importing addresses!");
+        assert(addresses.length === Blockchain.Wallet.addresses.length, "Addresses length differ after import: " + addresses.length + "!==" + Blockchain.Wallet.addresses.length);
 
-        assert(wallet.addresses.length == Blockchain.Wallet.addresses.length, "Wallet addresses number differ");
-
-        for (let i = 0; i < wallet.addresses.length; ++i) {
-            let address = wallet.addresses[i].address;
-            let unencodedAddress = wallet.addresses[i].unencodedAddress;
-            let publicKey = wallet.addresses[i].publicKey;
-            let privateKey = await wallet.addresses[i].getPrivateKey();
-
-            let address2 = Blockchain.Wallet.addresses[i].address;
-            let unencodedAddress2 = Blockchain.Wallet.addresses[i].unencodedAddress;
-            let publicKey2 = Blockchain.Wallet.addresses[i].publicKey;
-            let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
-
-            assert(address2 === address, 'address differ after load: ' + address2 + '!==' + address);
-            assert(unencodedAddress2.equals(unencodedAddress), 'unencodedAddress differ after load: ' + unencodedAddress2.toString('hex') + '!==' + address.toString('hex'));
-            assert(publicKey2.equals(publicKey), 'publicKey differ after load: ' + publicKey2.toString('hex') + '!==' + publicKey.toString('hex'));
-            assert(privateKey2.equals(privateKey), 'privateKey differ after load: ' + privateKey2.toString('hex') + '!==' + privateKey.toString('hex'));
+        for (let i = 0; i < addresses.length; ++i){
+            assert(addresses[i].address.toString() === Blockchain.Wallet.addresses[i].address.toString(), "Addresses differ after import:" + addresses[i].address + "!==" + Blockchain.Wallet.addresses[i].address);
         }
+
+    });
+
+
+    it('test export/import wallet privateKeys', async () => {
+
     });
 
     it('test create public/private Keys', async () => {
