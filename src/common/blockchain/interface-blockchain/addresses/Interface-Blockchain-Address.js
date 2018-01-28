@@ -270,6 +270,9 @@ class InterfaceBlockchainAddress{
         return this.savePrivateKey(Buffer.from(privateKeyString, "hex"));
     }
 
+    /**
+     * Export privateKey as string
+     */
     exportPrivateKeyToString(){
 
         return this.getPrivateKey().then( (response) => {
