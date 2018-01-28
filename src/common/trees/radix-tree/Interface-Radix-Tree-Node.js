@@ -20,7 +20,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
         try {
             let buffer = [];
 
-            buffer.push(this.serializeNodeData.apply(this, arguments));
+            buffer.push( this.serializeNodeData.apply(this, arguments) );
 
             if (includeEdges) {
 
@@ -29,7 +29,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                 for (let i = 0; i < this.edges.length; i++) {
                     buffer.push(Serialization.serializeNumber1Byte(this.edges[i].label.length));
                     buffer.push(this.edges[i].label);
-                    buffer.push(this.edges[i].targetNode.serializeNode.apply(arguments));
+                    buffer.push(this.edges[i].targetNode.serializeNode.apply(this.edges[i].targetNode, arguments));
                 }
 
             }

@@ -20,10 +20,12 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
 
     serializeNodeData(includeEdges, includeHashes){
 
-        let list = [ this.hash.sha256 ];
+        let list = [];
 
         if (includeHashes)
-            list.push(InterfaceRadixTreeNode.prototype.serializeNodeData.apply(this, arguments));
+            list.push(this.hash.sha256);
+
+        list.push(InterfaceRadixTreeNode.prototype.serializeNodeData.apply(this, arguments));
 
         return Buffer.concat ( list );
 

@@ -47,7 +47,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         let result = node.updateBalanceToken(value, tokenId);
 
-
         // it was deleted
         if (result === null)
             this.delete(address);
@@ -62,7 +61,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             return null;
 
         this.changedNode( node );
-
 
 
         return result;
@@ -153,12 +151,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     }
 
     async saveMiniAccountant(includeHashes, name){
-        let result = await this.saveTree(name||"accountantTree", includeHashes);
 
-        if (Buffer.isBuffer(result) )
-            return true;
-
-        return false;
+        return await this.saveTree(name||"accountantTree", includeHashes);
     }
 
     async loadMiniAccountant(buffer, offset, includeHashes, name){
