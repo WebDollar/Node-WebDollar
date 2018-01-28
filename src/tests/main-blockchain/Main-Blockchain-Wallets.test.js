@@ -174,6 +174,20 @@ describe('test save wallet to local storage', () => {
         }
     });
 
+    it('test export/import wallet privateKeys from string', async () => {
+
+        for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
+            let privateKey = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            let privateKeyString = await Blockchain.Wallet.addresses[i].exportPrivateKeyToString();
+
+            response = await Blockchain.Wallet.addresses[i].importPrivateKeyFromString(privateKeyString);
+            assert(response === true, "Error loading privateKey from string: " + response);
+
+            let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            assert(privateKey2.equals(privateKey), "PrivateKey differ after importing from string: " + privateKey.toString("hex") + "!==" + privateKey2.toString("hex"));
+        }
+    });
+
     it('test create public/private Keys', async () => {
 
         let privateKey1 =  MultiSig.createPrivateKey(['datanastere1','val','pllui']);

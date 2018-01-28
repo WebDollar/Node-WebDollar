@@ -262,6 +262,24 @@ class InterfaceBlockchainAddress{
         });
     }
 
+    /**
+     * Import a private key from user input
+     * @param privateKeyString is the imported text value
+     */
+    importPrivateKeyFromString(privateKeyString){
+        return this.savePrivateKey(Buffer.from(privateKeyString, "hex"));
+    }
+
+    exportPrivateKeyToString(){
+
+        return this.getPrivateKey().then( (response) => {
+            return response.toString("hex");
+        }).catch((err)=> {
+            console.log(colors.red("Cannot export privateKey as string: " + err));
+            return err;
+        });
+    }
+
     async serializeAddress(serializePrivateKey = false){
 
         let privateKeyArray = [];
