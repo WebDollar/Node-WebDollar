@@ -19,6 +19,8 @@ dist_bundle/browser/bundle_browser\.js
 
 dist_bundle/browser/bundle_terminal\.js
 
+dist_bundle/browser/browser-bundle.js
+
 MyDatabase/
 
 defaultDB/

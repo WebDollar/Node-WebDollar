@@ -20,11 +20,6 @@ import BufferExtended from "common/utils/BufferExtended"
 
 class InterfaceRadixTree extends InterfaceTree{
 
-    constructor(){
-
-        super();
-
-    }
 
     createNode(parent, edges, value){
         return new InterfaceRadixTreeNode(parent, edges, value);

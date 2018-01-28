@@ -113,6 +113,7 @@ class MiniBlockchain extends  inheritBlockchain{
         } catch (exception){
 
             console.log("MiniBlockchain simulateNewBlock 2 raised an exception", exception)
+            return false;
 
         }
 
@@ -133,9 +134,15 @@ class MiniBlockchain extends  inheritBlockchain{
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
 
-        return await this.simulateNewBlock(block, false, async ()=>{
-            return await PPoWBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast);
-        })
+        let result = await this.simulateNewBlock(block, false, async ()=>{
+            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast);
+        });
+
+        if (result){
+            result = await this.accountantTree.saveMiniAccountant();
+        }
+
+        return result;
 
     }
 

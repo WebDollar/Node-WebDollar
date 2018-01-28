@@ -12,8 +12,8 @@ import InterfaceMerkleTree from './../../merkle-tree/Interface-Merkle-Tree'
 
 class InterfaceRadixMerkleTree extends InterfaceRadixTree {
 
-    constructor(){
-        super();
+    constructor(db){
+        super(db);
 
         this.autoMerklify = true;
         this.root.hash = {sha256: new Buffer(32) }

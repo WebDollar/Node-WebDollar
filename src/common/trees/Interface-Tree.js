@@ -4,9 +4,10 @@ import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
 
 class InterfaceTree{
 
-    constructor(){
+    constructor(db){
 
         this.root = this.createNode(null,  [], null );
+        this.db = db;
 
     }
 
@@ -347,6 +348,16 @@ class InterfaceTree{
 
     toString(){
 
+    }
+
+    async saveTree(key){
+        return await this.db.save(key, this.serializeTree());
+    }
+
+    async loadTree(key){
+
+        let buffer = await this.db.load(key);
+        this.deserializeTree(buffer, 0);
     }
 
 }

@@ -9,9 +9,9 @@ const EventEmitter = require('events');
 
 class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
-    constructor (){
+    constructor (db){
 
-        super();
+        super(db);
 
         this.autoMerklify = true;
         this.root.hash = {sha256: new Buffer(32) }
@@ -145,15 +145,19 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     }
 
     serializeMiniAccountant(){
-
         return this.serializeTree();
-
     }
 
     deserializeMiniAccountant(buffer,offset){
-
         return this.deserializeTree(buffer,offset);
+    }
 
+    saveMiniAccountant(){
+        return this.saveTree("accountantTree");
+    }
+
+    loadMiniAccountant(){
+        return this.loadTree("accountantTree");
     }
 
 }
