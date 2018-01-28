@@ -156,6 +156,18 @@ describe('test save wallet to local storage', () => {
 
     it('test export/import wallet privateKeys', async () => {
 
+        for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
+            let privateKey = await Blockchain.Wallet.addresses[i].getPrivateKey();
+
+            response = await Blockchain.Wallet.addresses[i].exportPrivateKey("privateKey" + i + ".bin");
+            assert(response === true, "Error exporting privateKey: " + response);
+
+            response = await Blockchain.Wallet.addresses[i].importPrivateKey("privateKey" + i + ".bin");
+            assert(response === true, "Error importing privateKey: " + response);
+
+            let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            assert(privateKey2.equals(privateKey), "PrivateKey differ after import: " + privateKey2.toString("hex") + "!==" + privateKey.toString("hex"));
+        }
     });
 
     it('test create public/private Keys', async () => {
