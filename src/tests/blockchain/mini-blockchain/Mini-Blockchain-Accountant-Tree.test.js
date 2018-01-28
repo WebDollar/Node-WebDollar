@@ -41,7 +41,7 @@ describe('MiniBlockchainAccountantTree', () => {
 
 
         let list = [];
-        for (let i=0; i<100; i++){
+        for (let i=0; i<1000; i++){
             let address = InterfaceBlockchainAddressHelper.generateAddress();
 
             let found =false;

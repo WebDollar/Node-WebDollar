@@ -128,7 +128,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         return Buffer.concat(
             [
-                balances.id,
+                Serialization.serializeToFixedBuffer(balances.id, consts.TOKEN_ID_LENGTH),
                 Serialization.serializeBigNumber(balances.amount)
             ]);
 
@@ -140,11 +140,13 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             let buffer = new Buffer(0), //[InterfaceMerkleRadixTreeNode.prototype.serializeNodeData.apply(this, arguments)]
                 balancesBuffers = [];
 
+            let balancesCount = 0;
             if (this.balances !== undefined && this.balances !== null) {
+
                 //let serialize webd
                 let iWEBDSerialized = null;
                 for (let i = 0; i < this.balances.length; i++)
-                    if ((this.balances[i].id.length === 1) && (this.balances[i].id[0] === 0)) {
+                    if ((this.balances[i].id.length === 1) && (this.balances[i].id[0] === 1)) {
                         balancesBuffers.push(this._serializeBalances(this.balances[i]));
                         iWEBDSerialized = i;
                     }
@@ -157,17 +159,19 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                     balancesBuffers.push(this._serializeBalances({id: idWEBD, amount: new BigNumber(0)}));
                 }
 
+                balancesCount = 1;
+
                 //let serialize everything else
                 for (let i = 0; i < this.balances.length; i++)
                     if (i !== iWEBDSerialized) {
                         balancesBuffers.push(this._serializeBalances(this.balances[i]));
+                        balancesCount++;
                     }
+
+                balancesBuffers = Buffer.concat(balancesBuffers);
             }
 
-            balancesBuffers.unshift(Serialization.serializeNumber1Byte(balancesBuffers.length));
-            balancesBuffers = Buffer.concat(balancesBuffers);
-
-            return Buffer.concat( [buffer, balancesBuffers] );
+            return Buffer.concat( [buffer, Serialization.serializeNumber1Byte(balancesCount), balancesBuffers] );
 
         } catch (exception){
             console.log("Error Serializing MiniAccountantTree NodeData", exception);
@@ -183,49 +187,49 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         try {
 
-            let length = BufferExtended.substr(buffer, offset, 1);
+            let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
             offset += 1;
 
-            // webd balance
-            let webdId = BufferExtended.substr(buffer, offset,1);
-            offset += 1;
+            if (balancesLength > 0){
 
-            console.log("deserializeNodeData offset",offset)
-            console.log("deserializeNodeData length",length)
-            console.log("deserializeNodeData webdId",webdId)
+                // webd balance
+                let webdId =  BufferExtended.substr(buffer, offset,1) ;
+                offset += 1;
 
-            //webd token
-            if (webdId[0] !== 1) throw "webd token is incorrect";
-
-            let result = Serialization.deserializeBigNumber( buffer, offset );
-
-            offset = result.newOffset;
-
-            if (length > 0 || result.number.greaterThan(0)) {
+                //webd token
+                if (webdId[0] !== 1) throw "webd token is incorrect";
 
                 this.balances = [];
+                let result = Serialization.deserializeBigNumber( buffer, offset );
 
                 this.updateBalanceToken(result.number);
+                offset = result.newOffset;
 
-                //rest of tokens , in case there are
-                for (let i = 1; i < length; i++) {
-                    let tokenId = BufferExtended.substr(buffer, offset, consts.TOKEN_ID_LENGTH);
-                    offset += consts.TOKEN_ID_LENGTH;
+                if (balancesLength > 0) {
 
-                    result = Serialization.deserializeBigNumber(buffer, offset);
+                    //rest of tokens , in case there are
+                    for (let i = 1; i < balancesLength; i++) {
 
-                    this.updateBalanceToken(result.number, tokenId);
+                        let tokenId = BufferExtended.substr(buffer, offset, consts.TOKEN_ID_LENGTH);
+                        offset += consts.TOKEN_ID_LENGTH;
 
-                    offset = result.newOffset;
+                        result = Serialization.deserializeBigNumber(buffer, offset);
+
+                        this.updateBalanceToken(result.number, tokenId);
+
+                        offset = result.newOffset;
+                    }
                 }
+
+
             }
+
+            return offset;
 
         } catch (exception){
             console.log(colors.red("error deserializing tree node"), exception);
             throw exception;
         }
-
-        return offset;
 
     }
 

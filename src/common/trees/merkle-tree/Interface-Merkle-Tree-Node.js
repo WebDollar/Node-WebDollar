@@ -34,6 +34,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
         this.hash = {sha256: hashSha256};
 
+        arguments[1] = offset;
         offset = InterfaceTreeNode.prototype.deserializeNodeData.apply( this, arguments );
 
         return offset;

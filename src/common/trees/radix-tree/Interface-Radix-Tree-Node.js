@@ -57,11 +57,17 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
                 for (let i = 0; i < length; i++) {
 
-                    let valueLength = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 1));
+                    let valueLength = buffer[offset]; //1 byte
                     offset += 1;
 
-                    let value = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, valueLength));
+                    let label = BufferExtended.substr(buffer, offset, valueLength);
                     offset += valueLength;
+
+                    let targetNode = this.createNewNode();
+                    arguments[1] = offset;
+                    offset = targetNode.deserializeNode.apply(targetNode, arguments);
+
+                    this.edges.push( this.createEdge(label, targetNode) );
 
                 }
 
@@ -73,10 +79,12 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
             console.log("Error deserializing Interface Radix Tree", exception);
             throw exception;
         }
+
+
     }
 
-    createEdge(node){
-        return new InterfaceRadixTreeEdge(node, [], null);
+    createEdge(label, targetNode){
+        return new InterfaceRadixTreeEdge(label, targetNode);
     }
 
 }

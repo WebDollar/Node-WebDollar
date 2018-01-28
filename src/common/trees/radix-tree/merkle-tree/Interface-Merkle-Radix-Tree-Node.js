@@ -43,6 +43,7 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
 
         }
 
+        arguments[1] = offset;
         offset = InterfaceRadixTreeNode.prototype.deserializeNodeData.apply(this, arguments);
 
         return offset;

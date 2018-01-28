@@ -360,7 +360,7 @@ class InterfaceTree{
         if (buffer === undefined)
             buffer = await this.db.get(key);
 
-        console.log("loadMiniAccountant", buffer.length, "   ",buffer);
+        console.log("loadMiniAccountant", buffer.length, "   ",buffer.toString("hex"));
 
         return await this.deserializeTree(buffer, offset||0, includeHashes);
     }
