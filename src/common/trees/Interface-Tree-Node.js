@@ -40,7 +40,7 @@ class InterfaceTreeNode {
         try {
             let buffer = [];
 
-            this.serializeNodeData.apply(arguments);
+            this.serializeNodeData.apply(this, arguments);
 
             if (includeEdges) {
 

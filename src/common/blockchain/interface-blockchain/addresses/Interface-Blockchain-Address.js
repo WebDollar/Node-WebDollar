@@ -56,7 +56,7 @@ class InterfaceBlockchainAddress{
 
         try {
             let result = await this.db.save(key, value);
-            console.log("reesult save", result);
+            //console.log("reesult save", result);
             return  result;
         }
         catch(err) {

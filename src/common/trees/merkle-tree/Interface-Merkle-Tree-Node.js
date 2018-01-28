@@ -21,7 +21,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
         return Buffer.concat ( [
             this.hash.sha256,
-            InterfaceTreeNode.prototype.serializeNodeData.apply(this),
+            InterfaceTreeNode.prototype.serializeNodeData.apply(this, arguments),
         ]);
 
     }

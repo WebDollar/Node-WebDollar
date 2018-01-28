@@ -1,4 +1,4 @@
-
+const colors = require('colors/safe');
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */

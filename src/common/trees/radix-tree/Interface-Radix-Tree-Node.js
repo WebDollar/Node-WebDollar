@@ -20,13 +20,16 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
         try {
             let buffer = [];
 
+            buffer.push(this.serializeNodeData.apply(this, arguments));
+
             if (includeEdges) {
 
                 buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
+
                 for (let i = 0; i < this.edges.length; i++) {
                     buffer.push(Serialization.serializeNumber1Byte(this.edges[i].label.length));
                     buffer.push(this.edges[i].label);
-                    buffer.push(this.edges[i].targetNode.serializeNode(includeEdges));
+                    buffer.push(this.edges[i].targetNode.serializeNode.apply(arguments));
                 }
 
             }
@@ -42,6 +45,8 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
     deserializeNode(buffer, offset, includeEdges, includeHashes){
 
         try {
+
+            offset = this.deserializeNodeData.apply(this, arguments);
 
             if (includeEdges) {
 

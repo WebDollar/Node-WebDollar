@@ -1,3 +1,4 @@
+const colors = require('colors/safe');
 import InterfaceMerkleAccountantRadixTree from 'common/trees/radix-tree/accountant-tree/merkle-tree/Interface-Merkle-Accountant-Radix-Tree'
 import InterfaceMerkeRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
@@ -186,6 +187,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             // webd balance
             let webdId = BufferExtended.substr(buffer, offset,1);
             offset += 1;
+
+            console.log("deserializeNodeData offset",offset)
+            console.log("deserializeNodeData length",length)
+            console.log("deserializeNodeData webdId",webdId)
 
             //webd token
             if (webdId[0] !== 1) throw "webd token is incorrect";
