@@ -18,7 +18,7 @@ describe('interfaceSatoshminDB', () => {
     
     it('save/get sample ASCII test', async () => {
 
-        key = Math.floor(Math.random() * 10000).toString();;
+        key = Math.floor(Math.random() * 10000).toString();
         value = 'myValue_1';
         db = new InterfaceSatoshminDB();
 
@@ -49,7 +49,7 @@ describe('interfaceSatoshminDB', () => {
     
     it('save/save/get sample ASCII test', async () => {
 
-        key = Math.floor(Math.random() * 10000).toString();;
+        key = Math.floor(Math.random() * 10000).toString();
         value = 'myValue_2';
         let new_value = 'modified_value';
         db = new InterfaceSatoshminDB();
@@ -93,7 +93,7 @@ describe('interfaceSatoshminDB', () => {
      
     it('save/remove/get sample Buffer', async() => {
 
-        key = Math.floor(Math.random() * 10000).toString();;
+        key = Math.floor(Math.random() * 10000).toString();
         value = new Buffer('44FF00234561217fdeca', 'hex');
         db = new InterfaceSatoshminDB();
         
@@ -110,7 +110,7 @@ describe('interfaceSatoshminDB', () => {
 
     it('save/save/get sample Buffer test', async () => {
 
-        key = Math.floor(Math.random() * 10000).toString();;
+        key = Math.floor(Math.random() * 10000).toString();
         value = new Buffer('744Fagfe4578ab', 'hex');
         let new_value = new Buffer('7444caed', 'hex');
         
@@ -120,10 +120,10 @@ describe('interfaceSatoshminDB', () => {
         assert(response === true, 'save: ' + response);
         
         
-        response = await db.save(key, new_value)
+        response = await db.save(key, new_value);
         assert(response === true, 'save: ' + response);
         
-        response = await db.get(key)
+        response = await db.get(key);
         assert(response.equals(new_value), 'get: ' + response);
 
     });
@@ -140,7 +140,7 @@ describe('interfaceSatoshminDB', () => {
     
     it('save/get sample Array', async () => {
 
-        key = Math.floor(Math.random() * 10000).toString();;
+        key = Math.floor(Math.random() * 10000).toString();
         value = new Buffer([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
         db = new InterfaceSatoshminDB();
 
@@ -154,7 +154,7 @@ describe('interfaceSatoshminDB', () => {
     
     it('save string/update with Buffer/get sample Array', async () => {
 
-        key = Math.floor(Math.random() * 10000).toString();;
+        key = Math.floor(Math.random() * 10000).toString();
         value = 'my string value';
         let new_value = new Buffer([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
         db = new InterfaceSatoshminDB();

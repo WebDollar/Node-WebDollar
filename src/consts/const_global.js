@@ -46,10 +46,11 @@ consts.HASH_ARGON2_PARAMS = {salt: 'WebDollar_make_$', saltBuffer: Buffer.from([
 // change also to Browser-Mining-WebWorker.js
 
 consts.TOKEN_ID_LENGTH = 32;
+consts.MAX_UINT32 = 1 << 30;
 
 consts.BLOCKS_MAX_SIZE_BYTES = 1024*1024 * 1; // in bytes
 consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
-consts.BLOCKS_LEVEL_INFINITE = (1 << 30);
+consts.BLOCKS_LEVEL_INFINITE = 1 << 30;
 
 consts.POPOW_ACTIVATED = false;
 consts.POPOW_PARAMS={

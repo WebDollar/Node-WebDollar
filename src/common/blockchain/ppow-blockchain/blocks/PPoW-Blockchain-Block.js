@@ -24,7 +24,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             return this.level;
 
         let T = this.difficultyTarget;
-        let id = new BigInteger(this.hash.toString('hex'), 16);
+        let id = new BigInteger(this.hash.toString("hex"), 16);
         
         //If id <= T/2^u the block is of level u => block level is max(u) for 2^u * id <= T
         // T -> inf => u -> 255
@@ -128,10 +128,15 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         for (let i = 0; i < this.interlink.length; ++i) {
 
-            let heightBuffer = Serialization.serializeNumber4Bytes(this.interlink[i].height+1);
-            let blockIdBuffer = this.interlink[i].blockId;
-            list.push(heightBuffer);
-            list.push(blockIdBuffer);
+            //optimize storage
+            if (i > 0 && this.interlink[i-1].height === this.interlink[i].height){
+                list.push(Serialization.serializeNumber4Bytes(consts.MAX_UINT32));
+            } else {
+                let heightBuffer = Serialization.serializeNumber4Bytes(this.interlink[i].height + 1);
+                let blockIdBuffer = this.interlink[i].blockId;
+                list.push(heightBuffer);
+                list.push(blockIdBuffer);
+            }
 
         }
 
@@ -151,14 +156,18 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
                 offset += 4;
 
-                let blockId = BufferExtended.substr(buffer, offset, 32);
-                offset += 32;
-                
-                this.interlink.push (  {height: height-1, blockId: blockId} );
+                if (height === consts.MAX_UINT32) {
+                    this.interlink.push(this.interlink[i-1]);
+                } else {
+                    let blockId = BufferExtended.substr(buffer, offset, 32);
+                    offset += 32;
+
+                    this.interlink.push( {height: height - 1, blockId: blockId} );
+                }
             }
 
         } catch (exception){
-            console.log("error deserializing interlink. ", exception);
+            console.log("Error deserialize interlink. ", exception);
             throw exception;
         }
         
@@ -178,7 +187,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         } catch (exception){
 
-            console.log(colors.red("error deserializing a block  "), exception, buffer);
+            console.log(colors.red("Error deserialize a block.  "), exception, buffer);
             throw exception;
 
         }

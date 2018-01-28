@@ -27,7 +27,7 @@ class WebDollarCrypto {
     static encodeBase64(buffer) {
 
         if (!Buffer.isBuffer(buffer))
-            buffer = new Buffer(buffer)
+            buffer = new Buffer(buffer);
 
         let result = buffer.toString('base64');
 
@@ -77,7 +77,7 @@ class WebDollarCrypto {
 
         if ( count === undefined) count = 32;
 
-        let randArr = new Buffer(count) //create a typed array of 32 bytes (256 bits)
+        let randArr = new Buffer(count); //create a typed array of 32 bytes (256 bits)
 
         // if ( typeof window !== 'undefined' &&  window.crypto !==undefined)
         //     window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
@@ -94,7 +94,7 @@ class WebDollarCrypto {
 
         let result = '';
         for (let i=0; i<bytes.length; i++) {
-            let hex = bytes[i].toString(16)
+            let hex = bytes[i].toString(16);
             result += (hex.length === 1 ? '0' : '') + hex ;
         }
 
@@ -104,27 +104,27 @@ class WebDollarCrypto {
 
     static isHex(h) {
         let a = parseInt(h,16);
-        return (a.toString(16) ===h.toLowerCase())
+        return (a.toString(16) === h.toLowerCase());
     }
 
     static SHA256(bytes){
 
         let sha256 = crypto.createHash('sha256'); //sha256
-        sha256.update(bytes)
+        sha256.update(bytes);
 
         return sha256.digest();
     }
     
     static encryptAES(buffer, password){
 
-        var cipher = crypto.createCipher('aes-256-cbc', password)
-        var crypted = Buffer.concat([cipher.update(buffer),cipher.final()]);
+        var cipher = crypto.createCipher('aes-256-cbc', password);
+        var crypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
         return crypted;
     }
     
     static decryptAES(buffer, password) {
 
-        var decipher = crypto.createDecipher('aes-256-cbc', password)
+        var decipher = crypto.createDecipher('aes-256-cbc', password);
         var dec = Buffer.concat([decipher.update(buffer), decipher.final()]);
         return dec;
     }
@@ -132,9 +132,9 @@ class WebDollarCrypto {
     static RIPEMD160(bytes){
 
         let ripemd160 = crypto.createHash('ripemd160'); // RIPEMD160
-        ripemd160.update(bytes)
+        ripemd160.update(bytes);
 
-        return ripemd160.digest()
+        return ripemd160.digest();
     }
 
     /**
@@ -145,7 +145,7 @@ class WebDollarCrypto {
      */
     static hashPOW(data){
 
-       return Argon2.hash(data)
+       return Argon2.hash(data);
 
     }
 
@@ -156,7 +156,7 @@ class WebDollarCrypto {
      */
     static hashPOW_String(data){
 
-        return Argon2.hashString(data)
+        return Argon2.hashString(data);
 
     }
 
