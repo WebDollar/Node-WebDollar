@@ -23,9 +23,9 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
             buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
             for (let i = 0; i < this.edges.length; i++) {
-                buffer.push(this.edges[i].value.length);
-                buffer.push(this.edges[i].value);
-                buffer.push(this.edges[i].serializeNode(includeEdges));
+                buffer.push(Serialization.serializeNumber1Byte(this.edges[i].label.length));
+                buffer.push(this.edges[i].label);
+                buffer.push(this.edges[i].targetNode.serializeNode(includeEdges));
             }
 
         }
