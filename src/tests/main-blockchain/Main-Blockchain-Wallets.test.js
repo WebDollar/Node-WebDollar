@@ -158,15 +158,33 @@ describe('test save wallet to local storage', () => {
 
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
             let privateKey = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            let totalMultiSig = 3;
+            let requiredMultiSig = 2;
 
-            response = await Blockchain.Wallet.addresses[i].exportPrivateKey("privateKey" + i + ".bin");
+            response = await Blockchain.Wallet.addresses[i].exportPrivateKey("privateKey"+i+".bin", totalMultiSig, requiredMultiSig);
             assert(response === true, "Error exporting privateKey: " + response);
 
             response = await Blockchain.Wallet.addresses[i].importPrivateKey("privateKey" + i + ".bin");
-            assert(response === true, "Error importing privateKey: " + response);
+            assert(response.result === true, "Error importing privateKey: " + response.result);
+            assert(response.totalMultiSig === totalMultiSig, "Total multiSig differ: " + response.totalMultiSig);
+            assert(response.requiredMultiSig === requiredMultiSig, "Total multiSig differ: " + response.requiredMultiSig);
 
             let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
             assert(privateKey2.equals(privateKey), "PrivateKey differ after import: " + privateKey2.toString("hex") + "!==" + privateKey.toString("hex"));
+        }
+    });
+
+    it('test export/import wallet privateKeys from string', async () => {
+
+        for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
+            let privateKey = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            let privateKeyString = await Blockchain.Wallet.addresses[i].exportPrivateKeyToString();
+
+            response = await Blockchain.Wallet.addresses[i].importPrivateKeyFromString(privateKeyString);
+            assert(response === true, "Error loading privateKey from string: " + response);
+
+            let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            assert(privateKey2.equals(privateKey), "PrivateKey differ after importing from string: " + privateKey.toString("hex") + "!==" + privateKey2.toString("hex"));
         }
     });
 

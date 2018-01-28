@@ -190,9 +190,15 @@ class InterfaceBlockchainAddress{
      * @param fileName stores the path for privateKey file
      * @returns {Promise<void>}
      */
-    exportPrivateKey(fileName){
+    exportPrivateKey(fileName, totalMultiSig = 3, requiredMultiSig = 2){
 
         return new Promise(resolve => {
+
+            if (totalMultiSig < requiredMultiSig){
+                console.log(colors.red("totalMultiSig should be greater(or equal) than requiredMultiSig!"));
+                resolve(false);
+                return;
+            }
 
             FileSystem.open(fileName, 'w', async (err, fd) => {
 
@@ -201,9 +207,17 @@ class InterfaceBlockchainAddress{
                     return;
                 }
 
-                let privateKeyBuffer = await this.getPrivateKey();
+                let list = [];
+                let privateKey = await this.getPrivateKey();
 
-                FileSystem.write(fd, privateKeyBuffer, 0, privateKeyBuffer.length, null, function (err) {
+                list.push( Serialization.serializeNumber1Byte(privateKey.length) );
+                list.push( privateKey );
+                list.push( Serialization.serializeNumber1Byte(totalMultiSig) );
+                list.push( Serialization.serializeNumber1Byte(requiredMultiSig) );
+
+                let buffer = Buffer.concat(list);
+
+                FileSystem.write(fd, buffer, 0, buffer.length, null, function (err) {
 
                     if (err){
                         resolve(false);
@@ -231,9 +245,42 @@ class InterfaceBlockchainAddress{
 
             readStream.on('data', async (buffer) => {
 
-                resolve(await this.savePrivateKey(buffer));
+                let offset = 0;
+                let len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+                offset += 1;
+
+                let privateKey = BufferExtend.substr(buffer, offset, len);
+                offset += len;
+
+                let totalMultiSig = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+                offset += 1;
+
+                let requiredMultiSig = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+
+                resolve({result: await this.savePrivateKey(privateKey), totalMultiSig: totalMultiSig, requiredMultiSig: requiredMultiSig});
             });
 
+        });
+    }
+
+    /**
+     * Import a private key from user input
+     * @param privateKeyString is the imported text value
+     */
+    importPrivateKeyFromString(privateKeyString){
+        return this.savePrivateKey(Buffer.from(privateKeyString, "hex"));
+    }
+
+    /**
+     * Export privateKey as string
+     */
+    exportPrivateKeyToString(){
+
+        return this.getPrivateKey().then( (response) => {
+            return response.toString("hex");
+        }).catch((err)=> {
+            console.log(colors.red("Cannot export privateKey as string: " + err));
+            return err;
         });
     }
 
