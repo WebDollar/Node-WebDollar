@@ -3,7 +3,7 @@ import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 
 import BufferExtended from "common/utils/BufferExtended"
-import InterfaceBlockchainAddressHelper from "../../interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 
 const EventEmitter = require('events');
 
@@ -160,6 +160,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         try {
 
             let result = await this.loadTree(name||"accountantTree", buffer, offset, includeHashes);
+
+            console.log("this.root", this.root);
 
             return result !== false;
 
