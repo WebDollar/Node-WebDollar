@@ -135,36 +135,42 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     serializeNodeData(){
 
-        let buffer = [InterfaceMerkleRadixTreeNode.prototype.serializeNodeData()],
-            balancesBuffers = [];
+        try {
+            let buffer = [InterfaceMerkleRadixTreeNode.prototype.serializeNodeData()],
+                balancesBuffers = [];
 
-        if (this.balances !== undefined && this.balances !== null) {
-            //let serialize webd
-            let iWEBDSerialized = null;
-            for (let i = 0; i < this.balances.length; i++)
-                if ((this.balances[i].id.length === 1) && (this.balances[i].id[0] === 0)) {
-                    balancesBuffers.push(this._serializeBalances(this.balances[i]));
-                    iWEBDSerialized = i;
+            if (this.balances !== undefined && this.balances !== null) {
+                //let serialize webd
+                let iWEBDSerialized = null;
+                for (let i = 0; i < this.balances.length; i++)
+                    if ((this.balances[i].id.length === 1) && (this.balances[i].id[0] === 0)) {
+                        balancesBuffers.push(this._serializeBalances(this.balances[i]));
+                        iWEBDSerialized = i;
+                    }
+
+                // in case it was not serialize d and it is empty
+                if (iWEBDSerialized === null) {
+                    let idWEBD = new Buffer(1);
+                    idWEBD[0] = 1;
+
+                    balancesBuffers.push(this._serializeBalances({id: idWEBD, amount: new BigNumber(0)}));
                 }
 
-            // in case it was not serialize d and it is empty
-            if (iWEBDSerialized === null) {
-                let idWEBD = new Buffer(1);
-                idWEBD[0] = 1;
-
-                balancesBuffers.push(this._serializeBalances({id: idWEBD, amount: new BigNumber(0)}));
+                //let serialize everything else
+                for (let i = 0; i < this.balances.length; i++)
+                    if (i !== iWEBDSerialized) {
+                        balancesBuffers.push(this._serializeBalances(this.balances[i]));
+                    }
             }
 
-            //let serialize everything else
-            for (let i = 0; i < this.balances.length; i++)
-                if (i !== iWEBDSerialized) {
-                    balancesBuffers.push(this._serializeBalances(this.balances[i]));
-                }
+            balancesBuffers.unshift(Serialization.serializeNumber1Byte(balancesBuffers.length));
+
+            return Buffer.concat([buffer, balancesBuffers]);
+
+        } catch (exception){
+            console.log("Error Serializing MiniAccountantTree NodeData", exception);
+            throw exception;
         }
-
-        balancesBuffers.unshift(Serialization.serializeNumber1Byte(balancesBuffers.length));
-
-        return Buffer.concat ( [buffer, balancesBuffers] );
 
     }
 

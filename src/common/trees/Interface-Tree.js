@@ -354,10 +354,13 @@ class InterfaceTree{
         return await this.db.save(key, this.serializeTree());
     }
 
-    async loadTree(key){
+    async loadTree(key, buffer, offset){
 
-        let buffer = await this.db.load(key);
-        this.deserializeTree(buffer, 0);
+        if (buffer === undefined)
+            buffer = await this.db.load(key);
+
+
+        return await this.deserializeTree(buffer, offset||0);
     }
 
 }

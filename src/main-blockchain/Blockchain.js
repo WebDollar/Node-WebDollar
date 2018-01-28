@@ -101,7 +101,8 @@ class Blockchain{
 
         await this.Mining.setMinerAddress(await this.Wallet.getMiningAddress() );
 
-        if (process.env.START_MINING === 'true'){
+        if (process.env.START_MINING){
+
             this.Mining.startMining();
         }
 

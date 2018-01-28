@@ -17,41 +17,54 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
     serializeNode(includeEdges){
 
-        let buffer = [];
+        try {
+            let buffer = [];
 
-        if (includeEdges) {
+            if (includeEdges) {
 
-            buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
-            for (let i = 0; i < this.edges.length; i++) {
-                buffer.push(Serialization.serializeNumber1Byte(this.edges[i].label.length));
-                buffer.push(this.edges[i].label);
-                buffer.push(this.edges[i].targetNode.serializeNode(includeEdges));
+                buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
+                for (let i = 0; i < this.edges.length; i++) {
+                    buffer.push(Serialization.serializeNumber1Byte(this.edges[i].label.length));
+                    buffer.push(this.edges[i].label);
+                    buffer.push(this.edges[i].targetNode.serializeNode(includeEdges));
+                }
+
             }
 
-        }
+            return Buffer.concat(buffer);
 
-        return Buffer.concat(buffer);
+        } catch (exception){
+            console.log("Error serializing InterfaceRadixTreeNode", exception)
+            throw exception;
+        }
     }
 
     deserializeNode(buffer, offset, includeEdges){
 
-        if (includeEdges){
+        try {
 
-            let length = Serialization.deserializeNumber(buffer[offset]);
+            if (includeEdges) {
 
-            for (let i=0; i<length; i++){
+                let length = Serialization.deserializeNumber(buffer[offset]);
 
-                let valueLength =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
-                offset += 1;
+                for (let i = 0; i < length; i++) {
 
-                let value =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, valueLength) );
-                offset += valueLength;
+                    let valueLength = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 1));
+                    offset += 1;
+
+                    let value = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, valueLength));
+                    offset += valueLength;
+
+                }
 
             }
 
-        }
+            return offset;
 
-        return offset;
+        } catch (exception){
+            console.log("Error deserializing Interface Radix Tree", exception);
+            throw exception;
+        }
     }
 
     createEdge(node){

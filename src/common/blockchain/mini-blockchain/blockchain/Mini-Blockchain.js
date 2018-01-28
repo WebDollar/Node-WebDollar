@@ -152,6 +152,28 @@ class MiniBlockchain extends  inheritBlockchain{
 
     }
 
+
+    save(){
+
+        let result = this.accountantTree.saveMiniAccountant();
+
+        result = result && inheritBlockchain.prototype.save.call(this);
+
+        return result;
+
+    }
+
+    load(){
+
+
+        let result = this.accountantTree.loadMiniAccountant();
+
+        result = result && inheritBlockchain.prototype.load.call(this);
+
+        return result;
+
+    }
+
 }
 
 export default MiniBlockchain

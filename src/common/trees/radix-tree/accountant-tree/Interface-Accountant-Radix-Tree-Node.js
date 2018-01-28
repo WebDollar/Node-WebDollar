@@ -65,6 +65,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     }
 
+    // it is not done
     serializeNode(){
 
         let array = [ ];

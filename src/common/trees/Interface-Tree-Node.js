@@ -37,57 +37,71 @@ class InterfaceTreeNode {
 
     serializeNode(includeEdges){
 
-        let buffer = [];
+        try {
+            let buffer = [];
 
-        this.serializeNodeData();
+            this.serializeNodeData();
 
-        if (includeEdges) {
+            if (includeEdges) {
 
-            buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
-            for (let i = 0; i < this.edges.length; i++) {
+                buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
+                for (let i = 0; i < this.edges.length; i++) {
 
-                buffer.push(this.edges[i].serializeEdge() )
+                    buffer.push(this.edges[i].serializeEdge())
+
+                }
 
             }
 
-        }
+            return Buffer.concat(buffer);
 
-        return Buffer.concat(buffer);
+        } catch (exception){
+            console.log("Error serializing TreeNode", exception)
+            throw exception;
+        }
     }
 
     deserializeNodeData(buffer, offset){
 
-        let valueLength =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+
+        let valueLength = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 1));
         offset += 1;
 
-        let value =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, valueLength) );
+        let value = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, valueLength));
         offset += valueLength;
 
         this.value = value;
 
         return offset;
 
+
     }
 
     deserializeNode(buffer, offset, includeEdges){
 
-        offset = this.deserializeNodeData(buffer);
+        try {
+            offset = this.deserializeNodeData(buffer);
 
-        if (includeEdges){
+            if (includeEdges) {
 
-            //1 byte
-            let length = Serialization.deserializeNumber(buffer[offset]);
+                //1 byte
+                let length = Serialization.deserializeNumber(buffer[offset]);
 
-            for (let i=0; i<length; i++){
+                for (let i = 0; i < length; i++) {
 
-                let edge = new this.createNewEdge(null);
-                edge.deserializeEdge(buffer, offset, this.createNewNode);
-                this.edges.push(edge);
+                    let edge = new this.createNewEdge(null);
+                    edge.deserializeEdge(buffer, offset, this.createNewNode);
+                    this.edges.push(edge);
+                }
+
             }
 
-        }
+            return offset;
 
-        return offset;
+        } catch (exception){
+            console.log("Error deserializing TreeNode", exception)
+            throw exception;
+        }
     }
 
     createNewEdge(node){
