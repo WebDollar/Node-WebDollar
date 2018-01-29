@@ -133,16 +133,24 @@ If you are under a **router/firewall**, you need to port forward the port used b
 
 # To do:
 
-Mining Argon2 Web Worker using **WebWorkify**
-
-https://github.com/browserify/webworkify
+1. Pool Mining
+2. Exchange
+3. Multisig
 
 
 # Materials to learn
-
+7
 Ethereum https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369
 
 Mining in Bitcoins
 1.  http://blog.jameslarisch.com/mining-bitcoin-blocks-yourself-for-fun-and-no-profit
 2. http://www.righto.com/2014/02/bitcoin-mining-hard-way-algorithms.html
 3. https://steemit.com/blockchain/@verifyas/what-you-should-know-about-nonces-and-difficulty
+
+# Join WebDollar community
+
+<dl>
+    <a href="http://t.me/WebDollar">
+        <img src="http://icons.iconarchive.com/icons/froyoshark/enkel/64/Telegram-icon.png">
+    </a> 
+</dl>

@@ -156,11 +156,17 @@ class MiniBlockchain extends  inheritBlockchain{
 
     async save(){
 
-        let result = await this.accountantTree.saveMiniAccountant();
+        try {
+            let result = await this.accountantTree.saveMiniAccountant();
 
-        result = result && await inheritBlockchain.prototype.save.call(this);
+            result = result && await inheritBlockchain.prototype.save.call(this);
 
-        return result;
+            return result;
+
+        } catch (exception){
+            console.log(colors.red("Couldn't save MiniBlockchain"), exception)
+            return false;
+        }
     }
 
     /**
@@ -169,22 +175,28 @@ class MiniBlockchain extends  inheritBlockchain{
      */
     async load(){
 
-        let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
-        let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
+        try {
+            let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
+            let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
 
-        result =  result && await inheritBlockchain.prototype.load.call(this);
+            result = result && await inheritBlockchain.prototype.load.call(this);
 
-        //check the accountant Tree if matches
-        console.log("this.accountantTree", this.accountantTree.root);
-        console.log("finalAccountantTree", finalAccountantTree.root);
-        result = result && finalAccountantTree.matches(this.accountantTree);
+            //check the accountant Tree if matches
+            console.log("this.accountantTree", this.accountantTree.root);
+            console.log("finalAccountantTree", finalAccountantTree.root);
+            result = result && finalAccountantTree.matches(this.accountantTree);
 
-        if (result === false){
-            console.log(colors.red("finalAccountantTree doesn't match"))
+            if (result === false) {
+                console.log(colors.red("finalAccountantTree doesn't match"))
+            }
+
+            return result;
+
+        } catch (exception){
+
+            console.log(colors.red("Couldn't save MiniBlockchain"), exception)
+            return false;
         }
-
-        return result;
-
     }
 
 }
