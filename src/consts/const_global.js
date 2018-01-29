@@ -59,4 +59,8 @@ consts.POPOW_PARAMS={
     d: 0.5,
 };
 
+consts.POW_PARAMS={
+    VALIDATE_LAST_BLOCKS : 20,
+};
+
 export default consts

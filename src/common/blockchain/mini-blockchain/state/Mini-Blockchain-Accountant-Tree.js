@@ -150,9 +150,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         return this.deserializeTree(buffer,offset);
     }
 
-    async saveMiniAccountant(includeHashes, name){
-
-        return await this.saveTree(name||"accountantTree", includeHashes);
+    async saveMiniAccountant(includeHashes, name, serialization){
+        return await this.saveTree(name||"accountantTree", includeHashes, serialization);
     }
 
     async loadMiniAccountant(buffer, offset, includeHashes, name){
@@ -161,7 +160,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
             let result = await this.loadTree(name||"accountantTree", buffer, offset, includeHashes);
 
-            console.log("this.root", this.root);
+            //console.log("this.root", this.root);
 
             return result !== false;
 

@@ -53,7 +53,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                 let length = buffer[offset]; //1 byte
                 offset += 1;
 
-                console.log("length  length  ", length);
+                //console.log("length  length  ", length);
 
                 for (let i = 0; i < length; i++) {
 

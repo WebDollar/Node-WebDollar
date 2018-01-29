@@ -339,7 +339,7 @@ class InterfaceTree{
     }
 
     deserializeTree(buffer, offset, includeHashes){
-        console.log("deserializeTree", this.root);
+        //console.log("deserializeTree", this.root);
         return this.root.deserializeNode(buffer, offset, true, includeHashes);
     }
 
@@ -351,8 +351,12 @@ class InterfaceTree{
 
     }
 
-    async saveTree(key, includeHashes){
-        return await this.db.save(key, this.serializeTree(includeHashes));
+    async saveTree(key, includeHashes, serialization){
+
+        if (serialization === undefined || serialization === null)
+            serialization = this.serializeTree(includeHashes);
+
+        return await this.db.save(key, serialization);
     }
 
     async loadTree(key, buffer, offset, includeHashes){

@@ -25,11 +25,10 @@ class MiniBlockchain extends  inheritBlockchain{
         super(agent);
 
         this.accountantTree = new MiniBlockchainAccountantTree(this.db);
+        this.accountantTreeSerializations = [];
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, MiniBlockchainFork );
-
-        this.VALIDATE_LAST_BLOCKS = 20;
     }
 
     async simulateNewBlock(block, revertAutomatically, callback){
@@ -134,11 +133,8 @@ class MiniBlockchain extends  inheritBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
-        if (block.reward === undefined)
-            block.reward = BlockchainMiningReward.getReward(block.height);
-
         let result = await this.simulateNewBlock(block, false, async ()=>{
-            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType);
+            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
         });
 
         if (result && saveBlock){
@@ -181,7 +177,7 @@ class MiniBlockchain extends  inheritBlockchain{
             let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
             let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
 
-            result = result && await inheritBlockchain.prototype.load.call(this, this.VALIDATE_LAST_BLOCKS );
+            result = result && await inheritBlockchain.prototype.load.call(this, consts.POW_PARAMS.VALIDATE_LAST_BLOCKS  );
 
             //check the accountant Tree if matches
             console.log("this.accountantTree", this.accountantTree.root);

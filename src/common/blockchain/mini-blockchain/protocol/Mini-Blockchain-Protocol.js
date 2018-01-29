@@ -15,9 +15,6 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
     constructor(blockchain){
         super(blockchain)
-
-        this.MAX_ACCOUNTANT_TREE_BLOCK_DIFFERENCE = 100;
-
     }
 
     _validateBlockchainHeader(data){
@@ -44,12 +41,25 @@ class MiniBlockchainProtocol extends inheritProtocol{
                 if (typeof data.height !== "number")
                     throw "data.height is not a number";
 
+                if (this.blockchain.blocks.length < data.height) throw "height is not valid";
+                if (data.height < 0) throw "height is not valid";
+
+                let serialization;
+
+                if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS !== data.height) throw "height is not valid";
+                if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS !== data.height) throw "height is not valid";
+
+                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height || -1, {
+                    result: true,
+                    accountantTree: serialization,
+                });
+
 
             } catch (exception){
 
                 console.log(colors.red("Socket Error - get/blockchain/accountant-tree/get-accountant-tree", exception), data);
 
-                socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
+                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height || -1, {
                     result: false,
                     message: exception.toString()
                 });
