@@ -138,7 +138,7 @@ class MiniBlockchain extends  inheritBlockchain{
             block.reward = BlockchainMiningReward.getReward(block.height);
 
         let result = await this.simulateNewBlock(block, false, async ()=>{
-            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, blockValidationType);
+            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType);
         });
 
         if (result && saveBlock){
@@ -188,9 +188,10 @@ class MiniBlockchain extends  inheritBlockchain{
             console.log("finalAccountantTree", finalAccountantTree.root);
             result = result && finalAccountantTree.matches(this.accountantTree);
 
-            if (result === false) {
+            if (result )
+                this.accountantTree = finalAccountantTree;
+            else
                 console.log(colors.red("finalAccountantTree doesn't match"))
-            }
 
             return result;
 

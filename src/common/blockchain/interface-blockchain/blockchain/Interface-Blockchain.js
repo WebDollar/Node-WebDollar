@@ -86,7 +86,7 @@ class InterfaceBlockchain {
         if (this.transactions.uniqueness.searchTransactionsUniqueness(block.data.transactions))
             throw "transaction already processed";
 
-        if (! await this.validateBlockchainBlock(block, blockValidationType) ) return false; // the block has height === this.blocks.length
+        if (! await this.validateBlockchainBlock(block, undefined, undefined, undefined, blockValidationType) ) return false; // the block has height === this.blocks.length
 
 
         //let's check again the heights
@@ -100,11 +100,12 @@ class InterfaceBlockchain {
 
         await this.blockIncluded(block);
 
-        if (saveBlock)
+        if (saveBlock) {
             await this.saveNewBlock(block);
 
-        // propagating a new block in the network
-        this.propagateBlocks(block.height, socketsAvoidBroadcast)
+            // propagating a new block in the network
+            this.propagateBlocks(block.height, socketsAvoidBroadcast)
+        }
 
 
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
@@ -233,7 +234,7 @@ class InterfaceBlockchain {
         return result;
     }
 
-    async load(validateOnlyLastBlocks){
+    async load(validateLastBlocks){
 
         //load the number of blocks
         let numBlocks = await this.db.get(this.blockchainFileName);
@@ -250,16 +251,16 @@ class InterfaceBlockchain {
                 let block = this.blockCreator.createEmptyBlock(i);
                 block.height = i;
 
+                let blockValidationType = {};
+
+                if (validateLastBlocks !== undefined)
+                    blockValidationType["skip-hash-validation-before"] = {height: numBlocks - validateLastBlocks } ;
+
                 try{
 
                     if (await block.load() === false) throw "no block to load was found";
 
                     //it will include the block, but it will not ask to save, because it was already saved before
-
-                    let blockValidationType = [];
-
-                    if (blockValidationType !== undefined && i < numBlocks - validateOnlyLastBlocks )
-                        blockValidationType.push("skip-hash-validation");
 
                     if (await this.includeBlockchainBlock(block, undefined, "all", false, blockValidationType) === false)
                         console.log(colors.red("blockchain is invalid at index " + i));
