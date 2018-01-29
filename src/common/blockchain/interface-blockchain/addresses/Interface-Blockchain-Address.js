@@ -186,8 +186,11 @@ class InterfaceBlockchainAddress{
     }
 
     /**
+     *
      * @param fileName stores the path for privateKey file
-     * @returns {Promise<void>}
+     * @param totalMultiSig is the number of passwords used to encrypt privateKey
+     * @param requiredMultiSig is the minimum required number of passwords to decrypt privateKey with multiSig
+     * @returns {Promise<any>}
      */
     exportPrivateKey(fileName, totalMultiSig = 3, requiredMultiSig = 2){
 
@@ -283,6 +286,13 @@ class InterfaceBlockchainAddress{
         });
     }
 
+    /**
+     * Returns a string value of address
+     */
+    exportAddressToString(){
+        return this.address;
+    }
+
     async serializeAddress(serializePrivateKey = false){
 
         let privateKeyArray = [];
@@ -326,7 +336,8 @@ class InterfaceBlockchainAddress{
             offset += len;
 
             //calcuating the address from the unencodedAddress
-            if (InterfaceBlockchainAddressHelper.validateAddressChecksum(this.address).result === false) throw "address didn't pass the valdiateAddressChecksum "
+            if (InterfaceBlockchainAddressHelper.validateAddressChecksum(this.address).result === false)
+                throw "address didn't pass the valdiateAddressChecksum "
 
             len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
             offset += 1;

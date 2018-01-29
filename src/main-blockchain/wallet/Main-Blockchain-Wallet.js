@@ -181,6 +181,11 @@ class MainBlockchainWallet{
 
     }
 
+    /**
+     * Export wallet addresses array
+     * @param filePath is the binary file for storing addresses
+     * @returns {Promise<any>}
+     */
     exportAddresses(filePath){
 
         return new Promise(resolve => {
@@ -217,6 +222,11 @@ class MainBlockchainWallet{
 
     }
 
+    /**
+     * Import an wallet address array from a binary file
+     * @param filePath is the binary file path
+     * @returns {Promise<any>}
+     */
     importAddresses(filePath){
 
         return new Promise(resolve => {
@@ -243,10 +253,25 @@ class MainBlockchainWallet{
                     this.addresses.push(blockchainAddress);
                 }
 
-                resolve(true);
+                resolve(await this.saveAddresses());
             });
 
         });
+    }
+
+    /**
+     *
+     * @param addressString
+     */
+    async importAddressFromString(addressString){
+
+        let blockchainAddress = await this._justCreateNewAddress();
+        let unencodedAddress = Buffer.from(addressString, "hex");
+
+        blockchainAddress.unencodedAddress = unencodedAddress;
+        blockchainAddress.address = BufferExtended.toBase(unencodedAddress);
+
+        this.addresses.push(blockchainAddress);
     }
 
 }
