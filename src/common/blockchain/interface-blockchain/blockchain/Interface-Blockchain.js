@@ -37,12 +37,12 @@ class InterfaceBlockchain {
         this.mining = undefined;
 
         this.transactions = new InterfaceBlockchainTransactions();
-        
+
         this.db = new InterfaceSatoshminDB();
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
-        
+
         this.blockchainFileName = 'blockchain.bin';
     }
 
@@ -76,7 +76,7 @@ class InterfaceBlockchain {
      * @param socketsAvoidBroadcast
      * @returns {Promise.<boolean>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
@@ -86,7 +86,7 @@ class InterfaceBlockchain {
         if (this.transactions.uniqueness.searchTransactionsUniqueness(block.data.transactions))
             throw "transaction already processed";
 
-        if (! await this.validateBlockchainBlock(block) ) return false; // the block has height === this.blocks.length
+        if (! await this.validateBlockchainBlock(block, blockValidationType) ) return false; // the block has height === this.blocks.length
 
 
         //let's check again the heights
@@ -113,9 +113,7 @@ class InterfaceBlockchain {
         return true;
     }
 
-    async validateBlockchainBlock( block, prevDifficultyTarget, prevHash, prevTimeStamp, validationType ){
-
-        validationType = validationType || "normal";
+    async validateBlockchainBlock( block, prevDifficultyTarget, prevHash, prevTimeStamp, blockValidationType ){
 
         if ( block instanceof InterfaceBlockchainBlock === false ) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
 
@@ -139,7 +137,7 @@ class InterfaceBlockchain {
         }
 
         //validate difficulty & hash
-        if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash, validationType) === false) throw ('block validation failed');
+        if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash, blockValidationType) === false) throw ('block validation failed');
 
         //recalculate next target difficulty
         block.difficultyTarget = BlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
@@ -235,7 +233,7 @@ class InterfaceBlockchain {
         return result;
     }
 
-    async load(){
+    async load(validateOnlyLastBlocks){
 
         //load the number of blocks
         let numBlocks = await this.db.get(this.blockchainFileName);
@@ -243,7 +241,7 @@ class InterfaceBlockchain {
             console.log(colors.red("numBlocks was not found"));
             return false;
         }
-        
+
         this.blocks = [];
 
         try {
@@ -258,7 +256,12 @@ class InterfaceBlockchain {
 
                     //it will include the block, but it will not ask to save, because it was already saved before
 
-                    if (await this.includeBlockchainBlock(block, undefined, "all", false) === false)
+                    let blockValidationType = [];
+
+                    if (blockValidationType !== undefined && i < numBlocks - validateOnlyLastBlocks )
+                        blockValidationType.push("skip-hash-validation");
+
+                    if (await this.includeBlockchainBlock(block, undefined, "all", false, blockValidationType) === false)
                         console.log(colors.red("blockchain is invalid at index " + i));
                     else
                         console.log(colors.green("blockchain loaded successfully index ", i));
@@ -275,9 +278,9 @@ class InterfaceBlockchain {
 
         return true;
     }
-    
+
     async remove(index, removeFiles = true){
-        
+
         if (removeFiles === true) {
             for (let i = index; i < this.blocks.length; ++i){
                 let response = await this.blocks[i].remove();
@@ -286,9 +289,9 @@ class InterfaceBlockchain {
                     return response;
             }
         }
-        
+
         this.blocks.splice(index);
-        
+
         return true;
     }
 

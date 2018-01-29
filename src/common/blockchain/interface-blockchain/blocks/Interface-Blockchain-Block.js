@@ -59,7 +59,7 @@ class InterfaceBlockchainBlock {
         return true;
     }
 
-    async validateBlock(height, previousDifficultyTarget, previousHash, validationType){
+    async validateBlock(height, previousDifficultyTarget, previousHash, blockValidationType){
 
         if (this.version === undefined || this.version === null || typeof this.version !== 'number') throw ('version is empty');
 
@@ -83,7 +83,8 @@ class InterfaceBlockchainBlock {
 
         if (height !== this.height) throw 'height is different' + height+ " "+ this.height ;
 
-        await this._validateBlockHash(previousHash, validationType);
+        await this._validateBlockHash(previousHash, blockValidationType);
+
         this._validateTargetDifficulty(previousDifficultyTarget);
 
         if (this.reward.equals(BlockchainMiningReward.getReward(this.height)) === false ) throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward(this.height);
@@ -96,7 +97,7 @@ class InterfaceBlockchainBlock {
     /**
      * it will recheck the validity of the block
      */
-    async _validateBlockHash(previousHash, validationType) {
+    async _validateBlockHash(previousHash, blockValidationType) {
 
         if (this.computedBlockPrefix === null) this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
@@ -106,12 +107,15 @@ class InterfaceBlockchainBlock {
         if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
 
         //validate hash
-        let hash = await this.computeHash();
+        //skip the validation, if the blockValidationType is provided
+        if (blockValidationType === undefined || blockValidationType.indexOf("skip-hash-validation") < 0) {
 
+            let hash = await this.computeHash();
 
-        if (!hash.equals(this.hash)) throw "block hash is not right ("+this.nonce+")" + this.hash.toString("hex") + " "+ hash.toString("hex") +"    "+ Buffer.concat ( [this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce )] ).toString("hex") ;
+            if (!hash.equals(this.hash)) throw "block hash is not right (" + this.nonce + ")" + this.hash.toString("hex") + " " + hash.toString("hex") + "    " + Buffer.concat([this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)]).toString("hex");
+        }
 
-        await this.data.validateBlockData(validationType);
+        await this.data.validateBlockData(blockValidationType);
 
         return true;
 
