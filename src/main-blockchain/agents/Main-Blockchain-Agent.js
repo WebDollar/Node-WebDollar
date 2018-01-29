@@ -3,8 +3,8 @@ import MiniBlockchainAgentBlockHeaders from 'common/blockchain/mini-blockchain/a
 
 /**
  * MainBlockchainAgent inherit the entire MiniBlockchainAgent
- *
  */
+
 class MainBlockchainAgent{
 
     createAgent(agentName, blockchain){

@@ -4,7 +4,7 @@ import PPoWBlockchainProtocol from "./../protocol/PPoW-Blockchain-Protocol"
 class PPoWBlockchainAgentBlockHeaders extends InterfaceBlockchainAgentBlockHeaders{
 
     constructor(blockchain, blockchainProtocolClass){
-        super(blockchain, blockchainProtocolClass||PPoWBlockchainProtocol )
+        super ( blockchain, blockchainProtocolClass||PPoWBlockchainProtocol )
     }
 
 }

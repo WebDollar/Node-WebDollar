@@ -186,12 +186,13 @@ class MiniBlockchain extends  inheritBlockchain{
             //check the accountant Tree if matches
             console.log("this.accountantTree", this.accountantTree.root);
             console.log("finalAccountantTree", finalAccountantTree.root);
+
             result = result && finalAccountantTree.matches(this.accountantTree);
 
             if (result )
                 this.accountantTree = finalAccountantTree;
             else
-                console.log(colors.red("finalAccountantTree doesn't match"))
+                console.log( colors.red("finalAccountantTree doesn't match") )
 
             return result;
 

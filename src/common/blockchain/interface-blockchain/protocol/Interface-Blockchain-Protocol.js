@@ -152,7 +152,7 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - blockchain/new-block-header", exception.toString()), data);
+                    console.log(colors.red("Socket Error - blockchain/new-block-header"), exception, data);
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: false,
