@@ -68,6 +68,8 @@ class InterfaceBlockchainProtocolForkSolver{
             if (this.blockchain.forksAdministrator.findSocketProcessing(socket) !== null)
                 return false;
 
+            this.blockchain.forksAdministrator.addSocketProcessing(socket);
+
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
             if ( forkFound !== null ) return forkFound;
 
@@ -108,7 +110,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 if (data.position === null)
                     throw "connection dropped discoverForkBinarySearch"
-                
+
                 //console.log("binary search ", data)
             }
 
@@ -181,7 +183,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             this.blockchain.forksAdministrator.deleteSocketProcessing(socket);
             this.blockchain.forksAdministrator.deleteFork(fork);
-            console.log(colors.red("discoverAndSolveFork raised an exception" + Exception.toString() ) )
+            console.log(colors.red("discoverAndSolveFork raised an exception"  ), Exception )
 
             return null;
         }
