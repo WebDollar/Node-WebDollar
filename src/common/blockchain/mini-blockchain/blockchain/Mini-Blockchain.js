@@ -135,7 +135,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         let serializationAccountantTree, result;
 
-        if ( blockValidationType === undefined || blockValidationType['skip-validation-before'] === undefined ||
+        if (  blockValidationType['skip-validation-before'] === undefined ||
             (block.height >= blockValidationType['skip-validation-before'].height )) {
 
             result = await this.simulateNewBlock(block, false, async ()=>{

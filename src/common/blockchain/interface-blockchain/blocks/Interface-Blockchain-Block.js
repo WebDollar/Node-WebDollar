@@ -108,7 +108,7 @@ class InterfaceBlockchainBlock {
 
         //validate hash
         //skip the validation, if the blockValidationType is provided
-        if ( blockValidationType === undefined || blockValidationType['skip-validation-before'] === undefined ||
+        if ( blockValidationType['skip-validation-before'] === undefined ||
             (this.height >= blockValidationType['skip-validation-before'].height )) {
 
             console.log("_validateBlockHash");
