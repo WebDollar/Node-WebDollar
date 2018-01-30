@@ -97,7 +97,13 @@ class InterfaceBlockchainProtocolForkSolver{
             // in case it was you solved previously && there is something in the blockchain
 
             if ( data.position === -1 && currentBlockchainLength > 0 ) {
-                data = await this._discoverForkBinarySearch(sockets, 0, currentBlockchainLength - 1);
+
+                let answer = await sockets[0].node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
+
+                if (answer === undefined || answer === undefined || typeof answer.chaingStartingPoint !== "number" )
+                    throw "request-blockchain-info couldn't return real values";
+
+                data = await this._discoverForkBinarySearch(sockets, answer.chaingStartingPoint, currentBlockchainLength - 1);
                 //console.log("binary search ", data)
             }
 

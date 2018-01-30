@@ -154,7 +154,6 @@ class MiniBlockchain extends  inheritBlockchain{
 
             if (result && saveBlock){
                 result = await this.accountantTree.saveMiniAccountant( true, undefined, this.getSerializedAccountantTree( this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1 ));
-                console.log("reeesult23", result);
             }
 
         } else {

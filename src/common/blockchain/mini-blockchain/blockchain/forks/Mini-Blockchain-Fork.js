@@ -12,6 +12,7 @@ class MiniBlockchainFork extends InterfaceBlockchainFork{
 
         //remove transactions and rewards from each blocks
         for (let i = this.blockchain.getBlockchainLength()-1; i>=this.forkStartingHeight; i--) {
+
             //remove reward
 
             console.log(this.blockchain.blocks[i].reward.toString(),"+");

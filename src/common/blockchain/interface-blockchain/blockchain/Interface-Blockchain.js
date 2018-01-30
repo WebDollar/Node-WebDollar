@@ -44,6 +44,8 @@ class InterfaceBlockchain {
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
 
         this.blockchainFileName = 'blockchain.bin';
+
+        this.blocksStartingPoint = 0;
     }
 
     _setAgent(newAgent){
@@ -145,6 +147,10 @@ class InterfaceBlockchain {
 
         return true;
 
+    }
+
+    getBlockchainStartingPoint(){
+        return this.blocksStartingPoint;
     }
 
     getBlockchainLength(){

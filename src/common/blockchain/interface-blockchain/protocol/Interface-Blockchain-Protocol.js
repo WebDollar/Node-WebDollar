@@ -163,6 +163,27 @@ class InterfaceBlockchainProtocol {
 
             });
 
+        socket.on("blockchain/info/request-blockchain-info", (data)=>{
+
+            try{
+
+                socket.node.sendRequest("blockchain/headers-info/request-header-info-by-height/" + data.height || 0, {
+                    result: true,
+                    chaingStartingPoint: this.blockchain.getBlockchainStartingPoint(),
+                    chainLength: this.blockchain.getBlockchainLength()
+                });
+
+            } catch (exception) {
+
+                console.log(colors.red("Socket Error - blockchain/info/request-blockchain-info", exception.toString()));
+                socket.node.sendRequest("blockchain/info/request-blockchain-info/" + data.height || 0, {
+                    result: false,
+                    message: exception.toString()
+                });
+            }
+
+        });
+
         if (this.acceptBlockHeaders)
             socket.on("blockchain/headers-info/request-header-info-by-height", (data) => {
 

@@ -8,8 +8,7 @@ let inheritAgentClass;
 if (consts.POPOW_ACTIVATED) inheritAgentClass = PPoWBlockchainAgentFullNode;
 else  inheritAgentClass = InterfaceBlockchainAgentFullNode;
 
-
-class MiniBlockchainAgentFullNode extends inheritAgentClass{
+class MiniBlockchainAgentLightNode extends PPoWBlockchainAgentFullNode{
 
     constructor(blockchain, blockchainProtocolClass){
         super(blockchain, blockchainProtocolClass||MiniBlockchainProtocol )
@@ -17,4 +16,4 @@ class MiniBlockchainAgentFullNode extends inheritAgentClass{
 
 }
 
-export default MiniBlockchainAgentFullNode;
+export default MiniBlockchainAgentLightNode;
