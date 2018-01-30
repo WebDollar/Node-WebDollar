@@ -2,8 +2,9 @@
  * Copyright (c) Silviu Stroe 2018.
 */
 const BitcoinJS = require('bitcoinjs-lib');
-var Bigi = require('bigi');
-var Crypto = require('crypto');
+const Bigi = require('bigi');
+const Crypto = require('crypto');
+
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto';
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 
@@ -45,7 +46,7 @@ class MultiSig {
      * create (and broadcast via 3PBP) a Transaction with a 2-of-4 P2SH(multisig) input
      * https://github.com/BitcoinJSjs/BitcoinJSjs-lib/blob/e0f24fdd46e11533a7140e02dc43b04a4cc4522e/test/integration/transactions.js#L115
      */
-    createTransaction(numKeysRequired) {
+    static createTransaction(numKeysRequired) {
 
         let keyPairs = [
             '91avARGdfge8E4tZfYLoxeJ5sGBdNJQH4kvjJoQFacbgwmaKkrx', //public keys not public addresses
@@ -59,25 +60,25 @@ class MultiSig {
             return x.getPublicKeyBuffer()
         });
 
-        let redeemScript = BitcoinJS.script.multisig.output.encode(numKeysRequired, pubKeys)
-        let scriptPubKey = BitcoinJS.script.scriptHash.output.encode(BitcoinJS.crypto.hash160(redeemScript))
-        let address = BitcoinJS.address.fromOutputScript(scriptPubKey, testnet)
+        let redeemScript = BitcoinJS.script.multisig.output.encode(numKeysRequired, pubKeys);
+        let scriptPubKey = BitcoinJS.script.scriptHash.output.encode(BitcoinJS.crypto.hash160(redeemScript));
+        let address = BitcoinJS.address.fromOutputScript(scriptPubKey, testnet);
 
         testnetUtils.faucet(address, 2e4, function (err, unspent) {
-            if (err) return done(err)
+            if (err) return done(err);
 
-            let txb = new BitcoinJS.TransactionBuilder(testnet)
-            txb.addInput(unspent.txId, unspent.vout)
-            txb.addOutput(testnetUtils.RETURN_ADDRESS, 1e4)
+            let txb = new BitcoinJS.TransactionBuilder(testnet);
+            txb.addInput(unspent.txId, unspent.vout);
+            txb.addOutput(testnetUtils.RETURN_ADDRESS, 1e4);
 
-            txb.sign(0, keyPairs[0], redeemScript)
-            txb.sign(0, keyPairs[2], redeemScript)
+            txb.sign(0, keyPairs[0], redeemScript);
+            txb.sign(0, keyPairs[2], redeemScript);
 
-            let tx = txb.build()
+            let tx = txb.build();
 
             // build and broadcast to the BitcoinJS Testnet network
             testnetUtils.transactions.propagate(tx.toHex(), function (err) {
-                if (err) return done(err)
+                if (err) return done(err);
 
                 testnetUtils.verify(address, tx.getId(), 1e4, done)
             })
@@ -90,16 +91,16 @@ class MultiSig {
     * @param datesSalt is used as salt data for generating a privateKey
     * @returns a privateKey generated from a salt, @param datesSalt
     */
-    static createPrivateKey(datesSalt){
+    static createPrivateKey(saltDates){
 
-        let concatDates = "";
+        let concatDatesSalt = "";
 
-        for (let i = 0; i <= datesSalt.length; ++i){
+        for (let i = 0; i < saltDates.length; ++i){
 
-            concatDates += datesSalt[i];
+            concatDatesSalt += saltDates[i];
         }
 
-        return WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(concatDates));
+        return WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(concatDatesSalt));
 
     }
 
@@ -121,31 +122,40 @@ class MultiSig {
     
     /**
      * Generates 3 users' private keys => 3 users public Keys which are used in generating a multi sig address
-     *
      * each users privateKey is mapped with multisig address to return the multisig privateKey attached to the user privateKey
-     *
      * @returns {{}}
      */
-    makeMultisigAddress() {
-    
-        var privKeys = [
-            BitcoinJS.ECKey.makeRandom(),
-            BitcoinJS.ECKey.makeRandom(),
-            BitcoinJS.ECKey.makeRandom()
+    static makeMultisigAddress(saltDates) {
+
+        let saltDates = "";
+
+        for (let i = 0; i < saltDates.length; ++i){
+
+            concatDatesSalt += saltDates[i];
+        }
+
+        let privateKeys = [
+            BitcoinJS.ECPair.makeRandom(saltDates),
+            BitcoinJS.ECPair.makeRandom(saltDates),
+            BitcoinJS.ECPair.makeRandom(saltDates)
         ];
+
+        console.log("pk0=", privateKeys[0]);
+        console.log("pk1=", privateKeys[1]);
+        console.log("pk2=", privateKeys[2]);
+/*
+        let pubKeys = privateKeys.map(function(x) { return x.pub });
     
-        var pubKeys = privKeys.map(function(x) { return x.pub });
+        let redeemScript = BitcoinJS.scripts.multisigOutput(2, pubKeys);
+        let scriptPubKey = BitcoinJS.scripts.scriptHashOutput(redeemScript.getHash());
+        let address = BitcoinJS.Address.fromOutputScript(scriptPubKey).toString();
     
-        var redeemScript = BitcoinJS.scripts.multisigOutput(2, pubKeys);
-        var scriptPubKey = BitcoinJS.scripts.scriptHashOutput(redeemScript.getHash());
-        var address = BitcoinJS.Address.fromOutputScript(scriptPubKey).toString();
-    
-        var o = {};
+        let o = {};
         o.address = address;
         o.redeemScript = redeemScript.toHex();
-        o.privateKeys = privKeys.map(function(x) { return x.toWIF() });
+        o.privateKeys = privateKeys.map(function(x) { return x.toWIF() });
     
-        return o;
+        return o;*/
     }
 
 }

@@ -105,18 +105,18 @@ class WebDollarCrypto {
     
     static encryptAES(buffer, password){
 
-        var cipher = crypto.createCipher('aes-256-cbc', password);
-        var crypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
+        let cipher = crypto.createCipher('aes-256-cbc', password);
+        let crypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
         
         return crypted;
     }
     
     static decryptAES(buffer, password) {
 
-        var decipher = crypto.createDecipher('aes-256-cbc', password);
-        var dec = Buffer.concat([decipher.update(buffer), decipher.final()]);
+        let decipher = crypto.createDecipher('aes-256-cbc', password);
+        let decrypt = Buffer.concat([decipher.update(buffer), decipher.final()]);
         
-        return dec;
+        return decrypt;
     }
 
     static RIPEMD160(bytes){
