@@ -186,6 +186,7 @@ class InterfaceBlockchainBlock {
         // hash is hashPow ( block header + nonce )
 
         let buffer = Buffer.concat ( [
+                                       Serialization.serializeNumber4Bytes(this.height),
                                        this.computedBlockPrefix,
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );

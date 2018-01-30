@@ -101,7 +101,7 @@ module.exports = function (self) {
                 if (ev.data.count === 0 || jobTerminated) return new Promise((resolve)=>{resolve(true)});
 
                 //solution using Uint8Array
-                params.pass = new Uint8Array(block.length + 4);
+                params.pass = new Uint8Array(block.length + 4 );
                 params.pass.set(block);
 
                 let nonceArray = new Uint8Array(4);
@@ -110,7 +110,7 @@ module.exports = function (self) {
                 nonceArray [1] = nonce>>16 & 0xff;
                 nonceArray [0] = nonce>>24 & 0xff;
 
-                params.pass.set(nonceArray, block.length);
+                params.pass.set(nonceArray, block.length + 4);
 
                 //log(nonce)
                 //log(params.pass)

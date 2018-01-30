@@ -1,5 +1,6 @@
 import InterfaceBlockchainMining from "./Interface-Blockchain-Mining";
 import InterfaceBlockchainMiningWorkersList from "./Interface-Blockchain-Mining-Workers-List";
+import Serialization from 'common/utils/Serialization';
 
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
@@ -22,8 +23,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     mine(block, difficultyTarget){
 
-        if (typeof block === 'object' && block.computedBlockPrefix !== undefined)
-            block = block.computedBlockPrefix;
+        if (typeof block === 'object' && block.computedBlockPrefix !== undefined) {
+            block = Buffer.concat( [Serialization.serializeNumber4Bytes(block.height), block.computedBlockPrefix]);
+        }
 
         this.block = block;
         this.difficulty = difficultyTarget;

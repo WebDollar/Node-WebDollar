@@ -10,6 +10,8 @@ import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockch
 import InterfaceBlockchainForksAdministrator from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Forks-Administrator'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 
+import MiniBlockchainAgentLightNode from "./../agents/Mini-Blockchain-Agent-Light-Node"
+
 import consts from "consts/const_global";
 
 let inheritBlockchain;
@@ -154,6 +156,10 @@ class MiniBlockchain extends  inheritBlockchain{
 
             if (result && saveBlock){
                 result = await this.accountantTree.saveMiniAccountant( true, undefined, this.getSerializedAccountantTree( this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1 ));
+
+                // updating the blocksStartingPoint
+                if (this.agent instanceof MiniBlockchainAgentLightNode)
+                    this.blocksStartingPoint = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS;
             }
 
         } else {
