@@ -25,11 +25,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
             blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: mid}, mid);
 
-            if (blockHeaderResult === null){
-                this.blockchain.forksAdministrator.deleteFork(forkFound);
-                throw "connection dropped headers-info 0";
-            }
-
             if (blockHeaderResult === null || blockHeaderResult === undefined || blockHeaderResult.result !== true || blockHeaderResult.header === undefined || blockHeaderResult.header.hash === undefined ||  !Buffer.isBuffer(blockHeaderResult.header.hash) )
                 return {position: null, header: (blockHeaderResult === null ? null : blockHeaderResult.header) };
 
@@ -52,10 +47,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
         } catch (Exception){
 
-            console.log(colors.red("_discoverForkBinarySearch raised an exception" ), Exception)
+            console.log(colors.red("_discoverForkBinarySearch raised an exception" ), Exception);
 
-            return {position: -1, header: null};
-
+            return {position: null, header: null};
         }
 
     }
@@ -114,6 +108,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 if (data.position === null)
                     throw "connection dropped discoverForkBinarySearch"
+                
                 //console.log("binary search ", data)
             }
 
