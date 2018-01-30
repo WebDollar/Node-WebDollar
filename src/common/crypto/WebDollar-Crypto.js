@@ -1,20 +1,5 @@
-
-let crypto = null;
-
 import Argon2 from 'common/crypto/Argon2/Argon2'
-
-if (process.env.BROWSER){
-
-    //tutorial based on
-    crypto = require('crypto-browserify')
-}
-else {
-
-    //tutorial based on
-    crypto = require('crypto')
-}
-
-
+let crypto = (process.env.BROWSER) ? require('crypto-browserify') : require('crypto');
 
 
 class WebDollarCrypto {
@@ -75,7 +60,8 @@ class WebDollarCrypto {
 
     static getBufferRandomValues(count){
 
-        if ( count === undefined) count = 32;
+        if (count === undefined)
+            count = 32;
 
         let randArr = new Buffer(count); //create a typed array of 32 bytes (256 bits)
 
@@ -93,7 +79,8 @@ class WebDollarCrypto {
     static bytesToHex(bytes){
 
         let result = '';
-        for (let i=0; i<bytes.length; i++) {
+        
+        for (let i = 0; i < bytes.length; i++) {
             let hex = bytes[i].toString(16);
             result += (hex.length === 1 ? '0' : '') + hex ;
         }
@@ -103,7 +90,8 @@ class WebDollarCrypto {
 
 
     static isHex(h) {
-        let a = parseInt(h,16);
+        let a = parseInt(h, 16);
+        
         return (a.toString(16) === h.toLowerCase());
     }
 
@@ -119,6 +107,7 @@ class WebDollarCrypto {
 
         var cipher = crypto.createCipher('aes-256-cbc', password);
         var crypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
+        
         return crypted;
     }
     
@@ -126,6 +115,7 @@ class WebDollarCrypto {
 
         var decipher = crypto.createDecipher('aes-256-cbc', password);
         var dec = Buffer.concat([decipher.update(buffer), decipher.final()]);
+        
         return dec;
     }
 
@@ -146,7 +136,6 @@ class WebDollarCrypto {
     static hashPOW(data){
 
        return Argon2.hash(data);
-
     }
 
     /**
@@ -157,7 +146,6 @@ class WebDollarCrypto {
     static hashPOW_String(data){
 
         return Argon2.hashString(data);
-
     }
 
     /**
@@ -168,7 +156,6 @@ class WebDollarCrypto {
     static verifyHashPOW(hash, data){
 
         return Argon2.verify(hash, data);
-
     }
 
 }

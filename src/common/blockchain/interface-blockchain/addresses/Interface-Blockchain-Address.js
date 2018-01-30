@@ -16,7 +16,7 @@ class InterfaceBlockchainAddress{
 
         this.publicKey = null;
 
-        if (typeof db === 'undefined'){
+        if (db === undefined){
             this.db = new InterfaceSatoshminDB();
             this.password = 'password';
         } else {
@@ -410,7 +410,6 @@ class InterfaceBlockchainAddress{
         catch(err) {
             return 'ERROR on REMOVE blockchain address: ' , err;
         }
-
     }
 
     async _toStringDebug(){
@@ -425,7 +424,6 @@ class InterfaceBlockchainAddress{
     toString(){
 
         return this.address.toString()
-
     }
 
 

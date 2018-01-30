@@ -54,8 +54,6 @@ class InterfaceBlockchainAddressHelper{
             console.log("privateKey", privateKey.toString("hex"), "length", privateKey.length) //base58 "5Hx15HFGyep2CfPxsJKe2fXJsCVn5DEiyoeGGF6JZjGbTRnqfiD"
         }
 
-
-
         return {
             privateKeyWIF: privateKeyWIF,
             privateKey: privateKey,
@@ -63,6 +61,7 @@ class InterfaceBlockchainAddressHelper{
     }
 
     static _generatePrivateKey(salt, showDebug){
+        
         return InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, showDebug).privateKeyWIF.string;
     }
 
@@ -135,6 +134,7 @@ class InterfaceBlockchainAddressHelper{
 
         // sign the message
         const sigObj = secp256k1.sign(msg, privateKey);
+
         return sigObj;
     }
 
@@ -167,7 +167,6 @@ class InterfaceBlockchainAddressHelper{
             unencodedAddress: unencodedAddress,
             address: BufferExtended.toBase(unencodedAddress),
         };
-
     }
 
     static generateAddressWIF(address, showDebug){
@@ -208,7 +207,6 @@ class InterfaceBlockchainAddressHelper{
             publicKey: publicKey,
             privateKey: privateKey,
         };
-
     }
 
     /**
@@ -222,9 +220,10 @@ class InterfaceBlockchainAddressHelper{
 
         let result = this._validateAddressWIF(address);
 
-        if (result.result === true) return result.address;
-        else return null;
-
+        if (result.result === true)
+            return result.address;
+        else
+            return null;
     }
 
     static _calculateChecksum(privateKeyAndVersion, showDebug){
@@ -306,8 +305,8 @@ class InterfaceBlockchainAddressHelper{
 
             if (!versionDetected) throw "PRIVATE KEY  VERSION PREFIX is not recognized";
         }
+        
         return {result: true, privateKey: privateKeyWIF};
-
     }
 
 
@@ -396,8 +395,8 @@ class InterfaceBlockchainAddressHelper{
 
             if (!versionDetected) throw "ADDRESS KEY  VERSION PREFIX is not recognized";
         }
+        
         return {result: true, address: addressWIF};
-
     }
 
 
