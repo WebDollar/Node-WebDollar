@@ -76,7 +76,7 @@ class InterfaceBlockchainFork {
 
         }
 
-        return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp, "just-blocks" );
+        return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp, {"skip-accountant-tree-validation": true} );
 
     }
 

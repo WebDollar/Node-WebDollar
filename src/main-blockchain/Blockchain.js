@@ -114,14 +114,14 @@ class Blockchain{
 
         let chainLoaded = await this.Chain.load();
 
-        if (chainLoaded !== true) {
-            await this.Chain.save();
-            return false;
-        }
+        // if (chainLoaded !== true) {
+        //     await this.Chain.save();
+        //     return false;
+        // }
 
 
         this.emitter.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
-        return true;
+        return chainLoaded;
     }
 
 

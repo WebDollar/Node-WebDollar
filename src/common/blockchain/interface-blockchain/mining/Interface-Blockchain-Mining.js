@@ -156,7 +156,7 @@ this.finish++;
                 await this.blockchain.processBlocksSempahoreCallback( ()=>{
                     block.hash = answer.hash;
                     block.nonce = answer.nonce;
-                    return this.blockchain.includeBlockchainBlock( block );
+                    return this.blockchain.includeBlockchainBlock( block, false, undefined, true );
                 });
 
             } else

@@ -136,7 +136,7 @@ class MiniBlockchain extends  inheritBlockchain{
         let serializationAccountantTree, result;
 
         if ( blockValidationType === undefined || blockValidationType['skip-validation-before'] === undefined ||
-            (this.height >= blockValidationType['skip-validation-before'].height )) {
+            (block.height >= blockValidationType['skip-validation-before'].height )) {
 
             result = await this.simulateNewBlock(block, false, async ()=>{
                 return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
@@ -148,14 +148,16 @@ class MiniBlockchain extends  inheritBlockchain{
 
             this.accountantTreeSerializations[block.height] = serializationAccountantTree;
 
+            console.log("reeesult", result, saveBlock)
+
+            if (result && saveBlock){
+                result = await this.accountantTree.saveMiniAccountant(true, undefined, serializationAccountantTree);
+            }
+
         } else {
 
             result = await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
 
-        }
-
-        if (result && saveBlock){
-            result = await this.accountantTree.saveMiniAccountant(true, undefined, serializationAccountantTree);
         }
 
         return result;
@@ -172,6 +174,7 @@ class MiniBlockchain extends  inheritBlockchain{
     async save(){
 
         try {
+            console.log("saaaave");
 
             if (this.blocks.length === 0) return false;
 
