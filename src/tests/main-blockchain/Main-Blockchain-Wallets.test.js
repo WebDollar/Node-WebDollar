@@ -134,25 +134,6 @@ describe('test save wallet to local storage', () => {
 
     });
 
-    it('test export/import wallet addresses', async () => {
-
-        let addresses = Blockchain.Wallet.addresses;
-
-        response = await Blockchain.Wallet.exportAddresses("addresses.bin");
-        assert(response === true, "Error exporting addresses! : " + response + ".");
-        Blockchain.Wallet.addresses = [];
-
-        response = await Blockchain.Wallet.importAddresses("addresses.bin");
-        assert(response === true, "Error importing addresses!");
-        assert(addresses.length === Blockchain.Wallet.addresses.length, "Addresses length differ after import: " + addresses.length + "!==" + Blockchain.Wallet.addresses.length);
-
-        for (let i = 0; i < addresses.length; ++i){
-            assert(addresses[i].address.toString() === Blockchain.Wallet.addresses[i].address.toString(), "Addresses differ after import:" + addresses[i].address + "!==" + Blockchain.Wallet.addresses[i].address);
-        }
-        
-        FileSystem.unlinkSync("addresses.bin");
-    });
-
     it('test export/import wallet privateKeys', async () => {
 
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
@@ -187,6 +168,41 @@ describe('test save wallet to local storage', () => {
 
             let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
             assert(privateKey2.equals(privateKey), "PrivateKey differ after importing from string: " + privateKey.toString("hex") + "!==" + privateKey2.toString("hex"));
+        }
+    });
+    
+    it('test export/import wallet addresses', async () => {
+
+        let addresses = Blockchain.Wallet.addresses;
+
+        response = await Blockchain.Wallet.exportAddresses("addresses.bin");
+        assert(response === true, "Error exporting addresses! : " + response + ".");
+        Blockchain.Wallet.addresses = [];
+
+        response = await Blockchain.Wallet.importAddresses("addresses.bin");
+        assert(response === true, "Error importing addresses!");
+        assert(addresses.length === Blockchain.Wallet.addresses.length, "Addresses length differ after import: " + addresses.length + "!==" + Blockchain.Wallet.addresses.length);
+
+        for (let i = 0; i < addresses.length; ++i){
+            assert(addresses[i].address.toString() === Blockchain.Wallet.addresses[i].address.toString(), "Addresses differ after import:" + addresses[i].address + "!==" + Blockchain.Wallet.addresses[i].address);
+        }
+        
+        FileSystem.unlinkSync("addresses.bin");
+    });
+    
+    it('test export/import wallet address from/to string', async () => {
+
+        let len = Blockchain.Wallet.addresses.length;
+        
+        for (let i = 0; i < len; ++i) {
+            let address = Blockchain.Wallet.addresses[i].address;
+            let unencodedAddress = Blockchain.Wallet.addresses[i].unencodedAddress;
+            
+            let addressString = Blockchain.Wallet.addresses[i].exportAddressToString();
+            let blockchainAddress = await Blockchain.Wallet.importAddressFromString(addressString);
+
+            assert(blockchainAddress.address === address, "Address differ after importing from string: " + blockchainAddress.address + "!==" + address);
+            assert(blockchainAddress.unencodedAddress.equals(unencodedAddress), "Address differ after importing from string: " + blockchainAddress.unencodedAddress.toString("hex") + "!==" + unencodedAddress.toString("hex"));
         }
     });
 

@@ -260,12 +260,14 @@ class MainBlockchainWallet{
     async importAddressFromString(addressString){
 
         let blockchainAddress = await this._justCreateNewAddress();
-        let unencodedAddress = Buffer.from(addressString, "hex");
+        let unencodedAddress = BufferExtended.fromBase(addressString);
 
         blockchainAddress.unencodedAddress = unencodedAddress;
         blockchainAddress.address = BufferExtended.toBase(unencodedAddress);
 
         this.addresses.push(blockchainAddress);
+        
+        return blockchainAddress;
     }
 
 }
