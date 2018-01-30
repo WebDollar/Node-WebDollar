@@ -167,7 +167,7 @@ class InterfaceBlockchainProtocol {
 
             try{
 
-                socket.node.sendRequest("blockchain/headers-info/request-header-info-by-height/" + data.height || 0, {
+                socket.node.sendRequest("blockchain/info/request-blockchain-info", {
                     result: true,
                     chaingStartingPoint: this.blockchain.getBlockchainStartingPoint(),
                     chainLength: this.blockchain.getBlockchainLength()
@@ -176,7 +176,8 @@ class InterfaceBlockchainProtocol {
             } catch (exception) {
 
                 console.log(colors.red("Socket Error - blockchain/info/request-blockchain-info", exception.toString()));
-                socket.node.sendRequest("blockchain/info/request-blockchain-info/" + data.height || 0, {
+
+                socket.node.sendRequest("blockchain/info/request-blockchain-info", {
                     result: false,
                     message: exception.toString()
                 });
