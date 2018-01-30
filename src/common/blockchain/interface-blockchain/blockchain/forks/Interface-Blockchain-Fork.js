@@ -144,8 +144,10 @@ class InterfaceBlockchainFork {
                 this.postFork(forkedSuccessfully);
 
                 //propagating valid blocks
-                if (forkedSuccessfully)
+                if (forkedSuccessfully) {
+                    this.blockchain.save();
                     this.blockchain.propagateBlocks(this.forkStartingHeight, this.sockets);
+                }
 
                 // it was done successfully
                 if (forkedSuccessfully)

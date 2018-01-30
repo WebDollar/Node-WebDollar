@@ -114,7 +114,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         } catch (exception){
 
-            console.log("MiniBlockchain simulateNewBlock 2 raised an exception", exception)
+            console.log("MiniBlockchain simulateNewBlock 2 raised an exception", exception);
             return false;
 
         }
@@ -181,7 +181,7 @@ class MiniBlockchain extends  inheritBlockchain{
             if (this.blocks.length === 0) return false;
 
             //AccountantTree[:-POW_PARAMS.VALIDATE_LAST_BLOCKS]
-            let result = await this.accountantTree.saveMiniAccountant(true, undefined, this.getSerializedAccountantTree(this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS));
+            let result = await this.accountantTree.saveMiniAccountant(true, undefined, this.getSerializedAccountantTree(this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1));
 
             result = result && await inheritBlockchain.prototype.save.call(this);
 
@@ -209,6 +209,10 @@ class MiniBlockchain extends  inheritBlockchain{
 
             result = result && await inheritBlockchain.prototype.load.call(this, consts.POW_PARAMS.VALIDATE_LAST_BLOCKS  );
 
+            if (result === false){
+                throw "Problem loading the blockchain";
+            }
+
             //check the accountant Tree if matches
             console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
 
@@ -216,13 +220,22 @@ class MiniBlockchain extends  inheritBlockchain{
 
         } catch (exception){
 
-            console.log(colors.red("Couldn't save MiniBlockchain"), exception)
+            console.log(colors.red("Couldn't load MiniBlockchain"), exception);
+            this.accountantTree = new MiniBlockchainAccountantTree(this.db);
             return false;
         }
     }
 
 
     getSerializedAccountantTree(height){
+
+        if (height < 0)
+            height = -1;
+
+        if (height === -1){
+            let emptyAccountantTree = new MiniBlockchainAccountantTree(this.db);
+            return emptyAccountantTree.serializeMiniAccountant();
+        }
 
         if (Buffer.isBuffer(this.accountantTreeSerializations[height]))
             return this.accountantTreeSerializations[height];

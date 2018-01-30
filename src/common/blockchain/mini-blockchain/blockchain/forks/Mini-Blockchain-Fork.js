@@ -8,7 +8,7 @@ class MiniBlockchainFork extends InterfaceBlockchainFork{
         //clone the Accountant Tree
         this._accountantTreeRoot = this.blockchain.accountantTree.cloneTree();
 
-        console.log("root.targetNode.balances before", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
+        //console.log("root.targetNode.balances before", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
 
         //remove transactions and rewards from each blocks
         for (let i = this.blockchain.getBlockchainLength()-1; i>=this.forkStartingHeight; i--) {
@@ -24,8 +24,8 @@ class MiniBlockchainFork extends InterfaceBlockchainFork{
 
         console.log("this.forkStartingHeight", this.forkStartingHeight);
         console.log("root", this.blockchain.accountantTree.root);
-        console.log("root.edges", this.blockchain.accountantTree.root.edges[0]);
-        console.log("root.targetNode.balances", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
+        // console.log("root.edges", this.blockchain.accountantTree.root.edges[0]);
+        // console.log("root.targetNode.balances", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
 
     }
 

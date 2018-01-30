@@ -118,7 +118,7 @@ class InterfaceBlockchainBlock {
             if (!hash.equals(this.hash)) throw "block hash is not right (" + this.nonce + ")" + this.hash.toString("hex") + " " + hash.toString("hex") + "    " + Buffer.concat([this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)]).toString("hex");
         }
 
-        await this.data.validateBlockData(blockValidationType);
+        await this.data.validateBlockData(this.height, blockValidationType);
 
         return true;
 

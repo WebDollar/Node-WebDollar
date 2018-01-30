@@ -254,7 +254,7 @@ class InterfaceBlockchain {
                 let blockValidationType = {};
 
                 if (validateLastBlocks !== undefined)
-                    blockValidationType["skip-validation-before"] = {height: numBlocks - validateLastBlocks } ;
+                    blockValidationType["skip-validation-before"] = {height: numBlocks - validateLastBlocks};
 
                 try{
 
@@ -262,19 +262,25 @@ class InterfaceBlockchain {
 
                     //it will include the block, but it will not ask to save, because it was already saved before
 
-                    if (await this.includeBlockchainBlock(block, undefined, "all", false, blockValidationType) === false)
-                        console.log(colors.red("blockchain is invalid at index " + i));
-                    else
+                    if (await this.includeBlockchainBlock(block, undefined, "all", false, blockValidationType) ) {
                         console.log(colors.green("blockchain loaded successfully index ", i));
+                    }
+                    else {
+                        console.log(colors.red("blockchain is invalid at index " + i));
+                        throw "blockchain is invalid at index "+i;
+                    }
+
 
                 } catch (exception){
                     console.log(colors.red("blockchain LOADING stopped at " + i), exception);
-                    break;
+                    throw exception;
                 }
 
             }
+
         } catch (exception){
             console.log(colors.red("blockchain.load raised an exception"), exception);
+            return false;
         }
 
         return true;
