@@ -15,6 +15,8 @@ class InterfaceBlockchainForksAdministrator {
         this.forksId = 0;
 
         this.forkClass = forkClass || InterfaceBlockchainFork;
+
+        this.socketsProcessing = [];
     }
 
     createNewFork(sockets, forkStartingHeight, forkChainLength, header){
@@ -76,12 +78,46 @@ class InterfaceBlockchainForksAdministrator {
 
     deleteFork(fork){
 
+        if (fork === undefined) return false;
+
         for (let i=0; i<this.forks.length; i++)
             if (this.forks[i] === fork || this.forks[i].forkId === fork) {
                 this.forks.splice(i,1);
                 return true;
             }
         return false;
+    }
+
+    findSocketProcessing(socket){
+
+        for (let i=0; i<this.socketsProcessing.length; i++)
+            if (this.socketsProcessing[i] === socket || this.socketsProcessing[i].node.sckAddress.matchAddress(socket.node.sckAddress) )
+                return i;
+
+        return null;
+    }
+
+    deleteSocketProcessing(socket){
+
+        let index = this.findSocketProcessing(socket);
+
+        if (index !== null) {
+            this.socketsProcessing.splice(index, 1);
+            return true;
+        }
+
+        return false;
+
+    }
+
+    addSocketProcessing(socket){
+
+        if (this.findSocketProcessing(socket) === null){
+            this.socketsProcessing.push(socket)
+            return socket;
+        }
+
+        return null;
     }
 
 }
