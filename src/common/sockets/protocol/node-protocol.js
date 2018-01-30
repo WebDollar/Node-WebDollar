@@ -17,6 +17,9 @@ class NodeProtocol {
             uuid: consts.UUID,
         });
 
+        if (typeof response !== "object")
+            return false;
+
         console.log("RECEIVED HELLO NODE BACK", response.version, response.uuid);
 
         if (response === null || !response.hasOwnProperty("uuid")){
