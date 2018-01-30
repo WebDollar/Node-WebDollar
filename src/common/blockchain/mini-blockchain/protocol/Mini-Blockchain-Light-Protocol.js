@@ -1,4 +1,4 @@
-import MiniBlockchainProtocol from "Mini-Blockchain-Protocol";
+import MiniBlockchainProtocol from "./Mini-Blockchain-Protocol";
 
 class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
 
