@@ -86,14 +86,17 @@ class MultiSig {
 
 
 
-
-    static createPrivateKey(dates){
+    /*
+    * @param datesSalt is used as salt data for generating a privateKey
+    * @returns a privateKey generated from a salt, @param datesSalt
+    */
+    static createPrivateKey(datesSalt){
 
         let concatDates = "";
 
-        for (let i = 0; i <= dates.length; ++i){
+        for (let i = 0; i <= datesSalt.length; ++i){
 
-            concatDates += dates[i];
+            concatDates += datesSalt[i];
         }
 
         return WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(concatDates));
@@ -115,36 +118,35 @@ class MultiSig {
         return InterfaceBlockchainAddressHelper.verifySignedData(msg, signature, publicKey);
     }
 
-    //
-    // /**
-    //  * the demo generates 3 users' private keys => 3 users public Keys which are used in generating a multi sig address
-    //  *
-    //  * each users privateKey is mapped with multisig address to return the multisig privateKey attached to the user privateKey
-    //  *
-    //  * @returns {{}}
-    //  */
-    // makeMultisigAddress() {
-    //
-    //     var privKeys = [ BitcoinJS.ECKey.makeRandom(),
-    //         BitcoinJS.ECKey.makeRandom(),
-    //         BitcoinJS.ECKey.makeRandom() ];
-    //
-    //     var pubKeys = privKeys.map(function(x) { return x.pub });
-    //
-    //     var redeemScript = BitcoinJS.scripts.multisigOutput(2, pubKeys);
-    //     var scriptPubKey = BitcoinJS.scripts.scriptHashOutput(redeemScript.getHash());
-    //     var address = BitcoinJS.Address.fromOutputScript(scriptPubKey).toString();
-    //
-    //     var o = {};
-    //     o.address = address;
-    //     o.redeemScript = redeemScript.toHex();
-    //     o.privateKeys = privKeys.map(function(x) { return x.toWIF() });
-    //
-    //     return o;
-    //
-    // }
-
-
+    
+    /**
+     * Generates 3 users' private keys => 3 users public Keys which are used in generating a multi sig address
+     *
+     * each users privateKey is mapped with multisig address to return the multisig privateKey attached to the user privateKey
+     *
+     * @returns {{}}
+     */
+    makeMultisigAddress() {
+    
+        var privKeys = [
+            BitcoinJS.ECKey.makeRandom(),
+            BitcoinJS.ECKey.makeRandom(),
+            BitcoinJS.ECKey.makeRandom()
+        ];
+    
+        var pubKeys = privKeys.map(function(x) { return x.pub });
+    
+        var redeemScript = BitcoinJS.scripts.multisigOutput(2, pubKeys);
+        var scriptPubKey = BitcoinJS.scripts.scriptHashOutput(redeemScript.getHash());
+        var address = BitcoinJS.Address.fromOutputScript(scriptPubKey).toString();
+    
+        var o = {};
+        o.address = address;
+        o.redeemScript = redeemScript.toHex();
+        o.privateKeys = privKeys.map(function(x) { return x.toWIF() });
+    
+        return o;
+    }
 
 }
 
