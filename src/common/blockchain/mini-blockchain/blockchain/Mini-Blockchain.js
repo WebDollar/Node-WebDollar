@@ -60,7 +60,7 @@ class MiniBlockchain extends  inheritBlockchain{
             if (result !== null && result !== undefined)
                 revert.reward = true;
             else
-                throw "reward couldn't be set to the minerAddress"
+                throw "reward couldn't be set to the minerAddress";
 
 
             //validate transactions & tree
@@ -134,6 +134,8 @@ class MiniBlockchain extends  inheritBlockchain{
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
         let serializationAccountantTree, result;
+
+        console.log("blockValidationType", blockValidationType);
 
         if (  blockValidationType['skip-validation-before'] === undefined ||
             (block.height >= blockValidationType['skip-validation-before'].height )) {

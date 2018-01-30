@@ -19,10 +19,10 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         this.root.hash = {sha256: new Buffer(32) }
     }
 
-    changedNode(node){
+    _changedNode(node){
 
-        InterfaceMerkleTree.prototype.changedNode.call(this, node); //computing hash
-        InterfaceRadixTree.prototype.changedNode.call(this, node); //verifying hash and propagating it
+        InterfaceMerkleTree.prototype._changedNode.call(this, node); //computing hash
+        InterfaceRadixTree.prototype._changedNode.call(this, node); //verifying hash and propagating it
     }
 
     validateTree(node, callback){
@@ -36,30 +36,30 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         return true;
     }
 
-    checkInvalidNode(node){
+    _checkInvalidNode(node){
 
-        if (!InterfaceRadixTree.prototype.checkInvalidNode.call(this, node)) return false;
+        if (!InterfaceRadixTree.prototype._checkInvalidNode.call(this, node)) return false;
 
-        return InterfaceMerkleTree.prototype.checkInvalidNode.call(this, node);
+        return InterfaceMerkleTree.prototype._checkInvalidNode.call(this, node);
     }
 
     /*
         inherited
     */
-    validateHash(node){
-        return InterfaceMerkleTree.prototype.validateHash.call(this, node);
+    _validateHash(node){
+        return InterfaceMerkleTree.prototype._validateHash.call(this, node);
     }
 
     _computeHash(node) {
         return InterfaceMerkleTree.prototype._computeHash.call(this, node);
     }
 
-    refreshHash(node, forced){
-        return InterfaceMerkleTree.prototype.refreshHash.call(this, node,forced);
+    _refreshHash(node, forced){
+        return InterfaceMerkleTree.prototype._refreshHash.call(this, node,forced);
     }
 
-    getValueToHash(node){
-        return InterfaceMerkleTree.prototype.getValueToHash.call(this, node);
+    _getValueToHash(node){
+        return InterfaceMerkleTree.prototype._getValueToHash.call(this, node);
     }
 
     deserializeTree(buffer, offset, includeHashes){
@@ -68,7 +68,7 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
 
         //console.log("deserializeTree completed", buffer);
 
-        if (! this.refreshHash(this.root, true) )
+        if (! this._refreshHash(this.root, true) )
             throw "Refresh Hash didn't work";
 
         return offset;

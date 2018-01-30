@@ -6,7 +6,7 @@ class InterfaceTree{
 
     constructor(db){
 
-        this.root = this.createNode(null,  [], null );
+        this.root = this._createNode(null,  [], null );
         this.db = db;
 
     }
@@ -56,15 +56,15 @@ class InterfaceTree{
         return true;
     }
 
-    createNode(parent, edges, value){
+    _createNode(parent, edges, value){
         return new InterfaceTreeNode(parent, edges, value);
     }
 
-    createEdge(targetNode){
+    _createEdge(targetNode){
         return new InterfaceTreeEdge(targetNode);
     }
 
-    changedNode(node){
+    _changedNode(node){
         //no changes in a simple tree
     }
 
@@ -75,10 +75,10 @@ class InterfaceTree{
 
         if (parent === null || parent === undefined) parent = this.root;
 
-        let node = this.createNode( parent , [], data )
-        parent.edges.push( this.createEdge( node ) );
+        let node = this._createNode( parent , [], data )
+        parent.edges.push( this._createEdge( node ) );
 
-        this.changedNode(node);
+        this._changedNode(node);
         return node;
     }
 
@@ -112,7 +112,7 @@ class InterfaceTree{
             // incase the current node has children, let's move the childrens
             if (node.edges.length > 0)
                 for (let i=0; i<node.edges.length; i++) {
-                    nodeParent.edges.push(this.createEdge(node.edges[i].targetNode))
+                    nodeParent.edges.push(this._createEdge(node.edges[i].targetNode))
                     node.edges[i].targetNode.parent = nodeParent;
                 }
 
@@ -127,7 +127,7 @@ class InterfaceTree{
 
             if (nodeParent === null ||  nodeParent === undefined) nodeParent = this.root;
 
-            this.changedNode(nodeParent)
+            this._changedNode(nodeParent)
 
             return true;
         }

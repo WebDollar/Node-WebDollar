@@ -44,6 +44,9 @@ class InterfaceBlockchainFork {
         return true;
     }
 
+    /**
+     * It Will only validate the hashes of the Fork Blocks
+     */
     async validateForkBlock(block, height){
 
         //calcuate the forkHeight
@@ -115,6 +118,11 @@ class InterfaceBlockchainFork {
                 this.blockchain.blocks.splice(this.forkStartingHeight);
 
                 let forkedSuccessfully = true;
+
+
+                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
 
                 for (let i = 0; i < this.forkBlocks.length; i++)
                     if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length - 1), "all", false, {})) {

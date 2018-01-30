@@ -21,28 +21,28 @@ import BufferExtended from "common/utils/BufferExtended"
 class InterfaceRadixTree extends InterfaceTree{
 
 
-    createNode(parent, edges, value){
+    _createNode(parent, edges, value){
         return new InterfaceRadixTreeNode(parent, edges, value);
     }
 
-    setNode(node, value){
+    _setNode(node, value){
         node.value = value;
     }
 
-    createEdge(label, targetNode){
+    _createEdge(label, targetNode){
         return new InterfaceRadixTreeEdge(label, targetNode);
     }
 
-    changedNode(node){
+    _changedNode(node){
 
-        if (!this.checkInvalidNode(node)) {
+        if (!this._checkInvalidNode(node)) {
             console.log("Invalid Radix Tree", node)
             //this.printLevelSearch();
             throw( 'The Radix Tree is no longer valid at the node ' + JSON.stringify(node))
         }
     }
 
-    checkInvalidNode(node){
+    _checkInvalidNode(node){
 
         // Leaf nodes should have values
         // Other nodes should not have values
@@ -124,11 +124,11 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = this.createNode( nodeCurrent,  [], value);
-                                nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
+                                nodeMatch = this._createNode( nodeCurrent,  [], value);
+                                nodeCurrent.edges.push( this._createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this.createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), )
+                                nodeMatch.edges.push( this._createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), )
                                 edge.targetNode.parent = nodeMatch;
 
                                 nodeCurrent = edge.targetNode;
@@ -138,16 +138,16 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = this.createNode( nodeCurrent,  [], null);
-                                nodeCurrent.edges.push( this.createEdge( match, nodeMatch ));
+                                nodeMatch = this._createNode( nodeCurrent,  [], null);
+                                nodeCurrent.edges.push( this._createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this.createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), )
+                                nodeMatch.edges.push( this._createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), )
                                 edge.targetNode.parent = nodeMatch;
 
                                 // Adding thew new nodeChild with current Value
-                                let nodeChild = this.createNode( nodeMatch, [], value);
-                                nodeMatch.edges.push( this.createEdge(BufferExtended.substr(input, i+match.length), nodeChild));
+                                let nodeChild = this._createNode( nodeMatch, [], value);
+                                nodeMatch.edges.push( this._createEdge(BufferExtended.substr(input, i+match.length), nodeChild));
 
                                 nodeCurrent = nodeChild;
 
@@ -155,8 +155,8 @@ class InterfaceRadixTree extends InterfaceTree{
 
                             // console.log("nodeCurrent",nodeCurrent.value);
                             // console.log("nodeMatch",nodeMatch.value);
-                            this.changedNode(nodeCurrent);
-                            this.changedNode(nodeMatch);
+                            this._changedNode(nodeCurrent);
+                            this._changedNode(nodeMatch);
 
                             // Marking that it is done
                             i = input.length+1;
@@ -170,11 +170,11 @@ class InterfaceRadixTree extends InterfaceTree{
                             if (i === input.length){ //the prefix became a solution
 
                                 if (nodeCurrent.value !== null) throw ('the node already includes a value....');
-                                else this.setNode(nodeCurrent, value);
+                                else this._setNode(nodeCurrent, value);
 
                                 //console.log("nodeCurrent_2",nodeCurrent.value, nodeCurrent);
 
-                                this.changedNode(nodeCurrent)
+                                this._changedNode(nodeCurrent)
                             }
 
                         }
@@ -193,11 +193,11 @@ class InterfaceRadixTree extends InterfaceTree{
 
                 // no more Children...
 
-                let nodeChild = this.createNode(nodeCurrent, [], value);
-                nodeCurrent.edges.push( this.createEdge( BufferExtended.substr(input, i), nodeChild ));
+                let nodeChild = this._createNode(nodeCurrent, [], value);
+                nodeCurrent.edges.push( this._createEdge( BufferExtended.substr(input, i), nodeChild ));
 
                 //console.log("nodeChild2", nodeChild)
-                this.changedNode(nodeChild)
+                this._changedNode(nodeChild)
 
                 //console.log("nodeChild",nodeChild.value);
 
@@ -219,13 +219,21 @@ class InterfaceRadixTree extends InterfaceTree{
      */
     delete(input){
 
-        if (!Buffer.isBuffer(input))
-            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer
+        let searchResult;
 
-        let searchResult = this.search(input);
+        if ( input instanceof InterfaceRadixTreeNode === false) {
 
-        //console.log("searchResult", searchResult)
-        if ( searchResult.node === undefined || searchResult.node === null) return false;
+            if (!Buffer.isBuffer(input))
+                input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer
+
+            searchResult = this.search(input);
+
+            //console.log("searchResult", searchResult)
+            if (searchResult.node === undefined || searchResult.node === null) return false;
+
+        } else {
+            searchResult = {node: input, }
+        }
 
         //it is the last element, we should delete it
         let finished = false;
@@ -267,12 +275,12 @@ class InterfaceRadixTree extends InterfaceTree{
                     // prefix slow => slowly
                     if ( node._previousEdges.length === 1 ){
 
-                        nodeParent.edges.push(  this.createEdge( Buffer.concat( [ deletedParentEdge.label,  node._previousEdges[0].label  ] ), node._previousEdges[0].targetNode) );
+                        nodeParent.edges.push(  this._createEdge( Buffer.concat( [ deletedParentEdge.label,  node._previousEdges[0].label  ] ), node._previousEdges[0].targetNode) );
 
                         node = node._previousEdges[0].targetNode;
                         node.parent = nodeParent;
 
-                        //console.log("this.changedNode 1_0");
+                        //console.log("this._changedNode 1_0");
 
                         break;
 
@@ -282,7 +290,7 @@ class InterfaceRadixTree extends InterfaceTree{
                         node.edges = node._previousEdges;
                         nodeParent.edges.push( deletedParentEdge ) ;
 
-                        //console.log("this.changedNode 1_1");
+                        //console.log("this._changedNode 1_1");
 
                         break;
 
@@ -305,7 +313,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                     node.parent = grandParent;
 
                                     // it is not necessary its parent
-                                    //console.log("this.changedNode 1_2");
+                                    //console.log("this._changedNode 1_2");
 
                                     //console.log("grandParent deletion", node, nodeParent);
                                     break;
@@ -313,19 +321,19 @@ class InterfaceRadixTree extends InterfaceTree{
 
                         } else {
                             node = node.parent;
-                            //console.log("this.changedNode 1_3");
+                            //console.log("this._changedNode 1_3");
                         }
 
                     }
                     else {
                         node = nodeParent;
-                        //console.log("this.changedNode 1_4");
+                        //console.log("this._changedNode 1_4");
                     }
 
                     finished = false;
                     nodeParent = node.parent;
 
-                    //console.log("this.changedNode 2");
+                    //console.log("this._changedNode 2");
 
 
                 }
@@ -346,7 +354,7 @@ class InterfaceRadixTree extends InterfaceTree{
                         node = node.parent;
                         nodeParent = node.parent;
 
-                        //console.log(" this.changedNode 3 ");
+                        //console.log(" this._changedNode 3 ");
 
                         break;
                     }
@@ -358,7 +366,7 @@ class InterfaceRadixTree extends InterfaceTree{
         //console.log("this.printLevelSearch() node", node);
         //this.printLevelSearch();
 
-        this.changedNode( node );
+        this._changedNode( node );
 
         return true;
     }
@@ -436,7 +444,7 @@ class InterfaceRadixTree extends InterfaceTree{
         let node = searchResult.node;
 
         node.value = value;
-        this.changedNode( node );
+        this._changedNode( node );
 
     }
 

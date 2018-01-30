@@ -19,7 +19,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         this.emitter = new EventEmitter();
     }
 
-    createNode(parent, edges, value){
+    _createNode(parent, edges, value){
         return new MiniBlockchainAccountantTreeNode(parent, edges, value);
     }
 
@@ -45,25 +45,30 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
 
 
-        let result = node.updateBalanceToken(value, tokenId);
-
-        // it was deleted
-        if (result === null)
-            this.delete(address);
+        let resultUpdate = node.updateBalanceToken(value, tokenId);
 
         //optimization, but it doesn't work in browser
         //if (this.checkBalanceSubscribed("balances/changes/"+BufferExtended.toBase(address))){
 
         let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
-        this.emitter.emit("balances/changes/"+BufferExtended.toBase(address), {address: addressWIF, balances: (result !== null ? node.getBalances() : null)} );
+        this.emitter.emit("balances/changes/"+BufferExtended.toBase(address), {address: addressWIF, balances: (resultUpdate !== null ? node.getBalances() : null)} );
 
-        if (result === null)
+        // it was deleted
+        // while (node.balances === [] && node.edges.length === 0) {
+        //     this.delete(node);
+        //     node = node.parent;
+        // }
+
+        if (resultUpdate === null){
+            this.delete(address)
+        }
+
+        if (resultUpdate === null)
             return null;
 
-        this.changedNode( node );
+        this._changedNode( node );
 
-
-        return result;
+        return resultUpdate;
     }
 
     /**
@@ -86,11 +91,11 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
 
 
-    changedNode(node){
+    _changedNode(node){
 
         // recalculate the balances
 
-        InterfaceMerkleTree.prototype.changedNode.call(this, node); //computing hash
+        InterfaceMerkleTree.prototype._changedNode.call(this, node); //computing hash
     }
 
     validateTree(node, callback){
@@ -104,15 +109,15 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         return true;
     }
 
-    checkInvalidNode(node){
+    _checkInvalidNode(node){
 
-        //if (!InterfaceAccountantRadixTree.prototype.checkInvalidNode.call(this, node)) return false;
+        //if (!InterfaceAccountantRadixTree.prototype._checkInvalidNode.call(this, node)) return false;
 
-        return InterfaceMerkleTree.prototype.checkInvalidNode.call(this, node);
+        return InterfaceMerkleTree.prototype._checkInvalidNode.call(this, node);
     }
 
-    validateHash(node){
-        return InterfaceMerkleTree.prototype.validateHash.call(this, node);
+    _validateHash(node){
+        return InterfaceMerkleTree.prototype._validateHash.call(this, node);
     }
 
     /*
@@ -122,11 +127,11 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         return InterfaceMerkleTree.prototype._computeHash.call(this, node);
     }
 
-    refreshHash(node, forced){
-        return InterfaceMerkleTree.prototype.refreshHash.call(this, node,forced);
+    _refreshHash(node, forced){
+        return InterfaceMerkleTree.prototype._refreshHash.call(this, node,forced);
     }
 
-    getValueToHash(node){
+    _getValueToHash(node){
 
         return node.serializeNode(false);
     }

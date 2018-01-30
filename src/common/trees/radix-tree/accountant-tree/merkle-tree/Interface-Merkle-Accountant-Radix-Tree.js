@@ -11,14 +11,14 @@ class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
         this.autoMerklify = true;
     }
 
-    changedNode(node){
+    _changedNode(node){
 
         // recalculate the balances
         this.refreshAccount(node, true);
 
-        InterfaceMerkleTree.prototype.changedNode.call(this, node); //computing hash
+        InterfaceMerkleTree.prototype._changedNode.call(this, node); //computing hash
 
-        InterfaceRadixTree.prototype.changedNode.call(this, node); //verifying hash and propagating it
+        InterfaceRadixTree.prototype._changedNode.call(this, node); //verifying hash and propagating it
     }
 
     validateTree(node, callback){
@@ -32,15 +32,15 @@ class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
         return true;
     }
 
-    checkInvalidNode(node){
+    _checkInvalidNode(node){
 
-        if (!InterfaceAccountantRadixTree.prototype.checkInvalidNode.call(this, node)) return false;
+        if (!InterfaceAccountantRadixTree.prototype._checkInvalidNode.call(this, node)) return false;
 
-        return InterfaceMerkleTree.prototype.checkInvalidNode.call(this, node);
+        return InterfaceMerkleTree.prototype._checkInvalidNode.call(this, node);
     }
 
-    validateHash(node){
-        return InterfaceMerkleTree.prototype.validateHash.call(this, node);
+    _validateHash(node){
+        return InterfaceMerkleTree.prototype._validateHash.call(this, node);
     }
 
 
@@ -51,12 +51,12 @@ class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
         return InterfaceMerkleTree.prototype._computeHash.call(this, node);
     }
 
-    refreshHash(node, forced){
-        return InterfaceMerkleTree.prototype.refreshHash.call(this, node,forced);
+    _refreshHash(node, forced){
+        return InterfaceMerkleTree.prototype._refreshHash.call(this, node,forced);
     }
 
-    getValueToHash(node){
-        //return Buffer.concat ( [InterfaceMerkleTree.prototype.getValueToHash.call(this, node),  node.sum.buffer ]);
+    _getValueToHash(node){
+        //return Buffer.concat ( [InterfaceMerkleTree.prototype._getValueToHash.call(this, node),  node.sum.buffer ]);
         return node.serializeNode() ;
     }
 

@@ -17,7 +17,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         this.root.hash = {sha256: new Buffer(32) }
     }
 
-    createNode(parent, edges, value){
+    _createNode(parent, edges, value){
         return new InterfaceMerkleTreeNode(parent, edges, value);
     }
 
@@ -26,10 +26,10 @@ class InterfaceMerkleTree extends InterfaceTree{
      * When an Operation is done to a done, let's calculate its hash
      * @param node
      */
-    changedNode(node){
+    _changedNode(node){
 
         if (this.autoMerklify)
-            this.refreshHash(node, true);
+            this._refreshHash(node, true);
     }
 
 
@@ -38,15 +38,15 @@ class InterfaceMerkleTree extends InterfaceTree{
      * @param node
      * @returns {*}
      */
-    validateTree(node){
+    _validateHash(node){
 
-        let result = InterfaceTree.prototype.validateTree.call(this, node, this.validateHash);
+        let result = InterfaceTree.prototype._validateHash.call(this, node, this._validateHash);
         if (!result) return false;
 
         return true;
     }
 
-    checkInvalidNode(node){
+    _checkInvalidNode(node){
         //it should have a valid hash
 
         if ( node.hash === undefined || node.hash === null) return false;
@@ -59,7 +59,7 @@ class InterfaceMerkleTree extends InterfaceTree{
      * @param node
      * @returns {boolean}
      */
-    validateHash(node){
+    _validateHash(node){
 
         //validate to up
 
@@ -93,14 +93,14 @@ class InterfaceMerkleTree extends InterfaceTree{
      * @param node
      * return buffer
      */
-    getValueToHash(node){
+    _getValueToHash(node){
         // if (!Buffer.isBuffer(node.value))
-        //     console.log("getValueToHash", node.value);
+        //     console.log("_getValueToHash", node.value);
 
         if (Buffer.isBuffer(node.value) )
             return node.value
         else
-            return WebDollarCryptoData.createWebDollarCryptoData(node.value, true).buffer;WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer
+            return WebDollarCryptoData.createWebDollarCryptoData(node.value, true).buffer;
     }
 
     /**
@@ -118,7 +118,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         }
 
         // calcuating the value to hash which must be a buffer
-        let valueToHash = this.getValueToHash(node); //getting the node data
+        let valueToHash = this._getValueToHash(node); //getting the node data
 
         if (node.edges.length === 0){ //Leaf Node (terminal node)
 
@@ -173,7 +173,7 @@ class InterfaceMerkleTree extends InterfaceTree{
      * @param node
      * @returns {boolean}
      */
-    refreshHash(node, forced){
+    _refreshHash(node, forced){
 
         if (node === null ||  node === undefined) throw "Couldn't compute hash because Node is empty";
 
@@ -183,7 +183,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         if ( forced === undefined || forced === false ) {
             // in case it must recalculate the hash by force
             hashAlreadyComputed = true;
-            result  = this.validateHash(node);
+            result  = this._validateHash(node);
         }
 
         // no changes...
@@ -195,8 +195,8 @@ class InterfaceMerkleTree extends InterfaceTree{
                 this._computeHash(node)
 
             if (node.parent !== null)
-                if (!this.validateHash(node.parent))
-                    result = result && this.refreshHash(node.parent, true)
+                if (!this._validateHash(node.parent))
+                    result = result && this._refreshHash(node.parent, true)
 
         }
 

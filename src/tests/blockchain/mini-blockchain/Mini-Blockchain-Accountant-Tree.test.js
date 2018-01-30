@@ -25,7 +25,7 @@ describe('MiniBlockchainAccountantTree', () => {
         console.log("response", response);
         assert(response === true, 'save miniblockchain accountant tree : ' + response);
 
-        Tree.root = Tree.createNode(null,  [], null );
+        Tree.root = Tree._createNode(null,  [], null );
 
         response = await Tree.loadMiniAccountant(undefined,undefined, true, "MiniBlockchainAccountantTree.test");
         assert(response === true, 'load miniblockchain accountant tree: ' + response);
@@ -75,7 +75,7 @@ describe('MiniBlockchainAccountantTree', () => {
         console.log("response", response);
         assert(response === true, 'save miniblockchain accountant tree : ' + response);
 
-        Tree.root = Tree.createNode(null,  [], null );
+        Tree.root = Tree._createNode(null,  [], null );
 
         response = await Tree.loadMiniAccountant(undefined,undefined,true, "MiniBlockchainAccountantTree.test");
         assert(response === true, 'load miniblockchain accountant tree: ' + response);

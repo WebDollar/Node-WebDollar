@@ -68,7 +68,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         if (result.amount.lessThan(0) )
             throw 'balances became negative';
 
-        this.deleteBalancesEmpty();
+        this._deleteBalancesEmpty();
 
         if (this.balances.length === 0)
             return null; //to be deleted
@@ -109,7 +109,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         return list;
     }
 
-    deleteBalancesEmpty(){
+    _deleteBalancesEmpty(){
 
         let result = false;
         for (let i=this.balances.length-1; i>=0; i--) {

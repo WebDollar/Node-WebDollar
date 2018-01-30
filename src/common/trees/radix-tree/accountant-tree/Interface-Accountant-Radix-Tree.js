@@ -11,26 +11,26 @@ import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
  */
 class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
-    createNode(parent, edges, value){
+    _createNode(parent, edges, value){
         //console.log("amount", amount)
         return new InterfaceAccountRadixTreeNode(parent, edges, value);
     }
 
-    setNode(node, value){
-        InterfaceRadixTree.prototype.setNode(this, node);
+    _setNode(node, value){
+        InterfaceRadixTree.prototype._setNode(this, node);
         node.setValue(value);
     }
 
-    changedNode(node){
+    _changedNode(node){
         // recalculate the balances
         this.refreshAccount(node, true);
 
-        InterfaceRadixTree.prototype.changedNode.call(this, node);
+        InterfaceRadixTree.prototype._changedNode.call(this, node);
     }
 
-    checkInvalidNode(node){
+    _checkInvalidNode(node){
 
-        if (!InterfaceRadixTree.prototype.checkInvalidNode.call(this, node))
+        if (!InterfaceRadixTree.prototype._checkInvalidNode.call(this, node))
             return false;
 
         //it should have a valid value

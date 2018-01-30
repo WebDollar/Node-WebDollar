@@ -60,8 +60,8 @@ class InterfaceBlockchain {
         return true;
     }
 
-    simulateNewBlock(block, revertAutomatically, callback){
-
+    async simulateNewBlock(block, revertAutomatically, callback){
+        await callback();
     }
 
     async blockIncluded(block){
