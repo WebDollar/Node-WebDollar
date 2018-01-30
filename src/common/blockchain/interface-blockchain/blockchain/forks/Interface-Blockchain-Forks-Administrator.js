@@ -47,7 +47,10 @@ class InterfaceBlockchainForksAdministrator {
             for (let j=0; j<this.forks.length; j++) {
 
                 for (let q=0; q<this.forks[j].sockets.length; q++)
-                    if (this.forks[j].sockets[q].node.sckAddress.matchAddress(sockets[i].node.sckAddress))
+
+                    if ( this.forks[j].sockets[q].node.sckAddress === sockets[i].node.sckAddress ||
+                         this.forks[j].sockets[q].node.sckAddress.matchAddress(sockets[i].node.sckAddress) )
+
                         return this.forks[j];
             }
         }

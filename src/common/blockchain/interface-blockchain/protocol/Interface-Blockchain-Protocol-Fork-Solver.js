@@ -124,6 +124,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 try {
 
+                    //let check again
+                    forkFound = this.blockchain.forksAdministrator.findForkBySockets(sockets);
+                    if ( forkFound !== null ) return forkFound;
+
                     fork = await this.blockchain.forksAdministrator.createNewFork(sockets, data.position, newChainLength, data.header);
 
                 } catch (Exception){
@@ -143,7 +147,6 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (fork !== null) {
                         console.log("solveFork1");
                         return await this.solveFork(fork);
-                        console.log("solveFork2");
                     }
 
                     return fork;
