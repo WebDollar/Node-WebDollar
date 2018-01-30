@@ -23,13 +23,11 @@ class MainBlockchainWallet{
         else
             this.db = db;
 
-
         this.addresses = [];
 
         this.password = password;
 
         this.emitter = new EventEmitter();
-
     }
 
     async _justCreateNewAddress(salt, emptyAddress){
@@ -39,10 +37,7 @@ class MainBlockchainWallet{
         if (!emptyAddress)
             await blockchainAddress.createNewAddress(salt);
 
-        //console.log("_justCreateNewAddress", blockchainAddress);
-
         return blockchainAddress;
-
     }
 
     async createNewAddress(salt){
@@ -149,8 +144,6 @@ class MainBlockchainWallet{
             this.emitter.emit('wallet/changes', this.addresses );
 
         return true;
-
-
     }
 
     async removeAddresses() {
@@ -169,16 +162,17 @@ class MainBlockchainWallet{
             address = BufferExtended.toBase();
 
         return `https://www.gravatar.com/avatar/${md5(address)}?d=retro&f=y`;
-
     }
-
+    
+   /**
+     * @returns the mining address which will receive rewards
+     */
     async getMiningAddress(){
 
         if (this.addresses.length === 0)
             await this.createNewAddress();
 
         return this.addresses[0].address;
-
     }
 
     /**
@@ -200,8 +194,8 @@ class MainBlockchainWallet{
                 let list = [ Serialization.serializeNumber1Byte(this.addresses.length) ];
 
                 for (let i = 0; i < this.addresses.length; ++i) {
-                    list.push( Serialization.serializeNumber1Byte(this.addresses[i].address.length) );
-                    list.push( Buffer.from(this.addresses[i].address) );
+                    list.push( Serialization.serializeNumber1Byte(this.addresses[i].unencodedAddress.length) );
+                    list.push( this.addresses[i].unencodedAddress );
                 }
 
                 let buffer = Buffer.concat(list);
@@ -219,7 +213,6 @@ class MainBlockchainWallet{
                 });
             });
         });
-
     }
 
     /**
@@ -247,7 +240,8 @@ class MainBlockchainWallet{
                     offset += 1;
 
                     let blockchainAddress = await this._justCreateNewAddress();
-                    blockchainAddress.address = BufferExtend.substr(buffer, offset, len);
+                    blockchainAddress.unencodedAddress = BufferExtend.substr(buffer, offset, len);
+                    blockchainAddress.address = BufferExtended.toBase(blockchainAddress.unencodedAddress);
                     offset += len;
 
                     this.addresses.push(blockchainAddress);

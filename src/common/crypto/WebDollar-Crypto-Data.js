@@ -41,7 +41,6 @@ class WebDollarCryptoData {
         }
 
         return cryptoData;
-
     }
 
     constructor (data, type){
@@ -101,7 +100,8 @@ class WebDollarCryptoData {
             else
                 this.buffer = this.createBufferFromArray(data);
 
-        } else
+        }
+        else
         if (typeof data === "number"){
 
             //converting number value into a buffer on 4 bytes
@@ -139,36 +139,46 @@ class WebDollarCryptoData {
             }
         }
 
-        if (newValue !== null) return newValue.buffer;
-        else return new Buffer( [0] );
-
+        if (newValue !== null)
+            return newValue.buffer;
+        else
+            return new Buffer( [0] );
     }
 
     toHex(){
+        
         return this.buffer.toString('hex');
     }
 
     toString(param){
+        
         return this.buffer.toString(param);
     }
 
     toBytes(){
+
         let result = [];
+        
         for (let i = 0; i < this.buffer.length; ++i) {
             result.push (this.buffer[i]);
         }
+        
         return result;
     }
 
     toUint8Array(){
+        
         let result = new Uint8Array(this.buffer.length);
+        
         for (let i = 0; i < this.buffer.length; ++i) {
             result[i] = this.buffer[i];
         }
+        
         return result;
     }
 
     toBase(){
+        
         return BufferExtended.toBase(this.buffer);
     }
 
@@ -181,11 +191,9 @@ class WebDollarCryptoData {
         if (! WebDollarCryptoData.isWebDollarCryptoData(cryptoData2)) return null;
 
         return BufferExtended.longestMatch(this.buffer, cryptoData2.buffer, startIndex );
-
     }
 
     concat(data){
-
 
         data = WebDollarCryptoData.createWebDollarCryptoData(data);
 
@@ -202,10 +210,10 @@ class WebDollarCryptoData {
             data = WebDollarCryptoData.createWebDollarCryptoData(data);
 
         return this.buffer.compare(data.buffer)
-
     }
 
     toInt(){
+        
         return Serialization.deserializeNumber(this.buffer);
     }
 

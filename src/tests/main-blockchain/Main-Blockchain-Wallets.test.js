@@ -1,6 +1,7 @@
 import WebDollarCrypto from "../../common/crypto/WebDollar-Crypto";
 
 var assert = require('assert');
+var FileSystem = require('fs');
 
 import Blockchain from 'main-blockchain/Blockchain';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
@@ -68,7 +69,6 @@ describe('test save wallet to local storage', () => {
 
     });
 
-
     it('test save/load/remove/load with AES encrypt/decrypt privateKey', async () => {
 
         let blockchainAddress = await Blockchain.Wallet.createNewAddress();
@@ -103,7 +103,6 @@ describe('test save wallet to local storage', () => {
         assert(response !== true, 'load: ' + response);
 
     });
-
 
     it('load/store wallet manager', async () => {
 
@@ -150,9 +149,9 @@ describe('test save wallet to local storage', () => {
         for (let i = 0; i < addresses.length; ++i){
             assert(addresses[i].address.toString() === Blockchain.Wallet.addresses[i].address.toString(), "Addresses differ after import:" + addresses[i].address + "!==" + Blockchain.Wallet.addresses[i].address);
         }
-
+        
+        FileSystem.unlinkSync("addresses.bin");
     });
-
 
     it('test export/import wallet privateKeys', async () => {
 
@@ -160,8 +159,9 @@ describe('test save wallet to local storage', () => {
             let privateKey = await Blockchain.Wallet.addresses[i].getPrivateKey();
             let totalMultiSig = 3;
             let requiredMultiSig = 2;
+            let fileName = "privateKey" + i + ".bin";
 
-            response = await Blockchain.Wallet.addresses[i].exportPrivateKey("privateKey"+i+".bin", totalMultiSig, requiredMultiSig);
+            response = await Blockchain.Wallet.addresses[i].exportPrivateKey(fileName, totalMultiSig, requiredMultiSig);
             assert(response === true, "Error exporting privateKey: " + response);
 
             response = await Blockchain.Wallet.addresses[i].importPrivateKey("privateKey" + i + ".bin");
@@ -171,6 +171,8 @@ describe('test save wallet to local storage', () => {
 
             let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
             assert(privateKey2.equals(privateKey), "PrivateKey differ after import: " + privateKey2.toString("hex") + "!==" + privateKey.toString("hex"));
+            
+            FileSystem.unlinkSync(fileName);
         }
     });
 
