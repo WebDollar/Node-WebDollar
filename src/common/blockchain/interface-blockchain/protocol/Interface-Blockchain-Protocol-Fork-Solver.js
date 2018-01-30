@@ -44,10 +44,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
             //was not not found, search left because it must be there
             if (blockHeaderResult.header.hash.equals(this.blockchain.blocks[mid].hash) === false)
-                return this._discoverForkBinarySearch(sockets, left, mid);
+                return this._discoverForkBinarySearch(socket, left, mid);
             else
             //was found, search right because the fork must be there
-                return this._discoverForkBinarySearch(sockets, mid + 1, right);
+                return this._discoverForkBinarySearch(socket, mid + 1, right);
 
 
         } catch (Exception){

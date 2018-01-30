@@ -21,6 +21,8 @@ class InterfaceBlockchainForksAdministrator {
 
     createNewFork(sockets, forkStartingHeight, forkChainLength, header){
 
+        if (!Array.isArray(sockets)) sockets = [sockets];
+
         let fork;
 
         if (this.findForkBySockets(sockets) !== null) return null;
