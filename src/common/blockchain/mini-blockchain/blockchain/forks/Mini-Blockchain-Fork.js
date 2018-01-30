@@ -22,8 +22,8 @@ class MiniBlockchainFork extends InterfaceBlockchainFork{
             //this.blockchain.blocks[i] =
         }
 
-        console.log("this.forkStartingHeight", this.forkStartingHeight);
-        console.log("root", this.blockchain.accountantTree.root);
+        // console.log("this.forkStartingHeight", this.forkStartingHeight);
+        // console.log("root", this.blockchain.accountantTree.root);
         // console.log("root.edges", this.blockchain.accountantTree.root.edges[0]);
         // console.log("root.targetNode.balances", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
 

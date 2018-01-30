@@ -153,7 +153,8 @@ class MiniBlockchain extends  inheritBlockchain{
             console.log("reeesult", result, saveBlock)
 
             if (result && saveBlock){
-                result = await this.accountantTree.saveMiniAccountant(true, undefined, serializationAccountantTree);
+                result = await this.accountantTree.saveMiniAccountant( true, undefined, this.getSerializedAccountantTree( this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1 ));
+                console.log("reeesult23", result);
             }
 
         } else {
@@ -176,12 +177,12 @@ class MiniBlockchain extends  inheritBlockchain{
     async save(){
 
         try {
-            console.log("saaaave");
+            console.log("saaaave", this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1);
 
             if (this.blocks.length === 0) return false;
 
             //AccountantTree[:-POW_PARAMS.VALIDATE_LAST_BLOCKS]
-            let result = await this.accountantTree.saveMiniAccountant(true, undefined, this.getSerializedAccountantTree(this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1));
+            let result = await this.accountantTree.saveMiniAccountant( true, undefined, this.getSerializedAccountantTree( this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1 ));
 
             result = result && await inheritBlockchain.prototype.save.call(this);
 
