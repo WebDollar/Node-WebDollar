@@ -233,13 +233,15 @@ class InterfaceBlockchainProtocolForkSolver{
                         //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
                         let onlyHeader;
-                        if (this.protocol.acceptBlocks)
-                            onlyHeader = false;
-                        else if (this.protocol.acceptBlockHeaders)
-                            onlyHeader = true;
+                        if (this.protocol.acceptBlocks) onlyHeader = false;
+                        else if (this.protocol.acceptBlockHeaders) onlyHeader = true;
 
 
                         answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
+
+                        if (answer === null){
+                            throw "block never received "+ nextBlockHeight;
+                        }
 
                         if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
 
@@ -297,6 +299,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 }
 
                 if (fork.forkStartingHeight + fork.forkBlocks.length >= fork.forkChainLength ) {
+
                     if (await fork.saveFork()) {
                         resolve(true);
                         return true;
@@ -304,6 +307,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         resolve(false);
                         return false;
                     }
+
                 }
 
 
@@ -312,6 +316,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 console.log("solveFork raised an exception", exception);
                 resolve(false);
                 return false;
+
 
             }
 
