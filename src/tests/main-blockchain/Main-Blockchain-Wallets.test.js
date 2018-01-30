@@ -234,4 +234,13 @@ describe('test save wallet to local storage', () => {
 
     });
 
+    it('test check multiSig public/private Keys', async () => {
+
+        let pair = MultiSig.makeMultisigAddress(['datanastere1','val','pllui']);
+
+        console.log("pair", pair.address);
+    });
+
+
+
 });
