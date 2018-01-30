@@ -133,12 +133,29 @@ class MiniBlockchain extends  inheritBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
-        let result = await this.simulateNewBlock(block, false, async ()=>{
-            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
-        });
+        let serializationAccountantTree, result;
+
+        if ( blockValidationType === undefined || blockValidationType['skip-validation-before'] === undefined ||
+            (this.height >= blockValidationType['skip-validation-before'].height )) {
+
+            result = await this.simulateNewBlock(block, false, async ()=>{
+                return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
+            });
+
+            serializationAccountantTree = this.accountantTree.serializeMiniAccountant();
+
+            console.log("serializationAccountantTree", block.height, "   ", serializationAccountantTree.toString("hex"));
+
+            this.accountantTreeSerializations[block.height] = serializationAccountantTree;
+
+        } else {
+
+            result = await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
+
+        }
 
         if (result && saveBlock){
-            result = await this.accountantTree.saveMiniAccountant();
+            result = await this.accountantTree.saveMiniAccountant(true, undefined, serializationAccountantTree);
         }
 
         return result;
@@ -155,7 +172,11 @@ class MiniBlockchain extends  inheritBlockchain{
     async save(){
 
         try {
-            let result = await this.accountantTree.saveMiniAccountant();
+
+            if (this.blocks.length === 0) return false;
+
+            //AccountantTree[:-POW_PARAMS.VALIDATE_LAST_BLOCKS]
+            let result = await this.accountantTree.saveMiniAccountant(true, undefined, this.getSerializedAccountantTree(this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS));
 
             result = result && await inheritBlockchain.prototype.save.call(this);
 
@@ -174,21 +195,17 @@ class MiniBlockchain extends  inheritBlockchain{
     async load(){
 
         try {
-            let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
-            let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
+
+            //AccountantTree[:-POW_PARAMS.VALIDATE_LAST_BLOCKS]
+            let result = await this.accountantTree.loadMiniAccountant(undefined, undefined, true);
+
+            //check the accountant Tree if matches
+            console.log("this.accountantTree initial ", this.accountantTree.root.hash.sha256);
 
             result = result && await inheritBlockchain.prototype.load.call(this, consts.POW_PARAMS.VALIDATE_LAST_BLOCKS  );
 
             //check the accountant Tree if matches
-            console.log("this.accountantTree", this.accountantTree.root);
-            console.log("finalAccountantTree", finalAccountantTree.root);
-
-            result = result && finalAccountantTree.matches(this.accountantTree);
-
-            if (result )
-                this.accountantTree = finalAccountantTree;
-            else
-                console.log( colors.red("finalAccountantTree doesn't match") )
+            console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
 
             return result;
 
@@ -197,6 +214,17 @@ class MiniBlockchain extends  inheritBlockchain{
             console.log(colors.red("Couldn't save MiniBlockchain"), exception)
             return false;
         }
+    }
+
+
+    getSerializedAccountantTree(height){
+
+        if (Buffer.isBuffer(this.accountantTreeSerializations[height]))
+            return this.accountantTreeSerializations[height];
+
+        // else I need to compute it, by removing n-1..n
+        throw "not computed";
+
     }
 
 }

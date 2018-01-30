@@ -44,9 +44,8 @@ class MiniBlockchainProtocol extends inheritProtocol{
                 if (this.blockchain.blocks.length < data.height) throw "height is not valid";
                 if (data.height < 0) throw "height is not valid";
 
-                let serialization;
+                let serialization ;
 
-                if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS !== data.height) throw "height is not valid";
                 if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS !== data.height) throw "height is not valid";
 
                 socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height || -1, {

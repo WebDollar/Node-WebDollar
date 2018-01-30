@@ -254,7 +254,7 @@ class InterfaceBlockchain {
                 let blockValidationType = {};
 
                 if (validateLastBlocks !== undefined)
-                    blockValidationType["skip-hash-validation-before"] = {height: numBlocks - validateLastBlocks } ;
+                    blockValidationType["skip-validation-before"] = {height: numBlocks - validateLastBlocks } ;
 
                 try{
 
