@@ -1,0 +1,7 @@
+import InterfaceBlockchainProtocolForkSolver from 'common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol-Fork-Solver'
+
+class PPoWBlockchainProtocolForkSolver extends InterfaceBlockchainProtocolForkSolver{
+
+}
+
+export default PPoWBlockchainProtocolForkSolver

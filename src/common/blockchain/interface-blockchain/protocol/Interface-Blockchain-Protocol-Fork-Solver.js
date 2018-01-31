@@ -60,8 +60,8 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async discoverAndSolveFork(socket, newChainLength){
 
-        let fork, result = null;
-        let data = {position: -1, header: null };
+        let fork, result = null, chainStartingPoint = 0;
+        let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.getBlockchainLength();
 
         try{
@@ -79,59 +79,46 @@ class InterfaceBlockchainProtocolForkSolver{
             if (currentBlockchainLength <= newChainLength && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
 
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
-                if (answer === null)
-                    throw "connection dropped headers-info";
 
-                if (answer !== undefined && answer !== null && answer.result === true && answer.header !== undefined && Buffer.isBuffer(answer.header.hash) )
+                if (answer === null) throw "connection dropped headers-info";
+                if (answer === undefined || answer !== null || answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) ) throw "connection headers-info malformed";
 
-                    if (answer.header.hash.equals( this.blockchain.getBlockchainLastBlock().hash ))
+                if (answer.header.hash.equals( this.blockchain.getBlockchainLastBlock().hash ))
 
-                        data = {
-                            position : currentBlockchainLength - 1,
-                            header: answer.header,
-                        };
+                    binarySearchResult = {
+                        position : currentBlockchainLength - 1,
+                        header: answer.header,
+                    };
 
 
             }
 
             // in case it was you solved previously && there is something in the blockchain
 
-            if ( data.position === -1 && currentBlockchainLength > 0 ) {
+            if ( binarySearchResult.position === -1 && currentBlockchainLength > 0 ) {
 
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
 
-                if (answer === null)
-                    throw "connection dropped info";
+                if (answer === null) throw "connection dropped info";
+                if (answer === undefined || answer === undefined || typeof answer.chainStartingPoint !== "number" ) throw "request-blockchain-info couldn't return real values";
 
-                if (answer === undefined || answer === undefined || typeof answer.chaingStartingPoint !== "number" )
-                    throw "request-blockchain-info couldn't return real values";
+                chainStartingPoint = answer.chainStartingPoint;
 
-                data = await this._discoverForkBinarySearch(socket, answer.chaingStartingPoint, currentBlockchainLength - 1);
+                binarySearchResult = await this._discoverForkBinarySearch(socket, chainStartingPoint, currentBlockchainLength - 1);
 
-                if (data.position === null)
+                if (binarySearchResult.position === null)
                     throw "connection dropped discoverForkBinarySearch"
 
-                //console.log("binary search ", data)
+                //console.log("binary search ", binarySearchResult)
             }
 
-            // it has a ground-new blockchain
-            // very skeptical when the blockchain becomes bigger
-            if (data.position === -1 && currentBlockchainLength < newChainLength){
 
-                let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: 0 }, 0 );
-
-                if (answer === null)
-                    throw "connection dropped headers-info 0";
-
-                if (answer !== null && answer !== undefined && answer.result === true && answer.header !== undefined)
-                    data = {position: 0, header: answer.header};
-
-            }
+            binarySearchResult = await this._discoverProcessForkingPossibilities(binarySearchResult, chainStartingPoint, newChainLength);
 
             //its a fork... starting from position
-            console.log("fork position", data.position, "newChainLength", newChainLength);
+            console.log("fork position", binarySearchResult.position, "newChainLength", newChainLength);
 
-            if (data.position === 0 || (data.position > 0 && data.header !== undefined && data.header !== null) ){
+            if (binarySearchResult.position === 0 || (binarySearchResult.position > 0 && binarySearchResult.header !== undefined && binarySearchResult.header !== null) ){
 
                 try {
 
@@ -139,12 +126,12 @@ class InterfaceBlockchainProtocolForkSolver{
                     forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
                     if ( forkFound !== null ) return forkFound;
 
-                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, data.position, newChainLength, data.header);
+                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, newChainLength, binarySearchResult.header);
 
 
                 } catch (Exception){
 
-                    console.log(colors.red("discoverAndSolveFork - creating a fork raised an exception" ), Exception, "data", data )
+                    console.log(colors.red("discoverAndSolveFork - creating a fork raised an exception" ), Exception, "binarySearchResult", binarySearchResult )
                     throw Exception;
                 }
 
@@ -161,7 +148,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 } catch (Exception){
 
-                    console.log(colors.red("discoverAndSolveFork - solving a fork raised an exception" + Exception.toString() ), "data", data );
+                    console.log(colors.red("discoverAndSolveFork - solving a fork raised an exception" ), Exception, "binarySearchResult", binarySearchResult );
                     throw Exception;
                 }
 
@@ -184,6 +171,26 @@ class InterfaceBlockchainProtocolForkSolver{
         this.blockchain.forksAdministrator.deleteSocketProcessing(socket);
         this.blockchain.forksAdministrator.deleteFork(fork);
         return result;
+    }
+
+    async _discoverProcessForkingPossibilities(binarySearchResult, chainStartingPoint, newChainLength){
+
+        let currentBlockchainLength = this.blockchain.getBlockchainLength();
+
+        // it has a ground-new blockchain
+        // very skeptical when the blockchain becomes bigger
+        if (binarySearchResult.position === -1 && currentBlockchainLength < newChainLength){
+
+            let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: 0 }, 0 );
+
+            if (answer === null) throw "connection dropped headers-info 0";
+            if (answer === null || answer === undefined || answer.result !== true || answer.header === undefined) throw "headers-info 0 malformed"
+
+            binarySearchResult = {position: 0, header: answer.header};
+
+        }
+
+        return binarySearchResult;
     }
 
     /**

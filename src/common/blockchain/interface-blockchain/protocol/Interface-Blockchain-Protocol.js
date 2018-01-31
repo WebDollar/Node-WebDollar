@@ -173,7 +173,7 @@ class InterfaceBlockchainProtocol {
 
                 socket.node.sendRequest("blockchain/info/request-blockchain-info", {
                     result: true,
-                    chaingStartingPoint: this.blockchain.getBlockchainStartingPoint(),
+                    chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),
                     chainLength: this.blockchain.getBlockchainLength()
                 });
 
