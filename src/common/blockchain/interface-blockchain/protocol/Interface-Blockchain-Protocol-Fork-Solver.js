@@ -16,15 +16,15 @@ class InterfaceBlockchainProtocolForkSolver{
 
     async _discoverForkBinarySearch(socket, left, right){
 
-        console.log("_discoverForkBinarySearch", left, right)
-
         let blockHeaderResult;
 
         try {
 
             let mid = Math.trunc((left + right) / 2);
 
+            console.log("_discoverForkBinarySearch", left, right, 1111)
             blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: mid}, mid);
+            console.log("_discoverForkBinarySearch", left, right, 2222)
 
             if (blockHeaderResult === null || blockHeaderResult === undefined || blockHeaderResult.result !== true || blockHeaderResult.header === undefined || blockHeaderResult.header.hash === undefined ||  !Buffer.isBuffer(blockHeaderResult.header.hash) )
                 return {position: null, header: (blockHeaderResult === null ? null : blockHeaderResult.header) };
@@ -244,8 +244,6 @@ class InterfaceBlockchainProtocolForkSolver{
                     console.log(colors.yellow("ForkSolver ------ 6161 ********"));
                     answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
                     console.log(colors.yellow("ForkSolver ------ 6262"));
-
-                    throw "error";
 
                     if (answer === null)
                         throw "block never received "+ nextBlockHeight;
