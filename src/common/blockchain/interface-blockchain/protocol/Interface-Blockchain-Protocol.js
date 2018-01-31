@@ -248,7 +248,8 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - blockchain/blocks/request-block-by-height ", exception.toString()));
+                    console.log(colors.red("Socket Error - blockchain/blocks/request-block-by-height "), exception);
+
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + data.height || 0, {
                         result: false,
                         message: exception.toString()

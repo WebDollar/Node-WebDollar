@@ -74,7 +74,7 @@ class SocketExtend{
         Sending the Request and return the Promise to Wait Async
     */
 
-    sendRequestWaitOnce (socket, request, requestData, answerPrefix, timeOutInterval=10000) {
+    sendRequestWaitOnce (socket, request, requestData, answerPrefix, timeOutInterval=15000) {
 
         if ( answerPrefix !== undefined) answerPrefix = String(answerPrefix); //in case it is a number
 
@@ -96,14 +96,15 @@ class SocketExtend{
 
             let onceId = socket.once(requestAnswer, requestFunction );
 
-            this.sendRequest(socket, request, requestData);
-
             if (timeOutInterval !== undefined)
                 timeoutId = setTimeout(()=>{
                     socket.removeListener(requestAnswer, requestFunction);
+                    onceId();
                     //socket.off(onceId);
                     resolve(null)
                 }, timeOutInterval);
+
+            this.sendRequest(socket, request, requestData);
 
         });
     }

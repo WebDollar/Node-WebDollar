@@ -126,7 +126,6 @@ class InterfaceBlockchainProtocolForkSolver{
             // very skeptical when the blockchain becomes bigger
             if (data.position === -1 && currentBlockchainLength < newChainLength){
 
-                console.log(colors.yellow("ForkSolver ------ 1010"));
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: 0 }, 0 );
 
                 if (answer === null)
@@ -144,17 +143,20 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 try {
 
+                    console.log(colors.yellow("ForkSolver ------ 1010"));
                     //let check again
                     forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
                     if ( forkFound !== null ) return forkFound;
 
+                    console.log(colors.yellow("ForkSolver ------ 1111"));
                     fork = await this.blockchain.forksAdministrator.createNewFork(socket, data.position, newChainLength, data.header);
+
+                    console.log(colors.yellow("ForkSolver ------ 1212"));
 
                 } catch (Exception){
 
-                    this.blockchain.forksAdministrator.deleteFork(fork);
-
                     console.log(colors.red("discoverAndSolveFork - creating a fork raised an exception" ), Exception, "data", data )
+                    throw Exception;
                 }
 
                 try{
@@ -164,7 +166,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     if (fork !== null) {
                         console.log("solveFork1");
+                        console.log(colors.yellow("ForkSolver ------ 1212"));
                         result = await this.solveFork(fork);
+                        console.log(colors.yellow("ForkSolver ------ 1313"));
                     }
 
 
@@ -241,9 +245,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
 
-                        if (answer === null){
+                        if (answer === null)
                             throw "block never received "+ nextBlockHeight;
-                        }
 
                         if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
 
@@ -269,7 +272,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
                             try {
 
+                                console.log(colors.yellow("ForkSolver ------ 6655"));
                                 result = await fork.includeForkBlock(block);
+                                console.log(colors.yellow("ForkSolver ------ 6666"));
 
                             } catch (Exception) {
 
