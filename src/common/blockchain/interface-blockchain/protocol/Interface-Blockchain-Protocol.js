@@ -245,7 +245,8 @@ class InterfaceBlockchainProtocol {
 
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                         result: true,
-                        block: block.serializeBlock(data.onlyHeader || false)
+                        block: new Buffer(32),
+                        //block: block.serializeBlock(data.onlyHeader || false)
                     });
                     console.log(colors.green("blockchain/blocks/request-block-by-height/" + (data.height || 0)), "22222222222222222222")
 

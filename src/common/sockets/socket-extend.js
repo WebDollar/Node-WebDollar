@@ -89,9 +89,9 @@ class SocketExtend{
             }
 
             let requestFunction = (resData) => {
-                resolve(resData);
 
                 if (timeoutId !== undefined) clearTimeout(timeoutId);
+                resolve(resData);
             };
 
             let onceId = socket.once(requestAnswer, requestFunction );

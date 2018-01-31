@@ -16,6 +16,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
     async _discoverForkBinarySearch(socket, left, right){
 
+        console.log("_discoverForkBinarySearch", left, right)
+
         let blockHeaderResult;
 
         try {
@@ -38,10 +40,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
             //was not not found, search left because it must be there
             if (blockHeaderResult.header.hash.equals(this.blockchain.blocks[mid].hash) === false)
-                return this._discoverForkBinarySearch(socket, left, mid);
+                return await this._discoverForkBinarySearch(socket, left, mid);
             else
             //was found, search right because the fork must be there
-                return this._discoverForkBinarySearch(socket, mid + 1, right);
+                return await this._discoverForkBinarySearch(socket, mid + 1, right);
 
 
         } catch (Exception){
@@ -239,10 +241,11 @@ class InterfaceBlockchainProtocolForkSolver{
                     else if (this.protocol.acceptBlockHeaders) onlyHeader = true;
 
 
-                    console.log(colors.yellow("ForkSolver ------ 6161"));
+                    console.log(colors.yellow("ForkSolver ------ 6161 ********"));
                     answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
                     console.log(colors.yellow("ForkSolver ------ 6262"));
 
+                    throw "error";
 
                     if (answer === null)
                         throw "block never received "+ nextBlockHeight;
