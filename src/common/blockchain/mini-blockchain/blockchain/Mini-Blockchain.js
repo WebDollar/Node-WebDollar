@@ -137,7 +137,7 @@ class MiniBlockchain extends  inheritBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
-        let serializationAccountantTree, result;
+        let  result;
 
         console.log("blockValidationType", blockValidationType);
 
@@ -148,20 +148,13 @@ class MiniBlockchain extends  inheritBlockchain{
                 return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
             });
 
-            serializationAccountantTree = this.accountantTree.serializeMiniAccountant();
-
-            console.log("serializationAccountantTree", block.height, "   ", serializationAccountantTree.toString("hex"));
-
-            this.accountantTreeSerializations[block.height] = serializationAccountantTree;
 
             console.log("reeesult", result, saveBlock);
 
             if (result && saveBlock){
                 result = await this.accountantTree.saveMiniAccountant( true, undefined, this.getSerializedAccountantTree( this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1 ));
 
-                // updating the blocksStartingPoint
-                if (this.agent instanceof MiniBlockchainAgentLightNode)
-                    this.blocksStartingPoint = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS;
+                this._addTreeSerialization(block.height);
             }
 
         } else {
@@ -225,7 +218,7 @@ class MiniBlockchain extends  inheritBlockchain{
             //check the accountant Tree if matches
             console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
 
-            this.accountantTreeSerializations[this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1] = serializationAccountantTreeInitial;
+            this._addTreeSerialization(undefined, serializationAccountantTreeInitial);
 
             return result;
 
@@ -253,6 +246,28 @@ class MiniBlockchain extends  inheritBlockchain{
 
         // else I need to compute it, by removing n-1..n
         throw "not computed";
+
+    }
+
+    _addTreeSerialization(height, serialization){
+
+        if (height === undefined)
+            height = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 1;
+
+        if (serialization === undefined){
+            serialization = this.accountantTree.serializeMiniAccountant();
+            console.log("serializationAccountantTree", height, "   ", serialization.toString("hex"));
+        }
+
+        this.accountantTreeSerializations[height] = serialization;
+
+        //delete serializations older than [:-m]
+        if (this.accountantTreeSerializations[height-2] !== undefined)
+            this.accountantTreeSerializations.splice(height-2, 1);
+
+        // updating the blocksStartingPoint
+        if (this.agent instanceof MiniBlockchainAgentLightNode)
+            this.blocksStartingPoint = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS;
 
     }
 
