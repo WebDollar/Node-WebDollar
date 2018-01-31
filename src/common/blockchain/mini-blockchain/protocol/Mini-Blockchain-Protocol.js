@@ -1,3 +1,4 @@
+const colors = require('colors/safe');
 import InterfaceBlockchainProtocol from 'common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol'
 import Serialization from 'common/utils/Serialization'
 import consts from "consts/const_global";
@@ -39,19 +40,21 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
             try{
 
+                console.log(colors.yellow("get-accountant-tree"), data)
                 if (data.height === undefined) data.height = -1;
 
                 if (typeof data.height !== "number")
                     throw "data.height is not a number";
 
                 if (this.blockchain.blocks.length < data.height) throw "height is not valid";
-                if (data.height < 0) throw "height is not valid";
+                if (data.height < -1) throw "height is not valid";
 
                 if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS > data.height) throw "height is to large for request";
 
                 let serialization = this.blockchain.getSerializedAccountantTree(data.height);
 
-                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height || -1, {
+                console.log(colors.yellow("get-accountant-tree data"), serialization);
+                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + (data.height || -1), {
                     result: true,
                     accountantTree: serialization,
                 });
@@ -61,7 +64,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
                 console.log(colors.red("Socket Error - get/blockchain/accountant-tree/get-accountant-tree", exception), data);
 
-                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height || -1, {
+                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + (data.height || -1), {
                     result: false,
                     message: exception.toString()
                 });
