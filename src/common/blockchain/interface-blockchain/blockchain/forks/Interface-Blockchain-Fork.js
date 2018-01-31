@@ -79,6 +79,8 @@ class InterfaceBlockchainFork {
 
         }
 
+        block.difficultyTarget = prevDifficultyTarget;
+
         return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp, {"skip-accountant-tree-validation": true} );
 
     }

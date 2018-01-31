@@ -1,4 +1,3 @@
-import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainFork from "../blockchain/forks/Interface-Blockchain-Fork";
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 const colors = require('colors/safe');
@@ -166,9 +165,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     if (fork !== null) {
                         console.log("solveFork1");
-                        console.log(colors.yellow("ForkSolver ------ 1212"));
-                        result = await this.solveFork(fork);
                         console.log(colors.yellow("ForkSolver ------ 1313"));
+                        result = await this.solveFork(fork);
+                        console.log(colors.yellow("ForkSolver ------ 1414"));
                     }
 
 
@@ -210,7 +209,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
         let nextBlockHeight = fork.forkStartingHeight;
 
-        let socketsCheckedForBlock = [];
 
         //interval timer
 
@@ -227,77 +225,77 @@ class InterfaceBlockchainProtocolForkSolver{
                 //in case I didn't check this socket for the same block
                 while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength ) {
 
-                    if (socketsCheckedForBlock.indexOf(socket) < 0) {
 
-                        //console.log("it worked ", socket);
+                    // TODO you can paralize the downloading code from multiple sockets
 
-                        socketsCheckedForBlock.push(socket);
-                        console.log("nextBlockHeight", nextBlockHeight);
+                    console.log("nextBlockHeight", nextBlockHeight);
 
-                        let answer;
+                    let answer;
 
-                        //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
+                    //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
-                        let onlyHeader;
-                        if (this.protocol.acceptBlocks) onlyHeader = false;
-                        else if (this.protocol.acceptBlockHeaders) onlyHeader = true;
+                    let onlyHeader;
+                    if (this.protocol.acceptBlocks) onlyHeader = false;
+                    else if (this.protocol.acceptBlockHeaders) onlyHeader = true;
 
 
-                        answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
+                    console.log(colors.yellow("ForkSolver ------ 6161"));
+                    answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
+                    console.log(colors.yellow("ForkSolver ------ 6262"));
 
-                        if (answer === null)
-                            throw "block never received "+ nextBlockHeight;
 
-                        if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
+                    if (answer === null)
+                        throw "block never received "+ nextBlockHeight;
 
-                            let block;
+                    if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
+
+                        let block;
+
+                        try {
+
+                            console.log(colors.yellow("ForkSolver ------ 6363"));
+                            block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
+
+                            if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
+                                block.data._onlyHeader = true; //avoiding to store the transactions
+
+                            console.log(colors.yellow("ForkSolver ------ 6464"));
+                            block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), new Buffer(32) );
+                            console.log(colors.yellow("ForkSolver ------ 6565"));
+
+                        } catch (Exception) {
+                            console.log(colors.red("Error deserializing blocks "), Exception, answer.block);
+                            resolve(false);
+                            return false;
+                        }
+
+                        let result;
+
+                        try {
+
+                            console.log(colors.yellow("ForkSolver ------ 6655"));
+                            result = await fork.includeForkBlock(block);
+                            console.log(colors.yellow("ForkSolver ------ 6666"));
+
+                        } catch (Exception) {
+
+                            console.log(colors.red("Error including block " + nextBlockHeight + " in fork "), Exception);
 
                             try {
-
-                                block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
-
-                                if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
-                                    block.data._onlyHeader = true; //avoiding to store the transactions
-
-
-                                block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), this.blockchain.getDifficultyTarget());
-
-                            } catch (Exception) {
-                                console.log(colors.red("Error deserializing blocks "), Exception, answer.block);
-                                resolve(false);
-                                return false;
+                                console.log("block.serialization ", block.serializeBlock().toString("hex"));
+                            } catch (exception) {
+                                console.log(colors.red("Error serializing fork block"), block);
                             }
 
-                            let result;
+                            resolve(false);
+                            return false;
 
-                            try {
+                        }
 
-                                console.log(colors.yellow("ForkSolver ------ 6655"));
-                                result = await fork.includeForkBlock(block);
-                                console.log(colors.yellow("ForkSolver ------ 6666"));
+                        //if the block was included correctly
+                        if (result) {
 
-                            } catch (Exception) {
-
-                                console.log(colors.red("Error including block " + nextBlockHeight + " in fork "), Exception);
-
-                                try {
-                                    console.log("block.serialization ", block.serializeBlock().toString("hex"));
-                                } catch (exception) {
-                                    console.log(colors.red("Error serializing fork block"), block);
-                                }
-
-                                resolve(false);
-                                return false;
-
-                            }
-
-                            //if the block was included correctly
-                            if (result) {
-
-                                nextBlockHeight++;
-                                socketsCheckedForBlock = [];
-                            }
-
+                            nextBlockHeight++;
                         }
 
                     }
