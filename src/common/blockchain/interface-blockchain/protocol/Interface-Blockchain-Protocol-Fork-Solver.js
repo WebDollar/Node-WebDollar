@@ -105,7 +105,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 console.log(colors.yellow("ForkSolver ------ 6666"));
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
-                console.log(colors.yellow("ForkSolver ------ 777"));
+                console.log(colors.yellow("ForkSolver ------ 777"), answer);
 
                 if (answer === null)
                     throw "connection dropped info";
@@ -114,6 +114,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     throw "request-blockchain-info couldn't return real values";
 
                 console.log(colors.yellow("ForkSolver ------ 888"));
+
                 data = await this._discoverForkBinarySearch(socket, answer.chaingStartingPoint, currentBlockchainLength - 1);
 
                 console.log(colors.yellow("ForkSolver ------ 9999"));
@@ -243,7 +244,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     console.log(colors.yellow("ForkSolver ------ 6161 ********"));
                     answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
-                    console.log(colors.yellow("ForkSolver ------ 6262"));
+                    console.log(colors.yellow("ForkSolver ------ 6262"), answer);
 
                     if (answer === null)
                         throw "block never received "+ nextBlockHeight;
