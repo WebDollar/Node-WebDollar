@@ -48,7 +48,7 @@ class MiniBlockchainFork extends inheritFork{
 
         if (forkedSuccessfully) return true;
 
-        //rollback to the original Accountant Tree
+        //recover to the original Accountant Tree
         this.blockchain.accountantTree.root = this._accountantTreeRootClone;
 
     }
