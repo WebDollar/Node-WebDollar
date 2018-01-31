@@ -38,6 +38,8 @@ if ( typeof describe !== 'undefined') {
 
     require ('tests/utils/big-number/BigNumber.test');
     require ('tests/utils/serialization/Serialization.test');
+    
+    require ('tests/utils/reward-simulator/RewardSimulator.test');
 
     // require ('tests/blockchain/Node-Web-Peer.test')
 
