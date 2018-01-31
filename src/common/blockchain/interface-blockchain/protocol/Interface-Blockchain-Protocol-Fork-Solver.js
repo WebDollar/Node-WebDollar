@@ -216,9 +216,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
-                //console.log("processsing... fork.sockets.length ", fork.sockets.length);
-
                 let answer = null;
+
+                console.log("fork.forkStartingHeight", fork.forkStartingHeight, "fork.forkBlocks.length", fork.forkBlocks.length)
+                console.log(" < fork.forkChainLength", fork.forkChainLength)
 
                 //in case I didn't check this socket for the same block
                 while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength ) {
