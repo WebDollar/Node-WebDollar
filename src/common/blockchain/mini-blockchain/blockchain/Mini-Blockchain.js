@@ -5,7 +5,7 @@ import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockcha
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import MiniBlockchainBlock from '../blocks/Mini-Blockchain-Block'
 import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
-import MiniBlockchainFork from './forks/Mini-Blockchain-Fork'
+import MiniBlockchainFork from '../protocol/Mini-Blockchain-Fork'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import InterfaceBlockchainForksAdministrator from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Forks-Administrator'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
@@ -30,8 +30,10 @@ class MiniBlockchain extends  inheritBlockchain{
         this.accountantTreeSerializations = [];
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
-        this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, MiniBlockchainFork );
+        this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, agent.forkClass );
     }
+
+
 
     async simulateNewBlock(block, revertAutomatically, callback){
 

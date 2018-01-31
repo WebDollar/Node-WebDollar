@@ -2,6 +2,8 @@ const colors = require('colors/safe');
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
 import MiniBlockchainProtocol from "common/blockchain/mini-blockchain/protocol/Mini-Blockchain-Protocol"
+import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
+
 /**
  *
  * Agent 47   - The place I was raised, they didn't give us names. They gave us numbers. Mine was 47.
@@ -12,7 +14,7 @@ import MiniBlockchainProtocol from "common/blockchain/mini-blockchain/protocol/M
 
 class InterfaceBlockchainAgent{
 
-    constructor( blockchain, blockchainProtocolClass){
+    constructor( blockchain, blockchainProtocolClass, blockchainForkClass){
 
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
@@ -25,6 +27,9 @@ class InterfaceBlockchainAgent{
         if ( blockchainProtocolClass === undefined) blockchainProtocolClass = InterfaceBlockchainProtocol;
 
         this.protocol = new blockchainProtocolClass(this.blockchain);
+
+        if ( blockchainForkClass === undefined ) blockchainForkClass = InterfaceBlockchainFork;
+        this.forkClass = blockchainForkClass;
     }
 
     _initializeProtocol(){

@@ -1,12 +1,26 @@
+import PPoWBlockchainFork from "common/blockchain/ppow-blockchain/protocol/PPoW-Blockchain-Fork"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
-import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
+import consts from "consts/const_global";
 
-class MiniBlockchainFork extends InterfaceBlockchainFork{
+let inheritFork;
+if (consts.POPOW_ACTIVATED) inheritFork = PPoWBlockchainFork;
+else inheritFork = InterfaceBlockchainFork;
+
+class MiniBlockchainFork extends inheritFork{
+
+
+    constructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header){
+
+        super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header)
+
+        this._accountantTreeRootClone = null;
+
+    }
 
     preFork(){
 
         //clone the Accountant Tree
-        this._accountantTreeRoot = this.blockchain.accountantTree.cloneTree();
+        this._accountantTreeRootClone = this.blockchain.accountantTree.cloneTree();
 
         //console.log("root.targetNode.balances before", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
 
@@ -35,7 +49,7 @@ class MiniBlockchainFork extends InterfaceBlockchainFork{
         if (forkedSuccessfully) return true;
 
         //rollback to the original Accountant Tree
-        this.blockchain.accountantTree.root = this._accountantTreeRoot;
+        this.blockchain.accountantTree.root = this._accountantTreeRootClone;
 
     }
 

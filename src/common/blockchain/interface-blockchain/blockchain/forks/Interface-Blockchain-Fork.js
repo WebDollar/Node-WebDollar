@@ -5,7 +5,7 @@ const colors = require('colors/safe');
 class InterfaceBlockchainFork {
 
 
-    constructor (blockchain, forkId, sockets, forkStartingHeight, newChainLength, header){
+    constructor (blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header){
 
         this.blockchain = blockchain;
 
@@ -16,6 +16,8 @@ class InterfaceBlockchainFork {
 
         this.sockets = sockets;
         this.forkStartingHeight = forkStartingHeight||0;
+
+        this.forkChainStartingPoint = forkChainStartingPoint;
         this.forkChainLength = newChainLength||0;
         this.forkBlocks = [];
         this.forkHeader = header;

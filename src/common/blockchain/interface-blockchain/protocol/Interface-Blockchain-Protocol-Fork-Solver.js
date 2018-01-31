@@ -112,8 +112,20 @@ class InterfaceBlockchainProtocolForkSolver{
                 //console.log("binary search ", binarySearchResult)
             }
 
+            // it has a ground-new blockchain
+            // very skeptical when the blockchain becomes bigger
 
-            binarySearchResult = await this._discoverProcessForkingPossibilities(binarySearchResult, chainStartingPoint, newChainLength);
+            // probably for mini-blockchain light
+            if (binarySearchResult.position === -1 && currentBlockchainLength < newChainLength){
+
+                let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: chainStartingPoint }, chainStartingPoint );
+
+                if (answer === null) throw "connection dropped headers-info chainStartingPoint";
+                if (answer === null || answer === undefined || answer.result !== true || answer.header === undefined) throw "headers-info 0 malformed"
+
+                binarySearchResult = {position: chainStartingPoint, header: answer.header};
+
+            }
 
             //its a fork... starting from position
             console.log("fork position", binarySearchResult.position, "newChainLength", newChainLength);
@@ -126,7 +138,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
                     if ( forkFound !== null ) return forkFound;
 
-                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, newChainLength, binarySearchResult.header);
+                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, chainStartingPoint, newChainLength, binarySearchResult.header);
 
 
                 } catch (Exception){
@@ -173,25 +185,6 @@ class InterfaceBlockchainProtocolForkSolver{
         return result;
     }
 
-    async _discoverProcessForkingPossibilities(binarySearchResult, chainStartingPoint, newChainLength){
-
-        let currentBlockchainLength = this.blockchain.getBlockchainLength();
-
-        // it has a ground-new blockchain
-        // very skeptical when the blockchain becomes bigger
-        if (binarySearchResult.position === -1 && currentBlockchainLength < newChainLength){
-
-            let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: 0 }, 0 );
-
-            if (answer === null) throw "connection dropped headers-info 0";
-            if (answer === null || answer === undefined || answer.result !== true || answer.header === undefined) throw "headers-info 0 malformed"
-
-            binarySearchResult = {position: 0, header: answer.header};
-
-        }
-
-        return binarySearchResult;
-    }
 
     /**
      * Solve Fork by Downloading  the blocks required in the fork
@@ -221,7 +214,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength ) {
 
 
-                    // TODO you can paralize the downloading code from multiple sockets
+                    // TODO you can paralyze the downloading code from multiple sockets
 
                     console.log("nextBlockHeight", nextBlockHeight);
 

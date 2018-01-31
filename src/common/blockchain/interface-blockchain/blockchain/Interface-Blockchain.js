@@ -51,6 +51,7 @@ class InterfaceBlockchain {
     _setAgent(newAgent){
 
         this.agent = newAgent;
+        this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, newAgent.forkClass );
     }
 
     async validateBlockchain(){
