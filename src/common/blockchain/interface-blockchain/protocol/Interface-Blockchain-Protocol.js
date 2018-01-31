@@ -167,7 +167,7 @@ class InterfaceBlockchainProtocol {
 
             try{
 
-                socket.node.sendRequest("blockchain/info/request-blockchain-info", {
+                socket.node.sendRequest("blockchain/headers-info/request-header-info-by-height/" + data.height || 0, {
                     result: true,
                     chaingStartingPoint: this.blockchain.getBlockchainStartingPoint(),
                     chainLength: this.blockchain.getBlockchainLength()
@@ -176,8 +176,7 @@ class InterfaceBlockchainProtocol {
             } catch (exception) {
 
                 console.log(colors.red("Socket Error - blockchain/info/request-blockchain-info", exception.toString()));
-
-                socket.node.sendRequest("blockchain/info/request-blockchain-info", {
+                socket.node.sendRequest("blockchain/info/request-blockchain-info/" + data.height || 0, {
                     result: false,
                     message: exception.toString()
                 });
@@ -234,11 +233,9 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
-                    console.log(colors.green("blockchain/blocks/request-block-by-height/" + (data.height || 0)), "1111111111111111")
-
                     if (typeof data.height !== 'number') throw "data.height is not defined";
 
-                    if (this.blockchain.getBlockchainLength() <= data.height) throw "data.height is higher than I have";
+                    if (this.blockchain.getBlockchainLength() < data.height) throw "data.height is higher than I have";
 
 
                     let block = this.blockchain.blocks[data.height];
@@ -247,12 +244,10 @@ class InterfaceBlockchainProtocol {
                         result: true,
                         block: block.serializeBlock(data.onlyHeader || false)
                     });
-                    console.log(colors.green("blockchain/blocks/request-block-by-height/" + (data.height || 0)), "22222222222222222222")
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - blockchain/blocks/request-block-by-height "), exception);
-
+                    console.log(colors.red("Socket Error - blockchain/blocks/request-block-by-height ", exception.toString()));
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + data.height || 0, {
                         result: false,
                         message: exception.toString()
@@ -272,11 +267,6 @@ class InterfaceBlockchainProtocol {
     async askBlockchain(socket){
 
         let data = await socket.node.sendRequestWaitOnce("get/blockchain/header/last-block", undefined, "answer");
-
-        if (data === null){
-            console.log("get/blockchain/header/last-block timeout", data);
-            return null;
-        }
 
         console.log("get/blockchain/header/last-block2", data);
         console.log("get/blockchain/header/last-block2", data);
