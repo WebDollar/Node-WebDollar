@@ -99,7 +99,6 @@ class SocketExtend{
             if (timeOutInterval !== undefined)
                 timeoutId = setTimeout(()=>{
                     socket.removeListener(requestAnswer, requestFunction);
-                    onceId();
                     //socket.off(onceId);
                     resolve(null)
                 }, timeOutInterval);
