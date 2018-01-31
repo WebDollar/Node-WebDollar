@@ -9,6 +9,17 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         this.accountantTreeNew = null;
     }
 
+    async validateForkBlock(block, height){
+
+        if ( height === this.forkStartingHeight ){
+
+            return await this.blockchain.validateBlockchainBlock(block, null, null, null, { "skip-accountant-tree-validation": true, "skip-prev-hash-validation": true } );
+
+        } else
+            await MiniBlockchainFork.prototype.validateForkBlock.call(block,height);
+
+    }
+
     preFork() {
 
         //I have a new accountant Tree

@@ -162,11 +162,14 @@ class InterfaceBlockchain {
         return this.blocks[this.blocks.length-1];
     }
 
-    getDifficultyTarget(){
-        if (this.blocks.length > 0)
-            return this.blocks[this.blocks.length-1].difficultyTarget;
-        else
+    getDifficultyTarget(height){
+
+        if (height === undefined) height = this.blocks.length;
+
+        if (height === 0)
             return BlockchainGenesis.difficultyTarget;
+        else
+            return this.blocks[height-1].difficultyTarget;
     }
 
     /**

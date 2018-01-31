@@ -3,6 +3,7 @@ import PPowBlockchainProtocolForkSolver from 'common/blockchain/ppow-blockchain/
 import consts from 'consts/const_global'
 
 let inheritForkSolver;
+
 if (consts.POPOW_ACTIVATED) inheritForkSolver = PPowBlockchainProtocolForkSolver;
 else inheritForkSolver = InterfaceBlockchainProtocolForkSolver;
 

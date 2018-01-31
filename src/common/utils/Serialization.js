@@ -181,6 +181,23 @@ class Serialization{
         return result;
 
     }
+
+    serializeBufferRemovingLeadingZeros(buffer){
+
+        let count = 0;
+        while (count < buffer.length && buffer[count] === 0)
+            count ++;
+
+        let result = new Buffer(1 + buffer.length - count );
+        result [0] = buffer.length - count;
+
+        for (let i=count; i<buffer.length; i++)
+            result[i-count+1] = buffer[i]
+
+
+        return result;
+
+    }
     
     /**
      * Returns the position of most significant bit of 1
