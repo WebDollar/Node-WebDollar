@@ -203,7 +203,7 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async solveFork(fork) {
 
-        if (fork === null || fork === undefined || !(fork instanceof InterfaceBlockchainFork)) throw ('fork is null');
+        if (fork === null || fork === undefined || typeof fork !== "object" ) throw ('fork is null');
 
         let nextBlockHeight = fork.forkStartingHeight;
 
