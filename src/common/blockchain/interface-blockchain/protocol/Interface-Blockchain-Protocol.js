@@ -271,6 +271,7 @@ class InterfaceBlockchainProtocol {
 
         if (data === null){
             console.log("get/blockchain/header/last-block timeout", data);
+            return null;
         }
 
         console.log("get/blockchain/header/last-block2", data);

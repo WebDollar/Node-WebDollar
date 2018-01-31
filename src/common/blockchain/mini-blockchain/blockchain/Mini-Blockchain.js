@@ -152,7 +152,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
             this.accountantTreeSerializations[block.height] = serializationAccountantTree;
 
-            console.log("reeesult", result, saveBlock)
+            console.log("reeesult", result, saveBlock);
 
             if (result && saveBlock){
                 result = await this.accountantTree.saveMiniAccountant( true, undefined, this.getSerializedAccountantTree( this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1 ));
@@ -209,6 +209,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
             //AccountantTree[:-POW_PARAMS.VALIDATE_LAST_BLOCKS]
             let result = await this.accountantTree.loadMiniAccountant(undefined, undefined, true);
+            let serializationAccountantTreeInitial = this.accountantTree.serializeMiniAccountant();
 
             //check the accountant Tree if matches
             console.log("this.accountantTree initial ", this.accountantTree.root.hash.sha256);
@@ -221,6 +222,8 @@ class MiniBlockchain extends  inheritBlockchain{
 
             //check the accountant Tree if matches
             console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
+
+            this.accountantTreeSerializations[this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1] = serializationAccountantTreeInitial;
 
             return result;
 

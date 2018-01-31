@@ -15,7 +15,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    async _discoverForkBinarySearch(socket, left, right, forkFound){
+    async _discoverForkBinarySearch(socket, left, right){
 
         let blockHeaderResult;
 
@@ -59,7 +59,7 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async discoverAndSolveFork(socket, newChainLength){
 
-        let fork;
+        let fork, result = null;
         let data = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.getBlockchainLength();
 
@@ -70,14 +70,18 @@ class InterfaceBlockchainProtocolForkSolver{
 
             this.blockchain.forksAdministrator.addSocketProcessing(socket);
 
+            console.log(colors.yellow("ForkSolver ------ 111"))
+
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
             if ( forkFound !== null ) return forkFound;
 
+            console.log(colors.yellow("ForkSolver ------ 222"))
             //check if n-2 was ok, but I need at least 1 block
             if (currentBlockchainLength <= newChainLength && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
 
+                console.log(colors.yellow("ForkSolver ------ 333"))
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
-
+                console.log(colors.yellow("ForkSolver ------ 444"))
                 if (answer === null)
                     throw "connection dropped headers-info";
 
@@ -90,7 +94,7 @@ class InterfaceBlockchainProtocolForkSolver{
                             header: answer.header,
                         };
 
-
+                console.log(colors.yellow("ForkSolver ------ 555"))
 
             }
 
@@ -98,7 +102,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if ( data.position === -1 && currentBlockchainLength > 0 ) {
 
+                console.log(colors.yellow("ForkSolver ------ 6666"));
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
+                console.log(colors.yellow("ForkSolver ------ 777"));
 
                 if (answer === null)
                     throw "connection dropped info";
@@ -106,8 +112,10 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (answer === undefined || answer === undefined || typeof answer.chaingStartingPoint !== "number" )
                     throw "request-blockchain-info couldn't return real values";
 
+                console.log(colors.yellow("ForkSolver ------ 888"));
                 data = await this._discoverForkBinarySearch(socket, answer.chaingStartingPoint, currentBlockchainLength - 1);
 
+                console.log(colors.yellow("ForkSolver ------ 9999"));
                 if (data.position === null)
                     throw "connection dropped discoverForkBinarySearch"
 
@@ -118,6 +126,7 @@ class InterfaceBlockchainProtocolForkSolver{
             // very skeptical when the blockchain becomes bigger
             if (data.position === -1 && currentBlockchainLength < newChainLength){
 
+                console.log(colors.yellow("ForkSolver ------ 1010"));
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: 0 }, 0 );
 
                 if (answer === null)
@@ -148,11 +157,6 @@ class InterfaceBlockchainProtocolForkSolver{
                     console.log(colors.red("discoverAndSolveFork - creating a fork raised an exception" ), Exception, "data", data )
                 }
 
-                if (fork === null) {
-                    console.log("fork is null");
-                    return null;
-                }
-
                 try{
 
                     // for (let i=0; i<100; i++)
@@ -160,12 +164,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     if (fork !== null) {
                         console.log("solveFork1");
-                        let result = await this.solveFork(fork);
-                        this.blockchain.forksAdministrator.deleteFork(fork);
-                        return result;
+                        result = await this.solveFork(fork);
                     }
 
-                    return fork;
 
                 } catch (Exception){
 
@@ -173,21 +174,25 @@ class InterfaceBlockchainProtocolForkSolver{
                     throw Exception;
                 }
 
-            }
-            //it is a totally new blockchain (maybe genesis was mined)
-            console.log("fork is something new");
 
-            return null;
+                if (fork === null) {
+                    console.log("fork is null");
+                }
+
+
+            } else
+                //it is a totally new blockchain (maybe genesis was mined)
+                console.log("fork is something new");
 
         } catch (Exception){
 
-            this.blockchain.forksAdministrator.deleteSocketProcessing(socket);
-            this.blockchain.forksAdministrator.deleteFork(fork);
             console.log(colors.red("discoverAndSolveFork raised an exception"  ), Exception )
 
-            return null;
         }
 
+        this.blockchain.forksAdministrator.deleteSocketProcessing(socket);
+        this.blockchain.forksAdministrator.deleteFork(fork);
+        return result;
     }
 
     /**
