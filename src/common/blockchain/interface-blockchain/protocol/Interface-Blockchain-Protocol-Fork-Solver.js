@@ -55,12 +55,12 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    async _calculateForkBinarySearch(socket, chainStartingPoint, currentBlockchainLength){
+    async _calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength){
 
-        if (chainStartingPoint > currentBlockchainLength-1)
+        if (newChainStartingPoint > currentBlockchainLength-1)
             return {position: -1, header: null};
         else
-            return await this._discoverForkBinarySearch(socket, chainStartingPoint, currentBlockchainLength - 1);
+            return await this._discoverForkBinarySearch(socket, newChainStartingPoint, currentBlockchainLength - 1);
 
     }
 
@@ -69,7 +69,7 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async discoverAndSolveFork(socket, newChainLength){
 
-        let fork, result = null, chainStartingPoint = 0;
+        let fork, result = null, newChainStartingPoint = 0;
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.getBlockchainLength();
 
@@ -111,10 +111,10 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (answer === null) throw "connection dropped info";
                 if (answer === undefined || answer === undefined || typeof answer.chainStartingPoint !== "number" ) throw "request-blockchain-info couldn't return real values";
 
-                chainStartingPoint = answer.chainStartingPoint;
+                newChainStartingPoint = answer.chainStartingPoint;
 
 
-                binarySearchResult = await this._calculateForkBinarySearch(socket, chainStartingPoint, currentBlockchainLength );
+                binarySearchResult = await this._calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength );
 
                 if (binarySearchResult.position === null)
                     throw "connection dropped discoverForkBinarySearch"
@@ -128,12 +128,12 @@ class InterfaceBlockchainProtocolForkSolver{
             // probably for mini-blockchain light
             if (binarySearchResult.position === -1 && currentBlockchainLength < newChainLength){
 
-                let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: chainStartingPoint }, chainStartingPoint );
+                let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: newChainStartingPoint }, newChainStartingPoint );
 
-                if (answer === null) throw "connection dropped headers-info chainStartingPoint";
+                if (answer === null) throw "connection dropped headers-info newChainStartingPoint";
                 if (answer === null || answer === undefined || answer.result !== true || answer.header === undefined) throw "headers-info 0 malformed"
 
-                binarySearchResult = {position: chainStartingPoint, header: answer.header};
+                binarySearchResult = {position: newChainStartingPoint, header: answer.header};
 
             }
 
@@ -148,7 +148,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
                     if ( forkFound !== null ) return forkFound;
 
-                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, chainStartingPoint, newChainLength, binarySearchResult.header);
+                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, newChainStartingPoint, newChainLength, binarySearchResult.header);
 
 
                 } catch (Exception){

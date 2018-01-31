@@ -1,5 +1,5 @@
 import MiniBlockchainProtocol from "../Mini-Blockchain-Protocol";
-import MiniBlockchainProtocolForkSolver from "./Mini-Blockchain-Light-Protocol-Fork-Solver"
+import MiniBlockchainLightProtocolForkSolver from "./Mini-Blockchain-Light-Protocol-Fork-Solver"
 
 class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
 
@@ -8,7 +8,7 @@ class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
     }
 
     createForkSolver(){
-        this.forkSolver = new MiniBlockchainProtocolForkSolver(this.blockchain, this);
+        this.forkSolver = new MiniBlockchainLightProtocolForkSolver(this.blockchain, this);
     }
 
 }
