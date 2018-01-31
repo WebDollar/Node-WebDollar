@@ -48,10 +48,19 @@ class InterfaceBlockchainProtocolForkSolver{
 
         } catch (Exception){
 
-            console.log(colors.red("_discoverForkBinarySearch raised an exception" ), Exception);
+            console.log(colors.red("_discoverForkBinarySearch raised an exception" ), Exception, blockHeaderResult);
 
             return {position: null, header: null};
         }
+
+    }
+
+    async _calculateForkBinarySearch(socket, chainStartingPoint, currentBlockchainLength){
+
+        if (chainStartingPoint > currentBlockchainLength-1)
+            return {position: -1, header: null};
+        else
+            return await this._discoverForkBinarySearch(socket, chainStartingPoint, currentBlockchainLength - 1);
 
     }
 
@@ -104,7 +113,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 chainStartingPoint = answer.chainStartingPoint;
 
-                binarySearchResult = await this._discoverForkBinarySearch(socket, chainStartingPoint, currentBlockchainLength - 1);
+
+                binarySearchResult = await this._calculateForkBinarySearch(socket, chainStartingPoint, currentBlockchainLength );
 
                 if (binarySearchResult.position === null)
                     throw "connection dropped discoverForkBinarySearch"
