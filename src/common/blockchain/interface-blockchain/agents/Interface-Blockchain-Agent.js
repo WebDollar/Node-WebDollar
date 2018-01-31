@@ -25,9 +25,6 @@ class InterfaceBlockchainAgent{
         if ( blockchainProtocolClass === undefined) blockchainProtocolClass = InterfaceBlockchainProtocol;
 
         this.protocol = new blockchainProtocolClass(this.blockchain);
-        this._initializeProtocol();
-
-
     }
 
     _initializeProtocol(){
@@ -111,6 +108,8 @@ class InterfaceBlockchainAgent{
     }
 
     async initializeStartAgent(){
+
+        this._initializeProtocol();
 
         this._startAgentPromise = new Promise((resolve)=>{
             this.startAgentResolver = resolve;

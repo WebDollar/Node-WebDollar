@@ -32,6 +32,10 @@ class InterfaceBlockchainProtocol {
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
             this._uninitializeSocket(result)
         });
+
+        //already connected sockets
+        for (let i=0; i<NodesList.nodes.length; i++)
+            this._initializeNewSocket(NodesList.nodes[i]);
     }
 
     createForkSolver(){
@@ -192,8 +196,6 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
-                    console.log(colors.green("blockchain/blocks/request-block-by-height/" + (data.height || 0)), "1111111111111111")
-
                     if (typeof data.height !== 'number') throw "data.height is not defined";
 
                     if (this.blockchain.getBlockchainLength() <= data.height) throw "data.height is higher than I have " + data.height;
@@ -215,7 +217,7 @@ class InterfaceBlockchainProtocol {
                         }
                     });
 
-                    console.log(colors.green("blockchain/blocks/request-block-by-height/" + (data.height || 0)), "22222222222222222222")
+
 
                 } catch (exception) {
 
@@ -258,6 +260,8 @@ class InterfaceBlockchainProtocol {
                     });
 
                 }
+
+
             });
 
     }
