@@ -192,9 +192,11 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
+                    console.log(colors.green("blockchain/blocks/request-block-by-height/" + (data.height || 0)), "1111111111111111")
+
                     if (typeof data.height !== 'number') throw "data.height is not defined";
 
-                    if (this.blockchain.getBlockchainLength() < data.height) throw "data.height is higher than I have " + data.height;
+                    if (this.blockchain.getBlockchainLength() <= data.height) throw "data.height is higher than I have " + data.height;
 
 
                     let block = this.blockchain.blocks[data.height];
@@ -213,6 +215,7 @@ class InterfaceBlockchainProtocol {
                         }
                     });
 
+                    console.log(colors.green("blockchain/blocks/request-block-by-height/" + (data.height || 0)), "22222222222222222222")
 
                 } catch (exception) {
 
