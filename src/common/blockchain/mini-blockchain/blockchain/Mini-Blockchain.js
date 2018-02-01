@@ -334,12 +334,12 @@ class MiniBlockchain extends  inheritBlockchain{
 
         // updating the blocksStartingPoint
         if (this.agent.light === true) {
-            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
-            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
-            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
-            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
-            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
             this.blocksStartingPoint = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 1;
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
         }
 
     }
