@@ -83,6 +83,11 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevTimeStamp = this.forkPrevTimeStamp;
             this.blockchain.lightPrevHashPrev = this.forkPrevHashPrev;
 
+            //add dummy blocks between [beginning to where it starts]
+            while (this.blockchain.length < this.forkStartingHeight-1){
+                this.blockchain.blocks.push(undefined);
+            }
+
         } else
             //it is just a simple fork
             return MiniBlockchainFork.prototype.preFork.call(this);

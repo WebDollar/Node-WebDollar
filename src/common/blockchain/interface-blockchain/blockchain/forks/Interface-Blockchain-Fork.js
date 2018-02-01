@@ -135,9 +135,9 @@ class InterfaceBlockchainFork {
                 for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength(); i++)
                     this._blocksCopy.push(this.blockchain.blocks[i]);
 
-                this.preFork();
-
                 this.blockchain.blocks.splice(this.forkStartingHeight);
+
+                this.preFork();
 
                 let forkedSuccessfully = true;
 
@@ -145,6 +145,7 @@ class InterfaceBlockchainFork {
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+
 
                 for (let i = 0; i < this.forkBlocks.length; i++)
                     if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length - 1), "all", false, {})) {

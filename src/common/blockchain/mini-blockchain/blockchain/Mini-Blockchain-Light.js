@@ -257,6 +257,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     getDifficultyTarget(height){
 
+        console.log(colors.yellow("difficultyTarget"), height, this.blocksStartingPoint - 1);
+
         if (this.agent.light === true) {
 
             if (height === undefined) height = this.blocks.length;
