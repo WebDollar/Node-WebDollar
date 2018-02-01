@@ -253,6 +253,11 @@ class InterfaceBlockchain {
             return false;
         }
 
+        console.log(colors.yellow("validateLastBlocks", numBlocks))
+        console.log(colors.yellow("validateLastBlocks", numBlocks))
+        console.log(colors.yellow("validateLastBlocks", numBlocks))
+        console.log(colors.yellow("validateLastBlocks", numBlocks))
+
         this.blocks = [];
 
         try {
@@ -264,7 +269,7 @@ class InterfaceBlockchain {
                 let blockValidationType = {};
 
                 if (validateLastBlocks !== undefined)
-                    blockValidationType["skip-validation-before"] = {height: numBlocks - validateLastBlocks};
+                    blockValidationType["skip-validation-before"] = {height: numBlocks - validateLastBlocks -1};
 
                 try{
 

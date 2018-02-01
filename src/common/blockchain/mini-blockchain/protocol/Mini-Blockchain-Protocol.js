@@ -93,8 +93,9 @@ class MiniBlockchainProtocol extends inheritProtocol{
                 let serialization = this.blockchain.getDifficultyTarget(data.height);
 
                 console.log(colors.yellow("get-accountant-tree data"), serialization);
+
                 socket.node.sendRequest("get/blockchain/difficulty/get-difficulty/" + (data.height || -1), {
-                    result: true,
+                    result: serialization !== null ? true : false,
                     difficulty: serialization,
                 });
 

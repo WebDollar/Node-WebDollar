@@ -67,7 +67,12 @@ class InterfaceBlockchainMining{
     async mineNextBlock(showMiningOutput){
 
         while (this.started){
+
             //mining next blocks
+
+            // // LIMIT mining first 21 blocks
+            // if (this.blockchain.blocks.length === 30)
+            //     return;
 
             let nextBlock, nextTransactions;
 
@@ -88,8 +93,8 @@ class InterfaceBlockchainMining{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                await this.blockchain.processBlocksSempahoreCallback( ()=>{
-                    this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
+                await this.blockchain.processBlocksSempahoreCallback( async ()=>{
+                    await this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
                         this._simulatedNextBlockMining(nextBlock);
                     });
                 });
@@ -120,10 +125,10 @@ class InterfaceBlockchainMining{
     async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
 
         let intervalMiningOutput;
-if(this.finish === undefined)
-    this.finish = 0;
-this.finish++;
 
+        if(this.finish === undefined)
+            this.finish = 0;
+        this.finish++;
 
         console.log(" ----------- mineBlock-------------");
 

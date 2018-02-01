@@ -14,7 +14,7 @@ else inheritBlockData = InterfaceBlockchainBlockData;
 
 class MiniBlockchainBlockData extends  inheritBlockData {
 
-    constructor (blockchain, minerAddress, transactions, hashTransactions, hashData, hashAccountantTree){
+    constructor (blockchain, minerAddress, transactions, hashTransactions, hashData, hashAccountantTree) {
 
         super(blockchain, minerAddress, transactions, hashTransactions, hashData, );
 
@@ -44,14 +44,17 @@ class MiniBlockchainBlockData extends  inheritBlockData {
             //validate hashAccountantTree
             let hashAccountantTree = this.calculateAccountantTreeHashBlockData();
 
-            console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex"));
+            console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex") );
+            console.log("hashAccountantTree", this.blockchain.accountantTree.serializeMiniAccountant().toString("hex") );
 
-            if (!hashAccountantTree.equals(this.hashAccountantTree)) throw "block.data hashAccountantTree is not right  "+ hashAccountantTree.toString("hex") + "   vs    "+this.hashAccountantTree.toString("hex") ;
+            if (this.blockchain.accountantTree.root.edges.length > 0)
+                console.log("hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances );
+
+            if (! hashAccountantTree.equals(this.hashAccountantTree) ) throw "block.data hashAccountantTree is not right  "+ hashAccountantTree.toString("hex") + "   vs    "+this.hashAccountantTree.toString("hex") ;
 
         }
 
         return true;
-
     }
 
     _computeBlockDataHeaderPrefix(onlyHeader = false){
