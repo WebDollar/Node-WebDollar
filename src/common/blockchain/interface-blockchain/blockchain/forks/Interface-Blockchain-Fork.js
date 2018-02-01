@@ -1,4 +1,6 @@
 const colors = require('colors/safe');
+import BlockchainDifficulty from 'common/blockchain/global/difficulty/Blockchain-Difficulty'
+
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -57,33 +59,47 @@ class InterfaceBlockchainFork {
         if (block.height < this.forkStartingHeight) throw 'block height is smaller than the fork itself';
         if (block.height !== height) throw "block height is different than block's height";
 
-        let prevDifficultyTarget, prevHash, prevTimeStamp;
+        let prevData = this._getForkPrevsData(height, forkHeight);
+
+        block.difficultyTargetPrev = prevData.prevDifficultyTarget;
+
+        let result = await this.blockchain.validateBlockchainBlock(block, prevData.prevDifficultyTarget, prevData.prevHash, prevData.prevTimeStamp, {"skip-accountant-tree-validation": true} );
+
+        //recalculate next target difficulty automatically
+
+        return result;
+
+    }
+
+    _getForkPrevsData(height, forkHeight){
 
         // transition from blockchain to fork
-        if (height === 0) {
+        if (height === 0)
 
             // based on genesis block
+            return {
+                prevDifficultyTarget : undefined,
+                prevHash : undefined,
+                prevTimeStamp : undefined,
+            };
 
-        } else if ( forkHeight === 0) {
+        else if ( forkHeight === 0)
 
             // based on previous block from blockchain
 
-            prevDifficultyTarget = this.blockchain.blocks[height-1].difficultyTarget;
-            prevHash = this.blockchain.blocks[height-1].hash;
-            prevTimeStamp = this.blockchain.blocks[height-1].timeStamp;
+            return {
+                prevDifficultyTarget : this.blockchain.blocks[height-1].difficultyTarget,
+                prevHash : this.blockchain.blocks[height-1].hash,
+                prevTimeStamp : this.blockchain.blocks[height-1].timeStamp,
+            };
 
-        } else { // just the fork
+        else  // just the fork
 
-            prevDifficultyTarget = this.forkBlocks[forkHeight-1].difficultyTarget;
-            prevHash = this.forkBlocks[forkHeight-1].hash;
-            prevTimeStamp = this.forkBlocks[forkHeight-1].timeStamp;
-
-
-        }
-
-        block.difficultyTarget = prevDifficultyTarget;
-
-        return await this.blockchain.validateBlockchainBlock(block, prevDifficultyTarget, prevHash, prevTimeStamp, {"skip-accountant-tree-validation": true} );
+            return {
+                prevDifficultyTarget : this.forkBlocks[forkHeight - 1].difficultyTarget,
+                prevHash : this.forkBlocks[forkHeight - 1].hash,
+                prevTimeStamp : this.forkBlocks[forkHeight - 1].timeStamp,
+            }
 
     }
 
@@ -92,6 +108,8 @@ class InterfaceBlockchainFork {
      * Validate the Fork and Use the fork as main blockchain
      */
     async saveFork(){
+
+
 
         if (!await this.validateFork()) {
             console.log(colors.red("validateFork was not passed"));
@@ -164,6 +182,8 @@ class InterfaceBlockchainFork {
 
         return false;
     }
+
+
 
     preFork(){
 

@@ -34,46 +34,6 @@ class MiniBlockchainProtocol extends inheritProtocol{
         inheritProtocol.prototype._initializeNewSocket.call(this, nodesListObject);
 
         /**
-         * Get last K accountant Trees
-         */
-        socket.on("get/blockchain/accountant-tree/get-accountant-tree", async (data)=>{
-
-            try{
-
-                if (data.height === undefined) data.height = -1;
-
-                if (typeof data.height !== "number")
-                    throw "data.height is not a number";
-
-                if (this.blockchain.blocks.length < data.height) throw "height is not valid";
-                if (data.height < -1) throw "height is not valid";
-
-                if (this.blockchain.agent.light === true)
-                    if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2 > data.height) throw "height is to large for request";
-
-                let serialization = this.blockchain.getSerializedAccountantTree(data.height);
-
-                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + (data.height || -1), {
-                    result: true,
-                    accountantTree: serialization,
-                });
-
-
-            } catch (exception){
-
-                console.log(colors.red("Socket Error - get/blockchain/accountant-tree/get-accountant-tree", exception), data);
-
-                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + (data.height || -1), {
-                    result: false,
-                    message: exception.toString()
-                });
-
-            }
-
-
-        });
-
-        /**
          * Get difficulty
          */
         socket.on("get/blockchain/difficulty/get-difficulty", async (data)=>{

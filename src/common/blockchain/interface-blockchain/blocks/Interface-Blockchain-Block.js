@@ -46,7 +46,8 @@ class InterfaceBlockchainBlock {
         //computed data
         this.computedBlockPrefix = null;
 
-        this.difficultyTarget = null; // difficulty set by me
+        this.difficultyTarget = null; // difficulty set by Blockchain
+        this.difficultyTargetPrev = null; // difficulty set by Blockchain
         this.height = (typeof height === "number" ? height : null); // index set by me
 
         this.reward = undefined;
@@ -190,7 +191,7 @@ class InterfaceBlockchainBlock {
 
         let buffer = Buffer.concat ( [
                                        Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
-                                       Serialization.serializeBufferRemovingLeadingZeros( this.blockchain.getDifficultyTarget(this.height) ),
+                                       Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
                                        this.computedBlockPrefix,
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );

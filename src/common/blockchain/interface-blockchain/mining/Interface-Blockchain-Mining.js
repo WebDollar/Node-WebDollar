@@ -70,9 +70,9 @@ class InterfaceBlockchainMining{
 
             //mining next blocks
 
-            // // LIMIT mining first 21 blocks
-            // if (this.blockchain.blocks.length === 30)
-            //     return;
+            // LIMIT mining first 21 blocks
+            if (this.blockchain.blocks.length === 23)
+                return;
 
             let nextBlock, nextTransactions;
 

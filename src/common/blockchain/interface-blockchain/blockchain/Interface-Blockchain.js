@@ -139,6 +139,8 @@ class InterfaceBlockchain {
 
         }
 
+        block.difficultyTargetPrev = prevDifficultyTarget;
+
         //validate difficulty & hash
         if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash, blockValidationType) === false) throw ('block validation failed');
 
