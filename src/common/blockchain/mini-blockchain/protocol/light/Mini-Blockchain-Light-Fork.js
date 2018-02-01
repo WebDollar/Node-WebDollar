@@ -83,6 +83,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             console.log("pre ForkhashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
             console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
             console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
+            console.log("this.forkPrevDifficultyTarget", this.forkPrevDifficultyTarget );
+            console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp );
+            console.log("this.forkPrevHashPrev", this.forkPrevHashPrev );
 
             this._blocksStartingPointClone = this.blockchain.blocksStartingPoint;
             this._lightPrevDifficultyTargetClone = this.blockchain.lightPrevDifficultyTarget;
@@ -93,6 +96,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevDifficultyTarget = this.forkPrevDifficultyTarget;
             this.blockchain.lightPrevTimeStamp = this.forkPrevTimeStamp;
             this.blockchain.lightPrevHashPrev = this.forkPrevHashPrev;
+
 
             //add dummy blocks between [beginning to where it starts]
             while (this.blockchain.blocks.length < this.forkStartingHeight){

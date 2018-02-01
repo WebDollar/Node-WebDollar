@@ -17,7 +17,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         this.lightAccountantTreeSerializations = [];
 
         this.lightPrevDifficultyTarget = null;
-        this.lightPrevTimestamp = null;
+        this.lightPrevTimeStamp = null;
         this.lightPrevHashPrev = null;
     }
 
@@ -87,14 +87,14 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (diffIndex === -1) {
             this.lightPrevDifficultyTarget = BlockchainGenesis.difficultyTarget;
-            this.lightPrevTimestamp =  BlockchainGenesis.timeStamp ;
+            this.lightPrevTimeStamp =  BlockchainGenesis.timeStamp ;
             this.lightPrevHashPrev =  BlockchainGenesis.hash ;
         }
         else if (diffIndex >= 0) {
             if (diffIndex >= this.blocks.length) throw "_recalculateLightPrevs diffIndex wrong "+diffIndex;
 
             this.lightPrevDifficultyTarget = this.blocks[diffIndex].difficultyTarget;
-            this.lightPrevTimestamp =  this.blocks[diffIndex].timeStamp;
+            this.lightPrevTimeStamp =  this.blocks[diffIndex].timeStamp;
             this.lightPrevHashPrev =  this.blocks[diffIndex].hash;
         }
 
@@ -106,7 +106,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log("_LightPrevDifficultyTarget saved" );
 
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTarget) ) throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
-        if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevTimestamp", this.lightPrevTimestamp) ) throw "Couldn't be saved _LightSettings_prevTimestamp ";
+        if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevTimestamp", this.lightPrevTimeStamp) ) throw "Couldn't be saved _LightSettings_prevTimestamp ";
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevHashPrev", this.lightPrevHashPrev) ) throw "Couldn't be saved _LightSettings_prevHashPrev ";
     }
 
@@ -126,8 +126,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 return false;
             }
 
-            this.lightPrevTimestamp = await this.db.get(this.blockchainFileName + "_LightSettings_prevTimestamp");
-            if (this.lightPrevTimestamp === null) {
+            this.lightPrevTimeStamp = await this.db.get(this.blockchainFileName + "_LightSettings_prevTimestamp");
+            if (this.lightPrevTimeStamp === null) {
                 console.log(colors.red("_LightSettings_prevTimestamp was not found"));
                 return false;
             }
@@ -140,7 +140,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         }
 
         console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget)
-        console.log("this.lightPrevTimestamp", this.lightPrevTimestamp)
+        console.log("this.lightPrevTimestamp", this.lightPrevTimeStamp)
         console.log("this.lightPrevHashPrev", this.lightPrevHashPrev)
 
         this._addTreeSerialization(numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial);
@@ -280,9 +280,11 @@ class MiniBlockchainLight extends  MiniBlockchain{
     getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
+        console.log(colors.yellow("getTimeStamp"), height, this.blocksStartingPoint, this.lightPrevTimeStamp)
+
         if (this.agent.light === true && height !== 0) {
 
-            if (height === this.blocksStartingPoint  ) return this.lightPrevTimestamp;
+            if (height === this.blocksStartingPoint  ) return this.lightPrevTimeStamp;
             else
             if (height < this.blocksStartingPoint )  throw "Can not access this TimeStamp in Light Node";
         }
