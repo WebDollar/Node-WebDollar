@@ -263,13 +263,14 @@ class InterfaceBlockchain {
             console.log(colors.red("Error saving the blocks.length"));
         } else
 
-            for (let i = 0; i < this.blocks.length; ++i){
-                let response = await this.blocks[i].save();
+            for (let i = 0; i < this.blocks.length; ++i)
 
-                if (response !== true) {
-                    break;
+                if (this.blocks[i] !== undefined && this.blocks[i] !== null){
+                    let response = await this.blocks[i].save();
+
+                    if (response !== true)
+                        break;
                 }
-            }
 
         return result;
     }
