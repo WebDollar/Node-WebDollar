@@ -55,7 +55,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;
-            fork.forkPrevHashPrev = answer.prevHash;
+            fork.forkPrevHashPrev = answer.hashPrev;
 
         } else
             fork.forkPrevAccountantTree = null;
