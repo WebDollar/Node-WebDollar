@@ -89,7 +89,7 @@ class InterfaceBlockchainAgent{
 
             } else
             //it is not done, maybe timeout
-                this._setStartAgentTimeOut();
+                this._setStartAgentTimeOut(0.5);
 
 
         }
@@ -133,7 +133,7 @@ class InterfaceBlockchainAgent{
         return this._startAgentPromise;
     }
 
-    _setStartAgentTimeOut(){
+    _setStartAgentTimeOut(factor=1){
 
         console.log("_setStartAgentTimeOut");
 
@@ -155,7 +155,7 @@ class InterfaceBlockchainAgent{
                 message: "Start Agent Timeout",
             });
 
-        }, this.AGENT_TIME_OUT);
+        }, this.AGENT_TIME_OUT*factor);
     }
 
     _setBlockchain(newBlockchain){
