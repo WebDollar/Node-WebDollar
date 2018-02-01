@@ -257,15 +257,15 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     getDifficultyTarget(height){
 
-        console.log(colors.yellow("difficultyTarget"), height, this.blocksStartingPoint - 1);
+        console.log(colors.yellow("difficultyTarget"), height, this.blocksStartingPoint - 1, this.blocks.length);
 
         if (this.agent.light === true) {
 
             if (height === undefined) height = this.blocks.length;
 
-            if (height === this.blocksStartingPoint - 1 ) return this.lightPrevDifficultyTarget;
+            if (height === this.blocksStartingPoint  ) return this.lightPrevDifficultyTarget;
             else
-            if (height < this.blocksStartingPoint -1 ) throw "Can not access this DifficultyTarget in Light Node "+height+"  < "+this.blocksStartingPoint-1;
+            if (height < this.blocksStartingPoint  ) throw "Can not access this DifficultyTarget in Light Node "+height+"  < "+this.blocksStartingPoint-1;
         }
 
         return MiniBlockchain.prototype.getDifficultyTarget.call(this, height);
@@ -277,9 +277,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             if (height === undefined) height = this.blocks.length;
 
-            if (height === this.blocksStartingPoint - 1 ) return this.lightPrevTimestamp;
+            if (height === this.blocksStartingPoint  ) return this.lightPrevTimestamp;
             else
-            if (height < this.blocksStartingPoint -1 )  throw "Can not access this TimeStamp in Light Node";
+            if (height < this.blocksStartingPoint )  throw "Can not access this TimeStamp in Light Node";
         }
 
         return MiniBlockchain.prototype.getTimeStamp.call(this, height);
@@ -291,9 +291,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             if (height === undefined) height = this.blocks.length;
 
-            if (height === this.blocksStartingPoint - 1 ) return this.lightPrevHashPrev;
+            if (height === this.blocksStartingPoint  ) return this.lightPrevHashPrev;
             else
-            if (height < this.blocksStartingPoint -1 ) throw "Can not access this PrevHash in Light Node";
+            if (height < this.blocksStartingPoint) throw "Can not access this PrevHash in Light Node";
         }
 
         return MiniBlockchain.prototype.getHashPrev.call(this, height);

@@ -14,7 +14,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         super();
 
         this.autoMerklify = true;
-        this.root.hash = {sha256: new Buffer(32) }
+
     }
 
     _createNode(parent, edges, value){

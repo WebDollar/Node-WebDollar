@@ -142,7 +142,7 @@ class InterfaceBlockchain {
                 prevTimeStamp = 0; //Genesis timezone is 0
             } else {
 
-                prevDifficultyTarget = this.getDifficultyTarget(block.height );
+                prevDifficultyTarget = this.getDifficultyTarget(block.height);
                 prevHash = this.getHashPrev(block.height);
                 prevTimeStamp = this.getTimeStamp(block.height);
             }
@@ -156,7 +156,7 @@ class InterfaceBlockchain {
         if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash, blockValidationType) === false) throw ('block validation failed');
 
         //recalculate next target difficulty
-        console.log("block.difficultyTarget", prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height);
+        //console.log("block.difficultyTarget", prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height);
         block.difficultyTarget = BlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
         //console.log("block.difficultyTarget", block.difficultyTarget);
 

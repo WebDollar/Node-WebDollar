@@ -1,7 +1,5 @@
 import InterfaceRadixTree from './../Interface-Radix-Tree'
-
-import InterfaceRadixTreeEdge from './../Interface-Radix-Tree-Edge'
-import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
+import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree-Node'
 import InterfaceMerkleTree from './../../merkle-tree/Interface-Merkle-Tree'
 
 /*
@@ -16,8 +14,14 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         super(db);
 
         this.autoMerklify = true;
-        this.root.hash = {sha256: new Buffer(32) }
     }
+
+    _createNode(parent, edges, value){
+        let node = new InterfaceRadixTreeNode(parent, edges, value);
+        node.hash = {sha256: new Buffer(32)};
+        return node;
+    }
+
 
     _changedNode(node){
 

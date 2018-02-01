@@ -69,9 +69,20 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         //I have a new accountant Tree
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
+            console.log("preFork!!!!!!!!!!!!!!!!!! 2222222");
             this._accountantTreeRootClone = this.blockchain.accountantTree.cloneTree();
 
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
+
+            console.log("preFork hashAccountantTree",  this.forkPrevAccountantTree.toString("hex") );
+            console.log("preFork hashAccountantTree",  this.blockchain.accountantTree.root.edges );
+            console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
+            console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
+            console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
+            console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
+            console.log("pre ForkhashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
+            console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
+            console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
 
             this._blocksStartingPointClone = this.blockchain.blocksStartingPoint;
             this._lightPrevDifficultyTargetClone = this.blockchain.lightPrevDifficultyTarget;
@@ -84,7 +95,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrev = this.forkPrevHashPrev;
 
             //add dummy blocks between [beginning to where it starts]
-            while (this.blockchain.length <= this.forkStartingHeight){
+            while (this.blockchain.blocks.length < this.forkStartingHeight){
                 this.blockchain.blocks.push(undefined);
             }
 

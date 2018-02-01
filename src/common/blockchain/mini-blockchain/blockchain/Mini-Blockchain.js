@@ -180,10 +180,9 @@ class MiniBlockchain extends  inheritBlockchain{
 
         try {
 
-            let result = true;
-            //AccountantTree[:-POW_PARAMS.VALIDATE_LAST_BLOCKS]
-            // let result = await this.accountantTree.loadMiniAccountant(undefined, undefined, true);
-            // let serializationAccountantTreeFinal = this.accountantTree.serializeMiniAccountant();
+            let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
+            let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
+            //let serializationAccountantTreeFinal = this.accountantTree.serializeMiniAccountant();
 
             result = result && await inheritBlockchain.prototype.load.call( this  );
 
@@ -193,6 +192,11 @@ class MiniBlockchain extends  inheritBlockchain{
 
             //check the accountant Tree if matches
             console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
+            console.log("finalAccountantTree final", finalAccountantTree.root.hash.sha256);
+
+            if (this.accountantTree.root.hash.sha256.compare(finalAccountantTree.root.hash.sha256) !== 0){
+                throw "Accountant Trees are different";
+            }
 
             return result;
 
