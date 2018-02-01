@@ -117,6 +117,15 @@ class InterfaceBlockchain {
         return true;
     }
 
+    /**
+     * Validate the block, but the Block WAS NOT ADDED in the blockchain array
+     * @param block
+     * @param prevDifficultyTarget
+     * @param prevHash
+     * @param prevTimeStamp
+     * @param blockValidationType
+     * @returns {Promise.<boolean>}
+     */
     async validateBlockchainBlock( block, prevDifficultyTarget, prevHash, prevTimeStamp, blockValidationType ){
 
         if ( block instanceof InterfaceBlockchainBlock === false ) throw ('block '+height+' is not an instance of InterfaceBlockchainBlock ');
@@ -133,9 +142,9 @@ class InterfaceBlockchain {
                 prevTimeStamp = 0; //Genesis timezone is 0
             } else {
 
-                prevDifficultyTarget = this.getDifficultyTarget(block.height);
-                prevHash = this.getHashPrev(block.height);
-                prevTimeStamp = this.getTimeStamp(block.height);
+                prevDifficultyTarget = this.getDifficultyTarget(block.height-1 );
+                prevHash = this.getHashPrev(block.height-1);
+                prevTimeStamp = this.getTimeStamp(block.height-1);
             }
 
         }
