@@ -91,6 +91,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
             this.lightPrevHashPrev =  BlockchainGenesis.hash ;
         }
         else if (diffIndex >= 0) {
+            if (diffIndex >= this.blocks.length) throw "_recalculateLightPrevs diffIndex wrong "+diffIndex;
+
             this.lightPrevDifficultyTarget = this.blocks[diffIndex].difficultyTarget;
             this.lightPrevTimestamp =  this.blocks[diffIndex].timeStamp;
             this.lightPrevHashPrev =  this.blocks[diffIndex].hash;
@@ -109,7 +111,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
     }
 
     async _loadLightSettings(serializationAccountantTreeInitial){
-        console.log("_LightPrevDifficultyTarget load" );
+        console.log("_loadLightSettings load" );
 
         let numBlocks = await this.db.get(this.blockchainFileName);
         if (numBlocks === null ) {
@@ -136,6 +138,10 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 return false;
             }
         }
+
+        console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget)
+        console.log("this.lightPrevTimestamp", this.lightPrevTimestamp)
+        console.log("this.lightPrevHashPrev", this.lightPrevHashPrev)
 
         this._addTreeSerialization(numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial);
         console.log("numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial.toString("hex"))
@@ -257,25 +263,25 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     getDifficultyTarget(height){
 
+        if (height === undefined ) height = this.blocks.length;
+
         console.log(colors.yellow("difficultyTarget"), height, this.blocksStartingPoint - 1, this.blocks.length);
+        console.log(this.lightPrevDifficultyTarget);
 
-        if (this.agent.light === true) {
-
-            if (height === undefined) height = this.blocks.length;
+        if (this.agent.light === true && height !== 0) {
 
             if (height === this.blocksStartingPoint  ) return this.lightPrevDifficultyTarget;
             else
-            if (height < this.blocksStartingPoint  ) throw "Can not access this DifficultyTarget in Light Node "+height+"  < "+this.blocksStartingPoint-1;
+            if (height < this.blocksStartingPoint  ) throw "Can not access this DifficultyTarget in Light Node ";
         }
 
         return MiniBlockchain.prototype.getDifficultyTarget.call(this, height);
     }
 
     getTimeStamp(height){
+        if (height === undefined) height = this.blocks.length;
 
-        if (this.agent.light === true) {
-
-            if (height === undefined) height = this.blocks.length;
+        if (this.agent.light === true && height !== 0) {
 
             if (height === this.blocksStartingPoint  ) return this.lightPrevTimestamp;
             else
@@ -286,10 +292,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
     }
 
     getHashPrev(height){
+        if (height === undefined) height = this.blocks.length;
 
-        if (this.agent.light === true) {
-
-            if (height === undefined) height = this.blocks.length;
+        if (this.agent.light === true && height !== 0) {
 
             if (height === this.blocksStartingPoint  ) return this.lightPrevHashPrev;
             else
