@@ -55,11 +55,11 @@ class MiniBlockchainProtocol extends inheritProtocol{
                 let timestamp = this.blockchain.getTimeStamp(data.height);
                 let hashPrev = this.blockchain.getHashPrev(data.height);
 
-                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
-                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
-                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
-                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
-                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget.toString("hex"), hashPrev.toString("hex"));
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget.toString("hex"), hashPrev.toString("hex"));
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget.toString("hex"), hashPrev.toString("hex"));
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget.toString("hex"), hashPrev.toString("hex"));
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget.toString("hex"), hashPrev.toString("hex"));
 
                 socket.node.sendRequest("get/blockchain/light/get-light-settings/" + (data.height || -1), {
                     result: difficultyTarget !== null ? true : false,

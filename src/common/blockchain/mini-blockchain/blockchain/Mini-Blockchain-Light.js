@@ -45,7 +45,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             });
 
             console.log("this.blocks.height",block.height);
-            console.log("this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2);
+            //console.log("this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2);
 
             console.log("reeesult", result, saveBlock);
 
@@ -63,6 +63,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log("BLOCK ", block.serializeBlock().toString("hex"));
             console.log(" difficulty", block.difficultyTarget.toString("hex"));
             console.log(" prev difficulty ", block.difficultyTargetPrev.toString("hex"));
+            console.log(" prev hash ", block.hashPrev.toString("hex"));
 
         } else {
 
@@ -87,12 +88,12 @@ class MiniBlockchainLight extends  MiniBlockchain{
         if (diffIndex === -1) {
             this.lightPrevDifficultyTarget = BlockchainGenesis.difficultyTarget;
             this.lightPrevTimestamp =  BlockchainGenesis.timeStamp ;
-            this.lightPrevHashPrev =  BlockchainGenesis.hashPrev ;
+            this.lightPrevHashPrev =  BlockchainGenesis.hash ;
         }
         else if (diffIndex >= 0) {
             this.lightPrevDifficultyTarget = this.blocks[diffIndex].difficultyTarget;
             this.lightPrevTimestamp =  this.blocks[diffIndex].timeStamp;
-            this.lightPrevHashPrev =  this.blocks[diffIndex].prevHash;
+            this.lightPrevHashPrev =  this.blocks[diffIndex].hash;
         }
 
         await this._saveLightSettings();
