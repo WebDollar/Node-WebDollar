@@ -56,8 +56,8 @@ class InterfaceBlockchainProtocolForkSolver{
     }
 
     async _calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength){
-
-        if (newChainStartingPoint > currentBlockchainLength-1)
+    
+        if (newChainStartingPoint > currentBlockchainLength-1 || currentBlockchainLength === 0)
             return {position: -1, header: null};
         else
             return await this._discoverForkBinarySearch(socket, newChainStartingPoint, currentBlockchainLength - 1);
@@ -106,7 +106,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             console.log(colors.yellow("discoverFork 555" ), binarySearchResult)
 
-            if ( binarySearchResult.position === -1 && currentBlockchainLength > 0 ) {
+            if ( binarySearchResult.position === -1 ) {
 
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
 
