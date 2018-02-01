@@ -20,6 +20,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined)
                 throw "forkPrevDifficultyTarget was not specified";
 
+            block.difficultyTargetPrev = this.forkPrevDifficultyTarget;
+
             return await this.blockchain.validateBlockchainBlock(block, this.forkPrevDifficultyTarget, null, this.forkPrevTimestamp, { "skip-accountant-tree-validation": true, "skip-prev-hash-validation": true } );
 
         } else
@@ -31,8 +33,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         // transition from blockchain to fork
         if (height === 0)
-
-        // based on genesis block
+            // based on genesis block
             return {
                 prevDifficultyTarget : undefined,
                 prevHash : undefined,
