@@ -140,6 +140,7 @@ class InterfaceBlockchain {
 
         }
 
+
         block.difficultyTargetPrev = prevDifficultyTarget;
 
         //validate difficulty & hash
@@ -189,7 +190,7 @@ class InterfaceBlockchain {
         if (height === undefined) height = this.blocks.length;
 
         if (height === 0)  return BlockchainGenesis.hashPrev;
-        else return this.blocks[height-1].hashPrev;
+        else return this.blocks[height-1].hash;
     }
 
     /**

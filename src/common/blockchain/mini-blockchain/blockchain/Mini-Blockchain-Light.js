@@ -60,7 +60,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             this._addTreeSerialization(block.height);
 
-            console.log("BLOCK ", block.serializeBlock().toString("hex"), " difficulty", block.difficultyTarget.toString("hex"), " prev difficulty ", block.difficultyTargetPrev.toString("hex"));
+            console.log("BLOCK ", block.serializeBlock().toString("hex"));
+            console.log(" difficulty", block.difficultyTarget.toString("hex"));
+            console.log(" prev difficulty ", block.difficultyTargetPrev.toString("hex"));
 
         } else {
 
@@ -256,6 +258,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (this.agent.light === true) {
 
+            if (height === undefined) height = this.blocks.length;
+
             if (height === this.blocksStartingPoint - 1 ) return this.lightPrevDifficultyTarget;
             else
             if (height < this.blocksStartingPoint -1 ) throw "Can not access this DifficultyTarget in Light Node";
@@ -268,6 +272,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (this.agent.light === true) {
 
+            if (height === undefined) height = this.blocks.length;
+
             if (height === this.blocksStartingPoint - 1 ) return this.lightPrevTimestamp;
             else
             if (height < this.blocksStartingPoint -1 )  throw "Can not access this TimeStamp in Light Node";
@@ -279,6 +285,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
     getHashPrev(height){
 
         if (this.agent.light === true) {
+
+            if (height === undefined) height = this.blocks.length;
 
             if (height === this.blocksStartingPoint - 1 ) return this.lightPrevHashPrev;
             else
