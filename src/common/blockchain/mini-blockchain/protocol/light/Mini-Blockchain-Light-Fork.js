@@ -33,6 +33,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             this._accountantTreeRootClone = this.blockchain.accountantTree.cloneTree();
             this._lightPrevDifficultyTargetClone = this.blockchain.lightPrevDifficultyTarget;
+            this._blocksStartingPointClone = this.blockchain.blocksStartingPoint;
 
             this.blockchain.accountantTree.deserializeMiniAccountant( this.newForkAccountantTree );
 
@@ -48,6 +49,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         //recover to the original Accountant Tree & state
 
         this.blockchain.lightPrevDifficultyTarget = this._lightPrevDifficultyTargetClone;
+        this.blockchain.blocksStartingPoint = this._blocksStartingPointClone;
 
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
     }
