@@ -15,6 +15,7 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transactions'
 
 import consts from 'consts/const_global'
+import Serialization from 'common/utils/Serialization';
 
 const colors = require('colors/safe');
 const EventEmitter = require('events');
@@ -146,6 +147,7 @@ class InterfaceBlockchain {
 
         //recalculate next target difficulty
         block.difficultyTarget = BlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
+        block.difficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(block.difficultyTarget));
 
         return true;
 

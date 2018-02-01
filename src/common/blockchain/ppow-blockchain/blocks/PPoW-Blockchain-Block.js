@@ -24,6 +24,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             return this.level;
 
         let T = this.difficultyTarget;
+        if (Buffer.isBuffer(T)) T = new BigInteger(this.difficultyTarget.toString("hex"), 16);
+
         let id = new BigInteger(this.hash.toString('hex'), 16);
         
         //If id <= T/2^u the block is of level u => block level is max(u) for 2^u * id <= T

@@ -56,7 +56,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             this._addTreeSerialization(block.height);
 
-            console.log("BLOCK ", block.serializeBlock().toString("hex"));
+            console.log("BLOCK ", block.serializeBlock().toString("hex"), " difficulty", block.difficultyTarget.toString("hex"), " prev difficulty ", block.difficultyTargetPrev.toString("hex"));
 
         } else {
 
