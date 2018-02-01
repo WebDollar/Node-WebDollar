@@ -63,12 +63,15 @@ class InterfaceTreeNode {
 
     deserializeNodeData(buffer, offset){
 
+        offset = offset || 0;
+
 
         let valueLength = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 1));
         offset += 1;
 
         let value = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, valueLength));
         offset += valueLength;
+
 
         this.value = value;
 

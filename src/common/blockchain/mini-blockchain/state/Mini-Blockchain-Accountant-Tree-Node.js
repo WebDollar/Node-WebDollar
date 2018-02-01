@@ -187,6 +187,9 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         try {
 
+            offset = offset || 0;
+
+
             let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
             offset += 1;
 
@@ -220,7 +223,6 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                         offset = result.newOffset;
                     }
                 }
-
 
             }
 
