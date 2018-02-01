@@ -60,7 +60,8 @@ consts.POPOW_PARAMS={
 };
 
 consts.POW_PARAMS={
-    VALIDATE_LAST_BLOCKS : 20,
+    LIGHT_VALIDATE_LAST_BLOCKS : 20,
+    LIGHT_BUFFER_LAST_BLOCKS : 40,
 };
 
 export default consts

@@ -35,7 +35,7 @@ class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
                 if (data.height < -1) throw "height is not valid";
 
                 if (this.blockchain.agent.light === true)
-                    if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2 > data.height) throw "height is to large for request";
+                    if (this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2 > data.height) throw "height is to large for request";
 
                 let serialization = this.blockchain.getSerializedAccountantTree(data.height);
 

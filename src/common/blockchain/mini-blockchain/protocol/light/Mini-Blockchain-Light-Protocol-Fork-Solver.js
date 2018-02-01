@@ -17,7 +17,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
         if (newChainStartingPoint > currentBlockchainLength-1) {
 
-            let heightRequired = newChainLength - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 1;
+            let heightRequired = newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
 
             let blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: heightRequired }, heightRequired );
 

@@ -206,6 +206,7 @@ class MiniBlockchain extends  inheritBlockchain{
             this.accountantTree = new MiniBlockchainAccountantTree(this.db);
             return false;
         }
+
     }
 
 

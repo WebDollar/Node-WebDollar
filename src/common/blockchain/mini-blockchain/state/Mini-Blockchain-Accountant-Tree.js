@@ -14,7 +14,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         super(db);
 
         this.autoMerklify = true;
-        this.root.hash = {sha256: new Buffer(32) }
 
         this.emitter = new EventEmitter();
     }
@@ -32,6 +31,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
      */
     updateAccount(address, value, tokenId){
 
+        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = Buffer.from([1]);
+
         address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
         if (address === null) throw "sorry but your address is invalid";
 
@@ -47,17 +48,16 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         let resultUpdate = node.updateBalanceToken(value, tokenId);
 
+        //WEBD
+        if (tokenId.length === 1 && tokenId[0]===1){
+            this.root.total = this.root.total.plus( value )
+        }
+
         //optimization, but it doesn't work in browser
         //if (this.checkBalanceSubscribed("balances/changes/"+BufferExtended.toBase(address))){
 
         let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
         this.emitter.emit("balances/changes/"+BufferExtended.toBase(address), {address: addressWIF, balances: (resultUpdate !== null ? node.getBalances() : null)} );
-
-        // it was deleted
-        // while (node.balances === [] && node.edges.length === 0) {
-        //     this.delete(node);
-        //     node = node.parent;
-        // }
 
         if (resultUpdate === null){
             this.delete(address)

@@ -292,15 +292,21 @@ class InterfaceBlockchain {
         this.blocks = [];
 
         try {
-            for (let i = 0; i < numBlocks; ++i) {
+
+            let blockValidationType = {};
+
+            if (validateLastBlocks !== undefined)
+                blockValidationType["skip-validation-before"] = {height: numBlocks - validateLastBlocks -1};
+
+            let indexStart = 0;
+
+            if (this.agent.light)
+                indexStart = numBlocks - validateLastBlocks -1;
+
+            for (let i = indexStart; i < numBlocks; ++i) {
 
                 let block = this.blockCreator.createEmptyBlock(i);
                 block.height = i;
-
-                let blockValidationType = {};
-
-                if (validateLastBlocks !== undefined)
-                    blockValidationType["skip-validation-before"] = {height: numBlocks - validateLastBlocks -1};
 
                 try{
 
