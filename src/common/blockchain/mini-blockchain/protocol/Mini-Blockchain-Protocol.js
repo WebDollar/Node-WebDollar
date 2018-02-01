@@ -48,11 +48,11 @@ class MiniBlockchainProtocol extends inheritProtocol{
                 if (this.blockchain.blocks.length < data.height) throw "height is not valid";
                 if (data.height < -1) throw "height is not valid";
 
-                if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS > data.height) throw "height is to large for request";
+                if (this.blockchain.agent.light === true)
+                    if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2 > data.height) throw "height is to large for request";
 
                 let serialization = this.blockchain.getSerializedAccountantTree(data.height);
 
-                console.log(colors.yellow("get-accountant-tree data"), serialization);
                 socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + (data.height || -1), {
                     result: true,
                     accountantTree: serialization,
@@ -88,7 +88,8 @@ class MiniBlockchainProtocol extends inheritProtocol{
                 if (this.blockchain.blocks.length < data.height) throw "height is not valid";
                 if (data.height < -1) throw "height is not valid";
 
-                if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS > data.height) throw "height is to large for request";
+                if (this.blockchain.agent.light === true)
+                    if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -2 > data.height) throw "height is to large for request";
 
                 let difficultyTarget = this.blockchain.getDifficultyTarget(data.height);
 

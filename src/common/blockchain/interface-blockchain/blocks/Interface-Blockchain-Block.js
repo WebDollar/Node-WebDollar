@@ -101,10 +101,11 @@ class InterfaceBlockchainBlock {
 
         if (this.computedBlockPrefix === null) this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
-        //validate hashPrev
-        if ( previousHash === null || !Buffer.isBuffer(previousHash)) throw 'previous hash is not given'
-
         if ( blockValidationType["skip-prev-hash-validation"] === undefined ){
+
+            //validate hashPrev
+            if ( previousHash === null || !Buffer.isBuffer(previousHash)) throw 'previous hash is not given'
+
             if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
         }
 
