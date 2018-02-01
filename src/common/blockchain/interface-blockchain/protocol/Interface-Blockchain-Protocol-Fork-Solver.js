@@ -138,7 +138,7 @@ class InterfaceBlockchainProtocolForkSolver{
             }
 
             //its a fork... starting from position
-            console.log("fork position", binarySearchResult.position, "newChainLength", newChainLength);
+            console.log("fork position", binarySearchResult.position, "newChainStartingPoint", newChainStartingPoint, "newChainLength", newChainLength);
 
             if (binarySearchResult.position === 0 || (binarySearchResult.position > 0 && binarySearchResult.header !== undefined && binarySearchResult.header !== null) ){
 

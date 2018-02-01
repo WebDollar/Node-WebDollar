@@ -153,8 +153,8 @@ class MiniBlockchain extends  inheritBlockchain{
                 return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
             });
 
-            console.log("this.blocks.height",block.height)
-            console.log("this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2)
+            console.log("this.blocks.height",block.height);
+            console.log("this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2);
 
             console.log("reeesult", result, saveBlock);
 
@@ -166,6 +166,7 @@ class MiniBlockchain extends  inheritBlockchain{
                 if (this.agent.light === true) {
 
                     let diffIndex = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2;
+
                     if (diffIndex === -1)
                         this._setLightPrevDifficultyTarget(BlockchainGenesis.difficultyTarget)
                     else if (diffIndex >= 0)
