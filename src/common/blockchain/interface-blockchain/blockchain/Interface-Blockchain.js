@@ -131,11 +131,11 @@ class InterfaceBlockchain {
                 BlockchainGenesis.validateGenesis(block);
 
                 prevHash = BlockchainGenesis.hashPrev;
-                prevTimeStamp = 0; //Cosmin Debug BlockchainGenesis.timeStamp;
+                prevTimeStamp = 0; //Genesis timezone is 0
             } else {
 
-                prevHash = this.blocks[block.height-1].hash;
-                prevTimeStamp = this.blocks[block.height-1].timeStamp;
+                prevHash = this.getHashPrev(block.height);
+                prevTimeStamp = this.getTimeStamp(block.height);
             }
 
         }

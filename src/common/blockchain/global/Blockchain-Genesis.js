@@ -7,7 +7,7 @@ class BlockchainGenesis{
 
         this.hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex")
 
-        this.timeStamp = 0x5A63C910;
+        this.timeStamp = 0x5A733DAE;
 
         this.difficultyTarget = new Buffer ( "02978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ); //hard difficulty
         //this.difficultyTarget = new Buffer ( "00178112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ); //hard difficulty
