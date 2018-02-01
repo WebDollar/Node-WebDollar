@@ -84,7 +84,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         }
         else if (diffIndex >= 0) {
             this.lightPrevDifficultyTarget = this.blocks[diffIndex].difficultyTarget;
-            this.lightPrevTimestamp =  BlockchainGenesis.timeStamp;
+            this.lightPrevTimestamp =  this.blocks[diffIndex].timestamp;
         }
 
         await this._saveLightSettings();
