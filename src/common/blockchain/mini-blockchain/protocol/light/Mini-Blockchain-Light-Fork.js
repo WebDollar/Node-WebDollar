@@ -8,9 +8,13 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         this.forkPrevAccountantTree = null;
         this.forkPrevDifficultyTarget = null;
-        this.forkPrevTimestamp = null;
+        this.forkPrevTimeStamp = null;
+        this.forkPrevHashPrev = null;
 
+        this._blocksStartingPointClone = null;
         this._lightPrevDifficultyTargetClone = null;
+        this._lightPrevTimeStampClone = null;
+        this._lightPrevHashPrevClone = null;
     }
 
     async validateForkBlock(block, height){
@@ -22,7 +26,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             block.difficultyTargetPrev = this.forkPrevDifficultyTarget;
 
-            return await this.blockchain.validateBlockchainBlock(block, this.forkPrevDifficultyTarget, null, this.forkPrevTimestamp, { "skip-accountant-tree-validation": true, "skip-prev-hash-validation": true } );
+            return await this.blockchain.validateBlockchainBlock(block, this.forkPrevDifficultyTarget, this.forkPrevHashPrev, this.forkPrevTimeStamp, { "skip-accountant-tree-validation": true } );
 
         } else
             return await MiniBlockchainFork.prototype.validateForkBlock.call(this, block, height);
@@ -46,8 +50,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             return {
                 prevDifficultyTarget : this.forkPrevDifficultyTarget,
-                prevHash : new Buffer(32),
-                prevTimeStamp : this.forkPrevTimestamp,
+                prevHash : this.forkPrevHashPrev,
+                prevTimeStamp : this.forkPrevTimeStamp,
             };
 
         else  // just the fork
@@ -69,11 +73,15 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
 
-            this._lightPrevDifficultyTargetClone = this.blockchain.lightPrevDifficultyTarget;
             this._blocksStartingPointClone = this.blockchain.blocksStartingPoint;
+            this._lightPrevDifficultyTargetClone = this.blockchain.lightPrevDifficultyTarget;
+            this._lightPrevTimeStampClone = this.blockchain.lightPrevTimeStamp;
+            this._lightPrevHashPrevClone = this.blockchain.lightPrevHashPrev;
 
             this.blockchain.blocksStartingPoint = this.forkChainStartingPoint;
             this.blockchain.lightPrevDifficultyTarget = this.forkPrevDifficultyTarget;
+            this.blockchain.lightPrevTimeStamp = this.forkPrevTimeStamp;
+            this.blockchain.lightPrevHashPrev = this.forkPrevHashPrev;
 
         } else
             //it is just a simple fork
@@ -86,9 +94,11 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         //recover to the original Accountant Tree & state
 
-        this.blockchain.lightPrevDifficultyTarget = this._lightPrevDifficultyTargetClone;
         this.blockchain.blocksStartingPoint = this._blocksStartingPointClone;
         this.blockchain.lightPrevDifficultyTarget = this._lightPrevDifficultyTargetClone;
+        this.blockchain.lightPrevTimeStamp = this._lightPrevTimeStampClone;
+        this.blockchain.lightPrevHashPrev = this._lightPrevHashPrevClone;
+
 
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
     }

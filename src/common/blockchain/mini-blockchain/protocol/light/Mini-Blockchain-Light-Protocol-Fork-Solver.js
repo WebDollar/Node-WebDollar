@@ -53,8 +53,9 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             if (answer === null) throw "get-light-settings never received " + fork.forkChainStartingPoint - 1;
 
-            fork.forkPrevDifficultyTarget = answer.difficulty;
-            fork.forkPrevTimestamp = answer.timestamp;
+            fork.forkPrevDifficultyTarget = answer.difficultyTarget;
+            fork.forkPrevTimeStamp = answer.timeStamp;
+            fork.forkPrevHashPrev = answer.prevHash;
 
         } else
             fork.forkPrevAccountantTree = null;

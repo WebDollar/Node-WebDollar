@@ -178,11 +178,18 @@ class InterfaceBlockchain {
         else return this.blocks[height-1].difficultyTarget;
     }
 
-    getTimestamp(height){
+    getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
         if (height === 0)  return BlockchainGenesis.timeStamp;
         else return this.blocks[height-1].timeStamp;
+    }
+
+    getHashPrev(height){
+        if (height === undefined) height = this.blocks.length;
+
+        if (height === 0)  return BlockchainGenesis.hashPrev;
+        else return this.blocks[height-1].hashPrev;
     }
 
     /**

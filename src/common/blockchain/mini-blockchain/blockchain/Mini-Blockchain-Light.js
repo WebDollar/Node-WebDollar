@@ -5,6 +5,9 @@ import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tr
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import consts from 'consts/const_global'
 
+/**
+ * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
+ */
 class MiniBlockchainLight extends  MiniBlockchain{
 
     constructor (agent) {
@@ -15,6 +18,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         this.lightPrevDifficultyTarget = null;
         this.lightPrevTimestamp = null;
+        this.lightPrevHashPrev = null;
     }
 
     /**
@@ -81,10 +85,12 @@ class MiniBlockchainLight extends  MiniBlockchain{
         if (diffIndex === -1) {
             this.lightPrevDifficultyTarget = BlockchainGenesis.difficultyTarget;
             this.lightPrevTimestamp =  BlockchainGenesis.timeStamp ;
+            this.lightPrevHashPrev =  BlockchainGenesis.hashPrev ;
         }
         else if (diffIndex >= 0) {
             this.lightPrevDifficultyTarget = this.blocks[diffIndex].difficultyTarget;
             this.lightPrevTimestamp =  this.blocks[diffIndex].timeStamp;
+            this.lightPrevHashPrev =  this.blocks[diffIndex].prevHash;
         }
 
         await this._saveLightSettings();
@@ -96,6 +102,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTarget) ) throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevTimestamp", this.lightPrevTimestamp) ) throw "Couldn't be saved _LightSettings_prevTimestamp ";
+        if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevHashPrev", this.lightPrevHashPrev) ) throw "Couldn't be saved _LightSettings_prevHashPrev ";
     }
 
     async _loadLightSettings(serializationAccountantTreeInitial){
@@ -119,19 +126,18 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 console.log(colors.red("_LightSettings_prevTimestamp was not found"));
                 return false;
             }
+
+            this.lightPrevHashPrev = await this.db.get(this.blockchainFileName + "_LightSettings_prevHashPrev");
+            if (this.lightPrevHashPrev === null) {
+                console.log(colors.red("_LightSettings_prevHashPrev was not found"));
+                return false;
+            }
         }
 
         this._addTreeSerialization(numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial);
         console.log("numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial.toString("hex"))
         console.log("numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial.toString("hex"))
-        console.log("numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial.toString("hex"))
-        console.log("numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial.toString("hex"))
-        console.log("numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial.toString("hex"))
-        console.log("numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial.toString("hex"))
-        console.log("numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2", numBlocks - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial.toString("hex"))
         if (this.accountantTree.root.edges.length > 0) {
-            console.log("balances", this.accountantTree.root.edges[0].targetNode.balances)
-            console.log("balances", this.accountantTree.root.edges[0].targetNode.balances)
             console.log("balances", this.accountantTree.root.edges[0].targetNode.balances)
             console.log("balances", this.accountantTree.root.edges[0].targetNode.balances)
         }
@@ -250,26 +256,36 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (this.agent.light === true) {
 
-            if (height === this.blocksStartingPoint - 1 ) {
-                return this.lightPrevDifficultyTarget;
-            } else
-            if (height < this.blocksStartingPoint -1 ) return null;
+            if (height === this.blocksStartingPoint - 1 ) return this.lightPrevDifficultyTarget;
+            else
+            if (height < this.blocksStartingPoint -1 ) throw "Can not access this DifficultyTarget in Light Node";
         }
 
         return MiniBlockchain.prototype.getDifficultyTarget.call(this, height);
     }
 
-    getTimestamp(height){
+    getTimeStamp(height){
 
         if (this.agent.light === true) {
 
-            if (height === this.blocksStartingPoint - 1 ) {
-                return this.lightPrevTimestamp;
-            } else
-            if (height < this.blocksStartingPoint -1 ) return null;
+            if (height === this.blocksStartingPoint - 1 ) return this.lightPrevTimestamp;
+            else
+            if (height < this.blocksStartingPoint -1 )  throw "Can not access this TimeStamp in Light Node";
         }
 
-        return MiniBlockchain.prototype.getTimestamp.call(this, height);
+        return MiniBlockchain.prototype.getTimeStamp.call(this, height);
+    }
+
+    getHashPrev(height){
+
+        if (this.agent.light === true) {
+
+            if (height === this.blocksStartingPoint - 1 ) return this.lightPrevHashPrev;
+            else
+            if (height < this.blocksStartingPoint -1 ) throw "Can not access this PrevHash in Light Node";
+        }
+
+        return MiniBlockchain.prototype.getHashPrev.call(this, height);
     }
 
 
