@@ -1,7 +1,7 @@
 import WebDollarCrypto from "../../common/crypto/WebDollar-Crypto";
 
-var assert = require('assert');
-var FileSystem = require('fs');
+let assert = require('assert');
+let FileSystem = require('fs');
 
 import Blockchain from 'main-blockchain/Blockchain';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
