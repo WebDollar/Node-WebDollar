@@ -309,8 +309,6 @@ class MiniBlockchain extends  inheritBlockchain{
         if (Buffer.isBuffer(this.accountantTreeSerializations[height]))
             return this.accountantTreeSerializations[height];
 
-        console.log(JSON.stringify(this.accountantTreeSerializations));
-
         // else I need to compute it, by removing n-1..n
         throw "not computed "+height;
 
@@ -352,10 +350,10 @@ class MiniBlockchain extends  inheritBlockchain{
 
         if (this.agent.light === true) {
 
-            if (height === this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2 ) {
+            if (height === this.blocksStartingPoint - 1 ) {
                 return this.lightPrevDifficultyTarget;
             } else
-            if (height < this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2 ) return null;
+            if (height < this.blocksStartingPoint -1 ) return null;
         }
 
         return inheritBlockchain.prototype.getDifficultyTarget.call(this, height);
