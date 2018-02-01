@@ -84,7 +84,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrev = this.forkPrevHashPrev;
 
             //add dummy blocks between [beginning to where it starts]
-            while (this.blockchain.length < this.forkStartingHeight){
+            while (this.blockchain.length <= this.forkStartingHeight){
                 this.blockchain.blocks.push(undefined);
             }
 
