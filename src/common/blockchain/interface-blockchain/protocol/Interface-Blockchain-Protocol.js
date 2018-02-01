@@ -170,13 +170,6 @@ class InterfaceBlockchainProtocol {
         socket.on("blockchain/info/request-blockchain-info", (data)=>{
 
             try{
-                console.log("chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),",this.blockchain.getBlockchainStartingPoint())
-                console.log("chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),",this.blockchain.getBlockchainStartingPoint())
-                console.log("chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),",this.blockchain.getBlockchainStartingPoint())
-                console.log("chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),",this.blockchain.getBlockchainStartingPoint())
-                console.log("chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),",this.blockchain.getBlockchainStartingPoint())
-                console.log("chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),",this.blockchain.getBlockchainStartingPoint())
-                console.log("chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),",this.blockchain.getBlockchainStartingPoint())
 
                 socket.node.sendRequest("blockchain/info/request-blockchain-info", {
                     result: true,

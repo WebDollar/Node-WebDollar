@@ -90,13 +90,17 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
                 if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS > data.height) throw "height is to large for request";
 
-                let serialization = this.blockchain.getDifficultyTarget(data.height);
+                let difficultyTarget = this.blockchain.getDifficultyTarget(data.height);
 
-                console.log(colors.yellow("get-accountant-tree data"), serialization);
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
+                console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
 
                 socket.node.sendRequest("get/blockchain/difficulty/get-difficulty/" + (data.height || -1), {
-                    result: serialization !== null ? true : false,
-                    difficulty: serialization,
+                    result: difficultyTarget !== null ? true : false,
+                    difficulty: difficultyTarget,
                 });
 
 

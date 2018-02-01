@@ -56,7 +56,7 @@ class InterfaceBlockchainProtocolForkSolver{
     }
 
     async _calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength){
-    
+
         if (newChainStartingPoint > currentBlockchainLength-1 || currentBlockchainLength === 0)
             return {position: -1, header: null};
         else

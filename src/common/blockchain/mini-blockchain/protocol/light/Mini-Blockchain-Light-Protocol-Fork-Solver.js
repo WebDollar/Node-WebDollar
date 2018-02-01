@@ -37,6 +37,8 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
         //download the new Accountant Tree, in case there is a new fork and I don't have anything in common
+        console.log(colors.yellow("fork.forkStartingHeight "+ fork.forkStartingHeight+ "fork.forkChainStartingPoint "+ fork.forkChainStartingPoint));
+
         if (fork.forkStartingHeight === fork.forkChainStartingPoint) {
 
             let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint - 1}, fork.forkChainStartingPoint - 1);
