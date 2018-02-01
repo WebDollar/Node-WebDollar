@@ -333,8 +333,14 @@ class MiniBlockchain extends  inheritBlockchain{
         //     this.accountantTreeSerializations.splice(height-2, 1);
 
         // updating the blocksStartingPoint
-        if (this.agent.light === true)
-            this.blocksStartingPoint = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS-1;
+        if (this.agent.light === true) {
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            this.blocksStartingPoint = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 1;
+        }
 
     }
 
@@ -344,7 +350,6 @@ class MiniBlockchain extends  inheritBlockchain{
 
     getDifficultyTarget(height){
 
-        // updating the blocksStartingPoint
         if (this.agent.light === true) {
 
             if (height === this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2 ) {

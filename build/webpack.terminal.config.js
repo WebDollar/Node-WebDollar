@@ -26,7 +26,8 @@ const config = merge(base, {
     plugins: [
         new webpack.DefinePlugin({
             "process.env": {
-                BROWSER: 'false'
+                BROWSER: 'false',
+                SERVER_PORT: process.env.SERVER_PORT,
             }
         })
     ]

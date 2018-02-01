@@ -36,16 +36,15 @@ class InterfaceBlockchain {
 
         this.mining = undefined;
 
+        this.blockchainFileName = 'blockchain.bin';
+        this.blocksStartingPoint = 0;
+
         this.transactions = new InterfaceBlockchainTransactions();
 
         this.db = new InterfaceSatoshminDB();
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
-
-        this.blockchainFileName = 'blockchain.bin';
-
-        this.blocksStartingPoint = 0;
     }
 
     _setAgent(newAgent){

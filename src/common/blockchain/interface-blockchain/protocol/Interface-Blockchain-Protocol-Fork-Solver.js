@@ -85,7 +85,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if ( forkFound !== null ) return forkFound;
 
             //check if n-2 was ok, but I need at least 1 block
-            if (currentBlockchainLength <= newChainLength && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
+            if (currentBlockchainLength === newChainLength-1 && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
 
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
 
@@ -104,6 +104,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             // in case it was you solved previously && there is something in the blockchain
 
+            console.log(colors.yellow("discoverFork 555" ), binarySearchResult)
+
             if ( binarySearchResult.position === -1 && currentBlockchainLength > 0 ) {
 
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
@@ -113,6 +115,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 newChainStartingPoint = answer.chainStartingPoint;
 
+                console.log(colors.yellow("discoverFork 6666" + newChainStartingPoint))
 
                 binarySearchResult = await this._calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength );
 
@@ -121,6 +124,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 //console.log("binary search ", binarySearchResult)
             }
+
+            console.log(colors.yellow("discoverFork 7777" ), binarySearchResult)
 
             // it has a ground-new blockchain
             // very skeptical when the blockchain becomes bigger
