@@ -78,11 +78,11 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (diffIndex === -1) {
             this.lightPrevDifficultyTarget = BlockchainGenesis.difficultyTarget;
-            this.lightPrevTimestamp = Serialization.serializeNumber4Bytes( BlockchainGenesis.timeStamp );
+            this.lightPrevTimestamp =  BlockchainGenesis.timeStamp ;
         }
         else if (diffIndex >= 0) {
             this.lightPrevDifficultyTarget = this.blocks[diffIndex].difficultyTarget;
-            this.lightPrevTimestamp = Serialization.serializeNumber4Bytes( BlockchainGenesis.timeStamp );
+            this.lightPrevTimestamp =  BlockchainGenesis.timeStamp;
         }
 
         await this._saveLightSettings();
@@ -255,7 +255,19 @@ class MiniBlockchainLight extends  MiniBlockchain{
         }
 
         return MiniBlockchain.prototype.getDifficultyTarget.call(this, height);
+    }
 
+    getTimestamp(height){
+
+        if (this.agent.light === true) {
+
+            if (height === this.blocksStartingPoint - 1 ) {
+                return this.lightPrevTimestamp;
+            } else
+            if (height < this.blocksStartingPoint -1 ) return null;
+        }
+
+        return MiniBlockchain.prototype.getTimestamp.call(this, height);
     }
 
 

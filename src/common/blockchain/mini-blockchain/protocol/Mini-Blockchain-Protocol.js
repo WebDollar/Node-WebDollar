@@ -36,7 +36,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
         /**
          * Get difficulty
          */
-        socket.on("get/blockchain/difficulty/get-difficulty", async (data)=>{
+        socket.on("get/blockchain/light/get-light-settings", async (data)=>{
 
             try{
 
@@ -52,6 +52,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
                     if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -2 > data.height) throw "height is to large for request";
 
                 let difficultyTarget = this.blockchain.getDifficultyTarget(data.height);
+                let timestamp = this.blockchain.getTimestamp(data.height);
 
                 console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
                 console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
@@ -59,17 +60,18 @@ class MiniBlockchainProtocol extends inheritProtocol{
                 console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
                 console.log(colors.yellow("difficultyTarget data"), difficultyTarget);
 
-                socket.node.sendRequest("get/blockchain/difficulty/get-difficulty/" + (data.height || -1), {
+                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + (data.height || -1), {
                     result: difficultyTarget !== null ? true : false,
                     difficulty: difficultyTarget,
+                    timestamp: timestamp,
                 });
 
 
             } catch (exception){
 
-                console.log(colors.red("Socket Error - get/blockchain/difficulty/get-difficulty", exception), data);
+                console.log(colors.red("Socket Error - get/blockchain/light/get-light-settings", exception), data);
 
-                socket.node.sendRequest("get/blockchain/difficulty/get-difficulty/" + (data.height || -1), {
+                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + (data.height || -1), {
                     result: false,
                     message: exception.toString()
                 });
@@ -77,6 +79,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
             }
 
         });
+
 
     }
 

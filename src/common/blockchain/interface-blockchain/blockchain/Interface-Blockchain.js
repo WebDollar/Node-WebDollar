@@ -167,10 +167,15 @@ class InterfaceBlockchain {
 
         if (height === undefined) height = this.blocks.length;
 
-        if (height === 0)
-            return BlockchainGenesis.difficultyTarget;
-        else
-            return this.blocks[height-1].difficultyTarget;
+        if (height === 0)  return BlockchainGenesis.difficultyTarget;
+        else return this.blocks[height-1].difficultyTarget;
+    }
+
+    getTimestamp(height){
+        if (height === undefined) height = this.blocks.length;
+
+        if (height === 0)  return BlockchainGenesis.timeStamp;
+        else return this.blocks[height-1].timeStamp;
     }
 
     /**

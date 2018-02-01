@@ -49,11 +49,12 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevAccountantTree = answer.accountantTree;
 
 
-            answer = await socket.node.sendRequestWaitOnce("get/blockchain/difficulty/get-difficulty", {height: fork.forkChainStartingPoint - 1}, fork.forkChainStartingPoint - 1);
+            answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkChainStartingPoint - 1}, fork.forkChainStartingPoint - 1);
 
-            if (answer === null) throw "get-difficulty never received " + fork.forkChainStartingPoint - 1;
+            if (answer === null) throw "get-light-settings never received " + fork.forkChainStartingPoint - 1;
 
             fork.forkPrevDifficultyTarget = answer.difficulty;
+            fork.forkPrevTimestamp = answer.timestamp;
 
         } else
             fork.forkPrevAccountantTree = null;
