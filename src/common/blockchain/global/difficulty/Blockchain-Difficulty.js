@@ -53,28 +53,28 @@ class BlockchainDifficulty{
                        int(2**((block.number // 100000) - 2))                                                -- includeBombFormula
          */
 
-        if (typeof prevBlockDifficulty === "string"){ // it must be hex
+        if (Buffer.isBuffer(prevBlockDifficulty))
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
+        else if (typeof prevBlockDifficulty === "string"){ // it must be hex
             prevBlockDifficulty.replace("0x","");
             prevBlockDifficulty = BigInteger(prevBlockDifficulty, 16);
-        } else if (Buffer.isBuffer(prevBlockDifficulty)){
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
         }
 
 
-        if (typeof prevBlockTimestamp === "string"){
+        if (Buffer.isBuffer(prevBlockDifficulty))
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
+        else if (typeof prevBlockTimestamp === "string"){
             prevBlockTimestamp.replace("0x",""); //it must be hex
             prevBlockTimestamp = BigInteger(prevBlockTimestamp, 16);
-        } else if (Buffer.isBuffer(prevBlockDifficulty)){
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
         }
 
+        if (Buffer.isBuffer(blockTimestamp))
+            blockTimestamp = BigInteger(blockTimestamp.toString("hex"), 16);
+        else
         if (typeof blockTimestamp === "string"){
             blockTimestamp.replace("0x",""); //it must be hex
             blockTimestamp = BigInteger(blockTimestamp, 16);
-        } else if (Buffer.isBuffer(blockTimestamp)){
-            blockTimestamp = BigInteger(blockTimestamp.toString("hex"), 16);
         }
-
 
         if (prevBlockTimestamp instanceof BigInteger === false) prevBlockTimestamp = BigInteger(prevBlockTimestamp);
         if (blockTimestamp instanceof BigInteger === false) blockTimestamp = BigInteger(blockTimestamp);
