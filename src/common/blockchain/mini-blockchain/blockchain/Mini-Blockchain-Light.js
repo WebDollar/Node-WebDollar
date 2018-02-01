@@ -250,11 +250,11 @@ class MiniBlockchainLight extends  MiniBlockchain{
         this.lightAccountantTreeSerializations[height] = serialization;
 
         //delete serializations older than [:-m]
-        // let index = blocksLength||this.blocks.length - consts.POW_PARAMS.LIGHT_BUFFER_LAST_BLOCKS;
-        // while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
-        //     delete this.lightAccountantTreeSerializations[index];
-        //     index--;
-        // }
+        let index = blocksLength||this.blocks.length - consts.POW_PARAMS.LIGHT_BUFFER_LAST_BLOCKS;
+        while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
+            delete this.lightAccountantTreeSerializations[index];
+            index--;
+        }
 
         // updating the blocksStartingPoint
         if (this.agent.light === true) {
