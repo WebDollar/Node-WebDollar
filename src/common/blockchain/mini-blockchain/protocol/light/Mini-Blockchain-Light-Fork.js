@@ -20,7 +20,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined)
                 throw "forkPrevDifficultyTarget was not specified";
 
-            return await this.blockchain.validateBlockchainBlock(block, this.forkPrevDifficultyTarget, null, null, { "skip-accountant-tree-validation": true, "skip-prev-hash-validation": true } );
+            return await this.blockchain.validateBlockchainBlock(block, this.forkPrevDifficultyTarget, null, this.forkPrevTimestamp, { "skip-accountant-tree-validation": true, "skip-prev-hash-validation": true } );
 
         } else
             await MiniBlockchainFork.prototype.validateForkBlock.call(block,height);
