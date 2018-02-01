@@ -257,7 +257,7 @@ class InterfaceBlockchain {
     async save(){
 
         //save the number of blocks
-        let result = false;
+        let result = true;
 
         if (await this.db.save(this.blockchainFileName, this.blocks.length) !== true){
             console.log(colors.red("Error saving the blocks.length"));
@@ -267,6 +267,8 @@ class InterfaceBlockchain {
 
                 if (this.blocks[i] !== undefined && this.blocks[i] !== null){
                     let response = await this.blocks[i].save();
+
+                    console.log("save response", response)
 
                     if (response !== true)
                         break;

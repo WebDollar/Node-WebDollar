@@ -165,7 +165,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             await this._saveLightSettings();
 
-            if (! await this.inheritBlockchain.prototype.save.call(this)) throw "couldn't sae the blockchain"
+            if (! await this.inheritBlockchain.prototype.save.call(this)) throw "couldn't save the blockchain"
 
             return true;
 
