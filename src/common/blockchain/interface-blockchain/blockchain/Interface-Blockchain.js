@@ -142,9 +142,9 @@ class InterfaceBlockchain {
                 prevTimeStamp = 0; //Genesis timezone is 0
             } else {
 
-                prevDifficultyTarget = this.getDifficultyTarget(block.height-1 );
-                prevHash = this.getHashPrev(block.height-1);
-                prevTimeStamp = this.getTimeStamp(block.height-1);
+                prevDifficultyTarget = this.getDifficultyTarget(block.height );
+                prevHash = this.getHashPrev(block.height);
+                prevTimeStamp = this.getTimeStamp(block.height);
             }
 
         }
