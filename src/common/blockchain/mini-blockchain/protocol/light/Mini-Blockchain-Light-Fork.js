@@ -23,7 +23,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             return await this.blockchain.validateBlockchainBlock(block, this.forkPrevDifficultyTarget, null, this.forkPrevTimestamp, { "skip-accountant-tree-validation": true, "skip-prev-hash-validation": true } );
 
         } else
-            await MiniBlockchainFork.prototype.validateForkBlock.call(block,height);
+            await MiniBlockchainFork.prototype.validateForkBlock.call(this, block, height);
 
     }
 
