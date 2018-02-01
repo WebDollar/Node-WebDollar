@@ -1,3 +1,4 @@
+import Serialization from "common/utils/Serialization";
 const colors = require('colors/safe');
 import MiniBlockchain from "./Mini-Blockchain"
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
@@ -36,7 +37,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log("block.height > ", block.height);
 
             result = await this.simulateNewBlock(block, false, async ()=>{
-                return await MiniBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
+                return await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
             });
 
             console.log("this.blocks.height",block.height);
@@ -49,8 +50,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 console.log("this.getSerializedAccountantTree( this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -2 )", this.getSerializedAccountantTree( ));
                 result &= await this.accountantTree.saveMiniAccountant( true, undefined, this.getSerializedAccountantTree( ));
 
-
-
                 result &= this._recalculateLightPrevs();
 
             }
@@ -59,7 +58,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         } else {
 
-            result = await MiniBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
+            result = await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
 
             //for debugging only
 
@@ -71,7 +70,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     }
 
-    async _recalculateLight(){
+    async _recalculateLightPrevs(){
 
         if (this.agent.light === false) return;
 
@@ -79,11 +78,11 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (diffIndex === -1) {
             this.lightPrevDifficultyTarget = BlockchainGenesis.difficultyTarget;
-            this.lightPrevTimestamp = BlockchainGenesis.timeStamp;
+            this.lightPrevTimestamp = Serialization.serializeNumber4Bytes( BlockchainGenesis.timeStamp );
         }
         else if (diffIndex >= 0) {
             this.lightPrevDifficultyTarget = this.blocks[diffIndex].difficultyTarget;
-            this.lightPrevTimestamp = BlockchainGenesis.timeStamp;
+            this.lightPrevTimestamp = Serialization.serializeNumber4Bytes( BlockchainGenesis.timeStamp );
         }
 
         await this._saveLightSettings();

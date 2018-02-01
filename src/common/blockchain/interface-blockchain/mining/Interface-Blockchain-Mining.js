@@ -82,6 +82,7 @@ class InterfaceBlockchainMining{
                 nextTransactions = this._selectNextTransactions();
                 nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress, nextTransactions );
 
+                nextBlock.difficultyTargetPrev = this.blockchain.getDifficultyTarget();
                 nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
 
 
@@ -153,6 +154,7 @@ class InterfaceBlockchainMining{
             if (showMiningOutput)
                 intervalMiningOutput = this.setMiningHashRateInterval();
 
+
             let answer = await this.mine(block, difficulty);
 
             if (answer.result){
@@ -196,27 +198,31 @@ class InterfaceBlockchainMining{
 
         return new Promise( async(resolve)=>{
 
-            while (this._nonce <= 0xFFFFFFFF && this.started && !this.reset ){
+            try {
+                while (this._nonce <= 0xFFFFFFFF && this.started && !this.reset) {
 
-                let hash = await block.computeHash(this._nonce);
+                    let hash = await block.computeHash(this._nonce);
 
-                //console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
+                    //console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
 
 
-                if ( hash.compare(difficulty) <= 0 ) {
+                    if (hash.compare(difficulty) <= 0) {
 
-                    resolve({
-                        result:true,
-                        nonce: this._nonce,
-                        hash: hash,
-                    });
+                        resolve({
+                            result: true,
+                            nonce: this._nonce,
+                            hash: hash,
+                        });
 
-                    return;
+                        return;
 
+                    }
+
+                    this._nonce++;
+                    this._hashesPerSecond++;
                 }
-
-                this._nonce++;
-                this._hashesPerSecond++;
+            } catch (exception){
+                console.log("Error Mining ", exception)
             }
 
             resolve ({result:false});

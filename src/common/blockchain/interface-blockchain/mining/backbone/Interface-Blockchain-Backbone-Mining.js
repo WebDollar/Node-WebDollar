@@ -18,31 +18,37 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
     async mineNonces(){
 
-        for (let i=0; i<this.WORKER_NONCES_WORK; i++) {
+        try {
+            for (let i = 0; i < this.WORKER_NONCES_WORK; i++) {
 
-            if (this._nonce > 0xFFFFFFFF || !this.started || this.reset ){
-                this._workerResolve({result:false});
-                return false;
+                if (this._nonce > 0xFFFFFFFF || !this.started || this.reset) {
+                    this._workerResolve({result: false});
+                    return false;
+                }
+
+                let hash = await this.block.computeHash(this._nonce);
+
+                //console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
+
+                if (hash.compare(this.difficulty) <= 0) {
+
+                    this._workerResolve({
+                        result: true,
+                        nonce: this._nonce,
+                        hash: hash,
+                    });
+
+                    return;
+                }
+
+                this._nonce++;
+                this._hashesPerSecond++;
+
             }
 
-            let hash = await this.block.computeHash(this._nonce);
-
-            //console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
-
-            if ( hash.compare(this.difficulty) <= 0 ) {
-
-                this._workerResolve( {
-                    result:true,
-                    nonce: this._nonce,
-                    hash: hash,
-                } );
-
-                return;
-            }
-
-            this._nonce++;
-            this._hashesPerSecond++;
-
+        } catch (exception){
+            console.log("mineNonces returned error", exception);
+            return false;
         }
 
 
@@ -57,8 +63,10 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
         let promiseResolve = new Promise ( (resolve)=>{
 
+
             this._workerResolve = resolve;
-            setTimeout( async () => { return await this.mineNonces() }, 10);
+            setTimeout(async () => {return await this.mineNonces() }, 10);
+
 
         } );
 
