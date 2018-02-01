@@ -1,4 +1,7 @@
-var assert = require('assert');
+let assert = require('assert');
+
+const BigNumber = require('bignumber.js');
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
 describe('RewardSimulator', () => {
 
@@ -19,13 +22,13 @@ describe('RewardSimulator', () => {
             sum = 0.0;
             for (let i = 0; i < N; ++i)
                 sum += X / (1 << i);
-            console.log("sum =", sum);
             if (sum >= TS)
                 break;
         }
         
         let SR = X / BPC;
-        
+
+        console.log("Blocks per cycle:", BPC);
         console.log("Total supply:", sum);
         //console.log("Total reward per first cycle:", X);
         //console.log("Number of blocks mined per cycle:", BPC);
@@ -46,7 +49,32 @@ describe('RewardSimulator', () => {
     
     it('reward simulator test - particular formula', ()=>{
 
-       
+        let reward = 0;
+        let smallestReward = new BigNumber(0.0001);
+
+        for (let height = 0; height < 8409600; height += 1024) {
+            reward = BlockchainMiningReward.getReward(height);
+            assert(reward.equals(new BigNumber(2500)), "Wrong reward for bock " + height + ": " + reward.toString() + "!==2500");
+        }
+
+        for (let cycle = 1; cycle <= 25; ++cycle) {
+            let height = cycle * (8409600) - 1;
+            reward = BlockchainMiningReward.getReward(height);
+            let targetReward = new BigNumber(2500).dividedBy(1 << (cycle-1));
+
+            if (targetReward.lessThan(smallestReward))
+                targetReward = smallestReward;
+            assert(reward.equals(targetReward), "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
+
+            height = cycle * (8409600);
+            reward = BlockchainMiningReward.getReward(height);
+            targetReward = new BigNumber(2500).dividedBy(1 << cycle);
+
+            if (targetReward.lessThan(smallestReward))
+                targetReward = smallestReward;
+            assert(reward.equals(targetReward), "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
+        }
+
     });
 
 });
