@@ -124,7 +124,7 @@ class InterfaceBlockchain {
         // in case it is not a fork controlled blockchain
         if (prevDifficultyTarget === undefined && prevHash === undefined && prevTimeStamp === undefined){
 
-            prevDifficultyTarget = this.getDifficultyTarget();
+            prevDifficultyTarget = this.getDifficultyTarget(block.height);
 
             if (block.height === 0 ) {
                 //validate genesis

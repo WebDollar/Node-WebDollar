@@ -263,7 +263,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             if (height === this.blocksStartingPoint - 1 ) return this.lightPrevDifficultyTarget;
             else
-            if (height < this.blocksStartingPoint -1 ) throw "Can not access this DifficultyTarget in Light Node";
+            if (height < this.blocksStartingPoint -1 ) throw "Can not access this DifficultyTarget in Light Node "+height+"  < "+this.blocksStartingPoint-1;
         }
 
         return MiniBlockchain.prototype.getDifficultyTarget.call(this, height);
