@@ -40,7 +40,6 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
             try{
 
-                console.log(colors.yellow("get-accountant-tree"), data)
                 if (data.height === undefined) data.height = -1;
 
                 if (typeof data.height !== "number")
@@ -71,6 +70,45 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
             }
 
+
+        });
+
+        /**
+         * Get difficulty
+         */
+        socket.on("get/blockchain/difficulty/get-difficulty", async (data)=>{
+
+            try{
+
+                if (data.height === undefined) data.height = -1;
+
+                if (typeof data.height !== "number")
+                    throw "data.height is not a number";
+
+                if (this.blockchain.blocks.length < data.height) throw "height is not valid";
+                if (data.height < -1) throw "height is not valid";
+
+                if (this.blockchain.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS > data.height) throw "height is to large for request";
+
+                let serialization = this.blockchain.getDifficultyTarget(data.height);
+
+                console.log(colors.yellow("get-accountant-tree data"), serialization);
+                socket.node.sendRequest("get/blockchain/difficulty/get-difficulty/" + (data.height || -1), {
+                    result: true,
+                    difficulty: serialization,
+                });
+
+
+            } catch (exception){
+
+                console.log(colors.red("Socket Error - get/blockchain/difficulty/get-difficulty", exception), data);
+
+                socket.node.sendRequest("get/blockchain/difficulty/get-difficulty/" + (data.height || -1), {
+                    result: false,
+                    message: exception.toString()
+                });
+
+            }
 
         });
 

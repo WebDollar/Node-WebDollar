@@ -28,6 +28,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         this.accountantTree = new MiniBlockchainAccountantTree(this.db);
         this.accountantTreeSerializations = [];
+        this.lightPrevDifficultyTarget = null;
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, agent.forkClass );
@@ -152,9 +153,18 @@ class MiniBlockchain extends  inheritBlockchain{
             console.log("reeesult", result, saveBlock);
 
             if (result && saveBlock){
+
                 result = await this.accountantTree.saveMiniAccountant( true, undefined, this.getSerializedAccountantTree( this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1 ));
 
                 this._addTreeSerialization(block.height);
+
+                if (this.agent.light === true) {
+
+                    if (this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1 >= 0)
+                        this._setLightPrevDifficultyTarget( this.blocks[ this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS -1 ].difficultyTarget );
+
+                }
+
             }
 
         } else {
@@ -251,8 +261,8 @@ class MiniBlockchain extends  inheritBlockchain{
 
     _addTreeSerialization(height, serialization){
 
-        if (height === undefined)
-            height = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 1;
+        if (height === undefined) height = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 1;
+        if (height < -1) return;
 
         if (serialization === undefined){
             serialization = this.accountantTree.serializeMiniAccountant();
@@ -266,8 +276,27 @@ class MiniBlockchain extends  inheritBlockchain{
             this.accountantTreeSerializations.splice(height-2, 1);
 
         // updating the blocksStartingPoint
-        if (this.agent instanceof MiniBlockchainAgentLightNode)
+        if (this.agent.light === true)
             this.blocksStartingPoint = this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS;
+
+    }
+
+    _setLightPrevDifficultyTarget(newLightPrevDifficultyTarget ){
+        this.lightPrevDifficultyTarget = newLightPrevDifficultyTarget;
+    }
+
+    getDifficultyTarget(height){
+
+        // updating the blocksStartingPoint
+        if (this.agent.light === true) {
+
+            if (this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 1) {
+                return this.lightPrevDifficultyTarget;
+            }
+
+        }
+
+        return inheritBlockchain.prototype.getDifficultyTarget.call(height);
 
     }
 

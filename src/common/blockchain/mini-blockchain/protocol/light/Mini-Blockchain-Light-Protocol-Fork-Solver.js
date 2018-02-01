@@ -41,14 +41,20 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint - 1}, fork.forkChainStartingPoint - 1);
 
-            if (answer === null)
-                throw "get-accountant-tree never received " + fork.forkChainStartingPoint - 1;
+            if (answer === null) throw "get-accountant-tree never received " + fork.forkChainStartingPoint - 1;
 
-            let forkAccountantTree = answer.accountantTree;
-            fork.accountantTreeNew = forkAccountantTree;
+            fork.newForkAccountantTree = answer.accountantTree;
+
+
+            let answer = await socket.node.sendRequestWaitOnce("get/blockchain/difficulty/get-difficulty", {height: fork.forkChainStartingPoint - 1}, fork.forkChainStartingPoint - 1);
+
+            if (answer === null) throw "get-difficulty never received " + fork.forkChainStartingPoint - 1;
+
+            fork.newForkDifficultyTarget = answer.difficulty;
+
 
         } else
-            fork.accountantTreeNew = null;
+            fork.newForkAccountantTree = null;
 
         return inheritForkSolver.prototype.solveFork.call(this, fork);
 

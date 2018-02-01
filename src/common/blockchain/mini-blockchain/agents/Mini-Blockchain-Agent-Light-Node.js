@@ -13,6 +13,9 @@ class MiniBlockchainAgentLightNode extends PPoWBlockchainAgentFullNode{
 
     constructor(blockchain, blockchainProtocolClass, blockchainForkClass){
         super(blockchain, blockchainProtocolClass||MiniBlockchainLightProtocol, blockchainForkClass||MiniBlockchainForkLight )
+
+        this.light = true;
+
     }
 
 }

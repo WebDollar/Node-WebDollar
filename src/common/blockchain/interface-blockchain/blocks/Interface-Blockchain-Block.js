@@ -104,7 +104,9 @@ class InterfaceBlockchainBlock {
         //validate hashPrev
         if ( previousHash === null || !Buffer.isBuffer(previousHash)) throw 'previous hash is not given'
 
-        if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
+        if ( blockValidationType["skip-prev-hash-validation"] === undefined ){
+            if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
+        }
 
         //validate hash
         //skip the validation, if the blockValidationType is provided
