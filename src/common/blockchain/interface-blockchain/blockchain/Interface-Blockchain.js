@@ -300,8 +300,13 @@ class InterfaceBlockchain {
 
             let indexStart = 0;
 
-            if (this.agent.light)
-                indexStart = numBlocks - validateLastBlocks -1;
+            if (this.agent.light) {
+                indexStart = numBlocks - validateLastBlocks-1;
+
+                for (let i=0; i<indexStart; i++)
+                    this.blocks.push(undefined);
+
+            }
 
             for (let i = indexStart; i < numBlocks; ++i) {
 

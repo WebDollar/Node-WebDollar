@@ -299,7 +299,7 @@ class InterfaceBlockchainBlock {
             return true;
         }
         catch(exception) {
-            console.log ( 'ERROR on LOAD block: ' + exception);
+            console.log ( colors.red('ERROR on LOAD block: '), exception);
             return false;
         }
     }

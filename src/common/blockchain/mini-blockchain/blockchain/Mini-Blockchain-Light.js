@@ -143,7 +143,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log("this.lightPrevTimestamp", this.lightPrevTimeStamp)
         console.log("this.lightPrevHashPrev", this.lightPrevHashPrev)
 
-        this._addTreeSerialization(numBlocks - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial);
+        this._addTreeSerialization(numBlocks - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial, numBlocks);
 
         if (this.accountantTree.root.edges.length > 0) {
             console.log("balances", this.accountantTree.root.edges[0].targetNode.balances)
@@ -234,9 +234,13 @@ class MiniBlockchainLight extends  MiniBlockchain{
     }
 
 
-    _addTreeSerialization(height, serialization){
+    _addTreeSerialization(height, serialization, blocksLength){
 
-        if (height === undefined) height = this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
+        blocksLength = blocksLength || this.blocks.length;
+
+        if (height === undefined) height = blocksLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
+
+        console.log("height", height, "blocksLength", blocksLength,  blocksLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1 )
 
         if (serialization === undefined){
             serialization = this.accountantTree.serializeMiniAccountant();
@@ -246,15 +250,15 @@ class MiniBlockchainLight extends  MiniBlockchain{
         this.lightAccountantTreeSerializations[height] = serialization;
 
         //delete serializations older than [:-m]
-        let index = this.blocks.length - consts.POW_PARAMS.LIGHT_BUFFER_LAST_BLOCKS;
-        while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
-            delete this.lightAccountantTreeSerializations[index];
-            index--;
-        }
+        // let index = blocksLength||this.blocks.length - consts.POW_PARAMS.LIGHT_BUFFER_LAST_BLOCKS;
+        // while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
+        //     delete this.lightAccountantTreeSerializations[index];
+        //     index--;
+        // }
 
         // updating the blocksStartingPoint
         if (this.agent.light === true) {
-            this.blocksStartingPoint = this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
+            this.blocksStartingPoint = blocksLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
             console.log("this.blocksStartingPoint",this.blocksStartingPoint);
             console.log("this.blocksStartingPoint",this.blocksStartingPoint);
         }
