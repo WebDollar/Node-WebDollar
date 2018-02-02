@@ -248,8 +248,6 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (answer === null || answer === undefined)
                         throw "block never received "+ nextBlockHeight;
 
-                    console.log("answer", answer, Buffer.isBuffer(answer.block))
-
                     if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
 
                         let block;

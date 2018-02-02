@@ -169,6 +169,7 @@ class InterfaceBlockchainFork {
                 //propagating valid blocks
                 if (forkedSuccessfully) {
                     this.blockchain.save();
+                    this.blockchain.mining.resetMining();
                     this.blockchain.propagateBlocks(this.forkStartingHeight, this.sockets);
                 }
 

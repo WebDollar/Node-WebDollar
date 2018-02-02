@@ -12,7 +12,6 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMiningWorkers{
     _getWorker(){
         //let code = require('./Browser-Mining-Web-Worker.js');
         let code = require.resolve('./Browser-Mining-Web-Worker.js');
-        console.log("WORKER", code);
         return webWorkify(code);
     }
 

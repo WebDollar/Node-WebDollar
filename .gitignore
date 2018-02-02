@@ -38,3 +38,5 @@ dist_bundle/terminal-bundle\.js\.map
 dist_bundle/terminal-mocha-bundle\.js\.map
 
 addresses\.bin
+
+dist_bundle/WebDollar-Protocol-bundle\.js\.map
