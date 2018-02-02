@@ -92,10 +92,10 @@ class InterfaceBlockchainProtocol {
                 try {
 
                     let answer = {};
-                    if (this.blockchain.blocks.length > 0)
+                    if (this.blockchain.blocks.length > 0 && this.blockchain.last() !== undefined)
                         answer = {
                             result: true,
-                            data: this.blockchain.blocks[this.blockchain.blocks.length-1].getBlockHeader()
+                            data: this.blockchain.last().getBlockHeader()
                         };
                     else
                         answer = { result: false,  message: "no blocks"};
@@ -294,7 +294,8 @@ class InterfaceBlockchainProtocol {
             if (( data.height >= 0 && this.blockchain.getBlockchainLength() - 1 >= data.height && this.blockchain.getBlockchainLength() >= data.chainLength )) {
 
                 //in case the hashes are exactly the same, there is no reason why we should download it
-                if ( this.blockchain.blocks[data.height].hash.equals(data.header.hash) === true )
+                let myHash = this.blockchain.getHashPrev(data.height+1);
+                if ( myHash !== undefined && myHash !== null && myHash.equals(data.header.hash) === true )
                     throw "your block is not new, because I have a valid block at same height ";
 
             }

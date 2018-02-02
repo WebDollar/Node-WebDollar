@@ -369,7 +369,7 @@ class InterfaceBlockchain {
 
     // aka tail
     get first() {
-        return this.blocks[this.blocks.length -1];
+        return this.blocks[0];
     }
 
     propagateBlocks(height, socketsAvoidBroadcast){
