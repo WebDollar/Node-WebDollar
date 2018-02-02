@@ -175,11 +175,11 @@ describe('test save wallet to local storage', () => {
 
         let addresses = Blockchain.Wallet.addresses;
 
-        response = await Blockchain.Wallet.exportAddresses("addresses.bin");
+        response = await Blockchain.Wallet.exportWallet("addresses.bin");
         assert(response === true, "Error exporting addresses! : " + response + ".");
         Blockchain.Wallet.addresses = [];
 
-        response = await Blockchain.Wallet.importAddresses("addresses.bin");
+        response = await Blockchain.Wallet.importWallet("addresses.bin");
         assert(response === true, "Error importing addresses!");
         assert(addresses.length === Blockchain.Wallet.addresses.length, "Addresses length differ after import: " + addresses.length + "!==" + Blockchain.Wallet.addresses.length);
 

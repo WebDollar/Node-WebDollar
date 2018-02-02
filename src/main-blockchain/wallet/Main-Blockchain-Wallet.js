@@ -180,7 +180,7 @@ class MainBlockchainWallet{
      * @param filePath is the binary file for storing addresses
      * @returns {Promise<any>}
      */
-    exportAddresses(filePath){
+    exportWallet(filePath){
 
         return new Promise(resolve => {
 
@@ -220,7 +220,7 @@ class MainBlockchainWallet{
      * @param filePath is the binary file path
      * @returns {Promise<any>}
      */
-    importAddresses(filePath){
+    importWallet(filePath){
 
         return new Promise(resolve => {
 
@@ -283,7 +283,7 @@ class MainBlockchainWallet{
     /**
      * Export the Private Key from an Address
      * @param address
-     * @returns {Promise.<*>}
+     * @returns privateKeyWIF as Hex
      */
 
     async exportPrivateKeyFromAddress(address){
@@ -292,7 +292,7 @@ class MainBlockchainWallet{
             if (address === this.addresses[i].address || address === this.addresses[i].unencodedAddress){
                 return {
                     result:true,
-                    privateKey: await this.addresses[i].exportAddressPrivateKeyToString()
+                    privateKey: (await this.addresses[i].exportAddressPrivateKeyToHex())
                 }
             }
 

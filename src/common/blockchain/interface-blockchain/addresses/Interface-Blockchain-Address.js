@@ -295,8 +295,8 @@ class InterfaceBlockchainAddress{
     }
 
     //TODO REMOVE THIS FUNCTION!!!!!!!!!!!!!!
-    async exportAddressPrivateKeyToString(){
-        return await this.getPrivateKeyWIF();
+    async exportAddressPrivateKeyToHex(){
+        return (await this.getPrivateKeyWIF()).toString("hex");
     }
 
     async serializeAddress(serializePrivateKey = false){
