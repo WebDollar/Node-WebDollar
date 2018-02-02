@@ -31,7 +31,10 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
      */
     updateAccount(address, value, tokenId){
 
-        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = Buffer.from([1]);
+        if (tokenId === undefined  || tokenId === '' || tokenId === null) {
+            tokenId = Buffer.from([1]);
+            tokenId[0] = 1;
+        }
 
         address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
         if (address === null) throw "sorry but your address is invalid";
@@ -51,6 +54,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         //WEBD
         if (tokenId.length === 1 && tokenId[0]===1){
             this.root.total = this.root.total.plus( value )
+            this.emitter.emit("accountant-tree/root/total",this.root.total.toString());
         }
 
         //optimization, but it doesn't work in browser

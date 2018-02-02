@@ -92,6 +92,10 @@ class InterfaceBlockchainProtocol {
                 try {
 
                     let answer = {};
+
+                    console.log("get/blockchain/header/last-block length", this.blockchain.blocks.length);
+                    console.log("get/blockchain/header/last-block last", this.blockchain.last);
+
                     if (this.blockchain.blocks.length > 0 && this.blockchain.last !== undefined)
                         answer = {
                             result: true,
@@ -243,8 +247,9 @@ class InterfaceBlockchainProtocol {
 
                     if (this.blockchain.getBlockchainLength() < data.height) throw "data.height is higher than I have";
 
-
                     let block = this.blockchain.blocks[data.height];
+
+                    if (block === undefined) throw "block is empty at "+data.height;
 
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                         result: true,

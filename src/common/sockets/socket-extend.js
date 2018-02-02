@@ -23,8 +23,8 @@ class SocketExtend{
         socket.node.on = (name, callback ) => {
             socket.on(name, (data)=>{
 
-                if (process.env.BROWSER)
-                    this._processBrowserBufferArray(data);
+                if (process.env.BROWSER) this._processBrowserBufferArray(data);
+                else if (!process.env.BROWSER) this._processBackboneBufferArray(data);
 
                 return callback(data);
             })
@@ -33,8 +33,8 @@ class SocketExtend{
         socket.node.once = (name, callback ) => {
             socket.once(name, (data)=>{
 
-                if (process.env.BROWSER)
-                    this._processBrowserBufferArray(data);
+                if (process.env.BROWSER) this._processBrowserBufferArray(data);
+                else if (!process.env.BROWSER) this._processBackboneBufferArray(data);
 
                 return callback(data);
             })
@@ -112,8 +112,8 @@ class SocketExtend{
 
                 if (timeoutId !== undefined) clearTimeout(timeoutId);
 
-                if (process.env.BROWSER)
-                    this._processBrowserBufferArray(resData);
+                if (process.env.BROWSER) this._processBrowserBufferArray(resData);
+                else if (!process.env.BROWSER) this._processBackboneBufferArray(resData);
 
                 resolve(resData);
             };
@@ -163,6 +163,26 @@ class SocketExtend{
                         this._processBrowserBufferArray(data[prop]);
                 }
             }
+    }
+
+    _processBackboneBufferArray(data){
+
+        if (process.env.BROWSER) return;
+
+        if (typeof data === "object" && data !== null)
+            for (let prop in data){
+                if (data.hasOwnProperty(prop)){
+
+                    if (prop === "type" && data.type === "Buffer" && data.hasOwnProperty("data")) {
+                        data = new Buffer(data);
+                        return data;
+                    }
+                    else
+                        data[prop] = this._processBackboneBufferArray(data[prop]);
+                }
+            }
+
+        return data;
     }
 
 }

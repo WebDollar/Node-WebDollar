@@ -40,7 +40,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         //download the new Accountant Tree, in case there is a new fork and I don't have anything in common
         console.log(colors.yellow("fork.forkStartingHeight "+ fork.forkStartingHeight+ "fork.forkChainStartingPoint "+ fork.forkChainStartingPoint));
 
-        if (fork.forkStartingHeight === fork.forkChainStartingPoint) {
+        if (fork.forkChainStartingPoint === fork.forkStartingHeight || fork.forkChainStartingPoint === fork.forkStartingHeight-1 ) {
 
             let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint -1 }, fork.forkChainStartingPoint -1 );
 
@@ -56,6 +56,8 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             if (answer.difficultyTarget === null ) throw "get-light-settings difficultyTarget is null";
             if (answer.timeStamp === null ) throw "get-light-settings timeStamp is null";
             if (answer.hashPrev === null ) throw "get-light-settings hashPrev is null";
+
+            console.log("answer.difficultyTarget",answer.difficultyTarget)
 
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;

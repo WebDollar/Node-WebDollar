@@ -89,7 +89,7 @@ class BlockchainDifficulty{
 
         //ethereum changed from .plus to .minus
 
-        let blockDiff = prevBlockDifficulty.plus(  prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
+        let blockDiff = prevBlockDifficulty.minus(  prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
                                                     (equationTwo )
                                                );
 

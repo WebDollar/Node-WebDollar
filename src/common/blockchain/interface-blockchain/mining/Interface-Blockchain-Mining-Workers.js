@@ -166,7 +166,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         else
         if (event.data.message === "results") {
 
-            console.log("REEESULTS!!!", event.data, worker.suspended);
+            //console.log("REEESULTS!!!", event.data, worker.suspended);
 
             if ( worker.suspended )
                 return; //I am no longer interested
