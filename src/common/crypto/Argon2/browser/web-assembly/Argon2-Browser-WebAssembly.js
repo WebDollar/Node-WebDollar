@@ -124,7 +124,8 @@ class Argon2BrowserWebAssembly{
 
             //console.log("params.pass", params.pass);
 
-            let result = await this._calcBest(params);
+            //let result = await this._calcBest(params);
+            let result = await this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs, params);
 
             if (result === null) throw("Argon2 returned empty");
 

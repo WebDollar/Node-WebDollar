@@ -168,9 +168,11 @@ class Argon2BrowserWebAssemblyCalc{
         var t_cost = arg && arg.time || 10;
         var m_cost = arg && arg.mem || 1024;
         var parallelism = arg && arg.parallelism || 1;
-        var pwd = Module.allocate( arg.pass , 'i8', Module.ALLOC_NORMAL);
+        //var pwd = Module.allocate( arg.pass , 'i8', Module.ALLOC_NORMAL);
+        var pwd = this.allocateArray(arg && arg.pass || 'password');
         var pwdlen = arg && arg.pass ? arg.pass.length : 8;
-        var salt = Module.allocate(Module.intArrayFromString(arg && arg.salt || 'somesalt'), 'i8', Module.ALLOC_NORMAL);
+        //var salt = Module.allocate(Module.intArrayFromString(arg && arg.salt || 'somesalt'), 'i8', Module.ALLOC_NORMAL);
+        var salt =this.allocateArray(arg && arg.salt || 'somesalt');
         var saltlen = arg && arg.salt ? arg.salt.length : 8;
         var hash = Module.allocate(new Array(arg && arg.hashLen || 32), 'i8', Module.ALLOC_NORMAL);
         var hashlen = arg && arg.hashLen || 32;
@@ -196,16 +198,16 @@ class Argon2BrowserWebAssemblyCalc{
 
             var hashArr = new Uint8Array(hashlen);
             for (var i = hash; i < hash + hashlen; i++) {
-                hashArr[i-hash] = 128 + Module.HEAP8[i];
+                hashArr[i-hash] = Module.HEAP8[i];
             }
 
             result = {
                 hash: hashArr,
-                // encoded:Module.Pointer_stringify(encoded),
+                encoded:Module.Pointer_stringify(encoded),
                 elapsed: elapsed
             };
 
-            // this.log('Encoded: ' + result.encoded);
+            console.log('Encoded: ' + result.encoded);
             // this.log('Hash: ' + result.hash);
             // this.log('Elapsed: ' + result.elapsed);
 
@@ -271,6 +273,13 @@ class Argon2BrowserWebAssemblyCalc{
         el.onerror = onerror;
         document.body.appendChild(el);
     }
+
+    allocateArray(strOrArr) {
+        var arr = strOrArr instanceof Uint8Array || strOrArr instanceof Array ? strOrArr
+            : Module.intArrayFromString(strOrArr);
+        return Module.allocate(arr, 'i8', Module.ALLOC_NORMAL);
+    }
+
 
 
 }
