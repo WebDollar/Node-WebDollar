@@ -16,12 +16,21 @@ class InterfaceBlockchainAddressHelper{
 
     }
 
-    static _generatePrivateKeyAdvanced(salt, showDebug){
+    static _generatePrivateKeyAdvanced(salt, showDebug, privateKeyWIF){
 
         //tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 
         //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
-        let privateKey = WebDollarCrypto.getBufferRandomValues(consts.PRIVATE_KEY_LENGTH);
+        let privateKey;
+
+        let result = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKeyWIF);
+        if (result.result){
+            privateKey = result.privateKey;
+        }
+
+        if (privateKey === undefined)
+            privateKey = WebDollarCrypto.getBufferRandomValues(consts.PRIVATE_KEY_LENGTH);
+
 
         //if you want to follow the step-by-step results in this article, comment the
         //previous code and uncomment the following
@@ -195,9 +204,9 @@ class InterfaceBlockchainAddressHelper{
         return addressWIF;
     }
 
-    static generateAddress(salt){
+    static generateAddress(salt, privateKeyWIF){
 
-        let privateKey = InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, false);
+        let privateKey = InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, false, privateKeyWIF);
         let publicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey.privateKeyWIF, false);
         let address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, false);
 

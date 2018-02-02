@@ -254,20 +254,53 @@ class MainBlockchainWallet{
     }
 
     /**
-     *
-     * @param addressString
+     * import an Address from a PrivateKey/WIF
+     * @param privateKeyWIF
      */
-    async importAddressFromString(addressString){
+    async importAddressFromPrivateKey(privateKeyWIF){
 
-        let blockchainAddress = await this._justCreateNewAddress();
-        let unencodedAddress = BufferExtended.fromBase(addressString);
+        let blockchainAddress = new MiniBlockchainAddress(this.db, undefined);
 
-        blockchainAddress.unencodedAddress = unencodedAddress;
-        blockchainAddress.address = BufferExtended.toBase(unencodedAddress);
+        try {
 
-        this.addresses.push(blockchainAddress);
-        
-        return blockchainAddress;
+            await blockchainAddress.createNewAddress(undefined, privateKeyWIF);
+
+            this.addresses.push(blockchainAddress);
+
+            return {
+                result:true,
+                address: blockchainAddress.address,
+                unencodedAddress: blockchainAddress.unencodedAddress,
+                publicKey: blockchainAddress.publicKey,
+            }
+
+        } catch (exception){
+            return {result:false, message: exception.toString()};
+        }
+
+    }
+
+    /**
+     * Export the Private Key from an Address
+     * @param address
+     * @returns {Promise.<*>}
+     */
+
+    async exportPrivateKeyFromAddress(address){
+
+        for (let i=0; i<this.addresses.length; i++)
+            if (address === this.addresses[i].address || address === this.addresses[i].unencodedAddress){
+                return {
+                    result:true,
+                    privateKey: await this.addresses[i].exportAddressPrivateKeyToString()
+                }
+            }
+
+        return {
+            result:false,
+            message: "Address was not found",
+        }
+
     }
 
 }

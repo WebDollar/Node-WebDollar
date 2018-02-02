@@ -25,13 +25,13 @@ class InterfaceBlockchainAddress{
         }
     }
 
-    async createNewAddress(salt){
+    async createNewAddress(salt, privateKeyWIF){
 
         if (this.address !== null){
             console.log("WARNING! You overwrite the initial address")
         }
 
-        let result = InterfaceBlockchainAddressHelper.generateAddress(salt);
+        let result = InterfaceBlockchainAddressHelper.generateAddress(salt, privateKeyWIF);
 
         this.address = result.address;
         this.unencodedAddress = result.unencodedAddress;
@@ -292,6 +292,11 @@ class InterfaceBlockchainAddress{
      */
     exportAddressToString(){
         return this.address;
+    }
+
+    //TODO REMOVE THIS FUNCTION!!!!!!!!!!!!!!
+    async exportAddressPrivateKeyToString(){
+        return await this.getPrivateKeyWIF();
     }
 
     async serializeAddress(serializePrivateKey = false){

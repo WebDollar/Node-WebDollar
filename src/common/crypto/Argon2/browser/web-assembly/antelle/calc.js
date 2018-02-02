@@ -161,8 +161,6 @@ class Argon2BrowserWebAssemblyCalc{
 
         //this.log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
 
-        console.log("SALUUUUUUUT ARGON2D", arg.pass);
-
         var dt = this.now();
 
         var t_cost = arg && arg.time || 10;
@@ -203,11 +201,11 @@ class Argon2BrowserWebAssemblyCalc{
 
             result = {
                 hash: hashArr,
-                encoded:Module.Pointer_stringify(encoded),
+                //encoded:Module.Pointer_stringify(encoded),
                 elapsed: elapsed
             };
 
-            console.log('Encoded: ' + result.encoded);
+            //console.log('Encoded: ' + result.encoded);
             // this.log('Hash: ' + result.hash);
             // this.log('Elapsed: ' + result.elapsed);
 
