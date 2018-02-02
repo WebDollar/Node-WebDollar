@@ -57,14 +57,14 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         //if (this.checkBalanceSubscribed("balances/changes/"+BufferExtended.toBase(address))){
 
         let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
-        this.emitter.emit("balances/changes/"+BufferExtended.toBase(address), {address: addressWIF, balances: (resultUpdate !== null ? node.getBalances() : null)} );
+        this.emitter.emit("balances/changes/"+BufferExtended.toBase(address), { address: addressWIF, balances: (resultUpdate !== null ? node.getBalances() : null) } );
 
-        if (resultUpdate === null){
+        console.log("ADDRESS", addressWIF, node.getBalances(), resultUpdate );
+
+        if (resultUpdate === null) {
             this.delete(address)
-        }
-
-        if (resultUpdate === null)
             return null;
+        }
 
         this._changedNode( node );
 

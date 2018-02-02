@@ -52,7 +52,7 @@ class InterfaceBlockchainProtocol {
 
         NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeader(), "all", socketsAvoidBroadcast);
 
-        console.log("WEbDollar Hash", block.serializeBlock().toString("hex"));
+        //console.log("WEbDollar Hash", block.serializeBlock().toString("hex"));
 
     }
 

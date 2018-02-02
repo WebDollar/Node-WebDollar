@@ -92,7 +92,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (answer === null) throw "connection dropped headers-info";
                 if (answer === undefined || answer === null || answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) ) throw "connection headers-info malformed";
 
-                if (answer.header.hash.equals( this.blockchain.getBlockchainLastBlock().hash ))
+                if (answer.header.hash.equals( this.blockchain.last.hash ))
 
                     binarySearchResult = {
                         position : currentBlockchainLength - 1,

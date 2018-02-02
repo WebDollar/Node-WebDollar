@@ -40,3 +40,7 @@ dist_bundle/terminal-mocha-bundle\.js\.map
 addresses\.bin
 
 dist_bundle/WebDollar-Protocol-bundle\.js\.map
+
+User-Interface-WebDollar/dist_bundle/WebDollar-Protocol-bundle\.js
+
+User-Interface-WebDollar/dist_bundle/WebDollar-Protocol-bundle\.js\.map

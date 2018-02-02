@@ -301,7 +301,7 @@ class InterfaceBlockchain {
             let indexStart = 0;
 
             if (this.agent.light) {
-                indexStart = numBlocks - validateLastBlocks-1;
+                indexStart = Math.max(0, numBlocks - validateLastBlocks-1);
 
                 for (let i=0; i<indexStart; i++)
                     this.blocks.push(undefined);
