@@ -44,11 +44,11 @@ class MiniBlockchainBlockData extends  inheritBlockData {
             //validate hashAccountantTree
             let hashAccountantTree = this.calculateAccountantTreeHashBlockData();
 
-            console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex") );
-            console.log("hashAccountantTree", this.blockchain.accountantTree.serializeMiniAccountant().toString("hex") );
-
-            if (this.blockchain.accountantTree.root.edges.length > 0)
-                console.log("hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
+            // console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex") );
+            // console.log("hashAccountantTree", this.blockchain.accountantTree.serializeMiniAccountant().toString("hex") );
+            //
+            // if (this.blockchain.accountantTree.root.edges.length > 0)
+            //     console.log("hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
 
             if (! hashAccountantTree.equals(this.hashAccountantTree) ) throw "block.data hashAccountantTree is not right  "+ hashAccountantTree.toString("hex") + "   vs    "+this.hashAccountantTree.toString("hex") ;
 
