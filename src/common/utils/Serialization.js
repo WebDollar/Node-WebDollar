@@ -175,11 +175,13 @@ class Serialization{
 
         let result = new Buffer(noBytes);
 
-        for (let i=0; i<buffer.length; i++)
-            result[i]= buffer[i];
+        let c = 0;
+        for (let i=buffer.length-1; i>=0; i--){
+            c++;
+            result[noBytes-c]= buffer[i];
+        }
 
         return result;
-
     }
 
     serializeBufferRemovingLeadingZeros(buffer){

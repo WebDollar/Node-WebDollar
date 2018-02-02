@@ -7,6 +7,6 @@ Node.NodeServer.startServer();
 Node.NodeClientsService.startService();
 
 
-//Blockchain.createBlockchain("full-node");
-Blockchain.createBlockchain("light-node");
+Blockchain.createBlockchain("full-node");
+//Blockchain.createBlockchain("light-node");
 

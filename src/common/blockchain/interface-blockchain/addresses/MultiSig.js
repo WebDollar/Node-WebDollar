@@ -127,7 +127,7 @@ class MultiSig {
      */
     static makeMultisigAddress(saltDates) {
 
-        let saltDates = "";
+        let concatDatesSalt = "";
 
         for (let i = 0; i < saltDates.length; ++i){
 
