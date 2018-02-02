@@ -122,7 +122,14 @@ class SocketExtend{
 
             if (timeOutInterval !== undefined)
                 timeoutId = setTimeout(()=>{
-                    socket.removeListener(requestAnswer, requestFunction);
+                    if (socket !== null && socket !== undefined)
+                        if (socket.removeListener !== undefined) //websocket io
+                            socket.removeListener(requestAnswer, requestFunction);
+                        else
+                        if (1===2) //webRTC
+                        {
+                            //TODO WEBRTC
+                        }
                     //socket.off(onceId);
                     resolve(null)
                 }, timeOutInterval);
