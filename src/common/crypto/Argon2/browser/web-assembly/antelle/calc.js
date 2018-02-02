@@ -161,6 +161,7 @@ class Argon2BrowserWebAssemblyCalc{
 
         //this.log('Params: ' + Object.keys(arg).map(function(key) { return key + '=' + arg[key]; }).join(', '));
 
+        console.log("SALUUUUUUUT ARGON2D", arg.pass);
 
         var dt = this.now();
 

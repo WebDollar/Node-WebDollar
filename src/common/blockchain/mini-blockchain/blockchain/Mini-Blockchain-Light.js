@@ -14,8 +14,13 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         super(agent);
 
-        this.lightAccountantTreeSerializations = {};
+        this._initializeMiniBlockchainLight();
+    }
 
+    _initializeMiniBlockchainLight(){
+        this.blocks = [];
+        this.blocksStartingPoint = 0;
+        this.lightAccountantTreeSerializations = {};
         this.lightPrevDifficultyTarget = null;
         this.lightPrevTimeStamp = null;
         this.lightPrevHashPrev = null;
@@ -208,6 +213,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             console.log(colors.red("Couldn't load MiniBlockchain"), exception);
             this.accountantTree = new MiniBlockchainAccountantTree(this.db);
+            this._initializeMiniBlockchainLight();
+
             return false;
         }
     }

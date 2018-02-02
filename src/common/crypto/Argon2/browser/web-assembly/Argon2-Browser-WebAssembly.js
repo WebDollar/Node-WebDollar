@@ -11,7 +11,15 @@ import BufferExtended from "../../../../utils/BufferExtended";
     TUTORIAL BASED ON https://github.com/antelle/argon2-browser/blob/master/docs/index.html
  */
 
-const HASH_ARGON2_OPTIONS = { salt: consts.HASH_ARGON2_PARAMS.salt, time: consts.HASH_ARGON2_PARAMS.time, mem: consts.HASH_ARGON2_PARAMS.memBytes, parallelism: consts.HASH_ARGON2_PARAMS.parallelism, type: consts.HASH_ARGON2_PARAMS.type, hashLen: consts.HASH_ARGON2_PARAMS.hashLen, distPath: consts.HASH_ARGON2_PARAMS.distPath}
+const HASH_ARGON2_OPTIONS = {
+    salt: consts.HASH_ARGON2_PARAMS.salt,
+    time: consts.HASH_ARGON2_PARAMS.time,
+    mem: consts.HASH_ARGON2_PARAMS.memBytes,
+    parallelism: consts.HASH_ARGON2_PARAMS.parallelism,
+    type: consts.HASH_ARGON2_PARAMS.algoBrowser,
+    hashLen: consts.HASH_ARGON2_PARAMS.hashLen,
+    distPath: consts.HASH_ARGON2_PARAMS.distPath
+}
 
 class Argon2BrowserWebAssembly{
 

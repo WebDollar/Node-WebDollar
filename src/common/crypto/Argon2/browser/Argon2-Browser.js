@@ -13,7 +13,15 @@ import Argon2BrowserWebAssembly from './web-assembly/Argon2-Browser-WebAssembly'
  */
 
 
-const HASH_ARGON2_OPTIONS = { salt: consts.HASH_ARGON2_PARAMS.salt, time: consts.HASH_ARGON2_PARAMS.time, mem: consts.HASH_ARGON2_PARAMS.memBytes, parallelism: consts.HASH_ARGON2_PARAMS.parallelism, type: consts.HASH_ARGON2_PARAMS.type, hashLen: consts.HASH_ARGON2_PARAMS.hashLen, distPath: consts.HASH_ARGON2_PARAMS.distPath}
+const HASH_ARGON2_OPTIONS = {
+    salt: consts.HASH_ARGON2_PARAMS.salt,
+    time: consts.HASH_ARGON2_PARAMS.time,
+    mem: consts.HASH_ARGON2_PARAMS.memBytes,
+    parallelism: consts.HASH_ARGON2_PARAMS.parallelism,
+    type: consts.HASH_ARGON2_PARAMS.algoBrowser,
+    hashLen: consts.HASH_ARGON2_PARAMS.hashLen,
+    distPath: consts.HASH_ARGON2_PARAMS.distPath
+}
 
 class Argon2Browser{
 

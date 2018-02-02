@@ -184,21 +184,21 @@ class InterfaceBlockchain {
 
         if (height === undefined) height = this.blocks.length;
 
-        if (height === 0)  return BlockchainGenesis.difficultyTarget;
+        if (height <= 0)  return BlockchainGenesis.difficultyTarget;
         else return this.blocks[height-1].difficultyTarget;
     }
 
     getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
-        if (height === 0)  return BlockchainGenesis.timeStamp;
+        if (height <= 0)  return BlockchainGenesis.timeStamp;
         else return this.blocks[height-1].timeStamp;
     }
 
     getHashPrev(height){
         if (height === undefined) height = this.blocks.length;
 
-        if (height === 0)  return BlockchainGenesis.hashPrev;
+        if (height <= 0)  return BlockchainGenesis.hashPrev;
         else return this.blocks[height-1].hash;
     }
 
@@ -267,8 +267,6 @@ class InterfaceBlockchain {
 
                 if (this.blocks[i] !== undefined && this.blocks[i] !== null){
                     let response = await this.blocks[i].save();
-
-                    console.log("save response", response)
 
                     if (response !== true)
                         break;

@@ -196,8 +196,10 @@ class InterfaceBlockchainBlock {
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );
 
+        //console.log("computeHash", buffer.toString("hex"));
 
-        return await WebDollarCrypto.hashPOW(buffer);
+        return  await WebDollarCrypto.hashPOW(buffer);
+        //return  Buffer.from(await WebDollarCrypto.hashPOW_String(buffer.toString()));
     }
 
     serializeBlock(requestHeader){

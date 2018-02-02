@@ -42,7 +42,20 @@ consts.PUBLIC_ADDRESS_SUFFIX_BASE58 = "";
 
 consts.BLOCKS_POW_LENGTH = 32;
 consts.BLOCKS_NONCE = 4;
-consts.HASH_ARGON2_PARAMS = {salt: 'WebDollar_make_$', saltBuffer: Buffer.from(['W','e','b','D','o','l','l','a','r','_','m','a','k','e','_','$']),time: 2, memPower:10, memBytes: 1024, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://antelle.github.io/argon2-browser/dist' }
+consts.HASH_ARGON2_PARAMS = {
+    salt: 'WebDollar_make_$',
+    saltBuffer: Buffer.from("WebDollar_make_$"),
+    time: 2,
+    memPower:10,
+    memBytes: 1024,
+    parallelism: 2,
+    //argon2d
+    algoNode: 0,
+    algoBrowser: 0,
+    hashLen: 32,
+    distPath: 'https://antelle.github.io/argon2-browser/dist'
+}
+
 // change also to Browser-Mining-WebWorker.js
 
 consts.TOKEN_ID_LENGTH = 32;
