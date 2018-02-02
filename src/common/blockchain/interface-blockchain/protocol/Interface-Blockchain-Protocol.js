@@ -92,7 +92,7 @@ class InterfaceBlockchainProtocol {
                 try {
 
                     let answer = {};
-                    if (this.blockchain.blocks.length > 0 && this.blockchain.last() !== undefined)
+                    if (this.blockchain.blocks.length > 0 && this.blockchain.last !== undefined)
                         answer = {
                             result: true,
                             data: this.blockchain.last().getBlockHeader()
