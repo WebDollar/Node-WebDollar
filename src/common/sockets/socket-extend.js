@@ -4,6 +4,7 @@ import NodeSignalingServerProtocol from 'common/sockets/protocol/signaling/serve
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/node-signaling-client-protocol';
 import NodesList from 'node/lists/nodes-list'
 import SocketAddress from 'common/sockets/socket-address'
+import isArrayBuffer from 'is-array-buffer';
 
 // Extending Socket / Simple Peer
 
@@ -19,7 +20,26 @@ class SocketExtend{
 
         socket.node.getSocket = () => { return socket};
 
-        socket.node.on = (name, callback ) => { socket.on(name, callback) } ;
+        socket.node.on = (name, callback ) => {
+            socket.on(name, (data)=>{
+
+                if (process.env.BROWSER)
+                    this._processBrowserBufferArray(data);
+
+                return callback(data);
+            })
+        } ;
+
+        socket.node.once = (name, callback ) => {
+            socket.once(name, (data)=>{
+
+                if (process.env.BROWSER)
+                    this._processBrowserBufferArray(data);
+
+                return callback(data);
+            })
+        } ;
+
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port, uuid);
 
         socket.node.sendRequest = (request, requestData) => { return this.sendRequest(socket, request, requestData) };
@@ -91,10 +111,14 @@ class SocketExtend{
             let requestFunction = (resData) => {
 
                 if (timeoutId !== undefined) clearTimeout(timeoutId);
+
+                if (process.env.BROWSER)
+                    this._processBrowserBufferArray(resData);
+
                 resolve(resData);
             };
 
-            let onceId = socket.once(requestAnswer, requestFunction );
+            socket.once(requestAnswer, requestFunction );
 
             if (timeOutInterval !== undefined)
                 timeoutId = setTimeout(()=>{
@@ -108,8 +132,31 @@ class SocketExtend{
         });
     }
 
+    _isIterable(obj) {
+        // checks for null and undefined
+        if (obj === null || obj === undefined) {
+            return false;
+        }
+        return typeof obj[Symbol.iterator] === 'function';
+    }
 
+    /**
+     * Browser sockets receives ArrayBuffer and it is not compatible with Buffer (UIntArray) in the Browser
+     */
+    _processBrowserBufferArray(data){
 
+        if (!process.env.BROWSER) return;
+
+        if (typeof data === "object" && data !== null)
+            for (let prop in data){
+                if (data.hasOwnProperty(prop)){
+                    if (isArrayBuffer(data[prop]))
+                        data[prop] = Buffer.from(data[prop]);
+                    else
+                        this._processBrowserBufferArray(data[prop]);
+                }
+            }
+    }
 
 }
 

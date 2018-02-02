@@ -16,7 +16,7 @@ class NodeSignalingClientProtocol {
 
     initializeSignalingClientService(socket, params) {
 
-        socket.on("signals/client/initiator/generate-initiator-signal", async (data) => {
+        socket.node.on("signals/client/initiator/generate-initiator-signal", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
                 console.log(colors.red("data.remoteUUID 1"), data.remoteUUID);
@@ -50,7 +50,7 @@ class NodeSignalingClientProtocol {
         });
 
 
-        socket.on("signals/client/answer/receive-initiator-signal", async (data) => {
+        socket.node.on("signals/client/answer/receive-initiator-signal", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
                 console.log(colors.red("data.remoteUUID 2"), data.remoteUUID);
@@ -88,7 +88,7 @@ class NodeSignalingClientProtocol {
 
         });
 
-        socket.on("signals/client/answer/receive-ice-candidate", async (data) => {
+        socket.node.on("signals/client/answer/receive-ice-candidate", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
                 console.log(colors.red("data.remoteUUID 3"), data.remoteUUID);
@@ -127,7 +127,7 @@ class NodeSignalingClientProtocol {
 
         });
 
-        socket.on("signals/client/initiator/receive-ice-candidate", async (data) => {
+        socket.node.on("signals/client/initiator/receive-ice-candidate", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
                 console.log(colors.red("data.remoteUUID 4"), data.remoteUUID);
@@ -169,7 +169,7 @@ class NodeSignalingClientProtocol {
         });
 
 
-        socket.on("signals/client/initiator/join-answer-signal", async (data) => {
+        socket.node.on("signals/client/initiator/join-answer-signal", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
                 console.log(colors.red("data.remoteUUID 5"), data.remoteUUID);

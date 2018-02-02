@@ -22,7 +22,7 @@ class NodeSignalingServerProtocol {
 
     initializeSignalingServerService(socket){
 
-        socket.on("signals/server/register/accept-web-peer-connections", (data) =>{
+        socket.node.on("signals/server/register/accept-web-peer-connections", (data) =>{
 
             if ( socket.node.protocol.signaling.server.acceptingConnections === undefined) { //check it is for the first time
                 socket.node.protocol.signaling.server.acceptingConnections = true;
@@ -30,7 +30,7 @@ class NodeSignalingServerProtocol {
 
         });
 
-        socket.on("signals/server/connections/established-connection-was-dropped", (data)=>{
+        socket.node.on("signals/server/connections/established-connection-was-dropped", (data)=>{
 
             if (!data.connectionId){
 

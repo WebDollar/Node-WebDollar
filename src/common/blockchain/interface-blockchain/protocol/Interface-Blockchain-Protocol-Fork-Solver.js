@@ -245,8 +245,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
 
-                    if (answer === null)
+                    if (answer === null || answer === undefined)
                         throw "block never received "+ nextBlockHeight;
+
+                    console.log("answer", answer, Buffer.isBuffer(answer.block))
 
                     if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
 
@@ -292,9 +294,12 @@ class InterfaceBlockchainProtocolForkSolver{
                         if (result) {
 
                             nextBlockHeight++;
-                        }
+                        } else
+                            throw "Fork didn't work at height "+nextBlockHeight;
 
-                    }
+
+                    } else
+                        throw "Fork Answer is not Buffer";
 
 
                 }

@@ -22,7 +22,7 @@ class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
         /**
          * Get last K accountant Trees
          */
-        socket.on("get/blockchain/accountant-tree/get-accountant-tree", async (data)=>{
+        socket.node.on("get/blockchain/accountant-tree/get-accountant-tree", async (data)=>{
 
             try{
 

@@ -36,7 +36,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
         /**
          * Get difficulty
          */
-        socket.on("get/blockchain/light/get-light-settings", async (data)=>{
+        socket.node.on("get/blockchain/light/get-light-settings", async (data)=>{
 
             try{
 

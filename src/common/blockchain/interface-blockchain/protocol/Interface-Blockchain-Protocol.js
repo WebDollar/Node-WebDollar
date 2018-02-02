@@ -87,7 +87,7 @@ class InterfaceBlockchainProtocol {
 
         // sending the last block using the protocol
         if (this.acceptBlockHeaders)
-            socket.on("get/blockchain/header/last-block", async (data)=>{
+            socket.node.on("get/blockchain/header/last-block", async (data)=>{
 
                 try {
 
@@ -116,7 +116,7 @@ class InterfaceBlockchainProtocol {
             });
 
         if (this.acceptBlockHeaders)
-            socket.on("blockchain/header/new-block", async (data) => {
+            socket.node.on("blockchain/header/new-block", async (data) => {
 
                 /*
                     data.header.height
@@ -167,7 +167,7 @@ class InterfaceBlockchainProtocol {
 
             });
 
-        socket.on("blockchain/info/request-blockchain-info", (data)=>{
+        socket.node.on("blockchain/info/request-blockchain-info", (data)=>{
 
             try{
 
@@ -190,7 +190,7 @@ class InterfaceBlockchainProtocol {
         });
 
         if (this.acceptBlockHeaders)
-            socket.on("blockchain/headers-info/request-header-info-by-height", (data) => {
+            socket.node.on("blockchain/headers-info/request-header-info-by-height", (data) => {
 
                 // data.height
 
@@ -232,7 +232,7 @@ class InterfaceBlockchainProtocol {
 
         if (this.acceptBlocks)
 
-            socket.on("blockchain/blocks/request-block-by-height", (data) => {
+            socket.node.on("blockchain/blocks/request-block-by-height", (data) => {
 
                 // data.height
                 // data.onlyHeader
