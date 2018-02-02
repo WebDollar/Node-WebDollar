@@ -27,7 +27,7 @@ var ARGON2_PARAM = { salt: 'WebDollar_make_$', time: 2, mem: 1024, parallelism: 
 
 var algorithm = undefined;
 
-module.exports = function (self) {
+export default function (self) {
 
     let log = (msg) => {
         if (!msg ) return;
@@ -110,7 +110,7 @@ module.exports = function (self) {
                 nonceArray [1] = nonce>>16 & 0xff;
                 nonceArray [0] = nonce>>24 & 0xff;
 
-                params.pass.set(nonceArray, block.length + 4);
+                params.pass.set(nonceArray, block.length);
 
                 //log(nonce)
                 //log(params.pass)

@@ -23,9 +23,11 @@ class InterfaceBlockchainAddressHelper{
         //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
         let privateKey;
 
-        let result = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKeyWIF);
-        if (result.result){
-            privateKey = result.privateKey;
+        if (privateKeyWIF !== undefined && privateKeyWIF !== null) {
+            let result = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKeyWIF);
+            if (result.result) {
+                privateKey = result.privateKey;
+            }
         }
 
         if (privateKey === undefined)
@@ -56,7 +58,7 @@ class InterfaceBlockchainAddressHelper{
         if (showDebug)
             console.log("keyWithChecksum", keyWithChecksum, typeof keyWithChecksum); //"801184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD206EC97E"
 
-        let privateKeyWIF = keyWithChecksum;
+        privateKeyWIF = keyWithChecksum;
 
         if (showDebug) {
             console.log("privateKeyWIF", privateKeyWIF.toString("hex"), "length", privateKeyWIF.length); //base58 "5Hx15HFGyep2CfPxsJKe2fXJsCVn5DEiyoeGGF6JZjGbTRnqfiD"

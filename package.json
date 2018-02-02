@@ -41,13 +41,10 @@
     "atob": "^2.0.3",
     "axios": "^0.16.2",
     "babel-plugin-module-alias": "^1.6.0",
-    "babelify": "^7.3.0",
     "big-integer": "^1.6.26",
     "bignumber.js": "^4.1.0",
     "bitcoinjs-lib": "^3.3.2",
     "blob-to-buffer": "^1.2.7",
-    "browserify": "^14.5.0",
-    "browserify-fs": "^1.0.0",
     "bs58": "^4.0.1",
     "btoa": "^1.1.2",
     "buffer": "^5.0.8",
@@ -70,7 +67,7 @@
     "socket.io-client": "^2.0.4",
     "utf-8-validate": "^3.0.4",
     "uuid": "^3.2.1",
-    "webworkify": "^1.5.0",
+    "webworkify-webpack": "^2.1.0",
     "wrtc": "0.0.62"
   },
   "devDependencies": {

@@ -1,6 +1,7 @@
 import InterfaceBlockchainMiningWorkers from "../Interface-Blockchain-Mining-Workers";
 
-const webWorkify = require ('webworkify');
+import webWorkify from 'webworkify-webpack';
+//const webWorkify = require ('webworkify');
 
 /**3
  * WEBWORKIFY DOCUMENTATION ON https://github.com/browserify/webworkify
@@ -9,7 +10,10 @@ const webWorkify = require ('webworkify');
 class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMiningWorkers{
 
     _getWorker(){
-        return webWorkify(require('./Browser-Mining-Web-Worker.js'));
+        //let code = require('./Browser-Mining-Web-Worker.js');
+        let code = require.resolve('./Browser-Mining-Web-Worker.js');
+        console.log("WORKER", code);
+        return webWorkify(code);
     }
 
 }

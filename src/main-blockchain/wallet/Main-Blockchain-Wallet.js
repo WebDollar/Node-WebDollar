@@ -44,11 +44,8 @@ class MainBlockchainWallet{
 
         let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
-        this.addresses.push(blockchainAddress);
-
-        this.emitter.emit('wallet/address-changes', blockchainAddress.address );
-
-        await this.saveAddresses();
+        if (!await this._insertAddress(blockchainAddress))
+            throw "address is not new";
 
         return blockchainAddress;
     }
@@ -57,11 +54,8 @@ class MainBlockchainWallet{
 
         let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
-        this.addresses.push(blockchainAddress);
-
-        this.emitter.emit('wallet/address-changes', blockchainAddress );
-
-        await this.saveAddresses();
+        if (!await this._insertAddress(blockchainAddress))
+            throw "address is not new";
 
         return blockchainAddress;
     }
@@ -117,7 +111,7 @@ class MainBlockchainWallet{
         }
     }
 
-    async saveAddresses() {
+    async saveWallet() {
 
         let value = await this.serialize();
 
@@ -247,7 +241,7 @@ class MainBlockchainWallet{
                     this.addresses.push(blockchainAddress);
                 }
 
-                resolve(await this.saveAddresses());
+                resolve(await this.saveWallet());
             });
 
         });
@@ -263,9 +257,25 @@ class MainBlockchainWallet{
 
         try {
 
+            //private Key object {version: "xxx", privateKey: "HEX" }
+            if (typeof privateKeyWIF === "object"){
+                if (!privateKeyWIF.hasOwnProperty("version")) throw ".version not specified";
+                if (!privateKeyWIF.hasOwnProperty("privateKey")) throw ".privateKey not specified";
+
+                if (privateKeyWIF.version === "0.1"){
+                    privateKeyWIF = privateKeyWIF.privateKey;
+                } else
+                    throw "privateKey version is not good "+privateKeyWIF.version;
+
+            }
+
+            if (typeof privateKeyWIF === "string")
+                privateKeyWIF = Buffer.from(privateKeyWIF,"hex");
+
             await blockchainAddress.createNewAddress(undefined, privateKeyWIF);
 
-            this.addresses.push(blockchainAddress);
+            if (!await this._insertAddress(blockchainAddress))
+                throw "address is not new";
 
             return {
                 result:true,
@@ -292,13 +302,69 @@ class MainBlockchainWallet{
             if (address === this.addresses[i].address || address === this.addresses[i].unencodedAddress){
                 return {
                     result:true,
-                    privateKey: (await this.addresses[i].exportAddressPrivateKeyToHex())
+
+                    data: {
+                        version: consts.WALLET_VERSION,
+                        privateKey: (await this.addresses[i].exportAddressPrivateKeyToHex())
+                    }
+
                 }
             }
 
         return {
             result:false,
             message: "Address was not found",
+        }
+
+    }
+
+    findAddress(address){
+
+        for (let i=0; i<this.addresses.length; i++)
+            if (address === this.addresses[i].address)
+                return i;
+            else
+            if (typeof address ==="object" && (this.addresses[i].address === address.address || this.addresses[i].unencodedAddress === address.unencodedAddress))
+                return i;
+
+        return -1;
+    }
+
+    async _insertAddress(blockchainAddress){
+
+        let index = this.findAddress(blockchainAddress);
+        if (index !== -1) return false;
+
+        this.addresses.push(blockchainAddress);
+        this.emitter.emit('wallet/address-changes', blockchainAddress.address );
+        await this.saveWallet();
+
+        return true;
+    }
+
+    async deleteAddress(address){
+
+
+        if (typeof address === "object") address = address.address;
+
+        let index = this.findAddress(address);
+        if (index === -1) return {result: false, message: "Address was not found ", address:address};
+
+        let ask = confirm("Are your sure you wallet to delete " + address);
+
+        if(ask){
+
+            this.addresses.splice(index, 1);
+
+            await this.saveWallet();
+            this.emitter.emit('wallet/changes', this.addresses );
+
+            return {result:true, length: this.addresses.length }
+
+        } else {
+
+            return {result: false, message: "Action cancled by user" }
+
         }
 
     }
