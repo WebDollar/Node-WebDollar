@@ -4,8 +4,8 @@ let consts = {}
 
 consts.UUID = uuid.v4();
 
-consts.NODE_VERSION = "0.22";
-consts.NODE_VERSION_COMPATIBILITY = "0.21";
+consts.NODE_VERSION = "0.23";
+consts.NODE_VERSION_COMPATIBILITY = "0.23";
 consts.WALLET_VERSION = "0.1";
 
 consts.NODE_PROTOCOL = "WebDollar";
