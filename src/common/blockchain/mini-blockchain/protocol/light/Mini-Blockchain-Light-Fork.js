@@ -52,7 +52,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
 
             console.log("preFork hashAccountantTree", this.forkPrevAccountantTree.toString("hex"));
-            console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root);
 
             if (this.blockchain.accountantTree.root.edges.length > 0)
                 console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount);
@@ -75,28 +74,28 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain._addTreeSerialization(this.forkStartingHeight-1, this.forkPrevAccountantTree, this.forkChainLength);
 
             //add dummy blocks between [beginning to where it starts]
-            while (this.blockchain.blocks.length < this.forkStartingHeight){
+            while (this.blockchain.blocks.length < this.forkStartingHeight)
                 this.blockchain.addBlock(undefined);
-            }
-
-            console.log("PREFORK!!!!!!!!!!", this.blockchain.blocks.length, this.forkStartingHeight)
 
         } else
             //it is just a simple fork
             return MiniBlockchainFork.prototype.preFork.call(this);
     }
 
-    postFork(forkedSuccessfully){
+    async postFork(forkedSuccessfully){
 
         if (forkedSuccessfully) return true;
 
         //recover to the original Accountant Tree & state
+        if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
-        this.blockchain.blocksStartingPoint = this._blocksStartingPointClone;
-        this.blockchain.lightPrevDifficultyTarget = this._lightPrevDifficultyTargetClone;
-        this.blockchain.lightPrevTimeStamp = this._lightPrevTimeStampClone;
-        this.blockchain.lightPrevHashPrev = this._lightPrevHashPrevClone;
-        this.blockchain.lightAccountantTreeSerializations[this.forkStartingHeight-1] = this._lightAccountantTreeSerializationsHeightClone;
+            this.blockchain.blocksStartingPoint = this._blocksStartingPointClone;
+            this.blockchain.lightPrevDifficultyTarget = this._lightPrevDifficultyTargetClone;
+            this.blockchain.lightPrevTimeStamp = this._lightPrevTimeStampClone;
+            this.blockchain.lightPrevHashPrev = this._lightPrevHashPrevClone;
+            this.blockchain.lightAccountantTreeSerializations[this.forkStartingHeight-1] = this._lightAccountantTreeSerializationsHeightClone;
+
+        }
 
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
     }

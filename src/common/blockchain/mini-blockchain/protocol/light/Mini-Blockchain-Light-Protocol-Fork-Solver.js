@@ -38,7 +38,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
         //download the new Accountant Tree, in case there is a new fork and I don't have anything in common
-        console.log(colors.yellow(" fork.forkChainStartingPoint "+ fork.forkChainStartingPoint + "  "+ "fork.forkStartingHeight "+ fork.forkStartingHeight + " length "+ this.fork.forkChainLength));
+        console.log(colors.yellow(" fork.forkChainStartingPoint "+ fork.forkChainStartingPoint + "  "+ "fork.forkStartingHeight "+ fork.forkStartingHeight + " length "+ fork.forkChainLength));
 
         if (fork.forkChainStartingPoint === fork.forkStartingHeight) {
 
@@ -63,8 +63,12 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevTimeStamp = answer.timeStamp;
             fork.forkPrevHashPrev = answer.hashPrev;
 
-        } else
+        } else {
             fork.forkPrevAccountantTree = null;
+            fork.forkPrevDifficultyTarget = null;
+            fork.forkPrevTimeStamp = null;
+            fork.forkPrevHashPrev = null;
+        }
 
         return inheritForkSolver.prototype.solveFork.call(this, fork);
 

@@ -170,7 +170,7 @@ class InterfaceBlockchainFork {
                         }
                 }
 
-                this.postFork(forkedSuccessfully);
+                await this.postFork(forkedSuccessfully);
 
                 //propagating valid blocks
                 if (forkedSuccessfully) {
