@@ -40,18 +40,18 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         //download the new Accountant Tree, in case there is a new fork and I don't have anything in common
         console.log(colors.yellow(" fork.forkChainStartingPoint "+ fork.forkChainStartingPoint + "  "+ "fork.forkStartingHeight "+ fork.forkStartingHeight));
 
-        if (fork.forkChainStartingPoint === fork.forkStartingHeight || fork.forkChainStartingPoint === fork.forkStartingHeight-1 ) {
+        if (fork.forkChainStartingPoint === fork.forkStartingHeight) {
 
             let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint -1 }, fork.forkChainStartingPoint -1 );
 
-            if (answer === null) throw "get-accountant-tree never received " + fork.forkChainStartingPoint - 1;
+            if (answer === null) throw "get-accountant-tree never received " + (fork.forkChainStartingPoint);
 
             fork.forkPrevAccountantTree = answer.accountantTree;
 
 
             answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkChainStartingPoint  }, fork.forkChainStartingPoint );
 
-            if (answer === null) throw "get-light-settings never received " + fork.forkChainStartingPoint - 1;
+            if (answer === null) throw "get-light-settings never received " + (fork.forkChainStartingPoint);
 
             if (answer.difficultyTarget === null ) throw "get-light-settings difficultyTarget is null";
             if (answer.timeStamp === null ) throw "get-light-settings timeStamp is null";

@@ -95,6 +95,8 @@ class InterfaceBlockchainProtocol {
 
                     console.log("get/blockchain/header/last-block length", this.blockchain.blocks.length);
                     console.log("get/blockchain/header/last-block last", this.blockchain.last === undefined);
+                    for (let i=this.blockchain.blocks.length-10; i<this.blockchain.blocks.length; i++)
+                        console.log("get/blockchain/header/last-block", i, this.blockchain.blocks[i]);
 
                     if (this.blockchain.blocks.length > 0 && this.blockchain.last !== undefined)
                         answer = {
@@ -145,6 +147,10 @@ class InterfaceBlockchainProtocol {
                     if (( data.height >= 0 && this.blockchain.getBlockchainLength() - 1 >= data.height && this.blockchain.getBlockchainLength() >= data.chainLength )) {
 
                         //in case the hashes are exactly the same, there is no reason why we should download it
+
+                        if (this.blockchain.agent.light && this.blockchain.blocksStartingPoint > data.height ){
+                            //you are ok
+                        } else
                         if (this.blockchain.blocks[data.height].hash.equals(data.header.hash) === true)
                             throw "your block is not new, because I have a valid block at same height ";
 

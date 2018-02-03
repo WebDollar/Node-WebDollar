@@ -105,12 +105,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
             this.lightPrevTimeStamp =  this.blocks[diffIndex].timeStamp;
             this.lightPrevHashPrev =  this.blocks[diffIndex].hash;
 
-            console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget)
-            console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget)
-            console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget)
-            console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget)
-            console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget)
-            console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget)
         }
 
         await this._saveLightSettings();

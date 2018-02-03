@@ -20,16 +20,18 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     async validateForkBlock(block, height){
 
-        if ( height === this.forkStartingHeight ){
+        // if ( height === this.forkStartingHeight &&  ){
+        //
+        //     if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined)
+        //         throw "forkPrevDifficultyTarget was not specified";
+        //
+        //     block.difficultyTargetPrev = this.forkPrevDifficultyTarget;
+        //
+        //     return await this.blockchain.validateBlockchainBlock(block, this.forkPrevDifficultyTarget, this.forkPrevHashPrev, this.forkPrevTimeStamp, { "skip-accountant-tree-validation": true } );
+        //
+        // } else
 
-            if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined)
-                throw "forkPrevDifficultyTarget was not specified";
 
-            block.difficultyTargetPrev = this.forkPrevDifficultyTarget;
-
-            return await this.blockchain.validateBlockchainBlock(block, this.forkPrevDifficultyTarget, this.forkPrevHashPrev, this.forkPrevTimeStamp, { "skip-accountant-tree-validation": true } );
-
-        } else
             return await MiniBlockchainFork.prototype.validateForkBlock.call(this, block, height);
 
     }
@@ -43,24 +45,30 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
                 prevDifficultyTarget : undefined,
                 prevHash : undefined,
                 prevTimeStamp : undefined,
+                blockValidationType: {},
             };
 
-        else if ( forkHeight === 0)
+        else if ( forkHeight === 0) {
 
-        // based on previous block from blockchain
+            // based on previous block from blockchain
+            if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined) throw "forkPrevDifficultyTarget was not specified";
+            if (this.forkPrevHashPrev === null || this.forkPrevHashPrev === undefined) throw "forkPrevHashPrev was not specified";
+            if (this.forkPrevTimeStamp === null || this.forkPrevTimeStamp === undefined) throw "forkPrevTimeStamp was not specified";
 
             return {
-                prevDifficultyTarget : this.forkPrevDifficultyTarget,
-                prevHash : this.forkPrevHashPrev,
-                prevTimeStamp : this.forkPrevTimeStamp,
+                prevDifficultyTarget: this.forkPrevDifficultyTarget,
+                prevHash: this.forkPrevHashPrev,
+                prevTimeStamp: this.forkPrevTimeStamp,
+                blockValidationType: {},
             };
-
+        }
         else  // just the fork
 
             return {
                 prevDifficultyTarget : this.forkBlocks[forkHeight - 1].difficultyTarget,
                 prevHash : this.forkBlocks[forkHeight - 1].hash,
                 prevTimeStamp : this.forkBlocks[forkHeight - 1].timeStamp,
+                blockValidationType: {},
             }
 
     }

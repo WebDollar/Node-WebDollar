@@ -5,11 +5,11 @@ class BlockchainGenesis{
 
     constructor(){
 
-        this.hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex")
+        this.hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fc", "hex")
 
         this.timeStamp = 1517598169;
 
-        this.difficultyTarget = new Buffer ( "22878112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ); //hard difficulty
+        this.difficultyTarget = new Buffer ( "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ); //hard difficulty
         //this.difficultyTarget = new Buffer ( "00178112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ); //hard difficulty
         //this.difficultyTarget = new Buffer ( [0xff, 0xff, 0xff] ); // easy difficulty
 

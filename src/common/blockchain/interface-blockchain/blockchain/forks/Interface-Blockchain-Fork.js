@@ -51,7 +51,7 @@ class InterfaceBlockchainFork {
     /**
      * It Will only validate the hashes of the Fork Blocks
      */
-    async validateForkBlock(block, height){
+    async validateForkBlock(block, height, blockValidationType){
 
         //calcuate the forkHeight
         let forkHeight = block.height - this.forkStartingHeight;
@@ -61,13 +61,14 @@ class InterfaceBlockchainFork {
 
         let prevData = this._getForkPrevsData(height, forkHeight);
 
+        if (blockValidationType === undefined)
+            blockValidationType = prevData.blockValidationType;
+
         block.difficultyTargetPrev = prevData.prevDifficultyTarget;
 
-        let result = await this.blockchain.validateBlockchainBlock(block, prevData.prevDifficultyTarget, prevData.prevHash, prevData.prevTimeStamp, {"skip-accountant-tree-validation": true} );
+        return await this.blockchain.validateBlockchainBlock(block, prevData.prevDifficultyTarget, prevData.prevHash, prevData.prevTimeStamp, blockValidationType );
 
         //recalculate next target difficulty automatically
-
-        return result;
 
     }
 
@@ -81,6 +82,7 @@ class InterfaceBlockchainFork {
                 prevDifficultyTarget : undefined,
                 prevHash : undefined,
                 prevTimeStamp : undefined,
+                blockValidationType: {},
             };
 
         else if ( forkHeight === 0)
@@ -91,6 +93,7 @@ class InterfaceBlockchainFork {
                 prevDifficultyTarget : this.blockchain.blocks[height-1].difficultyTarget,
                 prevHash : this.blockchain.blocks[height-1].hash,
                 prevTimeStamp : this.blockchain.blocks[height-1].timeStamp,
+                blockValidationType:  {},
             };
 
         else  // just the fork
@@ -99,6 +102,7 @@ class InterfaceBlockchainFork {
                 prevDifficultyTarget : this.forkBlocks[forkHeight - 1].difficultyTarget,
                 prevHash : this.forkBlocks[forkHeight - 1].hash,
                 prevTimeStamp : this.forkBlocks[forkHeight - 1].timeStamp,
+                blockValidationType: {},
             }
 
     }
@@ -154,7 +158,7 @@ class InterfaceBlockchainFork {
                         break;
                     }
 
-                //revert
+                //revert the last K blocks
                 if (!forkedSuccessfully) {
                     this.blockchain.blocks.splice(this.forkStartingHeight);
                     for (let i = 0; i < this._blocksCopy.length; i++)
