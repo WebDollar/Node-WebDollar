@@ -69,7 +69,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
                 console.log(colors.yellow("difficultyTarget data"), difficultyTarget.toString("hex"), hashPrev.toString("hex"));
                 console.log(colors.yellow("difficultyTarget data"), difficultyTarget.toString("hex"), hashPrev.toString("hex"));
 
-                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + (data.height || -1), {
+                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
                     result: difficultyTarget !== null ? true : false,
                     difficultyTarget: difficultyTarget,
                     timeStamp: timestamp,
@@ -81,7 +81,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
                 console.log(colors.red("Socket Error - get/blockchain/light/get-light-settings"), exception, data);
 
-                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + (data.height || -1), {
+                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
                     result: false,
                     message: exception.toString()
                 });

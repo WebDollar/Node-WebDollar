@@ -18,22 +18,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         this._lightAccountantTreeSerializationsHeightClone = null;
     }
 
-    async validateForkBlock(block, height){
-
-        // if ( height === this.forkStartingHeight &&  ){
-        //
-        //     if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined)
-        //         throw "forkPrevDifficultyTarget was not specified";
-        //
-        //     block.difficultyTargetPrev = this.forkPrevDifficultyTarget;
-        //
-        //     return await this.blockchain.validateBlockchainBlock(block, this.forkPrevDifficultyTarget, this.forkPrevHashPrev, this.forkPrevTimeStamp, { "skip-accountant-tree-validation": true } );
-        //
-        // } else
-
-
-            return await MiniBlockchainFork.prototype.validateForkBlock.call(this, block, height);
-
+    async validateForkBlock(block, height, blockValidationType){
+        return await MiniBlockchainFork.prototype.validateForkBlock.call(this, block, height, blockValidationType||{});
     }
 
     _getForkPrevsData(height, forkHeight){
@@ -48,7 +34,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
                 blockValidationType: {},
             };
 
-        else if ( forkHeight === 0) {
+        else if ( forkHeight === 0 && this.forkChainStartingPoint === this.forkStartingHeight ) {
 
             // based on previous block from blockchain
             if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined) throw "forkPrevDifficultyTarget was not specified";
