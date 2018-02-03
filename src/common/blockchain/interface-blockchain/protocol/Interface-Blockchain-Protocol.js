@@ -94,7 +94,7 @@ class InterfaceBlockchainProtocol {
                     let answer = {};
 
                     console.log("get/blockchain/header/last-block length", this.blockchain.blocks.length);
-                    console.log("get/blockchain/header/last-block last", this.blockchain.last);
+                    console.log("get/blockchain/header/last-block last", this.blockchain.last === undefined);
 
                     if (this.blockchain.blocks.length > 0 && this.blockchain.last !== undefined)
                         answer = {

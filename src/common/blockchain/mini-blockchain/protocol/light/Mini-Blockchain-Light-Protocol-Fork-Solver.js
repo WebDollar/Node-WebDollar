@@ -38,11 +38,11 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
         //download the new Accountant Tree, in case there is a new fork and I don't have anything in common
-        console.log(colors.yellow("fork.forkStartingHeight "+ fork.forkStartingHeight+ "fork.forkChainStartingPoint "+ fork.forkChainStartingPoint));
+        console.log(colors.yellow(" fork.forkChainStartingPoint "+ fork.forkChainStartingPoint + "  "+ "fork.forkStartingHeight "+ fork.forkStartingHeight));
 
         if (fork.forkChainStartingPoint === fork.forkStartingHeight || fork.forkChainStartingPoint === fork.forkStartingHeight-1 ) {
 
-            let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint -1 }, fork.forkChainStartingPoint -1 );
+            let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint }, fork.forkChainStartingPoint );
 
             if (answer === null) throw "get-accountant-tree never received " + fork.forkChainStartingPoint - 1;
 
