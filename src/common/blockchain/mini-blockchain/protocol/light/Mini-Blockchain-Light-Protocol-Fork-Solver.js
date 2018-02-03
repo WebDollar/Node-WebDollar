@@ -28,7 +28,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
         } else
 
-            return await this._discoverForkBinarySearch(socket, newChainStartingPoint, currentBlockchainLength - 1);
+            return await inheritForkSolver._calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength);
 
 
     }

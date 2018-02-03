@@ -20,17 +20,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     _getForkPrevsData(height, forkHeight){
 
-        // transition from blockchain to fork
-        if (height === 0)
-            // based on genesis block
-            return {
-                prevDifficultyTarget : undefined,
-                prevHash : undefined,
-                prevTimeStamp : undefined,
-                blockValidationType: {},
-            };
-
-        else if ( forkHeight === 0 && this.forkChainStartingPoint === this.forkStartingHeight ) {
+        if ( forkHeight === 0 && this.forkChainStartingPoint === this.forkStartingHeight ) {
 
             // based on previous block from blockchain
             if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined) throw "forkPrevDifficultyTarget was not specified";
@@ -43,15 +33,11 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
                 prevTimeStamp: this.forkPrevTimeStamp,
                 blockValidationType: {},
             };
-        }
-        else  // just the fork
 
-            return {
-                prevDifficultyTarget : this.forkBlocks[forkHeight - 1].difficultyTarget,
-                prevHash : this.forkBlocks[forkHeight - 1].hash,
-                prevTimeStamp : this.forkBlocks[forkHeight - 1].timeStamp,
-                blockValidationType: {},
-            }
+        }
+
+        // transition from blockchain to fork
+        return MiniBlockchainFork.prototype._getForkPrevsData.call(this, height, forkHeight);
 
     }
 
@@ -92,6 +78,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             while (this.blockchain.blocks.length < this.forkStartingHeight){
                 this.blockchain.addBlock(undefined);
             }
+
+            console.log("PREFORK!!!!!!!!!!", this.blockchain.blocks.length, this.forkStartingHeight)
 
         } else
             //it is just a simple fork

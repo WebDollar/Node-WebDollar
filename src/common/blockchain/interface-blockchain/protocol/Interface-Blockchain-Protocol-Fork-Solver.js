@@ -59,8 +59,13 @@ class InterfaceBlockchainProtocolForkSolver{
 
         if (newChainStartingPoint > currentBlockchainLength-1 || currentBlockchainLength === 0)
             return {position: -1, header: null};
-        else
-            return await this._discoverForkBinarySearch(socket, newChainStartingPoint, currentBlockchainLength - 1);
+        else {
+            let binarySearchResult = await this._discoverForkBinarySearch(socket, newChainStartingPoint, currentBlockchainLength - 1);
+            //forcing the binary search for download the next unmatching element
+            if (binarySearchResult.position !== -1)
+                binarySearchResult.position++;
+            return binarySearchResult;
+        }
 
     }
 
@@ -145,7 +150,7 @@ class InterfaceBlockchainProtocolForkSolver{
             //its a fork... starting from position
             console.log("fork position", binarySearchResult.position, "newChainStartingPoint", newChainStartingPoint, "newChainLength", newChainLength);
 
-            if (binarySearchResult.position === 0 || (binarySearchResult.position > 0 && binarySearchResult.header !== undefined && binarySearchResult.header !== null) ){
+            if (binarySearchResult.position === -1 || (binarySearchResult.position > 0 && binarySearchResult.header !== undefined && binarySearchResult.header !== null) ){
 
                 try {
 
