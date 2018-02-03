@@ -32,7 +32,7 @@ class InterfaceBlockchainFork {
 
         for (let i=0; i<this.forkBlocks.length; i++){
 
-            if (! await this.validateForkBlock(this.forkBlocks[i], this.forkStartingHeight + i, i )) return false;
+            if (! await this.validateForkBlock( this.forkBlocks[i], this.forkStartingHeight + i )) return false;
 
         }
 
