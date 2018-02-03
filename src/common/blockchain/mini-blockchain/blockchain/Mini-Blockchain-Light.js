@@ -150,9 +150,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
             }
         }
 
-        console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget)
+        console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget.toString("hex"))
         console.log("this.lightPrevTimestamp", this.lightPrevTimeStamp)
-        console.log("this.lightPrevHashPrev", this.lightPrevHashPrev)
+        console.log("this.lightPrevHashPrev", this.lightPrevHashPrev.toString("hex"))
 
         this._addTreeSerialization( numBlocks - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial, numBlocks);
 
@@ -284,13 +284,13 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (height === undefined ) height = this.blocks.length;
 
-        console.log(colors.yellow("difficultyTarget"), height, this.blocksStartingPoint , this.blocks.length);
+        console.log(colors.yellow("difficultyTarget"), height, this.blocksStartingPoint , this.blocks.length, this.lightPrevDifficultyTarget.toString("hex"));
 
         if (this.agent.light === true && height !== 0) {
 
             if (height === this.blocksStartingPoint  ) return this.lightPrevDifficultyTarget;
             else
-            if (height < this.blocksStartingPoint  ) throw "Can not access this DifficultyTarget in Light Node "+height+"  < "+(this.blocksStartingPoint-1);
+            if (height < this.blocksStartingPoint  ) throw "Can not access this DifficultyTarget in Light Node "+height+"  < "+this.blocksStartingPoint;
         }
 
         return MiniBlockchain.prototype.getDifficultyTarget.call(this, height);
@@ -313,6 +313,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     getHashPrev(height){
         if (height === undefined) height = this.blocks.length;
+
+        console.log(colors.yellow("getTimeStamp"), height, this.blocksStartingPoint, this.lightPrevHashPrev.toString("hex"))
 
         if (this.agent.light === true && height !== 0) {
 
