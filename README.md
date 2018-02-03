@@ -9,6 +9,8 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 ## 0. Node.js
 
+**Required: v8.x**
+
 Windows: just download and install from URL: https://nodejs.org/en/download/
 
 Linux: tutorial how to install Node.js using NVM (recommended) [Install Node.js using NVM](/docs/InstallDebian.md) 
@@ -54,6 +56,10 @@ npm install -g node-gyp
 ```
 
 `gcc --version` will help you to find the Version. It worked on gcc 5 and gcc 6
+
+Replace `g++-5` with your version
+Verify if you can access `g++-5` or whatever version you have.
+then install  
 ``` 
 env CXX=g++-5 npm install
 env CXX=g++-5 npm install argon2

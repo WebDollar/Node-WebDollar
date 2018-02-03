@@ -18,10 +18,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         this._lightAccountantTreeSerializationsHeightClone = null;
     }
 
-    async validateForkBlock(block, height, blockValidationType){
-        return await MiniBlockchainFork.prototype.validateForkBlock.call(this, block, height, blockValidationType||{});
-    }
-
     _getForkPrevsData(height, forkHeight){
 
         // transition from blockchain to fork
@@ -71,8 +67,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             console.log("preFork hashAccountantTree", this.forkPrevAccountantTree.toString("hex"));
             console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root);
+
             if (this.blockchain.accountantTree.root.edges.length > 0)
                 console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount);
+
             console.log("this.forkPrevDifficultyTarget", this.forkPrevDifficultyTarget);
             console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp);
             console.log("this.forkPrevHashPrev", this.forkPrevHashPrev);

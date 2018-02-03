@@ -18,9 +18,7 @@ class MiniBlockchainFork extends inheritFork{
     }
 
     async validateForkBlock(block, height, blockValidationType){
-
-        return await inheritFork.prototype.validateForkBlock.call(this, block, height, blockValidationType||{"skip-accountant-tree-validation": true} );
-
+        return await inheritFork.prototype.validateForkBlock.call(this, block, height, blockValidationType || {"skip-accountant-tree-validation": true} );
     }
 
     preFork(){
