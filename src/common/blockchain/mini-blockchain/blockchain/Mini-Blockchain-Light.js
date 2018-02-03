@@ -159,7 +159,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log("this.lightPrevTimestamp", this.lightPrevTimeStamp)
         console.log("this.lightPrevHashPrev", this.lightPrevHashPrev)
 
-        this._addTreeSerialization(undefined, serializationAccountantTreeInitial, numBlocks);
+        this._addTreeSerialization( numBlocks - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2, serializationAccountantTreeInitial, numBlocks);
 
         if (this.accountantTree.root.edges.length > 0) {
             console.log("balances", this.accountantTree.root.edges[0].targetNode.balances)

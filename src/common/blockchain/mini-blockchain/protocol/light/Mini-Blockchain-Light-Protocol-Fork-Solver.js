@@ -42,7 +42,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
         if (fork.forkChainStartingPoint === fork.forkStartingHeight || fork.forkChainStartingPoint === fork.forkStartingHeight-1 ) {
 
-            let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint }, fork.forkChainStartingPoint );
+            let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint -1 }, fork.forkChainStartingPoint -1 );
 
             if (answer === null) throw "get-accountant-tree never received " + fork.forkChainStartingPoint - 1;
 
