@@ -1,8 +1,9 @@
 import NodesList from 'node/lists/nodes-list';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
-import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
+// import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
 const BigNumber = require('bignumber.js');
+var BigInteger = require('big-integer');
 
 class PoolLeaderProtocol {
 
@@ -20,7 +21,7 @@ class PoolLeaderProtocol {
         else
             this.db = dataBase;
 
-        this.blockchainReward = BlockchainMiningReward.getReward();
+        // this.blockchainReward = BlockchainMiningReward.getReward();
         this.hashTarget = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"); //target difficulty;
 
     }
@@ -62,24 +63,6 @@ class PoolLeaderProtocol {
     createMinerTask() {
 
         //To create minner task puzzle
-
-    }
-
-    getHigherHashDifficulty(hashList) {
-
-        let higherHash = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"); //target difficulty;
-
-        for (let i = 0; i < hashList.length; ++i) {
-
-            if (hashList[i].compare(higherHash) <= 0) {
-
-                higherHash = hashList[i];
-
-            }
-
-        }
-
-        return higherHash;
 
     }
 
@@ -134,6 +117,7 @@ class PoolLeaderProtocol {
     //          hashList.address (minner identifier address)
     //          hashList.hash (minner best hash)
     //          hashList.reward (will be filled by this function)
+    //          hashList.difficulty (difficulty of hash)
     //
     //  Return:
     //  - hashList
@@ -143,37 +127,35 @@ class PoolLeaderProtocol {
         // Convert to bignumber
         reward = new BigNumber(reward);
 
-        let poolLeaderReward = new BigNumber(reward.dividedBy(100)).multiply(poolLeaderCommission);
+        let poolLeaderReward = new BigNumber(reward).dividedBy(100).mul(poolLeaderCommission);
+
         let minnersReward =  new BigNumber(reward).minus(poolLeaderReward);
 
         // Create hash difficulties list from all minners best hasses
-        let hashDifficultiesList = this.generateHashDificulties(this.hashTarget,hashList);
+        hashList = this.generateHashDificulties(this.hashTarget,hashList);
 
         // Calculate total of Difficulties list
         let totalDifficulties =  new BigNumber(0);
-        for (let i=0; i<hashDifficultiesList.length; i++){
+        for (let i=0; i<hashList.length; i++){
 
-            totalDifficulties = totalDifficulties.plus(hashDifficultiesList[i]);
+            totalDifficulties = totalDifficulties.plus(hashList[i].difficulty);
 
         }
 
         // Add to hashList rewards for each minner
-        for (let i=0; i<hashDifficultiesList.length; i++){
+        for (let i=0; i<hashList.length; i++){
 
-            let currentDifficultyPercent = Math.floor((hashDifficultiesList[i] / totalDifficulties) * 100);
-            currentDifficultyPercent = currentDifficultyPercent.multiply(100);
+            let currentDifficultyPercent = new BigNumber (hashList[i].difficulty).dividedBy(totalDifficulties).mul(100);
 
-            let currentMinerReward = new BigNumber(currentDifficultyPercent).dividedBy(100);
-            currentMinerReward = currentMinerReward.multiply(minnersReward);
-            hashList[i].reward = currentMinerReward;
+            let currentMinerReward = new BigNumber(currentDifficultyPercent).dividedBy(100).mul(minnersReward);
 
-            minnersReward = minnersReward.minus(currentMinerReward);
+            hashList[i].reward = currentMinerReward.toString();
 
         }
 
         return {
-            poolLeader: poolLeaderReward,
-            minners: hashList
+            poolLeaderReward: poolLeaderReward,
+            minnersReward: hashList
         }
 
     }
@@ -192,4 +174,4 @@ class PoolLeaderProtocol {
 
 }
 
-export default new PoolLeaderProtocol();
+export default PoolLeaderProtocol;
