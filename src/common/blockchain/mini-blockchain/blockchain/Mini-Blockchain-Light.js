@@ -64,10 +64,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
             }
             this._addTreeSerialization(block.height);
 
-            // console.log("BLOCK ", block.serializeBlock().toString("hex"));
-            // console.log(" difficulty", block.difficultyTarget.toString("hex"));
-            // console.log(" prev difficulty ", block.difficultyTargetPrev.toString("hex"));
-            // console.log(" prev hash ", block.hashPrev.toString("hex"));
 
         } else {
 
@@ -77,8 +73,13 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         }
 
+        console.log("BLOCK ", block.serializeBlock().toString("hex"));
+        console.log(" hash", block.hash.toString("hex"));
+        console.log(" difficulty", block.difficultyTarget.toString("hex"));
+        console.log(" prev difficulty ", block.difficultyTargetPrev.toString("hex"));
+        console.log(" prev hash ", block.hashPrev.toString("hex"));
+
         console.log("blockchain tree serialization", this.accountantTree.root.hash.sha256.toString("hex"));
-        console.log("blockchain hash prev ", block.hashPrev.toString("hex") );
         console.log("blockchain tree value", this.accountantTree.root.edges[0].targetNode.balances);
 
         return result;
