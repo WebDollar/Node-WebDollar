@@ -95,7 +95,7 @@ class InterfaceBlockchainAddressHelper{
         let validation = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKeyWIF);
 
         if (showDebug)
-            console.log("VALIDATIOn", validation);
+            console.log("VALIDATION", validation);
 
         if (validation.result === false){
             return validation;

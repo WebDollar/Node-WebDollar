@@ -79,6 +79,16 @@ class InterfaceBlockchainAddress{
     }
 
     /**
+     * @returns true if privateKey is encrypted
+     */
+    async isPrivateKeyEncrypted() {
+
+        let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(await this.getPrivateKey());
+
+        return !generatedPublicKey.equals(this.publicKey);
+    }
+
+    /**
      * Save privateKey encrypted to local database
      * @param value privateKey's value
      * @param password Encrypt privateKey with AES using password

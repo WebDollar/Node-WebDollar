@@ -3,6 +3,7 @@ import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 let assert = require('assert');
 
 import MultiSig from 'common/blockchain/interface-blockchain/addresses/MultiSig';
+import Blockchain from 'main-blockchain/Blockchain';
 
 describe('test save wallet to local storage', () => {
 
@@ -28,6 +29,14 @@ describe('test save wallet to local storage', () => {
         encrypt = MultiSig.getMultiAESEncrypt(buffer, ["ana are mere rosii"]);
         decrypt = MultiSig.getMultiAESDecrypt(encrypt, ["anaaremererosii"]);
         assert(decrypt === null || !decrypt.equals(buffer), "Buffer should differ after multiAESDecrypt");
+    });
+
+    it('test check function isPrivateKeyEncrypted', async () => {
+
+        let addressBlockchain = await Blockchain.Wallet.createNewAddress();
+        let response = await addressBlockchain.isPrivateKeyEncrypted();
+
+        assert(response === false, "isPrivateKeyEncrypted doesn't work");
     });
 
 });
