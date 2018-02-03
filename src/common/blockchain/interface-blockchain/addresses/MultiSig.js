@@ -158,6 +158,44 @@ class MultiSig {
         return o;*/
     }
 
+    /**
+     *
+     * @param buffer is the data to be encrypted
+     * @param passwordsArray is the array with password for encrypt
+     * @returns multiAES encryption of buffer
+     */
+    static getMultiAESEncrypt(buffer, passwordsArray) {
+
+        let multiEncrypt = buffer;
+
+        for (let i = 0; i < passwordsArray.length; ++i) {
+            multiEncrypt = WebDollarCrypto.encryptAES(multiEncrypt, passwordsArray[i]);
+            if (multiEncrypt === null)
+                return null;
+        }
+
+        return multiEncrypt;
+    }
+
+    /**
+     *
+     * @param buffer is the data to be decrypted
+     * @param passwordsArray is the array with password for decrypt
+     * @returns multiAES decryption of buffer
+     */
+    static getMultiAESDecrypt(buffer, passwordsArray) {
+
+        let multiDecrypt = buffer;
+
+        for (let i = 0; i < passwordsArray.length; ++i) {
+            multiDecrypt = WebDollarCrypto.decryptAES(multiDecrypt, passwordsArray[i]);
+            if (multiDecrypt === null)
+                return null;
+        }
+
+        return multiDecrypt;
+    }
+
 }
 
 export default MultiSig;

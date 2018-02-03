@@ -1,4 +1,4 @@
-import WebDollarCrypto from "../../common/crypto/WebDollar-Crypto";
+import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 
 let assert = require('assert');
 let FileSystem = require('fs');
@@ -234,12 +234,12 @@ describe('test save wallet to local storage', () => {
 
     });
 
-    it('test check multiSig public/private Keys', async () => {
+    /*it('test check multiSig public/private Keys', async () => {
 
         let pair = MultiSig.makeMultisigAddress(['datanastere1','val','pllui']);
 
         console.log("pair", pair.address);
-    });
+    });*/
 
 
 
