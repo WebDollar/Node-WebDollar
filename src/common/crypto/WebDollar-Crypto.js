@@ -88,7 +88,6 @@ class WebDollarCrypto {
         return result;
     }
 
-
     static isHex(h) {
         let a = parseInt(h, 16);
         
@@ -105,18 +104,28 @@ class WebDollarCrypto {
     
     static encryptAES(buffer, password){
 
-        let cipher = crypto.createCipher('aes-256-cbc', password);
-        let crypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
-        
-        return crypted;
+        try {
+            let cipher = crypto.createCipher('aes-256-cbc', password);
+            let crypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
+
+            return crypted;
+        }
+        catch (exception) {
+            return null;
+        }
     }
     
     static decryptAES(buffer, password) {
 
-        let decipher = crypto.createDecipher('aes-256-cbc', password);
-        let decrypt = Buffer.concat([decipher.update(buffer), decipher.final()]);
-        
-        return decrypt;
+        try {
+            let decipher = crypto.createDecipher('aes-256-cbc', password);
+            let decrypt = Buffer.concat([decipher.update(buffer), decipher.final()]);
+
+            return decrypt;
+        }
+        catch(exception){
+            return null;
+        }
     }
 
     static RIPEMD160(bytes){
