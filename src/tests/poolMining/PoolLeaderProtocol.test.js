@@ -35,7 +35,7 @@ describe('test pool leader protocol', () => {
 
         let respose = miner.generateHashDificulties(targetHash,hashList);
 
-        assert(respose[0].difficulty>respose[1].difficulty>respose[2].difficulty,"Correct");
+        assert(respose[0].difficulty<respose[1].difficulty<respose[2].difficulty,"Correct hash difficulties");
 
     });
 

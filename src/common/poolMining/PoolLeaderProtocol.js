@@ -99,7 +99,7 @@ class PoolLeaderProtocol {
 
             let currentHash = new BigInteger(hashList[i].hash.toString('hex'), 16);
 
-            hashList[i].difficulty = new BigNumber(currentHash).dividedBy(hashTargetNumber);
+            hashList[i].difficulty = new BigNumber(hashTargetNumber).dividedBy(currentHash);
 
         }
 
