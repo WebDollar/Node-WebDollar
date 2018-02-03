@@ -32,7 +32,7 @@ class InterfaceBlockchainFork {
 
         for (let i=0; i<this.forkBlocks.length; i++){
 
-            if (! await this.validateForkBlock(this.forkBlocks[i], this.forkStartingHeight + i, i )) return false;
+            if (! await this.validateForkBlock( this.forkBlocks[i], this.forkStartingHeight + i )) return false;
 
         }
 
@@ -135,6 +135,7 @@ class InterfaceBlockchainFork {
 
             return await this.blockchain.processBlocksSempahoreCallback( async () => {
 
+                //making a copy of the current blockchain
                 this._blocksCopy = [];
                 for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength(); i++)
                     this._blocksCopy.push(this.blockchain.blocks[i]);
@@ -149,7 +150,6 @@ class InterfaceBlockchainFork {
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-
 
                 for (let i = 0; i < this.forkBlocks.length; i++)
                     if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length - 1), "all", false, {})) {
@@ -170,7 +170,7 @@ class InterfaceBlockchainFork {
                         }
                 }
 
-                this.postFork(forkedSuccessfully);
+                await this.postFork(forkedSuccessfully);
 
                 //propagating valid blocks
                 if (forkedSuccessfully) {

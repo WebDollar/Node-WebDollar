@@ -54,7 +54,7 @@ class InterfaceBlockchainAddress{
      */
     encrypt(data, password) {
 
-        if (typeof password === 'undefined')
+        if (password === undefined)
             password = this.password;
 
         let encr = WebDollarCrypto.encryptAES(data, password);
@@ -70,7 +70,7 @@ class InterfaceBlockchainAddress{
      */
     decrypt(data, password) {
 
-        if (typeof password === 'undefined')
+        if (password === undefined)
             password = this.password;
 
         let decr = WebDollarCrypto.decryptAES(data, password);

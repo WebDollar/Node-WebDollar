@@ -101,7 +101,6 @@ class NodeProtocol {
             }
 
             if (broadcast) {
-                console.log( "nodes.length", nodes.length );
                 nodes[i].socket.node.sendRequest(request, data);
             }
         }

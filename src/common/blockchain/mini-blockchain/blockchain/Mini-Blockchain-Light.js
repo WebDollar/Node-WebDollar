@@ -62,7 +62,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 // propagating a new block in the network
                 this.propagateBlocks(block.height, socketsAvoidBroadcast)
             }
-
             this._addTreeSerialization(block.height);
 
             // console.log("BLOCK ", block.serializeBlock().toString("hex"));
@@ -166,6 +165,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
     async save(){
 
         try {
+
             console.log("saaaave", this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS -2);
 
             if (this.blocks.length === 0) return false;
@@ -272,8 +272,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         // updating the blocksStartingPoint
         if (this.agent.light === true) {
             this.blocksStartingPoint = blocksLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS-1;
-            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
-            console.log("this.blocksStartingPoint",this.blocksStartingPoint);
+            //console.log("this.blocksStartingPoint",this.blocksStartingPoint);
         }
 
     }
