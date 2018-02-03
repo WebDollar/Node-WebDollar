@@ -115,6 +115,10 @@ class MiniBlockchainLight extends  MiniBlockchain{
     async _saveLightSettings(){
         console.log("_LightPrevDifficultyTarget saved" );
 
+        console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTarget.toString("hex"))
+        console.log("this.lightPrevTimestamp", this.lightPrevTimeStamp)
+        console.log("this.lightPrevHashPrev", this.lightPrevHashPrev.toString("hex"))
+
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTarget) ) throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevTimestamp", this.lightPrevTimeStamp) ) throw "Couldn't be saved _LightSettings_prevTimestamp ";
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevHashPrev", this.lightPrevHashPrev) ) throw "Couldn't be saved _LightSettings_prevHashPrev ";
@@ -312,9 +316,10 @@ class MiniBlockchainLight extends  MiniBlockchain{
     }
 
     getHashPrev(height){
+
         if (height === undefined) height = this.blocks.length;
 
-        console.log(colors.yellow("getTimeStamp"), height, this.blocksStartingPoint, this.lightPrevHashPrev.toString("hex"))
+        console.log(colors.yellow("getHashPrev"), height, this.blocksStartingPoint, this.lightPrevHashPrev.toString("hex"))
 
         if (this.agent.light === true && height !== 0) {
 
