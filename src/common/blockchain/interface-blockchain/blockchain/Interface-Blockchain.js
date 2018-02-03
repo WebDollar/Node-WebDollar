@@ -95,7 +95,7 @@ class InterfaceBlockchain {
         //let's check again the heights
         if (block.height !== this.blocks.length) throw ('height of a new block is not good... '+ block.height + " "+ this.blocks.length);
 
-        this.blocks.push(block);
+        this.addBlock(block);
 
         // if (block.height > 0)
         //     console.log("prevBlock", this.blocks[block.height-1]);
@@ -304,7 +304,7 @@ class InterfaceBlockchain {
                 indexStart = Math.max(0, numBlocks - validateLastBlocks-1);
 
                 for (let i=0; i<indexStart; i++)
-                    this.blocks.push(undefined);
+                    this.addBlock(undefined);
 
             }
 
@@ -354,7 +354,7 @@ class InterfaceBlockchain {
             }
         }
 
-        this.blocks.splice(index);
+        this.spliceBlocks(index);
 
         return true;
     }
@@ -377,6 +377,19 @@ class InterfaceBlockchain {
             for (let i=height; i<this.blocks.length; i++)
                 this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
         }
+    }
+
+    addBlock(block){
+
+        this.blocks.push(block);
+
+        this.emitter.emit("blockchain/blocks-count-changed", this.blocks.length);
+        this.emitter.emit("blockchain/block-inserted", block);
+    }
+
+    spliceBlocks(a,b){
+        this.blocks.splice(a,b);
+        this.emitter.emit("blockchain/blocks-count-changed", this.blocks.length);
     }
 
 }

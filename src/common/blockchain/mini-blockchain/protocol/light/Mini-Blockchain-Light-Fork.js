@@ -105,7 +105,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             //add dummy blocks between [beginning to where it starts]
             while (this.blockchain.blocks.length < this.forkStartingHeight){
-                this.blockchain.blocks.push(undefined);
+                this.blockchain.addBlock(undefined);
             }
 
         } else
