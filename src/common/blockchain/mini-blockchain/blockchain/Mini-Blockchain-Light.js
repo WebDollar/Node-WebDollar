@@ -186,11 +186,10 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         }
 
-        this.blocksStartingPoint = diffIndex;
+        if (this.agent.light === true)
+            this.blocksStartingPoint = diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS ;
 
-
-
-        console.log("diffIndex", diffIndex)
+        console.log("diffIndex", diffIndex);
         console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '')
         console.log("", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '')
         console.log("this.lightPrevTimestamp", this.lightPrevTimeStamps[diffIndex])

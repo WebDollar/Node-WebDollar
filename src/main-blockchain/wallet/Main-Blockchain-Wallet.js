@@ -368,7 +368,8 @@ class MainBlockchainWallet{
 
     isAddressEncrypted(address){
         address = this.getAddress(address);
-        return address.isPrivateKeyEncrypted(address);
+        if (address === null) return {result: false, message:"no address found"};
+        return {result: address.isPrivateKeyEncrypted(address) };
     }
 
     /**
@@ -379,7 +380,7 @@ class MainBlockchainWallet{
     getAddress(address){
         let index = this.getAddressIndex(address);
         if (index === -1) return null;
-        else return this.addresses[address];
+        else return this.addresses[index];
     }
 
     getAddressIndex(address){
