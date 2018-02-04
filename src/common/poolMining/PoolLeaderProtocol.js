@@ -1,5 +1,5 @@
 import NodesList from 'node/lists/nodes-list';
-import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
+import SaveRewardsInDB from 'common/poolMining/SaveRewardsInDB.js';
 // import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
 const BigNumber = require('bignumber.js');
@@ -16,13 +16,10 @@ class PoolLeaderProtocol {
             this._unsubscribeMiner(result)
         });
 
-        if (dataBase === undefined)
-            this.db = new InterfaceSatoshminDB();
-        else
-            this.db = dataBase;
-
         // this.blockchainReward = BlockchainMiningReward.getReward();
         this.hashTarget = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"); //target difficulty;
+
+        this.dataBase = new SaveRewardsInDB();
 
     }
 
@@ -99,7 +96,7 @@ class PoolLeaderProtocol {
 
             let currentHash = new BigInteger(hashList[i].hash.toString('hex'), 16);
 
-            hashList[i].difficulty = new BigNumber(hashTargetNumber).dividedBy(currentHash);
+            hashList[i].difficulty = new BigNumber(hashTargetNumber).dividedBy(currentHash).toString();
 
         }
 
@@ -160,15 +157,13 @@ class PoolLeaderProtocol {
 
     }
 
-    async saveMinersRewards(address,minnerReward){
+    getRewardFromBlockchain(reward){
 
-        try{
-            return (await this.db.save(address, minnerReward));
-        }
-        catch (exception){
-            console.log(colors.red('ERROR saving miner reward in BD: '),  exception);
-            throw exception;
-        }
+        let newRewardDistribution = this.rewardsDistribution(reward,poolLeaderCommission,hashList);
+
+        this.dataBase.updateMinersReward(newRewardDistribution.minnersReward);
+
+        //To add pool leader reward
 
     }
 
