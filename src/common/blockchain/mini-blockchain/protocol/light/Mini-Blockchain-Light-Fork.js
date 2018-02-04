@@ -1,3 +1,4 @@
+import consts from 'consts/const_global'
 import MiniBlockchainFork from "./../Mini-Blockchain-Fork"
 
 class MiniBlockchainLightFork extends MiniBlockchainFork {
@@ -84,7 +85,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     async postFork(forkedSuccessfully){
 
-        if (forkedSuccessfully) return true;
+        if (forkedSuccessfully) {
+            if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
+            return;
+        }
 
         //recover to the original Accountant Tree & state
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
@@ -95,6 +99,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrev = this._lightPrevHashPrevClone;
             this.blockchain.lightAccountantTreeSerializations[this.forkStartingHeight-1] = this._lightAccountantTreeSerializationsHeightClone;
 
+            if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
         }
 
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);

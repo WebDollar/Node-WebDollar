@@ -1,3 +1,4 @@
+const colors = require('colors/safe');
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
@@ -172,6 +173,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             return result !== false;
 
         } catch (exception){
+            console.log( colors.red("loadMiniAccountant error"), exception )
             return false;
         }
 

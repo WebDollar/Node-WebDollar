@@ -71,7 +71,11 @@ class InterfaceBlockchainMining{
             //mining next blocks
 
             // LIMIT mining first 21 blocks
-            // if (this.blockchain.blocks.length === 27)
+            // if (this.blockchain.blocks.length === 22) {
+            //     setTimeout( async ()=>{await this.mineNextBlock(showMiningOutput)}, 10000);
+            //     return;
+            // }
+            // if (this.blockchain.blocks.length === 23)
             //     return;
 
             let nextBlock, nextTransactions;
@@ -87,7 +91,7 @@ class InterfaceBlockchainMining{
 
 
             } catch (Exception){
-                console.log(colors.red("Error creating next block "+Exception.toString()), Exception, nextBlock);
+                console.log(colors.red("Error creating next block "), Exception, nextBlock);
             }
 
             try{

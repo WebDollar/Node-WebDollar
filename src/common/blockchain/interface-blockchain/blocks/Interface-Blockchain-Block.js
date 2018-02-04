@@ -73,7 +73,6 @@ class InterfaceBlockchainBlock {
         if (this.timeStamp === undefined || this.timeStamp === null || typeof this.timeStamp !== 'number') throw ('timeStamp is empty');
 
         //timestamp must be on 4 bytes
-        this.timeStamp = Math.floor(this.timeStamp);
         if (this.timeStamp >= 0xFFFFFFFF) throw ('timeStamp is invalid');
 
         if (height >=0) {
@@ -107,7 +106,7 @@ class InterfaceBlockchainBlock {
             //validate hashPrev
             if ( previousHash === null || !Buffer.isBuffer(previousHash)) throw 'previous hash is not given'
 
-            if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match";
+            if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match " + previousHash.toString("hex") + " " + this.hashPrev.toString("hex") ;
         }
 
         //validate hash

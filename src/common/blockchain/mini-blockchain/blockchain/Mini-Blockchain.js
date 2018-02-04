@@ -56,7 +56,7 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
             //updating reward
-            console.log(colors.green("block.data.minerAddress"),block.data.minerAddress, colors.yellow(block.reward));
+            //console.log(colors.green("block.data.minerAddress"),block.data.minerAddress, colors.yellow(block.reward));
 
             result = !this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
 
@@ -202,7 +202,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         } catch (exception){
 
-            console.log(colors.red("Couldn't load MiniBlockchain"), exception);
+            console.log(colors.red("Couldn't load  MiniBlockchain"), exception);
             this.accountantTree = new MiniBlockchainAccountantTree(this.db);
             return false;
         }
