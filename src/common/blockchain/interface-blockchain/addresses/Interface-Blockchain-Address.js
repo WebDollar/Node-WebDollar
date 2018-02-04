@@ -92,9 +92,9 @@ class InterfaceBlockchainAddress{
     /**
      * @returns true if privateKey is encrypted
      */
-    async isPrivateKeyEncrypted() {
+    async isPrivateKeyEncrypted(password) {
 
-        let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(await this.getPrivateKey());
+        let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(await this.getPrivateKey(password));
 
         return !generatedPublicKey.equals(this.publicKey);
     }
