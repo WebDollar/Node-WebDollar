@@ -71,12 +71,12 @@ class InterfaceBlockchainMining{
             //mining next blocks
 
             // LIMIT mining first 21 blocks
-            if (this.blockchain.blocks.length === 11 && suspend === false) {
-                setTimeout( async ()=>{await this.mineNextBlock(showMiningOutput, true)}, 10000);
-                return;
-            }
-            if (this.blockchain.blocks.length === 12)
-                return;
+            // if (this.blockchain.blocks.length === 11 && suspend === false) {
+            //     setTimeout( async ()=>{await this.mineNextBlock(showMiningOutput, true)}, 10000);
+            //     return;
+            // }
+            // if (this.blockchain.blocks.length === 12)
+            //     return;
 
             let nextBlock, nextTransactions;
 

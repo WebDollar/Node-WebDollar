@@ -87,8 +87,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             return MiniBlockchainFork.prototype.preFork.call(this);
     }
 
-    async postFork(forkedSuccessfully){
-
+    async postForkBefore(forkedSuccessfully){
+        
         if (forkedSuccessfully) {
             //if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
             return;
@@ -108,6 +108,11 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             //if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
         }
+
+        return MiniBlockchainFork.prototype.postForkBefore.call(this, forkedSuccessfully);
+    }
+
+    async postFork(forkedSuccessfully){
 
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
     }

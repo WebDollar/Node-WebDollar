@@ -158,6 +158,8 @@ class InterfaceBlockchainFork {
                         break;
                     }
 
+                await this.postForkBefore(forkedSuccessfully);
+
                 //revert the last K blocks
                 if (!forkedSuccessfully) {
 
@@ -194,6 +196,11 @@ class InterfaceBlockchainFork {
 
 
     preFork(){
+
+    }
+
+
+    postForkBefore(forkedSuccessfully){
 
     }
 
