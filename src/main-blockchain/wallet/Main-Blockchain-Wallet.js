@@ -318,9 +318,36 @@ class MainBlockchainWallet{
 
     }
 
+    /**
+     *
+     * @param addressString
+     */
+    async importAddressFromString(addressString){
+
+        let blockchainAddress = await this._justCreateNewAddress();
+        let unencodedAddress = BufferExtended.fromBase(addressString, "hex");
+
+        blockchainAddress.unencodedAddress = unencodedAddress;
+        blockchainAddress.address = BufferExtended.toBase(unencodedAddress);
+        this.addresses.push(blockchainAddress);
+
+        return blockchainAddress;
+    }
+
+    async encryptAddress(blockchainAddress, password){
+
+        let index = this.findAddress(blockchainAddress);
+
+        if (index !== -1)
+            return false;
+        let privateKey = this.addresses[index].getPrivateKey();
+
+        return (await this.addresses[index].savePrivateKey(privateKey, password));
+    }
+
     findAddress(address){
 
-        for (let i=0; i<this.addresses.length; i++)
+        for (let i = 0; i < this.addresses.length; i++)
             if (address === this.addresses[i].address)
                 return i;
             else

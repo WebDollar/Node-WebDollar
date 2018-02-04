@@ -197,7 +197,7 @@ describe('test save wallet to local storage', () => {
         for (let i = 0; i < len; ++i) {
             let address = Blockchain.Wallet.addresses[i].address;
             let unencodedAddress = Blockchain.Wallet.addresses[i].unencodedAddress;
-            
+
             let addressString = Blockchain.Wallet.addresses[i].exportAddressToString();
             let blockchainAddress = await Blockchain.Wallet.importAddressFromString(addressString);
 
