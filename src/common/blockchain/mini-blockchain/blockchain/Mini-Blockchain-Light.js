@@ -74,7 +74,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         }
 
-        if (!await this._recalculateLightPrevs( block.height, block)) throw "_recalculateLightPrevs failed";
+        if (!await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)) throw "_recalculateLightPrevs failed";
 
         console.log("BLOCK ", block.serializeBlock().toString("hex"));
         console.log(" hash", block.hash.toString("hex"));
@@ -97,7 +97,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
     /**
      * It must be last element
      */
-    async _recalculateLightPrevs(diffIndex, block, serialization){
+    async _recalculateLightPrevs(diffIndex, block, serialization, save=true){
 
         if (block === undefined || block === null)
             block = BlockchainGenesis;
@@ -121,8 +121,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         let result = true;
 
-        if (this.lightPrevDifficultyTargets[diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS] !== undefined)
-            result &= await this._saveLightSettings(diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
+        if (save)
+            if (this.lightPrevDifficultyTargets[diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS] !== undefined)
+                result &= await this._saveLightSettings(diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
 
         return result;
     }
@@ -130,7 +131,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
     async _saveLightSettings(diffIndex){
 
         try {
-            global.MINIBLOCKCHAIN_LIGHT_SAVED = false;
+            global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED = false;
 
             console.log("_LightPrevDifficultyTarget saved");
 
@@ -156,12 +157,12 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
             console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
             console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
-            global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
+            global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED = true;
 
             throw exception;
         }
 
-        global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
+        global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED = true;
         return true;
     }
 
@@ -224,20 +225,24 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         try {
 
+            global.MINIBLOCKCHAIN_LIGHT_SAVED = false;
+
             console.log("saaaave", this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS -2);
 
-            if (this.blocks.length === 0) return false;
+            if (this.blocks.length === 0) throw "Nothing to Save"
 
             await this._saveLightSettings();
 
             if (! await this.inheritBlockchain.prototype.save.call(this)) throw "couldn't save the blockchain"
 
-            return true;
-
         } catch (exception){
             console.log(colors.red("Couldn't save MiniBlockchain"), exception)
+            global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
             return false;
         }
+
+        global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
+        return true;
     }
 
     /**
@@ -261,8 +266,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             //load the number of blocks
             if (!await this._loadLightSettings(serializationAccountantTreeInitial)) throw "couldn't load the Light Settings";
 
-            if (! await this.inheritBlockchain.prototype.load.call(this, consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS  ))
-                throw "Problem loading the blockchain";
+            if (! await this.inheritBlockchain.prototype.load.call(this, consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS  )) throw "Problem loading the blockchain";
 
             //check the accountant Tree if matches
             console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);

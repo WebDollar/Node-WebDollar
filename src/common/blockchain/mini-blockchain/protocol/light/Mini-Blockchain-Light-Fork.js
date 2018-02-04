@@ -61,7 +61,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp);
             console.log("this.forkPrevHashPrev", this.forkPrevHashPrev.toString("hex"));
 
-            let diffIndex = this.forkStartingHeight -1;
+            let diffIndex = this.forkStartingHeight ;
 
             console.log("this.forkDiff", diffIndex);
 
@@ -89,10 +89,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     async postForkBefore(forkedSuccessfully){
 
-        if (forkedSuccessfully) {
-            //if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
-            return;
-        }
+        if (forkedSuccessfully)
+            return true;
 
         //recover to the original Accountant Tree & state
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
@@ -114,6 +112,12 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
     async postFork(forkedSuccessfully){
 
         if (forkedSuccessfully) {
+
+            //saving the Light Settings
+
+            console.log("postFork SAVE!!!!!!!!!!!!!!!!!!!");
+            await this.blockchain._saveLightSettings( this.forkStartingHeight + this.forkBlocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
+
             return true;
         }
 

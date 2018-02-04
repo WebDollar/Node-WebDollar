@@ -19,8 +19,13 @@ process.on('SIGINT', function() {
     global.TERMINATED = true;
 
     setInterval(()=>{
-        if ( global.MINIBLOCKCHAIN_LIGHT_SAVED === true &&
-             global.SEMAPHORE_PROCESS_DONE) {
+        if ( global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED &&
+             global.SEMAPHORE_PROCESS_DONE &&
+             global.MINIBLOCKCHAIN_LIGHT_SAVED) {
+
+            console.log(global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED)
+            console.log(global.SEMAPHORE_PROCESS_DONE)
+            console.log(global.MINIBLOCKCHAIN_LIGHT_SAVED)
 
             console.log(colors.yellow("process.exit(0)"));
             process.exit(0);

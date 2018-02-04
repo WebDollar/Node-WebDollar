@@ -151,14 +151,14 @@ class InterfaceBlockchainFork {
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
 
+                await this.postForkBefore(forkedSuccessfully);
+
                 for (let i = 0; i < this.forkBlocks.length; i++)
                     if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length - 1), "all", false, {})) {
                         console.log(colors.green("fork couldn't be included in main Blockchain ", i));
                         forkedSuccessfully = false;
                         break;
                     }
-
-                await this.postForkBefore(forkedSuccessfully);
 
                 //revert the last K blocks
                 if (!forkedSuccessfully) {
