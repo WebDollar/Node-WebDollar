@@ -61,18 +61,18 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp);
             console.log("this.forkPrevHashPrev", this.forkPrevHashPrev.toString("hex"));
 
-            this._lightAccountantTreeSerializationsHeightClone = this.blockchain.lightAccountantTreeSerializations[this.forkStartingHeight-1] ;
+            let diffIndex = this.forkStartingHeight;
+
+            this._lightAccountantTreeSerializationsHeightClone = this.blockchain.lightAccountantTreeSerializations[diffIndex] ;
             this._blocksStartingPointClone = this.blockchain.blocksStartingPoint;
-            this._lightPrevDifficultyTargetClone = this.blockchain.lightPrevDifficultyTarget;
-            this._lightPrevTimeStampClone = this.blockchain.lightPrevTimeStamp;
-            this._lightPrevHashPrevClone = this.blockchain.lightPrevHashPrev;
+            this._lightPrevDifficultyTargetClone = this.blockchain.lightPrevDifficultyTargets[diffIndex];
+            this._lightPrevTimeStampClone = this.blockchain.lightPrevTimeStamps[diffIndex];
+            this._lightPrevHashPrevClone = this.blockchain.lightPrevHashPrevs[diffIndex];
 
             this.blockchain.blocksStartingPoint = this.forkChainStartingPoint;
-            this.blockchain.lightPrevDifficultyTarget = this.forkPrevDifficultyTarget;
-            this.blockchain.lightPrevTimeStamp = this.forkPrevTimeStamp;
-            this.blockchain.lightPrevHashPrev = this.forkPrevHashPrev;
-
-            this.blockchain._addTreeSerialization(this.forkStartingHeight-1, this.forkPrevAccountantTree, this.forkChainLength);
+            this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;
+            this.blockchain.lightPrevTimeStamps[diffIndex] = this.forkPrevTimeStamp;
+            this.blockchain.lightPrevHashPrevs[diffIndex] = this.forkPrevHashPrev;
 
             //add dummy blocks between [beginning to where it starts]
             while (this.blockchain.blocks.length < this.forkStartingHeight)
@@ -94,10 +94,13 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
             this.blockchain.blocksStartingPoint = this._blocksStartingPointClone;
-            this.blockchain.lightPrevDifficultyTarget = this._lightPrevDifficultyTargetClone;
-            this.blockchain.lightPrevTimeStamp = this._lightPrevTimeStampClone;
-            this.blockchain.lightPrevHashPrev = this._lightPrevHashPrevClone;
-            this.blockchain.lightAccountantTreeSerializations[this.forkStartingHeight-1] = this._lightAccountantTreeSerializationsHeightClone;
+
+            let diffIndex = this.forkStartingHeight;
+
+            this.blockchain.lightPrevDifficultyTargets[diffIndex] = this._lightPrevDifficultyTargetClone;
+            this.blockchain.lightPrevTimeStamps[diffIndex] = this._lightPrevTimeStampClone;
+            this.blockchain.lightPrevHashPrevs[diffIndex] = this._lightPrevHashPrevClone;
+            this.blockchain.lightAccountantTreeSerializations[diffIndex] = this._lightAccountantTreeSerializationsHeightClone;
 
             //if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
         }

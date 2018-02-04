@@ -103,9 +103,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
         if (block === undefined || block === null)
             block = BlockchainGenesis;
 
-        this.lightPrevDifficultyTargets[diffIndex] = block.difficultyTarget;
-        this.lightPrevTimeStamps[diffIndex] =  block.timeStamp;
-        this.lightPrevHashPrevs[diffIndex] =  block.hash;
+        this.lightPrevDifficultyTargets[diffIndex+1] = block.difficultyTarget;
+        this.lightPrevTimeStamps[diffIndex+1] =  block.timeStamp;
+        this.lightPrevHashPrevs[diffIndex+1] =  block.hash;
 
         console.log("diffIndex", diffIndex);
         console.log("block.hash", block.hash.toString("hex"));
@@ -116,9 +116,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
         }
 
-        this.lightAccountantTreeSerializations[diffIndex] = serialization;
+        this.lightAccountantTreeSerializations[diffIndex+1] = serialization;
 
-        return await this._saveLightSettings(diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS -1 );
+        return await this._saveLightSettings(diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS );
 
     }
 
@@ -160,7 +160,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             return false;
         }
 
-        let diffIndex = numBlocks - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
+        let diffIndex = numBlocks - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS -1 ;
 
         if (numBlocks > consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS) {
 
