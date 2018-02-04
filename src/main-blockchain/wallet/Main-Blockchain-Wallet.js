@@ -141,7 +141,7 @@ class MainBlockchainWallet{
         return `https://www.gravatar.com/avatar/${md5(address)}?d=retro&f=y`;
     }
     
-   /**
+    /**
      * @returns the mining address which will receive rewards
      */
     async getMiningAddress(){
@@ -324,9 +324,10 @@ class MainBlockchainWallet{
     async isAddressEncrypted(address){
 
         address = this.getAddress(address);
-        if (address === null) throw "address not found"
+        if (address === null)
+            throw "address not found";
 
-        return (await this.addresses[index].isPrivateKeyEncrypted());
+        return (await address.isPrivateKeyEncrypted());
     }
 
     /**
@@ -337,16 +338,14 @@ class MainBlockchainWallet{
      */
     async encryptAddress(address, oldPassword, newPassword){
 
-        let index = this.getAddressIndex(address);
-        if (index < 0)
-            return false;
-
-        let privateKey = await this.addresses[index].getPrivateKey(oldPassword);
-
+        address = this.getAddress(address);
+console.log("here 1");
+        let privateKey = await address.getPrivateKey(oldPassword);
+        console.log("here 2="+privateKey);
         if (privateKey === null || privateKey === undefined || privateKey.length !== 32)
             return false;
-
-        return (await this.addresses[index].savePrivateKey(privateKey, newPassword));
+        console.log("here 3");
+        return (await address.savePrivateKey(privateKey, newPassword));
     }
 
     /**
@@ -357,7 +356,8 @@ class MainBlockchainWallet{
     async signTransaction(address, password){
 
         address = this.getAddress(address);
-        if (address === null) throw "address not found"
+        if (address === null)
+            throw "address not found";
 
         if (await address.isPrivateKeyEncrypted(password) === false) {
             let privateKey = await address.getPrivateKey(password);
@@ -370,21 +370,18 @@ class MainBlockchainWallet{
         }
     }
 
-    isAddressEncrypted(address){
-        address = this.getAddress(address);
-        if (address === null) return {result: false, message:"no address found"};
-        return {result: address.isPrivateKeyEncrypted(address) };
-    }
-
     /**
      * Finding stringAddress or address
      * @param address
      * @returns {*}
      */
     getAddress(address){
+
         let index = this.getAddressIndex(address);
-        if (index === -1) return null;
-        else return this.addresses[index];
+        if (index === -1)
+            return null;
+        else
+            return this.addresses[index];
     }
 
     getAddressIndex(address){

@@ -46,7 +46,7 @@ describe('test pool leader DB', (dataBase) => {
 
         }
 
-        assert(total>0,"Correct saved");
+        assert(total > 0, "Wrong saved");
 
     });
 

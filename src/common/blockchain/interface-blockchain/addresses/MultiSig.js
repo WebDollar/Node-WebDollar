@@ -166,15 +166,13 @@ class MultiSig {
      */
     static getMultiAESEncrypt(buffer, passwordsArray) {
 
-        let multiEncrypt = buffer;
+        let concatPasswords = "";
 
         for (let i = 0; i < passwordsArray.length; ++i) {
-            multiEncrypt = WebDollarCrypto.encryptAES(multiEncrypt, passwordsArray[i]);
-            if (multiEncrypt === null)
-                return null;
+            concatPasswords += passwordsArray[i];
         }
 
-        return multiEncrypt;
+        return WebDollarCrypto.encryptAES(buffer, concatPasswords);
     }
 
     /**
@@ -185,15 +183,13 @@ class MultiSig {
      */
     static getMultiAESDecrypt(buffer, passwordsArray) {
 
-        let multiDecrypt = buffer;
+        let concatPasswords = "";
 
         for (let i = 0; i < passwordsArray.length; ++i) {
-            multiDecrypt = WebDollarCrypto.decryptAES(multiDecrypt, passwordsArray[i]);
-            if (multiDecrypt === null)
-                return null;
+            concatPasswords += passwordsArray[i];
         }
 
-        return multiDecrypt;
+        return WebDollarCrypto.decryptAES(buffer, concatPasswords);
     }
 
 }

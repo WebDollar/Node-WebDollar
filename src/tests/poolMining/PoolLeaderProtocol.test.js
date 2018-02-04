@@ -31,28 +31,28 @@ describe('test pool leader protocol', () => {
         },
     ];
 
-    it('generate hash dificulties', ()=>{
+    it('generate hash dificulties', () => {
 
         let respose = miner.generateHashDificulties(targetHash,hashList);
 
-        assert(respose[0].difficulty<respose[1].difficulty<respose[2].difficulty,"Correct hash difficulties");
+        assert(respose[0].difficulty < respose[1].difficulty < respose[2].difficulty, "Bad hash difficulties");
 
     });
 
-    it('create reward distribution', ()=>{
+    it('create reward distribution', () => {
 
         let reward = 2500;
         let leaderCommissionPercentage = 10;
         let respose = miner.rewardsDistribution(reward,leaderCommissionPercentage,hashList);
 
-        assert(respose.poolLeaderReward==reward/leaderCommissionPercentage,"Good Pool leader reward");
+        assert(respose.poolLeaderReward === reward/leaderCommissionPercentage, "Bad Pool leader reward");
 
         let reward0 = new BigNumber(respose.minnersReward[0].reward);
         let reward1 = new BigNumber(respose.minnersReward[1].reward);
         let reward2 = new BigNumber(respose.minnersReward[2].reward);
         let totalMinersReward = reward0.plus(reward1).plus(reward2);
 
-        assert(totalMinersReward==reward-respose.poolLeaderReward,"Good minners reward distribution with "+totalMinersReward+ " WEBD");
+        assert(totalMinersReward === reward-respose.poolLeaderReward, "Bad minners reward distribution with " + totalMinersReward + " WEBD");
 
     });
 

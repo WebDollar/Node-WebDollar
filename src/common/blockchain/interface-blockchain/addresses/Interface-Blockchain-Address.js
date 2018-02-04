@@ -61,7 +61,7 @@ class InterfaceBlockchainAddress{
             else
                 encr = WebDollarCrypto.encryptAES(data, password);
 
-            return encr;
+            return Buffer.from(encr);
         }
     }
 
@@ -84,7 +84,7 @@ class InterfaceBlockchainAddress{
             else
                 decr = WebDollarCrypto.decryptAES(data, password);
 
-            return decr;
+            return Buffer.from(decr);
         }
     }
 
@@ -111,9 +111,9 @@ class InterfaceBlockchainAddress{
     async savePrivateKey(value, password) {
 
         let key = this.address + '_privateKey';
-        value = this.encrypt(value, password);
 
         try {
+            value = this.encrypt(value, password);
             let result = await this.db.save(key, value);
 
             return  result;

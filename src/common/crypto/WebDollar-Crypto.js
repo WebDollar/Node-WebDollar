@@ -104,11 +104,14 @@ class WebDollarCrypto {
     
     static encryptAES(buffer, password){
 
+        if (!Buffer.isBuffer(buffer))
+            throw "buffer argument is not a buffer";
+
         try {
             let cipher = crypto.createCipher('aes-256-cbc', password);
             let crypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
 
-            return crypted;
+            return Buffer.from(crypted);
         }
         catch (exception) {
             return null;
@@ -117,11 +120,14 @@ class WebDollarCrypto {
     
     static decryptAES(buffer, password) {
 
+        if (!Buffer.isBuffer(buffer))
+            throw "buffer argument is not a buffer";
+
         try {
             let decipher = crypto.createDecipher('aes-256-cbc', password);
             let decrypt = Buffer.concat([decipher.update(buffer), decipher.final()]);
 
-            return decrypt;
+            return Buffer.from(decrypt);
         }
         catch(exception){
             return null;

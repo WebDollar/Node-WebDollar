@@ -210,6 +210,33 @@ describe('test save wallet to local storage', () => {
 
     });
 
+    it('test check encrypt wallet address with 12 words', async () => {
+
+        let passwordZero = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j', 'k', 'l'];
+        let passwordOne = ['ak', 'bv', 'co', 'dy', 're', 'ff', 'sg', 'rh', 'ti','sj', 'ck', 'ul'];
+        let blockchainAddress = await Blockchain.Wallet.createNewAddress();
+        let hexAddress = blockchainAddress.address.toString("hex");
+        let index = Blockchain.Wallet.getAddressIndex(hexAddress);
+
+        assert(0 <= index, "Address index < 0: index = " + index);
+
+        let privateKey = await blockchainAddress.getPrivateKey();
+        console.log("privateKey=", privateKey.toString("hex"));
+
+        response = await Blockchain.Wallet.isAddressEncrypted(hexAddress);
+        assert(response === false, "Address should not be encrypted firstly");
+
+        response = await Blockchain.Wallet.encryptAddress(hexAddress, undefined, passwordZero);
+        assert(response === true, "Error encrypting with first password.");
+
+        response = await Blockchain.Wallet.isAddressEncrypted(hexAddress);
+        assert(response === true, "Address should be encrypted after encryptAddress");
+
+        response = await Blockchain.Wallet.encryptAddress(hexAddress, passwordZero, passwordOne);
+        assert(response === true, "Error encrypting with second password.");
+
+    });
+
     /*it('test check multiSig public/private Keys', async () => {
 
         let pair = MultiSig.makeMultisigAddress(['datanastere1','val','pllui']);
