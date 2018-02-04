@@ -52,6 +52,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkChainStartingPoint  }, fork.forkChainStartingPoint );
 
             if (answer === null) throw "get-light-settings never received " + (fork.forkChainStartingPoint);
+            if (answer.result === false) throw "get-light-settings received by it is false ";
 
             if (answer.difficultyTarget === null ) throw "get-light-settings difficultyTarget is null";
             if (answer.timeStamp === null ) throw "get-light-settings timeStamp is null";

@@ -61,7 +61,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp);
             console.log("this.forkPrevHashPrev", this.forkPrevHashPrev.toString("hex"));
 
-            let diffIndex = this.forkStartingHeight;
+            let diffIndex = this.forkStartingHeight ;
+
+            console.log("this.forkDiff", diffIndex);
 
             this._lightAccountantTreeSerializationsHeightClone = this.blockchain.lightAccountantTreeSerializations[diffIndex] ;
             this._blocksStartingPointClone = this.blockchain.blocksStartingPoint;
@@ -74,6 +76,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevTimeStamps[diffIndex] = this.forkPrevTimeStamp;
             this.blockchain.lightPrevHashPrevs[diffIndex] = this.forkPrevHashPrev;
 
+            this.blockchain.lightAccountantTreeSerializations[diffIndex] = this.forkPrevAccountantTree;
+
             //add dummy blocks between [beginning to where it starts]
             while (this.blockchain.blocks.length < this.forkStartingHeight)
                 this.blockchain.addBlock(undefined);
@@ -83,12 +87,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             return MiniBlockchainFork.prototype.preFork.call(this);
     }
 
-    async postFork(forkedSuccessfully){
+    async postForkBefore(forkedSuccessfully){
 
-        if (forkedSuccessfully) {
-            //if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
-            return;
-        }
+        if (forkedSuccessfully)
+            return true;
 
         //recover to the original Accountant Tree & state
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
@@ -103,9 +105,27 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this._lightAccountantTreeSerializationsHeightClone;
 
             //if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
+        } else
+        return MiniBlockchainFork.prototype.postForkBefore.call(this, forkedSuccessfully);
+    }
+
+    async postFork(forkedSuccessfully){
+
+        if (forkedSuccessfully) {
+
+            //saving the Light Settings
+
+            console.log("postFork SAVE!!!!!!!!!!!!!!!!!!!");
+            await this.blockchain._saveLightSettings( this.forkStartingHeight + this.forkBlocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
+
+            return true;
         }
 
+        if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
+
+        } else
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
+
     }
 
 }

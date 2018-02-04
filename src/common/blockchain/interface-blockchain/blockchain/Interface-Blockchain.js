@@ -15,6 +15,8 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transactions'
 
 import consts from 'consts/const_global'
+import global from "consts/global"
+
 import Serialization from 'common/utils/Serialization';
 
 const colors = require('colors/safe');
@@ -181,21 +183,37 @@ class InterfaceBlockchain {
         if (height === undefined) height = this.blocks.length;
 
         if (height <= 0)  return BlockchainGenesis.difficultyTarget;
-        else return this.blocks[height-1].difficultyTarget;
+        else{
+            if (height > this.blocks.length ) throw "invalid height"; else
+            if (this.blocks[height-1] === undefined) throw "invalid height";
+
+            return this.blocks[height-1].difficultyTarget;
+        }
+
     }
 
     getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
         if (height <= 0)  return BlockchainGenesis.timeStamp;
-        else return this.blocks[height-1].timeStamp;
+        else{
+            if (height > this.blocks.length ) throw "invalid height"; else
+            if (this.blocks[height-1] === undefined) throw "invalid height";
+
+            return this.blocks[height-1].timeStamp;
+        }
     }
 
     getHashPrev(height){
         if (height === undefined) height = this.blocks.length;
 
         if (height <= 0)  return BlockchainGenesis.hashPrev;
-        else return this.blocks[height-1].hash;
+        else {
+            if (height > this.blocks.length ) throw "invalid height"; else
+            if (this.blocks[height-1] === undefined) throw "invalid height";
+
+            return this.blocks[height-1].hash;
+        }
     }
 
     /**
@@ -209,21 +227,36 @@ class InterfaceBlockchain {
 
             let timer = setInterval( async () => {
 
+                if (global.TERMINATED){
+                    this._blocksSempahore = true;
+                    clearInterval(timer)
+                    return;
+                }
+
                 if ( this._blocksSempahore === false ){
 
                     this._blocksSempahore = true;
+                    global.SEMAPHORE_PROCESS_DONE = false;
                     clearInterval(timer);
 
+                    let exception, result;
+
                     try {
-                        let result = await callback();
-                        this._blocksSempahore = false;
-                        resolve(result);
-                        return result;
-                    } catch (exception){
-                        this._blocksSempahore = false;
-                        console.log("error processBlocksSempahoreCallback", exception);
-                        throw exception;
+                        result = await callback();
+                    } catch (ex){
+                        result = null;
+                        console.log(colors.red("error processBlocksSempahoreCallback"), ex);
+                        exception = ex;
                     }
+
+                    this._blocksSempahore = false;
+                    global.SEMAPHORE_PROCESS_DONE = true;
+
+                    if (exception !== undefined)
+                        throw exception;
+
+                    resolve(result);
+                    return result;
                 }
             },10);
         });

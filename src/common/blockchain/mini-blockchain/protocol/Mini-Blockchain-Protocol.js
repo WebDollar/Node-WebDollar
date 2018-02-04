@@ -52,13 +52,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
                 console.log("get-light-settings222")
 
-                if (this.blockchain.agent.light === true)
-                    if (data.height < this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS -1 ) throw "height is to small for request";
-
-                console.log("get-light-settings3333")
-
                 let difficultyTarget = this.blockchain.getDifficultyTarget(data.height);
-
                 let timestamp = this.blockchain.getTimeStamp(data.height);
                 let hashPrev = this.blockchain.getHashPrev(data.height);
 
