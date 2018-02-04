@@ -1,4 +1,5 @@
 var assert = require('assert');
+const BigNumber = require('bignumber.js');
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import SaveRewardsInDB from 'common/poolMining/SaveRewardsInDB.js';
@@ -12,6 +13,7 @@ describe('test pool leader DB', (dataBase) => {
     else
         this.db = dataBase;
 
+    let hashListTotalReward = 60;
     let hashList = [
         {
             address:"ad1",
@@ -33,20 +35,32 @@ describe('test pool leader DB', (dataBase) => {
         },
     ];
 
-    it('handle reward update in DB', async ()=>{
+    it('reward update in DB', async ()=>{
 
-        await saveDataBase.updateMinersReward(hashList);
-
-        let total = 0;
+        let DbTotalReward = new BigNumber(0);
 
         for (let i=0; i<hashList.length; i++){
 
             let currentReward = await this.db.get(hashList[i].address);
-            total += currentReward;
+            DbTotalReward = DbTotalReward.plus(currentReward);
 
         }
 
-        assert(total>0,"Correct saved");
+        await saveDataBase.updateMinersReward(hashList);
+
+        let total =  new BigNumber(0);
+
+        for (let i=0; i<hashList.length; i++){
+
+            let currentReward = await this.db.get(hashList[i].address);
+            total = total.plus(currentReward);
+
+        }
+
+        DbTotalReward=DbTotalReward.toString();
+        let totalDifference=total.minus(hashListTotalReward).toString();
+
+        assert(totalDifference===DbTotalReward,"Correct saved");
 
     });
 
