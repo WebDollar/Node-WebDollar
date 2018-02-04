@@ -13,7 +13,7 @@ const FileSystem = require('fs');
 
 class MainBlockchainWallet{
 
-    constructor(blockchain, password = 'password', db){
+    constructor(blockchain, db){
 
         this.blockchain = blockchain;
         this.walletFileName = 'wallet.bin';
@@ -25,14 +25,12 @@ class MainBlockchainWallet{
 
         this.addresses = [];
 
-        this.password = password;
-
         this.emitter = new EventEmitter();
     }
 
     async _justCreateNewAddress(salt, emptyAddress){
 
-        let blockchainAddress = new MiniBlockchainAddress(this.db, this.password);
+        let blockchainAddress = new MiniBlockchainAddress(this.db);
 
         if (!emptyAddress)
             await blockchainAddress.createNewAddress(salt);
@@ -58,20 +56,6 @@ class MainBlockchainWallet{
             throw "address is not new";
 
         return blockchainAddress;
-    }
-
-    async updatePassword(newPassword){
-
-        for (let i = 0; i < this.addresses.length; ++i) {
-            let privateKey = await this.addresses[i].getPrivateKey(this.password);
-            await this.addresses[i].savePrivateKey(privateKey, newPassword);
-
-            this.addresses[i].updatePassword(newPassword);
-        }
-
-        this.password = newPassword;
-
-        this.emitter.emit('wallet/password-changed', {});
     }
 
     async serialize(serializePrivateKey = false) {
@@ -131,8 +115,6 @@ class MainBlockchainWallet{
             alert('Wallet was not imported successfully');
             this.addresses = [];
         }
-
-        await this.updatePassword(this.password);
 
         if (this.addresses.length > 0)
             this.emitter.emit('wallet/changes', this.addresses );
@@ -334,23 +316,50 @@ class MainBlockchainWallet{
         return blockchainAddress;
     }
 
-    async encryptAddress(address, password){
+    /**
+     * @param address
+     * @returns true if privateKey of address is encrypted
+     */
+    async isAddressEncrypted(address){
 
         let index = this.getAddressIndex(address);
         if (index < 0)
             return false;
 
-        if (await this.addresses[index].isPrivateKeyEncrypted(password) === true) {
-            console.log("SIGNED 0");
-            return true;
-        } else {
-            console.log("SIGNED 1");
-            let privateKey = this.addresses[index].getPrivateKey();
-
-            return (await this.addresses[index].savePrivateKey(privateKey, password));
-        }
+        return (await this.addresses[index].isPrivateKeyEncrypted());
     }
 
+    /**
+     * @param address
+     * @param oldPassword
+     * @param newPassword
+     * @returns {Promise<*>}
+     */
+    async encryptAddress(address, oldPassword, newPassword){
+
+        let index = this.getAddressIndex(address);
+        if (index < 0)
+            return false;
+
+        let privateKey = null;
+
+        if (await this.addresses[index].isPrivateKeyEncrypted(oldPassword) === true) {
+            privateKey = await this.addresses[index].getPrivateKey(oldPassword);
+        } else {
+            privateKey = await this.addresses[index].getPrivateKey();
+        }
+
+        if (privateKey === null || privateKey === undefined || privateKey.length !== 32)
+            return false;
+
+        return (await this.addresses[index].savePrivateKey(privateKey, newPassword));
+    }
+
+    /**
+     * @param address
+     * @param password
+     * @returns {Promise<boolean>}
+     */
     async signTransaction(address, password){
 
         let index = this.getAddressIndex(address);
