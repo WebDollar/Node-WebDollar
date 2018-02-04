@@ -2,7 +2,7 @@ var BigNumber = require('bignumber.js');
 
 class TestsHelper {
 
-    makeId(count, randomLengths) {
+    makeId(count, randomLengths, textPossible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
 
         if ( count === undefined) count = Math.floor(Math.random()*100 + 30 );
 
@@ -13,12 +13,16 @@ class TestsHelper {
 
 
         let text = "";
-        let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let possible = textPossible;
 
         for (let i = 0; i < count; i++)
             text += possible.charAt(Math.floor(Math.random() * possible.length));
 
         return text;
+    }
+
+    makeIdHex(count, randomLengths){
+        return this.makeId(count, randomLengths, "ABCDEF01234567890")
     }
 
     makeDigitId(count, isNonDecimal) {
@@ -176,6 +180,7 @@ class TestsHelper {
         this.backCartesianProduct(0, maxLength, product, radixTestingArray, result);
         return result;
     }
+
 }
 
 

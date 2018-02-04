@@ -151,9 +151,23 @@ class PoolLeaderProtocol {
         }
 
         return {
-            poolLeaderReward: poolLeaderReward,
+            poolLeaderReward: poolLeaderReward.toString(),
             minnersReward: hashList
         }
+
+    }
+
+    // Budisteanu's formula
+    getMinerReward(bestHash,hashTarget,reward,hashsNumberLastTime){
+
+        bestHash = new BigInteger(bestHash.toString('hex'), 16);
+        hashTarget = new BigInteger(hashTarget.toString('hex'), 16);
+
+        let difficulty = new BigNumber(bestHash).dividedBy(hashTarget);
+        let rewardForHashes = new BigNumber(reward).dividedBy(hashsNumberLastTime);
+        let result = new BigNumber(difficulty).mul(rewardForHashes);
+
+        return result.toString();
 
     }
 
