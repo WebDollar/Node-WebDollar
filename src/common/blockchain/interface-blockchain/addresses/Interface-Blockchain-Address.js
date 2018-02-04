@@ -87,17 +87,13 @@ class InterfaceBlockchainAddress{
     }
 
     /**
-     * @returns true if privateKey is encrypted with password
+     * @returns true if privateKey is encrypted
      */
-    async isPrivateKeyEncrypted(password) {
+    async isPrivateKeyEncrypted() {
 
-        let privateKey = await this.getPrivateKey(password);
-
-        if (privateKey === null)
-            return true;
-
-        if (privateKey.length !== 32)
-            return true;
+        let privateKey = await this.getPrivateKey();
+        if (privateKey === null || privateKey.length !== 32)
+           return true;
 
         let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey);
 

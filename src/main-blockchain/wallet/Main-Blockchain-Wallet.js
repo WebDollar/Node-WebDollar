@@ -5,6 +5,7 @@ import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
 import consts from "../../consts/const_global";
 import BufferExtend from "../../common/utils/BufferExtended";
+import InterfaceBlockchainAddressHelper from "../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 const colors = require('colors/safe');
 
 const md5 = require('md5');
@@ -341,13 +342,7 @@ class MainBlockchainWallet{
         if (index < 0)
             return false;
 
-        let privateKey = null;
-
-        if (await this.addresses[index].isPrivateKeyEncrypted(oldPassword) === true) {
-            privateKey = await this.addresses[index].getPrivateKey(oldPassword);
-        } else {
-            privateKey = await this.addresses[index].getPrivateKey();
-        }
+        let privateKey = await this.addresses[index].getPrivateKey(oldPassword);
 
         if (privateKey === null || privateKey === undefined || privateKey.length !== 32)
             return false;
