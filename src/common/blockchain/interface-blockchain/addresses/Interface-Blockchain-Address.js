@@ -8,10 +8,12 @@ import BufferExtended from 'common/utils/BufferExtended';
 import MultiSig from "./MultiSig";
 const FileSystem = require('fs');
 
+let INITIAL_PASSWORD = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l' ]
+
 class InterfaceBlockchainAddress{
 
 
-    constructor (db, password = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l' ]){
+    constructor (db, password = INITIAL_PASSWORD){
 
         this.address = null;
 
@@ -19,7 +21,7 @@ class InterfaceBlockchainAddress{
 
         if (db === undefined){
             this.db = new InterfaceSatoshminDB();
-            this.password = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l' ];
+            this.password = INITIAL_PASSWORD;
         } else {
             this.db = db;
             this.password = password;
@@ -92,7 +94,7 @@ class InterfaceBlockchainAddress{
     /**
      * @returns true if privateKey is encrypted
      */
-    async isPrivateKeyEncrypted(password) {
+    async isPrivateKeyEncrypted(password=INITIAL_PASSWORD) {
 
         let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(await this.getPrivateKey(password));
 

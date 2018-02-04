@@ -368,6 +368,17 @@ class MainBlockchainWallet{
         }
     }
 
+    isAddressEncrypted(address){
+        address = this.getAddress(address);
+        return address.isPrivateKeyEncrypted(address);
+    }
+
+    getAddress(address){
+        let index = this.getAddressIndex(address);
+        if (index === -1) return null;
+        else return this.addresses[address];
+    }
+
     getAddressIndex(address){
 
         for (let i = 0; i < this.addresses.length; i++)

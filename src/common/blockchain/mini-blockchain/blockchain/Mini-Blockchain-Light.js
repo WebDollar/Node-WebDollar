@@ -188,6 +188,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         this.blocksStartingPoint = diffIndex;
 
+
+
         console.log("diffIndex", diffIndex)
         console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '')
         console.log("", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '')
