@@ -340,7 +340,7 @@ class MainBlockchainWallet{
         if (index < 0)
             return false;
 
-        if (await this.addresses[index].isPrivateKeyEncrypted() === true) {
+        if (await this.addresses[index].isPrivateKeyEncrypted(password) === true) {
             console.log("SIGNED 0");
             return true;
         } else {
@@ -357,11 +357,12 @@ class MainBlockchainWallet{
         if (index < 0)
             return false;
 
-        if (await this.addresses[index].isPrivateKeyEncrypted() === false) {
+        if (await this.addresses[index].isPrivateKeyEncrypted(password) === false) {
+            let privateKey = await this.addresses[index].getPrivateKey(password);
             //TODO: Sign transaction code
             return true;
         } else {
-            let privateKey = this.addresses[index].getPrivateKey();
+            let privateKey = await this.addresses[index].getPrivateKey(password);
             //TODO: Sign transaction code
             return true;
         }
