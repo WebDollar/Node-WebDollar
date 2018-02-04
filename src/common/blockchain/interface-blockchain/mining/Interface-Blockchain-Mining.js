@@ -5,6 +5,7 @@ const colors = require('colors/safe');
 const EventEmitter = require('events');
 
 import consts from 'consts/const_global'
+import global from 'consts/global'
 
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 import Serialization from 'common/utils/Serialization'
@@ -66,7 +67,7 @@ class InterfaceBlockchainMining{
      */
     async mineNextBlock(showMiningOutput, suspend){
 
-        while (this.started){
+        while (this.started && !global.TERMINATED){
 
             //mining next blocks
 

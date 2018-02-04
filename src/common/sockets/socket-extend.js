@@ -5,6 +5,7 @@ import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/clien
 import NodesList from 'node/lists/nodes-list'
 import SocketAddress from 'common/sockets/socket-address'
 import isArrayBuffer from 'is-array-buffer';
+import global from "consts/global"
 
 // Extending Socket / Simple Peer
 
@@ -23,6 +24,8 @@ class SocketExtend{
         socket.node.on = (name, callback ) => {
             socket.on(name, (data)=>{
 
+                if (global.TERMINATED) return;
+
                 if (process.env.BROWSER) this._processBrowserBufferArray(data);
                 else if (!process.env.BROWSER) this._processBackboneBufferArray(data);
 
@@ -32,6 +35,8 @@ class SocketExtend{
 
         socket.node.once = (name, callback ) => {
             socket.once(name, (data)=>{
+
+                if (global.TERMINATED) return;
 
                 if (process.env.BROWSER) this._processBrowserBufferArray(data);
                 else if (!process.env.BROWSER) this._processBackboneBufferArray(data);
@@ -109,6 +114,8 @@ class SocketExtend{
             }
 
             let requestFunction = (resData) => {
+
+                if (global.TERMINATED) return;
 
                 if (timeoutId !== undefined) clearTimeout(timeoutId);
 

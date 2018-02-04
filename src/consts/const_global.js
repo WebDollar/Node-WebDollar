@@ -2,6 +2,8 @@ const uuid = require('uuid');
 
 let consts = {}
 
+consts.TERMINATED = false;
+
 consts.UUID = uuid.v4();
 
 consts.NODE_VERSION = "0.244";

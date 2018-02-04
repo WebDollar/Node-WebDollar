@@ -4,6 +4,7 @@ import MiniBlockchain from "./Mini-Blockchain"
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import consts from 'consts/const_global'
+import global from "consts/global"
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -95,8 +96,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     /**
      * It must be last element
-     * @returns {Promise.<void>}
-     * @private
      */
     async _recalculateLightPrevs(diffIndex, block, serialization){
 
@@ -120,13 +119,19 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         this.lightAccountantTreeSerializations[diffIndex+1] = serialization;
 
-        return await this._saveLightSettings(diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS );
+        let result = true;
 
+        if (this.lightPrevDifficultyTargets[diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS] !== undefined)
+            result &= await this._saveLightSettings(diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
+
+        return result;
     }
 
     async _saveLightSettings(diffIndex){
 
         try {
+            global.MINIBLOCKCHAIN_LIGHT_SAVED = false;
+
             console.log("_LightPrevDifficultyTarget saved");
 
             if (diffIndex === undefined) diffIndex = this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
@@ -149,8 +154,14 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         } catch (exception){
             console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
+            console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
+            console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
+            global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
+
+            throw exception;
         }
 
+        global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
         return true;
     }
 
@@ -204,6 +215,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log("balances", this.accountantTree.root.edges[0].targetNode.balances)
         }
 
+        return true;
+
     }
 
 
@@ -246,7 +259,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             //console.log("this.accountantTree initial ", this.accountantTree.root.hash.sha256);
 
             //load the number of blocks
-            await this._loadLightSettings(serializationAccountantTreeInitial);
+            if (!await this._loadLightSettings(serializationAccountantTreeInitial)) throw "couldn't load the Light Settings";
 
             if (! await this.inheritBlockchain.prototype.load.call(this, consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS  ))
                 throw "Problem loading the blockchain";

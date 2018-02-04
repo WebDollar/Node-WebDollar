@@ -1,6 +1,7 @@
 import InterfaceBlockchainFork from "../blockchain/forks/Interface-Blockchain-Fork";
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 const colors = require('colors/safe');
+import global from "consts/global"
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
@@ -230,7 +231,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 console.log(" < fork.forkChainLength", fork.forkChainLength)
 
                 //in case I didn't check this socket for the same block
-                while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength ) {
+                while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength && !global.TERMINATED ) {
 
 
                     // TODO you can paralyze the downloading code from multiple sockets

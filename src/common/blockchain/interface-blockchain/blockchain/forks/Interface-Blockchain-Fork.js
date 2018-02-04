@@ -1,5 +1,5 @@
 const colors = require('colors/safe');
-import BlockchainDifficulty from 'common/blockchain/global/difficulty/Blockchain-Difficulty'
+import global from "consts/global"
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -113,7 +113,7 @@ class InterfaceBlockchainFork {
      */
     async saveFork(){
 
-
+        if (global.TERMINATED) return false;
 
         if (!await this.validateFork()) {
             console.log(colors.red("validateFork was not passed"));
