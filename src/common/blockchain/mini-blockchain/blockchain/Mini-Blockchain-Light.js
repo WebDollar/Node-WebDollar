@@ -59,8 +59,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             if (result && saveBlock ){
 
-                //if (!this._saveLightSettings( this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2)) throw "_saveLightSettings failed";
-
                 // propagating a new block in the network
                 this.propagateBlocks(block.height, socketsAvoidBroadcast)
             }
@@ -83,6 +81,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log(" prev hash ", block.hashPrev.toString("hex"));
 
         console.log("blockchain tree serialization", this.accountantTree.root.hash.sha256.toString("hex"));
+        if (this.accountantTree.root.edges.length > 0)
+            console.log("blockchain balances ", this.accountantTree.root.edges[0].targetNode.balances[0].amount);
 
 
         // console.log("this.lightAccountantTreeSerializations", this.lightAccountantTreeSerializations[block.height] !== undefined ? this.lightAccountantTreeSerializations[block.height].toString("hex") : '');
