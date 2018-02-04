@@ -84,7 +84,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     async postFork(forkedSuccessfully){
 
-        if (forkedSuccessfully) return true;
+        if (forkedSuccessfully) {
+            await this.blockchain._saveLightSettings();
+            return;
+        }
 
         //recover to the original Accountant Tree & state
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
@@ -95,6 +98,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrev = this._lightPrevHashPrevClone;
             this.blockchain.lightAccountantTreeSerializations[this.forkStartingHeight-1] = this._lightAccountantTreeSerializationsHeightClone;
 
+            await this.blockchain._saveLightSettings();
         }
 
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);

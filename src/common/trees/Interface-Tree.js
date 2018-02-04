@@ -365,6 +365,8 @@ class InterfaceTree{
         if (buffer === undefined)
             buffer = await this.db.get(key);
 
+        if (! Buffer.isBuffer(buffer) ) throw "InterfaceTree - buffer is not Buffer"
+
         console.log("loadMiniAccountant", buffer.length, "   ",buffer.toString("hex") );
 
         return await this.deserializeTree(buffer, offset||0, includeHashes);

@@ -87,7 +87,7 @@ class InterfaceBlockchainMining{
 
 
             } catch (Exception){
-                console.log(colors.red("Error creating next block "+Exception.toString()), Exception, nextBlock);
+                console.log(colors.red("Error creating next block "), Exception, nextBlock);
             }
 
             try{
