@@ -13,7 +13,7 @@ let INITIAL_PASSWORD = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', '
 class InterfaceBlockchainAddress{
 
 
-    constructor (db, password = INITIAL_PASSWORD){
+    constructor (db){
 
         this.address = null;
 
@@ -21,11 +21,10 @@ class InterfaceBlockchainAddress{
 
         if (db === undefined){
             this.db = new InterfaceSatoshminDB();
-            this.password = INITIAL_PASSWORD;
         } else {
             this.db = db;
-            this.password = password;
         }
+
     }
 
     async createNewAddress(salt, privateKeyWIF){
@@ -44,11 +43,6 @@ class InterfaceBlockchainAddress{
         await this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
     }
 
-    updatePassword(newPassword){
-
-        this.password = newPassword;
-    }
-
     /**
      *
      * @param data to be encrypted
@@ -58,16 +52,17 @@ class InterfaceBlockchainAddress{
     encrypt(data, password) {
 
         if (password === undefined)
-            password = this.password;
+            return data;
+        else {
+            let encr = null;
 
-        let encr = null;
+            if (Array.isArray(password))
+                encr = MultiSig.getMultiAESEncrypt(data, password);
+            else
+                encr = WebDollarCrypto.encryptAES(data, password);
 
-        if (Array.isArray(password))
-            encr = MultiSig.getMultiAESEncrypt(data, password);
-        else
-            encr = WebDollarCrypto.encryptAES(data, password);
-
-        return encr;
+            return encr;
+        }
     }
 
     /**
@@ -79,24 +74,30 @@ class InterfaceBlockchainAddress{
     decrypt(data, password) {
 
         if (password === undefined)
-            password = this.password;
+            return data;
+        else {
 
-        let decr = null;
+            let decr = null;
 
-        if (Array.isArray(password))
-            decr = MultiSig.getMultiAESDecrypt(data, password);
-        else
-            decr = WebDollarCrypto.decryptAES(data, password);
+            if (Array.isArray(password))
+                decr = MultiSig.getMultiAESDecrypt(data, password);
+            else
+                decr = WebDollarCrypto.decryptAES(data, password);
 
-        return decr;
+            return decr;
+        }
     }
 
     /**
      * @returns true if privateKey is encrypted
      */
-    async isPrivateKeyEncrypted(password=INITIAL_PASSWORD) {
+    async isPrivateKeyEncrypted() {
 
-        let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(await this.getPrivateKey(password));
+        let privateKey = await this.getPrivateKey();
+        if (privateKey === null || privateKey.length !== 32)
+           return true;
+
+        let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey);
 
         return !generatedPublicKey.equals(this.publicKey);
     }
@@ -110,7 +111,6 @@ class InterfaceBlockchainAddress{
     async savePrivateKey(value, password) {
 
         let key = this.address + '_privateKey';
-
         value = this.encrypt(value, password);
 
         try {
