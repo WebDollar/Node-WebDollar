@@ -334,17 +334,37 @@ class MainBlockchainWallet{
         return blockchainAddress;
     }
 
-    async encryptAddress(blockchainAddress, password){
+    async encryptAddress(address, password){
 
-        if ( await blockchainAddress.isPrivateKeyEncrypted() === true )
-            return true;
-
-        if ( this.getAddressIndex(blockchainAddress) === -1 )
+        let index = this.getAddressIndex(address);
+        if (index < 0)
             return false;
 
-        let privateKey = this.addresses[index].getPrivateKey();
+        if (await this.addresses[index].isPrivateKeyEncrypted() === true) {
+            console.log("SIGNED 0");
+            return true;
+        } else {
+            console.log("SIGNED 1");
+            let privateKey = this.addresses[index].getPrivateKey();
 
-        return (await this.addresses[index].savePrivateKey(privateKey, password));
+            return (await this.addresses[index].savePrivateKey(privateKey, password));
+        }
+    }
+
+    async signTransaction(address, password){
+
+        let index = this.getAddressIndex(address);
+        if (index < 0)
+            return false;
+
+        if (await this.addresses[index].isPrivateKeyEncrypted() === false) {
+            //TODO: Sign transaction code
+            return true;
+        } else {
+            let privateKey = this.addresses[index].getPrivateKey();
+            //TODO: Sign transaction code
+            return true;
+        }
     }
 
     getAddressIndex(address){
