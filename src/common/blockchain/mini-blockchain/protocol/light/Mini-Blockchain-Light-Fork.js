@@ -61,7 +61,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp);
             console.log("this.forkPrevHashPrev", this.forkPrevHashPrev.toString("hex"));
 
-            let diffIndex = this.forkStartingHeight;
+            let diffIndex = this.forkStartingHeight -1;
 
             console.log("this.forkDiff", diffIndex);
 

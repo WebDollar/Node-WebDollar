@@ -184,7 +184,7 @@ class InterfaceBlockchain {
 
         if (height <= 0)  return BlockchainGenesis.difficultyTarget;
         else{
-            if (height > this.blocks.length > 0) throw "invalid height"; else
+            if (height > this.blocks.length ) throw "invalid height"; else
             if (this.blocks[height-1] === undefined) throw "invalid height";
 
             return this.blocks[height-1].difficultyTarget;
@@ -197,7 +197,7 @@ class InterfaceBlockchain {
 
         if (height <= 0)  return BlockchainGenesis.timeStamp;
         else{
-            if (height > this.blocks.length > 0) throw "invalid height"; else
+            if (height > this.blocks.length ) throw "invalid height"; else
             if (this.blocks[height-1] === undefined) throw "invalid height";
 
             return this.blocks[height-1].timeStamp;
@@ -209,7 +209,7 @@ class InterfaceBlockchain {
 
         if (height <= 0)  return BlockchainGenesis.hashPrev;
         else {
-            if (height > this.blocks.length > 0) throw "invalid height"; else
+            if (height > this.blocks.length ) throw "invalid height"; else
             if (this.blocks[height-1] === undefined) throw "invalid height";
 
             return this.blocks[height-1].hash;
