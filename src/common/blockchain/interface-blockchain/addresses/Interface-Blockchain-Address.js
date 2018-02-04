@@ -5,12 +5,13 @@ import BufferExtend from "common/utils/BufferExtended";
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import BufferExtended from 'common/utils/BufferExtended';
+import MultiSig from "./MultiSig";
 const FileSystem = require('fs');
 
 class InterfaceBlockchainAddress{
 
 
-    constructor (db, password = 'password'){
+    constructor (db, password = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l' ]){
 
         this.address = null;
 
@@ -18,7 +19,7 @@ class InterfaceBlockchainAddress{
 
         if (db === undefined){
             this.db = new InterfaceSatoshminDB();
-            this.password = 'password';
+            this.password = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l' ];
         } else {
             this.db = db;
             this.password = password;
@@ -57,9 +58,14 @@ class InterfaceBlockchainAddress{
         if (password === undefined)
             password = this.password;
 
-        let encr = WebDollarCrypto.encryptAES(data, password);
+        let encr = null;
 
-        return Buffer.from(encr);
+        if (Array.isArray(password))
+            encr = MultiSig.getMultiAESEncrypt(data, password);
+        else
+            encr = WebDollarCrypto.encryptAES(data, password);
+
+        return encr;
     }
 
     /**
@@ -73,9 +79,24 @@ class InterfaceBlockchainAddress{
         if (password === undefined)
             password = this.password;
 
-        let decr = WebDollarCrypto.decryptAES(data, password);
+        let decr = null;
 
-        return Buffer.from(decr);
+        if (Array.isArray(password))
+            decr = MultiSig.getMultiAESDecrypt(data, password);
+        else
+            decr = WebDollarCrypto.decryptAES(data, password);
+
+        return decr;
+    }
+
+    /**
+     * @returns true if privateKey is encrypted
+     */
+    async isPrivateKeyEncrypted() {
+
+        let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(await this.getPrivateKey());
+
+        return !generatedPublicKey.equals(this.publicKey);
     }
 
     /**
@@ -92,7 +113,7 @@ class InterfaceBlockchainAddress{
 
         try {
             let result = await this.db.save(key, value);
-            //console.log("reesult save", result);
+
             return  result;
         }
         catch(err) {
