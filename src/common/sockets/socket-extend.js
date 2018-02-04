@@ -26,8 +26,7 @@ class SocketExtend{
 
                 if (global.TERMINATED) return;
 
-                if (process.env.BROWSER) this._processBrowserBufferArray(data);
-                else if (!process.env.BROWSER) this._processBackboneBufferArray(data);
+                this._processBufferArray(data);
 
                 return callback(data);
             })
@@ -38,8 +37,7 @@ class SocketExtend{
 
                 if (global.TERMINATED) return;
 
-                if (process.env.BROWSER) this._processBrowserBufferArray(data);
-                else if (!process.env.BROWSER) this._processBackboneBufferArray(data);
+                this._processBufferArray(data);
 
                 return callback(data);
             })
@@ -119,8 +117,7 @@ class SocketExtend{
 
                 if (timeoutId !== undefined) clearTimeout(timeoutId);
 
-                if (process.env.BROWSER) this._processBrowserBufferArray(resData);
-                else if (!process.env.BROWSER) this._processBackboneBufferArray(resData);
+                this._processBufferArray(resData);
 
                 resolve(resData);
             };
@@ -157,35 +154,22 @@ class SocketExtend{
     /**
      * Browser sockets receives ArrayBuffer and it is not compatible with Buffer (UIntArray) in the Browser
      */
-    _processBrowserBufferArray(data){
-
-        if (!process.env.BROWSER) return;
+    _processBufferArray(data){
 
         if (typeof data === "object" && data !== null)
             for (let prop in data){
                 if (data.hasOwnProperty(prop)){
+
                     if (isArrayBuffer(data[prop]))
                         data[prop] = Buffer.from(data[prop]);
                     else
-                        this._processBrowserBufferArray(data[prop]);
-                }
-            }
-    }
-
-    _processBackboneBufferArray(data){
-
-        if (process.env.BROWSER) return;
-
-        if (typeof data === "object" && data !== null)
-            for (let prop in data){
-                if (data.hasOwnProperty(prop)){
-
                     if (prop === "type" && data.type === "Buffer" && data.hasOwnProperty("data")) {
                         data = new Buffer(data);
                         return data;
                     }
                     else
-                        data[prop] = this._processBackboneBufferArray(data[prop]);
+                        data[prop] = this._processBufferArray(data[prop]);
+
                 }
             }
 

@@ -33,14 +33,14 @@ class InterfaceBlockchainProtocolForkSolver{
             //i have finished the binary search
             if (left >= right) {
                 //it the block actually is the same
-                if (blockHeaderResult.header.hash.equals(this.blockchain.blocks[mid].hash) )
+                if (blockHeaderResult.header.hash.equals( this.blockchain.getHashPrev(mid+1) ) )
                     return {position: mid, header: blockHeaderResult.header};
                 else
                     return {position: -1, header: blockHeaderResult.header};
             }
 
             //was not not found, search left because it must be there
-            if (blockHeaderResult.header.hash.equals(this.blockchain.blocks[mid].hash) === false)
+            if (blockHeaderResult.header.hash.equals( this.blockchain.getHashPrev(mid+1)  ) === false)
                 return await this._discoverForkBinarySearch(socket, left, mid);
             else
             //was found, search right because the fork must be there
@@ -300,8 +300,10 @@ class InterfaceBlockchainProtocolForkSolver{
                             throw "Fork didn't work at height "+nextBlockHeight;
 
 
-                    } else
+                    } else {
+                        console.log("Fork Answer received ", answer)
                         throw "Fork Answer is not Buffer";
+                    }
 
 
                 }
