@@ -336,16 +336,18 @@ class MainBlockchainWallet{
 
     async encryptAddress(blockchainAddress, password){
 
-        let index = this.findAddress(blockchainAddress);
+        if ( await blockchainAddress.isPrivateKeyEncrypted() === true )
+            return true;
 
-        if (index !== -1)
+        if ( this.getAddressIndex(blockchainAddress) === -1 )
             return false;
+
         let privateKey = this.addresses[index].getPrivateKey();
 
         return (await this.addresses[index].savePrivateKey(privateKey, password));
     }
 
-    findAddress(address){
+    getAddressIndex(address){
 
         for (let i = 0; i < this.addresses.length; i++)
             if (address === this.addresses[i].address)
@@ -359,7 +361,7 @@ class MainBlockchainWallet{
 
     async _insertAddress(blockchainAddress){
 
-        let index = this.findAddress(blockchainAddress);
+        let index = this.getAddressIndex(blockchainAddress);
         if (index !== -1) return false;
 
         this.addresses.push(blockchainAddress);
@@ -374,7 +376,7 @@ class MainBlockchainWallet{
 
         if (typeof address === "object") address = address.address;
 
-        let index = this.findAddress(address);
+        let index = this.getAddressIndex(address);
         if (index === -1) return {result: false, message: "Address was not found ", address:address};
 
         let ask = confirm("Are your sure you wallet to delete " + address);
