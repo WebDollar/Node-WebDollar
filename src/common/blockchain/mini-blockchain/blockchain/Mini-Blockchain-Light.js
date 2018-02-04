@@ -57,11 +57,11 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             if (result && saveBlock ){
 
+                if (!this._recalculateLightPrevs( this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2)) throw "_recalculateLightPrevs failed";
+
                 // propagating a new block in the network
                 this.propagateBlocks(block.height, socketsAvoidBroadcast)
             }
-
-            result &= this._recalculateLightPrevs( this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2);
 
 
         } else {
@@ -131,10 +131,12 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log("this.lightPrevTimestamp", this.lightPrevTimeStamp);
         console.log("this.lightPrevHashPrev", this.lightPrevHashPrev !== undefined ? this.lightPrevHashPrev.toString("hex") : '');
 
-        if (diffIndex === undefined)
-            diffIndex = this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
+        if (diffIndex === undefined) diffIndex = this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
 
-        if (!await this.accountantTree.saveMiniAccountant( true, undefined, this.getSerializedAccountantTree( diffIndex ) )) throw "saveMiniAccountant";
+        let treeSerialization = this.getSerializedAccountantTree( diffIndex  );
+        if (!await this.accountantTree.saveMiniAccountant( true, undefined, treeSerialization )) throw "saveMiniAccountant";
+
+        console.log(treeSerialization.toString('hex'));
 
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTarget) ) throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevTimestamp", this.lightPrevTimeStamp) ) throw "Couldn't be saved _LightSettings_prevTimestamp ";
@@ -251,6 +253,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
     getSerializedAccountantTree(height){
 
         if (height === undefined) height = this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2;
+
+        height = height - 1;
 
         if (height < 0)
             height = -1;
