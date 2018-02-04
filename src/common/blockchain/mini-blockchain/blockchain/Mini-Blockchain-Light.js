@@ -119,7 +119,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         }
 
-        await this._saveLightSettings(diffIndex);
+        return await this._saveLightSettings(diffIndex);
 
     }
 
@@ -141,6 +141,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTarget) ) throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevTimestamp", this.lightPrevTimeStamp) ) throw "Couldn't be saved _LightSettings_prevTimestamp ";
         if (! await this.db.save(this.blockchainFileName+"_LightSettings_prevHashPrev", this.lightPrevHashPrev) ) throw "Couldn't be saved _LightSettings_prevHashPrev ";
+
+        return true;
     }
 
     async _loadLightSettings(serializationAccountantTreeInitial){
