@@ -33,8 +33,8 @@ describe('test save wallet to local storage', () => {
 
     it('test check function isPrivateKeyEncrypted', async () => {
 
-        let addressBlockchain = await Blockchain.Wallet.createNewAddress();
-        let response = await addressBlockchain.isPrivateKeyEncrypted();
+        let blockchainAddress = await Blockchain.Wallet.createNewAddress();
+        let response = await blockchainAddress.isPrivateKeyEncrypted();
 
         assert(response === false, "isPrivateKeyEncrypted doesn't work");
     });

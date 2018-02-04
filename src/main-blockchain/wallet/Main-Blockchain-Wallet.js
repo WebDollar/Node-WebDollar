@@ -334,18 +334,41 @@ class MainBlockchainWallet{
         return blockchainAddress;
     }
 
-    async encryptAddress(blockchainAddress, password){
+    async encryptAddress(address, password){
 
-        let index = this.findAddress(blockchainAddress);
-
-        if (index !== -1)
+        let index = this.getAddressIndex(address);
+        if (index < 0)
             return false;
-        let privateKey = this.addresses[index].getPrivateKey();
 
-        return (await this.addresses[index].savePrivateKey(privateKey, password));
+        if (await this.addresses[index].isPrivateKeyEncrypted(password) === true) {
+            console.log("SIGNED 0");
+            return true;
+        } else {
+            console.log("SIGNED 1");
+            let privateKey = this.addresses[index].getPrivateKey();
+
+            return (await this.addresses[index].savePrivateKey(privateKey, password));
+        }
     }
 
-    findAddress(address){
+    async signTransaction(address, password){
+
+        let index = this.getAddressIndex(address);
+        if (index < 0)
+            return false;
+
+        if (await this.addresses[index].isPrivateKeyEncrypted(password) === false) {
+            let privateKey = await this.addresses[index].getPrivateKey(password);
+            //TODO: Sign transaction code
+            return true;
+        } else {
+            let privateKey = await this.addresses[index].getPrivateKey(password);
+            //TODO: Sign transaction code
+            return true;
+        }
+    }
+
+    getAddressIndex(address){
 
         for (let i = 0; i < this.addresses.length; i++)
             if (address === this.addresses[i].address)
@@ -359,7 +382,7 @@ class MainBlockchainWallet{
 
     async _insertAddress(blockchainAddress){
 
-        let index = this.findAddress(blockchainAddress);
+        let index = this.getAddressIndex(blockchainAddress);
         if (index !== -1) return false;
 
         this.addresses.push(blockchainAddress);
@@ -374,7 +397,7 @@ class MainBlockchainWallet{
 
         if (typeof address === "object") address = address.address;
 
-        let index = this.findAddress(address);
+        let index = this.getAddressIndex(address);
         if (index === -1) return {result: false, message: "Address was not found ", address:address};
 
         let ask = confirm("Are your sure you wallet to delete " + address);
