@@ -183,21 +183,37 @@ class InterfaceBlockchain {
         if (height === undefined) height = this.blocks.length;
 
         if (height <= 0)  return BlockchainGenesis.difficultyTarget;
-        else return this.blocks[height-1].difficultyTarget;
+        else{
+            if (height > this.blocks.length > 0) throw "invalid height"; else
+            if (this.blocks[height-1] === undefined) throw "invalid height";
+
+            return this.blocks[height-1].difficultyTarget;
+        }
+
     }
 
     getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
         if (height <= 0)  return BlockchainGenesis.timeStamp;
-        else return this.blocks[height-1].timeStamp;
+        else{
+            if (height > this.blocks.length > 0) throw "invalid height"; else
+            if (this.blocks[height-1] === undefined) throw "invalid height";
+
+            return this.blocks[height-1].timeStamp;
+        }
     }
 
     getHashPrev(height){
         if (height === undefined) height = this.blocks.length;
 
         if (height <= 0)  return BlockchainGenesis.hashPrev;
-        else return this.blocks[height-1].hash;
+        else {
+            if (height > this.blocks.length > 0) throw "invalid height"; else
+            if (this.blocks[height-1] === undefined) throw "invalid height";
+
+            return this.blocks[height-1].hash;
+        }
     }
 
     /**
