@@ -64,19 +64,19 @@ class InterfaceBlockchainMining{
     /**
      * mine next block
      */
-    async mineNextBlock(showMiningOutput){
+    async mineNextBlock(showMiningOutput, suspend){
 
         while (this.started){
 
             //mining next blocks
 
             // LIMIT mining first 21 blocks
-            // if (this.blockchain.blocks.length === 22) {
-            //     setTimeout( async ()=>{await this.mineNextBlock(showMiningOutput)}, 10000);
-            //     return;
-            // }
-            // if (this.blockchain.blocks.length === 23)
-            //     return;
+            if (this.blockchain.blocks.length === 11 && suspend === false) {
+                setTimeout( async ()=>{await this.mineNextBlock(showMiningOutput, true)}, 10000);
+                return;
+            }
+            if (this.blockchain.blocks.length === 12)
+                return;
 
             let nextBlock, nextTransactions;
 
@@ -135,6 +135,7 @@ class InterfaceBlockchainMining{
             this.finish = 0;
         this.finish++;
 
+        console.log("");
         console.log(" ----------- mineBlock-------------");
 
         try{

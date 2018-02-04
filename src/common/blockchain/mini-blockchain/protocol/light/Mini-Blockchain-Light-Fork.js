@@ -57,9 +57,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             if (this.blockchain.accountantTree.root.edges.length > 0)
                 console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount);
 
-            console.log("this.forkPrevDifficultyTarget", this.forkPrevDifficultyTarget);
+            console.log("this.forkPrevDifficultyTarget", this.forkPrevDifficultyTarget.toString("hex"));
             console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp);
-            console.log("this.forkPrevHashPrev", this.forkPrevHashPrev);
+            console.log("this.forkPrevHashPrev", this.forkPrevHashPrev.toString("hex"));
 
             this._lightAccountantTreeSerializationsHeightClone = this.blockchain.lightAccountantTreeSerializations[this.forkStartingHeight-1] ;
             this._blocksStartingPointClone = this.blockchain.blocksStartingPoint;
@@ -86,7 +86,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
     async postFork(forkedSuccessfully){
 
         if (forkedSuccessfully) {
-            if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
+            //if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
             return;
         }
 
@@ -99,7 +99,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrev = this._lightPrevHashPrevClone;
             this.blockchain.lightAccountantTreeSerializations[this.forkStartingHeight-1] = this._lightAccountantTreeSerializationsHeightClone;
 
-            if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
+            //if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
         }
 
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
