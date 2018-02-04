@@ -23,7 +23,7 @@ if ( typeof describe !== 'undefined') {
     require ('tests/blockchain/ppow-blockchain/PPoW-Blockchain-Interlink.test');
 
     require ('tests/main-blockchain/Main-Blockchain-Wallets.test');
-	require ('tests/main-blockchain/Interface-Blockchain-Address.test');
+    require ('tests/main-blockchain/Interface-Blockchain-Address.test');
 
     require ('tests/satoshmindb/Interface-SatoshminDB.test');
 
@@ -41,6 +41,8 @@ if ( typeof describe !== 'undefined') {
     require ('tests/utils/serialization/Serialization.test');
 
     require ('tests/utils/reward-simulator/RewardSimulator.test');
+
+    require ('tests/poolMining/PoolLeaderProtocol.test');
 
     // require ('tests/blockchain/Node-Web-Peer.test');
 

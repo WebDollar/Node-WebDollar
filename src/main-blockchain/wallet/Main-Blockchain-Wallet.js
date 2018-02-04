@@ -334,6 +334,17 @@ class MainBlockchainWallet{
         return blockchainAddress;
     }
 
+    async encryptAddress(blockchainAddress, password){
+
+        let index = this.findAddress(blockchainAddress);
+
+        if (index !== -1)
+            return false;
+        let privateKey = this.addresses[index].getPrivateKey();
+
+        return (await this.addresses[index].savePrivateKey(privateKey, password));
+    }
+
     findAddress(address){
 
         for (let i = 0; i < this.addresses.length; i++)
