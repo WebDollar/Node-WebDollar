@@ -416,7 +416,7 @@ console.log("here 1");
         let index = this.getAddressIndex(address);
         if (index === -1) return {result: false, message: "Address was not found ", address:address};
 
-        let ask = confirm("Are your sure you wallet to delete " + address);
+        let ask = confirm("Are you sure you want to delete " + address);
 
         if(ask){
 
