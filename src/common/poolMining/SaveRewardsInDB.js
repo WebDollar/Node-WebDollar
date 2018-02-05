@@ -6,7 +6,7 @@ class SaveRewardsInDB {
     constructor(dataBase) {
 
         if (dataBase === undefined)
-            this.db = new InterfaceSatoshminDB("sew");
+            this.db = new InterfaceSatoshminDB("poolDB");
         else
             this.db = dataBase;
 

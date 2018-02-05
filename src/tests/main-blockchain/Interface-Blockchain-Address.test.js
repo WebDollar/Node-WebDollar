@@ -18,7 +18,7 @@ describe('test save addresses to local storage', () => {
         assert(decrypt.equals(buffer), "Buffer differ after multiAESDecrypt" + buffer.toString("hex") + "!==" + decrypt.toString("hex"));
     });
 
-    /*it('test check multiSig encrypt/decrypt Buffer test 2', () => {
+    it('test check multiSig encrypt/decrypt Buffer test 2', () => {
 
         let buffer = WebDollarCrypto.getBufferRandomValues(32);
         let encrypt = MultiSig.getMultiAESEncrypt(buffer, ["ana", "are", "mere", "rosii"]);
@@ -29,7 +29,7 @@ describe('test save addresses to local storage', () => {
         encrypt = MultiSig.getMultiAESEncrypt(buffer, ["ana", "are", "mere", "rosii"]);
         decrypt = MultiSig.getMultiAESDecrypt(encrypt, ["anaaremererosii"]);
         assert(decrypt === null || !decrypt.equals(buffer), "Buffer should differ after multiAESDecrypt");
-    });*/
+    });
 
     it('test check function isPrivateKeyEncrypted', async () => {
 
@@ -38,8 +38,21 @@ describe('test save addresses to local storage', () => {
 
         assert(response === false, "isPrivateKeyEncrypted doesn't work");
     });
+    
+    it('test check multiSig encrypt/decrypt privateKey with 12 words', async () => {
+        
+        let passwordZero = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j', 'k', 'l'];
+        let blockchainAddress = await Blockchain.Wallet.createNewAddress();
+        let privateKey0 = await blockchainAddress.getPrivateKey();
+        
+        let encrypt = MultiSig.getMultiAESEncrypt(privateKey0, passwordZero);
+        let privateKey1 = MultiSig.getMultiAESDecrypt(encrypt, passwordZero);
+        
+        assert(privateKey1.equals(privateKey0), "privateKey differ after decrypt" + privateKey0.toString("hex") + "!==" + privateKey1.toString("hex"));
+        
+    });
 
-    it('test check save/get privateKey with 12 words', async () => {
+    it('test check save/get privateKey encrypted with 12 words', async () => {
 
         let passwordZero = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j', 'k', 'l'];
         let passwordOne = ['ak', 'bv', 'co', 'dy', 're', 'ff', 'sg', 'rh', 'ti','sj', 'ck', 'ul'];
