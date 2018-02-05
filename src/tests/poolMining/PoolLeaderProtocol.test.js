@@ -35,12 +35,12 @@ describe('test pool leader protocol', () => {
 
     });
 
-    it('create reward distribution', ()=>{
+    it('create reward distribution', () => {
 
         let leaderCommissionPercentage = 10;
         let respose = miner.rewardsDistribution(reward,leaderCommissionPercentage,hashList);
 
-        assert(respose.poolLeaderReward==reward/leaderCommissionPercentage,"Good Pool leader reward");
+        assert(respose.poolLeaderReward === reward/leaderCommissionPercentage, "Bad Pool leader reward");
 
         let totalMinersReward = new BigNumber(respose.minnersReward[0].reward);
 
