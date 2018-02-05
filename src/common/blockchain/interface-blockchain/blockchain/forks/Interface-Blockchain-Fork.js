@@ -123,10 +123,10 @@ class InterfaceBlockchainFork {
 
         let useFork = false;
 
-        if (this.blockchain.getBlockchainLength() < this.forkStartingHeight + this.forkBlocks.length)
+        if (this.blockchain.getBlockchainLength < this.forkStartingHeight + this.forkBlocks.length)
             useFork = true;
         else
-        if (this.blockchain.getBlockchainLength() === this.forkStartingHeight + this.forkBlocks.length){ //I need to check
+        if (this.blockchain.getBlockchainLength === this.forkStartingHeight + this.forkBlocks.length){ //I need to check
 
         }
 
@@ -137,7 +137,7 @@ class InterfaceBlockchainFork {
 
                 //making a copy of the current blockchain
                 this._blocksCopy = [];
-                for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength(); i++)
+                for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength; i++)
                     this._blocksCopy.push(this.blockchain.blocks[i]);
 
                 this.blockchain.spliceBlocks(this.forkStartingHeight);
@@ -184,6 +184,7 @@ class InterfaceBlockchainFork {
             });
 
             // it was done successfully
+            console.log("FORK SOLVER SUCCESS", success);
             if (success){
 
                 //propagate last block

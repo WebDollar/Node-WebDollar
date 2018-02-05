@@ -39,12 +39,12 @@ class InterfaceBlockchain {
 
         this.mining = undefined;
 
-        this._blockchainFileName = 'blockchain.bin';
+        this._blockchainFileName = consts.BLOCKCHAIN_FILE_NAME;
+        this.db = new InterfaceSatoshminDB("blockchainDB");
+
         this.blocksStartingPoint = 0;
 
         this.transactions = new InterfaceBlockchainTransactions();
-
-        this.db = new InterfaceSatoshminDB("blockchainDB");
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
@@ -170,11 +170,11 @@ class InterfaceBlockchain {
         return this.blocksStartingPoint;
     }
 
-    getBlockchainLength(){
+    get getBlockchainLength(){
         return this.blocks.length;
     }
 
-    getBlockchainLastBlock(){
+    get getBlockchainLastBlock(){
         return this.blocks[this.blocks.length-1];
     }
 

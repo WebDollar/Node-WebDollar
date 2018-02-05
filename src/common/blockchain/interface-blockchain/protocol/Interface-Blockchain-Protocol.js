@@ -111,9 +111,9 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - blockchain/header/last-block", exception.toString()));
+                    console.log(colors.red("Socket Error - get/blockchain/header/last-block/answer", exception.toString()));
 
-                    socket.node.sendRequest( "blockchain/header/last-block", {
+                    socket.node.sendRequest( "get/blockchain/header/last-block/answer", {
                         result: false,
                         message: exception.toString()
                     });
@@ -136,7 +136,11 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
+                    console.log("blockchain/header/new-block received", data);
+
                     this._validateBlockchainHeader(data)
+
+                    console.log("blockchain/header/new-block validated");
 
                     //validate header
                     //TODO !!!
@@ -145,7 +149,7 @@ class InterfaceBlockchainProtocol {
                         throw "your block is invalid";
 
                     //in case the hashes are the same, and I have already the block
-                    if (( data.height >= 0 && this.blockchain.getBlockchainLength() - 1 >= data.height && this.blockchain.getBlockchainLength() >= data.chainLength )) {
+                    if (( data.height >= 0 && this.blockchain.getBlockchainLength - 1 >= data.height && this.blockchain.getBlockchainLength >= data.chainLength )) {
 
                         //in case the hashes are exactly the same, there is no reason why we should download it
 
@@ -156,6 +160,8 @@ class InterfaceBlockchainProtocol {
                             throw "your block is not new, because I have a valid block at same height ";
 
                     }
+
+                    console.log("blockchain/header/new-block discoverAndSolveFork");
 
                     let result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header)
 
@@ -185,7 +191,7 @@ class InterfaceBlockchainProtocol {
                 socket.node.sendRequest("blockchain/info/request-blockchain-info", {
                     result: true,
                     chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),
-                    chainLength: this.blockchain.getBlockchainLength()
+                    chainLength: this.blockchain.getBlockchainLength
                 });
 
             } catch (exception) {
@@ -209,7 +215,7 @@ class InterfaceBlockchainProtocol {
 
                     if (typeof data.height !== 'number') throw "data.height is not defined";
 
-                    if (this.blockchain.getBlockchainLength() <= data.height) throw "data.height is higher than I have " + this.blockchain.getBlockchainLength() + " < " +data.height;
+                    if (this.blockchain.getBlockchainLength <= data.height) throw "data.height is higher than I have " + this.blockchain.getBlockchainLength + " < " +data.height;
 
 
                     let block = this.blockchain.blocks[data.height];
@@ -224,7 +230,7 @@ class InterfaceBlockchainProtocol {
                             height: block.height,
                             prevHash: block.hashPrev,
                             hash: block.hash,
-                            chainLength: this.blockchain.getBlockchainLength()
+                            chainLength: this.blockchain.getBlockchainLength
                         }
                     });
 
@@ -252,7 +258,7 @@ class InterfaceBlockchainProtocol {
 
                     if (typeof data.height !== 'number') throw "data.height is not defined";
 
-                    if (this.blockchain.getBlockchainLength() < data.height) throw "data.height is higher than I have "+this.blockchain.getBlockchainLength() + " < " +data.height;
+                    if (this.blockchain.getBlockchainLength < data.height) throw "data.height is higher than I have "+this.blockchain.getBlockchainLength + " < " +data.height;
 
                     let block = this.blockchain.blocks[data.height];
 
@@ -303,7 +309,7 @@ class InterfaceBlockchainProtocol {
             //TODO !!!
 
             //in case the hashes are the same, and I have already the block
-            if (( data.height >= 0 && this.blockchain.getBlockchainLength() - 1 >= data.height && this.blockchain.getBlockchainLength() >= data.chainLength )) {
+            if (( data.height >= 0 && this.blockchain.getBlockchainLength - 1 >= data.height && this.blockchain.getBlockchainLength >= data.chainLength )) {
 
                 //in case the hashes are exactly the same, there is no reason why we should download it
                 let myHash = this.blockchain.getHashPrev(data.height+1);

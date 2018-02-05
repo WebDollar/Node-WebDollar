@@ -29,7 +29,7 @@ class MiniBlockchainFork extends inheritFork{
         //console.log("root.targetNode.balances before", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
 
         //remove transactions and rewards from each blocks
-        for (let i = this.blockchain.getBlockchainLength()-1; i>=this.forkStartingHeight; i--) {
+        for (let i = this.blockchain.getBlockchainLength-1; i>=this.forkStartingHeight; i--) {
 
             //remove reward
 

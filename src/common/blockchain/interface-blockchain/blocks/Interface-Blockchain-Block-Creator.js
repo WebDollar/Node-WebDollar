@@ -55,13 +55,13 @@ class InterfaceBlockchainBlockCreator{
         for (let i=2; i<arguments.length; i++ )
             restArgs.push(arguments[i])
 
-        if (this.blockchain.getBlockchainLength() === 0){  //Genesis Block
+        if (this.blockchain.getBlockchainLength === 0){  //Genesis Block
 
             return this._createBlockGenesis( minerAddress, restArgs);
 
         } else { //Fetch Transactions and Create Block
 
-            return this._createBlockNew( this.blockchain.getBlockchainLength(), minerAddress, transactions,  restArgs );
+            return this._createBlockNew( this.blockchain.getBlockchainLength, minerAddress, transactions,  restArgs );
 
         }
 

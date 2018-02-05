@@ -78,7 +78,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         let fork, result = null, newChainStartingPoint = 0;
         let binarySearchResult = {position: -1, header: null };
-        let currentBlockchainLength = this.blockchain.getBlockchainLength();
+        let currentBlockchainLength = this.blockchain.getBlockchainLength;
 
         try{
 

@@ -48,16 +48,16 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             console.log("block.height > ", block.height);
 
-            result = await this.simulateNewBlock(block, false, async ()=>{
+            if (!await this.simulateNewBlock(block, false, async ()=>{
                 return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, blockValidationType );
-            });
+            })) throw "Error Including Blockchain Light Block";
 
             console.log("this.blocks.height",block.height);
             //console.log("this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 2", this.blocks.length - consts.POW_PARAMS.VALIDATE_LAST_BLOCKS - 2);
 
-            console.log("reeesult", result, saveBlock);
+            console.log("reeesult", saveBlock);
 
-            if (result && saveBlock ){
+            if (saveBlock ){
 
                 // propagating a new block in the network
                 this.propagateBlocks(block.height, socketsAvoidBroadcast)
@@ -66,7 +66,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         } else {
 
-            result = await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock, blockValidationType );
+            if (!await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock, blockValidationType ))
+                throw "Error Including Blockchain Light Block";
 
             //for debugging only
 
@@ -90,7 +91,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         // console.log("this.lightPrevTimestamp", this.lightPrevTimeStamps[block.height]);
         // console.log("this.lightPrevHashPrev", this.lightPrevHashPrevs[block.height] !== undefined ? this.lightPrevHashPrevs[block.height].toString("hex") : '');
 
-        return result;
+        return true;
 
     }
 
