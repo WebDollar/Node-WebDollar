@@ -39,12 +39,12 @@ class InterfaceBlockchain {
 
         this.mining = undefined;
 
-        this.blockchainFileName = 'blockchain.bin';
+        this._blockchainFileName = 'blockchain.bin';
         this.blocksStartingPoint = 0;
 
         this.transactions = new InterfaceBlockchainTransactions();
 
-        this.db = new InterfaceSatoshminDB();
+        this.db = new InterfaceSatoshminDB("blockchainDB");
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
@@ -273,7 +273,7 @@ class InterfaceBlockchain {
 
     async saveNewBlock(block){
 
-        if (await this.db.save(this.blockchainFileName, this.blocks.length) !== true){
+        if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
             console.log(colors.red("Error saving the blocks.length"));
             return false;
         }
@@ -288,7 +288,7 @@ class InterfaceBlockchain {
         //save the number of blocks
         let result = true;
 
-        if (await this.db.save(this.blockchainFileName, this.blocks.length) !== true){
+        if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
             console.log(colors.red("Error saving the blocks.length"));
         } else
 
@@ -307,7 +307,7 @@ class InterfaceBlockchain {
     async load(validateLastBlocks){
 
         //load the number of blocks
-        let numBlocks = await this.db.get(this.blockchainFileName);
+        let numBlocks = await this.db.get(this._blockchainFileName);
         if (numBlocks === null ) {
             console.log(colors.red("numBlocks was not found"));
             return false;

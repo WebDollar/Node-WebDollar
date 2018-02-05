@@ -149,9 +149,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log(colors.blue("this.lightPrevTimestamp"), this.lightPrevTimeStamps[diffIndex]);
             console.log(colors.blue("this.lightPrevHashPrev"), this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex") : '');
 
-            if (!await this.db.save(this.blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex])) throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
-            if (!await this.db.save(this.blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex])) throw "Couldn't be saved _LightSettings_prevTimestamp ";
-            if (!await this.db.save(this.blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex])) throw "Couldn't be saved _LightSettings_prevHashPrev ";
+            if (!await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex])) throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
+            if (!await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex])) throw "Couldn't be saved _LightSettings_prevTimestamp ";
+            if (!await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex])) throw "Couldn't be saved _LightSettings_prevHashPrev ";
 
         } catch (exception){
             console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
@@ -170,7 +170,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         console.log("_loadLightSettings load" );
 
-        let numBlocks = await this.db.get(this.blockchainFileName);
+        let numBlocks = await this.db.get(this._blockchainFileName);
         if (numBlocks === null ) {
             console.log(colors.red("numBlocks was not found"));
             return false;
@@ -182,19 +182,19 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             this.lightAccountantTreeSerializations[diffIndex] = serializationAccountantTreeInitial;
 
-            this.lightPrevDifficultyTargets[diffIndex] = await this.db.get(this.blockchainFileName + "_LightSettings_prevDifficultyTarget");
+            this.lightPrevDifficultyTargets[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTarget");
             if (this.lightPrevDifficultyTargets[diffIndex] === null) {
                 console.log(colors.red("_LightSettings_prevDifficultyTarget was not found"));
                 return false;
             }
 
-            this.lightPrevTimeStamps[diffIndex] = await this.db.get(this.blockchainFileName + "_LightSettings_prevTimestamp");
+            this.lightPrevTimeStamps[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevTimestamp");
             if (this.lightPrevTimeStamps[diffIndex] === null) {
                 console.log(colors.red("_LightSettings_prevTimestamp was not found"));
                 return false;
             }
 
-            this.lightPrevHashPrevs[diffIndex] = await this.db.get(this.blockchainFileName + "_LightSettings_prevHashPrev");
+            this.lightPrevHashPrevs[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevHashPrev");
             if (this.lightPrevHashPrevs[diffIndex] === null) {
                 console.log(colors.red("_LightSettings_prevHashPrev was not found"));
                 return false;

@@ -26,7 +26,6 @@ class InterfaceSatoshminDB {
             console.log("InterfaceSatoshminDB exception", pounchdb)
         }
 
-        this.attachName = 'wallet.bin';
     }
 
     async createDocument(key, value) {
@@ -197,7 +196,7 @@ class InterfaceSatoshminDB {
         try {
             let doc = await this.db.get(key);
 
-            let result = await this.db.removeAttachment(doc._id, this.attachName, doc._rev);
+            let result = await this.db.removeAttachment(doc._id, this.dbName, doc._rev);
 
             return true;
 
@@ -239,7 +238,8 @@ class InterfaceSatoshminDB {
                 clearTimeout(timeoutInterval);
             } catch (exception) {
                 console.log("db.save error " + key, exception);
-                if (exception.status === 500)
+
+                if (exception.status === 500 && MainBlockchain.emitter !== undefined)
                     MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"});
 
                 resolve(null);
@@ -269,7 +269,7 @@ class InterfaceSatoshminDB {
                 clearTimeout(timeoutInterval);
                 console.log(colors.red("db.get error " + key), exception);
 
-                if (exception.status === 500)
+                if (exception.status === 500 && MainBlockchain.emitter !== undefined)
                     MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
 
                 resolve(null);
@@ -286,8 +286,10 @@ class InterfaceSatoshminDB {
             return result;
         } catch (exception) {
             console.log("db.remove error " + key, exception);
-            if (exception.status === 500)
+
+            if (exception.status === 500 && MainBlockchain.emitter !== undefined)
                 MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
+
             return null;
         }
     }
