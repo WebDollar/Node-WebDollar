@@ -70,6 +70,7 @@ class InterfaceBlockchainForksAdministrator {
     findForkByHeader(header){
 
         if (header === null || header === undefined) return null;
+        if (header.hash === null || header.hash === undefined) return null;
 
         for (let i=0; i<this.forks.length; i++)
             if ( this.forks[i].forkHeader !== null && this.forks[i].forkHeader.hash !== undefined && this.forks[i].forkHeader.hash !== null && (this.forks[i].forkHeader === header || this.forks[i].forkHeader.hash.equals( header.hash )) )

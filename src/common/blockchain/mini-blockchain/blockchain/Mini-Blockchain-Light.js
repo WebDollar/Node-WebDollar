@@ -74,7 +74,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (!await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)) throw "_recalculateLightPrevs failed";
 
-        console.log("BLOCK ", block.serializeBlock().toString("hex"));
+        //console.log("BLOCK ", block.serializeBlock().toString("hex"));
         console.log(" hash", block.hash.toString("hex"));
         console.log(" difficulty", block.difficultyTarget.toString("hex"));
         console.log(" prev difficulty ", block.difficultyTargetPrev.toString("hex"));

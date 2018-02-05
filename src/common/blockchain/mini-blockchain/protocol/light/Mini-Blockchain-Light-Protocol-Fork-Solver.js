@@ -11,24 +11,40 @@ else inheritForkSolver = InterfaceBlockchainProtocolForkSolver;
 
 class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
+
+    async _getLastBlocks(heightRequired){
+
+        let blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: heightRequired }, heightRequired );
+
+        if (blockHeaderResult === null)
+            throw "LightProtocolForkSolver _calculateForkBinarySearch headers-info dropped " + heightRequired;
+
+        return {position: heightRequired, header: blockHeaderResult};
+
+    }
+
     async _calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength){
 
         console.log("chainStartingPoint", newChainStartingPoint, "newChainLength", newChainLength, "currentBlockchainLength", currentBlockchainLength)
 
         if (newChainStartingPoint > currentBlockchainLength-1) {
 
-            let heightRequired = newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
 
-            let blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: heightRequired }, heightRequired );
+            await this._getLastBlocks(newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
 
-            if (blockHeaderResult === null)
-                throw "LightProtocolForkSolver _calculateForkBinarySearch headers-info dropped " + heightRequired;
 
-            return {position: heightRequired, header: blockHeaderResult};
+        } else {
 
-        } else
+            let result = await inheritForkSolver.prototype._calculateForkBinarySearch.call(this, socket, newChainStartingPoint, newChainLength, currentBlockchainLength);
 
-            return await inheritForkSolver.prototype._calculateForkBinarySearch.call(this, socket, newChainStartingPoint, newChainLength, currentBlockchainLength);
+            if (this.blockchain.agent.light){
+
+                if (result.position === -1)
+                    await this._getLastBlocks(newChainStartingPoint);
+            }
+
+            return result;
+        }
 
 
     }

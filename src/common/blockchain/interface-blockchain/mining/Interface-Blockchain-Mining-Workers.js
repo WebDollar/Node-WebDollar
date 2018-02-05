@@ -133,6 +133,14 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             });
 
         }
+
+        console.log("WORKERS MINING RESTARTED", this.reset);
+        console.log("WORKERS MINING RESTARTED", this.reset);
+        console.log("WORKERS MINING RESTARTED", this.reset);
+        console.log("WORKERS MINING RESTARTED", this.reset);
+        console.log("WORKERS MINING RESTARTED", this.reset);
+        console.log("WORKERS MINING RESTARTED", this.reset);
+
     }
 
     _puzzleReceived(worker, event){

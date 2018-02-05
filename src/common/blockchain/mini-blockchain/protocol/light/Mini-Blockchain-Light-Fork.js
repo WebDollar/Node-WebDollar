@@ -21,7 +21,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     _getForkPrevsData(height, forkHeight){
 
-        if ( forkHeight === 0 && this.forkChainStartingPoint === this.forkStartingHeight ) {
+        if ( forkHeight === 0 && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
 
             // based on previous block from blockchain
             if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined) throw "forkPrevDifficultyTarget was not specified";
