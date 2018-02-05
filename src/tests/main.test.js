@@ -43,6 +43,7 @@ if ( typeof describe !== 'undefined') {
     require ('tests/utils/reward-simulator/RewardSimulator.test');
 
     require ('tests/poolMining/PoolLeaderProtocol.test');
+    require ('tests/poolMining/PoolData.test');
 
     // require ('tests/blockchain/Node-Web-Peer.test');
 

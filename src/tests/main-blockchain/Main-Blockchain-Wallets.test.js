@@ -220,9 +220,6 @@ describe('test save wallet to local storage', () => {
 
         assert(0 <= index, "Address index < 0: index = " + index);
 
-        let privateKey = await blockchainAddress.getPrivateKey();
-        console.log("privateKey=", privateKey.toString("hex"));
-
         response = await Blockchain.Wallet.isAddressEncrypted(hexAddress);
         assert(response === false, "Address should not be encrypted firstly");
 

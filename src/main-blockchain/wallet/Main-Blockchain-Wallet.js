@@ -339,12 +339,11 @@ class MainBlockchainWallet{
     async encryptAddress(address, oldPassword, newPassword){
 
         address = this.getAddress(address);
-console.log("here 1");
+
         let privateKey = await address.getPrivateKey(oldPassword);
-        console.log("here 2="+privateKey);
         if (privateKey === null || privateKey === undefined || privateKey.length !== 32)
             return false;
-        console.log("here 3");
+
         return (await address.savePrivateKey(privateKey, newPassword));
     }
 

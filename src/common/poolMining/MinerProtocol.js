@@ -1,6 +1,6 @@
 import NodesList from 'node/lists/nodes-list';
 
-class MinerProtocol{
+class MinerProtocol {
 
     constructor(){
 
