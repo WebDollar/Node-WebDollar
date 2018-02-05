@@ -12,7 +12,7 @@ else inheritForkSolver = InterfaceBlockchainProtocolForkSolver;
 class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
 
-    async _getLastBlocks(heightRequired){
+    async _getLastBlocks(socket, heightRequired){
 
         let blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: heightRequired }, heightRequired );
 
@@ -30,17 +30,19 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         if (newChainStartingPoint > currentBlockchainLength-1) {
 
 
-            await this._getLastBlocks(newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
+            return await this._getLastBlocks(socket, newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS-1);
 
 
         } else {
 
             let result = await inheritForkSolver.prototype._calculateForkBinarySearch.call(this, socket, newChainStartingPoint, newChainLength, currentBlockchainLength);
 
+            console.log(colors.yellow("_calculateForkBinarySearch"), result);
+
             if (this.blockchain.agent.light){
 
                 if (result.position === -1)
-                    await this._getLastBlocks(newChainStartingPoint);
+                    return await this._getLastBlocks(socket, newChainStartingPoint);
             }
 
             return result;

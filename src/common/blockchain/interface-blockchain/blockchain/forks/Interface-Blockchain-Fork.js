@@ -133,7 +133,7 @@ class InterfaceBlockchainFork {
         //overwrite the blockchain blocks with the forkBlocks
         if (useFork){
 
-            return await this.blockchain.processBlocksSempahoreCallback( async () => {
+            let success = await this.blockchain.processBlocksSempahoreCallback( async () => {
 
                 //making a copy of the current blockchain
                 this._blocksCopy = [];
@@ -176,17 +176,25 @@ class InterfaceBlockchainFork {
 
                 //propagating valid blocks
                 if (forkedSuccessfully) {
-                    this.blockchain.save();
+                    await this.blockchain.save();
                     this.blockchain.mining.resetMining();
-                    this.blockchain.propagateBlocks(this.forkStartingHeight, this.sockets);
                 }
-
-                // it was done successfully
-                if (forkedSuccessfully)
-                    this.blockchain.forksAdministrator.deleteFork(this);
 
                 return forkedSuccessfully;
             });
+
+            // it was done successfully
+            if (success){
+
+                //propagate last block
+                this.blockchain.propagateBlocks(this.blockchain.length-1, this.sockets);
+
+                //this.blockchain.propagateBlocks(this.forkStartingHeight, this.sockets);
+
+                this.blockchain.forksAdministrator.deleteFork(this);
+            }
+
+            return success;
 
         }
 

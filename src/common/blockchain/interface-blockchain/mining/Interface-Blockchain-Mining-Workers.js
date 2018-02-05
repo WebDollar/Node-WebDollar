@@ -123,23 +123,26 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         if (this._nonce > 0xFFFFFFFF || (this.started === false) || this.reset){
 
-            this._processWorkersSempahoreCallback(()=>{
+            //this._processWorkersSempahoreCallback(()=>{
 
                 this.workers.suspendWorkers();
                 this._suspendMiningWorking();
 
                 this._workerResolve({result:false}); //we didn't find anything
 
-            });
+                return true;
+
+            //});
 
         }
 
-        console.log("WORKERS MINING RESTARTED", this.reset);
-        console.log("WORKERS MINING RESTARTED", this.reset);
-        console.log("WORKERS MINING RESTARTED", this.reset);
-        console.log("WORKERS MINING RESTARTED", this.reset);
-        console.log("WORKERS MINING RESTARTED", this.reset);
-        console.log("WORKERS MINING RESTARTED", this.reset);
+        if (this.reset) {
+            console.log("WORKERS MINING RESTARTED", this.reset);
+            console.log("WORKERS MINING RESTARTED", this.reset);
+            console.log("WORKERS MINING RESTARTED", this.reset);
+        }
+
+        return false;
 
     }
 
@@ -147,7 +150,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         if (this._workerFinished) return; //job finished
 
-        this.checkFinished();
+        if (this.checkFinished())
+            return false;
 
         if (event.data.message === "algorithm"){
 
@@ -196,7 +200,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                         if (event.data.hash[i] < this.difficulty[i] ) {
 
-                            this._processWorkersSempahoreCallback( ()=>{
+                            //this._processWorkersSempahoreCallback( ()=>{
 
                                 console.log('processing');
 
@@ -209,7 +213,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                                     nonce: event.data.nonce,
                                 });
 
-                            });
+                            //});
 
                             return;
 

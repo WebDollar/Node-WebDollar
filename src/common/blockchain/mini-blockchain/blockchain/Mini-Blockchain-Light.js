@@ -114,7 +114,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (serialization === undefined){
             serialization = this.accountantTree.serializeMiniAccountant();
-            console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
+            //console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
         }
 
         this.lightAccountantTreeSerializations[diffIndex+1] = serialization;

@@ -209,7 +209,7 @@ class InterfaceBlockchainProtocol {
 
                     if (typeof data.height !== 'number') throw "data.height is not defined";
 
-                    if (this.blockchain.getBlockchainLength() <= data.height) throw "data.height is higher than I have " + data.height;
+                    if (this.blockchain.getBlockchainLength() <= data.height) throw "data.height is higher than I have " + this.blockchain.getBlockchainLength() + " < " +data.height;
 
 
                     let block = this.blockchain.blocks[data.height];
@@ -252,7 +252,7 @@ class InterfaceBlockchainProtocol {
 
                     if (typeof data.height !== 'number') throw "data.height is not defined";
 
-                    if (this.blockchain.getBlockchainLength() < data.height) throw "data.height is higher than I have";
+                    if (this.blockchain.getBlockchainLength() < data.height) throw "data.height is higher than I have "+this.blockchain.getBlockchainLength() + " < " +data.height;
 
                     let block = this.blockchain.blocks[data.height];
 

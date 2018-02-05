@@ -402,7 +402,6 @@ class InterfaceBlockchain {
     propagateBlocks(height, socketsAvoidBroadcast){
 
         if (this.agent !== undefined) {
-
             for (let i=height; i<this.blocks.length; i++)
                 this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
         }
@@ -416,8 +415,8 @@ class InterfaceBlockchain {
         this.emitter.emit("blockchain/block-inserted", block);
     }
 
-    spliceBlocks(a,b){
-        this.blocks.splice(a,b);
+    spliceBlocks(after){
+        this.blocks.splice(after);
         this.emitter.emit("blockchain/blocks-count-changed", this.blocks.length);
     }
 
