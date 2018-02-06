@@ -239,12 +239,11 @@ class InterfaceBlockchain {
                     global.SEMAPHORE_PROCESS_DONE = false;
                     clearInterval(timer);
 
-                    let exception, result;
+                    let exception, result=false;
 
                     try {
                         result = await callback();
                     } catch (ex){
-                        result = null;
                         console.log(colors.red("error processBlocksSempahoreCallback"), ex);
                         exception = ex;
                     }
@@ -252,11 +251,7 @@ class InterfaceBlockchain {
                     this._blocksSempahore = false;
                     global.SEMAPHORE_PROCESS_DONE = true;
 
-                    if (exception !== undefined)
-                        throw exception;
-
                     resolve(result);
-                    return result;
                 }
             },10);
         });
@@ -402,8 +397,11 @@ class InterfaceBlockchain {
     propagateBlocks(height, socketsAvoidBroadcast){
 
         if (this.agent !== undefined) {
-            for (let i=height; i<this.blocks.length; i++)
+            for (let i=Math.max(0, height); i<this.blocks.length; i++) {
+                console.log("PROPAGATE " ,height, " sockets", socketsAvoidBroadcast.length);
                 this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
+            }
+
         }
     }
 

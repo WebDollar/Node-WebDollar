@@ -99,11 +99,11 @@ class InterfaceBlockchainMining{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                await this.blockchain.processBlocksSempahoreCallback( async ()=>{
-                    await this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
-                        this._simulatedNextBlockMining(nextBlock);
-                    });
-                });
+                if (!await this.blockchain.processBlocksSempahoreCallback( async ()=>{
+                        return await this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
+                            this._simulatedNextBlockMining(nextBlock);
+                        });
+                    })) throw "Mining returned False";
 
 
             } catch (Exception){
@@ -166,11 +166,11 @@ class InterfaceBlockchainMining{
             if (answer.result){
                 console.log( colors.green("WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
 
-                await this.blockchain.processBlocksSempahoreCallback( ()=>{
-                    block.hash = answer.hash;
-                    block.nonce = answer.nonce;
-                    return this.blockchain.includeBlockchainBlock( block, false, undefined, true , {});
-                });
+                if (!await this.blockchain.processBlocksSempahoreCallback( ()=>{
+                        block.hash = answer.hash;
+                        block.nonce = answer.nonce;
+                        return this.blockchain.includeBlockchainBlock( block, false, undefined, true , {});
+                    })) throw "Mining returned false";
 
             } else
             if (!answer.result)

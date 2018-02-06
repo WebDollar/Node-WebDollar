@@ -188,7 +188,7 @@ class InterfaceBlockchainFork {
             if (success){
 
                 //propagate last block
-                this.blockchain.propagateBlocks(this.blockchain.length-1, this.sockets);
+                this.blockchain.propagateBlocks(this.blockchain.blocks.length-1, this.sockets);
 
                 //this.blockchain.propagateBlocks(this.forkStartingHeight, this.sockets);
 
