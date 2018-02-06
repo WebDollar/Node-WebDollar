@@ -2,7 +2,7 @@
 const assert = require('assert');
 const BigNumber = require('bignumber.js');
 
-import PoolLeaderProtocol from 'common/poolMining/PoolLeaderProtocol.js';
+import PoolLeaderProtocol from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolLeaderProtocol';
 import TestsHelper from 'tests/Tests.helper';
 
 

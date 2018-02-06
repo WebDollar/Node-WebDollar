@@ -1,5 +1,5 @@
 import NodesList from 'node/lists/nodes-list';
-import PoolData from 'common/poolMining/PoolData.js';
+import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
 // import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
 const BigNumber = require('bignumber.js');

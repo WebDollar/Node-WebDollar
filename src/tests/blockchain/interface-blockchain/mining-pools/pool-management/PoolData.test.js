@@ -2,7 +2,7 @@ var assert = require('assert');
 const BigNumber = require('bignumber.js');
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
-import PoolData from 'common/poolMining/PoolData';
+import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
 import TestsHelper from 'tests/Tests.helper';
 
 describe('test pool leader DB', () => {
