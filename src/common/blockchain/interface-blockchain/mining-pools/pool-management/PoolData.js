@@ -53,6 +53,7 @@ class PoolData {
     async removeMiner(minerAddress){
         
         let response = this.getMiner(minerAddress);
+
         if (response === null)
             return false; //miner doesn't exists
         
@@ -64,11 +65,11 @@ class PoolData {
         return (await this.saveMinersList());
     }
     
-    getMinersRewardList() {
+    getMinersList() {
         return this._minersList;
     }
     
-    setMinersRewardList(rewardList) {
+    setMinersList(rewardList) {
         this._minersList = rewardList;
     }
     
@@ -209,6 +210,35 @@ class PoolData {
             console.log('ERROR saving _minersList in DB: ',  exception);
             return false;
         }
+    }
+
+    /**
+     * @param minersList
+     * @returns {boolean} true if this._minersList === minersList
+     */
+    compareMinersList(minersList) {
+
+        if (minersList.length !== this._minersList.length)
+            return true;
+
+        for (let i = 0; i < this._minersList; ++i){
+            if (this._minersList[i].address !== minersList[i].address)
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param miner1
+     * @param miner2
+     * @returns {boolean} true if miners are equal
+     */
+    compareMiners(miner1, miner2) {
+
+        return !( typeof miner1 === typeof miner2 &&
+            miner1.address === miner2.address &&
+            miner1.reward.equals(miner2.reward) );
     }
 
 }

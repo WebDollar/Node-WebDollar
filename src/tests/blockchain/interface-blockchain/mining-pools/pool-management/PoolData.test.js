@@ -1,4 +1,4 @@
-var assert = require('assert');
+const assert = require('assert');
 const BigNumber = require('bignumber.js');
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
@@ -7,59 +7,59 @@ import TestsHelper from 'tests/Tests.helper';
 
 describe('test pool leader DB', () => {
 
-    let saveDataBase = new PoolData();
-
-    let db = new InterfaceSatoshminDB("poolDB");
-
-    let hashListTotalReward = 60;
-    let hashList = [
+    let minersList = [
         {
-            address: "ad1",
+            address: "WEBD$gDDEDYafT8ur7EkSQzkVAZU4egSgEkH25#9TM3zKKN#Yj#eH@HsPw==",
+            reward: new BigNumber(100),
             hash: TestsHelper.makeIdHex(32),
-            reward: 10,
             difficulty: 0
         },
         {
-            address: "ad2",
+            address: "WEBD$gD$q9AkZPN29xeHnuS$ykXHCqpv1@NT@R5yn4PkY#9bcxztwcDsPw==",
+            reward: new BigNumber(20.1243),
             hash: TestsHelper.makeIdHex(32),
-            reward: 20,
             difficulty: 0
         },
         {
-            address: "ad3",
+            address: "WEBD$gCBzvQdKroa&yU4sp2X3y8*mf#q&r5k3BG3J3mBvogbE3U$SPHsPw==",
+            reward: new BigNumber(30.34556),
             hash: TestsHelper.makeIdHex(32),
-            reward: 30,
             difficulty: 0
         },
     ];
 
-    it('test reward update in DB', async () => {
+    let response = null;
 
-        let dbTotalReward = new BigNumber(0);
+    it('test save/load minersList to/from DB', async () => {
 
-        for (let i = 0; i < hashList.length; i++){
+        let pd = new PoolData();
 
-            let currentReward = await db.get(hashList[i].address);
-            dbTotalReward = dbTotalReward.plus(currentReward);
+        response = await pd.saveMinersList();
+        assert(response === true, "Error saving empty minersList: " + response);
 
-        }
+        response = await pd.loadMinersList();
+        assert(response === true, "Error loading empty minersList: " + response);
 
-        await saveDataBase.updateMinersReward(hashList);
+        pd.setMinersList(minersList);
+        response = await  pd.saveMinersList();
+        assert(response === true, "Error saving minersList: " + response);
 
-        let total =  new BigNumber(0);
+        response = await  pd.loadMinersList();
+        assert(response === true, "Error loading minersList: " + response);
 
-        for (let i = 0; i < hashList.length; i++){
+        assert(!pd.compareMinersList(minersList), "minersList differ!");
+    });
 
-            let currentReward = await db.get(hashList[i].address);
-            total = total.plus(currentReward);
 
-        }
+    it('test edit miners', async () => {
 
-        dbTotalReward = dbTotalReward.toString();
-        let totalDifference = total.minus(hashListTotalReward).toString();
+        let pd = new PoolData();
 
-        assert(totalDifference === dbTotalReward, "totalDifference differs from dbTotalReward:" + totalDifference + "!==" + dbTotalReward);
+        await pd.setMiner(minersList[0].address, minersList[0].reward);
+        assert(!pd.compareMiners(pd.getMinersList()[0], minersList[0]), "Miners differ");
 
+        response = await pd.removeMiner(minersList[0].address);
+        assert(response === true, "Wrong when removing miner");
     });
 
 });
