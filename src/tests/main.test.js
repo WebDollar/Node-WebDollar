@@ -42,7 +42,8 @@ if ( typeof describe !== 'undefined') {
 
     require ('tests/utils/reward-simulator/RewardSimulator.test');
 
-    require ('tests/poolMining/PoolLeaderProtocol.test');
+    require ('tests/blockchain/interface-blockchain/mining-pools/pool-management/PoolLeaderProtocol.test');
+    require ('tests/blockchain/interface-blockchain/mining-pools/pool-management/PoolData.test');
 
     // require ('tests/blockchain/Node-Web-Peer.test');
 

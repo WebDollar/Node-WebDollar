@@ -28,13 +28,13 @@ describe('RewardSimulator', () => {
         
         let SR = X / BPC;
 
-        console.log("Blocks per cycle:", BPC);
-        console.log("Total supply:", sum);
+        //console.log("Blocks per cycle:", BPC);
+        //console.log("Total supply:", sum);
         //console.log("Total reward per first cycle:", X);
         //console.log("Number of blocks mined per cycle:", BPC);
-        console.log("Starting reward:", SR);
-        console.log("Total supply for Y years, CP year cycle, T seconds per block, SR starting reward: ~SR*(3600/T)*24*365*4*2");
-        console.log("Simplified formula and more accurate(using 1.9999999403953552 instead of 2): 252288000 * SR / T");
+        //console.log("Starting reward:", SR);
+        //console.log("Total supply for Y years, CP year cycle, T seconds per block, SR starting reward: ~SR*(3600/T)*24*365*4*2");
+        //console.log("Simplified formula and more accurate(using 1.9999999403953552 instead of 2): 252288000 * SR / T");
         
         SR = 2500;
         let TOTALSUPPLY = 0.0;
@@ -42,9 +42,9 @@ describe('RewardSimulator', () => {
             TOTALSUPPLY += (SR * BPC) / (1 << i);
         }
 
-        console.log("Total supply is", TOTALSUPPLY);
+        //console.log("Total supply is", TOTALSUPPLY);
         
-        console.log("Total supply is", SR*(3600/T)*24*365*4*1.9999999403953552);
+        //console.log("Total supply is", SR*(3600/T)*24*365*4*1.9999999403953552);
     });
     
     it('reward simulator test - particular formula', ()=>{

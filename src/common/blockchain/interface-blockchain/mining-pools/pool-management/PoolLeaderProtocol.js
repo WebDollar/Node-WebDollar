@@ -1,9 +1,9 @@
 import NodesList from 'node/lists/nodes-list';
-import SaveRewardsInDB from 'common/poolMining/SaveRewardsInDB.js';
+import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
 // import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
 const BigNumber = require('bignumber.js');
-var BigInteger = require('big-integer');
+const BigInteger = require('big-integer');
 
 class PoolLeaderProtocol {
 
@@ -12,6 +12,7 @@ class PoolLeaderProtocol {
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeMiner(result)
         });
+
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
             this._unsubscribeMiner(result)
         });
@@ -19,8 +20,7 @@ class PoolLeaderProtocol {
         // this.blockchainReward = BlockchainMiningReward.getReward();
         this.hashTarget = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"); //target difficulty;
 
-        this.dataBase = new SaveRewardsInDB();
-
+        this.poolData = new PoolData(dataBase);
     }
 
     _subscribeMiner(nodesListObject) {
@@ -30,13 +30,10 @@ class PoolLeaderProtocol {
         socket.node.sendRequest("mining-pool-protocol/create-minner-task", (data) => {
 
             try {
-
                 this.createMinerTask();
-
             } catch (exception) {
 
                 console.log("Failed to send task to minner");
-
             }
 
         });
@@ -46,7 +43,6 @@ class PoolLeaderProtocol {
             let higherHash = this.getHigherHashDifficulty(data);
 
             this.poolHigherHashesList(higherHash, data.address);
-
         });
 
     }
@@ -54,7 +50,6 @@ class PoolLeaderProtocol {
     _unsubscribeMiner(nodesListObject) {
 
         let socket = nodesListObject.socket;
-
     }
 
     createMinerTask() {
@@ -88,7 +83,7 @@ class PoolLeaderProtocol {
     //  Return:
     //  - hashList
     //
-    generateHashDificulties(target, hashList) {
+    generateHashDifficulties(target, hashList) {
 
         let hashTargetNumber = new BigInteger(target.toString('hex'), 16);
 
@@ -119,7 +114,7 @@ class PoolLeaderProtocol {
     //  Return:
     //  - hashList
     //
-    rewardsDistribution(reward,poolLeaderCommission,hashList){
+    rewardsDistribution(reward, poolLeaderCommission, hashList) {
 
         // Convert to bignumber
         reward = new BigNumber(reward);
@@ -129,18 +124,18 @@ class PoolLeaderProtocol {
         let minnersReward =  new BigNumber(reward).minus(poolLeaderReward);
 
         // Create hash difficulties list from all minners best hasses
-        hashList = this.generateHashDificulties(this.hashTarget,hashList);
+        hashList = this.generateHashDifficulties(this.hashTarget, hashList);
 
         // Calculate total of Difficulties list
         let totalDifficulties =  new BigNumber(0);
-        for (let i=0; i<hashList.length; i++){
+        for (let i = 0; i < hashList.length; i++){
 
             totalDifficulties = totalDifficulties.plus(hashList[i].difficulty);
 
         }
 
         // Add to hashList rewards for each minner
-        for (let i=0; i<hashList.length; i++){
+        for (let i = 0; i < hashList.length; i++){
 
             let currentDifficultyPercent = new BigNumber (hashList[i].difficulty).dividedBy(totalDifficulties).mul(100);
 
@@ -158,27 +153,36 @@ class PoolLeaderProtocol {
     }
 
     // Budisteanu's formula
-    getMinerReward(bestHash,hashTarget,reward,hashsNumberLastTime){
+    getMinerReward(bestHash, hashTarget, reward, numberHashedLastTime) {
 
         bestHash = new BigInteger(bestHash.toString('hex'), 16);
         hashTarget = new BigInteger(hashTarget.toString('hex'), 16);
 
         let difficulty = new BigNumber(bestHash).dividedBy(hashTarget);
-        let rewardForHashes = new BigNumber(reward).dividedBy(hashsNumberLastTime);
+        let rewardForHashes = new BigNumber(reward).dividedBy(numberHashedLastTime);
         let result = new BigNumber(difficulty).mul(rewardForHashes);
 
         return result.toString();
 
     }
 
-    getRewardFromBlockchain(reward){
+    getPoolRewardFromBlockchain(reward) {
 
-        let newRewardDistribution = this.rewardsDistribution(reward,poolLeaderCommission,hashList);
+        let poolLeaderFee = this.getPoolLeaderFee();
+        let newRewardDistribution = this.rewardsDistribution(reward, poolLeaderFee, hashList);
 
-        this.dataBase.updateMinersReward(newRewardDistribution.minnersReward);
+        this.poolData.updateMinersReward(newRewardDistribution.minnersReward);
 
         //To add pool leader reward
 
+    }
+
+    getPoolLeaderFee() {
+        return this._poolLeaderFee;
+    }
+
+    setPoolLeaderFee(fee) {
+        this._poolLeaderFee = fee;
     }
 
 }
