@@ -32,7 +32,7 @@ class PoolData {
     /**
      * Insert a new miner if not exists. Synchronizes with DB.
      * @param minerAddress
-     * @param reward
+     * @param minerReward
      * @returns true/false
      */
     async setMiner(minerAddress, minerReward = new BigNumber(0)){
@@ -85,12 +85,12 @@ class PoolData {
         
         return Buffer.from(response.miner.reward);
     }
-    
+
     /**
      * Set new reward for miner if it exists
      * @param minerAddress
      * @param reward
-     * @returns true/false if miner exists or not
+     * @returns {boolean} true/false if miner exists or not
      */
     setMinerReward(minerAddress, reward){
         
@@ -164,14 +164,14 @@ class PoolData {
     }
     
     /**
-     * Load miners from database
+     * Load _minersList from database
      */
     async loadMinersList() {
         
         try{
 
             let buffer = await this.db.get("minersList");
-            let respose = this._deserializeMiners(buffer);
+            let response = this._deserializeMiners(buffer);
             
             if (response !== true){
                 console.log('Unable to load _minersList from DB');
@@ -188,7 +188,7 @@ class PoolData {
     }
 
     /**
-     * Save miners to database
+     * Save _minersList to database
      */
     async saveMinersList() {
 
