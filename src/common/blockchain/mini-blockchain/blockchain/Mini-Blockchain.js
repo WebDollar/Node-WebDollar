@@ -126,7 +126,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         }
 
-        return result;
+        return true;
 
     }
 

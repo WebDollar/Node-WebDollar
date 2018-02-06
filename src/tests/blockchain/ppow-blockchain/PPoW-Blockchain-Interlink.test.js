@@ -76,7 +76,7 @@ describe('test PPoW-Blockchain interlink data structure', () => {
 
             block.deserializeBlock(buffer);
 
-            await blockchain.includeBlockchainBlock(block, undefined, undefined, false, {});
+            await blockchain.includeBlockchainBlock(block, undefined, [], false, {});
         }
     });
 
