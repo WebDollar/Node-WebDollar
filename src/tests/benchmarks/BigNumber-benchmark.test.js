@@ -7,7 +7,7 @@ import TestsHelper from 'tests/Tests.helper'
 
 describe('BigNumber BenchMarks', () => {
 
-    it('Creating big numbers and Multiplication/Division', ()=>{
+    it('Creating 100K BigNumbers and Multiplication/Division', ()=>{
 
         let x = new BigNumber(6), y;
 
@@ -25,12 +25,13 @@ describe('BigNumber BenchMarks', () => {
 
     });
 
-    it('creating big number', ()=>{
+    it('creating 100K BigNumbers and Serialization/Deserialization', ()=>{
 
         let x = new BigNumber(6);
         let y, buffer;
 
         let start = new Date().getTime();
+
         for (let i=0; i<100000; i++){
             x = x.plus(new BigNumber(i) );
             y = x.dividedBy( 3.523);
