@@ -192,7 +192,6 @@ class InterfaceBlockchainFork {
 
                 //this.blockchain.propagateBlocks(this.forkStartingHeight, this.sockets);
 
-                this.blockchain.forksAdministrator.deleteFork(this);
             }
 
             return success;

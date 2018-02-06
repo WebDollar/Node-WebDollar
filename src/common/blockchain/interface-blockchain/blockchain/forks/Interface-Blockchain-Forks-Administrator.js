@@ -91,10 +91,12 @@ class InterfaceBlockchainForksAdministrator {
         return false;
     }
 
+
+
     findSocketProcessing(socket){
 
         for (let i=0; i<this.socketsProcessing.length; i++)
-            if (this.socketsProcessing[i] === socket || this.socketsProcessing[i].node.sckAddress.matchAddress(socket.node.sckAddress) )
+            if (this.socketsProcessing[i].socket === socket || this.socketsProcessing[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress) )
                 return i;
 
         return null;
@@ -113,14 +115,26 @@ class InterfaceBlockchainForksAdministrator {
 
     }
 
-    addSocketProcessing(socket){
+    addSocketProcessing(socket, forkChainLength){
 
         if (this.findSocketProcessing(socket) === null){
-            this.socketsProcessing.push(socket)
-            return socket;
+            this.socketsProcessing.push({ socket: socket, forkChainLength: forkChainLength, forkChainLengthToDo: -1  })
+            return this.socketsProcessing[this.socketsProcessing.length-1];
         }
 
         return null;
+    }
+
+    updateSocketProcessingNewForkLength(socket, forkChainLengthToDo ){
+
+        let socketProcessing = this.findSocketProcessing(socket);
+        if (socketProcessing === null) return null;
+
+        if (socketProcessing.forkChainLength > forkChainLengthToDo) return; //nothing to update
+
+        socketProcessing.forkChainLengthToDo = Math.max(forkChainLengthToDo, socketProcessing.forkChainLengthToDo);
+
+        return socketProcessing;
     }
 
 }
