@@ -1,4 +1,5 @@
 const colors = require('colors/safe');
+const BigNumber = require('bignumber.js');
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
@@ -176,6 +177,26 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             console.log( colors.red("loadMiniAccountant error"), exception )
             return false;
         }
+
+    }
+
+    calculateNodeCoins(tokenId , node){
+
+        if (tokenId === undefined  || tokenId === '' || tokenId === null) {
+            tokenId = Buffer.from([1]);
+            tokenId[0] = 1;
+        }
+
+        if (node === undefined) node = this.root;
+
+        let sum = new BigNumber(0).plus( node.getBalance(tokenId)  );
+
+        for (let i=0; i<node.edges.length; i++)
+            if (node.edges[i].targetNode !== undefined && node.edges[i].targetNode !== null){
+                sum.plus( this.calculateNodeCoins( tokenId, node.edges[i].targetNode ) );
+            }
+
+        return sum;
 
     }
 

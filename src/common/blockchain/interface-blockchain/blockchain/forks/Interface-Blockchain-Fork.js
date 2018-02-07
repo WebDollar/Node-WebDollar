@@ -90,9 +90,9 @@ class InterfaceBlockchainFork {
             // based on previous block from blockchain
 
             return {
-                prevDifficultyTarget : this.blockchain.blocks[height-1].difficultyTarget,
-                prevHash : this.blockchain.blocks[height-1].hash,
-                prevTimeStamp : this.blockchain.blocks[height-1].timeStamp,
+                prevDifficultyTarget : this.blockchain.getDifficultyTarget(height),
+                prevHash : this.blockchain.getHashPrev(height),
+                prevTimeStamp : this.blockchain.getTimeStamp(height),
                 blockValidationType:  {},
             };
 
@@ -142,7 +142,7 @@ class InterfaceBlockchainFork {
                     this.blockchain.blocks[i] = undefined;
                 }
 
-                //this.blockchain.spliceBlocks(this.forkStartingHeight);
+                this.blockchain.spliceBlocks(this.forkStartingHeight);
 
                 this.preFork();
 

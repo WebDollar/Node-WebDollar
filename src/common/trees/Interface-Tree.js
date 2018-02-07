@@ -341,6 +341,8 @@ class InterfaceTree{
     deserializeTree(buffer, offset, includeHashes){
         //console.log("deserializeTree", this.root);
         this.root = this._createNode(null,  [], null );
+
+        if (buffer.length === 1) return true; // nothing to deserialize
         return this.root.deserializeNode(buffer, offset, true, includeHashes);
     }
 

@@ -110,11 +110,6 @@ class MiniBlockchain extends  inheritBlockchain{
                 if (revert.reward)
                     this.accountantTree.updateAccount( block.data.minerAddress, block.reward.negated(), undefined );
 
-                if (exception !== null) {
-                    console.log("exception simulateNewBlock ", exception);
-                    throw exception;
-                }
-
                 if (revert.revertNow)
                     return false;
             }

@@ -40,7 +40,7 @@ class InterfaceBlockchain {
         this.mining = undefined;
 
         this._blockchainFileName = consts.BLOCKCHAIN_FILE_NAME;
-        this.db = new InterfaceSatoshminDB("blockchainDB");
+        this.db = new InterfaceSatoshminDB(consts.BLOCKCHAIN_DIRECTORY_NAME);
 
         this.blocksStartingPoint = 0;
 

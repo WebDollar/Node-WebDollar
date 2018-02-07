@@ -161,16 +161,30 @@ class InterfaceBlockchainMining{
                 intervalMiningOutput = this.setMiningHashRateInterval();
 
 
-            let answer = await this.mine(block, difficulty);
+            let answer;
+
+            try {
+                answer = await this.mine(block, difficulty);
+            } catch (exception){
+                console.log(colors.red("Couldn't mine block " + block.height + exception.toString()), exception);
+                answer.result = false;
+            }
 
             if (answer.result){
                 console.log( colors.green("WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
 
-                if (!await this.blockchain.processBlocksSempahoreCallback( ()=>{
-                        block.hash = answer.hash;
-                        block.nonce = answer.nonce;
-                        return this.blockchain.includeBlockchainBlock( block, false, [], true , {});
-                    })) throw "Mining2 returned false";
+                try {
+
+                    if (!await this.blockchain.processBlocksSempahoreCallback(() => {
+                            block.hash = answer.hash;
+                            block.nonce = answer.nonce;
+                            return this.blockchain.includeBlockchainBlock(block, false, [], true, {});
+                        })) throw "Mining2 returned false";
+
+                } catch (exception){
+
+                    console.log(colors.red("Mining processBlocksSempahoreCallback raised an error " + block.height + exception.toString()), exception);
+                }
 
             } else
             if (!answer.result)
