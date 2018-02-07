@@ -76,6 +76,8 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async discoverAndSolveFork(socket, newChainLength){
 
+        if (typeof newChainLength !== "number") throw "newChainLength is not a number";
+
         let fork, result = null, newChainStartingPoint = 0;
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.getBlockchainLength;

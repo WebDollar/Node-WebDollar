@@ -66,11 +66,11 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             console.log("this.forkDiff", diffIndex);
 
-            this._lightAccountantTreeSerializationsHeightClone = this.blockchain.lightAccountantTreeSerializations[diffIndex] ;
+            this._lightAccountantTreeSerializationsHeightClone = new Buffer(this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializations[diffIndex] : 0);
             this._blocksStartingPointClone = this.blockchain.blocksStartingPoint;
-            this._lightPrevDifficultyTargetClone = this.blockchain.lightPrevDifficultyTargets[diffIndex];
+            this._lightPrevDifficultyTargetClone = new Buffer(this.blockchain.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.blockchain.lightPrevDifficultyTargets[diffIndex] : 0);
             this._lightPrevTimeStampClone = this.blockchain.lightPrevTimeStamps[diffIndex];
-            this._lightPrevHashPrevClone = this.blockchain.lightPrevHashPrevs[diffIndex];
+            this._lightPrevHashPrevClone = new Buffer(this.blockchain.lightPrevHashPrevs[diffIndex] !== undefined ? this.blockchain.lightPrevHashPrevs[diffIndex] : 0);
 
             this.blockchain.blocksStartingPoint = this.forkChainStartingPoint;
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;
