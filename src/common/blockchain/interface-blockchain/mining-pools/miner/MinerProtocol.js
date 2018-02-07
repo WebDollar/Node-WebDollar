@@ -65,8 +65,20 @@ class MinerProtocol {
         return this._serializeHashList();
     }
     
-    _serializeHashList(){
-        
+    _serializeHashList(hashList){
+
+        let list = [Serialization.serializeNumber2Bytes(hashList.length)];
+
+        for (let i = 0; i < hashList.length; ++i) {
+
+            list.push( Serialization.serializeNumber1Byte(BufferExtended.fromBase(hashList[i].address).length) );
+            list.push( BufferExtended.fromBase(hashList[i].address) );
+
+            list.push ( Serialization.serializeBigNumber(hashList[i].reward) );
+        }
+
+        return Buffer.concat(list);
+
     }
 
     createMiningHashes(){
