@@ -23,7 +23,7 @@ class PoolData {
     getMiner(minerAddress){
         
         for (let i = 0; i < this._minersList.length; ++i) 
-            if (this._minersList[i].minerAddress.equals(minerAddress))
+            if (this._minersList[i].address === minerAddress)
                 return {index: i, miner: this._minersList[i]};
                 
         return null;
@@ -51,7 +51,7 @@ class PoolData {
      * @returns true/false 
      */
     async removeMiner(minerAddress){
-        
+
         let response = this.getMiner(minerAddress);
 
         if (response === null)
@@ -84,7 +84,7 @@ class PoolData {
         if (response === null)
             return new BigNumber(0);
         
-        return Buffer.from(response.miner.reward);
+        return response.miner.reward;
     }
 
     /**
@@ -99,7 +99,7 @@ class PoolData {
         if (response === null)
             return false;
         
-        response.miner.reward = Buffer.from(reward);
+        response.miner.reward = reward;
         
         return true;
     }
@@ -111,7 +111,7 @@ class PoolData {
     increaseMinerReward(minerAddress, reward) {
 
         for (let i = 0; i < this._minersList.length; ++i) {
-            if (this._minersList[i].address.equals(minerAddress)){
+            if (this._minersList[i].address === minerAddress){
                 this._minersList[i].reward = this._minersList[i].reward.plus(reward);
                 break;
             }
