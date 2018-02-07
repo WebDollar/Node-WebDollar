@@ -80,16 +80,16 @@ class InterfaceBlockchainProtocolForkSolver{
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.getBlockchainLength;
 
-        let processingSocket = this.blockchain.forksAdministrator.findSocketProcessing(socket);
+        let processingSocket = this.blockchain.forksAdministrator.getSocketProcessing(socket);
 
-        if (processingSocket.findSocketProcessing(socket) !== null) {
-            processingSocket.updateSocketProcessingNewForkLength(socket, newChainLength);
+        if (processingSocket !== null) {
+            this.blockchain.forksAdministrator.updateSocketProcessingNewForkLength(processingSocket, newChainLength);
             return false;
         }
 
         try{
 
-            this.blockchain.forksAdministrator.addSocketProcessing(socket);
+            processingSocket =  this.blockchain.forksAdministrator.addSocketProcessing(socket);
 
 
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);

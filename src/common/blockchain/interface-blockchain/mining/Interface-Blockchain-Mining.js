@@ -101,9 +101,9 @@ class InterfaceBlockchainMining{
                 //simulating the new block and calculate the hashAccountantTree
                 if (!await this.blockchain.processBlocksSempahoreCallback(  ()=>{
                         return  this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
-                            this._simulatedNextBlockMining(nextBlock);
+                            return this._simulatedNextBlockMining(nextBlock);
                         });
-                    })) throw "Mining returned False";
+                    })) throw "Mining1 returned False";
 
 
             } catch (Exception){
@@ -170,7 +170,7 @@ class InterfaceBlockchainMining{
                         block.hash = answer.hash;
                         block.nonce = answer.nonce;
                         return this.blockchain.includeBlockchainBlock( block, false, [], true , {});
-                    })) throw "Mining returned false";
+                    })) throw "Mining2 returned false";
 
             } else
             if (!answer.result)

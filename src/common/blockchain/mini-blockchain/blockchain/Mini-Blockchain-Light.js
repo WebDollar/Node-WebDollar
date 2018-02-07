@@ -39,8 +39,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
-        let  result;
-
         console.log("blockchain serialization1", this.accountantTree.root.hash.sha256.toString("hex"));
 
         if (  blockValidationType['skip-validation-before'] === undefined ||
@@ -70,7 +68,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 throw "Error Including Blockchain Light Block";
 
             //for debugging only
-
         }
 
         if (!await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)) throw "_recalculateLightPrevs failed";
@@ -120,13 +117,17 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         this.lightAccountantTreeSerializations[diffIndex+1] = serialization;
 
-        let result = true;
+        try {
 
-        if (save)
-            if (this.lightPrevDifficultyTargets[diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS] !== undefined)
-                result &= await this._saveLightSettings(diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
+            if (save)
+                if (this.lightPrevDifficultyTargets[diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS] !== undefined)
+                    await this._saveLightSettings(diffIndex - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
 
-        return result;
+        } catch (exception){
+            console.log(colors.red("Couldn't save Light Settings _saveLightSettings"), exception);
+        }
+
+        return true;
     }
 
     async _saveLightSettings(diffIndex){

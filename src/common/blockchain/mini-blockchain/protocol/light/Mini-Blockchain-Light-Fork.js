@@ -52,6 +52,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
 
+            console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.hash.sha256.toString("hex"));
             console.log("preFork hashAccountantTree", this.forkPrevAccountantTree.toString("hex"));
 
             if (this.blockchain.accountantTree.root.edges.length > 0)

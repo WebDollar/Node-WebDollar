@@ -151,25 +151,37 @@ class InterfaceBlockchainFork {
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
 
-                await this.postForkBefore(forkedSuccessfully);
+                try {
+                    for (let i = 0; i < this.forkBlocks.length; i++)
+                        if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length - 1), "all", false, {})) {
+                            console.log(colors.green("fork couldn't be included in main Blockchain ", i));
+                            forkedSuccessfully = false;
+                            break;
+                        }
+                } catch (exception){
+                    console.log(colors.red("saveFork includeBlockchainBlock1 raised exception"), exception);
+                    forkedSuccessfully = false;
+                }
 
-                for (let i = 0; i < this.forkBlocks.length; i++)
-                    if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length - 1), "all", false, {})) {
-                        console.log(colors.green("fork couldn't be included in main Blockchain ", i));
-                        forkedSuccessfully = false;
-                        break;
-                    }
+
+                await this.postForkBefore(forkedSuccessfully);
 
                 //revert the last K blocks
                 if (!forkedSuccessfully) {
 
                     this.blockchain.spliceBlocks(this.forkStartingHeight);
 
-                    for (let i = 0; i < this._blocksCopy.length; i++)
-                        if (!await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], (i === this._blocksCopy.length - 1), "all", false, {})) {
-                            console.log(colors.green("blockchain couldn't restored after fork included in main Blockchain ", i));
-                            break;
-                        }
+                    try {
+
+                        for (let i = 0; i < this._blocksCopy.length; i++)
+                            if (!await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], (i === this._blocksCopy.length - 1), "all", false, {})) {
+                                console.log(colors.green("blockchain couldn't restored after fork included in main Blockchain ", i));
+                                break;
+                            }
+
+                    } catch (exception){
+                        console.log(colors.red("saveFork includeBlockchainBlock2 raised exception"), exception);
+                    }
                 }
 
                 await this.postFork(forkedSuccessfully);

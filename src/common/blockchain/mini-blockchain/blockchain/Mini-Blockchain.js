@@ -58,7 +58,7 @@ class MiniBlockchain extends  inheritBlockchain{
             //updating reward
             //console.log(colors.green("block.data.minerAddress"),block.data.minerAddress, colors.yellow(block.reward));
 
-            result = !this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
+            result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
 
             // let balances = this.accountantTree.listBalances( block.data.minerAddress );
             // console.log("balances", balances );
@@ -115,7 +115,8 @@ class MiniBlockchain extends  inheritBlockchain{
                     throw exception;
                 }
 
-                return false;
+                if (revert.revertNow)
+                    return false;
             }
 
 
@@ -144,7 +145,7 @@ class MiniBlockchain extends  inheritBlockchain{
             return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
         })) throw "Error includeBlockchainBlock MiniBlockchain ";
 
-        if (!await this.accountantTree.saveMiniAccountant( true)) throw "Error Saving Mini Accountant Tree";
+        if (!await this.accountantTree.saveMiniAccountant( true)) console.log(colors.red("Error Saving Mini Accountant Tree"));
 
         return true;
     }

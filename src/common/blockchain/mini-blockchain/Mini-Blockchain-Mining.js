@@ -14,6 +14,8 @@ class MiniBlockchainMining extends  InterfaceBlockchainMining {
         nextBlock.data.computeAccountantTreeHashBlockData();
         nextBlock.data.computeHashBlockData();
 
+        return true;
+
     }
 
 }

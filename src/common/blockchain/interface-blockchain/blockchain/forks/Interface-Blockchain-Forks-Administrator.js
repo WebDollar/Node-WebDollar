@@ -102,6 +102,12 @@ class InterfaceBlockchainForksAdministrator {
         return null;
     }
 
+    getSocketProcessing(socket){
+        let index = this.findSocketProcessing(socket);
+        if (index === null) return null;
+        else return this.socketsProcessing[index];
+    }
+
     deleteSocketProcessing(socket){
 
         let index = this.findSocketProcessing(socket);
@@ -125,16 +131,15 @@ class InterfaceBlockchainForksAdministrator {
         return null;
     }
 
-    updateSocketProcessingNewForkLength(socket, forkChainLengthToDo ){
+    updateSocketProcessingNewForkLength(processingSocket, forkChainLengthToDo ){
 
-        let socketProcessing = this.findSocketProcessing(socket);
-        if (socketProcessing === null) return null;
+        if (processingSocket === null) return null;
 
-        if (socketProcessing.forkChainLength > forkChainLengthToDo) return; //nothing to update
+        if (processingSocket.forkChainLength > forkChainLengthToDo) return; //nothing to update
 
-        socketProcessing.forkChainLengthToDo = Math.max(forkChainLengthToDo, socketProcessing.forkChainLengthToDo);
+        processingSocket.forkChainLengthToDo = Math.max(forkChainLengthToDo, processingSocket.forkChainLengthToDo);
 
-        return socketProcessing;
+        return processingSocket;
     }
 
 }
