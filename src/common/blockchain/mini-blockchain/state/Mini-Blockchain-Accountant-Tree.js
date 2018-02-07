@@ -192,9 +192,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         let sum = new BigNumber(0).plus( node.getBalance(tokenId)  );
 
         for (let i=0; i<node.edges.length; i++)
-            if (node.edges[i].targetNode !== undefined && node.edges[i].targetNode !== null){
-                sum.plus( this.calculateNodeCoins( tokenId, node.edges[i].targetNode ) );
-            }
+            if (node.edges[i].targetNode !== undefined && node.edges[i].targetNode !== null)
+                sum = sum.plus( this.calculateNodeCoins( tokenId, node.edges[i].targetNode ) );
 
         return sum;
 
