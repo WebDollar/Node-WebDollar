@@ -6,6 +6,8 @@ class MinerProtocol {
 
         NodesList.emitter.on("nodes-list/connected", (result) => { this._subscribeMiner(result) } );
         NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._unsubscribeMiner(result ) });
+        
+        this.hashList = [];
 
     }
 
@@ -13,7 +15,7 @@ class MinerProtocol {
 
         let socket = nodesListObject.socket;
 
-        socket.node.on("mining-pool-protocol/create-minner-task", (data)=>{
+        socket.node.on("mining-pool-protocol/create-minner-task", (data) => {
 
             try{
 
@@ -34,14 +36,20 @@ class MinerProtocol {
         let socket = nodesListObject.socket;
 
     }
+    
+    getMiningData() {
+        //TODO: get data from PoolLeader and deserialize
+    }
 
     sendTaskResponse(socket){
 
-        socket.node.sendRequest("mining-pool-protocol/get-minner-work", (data)=>{
+        socket.node.sendRequest("mining-pool-protocol/get-minner-work", (data) => {
 
             try{
 
-                this.createMiningHashes(socket);
+                //TODO: Serialize mining-data and send to PoolLeader
+                let taskResponse = this.getTaskResult(socket);
+                
 
             } catch (exception) {
 
@@ -52,10 +60,19 @@ class MinerProtocol {
         });
 
     }
+    
+    getTaskResult() {
+        return this._serializeHashList();
+    }
+    
+    _serializeHashList(){
+        
+    }
 
     createMiningHashes(){
 
-        //To do mining
+        //TODO: create a list with best X hashes
+        
 
     }
 

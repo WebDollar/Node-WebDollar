@@ -166,6 +166,7 @@ class PoolData {
     
     /**
      * Load _minersList from database
+     * @returns {boolean} true is success, otherwise false
      */
     async loadMinersList() {
         
@@ -190,6 +191,7 @@ class PoolData {
 
     /**
      * Save _minersList to database
+     * @returns {boolean} true is success, otherwise false
      */
     async saveMinersList() {
 
