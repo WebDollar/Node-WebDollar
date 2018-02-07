@@ -32,7 +32,7 @@ class PoolData {
     /**
      * Insert a new miner if not exists. Synchronizes with DB.
      * @param minerAddress
-     * @param reward
+     * @param minerReward
      * @returns true/false
      */
     async setMiner(minerAddress, minerReward = new BigNumber(0)){
@@ -53,6 +53,7 @@ class PoolData {
     async removeMiner(minerAddress){
         
         let response = this.getMiner(minerAddress);
+
         if (response === null)
             return false; //miner doesn't exists
         
@@ -64,11 +65,11 @@ class PoolData {
         return (await this.saveMinersList());
     }
     
-    getMinersRewardList() {
+    getMinersList() {
         return this._minersList;
     }
     
-    setMinersRewardList(rewardList) {
+    setMinersList(rewardList) {
         this._minersList = rewardList;
     }
     
@@ -85,12 +86,12 @@ class PoolData {
         
         return Buffer.from(response.miner.reward);
     }
-    
+
     /**
      * Set new reward for miner if it exists
      * @param minerAddress
      * @param reward
-     * @returns true/false if miner exists or not
+     * @returns {boolean} true/false if miner exists or not
      */
     setMinerReward(minerAddress, reward){
         
@@ -164,14 +165,14 @@ class PoolData {
     }
     
     /**
-     * Load miners from database
+     * Load _minersList from database
      */
     async loadMinersList() {
         
         try{
 
             let buffer = await this.db.get("minersList");
-            let respose = this._deserializeMiners(buffer);
+            let response = this._deserializeMiners(buffer);
             
             if (response !== true){
                 console.log('Unable to load _minersList from DB');
@@ -188,7 +189,7 @@ class PoolData {
     }
 
     /**
-     * Save miners to database
+     * Save _minersList to database
      */
     async saveMinersList() {
 
@@ -209,6 +210,35 @@ class PoolData {
             console.log('ERROR saving _minersList in DB: ',  exception);
             return false;
         }
+    }
+
+    /**
+     * @param minersList
+     * @returns {boolean} true if this._minersList === minersList
+     */
+    compareMinersList(minersList) {
+
+        if (minersList.length !== this._minersList.length)
+            return true;
+
+        for (let i = 0; i < this._minersList; ++i){
+            if (this._minersList[i].address !== minersList[i].address)
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param miner1
+     * @param miner2
+     * @returns {boolean} true if miners are equal
+     */
+    compareMiners(miner1, miner2) {
+
+        return !( typeof miner1 === typeof miner2 &&
+            miner1.address === miner2.address &&
+            miner1.reward.equals(miner2.reward) );
     }
 
 }
