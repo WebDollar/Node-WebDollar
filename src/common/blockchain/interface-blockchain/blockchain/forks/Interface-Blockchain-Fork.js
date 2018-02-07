@@ -137,10 +137,12 @@ class InterfaceBlockchainFork {
 
                 //making a copy of the current blockchain
                 this._blocksCopy = [];
-                for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength; i++)
+                for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength; i++) {
                     this._blocksCopy.push(this.blockchain.blocks[i]);
+                    this.blockchain.blocks[i] = undefined;
+                }
 
-                this.blockchain.spliceBlocks(this.forkStartingHeight);
+                //this.blockchain.spliceBlocks(this.forkStartingHeight);
 
                 this.preFork();
 
@@ -152,12 +154,14 @@ class InterfaceBlockchainFork {
                 console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
 
                 try {
+
                     for (let i = 0; i < this.forkBlocks.length; i++)
-                        if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], (i === this.forkBlocks.length - 1), "all", false, {})) {
+                        if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], false, "all", false, {})) {
                             console.log(colors.green("fork couldn't be included in main Blockchain ", i));
                             forkedSuccessfully = false;
                             break;
                         }
+
                 } catch (exception){
                     console.log(colors.red("saveFork includeBlockchainBlock1 raised exception"), exception);
                     forkedSuccessfully = false;
@@ -174,7 +178,7 @@ class InterfaceBlockchainFork {
                     try {
 
                         for (let i = 0; i < this._blocksCopy.length; i++)
-                            if (!await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], (i === this._blocksCopy.length - 1), "all", false, {})) {
+                            if (!await this.blockchain.includeBlockchainBlock( this._blocksCopy[i], false, "all", false, {})) {
                                 console.log(colors.green("blockchain couldn't restored after fork included in main Blockchain ", i));
                                 break;
                             }
@@ -200,7 +204,7 @@ class InterfaceBlockchainFork {
             if (success){
 
                 //propagate last block
-                this.blockchain.propagateBlocks(this.blockchain.blocks.length-1, this.sockets);
+                this.blockchain.propagateBlocks( this.blockchain.blocks.length-1, this.sockets );
 
                 //this.blockchain.propagateBlocks(this.forkStartingHeight, this.sockets);
 

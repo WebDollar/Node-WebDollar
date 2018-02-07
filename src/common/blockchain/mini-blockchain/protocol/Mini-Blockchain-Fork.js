@@ -13,7 +13,7 @@ class MiniBlockchainFork extends inheritFork{
 
         super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header)
 
-        this._accountantTreeRootClone = null;
+        this._accountantTreeClone = null;
 
     }
 
@@ -24,7 +24,7 @@ class MiniBlockchainFork extends inheritFork{
     preFork(){
 
         //clone the Accountant Tree
-        this._accountantTreeRootClone = this.blockchain.accountantTree.cloneTree();
+        this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
 
         //console.log("root.targetNode.balances before", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
 
@@ -48,12 +48,16 @@ class MiniBlockchainFork extends inheritFork{
 
     }
 
-    postFork(forkedSuccessfully){
+    postForkBefore(forkedSuccessfully){
 
         if (forkedSuccessfully) return true;
 
         //recover to the original Accountant Tree
-        this.blockchain.accountantTree.root = this._accountantTreeRootClone;
+        this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
+
+    }
+
+    postFork(forkedSuccessfully){
 
     }
 

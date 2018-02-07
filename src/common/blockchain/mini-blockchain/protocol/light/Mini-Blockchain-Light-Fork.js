@@ -48,7 +48,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
             console.log("preFork!!!!!!!!!!!!!!!!!! 2222222");
-            this._accountantTreeRootClone = this.blockchain.accountantTree.cloneTree();
+            this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
 
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
 
@@ -96,6 +96,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         //recover to the original Accountant Tree & state
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
+            //recover to the original Accountant Tree
+            this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
+
             this.blockchain.blocksStartingPoint = this._blocksStartingPointClone;
 
             let diffIndex = this.forkStartingHeight;
@@ -122,9 +125,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             return true;
         }
 
-        if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
-        } else
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
 
     }

@@ -210,7 +210,7 @@ class InterfaceBlockchainProtocolForkSolver{
         this.blockchain.forksAdministrator.deleteSocketProcessing(socket);
 
         if (processingSocket.forkChainLengthToDo !== -1 &&  processingSocket.forkChainLengthToDo > newChainLength )
-            this.discoverAndSolveFork(socket, this.blockchain.fork );
+            this.discoverAndSolveFork(socket, processingSocket.forkChainLengthToDo );
 
         return result;
     }
