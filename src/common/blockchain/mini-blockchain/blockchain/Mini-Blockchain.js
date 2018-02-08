@@ -51,7 +51,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         let exception = null;
 
-        let result = true;
+        let result;
 
         try{
 
@@ -92,13 +92,14 @@ class MiniBlockchain extends  inheritBlockchain{
             exception = ex;
             revert.revertNow = true;
 
-            console.log("MiniBlockchain simulateNewBlock 1 raised an exception", ex);
+            console.log(colors.red("MiniBlockchain simulateNewBlock 1 raised an exception"), ex);
 
         }
 
         try{
 
             //revert back the database
+            console.log("reveting", revert.revertNow, revertAutomatically)
             if (revert.revertNow || revertAutomatically){
 
                 //revert transactions

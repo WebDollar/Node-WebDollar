@@ -39,7 +39,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
-        console.log("blockchain serialization1", this.accountantTree.root.hash.sha256.toString("hex"));
+        console.log("blockchain serialization1", this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex"));
 
         if (  blockValidationType['skip-validation-before'] === undefined ||
             (block.height >= blockValidationType['skip-validation-before'].height )) {
@@ -78,14 +78,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log(" prev difficulty ", block.difficultyTargetPrev.toString("hex"));
         console.log(" prev hash ", block.hashPrev.toString("hex"));
 
-        console.log("blockchain tree serialization", this.accountantTree.root.hash.sha256.toString("hex"));
-        console.log("blockchain balances ",  this.accountantTree.calculateNodeCoins() );
-
-
-        // console.log("this.lightAccountantTreeSerializations", this.lightAccountantTreeSerializations[block.height] !== undefined ? this.lightAccountantTreeSerializations[block.height].toString("hex") : '');
-        // console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTargets[block.height] !== undefined ? this.lightPrevDifficultyTargets[block.height].toString("hex") : '');
-        // console.log("this.lightPrevTimestamp", this.lightPrevTimeStamps[block.height]);
-        // console.log("this.lightPrevHashPrev", this.lightPrevHashPrevs[block.height] !== undefined ? this.lightPrevHashPrevs[block.height].toString("hex") : '');
+        console.log("blockchain balances ",  this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex") );
 
         return true;
 
@@ -212,10 +205,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log("this.lightPrevTimestamp", this.lightPrevTimeStamps[diffIndex])
         console.log("this.lightPrevHashPrev", this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex")  : '')
 
-        if (this.accountantTree.root.edges.length > 0) {
-            console.log("balances", this.accountantTree.root.edges[0].targetNode.balances)
-            console.log("balances", this.accountantTree.root.edges[0].targetNode.balances)
-        }
 
         return true;
 

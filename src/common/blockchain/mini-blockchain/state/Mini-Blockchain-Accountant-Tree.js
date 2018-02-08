@@ -70,7 +70,10 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             return null;
         }
 
+        console.log("this.calculateNodeCoins", this.calculateNodeCoins());
+        console.log("changedNode ----", value, node.hash.sha256 !== undefined ? node.hash.sha256.toString("hex") : '', this.root.hash.sha256.toString("hex"));
         this._changedNode( node );
+        console.log("changedNode ----", value, node.hash.sha256.toString("hex"), this.root.hash.sha256.toString("hex"));
 
         return resultUpdate;
     }

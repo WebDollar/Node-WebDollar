@@ -11,7 +11,7 @@ consts.NODE_VERSION_COMPATIBILITY = "0.248";
 consts.WALLET_VERSION = "0.1";
 
 consts.BLOCKCHAIN_FILE_NAME = 'blockchain3.bin';
-consts.BLOCKCHAIN_DIRECTORY_NAME = '"blockchainDB"';
+consts.BLOCKCHAIN_DIRECTORY_NAME = 'blockchainDB2';
 
 consts.NODE_PROTOCOL = "WebDollar";
 consts.NODE_FALLBACK_INTERVAL =  10*1000; //miliseconds
