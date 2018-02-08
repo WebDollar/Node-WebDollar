@@ -247,6 +247,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
             if (!await this.accountantTree.loadMiniAccountant(undefined, undefined, true))
                 throw "Problem Loading Mini Accountant Tree Initial";
 
+            console.log("loading blockchain balances ",  this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex") );
+
             let serializationAccountantTreeInitial = this.accountantTree.serializeMiniAccountant();
 
             //check the accountant Tree if matches

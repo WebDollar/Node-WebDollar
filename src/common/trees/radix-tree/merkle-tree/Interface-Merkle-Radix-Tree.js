@@ -67,15 +67,7 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
     }
 
     deserializeTree(buffer, offset, includeHashes){
-
-        offset = InterfaceRadixTree.prototype.deserializeTree.call(this, buffer, offset, includeHashes);
-
-        //console.log("deserializeTree completed", buffer, offset);
-
-        if (! this._refreshHash(this.root, true) )
-            throw "Refresh Hash didn't work";
-
-        return offset;
+        return InterfaceMerkleTree.prototype.deserializeTree.apply(this, arguments);
     }
 
     matches(tree){

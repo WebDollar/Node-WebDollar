@@ -130,16 +130,9 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     /*
         inherited
     */
-    _computeHash(node) {
-        return InterfaceMerkleTree.prototype._computeHash.call(this, node);
-    }
 
-    _refreshHash(node, forced){
-        return InterfaceMerkleTree.prototype._refreshHash.call(this, node,forced);
-    }
 
     _getValueToHash(node){
-
         return node.serializeNode(false);
     }
 

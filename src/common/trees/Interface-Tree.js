@@ -369,7 +369,7 @@ class InterfaceTree{
 
         if (! Buffer.isBuffer(buffer) ) throw "InterfaceTree - buffer is not Buffer"
 
-        console.log("loadMiniAccountant", buffer.length, "   ",buffer.toString("hex") );
+        console.log("loadTree", buffer.length, "   ",buffer.toString("hex") );
 
         return await this.deserializeTree(buffer, offset||0, includeHashes);
     }
