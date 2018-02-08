@@ -9,17 +9,25 @@ describe('Serialization test', () => {
 
     it('Serialize Big Number - many random ', ()=>{
 
-        let v = TestsHelper.makeRandomBigNumbersArray(5000, true);
+        let v = TestsHelper.makeRandomBigNumbersArray(5000, true, true);
+        let sum1 = new BigNumber(0);
+        let sum2 = new BigNumber(0);
 
         for (let i=0; i<v.length; i++){
+
+            sum1 = sum1.plus(v[i]);
 
             let serialization = Serialization.serializeBigNumber(v[i]);
             let deserialization = Serialization.deserializeBigNumber(serialization).number;
 
-
             assert(deserialization.equals(v[i]), "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
+            //console.log(v[i],deserialization.toString());
 
+            sum2 = sum2.plus(deserialization);
         }
+
+        assert(sum1.equals(sum2), "sum1 is not equal with sum 2");
+
     });
 
     it('Serialize Big Number tests ', ()=>{

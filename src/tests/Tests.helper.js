@@ -11,7 +11,6 @@ class TestsHelper {
         if (randomLengths)
             count = randomLengths + Math.floor( Math.random() * ( count + randomLengths) );
 
-
         let text = "";
         let possible = textPossible;
 
@@ -25,7 +24,7 @@ class TestsHelper {
         return this.makeId(count, randomLengths, "ABCDEF01234567890")
     }
 
-    makeDigitId(count, isNonDecimal) {
+    makeDigitId(count, isNonDecimal, negative=false) {
 
         if ( count === undefined) count = Math.floor(Math.random()*100 + 30 );
 
@@ -40,6 +39,13 @@ class TestsHelper {
 
         for (; i < count; i++)
             text += digits.charAt(Math.floor(Math.random() * 10));
+
+        if (negative)
+            if (Math.floor(Math.random()*2) === 0)
+                negative = false;
+
+        if (negative)
+            text = '-'+text;
 
         return text;
     }
@@ -81,32 +87,28 @@ class TestsHelper {
         return Math.random()*biggestNumber +  300;
     }
 
-    makeRandomBigNumber(nodDecimalDigits, decimalDigits){
+    makeRandomBigNumber(noDecimalDigits=10, decimalDigits=10, negative=false){
 
-        if ( nodDecimalDigits === undefined) nodDecimalDigits = 10;
-        if ( decimalDigits === undefined) decimalDigits = 10;
-
-        let nonDecimalPart = this.makeDigitId(nodDecimalDigits, true);
+        let nonDecimalPart = this.makeDigitId(noDecimalDigits, true, negative);
 
         if(decimalDigits > 0) {
             let decimalPart = this.makeDigitId(decimalDigits, false);
             return new BigNumber(nonDecimalPart + "." + decimalPart);
         } else {
-            return new BigNumber(nodDecimalDigits);
+            return new BigNumber(noDecimalDigits);
         }
     }
 
-    makeRandomBigNumbersArray(count, isDecimal){
+    makeRandomBigNumbersArray(count, isDecimal=false, negative=false){
 
         if ( count === undefined) count = 10;
-        if ( isDecimal === undefined) isDecimal = false;
 
         let result = [];
         for (let i = 0; i < count; ++i) {
             if (isDecimal === true)
-                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10));
+                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10), negative);
             else
-                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), 0);
+                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), 0, negative);
         }
 
         return result;

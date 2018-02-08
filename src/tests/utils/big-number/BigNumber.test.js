@@ -7,7 +7,8 @@ describe('BigNumber test', () => {
 
     it('creating big number', ()=>{
 
-        let v = TestsHelper.makeRandomBigNumbersArray(5000, true);
+        let v = TestsHelper.makeRandomBigNumbersArray(5000, true, true);
+
         let sum1 = new BigNumber(0);
         let sum2 = new BigNumber(0);
         let prod1 = new BigNumber(1);
