@@ -163,8 +163,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 let iWEBDSerialized = null;
                 for (let i = 0; i < this.balances.length; i++)
                     if ((this.balances[i].id.length === 1) && (this.balances[i].id[0] === 1)) {
-                        balancesBuffers.push(this._serializeBalances(this.balances[i]));
                         iWEBDSerialized = i;
+                        break;
                     }
 
                 // in case it was not serialize d and it is empty
@@ -173,6 +173,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                     idWEBD[0] = 1;
 
                     balancesBuffers.push(this._serializeBalances({id: idWEBD, amount: new BigNumber(0)}));
+                } else {
+                    balancesBuffers.push(this._serializeBalances(this.balances[iWEBDSerialized]));
                 }
 
                 balancesCount = 1;

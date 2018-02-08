@@ -2,6 +2,7 @@ var assert = require('assert')
 var BigNumber = require('bignumber.js');
 const colors = require('colors/safe');
 
+import TestsHelper from 'tests/Tests.helper'
 import Blockchain from 'main-blockchain/Blockchain';
 import MiniBlockchainAccountantTree from 'common/blockchain/mini-blockchain/state/Mini-Blockchain-Accountant-Tree'
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
@@ -10,8 +11,12 @@ describe('MiniBlockchainAccountantTree', () => {
 
     it('save MiniBlockchainAccountantTree Tree', async () => {
 
-        let array = [{addr:"WEBD$gAWbRegeuENxh8SXRJgns6pWZ#&rZHqG#bCPUh35Zkxpbo1s%HsPw==", val: 103213.32 }, {addr:"WEBD$gAvuc$kGH1LQSYo62mPT#YpaVu*pH54rGxWmXfD5NaXi#Nu8svsPw==", val:124213},
-                     {addr:"WEBD$gB3TtEpjSy6ts1zToLMm9YUa5NJgh6i2pLhzA$5FXQCe6R%i17sPw==", val: 123233 },    {addr:"WEBD$gB34HQUEPTP4GgLJ9M4muGQfS5Q4EC1E1z$f&eASjs6eH1mbezsPw==", val:153213.312321312}]
+        let array = [
+                     {addr:"WEBD$gAWbRegeuENxh8SXRJgns6pWZ#&rZHqG#bCPUh35Zkxpbo1s%HsPw==", val: "0.000661817095001" },
+                     {addr:"WEBD$gAvuc$kGH1LQSYo62mPT#YpaVu*pH54rGxWmXfD5NaXi#Nu8svsPw==", val:124213},
+                     {addr:"WEBD$gB3TtEpjSy6ts1zToLMm9YUa5NJgh6i2pLhzA$5FXQCe6R%i17sPw==", val: 123233 },
+                     {addr:"WEBD$gB34HQUEPTP4GgLJ9M4muGQfS5Q4EC1E1z$f&eASjs6eH1mbezsPw==", val:153213.312321312}
+                    ]
 
         let Tree = new MiniBlockchainAccountantTree(Blockchain.blockchain.db);
         let sum = new BigNumber(0);
@@ -61,7 +66,7 @@ describe('MiniBlockchainAccountantTree', () => {
                 }
 
             if (!found)
-                list.push ( {address:address.address, value: Math.floor(Math.random()*1000) } );
+                list.push ( {address:address.address, value: TestsHelper.makeRandomBigNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10), false) } );
         }
 
         for (let i=0; i<list.length; i++){

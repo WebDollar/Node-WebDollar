@@ -1,3 +1,5 @@
+import BufferExtended from "./BufferExtended";
+
 var BigNumber = require('bignumber.js');
 
 class Serialization{
@@ -68,10 +70,10 @@ class Serialization{
         if (!Buffer.isBuffer(buffer)) throw "Can't deserialize Big Number because it is not a buffer";
 
         bigNumber.e = buffer[0 + offset ] % 128;
-        bigNumber.e *= Math.floor(buffer[0] / 128) === 0 ? 1 : -1;
+        bigNumber.e *= Math.floor(buffer[0 + offset] / 128) === 0 ? 1 : -1;
 
         let length = buffer[1 + offset ] % 128;
-        bigNumber.s = Math.floor(buffer[1] / 128) === 0 ? 1 : -1;
+        bigNumber.s = Math.floor(buffer[1 + offset] / 128) === 0 ? 1 : -1;
 
         for (let i=0; i<length; i++){
 

@@ -90,7 +90,9 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         let node = this.search(address).node;
 
-        if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
+        if (node === undefined || node === null) throw "address not found";
+
+        if (!node.isLeaf()) throw "couldn't list because input is not a leaf node";
 
         return node.getBalances();
     }
@@ -106,6 +108,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         if (address === null) throw "sorry but your address is invalid";
 
         let node = this.search(address).node;
+
+        if (node === undefined || node === null) throw "address not found";
 
         if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
 
