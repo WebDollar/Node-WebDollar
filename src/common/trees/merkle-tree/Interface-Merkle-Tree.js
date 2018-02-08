@@ -196,9 +196,9 @@ class InterfaceMerkleTree extends InterfaceTree{
 
             // console.log("sha_after", node.hash.sha256.toString("hex"));
 
-            if (node.parent !== null && node.parent !== undefined)
-                for (let j=0; j<node.parent.edges.length; j++)
-                    console.log(j, "node === node.parent.edges[j].targetNode", node === node.parent.edges[j].targetNode);
+            // if (node.parent !== null && node.parent !== undefined)
+            //     for (let j=0; j<node.parent.edges.length; j++)
+            //         console.log(j, "node === node.parent.edges[j].targetNode", node === node.parent.edges[j].targetNode);
 
             if (node.parent !== null)
                 result = result && this._refreshHash(node.parent, true)
@@ -217,7 +217,8 @@ class InterfaceMerkleTree extends InterfaceTree{
                 throw "Refresh Hash didn't work";
         }
         else { //let's recalculate
-            this._changedNode(this.root);
+            if (! this._refreshHash(this.root, true) )
+                throw "Refresh Hash2 didn't work";
         }
 
         return offset;

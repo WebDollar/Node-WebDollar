@@ -30,7 +30,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
     deserializeNodeData(buffer, offset){
 
-        let hashSha256 =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 32) );
+        let hashSha256 =  BufferExtended.substr(buffer, offset, 32);
         offset += 32;
 
         this.hash = {sha256: hashSha256};

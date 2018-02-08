@@ -93,7 +93,23 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
 
         return node.getBalances();
+    }
 
+    /**
+     *
+     * @param input must be Base or Base String
+     * @returns {*}
+     */
+    getBalance(address, tokenId){
+
+        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        if (address === null) throw "sorry but your address is invalid";
+
+        let node = this.search(address).node;
+
+        if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
+
+        return node.getBalance(tokenId);
     }
 
 
@@ -107,10 +123,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     validateTree(node, callback){
 
-        // if (!InterfaceAccountantRadixTree.prototype.validateTree.call(this, node, callback)) //verifying hash and propagating it
-        //     return false;
-
-        if (!InterfaceMerkleTree.prototype.validateTree.call(this, node)) //computing hash
+        if (!InterfaceMerkleTree.prototype.validateTree.call(this, node, callback)) //computing hash
             return false;
 
         return true;
@@ -119,7 +132,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     _checkInvalidNode(node){
 
         //if (!InterfaceAccountantRadixTree.prototype._checkInvalidNode.call(this, node)) return false;
-
         return InterfaceMerkleTree.prototype._checkInvalidNode.call(this, node);
     }
 
@@ -133,7 +145,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
 
     _getValueToHash(node){
-        return node.serializeNode(false);
+        return node.serializeNode(false, false);
     }
 
     checkBalanceSubscribed(name){

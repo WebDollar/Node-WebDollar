@@ -8,7 +8,8 @@ import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import InterfaceMerkleRadixTreeNode from "common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree-Node"
-import InterfaceRadixTreeEdge from "../../../trees/radix-tree/Interface-Radix-Tree-Edge";
+import InterfaceRadixTreeEdge from "common/trees/radix-tree/Interface-Radix-Tree-Edge";
+import InterfaceMerkleTreeNode from "common/trees/merkle-tree/Interface-Merkle-Tree-Node"
 
 let BigNumber = require('bignumber.js');
 
@@ -36,7 +37,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     updateBalanceToken(value, tokenId){
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) {
-            tokenId = Buffer.from([1]);
+            tokenId = Buffer.from( [1] );
             tokenId[0] = 1;
         }
 
@@ -142,11 +143,18 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     }
 
-    serializeNodeData( ){
+    serializeNodeData( includeEdges, includeHashes ){
 
         try {
-            let buffer = new Buffer(0), //[InterfaceMerkleRadixTreeNode.prototype.serializeNodeData.apply(this, arguments)]
+            let buffer,
                 balancesBuffers = [];
+
+            let hash = InterfaceMerkleRadixTreeNode.prototype.serializeNodeDataHash.apply(this, arguments);
+
+            if (hash !== null) buffer = hash;
+            else buffer = new Buffer(0);
+
+            console.log("buffer serializeNodeData hash", buffer.toString("hex"))
 
             let balancesCount = 0;
             if (this.balances !== undefined && this.balances !== null) {
@@ -179,6 +187,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 balancesBuffers = Buffer.concat(balancesBuffers);
             }
 
+            console.log("balancesBuffers", balancesBuffers.toString("hex"));
+
             return Buffer.concat( [buffer, Serialization.serializeNumber1Byte(balancesCount), balancesBuffers] );
 
         } catch (exception){
@@ -188,15 +198,15 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     }
 
-    deserializeNodeData(buffer, offset){
+    deserializeNodeData(buffer, offset, includeEdges, includeHashes){
 
         // deserializing this.value
-        //offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeData.apply(this, arguments);
+        offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeDataHash.apply(this, arguments);
+        console.log("offset", offset);
 
         try {
 
             offset = offset || 0;
-
 
             let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
             offset += 1;
@@ -213,6 +223,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 this.balances = [];
                 let result = Serialization.deserializeBigNumber( buffer, offset );
 
+                console.log("result.number",result.number);
+
                 this.updateBalanceToken(result.number);
                 offset = result.newOffset;
 
@@ -226,6 +238,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
                         result = Serialization.deserializeBigNumber(buffer, offset);
 
+                        console.log("result.number2",result.number);
                         this.updateBalanceToken(result.number, tokenId);
 
                         offset = result.newOffset;
