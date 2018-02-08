@@ -163,12 +163,12 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         return false;
     }
 
-    serializeMiniAccountant(){
-        return this.serializeTree();
+    serializeMiniAccountant(includeHashes=true){
+        return this.serializeTree(includeHashes);
     }
 
-    deserializeMiniAccountant(buffer,offset){
-        return this.deserializeTree(buffer,offset);
+    deserializeMiniAccountant(buffer,offset, includeHashes = true){
+        return this.deserializeTree(buffer,offset, includeHashes);
     }
 
     async saveMiniAccountant(includeHashes, name, serialization){
