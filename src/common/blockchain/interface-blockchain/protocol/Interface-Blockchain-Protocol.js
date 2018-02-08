@@ -136,7 +136,7 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
-                    console.log("blockchain/header/new-block received", data);
+                    console.log("blockchain/header/new-block received", data.chainLength||0);
 
                     this._validateBlockchainHeader(data)
 

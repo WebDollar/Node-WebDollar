@@ -121,9 +121,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             //saving the Light Settings
 
-            console.log("postFork SAVE!!!!!!!!!!!!!!!!!!!");
-            await this.blockchain._saveLightSettings( this.forkStartingHeight + this.forkBlocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS);
-
             return true;
         }
 
