@@ -65,8 +65,9 @@ describe('MiniBlockchainAccountantTree', () => {
                     break;
                 }
 
-            if (!found)
-                list.push ( {address:address.address, value: TestsHelper.makeRandomBigNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10), false) } );
+            let value = TestsHelper.makeRandomBigNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10), false);
+            if (!found && value.greaterThan(0))
+                list.push ( {address:address.address, value: value } );
         }
 
         for (let i=0; i<list.length; i++){

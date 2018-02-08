@@ -177,7 +177,6 @@ class InterfaceMerkleTree extends InterfaceTree{
         let result = false;
         let hashAlreadyComputed = false;
 
-        console.log("_refreshHash", forced);
         if ( forced === undefined || forced === false ) {
             // in case it must recalculate the hash by force
             hashAlreadyComputed = true;

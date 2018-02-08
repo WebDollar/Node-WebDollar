@@ -154,7 +154,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             if (hash !== null) buffer = hash;
             else buffer = new Buffer(0);
 
-            console.log("buffer serializeNodeData hash", buffer.toString("hex"))
+            //console.log("buffer serializeNodeData hash", buffer.toString("hex"))
 
             let balancesCount = 0;
             if (this.balances !== undefined && this.balances !== null) {
@@ -189,7 +189,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 balancesBuffers = Buffer.concat(balancesBuffers);
             }
 
-            console.log("balancesBuffers", balancesBuffers.toString("hex"));
+            //console.log("balancesBuffers", balancesBuffers.toString("hex"));
 
             return Buffer.concat( [buffer, Serialization.serializeNumber1Byte(balancesCount), balancesBuffers] );
 
