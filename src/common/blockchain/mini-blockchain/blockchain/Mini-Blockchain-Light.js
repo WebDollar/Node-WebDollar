@@ -79,8 +79,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log(" prev hash ", block.hashPrev.toString("hex"));
 
         console.log("blockchain tree serialization", this.accountantTree.root.hash.sha256.toString("hex"));
-        if (this.accountantTree.root.edges.length > 0)
-            console.log("blockchain balances ", this.accountantTree.root.edges[0].targetNode.balances[0].amount);
+        console.log("blockchain balances ",  this.accountantTree.calculateNodeCoins() );
 
 
         // console.log("this.lightAccountantTreeSerializations", this.lightAccountantTreeSerializations[block.height] !== undefined ? this.lightAccountantTreeSerializations[block.height].toString("hex") : '');

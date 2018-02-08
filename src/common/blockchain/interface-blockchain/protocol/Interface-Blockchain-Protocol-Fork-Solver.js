@@ -100,7 +100,7 @@ class InterfaceBlockchainProtocolForkSolver{
             //check if n-2 was ok, but I need at least 1 block
             if (currentBlockchainLength === newChainLength-1 && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
 
-                let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-2 }, currentBlockchainLength-2 );
+                let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-1 }, currentBlockchainLength-1 );
 
                 if (answer === null || answer === undefined) throw "connection dropped headers-info";
                 if (answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) ) throw "connection headers-info malformed";
@@ -108,7 +108,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (answer.header.hash.equals( this.blockchain.last.hash ))
 
                     binarySearchResult = {
-                        position : currentBlockchainLength - 1,
+                        position : currentBlockchainLength,
                         header: answer.header,
                     };
 
