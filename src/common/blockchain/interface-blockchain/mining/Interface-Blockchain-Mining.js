@@ -1,6 +1,6 @@
 import BufferExtended from "../../../utils/BufferExtended";
 
-var BigInteger = require('big-integer');
+const BigInteger = require('big-integer');
 const colors = require('colors/safe');
 const EventEmitter = require('events');
 

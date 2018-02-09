@@ -23,7 +23,7 @@ class MinerProtocol {
 
             } catch (exception) {
 
-                console.log("Minner didn't send task response");
+                console.log("Miner didn't send task response");
 
             }
 
@@ -49,11 +49,10 @@ class MinerProtocol {
 
                 //TODO: Serialize mining-data and send to PoolLeader
                 let taskResponse = this.getTaskResult(socket);
-                
 
             } catch (exception) {
 
-                console.log("Minner didn't send task response");
+                console.log("Miner didn't send task response");
 
             }
 
@@ -69,10 +68,19 @@ class MinerProtocol {
         
     }
 
-    createMiningHashes(){
+    async _mine() {
+
+    }
+
+    async createMiningHashes(){
 
         //TODO: create a list with best X hashes
-        
+        try {
+            answer = await this.mine(block, difficulty);
+        } catch (exception){
+            console.log(colors.red("Couldn't mine block " + block.height + exception.toString()), exception);
+            answer.result = false;
+        }
 
     }
 
