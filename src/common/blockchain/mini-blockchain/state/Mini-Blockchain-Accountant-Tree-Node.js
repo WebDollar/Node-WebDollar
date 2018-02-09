@@ -204,7 +204,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         // deserializing this.value
         offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeDataHash.apply(this, arguments);
-        console.log("offset", offset);
+        //console.log("offset", offset);
 
         try {
 
@@ -225,7 +225,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 this.balances = [];
                 let result = Serialization.deserializeBigNumber( buffer, offset );
 
-                console.log("result.number",result.number);
+                //console.log("result.number",result.number);
 
                 this.updateBalanceToken(result.number);
                 offset = result.newOffset;
@@ -240,7 +240,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
                         result = Serialization.deserializeBigNumber(buffer, offset);
 
-                        console.log("result.number2",result.number);
+                        //console.log("result.number2",result.number);
                         this.updateBalanceToken(result.number, tokenId);
 
                         offset = result.newOffset;
