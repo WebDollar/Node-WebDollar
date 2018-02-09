@@ -4,6 +4,7 @@ import Serialization from 'common/utils/Serialization';
 
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
+
     constructor(blockchain, minerAddress){
 
         super(blockchain, minerAddress);
