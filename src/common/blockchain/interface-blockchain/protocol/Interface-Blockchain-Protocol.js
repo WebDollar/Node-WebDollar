@@ -295,7 +295,6 @@ class InterfaceBlockchainProtocol {
         let data = await socket.node.sendRequestWaitOnce("get/blockchain/header/last-block", undefined, "answer");
 
         console.log("get/blockchain/header/last-block2", data);
-        console.log("get/blockchain/header/last-block2", data);
 
         try {
 

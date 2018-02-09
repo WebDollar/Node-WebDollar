@@ -41,7 +41,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: mid-1}, mid-1);
                         if ( blockHeaderResult !== null && blockHeaderResult !== undefined && blockHeaderResult.result && blockHeaderResult.header !== undefined && blockHeaderResult.header !== null && blockHeaderResult.header.hash !== undefined && Buffer.isBuffer(blockHeaderResult.header.hash) )
-                            return {position: mid-1, header: blockHeaderResult.header};
+                            if (blockHeaderResult.header.hash.equals( this.blockchain.getHashPrev(mid) ) )
+                                return {position: mid-1, header: blockHeaderResult.header};
                     }
                     return {position: -1, header: blockHeaderResult.header};
                 }
