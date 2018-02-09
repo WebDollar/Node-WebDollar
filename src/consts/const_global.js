@@ -6,12 +6,12 @@ consts.TERMINATED = false;
 
 consts.UUID = uuid.v4();
 
-consts.NODE_VERSION = "0.248";
-consts.NODE_VERSION_COMPATIBILITY = "0.248";
+consts.NODE_VERSION = "0.249";
+consts.NODE_VERSION_COMPATIBILITY = "0.249";
 consts.WALLET_VERSION = "0.1";
 
-consts.BLOCKCHAIN_FILE_NAME = 'blockchain3.bin';
-consts.BLOCKCHAIN_DIRECTORY_NAME = 'blockchainDB2';
+consts.BLOCKCHAIN_FILE_NAME = 'blockchain4.bin';
+consts.BLOCKCHAIN_DIRECTORY_NAME = 'blockchainDB3';
 
 consts.NODE_PROTOCOL = "WebDollar";
 consts.NODE_FALLBACK_INTERVAL =  10*1000; //miliseconds
