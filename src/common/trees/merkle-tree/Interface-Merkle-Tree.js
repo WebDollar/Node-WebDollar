@@ -207,9 +207,9 @@ class InterfaceMerkleTree extends InterfaceTree{
         return result;
     }
 
-    deserializeTree(buffer, offset, includeHashes){
+    _deserializeTree(buffer, offset, includeHashes){
 
-        offset = InterfaceTree.prototype.deserializeTree.call(this, buffer, offset, includeHashes);
+        offset = InterfaceTree.prototype._deserializeTree.call(this, buffer, offset, includeHashes);
 
         if (includeHashes) {
             if (!this.validateRoot())

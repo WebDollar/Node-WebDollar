@@ -44,9 +44,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         let node = this.search(address).node;
 
         // in case it doesn't exist, let's create it
-        if ( node === undefined || node === null){
+        if ( node === undefined || node === null)
             node = this.add(address, {balances: [] });
-        }
 
         if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
 
@@ -60,20 +59,17 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         }
 
         //optimization, but it doesn't work in browser
-        //if (this.checkBalanceSubscribed("balances/changes/"+BufferExtended.toBase(address))){
-
-        let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
-        this.emitter.emit("balances/changes/"+BufferExtended.toBase(address), { address: addressWIF, balances: (resultUpdate !== null ? node.getBalances() : null) } );
+        if (this.checkBalanceIsSubscribed(address)) {
+            let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
+            this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {address: addressWIF, balances: (resultUpdate !== null ? node.getBalances() : null)});
+        }
 
         if (resultUpdate === null) {
-            this.delete(address)
+            this.delete(address);
             return null;
         }
 
-        console.log("this.calculateNodeCoins", this.calculateNodeCoins());
-        console.log("changedNode ----", value, node.hash.sha256 !== undefined ? node.hash.sha256.toString("hex") : '', this.root.hash.sha256.toString("hex"));
         this._changedNode( node );
-        console.log("changedNode ----", value, node.hash.sha256.toString("hex"), this.root.hash.sha256.toString("hex"));
 
         return resultUpdate;
     }
@@ -152,36 +148,47 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         return node.serializeNode(false, false);
     }
 
-    checkBalanceSubscribed(name){
+    checkBalanceIsSubscribed(name){
+
+        if (Buffer.isBuffer(name))
+            name = "balances/changes/"+BufferExtended.toBase(name);
 
         //not working
-        let list = this.emitter.eventNames();
+        //TODO .eventNames() is not working
+        let list = this.emitter._events;
 
-        for (let i=0; i<list.length; i++)
-            if (list[i] === name) return true;
+        for (let key in list)
+            if (key === name) return true;
 
         return false;
     }
 
     serializeMiniAccountant(includeHashes=true){
-        return this.serializeTree(includeHashes);
+        return this._serializeTree(includeHashes);
+    }
+
+    _deserializeTree(buffer, offset, includeHashes){
+        let answer = InterfaceMerkleRadixTree.prototype._deserializeTree.call(this, buffer, offset, includeHashes);
+        this.emitBalancesChanges();
+        return answer;
     }
 
     deserializeMiniAccountant(buffer,offset, includeHashes = true){
-        return this.deserializeTree(buffer,offset, includeHashes);
+        return this._deserializeTree(buffer,offset, includeHashes);
     }
 
     async saveMiniAccountant(includeHashes, name, serialization){
         return await this.saveTree(name||"accountantTree", includeHashes, serialization);
     }
 
-    async loadMiniAccountant(buffer, offset, includeHashes, name){
+    async loadMiniAccountant(buffer, offset, includeHashes, name = "accountantTree"){
 
         try {
 
-            let result = await this.loadTree(name||"accountantTree", buffer, offset, includeHashes);
+            let result = await this.loadTree(name, buffer, offset, includeHashes);
 
             //console.log("this.root", this.root);
+            this.emitBalancesChanges();
 
             return result !== false;
 
@@ -209,6 +216,40 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         return sum;
 
+    }
+
+    emitBalancesChanges(){
+
+        //TODO .eventNames() is not working
+        let list = this.emitter._events;
+
+        for (let key in list)
+            if (key.indexOf("balances/changes/") === 0) {
+
+                let address = BufferExtended.fromBase(key.replace("balances/changes/", ""));
+
+                let node = null;
+                let balances = null;
+
+                try {
+
+                    node = this.search(address).node;
+
+                    // in case it doesn't exist, let's create it
+                    if (node !== undefined && node !== null && node.isLeaf()) {
+                        balances = node.getBalances();
+                    }
+
+                } catch (exception) {
+
+                }
+
+                let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
+                this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {
+                    address: addressWIF,
+                    balances: balances
+                });
+            }
     }
 
 }

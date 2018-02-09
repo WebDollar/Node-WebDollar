@@ -51,6 +51,7 @@
     "bufferutil": "^3.0.3",
     "colors": "^1.1.2",
     "elliptic": "^6.4.0",
+    "events": "^2.0.0",
     "fs": "0.0.1-security",
     "get-random-values": "^1.2.0",
     "ipaddr.js": "^1.5.4",

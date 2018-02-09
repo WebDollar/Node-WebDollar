@@ -88,7 +88,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             return MiniBlockchainFork.prototype.preFork.call(this);
     }
 
-    async postForkBefore(forkedSuccessfully){
+    postForkBefore(forkedSuccessfully){
 
         if (forkedSuccessfully)
             return true;

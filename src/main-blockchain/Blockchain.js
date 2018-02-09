@@ -77,7 +77,12 @@ class Blockchain{
         //loading the blockchain
         await this.loadBlockchain();
 
+        this.emitter.emit('blockchain/status', {message: "Start Synchronizing"});
+
         this.Agent.initializeStartAgent();
+
+        this.emitter.emit('blockchain/status', {message: "Synchronizing"});
+
         let resultAgentStarted = await this.Agent.startAgent();
 
         await this.startMining();

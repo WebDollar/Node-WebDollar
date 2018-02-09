@@ -46,7 +46,7 @@ class InterfaceBlockchainAgent{
 
         try {
 
-            let queueIndex = this.agentQueueProcessing.length;
+            let queueIndex = this.agentQueueProcessing.length-1;
             this.agentQueueProcessing.push(true);
             let answerBlockchain = await this.protocol.askBlockchain(result.socket);
             console.log("answerBlockchain");
@@ -61,6 +61,8 @@ class InterfaceBlockchainAgent{
 
         //check if start Agent is finished
 
+        console.log("this.startAgentResolver",this.startAgentResolver !== undefined)
+        console.log("this.agentQueueProcessing", this.agentQueueProcessing .length);
         if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0) {
 
             let done = true;
@@ -101,7 +103,7 @@ class InterfaceBlockchainAgent{
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
 
-        NodesList.emitter.on("nodes-list/connected", (result) => { this._requestBlockchainForNewPeer(result) } );
+        NodesList.emitter.on("nodes-list/connected", async (result) => { await this._requestBlockchainForNewPeer(result) } );
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
 
@@ -118,6 +120,7 @@ class InterfaceBlockchainAgent{
         this._initializeProtocol();
 
         this._startAgentPromise = new Promise((resolve)=>{
+            console.log("initializeStartAgent() this.startAgentResolver")
             this.startAgentResolver = resolve;
         });
 
