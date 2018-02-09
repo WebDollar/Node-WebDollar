@@ -19,10 +19,10 @@ class InterfaceBlockchainMining{
 
         this.emitter = new EventEmitter();
 
-        this.blockchain = blockchain;
+        this._minerAddress = undefined;
+        this._minerAddressBase = undefined;
 
-        this.minerAddressBase = '';
-        this.minerAddress = undefined;
+        this.blockchain = blockchain;
 
         this.setMinerAddress(minerAddress);
 
@@ -32,6 +32,27 @@ class InterfaceBlockchainMining{
 
     }
 
+    get minerAddress(){
+        return this._minerAddress;
+    }
+
+    get minerAddressBase(){
+        return this._minerAddressBase;
+    }
+
+    set minerAddress(newAddress){
+
+        if (typeof newAddress === "string")
+            newAddress = BufferExtended.fromBase(newAddress);
+
+        this._minerAddress = newAddress;
+        if (newAddress === undefined)
+            this._minerAddressBase = undefined;
+        else
+            this._minerAddressBase = BufferExtended.toBase(this._minerAddress);
+
+        this.blockchain.emitter.emit( 'blockchain/mining/address', { address: this._minerAddressBase, unencodedAddress: this._minerAddress });
+    }
 
     async startMining(){
 
@@ -68,6 +89,12 @@ class InterfaceBlockchainMining{
     async mineNextBlock(showMiningOutput, suspend){
 
         while (this.started && !global.TERMINATED){
+
+            if (this.minerAddress === undefined){
+                alert("Mining suspended. No Mining Address");
+                this.stopMining();
+                return;
+            }
 
             //mining next blocks
 
@@ -274,7 +301,6 @@ class InterfaceBlockchainMining{
         if (newMinerAddress === undefined || newMinerAddress === '' || newMinerAddress === null){
             console.log(colors.red("No Miner Address defined"));
             this.minerAddress = undefined;
-            this.minerAddressBase = '';
             return;
         }
 
@@ -282,7 +308,6 @@ class InterfaceBlockchainMining{
             newMinerAddress = BufferExtended.fromBase(newMinerAddress);
 
         this.minerAddress = newMinerAddress;
-        this.minerAddressBase = BufferExtended.toBase(newMinerAddress);
 
         this.emitter.emit('mining/miner-address-changed', BufferExtended.toBase(this.minerAddress));
 

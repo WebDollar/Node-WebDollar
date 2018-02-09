@@ -410,7 +410,7 @@ class MainBlockchainWallet{
     async deleteAddress(address){
 
 
-        if (typeof address === "object") address = address.address;
+        if (typeof address === "object" && address.hasOwnProperty("address")) address = address.address;
 
         let index = this.getAddressIndex(address);
         if (index === -1) return {result: false, message: "Address was not found ", address:address};
@@ -419,7 +419,16 @@ class MainBlockchainWallet{
 
         if(ask){
 
+            let addressDeleted = this.addresses[index];
+
             this.addresses.splice(index, 1);
+
+            //setting the next minerAddress
+            console.log("addressDeleted",addressDeleted)
+            if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.minerAddress.equals(addressDeleted.unencodedAddress) ) {
+                this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
+                this.blockchain.mining.resetMining();
+            }
 
             await this.saveWallet();
             this.emitter.emit('wallet/changes', this.addresses );
