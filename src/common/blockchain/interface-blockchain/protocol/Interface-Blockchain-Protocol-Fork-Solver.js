@@ -15,7 +15,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    async _discoverForkBinarySearch(socket, left, right){
+    async _discoverForkBinarySearch(socket, initialLeft, left, right){
 
         let blockHeaderResult;
 
@@ -23,7 +23,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let mid = Math.trunc((left + right) / 2);
 
-            console.log("_discoverForkBinarySearch", left, right, 1111)
+            console.log("_discoverForkBinarySearch", initialLeft, left, right, 1111)
             blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: mid}, mid);
 
             if (left < 0 || blockHeaderResult === null || blockHeaderResult === undefined || blockHeaderResult.result !== true || blockHeaderResult.header === undefined || blockHeaderResult.header === null || blockHeaderResult.header.hash === undefined ||  !Buffer.isBuffer(blockHeaderResult.header.hash) )
@@ -34,16 +34,25 @@ class InterfaceBlockchainProtocolForkSolver{
                 //it the block actually is the same
                 if (blockHeaderResult.header.hash.equals( this.blockchain.getHashPrev(mid+1) ) )
                     return {position: mid, header: blockHeaderResult.header};
-                else
+                else {
+
+                    //it is not a match, but it was previously a match
+                    if (mid-1 >= 0 && initialLeft <= mid-1 && initialLeft < left){
+
+                        blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: mid-1}, mid-1);
+                        if ( blockHeaderResult !== null && blockHeaderResult !== undefined && blockHeaderResult.result && blockHeaderResult.header !== undefined && blockHeaderResult.header !== null && blockHeaderResult.header.hash !== undefined && Buffer.isBuffer(blockHeaderResult.header.hash) )
+                            return {position: mid-1, header: blockHeaderResult.header};
+                    }
                     return {position: -1, header: blockHeaderResult.header};
+                }
             }
 
             //was not not found, search left because it must be there
             if (blockHeaderResult.header.hash.equals( this.blockchain.getHashPrev(mid+1)  ) === false)
-                return await this._discoverForkBinarySearch(socket, left, mid);
+                return await this._discoverForkBinarySearch(socket, initialLeft, left, mid);
             else
             //was found, search right because the fork must be there
-                return await this._discoverForkBinarySearch(socket, mid + 1, right);
+                return await this._discoverForkBinarySearch(socket, initialLeft, mid + 1, right);
 
 
         } catch (Exception){
@@ -60,7 +69,7 @@ class InterfaceBlockchainProtocolForkSolver{
         if (newChainStartingPoint > currentBlockchainLength-1 || currentBlockchainLength === 0)
             return {position: -1, header: null};
         else {
-            let binarySearchResult = await this._discoverForkBinarySearch(socket, newChainStartingPoint, currentBlockchainLength - 1);
+            let binarySearchResult = await this._discoverForkBinarySearch(socket, newChainStartingPoint, newChainStartingPoint, currentBlockchainLength - 1);
 
             //forcing the binary search for download the next unmatching element
             if (binarySearchResult.position !== -1)
