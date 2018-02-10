@@ -141,7 +141,7 @@ class Argon2BrowserWebAssemblyCalc{
                     this.log('Error loading script');
                 });
             };
-            xhr.onerror = function () {
+            xhr.onerror = () => {
                 this.log('Error loading wasm');
             };
             xhr.send(null);
