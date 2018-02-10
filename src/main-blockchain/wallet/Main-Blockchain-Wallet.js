@@ -6,8 +6,8 @@ import BufferExtended from "common/utils/BufferExtended";
 import consts from "../../consts/const_global";
 import BufferExtend from "../../common/utils/BufferExtended";
 import InterfaceBlockchainAddressHelper from "../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-const colors = require('colors/safe');
 
+const colors = require('colors/safe');
 const md5 = require('md5');
 const EventEmitter = require('events');
 const FileSystem = require('fs');
@@ -332,17 +332,32 @@ class MainBlockchainWallet{
 
     /**
      * @param address
-     * @param oldPassword
      * @param newPassword
      * @returns {Promise<*>}
      */
-    async encryptAddress(address, oldPassword, newPassword){
+    async encryptAddress(address, newPassword){
+
+        let oldPassword = undefined;
+
+        if (await this.isAddressEncrypted(address)) {
+
+            let response = prompt("Please enter your last password (12 words separated by space)");
+            oldPassword = response.trim().split(' ');
+
+            if (oldPassword.length !== 12) {
+                alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                return false;
+            }
+
+        }
 
         address = this.getAddress(address);
 
         let privateKey = await address.getPrivateKey(oldPassword);
-        if (privateKey === null || privateKey === undefined || privateKey.length !== 32)
+        if (privateKey === null || privateKey === undefined || privateKey.length !== 32) {
+            alert('Your old password is incorrect!!!');
             return false;
+        }
 
         return (await address.savePrivateKey(privateKey, newPassword));
     }
@@ -410,10 +425,35 @@ class MainBlockchainWallet{
     async deleteAddress(address){
 
 
-        if (typeof address === "object" && address.hasOwnProperty("address")) address = address.address;
+        if (typeof address === "object" && address.hasOwnProperty("address"))
+            address = address.address;
 
         let index = this.getAddressIndex(address);
-        if (index === -1) return {result: false, message: "Address was not found ", address:address};
+        if (index < 0)
+            return {result: false, message: "Address was not found ", address: address};
+
+        if (await this.isAddressEncrypted(address)) {
+
+            for (let tries = 3; tries >= 1; --tries) {
+
+                let response = prompt("Please enter your last password (12 words separated by space).  " +  tries + " tries left.");
+                let oldPassword = response.trim().split(' ');
+
+                if (oldPassword.length !== 12) {
+
+                    alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                    continue;
+                }
+
+                address = this.getAddress(address);
+                let privateKey = await address.getPrivateKey(oldPassword);
+                if (privateKey === null || privateKey === undefined || privateKey.length !== 32) {
+                    alert('Your old password is incorrect!!!');
+                    if (tries === 0)
+                        return {result: false, message: "Your old password is incorrect!"};
+                } else break;
+            }
+        }
 
         let ask = confirm("Are you sure you want to delete " + address);
 
@@ -424,7 +464,7 @@ class MainBlockchainWallet{
             this.addresses.splice(index, 1);
 
             //setting the next minerAddress
-            console.log("addressDeleted",addressDeleted)
+            console.log("addressDeleted", addressDeleted);
             if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.minerAddress.equals(addressDeleted.unencodedAddress) ) {
                 this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
                 this.blockchain.mining.resetMining();
@@ -437,7 +477,7 @@ class MainBlockchainWallet{
 
         } else {
 
-            return {result: false, message: "Action cancled by user" }
+            return {result: false, message: "Action canceled by user" };
 
         }
 
