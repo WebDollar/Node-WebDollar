@@ -90,12 +90,12 @@ class InterfaceBlockchainAgent{
                     message: "Start Agent worked successfully",
                 });
 
-            } else
-            //it is not done, maybe timeout
-                this._setStartAgentTimeOut(0.5);
-
-
+                return;
+            }
         }
+
+        //it is not done, maybe timeout
+        this._setStartAgentTimeOut(0.5);
     }
 
     async _requestBlockchainForNewPeers(){

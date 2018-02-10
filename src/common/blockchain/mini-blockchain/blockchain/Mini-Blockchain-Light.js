@@ -137,7 +137,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log(colors.blue("this.blocksStartingPoint "), this.blocksStartingPoint );
 
             let treeSerialization = this.getSerializedAccountantTree(diffIndex);
-            console.log(colors.blue("this.getSerializedAccountantTree "), colors.yellow(diffIndex), treeSerialization !== undefined ? treeSerialization.toString('hex') : '');
+            //console.log(colors.blue("this.getSerializedAccountantTree "), colors.yellow(diffIndex), treeSerialization !== undefined ? treeSerialization.toString('hex') : '');
+
             if (!await this.accountantTree.saveMiniAccountant(true, undefined, treeSerialization)) throw "saveMiniAccountant";
 
             console.log(colors.blue("this.lightPrevDifficultyTarget"), this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
