@@ -23,7 +23,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let mid = Math.trunc((left + right) / 2);
 
-            console.log("_discoverForkBinarySearch", initialLeft, left, right, 1111)
+            console.log("_discoverForkBinarySearch", initialLeft, left, right, 1111);
             blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: mid}, mid);
 
             if (left < 0 || blockHeaderResult === null || blockHeaderResult === undefined || blockHeaderResult.result !== true || blockHeaderResult.header === undefined || blockHeaderResult.header === null || blockHeaderResult.header.hash === undefined ||  !Buffer.isBuffer(blockHeaderResult.header.hash) )
@@ -84,7 +84,7 @@ class InterfaceBlockchainProtocolForkSolver{
     /*
         may the fork be with you Otto
      */
-    async discoverAndSolveFork(socket, newChainLength){
+    async discoverAndProcessFork(socket, newChainLength){
 
         if (typeof newChainLength !== "number") throw "newChainLength is not a number";
 
@@ -181,7 +181,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 } catch (Exception){
 
-                    console.log(colors.red("discoverAndSolveFork - creating a fork raised an exception" ), Exception, "binarySearchResult", binarySearchResult )
+                    console.log(colors.red("discoverAndProcessFork - creating a fork raised an exception" ), Exception, "binarySearchResult", binarySearchResult )
                     throw Exception;
                 }
 
@@ -196,7 +196,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 } catch (Exception){
 
-                    console.log(colors.red("discoverAndSolveFork - solving a fork raised an exception" ), Exception, "binarySearchResult", binarySearchResult );
+                    console.log(colors.red("discoverAndProcessFork - solving a fork raised an exception" ), Exception, "binarySearchResult", binarySearchResult );
                     throw Exception;
                 }
 
@@ -212,7 +212,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         } catch (Exception){
 
-            console.log(colors.red("discoverAndSolveFork raised an exception"  ), Exception )
+            console.log(colors.red("discoverAndProcessFork raised an exception"  ), Exception )
 
         }
 
@@ -220,7 +220,7 @@ class InterfaceBlockchainProtocolForkSolver{
         this.blockchain.forksAdministrator.deleteSocketProcessing(socket);
 
         if (processingSocket.forkChainLengthToDo !== -1 &&  processingSocket.forkChainLengthToDo > newChainLength )
-            this.discoverAndSolveFork(socket, processingSocket.forkChainLengthToDo );
+            this.discoverAndProcessFork(socket, processingSocket.forkChainLengthToDo );
 
         return result;
     }

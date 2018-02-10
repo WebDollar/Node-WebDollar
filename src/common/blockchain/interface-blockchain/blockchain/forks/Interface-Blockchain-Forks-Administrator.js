@@ -36,6 +36,19 @@ class InterfaceBlockchainForksAdministrator {
         return fork;
     }
 
+    getLargestFork(){
+        let maxFork = null;
+        let maxForkLength = 0;
+
+        for (let i=0; i<this.forks.length; i++)
+            if (this.forks[i].forkChainLength > maxForkLength){
+                maxForkLength = this.forks[i].forkChainLength;
+                maxFork = this.forks[i];
+            }
+
+        return maxFork;
+    }
+
     /**
      * Find a fork by a socket
      * @param sockets
@@ -90,6 +103,9 @@ class InterfaceBlockchainForksAdministrator {
             }
         return false;
     }
+
+
+
 
 
 

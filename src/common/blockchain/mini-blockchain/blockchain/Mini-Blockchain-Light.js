@@ -110,6 +110,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         this.lightAccountantTreeSerializations[diffIndex+1] = serialization;
 
+        this._deleteOldLightSettings();
+
         try {
 
             if (save)
@@ -221,14 +223,14 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             console.log("saaaave", this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS -2);
 
-            if (this.blocks.length === 0) throw "Nothing to Save"
+            if (this.blocks.length === 0) throw "Nothing to Save";
 
             await this._saveLightSettings();
 
-            if (! await this.inheritBlockchain.prototype.save.call(this)) throw "couldn't save the blockchain"
+            if (! await this.inheritBlockchain.prototype.save.call(this)) throw "couldn't save the blockchain";
 
         } catch (exception){
-            console.log(colors.red("Couldn't save MiniBlockchain"), exception)
+            console.log(colors.red("Couldn't save MiniBlockchain"), exception);
             global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
             return false;
         }
@@ -283,6 +285,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
         let index = this.blocks.length - consts.POW_PARAMS.LIGHT_BUFFER_LAST_BLOCKS;
         while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
             delete this.lightAccountantTreeSerializations[index];
+            delete this.lightPrevDifficultyTargets[index];
+            delete this.lightPrevHashPrevs[index];
+            delete this.lightPrevTimeStamps[index];
             index--;
         }
     }

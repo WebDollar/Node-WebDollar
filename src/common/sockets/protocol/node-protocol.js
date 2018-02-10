@@ -20,8 +20,6 @@ class NodeProtocol {
         if (typeof response !== "object")
             return false;
 
-        console.log("RECEIVED HELLO NODE BACK", response.version, response.uuid);
-
         if (response === null || !response.hasOwnProperty("uuid")){
             console.log(colors.red("hello received, but there is not uuid"), response);
             return false;
@@ -46,6 +44,8 @@ class NodeProtocol {
             // console.log("sendHello", result);
 
             if ( previousConnection === null ){
+                console.log("RECEIVED HELLO NODE BACK", response.version, response.uuid);
+
                 node.protocol.helloValidated = true;
                 console.log("hello validated");
                 return true;

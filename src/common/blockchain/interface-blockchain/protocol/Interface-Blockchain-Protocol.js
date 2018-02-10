@@ -1,5 +1,7 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
+import InterfaceBlockchainProtocolForkManager from "./Interface-Blockchain-Protocol-Fork-Manager"
+
 import Serialization from 'common/utils/Serialization';
 import NodeProtocol from 'common/sockets/protocol/node-protocol'
 
@@ -17,7 +19,10 @@ class InterfaceBlockchainProtocol {
         this.acceptBlockHeaders = true;
         this.acceptBlocks = true;
 
+        this.forkSolver = undefined;
+        this.forkManager = undefined;
         this.createForkSolver();
+        this.createForkManager();
 
     }
 
@@ -40,6 +45,10 @@ class InterfaceBlockchainProtocol {
 
     createForkSolver(){
         this.forkSolver = new InterfaceBlockchainProtocolForkSolver(this.blockchain, this);
+    }
+
+    createForkManager(){
+        this.forkManager = new InterfaceBlockchainProtocolForkManager(this.blockchain, this);
     }
 
     _setBlockchain(blockchain){
@@ -161,9 +170,9 @@ class InterfaceBlockchainProtocol {
 
                     }
 
-                    console.log("blockchain/header/new-block discoverAndSolveFork");
+                    console.log("blockchain/header/new-block discoverAndProcessFork");
 
-                    let result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header)
+                    let result = await this.forkSolver.discoverAndProcessFork(socket, data.chainLength, data.header)
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: true,
@@ -317,7 +326,7 @@ class InterfaceBlockchainProtocol {
 
             }
 
-            let result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header);
+            let result = await this.forkSolver.discoverAndProcessFork(socket, data.chainLength, data.header);
 
             socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                 result: true,
