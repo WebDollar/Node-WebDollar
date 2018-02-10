@@ -223,13 +223,13 @@ describe('test save wallet to local storage', () => {
         response = await Blockchain.Wallet.isAddressEncrypted(hexAddress);
         assert(response === false, "Address should not be encrypted firstly");
 
-        response = await Blockchain.Wallet.encryptAddress(hexAddress, undefined, passwordZero);
+        response = await Blockchain.Wallet.encryptAddress(hexAddress, passwordZero, undefined);
         assert(response === true, "Error encrypting with first password.");
 
         response = await Blockchain.Wallet.isAddressEncrypted(hexAddress);
         assert(response === true, "Address should be encrypted after encryptAddress");
 
-        response = await Blockchain.Wallet.encryptAddress(hexAddress, passwordZero, passwordOne);
+        response = await Blockchain.Wallet.encryptAddress(hexAddress, passwordOne, passwordZero);
         assert(response === true, "Error encrypting with second password.");
 
     });

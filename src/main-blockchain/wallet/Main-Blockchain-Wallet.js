@@ -333,13 +333,12 @@ class MainBlockchainWallet{
     /**
      * @param address
      * @param newPassword
+     * * @param oldPassword
      * @returns {Promise<*>}
      */
-    async encryptAddress(address, newPassword){
+    async encryptAddress(address, newPassword, oldPassword = undefined){
 
-        let oldPassword = undefined;
-
-        if (await this.isAddressEncrypted(address)) {
+        if (await this.isAddressEncrypted(address)  && process.env.BROWSER) {
 
             let response = prompt("Please enter your last password (12 words separated by space)");
             oldPassword = response.trim().split(' ');
