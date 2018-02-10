@@ -20,15 +20,18 @@ class InterfaceBlockchainProtocolForkManager {
 
         if (bestTip !== null){
 
-            await this.protocol.forkSolver.discoverAndProcessFork(bestTip);
+            let forkAnswer = await this.protocol.forkSolver.discoverAndProcessFork(bestTip);
+
+            //TODO process forkAnswer
 
             if (bestTip.forkChainLengthToDo !== -1 &&  bestTip.forkChainLengthToDo > bestTip.forkChainLength )
-                this.discoverAndProcessFork(socket, processingSocket.forkChainLengthToDo );
-            else {
-                
-            }
+                if (!bestTip.processToDo())
+                    this.protocol.tipsAdministrator.deleteTip( bestTip );
 
+            return true;
         }
+
+        return false;
     }
 
     /*
@@ -48,7 +51,7 @@ class InterfaceBlockchainProtocolForkManager {
             this.blockchain.tipsAdministrator.updateTipNewForkLength(tip, newChainLength);
             return false;
         } else
-            tip =  this.blockchain.tipsAdministrator.addSocketProcessing(socket);
+            tip =  this.blockchain.tipsAdministrator.addTip(socket);
 
     }
 

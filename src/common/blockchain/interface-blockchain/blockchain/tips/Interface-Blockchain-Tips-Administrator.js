@@ -35,7 +35,7 @@ class InterfaceBlockchainTipsAdministrator {
     findTip(socket){
 
         for (let i=0; i<this.tips.length; i++)
-            if (this.tips[i].socket === socket || this.tips[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress) )
+            if (this.tips[i] === socket || this.tips[i].socket === socket || this.tips[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress) )
                 return i;
 
         return null;
