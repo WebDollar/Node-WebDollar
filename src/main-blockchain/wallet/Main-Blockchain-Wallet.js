@@ -441,6 +441,9 @@ class MainBlockchainWallet{
                 if (oldPassword.length !== 12) {
 
                     alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                    if (tries === 1)
+                        return {result: false, message: "Your old password is incorrect!"};
+                    
                     continue;
                 }
 
@@ -448,7 +451,7 @@ class MainBlockchainWallet{
                 let privateKey = await address.getPrivateKey(oldPassword);
                 if (privateKey === null || privateKey === undefined || privateKey.length !== 32) {
                     alert('Your old password is incorrect!!!');
-                    if (tries === 0)
+                    if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};
                 } else break;
             }
