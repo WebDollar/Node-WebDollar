@@ -84,25 +84,16 @@ class InterfaceBlockchainProtocolForkSolver{
     /*
         may the fork be with you Otto
      */
-    async discoverAndProcessFork(socket, newChainLength){
-
-        if (typeof newChainLength !== "number") throw "newChainLength is not a number";
+    async discoverAndProcessFork(tip){
 
         let fork, result = null, newChainStartingPoint = 0;
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.getBlockchainLength;
 
-        let processingSocket = this.blockchain.forksAdministrator.getSocketProcessing(socket);
-
-        if (processingSocket !== null) {
-            this.blockchain.forksAdministrator.updateSocketProcessingNewForkLength(processingSocket, newChainLength);
-            return false;
-        }
+        let socket = tip.socket;
+        let newChainLength = tip.forkChainLength;
 
         try{
-
-            processingSocket =  this.blockchain.forksAdministrator.addSocketProcessing(socket);
-
 
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
             if ( forkFound !== null ) return forkFound;
@@ -217,10 +208,6 @@ class InterfaceBlockchainProtocolForkSolver{
         }
 
         this.blockchain.forksAdministrator.deleteFork(fork);
-        this.blockchain.forksAdministrator.deleteSocketProcessing(socket);
-
-        if (processingSocket.forkChainLengthToDo !== -1 &&  processingSocket.forkChainLengthToDo > newChainLength )
-            this.discoverAndProcessFork(socket, processingSocket.forkChainLengthToDo );
 
         return result;
     }

@@ -9,6 +9,7 @@ import BlockchainDifficulty from 'common/blockchain/global/difficulty/Blockchain
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 
 import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
+import InterfaceBlockchainTipsAdministrator from './tips/Interface-Blockchain-Tips-Administrator'
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
@@ -47,6 +48,8 @@ class InterfaceBlockchain {
         this.transactions = new InterfaceBlockchainTransactions();
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
+        this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator( this );
+
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
     }
 

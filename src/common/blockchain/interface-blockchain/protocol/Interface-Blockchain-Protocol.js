@@ -1,6 +1,6 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
-import InterfaceBlockchainProtocolForkManager from "./Interface-Blockchain-Protocol-Fork-Manager"
+import InterfaceBlockchainProtocolForkManager from "./Interface-Blockchain-Protocol-Tips-Manager"
 
 import Serialization from 'common/utils/Serialization';
 import NodeProtocol from 'common/sockets/protocol/node-protocol'
@@ -170,9 +170,9 @@ class InterfaceBlockchainProtocol {
 
                     }
 
-                    console.log("blockchain/header/new-block discoverAndProcessFork");
+                    console.log("blockchain/header/new-block discoverNewForkTip");
 
-                    let result = await this.forkSolver.discoverAndProcessFork(socket, data.chainLength, data.header)
+                    let result = await this.forkSolver.discoverNewForkTip(socket, data.chainLength, data.header)
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: true,
@@ -326,7 +326,7 @@ class InterfaceBlockchainProtocol {
 
             }
 
-            let result = await this.forkSolver.discoverAndProcessFork(socket, data.chainLength, data.header);
+            let result = await this.forkSolver.discoverNewForkTip(socket, data.chainLength, data.header);
 
             socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                 result: true,

@@ -36,18 +36,6 @@ class InterfaceBlockchainForksAdministrator {
         return fork;
     }
 
-    getLargestFork(){
-        let maxFork = null;
-        let maxForkLength = 0;
-
-        for (let i=0; i<this.forks.length; i++)
-            if (this.forks[i].forkChainLength > maxForkLength){
-                maxForkLength = this.forks[i].forkChainLength;
-                maxFork = this.forks[i];
-            }
-
-        return maxFork;
-    }
 
     /**
      * Find a fork by a socket
@@ -102,60 +90,6 @@ class InterfaceBlockchainForksAdministrator {
                 return true;
             }
         return false;
-    }
-
-
-
-
-
-
-    findSocketProcessing(socket){
-
-        for (let i=0; i<this.socketsProcessing.length; i++)
-            if (this.socketsProcessing[i].socket === socket || this.socketsProcessing[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress) )
-                return i;
-
-        return null;
-    }
-
-    getSocketProcessing(socket){
-        let index = this.findSocketProcessing(socket);
-        if (index === null) return null;
-        else return this.socketsProcessing[index];
-    }
-
-    deleteSocketProcessing(socket){
-
-        let index = this.findSocketProcessing(socket);
-
-        if (index !== null) {
-            this.socketsProcessing.splice(index, 1);
-            return true;
-        }
-
-        return false;
-
-    }
-
-    addSocketProcessing(socket, forkChainLength){
-
-        if (this.findSocketProcessing(socket) === null){
-            this.socketsProcessing.push({ socket: socket, forkChainLength: forkChainLength, forkChainLengthToDo: -1  })
-            return this.socketsProcessing[this.socketsProcessing.length-1];
-        }
-
-        return null;
-    }
-
-    updateSocketProcessingNewForkLength(processingSocket, forkChainLengthToDo ){
-
-        if (processingSocket === null) return null;
-
-        if (processingSocket.forkChainLength > forkChainLengthToDo) return; //nothing to update
-
-        processingSocket.forkChainLengthToDo = Math.max(forkChainLengthToDo, processingSocket.forkChainLengthToDo);
-
-        return processingSocket;
     }
 
 }
