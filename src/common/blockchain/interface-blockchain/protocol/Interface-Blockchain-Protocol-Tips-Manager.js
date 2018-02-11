@@ -22,7 +22,8 @@ class InterfaceBlockchainProtocolForkManager {
 
         for (let i=0; i<this.blockchain.tipsAdministrator.tips.length; i++)
             console.log(this.blockchain.tipsAdministrator.tips[i].toString());
-        console.log("bestTip", bestTip.toString());
+
+        console.log("bestTip", bestTip !== null ? bestTip.toString() : "null");
 
         if (bestTip !== null){
 
