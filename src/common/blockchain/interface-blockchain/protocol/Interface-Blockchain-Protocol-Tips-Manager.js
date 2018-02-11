@@ -27,7 +27,7 @@ class InterfaceBlockchainProtocolForkManager {
 
         if (bestTip !== null){
 
-            console.log("BEEEEEST TIIIP BEFORE", bestTip);
+            console.log("BEEEEEST TIIIP BEFORE", bestTip.toString());
 
             console.log("bans bans bans bans bans bans bans bans");
             console.log(this.blockchain.tipsAdministrator.bans);
