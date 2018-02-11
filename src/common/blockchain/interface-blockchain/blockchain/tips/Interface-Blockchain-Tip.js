@@ -7,7 +7,7 @@ class InterfaceBlockchainTip{
         this.forkChainLengthToDo = forkChainLengthToDo;
     }
 
-    processToDo(){
+    updateToDo(){
 
         if ( this.forkChainLengthToDo > 0 && this.forkChainLengthToDo > this.forkChainLength) {
             this.forkChainLength = this.forkChainLengthToDo;

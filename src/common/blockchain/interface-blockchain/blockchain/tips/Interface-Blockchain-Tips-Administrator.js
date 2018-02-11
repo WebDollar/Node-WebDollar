@@ -85,6 +85,25 @@ class InterfaceBlockchainTipsAdministrator {
         return tip;
     }
 
+    processTipsNewForkLengths(){
+
+        let blockchainLength = this.blockchain.getBlockchainLength;
+
+        for (let i=this.tips.length; i>=0; i--){
+
+            if (this.tips[i].forkChainLengthToDo !== -1 &&  this.tips[i].forkChainLengthToDo > this.tips[i].forkChainLength && this.tips[i].forkChainLengthToDo > blockchainLength)
+                this.tips[i].updateToDo();
+
+            if (this.tips[i].forkChainLength < blockchainLength){
+                this.tips.splice(i,1);
+            }
+
+        }
+
+
+    }
+
+
 }
 
 export default InterfaceBlockchainTipsAdministrator;

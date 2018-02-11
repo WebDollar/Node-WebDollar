@@ -20,6 +20,9 @@ class InterfaceBlockchainProtocolForkManager {
 
         let bestTip = this.blockchain.tipsAdministrator.getBestTip();
 
+        console.log("this.blockchain.tipsAdministrator", this.blockchain.tipsAdministrator.tips);
+        console.log("bestTip", bestTip);
+
         if (bestTip !== null){
 
             console.log("BEEEEEST TIIIP BEFORE", bestTip);
@@ -30,9 +33,7 @@ class InterfaceBlockchainProtocolForkManager {
 
             //TODO process forkAnswer
 
-            if (bestTip.forkChainLengthToDo !== -1 &&  bestTip.forkChainLengthToDo > bestTip.forkChainLength )
-                if (!bestTip.processToDo())
-                    this.protocol.tipsAdministrator.deleteTip( bestTip );
+            this.blockchain.tipsAdministrator.processTipsNewForkLengths();
 
             return true;
         }
