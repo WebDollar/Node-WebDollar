@@ -31,7 +31,15 @@ class InterfaceBlockchainProtocolForkManager {
 
             console.log("AFTER", bestTip);
 
+            if (!forkAnswer){
+                console.log("BANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+                this.blockchain.tipsAdministrator.addBan(bestTip.socket.node.sckAddress);
+            } else {
+                this.blockchain.tipsAdministrator.deleteBan(bestTip.socket.node.sckAddress);
+            }
+
             //TODO process forkAnswer
+
 
             this.blockchain.tipsAdministrator.processTipsNewForkLengths();
 

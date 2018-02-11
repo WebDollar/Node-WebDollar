@@ -1,4 +1,5 @@
 import InterfaceBlockchainTip from './Interface-Blockchain-Tip'
+import InterfaceBlockchainTipBan from './Interface-Blockchain-Tip-Ban'
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -27,7 +28,7 @@ class InterfaceBlockchainTipsAdministrator {
         let maxTipChainLength = 0;
 
         for (let i=0; i<this.tips.length; i++)
-            if (this.tips[i].forkChainLength > maxTipChainLength){
+            if (this.tips[i].forkChainLength > maxTipChainLength && !this.isBanned(this.tips[i].socket.node.sckAddress)){
                 maxTipChainLength = this.tips[i].forkChainLength;
                 maxTip = this.tips[i];
             }
@@ -70,7 +71,7 @@ class InterfaceBlockchainTipsAdministrator {
 
             let tip = new InterfaceBlockchainTip(socket, forkChainLength, -1);
 
-            this.tips.push(tip)
+            this.tips.push(tip);
             return this.tips[this.tips.length - 1];
         }
     }
@@ -103,26 +104,60 @@ class InterfaceBlockchainTipsAdministrator {
 
     }
 
-    addBanned(socket){
 
-        let ban = this.findBanned(socket);
+
+    isBanned(sckAddress){
+
+        let ban = this.getBan(sckAddress);
+        if (ban === null) return false;
+
+        return ban.isBanned(sckAddress);
+    }
+
+    addBan(sckAddress){
+
+        let ban = this.getBan(sckAddress);
+
         if (ban === null) {
-            this.bans.push({sckAddress: socket.sckAddress, time: new Date().getTime()  });
-            ban = this.bans[this.bans.length-1];
+
+            ban = new InterfaceBlockchainTipBan(sckAddress);
+            this.bans.push(ban);
+
+        } else {
+
+            ban.increaseBanTrials();
+
         }
 
         return ban;
     }
 
-    findBanned(socket){
+    findBan(sckAddress){
 
+        console.log("this.bansthis.bansthis.bansthis.bansthis.bansthis.bansthis.bans", this.bans);
         for (let i=0; i<this.bans.length; i++)
-            if (this.bans[i].sckAddress.matchAddress(socket.sckAddress, ["uuid"]))
-                return this.bans[i];
+            if (this.bans[i].sckAddress.matchAddress(sckAddress, ["uuid"]) )
+                return i;
 
         return null;
     }
 
+    getBan(sckAddress){
+
+        let index = this.findBan(sckAddress);
+        if (index !== null) return this.bans[index];
+
+        return null;
+    }
+
+    deleteBan(sckAddress){
+
+        let ban = this.getBan(sckAddress);
+
+        if (ban !== null)
+            ban.upLiftBan();
+
+    }
 
 }
 

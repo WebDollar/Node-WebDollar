@@ -62,15 +62,15 @@ class InterfaceBlockchainBlock {
 
     async validateBlock(height, previousDifficultyTarget, previousHash, blockValidationType){
 
-        if (this.version === undefined || this.version === null || typeof this.version !== 'number') throw ('version is empty');
+        if (typeof this.version !== 'number') throw ('version is empty');
 
         if (this.hash === undefined || this.hash === null || !Buffer.isBuffer(this.hash) ) throw ('hash is empty');
         if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw ('hashPrev is empty');
 
 
 
-        if (this.nonce === undefined || this.nonce === null || typeof this.nonce !== 'number') throw ('nonce is empty');
-        if (this.timeStamp === undefined || this.timeStamp === null || typeof this.timeStamp !== 'number') throw ('timeStamp is empty');
+        if (typeof this.nonce !== 'number') throw ('nonce is empty');
+        if (typeof this.timeStamp !== 'number') throw ('timeStamp is empty');
 
         //timestamp must be on 4 bytes
         if (this.timeStamp >= 0xFFFFFFFF) throw ('timeStamp is invalid');

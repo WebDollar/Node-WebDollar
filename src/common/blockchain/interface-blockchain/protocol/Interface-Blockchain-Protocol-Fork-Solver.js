@@ -73,7 +73,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let binarySearchResult = await this._discoverForkBinarySearch(socket, newChainStartingPoint, newChainStartingPoint, currentBlockchainLength - 1);
 
             //forcing the binary search for download the next unmatching element
-            if (binarySearchResult.position !== -1)
+            if (binarySearchResult.position !== -1 && binarySearchResult.position+1 < newChainLength)
                 binarySearchResult.position++;
 
             return binarySearchResult;
@@ -210,6 +210,7 @@ class InterfaceBlockchainProtocolForkSolver{
         } catch (Exception){
 
             console.log(colors.red("discoverAndProcessFork raised an exception"  ), Exception )
+            result = false;
 
         }
 
