@@ -19,6 +19,10 @@ class InterfaceBlockchainTip{
 
     }
 
+    toString(){
+        console.log("socket.uuid", this.socket.node.sckAddress.uuid, "forkChainLength", this.forkChainLength, "forkChainLengthToDo", this.forkChainLengthToDo );
+    }
+
 }
 
 export default InterfaceBlockchainTip;

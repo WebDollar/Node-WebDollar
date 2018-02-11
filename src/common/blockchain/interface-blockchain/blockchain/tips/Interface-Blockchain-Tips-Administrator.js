@@ -76,14 +76,6 @@ class InterfaceBlockchainTipsAdministrator {
         }
     }
 
-    printTips(){
-
-        console.log("ttiips");
-        for (let i=0; i<this.tips.length; i++)
-            console.log("socket.uuid", this.tips[i].socket.node.sckAddress.uuid, "forkChainLength", this.tips[i].forkChainLength, "forkChainLengthToDo", this.tips[i].forkChainLengthToDo );
-
-    }
-
     updateTipNewForkLength(tip, forkChainLengthToDo ){
 
         if (tip === null) return null;
