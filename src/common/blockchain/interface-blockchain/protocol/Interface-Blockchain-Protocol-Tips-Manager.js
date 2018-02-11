@@ -1,5 +1,5 @@
 const colors = require('colors/safe');
-const interval = require('interval-promise')
+const intervalPromise = require('interval-promise')
 
 class InterfaceBlockchainProtocolForkManager {
 
@@ -8,19 +8,25 @@ class InterfaceBlockchainProtocolForkManager {
         this.blockchain = blockchain;
         this.protocol = protocol;
 
-        interval( async () => {
+        intervalPromise( async () => {
             await this.processTips()
-        }, 10, );
+        }, 50, );
 
     }
 
     async processTips(){
 
+        if (this.blockchain === undefined) return; //not yet
+
         let bestTip = this.blockchain.tipsAdministrator.getBestTip();
 
         if (bestTip !== null){
 
+            console.log("BEEEEEST TIIIP BEFORE", bestTip);
+
             let forkAnswer = await this.protocol.forkSolver.discoverAndProcessFork(bestTip);
+
+            console.log("AFTER", bestTip);
 
             //TODO process forkAnswer
 
@@ -37,11 +43,12 @@ class InterfaceBlockchainProtocolForkManager {
     /*
         may the fork be with you Otto
      */
-    async discoverNewForkTip(socket, newChainLength){
+    async discoverNewForkTip(socket, newChainLength, header){
 
         if (typeof newChainLength !== "number") throw "newChainLength is not a number";
 
-        if (newChainLength > this.blockchain.getBlockchainLength){
+        if (newChainLength < this.blockchain.getBlockchainLength){
+            console.log(colors.red("Your blockchain is smaller than mine"));
             throw "Your blockchain is smaller than mine";
         }
 
@@ -51,7 +58,7 @@ class InterfaceBlockchainProtocolForkManager {
             this.blockchain.tipsAdministrator.updateTipNewForkLength(tip, newChainLength);
             return false;
         } else
-            tip =  this.blockchain.tipsAdministrator.addTip(socket);
+            tip =  this.blockchain.tipsAdministrator.addTip(socket, newChainLength);
 
     }
 

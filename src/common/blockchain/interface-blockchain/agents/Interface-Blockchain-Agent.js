@@ -24,12 +24,21 @@ class InterfaceBlockchainAgent{
         this.NODES_LIST_MINIM_LENGTH = 2;
 
         this.blockchain = blockchain;
+
         if ( blockchainProtocolClass === undefined) blockchainProtocolClass = InterfaceBlockchainProtocol;
 
         this.protocol = new blockchainProtocolClass(this.blockchain);
+    }
 
-        if ( blockchainForkClass === undefined ) blockchainForkClass = InterfaceBlockchainFork;
-        this.forkClass = blockchainForkClass;
+    newfork(){
+        let fork = new InterfaceBlockchainFork();
+        InterfaceBlockchainFork.prototype.initializeConstructor.apply(this, arguments);
+        return fork;
+    }
+
+    newProtocol(){
+        let protocol = new InterfaceBlockchainProtocol();
+        InterfaceBlockchainProtocol.prototype.initializeConstructor.apply(this, arguments);
     }
 
     _initializeProtocol(){

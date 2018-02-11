@@ -18,6 +18,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
         super(blockchain)
     }
 
+
     _validateBlockchainHeader(data){
 
         InterfaceBlockchainProtocol.prototype._validateBlockchainHeader.call(this, data);

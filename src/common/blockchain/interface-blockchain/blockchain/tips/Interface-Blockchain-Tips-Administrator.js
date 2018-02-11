@@ -12,8 +12,6 @@ class InterfaceBlockchainTipsAdministrator {
         this.blockchain = blockchain;
         this.forks = [];
 
-        this.tipsId = 0;
-
         this.tips = [];
     }
 
@@ -24,7 +22,7 @@ class InterfaceBlockchainTipsAdministrator {
 
         for (let i=0; i<this.tips.length; i++)
             if (this.tips[i].forkChainLength > maxTipChainLength){
-                maxTipChainLength = this.forks[i].forkChainLength;
+                maxTipChainLength = this.tips[i].forkChainLength;
                 maxTip = this.tips[i];
             }
 
