@@ -13,6 +13,7 @@ class InterfaceBlockchainTipsAdministrator {
         this.agent = agent;
 
         this.tips = [];
+        this.bans = [];
     }
 
     initialize(blockchain){
@@ -89,7 +90,7 @@ class InterfaceBlockchainTipsAdministrator {
 
         let blockchainLength = this.blockchain.getBlockchainLength;
 
-        for (let i=this.tips.length; i>=0; i--){
+        for (let i=this.tips.length-1; i>=0; i--){
 
             if (this.tips[i].forkChainLengthToDo !== -1 &&  this.tips[i].forkChainLengthToDo > this.tips[i].forkChainLength && this.tips[i].forkChainLengthToDo > blockchainLength)
                 this.tips[i].updateToDo();
@@ -100,7 +101,26 @@ class InterfaceBlockchainTipsAdministrator {
 
         }
 
+    }
 
+    addBanned(socket){
+
+        let ban = this.findBanned(socket);
+        if (ban === null) {
+            this.bans.push({sckAddress: socket.sckAddress, time: new Date().getTime()  });
+            ban = this.bans[this.bans.length-1];
+        }
+
+        return ban;
+    }
+
+    findBanned(socket){
+
+        for (let i=0; i<this.bans.length; i++)
+            if (this.bans[i].sckAddress.matchAddress(socket.sckAddress, ["uuid"]))
+                return this.bans[i];
+
+        return null;
     }
 
 

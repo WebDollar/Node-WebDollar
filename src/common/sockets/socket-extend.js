@@ -6,6 +6,7 @@ import NodesList from 'node/lists/nodes-list'
 import SocketAddress from 'common/sockets/socket-address'
 import isArrayBuffer from 'is-array-buffer';
 import global from "consts/global"
+const colors = require('colors/safe');
 
 // Extending Socket / Simple Peer
 
@@ -77,15 +78,21 @@ class SocketExtend{
 
         //console.log("sendRequest ############### ", socket, request, requestData);
 
-        if (typeof socket.emit === 'function')  return socket.emit( request, requestData ); //socket io and Simple-Peer WebRTC
-        else
-        if (typeof socket.send === 'function'){
+        try {
 
-            if (typeof socket.signal === 'function')
-                return socket.send({request: request, data: requestData});
-            else
-                return socket.send( request, requestData ); // Simple Peer WebRTC - socket
+            if (typeof socket.emit === 'function') return socket.emit(request, requestData); //socket io and Simple-Peer WebRTC
+            else if (typeof socket.send === 'function') {
 
+                if (typeof socket.signal === 'function')
+                    return socket.send({request: request, data: requestData});
+                else
+                    return socket.send(request, requestData); // Simple Peer WebRTC - socket
+
+            }
+
+        } catch (exception){
+            console.log(colors.red("Error sending request" + exception.toString()), exception);
+            return null;
         }
 
         console.log("ERROR!! Couldn't sendRequest ", socket, request, requestData);
@@ -122,23 +129,28 @@ class SocketExtend{
                 resolve(resData);
             };
 
+            let clearReturnFunction = ()=>{
+                if (socket !== null && socket !== undefined)
+                    if (socket.removeListener !== undefined) //websocket io
+                        socket.removeListener(requestAnswer, requestFunction);
+                    else
+                    if (1===2) //webRTC
+                    {
+                        //TODO WEBRTC create an EventEmitter
+                    }
+                //socket.off(onceId);
+                resolve(null);
+            };
+
             socket.once(requestAnswer, requestFunction );
 
             if (timeOutInterval !== undefined)
-                timeoutId = setTimeout(()=>{
-                    if (socket !== null && socket !== undefined)
-                        if (socket.removeListener !== undefined) //websocket io
-                            socket.removeListener(requestAnswer, requestFunction);
-                        else
-                        if (1===2) //webRTC
-                        {
-                            //TODO WEBRTC
-                        }
-                    //socket.off(onceId);
-                    resolve(null)
-                }, timeOutInterval);
+                timeoutId = setTimeout( clearReturnFunction, timeOutInterval);
 
-            this.sendRequest(socket, request, requestData);
+            let answer = this.sendRequest(socket, request, requestData);
+
+            if (answer === null)
+                clearReturnFunction();
 
         });
     }
