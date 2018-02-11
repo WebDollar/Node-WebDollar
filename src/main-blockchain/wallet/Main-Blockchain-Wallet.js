@@ -443,7 +443,7 @@ class MainBlockchainWallet{
                     alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
                     if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};
-                    
+
                     continue;
                 }
 
