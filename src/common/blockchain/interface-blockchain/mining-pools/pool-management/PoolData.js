@@ -117,6 +117,15 @@ class PoolData {
             }
         }
     }
+
+    /**
+     * @param id
+     * @param reward
+     */
+    increaseMinerRewardById(id, reward) {
+
+        this._minersList[id].reward = this._minersList[id].reward.plus(reward);
+    }
     
     _serializeMiners() {
         

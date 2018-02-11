@@ -29,7 +29,7 @@ describe('test pool leader protocol', () => {
 
     it('test generate hash difficulties', () => {
 
-        let respose = miner.generateHashDifficulties(targetHash, hashList);
+        let respose = miner.computeHashDifficulties();
 
         assert(respose, "Wrong hash difficulties:" + respose);
 

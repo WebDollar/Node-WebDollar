@@ -24,7 +24,10 @@ class PoolLeaderProtocol {
         this.poolData = new PoolData(dataBase);
 
         //TODO: Check is needed to store/load from database
-        this.reward = new BigNumber(0);
+        this.leaderReward = new BigNumber(0);
+
+        //TODO: Check is needed to store/load from database, Update hardcoded value
+        this.bestHash = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex");
     }
 
     _subscribeMiner(nodesListObject) {
@@ -74,66 +77,91 @@ class PoolLeaderProtocol {
     }
 
     /**
-     * Calculate difficulty for all hashes
-     * @param target
-     * @param hashList is the list of best hashes from all miners
-     * @returns {*}
+     * Divides 2 big integers
+     * @param divident
+     * @param divisor
+     * @returns {number}
      */
-    generateHashDifficulties(target, hashList) {
+    static divideBigInteger(divident, divisor) {
 
-        let hashTargetNumber = new BigInteger(target.toString('hex'), 16);
+        let result = 1;
+        let X = new BigInteger(divisor);
 
-        for (let i = 0; i < hashList.length; ++i) {
-
-            let currentHash = new BigInteger(hashList[i].hash.toString('hex'), 16);
-
-            hashList[i].difficulty = new BigNumber(hashTargetNumber).dividedBy(currentHash).toString();
-
+        //TODO: binary search for result
+        while(X.compare(divident) < 0) {
+            X = X.plus(divisor);
+            result++;
         }
 
-        return hashList;
+        return result;
+    }
+
+    /**
+     * Updates and returns besh hash from miners
+     * @returns {*} best hash from miners
+     */
+    updateBeshHash() {
+
+        let minersList = this.poolData.getMinersList();
+        let bestHash = minersList[0].beshHash;
+
+        for (let i = 1; i < minersList.length; ++i) {
+            if (bestHash.compare(minersList[i].bestHash) < 0)
+                bestHash = minersList[i].bestHash;
+        }
+
+        return bestHash;
+    }
+
+    /**
+     * Calculate difficulty for all miner's hashed. Each miner hash associated a hash difficulty number
+     * @returns {*}
+     */
+    computeHashDifficulties() {
+
+        let hashTargetNumber = new BigInteger(this.bestHash.toString('hex'), 16);
+        let minersList = this.poolData.getMinersList();
+        let difficultyList = [];
+        let sum = 0;
+
+        for (let i = 0; i < minersList.length; ++i) {
+            let currentHash = new BigInteger(minersList[i].hash.toString('hex'), 16);
+            difficultyList[i] = this.divideBigInteger(hashTargetNumber, currentHash);
+
+            sum += difficultyList[i];
+        }
+
+        return {list: difficultyList, sum: sum};
+    }
+
+    /**
+     * Update rewards for all miners. This function must be called at every block reward
+     * @param newReward is the total new reward of the pool
+     */
+    updateRewards(newReward) {
+
+        let leadReward = newReward.mul(100 - this._poolLeaderFee).dividedBy(100);
+        this.leaderReward = this.leaderReward.plus(leadReward);
+
+        let minersReward = newReward.minus(leadReward);
+
+        let response = this.computeHashDifficulties();
+        let difficultyList = response.list;
+        let difficultySum = response.sum;
+        let rewardPerDifficultyLevel = new BigNumber(minersReward.dividedBy(difficultySum));
+
+        //update rewards for each miner
+        for (let i = 0; i < difficultyList.length; ++i) {
+            let incReward = new BigNumber(rewardPerDifficultyLevel.mul(difficultyList[i]));
+            this.poolData.increaseMinerRewardById(i, incReward);
+        }
 
     }
 
     /**
-     * Computes the reward for miners. This function must be called at every block reward
-     * @param reward is the total new reward of the pool
-     * @param minersFee is the fee which will be weighted distributed to pool miners.
-     * @returns {{poolLeaderReward: string, minnersReward: *}}
+     * Send rewards for miners and reset rewards from storage
      */
-    rewardsDistribution(reward, minersFee) {
-
-        let leaderReward = reward.mul(minersFee).dividedBy(100);
-        this.reward = this.reward.plus(leaderReward);
-
-        let minersReward =  reward.minus(leaderReward);
-
-        // Create hash difficulties list from all minners best hasses
-        let hashList = this.generateHashDifficulties(this.hashTarget, hashList);
-
-        // Calculate total of Difficulties list
-        let totalDifficulties =  new BigNumber(0);
-        for (let i = 0; i < hashList.length; i++){
-
-            totalDifficulties = totalDifficulties.plus(hashList[i].difficulty);
-
-        }
-
-        // Add to hashList rewards for each minner
-        for (let i = 0; i < hashList.length; i++){
-
-            let currentDifficultyPercent = new BigNumber (hashList[i].difficulty).dividedBy(totalDifficulties).mul(100);
-
-            let currentMinerReward = new BigNumber(currentDifficultyPercent).dividedBy(100).mul(minnersReward);
-
-            hashList[i].reward = currentMinerReward.toString();
-
-        }
-
-        return {
-            poolLeaderReward: poolLeaderReward.toString(),
-            minnersReward: hashList
-        }
+    sendRewardsToMiners() {
 
     }
 
@@ -154,7 +182,7 @@ class PoolLeaderProtocol {
     getPoolRewardFromBlockchain(reward) {
 
         let poolLeaderFee = this.getPoolLeaderFee();
-        let newRewardDistribution = this.rewardsDistribution(reward, poolLeaderFee, hashList);
+        let newRewardDistribution = this.updateRewards(reward, poolLeaderFee, hashList);
 
         this.poolData.updateMinersReward(newRewardDistribution.minnersReward);
 
