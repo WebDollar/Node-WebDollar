@@ -7,12 +7,17 @@ import InterfaceBlockchainTip from './Interface-Blockchain-Tip'
 class InterfaceBlockchainTipsAdministrator {
 
 
-    constructor (blockchain){
+    constructor (blockchain, agent){
 
         this.blockchain = blockchain;
-        this.forks = [];
+        this.agent = agent;
 
         this.tips = [];
+    }
+
+    initialize(blockchain){
+        this.blockchain = blockchain;
+        this.tips = []
     }
 
     getBestTip(){

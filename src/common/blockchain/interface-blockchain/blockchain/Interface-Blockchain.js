@@ -56,7 +56,8 @@ class InterfaceBlockchain {
     _setAgent(newAgent){
 
         this.agent = newAgent;
-        this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, newAgent );
+        this.forksAdministrator.initialize(this);
+        this.tipsAdministrator.initialize(this);
     }
 
     async validateBlockchain(){
@@ -327,7 +328,7 @@ class InterfaceBlockchain {
 
             let indexStart = 0;
 
-            if (this.agent.light === true) {
+            if (this.agent !== undefined && this.agent.light === true) {
                 indexStart = Math.max(0, numBlocks - validateLastBlocks-1);
 
                 for (let i=0; i<indexStart; i++)

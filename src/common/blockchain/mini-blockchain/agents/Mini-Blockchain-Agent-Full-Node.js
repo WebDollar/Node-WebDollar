@@ -12,8 +12,15 @@ else  inheritAgentClass = InterfaceBlockchainAgentFullNode;
 
 class MiniBlockchainAgentFullNode extends inheritAgentClass{
 
-    constructor(blockchain, blockchainProtocolClass, blockchainForkClass){
-        super(blockchain, blockchainProtocolClass||MiniBlockchainProtocol, blockchainForkClass || MiniBlockchainFork )
+    newFork(){
+        let fork = new MiniBlockchainFork();
+        MiniBlockchainFork.prototype.initializeConstructor.apply(this, arguments);
+
+        return fork;
+    }
+
+    newProtocol(){
+        this.protocol = new MiniBlockchainProtocol(this.blockchain, this);
     }
 
 }

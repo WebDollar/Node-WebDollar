@@ -7,16 +7,20 @@ import InterfaceBlockchainFork from './Interface-Blockchain-Fork'
 class InterfaceBlockchainForksAdministrator {
 
 
-    constructor (blockchain, agent){
+    constructor (blockchain){
 
         this.blockchain = blockchain;
-        this.agent = agent;
 
         this.forks = [];
 
         this.forksId = 0;
 
         this.socketsProcessing = [];
+    }
+
+    initialize(blockchain){
+        this.blockchain = blockchain;
+        this.forks = []
     }
 
     createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header){
@@ -29,7 +33,9 @@ class InterfaceBlockchainForksAdministrator {
 
         if (this.findForkByHeader(header) !== null) return null;
 
-        let fork = this.agent.newfork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header );
+        if (this.blockchain.agent === undefined) return null;
+
+        let fork = this.blockchain.agent.newfork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header );
 
         this.forks.push(fork);
 

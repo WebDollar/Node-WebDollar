@@ -5,9 +5,6 @@ import consts from 'consts/const_global'
 
 class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
 
-    constructor(blockchain){
-        super(blockchain)
-    }
 
     createForkSolver(){
         this.forkSolver = new MiniBlockchainLightProtocolForkSolver(this.blockchain, this);

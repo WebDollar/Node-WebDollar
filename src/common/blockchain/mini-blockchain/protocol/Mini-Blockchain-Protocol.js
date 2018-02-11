@@ -14,10 +14,6 @@ else inheritProtocol = InterfaceBlockchainProtocol;
 
 class MiniBlockchainProtocol extends inheritProtocol{
 
-    constructor(blockchain){
-        super(blockchain)
-    }
-
 
     _validateBlockchainHeader(data){
 

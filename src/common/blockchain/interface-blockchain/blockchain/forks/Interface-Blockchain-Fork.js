@@ -7,7 +7,14 @@ import global from "consts/global"
 class InterfaceBlockchainFork {
 
 
-    constructor (blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header){
+    constructor (){
+    }
+
+    /**
+     * initializeConstructor is used to initialize the constructor dynamically using .apply method externally passing the arguments
+     */
+
+    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header){
 
         this.blockchain = blockchain;
 
@@ -25,7 +32,6 @@ class InterfaceBlockchainFork {
         this.forkHeader = header;
 
         this._blocksCopy = [];
-
     }
 
     async validateFork(){

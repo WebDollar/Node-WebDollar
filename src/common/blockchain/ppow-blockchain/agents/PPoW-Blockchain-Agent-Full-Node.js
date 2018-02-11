@@ -3,8 +3,8 @@ import PPoWBlockchainProtocol from "./../protocol/PPoW-Blockchain-Protocol"
 
 class PPoWBlockchainAgentFullNode extends InterfaceBlockchainAgentFullNode{
 
-    constructor(blockchain, blockchainProtocolClass, blockchainForkClass){
-        super(blockchain, blockchainProtocolClass||PPoWBlockchainProtocol, blockchainForkClass)
+    newProtocol(){
+        this.protocol = new PPoWBlockchainProtocol(this.blockchain, this);
     }
 
 }

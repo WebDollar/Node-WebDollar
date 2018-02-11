@@ -9,14 +9,10 @@ class Blockchain{
 
     constructor(){
 
-        this.Agent = MainBlockchainAgent.createAgent("full-node", null);
-
-        this.Chain = new MainBlockchain(this.Agent);
+        this.Chain = new MainBlockchain(undefined);
         this.blockchain = this.Chain;
 
         this.emitter = this.blockchain.emitter;
-
-        this.Agent._setBlockchain(this.blockchain);
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
 

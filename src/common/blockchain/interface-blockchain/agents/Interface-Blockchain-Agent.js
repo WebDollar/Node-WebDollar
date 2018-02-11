@@ -14,7 +14,7 @@ import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/bloc
 
 class InterfaceBlockchainAgent{
 
-    constructor( blockchain, blockchainProtocolClass, blockchainForkClass){
+    constructor( blockchain){
 
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
@@ -25,20 +25,19 @@ class InterfaceBlockchainAgent{
 
         this.blockchain = blockchain;
 
-        if ( blockchainProtocolClass === undefined) blockchainProtocolClass = InterfaceBlockchainProtocol;
-
-        this.protocol = new blockchainProtocolClass(this.blockchain);
+        this.newFork();
+        this.newProtocol();
     }
 
-    newfork(){
+    newFork(){
         let fork = new InterfaceBlockchainFork();
         InterfaceBlockchainFork.prototype.initializeConstructor.apply(this, arguments);
+
         return fork;
     }
 
     newProtocol(){
-        let protocol = new InterfaceBlockchainProtocol();
-        InterfaceBlockchainProtocol.prototype.initializeConstructor.apply(this, arguments);
+        this.protocol = new InterfaceBlockchainProtocol(this.blockchain, this);
     }
 
     _initializeProtocol(){

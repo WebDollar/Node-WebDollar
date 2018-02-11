@@ -11,11 +11,22 @@ else  inheritAgentClass = InterfaceBlockchainAgentFullNode;
 
 class MiniBlockchainAgentLightNode extends PPoWBlockchainAgentFullNode{
 
-    constructor(blockchain, blockchainProtocolClass, blockchainForkClass){
-        super(blockchain, blockchainProtocolClass||MiniBlockchainLightProtocol, blockchainForkClass||MiniBlockchainForkLight )
+    constructor(blockchain){
+
+        super(blockchain);
 
         this.light = true;
+    }
 
+    newFork(){
+        let fork = new MiniBlockchainForkLight();
+        MiniBlockchainForkLight.prototype.initializeConstructor.apply(this, arguments);
+
+        return fork;
+    }
+
+    newProtocol(){
+        this.protocol = new MiniBlockchainLightProtocol(this.blockchain, this);
     }
 
 }
