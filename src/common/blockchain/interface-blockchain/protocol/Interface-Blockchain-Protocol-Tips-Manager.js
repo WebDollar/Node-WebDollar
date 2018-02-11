@@ -29,6 +29,9 @@ class InterfaceBlockchainProtocolForkManager {
 
             console.log("BEEEEEST TIIIP BEFORE", bestTip);
 
+            console.log("bans bans bans bans bans bans bans bans");
+            console.log(this.blockchain.tipsAdministrator.bans);
+
             let forkAnswer = await this.protocol.forkSolver.discoverAndProcessFork(bestTip);
 
             console.log("AFTER", bestTip);

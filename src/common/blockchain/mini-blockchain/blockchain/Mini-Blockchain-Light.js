@@ -39,8 +39,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
-        console.log("blockchain serialization1", this.accountantTree.serializeMiniAccountant().toString("hex") );
-        console.log("blockchain serialization1", this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex"));
+        // console.log("blockchain serialization1", this.accountantTree.serializeMiniAccountant().toString("hex") );
+        // console.log("blockchain serialization1", this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex"));
 
         if (  blockValidationType['skip-validation-before'] === undefined ||
             (block.height >= blockValidationType['skip-validation-before'].height )) {

@@ -83,7 +83,7 @@ class InterfaceBlockchainBlock {
 
         if (height !== this.height) throw 'height is different' + height+ " "+ this.height ;
 
-        await this._validateBlockHash(previousHash, blockValidationType);
+        if (!await this._validateBlockHash(previousHash, blockValidationType)) throw "validateBlockchain return false";
 
         this._validateTargetDifficulty(previousDifficultyTarget);
 
@@ -119,6 +119,7 @@ class InterfaceBlockchainBlock {
             let hash = await this.computeHash();
 
             if (!hash.equals(this.hash)) throw "block hash is not right (" + this.nonce + ")" + this.hash.toString("hex") + " " + hash.toString("hex") + "    " + "difficultyTargetPrev" + this.difficultyTargetPrev.toString("hex")+ "    "+ Buffer.concat([this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)]).toString("hex");
+
         }
 
         await this.data.validateBlockData(this.height, blockValidationType);

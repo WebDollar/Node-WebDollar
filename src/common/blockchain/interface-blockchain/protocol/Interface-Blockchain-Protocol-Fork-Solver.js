@@ -287,6 +287,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         result = await fork.includeForkBlock(block);
 
+                        console.log("fork.includeForkBlockfork.includeForkBlockfork.includeForkBlock", result);
+
                     } catch (Exception) {
 
                         console.log(colors.red("Error including block " + nextBlockHeight + " in fork "), Exception);

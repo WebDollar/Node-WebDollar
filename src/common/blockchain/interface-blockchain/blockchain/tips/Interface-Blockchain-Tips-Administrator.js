@@ -134,7 +134,6 @@ class InterfaceBlockchainTipsAdministrator {
 
     findBan(sckAddress){
 
-        console.log("this.bansthis.bansthis.bansthis.bansthis.bansthis.bansthis.bans", this.bans);
         for (let i=0; i<this.bans.length; i++)
             if (this.bans[i].sckAddress.matchAddress(sckAddress, ["uuid"]) )
                 return i;

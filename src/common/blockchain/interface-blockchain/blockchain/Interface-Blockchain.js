@@ -155,7 +155,7 @@ class InterfaceBlockchain {
         block.difficultyTargetPrev = prevDifficultyTarget;
 
         //validate difficulty & hash
-        if (await block.validateBlock(block.height, prevDifficultyTarget, prevHash, blockValidationType) === false) throw ('block validation failed');
+        if (! await block.validateBlock(block.height, prevDifficultyTarget, prevHash, blockValidationType)) throw ('block validation failed');
 
         //recalculate next target difficulty
         // console.log("block.difficultyTarget", prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height);
@@ -165,6 +165,8 @@ class InterfaceBlockchain {
         block.difficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(block.difficultyTarget));
 
         // console.log(" computed ", block.difficultyTarget.toString("hex"), " from ", prevDifficultyTarget.toString("hex") )
+
+        console.log("validateBlockchainBlockvalidateBlockchainBlock", true);
 
         return true;
 
