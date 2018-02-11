@@ -23,18 +23,21 @@ class InterfaceBlockchainProtocolForkManager {
         for (let i=0; i<this.blockchain.tipsAdministrator.tips.length; i++)
             console.log(this.blockchain.tipsAdministrator.tips[i].toString());
 
-        console.log("bestTip", bestTip !== null ? bestTip.toString() : "null");
+        console.log("bestTip");
+        if (bestTip !== null) bestTip.toString();
 
         if (bestTip !== null){
 
-            console.log("BEEEEEST TIIIP BEFORE", bestTip.toString());
+            console.log("BEEEEEST TIIIP BEFORE");
+            bestTip.toString()
 
             console.log("bans bans bans bans bans bans bans bans");
             console.log(this.blockchain.tipsAdministrator.bans);
 
             let forkAnswer = await this.protocol.forkSolver.discoverAndProcessFork(bestTip);
 
-            console.log("AFTER", bestTip);
+            console.log("AFTER");
+            bestTip.toString();
 
             if (!forkAnswer){
                 console.log("BANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
@@ -57,7 +60,7 @@ class InterfaceBlockchainProtocolForkManager {
     /*
         may the fork be with you Otto
      */
-    async discoverNewForkTip(socket, newChainLength, header){
+    async discoverNewForkTip(socket, newChainLength, forkLastBlockHeader){
 
         if (typeof newChainLength !== "number") throw "newChainLength is not a number";
 
@@ -69,10 +72,10 @@ class InterfaceBlockchainProtocolForkManager {
         let tip = this.blockchain.tipsAdministrator.getTip(socket);
 
         if (tip !== null) {
-            this.blockchain.tipsAdministrator.updateTipNewForkLength(tip, newChainLength);
+            this.blockchain.tipsAdministrator.updateTipNewForkLength(tip, newChainLength, forkLastBlockHeader);
             return false;
         } else
-            tip =  this.blockchain.tipsAdministrator.addTip(socket, newChainLength);
+            tip =  this.blockchain.tipsAdministrator.addTip(socket, newChainLength, forkLastBlockHeader);
 
     }
 

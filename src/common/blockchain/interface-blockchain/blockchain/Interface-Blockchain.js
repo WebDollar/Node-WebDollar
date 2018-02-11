@@ -166,8 +166,6 @@ class InterfaceBlockchain {
 
         // console.log(" computed ", block.difficultyTarget.toString("hex"), " from ", prevDifficultyTarget.toString("hex") )
 
-        console.log("validateBlockchainBlockvalidateBlockchainBlock", true);
-
         return true;
 
     }

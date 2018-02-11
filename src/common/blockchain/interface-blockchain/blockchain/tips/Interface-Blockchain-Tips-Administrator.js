@@ -52,37 +52,29 @@ class InterfaceBlockchainTipsAdministrator {
         else return this.tips[index];
     }
 
-    deleteTip(socket){
 
-        let index = this.findTip(socket);
 
-        if (index !== null) {
-            this.tips.splice(index, 1);
-            return true;
-        }
-
-        return false;
-
-    }
-
-    addTip(socket, forkChainLength) {
+    addTip(socket,  forkChainLength, forkLastBlockHeader) {
 
         if (this.findTip(socket) === null) {
 
-            let tip = new InterfaceBlockchainTip(socket, forkChainLength, -1);
+            let tip = new InterfaceBlockchainTip(this.blockchain, socket, forkChainLength, forkLastBlockHeader);
+
+            if (!tip.validateTip()) return null;
 
             this.tips.push(tip);
             return this.tips[this.tips.length - 1];
         }
     }
 
-    updateTipNewForkLength(tip, forkChainLengthToDo ){
+    updateTipNewForkLength(tip, forkToDoChainLength, forkToDoLastHeader ){
 
         if (tip === null) return null;
 
-        if (tip.forkChainLength > forkChainLengthToDo) return; //nothing to update
+        if (tip.forkChainLength > forkToDoChainLength) return null; //nothing to update
 
-        tip.forkChainLengthToDo = Math.max(forkChainLengthToDo, tip.forkChainLengthToDo);
+        tip.forkToDoChainLength = forkToDoChainLength;
+        tip.forkToDoLastHeader = forkToDoLastHeader;
 
         return tip;
     }
@@ -93,10 +85,9 @@ class InterfaceBlockchainTipsAdministrator {
 
         for (let i=this.tips.length-1; i>=0; i--){
 
-            if (this.tips[i].forkChainLengthToDo !== -1 &&  this.tips[i].forkChainLengthToDo > this.tips[i].forkChainLength && this.tips[i].forkChainLengthToDo > blockchainLength)
-                this.tips[i].updateToDo();
+            this.tips[i].updateToDo();
 
-            if (this.tips[i].forkChainLength < blockchainLength){
+            if (!this.tips[i].validateTip){
                 this.tips.splice(i,1);
             }
 
