@@ -76,7 +76,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             if (answer.timeStamp === null ) throw "get-light-settings timeStamp is null";
             if (answer.hashPrev === null ) throw "get-light-settings hashPrev is null";
 
-            console.log("answer.difficultyTarget",answer.difficultyTarget)
+            console.log("answer.difficultyTarget",answer.difficultyTarget);
 
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;

@@ -13,7 +13,7 @@ class MiniBlockchainAgentBlockHeaders extends inheritAgentClass{
 
     newFork(){
         let fork = new MiniBlockchainFork();
-        MiniBlockchainFork.prototype.initializeConstructor.apply(this, arguments);
+        MiniBlockchainFork.prototype.initializeConstructor.apply(fork, arguments);
 
         return fork;
     }

@@ -1,7 +1,12 @@
 import InterfaceBlockchainAgent from "./Interface-Blockchain-Agent"
-import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
 
 class InterfaceBlockchainAgentFullNode extends InterfaceBlockchainAgent{
+
+    constructor(blockchain) {
+
+        super(blockchain);
+
+    }
 
     _initializeProtocol(){
 

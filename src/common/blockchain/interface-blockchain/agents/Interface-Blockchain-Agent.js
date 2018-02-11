@@ -16,6 +16,10 @@ class InterfaceBlockchainAgent{
 
     constructor( blockchain){
 
+        this.blockchain = blockchain;
+
+        console.log("%%%%%%%%%%%%%%%%%%%", this.blockchain);
+
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
 
@@ -23,15 +27,18 @@ class InterfaceBlockchainAgent{
         this.AGENT_QUEUE_COUNT_MAX = 2;
         this.NODES_LIST_MINIM_LENGTH = 2;
 
-        this.blockchain = blockchain;
-
         this.newFork();
         this.newProtocol();
     }
 
+    setBlockchain(blockchain){
+        this.blockchain = blockchain;
+        this.protocol.setBlockchain(blockchain);
+    }
+
     newFork(){
         let fork = new InterfaceBlockchainFork();
-        InterfaceBlockchainFork.prototype.initializeConstructor.apply(this, arguments);
+        InterfaceBlockchainFork.prototype.initializeConstructor.apply(fork, arguments);
 
         return fork;
     }
@@ -168,12 +175,6 @@ class InterfaceBlockchainAgent{
             });
 
         }, this.AGENT_TIME_OUT*factor);
-    }
-
-    _setBlockchain(newBlockchain){
-
-        this.blockchain = newBlockchain;
-        this.protocol._setBlockchain(newBlockchain);
     }
 
 }

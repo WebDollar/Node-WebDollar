@@ -25,6 +25,16 @@ class InterfaceBlockchainProtocol {
 
     }
 
+    setBlockchain(blockchain){
+        this.blockchain = blockchain;
+
+        if (this.forkSolver !== undefined)
+            this.forkSolver.blockchain = blockchain;
+
+        if (this.tipsManager !== undefined)
+            this.tipsManager.blockchain = blockchain;
+    }
+
     initialize(params){
 
         this.acceptBlockHeaders = params.indexOf("acceptBlockHeaders") >= 0;
@@ -51,16 +61,6 @@ class InterfaceBlockchainProtocol {
 
     createTipsManager(){
         this.tipsManager = new InterfaceBlockchainProtocolTipsManager(this.blockchain, this);
-    }
-
-    _setBlockchain(blockchain){
-        this.blockchain = blockchain;
-
-        if (this.forkSolver !== undefined)
-            this.forkSolver.blockchain = blockchain;
-
-        if (this.tipsManager !== undefined)
-            this.tipsManager.blockchain = blockchain;
     }
 
     propagateHeader(block, chainLength, socketsAvoidBroadcast){

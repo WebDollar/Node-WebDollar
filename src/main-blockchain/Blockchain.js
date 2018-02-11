@@ -30,7 +30,9 @@ class Blockchain{
 
     async createBlockchain(agentName){
 
+
         this.Agent = MainBlockchainAgent.createAgent(agentName, this.blockchain);
+        this.Agent.setBlockchain(this.blockchain)
 
         this.blockchain._setAgent(this.Agent);
 

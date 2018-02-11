@@ -27,15 +27,11 @@ class InterfaceBlockchainForksAdministrator {
 
         if (!Array.isArray(sockets)) sockets = [sockets];
 
-        let fork;
-
         if (this.findForkBySockets(sockets) !== null) return null;
 
         if (this.findForkByHeader(header) !== null) return null;
 
-        if (this.blockchain.agent === undefined) return null;
-
-        let fork = this.blockchain.agent.newfork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header );
+        let fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header );
 
         this.forks.push(fork);
 

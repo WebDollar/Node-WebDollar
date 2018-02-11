@@ -9,7 +9,7 @@ let inheritAgentClass;
 if (consts.POPOW_ACTIVATED) inheritAgentClass = PPoWBlockchainAgentFullNode;
 else  inheritAgentClass = InterfaceBlockchainAgentFullNode;
 
-class MiniBlockchainAgentLightNode extends PPoWBlockchainAgentFullNode{
+class MiniBlockchainAgentLightNode extends inheritAgentClass{
 
     constructor(blockchain){
 
@@ -20,7 +20,7 @@ class MiniBlockchainAgentLightNode extends PPoWBlockchainAgentFullNode{
 
     newFork(){
         let fork = new MiniBlockchainForkLight();
-        MiniBlockchainForkLight.prototype.initializeConstructor.apply(this, arguments);
+        MiniBlockchainForkLight.prototype.initializeConstructor.apply(fork, arguments);
 
         return fork;
     }
