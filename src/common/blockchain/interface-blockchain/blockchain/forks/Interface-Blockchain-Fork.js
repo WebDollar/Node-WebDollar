@@ -135,12 +135,12 @@ class InterfaceBlockchainFork {
 
         //overwrite the blockchain blocks with the forkBlocks
 
-        console.log("save Fork before validateFork")
+        console.log("save Fork before validateFork");
         if (!await this.validateFork()) {
             console.log(colors.red("validateFork was not passed"));
             return false
         }
-        console.log("save Fork after validateFork")
+        console.log("save Fork after validateFork");
 
         // to do
 
@@ -150,7 +150,6 @@ class InterfaceBlockchainFork {
             this._blocksCopy = [];
             for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength; i++) {
                 this._blocksCopy.push(this.blockchain.blocks[i]);
-                this.blockchain.blocks[i] = undefined;
             }
 
             this.preFork();
@@ -203,8 +202,10 @@ class InterfaceBlockchainFork {
 
             //propagating valid blocks
             if (forkedSuccessfully) {
+                console.log("FORK SOLVER SAVE");
                 await this.blockchain.save();
                 this.blockchain.mining.resetMining();
+                console.log("FORK SOLVER SAVE FINISHED");
             }
 
             return forkedSuccessfully;
@@ -212,6 +213,7 @@ class InterfaceBlockchainFork {
 
         // it was done successfully
         console.log("FORK SOLVER SUCCESS", success);
+
         if (success){
 
             //propagate last block

@@ -291,7 +291,6 @@ class NodeWebPeerRTC {
 
     checkDataChannelState() {
 
-        console.log('WebRTC changed:');
         console.log('WebRTC channel state is:', this.peer.dataChannel.readyState);
 
         if (this.peer.dataChannel.readyState === 'open') {
@@ -460,10 +459,10 @@ class NodeWebPeerRTC {
             let ip6 = this.extractValueFromDescription(str, "IP6");
             let candidate = this.extractValueFromDescription(str, "candidate:");
 
-            console.log("str", str);
-            console.log("IP4=", ip4);
-            console.log("IP6=", ip6);
-            console.log("candidate=", candidate);
+            // console.log("str", str);
+            // console.log("IP4=", ip4);
+            // console.log("IP6=", ip6);
+            // console.log("candidate=", candidate);
 
             let address = '';
 

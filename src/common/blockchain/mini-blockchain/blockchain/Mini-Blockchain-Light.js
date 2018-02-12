@@ -136,16 +136,16 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             if (this.lightPrevDifficultyTargets[diffIndex] === undefined) throw "_saveLightSettings is undefined "+diffIndex;
 
-            console.log(colors.blue("this.blocksStartingPoint "), this.blocksStartingPoint );
+            // console.log(colors.blue("this.blocksStartingPoint "), this.blocksStartingPoint );
 
             let treeSerialization = this.getSerializedAccountantTree(diffIndex);
             //console.log(colors.blue("this.getSerializedAccountantTree "), colors.yellow(diffIndex), treeSerialization !== undefined ? treeSerialization.toString('hex') : '');
 
             if (!await this.accountantTree.saveMiniAccountant(true, undefined, treeSerialization)) throw "saveMiniAccountant";
 
-            console.log(colors.blue("this.lightPrevDifficultyTarget"), this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
-            console.log(colors.blue("this.lightPrevTimestamp"), this.lightPrevTimeStamps[diffIndex]);
-            console.log(colors.blue("this.lightPrevHashPrev"), this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex") : '');
+            // console.log(colors.blue("this.lightPrevDifficultyTarget"), this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
+            // console.log(colors.blue("this.lightPrevTimestamp"), this.lightPrevTimeStamps[diffIndex]);
+            // console.log(colors.blue("this.lightPrevHashPrev"), this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex") : '');
 
             if (!await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex])) throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
             if (!await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex])) throw "Couldn't be saved _LightSettings_prevTimestamp ";
@@ -227,7 +227,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             await this._saveLightSettings();
 
-            if (! await this.inheritBlockchain.prototype.save.call(this)) throw "couldn't save the blockchain";
+            if (! await this.inheritBlockchain.prototype.save.call(this, consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS )) throw "couldn't save the blockchain";
 
         } catch (exception){
             console.log(colors.red("Couldn't save MiniBlockchain"), exception);

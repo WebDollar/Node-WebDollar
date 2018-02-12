@@ -282,28 +282,36 @@ class InterfaceBlockchain {
         return true;
     }
 
-    async save(){
+    async save(onlyLastBlocks){
 
         //save the number of blocks
         let result = true;
 
         if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
             console.log(colors.red("Error saving the blocks.length"));
-        } else
+        } else {
 
-            for (let i = 0; i < this.blocks.length; ++i)
+            let indexStart = 0;
 
-                if (this.blocks[i] !== undefined && this.blocks[i] !== null){
+            if (onlyLastBlocks !== undefined){
+                indexStart = this.blocks.length - onlyLastBlocks;
+            }
+
+
+            for (let i = indexStart; i < this.blocks.length; ++i)
+
+                if (this.blocks[i] !== undefined && this.blocks[i] !== null) {
                     let response = await this.blocks[i].save();
 
                     if (response !== true)
                         break;
                 }
+        }
 
         return result;
     }
 
-    async load(validateLastBlocks){
+    async load(onlyLastBlocks = undefined){
 
         //load the number of blocks
         let numBlocks = await this.db.get(this._blockchainFileName);
@@ -323,17 +331,17 @@ class InterfaceBlockchain {
 
             let blockValidationType = {};
 
-            if (validateLastBlocks !== undefined)
-                blockValidationType["skip-validation-before"] = {height: numBlocks - validateLastBlocks -1};
+            if (onlyLastBlocks !== undefined)
+                blockValidationType["skip-validation-before"] = {height: numBlocks - onlyLastBlocks -1};
 
             let indexStart = 0;
 
             if (this.agent !== undefined && this.agent.light === true) {
-                indexStart = Math.max(0, numBlocks - validateLastBlocks-1);
+
+                indexStart = Math.max(0, numBlocks - onlyLastBlocks-1);
 
                 for (let i=0; i<indexStart; i++)
                     this.addBlock(undefined);
-
             }
 
             for (let i = indexStart; i < numBlocks; ++i) {
@@ -403,7 +411,13 @@ class InterfaceBlockchain {
         if (this.agent !== undefined) {
             for (let i=Math.max(0, height); i<this.blocks.length; i++) {
                 console.log("PROPAGATE " ,height, " sockets", socketsAvoidBroadcast.length);
-                this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
+
+                if (this.blocks[i] === undefined)
+                    console.log(colors.red("PROPAGATE ERROR"+i), this.blocks[i]);
+                else {
+                    console.log("PROPAGATING", this.blocks[i].hash.toString("hex"));
+                    this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
+                }
             }
 
         }

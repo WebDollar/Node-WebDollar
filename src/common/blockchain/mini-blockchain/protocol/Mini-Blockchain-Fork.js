@@ -27,13 +27,16 @@ class MiniBlockchainFork extends inheritFork{
         this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
 
         console.log("preFork root before", this.blockchain.accountantTree.calculateNodeCoins());
+        console.log("preFork positions", this.forkStartingHeight, this.blockchain.getBlockchainLength-1);
 
         //remove transactions and rewards from each blocks
         for (let i = this.blockchain.getBlockchainLength-1; i>=this.forkStartingHeight; i--) {
 
+
             //remove reward
 
-            console.log(this.blockchain.blocks[i].reward.toString(),"+");
+            console.log("preFork block", i, this.blockchain.blocks[i]);
+            console.log("preFork block ", this.blockchain.blocks[i].reward.toString(),"+");
             this.blockchain.accountantTree.updateAccount(this.blockchain.blocks[i].data.minerAddress, this.blockchain.blocks[i].reward.negated() );
 
             //remove transactions
