@@ -153,9 +153,9 @@ class InterfaceBlockchainFork {
                 this.blockchain.blocks[i] = undefined;
             }
 
-            this.blockchain.spliceBlocks(this.forkStartingHeight);
-
             this.preFork();
+
+            this.blockchain.spliceBlocks(this.forkStartingHeight);
 
             let forkedSuccessfully = true;
 
