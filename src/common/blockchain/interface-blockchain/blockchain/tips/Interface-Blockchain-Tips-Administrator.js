@@ -85,7 +85,7 @@ class InterfaceBlockchainTipsAdministrator {
 
             this.tips[i].updateToDo();
 
-            if (!this.tips[i].validateTip){
+            if (!this.tips[i].validateTip()){
                 this.tips.splice(i,1);
             }
 

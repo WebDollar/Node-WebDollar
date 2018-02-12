@@ -26,7 +26,7 @@ class InterfaceBlockchainTip{
     }
 
     toString(){
-        return "socket.uuid " + this.socket.node.sckAddress.uuid + " forkChainLength " + this.forkChainLength, " forkToDoChainLength " + this.forkToDoChainLength;
+        return "socket.uuid " + this.socket.node.sckAddress.uuid + " forkChainLength " + this.forkChainLength + " forkToDoChainLength " + this.forkToDoChainLength;
     }
 
     validateTip(){
