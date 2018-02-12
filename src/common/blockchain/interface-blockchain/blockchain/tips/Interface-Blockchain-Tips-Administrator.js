@@ -67,14 +67,14 @@ class InterfaceBlockchainTipsAdministrator {
         }
     }
 
-    updateTipNewForkLength(tip, forkToDoChainLength, forkToDoLastHeader ){
+    updateTipNewForkLength(tip, forkToDoChainLength, forkToDoLastBlockHeader ){
 
         if (tip === null) return null;
 
         if (tip.forkChainLength > forkToDoChainLength) return null; //nothing to update
 
         tip.forkToDoChainLength = forkToDoChainLength;
-        tip.forkToDoLastHeader = forkToDoLastHeader;
+        tip.forkToDoLastBlockHeader = forkToDoLastBlockHeader;
 
         return tip;
     }
@@ -82,6 +82,9 @@ class InterfaceBlockchainTipsAdministrator {
     processTipsNewForkLengths(){
 
         for (let i=this.tips.length-1; i>=0; i--){
+
+            if (this.tips[i] === null || this.tips[i] === undefined)
+                this.tips.splice(i, 1);
 
             this.tips[i].updateToDo();
 
