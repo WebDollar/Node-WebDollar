@@ -2,6 +2,7 @@ import InterfaceBlockchainFork from "../blockchain/forks/Interface-Blockchain-Fo
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 const colors = require('colors/safe');
 import global from "consts/global"
+import consts from 'consts/const_global'
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
@@ -134,6 +135,12 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (answer === undefined || answer === undefined || typeof answer.chainStartingPoint !== "number" ) throw "request-blockchain-info couldn't return real values";
 
                 newChainStartingPoint = answer.chainStartingPoint;
+
+                if (this.blockchain.agent.light)
+                    if (newChainLength - newChainStartingPoint > consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS){
+                        console.log(colors.red("LIGHT CHANGES from "), newChainStartingPoint, " to ", newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1);
+                        newChainStartingPoint = newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
+                    }
 
                 console.log(colors.yellow("discoverFork 6666" + newChainStartingPoint))
 
@@ -286,8 +293,6 @@ class InterfaceBlockchainProtocolForkSolver{
                     try {
 
                         result = await fork.includeForkBlock(block);
-
-                        console.log("fork.includeForkBlockfork.includeForkBlockfork.includeForkBlock", result);
 
                     } catch (Exception) {
 

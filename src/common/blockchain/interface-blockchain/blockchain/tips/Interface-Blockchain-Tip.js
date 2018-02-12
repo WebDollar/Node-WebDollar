@@ -26,7 +26,7 @@ class InterfaceBlockchainTip{
     }
 
     toString(){
-        console.log("socket.uuid", this.socket.node.sckAddress.uuid, "forkChainLength", this.forkChainLength, "forkToDoChainLength", this.forkToDoChainLength );
+        return "socket.uuid " + this.socket.node.sckAddress.uuid + " forkChainLength " + this.forkChainLength, " forkToDoChainLength " + this.forkToDoChainLength;
     }
 
     validateTip(){
@@ -37,7 +37,7 @@ class InterfaceBlockchainTip{
             return true;
         else
         if (blockchainLength === this.forkChainLength) //I need to check
-            if (this.forkLastBlockHeader.hash.compare( this.blockchain.getHashPrev(this.blockchain.getBlockchainLength) ) <=0)
+            if (this.forkLastBlockHeader.hash.compare( this.blockchain.getHashPrev(this.blockchain.getBlockchainLength) ) < 0)
                 return true;
 
         return false;

@@ -15,7 +15,7 @@ class InterfaceBlockchainTipBan{
 
         let time = new Date().getTime();
 
-        if ( (time - this.timeStamp) >= ( this.banTrials * TIP_BAN_TIME ))
+        if ( (time - this.timeStamp) < ( this.banTrials * TIP_BAN_TIME ))
             return true;
 
         return false;

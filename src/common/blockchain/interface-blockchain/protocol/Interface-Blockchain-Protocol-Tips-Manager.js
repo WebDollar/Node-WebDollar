@@ -18,13 +18,14 @@ class InterfaceBlockchainProtocolForkManager {
 
         if (this.blockchain === undefined) return; //not yet
 
+        this.blockchain.tipsAdministrator.processTipsNewForkLengths();
+
         let bestTip = this.blockchain.tipsAdministrator.getBestTip();
 
         for (let i=0; i<this.blockchain.tipsAdministrator.tips.length; i++)
-            console.log(this.blockchain.tipsAdministrator.tips[i].toString());
+            console.log("tip: ",this.blockchain.tipsAdministrator.tips[i].toString());
 
-        console.log("bestTip");
-        if (bestTip !== null) bestTip.toString();
+        console.log("bestTip", bestTip !== null ? bestTip.toString() : "null");
 
         if (bestTip !== null){
 
@@ -47,9 +48,6 @@ class InterfaceBlockchainProtocolForkManager {
             }
 
             //TODO process forkAnswer
-
-
-            this.blockchain.tipsAdministrator.processTipsNewForkLengths();
 
             return true;
         }

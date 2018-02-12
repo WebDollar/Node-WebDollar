@@ -25,7 +25,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
     async _calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength){
 
-        console.log("chainStartingPoint", newChainStartingPoint, "newChainLength", newChainLength, "currentBlockchainLength", currentBlockchainLength)
+        console.log("newChainStartingPoint", newChainStartingPoint, "newChainLength", newChainLength, "currentBlockchainLength", currentBlockchainLength)
 
         if (newChainStartingPoint > currentBlockchainLength-1) {
 
@@ -63,14 +63,14 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint }, fork.forkChainStartingPoint );
 
             if (answer === null) throw "get-accountant-tree never received " + (fork.forkChainStartingPoint);
+            if (!answer.result) throw "get-accountant-tree return false "+ answer.message;
 
             fork.forkPrevAccountantTree = answer.accountantTree;
-
 
             answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkChainStartingPoint  }, fork.forkChainStartingPoint );
 
             if (answer === null) throw "get-light-settings never received " + (fork.forkChainStartingPoint);
-            if (answer.result === false) throw "get-light-settings received by it is false ";
+            if (answer.result === false) throw "get-light-settings return false "+ answer.message;
 
             if (answer.difficultyTarget === null ) throw "get-light-settings difficultyTarget is null";
             if (answer.timeStamp === null ) throw "get-light-settings timeStamp is null";
@@ -81,7 +81,6 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;
             fork.forkPrevHashPrev = answer.hashPrev;
-
         } else {
             fork.forkPrevAccountantTree = null;
             fork.forkPrevDifficultyTarget = null;

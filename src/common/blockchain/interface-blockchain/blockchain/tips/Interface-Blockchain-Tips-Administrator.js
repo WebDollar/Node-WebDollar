@@ -81,8 +81,6 @@ class InterfaceBlockchainTipsAdministrator {
 
     processTipsNewForkLengths(){
 
-        let blockchainLength = this.blockchain.getBlockchainLength;
-
         for (let i=this.tips.length-1; i>=0; i--){
 
             this.tips[i].updateToDo();

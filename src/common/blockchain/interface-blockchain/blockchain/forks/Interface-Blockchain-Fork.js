@@ -37,11 +37,12 @@ class InterfaceBlockchainFork {
     async validateFork(){
 
         let useFork = false;
+
         if (this.blockchain.getBlockchainLength < this.forkStartingHeight + this.forkBlocks.length)
             useFork = true;
         else
         if (this.blockchain.getBlockchainLength === this.forkStartingHeight + this.forkBlocks.length) //I need to check
-            if (this.forkBlocks[this.forkBlocks.length-1].hash.compare( this.blockchain.getHashPrev(this.blockchain.getBlockchainLength) ) <=0)
+            if (this.forkBlocks[this.forkBlocks.length-1].hash.compare( this.blockchain.getHashPrev(this.blockchain.getBlockchainLength) ) < 0)
                 useFork = true;
 
         if (useFork === false)
@@ -53,8 +54,6 @@ class InterfaceBlockchainFork {
 
         }
 
-        console.log("validateFork ", true)
-
         return true;
     }
 
@@ -63,8 +62,6 @@ class InterfaceBlockchainFork {
         if (! await this.validateForkBlock(block, block.height ) ) throw "includeForkBlock failed for "+block.height;
 
         this.forkBlocks.push(block);
-
-        console.log("includeForkBlock ", true)
 
         return true;
     }
@@ -88,8 +85,6 @@ class InterfaceBlockchainFork {
         block.difficultyTargetPrev = prevData.prevDifficultyTarget;
 
         let result = await this.blockchain.validateBlockchainBlock(block, prevData.prevDifficultyTarget, prevData.prevHash, prevData.prevTimeStamp, blockValidationType );
-
-        console.log("validateForkBlock",result);
 
         return result;
 
