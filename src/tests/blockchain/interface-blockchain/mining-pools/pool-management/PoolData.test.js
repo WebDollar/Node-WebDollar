@@ -62,7 +62,7 @@ describe('test pool leader DB', () => {
         
         let miner = pd.getMinersList()[0];
         
-        assert(!pd.compareMiners(miner, minersList[0]), "Miners differ");
+        assert(!PoolData.compareMiners(miner, minersList[0]), "Miners differ");
 
         response = await pd.removeMiner(miner.address);
         assert(response === true, "Wrong when removing miner");
