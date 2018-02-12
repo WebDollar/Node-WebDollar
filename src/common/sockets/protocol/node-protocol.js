@@ -29,7 +29,7 @@ class NodeProtocol {
 
             if (response.version < consts.NODE_VERSION_COMPATIBILITY){
 
-                console.log(colors.red("hello received, VERSION is not right"), response.version);
+                console.log(colors.red("hello received, VERSION is not right"), response.version, consts.NODE_VERSION_COMPATIBILITY);
                 return false;
 
             }
