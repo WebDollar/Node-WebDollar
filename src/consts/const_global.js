@@ -6,8 +6,8 @@ consts.TERMINATED = false;
 
 consts.UUID = uuid.v4();
 
-consts.NODE_VERSION = "0.249";
-consts.NODE_VERSION_COMPATIBILITY = "0.249";
+consts.NODE_VERSION = "0.28";
+consts.NODE_VERSION_COMPATIBILITY = "0.28";
 consts.WALLET_VERSION = "0.1";
 
 consts.BLOCKCHAIN_FILE_NAME = 'blockchain4.bin';
