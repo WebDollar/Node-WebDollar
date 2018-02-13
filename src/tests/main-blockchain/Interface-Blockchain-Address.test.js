@@ -46,6 +46,7 @@ describe('test save addresses to local storage', () => {
         let unecodedAddress = BufferExtended.fromBase(address);
 
         assert(unecodedAddress !== undefined, "Error BufferExtended.fromBase");
+        assert(Buffer.isBuffer(unecodedAddress), "BufferExtended.fromBase(address) should create buffer");
     });
     
     it('test check multiSig encrypt/decrypt privateKey with 12 words', async () => {
