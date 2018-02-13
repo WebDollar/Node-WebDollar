@@ -242,7 +242,6 @@ class MainBlockchainWallet{
 
             let address, publicKey;
             let privateKey = data;
-            let result;
 
             //private Key object {version: "xxx", privateKey: "HEX" }
             if (typeof data === "object"){
@@ -271,7 +270,7 @@ class MainBlockchainWallet{
             } else {
                 blockchainAddress.publicKey = Buffer.from( publicKey, "hex");
                 blockchainAddress.address = address;
-                blockchainAddress.unecodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(publicAddress).address;
+                blockchainAddress.unecodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(address).address;
                 await blockchainAddress.savePrivateKey(Buffer.from( privateKey, "hex"));
             }
 
