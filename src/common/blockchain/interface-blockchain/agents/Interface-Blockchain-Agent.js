@@ -128,17 +128,20 @@ class InterfaceBlockchainAgent{
 
     }
 
-    async initializeStartAgent(){
-
-        this._initializeProtocol();
-
+    initializeAgentPromise(){
         this._startAgentPromise = new Promise((resolve)=>{
             console.log("initializeStartAgent() this.startAgentResolver")
             this.startAgentResolver = resolve;
         });
 
-
         this._setStartAgentTimeOut();
+    }
+
+    async initializeStartAgent(){
+
+        this._initializeProtocol();
+
+        this.initializeAgentPromise();
 
         await this._requestBlockchainForNewPeers();
 

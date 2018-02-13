@@ -77,11 +77,28 @@ class Blockchain{
 
         this.emitter.emit('blockchain/status', {message: "Start Synchronizing"});
 
-        this.Agent.initializeStartAgent();
+        await this.Agent.initializeStartAgent();
 
-        this.emitter.emit('blockchain/status', {message: "Synchronizing"});
+        //it tries synchronizing multiple times
+        
+        let agentInitialization = false;
+        while (!agentInitialization){
 
-        let resultAgentStarted = await this.Agent.startAgent();
+            this.emitter.emit('blockchain/status', {message: "Synchronizing"});
+
+            let resultAgentStarted = await this.Agent.startAgent();
+
+            if (resultAgentStarted.result){
+                this.emitter.emit('blockchain/status', {message: "Synchronization Successful"});
+                agentInitialization = true;
+            } else {
+                this.emitter.emit('blockchain/status', {message: "Error Synchronizing"});
+                this.emitter.emit('blockchain/status-webdollar', {message: "Error Synchronizing"});
+
+                this.Agent.initializeAgentPromise();
+            }
+
+        }
 
         await this.startMining();
 
