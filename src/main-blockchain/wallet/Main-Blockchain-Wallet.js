@@ -274,8 +274,8 @@ class MainBlockchainWallet{
             } else {
                 blockchainAddress.publicKey = Buffer.from(publicKey, "hex");
                 blockchainAddress.address = address;
-                blockchainAddress.unecodedAddress = BufferExtended.fromBase(address);
-                alert("unencodedAddress7777="+blockchainAddress.unencodedAddress);
+                blockchainAddress.unecodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+                //alert("unencodedAddress7777="+blockchainAddress.unencodedAddress);
                 await blockchainAddress.savePrivateKey(Buffer.from(privateKey, "hex"));
             }
 
@@ -441,7 +441,7 @@ class MainBlockchainWallet{
     async _insertAddress(blockchainAddress){
 
         let index = this.getAddressIndex(blockchainAddress);
-        if (index < 0)
+        if (index >= 0)
             return false;
 
         this.addresses.push(blockchainAddress);

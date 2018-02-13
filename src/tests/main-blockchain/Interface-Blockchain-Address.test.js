@@ -4,6 +4,7 @@ let assert = require('assert');
 
 import MultiSig from 'common/blockchain/interface-blockchain/addresses/MultiSig';
 import Blockchain from 'main-blockchain/Blockchain';
+import BufferExtended from "../../common/utils/BufferExtended";
 
 describe('test save addresses to local storage', () => {
 
@@ -37,6 +38,14 @@ describe('test save addresses to local storage', () => {
         let response = await blockchainAddress.isPrivateKeyEncrypted();
 
         assert(response === false, "isPrivateKeyEncrypted doesn't work");
+    });
+
+    it('test BufferExtended.fromBase', async () => {
+
+        let address = "WEBD$gCV7BpnRcygsUyJZEyKK95cEG1keYcSwk2HAsm9pFbAqpiLhUjsPw==";
+        let unecodedAddress = BufferExtended.fromBase(address);
+
+        assert(unecodedAddress !== undefined, "Error BufferExtended.fromBase");
     });
     
     it('test check multiSig encrypt/decrypt privateKey with 12 words', async () => {
