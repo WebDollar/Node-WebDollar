@@ -6,6 +6,9 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import BufferExtended from 'common/utils/BufferExtended';
 import MultiSig from "./MultiSig";
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
+
+
 const FileSystem = require('fs');
 
 let INITIAL_PASSWORD = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l' ]
@@ -39,8 +42,7 @@ class InterfaceBlockchainAddress{
         this.unencodedAddress = result.unencodedAddress;
         this.publicKey = result.publicKey;
 
-        await this.savePrivateKey(result.privateKey.privateKey);
-        await this.savePrivateKeyWIF(result.privateKey.privateKeyWIF);
+        await this.savePrivateKey(result.privateKey.privateKeyWIF);
     }
 
     /**
@@ -94,12 +96,16 @@ class InterfaceBlockchainAddress{
     async isPrivateKeyEncrypted() {
 
         let privateKey = await this.getPrivateKey();
-        if (privateKey === null || privateKey.length !== 32)
-           return true;
 
-        let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey);
+        try {
+            if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
+                let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey);
+                return !generatedPublicKey.equals(this.publicKey);
+            }
+        } catch (exception) {
 
-        return !generatedPublicKey.equals(this.publicKey);
+            return true;
+        }
     }
 
     /**
@@ -157,56 +163,6 @@ class InterfaceBlockchainAddress{
         catch(err) {
             return 'ERROR on REMOVE privateKey: ' + err;
         }
-    }
-
-    /**
-     * Save privateKeyWIF encrypted to local database
-     * @param value privateKey's value
-     * @param password Encrypt privateKeyWIF with AES using password
-     * @returns database response
-     */
-    async savePrivateKeyWIF(value) {
-
-        let key = this.address + '_privateKeyWIF';
-
-        try {
-            return (await this.db.save(key, value));
-        }
-        catch(err) {
-            return 'ERROR on SAVE privateKeyWIF: ' + err;
-        }
-    }
-
-    /**
-     * @returns privateKeyWIF's value decrypted
-     */
-    async getPrivateKeyWIF() {
-
-        let key = this.address + '_privateKeyWIF';
-
-        try {
-            return (await this.db.get(key));
-        }
-        catch(err) {
-            return 'ERROR on LOAD privateKeyWIF: ' + err;
-        }
-    }
-
-    /**
-     * Removes privateKeyWIF from database
-     * @returns database result
-     */
-    async removePrivateKeyWIF() {
-
-        let key = this.address + '_privateKeyWIF';
-
-        try {
-            return (await this.db.remove(key));
-        }
-        catch(err) {
-            return 'ERROR on REMOVE privateKeyWIF: ' + err;
-        }
-
     }
 
     /**
@@ -319,7 +275,7 @@ class InterfaceBlockchainAddress{
 
     //TODO REMOVE THIS FUNCTION!!!!!!!!!!!!!!
     async exportAddressPrivateKeyToHex(){
-        return (await this.getPrivateKeyWIF()).toString("hex");
+        return (await this.getPrivateKey()).toString("hex");
     }
 
     async serializeAddress(serializePrivateKey = false){
