@@ -144,7 +144,7 @@ class InterfaceBlockchainFork {
 
         // to do
 
-        let success = await this.blockchain.processBlocksSempahoreCallback( async () => {
+        let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
             //making a copy of the current blockchain
             this._blocksCopy = [];

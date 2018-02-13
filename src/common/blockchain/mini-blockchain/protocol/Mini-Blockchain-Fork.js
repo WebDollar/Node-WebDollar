@@ -35,7 +35,6 @@ class MiniBlockchainFork extends inheritFork{
 
             //remove reward
 
-            console.log("preFork block", i, this.blockchain.blocks[i]);
             console.log("preFork block ", this.blockchain.blocks[i].reward.toString(),"+");
             this.blockchain.accountantTree.updateAccount(this.blockchain.blocks[i].data.minerAddress, this.blockchain.blocks[i].reward.negated() );
 

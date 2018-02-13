@@ -1,6 +1,10 @@
 import InterfaceBlockchainMining from "./Interface-Blockchain-Mining";
 import InterfaceBlockchainMiningWorkersList from "./Interface-Blockchain-Mining-Workers-List";
+
 import Serialization from 'common/utils/Serialization';
+import SemaphoreProcessing from "common/utils/Semaphore-Processing";
+
+SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL = 10;
 
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
@@ -16,9 +20,10 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this.block = null;
 
-        this.WORKER_NONCES_WORK = 47;
+        this.WORKER_NONCES_WORK = 42;
 
         this.workers = new InterfaceBlockchainMiningWorkersList(this);
+
     }
 
 
@@ -236,6 +241,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         }
 
     }
+
+    //TODO replace interval with SetTimeOut
+    //
 
     _processWorkersSempahoreCallback(callback){
 

@@ -1,36 +1,37 @@
 const colors = require('colors/safe');
-const intervalPromise = require('interval-promise')
 
-class InterfaceBlockchainProtocolForkManager {
+class InterfaceBlockchainProtocolTipsManager {
 
     constructor(blockchain, protocol){
 
         this.blockchain = blockchain;
         this.protocol = protocol;
 
-        intervalPromise( async () => {
-            await this.processTips()
-        }, 50, );
-
+        setTimeout(async ()=>{return await this.processTips()}, 50);
     }
+
 
     async processTips(){
 
-        if (this.blockchain === undefined) return; //not yet
+        if (this.blockchain === undefined) {
+            setTimeout(async ()=>{return await this.processTips()}, 50);
+            return false;
+        }
 
         this.blockchain.tipsAdministrator.processTipsNewForkLengths();
 
         let bestTip = this.blockchain.tipsAdministrator.getBestTip();
+        let result = false;
 
         // for (let i=0; i<this.blockchain.tipsAdministrator.tips.length; i++)
         //     console.log("tip: ",this.blockchain.tipsAdministrator.tips[i].toString());
         //
         // console.log("bestTip", bestTip !== null ? bestTip.toString() : "null");
 
-        if (bestTip !== null){
+        if (bestTip !== null) {
 
             console.log("BEEEEEST TIIIP BEFORE");
-            bestTip.toString()
+            bestTip.toString();
 
             console.log("bans bans bans bans bans bans bans bans");
             console.log(this.blockchain.tipsAdministrator.bans);
@@ -40,19 +41,19 @@ class InterfaceBlockchainProtocolForkManager {
             console.log("AFTER");
             bestTip.toString();
 
-            if (!forkAnswer){
+            if (!forkAnswer) {
                 console.log("BANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
                 this.blockchain.tipsAdministrator.addBan(bestTip.socket.node.sckAddress);
             } else {
                 this.blockchain.tipsAdministrator.deleteBan(bestTip.socket.node.sckAddress);
             }
 
-            //TODO process forkAnswer
-
-            return true;
+            result = true;
         }
 
-        return false;
+        setTimeout(async ()=>{return await this.processTips()}, 50);
+
+        return result;
     }
 
     /*
@@ -80,4 +81,4 @@ class InterfaceBlockchainProtocolForkManager {
 
 }
 
-export default InterfaceBlockchainProtocolForkManager;
+export default InterfaceBlockchainProtocolTipsManager;

@@ -28,6 +28,9 @@ class InterfaceBlockchainProtocol {
     setBlockchain(blockchain){
         this.blockchain = blockchain;
 
+        console.log("setBlockchain", blockchain !== undefined);
+        console.log("setBlockchain",  this.tipsManager);
+
         if (this.forkSolver !== undefined)
             this.forkSolver.blockchain = blockchain;
 

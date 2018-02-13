@@ -19,9 +19,12 @@ import consts from 'consts/const_global'
 import global from "consts/global"
 
 import Serialization from 'common/utils/Serialization';
+import SemaphoreProcessing from "common/utils/Semaphore-Processing"
 
 const colors = require('colors/safe');
 const EventEmitter = require('events');
+
+SEMAPHORE_PROCESSING_INTERVAL = 10;
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -36,7 +39,6 @@ class InterfaceBlockchain {
         this.agent = agent;
 
         this.blocks = [];
-        this._blocksSempahore = false;
 
         this.mining = undefined;
 
@@ -51,6 +53,8 @@ class InterfaceBlockchain {
         this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator( this );
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
+
+        this.semaphoreProcessing = new SemaphoreProcessing(SEMAPHORE_PROCESSING_INTERVAL);
     }
 
     _setAgent(newAgent){
@@ -218,48 +222,6 @@ class InterfaceBlockchain {
 
             return this.blocks[height-1].hash;
         }
-    }
-
-    /**
-     * Multiple Forks and Mining are asynchronously, and they can happen in the same time, changing the this.blocks
-     * @param callback
-     * @returns {Promise.<void>}
-     */
-    processBlocksSempahoreCallback(callback){
-
-        return new Promise ((resolve) =>{
-
-            let timer = setInterval( async () => {
-
-                if (global.TERMINATED){
-                    this._blocksSempahore = true;
-                    clearInterval(timer)
-                    return;
-                }
-
-                if ( this._blocksSempahore === false ){
-
-                    this._blocksSempahore = true;
-                    global.SEMAPHORE_PROCESS_DONE = false;
-                    clearInterval(timer);
-
-                    let exception, result=false;
-
-                    try {
-                        result = await callback();
-                    } catch (ex){
-                        console.log(colors.red("error processBlocksSempahoreCallback"), ex);
-                        exception = ex;
-                    }
-
-                    this._blocksSempahore = false;
-                    global.SEMAPHORE_PROCESS_DONE = true;
-
-                    resolve(result);
-                }
-            },10);
-        });
-
     }
 
     toString(){

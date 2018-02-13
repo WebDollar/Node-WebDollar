@@ -126,7 +126,7 @@ class InterfaceBlockchainMining{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                if (!await this.blockchain.processBlocksSempahoreCallback(  ()=>{
+                if (!await this.blockchain.semaphoreProcessing.processSempahoreCallback(  ()=>{
                         return  this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
                             return this._simulatedNextBlockMining(nextBlock);
                         });
@@ -202,7 +202,7 @@ class InterfaceBlockchainMining{
 
                 try {
 
-                    if (!await this.blockchain.processBlocksSempahoreCallback(() => {
+                    if (!await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
                             block.hash = answer.hash;
                             block.nonce = answer.nonce;
                             return this.blockchain.includeBlockchainBlock(block, false, [], true, {});
