@@ -4,7 +4,7 @@ import InterfaceBlockchainMiningWorkersList from "./Interface-Blockchain-Mining-
 import Serialization from 'common/utils/Serialization';
 import SemaphoreProcessing from "common/utils/Semaphore-Processing";
 
-SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL = 10;
+const SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL = 20;
 
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
@@ -16,13 +16,14 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         this._workerFinished = false;
 
         this._workerResolve = undefined;
-        this._workersSempahore = false;
 
         this.block = null;
 
         this.WORKER_NONCES_WORK = 42;
 
         this.workers = new InterfaceBlockchainMiningWorkersList(this);
+
+        this._semaphoreProcessing = new SemaphoreProcessing(SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL);
 
     }
 
@@ -129,7 +130,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         if (this._nonce > 0xFFFFFFFF || (this.started === false) || this.reset){
 
-            //this._processWorkersSempahoreCallback(()=>{
+            //this._semaphoreProcessing.processSempahoreCallback(()=>{
 
                 this.workers.suspendWorkers();
                 this._suspendMiningWorking();
@@ -207,7 +208,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                         if (event.data.hash[i] < this.difficulty[i] ) {
 
-                            //this._processWorkersSempahoreCallback( ()=>{
+                            //this._semaphoreProcessing.processSempahoreCallback( ()=>{
 
                                 console.log('processing');
 
@@ -239,44 +240,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         if (event.data.message === "log") {
             console.log("worker", event.data.log);
         }
-
-    }
-
-    //TODO replace interval with SetTimeOut
-    //
-
-    _processWorkersSempahoreCallback(callback){
-
-        return new Promise ((resolve) =>{
-
-            let timer = setInterval( async () => {
-
-                if ( this._workersSempahore === false ){
-
-                    this._workersSempahore = true;
-                    clearInterval(timer);
-
-                    try {
-                        // solved by somebody else
-                        if (this._workerResolve === undefined || this._workerFinished){
-                            this._workersSempahore = false;
-                            resolve(false);
-                            return;
-                        }
-
-                        let result = await callback();
-                        this._workersSempahore = false;
-
-                        resolve(result);
-                    } catch (exception){
-                        this._workersSempahore = false;
-                        console.log("_processWorkersSempahoreCallback Error", exception);
-                        resolve(false);
-                        throw exception;
-                    }
-                }
-            },10);
-        });
 
     }
 

@@ -24,7 +24,7 @@ import SemaphoreProcessing from "common/utils/Semaphore-Processing"
 const colors = require('colors/safe');
 const EventEmitter = require('events');
 
-SEMAPHORE_PROCESSING_INTERVAL = 10;
+const SEMAPHORE_PROCESSING_INTERVAL = 10;
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
