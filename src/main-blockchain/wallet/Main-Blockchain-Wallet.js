@@ -373,12 +373,17 @@ class MainBlockchainWallet{
         address = this.getAddress(address);
 
         let privateKey = await address.getPrivateKey(oldPassword);
-        if (privateKey === null || privateKey === undefined || privateKey.length !== 32) {
+
+
+        try {
+            if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
+                return (await address.savePrivateKey(privateKey, newPassword));
+            }
+        } catch (exception) {
             alert('Your old password is incorrect!!!');
             return false;
         }
 
-        return (await address.savePrivateKey(privateKey, newPassword));
     }
 
     /**
