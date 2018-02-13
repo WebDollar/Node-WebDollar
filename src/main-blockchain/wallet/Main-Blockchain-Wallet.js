@@ -269,10 +269,10 @@ class MainBlockchainWallet{
                 await blockchainAddress.createNewAddress(undefined, privateKey);
 
             } else {
-                blockchainAddress.publicKey = publicKey;
+                blockchainAddress.publicKey = Buffer.from( publicKey, "hex");
                 blockchainAddress.address = address;
                 blockchainAddress.unecodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(publicAddress).address;
-                await blockchainAddress.savePrivateKeyWIF(privateKey);
+                await blockchainAddress.savePrivateKey(Buffer.from( privateKey, "hex"));
             }
 
             if (!await this._insertAddress(blockchainAddress))
@@ -307,7 +307,7 @@ class MainBlockchainWallet{
                     data: {
                         version: consts.WALLET_VERSION,
                         address: this.addresses[i].address,
-                        publicKey: this.addresses[i].publicKey,
+                        publicKey: this.addresses[i].publicKey.toString("hex"),
                         privateKey: (await this.addresses[i].exportAddressPrivateKeyToHex())
                     }
 
