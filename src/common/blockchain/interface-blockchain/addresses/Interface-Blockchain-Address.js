@@ -16,8 +16,8 @@ class InterfaceBlockchainAddress{
     constructor (db){
 
         this.address = null;
-
         this.publicKey = null;
+
 
         if (db === undefined){
             this.db = new InterfaceSatoshminDB();

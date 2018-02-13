@@ -234,28 +234,46 @@ class MainBlockchainWallet{
      * import an Address from a PrivateKey/WIF
      * @param privateKeyWIF
      */
-    async importAddressFromPrivateKey(privateKeyWIF){
+    async importAddressFromPrivateKey(data){
 
         let blockchainAddress = new MiniBlockchainAddress(this.db, undefined);
 
         try {
 
-            //private Key object {version: "xxx", privateKey: "HEX" }
-            if (typeof privateKeyWIF === "object"){
-                if (!privateKeyWIF.hasOwnProperty("version")) throw ".version not specified";
-                if (!privateKeyWIF.hasOwnProperty("privateKey")) throw ".privateKey not specified";
+            let address, publicKey;
+            let privateKey = data;
+            let result;
 
-                if (privateKeyWIF.version === "0.1"){
-                    privateKeyWIF = privateKeyWIF.privateKey;
+            //private Key object {version: "xxx", privateKey: "HEX" }
+            if (typeof data === "object"){
+                if (!data.hasOwnProperty("version")) throw ".version not specified";
+                if (!data.hasOwnProperty("privateKey")) throw ".privateKey not specified";
+
+                if (data.version === "0.1"){
+                    privateKey = data.privateKey;
                 } else
-                    throw "privateKey version is not good "+privateKeyWIF.version;
+                    throw "privateKey version is not good "+data.version;
+
+                if (data.hasOwnProperty('address')) address = data.address;
+                if (data.hasOwnProperty('publicKey')) publicKey = data.publicKey;
 
             }
 
-            if (typeof privateKeyWIF === "string")
-                privateKeyWIF = Buffer.from(privateKeyWIF,"hex");
+            if (typeof data === "string")
+                privateKey = Buffer.from(data,"hex");
 
-            await blockchainAddress.createNewAddress(undefined, privateKeyWIF);
+            if (Buffer.isBuffer(data))
+                privateKey = new Buffer(data);
+
+            if (address === undefined && publicKey === undefined) {
+                await blockchainAddress.createNewAddress(undefined, privateKey);
+
+            } else {
+                blockchainAddress.publicKey = publicKey;
+                blockchainAddress.address = address;
+                blockchainAddress.unecodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(publicAddress).address;
+                await blockchainAddress.savePrivateKeyWIF(privateKey);
+            }
 
             if (!await this._insertAddress(blockchainAddress))
                 throw "address is not new";
@@ -288,6 +306,8 @@ class MainBlockchainWallet{
 
                     data: {
                         version: consts.WALLET_VERSION,
+                        address: this.addresses[i].address,
+                        publicKey: this.addresses[i].publicKey,
                         privateKey: (await this.addresses[i].exportAddressPrivateKeyToHex())
                     }
 
