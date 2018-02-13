@@ -1,5 +1,5 @@
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
-import NodeDiscoveryService from 'node/sockets/node_clients/service/discovery/node-clients-discovery-service'
+import NodeDiscoveryService from 'node/sockets/node-clients/service/discovery/node-clients-discovery-service'
 import NodesList from 'node/lists/nodes-list'
 
 

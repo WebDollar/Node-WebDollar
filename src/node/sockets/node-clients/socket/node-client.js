@@ -5,7 +5,7 @@ import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
 import SocketAddress from 'common/sockets/socket-address'
 import NodesList from 'node/lists/nodes-list'
-import NodeClientsService from 'node/sockets/node_clients/service/node-clients-service'
+import NodeClientsService from 'node/sockets/node-clients/service/node-clients-service'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 
 class NodeClient {

@@ -18,8 +18,6 @@ class InterfaceBlockchainAgent{
 
         this.blockchain = blockchain;
 
-        console.log("%%%%%%%%%%%%%%%%%%%", this.blockchain);
-
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
 
