@@ -28,9 +28,9 @@ describe('Argon2', ()=>{
         assert(await Argon2.verify(hash1_copy, message1_copy) , "Hash1_copy is not good");
         assert(await Argon2.verify(hash2, message2) , "Hash2 is not good");
 
-        assert(! await Argon2.verify(hash1, message2), "Hash1 is not good because message2 "+message2);
-        assert(! await Argon2.verify(hash1_copy, message2), "Hash1_copy is not good because message2 "+message2);
-        assert(! await Argon2.verify(hash2, message1), "Hash2 is not good because message1 "+message1);
+        assert(! (await Argon2.verify(hash1, message2)), "Hash1 is not good because message2 "+message2);
+        assert(! (await Argon2.verify(hash1_copy, message2)), "Hash1_copy is not good because message2 "+message2);
+        assert(! (await Argon2.verify(hash2, message1)), "Hash2 is not good because message1 "+message1);
 
 
     })
@@ -59,9 +59,9 @@ describe('Argon2', ()=>{
         assert(await Argon2.verify(hash1_copy, message1_copy) , "Hash1_copy is not good");
         assert(await Argon2.verify(hash2, message2) , "Hash2 is not good");
 
-        assert(! await Argon2.verify(hash1, message2), "Hash1 is not good because message2 "+message2);
-        assert(! await Argon2.verify(hash1_copy, message2), "Hash1_copy is not good because message2 "+message2);
-        assert(! await Argon2.verify(hash2, message1), "Hash2 is not good because message1 "+message1);
+        assert(! (await Argon2.verify(hash1, message2)), "Hash1 is not good because message2 "+message2);
+        assert(! (await Argon2.verify(hash1_copy, message2)), "Hash1_copy is not good because message2 "+message2);
+        assert(! (await Argon2.verify(hash2, message1)), "Hash2 is not good because message1 "+message1);
 
 
     })

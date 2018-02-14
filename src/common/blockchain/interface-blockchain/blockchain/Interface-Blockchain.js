@@ -67,7 +67,7 @@ class InterfaceBlockchain {
     async validateBlockchain(){
 
         for (let i=0; i<this.blocks.length; i++){
-            if (! await this.validateBlockchainBlock(this.blocks[i]) ) return false;
+            if (! (await this.validateBlockchainBlock(this.blocks[i])) ) return false;
         }
 
         return true;
@@ -99,7 +99,7 @@ class InterfaceBlockchain {
         if (this.transactions.uniqueness.searchTransactionsUniqueness(block.data.transactions))
             throw "transaction already processed";
 
-        if (! await this.validateBlockchainBlock(block, undefined, undefined, undefined, blockValidationType) ) return false; // the block has height === this.blocks.length
+        if (! (await this.validateBlockchainBlock(block, undefined, undefined, undefined, blockValidationType)) ) return false; // the block has height === this.blocks.length
 
 
         //let's check again the heights
@@ -159,7 +159,7 @@ class InterfaceBlockchain {
         block.difficultyTargetPrev = prevDifficultyTarget;
 
         //validate difficulty & hash
-        if (! await block.validateBlock(block.height, prevDifficultyTarget, prevHash, blockValidationType)) throw ('block validation failed');
+        if (! (await block.validateBlock(block.height, prevDifficultyTarget, prevHash, blockValidationType))) throw ('block validation failed');
 
         //recalculate next target difficulty
         // console.log("block.difficultyTarget", prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height);

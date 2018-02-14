@@ -125,7 +125,8 @@ class Blockchain{
                 agentInitialization = true;
 
             } else {
-                this.emitter.emit('blockchain/status', {message: "Error Synchronizing"});
+
+                this.emitter.emit('blockchain/status', { message: "Error Synchronizing" });
                 this.emitter.emit('blockchain/status-webdollar', {message: "Error Synchronizing"});
 
                 this.Agent.initializeAgentPromise();

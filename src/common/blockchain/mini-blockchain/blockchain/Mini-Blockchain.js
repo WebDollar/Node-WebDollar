@@ -136,11 +136,11 @@ class MiniBlockchain extends  inheritBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
-        if (!await this.simulateNewBlock(block, false, async ()=>{
+        if (! (await this.simulateNewBlock(block, false, async ()=>{
             return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
-        })) throw "Error includeBlockchainBlock MiniBlockchain ";
+        }))) throw "Error includeBlockchainBlock MiniBlockchain ";
 
-        if (!await this.accountantTree.saveMiniAccountant( true)) console.log(colors.red("Error Saving Mini Accountant Tree"));
+        if (! (await this.accountantTree.saveMiniAccountant( true))) console.log(colors.red("Error Saving Mini Accountant Tree"));
 
         return true;
     }
@@ -156,9 +156,9 @@ class MiniBlockchain extends  inheritBlockchain{
 
             if (this.blocks.length === 0) return false;
 
-            if (! await this.accountantTree.saveMiniAccountant( true )) throw "Couldn't save the Account Tree"
+            if (! (await this.accountantTree.saveMiniAccountant( true ))) throw "Couldn't save the Account Tree"
 
-            if (! await inheritBlockchain.prototype.save.call(this)) throw "couldn't sae the blockchain"
+            if (! (await inheritBlockchain.prototype.save.call(this))) throw "couldn't sae the blockchain"
 
             return true;
 

@@ -45,12 +45,12 @@ class InterfaceBlockchainFork {
             if (this.forkBlocks[this.forkBlocks.length-1].hash.compare( this.blockchain.getHashPrev(this.blockchain.getBlockchainLength) ) < 0)
                 useFork = true;
 
-        if (useFork === false)
+        if (!useFork)
             return false;
 
         for (let i=0; i<this.forkBlocks.length; i++){
 
-            if (! await this.validateForkBlock( this.forkBlocks[i], this.forkStartingHeight + i )) throw "validateForkBlock failed for " + i;
+            if (! (await this.validateForkBlock( this.forkBlocks[i], this.forkStartingHeight + i ))) throw "validateForkBlock failed for " + i;
 
         }
 
@@ -59,7 +59,7 @@ class InterfaceBlockchainFork {
 
     async includeForkBlock(block){
 
-        if (! await this.validateForkBlock(block, block.height ) ) throw "includeForkBlock failed for "+block.height;
+        if (! (await this.validateForkBlock(block, block.height )) ) throw "includeForkBlock failed for "+block.height;
 
         this.forkBlocks.push(block);
 
@@ -136,7 +136,7 @@ class InterfaceBlockchainFork {
         //overwrite the blockchain blocks with the forkBlocks
 
         console.log("save Fork before validateFork");
-        if (!await this.validateFork()) {
+        if (! (await this.validateFork())) {
             console.log(colors.red("validateFork was not passed"));
             return false
         }
@@ -166,7 +166,7 @@ class InterfaceBlockchainFork {
             try {
 
                 for (let i = 0; i < this.forkBlocks.length; i++)
-                    if (!await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], false, "all", false, {})) {
+                    if (! (await this.blockchain.includeBlockchainBlock(this.forkBlocks[i], false, "all", false, {}))) {
                         console.log(colors.green("fork couldn't be included in main Blockchain ", i));
                         forkedSuccessfully = false;
                         break;
@@ -188,7 +188,7 @@ class InterfaceBlockchainFork {
                 try {
 
                     for (let i = 0; i < this._blocksCopy.length; i++)
-                        if (!await this.blockchain.includeBlockchainBlock( this._blocksCopy[i], false, "all", false, {})) {
+                        if (! (await this.blockchain.includeBlockchainBlock( this._blocksCopy[i], false, "all", false, {}))) {
                             console.log(colors.green("blockchain couldn't restored after fork included in main Blockchain ", i));
                             break;
                         }

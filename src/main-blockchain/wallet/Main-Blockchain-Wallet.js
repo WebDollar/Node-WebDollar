@@ -43,7 +43,7 @@ class MainBlockchainWallet{
 
         let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
-        if (!await this._insertAddress(blockchainAddress))
+        if (! (await this._insertAddress(blockchainAddress)))
             throw "Address already exists";
 
         return blockchainAddress;
@@ -53,7 +53,7 @@ class MainBlockchainWallet{
 
         let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
-        if (!await this._insertAddress(blockchainAddress))
+        if (! (await this._insertAddress(blockchainAddress)))
             throw "Address already exists";
 
         return blockchainAddress;
@@ -279,7 +279,7 @@ class MainBlockchainWallet{
                 await blockchainAddress.savePrivateKey(Buffer.from(privateKey, "hex"));
             }
 
-            if (!await this._insertAddress(blockchainAddress))
+            if (! (await this._insertAddress(blockchainAddress)))
                 throw "Address already exists";
 
             return {

@@ -21,7 +21,7 @@ class InterfaceBlockchainAgent{
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
 
-        this.AGENT_TIME_OUT = 30000;
+        this.AGENT_TIME_OUT = 40000;
         this.AGENT_QUEUE_COUNT_MAX = 1;
         this.NODES_LIST_MINIM_LENGTH = 1;
 
@@ -53,8 +53,8 @@ class InterfaceBlockchainAgent{
 
         // let's ask everybody
 
-        clearTimeout(this.startAgentTimeOut);
-        this.startAgentTimeOut = undefined;
+        clearTimeout(this._startAgentTimeOut);
+        this._startAgentTimeOut = undefined;
 
         try {
 
@@ -73,7 +73,7 @@ class InterfaceBlockchainAgent{
 
         //check if start Agent is finished
 
-        console.log("this.startAgentResolver",this.startAgentResolver !== undefined)
+        console.log("this.startAgentResolver",this.startAgentResolver !== undefined);
         console.log("this.agentQueueProcessing", this.agentQueueProcessing .length);
         if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0) {
 
@@ -134,6 +134,9 @@ class InterfaceBlockchainAgent{
             this.startAgentResolver = resolve;
         });
 
+        clearTimeout(this._startAgentTimeOut);
+        this._startAgentTimeOut = undefined;
+
         this._setStartAgentTimeOut();
     }
 
@@ -156,9 +159,9 @@ class InterfaceBlockchainAgent{
 
         console.log("_setStartAgentTimeOut");
 
-        if (this.startAgentTimeOut !== undefined) return;
+        if (this._startAgentTimeOut !== undefined) return;
 
-        this.startAgentTimeOut = setTimeout( ()=>{
+        this._startAgentTimeOut = setTimeout( ()=>{
 
             if (this.startAgentResolver === undefined) return;
 
@@ -167,7 +170,7 @@ class InterfaceBlockchainAgent{
 
             console.log( colors.green("Synchronization done FAILED") );
 
-            this.startAgentTimeOut = undefined;
+            this._startAgentTimeOut = undefined;
 
             resolver({
                 result: false,

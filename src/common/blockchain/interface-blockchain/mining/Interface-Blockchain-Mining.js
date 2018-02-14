@@ -126,11 +126,11 @@ class InterfaceBlockchainMining{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                if (!await this.blockchain.semaphoreProcessing.processSempahoreCallback(  ()=>{
+                if (! (await this.blockchain.semaphoreProcessing.processSempahoreCallback(  ()=>{
                         return  this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
                             return this._simulatedNextBlockMining(nextBlock);
                         });
-                    })) throw "Mining1 returned False";
+                    }))) throw "Mining1 returned False";
 
 
             } catch (Exception){
@@ -202,11 +202,11 @@ class InterfaceBlockchainMining{
 
                 try {
 
-                    if (!await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
+                    if (! (await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
                             block.hash = answer.hash;
                             block.nonce = answer.nonce;
                             return this.blockchain.includeBlockchainBlock(block, false, [], true, {});
-                        })) throw "Mining2 returned false";
+                        }))) throw "Mining2 returned false";
 
                 } catch (exception){
 

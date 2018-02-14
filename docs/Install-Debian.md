@@ -30,13 +30,14 @@ nvm use default
 
 ## Deploy Full Node on Port 80
 
-#### M1
+#### Method 1
 `sudo -s`
 `npm run start80`
 
-#### M2
+#### Method 2
 
-`npm install -g pm2`
+To install pm2
+`npm install -g pm2` 
 
 ```
 sudo -s

@@ -110,7 +110,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrevs[diffIndex] = this._lightPrevHashPrevClone;
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this._lightAccountantTreeSerializationsHeightClone;
 
-            //if (!await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1)) throw "_recalculateLightPrevs failed";
+            //if (! (await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1))) throw "_recalculateLightPrevs failed";
         } else
         return MiniBlockchainFork.prototype.postForkBefore.call(this, forkedSuccessfully);
     }

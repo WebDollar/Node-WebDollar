@@ -83,7 +83,7 @@ class InterfaceBlockchainBlock {
 
         if (height !== this.height) throw 'height is different' + height+ " "+ this.height ;
 
-        if (!await this._validateBlockHash(previousHash, blockValidationType)) throw "validateBlockchain return false";
+        if (! (await this._validateBlockHash(previousHash, blockValidationType))) throw "validateBlockchain return false";
 
         this._validateTargetDifficulty(previousDifficultyTarget);
 
