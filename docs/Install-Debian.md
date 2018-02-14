@@ -26,3 +26,20 @@ nvm ls
 nvm alias default 8.1.4
 nvm use default
 ```
+
+
+## Deploy Full Node on Port 80
+
+#### M1
+`sudo -s`
+`npm run start80`
+
+#### M2
+
+`npm install -g pm2`
+
+```
+sudo -s
+pm2 start npm -- run start80
+pm2 logs
+```

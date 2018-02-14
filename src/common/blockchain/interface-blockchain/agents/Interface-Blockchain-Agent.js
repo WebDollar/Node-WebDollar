@@ -21,7 +21,7 @@ class InterfaceBlockchainAgent{
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
 
-        this.AGENT_TIME_OUT = 10000;
+        this.AGENT_TIME_OUT = 30000;
         this.AGENT_QUEUE_COUNT_MAX = 1;
         this.NODES_LIST_MINIM_LENGTH = 1;
 

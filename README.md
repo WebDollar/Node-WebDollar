@@ -13,7 +13,7 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 Windows: just download and install from URL: https://nodejs.org/en/download/
 
-Linux: tutorial how to install Node.js using NVM (recommended) [Install Node.js using NVM](/docs/InstallDebian.md) 
+Linux: tutorial how to install Node.js using NVM (recommended) [Install Node.js using NVM](/docs/Install-Debian.md) 
 
 ## 1. Cloning Repository 
 ```
