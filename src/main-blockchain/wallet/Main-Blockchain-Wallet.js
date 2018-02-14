@@ -136,7 +136,7 @@ class MainBlockchainWallet{
     getAddressPic(address){
 
         if (Buffer.isBuffer(address))
-            address = BufferExtended.toBase();
+            address = BufferExtended.toBase(address);
 
         return `https://www.gravatar.com/avatar/${md5(address)}?d=retro&f=y`;
     }
