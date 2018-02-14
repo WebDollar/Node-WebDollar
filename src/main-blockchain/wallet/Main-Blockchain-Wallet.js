@@ -274,7 +274,7 @@ class MainBlockchainWallet{
             } else {
                 blockchainAddress.publicKey = Buffer.from(publicKey, "hex");
                 blockchainAddress.address = address;
-                blockchainAddress.unencodedAddress = BufferExtended.fromBase("WEBD$gCV7BpnRcygsUyJZEyKK95cEG1keYcSwk2HAsm9pFbAqpiLhUjsPw==");
+                blockchainAddress.unencodedAddress = BufferExtended.fromBase(blockchainAddress.address);
 
                 await blockchainAddress.savePrivateKey(Buffer.from(privateKey, "hex"));
             }
