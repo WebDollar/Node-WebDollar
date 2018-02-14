@@ -22,8 +22,8 @@ class InterfaceBlockchainAgent{
         this.agentQueueCount = 0;
 
         this.AGENT_TIME_OUT = 10000;
-        this.AGENT_QUEUE_COUNT_MAX = 2;
-        this.NODES_LIST_MINIM_LENGTH = 2;
+        this.AGENT_QUEUE_COUNT_MAX = 1;
+        this.NODES_LIST_MINIM_LENGTH = 1;
 
         this.newFork();
         this.newProtocol();
@@ -79,7 +79,7 @@ class InterfaceBlockchainAgent{
 
             let done = true;
             for (let i = 0; i < NodesList.nodes.length; i++)
-                if (NodesList.nodes[i].socket.level <= 3 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
+                if (NodesList.nodes[i].socket.level <= 2 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
 
                     done = false;
                     console.log("not done", NodesList.nodes[i]);
@@ -107,7 +107,7 @@ class InterfaceBlockchainAgent{
         }
 
         //it is not done, maybe timeout
-        this._setStartAgentTimeOut(0.5);
+        this._setStartAgentTimeOut(1);
     }
 
     async _requestBlockchainForNewPeers(){
