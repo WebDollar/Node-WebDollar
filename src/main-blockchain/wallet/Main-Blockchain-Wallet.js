@@ -522,6 +522,38 @@ class MainBlockchainWallet{
 
     }
 
+
+    async loadWallet(){
+
+        //loading the Wallet
+        this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Loading"});
+
+        try{
+
+            let response = await this.loadAddresses();
+
+            if (response !== false)
+                this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Loaded Successfully"});
+
+            if (response === false || this.addresses.length === 0) {
+
+                console.log("create this.Wallet.createNewAddress");
+                await this.createNewAddress(); //it will save automatically
+                console.log("create this.Wallet.createNewAddress done");
+
+                this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Creating New Wallet"});
+            }
+
+        } catch (exception){
+
+            console.log("exception loading Wallet.Addresses");
+
+            this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Error Loading and Creating"});
+
+            await this.createNewAddress(); //it will save automatically
+        }
+    }
+
 }
 
 export default MainBlockchainWallet

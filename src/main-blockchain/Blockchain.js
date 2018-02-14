@@ -4,6 +4,7 @@ import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining'
 import MainBlockchainProtocol from 'main-blockchain/blockchain-protocol/Main-Blockchain-Protocol'
 import MainBlockchainAgent from 'main-blockchain/agents/Main-Blockchain-Agent'
 import MainBlockchainBalances from "main-blockchain/balances/Main-Blockchain-Balances";
+import ValidityState from "common/utils/validation/Validations-Utils";
 import NodesList from 'node/lists/nodes-list'
 
 class Blockchain{
@@ -52,33 +53,13 @@ class Blockchain{
 
     async initializeBlockchain(){
 
+        //Waiting Until a Single Window is present
 
-        //loading the Wallet
-        this.emitter.emit('blockchain/status', {message: "Wallet Loading"});
-        try{
+        let validation = new ValidityState(this);
+        await validation.waitSingleTab(()=>{this.emitter.emit('blockchain/status-webdollar', {message: "Multiple Windows Detected"}); });
+        this.emitter.emit('blockchain/status-webdollar', {message: "Single Window"});
 
-            let response = await this.Wallet.loadAddresses();
-
-            if (response !== false)
-                this.emitter.emit('blockchain/status', {message: "Wallet Loaded Successfully"});
-
-            if (response === false || this.Wallet.addresses.length === 0) {
-
-                console.log("create this.Wallet.createNewAddress");
-                await this.Wallet.createNewAddress(); //it will save automatically
-                console.log("create this.Wallet.createNewAddress done");
-
-                this.emitter.emit('blockchain/status', {message: "Wallet Creating New Wallet"});
-            }
-
-        } catch (exception){
-
-            console.log("exception loading Wallet.Addresses");
-
-            this.emitter.emit('blockchain/status', {message: "Wallet Error Loading and Creating"});
-
-            await this.Wallet.createNewAddress(); //it will save automatically
-        }
+        await this.Wallet.loadWallet();
 
         //starting mining
         await this.initializeMining();
@@ -107,10 +88,8 @@ class Blockchain{
 
         await this.Mining.setMinerAddress(await this.Wallet.getMiningAddress() );
 
-        if (process.env.START_MINING){
-
+        if (process.env.START_MINING)
             this.Mining.startMining();
-        }
 
     }
 
