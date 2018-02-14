@@ -1,5 +1,5 @@
 import {setCookie, getCookie} from "../cookies/Cookies"
-import DetectMultipleTabs from "./Detect-Multiple-Tabs"
+import DetectMultipleWindows from "./Detect-Multiple-Windows"
 
 class ValidationsUtils{
 
@@ -33,7 +33,7 @@ class ValidationsUtils{
 
         if (typeof window === "undefined") return true;
 
-        return DetectMultipleTabs.waitForSingleTabNow(waitCallback);
+        return DetectMultipleWindows.waitForSingleTabNow(waitCallback);
     }
 
     // _validateBrowser(){

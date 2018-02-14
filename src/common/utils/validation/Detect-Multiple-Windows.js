@@ -1,6 +1,9 @@
-class DetectMultipleTabs {
+class DetectMultipleWindows {
 
     constructor() {
+
+        if (typeof window === "undefined")
+            return;
 
         window.addEventListener('storage', (data) => {
             if (data.key === this.HI1)
@@ -52,8 +55,6 @@ class DetectMultipleTabs {
 
         let windowSingle = await this.isWindowSingle();
 
-        console.log("_waitForSingleTab _waitForSingleTab",);
-
         if (windowSingle)
             promiseResolver ( true );
         else {
@@ -74,15 +75,15 @@ class DetectMultipleTabs {
 
 
     get HI1() {
-        return 'WindowDetector.HI1';
+        return 'Windows.HI1';
     }
 
     get HI2() {
-        return 'WindowDetector.HI2';
+        return 'Windows.HI2';
     }
 
     get HI3() {
-        return 'WindowDetector.Hi3';
+        return 'Windows.HI3';
     }
 
     _hi1(nonce) {
@@ -98,4 +99,4 @@ class DetectMultipleTabs {
     }
 }
 
-export default new DetectMultipleTabs();
+export default new DetectMultipleWindows();
