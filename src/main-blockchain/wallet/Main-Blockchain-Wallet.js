@@ -270,7 +270,7 @@ class MainBlockchainWallet{
             } else {
                 blockchainAddress.publicKey = Buffer.from( publicKey, "hex");
                 blockchainAddress.address = address;
-                blockchainAddress.unecodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(address).address;
+                blockchainAddress.unecodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
                 await blockchainAddress.savePrivateKey(Buffer.from( privateKey, "hex"));
             }
 

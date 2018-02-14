@@ -99,9 +99,11 @@ class NodesList {
 
                 console.log(colors.green('deleting client socket '+ i +" "+ socket.node.sckAddress.toString()));
 
-                this.emitter.emit("nodes-list/disconnected", this.nodes[i]);
-
+                let nodeToBeDeleted = this.nodes[i];
                 this.nodes.splice(i, 1);
+
+                this.emitter.emit("nodes-list/disconnected", nodeToBeDeleted);
+
                 socket.disconnect(true);
                 return true;
             }

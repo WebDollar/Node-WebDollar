@@ -4,6 +4,7 @@ import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining'
 import MainBlockchainProtocol from 'main-blockchain/blockchain-protocol/Main-Blockchain-Protocol'
 import MainBlockchainAgent from 'main-blockchain/agents/Main-Blockchain-Agent'
 import MainBlockchainBalances from "main-blockchain/balances/Main-Blockchain-Balances";
+import NodesList from 'node/lists/nodes-list'
 
 class Blockchain{
 
@@ -25,6 +26,16 @@ class Blockchain{
         this.onLoaded = new Promise((resolve)=>{
             this._onLoadedResolver = resolve;
         })
+
+        NodesList.emitter.on("nodes-list/disconnected", async (result) => {
+
+            if (NodesList.nodes.length === 0) { //no more sockets, maybe I no longer have internet
+                console.log("################### RESYNCHRONIZATION STARTED ##########");
+                this.Mining.stopMining();
+                this.emitter.emit('blockchain/status-webdollar', {message: "No Internet Access"});
+                await this.synchronizeBlockchain();
+            }
+        });
 
     }
 
@@ -75,41 +86,13 @@ class Blockchain{
         //loading the blockchain
         await this.loadBlockchain();
 
-        this.emitter.emit('blockchain/status', {message: "Start Synchronizing"});
-
         await this.Agent.initializeStartAgent();
 
         //it tries synchronizing multiple times
-
-        let agentInitialization = false;
-
-        while (!agentInitialization){
-
-            this.emitter.emit('blockchain/status', {message: "Synchronizing"});
-
-            let resultAgentStarted = await this.Agent.startAgent();
-
-            if (resultAgentStarted.result){
-
-                this.emitter.emit('blockchain/status', {message: "Synchronization Successful"});
-                agentInitialization = true;
-
-            } else {
-                this.emitter.emit('blockchain/status', {message: "Error Synchronizing"});
-                this.emitter.emit('blockchain/status-webdollar', {message: "Error Synchronizing"});
-
-                this.Agent.initializeAgentPromise();
-            }
-
-        }
-
-        await this.startMining();
-
-        this.emitter.emit('blockchain/status', {message: "Blockchain Ready to Mine"});
-
-        this.emitter.emit('blockchain/status-webdollar', {message: "Ready"});
+        await this.synchronizeBlockchain(true);
 
         this._onLoadedResolver("Ready");
+        this._onLoadedResolver = "done";
 
     }
 
@@ -141,6 +124,42 @@ class Blockchain{
         return chainLoaded;
     }
 
+    /**
+     * it tries synchronizing multiple times
+     * @returns {Promise.<void>}
+     */
+    async synchronizeBlockchain(firstTime){
+
+        this.emitter.emit('blockchain/status', {message: "Start Synchronizing"});
+        let agentInitialization = false;
+
+        while (!agentInitialization){
+
+            this.emitter.emit('blockchain/status', {message: "Synchronizing"});
+
+            let resultAgentStarted = await this.Agent.startAgent(firstTime);
+
+            if (resultAgentStarted.result){
+
+                this.emitter.emit('blockchain/status', {message: "Synchronization Successful"});
+                agentInitialization = true;
+
+            } else {
+                this.emitter.emit('blockchain/status', {message: "Error Synchronizing"});
+                this.emitter.emit('blockchain/status-webdollar', {message: "Error Synchronizing"});
+
+                this.Agent.initializeAgentPromise();
+            }
+
+        }
+
+        await this.startMining();
+
+        this.emitter.emit('blockchain/status', {message: "Blockchain Ready to Mine"} );
+
+        this.emitter.emit('blockchain/status-webdollar', {message: "Ready"} );
+
+    }
 
 }
 

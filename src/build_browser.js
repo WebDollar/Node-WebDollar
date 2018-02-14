@@ -10,7 +10,7 @@ Node.NodeWebPeersService.startService();
 //Blockchain.createBlockchain("headers-node");
 Blockchain.createBlockchain("light-node");
 
-window.onbeforeunload = function(){
+window.onbeforeunload = () => {
     console.log(colors.yellow("SIGINT FIRED"))
     global.TERMINATED = true;
 

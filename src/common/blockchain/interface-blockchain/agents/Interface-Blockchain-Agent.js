@@ -46,7 +46,6 @@ class InterfaceBlockchainAgent{
     }
 
     _initializeProtocol(){
-
         this.protocol.initialize(["acceptBlockHeaders"]);
     }
 
@@ -129,6 +128,7 @@ class InterfaceBlockchainAgent{
     }
 
     initializeAgentPromise(){
+
         this._startAgentPromise = new Promise((resolve)=>{
             console.log("initializeStartAgent() this.startAgentResolver")
             this.startAgentResolver = resolve;
@@ -137,18 +137,17 @@ class InterfaceBlockchainAgent{
         this._setStartAgentTimeOut();
     }
 
-    async initializeStartAgent(){
-
+    initializeStartAgent(){
         this._initializeProtocol();
+    }
+
+    async startAgent(firsTime){
+        console.log(colors.yellow("startAgent was started"));
 
         this.initializeAgentPromise();
 
-        await this._requestBlockchainForNewPeers();
-
-    }
-
-    startAgent(){
-        console.log(colors.yellow("startAgent was started"));
+        if (firsTime)
+            await this._requestBlockchainForNewPeers();
 
         return this._startAgentPromise;
     }

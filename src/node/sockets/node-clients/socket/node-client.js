@@ -52,9 +52,10 @@ class NodeClient {
                 try {
 
                     // params described in the documentation https://socket.io/docs/client-api#manager
-                    socket = io.connect(address, {
+                    socket = io(address, {
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
+                        timeout: 10000, //10 sec, default 20 sec
                     });
 
                 }  catch (Exception){
@@ -97,7 +98,7 @@ class NodeClient {
                     resolve(false);
                 });
 
-                socket.once("disconnect", () => {
+                socket.on("disconnect", () => {
 
                     //disconnect over the time, so it was connected before
 

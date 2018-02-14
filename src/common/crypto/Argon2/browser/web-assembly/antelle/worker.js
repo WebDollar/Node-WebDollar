@@ -6,7 +6,7 @@
 
 var calcHashArg;
 
-self.onmessage = function(e) {
+self.onmessage = (e) => {
     self.postMessage('calc:' + e.data.calc);
     calcHashArg = e.data.arg;
     switch (e.data.calc) {

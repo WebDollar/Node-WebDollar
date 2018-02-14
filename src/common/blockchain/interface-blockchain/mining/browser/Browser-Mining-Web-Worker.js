@@ -7,7 +7,7 @@ let Argon2WebAssemblyCalc = new Argon2WebAssemblyCalcClass();
  * @param callback
  * @param errorCallback
  */
-let loadScriptWorker = function (script, callback, errorCallback) {
+let loadScriptWorker =  (script, callback, errorCallback) => {
     try {
         importScripts(script);
     } catch (e) {
