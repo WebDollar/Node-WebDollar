@@ -100,7 +100,13 @@ class NodeDiscoveryService {
         try {
             //console.log(data);
 
-            if (typeof data === 'string') data = JSON.parse(data);
+            if (typeof data === 'string') {
+                try {
+                    data = JSON.parse(data);
+                } catch (exception){
+                    console.error("Error processFallbackNodes String", data, exception);
+                }
+            }
 
 
             if ((typeof data === 'object') && (data !== null)) {

@@ -9,7 +9,7 @@ class DetectMultipleTabs {
         window.addEventListener('unload', () => {
             this._hi3();
         });
-        
+
     }
 
     isWindowSingle() {

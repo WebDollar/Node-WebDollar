@@ -117,6 +117,7 @@ class Blockchain{
             this.emitter.emit('blockchain/status', {message: "Synchronizing"});
 
             let resultAgentStarted = await this.Agent.startAgent(firstTime);
+            firstTime = false;
 
             if (resultAgentStarted.result){
 
