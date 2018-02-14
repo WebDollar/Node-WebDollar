@@ -4,13 +4,11 @@ import global from "consts/global.js";
 
 console.log("TESTING MODE");
 
-
-Node.NodeServer.startServer();
-Node.NodeClientsService.startService();
-
-
 //Blockchain.createBlockchain("full-node");
-Blockchain.createBlockchain("light-node");
+Blockchain.createBlockchain("light-node",()=>{
+    Node.NodeServer.startServer();
+    Node.NodeClientsService.startService();
+});
 
 
 process.on('SIGINT', function() {

@@ -7,7 +7,7 @@ class DetectMultipleWindows {
 
         window.addEventListener('storage', (data) => {
             if (data.key === this.HI1)
-                this._hi2(e.newValue);
+                this._hi2(data.newValue);
         });
         window.addEventListener('unload', () => {
             this._hi3();
@@ -15,32 +15,6 @@ class DetectMultipleWindows {
 
     }
 
-    isWindowSingle() {
-
-        return new Promise((resolve) => {
-
-            const nonce = Math.round(Math.random() * Number.MAX_SAFE_INTEGER);
-
-            const timeout = setTimeout( () => {
-                window.removeEventListener('storage', listener);
-                resolve(true);
-            }, 500);
-
-            const listener = (e) => {
-
-                if (e.key === this.HI2 && e.newValue == nonce) {
-                    clearTimeout(timeout);
-
-                    window.removeEventListener('storage', listener);
-                    resolve(false);
-                }
-
-            };
-            window.addEventListener('storage', listener);
-
-            this._hi1(nonce);
-        });
-    }
 
     waitForSingleTabNow(waitCallback, ) {
 
@@ -62,8 +36,8 @@ class DetectMultipleWindows {
             if (typeof waitCallback === "function")
                 waitCallback();
 
-            const listener = (e) => {
-                if (e.key === this.HI3) {
+            const listener = (data) => {
+                if (data.key === this.HI3) {
                     window.removeEventListener('storage', listener);
                     // Don't pass fnWait, we only want it to be called once.
                     this._waitForSingleTab(undefined, promiseResolver);
@@ -71,6 +45,35 @@ class DetectMultipleWindows {
             };
             window.addEventListener('storage', listener);
         }
+    }
+
+
+
+    isWindowSingle() {
+
+        return new Promise((resolve) => {
+
+            const nonce = Math.round(Math.random() * Number.MAX_SAFE_INTEGER);
+
+            const timeout = setTimeout( () => {
+                window.removeEventListener('storage', listener);
+                resolve(true);
+            }, 500);
+
+            const listener = (data) => {
+
+                if (data.key === this.HI2 && data.newValue == nonce) {
+                    clearTimeout(timeout);
+
+                    window.removeEventListener('storage', listener);
+                    resolve(false);
+                }
+
+            };
+            window.addEventListener('storage', listener);
+
+            this._hi1(nonce);
+        });
     }
 
 

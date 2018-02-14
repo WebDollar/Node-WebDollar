@@ -26,7 +26,7 @@ class Blockchain{
 
         this.onLoaded = new Promise((resolve)=>{
             this._onLoadedResolver = resolve;
-        })
+        });
 
         NodesList.emitter.on("nodes-list/disconnected", async (result) => {
 
@@ -40,7 +40,7 @@ class Blockchain{
 
     }
 
-    async createBlockchain(agentName){
+    async createBlockchain(agentName, initializationCallback){
 
 
         this.Agent = MainBlockchainAgent.createAgent(agentName, this.blockchain);
@@ -48,16 +48,21 @@ class Blockchain{
 
         this.blockchain._setAgent(this.Agent);
 
+        //Waiting Until a Single Window is present
+        let validation = new ValidityState(this);
+
+        await validation.waitSingleTab( ()=>{
+            this.emitter.emit('blockchain/status-webdollar', {message: "Multiple Windows Detected"});
+        });
+        this.emitter.emit('blockchain/status-webdollar', {message: "Single Window"});
+
+        if (typeof initializationCallback === "function")
+            initializationCallback();
+
         await this.initializeBlockchain();
     }
 
     async initializeBlockchain(){
-
-        //Waiting Until a Single Window is present
-
-        let validation = new ValidityState(this);
-        await validation.waitSingleTab(()=>{this.emitter.emit('blockchain/status-webdollar', {message: "Multiple Windows Detected"}); });
-        this.emitter.emit('blockchain/status-webdollar', {message: "Single Window"});
 
         await this.Wallet.loadWallet();
 
