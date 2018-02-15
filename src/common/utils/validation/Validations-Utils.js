@@ -50,10 +50,9 @@ class ValidationsUtils{
             let db = new InterfaceSatoshminDB(dbName);
 
             let number = Math.floor(Math.random()*10000000);
-            await db.save("validate_test", number);
-            let number2 = await db.get("validate_test");
 
-            await db.remove("validate_test");
+            await db.save("validate_test", number, 1000);
+            let number2 = await db.get("validate_test", 1000);
 
             if (number !== number2){
                 throw "number !== number2";
