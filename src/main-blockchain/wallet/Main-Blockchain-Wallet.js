@@ -19,6 +19,7 @@ class MainBlockchainWallet{
         this.blockchain = blockchain;
         this.walletFileName = 'wallet.bin';
 
+        //TODO change db name to "walletDB"
         if(db === undefined)
             this.db = new InterfaceSatoshminDB();
         else

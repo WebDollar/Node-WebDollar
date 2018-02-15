@@ -197,7 +197,7 @@ class InterfaceBlockchainMining{
                 answer.result = false;
             }
 
-            if (answer.result){
+            if (answer.result && this.blockchain.blocks.length === block.height ){
                 console.log( colors.green("WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
 
                 try {
@@ -205,6 +205,10 @@ class InterfaceBlockchainMining{
                     if (! (await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
                             block.hash = answer.hash;
                             block.nonce = answer.nonce;
+
+                            //returning false, because a new fork was changed in the mean while
+                            if (this.blockchain.blocks.length !== block.height) return false;
+
                             return this.blockchain.includeBlockchainBlock(block, false, [], true, {});
                         }))) throw "Mining2 returned false";
 

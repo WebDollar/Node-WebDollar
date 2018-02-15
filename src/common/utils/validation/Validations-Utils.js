@@ -1,32 +1,91 @@
 import {setCookie, getCookie} from "../cookies/Cookies"
 import DetectMultipleWindows from "./Detect-Multiple-Windows"
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
 class ValidationsUtils{
 
-    constructor(blockchain){
+    constructor(emitter){
 
+        this._emitter = emitter;
 
-        this._blockchain = blockchain;
+    }
 
-
+    async validate(){
         this._validateIndexedDB();
-
+        await this._validatePouchDB();
+        this._detectIncognito();
     }
 
     _validateIndexedDB(){
 
-        if (typeof window === 'undefined') return;
+        if (typeof window === 'undefined') return true;
 
         let indexedDB = window.indexedDB ||
             window.mozIndexedDB ||
             window.webkitIndexedDB ||
             window.msIndexedDB;
 
-        if (indexedDB)
-            this._blockchain.emitter.emit("validation/status", {result:true, message: "IndexedDB is available"})
-        else
-            this._blockchain.emitter.emit("validation/status", {result:false, message: "IndexedDB is not supported"})
+        if (indexedDB) {
+            this._emitter.emit("validation/status", {result: true, message: "IndexedDB is available"})
+            return true;
+        }
+        else {
+            this._emitter.emit("validation/status", {result: false, message: "IndexedDB is not supported"})
+            return false;
+        }
 
+    }
+
+
+    async _validatePouchDB(){
+
+        if (await this.testPounchDB("validateDB"))
+            await this.testPounchDB("defaultDB");
+
+    }
+
+    async testPounchDB(dbName){
+
+        try{
+            let db = new InterfaceSatoshminDB(dbName);
+
+            let number = Math.floor(Math.random()*10000000);
+            await db.save("validate_test", number);
+            let number2 = await db.get("validate_test");
+
+            await db.remove("validate_test");
+
+            if (number !== number2){
+                throw "number !== number2";
+            } else {
+                this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB works", dbName: dbName});
+                return true;
+            }
+
+        } catch (exception){
+            this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName});
+            return false;
+        }
+
+    }
+
+    _detectIncognito(){
+
+        if (typeof window === "undefined") return true;
+
+        let fs = window.RequestFileSystem || window.webkitRequestFileSystem;
+
+        if (!fs) {
+            console.error("_detectIncognito didn't work .. check failed?");
+        } else {
+            fs(window.TEMPORARY, 100,
+                ()=>{
+                    this._emitter.emit("validation/status", {result: true, message: "Not incognito mode"})
+                },
+                ()=>{
+                    this._emitter.emit("validation/status", {result: false, message: "Incognito mode"})
+                });
+        }
     }
 
     waitSingleTab(waitCallback){
@@ -35,38 +94,6 @@ class ValidationsUtils{
 
         return DetectMultipleWindows.waitForSingleTabNow(waitCallback);
     }
-
-    // _validateBrowser(){
-    //     // Do not allow multiple call center tabs
-    //     //if (~window.location.hash.indexOf('#admin/callcenter')) {
-    //     if (1===1) {
-    //         $(window).on('beforeunload onbeforeunload', function(){
-    //             document.cookie = 'ic_window_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    //         });
-    //
-    //         function validateCallCenterTab() {
-    //             var win_id_cookie_duration = 10; // in seconds
-    //
-    //             if (!window.name) {
-    //                 window.name = Math.random().toString();
-    //             }
-    //
-    //             if (!getCookie('ic_window_id') || window.name === getCookie('ic_window_id')) {
-    //                 // This means they are using just one tab. Set/clobber the cookie to prolong the tab's validity.
-    //                 setCookie('ic_window_id', window.name, win_id_cookie_duration);
-    //             } else if (getCookie('ic_window_id') !== window.name) {
-    //                 // this means another browser tab is open, alert them to close the tabs until there is only one remaining
-    //                 var message = 'You cannot have this website open in multiple tabs. ' +
-    //                     'Please close them until there is only one remaining. Thanks!';
-    //                 $('html').html(message);
-    //                 clearInterval(callCenterInterval);
-    //                 throw 'Multiple call center tabs error. Program terminating.';
-    //             }
-    //         }
-    //
-    //         callCenterInterval = setInterval(validateCallCenterTab, 3000);
-    //     }
-    // }
 
 }
 

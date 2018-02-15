@@ -4,7 +4,7 @@ import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining'
 import MainBlockchainProtocol from 'main-blockchain/blockchain-protocol/Main-Blockchain-Protocol'
 import MainBlockchainAgent from 'main-blockchain/agents/Main-Blockchain-Agent'
 import MainBlockchainBalances from "main-blockchain/balances/Main-Blockchain-Balances";
-import ValidityState from "common/utils/validation/Validations-Utils";
+import ValidationsUtils from "common/utils/validation/Validations-Utils";
 import NodesList from 'node/lists/nodes-list'
 
 class Blockchain{
@@ -49,7 +49,13 @@ class Blockchain{
         this.blockchain._setAgent(this.Agent);
 
         //Waiting Until a Single Window is present
-        let validation = new ValidityState(this);
+        let validation;
+        try {
+            validation = new ValidationsUtils(this.emitter);
+            await validation.validate();
+        } catch (exception){
+
+        }
 
         await validation.waitSingleTab( ()=>{
             this.emitter.emit('blockchain/status-webdollar', {message: "Multiple Windows Detected"});

@@ -48,11 +48,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         //initialize new workers
 
-        console.log("init mining workers");
-
         this.workers.initializeWorkers(block, difficultyTarget );
-
-        console.log("init mining workers done");
 
         return promiseResolve;
     }
@@ -145,9 +141,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         }
 
         if (this.reset) {
-            console.log("WORKERS MINING RESTARTED", this.reset);
-            console.log("WORKERS MINING RESTARTED", this.reset);
-            console.log("WORKERS MINING RESTARTED", this.reset);
+            console.warn("WORKERS MINING RESTARTED", this.reset);
         }
 
         return false;
@@ -168,13 +162,13 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             if (event.data.answer === "WebAssembly supported" || event.data.answer === "ASM.JS supported" ){
 
                 if (event.data.answer === "ASM.JS supported")
-                    this.blockchain.emitter.emit("blockchain/compatibility", {type: "MINING", message: "Your browser doesn't support WebAssembly. Install Chrome and your mining will increase with 70% more."});
+                    this.blockchain.emitter.emit("validation/status", {type: "MINING", message: "WebAssembly not supported"});
 
                 this.workers._initializeWorker( worker );
 
             } else { // Argon2 is not supported in Browser
 
-                this.blockchain.emitter.emit("blockchain/compatibility", {type: "MINING", message: "Mining is not available on your machine. Please update your browser"})
+                this.blockchain.emitter.emit("validation/status", {type: "MINING", message: "ASM.JS not supported"});
 
                 this.stopMining();
             }
