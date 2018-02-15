@@ -234,6 +234,8 @@ class InterfaceBlockchain {
 
     async saveNewBlock(block){
 
+        if (process.env.BROWSER) return true;
+
         if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
             console.log(colors.red("Error saving the blocks.length"));
             return false;

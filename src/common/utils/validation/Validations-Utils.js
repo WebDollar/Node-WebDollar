@@ -49,20 +49,20 @@ class ValidationsUtils{
         try{
             let db = new InterfaceSatoshminDB(dbName);
 
-            let number = Math.floor(Math.random()*10000000);
+            let number = Math.floor(Math.random()*10000000).toString();
 
-            await db.save("validate_test", number, 1000);
-            let number2 = await db.get("validate_test", 1000);
+            await db.save("validate_test", number, 5000);
+            let number2 = await db.get("validate_test", 5000);
 
-            if (number !== number2){
-                throw "number !== number2";
+            if (number != number2 || number === null || number2 === null){
+                throw (number === null ? 'null' : number.toString())+" !== "+ (number2 === null ? 'null' : number2.toString());
             } else {
                 this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB works", dbName: dbName});
                 return true;
             }
 
         } catch (exception){
-            this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName});
+            this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName + exception.toString() });
             return false;
         }
 
