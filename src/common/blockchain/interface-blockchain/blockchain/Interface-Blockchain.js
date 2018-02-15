@@ -239,12 +239,14 @@ class InterfaceBlockchain {
             return false;
         }
 
-        await block.save();
+        await block.saveBlock();
 
         return true;
     }
 
-    async save(onlyLastBlocks){
+    async saveBlockchain(onlyLastBlocks){
+
+        if (process.env.BROWSER) return true;
 
         //save the number of blocks
         let result = true;
@@ -263,7 +265,7 @@ class InterfaceBlockchain {
             for (let i = indexStart; i < this.blocks.length; ++i)
 
                 if (this.blocks[i] !== undefined && this.blocks[i] !== null) {
-                    let response = await this.blocks[i].save();
+                    let response = await this.blocks[i].saveBlock();
 
                     if (response !== true)
                         break;
@@ -273,7 +275,9 @@ class InterfaceBlockchain {
         return result;
     }
 
-    async load(onlyLastBlocks = undefined){
+    async loadBlockchain(onlyLastBlocks = undefined){
+
+        if (process.env.BROWSER) return true;
 
         //load the number of blocks
         let numBlocks = await this.db.get(this._blockchainFileName);
@@ -313,7 +317,7 @@ class InterfaceBlockchain {
 
                 try{
 
-                    if (await block.load() === false) throw "no block to load was found";
+                    if (await block.loadBlock() === false) throw "no block to load was found";
 
                     //it will include the block, but it will not ask to save, because it was already saved before
 
@@ -341,11 +345,11 @@ class InterfaceBlockchain {
         return true;
     }
 
-    async remove(index, removeFiles = true){
+    async removeBlockchain(index, removeFiles = true){
 
         if (removeFiles === true) {
             for (let i = index; i < this.blocks.length; ++i){
-                let response = await this.blocks[i].remove();
+                let response = await this.blocks[i].removeBlock();
 
                 if (response !== true)
                     return response;

@@ -352,7 +352,7 @@ class InterfaceBlockchainAddress{
         return offset;
     }
 
-    async save() {
+    async saveAddress() {
 
         let key = this.address.toString('hex');
         let value = await this.serializeAddress();
@@ -365,7 +365,7 @@ class InterfaceBlockchainAddress{
         }
     }
 
-    async load() {
+    async loadAddress() {
 
         let key = this.address.toString('hex');
 
@@ -384,7 +384,7 @@ class InterfaceBlockchainAddress{
         }
     }
 
-    async remove() {
+    async removeAddress() {
 
         let key = this.address.toString('hex');
 

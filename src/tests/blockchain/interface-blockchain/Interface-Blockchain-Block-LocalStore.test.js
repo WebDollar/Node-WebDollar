@@ -25,10 +25,10 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
 
         block = new InterfaceBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
 
-        result = await block.save();
+        result = await block.saveBlock();
         assert(result === true, 'save: ' + result);
 
-        result = await block.load();
+        result = await block.loadBlock();
         assert(result === true, 'load: ' + result);
 
         assert(block.version === version,'block version differ after load: ' + block.version + '!==' + version);
@@ -40,10 +40,10 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
         assert(block.data.minerAddress.toString() === data.minerAddress.toString(),'block data.minerAddress differ after load: ' + block.data.minerAddress + '!==' + data.minerAddress);
         assert(block.height === height,'block height differ after load: ' + block.height + '!==' + height);
 
-        result = await block.remove();
+        result = await block.removeBlock();
         assert(result === true, 'remove: ' + result);
         
-        result = await block.remove();
+        result = await block.removeBlock();
         assert(result !== true, 'remove: ' + result);
     });
     
@@ -51,19 +51,19 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
 
         block = new InterfaceBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
         
-        result = await block.save();
+        result = await block.saveBlock();
         assert(result === true, 'save: ' + result);
         
-        result = await block.remove();
+        result = await block.removeBlock();
         assert(result === true, 'remove: ' + result);
         
-        result = block.load();
+        result = block.loadBlock();
         assert(result !== true, 'load: block was found after remove. ' + result);
         
-        result = block.load();
+        result = block.loadBlock();
         assert(result !== true, 'load: block was found after remove. ' + result);
         
-        result = block.load();
+        result = block.loadBlock();
         assert(result !== true, 'load: block was found after remove. ' + result);
 
     });

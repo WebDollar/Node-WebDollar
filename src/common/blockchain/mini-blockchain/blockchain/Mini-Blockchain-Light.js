@@ -215,19 +215,19 @@ class MiniBlockchainLight extends  MiniBlockchain{
     }
 
 
-    async save(){
+    async saveBlockchain(){
+
+        if (process.env.BROWSER) return true;
 
         try {
 
             global.MINIBLOCKCHAIN_LIGHT_SAVED = false;
 
-            console.log("saaaave", this.blocks.length - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS -2);
-
             if (this.blocks.length === 0) throw "Nothing to Save";
 
             await this._saveLightSettings();
 
-            if (! (await this.inheritBlockchain.prototype.save.call(this, consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS ))) throw "couldn't save the blockchain";
+            if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS ))) throw "couldn't save the blockchain";
 
         } catch (exception){
             console.log(colors.red("Couldn't save MiniBlockchain"), exception);
@@ -243,9 +243,12 @@ class MiniBlockchainLight extends  MiniBlockchain{
      * Load blocks and check the Accountant Tree
      * @returns boolean
      */
-    async load(){
+    async loadBlockchain(){
+
+        if (process.env.BROWSER) return true;
 
         try {
+            if (process.env.BROWSER) return true;
 
             //AccountantTree[:-POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS]
             if (! (await this.accountantTree.loadMiniAccountant(undefined, undefined, true)))
@@ -262,7 +265,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             //load the number of blocks
             if (! (await this._loadLightSettings(serializationAccountantTreeInitial))) throw "couldn't load the Light Settings";
 
-            if (! (await this.inheritBlockchain.prototype.load.call(this, consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS  ))) throw "Problem loading the blockchain";
+            if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS  ))) throw "Problem loading the blockchain";
 
             //check the accountant Tree if matches
             console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);

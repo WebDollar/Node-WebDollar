@@ -150,7 +150,9 @@ class MiniBlockchain extends  inheritBlockchain{
     }
 
 
-    async save(){
+    async saveBlockchain(){
+
+        if (process.env.BROWSER) return true;
 
         try {
 
@@ -158,7 +160,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
             if (! (await this.accountantTree.saveMiniAccountant( true ))) throw "Couldn't save the Account Tree"
 
-            if (! (await inheritBlockchain.prototype.save.call(this))) throw "couldn't sae the blockchain"
+            if (! (await inheritBlockchain.prototype.saveBlockchain.call(this))) throw "couldn't sae the blockchain"
 
             return true;
 
@@ -172,7 +174,9 @@ class MiniBlockchain extends  inheritBlockchain{
      * Load blocks and check the Accountant Tree
      * @returns boolean
      */
-    async load(){
+    async loadBlockchain(){
+
+        if (process.env.BROWSER) return true;
 
         try {
 
@@ -180,7 +184,7 @@ class MiniBlockchain extends  inheritBlockchain{
             let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
             //let serializationAccountantTreeFinal = this.accountantTree.serializeMiniAccountant();
 
-            result = result && await inheritBlockchain.prototype.load.call( this  );
+            result = result && await inheritBlockchain.prototype.loadBlockchain.call( this  );
 
             if (result === false){
                 throw "Problem loading the blockchain";

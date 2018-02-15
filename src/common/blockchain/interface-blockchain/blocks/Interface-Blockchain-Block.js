@@ -257,7 +257,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    async save(){
+    async saveBlock(){
 
         let key = "block" + this.height;
 
@@ -279,7 +279,7 @@ class InterfaceBlockchainBlock {
         }
     }
 
-    async load(){
+    async loadBlock(){
 
         let key = "block" + this.height;
         console.log("block load", key);
@@ -303,7 +303,7 @@ class InterfaceBlockchainBlock {
         }
     }
     
-    async remove() {
+    async removeBlock() {
         
         let key = "block" + this.height;
         

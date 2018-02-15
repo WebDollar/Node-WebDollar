@@ -51,8 +51,10 @@ class Blockchain{
         //Waiting Until a Single Window is present
         let validation;
         try {
+
             validation = new ValidationsUtils(this.emitter);
             await validation.validate();
+
         } catch (exception){
 
         }
@@ -108,7 +110,7 @@ class Blockchain{
 
         this.emitter.emit('blockchain/status', {message: "Blockchain Loading"});
 
-        let chainLoaded = await this.Chain.load();
+        let chainLoaded = await this.Chain.loadBlockchain();
 
         this.emitter.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
         return chainLoaded;

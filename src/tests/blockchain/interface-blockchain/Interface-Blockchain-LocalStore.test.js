@@ -22,21 +22,21 @@ describe('test Interface-Blockchain save/load/remove to/from local storage', () 
         let b3 = new InterfaceBlockchainBlock( Blockchain.blockchain, 0x01, new Buffer(consts.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 3, blockchain.db );
         blockchain.blocks = [b0, b1, b2, b3];
 
-        response = await blockchain.save();
+        response = await blockchain.saveBlockchain();
         assert(response === true, 'save: ' + response);
 
         /*
             this test will fail because it requires real blocks
          */
 
-        //let response = blockchain.load();
+        //let response = blockchain.loadBlock();
 
         assert(response === true, 'load: ' + response);
 
-        await b0.load();
-        await b1.load();
-        await b2.load();
-        await b3.load();
+        await b0.loadBlock();
+        await b1.loadBlock();
+        await b2.loadBlock();
+        await b3.loadBlock();
 
 
 
@@ -48,7 +48,7 @@ describe('test Interface-Blockchain save/load/remove to/from local storage', () 
 
         assert(blockchain.blocks.length === 4, 'load: blocks.length=' + blockchain.blocks.length);
         
-        response = await blockchain.remove();
+        response = await blockchain.removeBlockchain();
         assert(response === true, 'remove: ' + response);
     });
 

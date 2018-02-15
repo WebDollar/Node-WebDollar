@@ -44,11 +44,11 @@ class InterfaceTransactionsUniqueness extends InterfaceRadixTree {
 
     }
 
-    save(){
+    saveTransactionsUniqueness(){
 
     }
 
-    load(){
+    loadTrasactionsUniqueness(){
 
     }
 
