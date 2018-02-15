@@ -159,28 +159,27 @@ class InterfaceBlockchainMining{
 
         let intervalMiningOutput;
 
-        if(this.finish === undefined)
-            this.finish = 0;
-        this.finish++;
-
         console.log("");
         console.log(" ----------- mineBlock-------------");
 
         try{
             console.log("difficultydifficultydifficulty", difficulty === undefined || difficulty === null);
 
-            if (difficulty === undefined || difficulty === null) throw 'difficulty not specified';
+            if (difficulty === undefined || difficulty === null)
+                throw 'difficulty not specified';
 
             if (difficulty instanceof BigInteger)
                 difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
 
-            if (block === undefined || block === null) throw "block is undefined";
+            if (block === undefined || block === null)
+                throw "block is undefined";
 
             block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
 
             this._nonce = initialNonce||0;
 
-            if (typeof this._nonce !== 'number') return 'initial nonce is not a number';
+            if (typeof this._nonce !== 'number')
+                return 'initial nonce is not a number';
 
             //calculating the hashes per second
 
