@@ -127,6 +127,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     async _saveLightSettings(diffIndex){
 
+        if (process.env.BROWSER) return true;
+
         try {
             global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED = false;
 

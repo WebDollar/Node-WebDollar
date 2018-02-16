@@ -53,7 +53,8 @@ class Blockchain{
         try {
 
             validation = new ValidationsUtils(this.emitter);
-            validation.validate();
+
+            await validation.validate();
 
         } catch (exception){
 

@@ -294,6 +294,13 @@ class InterfaceSatoshminDB {
         }
     }
 
+    close(){
+
+        if (this.db !== undefined && this.db !== null)
+            this.db.close();
+
+    }
+
 }
 
 export default InterfaceSatoshminDB;

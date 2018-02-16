@@ -53,6 +53,7 @@ class InterfaceBlockchain {
         this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator( this );
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
+        this.blocksDifficulty = new BlockchainDifficulty( this );
 
         this.semaphoreProcessing = new SemaphoreProcessing(SEMAPHORE_PROCESSING_INTERVAL);
     }
@@ -162,13 +163,13 @@ class InterfaceBlockchain {
         if (! (await block.validateBlock(block.height, prevDifficultyTarget, prevHash, blockValidationType))) throw ('block validation failed');
 
         //recalculate next target difficulty
-        // console.log("block.difficultyTarget", prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height);
-        block.difficultyTarget = BlockchainDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
-        // console.log("block.difficultyTarget", block.difficultyTarget);
+        console.log("block.difficultyTarget", prevDifficultyTarget.toString("hex"), prevTimeStamp, block.timeStamp, block.height);
+        block.difficultyTarget = this.blocksDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
+        console.log("block.difficultyTarget", block.difficultyTarget);
 
         block.difficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(block.difficultyTarget));
 
-        // console.log(" computed ", block.difficultyTarget.toString("hex"), " from ", prevDifficultyTarget.toString("hex") )
+        console.log(" computed ", block.difficultyTarget.toString("hex"), " from ", prevDifficultyTarget.toString("hex") )
 
         return true;
 

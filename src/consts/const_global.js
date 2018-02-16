@@ -14,6 +14,9 @@ consts.WALLET_VERSION = "0.1";
 consts.BLOCKCHAIN_FILE_NAME = 'blockchain4.bin';
 consts.BLOCKCHAIN_DIRECTORY_NAME = 'blockchainDB3';
 
+consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS = 10;
+consts.BLOCKCHAIN_DIFFICULTY_TIME = 20000; //seconds
+
 consts.NODE_PROTOCOL = "WebDollar";
 consts.NODE_FALLBACK_INTERVAL =  10*1000; //miliseconds
 consts.NODE_PORT =  12320; //port
