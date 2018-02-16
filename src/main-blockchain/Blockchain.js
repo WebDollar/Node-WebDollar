@@ -76,7 +76,7 @@ class Blockchain{
         await this.Wallet.loadWallet();
 
         //starting mining
-        await this.initializeMining();
+        await this.Mining.loadMinerAddress(this.Wallet.addresses[0]);
 
         //loading the blockchain
         await this.loadBlockchain();
@@ -93,14 +93,11 @@ class Blockchain{
 
     async initializeMining(){
 
-        await this.Mining.setMinerAddress(await this.Wallet.getMiningAddress() );
         this.emitter.emit('blockchain/status', {message: "Mining Setting Address"});
 
     }
 
     async startMining(){
-
-        await this.Mining.setMinerAddress(await this.Wallet.getMiningAddress() );
 
         if (process.env.START_MINING)
             this.Mining.startMining();

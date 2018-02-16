@@ -10,6 +10,9 @@ import global from 'consts/global'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 import Serialization from 'common/utils/Serialization'
 
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
+import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
+
 
 
 class InterfaceBlockchainMining{
@@ -20,38 +23,92 @@ class InterfaceBlockchainMining{
         this.emitter = new EventEmitter();
 
         this._minerAddress = undefined;
-        this._minerAddressBase = undefined;
+        this._unencodedMinerAddress = undefined;
 
         this.blockchain = blockchain;
 
-        this.setMinerAddress(minerAddress);
+        if (minerAddress !== undefined)
+            this.minerAddress = minerAddress;
 
         this._nonce = 0;
         this.started = false;
         this._hashesPerSecond = 0;
 
+        this.walletDB = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
+    }
+
+    async saveMinerAddress(minerAddress){
+
+        if (minerAddress === undefined)
+            minerAddress = this.minerAddress;
+
+        if (typeof minerAddress === "object" && minerAddress.hasOwnProperty("address"))
+            minerAddress = minerAddress.address;
+
+        let key = "minerAddress";
+
+        try {
+
+            return (await this.walletDB.save(key, minerAddress));
+        }
+        catch(err) {
+            console.error('ERROR on SAVE miner address: ', err);
+            return false;
+        }
+
+    }
+
+    async loadMinerAddress(defaultAddress){
+
+        let key = "minerAddress";
+
+        try {
+            let minerAddress = await this.walletDB.get(key);
+
+            if (minerAddress === null || minerAddress === undefined) {
+                this.minerAddress = defaultAddress;
+                return true;
+            }
+
+            this._setAddress(minerAddress, false);
+
+            return true;
+        }
+        catch(err) {
+            console.error( 'ERROR on LOAD miner address: ', err);
+            return false;
+        }
     }
 
     get minerAddress(){
-        return this._minerAddress;
+      return this._minerAddress;
     }
 
-    get minerAddressBase(){
-        return this._minerAddressBase;
+    get unencodedMinerAddress(){
+        return this._unencodedMinerAddress;
     }
 
     set minerAddress(newAddress){
+        return this._setAddress(newAddress, true)
+    }
 
-        if (typeof newAddress === "string")
-            newAddress = BufferExtended.fromBase(newAddress);
+    _setAddress(newAddress, save=true){
+
+        if (typeof newAddress === "object" && newAddress.hasOwnProperty("address"))
+            newAddress = newAddress.address;
+
+        if (Buffer.isBuffer(newAddress)) newAddress = BufferExtended.toBase(newAddress);
 
         this._minerAddress = newAddress;
         if (newAddress === undefined)
-            this._minerAddressBase = undefined;
+            this._unencodedMinerAddress = undefined;
         else
-            this._minerAddressBase = BufferExtended.toBase(this._minerAddress);
+            this._unencodedMinerAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(newAddress);
 
-        this.blockchain.emitter.emit( 'blockchain/mining/address', { address: this._minerAddressBase, unencodedAddress: this._minerAddress });
+        this.blockchain.emitter.emit( 'blockchain/mining/address', { address: this._minerAddress, unencodedAddress: this._unencodedMinerAddress});
+
+        if (!save) return true;
+        else return this.saveMinerAddress();
     }
 
     async startMining(){
@@ -112,7 +169,7 @@ class InterfaceBlockchainMining{
 
 
                 nextTransactions = this._selectNextTransactions();
-                nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress, nextTransactions );
+                nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, nextTransactions );
 
                 nextBlock.difficultyTargetPrev = this.blockchain.getDifficultyTarget();
                 nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
@@ -294,26 +351,6 @@ class InterfaceBlockchainMining{
             this._hashesPerSecond = 0;
 
         }, 1000);
-    }
-
-
-    setMinerAddress(newMinerAddress){
-
-        //console.log("setMinerAddress", newMinerAddress);
-
-        if (newMinerAddress === undefined || newMinerAddress === '' || newMinerAddress === null){
-            console.log(colors.red("No Miner Address defined"));
-            this.minerAddress = undefined;
-            return;
-        }
-
-        if (!Buffer.isBuffer(newMinerAddress))
-            newMinerAddress = BufferExtended.fromBase(newMinerAddress);
-
-        this.minerAddress = newMinerAddress;
-
-        this.emitter.emit('mining/miner-address-changed', BufferExtended.toBase(this.minerAddress));
-
     }
 
 }

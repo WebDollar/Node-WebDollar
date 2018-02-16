@@ -88,4 +88,13 @@ consts.POW_PARAMS={
     LIGHT_BUFFER_LAST_BLOCKS : 40,
 };
 
+consts.DATABASE_NAMES={
+    DEFAULT_DATABASE: "defaultDB",
+    WALLET_DATABASE: "walletDB",
+    BLOCKCHAIN_DATABASE: "blockchainDB",
+    POOL_DATABASE: "poolDB",
+    VALIDATE_DATABASE: "validateDB",
+    TESTS_DATABASE: "testDB",
+};
+
 export default consts

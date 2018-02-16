@@ -106,7 +106,7 @@ class MainBlockchainWallet{
             return true;
 
         } catch (exception){
-            console.log("Error deserializing a Wallet. ", exception);
+            console.error("Error deserializing a Wallet. ", exception);
             throw exception;
         }
     }
@@ -571,16 +571,16 @@ class MainBlockchainWallet{
 
             if (response === false || this.addresses.length === 0) {
 
-                console.log("create this.Wallet.createNewAddress");
+                console.error("create this.Wallet.createNewAddress");
                 await this.createNewAddress(); //it will save automatically
-                console.log("create this.Wallet.createNewAddress done");
+                console.error("create this.Wallet.createNewAddress done");
 
                 this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Creating New Wallet"});
             }
 
         } catch (exception){
 
-            console.log("exception loading Wallet.Addresses");
+            console.error("exception loading Wallet.Addresses");
 
             this.blockchain.emitter.emit('validation/status', {message: "IndexedDB - Wallet couldn't be imported"});
 
