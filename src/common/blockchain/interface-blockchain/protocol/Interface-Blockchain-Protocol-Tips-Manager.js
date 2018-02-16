@@ -14,7 +14,7 @@ class InterfaceBlockchainProtocolTipsManager {
     async processTips(){
 
         if (this.blockchain === undefined) {
-            setTimeout(async ()=>{return await this.processTips()}, 50);
+            setTimeout(async ()=>{ return await this.processTips() }, 50);
             return false;
         }
 
@@ -44,8 +44,12 @@ class InterfaceBlockchainProtocolTipsManager {
             if (!forkAnswer) {
                 console.log("BANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
                 this.blockchain.tipsAdministrator.addBan(bestTip.socket.node.sckAddress);
+
+                bestTip.forkResolve(true);
             } else {
                 this.blockchain.tipsAdministrator.deleteBan(bestTip.socket.node.sckAddress);
+
+                bestTip.forkResolve(false);
             }
 
             result = true;
@@ -63,19 +67,22 @@ class InterfaceBlockchainProtocolTipsManager {
 
         if (typeof newChainLength !== "number") throw "newChainLength is not a number";
 
-        if (newChainLength < this.blockchain.getBlockchainLength){
+        if (newChainLength < this.blockchain.blocks.length){
             console.log(colors.red("Your blockchain is smaller than mine"));
             throw "Your blockchain is smaller than mine";
         }
 
         let tip = this.blockchain.tipsAdministrator.getTip(socket);
 
-        if (tip !== null) {
+        if (tip !== null)
             this.blockchain.tipsAdministrator.updateTipNewForkLength(tip, newChainLength, forkLastBlockHeader);
-            return false;
-        } else
+        else
             tip =  this.blockchain.tipsAdministrator.addTip(socket, newChainLength, forkLastBlockHeader);
 
+        if (tip === null)
+            return false; // the tip is not valid
+        else
+            return tip.promise;
     }
 
 

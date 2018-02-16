@@ -1,6 +1,7 @@
 import NodeProtocol from 'common/sockets/protocol/node-protocol';
 
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import InterfaceBlockchainBlocks from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Blocks'
 import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
@@ -38,14 +39,13 @@ class InterfaceBlockchain {
 
         this.agent = agent;
 
-        this.blocks = [];
+        this.blocks = new InterfaceBlockchainBlocks(this);
 
         this.mining = undefined;
 
         this._blockchainFileName = consts.BLOCKCHAIN_FILE_NAME;
         this.db = new InterfaceSatoshminDB(consts.BLOCKCHAIN_DIRECTORY_NAME);
 
-        this.blocksStartingPoint = 0;
 
         this.transactions = new InterfaceBlockchainTransactions();
 
@@ -67,9 +67,9 @@ class InterfaceBlockchain {
 
     async validateBlockchain(){
 
-        for (let i=0; i<this.blocks.length; i++){
-            if (! (await this.validateBlockchainBlock(this.blocks[i])) ) return false;
-        }
+        for (let i=this.blocks.blocksStartingPoint; i<this.blocks.length; i++)
+            if (! (await this.validateBlockchainBlock(this.blocks[i])) )
+                return false;
 
         return true;
     }
@@ -106,7 +106,7 @@ class InterfaceBlockchain {
         //let's check again the heights
         if (block.height !== this.blocks.length) throw ('height of a new block is not good... '+ block.height + " "+ this.blocks.length);
 
-        this.addBlock(block);
+        this.blocks.addBlock(block);
 
         await this.blockIncluded(block);
 
@@ -176,16 +176,9 @@ class InterfaceBlockchain {
     }
 
     getBlockchainStartingPoint(){
-        return this.blocksStartingPoint;
+        return
     }
 
-    get getBlockchainLength(){
-        return this.blocks.length;
-    }
-
-    get getBlockchainLastBlock(){
-        return this.blocks[this.blocks.length-1];
-    }
 
     getDifficultyTarget(height){
 
@@ -294,7 +287,7 @@ class InterfaceBlockchain {
         console.log(colors.yellow("validateLastBlocks", numBlocks))
         console.log(colors.yellow("validateLastBlocks", numBlocks))
 
-        this.blocks = [];
+        this.blocks.clear();
 
         try {
 
@@ -309,8 +302,7 @@ class InterfaceBlockchain {
 
                 indexStart = Math.max(0, numBlocks - onlyLastBlocks-1);
 
-                for (let i=0; i<indexStart; i++)
-                    this.addBlock(undefined);
+                this.blocks.length = indexStart||0; // marking the first blocks as undefined
             }
 
             for (let i = indexStart; i < numBlocks; ++i) {
@@ -359,7 +351,7 @@ class InterfaceBlockchain {
             }
         }
 
-        this.spliceBlocks(index);
+        this.blocks.spliceBlocks(index);
 
         return true;
     }
@@ -392,18 +384,7 @@ class InterfaceBlockchain {
         }
     }
 
-    addBlock(block){
 
-        this.blocks.push(block);
-
-        this.emitter.emit("blockchain/blocks-count-changed", this.blocks.length);
-        this.emitter.emit("blockchain/block-inserted", block);
-    }
-
-    spliceBlocks(after){
-        this.blocks.splice(after);
-        this.emitter.emit("blockchain/blocks-count-changed", this.blocks.length);
-    }
 
 }
 

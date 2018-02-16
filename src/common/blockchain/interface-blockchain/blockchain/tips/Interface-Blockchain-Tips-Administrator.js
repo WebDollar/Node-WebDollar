@@ -56,15 +56,19 @@ class InterfaceBlockchainTipsAdministrator {
 
     addTip(socket,  forkChainLength, forkLastBlockHeader) {
 
-        if (this.findTip(socket) === null) {
+        let tip = this.findTip(socket);
 
-            let tip = new InterfaceBlockchainTip(this.blockchain, socket, forkChainLength, forkLastBlockHeader);
+        if ( tip === null) {
 
-            if (!tip.validateTip()) return null;
+            tip = new InterfaceBlockchainTip(this.blockchain, socket, forkChainLength, forkLastBlockHeader);
+
+            if (!tip.validateTip())
+                return null;
 
             this.tips.push(tip);
-            return this.tips[this.tips.length - 1];
         }
+
+        return tip;
     }
 
     updateTipNewForkLength(tip, forkToDoChainLength, forkToDoLastBlockHeader ){
@@ -75,6 +79,12 @@ class InterfaceBlockchainTipsAdministrator {
 
         tip.forkToDoChainLength = forkToDoChainLength;
         tip.forkToDoLastBlockHeader = forkToDoLastBlockHeader;
+
+        if (tip.forkToDoPromise === null){
+            tip.forkToDoPromise = new Promise((resolve)=>{
+                tip.forkToDoResolve = resolve;
+            })
+        }
 
         return tip;
     }

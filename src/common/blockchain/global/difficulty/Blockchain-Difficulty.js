@@ -10,8 +10,14 @@ class BlockchainDifficulty{
 
     }
 
-    getDifficultyMean(prevBlockDifficulty, prevBlocksTimestamps, blockTimestamp, blockNumber){
-        let rez = this.getDifficultyMean(prevBlockDifficulty, prevBlocksTimestamps, blockTimestamp, blockNumber);
+    getDifficultyMean(prevBlockDifficulty, blockTimestamp, blockNumber){
+
+        if (!( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.greaterThanOrEqualTo(0))))
+            throw "invalid block number";
+
+        let rez = this.getDifficultyMean(prevBlockDifficulty, blockTimestamp, blockNumber);
+
+        return rez;
     }
 
     getDifficulty(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber){
@@ -137,7 +143,7 @@ class BlockchainDifficulty{
      */
 
     //newDifficulty
-    getDifficultyMean(prevBlockDifficulty, prevBlocksTimestamps, blockTimestamp, blockNumber){
+    getDifficultyMean(prevBlockDifficulty, blockTimestamp, blockNumber){
 
         if (Buffer.isBuffer(prevBlockDifficulty))
             prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);

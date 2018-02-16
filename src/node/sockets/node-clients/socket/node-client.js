@@ -102,7 +102,7 @@ class NodeClient {
 
                     //disconnect over the time, so it was connected before
 
-                    console.log(colors.green("Client disconnected ")); console.log( this.socket.node.sckAddress.getAddress() );
+                    console.log(colors.green("Client disconnected ", address));
                     NodesList.disconnectSocket(this.socket);
 
                 });

@@ -582,7 +582,7 @@ class MainBlockchainWallet{
 
             console.log("exception loading Wallet.Addresses");
 
-            this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Error Loading and Creating"});
+            this.blockchain.emitter.emit('validation/status', {message: "IndexedDB - Wallet couldn't be imported"});
 
             await this.createNewAddress(); //it will save automatically
         }

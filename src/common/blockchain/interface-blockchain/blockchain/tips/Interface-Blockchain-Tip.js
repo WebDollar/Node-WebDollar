@@ -1,6 +1,6 @@
 class InterfaceBlockchainTip{
 
-    constructor(blockchain, socket, forkChainLength, forkLastBlockHeader, forkToDoChainLength = -1, forkToDoLastBlockHeader = null ){
+    constructor(blockchain, socket, forkChainLength, forkLastBlockHeader){
 
         this.blockchain = blockchain;
 
@@ -8,16 +8,31 @@ class InterfaceBlockchainTip{
         this.forkChainLength = forkChainLength;
         this.forkLastBlockHeader = forkLastBlockHeader;
 
-        this.forkToDoChainLength = forkToDoChainLength;
-        this.forkToDoLastBlockHeader = forkToDoLastBlockHeader;
+        this.forkPromise = new Promise((resolve)=>{
+            this.forkResolve = resolve;
+        })
+
+        this.forkToDoChainLength = -1;
+        this.forkToDoLastBlockHeader = null;
+        this.forkToDoPromise = null;
+        this.forkToDoResolve = null;
     }
 
     updateToDo(){
 
         if ( this.forkToDoChainLength > 0 && this.forkToDoChainLength > this.forkChainLength) {
+
             this.forkChainLength = this.forkToDoChainLength;
-            this.forkLastBlockHeader = this.forkToDoLastBlockHeader;
+            this.forkLastBlockHeader = this.forkToDoLastBlockHeader
+            this.forkPromise = this.forkToDoPromise;
+            this.forkResolve = this.forkToDoResolve;
+
+
             this.forkToDoChainLength = -1;
+            this.forkToDoLastBlockHeader = null;
+            this.forkToDoPromise = null;
+            this.forkToDoResolve = null;
+
             return true;
         }
 
@@ -31,13 +46,14 @@ class InterfaceBlockchainTip{
 
     validateTip(){
 
-        let blockchainLength = this.blockchain.getBlockchainLength;
+        console.log("this.blockchain.blocks.length", this.blockchain.blocks.length);
+        console.log("this.forkChainLength", this.forkChainLength);
 
-        if (blockchainLength < this.forkChainLength)
+        if (this.blockchain.blocks.length < this.forkChainLength)
             return true;
         else
-        if (blockchainLength === this.forkChainLength) //I need to check
-            if (this.forkLastBlockHeader.hash.compare( this.blockchain.getHashPrev(this.blockchain.getBlockchainLength) ) < 0)
+        if (this.blockchain.blocks.length === this.forkChainLength) //I need to check
+            if (this.forkLastBlockHeader.hash.compare( this.blockchain.getHashPrev(this.blockchain.blocks.length) ) < 0)
                 return true;
 
         return false;

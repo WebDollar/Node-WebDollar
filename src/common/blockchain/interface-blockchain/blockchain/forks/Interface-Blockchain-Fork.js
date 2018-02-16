@@ -38,11 +38,11 @@ class InterfaceBlockchainFork {
 
         let useFork = false;
 
-        if (this.blockchain.getBlockchainLength < this.forkStartingHeight + this.forkBlocks.length)
+        if (this.blockchain.blocks.length < this.forkStartingHeight + this.forkBlocks.length)
             useFork = true;
         else
-        if (this.blockchain.getBlockchainLength === this.forkStartingHeight + this.forkBlocks.length) //I need to check
-            if (this.forkBlocks[this.forkBlocks.length-1].hash.compare( this.blockchain.getHashPrev(this.blockchain.getBlockchainLength) ) < 0)
+        if (this.blockchain.blocks.length === this.forkStartingHeight + this.forkBlocks.length) //I need to check
+            if (this.forkBlocks[this.forkBlocks.length-1].hash.compare( this.blockchain.getHashPrev(this.blockchain.blocks.length) ) < 0)
                 useFork = true;
 
         if (!useFork)
@@ -148,13 +148,13 @@ class InterfaceBlockchainFork {
 
             //making a copy of the current blockchain
             this._blocksCopy = [];
-            for (let i = this.forkStartingHeight; i < this.blockchain.getBlockchainLength; i++) {
+            for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++) {
                 this._blocksCopy.push(this.blockchain.blocks[i]);
             }
 
             this.preFork();
 
-            this.blockchain.spliceBlocks(this.forkStartingHeight);
+            this.blockchain.blocks.spliceBlocks(this.forkStartingHeight);
 
             let forkedSuccessfully = true;
 
@@ -183,7 +183,7 @@ class InterfaceBlockchainFork {
             //revert the last K blocks
             if (!forkedSuccessfully) {
 
-                this.blockchain.spliceBlocks(this.forkStartingHeight);
+                this.blockchain.blocks.spliceBlocks(this.forkStartingHeight);
 
                 try {
 
@@ -196,6 +196,11 @@ class InterfaceBlockchainFork {
                 } catch (exception){
                     console.log(colors.red("saveFork includeBlockchainBlock2 raised exception"), exception);
                 }
+
+            //successfully, let's delete the backup blocks
+            } else {
+                for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++)
+                    delete this._blocksCopy[i];
             }
 
             await this.postFork(forkedSuccessfully);
