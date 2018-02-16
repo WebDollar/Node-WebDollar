@@ -179,7 +179,7 @@ class InterfaceBlockchainProtocol {
 
                     console.log("blockchain/header/new-block discoverNewForkTip");
 
-                    let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.header)
+                    let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.header);
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: true,

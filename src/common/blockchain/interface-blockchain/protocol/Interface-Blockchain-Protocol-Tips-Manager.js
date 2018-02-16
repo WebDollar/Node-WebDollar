@@ -82,7 +82,7 @@ class InterfaceBlockchainProtocolTipsManager {
         if (tip === null)
             return false; // the tip is not valid
         else
-            return tip.promise;
+            return tip.forkPromise;
     }
 
 
