@@ -336,7 +336,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log(colors.yellow("getTimeStamp"), height, this.blocks.blocksStartingPoint, this.lightPrevTimeStamps[height])
 
         if (this.agent.light === true && height !== 0) {
-
             if ( this.lightPrevTimeStamps[height] !== undefined ) return this.lightPrevTimeStamps[height];
 
         }
@@ -350,11 +349,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         console.log(colors.yellow("getHashPrev"), height, this.blocks.blocksStartingPoint, this.lightPrevHashPrevs[height] !== undefined ? this.lightPrevHashPrevs[height].toString("hex") : '')
 
-        if (this.agent.light === true && height !== 0) {
-
+        if (this.agent.light === true && height !== 0)
             if ( this.lightPrevHashPrevs[height] !== undefined ) return this.lightPrevHashPrevs[height];
-
-        }
 
         return MiniBlockchain.prototype.getHashPrev.call(this, height);
     }

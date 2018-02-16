@@ -51,7 +51,7 @@ class InterfaceBlockchainMining{
         else
             this._minerAddressBase = BufferExtended.toBase(this._minerAddress);
 
-        this.blockchain.emitter.emit( 'blockchain/mining/address', { address: this._minerAddressBase, unencodedAddress: this._minerAddress });
+        this.blockchain.emitter.emit( 'blockchain/mining/address', { address: this._minerAddressBase, unencodedAddress: this._minerAddress } );
     }
 
     async startMining(){

@@ -142,17 +142,12 @@ class InterfaceBlockchain {
 
             if (block.height === 0 ) {
                 //validate genesis
-                prevDifficultyTarget = BlockchainGenesis.difficultyTarget;
                 BlockchainGenesis.validateGenesis(block);
-
-                prevHash = BlockchainGenesis.hashPrev;
-                prevTimeStamp = 0; //Genesis timezone is 0
-            } else {
-
-                prevDifficultyTarget = this.getDifficultyTarget(block.height);
-                prevHash = this.getHashPrev(block.height);
-                prevTimeStamp = this.getTimeStamp(block.height);
             }
+
+            prevDifficultyTarget = this.getDifficultyTarget(block.height);
+            prevHash = this.getHashPrev(block.height);
+            prevTimeStamp = this.getTimeStamp(block.height);
 
         }
 

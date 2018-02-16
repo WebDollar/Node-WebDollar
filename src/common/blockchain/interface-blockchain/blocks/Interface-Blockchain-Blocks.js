@@ -1,3 +1,4 @@
+import consts from 'consts/const_global'
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
  **/
@@ -19,6 +20,18 @@ class InterfaceBlockchainBlocks{
 
         this.blockchain.emitter.emit("blockchain/blocks-count-changed", this.length);
         this.blockchain.emitter.emit("blockchain/block-inserted", block);
+
+        //delete old blocks when I am in light node
+        if (this.blockchain.agent.light){
+
+            let index = this.length - consts.POW_PARAMS.LIGHT_BUFFER_LAST_BLOCKS;
+            while (this[index] !== undefined){
+                delete this[index];
+                index--;
+            }
+
+        }
+
     }
 
     spliceBlocks(after, freeMemory=false){

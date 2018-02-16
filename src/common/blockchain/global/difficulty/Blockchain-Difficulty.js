@@ -10,16 +10,6 @@ class BlockchainDifficulty{
 
     }
 
-    getDifficultyMean(prevBlockDifficulty, blockTimestamp, blockNumber){
-
-        if (!( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.greaterThanOrEqualTo(0))))
-            throw "invalid block number";
-
-        let rez = this.getDifficultyMean(prevBlockDifficulty, blockTimestamp, blockNumber);
-
-        return rez;
-    }
-
     getDifficulty(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber){
 
         // difficulty algorithm is based on blockNumber
@@ -30,13 +20,14 @@ class BlockchainDifficulty{
         // console.log("blockTimestamp", blockTimestamp.toString(16));
         // console.log("blockNumber", blockNumber.toString(16));
 
-        let rez = this.calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber);
+        if (blockNumber < 31925)
+            return this.getDifficultyMean(prevBlockDifficulty, blockTimestamp, blockNumber);
+        else
+            return this.calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber);
 
         // console.log("difficulty0",  rez.toString() );
         // console.log("difficulty1",  Serialization.serializeBigInteger( rez ).length, Serialization.serializeBigInteger( rez ) );
         // console.log("difficulty2", Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez )).length, Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez ) ));
-        return rez;
-
 
     }
 
@@ -84,54 +75,25 @@ class BlockchainDifficulty{
 
         //console.log(blockTimestamp, prevBlockTimestamp)
 
-        // if (blockNumber.greater(31924)) {
-        //
-        //     if (blockNumber.equals(31925)) {
-        //         blockTimestamp = BigInteger(1);
-        //     }
-        //     prevBlockDifficulty = BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",16).minus(prevBlockDifficulty);
-        // }
-
         let equationTwoPartA =  BigInteger(1).minus( blockTimestamp.minus( prevBlockTimestamp ).divide(10));    // max(1 - (block_timestamp - parent_timestamp) // 10, -99) +
         let equationTwo = equationTwoPartA.greater( -99 ) ? equationTwoPartA : -99;
 
         //console.log("equationTwo", equationTwo);
 
-        if (blockNumber.equals(31925)) {
+        if (blockNumber.equals(31925))
             blockNumber = BigInteger(1);
-        }
 
 
         let blockDiff;
 
-        // if (blockNumber < 31924)
-            blockDiff = prevBlockDifficulty.minus(prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
-                (equationTwo)
-            );
-        // else
-        // if (blockNumber >= 31924) // ETHEREUM ORIGINAL FORMULA
-        //     blockDiff = prevBlockDifficulty.plus(prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
-        //         (equationTwo)
-        //     );
-        //
-        // if (includeBombFormula)
-        //     blockDiff = blockDiff.plus(  BigInteger(2).pow( blockNumber.divide(100000).minus(2)) )  //int(2**((block.number // 100000) - 2))
-        //
-        // if (blockNumber.lesser(31924) )
-        //     return blockDiff;
-        // else
-        // if (blockNumber.equals(31924)) {
-        //     return BigInteger("00098112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", 16);
-        // }
-        // else
-        //     //Adoption to Converge to 0 from Ethereum original Formula
-        //     return BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",16).minus(blockDiff);
+        blockDiff = prevBlockDifficulty.minus(prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
+            (equationTwo)
+        );
 
-        if (blockDiff.lesser(0)) {
+        if (blockDiff.lesser(0))
             return BigInteger("00148112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", 16);
-        }else
+        else
             return blockDiff;
-
     }
 
     /**
@@ -143,28 +105,41 @@ class BlockchainDifficulty{
      */
 
     //newDifficulty
-    getDifficultyMean(prevBlockDifficulty, blockTimestamp, blockNumber){
+    getDifficultyMean(blockTimestamp, blockNumber){
+
+        let prevBlockDifficulty = this.blockchain.getDifficultyTarget(blockNumber - 1);
 
         if (Buffer.isBuffer(prevBlockDifficulty))
             prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
         else if (typeof prevBlockDifficulty === "string") // it must be hex
             prevBlockDifficulty = BigInteger(prevBlockDifficulty.replace("0x",""), 16);
 
-        if (blockNumber % 10 !== 0) return prevBlockDifficulty;
+        //let's suppose BLOCKCHAIN_DIFFICULTY_NO_BLOCKS === 10
+        //              blockNumber === 9
+        // it should recalcule using [0...9]
+
+        if (blockNumber % consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS-1 !== 0) return prevBlockDifficulty;
         else {
 
             let how_much_it_should_have_taken_X_Blocks = consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS * consts.BLOCKCHAIN_DIFFICULTY_TIME;
             let how_much_it_took_to_mine_X_Blocks = 0;
 
-            for (let i = this.blockchain.blocks.length - 1 - consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS; i < this.blockchain.blocks.length - 1; i++) {
+            //calculating 0, when blockNumber = 9
+            let firstBlock = (blockNumber+1) - consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS; // blockNumber is not included
 
+            //adding 0..8
+            for (let i = firstBlock; i < blockNumber; i++)
                 how_much_it_took_to_mine_X_Blocks += this.blockchain.getTimeStamp(i);
 
-            }
+            //adding 9
+            how_much_it_took_to_mine_X_Blocks += blockTimestamp;
 
-            let ratio = new BigNumber(how_much_it_should_have_taken_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks).decimalPlaces(6);
+            //It should substitute, the number of Blocks * Initial Block
+            how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS * this.blockchain.getTimeStamp(firstBlock);
 
-            return prevBlockDifficulty.divide(ratio.toString());
+            let ratio = new BigNumber(how_much_it_should_have_taken_X_Blocks).dividedBy(how_much_it_took_to_mine_X_Blocks).decimalPlaces(8);
+
+            return prevBlockDifficulty.mul(ratio.toString());
         }
 
     }

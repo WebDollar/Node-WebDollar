@@ -31,7 +31,7 @@ class InterfaceBlockchainBlock {
         
         if ( timeStamp === undefined){
 
-            timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStamp;
+            timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStampOffset;
         }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
