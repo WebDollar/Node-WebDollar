@@ -5,7 +5,7 @@ import consts from "consts/const_global";
 
 let inheritBlockData;
 
-if (consts.POPOW_ACTIVATED) inheritBlockData = PPoWBlockchainBlockData;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritBlockData = PPoWBlockchainBlockData;
 else inheritBlockData = InterfaceBlockchainBlockData;
 
 /**

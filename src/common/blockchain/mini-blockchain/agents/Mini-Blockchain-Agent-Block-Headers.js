@@ -6,7 +6,7 @@ import consts from "consts/const_global";
 
 let inheritAgentClass;
 
-if (consts.POPOW_ACTIVATED) inheritAgentClass = PPoWBlockchainAgentBlockHeaders;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritAgentClass = PPoWBlockchainAgentBlockHeaders;
 else  inheritAgentClass = InterfaceBlockchainAgentBlockHeaders;
 
 class MiniBlockchainAgentBlockHeaders extends inheritAgentClass{

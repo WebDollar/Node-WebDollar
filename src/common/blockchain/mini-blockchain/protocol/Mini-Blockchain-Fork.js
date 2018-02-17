@@ -3,7 +3,7 @@ import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/bloc
 import consts from "consts/const_global";
 
 let inheritFork;
-if (consts.POPOW_ACTIVATED) inheritFork = PPoWBlockchainFork;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritFork = PPoWBlockchainFork;
 else inheritFork = InterfaceBlockchainFork;
 
 class MiniBlockchainFork extends inheritFork{

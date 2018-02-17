@@ -18,7 +18,7 @@ import consts from "consts/const_global";
 
 let inheritBlockchain;
 
-if (consts.POPOW_ACTIVATED) inheritBlockchain = PPoWBlockchain;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritBlockchain = PPoWBlockchain;
 else  inheritBlockchain = InterfaceBlockchain;
 
 

@@ -137,7 +137,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         return Buffer.concat(
             [
-                Serialization.serializeToFixedBuffer(balances.id, consts.TOKEN_ID_LENGTH),
+                Serialization.serializeToFixedBuffer(balances.id, consts.MINI_BLOCKCHAIN.TOKEN_ID_LENGTH),
                 Serialization.serializeBigNumber(balances.amount)
             ]);
 
@@ -235,8 +235,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                     //rest of tokens , in case there are
                     for (let i = 1; i < balancesLength; i++) {
 
-                        let tokenId = BufferExtended.substr(buffer, offset, consts.TOKEN_ID_LENGTH);
-                        offset += consts.TOKEN_ID_LENGTH;
+                        let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKEN_ID_LENGTH);
+                        offset += consts.MINI_BLOCKCHAIN.TOKEN_ID_LENGTH;
 
                         result = Serialization.deserializeBigNumber(buffer, offset);
 

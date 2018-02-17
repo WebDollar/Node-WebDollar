@@ -137,9 +137,9 @@ class InterfaceBlockchainProtocolForkSolver{
                 newChainStartingPoint = answer.chainStartingPoint;
 
                 if (this.blockchain.agent.light)
-                    if (newChainLength - newChainStartingPoint > consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS){
-                        console.log(colors.red("LIGHT CHANGES from "), newChainStartingPoint, " to ", newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1);
-                        newChainStartingPoint = newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS - 1;
+                    if (newChainLength - newChainStartingPoint > consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS){
+                        console.log(colors.red("LIGHT CHANGES from "), newChainStartingPoint, " to ", newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1);
+                        newChainStartingPoint = newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1;
                     }
 
                 console.log(colors.yellow("discoverFork 6666" + newChainStartingPoint))

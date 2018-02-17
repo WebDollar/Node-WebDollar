@@ -5,7 +5,7 @@ import consts from 'consts/const_global'
 
 let inheritForkSolver;
 
-if (consts.POPOW_ACTIVATED) inheritForkSolver = PPowBlockchainProtocolForkSolver;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritForkSolver = PPowBlockchainProtocolForkSolver;
 else inheritForkSolver = InterfaceBlockchainProtocolForkSolver;
 
 
@@ -30,7 +30,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         if (newChainStartingPoint > currentBlockchainLength-1) {
 
 
-            return await this._getLastBlocks(socket, newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS-1);
+            return await this._getLastBlocks(socket, newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS-1);
 
 
         } else {

@@ -23,7 +23,7 @@ describe('test PPoW-Blockchain interlink data structure', () => {
         let height = [];
         let blockId = [];
         let blockchain = new MiniBlockcain();
-        let block = new MiniBlockcainBlock( blockchain, 0x01, new Buffer(consts.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 0, blockchain.db );
+        let block = new MiniBlockcainBlock( blockchain, 0x01, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 0, blockchain.db );
 
         for (let i = 0; i < logLen; ++i) {
             height.push(i);
@@ -71,7 +71,7 @@ describe('test PPoW-Blockchain interlink data structure', () => {
         
         for (let i = 0; i < serialized.length; ++i) {
 
-            let block = new MiniBlockcainBlock( blockchain, 0x01, new Buffer(consts.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, blockchain.db );
+            let block = new MiniBlockcainBlock( blockchain, 0x01, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, blockchain.db );
             let buffer = new Buffer(serialized[i], 'hex');
 
             block.deserializeBlock(buffer);

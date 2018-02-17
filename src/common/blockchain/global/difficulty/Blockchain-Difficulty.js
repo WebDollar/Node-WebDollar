@@ -114,18 +114,18 @@ class BlockchainDifficulty{
         else if (typeof prevBlockDifficulty === "string") // it must be hex
             prevBlockDifficulty = BigInteger(prevBlockDifficulty.replace("0x",""), 16);
 
-        //let's suppose BLOCKCHAIN_DIFFICULTY_NO_BLOCKS === 10
+        //let's suppose BLOCKCHAIN.DIFFICULTY_NO_BLOCKS === 10
         //              blockNumber === 9
         // it should recalcule using [0...9]
 
-        if (blockNumber % consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS-1 !== 0) return prevBlockDifficulty;
+        if (blockNumber % consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS-1 !== 0) return prevBlockDifficulty;
         else {
 
-            let how_much_it_should_have_taken_X_Blocks = consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS * consts.BLOCKCHAIN_DIFFICULTY_TIME;
+            let how_much_it_should_have_taken_X_Blocks = consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * consts.BLOCKCHAIN.DIFFICULTY_TIME;
             let how_much_it_took_to_mine_X_Blocks = 0;
 
             //calculating 0, when blockNumber = 9
-            let firstBlock = (blockNumber+1) - consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS; // blockNumber is not included
+            let firstBlock = (blockNumber+1) - consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS; // blockNumber is not included
 
             //adding 0..8
             for (let i = firstBlock; i < blockNumber; i++)
@@ -135,7 +135,7 @@ class BlockchainDifficulty{
             how_much_it_took_to_mine_X_Blocks += blockTimestamp;
 
             //It should substitute, the number of Blocks * Initial Block
-            how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS * this.blockchain.getTimeStamp(firstBlock);
+            how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * this.blockchain.getTimeStamp(firstBlock);
 
             let ratio = new BigNumber(how_much_it_should_have_taken_X_Blocks).dividedBy(how_much_it_took_to_mine_X_Blocks).decimalPlaces(8);
 

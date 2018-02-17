@@ -226,7 +226,7 @@ class InterfaceBlockchainMining{
                 throw 'difficulty not specified';
 
             if (difficulty instanceof BigInteger)
-                difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
+                difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
 
             if (block === undefined || block === null)
                 throw "block is undefined";

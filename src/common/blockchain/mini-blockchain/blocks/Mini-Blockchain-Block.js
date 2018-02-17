@@ -5,7 +5,7 @@ import PPoWBlock from 'common/blockchain/ppow-blockchain/blocks/PPoW-Blockchain-
 
 let inheritBlockchainBlock;
 
-if (consts.POPOW_ACTIVATED) inheritBlockchainBlock = PPoWBlock;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritBlockchainBlock = PPoWBlock;
 else  inheritBlockchainBlock = InterfaceBlock;
 
 

@@ -11,11 +11,32 @@ consts.NODE_VERSION_COMPATIBILITY = "0.249";
 
 consts.WALLET_VERSION = "0.1";
 
-consts.BLOCKCHAIN_FILE_NAME = 'blockchain4.bin';
-consts.BLOCKCHAIN_DIRECTORY_NAME = 'blockchainDB3';
+consts.BLOCKCHAIN = {
+    DIFFICULTY_NO_BLOCKS : 10,
+    DIFFICULTY_TIME : 20000, //seconds
 
-consts.BLOCKCHAIN_DIFFICULTY_NO_BLOCKS = 10;
-consts.BLOCKCHAIN_DIFFICULTY_TIME = 20000; //seconds
+    BLOCKS_POW_LENGTH: 32,
+    BLOCKS_NONCE : 4,
+
+    LIGHT:{
+        VALIDATE_LAST_BLOCKS : 10,
+        SAFETY_LAST_BLOCKS : 40,
+    }
+};
+
+consts.MINI_BLOCKCHAIN = {
+    TOKEN_ID_LENGTH :32,
+};
+
+
+consts.POPOW_PARAMS={
+    m: 6,
+    k: 6,
+    d: 0.5,
+    BLOCKS_LEVEL_INFINITE: 1 << 30,
+    ACTIVATED : false,
+};
+
 
 consts.NODE_PROTOCOL = "WebDollar";
 consts.NODE_FALLBACK_INTERVAL =  10*1000; //miliseconds
@@ -51,8 +72,7 @@ consts.PUBLIC_ADDRESS_SUFFIX_BASE64 = "EC3F"; //ending BASE64 HEX
 consts.PUBLIC_ADDRESS_PREFIX_BASE58 = "00"; //BASE58 HEX and it will be converted to Base64/58
 consts.PUBLIC_ADDRESS_SUFFIX_BASE58 = "";
 
-consts.BLOCKS_POW_LENGTH = 32;
-consts.BLOCKS_NONCE = 4;
+
 consts.HASH_ARGON2_PARAMS = {
     salt: 'WebDollar_make_$',
     saltBuffer: Buffer.from("WebDollar_make_$"),
@@ -69,29 +89,18 @@ consts.HASH_ARGON2_PARAMS = {
 
 // change also to Browser-Mining-WebWorker.js
 
-consts.TOKEN_ID_LENGTH = 32;
+
 consts.MAX_UINT32 = 1 << 30;
 
 consts.BLOCKS_MAX_SIZE_BYTES = 1024 * 1024 * 1; // in bytes
 consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
-consts.BLOCKS_LEVEL_INFINITE = 1 << 30;
 
-consts.POPOW_ACTIVATED = false;
-consts.POPOW_PARAMS={
-    m: 6,
-    k: 6,
-    d: 0.5,
-};
-
-consts.POW_PARAMS={
-    LIGHT_VALIDATE_LAST_BLOCKS : 10,
-    LIGHT_SAFETY_LAST_BLOCKS : 40,
-};
 
 consts.DATABASE_NAMES={
     DEFAULT_DATABASE: "defaultDB",
     WALLET_DATABASE: "walletDB",
-    BLOCKCHAIN_DATABASE: "blockchainDB",
+    BLOCKCHAIN_DATABASE: "blockchainDB3",
+    BLOCKCHAIN_DATABASE_FILE_NAME : 'blockchain4.bin',
     POOL_DATABASE: "poolDB",
     VALIDATE_DATABASE: "validateDB",
     TESTS_DATABASE: "testDB",

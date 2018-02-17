@@ -43,8 +43,8 @@ class InterfaceBlockchain {
 
         this.mining = undefined;
 
-        this._blockchainFileName = consts.BLOCKCHAIN_FILE_NAME;
-        this.db = new InterfaceSatoshminDB(consts.BLOCKCHAIN_DIRECTORY_NAME);
+        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE_FILE_NAME;
+        this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE);
 
 
         this.transactions = new InterfaceBlockchainTransactions();
@@ -162,7 +162,7 @@ class InterfaceBlockchain {
         block.difficultyTarget = this.blocksDifficulty.getDifficulty( prevDifficultyTarget, prevTimeStamp, block.timeStamp, block.height );
         console.log("block.difficultyTarget", block.difficultyTarget);
 
-        block.difficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(block.difficultyTarget));
+        block.difficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(block.difficultyTarget));
 
         console.log(" computed ", block.difficultyTarget.toString("hex"), " from ", prevDifficultyTarget.toString("hex") )
 
