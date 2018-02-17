@@ -207,10 +207,8 @@ class InterfaceBlockchainFork {
 
             //propagating valid blocks
             if (forkedSuccessfully) {
-                console.log("FORK SOLVER SAVE");
                 await this.blockchain.saveBlockchain();
                 this.blockchain.mining.resetMining();
-                console.log("FORK SOLVER SAVE FINISHED");
             }
 
             return forkedSuccessfully;

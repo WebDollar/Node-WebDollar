@@ -24,7 +24,7 @@ class InterfaceBlockchainBlocks{
         //delete old blocks when I am in light node
         if (this.blockchain.agent.light){
 
-            let index = this.length - consts.POW_PARAMS.LIGHT_BUFFER_LAST_BLOCKS;
+            let index = this.length - consts.POW_PARAMS.LIGHT_SAFETY_LAST_BLOCKS -1;
             while (this[index] !== undefined){
                 delete this[index];
                 index--;

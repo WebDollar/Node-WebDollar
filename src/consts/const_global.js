@@ -72,7 +72,7 @@ consts.HASH_ARGON2_PARAMS = {
 consts.TOKEN_ID_LENGTH = 32;
 consts.MAX_UINT32 = 1 << 30;
 
-consts.BLOCKS_MAX_SIZE_BYTES = 1024*1024 * 1; // in bytes
+consts.BLOCKS_MAX_SIZE_BYTES = 1024 * 1024 * 1; // in bytes
 consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
 consts.BLOCKS_LEVEL_INFINITE = 1 << 30;
 
@@ -85,7 +85,7 @@ consts.POPOW_PARAMS={
 
 consts.POW_PARAMS={
     LIGHT_VALIDATE_LAST_BLOCKS : 10,
-    LIGHT_BUFFER_LAST_BLOCKS : 40,
+    LIGHT_SAFETY_LAST_BLOCKS : 40,
 };
 
 export default consts

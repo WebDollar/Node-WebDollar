@@ -17,6 +17,7 @@ class NodesWaitlist {
         console.log("NodesWaitlist constructor");
 
         this.NODES_WAITLIST_OBJECT_TYPE = NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE;
+        this.NodesWaitlistObject = NodesWaitlistObject;
 
         this.emitter = new EventEmitter();
 
