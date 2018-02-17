@@ -12,11 +12,11 @@ describe('testAddressGenerator', () => {
     it('should return privateKey', ()=>{
         privateKey =  InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced("123", true);
 
-        assert (privateKey.privateKeyWIF, "privateKeyWIF doesn't exist")
-        assert (privateKey.privateKey, "privateKey doesn't exist")
+        assert (privateKey.privateKeyWIF, "privateKeyWIF doesn't exist");
+        assert (privateKey.privateKey, "privateKey doesn't exist");
 
-        assert(Buffer.isBuffer(privateKey.privateKey), 'Private Key privateKey is not an object')
-        assert(Buffer.isBuffer(privateKey.privateKeyWIF), 'Private Key privateKeyWIF is not an object')
+        assert(Buffer.isBuffer(privateKey.privateKey), 'Private Key privateKey is not an object');
+        assert(Buffer.isBuffer(privateKey.privateKeyWIF), 'Private Key privateKeyWIF is not an object');
     });
 
     let publicKey  = null;
@@ -25,7 +25,7 @@ describe('testAddressGenerator', () => {
         publicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey.privateKeyWIF, true);
 
         assert(Buffer.isBuffer(publicKey), 'Public Key is not an object');
-    })
+    });
 
     let address = null;
     it ('should return address', ()=>{
@@ -34,7 +34,7 @@ describe('testAddressGenerator', () => {
         console.log("should return address", address);
         assert(Buffer.isBuffer(address.unencodedAddress), 'Address is not an object');
         assert(typeof address.address === "string", 'Address is not an object');
-    })
+    });
 
     it ('blockchain address', async ()=>{
 
@@ -49,9 +49,7 @@ describe('testAddressGenerator', () => {
         assert(Buffer.isBuffer(blockchainAddress.publicKey), "blockChain Public Key");
         
         let privateKey = await blockchainAddress.getPrivateKey();
-        let privateKeyWIF = await blockchainAddress.getPrivateKeyWIF();
         assert(Buffer.isBuffer(privateKey), "blockChain Private Key");
-        assert(Buffer.isBuffer(privateKeyWIF), "blockChain Private Key WIF");
 
         let stringDebug = await blockchainAddress._toStringDebug();
         let string = blockchainAddress.toString();
@@ -59,7 +57,7 @@ describe('testAddressGenerator', () => {
         assert(typeof stringDebug === 'string', "Addresses Debug String returned is not string");
         assert(typeof string === 'string', "Addresses String returned is not string");
 
-    })
+    });
 
 
 });

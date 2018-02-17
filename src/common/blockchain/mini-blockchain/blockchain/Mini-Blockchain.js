@@ -18,7 +18,7 @@ import consts from "consts/const_global";
 
 let inheritBlockchain;
 
-if (consts.POPOW_ACTIVATED) inheritBlockchain = PPoWBlockchain;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritBlockchain = PPoWBlockchain;
 else  inheritBlockchain = InterfaceBlockchain;
 
 
@@ -33,7 +33,6 @@ class MiniBlockchain extends  inheritBlockchain{
         this.inheritBlockchain = inheritBlockchain;
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
-        this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this, agent.forkClass );
     }
 
 
@@ -51,7 +50,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         let exception = null;
 
-        let result = true;
+        let result;
 
         try{
 
@@ -92,13 +91,14 @@ class MiniBlockchain extends  inheritBlockchain{
             exception = ex;
             revert.revertNow = true;
 
-            console.log("MiniBlockchain simulateNewBlock 1 raised an exception", ex);
+            console.log(colors.red("MiniBlockchain simulateNewBlock 1 raised an exception"), ex);
 
         }
 
         try{
 
             //revert back the database
+            console.log("reveting", revert.revertNow, revertAutomatically)
             if (revert.revertNow || revertAutomatically){
 
                 //revert transactions
@@ -109,11 +109,6 @@ class MiniBlockchain extends  inheritBlockchain{
                 //revert reward
                 if (revert.reward)
                     this.accountantTree.updateAccount( block.data.minerAddress, block.reward.negated(), undefined );
-
-                if (exception !== null) {
-                    console.log("exception simulateNewBlock ", exception);
-                    throw exception;
-                }
 
                 if (revert.revertNow)
                     return false;
@@ -141,11 +136,11 @@ class MiniBlockchain extends  inheritBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
 
-        if (!await this.simulateNewBlock(block, false, async ()=>{
+        if (! (await this.simulateNewBlock(block, false, async ()=>{
             return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
-        })) throw "Error includeBlockchainBlock MiniBlockchain ";
+        }))) throw "Error includeBlockchainBlock MiniBlockchain ";
 
-        if (!await this.accountantTree.saveMiniAccountant( true)) console.log(colors.red("Error Saving Mini Accountant Tree"));
+        if (! (await this.accountantTree.saveMiniAccountant( true))) console.log(colors.red("Error Saving Mini Accountant Tree"));
 
         return true;
     }
@@ -155,15 +150,17 @@ class MiniBlockchain extends  inheritBlockchain{
     }
 
 
-    async save(){
+    async saveBlockchain(){
+
+        if (process.env.BROWSER) return true;
 
         try {
 
             if (this.blocks.length === 0) return false;
 
-            if (! await this.accountantTree.saveMiniAccountant( true )) throw "Couldn't save the Account Tree"
+            if (! (await this.accountantTree.saveMiniAccountant( true ))) throw "Couldn't save the Account Tree"
 
-            if (! await inheritBlockchain.prototype.save.call(this)) throw "couldn't sae the blockchain"
+            if (! (await inheritBlockchain.prototype.saveBlockchain.call(this))) throw "couldn't sae the blockchain"
 
             return true;
 
@@ -177,7 +174,9 @@ class MiniBlockchain extends  inheritBlockchain{
      * Load blocks and check the Accountant Tree
      * @returns boolean
      */
-    async load(){
+    async loadBlockchain(){
+
+        if (process.env.BROWSER) return true;
 
         try {
 
@@ -185,7 +184,7 @@ class MiniBlockchain extends  inheritBlockchain{
             let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
             //let serializationAccountantTreeFinal = this.accountantTree.serializeMiniAccountant();
 
-            result = result && await inheritBlockchain.prototype.load.call( this  );
+            result = result && await inheritBlockchain.prototype.loadBlockchain.call( this  );
 
             if (result === false){
                 throw "Problem loading the blockchain";

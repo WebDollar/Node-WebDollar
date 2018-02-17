@@ -7,7 +7,7 @@ let Argon2WebAssemblyCalc = new Argon2WebAssemblyCalcClass();
  * @param callback
  * @param errorCallback
  */
-let loadScriptWorker = function (script, callback, errorCallback) {
+let loadScriptWorker =  (script, callback, errorCallback) => {
     try {
         importScripts(script);
     } catch (e) {
@@ -20,12 +20,12 @@ let loadScriptWorker = function (script, callback, errorCallback) {
 
 Argon2WebAssemblyCalc.loadScript = loadScriptWorker;
 
-var jobTerminated = false; //is not working and jobTermianted is not reliable in the Worker....
-var method = undefined;
-var block = undefined;
-var ARGON2_PARAM = { salt: 'WebDollar_make_$', time: 2, mem: 1024, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://antelle.github.io/argon2-browser/dist'}
+let jobTerminated = false; //is not working and jobTermianted is not reliable in the Worker....
+let method = undefined;
+let block = undefined;
+let ARGON2_PARAM = { salt: 'WebDollar_make_$', time: 2, mem: 1024, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://antelle.github.io/argon2-browser/dist'}
 
-var algorithm = undefined;
+let algorithm = undefined;
 
 export default function (self) {
 

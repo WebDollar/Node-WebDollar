@@ -5,7 +5,7 @@ import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
 import SocketAddress from 'common/sockets/socket-address'
 import NodesList from 'node/lists/nodes-list'
-import NodeClientsService from 'node/sockets/node_clients/service/node-clients-service'
+import NodeClientsService from 'node/sockets/node-clients/service/node-clients-service'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 
 class NodeClient {
@@ -52,9 +52,10 @@ class NodeClient {
                 try {
 
                     // params described in the documentation https://socket.io/docs/client-api#manager
-                    socket = io.connect(address, {
+                    socket = io(address, {
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
+                        timeout: 10000, //10 sec, default 20 sec
                     });
 
                 }  catch (Exception){
@@ -97,11 +98,11 @@ class NodeClient {
                     resolve(false);
                 });
 
-                socket.once("disconnect", () => {
+                socket.on("disconnect", () => {
 
                     //disconnect over the time, so it was connected before
 
-                    console.log(colors.green("Client disconnected ")); console.log( this.socket.node.sckAddress.getAddress() );
+                    console.log(colors.green("Client disconnected ", address));
                     NodesList.disconnectSocket(this.socket);
 
                 });

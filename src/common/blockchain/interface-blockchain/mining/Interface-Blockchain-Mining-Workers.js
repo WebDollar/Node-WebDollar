@@ -1,8 +1,13 @@
 import InterfaceBlockchainMining from "./Interface-Blockchain-Mining";
 import InterfaceBlockchainMiningWorkersList from "./Interface-Blockchain-Mining-Workers-List";
+
 import Serialization from 'common/utils/Serialization';
+import SemaphoreProcessing from "common/utils/Semaphore-Processing";
+
+const SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL = 20;
 
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
+
 
     constructor(blockchain, minerAddress){
 
@@ -11,13 +16,15 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         this._workerFinished = false;
 
         this._workerResolve = undefined;
-        this._workersSempahore = false;
 
         this.block = null;
 
-        this.WORKER_NONCES_WORK = 47;
+        this.WORKER_NONCES_WORK = 42;
 
         this.workers = new InterfaceBlockchainMiningWorkersList(this);
+
+        this._semaphoreProcessing = new SemaphoreProcessing(SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL);
+
     }
 
 
@@ -41,11 +48,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         //initialize new workers
 
-        console.log("init mining workers");
-
         this.workers.initializeWorkers(block, difficultyTarget );
-
-        console.log("init mining workers done");
 
         return promiseResolve;
     }
@@ -123,12 +126,13 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         if (this._nonce > 0xFFFFFFFF || (this.started === false) || this.reset){
 
-            //this._processWorkersSempahoreCallback(()=>{
+            //this._semaphoreProcessing.processSempahoreCallback(()=>{
 
                 this.workers.suspendWorkers();
                 this._suspendMiningWorking();
 
-                this._workerResolve({result:false}); //we didn't find anything
+                if (this._workerResolve !== null && this._workerResolve !== undefined)
+                    this._workerResolve({result:false}); //we didn't find anything
 
                 return true;
 
@@ -137,9 +141,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         }
 
         if (this.reset) {
-            console.log("WORKERS MINING RESTARTED", this.reset);
-            console.log("WORKERS MINING RESTARTED", this.reset);
-            console.log("WORKERS MINING RESTARTED", this.reset);
+            console.warn("WORKERS MINING RESTARTED", this.reset);
         }
 
         return false;
@@ -160,13 +162,13 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             if (event.data.answer === "WebAssembly supported" || event.data.answer === "ASM.JS supported" ){
 
                 if (event.data.answer === "ASM.JS supported")
-                    this.blockchain.emitter.emit("blockchain/compatibility", {type: "MINING", message: "Your browser doesn't support WebAssembly. Install Chrome and your mining will increase with 70% more."});
+                    this.blockchain.emitter.emit("validation/status", {type: "MINING", message: "WebAssembly not supported"});
 
                 this.workers._initializeWorker( worker );
 
             } else { // Argon2 is not supported in Browser
 
-                this.blockchain.emitter.emit("blockchain/compatibility", {type: "MINING", message: "Mining is not available on your machine. Please update your browser"})
+                this.blockchain.emitter.emit("validation/status", {type: "MINING", message: "ASM.JS not supported"});
 
                 this.stopMining();
             }
@@ -200,7 +202,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                         if (event.data.hash[i] < this.difficulty[i] ) {
 
-                            //this._processWorkersSempahoreCallback( ()=>{
+                            //this._semaphoreProcessing.processSempahoreCallback( ()=>{
 
                                 console.log('processing');
 
@@ -232,41 +234,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         if (event.data.message === "log") {
             console.log("worker", event.data.log);
         }
-
-    }
-
-    _processWorkersSempahoreCallback(callback){
-
-        return new Promise ((resolve) =>{
-
-            let timer = setInterval( async () => {
-
-                if ( this._workersSempahore === false ){
-
-                    this._workersSempahore = true;
-                    clearInterval(timer);
-
-                    try {
-                        // solved by somebody else
-                        if (this._workerResolve === undefined || this._workerFinished){
-                            this._workersSempahore = false;
-                            resolve(false);
-                            return;
-                        }
-
-                        let result = await callback();
-                        this._workersSempahore = false;
-
-                        resolve(result);
-                    } catch (exception){
-                        this._workersSempahore = false;
-                        console.log("_processWorkersSempahoreCallback Error", exception);
-                        resolve(false);
-                        throw exception;
-                    }
-                }
-            },10);
-        });
 
     }
 

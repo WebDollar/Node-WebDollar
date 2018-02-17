@@ -334,13 +334,15 @@ class InterfaceTree{
     }
 
 
-    serializeTree(includeHashes){
+    _serializeTree(includeHashes){
         return this.root.serializeNode(true, includeHashes);
     }
 
-    deserializeTree(buffer, offset, includeHashes){
-        //console.log("deserializeTree", this.root);
+    _deserializeTree(buffer, offset, includeHashes){
+        //console.log("_deserializeTree", this.root);
         this.root = this._createNode(null,  [], null );
+
+        if (buffer.length === 1) return true; // nothing to deserialize
         return this.root.deserializeNode(buffer, offset, true, includeHashes);
     }
 
@@ -355,7 +357,7 @@ class InterfaceTree{
     async saveTree(key, includeHashes, serialization){
 
         if (serialization === undefined || serialization === null)
-            serialization = this.serializeTree(includeHashes);
+            serialization = this._serializeTree(includeHashes);
 
         return await this.db.save(key, serialization);
     }
@@ -367,9 +369,9 @@ class InterfaceTree{
 
         if (! Buffer.isBuffer(buffer) ) throw "InterfaceTree - buffer is not Buffer"
 
-        console.log("loadMiniAccountant", buffer.length, "   ",buffer.toString("hex") );
+        console.log("loadTree", buffer.length, "   ",buffer.toString("hex") );
 
-        return await this.deserializeTree(buffer, offset||0, includeHashes);
+        return this._deserializeTree(buffer, offset||0, includeHashes);
     }
 
     matches(tree){

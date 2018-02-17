@@ -24,10 +24,10 @@ describe('test save wallet to local storage', () => {
         assert(Buffer.isBuffer(publicKey), "publicKey is not not buffer");
         assert(Buffer.isBuffer(privateKey), "privateKey is not not buffer");
 
-        response = await blockchainAddress.save();
+        response = await blockchainAddress.saveAddress();
         assert(response === true, 'save: ' + response);
 
-        response = await blockchainAddress.load();
+        response = await blockchainAddress.loadAddress();
         assert(response === true, 'load: ' + response);
 
         let address2 = blockchainAddress.address;
@@ -40,10 +40,10 @@ describe('test save wallet to local storage', () => {
         assert(publicKey2.equals(publicKey), 'publicKey differ after load: ' + publicKey2.toString('hex') + '!==' + publicKey.toString('hex'));
         assert(privateKey2.equals(privateKey), 'privateKey differ after load: ' + privateKey2.toString('hex') + '!==' + privateKey.toString('hex'));
 
-        response = await blockchainAddress.remove();
+        response = await blockchainAddress.removeAddress();
         assert(response === true, 'remove: ' + response);
 
-        response = await blockchainAddress.load();
+        response = await blockchainAddress.loadAddress();
         assert(response !== true, 'load: ' + response);
     });
 
@@ -55,16 +55,16 @@ describe('test save wallet to local storage', () => {
         let publicKey = blockchainAddress.publicKey;
         let privateKey = await blockchainAddress.getPrivateKey();
 
-        response = await blockchainAddress.save();
+        response = await blockchainAddress.saveAddress();
         assert(response === true, 'save: ' + response);
 
-        response = await blockchainAddress.save();
+        response = await blockchainAddress.saveAddress();
         assert(response === true, 'save: ' + response);
 
-        response = await blockchainAddress.remove();
+        response = await blockchainAddress.removeAddress();
         assert(response === true, 'remove: ' + response);
 
-        response = await blockchainAddress.load();
+        response = await blockchainAddress.loadAddress();
         assert(response !== true, 'load: ' + response);
 
     });
@@ -80,10 +80,10 @@ describe('test save wallet to local storage', () => {
 
         //blockchainAddress.encrypt(password);
 
-        response = await blockchainAddress.save();
+        response = await blockchainAddress.saveAddress();
         assert(response === true, 'save: ' + response);
 
-        response = await blockchainAddress.load();
+        response = await blockchainAddress.loadAddress();
         assert(response === true, 'load: ' + response);
 
         let address2 = blockchainAddress.address;
@@ -96,10 +96,10 @@ describe('test save wallet to local storage', () => {
         assert(publicKey2.equals(publicKey), 'publicKey differ after load: ' + publicKey2.toString('hex') + '!==' + publicKey.toString('hex'));
         assert(privateKey2.equals(privateKey), 'privateKey differ after load: ' + privateKey2.toString('hex') + '!==' + privateKey.toString('hex'));
 
-        response = await blockchainAddress.remove();
+        response = await blockchainAddress.removeAddress();
         assert(response === true, 'remove: ' + response);
 
-        response = await blockchainAddress.load();
+        response = await blockchainAddress.loadAddress();
         assert(response !== true, 'load: ' + response);
 
     });
@@ -223,13 +223,13 @@ describe('test save wallet to local storage', () => {
         response = await Blockchain.Wallet.isAddressEncrypted(hexAddress);
         assert(response === false, "Address should not be encrypted firstly");
 
-        response = await Blockchain.Wallet.encryptAddress(hexAddress, undefined, passwordZero);
+        response = await Blockchain.Wallet.encryptAddress(hexAddress, passwordZero, undefined);
         assert(response === true, "Error encrypting with first password.");
 
         response = await Blockchain.Wallet.isAddressEncrypted(hexAddress);
         assert(response === true, "Address should be encrypted after encryptAddress");
 
-        response = await Blockchain.Wallet.encryptAddress(hexAddress, passwordZero, passwordOne);
+        response = await Blockchain.Wallet.encryptAddress(hexAddress, passwordOne, passwordZero);
         assert(response === true, "Error encrypting with second password.");
 
     });

@@ -1,4 +1,4 @@
-import NodeWebPeer from 'node/webrtc/web_peer/node-web-peer';
+import NodeWebPeer from 'node/webrtc/web-peer/node-web-peer';
 import consts from 'consts/const_global'
 import NodeWebPeersService from 'node/webrtc/service/node-web-peers-service'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'

@@ -4,13 +4,13 @@ import global from "consts/global.js";
 
 console.log("BROWSER MODE");
 
-Node.NodeClientsService.startService();
-Node.NodeWebPeersService.startService();
-
 //Blockchain.createBlockchain("headers-node");
-Blockchain.createBlockchain("light-node");
+Blockchain.createBlockchain("light-node", ()=>{
+    Node.NodeClientsService.startService();
+    Node.NodeWebPeersService.startService();
+});
 
-window.onbeforeunload = function(){
+window.onbeforeunload = () => {
     console.log(colors.yellow("SIGINT FIRED"))
     global.TERMINATED = true;
 

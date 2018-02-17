@@ -34,9 +34,6 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         if (!InterfaceRadixTree.prototype.validateTree.call(this, node, callback)) //verifying hash and propagating it
             return false;
 
-        if (!InterfaceMerkleTree.prototype.validateTree.call(this, node)) //computing hash
-            return false;
-
         return true;
     }
 
@@ -66,16 +63,8 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         return InterfaceMerkleTree.prototype._getValueToHash.call(this, node);
     }
 
-    deserializeTree(buffer, offset, includeHashes){
-
-        offset = InterfaceRadixTree.prototype.deserializeTree.call(this, buffer, offset, includeHashes);
-
-        //console.log("deserializeTree completed", buffer, offset);
-
-        if (! this._refreshHash(this.root, true) )
-            throw "Refresh Hash didn't work";
-
-        return offset;
+    _deserializeTree(buffer, offset, includeHashes){
+        return InterfaceMerkleTree.prototype._deserializeTree.apply(this, arguments);
     }
 
     matches(tree){

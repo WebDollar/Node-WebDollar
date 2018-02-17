@@ -72,6 +72,18 @@ class PoolData {
     setMinersList(rewardList) {
         this._minersList = rewardList;
     }
+
+    /**
+     * Set miners reward to 0. Synchronizes with DB.
+     * @returns {Promise<*>}
+     */
+    async resetRewards() {
+
+        for (let i = 0; i < this._minersList.length; ++i)
+            this._minersList[i].reward = new BigNumber(0);
+
+        return (await this.saveMinersList());
+    }
     
     /**
      * Set new reward for miner if it exists
@@ -116,6 +128,15 @@ class PoolData {
                 break;
             }
         }
+    }
+
+    /**
+     * @param id
+     * @param reward
+     */
+    increaseMinerRewardById(id, reward) {
+
+        this._minersList[id].reward = this._minersList[id].reward.plus(reward);
     }
     
     _serializeMiners() {
@@ -236,7 +257,7 @@ class PoolData {
      * @param miner2
      * @returns {boolean} true if miners are equal
      */
-    compareMiners(miner1, miner2) {
+    static compareMiners(miner1, miner2) {
 
         return !( typeof miner1 === typeof miner2 &&
             miner1.address === miner2.address &&

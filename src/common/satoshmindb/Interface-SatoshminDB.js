@@ -23,7 +23,7 @@ class InterfaceSatoshminDB {
         try {
             this.db = new pounchdb(this.dbName);
         } catch (exception){
-            console.log("InterfaceSatoshminDB exception", pounchdb)
+            console.error("InterfaceSatoshminDB exception", pounchdb);
         }
 
     }
@@ -38,9 +38,9 @@ class InterfaceSatoshminDB {
             return true;
         } catch (err) {
             if (err.status === 409)
-                return await this.updateDocument(key, value)
+                return await this.updateDocument(key, value);
             else {
-                console.log("createDocument raised exception", key, err);
+                console.error("createDocument raised exception", key, err);
                 throw err;
             }
         }
@@ -60,7 +60,7 @@ class InterfaceSatoshminDB {
 
             return true;
         } catch (exception) {
-            console.log("updateDocument error" + key, exception)
+            console.error("updateDocument error" + key, exception);
             throw exception;
         }
 
@@ -82,7 +82,7 @@ class InterfaceSatoshminDB {
 
             if (Exception.status === 404) return null; //nothing
             else {
-                console.log("error getDocument ", Exception);
+                console.error("error getDocument ", Exception);
                 throw Exception;
             }
         }
@@ -92,16 +92,16 @@ class InterfaceSatoshminDB {
     async deleteDocument(key) {
 
         try {
-            let doc = await this.db.get(key, {attachments: true})
+            let doc = await this.db.get(key, {attachments: true});
 
-            let response = await this.db.remove(doc._id, doc._rev)
+            let response = await this.db.remove(doc._id, doc._rev);
 
             return true;
 
         } catch (err) {
             if (err.status === 404) return null; // not existing
             else {
-                console.log("deleteDocument raised an error ", key);
+                console.error("deleteDocument raised an error ", key);
                 return err;
             }
         }
@@ -150,11 +150,11 @@ class InterfaceSatoshminDB {
                         return await this.saveDocumentAttachment(key, value);
                     } catch (exception) {
 
-                        console.log('saveDocumentAttachment raised an error for key ' + key, exception);
+                        console.error('saveDocumentAttachment raised an error for key ' + key, exception);
                     }
 
                 } else {
-                    console.log('saveDocumentAttachment 222 raised an error for key ' + key, err);
+                    console.error('saveDocumentAttachment 222 raised an error for key ' + key, err);
                     throw err;
                 }
             }
@@ -181,13 +181,13 @@ class InterfaceSatoshminDB {
                 });
                 return true;
             } catch (err) {
-                console.log("error updateDocumentAttachment1 " + key, err);
+                console.error("error updateDocumentAttachment1 " + key, err);
                 throw err;
             }
 
 
         } catch (err) {
-            console.log("error updateDocumentAttachment2  " + key, err);
+            console.error("error updateDocumentAttachment2  " + key, err);
             throw err;
         }
     }
@@ -212,20 +212,20 @@ class InterfaceSatoshminDB {
             let value = await this.getDocument(key);
             return await this.deleteDocumentAttachment(key);
         } catch (err) {
-            console.log("deleteDocumentAttachmentIfExist raised an error", err);
+            console.error("deleteDocumentAttachmentIfExist raised an error", err);
             return false;
         }
     }
 
 
     //main methods
-    save(key, value, timeout=10000) {
+    save(key, value, timeout=5000) {
 
         return new Promise(async (resolve)=>{
 
             //timeout, max 10 seconds to load the database
             let timeoutInterval = setTimeout(()=>{
-                console.log(colors.red("save failed !!"+ key), value);
+                console.error("save failed !!"+ key, value);
                 resolve(null);
             }, timeout);
 
@@ -237,25 +237,24 @@ class InterfaceSatoshminDB {
 
                 clearTimeout(timeoutInterval);
             } catch (exception) {
-                console.log("db.save error " + key, exception);
+                console.error("db.save error " + key, exception);
 
                 if (exception.status === 500 && MainBlockchain.emitter !== undefined)
                     MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"});
 
                 resolve(null);
-                return null;
             }
 
         })
     }
 
-    get(key, timeout=10000) {
+    get(key, timeout=5000) {
 
         return new Promise((resolve)=>{
 
             //timeout, max 10 seconds to load the database
             let timeoutInterval = setTimeout(()=>{
-                console.log(colors.red("get failed !!" + key));
+                console.error(colors.red("get failed !!" + key));
                 resolve(null);
             }, timeout);
 
@@ -267,7 +266,7 @@ class InterfaceSatoshminDB {
             }).catch((exception)=>{
 
                 clearTimeout(timeoutInterval);
-                console.log(colors.red("db.get error " + key), exception);
+                console.error(colors.red("db.get error " + key), exception);
 
                 if (exception.status === 500 && MainBlockchain.emitter !== undefined)
                     MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
@@ -285,13 +284,20 @@ class InterfaceSatoshminDB {
             let result = await this.deleteDocument(key);
             return result;
         } catch (exception) {
-            console.log("db.remove error " + key, exception);
+            console.error("db.remove error " + key, exception);
 
             if (exception.status === 500 && MainBlockchain.emitter !== undefined)
                 MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
 
             return null;
         }
+    }
+
+    close(){
+
+        if (this.db !== undefined && this.db !== null)
+            this.db.close();
+
     }
 
 }

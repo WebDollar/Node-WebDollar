@@ -1,5 +1,5 @@
 var assert = require('assert')
-import NodeWebPeer from 'node/webrtc/web_peer/node-web-peer';
+import NodeWebPeer from 'node/webrtc/web-peer/node-web-peer';
 
 describe('test node WebPeer', async () =>{
 

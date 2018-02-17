@@ -6,14 +6,21 @@ import consts from "consts/const_global";
 
 let inheritAgentClass;
 
-if (consts.POPOW_ACTIVATED) inheritAgentClass = PPoWBlockchainAgentFullNode;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritAgentClass = PPoWBlockchainAgentFullNode;
 else  inheritAgentClass = InterfaceBlockchainAgentFullNode;
 
 
 class MiniBlockchainAgentFullNode extends inheritAgentClass{
 
-    constructor(blockchain, blockchainProtocolClass, blockchainForkClass){
-        super(blockchain, blockchainProtocolClass||MiniBlockchainProtocol, blockchainForkClass || MiniBlockchainFork )
+    newFork(){
+        let fork = new MiniBlockchainFork();
+        MiniBlockchainFork.prototype.initializeConstructor.apply(fork, arguments);
+
+        return fork;
+    }
+
+    newProtocol(){
+        this.protocol = new MiniBlockchainProtocol(this.blockchain, this);
     }
 
 }

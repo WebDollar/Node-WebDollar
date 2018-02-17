@@ -1,6 +1,6 @@
 import BufferExtended from "../../../utils/BufferExtended";
 
-var BigInteger = require('big-integer');
+const BigInteger = require('big-integer');
 const colors = require('colors/safe');
 const EventEmitter = require('events');
 
@@ -9,6 +9,9 @@ import global from 'consts/global'
 
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 import Serialization from 'common/utils/Serialization'
+
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
+import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
 
 
 
@@ -19,19 +22,94 @@ class InterfaceBlockchainMining{
 
         this.emitter = new EventEmitter();
 
+        this._minerAddress = undefined;
+        this._unencodedMinerAddress = undefined;
+
         this.blockchain = blockchain;
 
-        this.minerAddressBase = '';
-        this.minerAddress = undefined;
-
-        this.setMinerAddress(minerAddress);
+        if (minerAddress !== undefined)
+            this.minerAddress = minerAddress;
 
         this._nonce = 0;
         this.started = false;
         this._hashesPerSecond = 0;
 
+        this.walletDB = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
     }
 
+    async saveMinerAddress(minerAddress){
+
+        if (minerAddress === undefined)
+            minerAddress = this.minerAddress;
+
+        if (typeof minerAddress === "object" && minerAddress.hasOwnProperty("address"))
+            minerAddress = minerAddress.address;
+
+        let key = "minerAddress";
+
+        try {
+
+            return (await this.walletDB.save(key, minerAddress));
+        }
+        catch(err) {
+            console.error('ERROR on SAVE miner address: ', err);
+            return false;
+        }
+
+    }
+
+    async loadMinerAddress(defaultAddress){
+
+        let key = "minerAddress";
+
+        try {
+            let minerAddress = await this.walletDB.get(key);
+
+            if (minerAddress === null || minerAddress === undefined) {
+                this.minerAddress = defaultAddress;
+                return true;
+            }
+
+            this._setAddress(minerAddress, false);
+
+            return true;
+        }
+        catch(err) {
+            console.error( 'ERROR on LOAD miner address: ', err);
+            return false;
+        }
+    }
+
+    get minerAddress(){
+      return this._minerAddress;
+    }
+
+    get unencodedMinerAddress(){
+        return this._unencodedMinerAddress;
+    }
+
+    set minerAddress(newAddress){
+        return this._setAddress(newAddress, true)
+    }
+
+    _setAddress(newAddress, save=true){
+
+        if (typeof newAddress === "object" && newAddress.hasOwnProperty("address"))
+            newAddress = newAddress.address;
+
+        if (Buffer.isBuffer(newAddress)) newAddress = BufferExtended.toBase(newAddress);
+
+        this._minerAddress = newAddress;
+        if (newAddress === undefined)
+            this._unencodedMinerAddress = undefined;
+        else
+            this._unencodedMinerAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(newAddress);
+
+        this.blockchain.emitter.emit( 'blockchain/mining/address', { address: this._minerAddress, unencodedAddress: this._unencodedMinerAddress});
+
+        if (!save) return true;
+        else return this.saveMinerAddress();
+    }
 
     async startMining(){
 
@@ -69,6 +147,12 @@ class InterfaceBlockchainMining{
 
         while (this.started && !global.TERMINATED){
 
+            if (this.minerAddress === undefined){
+                alert("Mining suspended. No Mining Address");
+                this.stopMining();
+                return;
+            }
+
             //mining next blocks
 
             // LIMIT mining first 21 blocks
@@ -85,7 +169,7 @@ class InterfaceBlockchainMining{
 
 
                 nextTransactions = this._selectNextTransactions();
-                nextBlock = this.blockchain.blockCreator.createBlockNew(this.minerAddress, nextTransactions );
+                nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, nextTransactions );
 
                 nextBlock.difficultyTargetPrev = this.blockchain.getDifficultyTarget();
                 nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
@@ -99,11 +183,11 @@ class InterfaceBlockchainMining{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                if (!await this.blockchain.processBlocksSempahoreCallback(  ()=>{
+                if (! (await this.blockchain.semaphoreProcessing.processSempahoreCallback(  ()=>{
                         return  this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
                             return this._simulatedNextBlockMining(nextBlock);
                         });
-                    })) throw "Mining1 returned False";
+                    }))) throw "Mining1 returned False";
 
 
             } catch (Exception){
@@ -132,28 +216,27 @@ class InterfaceBlockchainMining{
 
         let intervalMiningOutput;
 
-        if(this.finish === undefined)
-            this.finish = 0;
-        this.finish++;
-
         console.log("");
         console.log(" ----------- mineBlock-------------");
 
         try{
             console.log("difficultydifficultydifficulty", difficulty === undefined || difficulty === null);
 
-            if (difficulty === undefined || difficulty === null) throw 'difficulty not specified';
+            if (difficulty === undefined || difficulty === null)
+                throw 'difficulty not specified';
 
             if (difficulty instanceof BigInteger)
-                difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
+                difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
 
-            if (block === undefined || block === null) throw "block is undefined";
+            if (block === undefined || block === null)
+                throw "block is undefined";
 
             block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
 
             this._nonce = initialNonce||0;
 
-            if (typeof this._nonce !== 'number') return 'initial nonce is not a number';
+            if (typeof this._nonce !== 'number')
+                return 'initial nonce is not a number';
 
             //calculating the hashes per second
 
@@ -161,16 +244,34 @@ class InterfaceBlockchainMining{
                 intervalMiningOutput = this.setMiningHashRateInterval();
 
 
-            let answer = await this.mine(block, difficulty);
+            let answer;
 
-            if (answer.result){
+            try {
+                answer = await this.mine(block, difficulty);
+            } catch (exception){
+                console.log(colors.red("Couldn't mine block " + block.height + exception.toString()), exception);
+                answer.result = false;
+            }
+
+            if (answer.result && this.blockchain.blocks.length === block.height ){
                 console.log( colors.green("WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
 
-                if (!await this.blockchain.processBlocksSempahoreCallback( ()=>{
-                        block.hash = answer.hash;
-                        block.nonce = answer.nonce;
-                        return this.blockchain.includeBlockchainBlock( block, false, [], true , {});
-                    })) throw "Mining2 returned false";
+                try {
+
+                    if (! (await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
+                            block.hash = answer.hash;
+                            block.nonce = answer.nonce;
+
+                            //returning false, because a new fork was changed in the mean while
+                            if (this.blockchain.blocks.length !== block.height) return false;
+
+                            return this.blockchain.includeBlockchainBlock(block, false, [], true, {});
+                        }))) throw "Mining2 returned false";
+
+                } catch (exception){
+
+                    console.log(colors.red("Mining processBlocksSempahoreCallback raised an error " + block.height + exception.toString()), exception);
+                }
 
             } else
             if (!answer.result)
@@ -250,28 +351,6 @@ class InterfaceBlockchainMining{
             this._hashesPerSecond = 0;
 
         }, 1000);
-    }
-
-
-    setMinerAddress(newMinerAddress){
-
-        //console.log("setMinerAddress", newMinerAddress);
-
-        if (newMinerAddress === undefined || newMinerAddress === '' || newMinerAddress === null){
-            console.log(colors.red("No Miner Address defined"));
-            this.minerAddress = undefined;
-            this.minerAddressBase = '';
-            return;
-        }
-
-        if (!Buffer.isBuffer(newMinerAddress))
-            newMinerAddress = BufferExtended.fromBase(newMinerAddress);
-
-        this.minerAddress = newMinerAddress;
-        this.minerAddressBase = BufferExtended.toBase(newMinerAddress);
-
-        this.emitter.emit('mining/miner-address-changed', BufferExtended.toBase(this.minerAddress));
-
     }
 
 }

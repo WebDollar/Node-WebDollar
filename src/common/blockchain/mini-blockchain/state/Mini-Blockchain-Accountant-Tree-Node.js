@@ -8,7 +8,8 @@ import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import InterfaceMerkleRadixTreeNode from "common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree-Node"
-import InterfaceRadixTreeEdge from "../../../trees/radix-tree/Interface-Radix-Tree-Edge";
+import InterfaceRadixTreeEdge from "common/trees/radix-tree/Interface-Radix-Tree-Edge";
+import InterfaceMerkleTreeNode from "common/trees/merkle-tree/Interface-Merkle-Tree-Node"
 
 let BigNumber = require('bignumber.js');
 
@@ -35,7 +36,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     updateBalanceToken(value, tokenId){
 
-        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = Buffer.from([1]);
+        if (tokenId === undefined  || tokenId === '' || tokenId === null) {
+            tokenId = Buffer.from( [1] );
+            tokenId[0] = 1;
+        }
 
         if (this.balances === undefined || this.balances === null) throw 'balances is null';
 
@@ -82,9 +86,12 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     }
 
-    getBalances(tokenId){
+    getBalance(tokenId){
 
-        if (tokenId === undefined  || tokenId === '' || tokenId === null) tokenId = new Buffer([1]);
+        if (tokenId === undefined  || tokenId === '' || tokenId === null) {
+            tokenId = Buffer.from([1]);
+            tokenId[0] = 1;
+        }
 
         if (!Buffer.isBuffer(tokenId))
             tokenId = BufferExtended.fromBase(tokenId);
@@ -130,17 +137,24 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         return Buffer.concat(
             [
-                Serialization.serializeToFixedBuffer(balances.id, consts.TOKEN_ID_LENGTH),
+                Serialization.serializeToFixedBuffer(balances.id, consts.MINI_BLOCKCHAIN.TOKEN_ID_LENGTH),
                 Serialization.serializeBigNumber(balances.amount)
             ]);
 
     }
 
-    serializeNodeData( ){
+    serializeNodeData( includeEdges, includeHashes ){
 
         try {
-            let buffer = new Buffer(0), //[InterfaceMerkleRadixTreeNode.prototype.serializeNodeData.apply(this, arguments)]
+            let buffer,
                 balancesBuffers = [];
+
+            let hash = InterfaceMerkleRadixTreeNode.prototype.serializeNodeDataHash.apply(this, arguments);
+
+            if (hash !== null) buffer = hash;
+            else buffer = new Buffer(0);
+
+            //console.log("buffer serializeNodeData hash", buffer.toString("hex"))
 
             let balancesCount = 0;
             if (this.balances !== undefined && this.balances !== null) {
@@ -149,8 +163,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 let iWEBDSerialized = null;
                 for (let i = 0; i < this.balances.length; i++)
                     if ((this.balances[i].id.length === 1) && (this.balances[i].id[0] === 1)) {
-                        balancesBuffers.push(this._serializeBalances(this.balances[i]));
                         iWEBDSerialized = i;
+                        break;
                     }
 
                 // in case it was not serialize d and it is empty
@@ -159,6 +173,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                     idWEBD[0] = 1;
 
                     balancesBuffers.push(this._serializeBalances({id: idWEBD, amount: new BigNumber(0)}));
+                } else {
+                    balancesBuffers.push(this._serializeBalances(this.balances[iWEBDSerialized]));
                 }
 
                 balancesCount = 1;
@@ -173,6 +189,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 balancesBuffers = Buffer.concat(balancesBuffers);
             }
 
+            //console.log("balancesBuffers", balancesBuffers.toString("hex"));
+
             return Buffer.concat( [buffer, Serialization.serializeNumber1Byte(balancesCount), balancesBuffers] );
 
         } catch (exception){
@@ -182,15 +200,15 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     }
 
-    deserializeNodeData(buffer, offset){
+    deserializeNodeData(buffer, offset, includeEdges, includeHashes){
 
         // deserializing this.value
-        //offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeData.apply(this, arguments);
+        offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeDataHash.apply(this, arguments);
+        //console.log("offset", offset);
 
         try {
 
             offset = offset || 0;
-
 
             let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
             offset += 1;
@@ -207,6 +225,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 this.balances = [];
                 let result = Serialization.deserializeBigNumber( buffer, offset );
 
+                //console.log("result.number",result.number);
+
                 this.updateBalanceToken(result.number);
                 offset = result.newOffset;
 
@@ -215,11 +235,12 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                     //rest of tokens , in case there are
                     for (let i = 1; i < balancesLength; i++) {
 
-                        let tokenId = BufferExtended.substr(buffer, offset, consts.TOKEN_ID_LENGTH);
-                        offset += consts.TOKEN_ID_LENGTH;
+                        let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKEN_ID_LENGTH);
+                        offset += consts.MINI_BLOCKCHAIN.TOKEN_ID_LENGTH;
 
                         result = Serialization.deserializeBigNumber(buffer, offset);
 
+                        //console.log("result.number2",result.number);
                         this.updateBalanceToken(result.number, tokenId);
 
                         offset = result.newOffset;

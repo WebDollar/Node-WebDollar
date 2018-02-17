@@ -5,9 +5,6 @@ import consts from 'consts/const_global'
 
 class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
 
-    constructor(blockchain){
-        super(blockchain)
-    }
 
     createForkSolver(){
         this.forkSolver = new MiniBlockchainLightProtocolForkSolver(this.blockchain, this);
@@ -36,7 +33,7 @@ class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
 
                 let serialization = this.blockchain.getSerializedAccountantTree(data.height);
 
-                console.log("get/blockchain/accountant-tree/get-accountant-tree", serialization.toString("hex"))
+                //console.log("get/blockchain/accountant-tree/get-accountant-tree", serialization.toString("hex"))
 
                 socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
                     result: true,

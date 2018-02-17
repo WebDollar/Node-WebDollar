@@ -141,20 +141,17 @@ class InterfaceMerkleTree extends InterfaceTree{
                 if (node.edges[i].targetNode.hash === null || node.edges[i].targetNode.hash === undefined )
                     this._computeHash(node.edges[i].targetNode);
 
-                if (i === 0) {
-                    hashConcat.sha256 = node.edges[i].targetNode.hash.sha256;
-                }
-                else {
-                    Buffer.concat ( [hashConcat.sha256, node.edges[i].targetNode.hash.sha256]);
-                }
-
+                if (i === 0)
+                    hashConcat.sha256 = new Buffer(node.edges[i].targetNode.hash.sha256);
+                else
+                    hashConcat.sha256 = Buffer.concat ( [hashConcat.sha256, node.edges[i].targetNode.hash.sha256]);
             }
 
             if (hashConcat.sha256 === null) throw ("Empty node with invalid sha256");
 
             // Let's hash
-            // console.log("valueToHash222", typeof valueToHash, valueToHash)
-            // console.log("hashConcat.sha256 ", typeof hashConcat.sha256 , hashConcat.sha256 )
+            // console.log("valueToHash222", typeof valueToHash, valueToHash.toString("hex"))
+            // console.log("hashConcat.sha256 ", typeof hashConcat.sha256 , hashConcat.sha256.toString("hex") )
 
             let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( Buffer.concat ( [valueToHash, hashConcat.sha256 ]  ) ));
             node.hash = {sha256: sha256};
@@ -191,16 +188,39 @@ class InterfaceMerkleTree extends InterfaceTree{
 
             result = true;
 
+            // console.log("sha_before", node.hash.sha256.toString("hex"));
+
             if (!hashAlreadyComputed)
                 this._computeHash(node)
 
+            // console.log("sha_after", node.hash.sha256.toString("hex"));
+
+            // if (node.parent !== null && node.parent !== undefined)
+            //     for (let j=0; j<node.parent.edges.length; j++)
+            //         console.log(j, "node === node.parent.edges[j].targetNode", node === node.parent.edges[j].targetNode);
+
             if (node.parent !== null)
-                if (!this._validateHash(node.parent))
-                    result = result && this._refreshHash(node.parent, true)
+                result = result && this._refreshHash(node.parent, true)
 
         }
 
         return result;
+    }
+
+    _deserializeTree(buffer, offset, includeHashes){
+
+        offset = InterfaceTree.prototype._deserializeTree.call(this, buffer, offset, includeHashes);
+
+        if (includeHashes) {
+            if (!this.validateRoot())
+                throw "Refresh Hash didn't work";
+        }
+        else { //let's recalculate
+            if (! this._refreshHash(this.root, true) )
+                throw "Refresh Hash2 didn't work";
+        }
+
+        return offset;
     }
 
     /**

@@ -1,5 +1,7 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
+import InterfaceBlockchainProtocolTipsManager from "./Interface-Blockchain-Protocol-Tips-Manager"
+
 import Serialization from 'common/utils/Serialization';
 import NodeProtocol from 'common/sockets/protocol/node-protocol'
 
@@ -17,8 +19,20 @@ class InterfaceBlockchainProtocol {
         this.acceptBlockHeaders = true;
         this.acceptBlocks = true;
 
-        this.createForkSolver();
+        this.forkSolver = undefined;
+        this.tipsManager = undefined;
 
+
+    }
+
+    setBlockchain(blockchain){
+        this.blockchain = blockchain;
+
+        if (this.forkSolver !== undefined)
+            this.forkSolver.blockchain = blockchain;
+
+        if (this.tipsManager !== undefined)
+            this.tipsManager.blockchain = blockchain;
     }
 
     initialize(params){
@@ -36,15 +50,17 @@ class InterfaceBlockchainProtocol {
         //already connected sockets
         for (let i=0; i<NodesList.nodes.length; i++)
             this._initializeNewSocket(NodesList.nodes[i]);
+
+        this.createForkSolver();
+        this.createTipsManager();
     }
 
     createForkSolver(){
         this.forkSolver = new InterfaceBlockchainProtocolForkSolver(this.blockchain, this);
     }
 
-    _setBlockchain(blockchain){
-        this.blockchain = blockchain;
-        this.forkSolver.blockchain = blockchain;
+    createTipsManager(){
+        this.tipsManager = new InterfaceBlockchainProtocolTipsManager(this.blockchain, this);
     }
 
     propagateHeader(block, chainLength, socketsAvoidBroadcast){
@@ -136,7 +152,7 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
-                    console.log("blockchain/header/new-block received", data);
+                    console.log("blockchain/header/new-block received", data.chainLength||0);
 
                     this._validateBlockchainHeader(data)
 
@@ -149,11 +165,11 @@ class InterfaceBlockchainProtocol {
                         throw "your block is invalid";
 
                     //in case the hashes are the same, and I have already the block
-                    if (( data.height >= 0 && this.blockchain.getBlockchainLength - 1 >= data.height && this.blockchain.getBlockchainLength >= data.chainLength )) {
+                    if (( data.height >= 0 && this.blockchain.blocks.length - 1 >= data.height && this.blockchain.blocks.length >= data.chainLength )) {
 
                         //in case the hashes are exactly the same, there is no reason why we should download it
 
-                        if (this.blockchain.agent.light && this.blockchain.blocksStartingPoint > data.height ){
+                        if (this.blockchain.agent.light && this.blockchain.blocks.blocksStartingPoint > data.height ){
                             //you are ok
                         } else
                         if (this.blockchain.blocks[data.height].hash.equals(data.header.hash) === true)
@@ -161,9 +177,9 @@ class InterfaceBlockchainProtocol {
 
                     }
 
-                    console.log("blockchain/header/new-block discoverAndSolveFork");
+                    console.log("blockchain/header/new-block discoverNewForkTip");
 
-                    let result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header)
+                    let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.header);
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: true,
@@ -191,7 +207,7 @@ class InterfaceBlockchainProtocol {
                 socket.node.sendRequest("blockchain/info/request-blockchain-info", {
                     result: true,
                     chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),
-                    chainLength: this.blockchain.getBlockchainLength
+                    chainLength: this.blockchain.blocks.length
                 });
 
             } catch (exception) {
@@ -215,7 +231,7 @@ class InterfaceBlockchainProtocol {
 
                     if (typeof data.height !== 'number') throw "data.height is not defined";
 
-                    if (this.blockchain.getBlockchainLength <= data.height) throw "data.height is higher than I have " + this.blockchain.getBlockchainLength + " < " +data.height;
+                    if (this.blockchain.blocks.length <= data.height) throw "data.height is higher than I have " + this.blockchain.blocks.length + " < " +data.height;
 
 
                     let block = this.blockchain.blocks[data.height];
@@ -230,7 +246,7 @@ class InterfaceBlockchainProtocol {
                             height: block.height,
                             prevHash: block.hashPrev,
                             hash: block.hash,
-                            chainLength: this.blockchain.getBlockchainLength
+                            chainLength: this.blockchain.blocks.length
                         }
                     });
 
@@ -258,7 +274,7 @@ class InterfaceBlockchainProtocol {
 
                     if (typeof data.height !== 'number') throw "data.height is not defined";
 
-                    if (this.blockchain.getBlockchainLength <= data.height) throw "data.height is higher than I have "+this.blockchain.getBlockchainLength + " < " +data.height;
+                    if (this.blockchain.blocks.length <= data.height) throw "data.height is higher than I have "+this.blockchain.blocks.length + " < " +data.height;
 
                     let block = this.blockchain.blocks[data.height];
 
@@ -295,7 +311,6 @@ class InterfaceBlockchainProtocol {
         let data = await socket.node.sendRequestWaitOnce("get/blockchain/header/last-block", undefined, "answer");
 
         console.log("get/blockchain/header/last-block2", data);
-        console.log("get/blockchain/header/last-block2", data);
 
         try {
 
@@ -307,9 +322,8 @@ class InterfaceBlockchainProtocol {
 
             //validate header
             //TODO !!!
-
             //in case the hashes are the same, and I have already the block
-            if (( data.height >= 0 && this.blockchain.getBlockchainLength - 1 >= data.height && this.blockchain.getBlockchainLength >= data.chainLength )) {
+            if (( data.height >= 0 && this.blockchain.blocks.length - 1 >= data.height && this.blockchain.blocks.length >= data.chainLength )) {
 
                 //in case the hashes are exactly the same, there is no reason why we should download it
                 let myHash = this.blockchain.getHashPrev(data.height+1);
@@ -317,8 +331,7 @@ class InterfaceBlockchainProtocol {
                     throw "your block is not new, because I have a valid block at same height ";
 
             }
-
-            let result = await this.forkSolver.discoverAndSolveFork(socket, data.chainLength, data.header);
+            let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.header);
 
             socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                 result: true,

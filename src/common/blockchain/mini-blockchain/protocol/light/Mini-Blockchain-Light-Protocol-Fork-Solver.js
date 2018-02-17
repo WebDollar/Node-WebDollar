@@ -5,7 +5,7 @@ import consts from 'consts/const_global'
 
 let inheritForkSolver;
 
-if (consts.POPOW_ACTIVATED) inheritForkSolver = PPowBlockchainProtocolForkSolver;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritForkSolver = PPowBlockchainProtocolForkSolver;
 else inheritForkSolver = InterfaceBlockchainProtocolForkSolver;
 
 
@@ -25,12 +25,12 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
     async _calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength){
 
-        console.log("chainStartingPoint", newChainStartingPoint, "newChainLength", newChainLength, "currentBlockchainLength", currentBlockchainLength)
+        console.log("newChainStartingPoint", newChainStartingPoint, "newChainLength", newChainLength, "currentBlockchainLength", currentBlockchainLength)
 
         if (newChainStartingPoint > currentBlockchainLength-1) {
 
 
-            return await this._getLastBlocks(socket, newChainLength - consts.POW_PARAMS.LIGHT_VALIDATE_LAST_BLOCKS-1);
+            return await this._getLastBlocks(socket, newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS-1);
 
 
         } else {
@@ -63,25 +63,24 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkChainStartingPoint }, fork.forkChainStartingPoint );
 
             if (answer === null) throw "get-accountant-tree never received " + (fork.forkChainStartingPoint);
+            if (!answer.result) throw "get-accountant-tree return false "+ answer.message;
 
             fork.forkPrevAccountantTree = answer.accountantTree;
-
 
             answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkChainStartingPoint  }, fork.forkChainStartingPoint );
 
             if (answer === null) throw "get-light-settings never received " + (fork.forkChainStartingPoint);
-            if (answer.result === false) throw "get-light-settings received by it is false ";
+            if (answer.result === false) throw "get-light-settings return false "+ answer.message;
 
             if (answer.difficultyTarget === null ) throw "get-light-settings difficultyTarget is null";
             if (answer.timeStamp === null ) throw "get-light-settings timeStamp is null";
             if (answer.hashPrev === null ) throw "get-light-settings hashPrev is null";
 
-            console.log("answer.difficultyTarget",answer.difficultyTarget)
+            console.log("answer.difficultyTarget",answer.difficultyTarget);
 
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;
             fork.forkPrevHashPrev = answer.hashPrev;
-
         } else {
             fork.forkPrevAccountantTree = null;
             fork.forkPrevDifficultyTarget = null;
@@ -89,7 +88,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevHashPrev = null;
         }
 
-        return inheritForkSolver.prototype.solveFork.call(this, fork);
+        return await inheritForkSolver.prototype.solveFork.call(this, fork);
 
     }
 

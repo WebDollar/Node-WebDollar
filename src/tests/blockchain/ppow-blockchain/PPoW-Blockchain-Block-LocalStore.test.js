@@ -30,10 +30,10 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
         block = new PPoWBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
         block.interlink = interlink;
         
-        response = await block.save();
+        response = await block.saveBlock();
         assert(response === true, 'save: ' + response);
 
-        response = await block.load();
+        response = await block.loadBlock();
         assert(response === true, 'load: ' + response);
 
         assert(block.version === version,'ppow-block version differ after load: ' + block.version + '!==' + version);
@@ -50,10 +50,10 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
             assert(link.blockId.equals(interlink[i].blockId), 'PPoW Block blockId  differ ' + link.blockId + '!==' + interlink[i].blockId);
         }
 
-        response = await block.remove();
+        response = await block.removeBlock();
         assert(response === true, 'remove: ' + response);
         
-        response = await block.remove();
+        response = await block.removeBlock();
         assert(response !== true, 'remove: ' + response);
     });
     
@@ -64,19 +64,19 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
         block = new PPoWBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
         block.interlink = interlink;
         
-        response = await block.save();
+        response = await block.saveBlock();
         assert(response === true, 'save: ' + response);
         
-        response = await block.remove();
+        response = await block.removeBlock();
         assert(response === true, 'remove: ' + response);
         
-        response = block.load();
+        response = block.loadBlock();
         assert(response !== true, 'load: ppow-block was found after remove. ' + response);
         
-        response = block.load();
+        response = block.loadBlock();
         assert(response !== true, 'load: ppow-block was found after remove. ' + response);
         
-        response = block.load();
+        response = block.loadBlock();
         assert(response !== true, 'load: ppow-block was found after remove. ' + response);
     });
 

@@ -6,8 +6,8 @@ import BufferExtended from "common/utils/BufferExtended";
 import consts from "../../consts/const_global";
 import BufferExtend from "../../common/utils/BufferExtended";
 import InterfaceBlockchainAddressHelper from "../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-const colors = require('colors/safe');
 
+const colors = require('colors/safe');
 const md5 = require('md5');
 const EventEmitter = require('events');
 const FileSystem = require('fs');
@@ -19,6 +19,7 @@ class MainBlockchainWallet{
         this.blockchain = blockchain;
         this.walletFileName = 'wallet.bin';
 
+        //TODO change db name to "walletDB"
         if(db === undefined)
             this.db = new InterfaceSatoshminDB();
         else
@@ -43,8 +44,8 @@ class MainBlockchainWallet{
 
         let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
-        if (!await this._insertAddress(blockchainAddress))
-            throw "address is not new";
+        if (! (await this._insertAddress(blockchainAddress)))
+            throw "Address already exists";
 
         return blockchainAddress;
     }
@@ -53,10 +54,24 @@ class MainBlockchainWallet{
 
         let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
-        if (!await this._insertAddress(blockchainAddress))
-            throw "address is not new";
+        if (! (await this._insertAddress(blockchainAddress)))
+            throw "Address already exists";
 
         return blockchainAddress;
+    }
+
+    async _insertAddress(blockchainAddress){
+
+        let index = this.getAddressIndex(blockchainAddress);
+        if (index >= 0)
+            return false;
+
+        this.addresses.push(blockchainAddress);
+        this.emitter.emit('wallet/address-changes', blockchainAddress.address );
+
+        await this.saveWallet();
+
+        return true;
     }
 
     async serialize(serializePrivateKey = false) {
@@ -91,7 +106,7 @@ class MainBlockchainWallet{
             return true;
 
         } catch (exception){
-            console.log("Error deserializing a Wallet. ", exception);
+            console.error("Error deserializing a Wallet. ", exception);
             throw exception;
         }
     }
@@ -132,11 +147,42 @@ class MainBlockchainWallet{
 
         return answer;
     }
+    
+    /**
+     * Finding stringAddress or address
+     * @param address
+     * @returns {*}
+     */
+    getAddress(address){
+
+        let index = this.getAddressIndex(address);
+        if (index === -1)
+            return null;
+        else
+            return this.addresses[index];
+    }
+
+    /**
+     * Finding stringAddress or address
+     * @param address
+     * @returns {*}
+     */
+    getAddressIndex(address){
+
+        for (let i = 0; i < this.addresses.length; i++)
+            if (address === this.addresses[i].address)
+                return i;
+            else
+            if (typeof address ==="object" && (this.addresses[i].address === address.address || this.addresses[i].unencodedAddress === address.unencodedAddress))
+                return i;
+
+        return -1;
+    }
 
     getAddressPic(address){
 
         if (Buffer.isBuffer(address))
-            address = BufferExtended.toBase();
+            address = BufferExtended.toBase(address);
 
         return `https://www.gravatar.com/avatar/${md5(address)}?d=retro&f=y`;
     }
@@ -150,6 +196,19 @@ class MainBlockchainWallet{
             await this.createNewAddress();
 
         return this.addresses[0].address;
+    }
+    
+    /**
+     * @param address
+     * @returns true if privateKey of address is encrypted
+     */
+    async isAddressEncrypted(address){
+
+        address = this.getAddress(address);
+        if (address === null)
+            throw "address not found";
+
+        return (await address.isPrivateKeyEncrypted());
     }
 
     /**
@@ -232,36 +291,58 @@ class MainBlockchainWallet{
 
     /**
      * import an Address from a PrivateKey/WIF
-     * @param privateKeyWIF
+     * @param inputData is JSON or String
      */
-    async importAddressFromPrivateKey(privateKeyWIF){
+    async importAddressFromPrivateKey(inputData){
 
-        let blockchainAddress = new MiniBlockchainAddress(this.db, undefined);
+        let blockchainAddress = new MiniBlockchainAddress(this.db);
 
         try {
 
-            //private Key object {version: "xxx", privateKey: "HEX" }
-            if (typeof privateKeyWIF === "object"){
-                if (!privateKeyWIF.hasOwnProperty("version")) throw ".version not specified";
-                if (!privateKeyWIF.hasOwnProperty("privateKey")) throw ".privateKey not specified";
+            let address, publicKey;
+            let privateKey = inputData;
 
-                if (privateKeyWIF.version === "0.1"){
-                    privateKeyWIF = privateKeyWIF.privateKey;
+            //private Key object {version: "xxx", address: "HEX", publicKet: "HEX", privateKey: "HEX" }
+            if (typeof inputData === "object"){
+                if (!inputData.hasOwnProperty("version"))
+                    throw ".version not specified";
+                if (!inputData.hasOwnProperty("privateKey"))
+                    throw ".privateKey not specified";
+
+                if (inputData.version === "0.1"){
+                    privateKey = inputData.privateKey;
                 } else
-                    throw "privateKey version is not good "+privateKeyWIF.version;
+                    throw "privateKey version is not good " + inputData.version;
+
+                if (inputData.hasOwnProperty('address'))
+                    address = inputData.address;
+                if (inputData.hasOwnProperty('publicKey'))
+                    publicKey = inputData.publicKey;
 
             }
 
-            if (typeof privateKeyWIF === "string")
-                privateKeyWIF = Buffer.from(privateKeyWIF,"hex");
+            if (typeof inputData === "string")
+                privateKey = Buffer.from(inputData, "hex");
 
-            await blockchainAddress.createNewAddress(undefined, privateKeyWIF);
+            if (Buffer.isBuffer(inputData))
+                privateKey = new Buffer(inputData);
 
-            if (!await this._insertAddress(blockchainAddress))
-                throw "address is not new";
+            if (address === undefined && publicKey === undefined) {
+                await blockchainAddress.createNewAddress(undefined, privateKey);
+
+            } else {
+                blockchainAddress.publicKey = Buffer.from(publicKey, "hex");
+                blockchainAddress.address = address;
+                blockchainAddress.unencodedAddress = BufferExtended.fromBase(blockchainAddress.address);
+
+                await blockchainAddress.savePrivateKey(Buffer.from(privateKey, "hex"));
+            }
+
+            if (! (await this._insertAddress(blockchainAddress)))
+                throw "Address already exists";
 
             return {
-                result:true,
+                result: true,
                 address: blockchainAddress.address,
                 unencodedAddress: blockchainAddress.unencodedAddress,
                 publicKey: blockchainAddress.publicKey,
@@ -278,7 +359,6 @@ class MainBlockchainWallet{
      * @param address
      * @returns privateKeyWIF as Hex
      */
-
     async exportPrivateKeyFromAddress(address){
 
         for (let i=0; i<this.addresses.length; i++)
@@ -288,6 +368,8 @@ class MainBlockchainWallet{
 
                     data: {
                         version: consts.WALLET_VERSION,
+                        address: this.addresses[i].address,
+                        publicKey: this.addresses[i].publicKey.toString("hex"),
                         privateKey: (await this.addresses[i].exportAddressPrivateKeyToHex())
                     }
 
@@ -315,38 +397,8 @@ class MainBlockchainWallet{
         this.addresses.push(blockchainAddress);
 
         return blockchainAddress;
-    }
-
-    /**
-     * @param address
-     * @returns true if privateKey of address is encrypted
-     */
-    async isAddressEncrypted(address){
-
-        address = this.getAddress(address);
-        if (address === null)
-            throw "address not found";
-
-        return (await address.isPrivateKeyEncrypted());
-    }
-
-    /**
-     * @param address
-     * @param oldPassword
-     * @param newPassword
-     * @returns {Promise<*>}
-     */
-    async encryptAddress(address, oldPassword, newPassword){
-
-        address = this.getAddress(address);
-
-        let privateKey = await address.getPrivateKey(oldPassword);
-        if (privateKey === null || privateKey === undefined || privateKey.length !== 32)
-            return false;
-
-        return (await address.savePrivateKey(privateKey, newPassword));
-    }
-
+    }  
+    
     /**
      * @param address
      * @param password
@@ -370,56 +422,126 @@ class MainBlockchainWallet{
     }
 
     /**
-     * Finding stringAddress or address
+     * 
      * @param address
-     * @returns {*}
+     * @param password
+     * @returns {Promise<*>} true if address's password is @param password
      */
-    getAddress(address){
+    async validatePassword(address, password){
 
-        let index = this.getAddressIndex(address);
-        if (index === -1)
-            return null;
-        else
-            return this.addresses[index];
+        if (typeof address === "object" && address.hasOwnProperty("address"))
+            address = address.address;
+
+        address = this.getAddress(address);
+        
+        let privateKey = await address.getPrivateKey(password);
+        
+        try {
+            if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
+                return true;
+            }
+        } catch (exception) {
+            return false;
+        }
+        
+        return false;
     }
+    
+    /**
+     * @param addressString
+     * @param newPassword
+     * @param oldPassword
+     * @returns {Promise<*>}
+     */
+    async encryptAddress(address, newPassword, oldPassword = undefined){
 
-    getAddressIndex(address){
+        if (typeof address === "object" && address.hasOwnProperty("address"))
+            address = address.address;
+        
+        if (await this.isAddressEncrypted(address)  && process.env.BROWSER) {
 
-        for (let i = 0; i < this.addresses.length; i++)
-            if (address === this.addresses[i].address)
-                return i;
-            else
-            if (typeof address ==="object" && (this.addresses[i].address === address.address || this.addresses[i].unencodedAddress === address.unencodedAddress))
-                return i;
+            let response = prompt("Please enter your last password (12 words separated by space)");
+            oldPassword = response.trim().split(' ');
 
-        return -1;
-    }
+            if (oldPassword.length !== 12) {
+                alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                return false;
+            }
 
-    async _insertAddress(blockchainAddress){
+        }
 
-        let index = this.getAddressIndex(blockchainAddress);
-        if (index !== -1) return false;
+        address = this.getAddress(address);
 
-        this.addresses.push(blockchainAddress);
-        this.emitter.emit('wallet/address-changes', blockchainAddress.address );
-        await this.saveWallet();
+        let privateKey = await address.getPrivateKey(oldPassword);
 
-        return true;
+
+        try {
+            if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
+                return (await address.savePrivateKey(privateKey, newPassword));
+            }
+        } catch (exception) {
+            alert('Your old password is incorrect!!!');
+            return false;
+        }
+
     }
 
     async deleteAddress(address){
 
 
-        if (typeof address === "object") address = address.address;
+        if (typeof address === "object" && address.hasOwnProperty("address"))
+            address = address.address;
 
         let index = this.getAddressIndex(address);
-        if (index === -1) return {result: false, message: "Address was not found ", address:address};
+        if (index < 0)
+            return {result: false, message: "Address was not found ", address: address};
+
+        if (await this.isAddressEncrypted(address)) {
+
+            for (let tries = 3; tries >= 1; --tries) {
+
+                let response = prompt("Please enter your last password (12 words separated by space).  " +  tries + " tries left.");
+                let oldPassword = response.trim().split(' ');
+
+                if (oldPassword.length !== 12) {
+
+                    alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                    if (tries === 1)
+                        return {result: false, message: "Your old password is incorrect!"};
+
+                    continue;
+                }
+
+                address = this.getAddress(address);
+                let privateKey = await address.getPrivateKey(oldPassword);
+
+                try {
+                    if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
+                        break;
+                    }
+                } catch (exception) {
+                    alert('Your old password is incorrect!!!');
+                    if (tries === 1)
+                        return {result: false, message: "Your old password is incorrect!"};
+                }
+
+            }
+        }
 
         let ask = confirm("Are you sure you want to delete " + address);
 
         if(ask){
 
+            let addressDeleted = this.addresses[index];
+
             this.addresses.splice(index, 1);
+
+            //setting the next minerAddress
+            console.log("addressDeleted", addressDeleted);
+            if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.minerAddress.equals(addressDeleted.unencodedAddress) ) {
+                this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
+                this.blockchain.mining.resetMining();
+            }
 
             await this.saveWallet();
             this.emitter.emit('wallet/changes', this.addresses );
@@ -428,10 +550,42 @@ class MainBlockchainWallet{
 
         } else {
 
-            return {result: false, message: "Action cancled by user" }
+            return {result: false, message: "Action canceled by user" };
 
         }
 
+    }
+
+
+    async loadWallet(){
+
+        //loading the Wallet
+        this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Loading"});
+
+        try{
+
+            let response = await this.loadAddresses();
+
+            if (response !== false)
+                this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Loaded Successfully"});
+
+            if (response === false || this.addresses.length === 0) {
+
+                console.error("create this.Wallet.createNewAddress");
+                await this.createNewAddress(); //it will save automatically
+                console.error("create this.Wallet.createNewAddress done");
+
+                this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Creating New Wallet"});
+            }
+
+        } catch (exception){
+
+            console.error("exception loading Wallet.Addresses");
+
+            this.blockchain.emitter.emit('validation/status', {message: "IndexedDB - Wallet couldn't be imported"});
+
+            await this.createNewAddress(); //it will save automatically
+        }
     }
 
 }

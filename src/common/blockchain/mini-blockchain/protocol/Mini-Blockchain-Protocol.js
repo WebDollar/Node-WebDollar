@@ -9,14 +9,11 @@ import PPoWBlockchainProtocol from "common/blockchain/ppow-blockchain/protocol/P
  */
 
 let inheritProtocol;
-if (consts.POPOW_ACTIVATED) inheritProtocol = PPoWBlockchainProtocol;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritProtocol = PPoWBlockchainProtocol;
 else inheritProtocol = InterfaceBlockchainProtocol;
 
 class MiniBlockchainProtocol extends inheritProtocol{
 
-    constructor(blockchain){
-        super(blockchain)
-    }
 
     _validateBlockchainHeader(data){
 

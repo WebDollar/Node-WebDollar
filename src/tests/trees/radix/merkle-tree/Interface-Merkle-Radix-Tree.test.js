@@ -5,7 +5,7 @@ import TestsHelper from 'tests/Tests.helper'
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import InterfaceTreeTestHelperClass from '../../helpers/Interface-Tree.test.helper'
 
-import InterfaceRadixTreeTestTeser from './../helpers/Interface-Radix-Tree-tester';
+import InterfaceRadixTreeTestTester from './../helpers/Interface-Radix-Tree-tester';
 
 describe("Interface Merkle + Radix Tree", () => {
 
@@ -37,7 +37,7 @@ describe("Interface Merkle + Radix Tree", () => {
     });
 
     let InterfaceTreeTestHelper = new InterfaceTreeTestHelperClass(InterfaceMerkleRadixTree);
-    InterfaceRadixTreeTestTeser(InterfaceTreeTestHelper, true);
+    InterfaceRadixTreeTestTester(InterfaceTreeTestHelper, true);
 
 
 });

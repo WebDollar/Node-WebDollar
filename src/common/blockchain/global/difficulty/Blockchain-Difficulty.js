@@ -1,35 +1,33 @@
-import Serialization from "common/utils/Serialization";
-import BufferExtended from "common/utils/BufferExtended"
-
 var BigInteger = require('big-integer');
+var BigNumber = require('bignumber.js');
+import consts from 'consts/const_global'
 
 class BlockchainDifficulty{
 
+    constructor(blockchain){
+
+        this.blockchain = blockchain;
+
+    }
+
     getDifficulty(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber){
 
-
         // difficulty algorithm is based on blockNumber
-        // console.log("prevBlockDifficulty", prevBlockDifficulty.length, prevBlockDifficulty);
+        if (!( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.greaterThanOrEqualTo(0))))
+            throw "invalid block number";
 
-        if ( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.greaterThanOrEqualTo(0))) {
+        // console.log("prevBlockTimestamp", prevBlockTimestamp.toString(16));
+        // console.log("blockTimestamp", blockTimestamp.toString(16));
+        // console.log("blockNumber", blockNumber.toString(16));
 
-            // if (Buffer.isBuffer(prevBlockDifficulty))
-            //     console.log(prevBlockDifficulty.toString("hex"));
-            // else
-            //     console.log(prevBlockDifficulty.toString());
-            // console.log("prevBlockTimestamp", prevBlockTimestamp.toString(16));
-            // console.log("blockTimestamp", blockTimestamp.toString(16));
-            // console.log("blockNumber", blockNumber.toString(16));
+        if (blockNumber < 31925)
+            return this.getDifficultyMean(prevBlockDifficulty, blockTimestamp, blockNumber);
+        else
+            return this.calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber);
 
-            let rez = this.calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber);
-
-            // console.log("difficulty0",  rez.toString() );
-            // console.log("difficulty1",  Serialization.serializeBigInteger( rez ).length, Serialization.serializeBigInteger( rez ) );
-            // console.log("difficulty2", Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez )).length, Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez ) ));
-            return rez;
-        }
-
-        throw ('invalid block number')
+        // console.log("difficulty0",  rez.toString() );
+        // console.log("difficulty1",  Serialization.serializeBigInteger( rez ).length, Serialization.serializeBigInteger( rez ) );
+        // console.log("difficulty2", Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez )).length, Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez ) ));
 
     }
 
@@ -55,25 +53,20 @@ class BlockchainDifficulty{
 
         if (Buffer.isBuffer(prevBlockDifficulty))
             prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
-        else if (typeof prevBlockDifficulty === "string"){ // it must be hex
-            prevBlockDifficulty.replace("0x","");
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty, 16);
-        }
+        else if (typeof prevBlockDifficulty === "string") // it must be hex
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty.replace("0x",""), 16);
 
 
         if (Buffer.isBuffer(prevBlockDifficulty))
             prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
-        else if (typeof prevBlockTimestamp === "string"){
-            prevBlockTimestamp.replace("0x",""); //it must be hex
-            prevBlockTimestamp = BigInteger(prevBlockTimestamp, 16);
-        }
+        else if (typeof prevBlockTimestamp === "string")
+            prevBlockTimestamp = BigInteger(prevBlockTimestamp.replace("0x",""), 16);
 
         if (Buffer.isBuffer(blockTimestamp))
             blockTimestamp = BigInteger(blockTimestamp.toString("hex"), 16);
         else
         if (typeof blockTimestamp === "string"){
-            blockTimestamp.replace("0x",""); //it must be hex
-            blockTimestamp = BigInteger(blockTimestamp, 16);
+            blockTimestamp = BigInteger(blockTimestamp.replace("0x",""), 16);
         }
 
         if (prevBlockTimestamp instanceof BigInteger === false) prevBlockTimestamp = BigInteger(prevBlockTimestamp);
@@ -87,19 +80,70 @@ class BlockchainDifficulty{
 
         //console.log("equationTwo", equationTwo);
 
-        //ethereum changed from .plus to .minus
+        if (blockNumber.equals(31925))
+            blockNumber = BigInteger(1);
 
-        let blockDiff = prevBlockDifficulty.minus(  prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
-                                                    (equationTwo )
-                                               );
 
-        if (includeBombFormula)
-            blockDiff = blockDiff.plus(  BigInteger(2).pow( blockNumber.divide(100000).minus(2)) )  //int(2**((block.number // 100000) - 2))
+        let blockDiff;
 
-        return blockDiff;
+        blockDiff = prevBlockDifficulty.minus(prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
+            (equationTwo)
+        );
+
+        if (blockDiff.lesser(0))
+            return BigInteger("00148112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", 16);
+        else
+            return blockDiff;
+    }
+
+    /**
+     * like on BITCOIN
+     *
+     * every X Blocks,
+     * newDiff = prevDifficulty * (how_much_it_should_have_taken_X_Blocks) / (how_much_it_took_to_mine_X_Blocks)
+     *
+     */
+
+    //newDifficulty
+    getDifficultyMean(blockTimestamp, blockNumber){
+
+        let prevBlockDifficulty = this.blockchain.getDifficultyTarget(blockNumber - 1);
+
+        if (Buffer.isBuffer(prevBlockDifficulty))
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
+        else if (typeof prevBlockDifficulty === "string") // it must be hex
+            prevBlockDifficulty = BigInteger(prevBlockDifficulty.replace("0x",""), 16);
+
+        //let's suppose BLOCKCHAIN.DIFFICULTY_NO_BLOCKS === 10
+        //              blockNumber === 9
+        // it should recalcule using [0...9]
+
+        if (blockNumber % consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS-1 !== 0) return prevBlockDifficulty;
+        else {
+
+            let how_much_it_should_have_taken_X_Blocks = consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * consts.BLOCKCHAIN.DIFFICULTY_TIME;
+            let how_much_it_took_to_mine_X_Blocks = 0;
+
+            //calculating 0, when blockNumber = 9
+            let firstBlock = (blockNumber+1) - consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS; // blockNumber is not included
+
+            //adding 0..8
+            for (let i = firstBlock; i < blockNumber; i++)
+                how_much_it_took_to_mine_X_Blocks += this.blockchain.getTimeStamp(i);
+
+            //adding 9
+            how_much_it_took_to_mine_X_Blocks += blockTimestamp;
+
+            //It should substitute, the number of Blocks * Initial Block
+            how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * this.blockchain.getTimeStamp(firstBlock);
+
+            let ratio = new BigNumber(how_much_it_should_have_taken_X_Blocks).dividedBy(how_much_it_took_to_mine_X_Blocks).decimalPlaces(8);
+
+            return prevBlockDifficulty.mul(ratio.toString());
+        }
 
     }
 
 }
 
-export default new BlockchainDifficulty();
+export default BlockchainDifficulty;

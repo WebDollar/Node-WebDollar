@@ -180,7 +180,7 @@ let continents = {
 exports.continents= continents;
 
 
-exports.getContinentFromCountry = function(countryCode){
+exports.getContinentFromCountry = (countryCode) =>{
 
     for (let key in continents)
         if (continents.hasOwnProperty(key))

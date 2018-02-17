@@ -16,6 +16,8 @@ describe('test blockchain difficulty', () => {
 
         if (Difficulty_ETH_DifficultyHomestead  === undefined) return;
 
+        BlockchainDifficulty = new BlockchainDifficulty();
+
         let index = 0;
         for (let difficultyTest in Difficulty_ETH_DifficultyHomestead){
 

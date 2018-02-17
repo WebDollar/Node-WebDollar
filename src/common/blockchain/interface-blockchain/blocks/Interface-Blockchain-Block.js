@@ -31,7 +31,7 @@ class InterfaceBlockchainBlock {
         
         if ( timeStamp === undefined){
 
-            timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStamp;
+            timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStampOffset;
         }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
@@ -62,15 +62,15 @@ class InterfaceBlockchainBlock {
 
     async validateBlock(height, previousDifficultyTarget, previousHash, blockValidationType){
 
-        if (this.version === undefined || this.version === null || typeof this.version !== 'number') throw ('version is empty');
+        if (typeof this.version !== 'number') throw ('version is empty');
 
         if (this.hash === undefined || this.hash === null || !Buffer.isBuffer(this.hash) ) throw ('hash is empty');
         if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw ('hashPrev is empty');
 
 
 
-        if (this.nonce === undefined || this.nonce === null || typeof this.nonce !== 'number') throw ('nonce is empty');
-        if (this.timeStamp === undefined || this.timeStamp === null || typeof this.timeStamp !== 'number') throw ('timeStamp is empty');
+        if (typeof this.nonce !== 'number') throw ('nonce is empty');
+        if (typeof this.timeStamp !== 'number') throw ('timeStamp is empty');
 
         //timestamp must be on 4 bytes
         if (this.timeStamp >= 0xFFFFFFFF) throw ('timeStamp is invalid');
@@ -83,7 +83,7 @@ class InterfaceBlockchainBlock {
 
         if (height !== this.height) throw 'height is different' + height+ " "+ this.height ;
 
-        await this._validateBlockHash(previousHash, blockValidationType);
+        if (! (await this._validateBlockHash(previousHash, blockValidationType))) throw "validateBlockchain return false";
 
         this._validateTargetDifficulty(previousDifficultyTarget);
 
@@ -119,6 +119,7 @@ class InterfaceBlockchainBlock {
             let hash = await this.computeHash();
 
             if (!hash.equals(this.hash)) throw "block hash is not right (" + this.nonce + ")" + this.hash.toString("hex") + " " + hash.toString("hex") + "    " + "difficultyTargetPrev" + this.difficultyTargetPrev.toString("hex")+ "    "+ Buffer.concat([this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)]).toString("hex");
+
         }
 
         await this.data.validateBlockData(this.height, blockValidationType);
@@ -131,7 +132,7 @@ class InterfaceBlockchainBlock {
 
 
         if (prevDifficultyTarget instanceof BigInteger)
-            prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
+            prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
 
         if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget)) throw 'previousDifficultyTarget is not given'
 
@@ -174,7 +175,7 @@ class InterfaceBlockchainBlock {
 
         this.computedBlockPrefix = Buffer.concat ( [
                                                      Serialization.serializeNumber2Bytes( this.version),
-                                                     Serialization.serializeToFixedBuffer( consts.BLOCKS_POW_LENGTH , this.hashPrev ),
+                                                     Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
                                                      Serialization.serializeNumber4Bytes( this.timeStamp ),
                                                      //data contains addressMiner, transactions history, contracts, etc
                                                      this.data.serializeData(requestHeader),
@@ -204,7 +205,7 @@ class InterfaceBlockchainBlock {
 
         this._computeBlockHeaderPrefix(true, requestHeader);
 
-        if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKS_POW_LENGTH)
+        if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
             this.hash = this.computeHash();
 
         return Buffer.concat( [
@@ -228,18 +229,18 @@ class InterfaceBlockchainBlock {
 
         try {
 
-            this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
-            offset += consts.BLOCKS_POW_LENGTH;
+            this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+            offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
-            this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, consts.BLOCKS_NONCE) );
-            offset += consts.BLOCKS_NONCE;
+            this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_NONCE) );
+            offset += consts.BLOCKCHAIN.BLOCKS_NONCE;
 
 
             this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) );
             offset += 2;
 
-            this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKS_POW_LENGTH);
-            offset += consts.BLOCKS_POW_LENGTH;
+            this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+            offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
 
             this.timeStamp = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 4) );
@@ -256,7 +257,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    async save(){
+    async saveBlock(){
 
         let key = "block" + this.height;
 
@@ -278,7 +279,7 @@ class InterfaceBlockchainBlock {
         }
     }
 
-    async load(){
+    async loadBlock(){
 
         let key = "block" + this.height;
         console.log("block load", key);
@@ -302,7 +303,7 @@ class InterfaceBlockchainBlock {
         }
     }
     
-    async remove() {
+    async removeBlock() {
         
         let key = "block" + this.height;
         

@@ -3,7 +3,7 @@ import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/bloc
 import consts from "consts/const_global";
 
 let inheritFork;
-if (consts.POPOW_ACTIVATED) inheritFork = PPoWBlockchainFork;
+if (consts.POPOW_PARAMS.ACTIVATED) inheritFork = PPoWBlockchainFork;
 else inheritFork = InterfaceBlockchainFork;
 
 class MiniBlockchainFork extends inheritFork{
@@ -26,14 +26,16 @@ class MiniBlockchainFork extends inheritFork{
         //clone the Accountant Tree
         this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
 
-        //console.log("root.targetNode.balances before", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
+        console.log("preFork root before", this.blockchain.accountantTree.calculateNodeCoins());
+        console.log("preFork positions", this.forkStartingHeight, this.blockchain.blocks.length-1);
 
         //remove transactions and rewards from each blocks
-        for (let i = this.blockchain.getBlockchainLength-1; i>=this.forkStartingHeight; i--) {
+        for (let i = this.blockchain.blocks.length-1; i>=this.forkStartingHeight; i--) {
+
 
             //remove reward
 
-            console.log(this.blockchain.blocks[i].reward.toString(),"+");
+            console.log("preFork block ", this.blockchain.blocks[i].reward.toString(),"+");
             this.blockchain.accountantTree.updateAccount(this.blockchain.blocks[i].data.minerAddress, this.blockchain.blocks[i].reward.negated() );
 
             //remove transactions
@@ -44,7 +46,7 @@ class MiniBlockchainFork extends inheritFork{
         // console.log("this.forkStartingHeight", this.forkStartingHeight);
         // console.log("root", this.blockchain.accountantTree.root);
         // console.log("root.edges", this.blockchain.accountantTree.root.edges[0]);
-        // console.log("root.targetNode.balances", this.blockchain.accountantTree.root.edges[0].targetNode.balances);
+        console.log("preFork root after ", this.blockchain.accountantTree.calculateNodeCoins());
 
     }
 

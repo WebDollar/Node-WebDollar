@@ -189,7 +189,13 @@ class NodeWebPeerRTC {
         let promise = new Promise ( (resolve) => {
 
             //answer
-            if (typeof inputSignal === "string") inputSignal = JSON.parse(inputSignal);
+            if (typeof inputSignal === "string") {
+                try {
+                    inputSignal = JSON.parse(inputSignal);
+                } catch (exception){
+                    console.error("Error processing JSON createSignal", inputSignal, exception)
+                }
+            }
 
 
             if (inputSignal.sdp) {
@@ -277,12 +283,17 @@ class NodeWebPeerRTC {
 
         this.peer.dataChannel.onmessage = (event) => {
 
-            let data = JSON.parse(event.data);
+            try {
+                let data = JSON.parse(event.data);
 
-            let name = data.name;
-            let value = data.value;
-            if (name !== '')
-                this.callEvents(name, value);
+                let name = data.name;
+                let value = data.value;
+                if (name !== '')
+                    this.callEvents(name, value);
+
+            } catch (exception){
+                console.error("Error onMessage", event.data, exception);
+            }
 
             //console.log("DATA RECEIVED# ################", data);
         }
@@ -291,7 +302,6 @@ class NodeWebPeerRTC {
 
     checkDataChannelState() {
 
-        console.log('WebRTC changed:');
         console.log('WebRTC channel state is:', this.peer.dataChannel.readyState);
 
         if (this.peer.dataChannel.readyState === 'open') {
@@ -460,10 +470,10 @@ class NodeWebPeerRTC {
             let ip6 = this.extractValueFromDescription(str, "IP6");
             let candidate = this.extractValueFromDescription(str, "candidate:");
 
-            console.log("str", str);
-            console.log("IP4=", ip4);
-            console.log("IP6=", ip6);
-            console.log("candidate=", candidate);
+            // console.log("str", str);
+            // console.log("IP4=", ip4);
+            // console.log("IP6=", ip6);
+            // console.log("candidate=", candidate);
 
             let address = '';
 
