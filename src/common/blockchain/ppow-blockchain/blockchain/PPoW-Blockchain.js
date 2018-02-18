@@ -1,7 +1,8 @@
+let BigNumber = require('bignumber.js');
+
 import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockchain/Interface-Blockchain'
 import BlockchainMiningReward from "../../global/Blockchain-Mining-Reward";
 import consts from 'consts/const_global'
-var BigNumber = require('bignumber.js');
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import PPoWBlockchainProver from './prover/PPoW-Blockchain-Prover'
 import PPoWHelper from './prover/helpers/PPoW-Helper'
@@ -51,12 +52,14 @@ class PPoWBlockchain extends InterfaceBlockchain {
       */
     verify(provers){
 
-        if (!Array.isArray(provers)) return false;
+        if (!Array.isArray(provers))
+            return false;
 
         let proofBest = BlockchainGenesis.prevHash;
         let lastBlocksBest = undefined;
 
-        for (let prover in provers){
+        for (let i = 0; i < provers.length; ++i){
+            let prover = provers[i];
             if (this.validateChain(prover.proofs, prover.lastBlocks) && prover.lastBlocks.length === consts.POPOW_PARAMS.k && this.compareProofs(prover.proofs, proofBest) ){
 
                 proofBest = prover.proofs;
@@ -74,37 +77,40 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     /**
      * Algorithm 8 The verify algorithm for the NIPoPoW infix protocol
-     * @param Provers
+     * @param provers
      */
 
-    verifyInfix(Provers){
+    verifyInfix(provers){
 
         let blockById = [];
 
-        for (let prover in Provers)
+        for (let i = 0; i < provers.length; ++i){
+            let prover = provers[i];
             for (let i = 0; i < prover.proofs.blocks.length; ++i) {
                 let B = prover.proofs.blocks[i];
                 // blockById[B.id] ← B
                 blockById[B.hash] = B;
             }
+        }
 
-        let proofBest = this.verify(Provers).proofBest;
+        let proofBest = this.verify(provers).proofBest;
 
         // if |π˜[−1].index| < ` then
         // TODO who is index ????
-        if (proofBest[proofBest.length-1].interlink.length < l)
+        if (proofBest[proofBest.length - 1].interlink.length < l)
             return null;
         else
-            return this.D(ancestors(proofBest[proofBest.length-1], blockById));
+            return this.D( ancestors(proofBest[proofBest.length - 1], blockById) );
 
     }
 
     predicateQ(C){
 
         // undefined, if |C[: −k]| < l, otherwise:
-        if (C.length - consts.POPOW_PARAMS.k < consts.POPOW_PARAMS.l ) return undefined;
+        if (C.length - consts.POPOW_PARAMS.k < consts.POPOW_PARAMS.l )
+            return undefined;
 
-        let CTest = C.splice(C.length-consts.POPOW_PARAMS.k);
+        let CTest = C.splice(C.length - consts.POPOW_PARAMS.k);
 
         // TODO
 
@@ -134,7 +140,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
             index = proofs.length - 1;
             while (index >= 0) {
                 // { b : }
-                if (proofs[index] === blockStop) break;
+                if (proofs[index] === blockStop)
+                    break;
                 index--;
             }
         } else index = 0;
@@ -157,7 +164,9 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     /**
      * Algorithm 4. Compare 2 proofs. aka bestArg
-     * @param Provers
+     * @param proofs1
+     * @param proofs2
+     * @returns {boolean}
      */
     compareProofs(proofs1, proofs2){
 
@@ -192,11 +201,13 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     }
 
-
-
     /**
      * Definition 5 (Locally good superchain).
-     *
+     * @param superLength
+     * @param underlyingLength
+     * @param miu
+     * @returns {boolean}
+     * @private
      */
     _localGood(superLength, underlyingLength, miu){
 
@@ -211,12 +222,18 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     /**
      * Definition 6 (Superchain quality).
+     * @param superchain
+     * @param miu
+     * @param m
+     * @returns {boolean}
+     * @private
      */
     static _superchainQuality(superchain, miu, m){
 
         if (m < 1) throw ('superchainQuality is not good');
 
-        if (superchain.length < m) return false;
+        if (superchain.length < m)
+            return false;
 
         //m ∈ N states that for all m' ≥ m
 
@@ -242,8 +259,11 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     /**
      * Definition 7 (Multilevel quality)
+     * @param superchain
+     * @param miu
+     * @returns {boolean}
+     * @private
      */
-
     static _multilevelQuality(superchain, miu){
 
         //C ∗ = C [−m : ]
@@ -254,16 +274,19 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     /**
      * Definition 8 (Good superchain)
-     *
-     *  if it has both superquality and multilevel quality with parameters (δ, m)
+     * if it has both superquality and multilevel quality with parameters (δ, m)
+     * @param superchain
+     * @param miu
+     * @returns {boolean}
      */
     static good(superchain, miu){
 
-        if (PPoWBlockchain._superchainQuality(superchain, miu) === false) return false;
-        if (PPoWBlockchain._multilevelQuality(superchain, miu) === false) return false;
+        if (PPoWBlockchain._superchainQuality(superchain, miu) === false)
+            return false;
+        if (PPoWBlockchain._multilevelQuality(superchain, miu) === false)
+            return false;
 
         return true;
-
     }
 
 
@@ -302,7 +325,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
                     C1.push(C[j]);
 
                     // [: m]
-                    if (C1.length === consts.POPOW_PARAMS.m) break;   // Sliding m-sized window
+                    if (C1.length === consts.POPOW_PARAMS.m) // Sliding m-sized window
+                        break;
 
                 }
 
