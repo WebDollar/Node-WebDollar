@@ -1,5 +1,6 @@
 let io = require('socket.io');
 const colors = require('colors/safe');
+const https = require('https');
 
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
@@ -36,6 +37,12 @@ class NodeServer {
         try
         {
             let server = null;
+
+            let options = {
+                // key: fs.readFileSync('test/fixtures/keys/agent2-key.pem'),
+                // cert: fs.readFileSync('test/fixtures/keys/agent2-cert.pem')
+            };
+
             try {
                 server = io({
                     maxHttpBufferSize:consts.SOCKET_MAX_SIZE_BYRES,
@@ -44,6 +51,7 @@ class NodeServer {
             } catch(Exception){
                 console.log("Error Importing io() library", Exception.toString());
             }
+
             this.nodeServer = server;
 
             server.on("connection", socket => {
@@ -64,29 +72,49 @@ class NodeServer {
             });
 
             try {
+
                 console.log("SERVER typeof", typeof server);
 
                 //multiple ports, but doesn't work
 
                 let port = process.env.SERVER_PORT||consts.NODE_PORT;
+
                 try{
-                    server.listen (port);
+
+                    https.createServer(options, function (req, res) {
+                        res.writeHead(200);
+                        res.end("hello world\n");
+                    }).listen(port);
+                    // server.listen (port);
+
                 } catch (Exception) {
+
                     console.log( colors.red("Couldn't open server on port ", port, " try next port") );
-                    server.listen (port+1);
+
+                    https.createServer(options, function (req, res) {
+                        res.writeHead(200);
+                        res.end("hello world\n");
+                    }).listen(port+1);
+                    // server.listen (port+1);
+
                 }
             } catch(Exception){
+
                 console.log("Error Calling node-server.listen", Exception.toString());
+
             }
 
         }
         catch(Exception){
+
             console.log("Error Starting Node Server ", Exception.toString());
             return false;
+
         }
 
         console.log("Node Server Started");
         return true;
+
     }
 
 
@@ -103,6 +131,7 @@ class NodeServer {
 
         socket.node.protocol.propagation.initializePropagation();
         socket.node.protocol.signaling.server.initializeSignalingServerService();
+
     }
 
 
