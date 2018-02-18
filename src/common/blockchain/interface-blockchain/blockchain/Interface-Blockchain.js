@@ -171,7 +171,7 @@ class InterfaceBlockchain {
     }
 
     getBlockchainStartingPoint(){
-        return
+        return this.blocks.blocksStartingPoint;
     }
 
 
