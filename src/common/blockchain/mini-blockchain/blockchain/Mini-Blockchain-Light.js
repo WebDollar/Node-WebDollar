@@ -89,35 +89,35 @@ class MiniBlockchainLight extends  MiniBlockchain{
     /**
      * It must be last element
      */
-    async _recalculateLightPrevs(diffIndex, block, serialization, save=true){
+    async _recalculateLightPrevs(height, block, serialization, save=true){
 
         if (block === undefined || block === null)
             block = BlockchainGenesis;
 
-        this.lightPrevDifficultyTargets[diffIndex+1] = block.difficultyTarget;
-        this.lightPrevTimeStamps[diffIndex+1] =  block.timeStamp;
-        this.lightPrevHashPrevs[diffIndex+1] =  block.hash;
+        this.lightPrevDifficultyTargets[height+1] = block.difficultyTarget;
+        this.lightPrevTimeStamps[height+1] =  block.timeStamp;
+        this.lightPrevHashPrevs[height+1] =  block.hash;
 
-        console.log("diffIndex", diffIndex);
+        console.log("diffIndex", height);
         console.log("block.hash", block.hash.toString("hex"));
 
         if (this.agent.light === true)
-            this.blocks.blocksStartingPoint = diffIndex - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS ;
+            this.blocks.blocksStartingPoint = height - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS ;
 
         if (serialization === undefined){
             serialization = this.accountantTree.serializeMiniAccountant();
             //console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
         }
 
-        this.lightAccountantTreeSerializations[diffIndex+1] = serialization;
+        this.lightAccountantTreeSerializations[height+1] = serialization;
 
         this._deleteOldLightSettings();
 
         try {
 
-            if (save)
-                if (this.lightPrevDifficultyTargets[diffIndex - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS] !== undefined)
-                    await this._saveLightSettings(diffIndex - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS);
+            if (this.agent.light && save)
+                if (this.lightPrevDifficultyTargets[height - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS] !== undefined)
+                    await this._saveLightSettings(height - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS);
 
         } catch (exception){
             console.log(colors.red("Couldn't save Light Settings _saveLightSettings"), exception);
@@ -135,7 +135,10 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             console.log("_LightPrevDifficultyTarget saved");
 
-            if (diffIndex === undefined) diffIndex = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 1;
+            if (diffIndex === undefined)
+                diffIndex = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 1;
+
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_diffIndex", diffIndex))) throw "Couldn't be saved _LightSettings_diffIndex";
 
             if (this.lightPrevDifficultyTargets[diffIndex] === undefined) throw "_saveLightSettings is undefined "+diffIndex;
 
@@ -155,9 +158,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex]))) throw "Couldn't be saved _LightSettings_prevHashPrev ";
 
         } catch (exception){
-            console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
-            console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
-            console.log(colors.red("Error saving LIGHT SETTINGS"), exception)
+            console.log(colors.red("Error saving LIGHT SETTINGS"), exception);
+            console.log(colors.red("Error saving LIGHT SETTINGS"), exception);
+            console.log(colors.red("Error saving LIGHT SETTINGS"), exception);
             global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED = true;
 
             throw exception;
@@ -177,7 +180,11 @@ class MiniBlockchainLight extends  MiniBlockchain{
             return false;
         }
 
-        let diffIndex = numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS -1 ;
+        // trying to read the diffIndex
+        let diffIndex = await this.db.get(this._blockchainFileName + "_LightSettings_diffIndex");
+
+        if (diffIndex === null || diffIndex === undefined)
+            diffIndex = numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS -1 ;
 
         if (numBlocks > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS) {
 
@@ -201,16 +208,16 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 return false;
             }
 
-        }
+        } else throw "Error Loading Light Settings";
 
         if (this.agent.light === true)
             this.blocks.blocksStartingPoint = diffIndex;
 
         console.log("diffIndex", diffIndex);
-        console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '')
-        console.log("", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '')
-        console.log("this.lightPrevTimestamp", this.lightPrevTimeStamps[diffIndex])
-        console.log("this.lightPrevHashPrev", this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex")  : '')
+        console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
+        console.log("", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
+        console.log("this.lightPrevTimestamp", this.lightPrevTimeStamps[diffIndex]);
+        console.log("this.lightPrevHashPrev", this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex")  : '');
 
 
         return true;

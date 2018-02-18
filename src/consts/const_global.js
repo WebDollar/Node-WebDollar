@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 
-let consts = {}
+let consts = {};
 
 consts.TERMINATED = false;
 
@@ -19,10 +19,12 @@ consts.BLOCKCHAIN = {
     BLOCKS_NONCE : 4,
 
     LIGHT:{
-        VALIDATE_LAST_BLOCKS : 10,
-        SAFETY_LAST_BLOCKS : 40,
+        VALIDATE_LAST_BLOCKS: 10 , //overwrite below
+        SAFETY_LAST_BLOCKS: 40, //overwrite below
     }
 };
+consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * 1;
+consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS + 2* consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS ;
 
 consts.MINI_BLOCKCHAIN = {
     TOKEN_ID_LENGTH :32,

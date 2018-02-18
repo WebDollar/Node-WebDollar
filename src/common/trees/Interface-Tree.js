@@ -369,7 +369,7 @@ class InterfaceTree{
 
         if (! Buffer.isBuffer(buffer) ) throw "InterfaceTree - buffer is not Buffer"
 
-        console.log("loadTree", buffer.length, "   ",buffer.toString("hex") );
+        //console.log("loadTree", buffer.length, "   ",buffer.toString("hex") );
 
         return this._deserializeTree(buffer, offset||0, includeHashes);
     }
