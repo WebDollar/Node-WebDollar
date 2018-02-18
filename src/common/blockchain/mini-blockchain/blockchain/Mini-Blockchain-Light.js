@@ -211,7 +211,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         } else throw "Error Loading Light Settings";
 
         if (this.agent.light === true)
-            this.blocks.blocksStartingPoint = diffIndex;
+            this.blocks.blocksStartingPoint = numBlocks - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS -1  ;
 
         console.log("diffIndex", diffIndex);
         console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
