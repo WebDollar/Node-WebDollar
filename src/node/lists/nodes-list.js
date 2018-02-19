@@ -73,7 +73,7 @@ class NodesList {
             return true;
         }
 
-        console.log(colors.red( "Already connected to "+socket.node.sckAddress.getAddress(true)));
+        console.error("Already connected to ", socket.node.sckAddress.getAddress(true));
         socket.disconnect(true);
         return false;
     }
@@ -84,7 +84,7 @@ class NodesList {
 
         if (socket !== null && !socket.hasOwnProperty("node") ) {
 
-            //console.log(colors.red("Error - disconnectSocket rejected by invalid helloValidated"));
+            //console.error("Error - disconnectSocket rejected by invalid helloValidated");
             //if (socket.hasOwnProperty("node")) console.log("hello validated value",socket.node.protocol.helloValidated);
             socket.disconnect(true);
             return false;

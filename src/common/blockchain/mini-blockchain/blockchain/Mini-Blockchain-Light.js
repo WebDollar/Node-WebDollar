@@ -55,8 +55,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log("this.blocks.height",block.height);
             //console.log("this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 2", this.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 2);
 
-            console.log("reeesult", saveBlock);
-
             if (saveBlock ){
 
                 // propagating a new block in the network
@@ -120,7 +118,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
                     await this._saveLightSettings(height - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS);
 
         } catch (exception){
-            console.log(colors.red("Couldn't save Light Settings _saveLightSettings"), exception);
+            console.error("Couldn't save Light Settings _saveLightSettings", exception);
         }
 
         return true;
@@ -158,9 +156,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex]))) throw "Couldn't be saved _LightSettings_prevHashPrev ";
 
         } catch (exception){
-            console.log(colors.red("Error saving LIGHT SETTINGS"), exception);
-            console.log(colors.red("Error saving LIGHT SETTINGS"), exception);
-            console.log(colors.red("Error saving LIGHT SETTINGS"), exception);
+            console.error("Error saving LIGHT SETTINGS", exception);
+            console.error("Error saving LIGHT SETTINGS", exception);
+            console.error("Error saving LIGHT SETTINGS", exception);
             global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED = true;
 
             throw exception;
@@ -176,7 +174,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         let numBlocks = await this.db.get(this._blockchainFileName);
         if (numBlocks === null ) {
-            console.log(colors.red("numBlocks was not found"));
+            console.error("numBlocks was not found");
             return false;
         }
 
@@ -192,19 +190,19 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             this.lightPrevDifficultyTargets[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTarget");
             if (this.lightPrevDifficultyTargets[diffIndex] === null) {
-                console.log(colors.red("_LightSettings_prevDifficultyTarget was not found"));
+                console.error("_LightSettings_prevDifficultyTarget was not found");
                 return false;
             }
 
             this.lightPrevTimeStamps[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevTimestamp");
             if (this.lightPrevTimeStamps[diffIndex] === null) {
-                console.log(colors.red("_LightSettings_prevTimestamp was not found"));
+                console.error("_LightSettings_prevTimestamp was not found");
                 return false;
             }
 
             this.lightPrevHashPrevs[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevHashPrev");
             if (this.lightPrevHashPrevs[diffIndex] === null) {
-                console.log(colors.red("_LightSettings_prevHashPrev was not found"));
+                console.error("_LightSettings_prevHashPrev was not found");
                 return false;
             }
 
@@ -240,7 +238,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS ))) throw "couldn't save the blockchain";
 
         } catch (exception){
-            console.log(colors.red("Couldn't save MiniBlockchain"), exception);
+            console.error("Couldn't save MiniBlockchain", exception);
             global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
             return false;
         }
@@ -258,7 +256,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
         if (process.env.BROWSER) return true;
 
         try {
-            if (process.env.BROWSER) return true;
 
             //AccountantTree[:-BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS]
             if (! (await this.accountantTree.loadMiniAccountant(undefined, undefined, true)))
@@ -284,7 +281,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         } catch (exception){
 
-            console.log(colors.red("Couldn't load Light MiniBlockchain"), exception);
+            console.error("Couldn't load Light MiniBlockchain", exception);
             this.accountantTree.root = this.accountantTree._createNode(null,  [], null )
             this._initializeMiniBlockchainLight();
 
@@ -296,6 +293,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
     _deleteOldLightSettings(){
 
         //delete serializations older than [:-m]
+
         let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 3;
         while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
             delete this.lightAccountantTreeSerializations[index];

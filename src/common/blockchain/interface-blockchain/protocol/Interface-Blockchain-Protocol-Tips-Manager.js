@@ -68,7 +68,7 @@ class InterfaceBlockchainProtocolTipsManager {
         if (typeof newChainLength !== "number") throw "newChainLength is not a number";
 
         if (newChainLength < this.blockchain.blocks.length){
-            console.log(colors.red("Your blockchain is smaller than mine"));
+            console.error("Your blockchain is smaller than mine");
             throw "Your blockchain is smaller than mine";
         }
 

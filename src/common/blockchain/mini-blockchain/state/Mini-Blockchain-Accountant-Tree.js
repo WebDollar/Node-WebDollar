@@ -193,7 +193,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             return result !== false;
 
         } catch (exception){
-            console.log( colors.red("loadMiniAccountant error"), exception )
+            console.error( "loadMiniAccountant error", exception )
             return false;
         }
 

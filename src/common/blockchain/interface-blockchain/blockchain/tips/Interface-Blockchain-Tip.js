@@ -46,8 +46,8 @@ class InterfaceBlockchainTip{
 
     validateTip(){
 
-        console.log("this.blockchain.blocks.length", this.blockchain.blocks.length);
-        console.log("this.forkChainLength", this.forkChainLength);
+        // console.log("this.blockchain.blocks.length", this.blockchain.blocks.length);
+        // console.log("this.forkChainLength", this.forkChainLength);
 
         if (this.blockchain.blocks.length < this.forkChainLength)
             return true;

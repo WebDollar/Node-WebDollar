@@ -63,7 +63,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
             } catch (exception){
 
-                console.log(colors.red("Socket Error - get/blockchain/light/get-light-settings"), exception, data);
+                console.error("Socket Error - get/blockchain/light/get-light-settings", exception, data);
 
                 socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
                     result: false,

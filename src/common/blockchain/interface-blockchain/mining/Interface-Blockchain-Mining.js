@@ -176,7 +176,7 @@ class InterfaceBlockchainMining{
 
 
             } catch (Exception){
-                console.log(colors.red("Error creating next block "), Exception, nextBlock);
+                console.error("Error creating next block ", Exception, nextBlock);
             }
 
             try{
@@ -191,7 +191,7 @@ class InterfaceBlockchainMining{
 
 
             } catch (Exception){
-                console.log(colors.red("Error processBlocksSempahoreCallback "+Exception.toString()), Exception, nextBlock);
+                console.error("Error processBlocksSempahoreCallback "+Exception.toString(), Exception, nextBlock);
             }
 
             try {
@@ -249,7 +249,7 @@ class InterfaceBlockchainMining{
             try {
                 answer = await this.mine(block, difficulty);
             } catch (exception){
-                console.log(colors.red("Couldn't mine block " + block.height + exception.toString()), exception);
+                console.error("Couldn't mine block " + block.height + exception.toString(), exception);
                 answer.result = false;
             }
 
@@ -270,12 +270,12 @@ class InterfaceBlockchainMining{
 
                 } catch (exception){
 
-                    console.log(colors.red("Mining processBlocksSempahoreCallback raised an error " + block.height + exception.toString()), exception);
+                    console.error("Mining processBlocksSempahoreCallback raised an error " + block.height + exception.toString(), exception);
                 }
 
             } else
             if (!answer.result)
-                console.log( colors.red("block ", block.height ," was not mined...") );
+                console.error( "block ", block.height ," was not mined...");
 
             if (this.reset) // it was reset
                 this.reset = false;
@@ -285,7 +285,7 @@ class InterfaceBlockchainMining{
 
         } catch (Exception){
 
-            console.log( colors.red("Error mining block "), Exception, block);
+            console.error( "Error mining block ", Exception, block);
 
             if (intervalMiningOutput !== undefined) clearInterval(intervalMiningOutput);
             throw Exception;

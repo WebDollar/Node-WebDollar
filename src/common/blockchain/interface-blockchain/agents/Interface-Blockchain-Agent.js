@@ -65,7 +65,7 @@ class InterfaceBlockchainAgent{
             this.agentQueueProcessing.splice(queueIndex, 1);
 
         } catch (exception) {
-            console.log(colors.red("Error asking for Blockchain"), exception);
+            console.error("Error asking for Blockchain", exception);
         }
 
         result.socket.node.protocol.agent.startedAgentDone = true;
@@ -82,7 +82,7 @@ class InterfaceBlockchainAgent{
                 if (NodesList.nodes[i].socket.level <= 2 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
 
                     done = false;
-                    console.log("not done", NodesList.nodes[i]);
+                    // console.log("not done", NodesList.nodes[i]);
                     break;
                 }
 

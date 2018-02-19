@@ -252,7 +252,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             return offset;
 
         } catch (exception){
-            console.log(colors.red("error deserializing tree node"), exception);
+            console.error("error deserializing tree node", exception);
             throw exception;
         }
 

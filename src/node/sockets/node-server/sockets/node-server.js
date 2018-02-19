@@ -72,7 +72,7 @@ class NodeServer {
                 try{
                     server.listen (port);
                 } catch (Exception) {
-                    console.log( colors.red("Couldn't open server on port ", port, " try next port") );
+                    console.error( "Couldn't open server on port ", port, " try next port") ;
                     server.listen (port+1);
                 }
             } catch(Exception){

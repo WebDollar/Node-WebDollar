@@ -43,7 +43,7 @@ class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
 
             } catch (exception){
 
-                console.log(colors.red("Socket Error - get/blockchain/accountant-tree/get-accountant-tree", exception), data);
+                console.error("Socket Error - get/blockchain/accountant-tree/get-accountant-tree", exception, data);
 
                 socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
                     result: false,

@@ -35,7 +35,7 @@ class SemaphoreProcessing{
             try {
                 answer = this._list[0].callback();
             } catch (ex){
-                console.log(colors.red("error processingSemaphoreList !!!!!!!!!!!!!!!!!!!!!!!!"), ex);
+                console.error("error processingSemaphoreList !!!!!!!!!!!!!!!!!!!!!!!!", ex);
             }
 
             try {
@@ -45,7 +45,7 @@ class SemaphoreProcessing{
                 resolver(answer);
 
             } catch (ex){
-                console.log(colors.red("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!"), ex);
+                console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
             }
 
         }

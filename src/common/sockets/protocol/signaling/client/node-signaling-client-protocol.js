@@ -19,7 +19,7 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/initiator/generate-initiator-signal", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
-                console.log(colors.red("data.remoteUUID 1"), data.remoteUUID);
+                console.error("data.remoteUUID 1", data.remoteUUID);
                 return false;
             }
 
@@ -53,7 +53,7 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/answer/receive-initiator-signal", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
-                console.log(colors.red("data.remoteUUID 2"), data.remoteUUID);
+                console.error("data.remoteUUID 2", data.remoteUUID);
                 return false;
             }
 
@@ -91,7 +91,7 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/answer/receive-ice-candidate", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
-                console.log(colors.red("data.remoteUUID 3"), data.remoteUUID);
+                console.error("data.remoteUUID 3", data.remoteUUID);
                 return false;
             }
 
@@ -130,12 +130,12 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/initiator/receive-ice-candidate", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
-                console.log(colors.red("data.remoteUUID 4"), data.remoteUUID);
+                console.error("data.remoteUUID 4", data.remoteUUID);
                 return false;
             }
 
             if (data.iceCandidate === undefined){
-                console.log(colors.red("data.iceCandidate 4"), data.answerSignal);
+                console.error("data.iceCandidate 4", data.answerSignal);
                 return false;
             }
 
@@ -172,7 +172,7 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/initiator/join-answer-signal", async (data) => {
 
             if (data.remoteUUID === undefined || data.remoteUUID === null){
-                console.log(colors.red("data.remoteUUID 5"), data.remoteUUID);
+                console.error("data.remoteUUID 5", data.remoteUUID);
                 return false;
             }
 

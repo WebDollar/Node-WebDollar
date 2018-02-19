@@ -133,7 +133,7 @@ class InterfaceBlockchainTransaction{
             offset = this.to.deserializeTo(buffer, offset);
 
         } catch (exception){
-            console.log(colors.red("error deserializing a transaction "), exception);
+            console.error("error deserializing a transaction ", exception);
             throw exception;
         }
 

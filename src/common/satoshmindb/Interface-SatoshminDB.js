@@ -254,7 +254,7 @@ class InterfaceSatoshminDB {
 
             //timeout, max 10 seconds to load the database
             let timeoutInterval = setTimeout(()=>{
-                console.error(colors.red("get failed !!" + key));
+                console.error("get failed !!" + key);
                 resolve(null);
             }, timeout);
 
@@ -266,7 +266,7 @@ class InterfaceSatoshminDB {
             }).catch((exception)=>{
 
                 clearTimeout(timeoutInterval);
-                console.error(colors.red("db.get error " + key), exception);
+                console.error("db.get error " + key, exception);
 
                 if (exception.status === 500 && MainBlockchain.emitter !== undefined)
                     MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});

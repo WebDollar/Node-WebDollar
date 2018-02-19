@@ -91,7 +91,7 @@ class SocketExtend{
             }
 
         } catch (exception){
-            console.log(colors.red("Error sending request" + exception.toString()), exception);
+            console.error("Error sending request" + exception.toString(), exception);
             return null;
         }
 

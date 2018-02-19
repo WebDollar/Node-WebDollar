@@ -177,7 +177,7 @@ class InterfaceBlockchainAddress{
         return new Promise(resolve => {
 
             if (totalMultiSig < requiredMultiSig){
-                console.log(colors.red("totalMultiSig should be greater(or equal) than requiredMultiSig!"));
+                console.error("totalMultiSig should be greater(or equal) than requiredMultiSig!");
                 resolve(false);
                 return;
             }
@@ -261,7 +261,7 @@ class InterfaceBlockchainAddress{
         return this.getPrivateKey().then( (response) => {
             return response.toString("hex");
         }).catch((err)=> {
-            console.log(colors.red("Cannot export privateKey as string: " + err));
+            console.error("Cannot export privateKey as string: " + err);
             return err;
         });
     }

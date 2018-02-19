@@ -75,10 +75,11 @@ class MinerProtocol {
     async createMiningHashes(){
 
         //TODO: create a list with best X hashes
+        let answer;
         try {
             answer = await this.mine(block, difficulty);
         } catch (exception){
-            console.log(colors.red("Couldn't mine block " + block.height + exception.toString()), exception);
+            console.error("Couldn't mine block " + block.height + exception.toString(), exception);
             answer.result = false;
         }
 

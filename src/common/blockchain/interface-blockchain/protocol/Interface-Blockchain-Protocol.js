@@ -127,7 +127,7 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - get/blockchain/header/last-block/answer", exception.toString()));
+                    console.error("Socket Error - get/blockchain/header/last-block/answer", exception.toString());
 
                     socket.node.sendRequest( "get/blockchain/header/last-block/answer", {
                         result: false,
@@ -189,7 +189,7 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - blockchain/new-block-header"), exception, data);
+                    console.error("Socket Error - blockchain/new-block-header", exception, data);
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: false,
@@ -212,7 +212,7 @@ class InterfaceBlockchainProtocol {
 
             } catch (exception) {
 
-                console.log(colors.red("Socket Error - blockchain/info/request-blockchain-info", exception.toString()));
+                console.error("Socket Error - blockchain/info/request-blockchain-info", exception);
 
                 socket.node.sendRequest("blockchain/info/request-blockchain-info", {
                     result: false,
@@ -254,7 +254,7 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - blockchain/headers-info/request-header-info-by-height", exception.toString()));
+                    console.error("Socket Error - blockchain/headers-info/request-header-info-by-height", exception.toString);
                     socket.node.sendRequest("blockchain/headers-info/request-header-info-by-height/" + data.height || 0, {
                         result: false,
                         message: exception.toString()
@@ -287,7 +287,7 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.log(colors.red("Socket Error - blockchain/blocks/request-block-by-height ", exception.toString()));
+                    console.error("Socket Error - blockchain/blocks/request-block-by-height ", exception);
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + data.height || 0, {
                         result: false,
                         message: exception.toString()
@@ -342,7 +342,7 @@ class InterfaceBlockchainProtocol {
 
         } catch (exception) {
 
-            console.log(colors.red("Socket Error - get/blockchain/header/last-block"), exception);
+            console.error("Socket Error - get/blockchain/header/last-block", exception);
             return false;
         }
 

@@ -91,7 +91,7 @@ class MiniBlockchain extends  inheritBlockchain{
             exception = ex;
             revert.revertNow = true;
 
-            console.log(colors.red("MiniBlockchain simulateNewBlock 1 raised an exception"), ex);
+            console.error("MiniBlockchain simulateNewBlock 1 raised an exception", ex);
 
         }
 
@@ -140,7 +140,7 @@ class MiniBlockchain extends  inheritBlockchain{
             return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
         }))) throw "Error includeBlockchainBlock MiniBlockchain ";
 
-        if (! (await this.accountantTree.saveMiniAccountant( true))) console.log(colors.red("Error Saving Mini Accountant Tree"));
+        if (! (await this.accountantTree.saveMiniAccountant( true))) console.error("Error Saving Mini Accountant Tree");
 
         return true;
     }
@@ -165,7 +165,7 @@ class MiniBlockchain extends  inheritBlockchain{
             return true;
 
         } catch (exception){
-            console.log(colors.red("Couldn't save MiniBlockchain"), exception)
+            console.error("Couldn't save MiniBlockchain", exception)
             return false;
         }
     }
@@ -202,7 +202,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         } catch (exception){
 
-            console.log(colors.red("Couldn't load  MiniBlockchain"), exception);
+            console.error("Couldn't load  MiniBlockchain", exception);
             this.accountantTree = new MiniBlockchainAccountantTree(this.db);
             return false;
         }

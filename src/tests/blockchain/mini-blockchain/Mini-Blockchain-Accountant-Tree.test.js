@@ -76,7 +76,7 @@ describe('MiniBlockchainAccountantTree', () => {
                 Tree.updateAccount(list[i].address, list[i].value);
                 sum = sum.plus(list[i].value);
             } catch (exception){
-                console.log(colors.red("error updating Account"), i, list[i]) ;
+                console.error("error updating Account", i, list[i]);
                 throw exception;
             }
 

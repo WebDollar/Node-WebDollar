@@ -64,7 +64,7 @@ class NodeSignalingServerProtocol {
                 if (NodesList.nodes[i].socket.node.sckAddress.uuid !== undefined)
                     listAcceptingWebPeerConnections.push(NodesList.nodes[i].socket);
                 else
-                    console.log(colors.red("uuid is empty", NodesList.nodes[i].socket.node.sckAddress));
+                    console.error("uuid is empty", NodesList.nodes[i].socket.node.sckAddress);
 
         if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("listAcceptingWebPeerConnections", listAcceptingWebPeerConnections.length );
 

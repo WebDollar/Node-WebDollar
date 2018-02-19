@@ -144,6 +144,8 @@ export default function (self) {
                         nonce ++ ;
                         ev.data.count --;
 
+                        log({message:"worker nonce changed", nonce: block});
+
                         return chainNext();
 
                     });
