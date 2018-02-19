@@ -1,3 +1,6 @@
+const FileSystem = require('fs');
+
+import consts from 'consts/const_global'
 import InterfaceBlockchainAddressHelper from './Interface-Blockchain-Address-Helper';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import Serialization from "common/utils/Serialization";
@@ -8,9 +11,6 @@ import BufferExtended from 'common/utils/BufferExtended';
 import MultiSig from "./MultiSig";
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
-const FileSystem = require('fs');
-
-let INITIAL_PASSWORD = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l' ]
 
 class InterfaceBlockchainAddress{
 
@@ -21,7 +21,7 @@ class InterfaceBlockchainAddress{
 
 
         if (db === undefined){
-            this.db = new InterfaceSatoshminDB();
+            this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
         } else {
             this.db = db;
         }

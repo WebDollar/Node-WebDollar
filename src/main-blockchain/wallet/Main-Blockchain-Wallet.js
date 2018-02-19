@@ -21,7 +21,7 @@ class MainBlockchainWallet{
 
         //TODO change db name to "walletDB"
         if(db === undefined)
-            this.db = new InterfaceSatoshminDB();
+            this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
         else
             this.db = db;
 

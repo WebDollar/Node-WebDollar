@@ -1,14 +1,16 @@
-import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 const BigNumber = require('bignumber.js');
+
+import consts from 'consts/const_global'
 import Serialization from "common/utils/Serialization";
 import BufferExtended from 'common/utils/BufferExtended';
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 
 class PoolData {
 
     constructor(dataBase) {
 
         if (dataBase === undefined)
-            this.db = new InterfaceSatoshminDB("poolDB");
+            this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.POOL_DATABASE);
         else
             this.db = dataBase;
 

@@ -1,11 +1,12 @@
-var BigInteger = require('big-integer');
+const BigInteger = require('big-integer');
+const colors = require('colors/safe');
+
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import consts from 'consts/const_global'
-const colors = require('colors/safe');
 
 class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
