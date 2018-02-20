@@ -3,6 +3,7 @@ import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-R
 const colors = require('colors/safe');
 import global from "consts/global"
 import consts from 'consts/const_global'
+import InterfaceBlockchainBlockValidation from "../blocks/validation/Interface-Blockchain-Block-Validation";
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
@@ -59,7 +60,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         } catch (Exception){
 
-            console.log(colors.red("_discoverForkBinarySearch raised an exception" ), Exception, blockHeaderResult);
+            console.error("_discoverForkBinarySearch raised an exception" , Exception, blockHeaderResult);
 
             return {position: null, header: null};
         }
@@ -101,7 +102,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
             if ( forkFound !== null ) {
-                console.log(colors.red("discoverAndProcessFork - fork already found"));
+                console.error("discoverAndProcessFork - fork already found");
                 return forkFound;
             }
 
@@ -132,13 +133,13 @@ class InterfaceBlockchainProtocolForkSolver{
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
 
                 if (answer === null) throw "connection dropped info";
-                if (answer === undefined || answer === undefined || typeof answer.chainStartingPoint !== "number" ) throw "request-blockchain-info couldn't return real values";
+                if (answer === undefined || typeof answer.chainStartingPoint !== "number" ) throw "request-blockchain-info couldn't return real values";
 
                 newChainStartingPoint = answer.chainStartingPoint;
 
                 if (this.blockchain.agent.light)
                     if (newChainLength - newChainStartingPoint > consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS){
-                        console.log(colors.red("LIGHT CHANGES from "), newChainStartingPoint, " to ", newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1);
+                        console.warn("LIGHT CHANGES from ", newChainStartingPoint, " to ", newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1);
                         newChainStartingPoint = newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1;
                     }
 
@@ -149,7 +150,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === null)
                     throw "connection dropped discoverForkBinarySearch"
 
-                //console.log("binary search ", binarySearchResult)
+                // console.log("binary search ", binarySearchResult)
             }
 
             console.log(colors.yellow("discoverFork 7777" ), binarySearchResult)
@@ -185,7 +186,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 } catch (Exception){
 
-                    console.log(colors.red("discoverAndProcessFork - creating a fork raised an exception" ), Exception, "binarySearchResult", binarySearchResult )
+                    console.error("discoverAndProcessFork - creating a fork raised an exception" , Exception, "binarySearchResult", binarySearchResult )
                     throw Exception;
                 }
 
@@ -200,7 +201,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 } catch (Exception){
 
-                    console.log(colors.red("discoverAndProcessFork - solving a fork raised an exception" ), Exception, "binarySearchResult", binarySearchResult );
+                    console.error("solving a fork raised an exception" , Exception, "binarySearchResult", binarySearchResult );
                     throw Exception;
                 }
 
@@ -216,7 +217,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         } catch (Exception){
 
-            console.log(colors.red("discoverAndProcessFork raised an exception"  ), Exception )
+            console.error("discoverAndProcessFork raised an exception", Exception );
             result = false;
 
         }
@@ -236,7 +237,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         if (fork === null || fork === undefined || typeof fork !== "object" ) throw ('fork is null');
 
-        let nextBlockHeight = fork.forkStartingHeight;
+        let nextBlockHeight = fork.forkStartingHeightDownloading;
 
 
         //interval timer
@@ -245,8 +246,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
-            console.log("fork.forkStartingHeight", fork.forkStartingHeight, "fork.forkBlocks.length", fork.forkBlocks.length)
-            console.log(" < fork.forkChainLength", fork.forkChainLength)
+            console.log("fork.forkStartingHeight", fork.forkStartingHeight, "fork.forkBlocks.length", fork.forkBlocks.length);
+            console.log(" < fork.forkChainLength", fork.forkChainLength);
 
             //in case I didn't check this socket for the same block
             while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength && !global.TERMINATED ) {
@@ -265,60 +266,46 @@ class InterfaceBlockchainProtocolForkSolver{
                 else if (this.protocol.acceptBlockHeaders) onlyHeader = true;
 
 
-                answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight, onlyHeader: onlyHeader}, nextBlockHeight);
+                answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight);
 
                 if (answer === null || answer === undefined)
                     throw "block never received "+ nextBlockHeight;
 
-                if (answer !== undefined && answer !== null && answer.result === true && answer.block !== undefined  && Buffer.isBuffer(answer.block) ) {
-
-                    let block;
-
-                    try {
-
-                        block = this.blockchain.blockCreator.createEmptyBlock(nextBlockHeight);
-
-                        if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
-                            block.data._onlyHeader = true; //avoiding to store the transactions
-
-                        block.deserializeBlock( answer.block, nextBlockHeight, BlockchainMiningReward.getReward(block.height), new Buffer(32) );
-
-                    } catch (Exception) {
-                        console.log(colors.red("Error deserializing blocks "), Exception, answer.block);
-                        return false;
-                    }
-
-                    let result;
-
-                    try {
-
-                        result = await fork.includeForkBlock(block);
-
-                    } catch (Exception) {
-
-                        console.log(colors.red("Error including block " + nextBlockHeight + " in fork "), Exception);
-
-                        try {
-                            console.log("block.serialization ", block.serializeBlock().toString("hex"));
-                        } catch (exception) {
-                            console.log(colors.red("Error serializing fork block"), block);
-                        }
-
-                        return false;
-
-                    }
-
-                    //if the block was included correctly
-                    if (result) {
-                        nextBlockHeight++;
-                    } else
-                        throw "Fork didn't work at height "+nextBlockHeight;
-
-
-                } else {
-                    console.log("Fork Answer received ", answer)
+                if ( !answer.result || answer.block === undefined  || !Buffer.isBuffer(answer.block) ) {
+                    console.log("Fork Answer received ", answer);
                     throw "Fork Answer is not Buffer";
                 }
+
+
+                let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight);
+                let block = this._deserializeForkBlock(answer.block, nextBlockHeight, blockValidation );
+
+                let result;
+
+                try {
+
+                    result = await fork.includeForkBlock(block);
+
+                } catch (Exception) {
+
+                    console.error("Error including block " + nextBlockHeight + " in fork ", Exception);
+
+                    try {
+                        console.log("block.serialization ", block.serializeBlock().toString("hex"));
+                    } catch (exception) {
+                        console.error("Error serializing fork block", block);
+                    }
+
+                    return false;
+
+                }
+
+                //if the block was included correctly
+                if (result)
+                    nextBlockHeight++;
+                else
+                    throw "Fork didn't work at height "+nextBlockHeight;
+
 
 
             }
@@ -341,6 +328,27 @@ class InterfaceBlockchainProtocolForkSolver{
 
         }
 
+    }
+
+    _deserializeForkBlock( blockData, blockHeight, validationBlock){
+
+        let block = undefined;
+
+        try {
+
+            block = this.blockchain.blockCreator.createEmptyBlock(blockHeight, validationBlock);
+
+            if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
+                block.data._onlyHeader = true; //avoiding to store the transactions
+
+            block.deserializeBlock( blockData, blockHeight, BlockchainMiningReward.getReward(block.height), new Buffer(32) );
+
+        } catch (Exception) {
+            console.error("Error deserializing blocks ", Exception, blockData);
+            return false;
+        }
+
+        return block;
     }
 
 }

@@ -4,13 +4,7 @@ import consts from 'consts/const_global'
 
 class BlockchainDifficulty{
 
-    constructor(blockchain){
-
-        this.blockchain = blockchain;
-
-    }
-
-    getDifficulty(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber){
+    static getDifficulty(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 
         // difficulty algorithm is based on blockNumber
         if (!( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.greaterThanOrEqualTo(0))))
@@ -20,10 +14,17 @@ class BlockchainDifficulty{
         // console.log("blockTimestamp", blockTimestamp.toString(16));
         // console.log("blockNumber", blockNumber.toString(16));
 
-        if (blockNumber < 31925)
-            return this.getDifficultyMean(prevBlockDifficulty, blockTimestamp, blockNumber);
+        try {
+            console.warn("new difficulty mean");
+            console.warn(this.getDifficultyMean(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber));
+        } catch (exception){
+            console.error("couldn't calculate the getDifficultyMean for", blockNumber, exception);
+        }
+
+        if (blockNumber < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK)
+            return this.calculateBlockDifficultyETH(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
         else
-            return this.calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber);
+            return this.getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
 
         // console.log("difficulty0",  rez.toString() );
         // console.log("difficulty1",  Serialization.serializeBigInteger( rez ).length, Serialization.serializeBigInteger( rez ) );
@@ -39,7 +40,7 @@ class BlockchainDifficulty{
      * @param blockNumber
      * @param includeBombFormula
      */
-    calculateBlockDifficultyETH(prevBlockDifficulty, prevBlockTimestamp, blockTimestamp, blockNumber, includeBombFormula){
+    static calculateBlockDifficultyETH( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber, includeBombFormula){
 
         // difficulty function based on Ethereum
         // https://ethereum.stackexchange.com/questions/5913/how-does-the-ethereum-homestead-difficulty-adjustment-algorithm-work
@@ -51,14 +52,17 @@ class BlockchainDifficulty{
                        int(2**((block.number // 100000) - 2))                                                -- includeBombFormula
          */
 
+        let prevBlockDifficulty = getDifficultyCallback(blockNumber);
+        let prevBlockTimestamp = getTimeStampCallback(blockNumber);
+
         if (Buffer.isBuffer(prevBlockDifficulty))
             prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
         else if (typeof prevBlockDifficulty === "string") // it must be hex
             prevBlockDifficulty = BigInteger(prevBlockDifficulty.replace("0x",""), 16);
 
 
-        if (Buffer.isBuffer(prevBlockDifficulty))
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
+        if (Buffer.isBuffer(prevBlockTimestamp))
+            prevBlockTimestamp = BigInteger(prevBlockTimestamp.toString("hex"), 16);
         else if (typeof prevBlockTimestamp === "string")
             prevBlockTimestamp = BigInteger(prevBlockTimestamp.replace("0x",""), 16);
 
@@ -79,10 +83,6 @@ class BlockchainDifficulty{
         let equationTwo = equationTwoPartA.greater( -99 ) ? equationTwoPartA : -99;
 
         //console.log("equationTwo", equationTwo);
-
-        if (blockNumber.equals(31925))
-            blockNumber = BigInteger(1);
-
 
         let blockDiff;
 
@@ -105,9 +105,9 @@ class BlockchainDifficulty{
      */
 
     //newDifficulty
-    getDifficultyMean(blockTimestamp, blockNumber){
+    static getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 
-        let prevBlockDifficulty = this.blockchain.getDifficultyTarget(blockNumber - 1);
+        let prevBlockDifficulty = getDifficultyCallback(blockNumber);
 
         if (Buffer.isBuffer(prevBlockDifficulty))
             prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
@@ -121,6 +121,8 @@ class BlockchainDifficulty{
         if (blockNumber % consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS-1 !== 0) return prevBlockDifficulty;
         else {
 
+            console.warn("new difficulty mean recalculated", blockNumber);
+
             let how_much_it_should_have_taken_X_Blocks = consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * consts.BLOCKCHAIN.DIFFICULTY_TIME;
             let how_much_it_took_to_mine_X_Blocks = 0;
 
@@ -129,13 +131,13 @@ class BlockchainDifficulty{
 
             //adding 0..8
             for (let i = firstBlock; i < blockNumber; i++)
-                how_much_it_took_to_mine_X_Blocks += this.blockchain.getTimeStamp(i);
+                how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i);
 
             //adding 9
             how_much_it_took_to_mine_X_Blocks += blockTimestamp;
 
             //It should substitute, the number of Blocks * Initial Block
-            how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * this.blockchain.getTimeStamp(firstBlock);
+            how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * getTimeStampCallback(firstBlock);
 
             let ratio = new BigNumber(how_much_it_should_have_taken_X_Blocks).dividedBy(how_much_it_took_to_mine_X_Blocks).decimalPlaces(8);
 

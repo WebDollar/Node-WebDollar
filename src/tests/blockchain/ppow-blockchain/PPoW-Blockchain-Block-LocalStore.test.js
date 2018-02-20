@@ -27,7 +27,7 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
         
         let interlink = [{height: h1, blockId: interlinkHash1}, {height: h2, blockId: interlinkHash2}];
         
-        block = new PPoWBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
+        block = new PPoWBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db );
         block.interlink = interlink;
         
         response = await block.saveBlock();
@@ -61,7 +61,7 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
 
         let interlink = [{height: h1, blockId: interlinkHash1}, {height: h2, blockId: interlinkHash2}];
         
-        block = new PPoWBlockchainBlock( Blockchain.blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db );
+        block = new PPoWBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db );
         block.interlink = interlink;
         
         response = await block.saveBlock();

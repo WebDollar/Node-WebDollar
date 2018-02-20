@@ -17,7 +17,7 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-    constructor (blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db){
+    constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db){
 
         this.blockchain = blockchain;
 
@@ -52,6 +52,8 @@ class InterfaceBlockchainBlock {
 
         this.reward = undefined;
 
+        this.blockValidation = blockValidation;
+
         this.db = db;
 
     }
@@ -60,7 +62,7 @@ class InterfaceBlockchainBlock {
         return true;
     }
 
-    async validateBlock(height, previousDifficultyTarget, previousHash, blockValidationType){
+    async validateBlock(height){
 
         if (typeof this.version !== 'number') throw ('version is empty');
 
@@ -83,11 +85,12 @@ class InterfaceBlockchainBlock {
 
         if (height !== this.height) throw 'height is different' + height+ " "+ this.height ;
 
-        if (! (await this._validateBlockHash(previousHash, blockValidationType))) throw "validateBlockchain return false";
+        if (! (await this._validateBlockHash())) throw "validateBlockchain return false";
 
-        this._validateTargetDifficulty(previousDifficultyTarget);
+        this._validateTargetDifficulty();
 
-        if (this.reward.equals(BlockchainMiningReward.getReward(this.height)) === false ) throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward(this.height);
+        if (this.reward.equals( BlockchainMiningReward.getReward(this.height) ) === false )
+            throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward( this.height );
 
         if (this._supplementaryValidation() === false) throw "supplementaryValidation failed";
 
@@ -97,13 +100,14 @@ class InterfaceBlockchainBlock {
     /**
      * it will recheck the validity of the block
      */
-    async _validateBlockHash(previousHash, blockValidationType) {
+    async _validateBlockHash() {
 
         if (this.computedBlockPrefix === null) this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
-        if ( blockValidationType["skip-prev-hash-validation"] === undefined ){
+        if ( this.blockValidation.blockValidationType["skip-prev-hash-validation"] === undefined ){
 
             //validate hashPrev
+            let previousHash = this.blockValidation.getHashPrevCallback(this.height);
             if ( previousHash === null || !Buffer.isBuffer(previousHash)) throw 'previous hash is not given'
 
             if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match " + previousHash.toString("hex") + " " + this.hashPrev.toString("hex") ;
@@ -111,8 +115,7 @@ class InterfaceBlockchainBlock {
 
         //validate hash
         //skip the validation, if the blockValidationType is provided
-        if ( blockValidationType['skip-validation-before'] === undefined ||
-            (this.height >= blockValidationType['skip-validation-before'].height )) {
+        if ( !this.blockValidation.blockValidationType['skip-validation']) {
 
             console.log("_validateBlockHash");
 
@@ -122,14 +125,16 @@ class InterfaceBlockchainBlock {
 
         }
 
-        await this.data.validateBlockData(this.height, blockValidationType);
+        await this.data.validateBlockData(this.height, this.blockValidation);
 
         return true;
 
     }
 
-    _validateTargetDifficulty(prevDifficultyTarget){
+    _validateTargetDifficulty(){
 
+
+        let prevDifficultyTarget = this.blockValidation.getDifficultyCallback(this.height);
 
         if (prevDifficultyTarget instanceof BigInteger)
             prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
@@ -249,7 +254,7 @@ class InterfaceBlockchainBlock {
             offset = this.data.deserializeData(buffer, offset);
 
         } catch (exception){
-            console.log(colors.red("error deserializing a block  "), exception, buffer);
+            console.error("error deserializing a block  ", exception, buffer);
             throw exception;
         }
 
@@ -266,7 +271,7 @@ class InterfaceBlockchainBlock {
         try {
             bufferValue = this.serializeBlock();
         } catch (exception){
-            console.log(colors.red('ERROR serializing block: '),  exception);
+            console.error('ERROR serializing block: ',  exception);
             throw exception;
         }
     
@@ -274,7 +279,7 @@ class InterfaceBlockchainBlock {
             return (await this.db.save(key, bufferValue));
         }
         catch (exception){
-            console.log(colors.red('ERROR on SAVE block: '),  exception);
+            console.error('ERROR on SAVE block: ',  exception);
             throw exception;
         }
     }
@@ -289,7 +294,7 @@ class InterfaceBlockchainBlock {
             let buffer = await this.db.get(key);
 
             if (buffer === null) {
-                console.log(colors.red("block "+this.height+" was not found "+ key));
+                console.error("block "+this.height+" was not found "+ key);
                 return false;
             }
 
@@ -298,7 +303,7 @@ class InterfaceBlockchainBlock {
             return true;
         }
         catch(exception) {
-            console.log ( colors.red('ERROR on LOAD block: '), exception);
+            console.error( 'ERROR on LOAD block: ', exception);
             return false;
         }
     }

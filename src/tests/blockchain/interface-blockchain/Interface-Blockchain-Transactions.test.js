@@ -14,7 +14,7 @@ describe('test transactions', () => {
 
         blockchain = new InterfaceBlockchain();
         //create dummy blocks
-        let b0 = new InterfaceBlockchainBlock( blockchain, 0, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 0, blockchain.db );
+        let b0 = new InterfaceBlockchainBlock( blockchain, blockchain.blockValidation,  0, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 0, blockchain.db );
 
     });
 

@@ -9,9 +9,9 @@ const colors = require('colors/safe');
 
 class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
-    constructor (blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db) {
+    constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db) {
 
-        super(blockchain, version, hash, hashPrev, timeStamp, nonce, data, height, db);
+        super(blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db);
 
         //first pointer is to Genesis
         this.interlink = [{height: -1, blockId: BlockchainGenesis.hashPrev}];
@@ -76,7 +76,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     _validateInterlink() {
 
         if (this.interlink[0].height !== -1 || !this.interlink[0].blockId.equals(BlockchainGenesis.hashPrev)){
-            console.log(colors.red("Interlink to Genesis is wrong! "));
+            console.error("Interlink to Genesis is wrong! ");
             return false;
         }
 
@@ -84,7 +84,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             let link = this.interlink[i];
             let linkedBlock = this.blockchain.blocks[link.height];
             if (!linkedBlock.hash.equals(link.blockId)){
-                console.log(colors.red("Interlink to Genesis is wrong! "));
+                console.error("Interlink to Genesis is wrong! ");
                 return false;
             }
         }
@@ -95,7 +95,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         let linkLevel = this.blockchain[lastLink.height].getLevel();
 
         if (linkLevel + 1 < crtLevel) {
-            console.log(colors.red('Interlink level errors'));
+            console.error('Interlink level errors');
             return false;
         }*/
 
@@ -189,7 +189,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         } catch (exception){
 
-            console.log(colors.red("error deserialize a block  "), exception, buffer);
+            console.error("error deserialize a block  ", exception, buffer);
             throw exception;
 
         }

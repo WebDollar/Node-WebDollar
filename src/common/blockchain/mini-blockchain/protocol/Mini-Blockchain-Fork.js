@@ -1,6 +1,7 @@
 import PPoWBlockchainFork from "common/blockchain/ppow-blockchain/protocol/PPoW-Blockchain-Fork"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
 import consts from "consts/const_global";
+import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 
 let inheritFork;
 if (consts.POPOW_PARAMS.ACTIVATED) inheritFork = PPoWBlockchainFork;
@@ -17,8 +18,11 @@ class MiniBlockchainFork extends inheritFork{
 
     }
 
-    async validateForkBlock(block, height, blockValidationType){
-        return await inheritFork.prototype.validateForkBlock.call(this, block, height, blockValidationType || {"skip-accountant-tree-validation": true} );
+    /**
+     * Fork Validation for Mini Blockchain is not checking the Accountant Tree
+     */
+    _createBlockValidation_ForkValidation(height){
+        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), {"skip-accountant-tree-validation": true} );
     }
 
     preFork(){

@@ -1,5 +1,6 @@
 import consts from 'consts/const_global'
 import MiniBlockchainFork from "./../Mini-Blockchain-Fork"
+import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 
 class MiniBlockchainLightFork extends MiniBlockchainFork {
 
@@ -12,6 +13,11 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         this.forkPrevTimeStamp = null;
         this.forkPrevHashPrev = null;
 
+        this.forkDifficultyCalculation = {
+            difficultyAdditionalBlocks: [],
+            difficultyCalculationStarts: 0,
+        };
+
         this._blocksStartingPointClone = null;
         this._lightPrevDifficultyTargetClone = null;
         this._lightPrevTimeStampClone = null;
@@ -19,36 +25,74 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         this._lightAccountantTreeSerializationsHeightClone = null;
     }
 
-    _getForkPrevsData(height, forkHeight){
+    // return the difficultly target for ForkBlock
+    getForkDifficultyTarget(height){
 
-        if ( forkHeight === 0 && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+        let forkHeight = height - this.forkStartingHeight;
 
-            // based on previous block from blockchain
+        if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
             if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined) throw "forkPrevDifficultyTarget was not specified";
-            if (this.forkPrevHashPrev === null || this.forkPrevHashPrev === undefined) throw "forkPrevHashPrev was not specified";
-            if (this.forkPrevTimeStamp === null || this.forkPrevTimeStamp === undefined) throw "forkPrevTimeStamp was not specified";
-
-            return {
-                prevDifficultyTarget: this.forkPrevDifficultyTarget,
-                prevHash: this.forkPrevHashPrev,
-                prevTimeStamp: this.forkPrevTimeStamp,
-                blockValidationType: {},
-            };
-
+            return this.forkPrevDifficultyTarget;
         }
 
-        // transition from blockchain to fork
-        return MiniBlockchainFork.prototype._getForkPrevsData.call(this, height, forkHeight);
+        return MiniBlockchainFork.prototype.getForkDifficultyTarget.call(this, height);
 
+    }
+
+    getForkTimeStamp(height){
+
+        let forkHeight = height - this.forkStartingHeight;
+
+        if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
+            if (this.forkPrevTimeStamp === null || this.forkPrevTimeStamp === undefined) throw "forkPrevTimeStamp was not specified";
+            return this.forkPrevTimeStamp;
+        }
+
+        return MiniBlockchainFork.prototype.getForkTimeStamp.call(this, height);
+
+    }
+
+    getForkPrevHash(height){
+
+        let forkHeight = height - this.forkStartingHeight;
+
+        if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
+            if (this.forkPrevHashPrev === null || this.forkPrevHashPrev === undefined) throw "forkPrevHashPrev was not specified";
+            return this.forkPrevHashPrev;
+        }
+
+        return MiniBlockchainFork.prototype.getForkPrevHash.call(this, height);
+    }
+
+    _createBlockValidation_ForkValidation(height){
+
+        let validationType = {
+            "skip-accountant-tree-validation": true,
+        };
+
+        if ( height < this.forkDifficultyCalculation.difficultyCalculationStarts)
+            validationType["skip-difficulty-recalculation"] = true;
+
+        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+    }
+
+    _createBlockValidation_BlockchainValidation(height){
+        let validationType = {};
+
+        if ( height < this.forkDifficultyCalculation.difficultyCalculationStarts)
+            validationType["skip-difficulty-recalculation"] = true;
+
+        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
     preFork() {
 
-        //I have a new accountant Tree
-        if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
+        // I have a new accountant Tree, so it is a new [:-m] light proof
+        if (this.forkChainStartingPoint === this.forkStartingHeight &&
+            this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
             console.log("preFork!!!!!!!!!!!!!!!!!! 2222222");
-            let diffIndex = this.forkStartingHeight;
+            let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
             console.log("this.forkDiff", diffIndex);
 
             this._accountantTreeClone = this.blockchain.lightAccountantTreeSerializations[diffIndex];
@@ -126,7 +170,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
 
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
-
     }
 
 }

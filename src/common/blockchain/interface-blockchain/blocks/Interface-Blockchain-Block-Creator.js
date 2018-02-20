@@ -16,31 +16,31 @@ class InterfaceBlockchainBlockCreator{
     /*
         Generate a Genesis Block (no previous block)
      */
-    _createBlockGenesis(minerAddress, args){
+    _createBlockGenesis(blockValidation, minerAddress, args){
 
         //validate miner Address
 
-        args.unshift (  this.blockchain, minerAddress, undefined, undefined, undefined );
+        args.unshift (  this.blockchain,  minerAddress, undefined, undefined, undefined );
 
         let data = new this.blockDataClass(...args);
 
-        return new this.blockClass( this.blockchain,  1, undefined, BlockchainGenesis.hashPrev, undefined, 0, data, 0, this.db );
+        return new this.blockClass( this.blockchain,  blockValidation, 1, undefined, BlockchainGenesis.hashPrev, undefined, 0, data, 0, this.db );
     }
 
     /*
         Generate a new block at the end of Blockchain
      */
-    _createBlockNew(height, minerAddress, transactions, args){
+    _createBlockNew(height, blockValidation, minerAddress, transactions, args){
 
         //validate miner Address
 
         args.unshift( this.blockchain, minerAddress, transactions, undefined, undefined );
         let data = new this.blockDataClass(...args);
 
-        return new this.blockClass( this.blockchain, 1, undefined, this.blockchain.getHashPrev(), undefined, 0, data, height, this.db);
+        return new this.blockClass( this.blockchain, blockValidation, blockValidation, 1, undefined, this.blockchain.getHashPrev(), undefined, 0, data, height, this.db);
     }
 
-    createBlockNew(minerAddress, transactions){
+    createBlockNew(minerAddress, blockValidation, transactions){
 
         try {
 
@@ -57,19 +57,19 @@ class InterfaceBlockchainBlockCreator{
 
         if (this.blockchain.blocks.length === 0){  //Genesis Block
 
-            return this._createBlockGenesis( minerAddress, restArgs);
+            return this._createBlockGenesis( blockValidation, minerAddress, restArgs);
 
         } else { //Fetch Transactions and Create Block
 
-            return this._createBlockNew( this.blockchain.blocks.length, minerAddress, transactions,  restArgs );
+            return this._createBlockNew( this.blockchain.blocks.length, blockValidation, minerAddress, transactions, restArgs );
 
         }
 
     }
 
-    createEmptyBlock(height){
+    createEmptyBlock(height, blockValidation){
 
-        return new this.blockClass(this.blockchain, 1, undefined, undefined, undefined, 0, null, height, this.db);
+        return new this.blockClass(this.blockchain, blockValidation, 1, undefined, undefined, undefined, 0, null, height, this.db);
 
     }
 

@@ -30,16 +30,15 @@ class MiniBlockchainBlockData extends  inheritBlockData {
     }
 
 
-    validateBlockData(height, blockValidationType){
+    validateBlockData(height, blockValidation){
 
-        let result = inheritBlockData.prototype.validateBlockData.call(this, height, blockValidationType  );
+        let result = inheritBlockData.prototype.validateBlockData.call(this, height, blockValidation );
 
         if (!result) return false;
 
         if (this.hashAccountantTree === undefined || this.hashAccountantTree === null || !Buffer.isBuffer(this.hashAccountantTree)) throw ('hashAccountantTree is empty');
 
-        if ( (blockValidationType['skip-validation-before'] === undefined || height >= blockValidationType['skip-validation-before'].height ) &&
-             (blockValidationType['skip-accountant-tree-validation'] === undefined) ) {
+        if ( !blockValidation.blockValidationType['skip-validation'] && !blockValidation.blockValidationType['skip-accountant-tree-validation'] ) {
 
             //validate hashAccountantTree
             let hashAccountantTree = this.calculateAccountantTreeHashBlockData();

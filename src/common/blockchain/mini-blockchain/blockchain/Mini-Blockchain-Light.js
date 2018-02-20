@@ -43,8 +43,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         // console.log("blockchain serialization1", this.accountantTree.serializeMiniAccountant().toString("hex") );
         // console.log("blockchain serialization1", this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex"));
 
-        if (  blockValidationType['skip-validation-before'] === undefined ||
-            (block.height >= blockValidationType['skip-validation-before'].height )) {
+        if (  !blockValidationType['skip-validation'] ) {
 
             console.log("block.height > ", block.height);
 
@@ -327,7 +326,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (height === undefined ) height = this.blocks.length;
 
-        console.log(colors.yellow("difficultyTarget"), height, this.blocks.blocksStartingPoint , this.blocks.length, this.lightPrevDifficultyTargets[height] !== undefined ? this.lightPrevDifficultyTargets[height].toString("hex") : '');
+        console.warn("difficultyTarget", height, this.blocks.blocksStartingPoint , this.blocks.length, this.lightPrevDifficultyTargets[height] !== undefined ? this.lightPrevDifficultyTargets[height].toString("hex") : '');
 
         if (this.agent.light === true && height !== 0) {
 
@@ -340,7 +339,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
     getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
-        console.log(colors.yellow("getTimeStamp"), height, this.blocks.blocksStartingPoint, this.lightPrevTimeStamps[height])
+        console.warn("getTimeStamp", height, this.blocks.blocksStartingPoint, this.lightPrevTimeStamps[height])
 
         if (this.agent.light === true && height !== 0) {
             if ( this.lightPrevTimeStamps[height] !== undefined ) return this.lightPrevTimeStamps[height];
@@ -354,7 +353,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (height === undefined) height = this.blocks.length;
 
-        console.log(colors.yellow("getHashPrev"), height, this.blocks.blocksStartingPoint, this.lightPrevHashPrevs[height] !== undefined ? this.lightPrevHashPrevs[height].toString("hex") : '')
+        console.warn("getHashPrev", height, this.blocks.blocksStartingPoint, this.lightPrevHashPrevs[height] !== undefined ? this.lightPrevHashPrevs[height].toString("hex") : '')
 
         if (this.agent.light === true && height !== 0)
             if ( this.lightPrevHashPrevs[height] !== undefined ) return this.lightPrevHashPrevs[height];
