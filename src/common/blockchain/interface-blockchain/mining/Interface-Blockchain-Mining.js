@@ -265,7 +265,7 @@ class InterfaceBlockchainMining{
                             //returning false, because a new fork was changed in the mean while
                             if (this.blockchain.blocks.length !== block.height) return false;
 
-                            return this.blockchain.includeBlockchainBlock(block, false, [], true, {});
+                            return this.blockchain.includeBlockchainBlock(block, false, [], true);
                         }))) throw "Mining2 returned false";
 
                 } catch (exception){

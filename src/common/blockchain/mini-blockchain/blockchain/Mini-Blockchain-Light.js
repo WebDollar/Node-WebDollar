@@ -39,17 +39,17 @@ class MiniBlockchainLight extends  MiniBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
 
         // console.log("blockchain serialization1", this.accountantTree.serializeMiniAccountant().toString("hex") );
         // console.log("blockchain serialization1", this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex"));
 
-        if (  !blockValidationType['skip-validation'] ) {
+        if (  !block.blockValidation.blockValidationType['skip-validation'] ) {
 
             console.log("block.height > ", block.height);
 
             if (! (await this.simulateNewBlock(block, false, async ()=>{
-                return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, blockValidationType );
+                return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock );
             }))) throw "Error Including Blockchain Light Block";
 
             console.log("this.blocks.height",block.height);
@@ -64,7 +64,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         } else {
 
-            if (! (await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock, blockValidationType )))
+            if (! (await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock )))
                 throw "Error Including Blockchain Light Block";
 
             //for debugging only

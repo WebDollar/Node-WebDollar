@@ -47,7 +47,7 @@ class NodesWaitlist {
 
         if (typeof addresses === "string" || !Array.isArray(addresses)) addresses = [addresses];
 
-        console.log("addresses", addresses);
+        console.log("addresses", addresses, port);
 
         let sckAddresses = [];
         for (let i=0; i<addresses.length; i++){

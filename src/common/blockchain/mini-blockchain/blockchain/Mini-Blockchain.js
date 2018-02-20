@@ -134,10 +134,10 @@ class MiniBlockchain extends  inheritBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
 
         if (! (await this.simulateNewBlock(block, false, async ()=>{
-            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, blockValidationType );
+            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock );
         }))) throw "Error includeBlockchainBlock MiniBlockchain ";
 
         if (! (await this.accountantTree.saveMiniAccountant( true))) console.error("Error Saving Mini Accountant Tree");

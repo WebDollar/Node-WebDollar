@@ -23,7 +23,7 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
 
     it('save/load/remove block to local storage, sample test', async () => {
 
-        block = new InterfaceBlockchainBlock( Blockchain.blockchain,  Blockchain.blockchain.blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db );
+        block = new InterfaceBlockchainBlock( Blockchain.blockchain,  Blockchain.blockchain.createBlockValidation(), version, hash, hashPrev, timeStamp, nonce, data, height, db );
 
         result = await block.saveBlock();
         assert(result === true, 'save: ' + result);
@@ -49,7 +49,7 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
     
     it('remove block from local storage, sample test', async () => {
 
-        block = new InterfaceBlockchainBlock( Blockchain.blockchain,  Blockchain.blockchain.blockValidation,  version, hash, hashPrev, timeStamp, nonce, data, height, db );
+        block = new InterfaceBlockchainBlock( Blockchain.blockchain,  Blockchain.blockchain.createBlockValidation(),  version, hash, hashPrev, timeStamp, nonce, data, height, db );
         
         result = await block.saveBlock();
         assert(result === true, 'save: ' + result);

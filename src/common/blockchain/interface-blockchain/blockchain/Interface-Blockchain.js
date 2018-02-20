@@ -52,9 +52,6 @@ class InterfaceBlockchain {
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
 
-
-        this.blockValidation = new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this) );
-
         this.semaphoreProcessing = new SemaphoreProcessing(SEMAPHORE_PROCESSING_INTERVAL);
     }
 
@@ -145,7 +142,7 @@ class InterfaceBlockchain {
         }
 
         if (block.blockValidation === undefined)
-            block.blockValidation = this.blockValidation;
+            block.blockValidation = this.createBlockValidation();
 
         block.difficultyTargetPrev = block.blockValidation.getDifficultyCallback(block.height);
 
@@ -380,6 +377,9 @@ class InterfaceBlockchain {
         }
     }
 
+    createBlockValidation(){
+        return new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this) );
+    }
 
 
 }
