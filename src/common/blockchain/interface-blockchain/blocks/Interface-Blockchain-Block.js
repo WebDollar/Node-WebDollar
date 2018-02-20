@@ -89,7 +89,7 @@ class InterfaceBlockchainBlock {
 
         this._validateTargetDifficulty();
 
-        if (this.reward.equals( BlockchainMiningReward.getReward(this.height) ) === false )
+        if (this.reward.isEqualTo( BlockchainMiningReward.getReward(this.height) ) === false )
             throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward( this.height );
 
         if (this._supplementaryValidation() === false) throw "supplementaryValidation failed";

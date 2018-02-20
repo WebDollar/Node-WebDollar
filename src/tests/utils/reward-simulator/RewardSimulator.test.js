@@ -54,7 +54,7 @@ describe('RewardSimulator', () => {
 
         for (let height = 0; height < 8409600; height += 1024) {
             reward = BlockchainMiningReward.getReward(height);
-            assert(reward.equals(new BigNumber(2500)), "Wrong reward for bock " + height + ": " + reward.toString() + "!==2500");
+            assert(reward.isEqualTo(new BigNumber(2500)), "Wrong reward for bock " + height + ": " + reward.toString() + "!==2500");
         }
 
         for (let cycle = 1; cycle <= 25; ++cycle) {
@@ -62,17 +62,17 @@ describe('RewardSimulator', () => {
             reward = BlockchainMiningReward.getReward(height);
             let targetReward = new BigNumber(2500).dividedBy(1 << (cycle-1));
 
-            if (targetReward.lessThan(smallestReward))
+            if (targetReward.isLessThan(smallestReward))
                 targetReward = smallestReward;
-            assert(reward.equals(targetReward), "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
+            assert(reward.isEqualTo(targetReward), "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
 
             height = cycle * (8409600);
             reward = BlockchainMiningReward.getReward(height);
             targetReward = new BigNumber(2500).dividedBy(1 << cycle);
 
-            if (targetReward.lessThan(smallestReward))
+            if (targetReward.isLessThan(smallestReward))
                 targetReward = smallestReward;
-            assert(reward.equals(targetReward), "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
+            assert(reward.isEqualTo(targetReward), "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
         }
 
     });

@@ -214,7 +214,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         //local-goodδ (C', C, µ), if |C0| > (1 − δ) 2^−µ * |C|.
 
         //using big Number
-        if ( new BigNumber(superLength).greaterThan( (new BigNumber(1).minus(consts.POPOW_PARAMS.d)).mul( new BigNumber(2).pow( - miu ) * underlyingLength ) ))
+        if ( new BigNumber(superLength).isGreaterThan( (new BigNumber(1).minus(consts.POPOW_PARAMS.d)).mul( new BigNumber(2).pow( - miu ) * underlyingLength ) ))
             return true;
         else
             return false;
@@ -338,7 +338,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
                     let Cstar = [];
 
-                    if ( new BigNumber( 2 * C1.length ).lessThan(  new BigNumber(1-consts.POPOW_PARAMS.d).pow(p) * Cstar.length  ) )
+                    if ( new BigNumber( 2 * C1.length ).isLessThan(  new BigNumber(1-consts.POPOW_PARAMS.d).pow(p) * Cstar.length  ) )
 
                         return Cstar; //Chain is bad
 

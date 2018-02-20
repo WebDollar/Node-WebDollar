@@ -26,7 +26,7 @@ describe('Serialization test', () => {
             sum2 = sum2.plus(deserialization);
         }
 
-        assert(sum1.equals(sum2), "sum1 is not equal with sum 2");
+        assert(sum1.isEqualTo(sum2), "sum1 is not equal with sum 2");
 
     });
 

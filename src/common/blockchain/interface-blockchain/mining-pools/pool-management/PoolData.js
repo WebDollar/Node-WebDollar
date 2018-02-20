@@ -263,7 +263,7 @@ class PoolData {
 
         return !( typeof miner1 === typeof miner2 &&
             miner1.address === miner2.address &&
-            miner1.reward.equals(miner2.reward) );
+            miner1.reward.isEqualTo(miner2.reward) );
     }
 
 }

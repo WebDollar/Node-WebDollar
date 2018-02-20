@@ -7,7 +7,7 @@ class BlockchainDifficulty{
     static getDifficulty(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 
         // difficulty algorithm is based on blockNumber
-        if (!( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.greaterThanOrEqualTo(0))))
+        if (!( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.isGreaterThanOrEqualTo(0))))
             throw "invalid block number";
 
         // console.log("prevBlockTimestamp", prevBlockTimestamp.toString(16));
@@ -15,8 +15,7 @@ class BlockchainDifficulty{
         // console.log("blockNumber", blockNumber.toString(16));
 
         try {
-            console.warn("new difficulty mean");
-            console.warn(this.getDifficultyMean(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber));
+            console.warn("new difficulty mean", this.getDifficultyMean(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber));
         } catch (exception){
             console.error("couldn't calculate the getDifficultyMean for", blockNumber, exception);
         }
@@ -110,9 +109,9 @@ class BlockchainDifficulty{
         let prevBlockDifficulty = getDifficultyCallback(blockNumber);
 
         if (Buffer.isBuffer(prevBlockDifficulty))
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
+            prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex"));
         else if (typeof prevBlockDifficulty === "string") // it must be hex
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty.replace("0x",""), 16);
+            prevBlockDifficulty = new BigNumber(prevBlockDifficulty);
 
         //let's suppose BLOCKCHAIN.DIFFICULTY_NO_BLOCKS === 10
         //              blockNumber === 9
@@ -139,12 +138,26 @@ class BlockchainDifficulty{
             //It should substitute, the number of Blocks * Initial Block
             how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * getTimeStampCallback(firstBlock);
 
-            let ratio = new BigNumber(how_much_it_should_have_taken_X_Blocks).dividedBy(how_much_it_took_to_mine_X_Blocks).decimalPlaces(8);
+            let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks).decimalPlaces(8);
 
-            return prevBlockDifficulty.mul(ratio.toString());
+            ratio = BigNumber.minimum( ratio, 20 );
+            ratio = BigNumber.maximum( ratio, 0.01);
+
+            console.warn("ratio2", ratio, ratio.toString());
+            console.warn("how_much_it_should_have_taken_X_Blocks", how_much_it_should_have_taken_X_Blocks);
+            console.warn("how_much_it_took_to_mine_X_Blocks", how_much_it_took_to_mine_X_Blocks);
+
+            let newBlockDifficulty = prevBlockDifficulty.multipliedBy(ratio);
+            newBlockDifficulty = newBlockDifficulty.decimalPlaces(0);
+
+            console.warn("newBlockDifficulty2", newBlockDifficulty, newBlockDifficulty.toString());
+            return newBlockDifficulty.toString(16);
+            //return prevBlockDifficulty.multiply(ratio.toString());
         }
 
     }
+
+
 
 }
 

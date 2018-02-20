@@ -12,7 +12,7 @@ class BlockchainMiningReward{
             let reward = new BigNumber(2500).dividedBy(1 << cicleNumber);
             let smallestReward = new BigNumber(0.0001);
 
-            if (reward.lessThan(smallestReward)) reward = smallestReward;
+            if (reward.isLessThan(smallestReward)) reward = smallestReward;
 
             return reward;
 

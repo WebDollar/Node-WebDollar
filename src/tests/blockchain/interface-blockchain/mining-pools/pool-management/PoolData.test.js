@@ -88,7 +88,7 @@ describe('test pool leader DB', () => {
 
             let targetReward = minersList[i].reward.plus(new BigNumber(10.133333));
             let minerReward = pd.getMinerReward(minersList[i].address);
-            assert(minerReward.equals(targetReward), "Miner updateReward is wrong");
+            assert(minerReward.isEqualTo(targetReward), "Miner updateReward is wrong");
         }
         
         

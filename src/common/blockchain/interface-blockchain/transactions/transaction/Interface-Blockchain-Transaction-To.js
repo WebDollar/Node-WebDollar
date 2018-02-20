@@ -63,13 +63,13 @@ class InterfaceBlockchainTransactionTo{
 
             if (!toObject.amount ||  toObject.amount instanceof BigNumber === false ) throw 'To.Object Amount is not specified';
 
-            if ( toObject.amount.lessThan(0) ) throw "To.Object Amount is an invalid number";
+            if ( toObject.amount.isLessThan(0) ) throw "To.Object Amount is an invalid number";
 
         });
 
         if (!this.fee || this.fee instanceof BigNumber === false ) throw 'To.fee is not valid ';
 
-        if (this.fee.lessThan(0) ) throw "To.fee is smaller than 0";
+        if (this.fee.isLessThan(0) ) throw "To.fee is smaller than 0";
 
         //Validate to.currency
 

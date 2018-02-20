@@ -37,10 +37,10 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
 
         if (node.isSumValid() === false)  return false;
-        if (node.sum.lessThan ( 0 ) ) return false;
+        if (node.sum.isLessThan ( 0 ) ) return false;
 
         if (node.isLeaf() && (node.isBalancesValid() === false ) ) return false;
-        if (node.isBalancesValid() && node.value.balances.lessThan ( 0 )) return false;
+        if (node.isBalancesValid() && node.value.balances.isLessThan ( 0 )) return false;
 
         return true;
     }
