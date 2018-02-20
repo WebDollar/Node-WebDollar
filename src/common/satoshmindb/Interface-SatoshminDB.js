@@ -1,11 +1,12 @@
 /* Added by Silviu Bogdan Stroe - https://www.silviu-s.com */
 /* Edited by Cosmin-Dumitru Oprea */
 
-const colors = require('colors/safe');
+import consts from 'consts/const_global'
 
 let pounchdb;
 let atob = require('atob');
 let btoa = require('btoa');
+const colors = require('colors/safe');
 const MainBlockchain = require('main-blockchain/Blockchain');
 
 
@@ -16,7 +17,7 @@ else
 
 class InterfaceSatoshminDB {
 
-    constructor(databaseName = "defaultDB") {
+    constructor(databaseName = consts.DATABASE_NAMES.DEFAULT_DATABASE) {
 
         this.dbName = databaseName;
 

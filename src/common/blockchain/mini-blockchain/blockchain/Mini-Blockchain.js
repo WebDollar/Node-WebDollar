@@ -1,9 +1,9 @@
-import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-
 const colors = require('colors/safe');
+
+import consts from "consts/const_global";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import PPoWBlockchain from 'common/blockchain/ppow-blockchain/blockchain/PPoW-Blockchain'
 import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockchain/Interface-Blockchain'
-
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import MiniBlockchainBlock from '../blocks/Mini-Blockchain-Block'
 import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
@@ -11,15 +11,15 @@ import MiniBlockchainFork from '../protocol/Mini-Blockchain-Fork'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import InterfaceBlockchainForksAdministrator from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Forks-Administrator'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
-
 import MiniBlockchainAgentLightNode from "./../agents/Mini-Blockchain-Agent-Light-Node"
 
-import consts from "consts/const_global";
 
 let inheritBlockchain;
 
-if (consts.POPOW_PARAMS.ACTIVATED) inheritBlockchain = PPoWBlockchain;
-else  inheritBlockchain = InterfaceBlockchain;
+if (consts.POPOW_PARAMS.ACTIVATED)
+    inheritBlockchain = PPoWBlockchain;
+else
+    inheritBlockchain = InterfaceBlockchain;
 
 
 class MiniBlockchain extends  inheritBlockchain{

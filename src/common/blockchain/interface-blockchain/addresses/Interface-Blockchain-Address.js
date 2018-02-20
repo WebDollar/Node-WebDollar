@@ -1,20 +1,18 @@
-import InterfaceBlockchainAddressHelper from './Interface-Blockchain-Address-Helper'
-import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
+const FileSystem = require('fs');
+
+import consts from 'consts/const_global'
+import InterfaceBlockchainAddressHelper from './Interface-Blockchain-Address-Helper';
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import Serialization from "common/utils/Serialization";
 import BufferExtend from "common/utils/BufferExtended";
-import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto';
+import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data';
 import BufferExtended from 'common/utils/BufferExtended';
 import MultiSig from "./MultiSig";
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
 
-const FileSystem = require('fs');
-
-let INITIAL_PASSWORD = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l' ]
-
 class InterfaceBlockchainAddress{
-
 
     constructor (db){
 
@@ -23,7 +21,7 @@ class InterfaceBlockchainAddress{
 
 
         if (db === undefined){
-            this.db = new InterfaceSatoshminDB();
+            this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
         } else {
             this.db = db;
         }
@@ -209,9 +207,13 @@ class InterfaceBlockchainAddress{
                     FileSystem.close(fd, function () {
                         resolve(true);
                     });
+
                 });
+
             });
+
         });
+
     }
 
     /**

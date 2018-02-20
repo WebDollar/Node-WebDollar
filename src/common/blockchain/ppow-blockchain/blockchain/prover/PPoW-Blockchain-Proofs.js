@@ -17,8 +17,8 @@ class PPowBlockchainProofs{
 
         let list = [];
 
-        for (let i = 0; i < this.blocks.length; i++)
-            if (this.blocks[i].level >= miu)
+        for (let i = 0; i < this.blocks.length; ++i)
+            if (miu <= this.blocks[i].level)
                 list.push(this.blocks[i]);
 
         return list;
@@ -31,7 +31,7 @@ class PPowBlockchainProofs{
 
         let list = [];
 
-        for (let i = 0; i < this.blocks.length; i++)
+        for (let i = 0; i < this.blocks.length; ++i)
             if (this.blocks[i].level <= miu)
                 list.push(this.blocks[i]);
 

@@ -53,6 +53,7 @@ class PoolLeaderProtocol {
             let higherHash = this.getHigherHashDifficulty(data);
 
             this.poolHigherHashesList(higherHash, data.address);
+
         });
 
     }

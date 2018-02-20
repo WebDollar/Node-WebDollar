@@ -1,10 +1,11 @@
-import Serialization from "common/utils/Serialization";
 const colors = require('colors/safe');
+
+import consts from 'consts/const_global'
+import global from "consts/global"
+import Serialization from "common/utils/Serialization";
 import MiniBlockchain from "./Mini-Blockchain"
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-import consts from 'consts/const_global'
-import global from "consts/global"
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget

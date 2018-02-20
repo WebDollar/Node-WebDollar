@@ -110,9 +110,9 @@ class PPoWBlockchainProver{
                 //if depth[E] ≥ depth[B1] then
                 if (E.level >= B1.level){
                     // R ← followDown(E, B0, depth)
-                    let R = this.followDown( E, B1, blockById );
+                    let R = this.followDown(E, B1, blockById);
 
-                    for (let i=0; i <R.length; i++)
+                    for (let i = 0; i < R.length; ++i)
                         aux = aux.push(R[i]);
 
                     break;
@@ -125,7 +125,7 @@ class PPoWBlockchainProver{
         }
 
         // aux ∪ π
-        for (let i=0; i<prove.proofs.blocks.length; i++)
+        for (let i = 0; i < prove.proofs.blocks.length; ++i)
             aux.push(prove.proofs.blocks[i])
 
         return new PPoWBlockchainProver(this.blockchain, aux, prove.lastBlocks);

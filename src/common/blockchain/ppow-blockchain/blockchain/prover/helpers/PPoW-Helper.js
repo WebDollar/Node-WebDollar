@@ -2,11 +2,13 @@ import consts from 'consts/const_global'
 
 class PPoWHelper{
 
-
     /**
      * LCA between too proofs. Each proof contains a blocks array
+     * @param proofs1
+     * @param proofs2
+     * @returns {*}
+     * @constructor
      */
-
     LCA(proofs1, proofs2){
 
         //LCA(C1, C2) = (C1 ∩ C2)[−1] π

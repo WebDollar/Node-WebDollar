@@ -11,7 +11,6 @@ import consts from 'consts/const_global'
 
 class InterfaceBlockchainAddressHelper{
 
-
     constructor (){
 
     }
