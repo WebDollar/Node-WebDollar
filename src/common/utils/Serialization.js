@@ -15,15 +15,17 @@ class Serialization{
         // e: 9  - it can also be negative
         // s: 1
 
-        if (data instanceof BigNumber === false) throw 'data is not big decimal';
-        if ( data.c.length === 0 ) throw "data is 0 and can't be ";
+        if (data instanceof BigNumber === false)
+            throw 'data is not big decimal';
+        if ( data.c.length === 0 )
+            throw "data is 0 and can't be ";
 
         let buffer = new Buffer( 1 + 1 + data.c.length*6 );
 
         buffer[0] = Math.abs(data.e) % 128 + (data.e >= 0 ? 0 : 1)*128;
         buffer[1] = data.c.length % 128 + (data.s >= 0? 0 : 1)*128;
 
-        for (let i=0; i<data.c.length; i++) {
+        for (let i = 0; i < data.c.length; i++) {
 
             //converting the number to buffer
             let long = data.c[i], byte;
@@ -67,7 +69,8 @@ class Serialization{
 
         let bigNumber = {e:0, s:0, c: []};
 
-        if (!Buffer.isBuffer(buffer)) throw "Can't deserialize Big Number because it is not a buffer";
+        if (!Buffer.isBuffer(buffer))
+            throw "Can't deserialize Big Number because it is not a buffer";
 
         bigNumber.e = buffer[0 + offset ] % 128;
         bigNumber.e *= Math.floor(buffer[0 + offset] / 128) === 0 ? 1 : -1;
@@ -75,7 +78,7 @@ class Serialization{
         let length = buffer[1 + offset ] % 128;
         bigNumber.s = Math.floor(buffer[1 + offset] / 128) === 0 ? 1 : -1;
 
-        for (let i=0; i<length; i++){
+        for (let i = 0; i < length; i++){
 
             let nr = 0 ;
 
@@ -119,7 +122,7 @@ class Serialization{
 
         let buffer = new Buffer( list.length );
 
-        for (let i=0; i<list.length; i++)
+        for (let i = 0; i < list.length; i++)
             buffer[i] = list[i];
 
         return buffer;
@@ -172,15 +175,17 @@ class Serialization{
      */
     serializeToFixedBuffer(noBytes, buffer){
 
-        if (buffer === undefined || buffer === null) return new Buffer(noBytes);
-        if (buffer.length === noBytes) return buffer; // in case has the same number of bits as output
+        if (buffer === undefined || buffer === null)
+            return new Buffer(noBytes);
+        if (buffer.length === noBytes) // in case has the same number of bits as output
+            return buffer;
 
         let result = new Buffer(noBytes);
 
         let c = 0;
-        for (let i=buffer.length-1; i>=0; i--){
+        for (let i = buffer.length-1; i >= 0; i--){
             c++;
-            result[noBytes-c]= buffer[i];
+            result[noBytes-c] = buffer[i];
         }
 
         return result;
@@ -190,13 +195,13 @@ class Serialization{
 
         let count = 0;
         while (count < buffer.length && buffer[count] === 0)
-            count ++;
+            count++;
 
         let result = new Buffer(1 + buffer.length - count );
         result [0] = buffer.length - count;
 
-        for (let i=count; i<buffer.length; i++)
-            result[i-count+1] = buffer[i]
+        for (let i = count; i < buffer.length; i++)
+            result[i-count+1] = buffer[i];
 
 
         return result;
@@ -233,7 +238,7 @@ class Serialization{
             num += 1;
         }
 
-        return 1;
+        return num;
     }
 
 }
