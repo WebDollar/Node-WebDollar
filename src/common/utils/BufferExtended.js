@@ -5,15 +5,17 @@ const bs58 = require('bs58')
 class BufferExtended {
 
     substr(buffer, index, count){
-        if ( count === undefined) count = buffer.length;
+        if (count === undefined)
+            count = buffer.length;
 
-        let length = Math.min(index+count, buffer.length);
+        let length = Math.min(index + count, buffer.length);
 
-        if (length-index <= 0) throw "length-index <= 0..."+ buffer.toString("hex")+"  index "+index+"   length "+length+"  count "+count;
+        if (length-index <= 0)
+            throw "length-index <= 0..." + buffer.toString("hex") + "  index " + index + "   length " + length + "  count " + count;
 
-        let array = new Buffer(length-index);
+        let array = new Buffer(length - index);
 
-        for (let i=index; i<length; i++)
+        for (let i = index; i < length; i++)
             array[i-index] = buffer[i];
 
         return array;
@@ -21,9 +23,10 @@ class BufferExtended {
 
     longestMatch(buffer, buffer2, startIndex){
 
-        if ( startIndex === undefined) startIndex = 0;
+        if (startIndex === undefined)
+            startIndex = 0;
 
-        let i =0;
+        let i = 0;
         while (i + startIndex < buffer.length && i < buffer2.length ) {
 
             if (buffer[i + startIndex] !== buffer2[i]) //no more match
