@@ -20,7 +20,7 @@ describe('Serialization test', () => {
             let serialization = Serialization.serializeBigNumber(v[i]);
             let deserialization = Serialization.deserializeBigNumber(serialization).number;
 
-            assert(deserialization.equals(v[i]), "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
+            assert(deserialization.isEqualTo(v[i]), "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
             //console.log(v[i],deserialization.toString());
 
             sum2 = sum2.plus(deserialization);
@@ -44,7 +44,7 @@ describe('Serialization test', () => {
 
             //console.log(v[i], serialization.toString("hex"), deserialization);
 
-            assert(deserialization.equals(x[i]), "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
+            assert(deserialization.isEqualTo(x[i]), "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
 
         }
     });

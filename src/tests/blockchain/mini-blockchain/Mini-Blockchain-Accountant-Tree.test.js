@@ -41,10 +41,10 @@ describe('MiniBlockchainAccountantTree', () => {
         assert(Tree2.root.hash.sha256.equals(Tree.root.hash.sha256), " root hash is not the same: " +Tree2.root.hash.sha256.toString("hex")+"  "+Tree.root.hash.sha256.toString("hex"));
 
         for (let i=0; i<array.length; i++){
-            assert(Tree2.getBalance(array[i].addr).equals(array[i].val), " value is not equal: " +array[i].val+"  "+Tree2.getBalance(array[i].addr));
+            assert(Tree2.getBalance(array[i].addr).isEqualTo(array[i].val), " value is not equal: " +array[i].val+"  "+Tree2.getBalance(array[i].addr));
         }
 
-        assert(Tree2.calculateNodeCoins().equals(sum), "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sum.toString()+" ")
+        assert(Tree2.calculateNodeCoins().isEqualTo(sum), "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sum.toString()+" ")
 
     });
 
@@ -83,7 +83,7 @@ describe('MiniBlockchainAccountantTree', () => {
         }
 
         for (let i=0; i<list.length; i++)
-            assert(Tree.getBalance(list[i].address).equals(list[i].value), " value is not equal: " +list[i].value+"  "+Tree.getBalance(list[i].address));
+            assert(Tree.getBalance(list[i].address).isEqualTo(list[i].value), " value is not equal: " +list[i].value+"  "+Tree.getBalance(list[i].address));
 
         assert(!Tree.root.hash.sha256.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.sha256.toString("hex"));
 
@@ -100,9 +100,9 @@ describe('MiniBlockchainAccountantTree', () => {
 
 
         for (let i=0; i<list.length; i++)
-            assert(Tree2.getBalance(list[i].address).equals(list[i].value), " value is not equal: " +list[i].value+"  "+Tree2.getBalance(list[i].address));
+            assert(Tree2.getBalance(list[i].address).isEqualTo(list[i].value), " value is not equal: " +list[i].value+"  "+Tree2.getBalance(list[i].address));
 
-        assert(Tree2.calculateNodeCoins().equals(sum), "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sum.toString()+" ")
+        assert(Tree2.calculateNodeCoins().isEqualTo(sum), "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sum.toString()+" ")
     });
 
 });

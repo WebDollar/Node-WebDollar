@@ -71,7 +71,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         this._computeAccount(node);
 
         if ( node.isSumValid() === false ) return false;
-        if ( initialSum.equals(node.sum) === false ) return false; // different sum
+        if ( initialSum.isEqualTo(node.sum) === false ) return false; // different sum
 
         return true;
     }

@@ -6,12 +6,13 @@ consts.TERMINATED = false;
 
 consts.UUID = uuid.v4();
 
-consts.NODE_VERSION = "0.249";
-consts.NODE_VERSION_COMPATIBILITY = "0.249";
+consts.NODE_VERSION = "0.250";
+consts.NODE_VERSION_COMPATIBILITY = "0.250";
 
 consts.WALLET_VERSION = "0.1";
 
 consts.BLOCKCHAIN = {
+
     DIFFICULTY_NO_BLOCKS : 10,
     DIFFICULTY_TIME : 20000, //seconds
 
@@ -25,7 +26,7 @@ consts.BLOCKCHAIN = {
 
     HARD_FORKS : {
         TEST_NET_3:{
-            DIFFICULTY_HARD_FORK: 400000
+            DIFFICULTY_HARD_FORK: 60290
         },
     }
 

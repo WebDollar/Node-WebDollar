@@ -24,9 +24,9 @@ describe('BigNumber test', () => {
         let diff2 = sum1.plus(sum2);
         let diff3 = prod1.minus(prod2)
 
-        assert(diff1.equals(new BigNumber(0)), diff1 + "!=" + 0);
-        assert(diff2.equals(new BigNumber(0)), diff2 + "!=" + 0);
-        assert(diff3.equals(new BigNumber(0)), diff3 + "!=" + 0);
+        assert(diff1.isEqualTo(new BigNumber(0)), diff1 + "!=" + 0);
+        assert(diff2.isEqualTo(new BigNumber(0)), diff2 + "!=" + 0);
+        assert(diff3.isEqualTo(new BigNumber(0)), diff3 + "!=" + 0);
     });
 
     it('Big Number 1/3+1/3+1/3 === 1', ()=>{

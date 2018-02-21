@@ -51,7 +51,7 @@ class InterfaceAccountantRadixTreeTestHelper {
         // console.log(sum);
         // console.log(result[0][0].sum);
 
-        assert(accountantTree.root.sum.equals(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].sum + "       " + sum + "       diff: " + accountantTree.root.sum.minus(sum).toString());
+        assert(accountantTree.root.sum.isEqualTo(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].sum + "       " + sum + "       diff: " + accountantTree.root.sum.minus(sum).toString());
 
         //accountantTree.printLevelSearch();
 

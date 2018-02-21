@@ -14,11 +14,11 @@ class BlockchainDifficulty{
         // console.log("blockTimestamp", blockTimestamp.toString(16));
         // console.log("blockNumber", blockNumber.toString(16));
 
-        try {
-            console.warn("new difficulty mean", this.getDifficultyMean(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber));
-        } catch (exception){
-            console.error("couldn't calculate the getDifficultyMean for", blockNumber, exception);
-        }
+        // try {
+        //     console.warn("new difficulty mean", this.getDifficultyMean(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber));
+        // } catch (exception){
+        //     console.error("couldn't calculate the getDifficultyMean for", blockNumber, exception);
+        // }
 
         if (blockNumber < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK)
             return this.calculateBlockDifficultyETH(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
