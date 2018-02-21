@@ -155,6 +155,11 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         if (this.checkFinished())
             return false;
 
+        if (event.data.message === "worker nonce worked"){
+
+            this._hashesPerSecond += event.data.nonceWork;
+
+        } else
         if (event.data.message === "algorithm"){
 
             console.log("algorithm information", event.data.answer);
@@ -228,7 +233,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             worker.postMessage({message: "new-nonces", nonce: this._nonce, count: this.WORKER_NONCES_WORK});
 
             this._nonce += this.WORKER_NONCES_WORK;
-            this._hashesPerSecond += this.WORKER_NONCES_WORK;
 
         } else
         if (event.data.message === "log") {

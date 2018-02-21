@@ -151,7 +151,7 @@ class BlockchainDifficulty{
             newBlockDifficulty = newBlockDifficulty.decimalPlaces(0);
 
             console.warn("newBlockDifficulty2", newBlockDifficulty, newBlockDifficulty.toString());
-            return newBlockDifficulty.toString(16);
+            return BigInteger( newBlockDifficulty.toString(16), 16 );
             //return prevBlockDifficulty.multiply(ratio.toString());
         }
 

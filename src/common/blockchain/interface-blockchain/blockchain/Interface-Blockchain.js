@@ -378,7 +378,7 @@ class InterfaceBlockchain {
     }
 
     createBlockValidation(){
-        return new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this) );
+        return new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
     }
 
 

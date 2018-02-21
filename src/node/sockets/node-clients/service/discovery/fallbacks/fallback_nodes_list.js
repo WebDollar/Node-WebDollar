@@ -7,7 +7,7 @@ export default {
        "port": 80,
     },
     {
-        "addr": ["webdollar.ddns.net"],
+        "addr": ["5.12.102.239"],
         "port": 2095,
     },
     {

@@ -169,7 +169,7 @@ class InterfaceBlockchainMining{
 
 
                 nextTransactions = this._selectNextTransactions();
-                nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, nextTransactions );
+                nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
                 nextBlock.difficultyTargetPrev = this.blockchain.getDifficultyTarget();
                 nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);

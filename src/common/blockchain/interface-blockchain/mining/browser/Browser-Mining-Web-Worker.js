@@ -95,6 +95,7 @@ export default function (self) {
             let params = ARGON2_PARAM;
 
             let nonce = ev.data.nonce;
+            let noncePrevious = nonce;
 
             let chainNext = ()=>{
 
@@ -144,7 +145,10 @@ export default function (self) {
                         nonce ++ ;
                         ev.data.count --;
 
-                        log({message:"worker nonce changed", nonce: block});
+                        if (nonce % 3 === 0) {
+                            self.postMessage({message: "worker nonce worked", nonce: nonce, nonceWork: nonce - noncePrevious});
+                            noncePrevious = nonce;
+                        }
 
                         return chainNext();
 

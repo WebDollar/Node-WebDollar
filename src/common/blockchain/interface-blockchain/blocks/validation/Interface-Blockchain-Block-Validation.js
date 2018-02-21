@@ -4,9 +4,13 @@ class InterfaceBlockchainBlockValidation {
 
     constructor(getDifficultyCallback, getTimeStampCallback, getHashPrevCallback, blockValidationType){
 
+        if (blockValidationType === undefined || blockValidationType === null)
+            blockValidationType = {};
+
         this.getDifficultyCallback = getDifficultyCallback;
         this.getTimeStampCallback = getTimeStampCallback;
         this.getHashPrevCallback = getHashPrevCallback;
+
         this.blockValidationType = blockValidationType;
     }
 
