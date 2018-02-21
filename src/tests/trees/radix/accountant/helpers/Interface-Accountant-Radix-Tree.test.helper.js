@@ -1,5 +1,5 @@
-var assert = require('assert')
-var BigNumber = require('bignumber.js');
+let assert = require('assert');
+let BigNumber = require('bignumber.js');
 
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import IntefaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'

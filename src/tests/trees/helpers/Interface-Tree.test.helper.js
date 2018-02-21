@@ -1,4 +1,4 @@
-var assert = require('assert')
+let assert = require('assert');
 
 
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'

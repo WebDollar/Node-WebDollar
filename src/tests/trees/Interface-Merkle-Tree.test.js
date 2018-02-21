@@ -1,4 +1,4 @@
-var assert = require('assert')
+let assert = require('assert');
 
 
 import InterfaceMerkleTree from 'common/trees/merkle-tree/Interface-Merkle-Tree'

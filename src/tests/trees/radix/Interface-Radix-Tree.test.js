@@ -1,4 +1,4 @@
-var assert = require('assert')
+let assert = require('assert');
 
 import TestsHelper from 'tests/Tests.helper'
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
