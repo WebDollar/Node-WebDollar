@@ -1,4 +1,4 @@
-var assert = require('assert')
+let assert = require('assert');
 
 import InterfaceAccountantRadixTreeHelperClass from './helpers/Interface-Accountant-Radix-Tree.test.helper'
 

@@ -1,4 +1,4 @@
-var assert = require('assert')
+let assert = require('assert');
 
 import InterfaceAccountantRadixTreeHelperClass from '../helpers/Interface-Accountant-Radix-Tree.test.helper'
 import InterfaceMerkleAccountantRadixTree from 'common/trees/radix-tree/accountant-tree/merkle-tree/Interface-Merkle-Accountant-Radix-Tree'
