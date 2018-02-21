@@ -155,6 +155,7 @@ class InterfaceBlockchain {
             //console.log("block.difficultyTarget", prevDifficultyTarget.toString("hex"), prevTimeStamp, block.timeStamp, block.height);
 
             block.difficultyTarget = block.blockValidation.getDifficulty( block.timeStamp, block.height );
+            console.warn(block.difficultyTarget);
             block.difficultyTarget = Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(block.difficultyTarget) );
 
             //console.log(" computed ", block.difficultyTarget.toString("hex"), " from ", prevDifficultyTarget.toString("hex") )
@@ -177,8 +178,8 @@ class InterfaceBlockchain {
 
         if (height <= 0)  return BlockchainGenesis.difficultyTarget;
         else{
-            if (height > this.blocks.length ) throw "getDifficultyTarget invalid height"; else
-            if (this.blocks[height-1] === undefined) throw "getDifficultyTarget invalid height";
+            if (height > this.blocks.length ) throw "getDifficultyTarget invalid height "+height+" "+this.blocks.length; else
+            if (this.blocks[height-1] === undefined) throw "getDifficultyTarget invalid height"+height+" "+this.blocks.length;
 
             return this.blocks[height-1].difficultyTarget;
         }

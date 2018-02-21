@@ -76,7 +76,7 @@ class Blockchain{
         await this.Wallet.loadWallet();
 
         //starting mining
-        await this.Mining.loadMinerAddress(this.Wallet.addresses[0]);
+        await this.Mining.loadMinerAddress(this.Wallet.addresses[0], this.Wallet);
 
         //loading the blockchain
         await this.loadBlockchain();

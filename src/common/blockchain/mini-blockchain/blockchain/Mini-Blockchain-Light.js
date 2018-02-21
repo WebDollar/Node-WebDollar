@@ -181,14 +181,17 @@ class MiniBlockchainLight extends  MiniBlockchain{
         // trying to read the diffIndex
         let diffIndex = await this.db.get(this._blockchainFileName + "_LightSettings_diffIndex");
 
-        if (diffIndex === null || diffIndex === undefined)
+        if ( diffIndex === null || diffIndex === undefined || diffIndex > numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 1)
             diffIndex = numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS -1 ;
+
+        console.log("DIFFFINDEXAFTER", diffIndex);
 
         if (numBlocks > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS) {
 
             this.lightAccountantTreeSerializations[diffIndex] = serializationAccountantTreeInitial;
 
             this.lightPrevDifficultyTargets[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTarget");
+
             if (this.lightPrevDifficultyTargets[diffIndex] === null) {
                 console.error("_LightSettings_prevDifficultyTarget was not found");
                 return false;

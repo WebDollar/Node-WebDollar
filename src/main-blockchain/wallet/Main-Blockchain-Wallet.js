@@ -566,7 +566,7 @@ class MainBlockchainWallet{
 
             let response = await this.loadAddresses();
 
-            if (response !== false)
+            if (response === true)
                 this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Loaded Successfully"});
 
             if (response === false || this.addresses.length === 0) {

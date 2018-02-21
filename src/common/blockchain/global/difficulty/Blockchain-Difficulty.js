@@ -117,7 +117,8 @@ class BlockchainDifficulty{
         //              blockNumber === 9
         // it should recalcule using [0...9]
 
-        if (blockNumber % consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS-1 !== 0) return prevBlockDifficulty;
+        if ( (blockNumber+1) % consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS !== 0)
+            return BigInteger( prevBlockDifficulty.toString(16), 16 );
         else {
 
             console.warn("new difficulty mean recalculated", blockNumber);
@@ -136,7 +137,7 @@ class BlockchainDifficulty{
             how_much_it_took_to_mine_X_Blocks += blockTimestamp;
 
             //It should substitute, the number of Blocks * Initial Block
-            how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS * getTimeStampCallback(firstBlock);
+            how_much_it_took_to_mine_X_Blocks -= (consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS-1) * getTimeStampCallback(firstBlock);
 
             let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks).decimalPlaces(8);
 
@@ -150,7 +151,7 @@ class BlockchainDifficulty{
             let newBlockDifficulty = prevBlockDifficulty.multipliedBy(ratio);
             newBlockDifficulty = newBlockDifficulty.decimalPlaces(0);
 
-            console.warn("newBlockDifficulty2", newBlockDifficulty, newBlockDifficulty.toString());
+            console.warn("newBlockDifficulty2", newBlockDifficulty, newBlockDifficulty.toString(16));
             return BigInteger( newBlockDifficulty.toString(16), 16 );
             //return prevBlockDifficulty.multiply(ratio.toString());
         }

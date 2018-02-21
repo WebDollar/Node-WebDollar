@@ -58,7 +58,7 @@ class InterfaceBlockchainMining{
 
     }
 
-    async loadMinerAddress(defaultAddress){
+    async loadMinerAddress(defaultAddress, Wallet){
 
         let key = "minerAddress";
 
@@ -69,6 +69,22 @@ class InterfaceBlockchainMining{
                 this.minerAddress = defaultAddress;
                 return true;
             }
+
+            if ( Wallet.getAddressIndex( minerAddress ) === -1 ){
+                if (typeof window === "undefined"){
+
+                    console.error("You are mining on an address that is not in your wallet. Do you want to change the mining address on your wallet?")
+
+                } else {
+
+                    let confirmation = confirm("You are mining on an address that is not in your wallet. Do you want to change the mining address on your wallet?");
+
+                    if (confirmation)
+                        minerAddress = Wallet.addresses[0];
+                }
+
+            }
+
 
             this._setAddress(minerAddress, false);
 
@@ -100,10 +116,12 @@ class InterfaceBlockchainMining{
         if (Buffer.isBuffer(newAddress)) newAddress = BufferExtended.toBase(newAddress);
 
         this._minerAddress = newAddress;
+
         if (newAddress === undefined)
             this._unencodedMinerAddress = undefined;
         else
             this._unencodedMinerAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(newAddress);
+
 
         this.blockchain.emitter.emit( 'blockchain/mining/address', { address: this._minerAddress, unencodedAddress: this._unencodedMinerAddress});
 
@@ -254,7 +272,7 @@ class InterfaceBlockchainMining{
             }
 
             if (answer.result && this.blockchain.blocks.length === block.height ){
-                console.log( colors.green("WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD") );
+                console.warn( "WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress);
 
                 try {
 
