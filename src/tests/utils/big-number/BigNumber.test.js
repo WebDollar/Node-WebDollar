@@ -17,12 +17,12 @@ describe('BigNumber test', () => {
         for (let i = 0; i < v.length; ++i) {
             sum1 = sum1.plus(v[i]);
             sum2 = sum2.minus(v[i]);
-            prod1 = prod1.mul(v[i]);
-            prod2 = prod2.mul(v[i]);
+            prod1 = prod1.multipliedBy(v[i]);
+            prod2 = prod2.multipliedBy(v[i]);
         }
-        let diff1 = sum1.minus(sum2).minus(sum1.mul(new BigNumber(2)));
+        let diff1 = sum1.minus(sum2).minus(sum1.multipliedBy(new BigNumber(2)));
         let diff2 = sum1.plus(sum2);
-        let diff3 = prod1.minus(prod2)
+        let diff3 = prod1.minus(prod2);
 
         assert(diff1.isEqualTo(new BigNumber(0)), diff1 + "!=" + 0);
         assert(diff2.isEqualTo(new BigNumber(0)), diff2 + "!=" + 0);
