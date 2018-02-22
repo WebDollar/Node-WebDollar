@@ -9,19 +9,18 @@ class BlockchainNetworkAdjustedTime{
 
         NodesList.emitter.on("nodes-list/connected", async (result) => { await this.initializingNewNode(result) } );
 
-        NodesList.emitter.on("nodes-list/disconnected", (result) => {
-
-        });
+        NodesList.emitter.on("nodes-list/disconnected", async (result) => { await this._removeNodeTimeAdjusted(result) });
 
     }
 
     get networkAdjustedTime(){
-        return this._networkAdjustedTime;
+        return this._networkAdjustedTimeOffset / this._networkAdjustedTimeNodesUsed;
     }
 
     resetNetworkAdjustedTime(){
         this._networkAdjustedTimeOffset = 0;
         this._networkAdjustedTimeNodes = [];
+        this._networkAdjustedTimeNodesUsed = 0;
     }
 
     async initializingNewNode(nodesListObject){
@@ -44,20 +43,42 @@ class BlockchainNetworkAdjustedTime{
     }
 
 
-    _addNodeTimeAdjusted(socket, timeUTC ){
+    _addNodeTimeAdjusted(socket, socketTimeUTC ){
 
         //one IP, one vote
-        if (this._findNodeTimeAdjusted(socket) === -1){
+        let foundNodeIndex = this._findNodeTimeAdjusted(socket);
+        if (foundNodeIndex === -1){
 
-            this._networkAdjustedTimeOffset +=  (timeUTC - this.blockchainTimestamp.timeUTC);
+            this._insertNodeTimeAdjusted(socket, socketTimeUTC - this.blockchainTimestamp.timeUTC);
+
+            foundNodeIndex = this._networkAdjustedTimeNodes.length - 1;
 
         } else { // I already found one, let's refresh
 
-            this._networkAdjustedTimeOffset +=  (timeUTC - this.blockchainTimestamp.timeUTC);
+            this._networkAdjustedTimeOffset -= (this._networkAdjustedTimeNodes[foundNodeIndex].socketTimeUTCOffset);
+
+            this._networkAdjustedTimeNodes[foundNodeIndex].socketTimeUTCOffset = (socketTimeUTC - this.blockchainTimestamp.timeUTC);
 
         }
 
+        this._networkAdjustedTimeOffset +=  this._networkAdjustedTimeNodes[foundNodeIndex].socketTimeUTCOffset;
+
     }
+
+    _removeNodeTimeAdjusted(socket){
+
+        let foundNodeIndex = this._findNodeTimeAdjusted(socket);
+        if (foundNodeIndex === -1) return false;
+
+        this._networkAdjustedTimeOffset -= (this._networkAdjustedTimeNodes[foundNodeIndex].socketTimeUTCOffset);
+
+        this._deleteNodeTimeAdjusted(socket);
+    }
+
+
+    /**
+     * Operations with Array
+     */
 
     _findNodeTimeAdjusted(socket){
 
@@ -67,6 +88,26 @@ class BlockchainNetworkAdjustedTime{
             }
 
         return -1;
+
+    }
+
+    _insertNodeTimeAdjusted(socket, socketTimeUTCOffset){
+        this._networkAdjustedTimeNodes.push ( {
+            socket: socket,
+            socketTimeUTCOffset: socketTimeUTCOffset
+        });
+
+        this._networkAdjustedTimeNodesUsed++;
+    }
+
+    _deleteNodeTimeAdjusted(socket){
+
+        let nodeFoundIndex = this._findNodeTimeAdjusted(socket);
+
+        if (nodeFoundIndex === -1) return false;
+
+        this._networkAdjustedTimeNodes.splice(nodeFoundIndex, 1);
+        this._networkAdjustedTimeNodesUsed--;
 
     }
 
