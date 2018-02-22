@@ -94,7 +94,7 @@ class InterfaceBlockchainBlock {
 
         this._validateTargetDifficulty();
 
-        this._validateBlockTimeStmap();
+        this._validateBlockTimeStamp();
 
         if (this.reward.equals( BlockchainMiningReward.getReward(this.height) ) === false )
             throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward( this.height );
@@ -162,22 +162,23 @@ class InterfaceBlockchainBlock {
         return true;
     }
 
-    _validateBlockTimeStmap(){
+    _validateBlockTimeStamp(){
 
         // A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
         if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS) {
 
             let medianTimestamp = 0;
-            for (let i=height; i > this.height - consts.BLOCKCHAIN.TIMESTAMP_VALIDATION_NO_BLOCKS; i++){
+            for (let i=height; i > this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i++){
                 medianTimestamp += this.blockValidation.getTimeStampCallback(i);
             }
-            medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP_VALIDATION_NO_BLOCKS;
+            medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
 
             if (this.timeStamp < medianTimestamp) throw "Block Timestamp is not bigger than the previous 10 blocks";
 
+        }
 
+        if (!this.blockValidation.blockValidationType['skip-validation-timestamp-adjusted-time']) {
             if (this.timeStamp < this.blockchain.timestamp.networkAdjustedTime + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET) throw ""
-
         }
 
     }
