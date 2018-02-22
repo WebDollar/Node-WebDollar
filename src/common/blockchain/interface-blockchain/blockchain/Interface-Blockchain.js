@@ -155,10 +155,10 @@ class InterfaceBlockchain {
             //console.log("block.difficultyTarget", prevDifficultyTarget.toString("hex"), prevTimeStamp, block.timeStamp, block.height);
 
             block.difficultyTarget = block.blockValidation.getDifficulty( block.timeStamp, block.height );
-            console.warn(block.difficultyTarget);
+
             block.difficultyTarget = Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(block.difficultyTarget) );
 
-            //console.log(" computed ", block.difficultyTarget.toString("hex"), " from ", prevDifficultyTarget.toString("hex") )
+            console.warn(" computed ", block.difficultyTarget.toString("hex"), " from ", block.difficultyTargetPrev.toString("hex") )
         }
 
 

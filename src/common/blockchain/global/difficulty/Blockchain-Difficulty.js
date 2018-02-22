@@ -137,7 +137,7 @@ class BlockchainDifficulty{
             how_much_it_took_to_mine_X_Blocks += blockTimestamp;
 
             //It should substitute, the number of Blocks * Initial Block
-            how_much_it_took_to_mine_X_Blocks -= (consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS-1) * getTimeStampCallback(firstBlock);
+            how_much_it_took_to_mine_X_Blocks -= (consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS) * getTimeStampCallback(firstBlock);
 
             let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks).decimalPlaces(8);
 
