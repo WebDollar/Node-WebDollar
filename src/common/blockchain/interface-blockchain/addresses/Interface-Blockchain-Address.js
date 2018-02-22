@@ -19,7 +19,6 @@ class InterfaceBlockchainAddress{
         this.address = null;
         this.publicKey = null;
 
-
         if (db === undefined){
             this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
         } else {

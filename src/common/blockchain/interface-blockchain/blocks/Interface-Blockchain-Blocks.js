@@ -34,9 +34,9 @@ class InterfaceBlockchainBlocks{
 
     }
 
-    spliceBlocks(after, freeMemory=false){
+    spliceBlocks(after, freeMemory = false){
 
-        for (let i=this.length-1; i>=after; i--)
+        for (let i = this.length - 1; i >= after; i--)
             if (this[i] !== undefined){
                 if (freeMemory)
                     delete this[i];

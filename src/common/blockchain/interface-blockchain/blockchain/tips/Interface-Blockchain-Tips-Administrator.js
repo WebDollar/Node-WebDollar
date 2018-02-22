@@ -27,7 +27,7 @@ class InterfaceBlockchainTipsAdministrator {
         let maxTip = null;
         let maxTipChainLength = 0;
 
-        for (let i=0; i<this.tips.length; i++)
+        for (let i = 0; i < this.tips.length; i++)
             if (this.tips[i].forkChainLength > maxTipChainLength && !this.isBanned(this.tips[i].socket.node.sckAddress)){
                 maxTipChainLength = this.tips[i].forkChainLength;
                 maxTip = this.tips[i];
@@ -39,7 +39,7 @@ class InterfaceBlockchainTipsAdministrator {
 
     findTip(socket){
 
-        for (let i=0; i<this.tips.length; i++)
+        for (let i = 0; i < this.tips.length; i++)
             if (this.tips[i] === socket || this.tips[i].socket === socket || this.tips[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress) )
                 return i;
 
@@ -48,8 +48,10 @@ class InterfaceBlockchainTipsAdministrator {
 
     getTip(socket){
         let index = this.findTip(socket);
-        if (index === null) return null;
-        else return this.tips[index];
+        if (index === null)
+            return null;
+        else
+            return this.tips[index];
     }
 
 
@@ -73,9 +75,11 @@ class InterfaceBlockchainTipsAdministrator {
 
     updateTipNewForkLength(tip, forkToDoChainLength, forkToDoLastBlockHeader ){
 
-        if (tip === null) return null;
+        if (tip === null)
+            return null;
 
-        if (tip.forkChainLength > forkToDoChainLength) return null; //nothing to update
+        if (tip.forkChainLength > forkToDoChainLength) //nothing to update
+            return null;
 
         tip.forkToDoChainLength = forkToDoChainLength;
         tip.forkToDoLastBlockHeader = forkToDoLastBlockHeader;
@@ -91,7 +95,7 @@ class InterfaceBlockchainTipsAdministrator {
 
     processTipsNewForkLengths(){
 
-        for (let i=this.tips.length-1; i>=0; i--){
+        for (let i = this.tips.length - 1; i >= 0; i--){
 
             if (this.tips[i] === null || this.tips[i] === undefined)
                 this.tips.splice(i, 1);
@@ -111,7 +115,8 @@ class InterfaceBlockchainTipsAdministrator {
     isBanned(sckAddress){
 
         let ban = this.getBan(sckAddress);
-        if (ban === null) return false;
+        if (ban === null)
+            return false;
 
         return ban.isBanned(sckAddress);
     }
@@ -136,7 +141,7 @@ class InterfaceBlockchainTipsAdministrator {
 
     findBan(sckAddress){
 
-        for (let i=0; i<this.bans.length; i++)
+        for (let i = 0; i < this.bans.length; i++)
             if (this.bans[i].sckAddress.matchAddress(sckAddress, ["uuid"]) )
                 return i;
 
@@ -146,7 +151,8 @@ class InterfaceBlockchainTipsAdministrator {
     getBan(sckAddress){
 
         let index = this.findBan(sckAddress);
-        if (index !== null) return this.bans[index];
+        if (index !== null)
+            return this.bans[index];
 
         return null;
     }

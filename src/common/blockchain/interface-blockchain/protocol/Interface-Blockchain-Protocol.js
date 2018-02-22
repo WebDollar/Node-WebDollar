@@ -75,25 +75,38 @@ class InterfaceBlockchainProtocol {
     _validateBlockchainHeader(data){
 
         // validating data
-        if (typeof data.chainLength !== 'number') throw 'chainLength is not specified';
-        if (typeof data.height !== 'number') throw 'height is not specified';
+        if (typeof data.chainLength !== 'number')
+            throw 'chainLength is not specified';
+        if (typeof data.height !== 'number')
+            throw 'height is not specified';
 
-        if (typeof data.header !== 'object') throw 'header is not specified';
-        if (data.header.hashPrev === undefined ) throw 'header.hashPrev is not specified';
-        if (data.header.hash === undefined) throw 'header.hash is not specified';
+        if (typeof data.header !== 'object')
+            throw 'header is not specified';
+        if (data.header.hashPrev === undefined )
+            throw 'header.hashPrev is not specified';
+        if (data.header.hash === undefined)
+            throw 'header.hash is not specified';
 
-        if (typeof data.header.hashPrev === 'string') data.header.hashPrev = Serialization.fromBase(data.header.hashPrev);
-        else data.header.hashPrev = new Buffer(data.header.hashPrev);
+        if (typeof data.header.hashPrev === 'string')
+            data.header.hashPrev = Serialization.fromBase(data.header.hashPrev);
+        else
+            data.header.hashPrev = new Buffer(data.header.hashPrev);
 
-        if (typeof data.header.hash === 'string') data.header.hash = Serialization.fromBase(data.header.hash);
-        else data.header.hash = new Buffer(data.header.hash);
+        if (typeof data.header.hash === 'string')
+            data.header.hash = Serialization.fromBase(data.header.hash);
+        else
+            data.header.hash = new Buffer(data.header.hash);
 
-        if ((typeof data.header.nonce === 'number' || Buffer.isBuffer(data.header.nonce)) === false) throw 'nonce is not specified';
+        if ((typeof data.header.nonce === 'number' || Buffer.isBuffer(data.header.nonce)) === false)
+            throw 'nonce is not specified';
 
-        if (typeof data.header.data.hashData === 'string') data.header.data.hashData = Serialization.fromBase(data.header.data.hashData);
-        else data.header.data.hashData = new Buffer(data.header.data.hashData);
+        if (typeof data.header.data.hashData === 'string')
+            data.header.data.hashData = Serialization.fromBase(data.header.data.hashData);
+        else
+            data.header.data.hashData = new Buffer(data.header.data.hashData);
 
-        if (data.header.chainLength < data.header.height) throw ('chainLength is smaller than block height ?? ');
+        if (data.header.chainLength < data.header.height)
+            throw ('chainLength is smaller than block height ?? ');
 
     }
 
@@ -111,7 +124,7 @@ class InterfaceBlockchainProtocol {
 
                     console.log("get/blockchain/header/last-block length", this.blockchain.blocks.length);
                     console.log("get/blockchain/header/last-block last", this.blockchain.last === undefined);
-                    for (let i=this.blockchain.blocks.length-10; i<this.blockchain.blocks.length; i++)
+                    for (let i = this.blockchain.blocks.length - 10; i < this.blockchain.blocks.length; i++)
                         if (this.blockchain.blocks[i] === undefined)
                             console.log("get/blockchain/header/last-block", i, this.blockchain.blocks[i]);
 
@@ -229,14 +242,17 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
-                    if (typeof data.height !== 'number') throw "data.height is not defined";
+                    if (typeof data.height !== 'number')
+                        throw "data.height is not defined";
 
-                    if (this.blockchain.blocks.length <= data.height) throw "data.height is higher than I have " + this.blockchain.blocks.length + " < " +data.height;
+                    if (this.blockchain.blocks.length <= data.height)
+                        throw "data.height is higher than I have " + this.blockchain.blocks.length + " < " +data.height;
 
 
                     let block = this.blockchain.blocks[data.height];
 
-                    if (block === undefined) throw "Block not found: "+data.height;
+                    if (block === undefined)
+                        throw "Block not found: "+data.height;
 
                     //console.log("blooock", block);
 
@@ -272,13 +288,16 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
-                    if (typeof data.height !== 'number') throw "data.height is not defined";
+                    if (typeof data.height !== 'number')
+                        throw "data.height is not defined";
 
-                    if (this.blockchain.blocks.length <= data.height) throw "data.height is higher than I have "+this.blockchain.blocks.length + " < " +data.height;
+                    if (this.blockchain.blocks.length <= data.height)
+                        throw "data.height is higher than I have "+this.blockchain.blocks.length + " < " +data.height;
 
                     let block = this.blockchain.blocks[data.height];
 
-                    if (block === undefined) throw "block is empty at "+data.height;
+                    if (block === undefined)
+                        throw "block is empty at "+data.height;
 
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                         result: true,
@@ -314,7 +333,8 @@ class InterfaceBlockchainProtocol {
 
         try {
 
-            if (data === null || data.result !== true) throw "last block is not valid";
+            if (data === null || data.result !== true)
+                throw "last block is not valid";
 
             data = data.data;
 

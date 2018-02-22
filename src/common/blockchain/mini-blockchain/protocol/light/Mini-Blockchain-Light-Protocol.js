@@ -28,8 +28,11 @@ class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
                 if (typeof data.height !== "number")
                     throw "data.height is not a number";
 
-                if (this.blockchain.blocks.length < data.height) throw "height is not valid";
-                if (data.height < -1) throw "height is not valid";
+                if (this.blockchain.blocks.length < data.height)
+                    throw "height is not valid";
+                
+                if (data.height < -1)
+                    throw "height is not valid";
 
                 let serialization = this.blockchain.getSerializedAccountantTree(data.height);
 

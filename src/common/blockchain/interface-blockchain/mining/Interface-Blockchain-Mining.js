@@ -125,8 +125,10 @@ class InterfaceBlockchainMining{
 
         this.blockchain.emitter.emit( 'blockchain/mining/address', { address: this._minerAddress, unencodedAddress: this._unencodedMinerAddress});
 
-        if (!save) return true;
-        else return this.saveMinerAddress();
+        if (!save)
+            return true;
+        else
+            return this.saveMinerAddress();
     }
 
     async startMining(){
@@ -281,7 +283,8 @@ class InterfaceBlockchainMining{
                             block.nonce = answer.nonce;
 
                             //returning false, because a new fork was changed in the mean while
-                            if (this.blockchain.blocks.length !== block.height) return false;
+                            if (this.blockchain.blocks.length !== block.height)
+                                return false;
 
                             return this.blockchain.includeBlockchainBlock(block, false, [], true);
                         }))) throw "Mining2 returned false";
@@ -305,9 +308,9 @@ class InterfaceBlockchainMining{
 
             console.error( "Error mining block ", Exception, block);
 
-            if (intervalMiningOutput !== undefined) clearInterval(intervalMiningOutput);
+            if (intervalMiningOutput !== undefined)
+                clearInterval(intervalMiningOutput);
             throw Exception;
-
         }
 
     }

@@ -16,10 +16,12 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     setSum(sum){
 
-        if (typeof sum === "object"  && sum !== null && sum.constructor.name === "BigNumber") this.sum =  sum;
+        if (typeof sum === "object"  && sum !== null && sum.constructor.name === "BigNumber")
+            this.sum =  sum;
         else {
 
-            if ( sum === undefined || sum === null) sum = 0;
+            if (sum === undefined || sum === null)
+                sum = 0;
 
             this.sum = new BigNumber(sum);
         }
@@ -28,8 +30,10 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     isSumValid(){
 
-        if ( this.sum === undefined && this.sum=== null) return false;
-        if (typeof this.sum !== "object"  || this.sum.constructor.name !== "BigNumber") return false;
+        if (this.sum === undefined && this.sum=== null)
+            return false;
+        if (typeof this.sum !== "object"  || this.sum.constructor.name !== "BigNumber")
+            return false;
 
         return true;
 
@@ -40,10 +44,12 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         if (typeof value === 'object' && value !== null){
 
-            if (typeof value.balances === "object"  && value.balances !== null && value.balance.constructor.name === "BigNumber") { }
+            if (typeof value.balances === "object"  && value.balances !== null && value.balance.constructor.name === "BigNumber") { 
+            }
             else {
 
-                if ( value.balances === undefined || value.balances === null) value.balances = 0;
+                if ( value.balances === undefined || value.balances === null)
+                    value.balances = 0;
 
                 value.balances = new BigNumber(value.balances);
             }
@@ -56,10 +62,14 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     isBalancesValid(){
 
-        if (typeof this.value !== 'object' || this.value === null) return false;
+        if (typeof this.value !== 'object' || this.value === null)
+            return false;
 
-        if ( this.value.balances === undefined && this.value.balances=== null) return false;
-        if (typeof this.value.balances !== "object"  || this.value.balances.constructor.name !== "BigNumber") return false;
+        if ( this.value.balances === undefined && this.value.balances === null)
+            return false;
+
+        if (typeof this.value.balances !== "object"  || this.value.balances.constructor.name !== "BigNumber")
+            return false;
 
         return true;
 

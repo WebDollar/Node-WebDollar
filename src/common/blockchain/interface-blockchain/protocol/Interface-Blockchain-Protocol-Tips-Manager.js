@@ -7,14 +7,14 @@ class InterfaceBlockchainProtocolTipsManager {
         this.blockchain = blockchain;
         this.protocol = protocol;
 
-        setTimeout(async ()=>{return await this.processTips()}, 50);
+        setTimeout(async () => { return await this.processTips(); }, 50);
     }
 
 
     async processTips(){
 
         if (this.blockchain === undefined) {
-            setTimeout(async ()=>{ return await this.processTips() }, 50);
+            setTimeout(async () => { return await this.processTips(); }, 50);
             return false;
         }
 
@@ -55,7 +55,7 @@ class InterfaceBlockchainProtocolTipsManager {
             result = true;
         }
 
-        setTimeout(async ()=>{return await this.processTips()}, 50);
+        setTimeout(async () => { return await this.processTips(); }, 50);
 
         return result;
     }
@@ -65,7 +65,8 @@ class InterfaceBlockchainProtocolTipsManager {
      */
     async discoverNewForkTip(socket, newChainLength, forkLastBlockHeader){
 
-        if (typeof newChainLength !== "number") throw "newChainLength is not a number";
+        if (typeof newChainLength !== "number")
+            throw "newChainLength is not a number";
 
         if (newChainLength < this.blockchain.blocks.length){
             console.error("Your blockchain is smaller than mine");

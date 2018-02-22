@@ -28,7 +28,8 @@ class SignalingServerRoomList {
 
     registerSignalingServerRoomConnection(client1, client2, status) {
 
-        if (client1 === null || client2 === null) return null;
+        if (client1 === null || client2 === null)
+            return null;
 
         let connection = this.searchSignalingServerRoomConnection(client1, client2);
 
@@ -70,8 +71,10 @@ class SignalingServerRoomList {
     }
 
     searchSignalingServerRoomConnectionById(id){
-        for (let i=0; i<this.list.length; i++)
-            if (this.list[i].id === id) return this.list[i];
+        
+        for (let i = 0; i < this.list.length; i++)
+            if (this.list[i].id === id)
+                return this.list[i];
 
         return null;
     }

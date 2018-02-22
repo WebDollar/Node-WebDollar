@@ -49,7 +49,8 @@ class InterfaceRadixTree extends InterfaceTree{
 
         if ( !node.isLeaf() )  {
 
-            if (node.isLeaf() !== false) return false; //it should not be a leaf
+            if (node.isLeaf() !== false) //it should not be a leaf
+                return false;
 
             return true;
 
@@ -57,9 +58,10 @@ class InterfaceRadixTree extends InterfaceTree{
 
             if (node !== this.root){
 
-                if (node.isLeaf() !== true) return false; // it should be a leaf
-                if (node.value === null || node.value === undefined)
-                    return false; //it should have a valid value
+                if (node.isLeaf() !== true) // it should be a leaf
+                    return false;
+                if (node.value === null || node.value === undefined) //it should have a valid value
+                    return false;
 
             } else
             if (node === this.root){
@@ -81,13 +83,14 @@ class InterfaceRadixTree extends InterfaceTree{
         if (!Buffer.isBuffer(input))
             input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer
 
-        if (input.length === 0) throw 'No input';
+        if (input.length === 0)
+            throw 'No input';
 
         let nodeCurrent = this.root;
 
         // console.log("input", input)
 
-        let i=0;
+        let i = 0;
         while (i < input.length) {
 
             //searching for existence of input[i...] in nodeCurrent list
@@ -128,7 +131,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                 nodeCurrent.edges.push( this._createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this._createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), )
+                                nodeMatch.edges.push( this._createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
                                 edge.targetNode.parent = nodeMatch;
 
                                 nodeCurrent = edge.targetNode;
@@ -142,7 +145,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                 nodeCurrent.edges.push( this._createEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this._createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), )
+                                nodeMatch.edges.push( this._createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
                                 edge.targetNode.parent = nodeMatch;
 
                                 // Adding thew new nodeChild with current Value
@@ -159,7 +162,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             this._changedNode(nodeMatch);
 
                             // Marking that it is done
-                            i = input.length+1;
+                            i = input.length + 1;
 
                         } else {
                             i += nodeCurrent.edges[j].label.length;
@@ -169,8 +172,10 @@ class InterfaceRadixTree extends InterfaceTree{
 
                             if (i === input.length){ //the prefix became a solution
 
-                                if (nodeCurrent.value !== null) throw ('the node already includes a value....');
-                                else this._setNode(nodeCurrent, value);
+                                if (nodeCurrent.value !== null)
+                                    throw ('the node already includes a value....');
+                                else
+                                    this._setNode(nodeCurrent, value);
 
                                 //console.log("nodeCurrent_2",nodeCurrent.value, nodeCurrent);
 
@@ -185,7 +190,8 @@ class InterfaceRadixTree extends InterfaceTree{
                 }
 
                 //in case it got stuck in the root
-                if (nodePrevious !== nodeCurrent) skipOptimization = true;
+                if (nodePrevious !== nodeCurrent)
+                    skipOptimization = true;
                 else skipOptimization = false;
             }
 
@@ -229,7 +235,8 @@ class InterfaceRadixTree extends InterfaceTree{
             searchResult = this.search(input);
 
             //console.log("searchResult", searchResult)
-            if (searchResult.node === undefined || searchResult.node === null) return false;
+            if (searchResult.node === undefined || searchResult.node === null)
+                return false;
 
         } else {
             searchResult = {node: input, }
@@ -238,7 +245,8 @@ class InterfaceRadixTree extends InterfaceTree{
         //it is the last element, we should delete it
         let finished = false;
 
-        if (!searchResult.node.isLeaf()) throw ("couldn't delete because input is not a leaf node");
+        if (!searchResult.node.isLeaf())
+            throw ("couldn't delete because input is not a leaf node");
 
         let node = searchResult.node;
 
@@ -261,7 +269,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                 //removing edge to current node from my direct parent
                 let deletedParentEdge = null;
-                for (let i=0; i<nodeParent.edges.length; i++)
+                for (let i = 0; i < nodeParent.edges.length; i++)
                     if (nodeParent.edges[i].targetNode === node) {
                         deletedParentEdge = nodeParent.edges[i];
                         nodeParent.edges.splice(i, 1);
@@ -304,7 +312,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             let grandParent = nodeParent.parent;
 
                             //replace grand parent edge child
-                            for (let i=0; i<grandParent.edges.length; i++)
+                            for (let i = 0; i < grandParent.edges.length; i++)
                                 if (grandParent.edges[i].targetNode === nodeParent){
 
                                     grandParent.edges[i].label =  Buffer.concat( [ grandParent.edges[i].label, edge.label  ] );
@@ -345,7 +353,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                 //console.log("node22..... ", node.value, node.edges)
 
-                for (let i=nodeParent.edges.length-1; i>=0; i--)
+                for (let i = nodeParent.edges.length - 1; i >= 0; i--)
                     if (nodeParent.edges[i].targetNode === node) {
 
                         nodeParent.edges.splice(i, 1);
@@ -381,7 +389,8 @@ class InterfaceRadixTree extends InterfaceTree{
         if (!Buffer.isBuffer(input))
             input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer
 
-        if (input.length === 0) throw 'No input';
+        if (input.length === 0)
+            throw 'No input';
 
         let nodeCurrent = this.root;
 
@@ -437,9 +446,11 @@ class InterfaceRadixTree extends InterfaceTree{
         let searchResult = this.search(input);
 
         // nothing to update
-        if ( searchResult.node === undefined || searchResult.node === null) return false;
+        if ( searchResult.node === undefined || searchResult.node === null)
+            return false;
 
-        if (!searchResult.node.isLeaf()) throw ("couldn't delete because input is not a leaf node");
+        if (!searchResult.node.isLeaf())
+            throw ("couldn't delete because input is not a leaf node");
 
         let node = searchResult.node;
 

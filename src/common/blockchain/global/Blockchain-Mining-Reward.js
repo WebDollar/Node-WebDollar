@@ -4,7 +4,8 @@ class BlockchainMiningReward{
 
     getReward(height){
 
-        if (typeof height !== "number") throw ('height is not defined');
+        if (typeof height !== "number")
+            throw ('height is not defined');
 
         if (height >= 0) {
 
@@ -12,10 +13,10 @@ class BlockchainMiningReward{
             let reward = new BigNumber(2500).dividedBy(1 << cicleNumber);
             let smallestReward = new BigNumber(0.0001);
 
-            if (reward.isLessThan(smallestReward)) reward = smallestReward;
+            if (reward.isLessThan(smallestReward))
+                reward = smallestReward;
 
             return reward;
-
         }
 
     }

@@ -36,14 +36,17 @@ class InterfaceBlockchainBlockData {
 
     validateBlockData(height, blockValidation){
 
-        if (this.minerAddress === undefined || this.minerAddress === null || !Buffer.isBuffer(this.minerAddress)  ) throw ('data.minerAddress is empty');
+        if (this.minerAddress === undefined || this.minerAddress === null || !Buffer.isBuffer(this.minerAddress)  )
+            throw ('data.minerAddress is empty');
 
-        if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData)) throw ('hashData is empty');
+        if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData))
+            throw ('hashData is empty');
 
         //validate hash
         let hashData = this.calculateHashBlockData();
 
-        if (!hashData.equals(this.hashData)) throw "block.data hashData is not right";
+        if (!hashData.equals(this.hashData))
+            throw "block.data hashData is not right";
 
         return true;
     }
@@ -69,7 +72,7 @@ class InterfaceBlockchainBlockData {
 
         let bufferList = [];
 
-        for (let i=0; i<this.transactions.length; i++)
+        for (let i = 0; i < this.transactions.length; i++)
             bufferList.push( this.transactions[i].serializeTransaction() );
 
         return Buffer.concat( bufferList )

@@ -23,15 +23,17 @@ class InterfaceTree{
      */
     validateTree(node, callback){
 
-        if ( node === undefined || node === null) throw ('Tree Validation Errror. Node is null');
+        if ( node === undefined || node === null)
+            throw ('Tree Validation Errror. Node is null');
 
-        for (let i=0; i < node.edges.length; i++) {
+        for (let i = 0; i < node.edges.length; i++) {
 
             if (  node.edges[i].targetNode === undefined || node.edges[i].targetNode === null ){
                 console.log("Edge target node is Null", node, node.edges[i], i)
                 throw('Edge target node is Null')
             }
-            if (node.edges[i].targetNode.parent !== node) throw ('Edge target node parent is different that current node');
+            if (node.edges[i].targetNode.parent !== node)
+                throw ('Edge target node parent is different that current node');
 
             if (typeof callback === 'function') {
                 let result = this.validateTree(node.edges[i].targetNode, callback);
@@ -73,7 +75,8 @@ class InterfaceTree{
         if (!Buffer.isBuffer(data))
             data = WebDollarCryptoData.createWebDollarCryptoData(data).buffer
 
-        if (parent === null || parent === undefined) parent = this.root;
+        if (parent === null || parent === undefined)
+            parent = this.root;
 
         let node = this._createNode( parent , [], data )
         parent.edges.push( this._createEdge( node ) );
@@ -87,11 +90,13 @@ class InterfaceTree{
         if (!Buffer.isBuffer(value))
             value = WebDollarCryptoData.createWebDollarCryptoData(value).buffer
 
-        if (value.length === 0) throw 'No input';
+        if (value.length === 0)
+            throw 'No input';
         let searchResult = this.search(value);
 
         //console.log("searchResult", searchResult)
-        if ( searchResult.node === undefined || searchResult.node === null) return false;
+        if (searchResult.node === undefined || searchResult.node === null)
+            return false;
 
         let node = searchResult.node;
 
@@ -102,7 +107,7 @@ class InterfaceTree{
         while (nodeParent !== null && node.value === null){
 
             //delete the edge from parent to deleted child
-            for (let i=0; i<nodeParent.edges.length; i++)
+            for (let i = 0; i < nodeParent.edges.length; i++)
                 if (nodeParent.edges[i].targetNode === node){
                     nodeParent.edges.splice(i,1);
                     deleted = true;
@@ -111,7 +116,7 @@ class InterfaceTree{
 
             // incase the current node has children, let's move the childrens
             if (node.edges.length > 0)
-                for (let i=0; i<node.edges.length; i++) {
+                for (let i = 0; i < node.edges.length; i++) {
                     nodeParent.edges.push(this._createEdge(node.edges[i].targetNode))
                     node.edges[i].targetNode.parent = nodeParent;
                 }
@@ -125,7 +130,8 @@ class InterfaceTree{
 
         if (deleted) {
 
-            if (nodeParent === null ||  nodeParent === undefined) nodeParent = this.root;
+            if (nodeParent === null ||  nodeParent === undefined)
+                nodeParent = this.root;
 
             this._changedNode(nodeParent)
 
@@ -143,9 +149,11 @@ class InterfaceTree{
      */
     search(value, node){
 
-        if ( value === undefined || value === null) return null;
+        if ( value === undefined || value === null)
+            return null;
 
-        if ( node === undefined || node === null) node = this.root;
+        if ( node === undefined || node === null)
+            node = this.root;
         //console.log("value1", value,  );
         if (!Buffer.isBuffer(value))
             value = WebDollarCryptoData.createWebDollarCryptoData(value).buffer
@@ -158,10 +166,11 @@ class InterfaceTree{
         }
 
 
-        for (let i=0; i<node.edges.length; i++) {
+        for (let i = 0; i < node.edges.length; i++) {
             let result = this.search(value, node.edges[i].targetNode);
 
-            if (result.result !== false) return result;
+            if (result.result !== false)
+                return result;
         }
 
         return { result: false, node: null, value:null }
@@ -172,13 +181,15 @@ class InterfaceTree{
     //Level Search
     levelSearch(node, level) {
 
-        if (node === undefined) node = this.root;
-        if (level === undefined) level =  0;
+        if (node === undefined)
+            node = this.root;
+        if (level === undefined)
+            level =  0;
 
         let queue = [ {node: node, level: level} ];
         let result = [];
 
-        let i =0;
+        let i = 0;
         while (i < queue.length){
 
             let node = queue[i].node;
@@ -204,8 +215,8 @@ class InterfaceTree{
         let searchResult = this.levelSearch(node, level);
 
         let BFSResult = [];
-        for (let i=0; i<searchResult.length; i++)
-            for (let j=0; j<searchResult[i].length; j++)
+        for (let i = 0; i < searchResult.length; i++)
+            for (let j = 0; j < searchResult[i].length; j++)
                 BFSResult.push( searchResult[i][j] );
 
         return BFSResult;
@@ -213,12 +224,15 @@ class InterfaceTree{
 
     validateParentsAndChildrenEdges(node, parent){
 
-        if ( node === undefined) node = this.root;
-        if ( parent === undefined) parent = null;
+        if (node === undefined)
+            node = this.root;
+        if (parent === undefined)
+            parent = null;
 
-        if (node.parent !== parent) return false;
+        if (node.parent !== parent)
+            return false;
 
-        for (let i=0; i<node.edges.length; i++) {
+        for (let i = 0; i < node.edges.length; i++) {
 
             if (node.edges[i].targetNode.parent !== node)
                 return false;
@@ -229,13 +243,15 @@ class InterfaceTree{
 
         let nodeLevel=-1, parentLevel=-2;
         let bfs = this.BFS();
-        for (let i=0; i<bfs.length; i++)
-            for (let j=0; j<bfs[i].length; j++)
-                if (bfs[i][j] === node) nodeLevel = i;
-                else if (bfs[i][j] === parent ) parentLevel = i;
+        for (let i = 0; i < bfs.length; i++)
+            for (let j = 0; j < bfs[i].length; j++)
+                if (bfs[i][j] === node)
+                    nodeLevel = i;
+                else if (bfs[i][j] === parent )
+                    parentLevel = i;
 
-        if (node !== this.root && parentLevel !== nodeLevel - 1) return false;
-
+        if (node !== this.root && parentLevel !== nodeLevel - 1)
+            return false;
 
         return true;
     }
@@ -247,9 +263,10 @@ class InterfaceTree{
 
         console.log("BFS Levels", result.length);
 
-        for (let i=0; i< result.length; i++) {
+        for (let i = 0; i < result.length; i++) {
 
-            let data = []; let hasHashses = false;
+            let data = [];
+            let hasHashses = false;
 
             result[i].forEach( (node, index) => {
 
@@ -285,9 +302,13 @@ class InterfaceTree{
 
                     dataString += "id: "+element.id + " parentId: "+element.parentId+ "   ";
 
-                    if (Buffer.isBuffer(element.value))  dataString += element.value.toString();
-                    else if (typeof element.value === "object")  dataString += JSON.stringify(element.value);
-                    else dataString += " null";
+                    if (Buffer.isBuffer(element.value))
+                        dataString += element.value.toString();
+                    else
+                    if (typeof element.value === "object")
+                        dataString += JSON.stringify(element.value);
+                    else
+                        dataString += " null";
 
                 } catch (exception){
                     dataString += "invalid";
@@ -301,9 +322,13 @@ class InterfaceTree{
                     if (element.sum !== 'null' &&  element.sum !== undefined) {
                         dataString += " , sum: ";
 
-                        if (Buffer.isBuffer(element.sum)) dataString += element.sum.toString();
-                        else if (typeof element.sum === "object") dataString += JSON.stringify(element.sum);
-                        else dataString += element.sum;
+                        if (Buffer.isBuffer(element.sum))
+                            dataString += element.sum.toString();
+                        else
+                        if (typeof element.sum === "object")
+                            dataString += JSON.stringify(element.sum);
+                        else
+                            dataString += element.sum;
                     }
 
                 } catch (exception){

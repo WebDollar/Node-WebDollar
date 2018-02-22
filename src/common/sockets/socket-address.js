@@ -8,9 +8,11 @@ class SocketAddress {
 
         //console.log("checkIsSocketAddress", sckAddress);
 
-        if (typeof sckAddress !== 'object' || sckAddress === null) return false;
+        if (typeof sckAddress !== 'object' || sckAddress === null)
+            return false;
 
-        if (! (sckAddress.constructor.name === "SocketAddress" )) return false;
+        if (! (sckAddress.constructor.name === "SocketAddress" ))
+            return false;
 
         return true;
     }
@@ -21,22 +23,32 @@ class SocketAddress {
     static createSocketAddress(address, port, uuid){
 
         //in case address is actually a Socket
-        if (typeof address === "object" && address !== null && address.hasOwnProperty("node") && address.node.hasOwnProperty("sckAddress")) address = address.node.sckAddress;
-        if (typeof address === "object" && address !== null && address.hasOwnProperty("sckAddress")) address = address.sckAddress;
+        if (typeof address === "object" && address !== null && address.hasOwnProperty("node") && address.node.hasOwnProperty("sckAddress"))
+            address = address.node.sckAddress;
 
-        if (SocketAddress.checkIsSocketAddress(address)) return address;
+        if (typeof address === "object" && address !== null && address.hasOwnProperty("sckAddress"))
+            address = address.sckAddress;
 
-        if (  port === undefined || port === '') port = consts.NODE_PORT;
+        if (SocketAddress.checkIsSocketAddress(address))
+            return address;
+
+        if (  port === undefined || port === '')
+            port = consts.NODE_PORT;
+
         return new SocketAddress(address, port, uuid);
     }
 
 
     constructor(address, port, uuid){
 
-        if ( address === undefined) address = '';
-        if (typeof address === 'string') address = address.toLowerCase();
+        if (address === undefined)
+            address = '';
+        
+        if (typeof address === 'string')
+            address = address.toLowerCase();
 
-        if ( port === undefined) port = consts.NODE_PORT;
+        if (port === undefined)
+            port = consts.NODE_PORT;
 
         try {
             if (typeof address === 'string')
@@ -58,8 +70,11 @@ class SocketAddress {
 
     matchAddress(address, validationDoubleConnectionsTypes){
 
-        if (validationDoubleConnectionsTypes === undefined) validationDoubleConnectionsTypes = ["ip","uuid"];
-        else if (!Array.isArray(validationDoubleConnectionsTypes)) validationDoubleConnectionsTypes = [validationDoubleConnectionsTypes];
+        if (validationDoubleConnectionsTypes === undefined)
+            validationDoubleConnectionsTypes = ["ip","uuid"];
+        else
+        if (!Array.isArray(validationDoubleConnectionsTypes))
+            validationDoubleConnectionsTypes = [validationDoubleConnectionsTypes];
 
         //maybe it is a socket
         let sckAddress = SocketAddress.createSocketAddress(address);
@@ -67,7 +82,8 @@ class SocketAddress {
         //uuid validation
         if ( validationDoubleConnectionsTypes.indexOf("uuid") >= 0 ){
 
-            if (this.uuid !== null && this.uuid !== undefined && this.uuid === sckAddress.uuid) return true;
+            if (this.uuid !== null && this.uuid !== undefined && this.uuid === sckAddress.uuid)
+                return true;
 
         }
 
@@ -96,7 +112,8 @@ class SocketAddress {
     getAddress(includePort){
 
         try {
-            if ( includePort === undefined) includePort = true;
+            if ( includePort === undefined)
+                includePort = true;
 
             if (typeof this.address === 'object') {
 
@@ -135,7 +152,8 @@ class SocketAddress {
     }
 
     getGeoLocation(){
-        if (this.geoLocation !== null) return (this.geoLocation); //already computed
+        if (this.geoLocation !== null) //already computed
+            return (this.geoLocation);
 
         return GeoHelper.getLocationFromAddress(this);
 

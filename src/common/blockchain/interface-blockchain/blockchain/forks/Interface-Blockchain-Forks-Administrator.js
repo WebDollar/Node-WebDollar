@@ -27,9 +27,11 @@ class InterfaceBlockchainForksAdministrator {
 
         if (!Array.isArray(sockets)) sockets = [sockets];
 
-        if (this.findForkBySockets(sockets) !== null) return null;
+        if (this.findForkBySockets(sockets) !== null)
+            return null;
 
-        if (this.findForkByHeader(header) !== null) return null;
+        if (this.findForkByHeader(header) !== null)
+            return null;
 
         let fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header );
 
@@ -49,11 +51,11 @@ class InterfaceBlockchainForksAdministrator {
 
         if (!Array.isArray(sockets)) sockets = [sockets];
 
-        for (let i=0; i<sockets.length; i++){
+        for (let i = 0; i < sockets.length; i++){
 
-            for (let j=0; j<this.forks.length; j++) {
+            for (let j = 0; j < this.forks.length; j++) {
 
-                for (let q=0; q<this.forks[j].sockets.length; q++)
+                for (let q = 0; q < this.forks[j].sockets.length; q++)
 
                     if ( this.forks[j].sockets[q].node.sckAddress === sockets[i].node.sckAddress ||
                          this.forks[j].sockets[q].node.sckAddress.matchAddress(sockets[i].node.sckAddress) )
@@ -72,10 +74,12 @@ class InterfaceBlockchainForksAdministrator {
      */
     findForkByHeader(header){
 
-        if (header === null || header === undefined) return null;
-        if (header.hash === null || header.hash === undefined) return null;
+        if (header === null || header === undefined)
+            return null;
+        if (header.hash === null || header.hash === undefined)
+            return null;
 
-        for (let i=0; i<this.forks.length; i++)
+        for (let i = 0; i < this.forks.length; i++)
             if ( this.forks[i].forkHeader !== null && this.forks[i].forkHeader.hash !== undefined && this.forks[i].forkHeader.hash !== null && (this.forks[i].forkHeader === header || this.forks[i].forkHeader.hash.equals( header.hash )) )
                 return this.forks[i];
 
@@ -84,13 +88,15 @@ class InterfaceBlockchainForksAdministrator {
 
     deleteFork(fork){
 
-        if (fork === undefined) return false;
+        if (fork === undefined)
+            return false;
 
         for (let i=0; i<this.forks.length; i++)
             if (this.forks[i] === fork || this.forks[i].forkId === fork) {
                 this.forks.splice(i,1);
                 return true;
             }
+
         return false;
     }
 

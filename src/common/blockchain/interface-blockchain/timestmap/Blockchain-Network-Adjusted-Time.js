@@ -9,9 +9,9 @@ class BlockchainNetworkAdjustedTime {
         this.blockchainTimestamp = blockchainTimestamp;
         this.resetNetworkAdjustedTime();
 
-        NodesList.emitter.on("nodes-list/connected", async (result) => { await this.initializingNewNode(result) } );
+        NodesList.emitter.on("nodes-list/connected", async (result) => { await this.initializingNewNode(result); } );
 
-        NodesList.emitter.on("nodes-list/disconnected", async (result) => { await this._removeNodeTimeAdjusted(result) });
+        NodesList.emitter.on("nodes-list/disconnected", async (result) => { await this._removeNodeTimeAdjusted(result); });
 
     }
 
@@ -32,7 +32,8 @@ class BlockchainNetworkAdjustedTime {
         try {
             let answer = await socket.node.sendRequestWaitOnce("timestamp/request-timeUTC", {}, 'answer' );
 
-            if (typeof answer !== "number") return "The node didn't answer to my request-timeUTC";
+            if (typeof answer !== "number")
+                return "The node didn't answer to my request-timeUTC";
 
             //avoiding double couting the same timestamp from the same node
             this._addNodeTimeAdjusted(socket, answer);
@@ -74,7 +75,8 @@ class BlockchainNetworkAdjustedTime {
     _removeNodeTimeAdjusted(socket){
 
         let foundNodeIndex = this._findNodeTimeAdjusted(socket);
-        if (foundNodeIndex === -1) return false;
+        if (foundNodeIndex === -1)
+            return false;
 
         this._networkAdjustedTimeOffset -= (this._networkAdjustedTimeNodes[foundNodeIndex].socketTimeUTCOffset);
 
@@ -88,7 +90,7 @@ class BlockchainNetworkAdjustedTime {
 
     _findNodeTimeAdjusted(socket){
 
-        for (let i=0; i<this._networkAdjustedTimeNodes.length; i++)
+        for (let i = 0; i < this._networkAdjustedTimeNodes.length; i++)
             if (socket.node.sckAddress.matchAddress(this._networkAdjustedTimeNodes[i].socket.node.sckAddress)){
                 return i;
             }
@@ -110,7 +112,8 @@ class BlockchainNetworkAdjustedTime {
 
         let nodeFoundIndex = this._findNodeTimeAdjusted(socket);
 
-        if (nodeFoundIndex === -1) return false;
+        if (nodeFoundIndex === -1)
+            return false;
 
         this._networkAdjustedTimeNodes.splice(nodeFoundIndex, 1);
         this._networkAdjustedTimeNodesUsed--;

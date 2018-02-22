@@ -20,12 +20,13 @@ class SocketExtend{
             level: level,
         };
 
-        socket.node.getSocket = () => { return socket};
+        socket.node.getSocket = () => { return socket; };
 
         socket.node.on = (name, callback ) => {
             socket.on(name, (data)=>{
 
-                if (global.TERMINATED) return;
+                if (global.TERMINATED)
+                    return;
 
                 this._processBufferArray(data);
 
@@ -36,7 +37,8 @@ class SocketExtend{
         socket.node.once = (name, callback ) => {
             socket.once(name, (data)=>{
 
-                if (global.TERMINATED) return;
+                if (global.TERMINATED)
+                    return;
 
                 this._processBufferArray(data);
 
@@ -80,14 +82,15 @@ class SocketExtend{
 
         try {
 
-            if (typeof socket.emit === 'function') return socket.emit(request, requestData); //socket io and Simple-Peer WebRTC
-            else if (typeof socket.send === 'function') {
+            if (typeof socket.emit === 'function')
+                return socket.emit(request, requestData); //socket io and Simple-Peer WebRTC
+            else
+            if (typeof socket.send === 'function') {
 
                 if (typeof socket.signal === 'function')
                     return socket.send({request: request, data: requestData});
                 else
                     return socket.send(request, requestData); // Simple Peer WebRTC - socket
-
             }
 
         } catch (exception){
@@ -134,7 +137,7 @@ class SocketExtend{
                     if (socket.removeListener !== undefined) //websocket io
                         socket.removeListener(requestAnswer, requestFunction);
                     else
-                    if (1===2) //webRTC
+                    if (1 === 2) //webRTC
                     {
                         //TODO WEBRTC create an EventEmitter
                     }

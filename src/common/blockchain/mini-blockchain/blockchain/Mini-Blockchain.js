@@ -68,10 +68,9 @@ class MiniBlockchain extends  inheritBlockchain{
             else
                 throw "reward couldn't be set to the minerAddress";
 
-
             //validate transactions & tree
             revert.transactions.start = 0;
-            for (let i=0; i<block.data.transactions.length; i++) {
+            for (let i = 0; i < block.data.transactions.length; i++) {
                 //TO DO
                 if (1===1){
                     revert.transactions.end = i;
@@ -102,7 +101,7 @@ class MiniBlockchain extends  inheritBlockchain{
             if (revert.revertNow || revertAutomatically){
 
                 //revert transactions
-                for (let i=revert.transactions.end; i>= revert.transactions.start; i--) {
+                for (let i = revert.transactions.end; i >= revert.transactions.start; i--) {
                     // TO DO
                 }
 
@@ -140,7 +139,8 @@ class MiniBlockchain extends  inheritBlockchain{
             return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock );
         }))) throw "Error includeBlockchainBlock MiniBlockchain ";
 
-        if (! (await this.accountantTree.saveMiniAccountant( true))) console.error("Error Saving Mini Accountant Tree");
+        if (! (await this.accountantTree.saveMiniAccountant(true)))
+            console.error("Error Saving Mini Accountant Tree");
 
         return true;
     }
@@ -152,15 +152,19 @@ class MiniBlockchain extends  inheritBlockchain{
 
     async saveBlockchain(){
 
-        if (process.env.BROWSER) return true;
+        if (process.env.BROWSER)
+            return true;
 
         try {
 
-            if (this.blocks.length === 0) return false;
+            if (this.blocks.length === 0)
+                return false;
 
-            if (! (await this.accountantTree.saveMiniAccountant( true ))) throw "Couldn't save the Account Tree"
+            if (! (await this.accountantTree.saveMiniAccountant( true )))
+                throw "Couldn't save the Account Tree"
 
-            if (! (await inheritBlockchain.prototype.saveBlockchain.call(this))) throw "couldn't sae the blockchain"
+            if (! (await inheritBlockchain.prototype.saveBlockchain.call(this)))
+                throw "couldn't sae the blockchain"
 
             return true;
 
@@ -176,7 +180,8 @@ class MiniBlockchain extends  inheritBlockchain{
      */
     async loadBlockchain(){
 
-        if (process.env.BROWSER) return true;
+        if (process.env.BROWSER)
+            return true;
 
         try {
 

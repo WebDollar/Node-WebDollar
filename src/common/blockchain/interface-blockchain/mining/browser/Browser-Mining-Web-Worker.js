@@ -30,12 +30,13 @@ let algorithm = undefined;
 export default function (self) {
 
     let log = (msg) => {
-        if (!msg ) return;
+        if (!msg )
+            return;
         self.postMessage({message: "log", log: msg});
     };
     Argon2WebAssemblyCalc.log = log;
 
-    self.addEventListener('message',function (ev) {
+    self.addEventListener('message', function (ev) {
 
         if (ev.data.message === "terminate"){ //JOB TERMINATED
             //log("message received to TERMINATE..."+jobTerminated);
@@ -78,7 +79,8 @@ export default function (self) {
 
                 jobTerminated = false;
 
-                if (ev.data.block !== undefined && ev.data.block !== null) block = ev.data.block;
+                if (ev.data.block !== undefined && ev.data.block !== null)
+                    block = ev.data.block;
 
                 log({message:"worker initialize", block: block});
 
@@ -99,7 +101,8 @@ export default function (self) {
 
             let chainNext = ()=>{
 
-                if (ev.data.count === 0 || jobTerminated) return new Promise((resolve)=>{resolve(true)});
+                if (ev.data.count === 0 || jobTerminated)
+                    return new Promise((resolve) => { resolve(true); });
 
                 //solution using Uint8Array
                 params.pass = new Uint8Array(block.length + 4 );
@@ -129,12 +132,13 @@ export default function (self) {
 
                         if (bestHash === undefined) change = true;
                         else
-                            for (let i = 0, l=bestHash.length; i < l; i++)
+                            for (let i = 0, l = bestHash.length; i < l; i++)
                                 if (hash[i] < bestHash[i]) {
                                     change = true;
                                     break;
                                 }
-                                else if (hash[i] > bestHash[i]) break;
+                                else if (hash[i] > bestHash[i])
+                                    break;
 
 
                         if ( change ) {

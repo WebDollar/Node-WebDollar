@@ -41,7 +41,8 @@ class InterfaceMerkleTree extends InterfaceTree{
     _validateHash(node){
 
         let result = InterfaceTree.prototype._validateHash.call(this, node, this._validateHash);
-        if (!result) return false;
+        if (!result)
+            return false;
 
         return true;
     }
@@ -49,7 +50,8 @@ class InterfaceMerkleTree extends InterfaceTree{
     _checkInvalidNode(node){
         //it should have a valid hash
 
-        if ( node.hash === undefined || node.hash === null) return false;
+        if ( node.hash === undefined || node.hash === null)
+            return false;
 
         return true;
     }
@@ -66,26 +68,28 @@ class InterfaceMerkleTree extends InterfaceTree{
         let initialHash = null;
 
 
-        if ( node.hash === undefined || node.hash === null  ||  node.hash.sha256 === undefined || node.hash.sha256 === null )  return false;
+        if ( node.hash === undefined || node.hash === null || node.hash.sha256 === undefined || node.hash.sha256 === null )
+            return false;
         else {
             initialHash = {};
             initialHash.sha256 = node.hash.sha256;
         }
 
-
         this._computeHash(node);
 
-        if (initialHash === null && node.hash !== null) return false; // different hash
-        if (initialHash.sha256 === null && node.hash.sha256 !== null) return false; // different hash
+        if (initialHash === null && node.hash !== null)
+            return false; // different hash
+        if (initialHash.sha256 === null && node.hash.sha256 !== null) // different hash
+            return false;
 
+        if (node.hash.sha256.length !== initialHash.sha256.length)
+            return false;
 
-        if (node.hash.sha256.length !== initialHash.sha256.length) return false;
-
-        for (let i=0; i<node.hash.sha256.length; i++)
-            if (node.hash.sha256[i] !== initialHash.sha256[i]) return false;
+        for (let i = 0; i < node.hash.sha256.length; i++)
+            if (node.hash.sha256[i] !== initialHash.sha256[i])
+                return false;
 
         return true;
-
     }
 
     /**
@@ -110,7 +114,8 @@ class InterfaceMerkleTree extends InterfaceTree{
      */
     _computeHash(node){
 
-        if (node === null ||  node === undefined) throw "Couldn't compute hash because Node is empty";
+        if (node === null ||  node === undefined)
+            throw "Couldn't compute hash because Node is empty";
 
         if (node === this.root && node.edges.length === 0){
             node.hash = { sha256: new Buffer(32) };
@@ -122,8 +127,10 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         if (node.edges.length === 0){ //Leaf Node (terminal node)
 
-            if ( node.value === null || node === undefined) throw ("Leaf nodes has not value");
-            if ( node.isLeaf() === false) throw ("Node is not leaf");
+            if ( node.value === null || node === undefined)
+                throw ("Leaf nodes has not value");
+            if ( node.isLeaf() === false)
+                throw ("Node is not leaf");
 
             // Let's hash
 
@@ -135,10 +142,10 @@ class InterfaceMerkleTree extends InterfaceTree{
 
             let hashConcat = {sha256: null};//it will be the hash
 
-            for (let i=0; i < node.edges.length; i++){
+            for (let i = 0; i < node.edges.length; i++){
 
                 // the hash was not calculated ....
-                if (node.edges[i].targetNode.hash === null || node.edges[i].targetNode.hash === undefined )
+                if (node.edges[i].targetNode.hash === null || node.edges[i].targetNode.hash === undefined)
                     this._computeHash(node.edges[i].targetNode);
 
                 if (i === 0)
@@ -147,7 +154,8 @@ class InterfaceMerkleTree extends InterfaceTree{
                     hashConcat.sha256 = Buffer.concat ( [hashConcat.sha256, node.edges[i].targetNode.hash.sha256]);
             }
 
-            if (hashConcat.sha256 === null) throw ("Empty node with invalid sha256");
+            if (hashConcat.sha256 === null)
+                throw ("Empty node with invalid sha256");
 
             // Let's hash
             // console.log("valueToHash222", typeof valueToHash, valueToHash.toString("hex"))
@@ -172,7 +180,8 @@ class InterfaceMerkleTree extends InterfaceTree{
      */
     _refreshHash(node, forced){
 
-        if (node === null ||  node === undefined) throw "Couldn't compute hash because Node is empty";
+        if (node === null ||  node === undefined)
+            throw "Couldn't compute hash because Node is empty";
 
         let result = false;
         let hashAlreadyComputed = false;

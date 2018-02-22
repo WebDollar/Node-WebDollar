@@ -41,7 +41,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             tokenId[0] = 1;
         }
 
-        if (this.balances === undefined || this.balances === null) throw 'balances is null';
+        if (this.balances === undefined || this.balances === null)
+            throw 'balances is null';
 
         if (!Buffer.isBuffer(tokenId))
             tokenId = BufferExtended.fromBase(tokenId);
@@ -69,7 +70,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             result = this.balances[this.balances.length-1];
         }
 
-        if (result === undefined) throw 'token is empty';
+        if (result === undefined)
+            throw 'token is empty';
 
         if (result.amount.isLessThan(0) )
             throw 'balances became negative';
@@ -96,7 +98,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         if (!Buffer.isBuffer(tokenId))
             tokenId = BufferExtended.fromBase(tokenId);
 
-        for (let i=0; i<this.balances.length; i++)
+        for (let i = 0; i < this.balances.length; i++)
             if (this.balances[i].id.equals( tokenId) )
                 return this.balances[i].amount;
 
@@ -111,7 +113,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         let list = { };
 
-        for (let i=0; i<this.balances.length; i++)
+        for (let i = 0; i < this.balances.length; i++)
             list[ "0x"+this.balances[i].id.toString("hex") ] = this.balances[i].amount.toString();
 
 
@@ -121,7 +123,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     _deleteBalancesEmpty(){
 
         let result = false;
-        for (let i=this.balances.length-1; i>=0; i--) {
+        for (let i = this.balances.length - 1; i >= 0; i--) {
 
             if (this.balances[i] === null || this.balances[i] === undefined || this.balances[i].amount.isEqualTo(0)) {
                 this.balances.splice(i, 1);
@@ -151,8 +153,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             let hash = InterfaceMerkleRadixTreeNode.prototype.serializeNodeDataHash.apply(this, arguments);
 
-            if (hash !== null) buffer = hash;
-            else buffer = new Buffer(0);
+            if (hash !== null)
+                buffer = hash;
+            else
+                buffer = new Buffer(0);
 
             //console.log("buffer serializeNodeData hash", buffer.toString("hex"))
 
@@ -220,7 +224,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 offset += 1;
 
                 //webd token
-                if (webdId[0] !== 1) throw "webd token is incorrect";
+                if (webdId[0] !== 1)
+                    throw "webd token is incorrect";
 
                 this.balances = [];
                 let result = Serialization.deserializeBigNumber( buffer, offset );

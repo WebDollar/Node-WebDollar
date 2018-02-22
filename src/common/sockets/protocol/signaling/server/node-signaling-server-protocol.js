@@ -49,7 +49,8 @@ class NodeSignalingServerProtocol {
 
     startConnectingWebPeers(){
 
-        if (this.started === true) return;
+        if (this.started === true)
+            return;
 
         this.started = true;
         this.connectWebPeersInterval();
@@ -59,7 +60,7 @@ class NodeSignalingServerProtocol {
 
         let listAcceptingWebPeerConnections = [] ;
 
-        for (let i=0; i<NodesList.nodes.length; i++)
+        for (let i = 0; i < NodesList.nodes.length; i++)
             if ( (NodesList.nodes[i].socket.node.protocol.signaling.server.acceptingConnections||false) === true )
                 if (NodesList.nodes[i].socket.node.sckAddress.uuid !== undefined)
                     listAcceptingWebPeerConnections.push(NodesList.nodes[i].socket);
@@ -69,7 +70,7 @@ class NodeSignalingServerProtocol {
         if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("listAcceptingWebPeerConnections", listAcceptingWebPeerConnections.length );
 
         //mixing users
-        for (let i=0; i<listAcceptingWebPeerConnections.length; i++) {
+        for (let i = 0; i < listAcceptingWebPeerConnections.length; i++) {
 
             for (let j = 0; j < listAcceptingWebPeerConnections.length; j++){
 
@@ -88,7 +89,8 @@ class NodeSignalingServerProtocol {
 
                     let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
-                    if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection ? previousEstablishedConnection.id : 'no-id'), (previousEstablishedConnection ? previousEstablishedConnection.status : 'no status') );
+                    if (process.env.DEBUG_SIGNALING_SERVER === 'true')
+                        console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection ? previousEstablishedConnection.id : 'no-id'), (previousEstablishedConnection ? previousEstablishedConnection.status : 'no status') );
 
                     if (previousEstablishedConnection === null
                         || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished )
@@ -96,7 +98,8 @@ class NodeSignalingServerProtocol {
 
                         let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
-                        if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("Step 1 - generate-initiator-signal  ", (connection === null ? null : connection.id) , { id: connection.id,  address: client2.node.sckAddress.getAddress() } );
+                        if (process.env.DEBUG_SIGNALING_SERVER === 'true')
+                            console.log("Step 1 - generate-initiator-signal  ", (connection === null ? null : connection.id) , { id: connection.id,  address: client2.node.sckAddress.getAddress() } );
 
                         // Step1, send the request to generate the INITIATOR SIGNAL
                         client1.node.sendRequestWaitOnce("signals/client/initiator/generate-initiator-signal", {
@@ -151,7 +154,8 @@ class NodeSignalingServerProtocol {
                                             remoteUUID: client2.node.sckAddress.uuid,
                                         }, connection.id).then( (result)=>{
 
-                                             if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("Step 4 - join-answer-signal  ", connection.id, result );
+                                             if (process.env.DEBUG_SIGNALING_SERVER === 'true')
+                                                 console.log("Step 4 - join-answer-signal  ", connection.id, result );
 
                                              if ( result === null || result === undefined )
                                                 SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
@@ -176,7 +180,8 @@ class NodeSignalingServerProtocol {
 
                                     client2.node.on("signals/server/new-answer-ice-candidate/" + connection.id, (iceCandidate) => {
 
-                                        if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("Answer iceCandidate  ", connection.id, iceCandidate );
+                                        if (process.env.DEBUG_SIGNALING_SERVER === 'true')
+                                            console.log("Answer iceCandidate  ", connection.id, iceCandidate );
 
                                         client1.node.sendRequest("signals/client/initiator/receive-ice-candidate",{
                                             id: connection.id,
@@ -196,7 +201,8 @@ class NodeSignalingServerProtocol {
 
                                 client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, (iceCandidate) => {
 
-                                    if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("Initiator iceCandidate  ", connection.id, iceCandidate );
+                                    if (process.env.DEBUG_SIGNALING_SERVER === 'true')
+                                        console.log("Initiator iceCandidate  ", connection.id, iceCandidate );
 
                                     client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{
                                         id: connection.id,
@@ -209,10 +215,6 @@ class NodeSignalingServerProtocol {
                                     });
 
                                 });
-
-
-
-
 
 
                             }

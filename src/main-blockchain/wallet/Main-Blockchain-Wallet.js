@@ -19,7 +19,6 @@ class MainBlockchainWallet{
         this.blockchain = blockchain;
         this.walletFileName = 'wallet.bin';
 
-        //TODO change db name to "walletDB"
         if(db === undefined)
             this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
         else
@@ -140,8 +139,8 @@ class MainBlockchainWallet{
 
     async removeAddresses() {
 
-        this.addresses = [];
         let answer = await this.db.remove(this.walletFileName);
+        this.addresses = [];
 
         this.emitter.emit('wallet/changes', this.addresses);
 
@@ -361,7 +360,7 @@ class MainBlockchainWallet{
      */
     async exportPrivateKeyFromAddress(address){
 
-        for (let i=0; i<this.addresses.length; i++)
+        for (let i = 0; i < this.addresses.length; i++)
             if (address === this.addresses[i].address || address === this.addresses[i].unencodedAddress){
                 return {
                     result:true,
@@ -416,7 +415,7 @@ class MainBlockchainWallet{
             return true;
         } else {
             let privateKey = await address.getPrivateKey(password);
-            //TODO: Sign transaction code
+            //TODO: Sign transaction code here
             return true;
         }
     }

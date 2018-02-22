@@ -10,7 +10,8 @@ class InterfaceRadixTreeEdge extends InterfaceTreeEdge {
 
     constructor (label, targetNode) {
 
-        if ( targetNode instanceof InterfaceRadixTreeNode === false ) throw "Target Node is not a Radix Node";
+        if ( targetNode instanceof InterfaceRadixTreeNode === false )
+            throw "Target Node is not a Radix Node";
 
         super ( targetNode );
 

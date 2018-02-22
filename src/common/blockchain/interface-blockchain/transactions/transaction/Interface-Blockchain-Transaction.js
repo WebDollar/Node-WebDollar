@@ -84,12 +84,17 @@ class InterfaceBlockchainTransaction{
      */
     validateTransaction(){
 
-        if (this.nonce === undefined || this.nonce === null || typeof this.nonce !== 'number') throw ('nonce is empty');
+        if (this.nonce === undefined || this.nonce === null || typeof this.nonce !== 'number')
+            throw ('nonce is empty');
 
-        if (!this.from) throw 'Validation Invalid: From was not specified';
-        if (!this.from.address) throw 'Validation Invalid: from.Address was not specified'
+        if (!this.from)
+            throw 'Validation Invalid: From was not specified';
+        
+        if (!this.from.address)
+            throw 'Validation Invalid: from.Address was not specified'
 
-        if (!this.to) throw 'Validation Invalid: To was not specified'
+        if (!this.to)
+            throw 'Validation Invalid: To was not specified'
 
         this.from.validateFrom();
         this.to.validateTo();
@@ -154,7 +159,8 @@ class InterfaceBlockchainTransaction{
             nonce: this.nonce,
         };
 
-        if (!dontIncludeTxId ) result.txId = this.txId;
+        if (!dontIncludeTxId )
+            result.txId = this.txId;
 
         return result;
 
