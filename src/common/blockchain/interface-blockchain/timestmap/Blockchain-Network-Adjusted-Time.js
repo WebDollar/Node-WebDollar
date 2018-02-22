@@ -83,7 +83,7 @@ class BlockchainNetworkAdjustedTime{
     _findNodeTimeAdjusted(socket){
 
         for (let i=0; i<this._networkAdjustedTimeNodes.length; i++)
-            if (socket.node.sckAddress.matchAddress(this._networkAdjustedTimeNodes[i].socket.node.sckAddress){
+            if (socket.node.sckAddress.matchAddress(this._networkAdjustedTimeNodes[i].socket.node.sckAddress)){
                 return i;
             }
 
