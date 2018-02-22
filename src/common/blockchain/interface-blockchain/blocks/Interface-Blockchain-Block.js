@@ -29,10 +29,8 @@ class InterfaceBlockchainBlock {
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
-        if ( timeStamp === undefined){
-
-            timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStampOffset;
-        }
+        if ( timeStamp === undefined)
+            timeStamp = this.blockchain.timestamp.timeUTCNetworkAdjustedTime - BlockchainGenesis.timeStampOffset;
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
@@ -77,11 +75,8 @@ class InterfaceBlockchainBlock {
         //timestamp must be on 4 bytes
         if (this.timeStamp >= 0xFFFFFFFF) throw ('timeStamp is invalid');
 
-        if (height >=0) {
-
+        if (height >=0)
             if (this.version !== 0x01) throw ('invalid version '+this.version);
-
-        }
 
         if (height !== this.height) throw 'height is different' + height+ " "+ this.height ;
 
@@ -89,7 +84,7 @@ class InterfaceBlockchainBlock {
 
         this._validateTargetDifficulty();
 
-        if (this.reward.isEqualTo( BlockchainMiningReward.getReward(this.height) ) === false )
+        if (this.reward.equals( BlockchainMiningReward.getReward(this.height) ) === false )
             throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward( this.height );
 
         if (this._supplementaryValidation() === false) throw "supplementaryValidation failed";

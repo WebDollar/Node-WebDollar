@@ -14,7 +14,7 @@ consts.WALLET_VERSION = "0.1";
 consts.BLOCKCHAIN = {
 
     DIFFICULTY_NO_BLOCKS : 10,
-    DIFFICULTY_TIME : 20, //seconds
+    DIFFICULTY_TIME : 20000, //in ms, timestamp in UNIX format
 
     BLOCKS_POW_LENGTH: 32,
     BLOCKS_NONCE : 4,

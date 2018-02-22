@@ -1,6 +1,8 @@
 import NodesList from 'node/lists/nodes-list'
 
-class BlockchainNetworkAdjustedTime{
+const MAX_UTC_DIFFERENCE = 7*60*1000; //7 minutes
+
+class BlockchainNetworkAdjustedTime {
 
     constructor(blockchainTimestamp){
 
@@ -14,7 +16,7 @@ class BlockchainNetworkAdjustedTime{
     }
 
     get networkAdjustedTime(){
-        return this._networkAdjustedTimeOffset / this._networkAdjustedTimeNodesUsed;
+        return (this._networkAdjustedTimeOffset + this.blockchainTimestamp.timeUTC) / (this._networkAdjustedTimeNodesUsed + 1);
     }
 
     resetNetworkAdjustedTime(){
@@ -28,7 +30,7 @@ class BlockchainNetworkAdjustedTime{
         let socket = nodesListObject.socket;
 
         try {
-            let answer = await socket.node.sendRequestWaitOnce("timestamp/request-timeUTC", {}, );
+            let answer = await socket.node.sendRequestWaitOnce("timestamp/request-timeUTC", {}, 'answer' );
 
             if (typeof answer !== "number") return "The node didn't answer to my request-timeUTC";
 
@@ -44,6 +46,10 @@ class BlockchainNetworkAdjustedTime{
 
 
     _addNodeTimeAdjusted(socket, socketTimeUTC ){
+
+        if ( Math.abs(socketTimeUTC - this.blockchainTimestamp.timeUTC) > MAX_UTC_DIFFERENCE ) {
+            console.error("Socket", socket.node.sckAddress, " return a strange socketTimeUTC ", socketTimeUTC, " while my UTC is ", this.blockchainTimestamp.timeUTC, " the Difference is ", socketTimeUTC - this.blockchainTimestamp.timeUTC )
+        }
 
         //one IP, one vote
         let foundNodeIndex = this._findNodeTimeAdjusted(socket);

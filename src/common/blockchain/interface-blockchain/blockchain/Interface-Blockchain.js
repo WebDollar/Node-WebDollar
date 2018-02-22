@@ -21,6 +21,8 @@ import SemaphoreProcessing from "common/utils/Semaphore-Processing"
 
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 
+import BlockchainTimestamp from "common/blockchain/interface-blockchain/timestmap/Blockchain-Timestamp"
+
 const EventEmitter = require('events');
 
 const SEMAPHORE_PROCESSING_INTERVAL = 10;
@@ -51,6 +53,8 @@ class InterfaceBlockchain {
         this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator( this );
 
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
+
+        this.timestamp = new BlockchainTimestamp();
 
         this.semaphoreProcessing = new SemaphoreProcessing(SEMAPHORE_PROCESSING_INTERVAL);
     }
