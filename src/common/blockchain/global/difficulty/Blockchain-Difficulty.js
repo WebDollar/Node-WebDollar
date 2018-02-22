@@ -139,9 +139,11 @@ class BlockchainDifficulty{
             //It should substitute, the number of Blocks * Initial Block
             how_much_it_took_to_mine_X_Blocks -= (consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS) * getTimeStampCallback(firstBlock);
 
-            let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks).decimalPlaces(8);
+            let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks);
 
-            ratio = BigNumber.minimum( ratio, 20 );
+            ratio = ratio.decimalPlaces(8);
+
+            ratio = BigNumber.minimum( ratio, 10 );
             ratio = BigNumber.maximum( ratio, 0.01);
 
             console.warn("ratio2", ratio, ratio.toString());
