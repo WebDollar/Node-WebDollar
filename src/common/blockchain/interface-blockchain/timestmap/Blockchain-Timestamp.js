@@ -6,7 +6,7 @@ class BlockchainTimestamp{
 
     constructor(){
 
-        this.networkAdjustedTime = new BlockchainnetworkTime(this);
+        this._networkAdjustedTime = new BlockchainnetworkTime(this);
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._initializeNewSocket(result)
@@ -15,6 +15,9 @@ class BlockchainTimestamp{
     }
 
 
+    get networkAdjustedTime(){
+        return this._networkAdjustedTime.networkAdjustedTime;
+    }
 
     /**
      * Returns UTC timestamp

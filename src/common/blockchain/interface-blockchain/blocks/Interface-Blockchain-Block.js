@@ -30,7 +30,7 @@ class InterfaceBlockchainBlock {
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
         if ( timeStamp === undefined)
-            timeStamp = this.blockchain.timestamp.timeUTCNetworkAdjustedTime - BlockchainGenesis.timeStampOffset;
+            timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
@@ -94,6 +94,8 @@ class InterfaceBlockchainBlock {
 
         this._validateTargetDifficulty();
 
+        this._validateBlockTimeStmap();
+
         if (this.reward.equals( BlockchainMiningReward.getReward(this.height) ) === false )
             throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward( this.height );
 
@@ -150,7 +152,7 @@ class InterfaceBlockchainBlock {
             prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
 
         if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget))
-            throw 'previousDifficultyTarget is not given'
+            throw 'previousDifficultyTarget is not given';
 
         //console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
 
@@ -158,6 +160,26 @@ class InterfaceBlockchainBlock {
             throw "block doesn't match the difficulty target is not ";
 
         return true;
+    }
+
+    _validateBlockTimeStmap(){
+
+        // A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
+        if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS) {
+
+            let medianTimestamp = 0;
+            for (let i=height; i > this.height - consts.BLOCKCHAIN.TIMESTAMP_VALIDATION_NO_BLOCKS; i++){
+                medianTimestamp += this.blockValidation.getTimeStampCallback(i);
+            }
+            medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP_VALIDATION_NO_BLOCKS;
+
+            if (this.timeStamp < medianTimestamp) throw "Block Timestamp is not bigger than the previous 10 blocks";
+
+
+            if (this.timeStamp < this.blockchain.timestamp.networkAdjustedTime + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET) throw ""
+
+        }
+
     }
 
     toString(){

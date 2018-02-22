@@ -1,6 +1,5 @@
 import NodesList from 'node/lists/nodes-list'
-
-const MAX_UTC_DIFFERENCE = 7*60*1000; //7 minutes
+import consts from 'consts/const_global'
 
 class BlockchainNetworkAdjustedTime {
 
@@ -48,8 +47,10 @@ class BlockchainNetworkAdjustedTime {
 
     _addNodeTimeAdjusted(socket, socketTimeUTC ){
 
-        if ( Math.abs(socketTimeUTC - this.blockchainTimestamp.timeUTC) > MAX_UTC_DIFFERENCE ) {
-            console.error("Socket", socket.node.sckAddress, " return a strange socketTimeUTC ", socketTimeUTC, " while my UTC is ", this.blockchainTimestamp.timeUTC, " the Difference is ", socketTimeUTC - this.blockchainTimestamp.timeUTC )
+        if ( Math.abs(socketTimeUTC - this.blockchainTimestamp.timeUTC) > consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE ) {
+
+            console.error("Socket", socket.node.sckAddress, " return a strange socketTimeUTC ", socketTimeUTC, " while my UTC is ", this.blockchainTimestamp.timeUTC, " the Difference is ", socketTimeUTC - this.blockchainTimestamp.timeUTC );
+
         }
 
         //one IP, one vote

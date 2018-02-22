@@ -123,12 +123,12 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         let forkPosition = fork.forkStartingHeight;
         let forkAdditionalBlocksBlocksRequired = [];
 
-        for (let i = forkPosition - (forkPosition+1) % consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS - consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS ; i < forkPosition; i++)
+        for (let i = forkPosition - (forkPosition+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ; i < forkPosition; i++)
             forkAdditionalBlocksBlocksRequired.push(i);
 
         return {
             difficultyAdditionalBlocks: forkAdditionalBlocksBlocksRequired,
-            difficultyCalculationStarts: forkPosition - (forkPosition+1) % consts.BLOCKCHAIN.DIFFICULTY_NO_BLOCKS,
+            difficultyCalculationStarts: forkPosition - (forkPosition+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS,
         }
 
     }
