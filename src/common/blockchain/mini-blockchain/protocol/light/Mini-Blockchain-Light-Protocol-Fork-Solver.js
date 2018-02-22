@@ -198,7 +198,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
                 if ( answer === undefined || answer === null || !answer.result || answer.block === undefined  || !Buffer.isBuffer(answer.block) )
                     throw "block for difficulty never received "+ blockRequested;
 
-                let blockValidation = fork._createBlockValidation_ForkValidation(blockRequested);
+                let blockValidation = fork._createBlockValidation_ForkValidation(blockRequested, fork.forkBlocks.length-1);
                 let block = this._deserializeForkBlock( answer.block, blockRequested , blockValidation);
 
                 if (blockRequested < fork.forkDifficultyCalculation.difficultyCalculationStarts)

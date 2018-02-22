@@ -134,12 +134,24 @@ class InterfaceBlockchainFork {
             return this.blockchain.getHashPrev(height) // the blockchain
     }
 
-    _createBlockValidation_ForkValidation(height){
-        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), { });
+    _createBlockValidation_ForkValidation(height, forkHeight){
+
+        let validationType = {};
+
+        if (height === this.forkChainLength-1)
+            validationType["validation-timestamp-adjusted-time"] = true;
+
+        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
-    _createBlockValidation_BlockchainValidation(height){
-        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), { });
+    _createBlockValidation_BlockchainValidation(height, forkHeight){
+
+        let validationType = {};
+
+        if (height === this.forkChainLength-1)
+            validationType["validation-timestamp-adjusted-time"] = true;
+
+        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
 
@@ -188,7 +200,7 @@ class InterfaceBlockchainFork {
 
                 for (index = 0; index < this.forkBlocks.length; index++) {
 
-                    this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height );
+                    this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
 
                     if (! (await this.blockchain.includeBlockchainBlock(this.forkBlocks[index], false, "all", false))) {
                         console.error("fork couldn't be included in main Blockchain ", index);

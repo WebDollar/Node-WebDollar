@@ -21,8 +21,14 @@ class MiniBlockchainFork extends inheritFork{
     /**
      * Fork Validation for Mini Blockchain is not checking the Accountant Tree
      */
-    _createBlockValidation_ForkValidation(height){
-        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), {"skip-accountant-tree-validation": true} );
+    _createBlockValidation_ForkValidation(height, forkHeight){
+
+        let validationType = {"skip-accountant-tree-validation": true};
+
+        if (height === this.forkChainLength-1)
+            validationType["validation-timestamp-adjusted-time"] = true;
+
+        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
     preFork(){

@@ -287,7 +287,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 }
 
 
-                let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight);
+                let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
                 let block = this._deserializeForkBlock(answer.block, nextBlockHeight, blockValidation );
 
                 let result;

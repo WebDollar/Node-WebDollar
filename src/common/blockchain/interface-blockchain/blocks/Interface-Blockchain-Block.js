@@ -177,8 +177,10 @@ class InterfaceBlockchainBlock {
 
         }
 
-        if (!this.blockValidation.blockValidationType['skip-validation-timestamp-adjusted-time']) {
-            if (this.timeStamp < this.blockchain.timestamp.networkAdjustedTime + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET) throw ""
+        if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time']) {
+
+            if (this.timeStamp < this.blockchain.timestamp.networkAdjustedTime + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET)
+                throw "Timestamp of block is less than the network-adjusted time "+consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET
         }
 
     }
