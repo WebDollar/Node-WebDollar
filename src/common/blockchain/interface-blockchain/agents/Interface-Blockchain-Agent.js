@@ -115,16 +115,17 @@ class InterfaceBlockchainAgent{
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
 
-        NodesList.emitter.on("nodes-list/connected", async (result) => { await this._requestBlockchainForNewPeer(result) } );
+        NodesList.emitter.on("nodes-list/connected", async (result) => {
+            await this._requestBlockchainForNewPeer(result);
+        });
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
 
         });
 
 
-        for (let i=0; i<NodesList.nodes.length; i++)
+        for (let i = 0; i < NodesList.nodes.length; i++)
             await this._requestBlockchainForNewPeer(NodesList.nodes[i]);
-
     }
 
     initializeAgentPromise(){
@@ -155,15 +156,17 @@ class InterfaceBlockchainAgent{
         return this._startAgentPromise;
     }
 
-    _setStartAgentTimeOut(factor=1){
+    _setStartAgentTimeOut(factor = 1){
 
         console.log("_setStartAgentTimeOut");
 
-        if (this._startAgentTimeOut !== undefined) return;
+        if (this._startAgentTimeOut !== undefined)
+            return;
 
-        this._startAgentTimeOut = setTimeout( ()=>{
+        this._startAgentTimeOut = setTimeout( () => {
 
-            if (this.startAgentResolver === undefined) return;
+            if (this.startAgentResolver === undefined)
+                return;
 
             let resolver = this.startAgentResolver;
             this.startAgentResolver = undefined;

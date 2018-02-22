@@ -17,7 +17,7 @@ class InterfaceTransactionsUniqueness extends InterfaceRadixTree {
             txIds = [txIds];
 
 
-        for (let i=0; i<txIds.length; i++){
+        for (let i = 0; i < txIds.length; i++){
             if (this.searchTransactionUniqueness(txIds[i]))
                 return true;
         }

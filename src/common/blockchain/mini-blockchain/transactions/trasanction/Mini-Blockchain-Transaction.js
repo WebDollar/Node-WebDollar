@@ -7,8 +7,8 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction{
 
         let result = InterfaceBlockchainTransaction.prototype.validateTransaction.call(this);
 
-        if (!result) return result;
-
+        if (!result)
+            return result;
 
         //check balance in accountant tree
 

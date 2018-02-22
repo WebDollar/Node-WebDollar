@@ -111,8 +111,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-1 }, currentBlockchainLength-1 );
 
-                if (answer === null || answer === undefined) throw "connection dropped headers-info";
-                if (answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) ) throw "connection headers-info malformed";
+                if (answer === null || answer === undefined)
+                    throw "connection dropped headers-info";
+                if (answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) )
+                    throw "connection headers-info malformed";
 
                 if (answer.header.hash.equals( this.blockchain.last.hash ))
 
@@ -133,7 +135,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
 
                 if (answer === null) throw "connection dropped info";
-                if (answer === undefined || typeof answer.chainStartingPoint !== "number" ) throw "request-blockchain-info couldn't return real values";
+                if (answer === undefined || typeof answer.chainStartingPoint !== "number" )
+                    throw "request-blockchain-info couldn't return real values";
 
                 newChainStartingPoint = answer.chainStartingPoint;
 
@@ -163,8 +166,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: newChainStartingPoint }, newChainStartingPoint );
 
-                if (answer === null || answer === undefined ) throw "connection dropped headers-info newChainStartingPoint";
-                if (answer.result !== true || answer.header === undefined) throw "headers-info 0 malformed"
+                if (answer === null || answer === undefined )
+                    throw "connection dropped headers-info newChainStartingPoint";
+                if (answer.result !== true || answer.header === undefined)
+                    throw "headers-info 0 malformed"
 
                 binarySearchResult = {position: newChainStartingPoint, header: answer.header};
 
@@ -179,7 +184,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     //let check again
                     forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
-                    if ( forkFound !== null ) return forkFound;
+                    if ( forkFound !== null )
+                        return forkFound;
 
                     fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, newChainStartingPoint, newChainLength, binarySearchResult.header);
 
@@ -235,7 +241,8 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async solveFork(fork) {
 
-        if (fork === null || fork === undefined || typeof fork !== "object" ) throw ('fork is null');
+        if (fork === null || fork === undefined || typeof fork !== "object" )
+            throw ('fork is null');
 
         let nextBlockHeight = fork.forkStartingHeightDownloading;
 
@@ -262,8 +269,11 @@ class InterfaceBlockchainProtocolForkSolver{
                 //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
                 let onlyHeader;
-                if (this.protocol.acceptBlocks) onlyHeader = false;
-                else if (this.protocol.acceptBlockHeaders) onlyHeader = true;
+                if (this.protocol.acceptBlocks)
+                    onlyHeader = false;
+                else
+                if (this.protocol.acceptBlockHeaders)
+                    onlyHeader = true;
 
 
                 answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight);
@@ -305,8 +315,6 @@ class InterfaceBlockchainProtocolForkSolver{
                     nextBlockHeight++;
                 else
                     throw "Fork didn't work at height "+nextBlockHeight;
-
-
 
             }
 

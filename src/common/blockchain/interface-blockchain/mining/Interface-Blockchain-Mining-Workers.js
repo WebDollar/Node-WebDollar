@@ -76,13 +76,15 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     async increaseWorkers(number){
 
-        if (number === 0) return;
+        if (number === 0)
+            return;
 
         console.log("number", number);
 
         this.workers.addWorkers(number);
 
-        if (!this.started && this.workers.workers > 0) await this.startMining();
+        if (!this.started && this.workers.workers > 0)
+            await this.startMining();
 
         this.workers.createWorkers();
 
@@ -91,7 +93,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     async decreaseWorkers(number){
 
-        if (number === 0) return;
+        if (number === 0)
+            return;
 
         console.log("number", number);
 
@@ -150,7 +153,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     _puzzleReceived(worker, event){
 
-        if (this._workerFinished) return; //job finished
+        if (this._workerFinished) //job finished
+            return;
 
         if (this.checkFinished())
             return false;
@@ -197,7 +201,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                 //verify block with the worker block
                 let match = true;
 
-                for (let i=0; i<this.block.length; i++)
+                for (let i = 0; i < this.block.length; i++)
                     if (this.block[i] !== event.data.block[i] ) // do not match
                         match = false;
 
@@ -224,7 +228,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                             return;
 
-                        } else if (event.data.hash[i] > this.difficulty[i] ) break;
+                        } else if (event.data.hash[i] > this.difficulty[i] )
+                            break;
             }
 
             if ( worker.suspended )

@@ -65,7 +65,8 @@ class MultiSig {
         let address = BitcoinJS.address.fromOutputScript(scriptPubKey, testnet);
 
         testnetUtils.faucet(address, 2e4, function (err, unspent) {
-            if (err) return done(err);
+            if (err)
+                return done(err);
 
             let txb = new BitcoinJS.TransactionBuilder(testnet);
             txb.addInput(unspent.txId, unspent.vout);
@@ -78,7 +79,8 @@ class MultiSig {
 
             // build and broadcast to the BitcoinJS Testnet network
             testnetUtils.transactions.propagate(tx.toHex(), function (err) {
-                if (err) return done(err);
+                if (err)
+                    return done(err);
 
                 testnetUtils.verify(address, tx.getId(), 1e4, done)
             })

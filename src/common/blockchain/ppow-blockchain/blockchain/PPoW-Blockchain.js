@@ -230,7 +230,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
      */
     static _superchainQuality(superchain, miu, m){
 
-        if (m < 1) throw ('superchainQuality is not good');
+        if (m < 1)
+            throw ('superchainQuality is not good');
 
         if (superchain.length < m)
             return false;
@@ -283,6 +284,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
         if (PPoWBlockchain._superchainQuality(superchain, miu) === false)
             return false;
+        
         if (PPoWBlockchain._multilevelQuality(superchain, miu) === false)
             return false;
 
@@ -304,7 +306,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
         let max;
         for (max = M.length - 1; M[max] !== undefined && max >= 0; --max);
 
-        if (max === 0) throw 'max === 0';
+        if (max === 0)
+            throw 'max === 0';
 
 
         // ρ ← 1/ max(M)
@@ -338,8 +341,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
                     let Cstar = [];
 
-                    if ( new BigNumber( 2 * C1.length ).isLessThan(  new BigNumber(1-consts.POPOW_PARAMS.d).pow(p) * Cstar.length  ) )
-
+                    if ( new BigNumber( 2 * C1.length ).isLessThan( new BigNumber(1-consts.POPOW_PARAMS.d).pow(p) * Cstar.length  ) )
                         return Cstar; //Chain is bad
 
 

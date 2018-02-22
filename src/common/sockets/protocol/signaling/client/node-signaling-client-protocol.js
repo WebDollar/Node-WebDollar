@@ -42,8 +42,10 @@ class NodeSignalingClientProtocol {
                 console.log("WEBRTC 1 is not supported !!!! being the initiator");
 
             let signalAnswer = {};
-            if (answer.result === true) signalAnswer = {accepted: true, initiatorSignal: answer.signal};
-            else signalAnswer = {accepted:false, message: answer.message};
+            if (answer.result === true)
+                signalAnswer = {accepted: true, initiatorSignal: answer.signal};
+            else
+                signalAnswer = {accepted:false, message: answer.message};
 
             socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, signalAnswer);
 
@@ -80,8 +82,10 @@ class NodeSignalingClientProtocol {
                 console.log("WEBRTC 2 is not supported !!!!", data.initiatorSignal);
 
             let signalAnswer = {};
-            if (answer.result === true) signalAnswer = {accepted: true, answerSignal: answer.signal};
-            else signalAnswer = {accepted:false, message: answer.message};
+            if (answer.result === true)
+                signalAnswer = {accepted: true, answerSignal: answer.signal};
+            else
+                signalAnswer = {accepted:false, message: answer.message};
 
 
             socket.node.sendRequest("signals/client/answer/receive-initiator-signal/" + data.id, signalAnswer);
@@ -119,8 +123,10 @@ class NodeSignalingClientProtocol {
                 console.log("WEBRTC 3 is not supported !!!!", data.iceCandidate);
 
             let signalAnswer = {};
-            if (answer.result === true) signalAnswer = {accepted: true, answerSignal: answer.signal};
-            else signalAnswer = {accepted:false, message: answer.message}
+            if (answer.result === true)
+                signalAnswer = {accepted: true, answerSignal: answer.signal};
+            else
+                signalAnswer = {accepted:false, message: answer.message}
 
 
             socket.node.sendRequest("signals/client/answer/receive-ice-candidate/" + data.id, signalAnswer);
@@ -159,8 +165,10 @@ class NodeSignalingClientProtocol {
             let answer = await webPeer.createSignal(data.iceCandidate);
 
             let signalAnswer = {};
-            if (answer.result === true) signalAnswer = {accepted: true, answerSignal: answer.signal};
-            else signalAnswer = {accepted:false, message: answer.message};
+            if (answer.result === true)
+                signalAnswer = {accepted: true, answerSignal: answer.signal};
+            else
+                signalAnswer = {accepted:false, message: answer.message};
 
             console.log("################# signals/client/initiator/receive-ice-candidate/",  data.iceCandidate, signalAnswer, data.id);
 

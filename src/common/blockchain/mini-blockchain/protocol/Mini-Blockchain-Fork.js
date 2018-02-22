@@ -34,7 +34,7 @@ class MiniBlockchainFork extends inheritFork{
         console.log("preFork positions", this.forkStartingHeight, this.blockchain.blocks.length-1);
 
         //remove transactions and rewards from each blocks
-        for (let i = this.blockchain.blocks.length-1; i>=this.forkStartingHeight; i--) {
+        for (let i = this.blockchain.blocks.length - 1; i >= this.forkStartingHeight; i--) {
 
 
             //remove reward
@@ -56,7 +56,8 @@ class MiniBlockchainFork extends inheritFork{
 
     postForkBefore(forkedSuccessfully){
 
-        if (forkedSuccessfully) return true;
+        if (forkedSuccessfully)
+            return true;
 
         //recover to the original Accountant Tree
         this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);

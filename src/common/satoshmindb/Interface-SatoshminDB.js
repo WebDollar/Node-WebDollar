@@ -3,17 +3,12 @@
 
 import consts from 'consts/const_global'
 
-let pounchdb;
-let atob = require('atob');
-let btoa = require('btoa');
+const atob = require('atob');
+const btoa = require('btoa');
 const colors = require('colors/safe');
 const MainBlockchain = require('main-blockchain/Blockchain');
 
-
-if (process.env.BROWSER)
-    pounchdb = require('pouchdb').default;
-else
-    pounchdb  = require('pouchdb-node');
+let pounchdb = (process.env.BROWSER) ? (require('pouchdb').default) : (require('pouchdb-node'));
 
 class InterfaceSatoshminDB {
 
@@ -81,7 +76,8 @@ class InterfaceSatoshminDB {
 
         } catch (Exception) {
 
-            if (Exception.status === 404) return null; //nothing
+            if (Exception.status === 404) //NOT FOUND
+                return null;
             else {
                 console.error("error getDocument ", Exception);
                 throw Exception;
@@ -100,7 +96,8 @@ class InterfaceSatoshminDB {
             return true;
 
         } catch (err) {
-            if (err.status === 404) return null; // not existing
+            if (err.status === 404) //NOT FOUND
+                return null;
             else {
                 console.error("deleteDocument raised an error ", key);
                 return err;
@@ -118,7 +115,6 @@ class InterfaceSatoshminDB {
         } else { //we are in node
             attachment = new Buffer(value.toString('hex'));
         }
-
 
         try {
 

@@ -72,9 +72,14 @@ class BlockchainDifficulty{
             blockTimestamp = BigInteger(blockTimestamp.replace("0x",""), 16);
         }
 
-        if (prevBlockTimestamp instanceof BigInteger === false) prevBlockTimestamp = BigInteger(prevBlockTimestamp);
-        if (blockTimestamp instanceof BigInteger === false) blockTimestamp = BigInteger(blockTimestamp);
-        if (blockNumber instanceof BigInteger === false) blockNumber = BigInteger(blockNumber);
+        if (prevBlockTimestamp instanceof BigInteger === false)
+            prevBlockTimestamp = BigInteger(prevBlockTimestamp);
+        
+        if (blockTimestamp instanceof BigInteger === false)
+            blockTimestamp = BigInteger(blockTimestamp);
+        
+        if (blockNumber instanceof BigInteger === false)
+            blockNumber = BigInteger(blockNumber);
 
         //console.log(blockTimestamp, prevBlockTimestamp)
 
@@ -143,8 +148,8 @@ class BlockchainDifficulty{
 
             ratio = ratio.decimalPlaces(8);
 
-            ratio = BigNumber.minimum( ratio, 10 );
-            ratio = BigNumber.maximum( ratio, 0.01);
+            ratio = BigNumber.minimum(ratio, 10);
+            ratio = BigNumber.maximum(ratio, 0.01);
 
             console.warn("ratio2", ratio, ratio.toString());
             console.warn("how_much_it_should_have_taken_X_Blocks", how_much_it_should_have_taken_X_Blocks);

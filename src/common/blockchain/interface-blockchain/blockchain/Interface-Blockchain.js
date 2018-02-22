@@ -64,7 +64,7 @@ class InterfaceBlockchain {
 
     async validateBlockchain(){
 
-        for (let i=this.blocks.blocksStartingPoint; i<this.blocks.length; i++)
+        for (let i = this.blocks.blocksStartingPoint; i < this.blocks.length; i++)
             if (! (await this.validateBlockchainBlock(this.blocks[i])) )
                 return false;
 
@@ -92,16 +92,19 @@ class InterfaceBlockchain {
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
 
-        if (saveBlock === undefined) saveBlock = true;
+        if (saveBlock === undefined)
+            saveBlock = true;
 
         if (this.transactions.uniqueness.searchTransactionsUniqueness(block.data.transactions))
             throw "transaction already processed";
 
-        if (! (await this.validateBlockchainBlock(block)) ) return false; // the block has height === this.blocks.length
+        if (! (await this.validateBlockchainBlock(block)) ) // the block has height === this.blocks.length
+            return false;
 
 
         //let's check again the heights
-        if (block.height !== this.blocks.length) throw ('height of a new block is not good... '+ block.height + " "+ this.blocks.length);
+        if (block.height !== this.blocks.length)
+            throw ('height of a new block is not good... '+ block.height + " "+ this.blocks.length);
 
         this.blocks.addBlock(block);
 
@@ -132,7 +135,8 @@ class InterfaceBlockchain {
      */
     async validateBlockchainBlock( block ){
 
-        if ( block instanceof InterfaceBlockchainBlock === false ) throw ('block '+block.height+' is not an instance of InterfaceBlockchainBlock ');
+        if ( block instanceof InterfaceBlockchainBlock === false )
+            throw ('block '+block.height+' is not an instance of InterfaceBlockchainBlock ');
 
         // in case it is not a fork controlled blockchain
 
@@ -147,7 +151,8 @@ class InterfaceBlockchain {
         block.difficultyTargetPrev = block.blockValidation.getDifficultyCallback(block.height);
 
         //validate difficulty & hash
-        if (! (await block.validateBlock(block.height))) throw ('block validation failed');
+        if (! (await block.validateBlock(block.height)))
+            throw ('block validation failed');
 
         //recalculate next target difficulty
         if ( block.height < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK || !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] ){
@@ -161,10 +166,7 @@ class InterfaceBlockchain {
             console.warn(" computed ", block.difficultyTarget.toString("hex"), " from ", block.difficultyTargetPrev.toString("hex") )
         }
 
-
-
         return true;
-
     }
 
     getBlockchainStartingPoint(){
@@ -174,12 +176,16 @@ class InterfaceBlockchain {
 
     getDifficultyTarget(height){
 
-        if (height === undefined) height = this.blocks.length;
+        if (height === undefined)
+            height = this.blocks.length;
 
-        if (height <= 0)  return BlockchainGenesis.difficultyTarget;
+        if (height <= 0)
+            return BlockchainGenesis.difficultyTarget;
         else{
-            if (height > this.blocks.length ) throw "getDifficultyTarget invalid height "+height+" "+this.blocks.length; else
-            if (this.blocks[height-1] === undefined) throw "getDifficultyTarget invalid height"+height+" "+this.blocks.length;
+            if (height > this.blocks.length )
+                throw "getDifficultyTarget invalid height "+height+" "+this.blocks.length; else
+            if (this.blocks[height-1] === undefined)
+                throw "getDifficultyTarget invalid height"+height+" "+this.blocks.length;
 
             return this.blocks[height-1].difficultyTarget;
         }
@@ -189,22 +195,32 @@ class InterfaceBlockchain {
     getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
-        if (height <= 0)  return BlockchainGenesis.timeStamp;
+        if (height <= 0)
+            return BlockchainGenesis.timeStamp;
         else{
-            if (height > this.blocks.length ) throw "getTimeStamp invalid height"; else
-            if (this.blocks[height-1] === undefined) throw "getTimeStamp invalid height";
+            if (height > this.blocks.length )
+                throw "getTimeStamp invalid height";
+            else
+            if (this.blocks[height-1] === undefined)
+                throw "getTimeStamp invalid height";
 
             return this.blocks[height-1].timeStamp;
         }
     }
 
     getHashPrev(height){
-        if (height === undefined) height = this.blocks.length;
+        
+        if (height === undefined)
+            height = this.blocks.length;
 
-        if (height <= 0)  return BlockchainGenesis.hashPrev;
+        if (height <= 0)
+            return BlockchainGenesis.hashPrev;
         else {
-            if (height > this.blocks.length ) throw "getHashPrev invalid height"; else
-            if (this.blocks[height-1] === undefined) throw "getHashPrev invalid height";
+            if (height > this.blocks.length )
+                throw "getHashPrev invalid height";
+            else
+            if (this.blocks[height-1] === undefined)
+                throw "getHashPrev invalid height";
 
             return this.blocks[height-1].hash;
         }
@@ -220,7 +236,8 @@ class InterfaceBlockchain {
 
     async saveNewBlock(block){
 
-        if (process.env.BROWSER) return true;
+        if (process.env.BROWSER)
+            return true;
 
         if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
             console.error("Error saving the blocks.length");
@@ -234,7 +251,8 @@ class InterfaceBlockchain {
 
     async saveBlockchain(onlyLastBlocks){
 
-        if (process.env.BROWSER) return true;
+        if (process.env.BROWSER)
+            return true;
 
         //save the number of blocks
         let result = true;
@@ -265,7 +283,8 @@ class InterfaceBlockchain {
 
     async loadBlockchain(onlyLastBlocks = undefined){
 
-        if (process.env.BROWSER) return true;
+        if (process.env.BROWSER)
+            return true;
 
         //load the number of blocks
         let numBlocks = await this.db.get(this._blockchainFileName);
@@ -306,7 +325,8 @@ class InterfaceBlockchain {
 
                 try{
 
-                    if (await block.loadBlock() === false) throw "no block to load was found";
+                    if (await block.loadBlock() === false)
+                        throw "no block to load was found";
 
                     //it will include the block, but it will not ask to save, because it was already saved before
 
@@ -364,7 +384,7 @@ class InterfaceBlockchain {
     propagateBlocks(height, socketsAvoidBroadcast){
 
         if (this.agent !== undefined) {
-            for (let i=Math.max(0, height); i<this.blocks.length; i++) {
+            for (let i = Math.max(0, height); i < this.blocks.length; i++) {
                 console.log("PROPAGATE " ,height, " sockets", socketsAvoidBroadcast.length);
 
                 if (this.blocks[i] === undefined)

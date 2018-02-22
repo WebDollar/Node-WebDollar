@@ -44,7 +44,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         let forkHeight = height - this.forkStartingHeight;
 
         if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
-            if (this.forkPrevTimeStamp === null || this.forkPrevTimeStamp === undefined) throw "forkPrevTimeStamp was not specified";
+            if (this.forkPrevTimeStamp === null || this.forkPrevTimeStamp === undefined)
+                throw "forkPrevTimeStamp was not specified";
             return this.forkPrevTimeStamp;
         }
 
@@ -57,7 +58,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         let forkHeight = height - this.forkStartingHeight;
 
         if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
-            if (this.forkPrevHashPrev === null || this.forkPrevHashPrev === undefined) throw "forkPrevHashPrev was not specified";
+            if (this.forkPrevHashPrev === null || this.forkPrevHashPrev === undefined)
+                throw "forkPrevHashPrev was not specified";
             return this.forkPrevHashPrev;
         }
 
@@ -96,7 +98,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             console.log("this.forkDiff", diffIndex);
 
             this._accountantTreeClone = this.blockchain.lightAccountantTreeSerializations[diffIndex];
-            if (this._accountantTreeClone === undefined || this._accountantTreeClone === null) this._accountantTreeClone = new Buffer(0);
+            if (this._accountantTreeClone === undefined || this._accountantTreeClone === null)
+                this._accountantTreeClone = new Buffer(0);
 
             console.log("preFork1 accountantTree sum all", this.blockchain.accountantTree.calculateNodeCoins() );
             //console.log("preFork hashAccountantTree", this.forkPrevAccountantTree.toString("hex"));
@@ -156,7 +159,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             //if (! (await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1))) throw "_recalculateLightPrevs failed";
         } else
-        return MiniBlockchainFork.prototype.postForkBefore.call(this, forkedSuccessfully);
+            return MiniBlockchainFork.prototype.postForkBefore.call(this, forkedSuccessfully);
     }
 
     async postFork(forkedSuccessfully){

@@ -23,7 +23,7 @@ class InterfaceTransactionsPendingQueue {
 
     findTransaction(transaction){
 
-        for (let i=0; i<this.list.length; i++)
+        for (let i = 0; i < this.list.length; i++)
             if (this.list[i] === transaction)
                 return i;
 
@@ -35,7 +35,8 @@ class InterfaceTransactionsPendingQueue {
 
         let index = this.findTransaction(transaction);
 
-        if (index === null) return true;
+        if (index === null)
+            return true;
 
         this.list.splice(index, 1);
 

@@ -25,7 +25,7 @@ class InterfaceBlockchainTransactionTo{
         if (Array.isArray(addresses))
             addresses = [addresses];
 
-        for (let i=0; i<addresses.length; i++) {
+        for (let i = 0; i < addresses.length; i++) {
             if (typeof addresses[i].address === "string")
                 addresses[i].address = BufferExtended.fromBase(addresses[i].address);
 
@@ -59,17 +59,22 @@ class InterfaceBlockchainTransactionTo{
 
         this.addresses.forEach ( (toObject, index) =>{
 
-            if (!toObject.address || toObject.address === null || !Buffer.isBuffer(toObject.address)) throw 'To.Object Address is not specified';
+            if (!toObject.address || toObject.address === null || !Buffer.isBuffer(toObject.address))
+                throw 'To.Object Address is not specified';
 
-            if (!toObject.amount ||  toObject.amount instanceof BigNumber === false ) throw 'To.Object Amount is not specified';
+            if (!toObject.amount ||  toObject.amount instanceof BigNumber === false )
+                throw 'To.Object Amount is not specified';
 
-            if ( toObject.amount.isLessThan(0) ) throw "To.Object Amount is an invalid number";
+            if ( toObject.amount.isLessThan(0) )
+                throw "To.Object Amount is an invalid number";
 
         });
 
-        if (!this.fee || this.fee instanceof BigNumber === false ) throw 'To.fee is not valid ';
+        if (!this.fee || this.fee instanceof BigNumber === false )
+            throw 'To.fee is not valid ';
 
-        if (this.fee.isLessThan(0) ) throw "To.fee is smaller than 0";
+        if (this.fee.isLessThan(0) )
+            throw "To.fee is smaller than 0";
 
         //Validate to.currency
 
@@ -80,7 +85,7 @@ class InterfaceBlockchainTransactionTo{
 
         let addressesBuffer = [];
 
-        for (let i=0; i<this.addresses.length; i++){
+        for (let i = 0; i < this.addresses.length; i++){
             addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].address ));
             addressesBuffer.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
         }
@@ -102,9 +107,9 @@ class InterfaceBlockchainTransactionTo{
         offset = result.newOffset;
 
         let length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
-        offset +=1;
+        offset += 1;
 
-        for (let i=0; i<length; i++){
+        for (let i = 0; i < length; i++){
             let address = {};
 
             address.address= BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);

@@ -13,7 +13,8 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
         super(parent, edges, value);
 
-        if (hash === undefined) hash = {sha256: new Buffer(32)}
+        if (hash === undefined)
+            hash = {sha256: new Buffer(32)}
         this.hash = hash;
 
     }

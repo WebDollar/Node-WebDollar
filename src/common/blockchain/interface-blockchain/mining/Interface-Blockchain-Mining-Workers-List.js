@@ -13,17 +13,19 @@ class InterfaceBlockchainMiningWorkersList{
 
         this.workers = 0; // browser webWorkers, backbone cores
 
-
     }
 
     addWorkers(number){
 
-        if (number === 0) return false;
+        if (number === 0)
+            return false;
 
         this.workers += number;
 
-        if (this.workers <= 0) this.workers = 0;
-        if (this.workers > this.WORKERS_MAX) this.workers = this.WORKERS_MAX;
+        if (this.workers <= 0)
+            this.workers = 0;
+        if (this.workers > this.WORKERS_MAX)
+            this.workers = this.WORKERS_MAX;
 
         this.mining.emitter.emit('mining/workers-changed', this.workers);
     }
@@ -64,9 +66,10 @@ class InterfaceBlockchainMiningWorkersList{
     }
 
     decreaseWorkers(){
-        if (this.workers < 0) this.workers = 0; //can not be < 0 workers
+        if (this.workers < 0) //can not be < 0 workers
+            this.workers = 0;
 
-        for (let i=this._workersList.length-1; i>this.workers-1; i--)
+        for (let i = this._workersList.length - 1; i > this.workers - 1; i--)
             this.terminateWorker(this._workersList[i]);
 
         this._workersList.splice(this.workers-1);
@@ -74,14 +77,16 @@ class InterfaceBlockchainMiningWorkersList{
 
     reduceWorkers(){
 
-        if (this._workersList.length < this.workers) return;
+        if (this._workersList.length < this.workers)
+            return;
 
         //be sure we didn't skip anything
 
         console.log("reduce workers");
 
         this.mining._nonce -= this.mining.WORKER_NONCES_WORK * (this._workersList.length - this.workers);
-        if (this.mining._nonce < 0) this.mining._nonce = 0;
+        if (this.mining._nonce < 0)
+            this.mining._nonce = 0;
 
         this.decreaseWorkers();
     }
@@ -91,7 +96,8 @@ class InterfaceBlockchainMiningWorkersList{
         let worker = this.mining._getWorker();
         console.log("worker created",worker);
 
-        if (worker === undefined || worker === null) throw 'No Worker specified';
+        if (worker === undefined || worker === null)
+            throw 'No Worker specified';
 
         this._workersList.push(worker);
 
@@ -110,7 +116,7 @@ class InterfaceBlockchainMiningWorkersList{
 
     terminateWorkers(){
 
-        for (let i=0; i<this._workersList.length; i++)
+        for (let i = 0; i < this._workersList.length; i++)
             this.terminateWorker(this._workersList[i]);
 
         this._workersList = [];
@@ -122,7 +128,7 @@ class InterfaceBlockchainMiningWorkersList{
     }
 
     suspendWorkers(){
-        for (let i=0; i<this._workersList.length; i++)
+        for (let i = 0; i < this._workersList.length; i++)
             this.suspendWorker(this._workersList[i]);
     }
 

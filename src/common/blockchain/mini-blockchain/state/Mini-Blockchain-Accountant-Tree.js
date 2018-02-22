@@ -39,7 +39,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         }
 
         address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
-        if (address === null) throw "sorry but your address is invalid";
+        if (address === null)
+            throw "sorry but your address is invalid";
 
         let node = this.search(address).node;
 
@@ -47,15 +48,15 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         if ( node === undefined || node === null)
             node = this.add(address, {balances: [] });
 
-        if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
-
+        if (!node.isLeaf())
+            throw "couldn't delete because input is not a leaf node";
 
         let resultUpdate = node.updateBalanceToken(value, tokenId);
 
         //WEBD
-        if (tokenId.length === 1 && tokenId[0]===1){
-            this.root.total = this.root.total.plus( value )
-            this.emitter.emit("accountant-tree/root/total",this.root.total.toString());
+        if (tokenId.length === 1 && tokenId[0] === 1){
+            this.root.total = this.root.total.plus( value );
+            this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
         }
 
         //optimization, but it doesn't work in browser
@@ -82,13 +83,16 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     listBalances(address){
 
         address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
-        if (address === null) throw "sorry but your address is invalid";
+        if (address === null)
+            throw "sorry but your address is invalid";
 
         let node = this.search(address).node;
 
-        if (node === undefined || node === null) throw "address not found";
+        if (node === undefined || node === null)
+            throw "address not found";
 
-        if (!node.isLeaf()) throw "couldn't list because input is not a leaf node";
+        if (!node.isLeaf())
+            throw "couldn't list because input is not a leaf node";
 
         return node.getBalances();
     }
@@ -101,13 +105,16 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     getBalance(address, tokenId){
 
         address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
-        if (address === null) throw "sorry but your address is invalid";
+        if (address === null)
+            throw "sorry but your address is invalid";
 
         let node = this.search(address).node;
 
-        if (node === undefined || node === null) throw "address not found";
+        if (node === undefined || node === null)
+            throw "address not found";
 
-        if (!node.isLeaf()) throw "couldn't delete because input is not a leaf node";
+        if (!node.isLeaf())
+            throw "couldn't delete because input is not a leaf node";
 
         return node.getBalance(tokenId);
     }
@@ -158,7 +165,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         let list = this.emitter._events;
 
         for (let key in list)
-            if (key === name) return true;
+            if (key === name)
+                return true;
 
         return false;
     }
@@ -210,7 +218,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         let sum = new BigNumber(0).plus( node.getBalance(tokenId)  );
 
-        for (let i=0; i<node.edges.length; i++)
+        for (let i = 0; i < node.edges.length; i++)
             if (node.edges[i].targetNode !== undefined && node.edges[i].targetNode !== null)
                 sum = sum.plus( this.calculateNodeCoins( tokenId, node.edges[i].targetNode ) );
 

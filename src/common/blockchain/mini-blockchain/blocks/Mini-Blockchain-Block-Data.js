@@ -34,9 +34,11 @@ class MiniBlockchainBlockData extends  inheritBlockData {
 
         let result = inheritBlockData.prototype.validateBlockData.call(this, height, blockValidation );
 
-        if (!result) return false;
+        if (!result)
+            return false;
 
-        if (this.hashAccountantTree === undefined || this.hashAccountantTree === null || !Buffer.isBuffer(this.hashAccountantTree)) throw ('hashAccountantTree is empty');
+        if (this.hashAccountantTree === undefined || this.hashAccountantTree === null || !Buffer.isBuffer(this.hashAccountantTree))
+            throw ('hashAccountantTree is empty');
 
         if ( !blockValidation.blockValidationType['skip-validation'] && !blockValidation.blockValidationType['skip-accountant-tree-validation'] ) {
 
@@ -49,7 +51,8 @@ class MiniBlockchainBlockData extends  inheritBlockData {
             // if (this.blockchain.accountantTree.root.edges.length > 0)
             //     console.log("hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
 
-            if (! hashAccountantTree.equals(this.hashAccountantTree) ) throw "block.data hashAccountantTree is not right  "+ hashAccountantTree.toString("hex") + "   vs    "+this.hashAccountantTree.toString("hex") ;
+            if (! hashAccountantTree.equals(this.hashAccountantTree) )
+                throw "block.data hashAccountantTree is not right  "+ hashAccountantTree.toString("hex") + "   vs    "+this.hashAccountantTree.toString("hex") ;
 
         }
 

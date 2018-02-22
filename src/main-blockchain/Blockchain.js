@@ -60,7 +60,7 @@ class Blockchain{
 
         }
 
-        await validation.waitSingleTab( ()=>{
+        await validation.waitSingleTab( () => {
             this.emitter.emit('blockchain/status-webdollar', {message: "Multiple Windows Detected"});
         });
         this.emitter.emit('blockchain/status-webdollar', {message: "Single Window"});

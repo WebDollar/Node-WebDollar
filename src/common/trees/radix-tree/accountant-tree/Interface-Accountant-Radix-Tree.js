@@ -35,12 +35,15 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         //it should have a valid value
 
+        if (node.isSumValid() === false)
+            return false;
+        if (node.sum.isLessThan(0) )
+            return false;
 
-        if (node.isSumValid() === false)  return false;
-        if (node.sum.isLessThan ( 0 ) ) return false;
-
-        if (node.isLeaf() && (node.isBalancesValid() === false ) ) return false;
-        if (node.isBalancesValid() && node.value.balances.isLessThan ( 0 )) return false;
+        if (node.isLeaf() && (node.isBalancesValid() === false ) )
+            return false;
+        if (node.isBalancesValid() && node.value.balances.isLessThan(0))
+            return false;
 
         return true;
     }
@@ -48,7 +51,8 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
     validateTree(node){
 
         let result = InterfaceRadixTree.prototype.validateTree.call(this, node, this.validateAccount);
-        if (!result) return false;
+        if (!result)
+            return false;
 
         return true;
     }
@@ -64,14 +68,17 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         let initialSum = null;
 
-        if ( node.isSumValid() === false)  return false;
+        if (node.isSumValid() === false)
+            return false;
         else
             initialSum = node.sum;
 
         this._computeAccount(node);
 
-        if ( node.isSumValid() === false ) return false;
-        if ( initialSum.isEqualTo(node.sum) === false ) return false; // different sum
+        if (node.isSumValid() === false)
+            return false;
+        if (initialSum.isEqualTo(node.sum) === false)
+            return false; // different sum
 
         return true;
     }
@@ -82,8 +89,8 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
      */
     _computeAccount(node){
 
-        if (node === null || node === undefined) throw "Couldn't compute the Sum because Node is empty";
-
+        if (node === null || node === undefined)
+            throw "Couldn't compute the Sum because Node is empty";
 
         let sum;
 
@@ -95,7 +102,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         if ( node.edges.length > 0 ){
 
-            for (let i=0; i<node.edges.length; i++){
+            for (let i = 0; i < node.edges.length; i++){
 
                 if (node.edges[i].targetNode.isSumValid() === false )
                     sum = sum.plus(this._computeAccount(node.edges[i].targetNode));
@@ -113,11 +120,13 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
     refreshAccount(node, forced){
 
-        if (node === null || node === undefined) throw "Couldn't compute the Sum because Node is empty";
+        if (node === null || node === undefined)
+            throw "Couldn't compute the Sum because Node is empty";
 
         let result = false;
 
-        if ( forced === undefined || forced === false ) result  = this.validateAccount(node); // in case it is not necessary to recalculate the hash by force
+        if (forced === undefined || forced === false)
+            result  = this.validateAccount(node); // in case it is not necessary to recalculate the hash by force
 
         // no changes...
         if (!result) {
@@ -132,7 +141,6 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
             }
 
         }
-
 
         return result;
 

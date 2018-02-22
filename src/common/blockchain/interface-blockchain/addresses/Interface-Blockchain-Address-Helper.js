@@ -135,7 +135,8 @@ class InterfaceBlockchainAddressHelper{
             throw 'privateKey must be a Buffer';
         }
 
-        if ( signature.signature !== undefined) signature = signature.signature;
+        if ( signature.signature !== undefined)
+            signature = signature.signature;
 
         return secp256k1.verify(msg, signature, pubKey);
     }
@@ -374,7 +375,6 @@ class InterfaceBlockchainAddressHelper{
         }
 
 
-
         let checkSumDetected = false;
 
         if (addressWIF.length === consts.PUBLIC_KEY_LENGTH + consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH ) {
@@ -397,13 +397,17 @@ class InterfaceBlockchainAddressHelper{
 
         if (addressWIF.length !== consts.PUBLIC_KEY_LENGTH){
 
-            if (!prefixDetected) throw "ADDRESS KEY  PREFIX  is not right";
+            if (!prefixDetected) 
+                throw "ADDRESS KEY  PREFIX  is not right";
 
-            if (!suffixDetected) throw "ADDRESS KEY  SUFFIX is not right";
+            if (!suffixDetected)
+                throw "ADDRESS KEY  SUFFIX is not right";
 
-            if (!checkSumDetected) throw "ADDRESS KEY  CHECK SUM is not right";
+            if (!checkSumDetected)
+                throw "ADDRESS KEY  CHECK SUM is not right";
 
-            if (!versionDetected) throw "ADDRESS KEY  VERSION PREFIX is not recognized";
+            if (!versionDetected)
+                throw "ADDRESS KEY  VERSION PREFIX is not recognized";
         }
         
         return {result: true, address: addressWIF};

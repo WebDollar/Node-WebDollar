@@ -1,6 +1,5 @@
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import InterfaceAccountantRadixTree from 'common/trees/radix-tree/accountant-tree/Interface-Accountant-Radix-Tree'
-
 import InterfaceMerkleTree from 'common/trees/merkle-tree/Interface-Merkle-Tree'
 
 class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
@@ -34,7 +33,8 @@ class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
 
     _checkInvalidNode(node){
 
-        if (!InterfaceAccountantRadixTree.prototype._checkInvalidNode.call(this, node)) return false;
+        if (!InterfaceAccountantRadixTree.prototype._checkInvalidNode.call(this, node))
+            return false;
 
         return InterfaceMerkleTree.prototype._checkInvalidNode.call(this, node);
     }

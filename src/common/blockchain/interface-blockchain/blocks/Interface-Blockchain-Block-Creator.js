@@ -20,7 +20,7 @@ class InterfaceBlockchainBlockCreator{
 
         //validate miner Address
 
-        args.unshift (  this.blockchain,  minerAddress, undefined, undefined, undefined );
+        args.unshift ( this.blockchain,  minerAddress, undefined, undefined, undefined );
 
         let data = new this.blockDataClass(...args);
 

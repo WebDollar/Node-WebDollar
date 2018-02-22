@@ -25,8 +25,10 @@ class SignalingClientList {
 
         let signalingClientPeerObject = null;
 
-        if ( signalToSearch === undefined) signalingClientPeerObject = null;
-        else signalingClientPeerObject = this.searchWebPeerSignalingClientList(signalToSearch);
+        if ( signalToSearch === undefined)
+            signalingClientPeerObject = null;
+        else
+            signalingClientPeerObject = this.searchWebPeerSignalingClientList(signalToSearch);
 
         if (signalingClientPeerObject === null){
 
@@ -42,7 +44,8 @@ class SignalingClientList {
 
     searchWebPeerSignalingClientList(data){
 
-        if (data === null) return null;
+        if (data === null)
+            return null;
 
         //previous established connection
         for (let i = 0; i < this.list.length; i++) {

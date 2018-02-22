@@ -56,14 +56,22 @@ class InterfaceBlockchainTransactionFrom{
      */
     validateFrom(){
 
-        if (!this.address.publicAddress || this.address.publicAddress === null) throw 'From.address.publicAddress is not specified';
-        if (!this.address.publicKey || this.address.publicKey === null) throw 'From.address.publicKey is not specified';
+        if (!this.address.publicAddress || this.address.publicAddress === null)
+            throw 'From.address.publicAddress is not specified';
+        
+        if (!this.address.publicKey || this.address.publicKey === null)
+            throw 'From.address.publicKey is not specified';
+        
         if (!this.currency || this.currency === null) throw 'From.currency is not specified';
 
-        if (!Buffer.isBuffer(this.address.publicAddress) || this.address.publicAddress.length !== consts.PUBLIC_ADDRESS_LENGTH )  throw "From.address.publicAddress is not a buffer";
-        if (!Buffer.isBuffer(this.address.publicKey) || this.address.publicKey.length !== consts.PUBLIC_KEY_LENGTH) throw "From.address.publicAddress is not a buffer";
+        if (!Buffer.isBuffer(this.address.publicAddress) || this.address.publicAddress.length !== consts.PUBLIC_ADDRESS_LENGTH )
+            throw "From.address.publicAddress is not a buffer";
+        
+        if (!Buffer.isBuffer(this.address.publicKey) || this.address.publicKey.length !== consts.PUBLIC_KEY_LENGTH)
+            throw "From.address.publicAddress is not a buffer";
 
-        if (!Buffers.isBuffer(this.currency)) throw 'To.currency is not  a buffer';
+        if (!Buffers.isBuffer(this.currency))
+            throw 'To.currency is not  a buffer';
         //Validate to.currency
 
         return true;

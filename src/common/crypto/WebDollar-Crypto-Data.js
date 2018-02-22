@@ -1,8 +1,7 @@
-import BufferExtended from "../utils/BufferExtended";
-
 const BigInteger = require('big-integer');
 const BigNumber = require('bignumber.js');
 
+import BufferExtended from "../utils/BufferExtended";
 import WebDollarCrypto from './WebDollar-Crypto';
 import Serialization from 'common/utils/Serialization';
 import consts from 'consts/const_global'
@@ -29,7 +28,6 @@ class WebDollarCryptoData {
 
             if (forceToCreate)
                 return new WebDollarCryptoData( new Buffer(object.buffer), "buffer" );
-
 
             return object;
         }
@@ -96,7 +94,8 @@ class WebDollarCryptoData {
                 return
             }
 
-            if (data === null) this.buffer = new Buffer ( [0] );
+            if (data === null)
+                this.buffer = new Buffer ( [0] );
             else
                 this.buffer = this.createBufferFromArray(data);
 
@@ -188,7 +187,8 @@ class WebDollarCryptoData {
 
     longestMatch(cryptoData2, startIndex){
 
-        if (! WebDollarCryptoData.isWebDollarCryptoData(cryptoData2)) return null;
+        if (! WebDollarCryptoData.isWebDollarCryptoData(cryptoData2))
+            return null;
 
         return BufferExtended.longestMatch(this.buffer, cryptoData2.buffer, startIndex );
     }

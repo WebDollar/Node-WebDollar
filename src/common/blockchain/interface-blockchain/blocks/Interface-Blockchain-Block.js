@@ -34,7 +34,7 @@ class InterfaceBlockchainBlock {
             timeStamp = Math.floor( new Date().getTime() / 1000 ) - BlockchainGenesis.timeStampOffset;
         }
 
-        this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
+        this.timeStamp = timeStamp || null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
 
         if (data === undefined || data === null)
@@ -64,35 +64,43 @@ class InterfaceBlockchainBlock {
 
     async validateBlock(height){
 
-        if (typeof this.version !== 'number') throw ('version is empty');
+        if (typeof this.version !== 'number')
+            throw ('version is empty');
 
-        if (this.hash === undefined || this.hash === null || !Buffer.isBuffer(this.hash) ) throw ('hash is empty');
-        if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw ('hashPrev is empty');
-
-
-
-        if (typeof this.nonce !== 'number') throw ('nonce is empty');
-        if (typeof this.timeStamp !== 'number') throw ('timeStamp is empty');
+        if (this.hash === undefined || this.hash === null || !Buffer.isBuffer(this.hash) )
+            throw ('hash is empty');
+        
+        if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) )
+            throw ('hashPrev is empty');
+        
+        if (typeof this.nonce !== 'number')
+            throw ('nonce is empty');
+        
+        if (typeof this.timeStamp !== 'number')
+            throw ('timeStamp is empty');
 
         //timestamp must be on 4 bytes
-        if (this.timeStamp >= 0xFFFFFFFF) throw ('timeStamp is invalid');
+        if (this.timeStamp >= 0xFFFFFFFF)
+            throw ('timeStamp is invalid');
 
-        if (height >=0) {
-
-            if (this.version !== 0x01) throw ('invalid version '+this.version);
-
+        if (height >= 0) {
+            if (this.version !== 0x01)
+                throw ('invalid version '+this.version);
         }
 
-        if (height !== this.height) throw 'height is different' + height+ " "+ this.height ;
+        if (height !== this.height)
+            throw 'height is different' + height+ " "+ this.height ;
 
-        if (! (await this._validateBlockHash())) throw "validateBlockchain return false";
+        if (! (await this._validateBlockHash()))
+            throw "validateBlockchain return false";
 
         this._validateTargetDifficulty();
 
         if (this.reward.isEqualTo( BlockchainMiningReward.getReward(this.height) ) === false )
             throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward( this.height );
 
-        if (this._supplementaryValidation() === false) throw "supplementaryValidation failed";
+        if (this._supplementaryValidation() === false)
+            throw "supplementaryValidation failed";
 
         return true;
     }
@@ -102,15 +110,18 @@ class InterfaceBlockchainBlock {
      */
     async _validateBlockHash() {
 
-        if (this.computedBlockPrefix === null) this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
+        if (this.computedBlockPrefix === null)
+            this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
         if ( this.blockValidation.blockValidationType["skip-prev-hash-validation"] === undefined ){
 
             //validate hashPrev
             let previousHash = this.blockValidation.getHashPrevCallback(this.height);
-            if ( previousHash === null || !Buffer.isBuffer(previousHash)) throw 'previous hash is not given'
+            if ( previousHash === null || !Buffer.isBuffer(previousHash))
+                throw 'previous hash is not given'
 
-            if (! previousHash.equals(this.hashPrev)) throw "block prevHash doesn't match " + previousHash.toString("hex") + " " + this.hashPrev.toString("hex") ;
+            if (! previousHash.equals(this.hashPrev))
+                throw "block prevHash doesn't match " + previousHash.toString("hex") + " " + this.hashPrev.toString("hex") ;
         }
 
         //validate hash
@@ -121,7 +132,8 @@ class InterfaceBlockchainBlock {
 
             let hash = await this.computeHash();
 
-            if (!hash.equals(this.hash)) throw "block hash is not right (" + this.nonce + ")" + this.hash.toString("hex") + " " + hash.toString("hex") + "    " + "difficultyTargetPrev" + this.difficultyTargetPrev.toString("hex")+ "    "+ Buffer.concat([this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)]).toString("hex");
+            if (!hash.equals(this.hash))
+                throw "block hash is not right (" + this.nonce + ")" + this.hash.toString("hex") + " " + hash.toString("hex") + "    " + "difficultyTargetPrev" + this.difficultyTargetPrev.toString("hex")+ "    "+ Buffer.concat([this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)]).toString("hex");
 
         }
 
@@ -139,7 +151,8 @@ class InterfaceBlockchainBlock {
         if (prevDifficultyTarget instanceof BigInteger)
             prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
 
-        if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget)) throw 'previousDifficultyTarget is not given'
+        if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget))
+            throw 'previousDifficultyTarget is not given'
 
         //console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
 
@@ -226,11 +239,15 @@ class InterfaceBlockchainBlock {
         if (!Buffer.isBuffer(buffer))
             buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
 
-        if (height !== undefined) this.height = height;
-        if (reward !== undefined) this.reward = reward;
-        if (difficultyTarget !== undefined) this.difficultyTarget= difficultyTarget;
+        if (height !== undefined)
+            this.height = height;
+        if (reward !== undefined)
+            this.reward = reward;
+        if (difficultyTarget !== undefined)
+            this.difficultyTarget = difficultyTarget;
 
-        if (offset === undefined) offset = 0;
+        if (offset === undefined)
+            offset = 0;
 
         try {
 
