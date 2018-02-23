@@ -324,15 +324,15 @@ class InterfaceBlockchain {
 
             for (let i = indexStart; i < numBlocks; ++i) {
 
-                let blockValidationType = {};
+                let validationType = {};
 
                 if (onlyLastBlocks !== undefined && i < numBlocks -1 - onlyLastBlocks )
-                    blockValidationType["skip-validation"] = true;
+                    validationType["skip-validation"] = true;
 
                 if (i === numBlocks-1)
-                    blockValidationType['validation-timestamp-adjusted-time'] = true;
+                    validationType['validation-timestamp-adjusted-time'] = true;
 
-                let blockValidation = new InterfaceBlockchainBlockValidation(this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), blockValidationType );
+                let blockValidation = new InterfaceBlockchainBlockValidation(this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
 
                 let block = this.blockCreator.createEmptyBlock(i, blockValidation);
                 block.height = i;
