@@ -4,12 +4,20 @@ import NetworkAdjustedTimeCluster from "./Network-Adjusted-Time-Cluster"
 class NetworkAdjustedTimeClusters{
 
     constructor(){
+
+        this.clearClusters();
+
+    }
+
+    clearClusters() {
+
         this.clusters = [];
+        this.clusterBest = null;
     }
 
     addNAT(socket, socketTimeUTCOffset){
 
-        let bestClusterAnswer = this.findNATCluster(socketTimeUTCOffset);
+        let bestClusterAnswer = this._findNATCluster(socketTimeUTCOffset);
         let cluster = undefined;
 
         if (bestClusterAnswer === null){
@@ -26,6 +34,8 @@ class NetworkAdjustedTimeClusters{
             cluster.pushSocket(socket, socketTimeUTCOffset);
 
         }
+
+        this._calculateBestCluster();
 
         return cluster;
     }
@@ -44,6 +54,8 @@ class NetworkAdjustedTimeClusters{
             if (cluster.sockets.length === 0)
                 this.clusters.splice(index, 1);
         }
+
+        this._calculateBestCluster();
     }
 
     _findNATClusterBySocket(socket){
@@ -56,7 +68,7 @@ class NetworkAdjustedTimeClusters{
         return -1;
     }
 
-    findNATCluster(socketTimeUTCOffset){
+    _findNATCluster(socketTimeUTCOffset){
 
         let bestCluster = null;
 
@@ -75,6 +87,23 @@ class NetworkAdjustedTimeClusters{
 
             }
         }
+    }
+
+
+    _calculateBestCluster(){
+
+        let bestCluster = null;
+
+        for (let i=0; i<this.clusters.length; i++)
+            if ( bestCluster === null || this.clusters[i].sockets.length > bestCluster.sockets.length ){
+
+                bestCluster = this.clusters[i];
+
+            }
+
+
+        this.clusterBest = bestCluster;
+
     }
 
 }

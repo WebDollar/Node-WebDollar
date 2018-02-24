@@ -7,7 +7,7 @@ class InterfaceBlockchainTransactions{
 
     constructor(){
 
-        let db = InterfaceSatoshminDB(consts.DATABASE_NAMES.TRANSACTIONS_DATABASE);
+        let db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.TRANSACTIONS_DATABASE);
 
         this.pendingQueue = new InterfaceTransactionsPendingQueue(db);
         this.uniqueness = new InterfaceTransactionsUniqueness(db);

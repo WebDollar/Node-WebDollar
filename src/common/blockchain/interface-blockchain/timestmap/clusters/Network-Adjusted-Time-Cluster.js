@@ -29,7 +29,10 @@ class NetworkAdjustedTimeCluster{
             }
 
         if (this.sockets.length > 0){
-            this.meanTimeUTCOffset /= this.sockets.length;
+
+            this.meanTimeUTCOffset = Math.floor( this.meanTimeUTCOffset / this.sockets.length )
+            ;
+
         }
 
     }
