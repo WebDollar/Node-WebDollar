@@ -2,10 +2,11 @@ import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-pr
 
 class InterfaceTransactionsPendingQueue {
 
-    constructor(){
+    constructor(db){
 
-        this.list = []
+        this.list = [];
 
+        this.db = db;
     }
 
     includePendingTransaction(transaction){
@@ -15,7 +16,7 @@ class InterfaceTransactionsPendingQueue {
         }
 
         this.list.push(transaction);
-        transaction._propagateTransaction();
+        transaction.propagateTransaction();
 
         return true;
 

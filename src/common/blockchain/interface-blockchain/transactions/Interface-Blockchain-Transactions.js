@@ -1,12 +1,16 @@
+import consts from 'consts/const_global'
 import InterfaceTransactionsPendingQueue from './pending/Interface-Transactions-Pending-Queue'
 import InterfaceTransactionsUniqueness from './uniqueness/Interface-Transactions-Uniqueness'
+import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
 class InterfaceBlockchainTransactions{
 
     constructor(){
 
-        this.pendingQueue = new InterfaceTransactionsPendingQueue();
-        this.uniqueness = new InterfaceTransactionsUniqueness();
+        let db = InterfaceSatoshminDB(consts.DATABASE_NAMES.TRANSACTIONS_DATABASE);
+
+        this.pendingQueue = new InterfaceTransactionsPendingQueue(db);
+        this.uniqueness = new InterfaceTransactionsUniqueness(db);
 
     }
 

@@ -123,6 +123,7 @@ consts.DATABASE_NAMES={
     POOL_DATABASE: "poolDB",
     VALIDATE_DATABASE: "validateDB",
     TESTS_DATABASE: "testDB",
+    TRANSACTIONS_DATABASE: "transactionsDB"
 };
 
 export default consts

@@ -1,5 +1,7 @@
 import NodesList from 'node/lists/nodes-list'
 import consts from 'consts/const_global'
+import NetworkAdjustedTimeClusters from "./clusters/Network-Adjusted-Time-Clusters";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class BlockchainNetworkAdjustedTime {
 
@@ -11,7 +13,6 @@ class BlockchainNetworkAdjustedTime {
         NodesList.emitter.on("nodes-list/connected", async (result) => { await this.initializingNewNode(result); } );
 
         NodesList.emitter.on("nodes-list/disconnected", async (result) => { await this._removeNodeTimeAdjusted(result); });
-
     }
 
     get networkAdjustedTime(){
@@ -19,9 +20,11 @@ class BlockchainNetworkAdjustedTime {
     }
 
     resetNetworkAdjustedTime(){
+
         this._networkAdjustedTimeOffset = 0;
         this._networkAdjustedTimeNodes = [];
         this._networkAdjustedTimeNodesUsed = 0;
+
     }
 
     async initializingNewNode(nodesListObject){
@@ -47,10 +50,9 @@ class BlockchainNetworkAdjustedTime {
 
     _addNodeTimeAdjusted(socket, socketTimeUTC ){
 
-        if ( Math.abs(socketTimeUTC - this.blockchainTimestamp.timeUTC) > consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE ) {
-
-            console.error("Socket", socket.node.sckAddress, " return a strange socketTimeUTC ", socketTimeUTC, " while my UTC is ", this.blockchainTimestamp.timeUTC, " the Difference is ", socketTimeUTC - this.blockchainTimestamp.timeUTC );
-
+        if ( socketTimeUTC  <= BlockchainGenesis.timeStampOffset ) {
+            console.error("Socket timestamp is illegal");
+            return false;
         }
 
         //one IP, one vote
@@ -84,6 +86,9 @@ class BlockchainNetworkAdjustedTime {
         this._deleteNodeTimeAdjusted(socket);
     }
 
+    determiningNodeTimeAdjustedMajoriy(socket){
+
+    }
 
     /**
      * Operations with Array
