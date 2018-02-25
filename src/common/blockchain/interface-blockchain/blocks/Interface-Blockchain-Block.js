@@ -96,7 +96,8 @@ class InterfaceBlockchainBlock {
 
         this._validateBlockTimeStamp();
 
-        if (this.reward.equals( BlockchainMiningReward.getReward(this.height) ) === false )
+
+        if (this.reward.isEqualTo( BlockchainMiningReward.getReward(this.height) ) === false )
             throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward( this.height );
 
         if (this._supplementaryValidation() === false)
@@ -168,7 +169,7 @@ class InterfaceBlockchainBlock {
         if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS) {
 
             let medianTimestamp = 0;
-            for (let i=height; i > this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i++){
+            for (let i=this.height; i > this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i++){
                 medianTimestamp += this.blockValidation.getTimeStampCallback(i);
             }
             medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;

@@ -20,6 +20,15 @@ class InterfaceBlockchainBlockValidation {
 
     }
 
+
+    saveValidation(){
+
+    }
+
+    loadValidation(){
+
+    }
+
 }
 
 export default InterfaceBlockchainBlockValidation;

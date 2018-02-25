@@ -6,7 +6,7 @@ import consts from 'consts/const_global'
 const atob = require('atob');
 const btoa = require('btoa');
 const colors = require('colors/safe');
-const MainBlockchain = require('main-blockchain/Blockchain');
+import MainBlockchain from 'main-blockchain/Blockchain';
 
 let pounchdb = (process.env.BROWSER) ? (require('pouchdb').default) : (require('pouchdb-node'));
 
@@ -237,7 +237,7 @@ class InterfaceSatoshminDB {
                 console.error("db.save error " + key, exception);
 
                 if (exception.status === 500 && MainBlockchain.emitter !== undefined)
-                    MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Errror"});
+                    MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason});
 
                 resolve(null);
             }
@@ -266,7 +266,7 @@ class InterfaceSatoshminDB {
                 console.error("db.get error " + key, exception);
 
                 if (exception.status === 500 && MainBlockchain.emitter !== undefined)
-                    MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
+                    MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason});
 
                 resolve(null);
             });
@@ -284,7 +284,7 @@ class InterfaceSatoshminDB {
             console.error("db.remove error " + key, exception);
 
             if (exception.status === 500 && MainBlockchain.emitter !== undefined)
-                MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error"});
+                MainBlockchain.emitter.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason});
 
             return null;
         }

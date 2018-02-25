@@ -50,9 +50,9 @@ class NodesList {
         socket.node.type = type;
         socket.node.index = ++this.nodesTotal;
 
-        if (!socket.node || !socket.node.protocol || !(socket.node.protocol.helloValidated || false)) {
+        if (!socket.node || !socket.node.protocol || !socket.node.protocol.helloValidated ) {
 
-            //console.log("Error - registerUniqueSocket rejected by invalid helloValidated", ( socket.node !== undefined ? socket.node.protocol.helloValidated : undefined ) );
+            //console.error("Error - registerUniqueSocket rejected by invalid helloValidated", ( socket.node !== undefined ? socket.node.protocol.helloValidated : undefined ) );
 
             socket.disconnect(true);
             return false;
@@ -84,7 +84,7 @@ class NodesList {
 
         if (socket !== null && !socket.hasOwnProperty("node") ) {
 
-            //console.error("Error - disconnectSocket rejected by invalid helloValidated");
+            console.error("Error - disconnectSocket rejected by invalid helloValidated");
             //if (socket.hasOwnProperty("node")) console.log("hello validated value",socket.node.protocol.helloValidated);
             socket.disconnect(true);
             return false;
@@ -97,7 +97,7 @@ class NodesList {
         for (let i=this.nodes.length-1; i>=0; i--)
             if ((this.nodes[i].type === type || type  === "all") && ((this.nodes[i].socket === socket ) || (this.nodes[i].socket.node.sckAddress.uuid === socket.node.sckAddress.uuid  ) )) {
 
-                console.log(colors.green('deleting client socket '+ i +" "+ socket.node.sckAddress.toString()));
+                console.error('deleting client socket '+ i +" "+ socket.node.sckAddress.toString());
 
                 let nodeToBeDeleted = this.nodes[i];
                 this.nodes.splice(i, 1);
@@ -108,7 +108,8 @@ class NodesList {
                 return true;
             }
 
-        //console.log("Disconnecting Socket but it was not validated before...", socket.node.sckAddress.getAddress());
+        //console.error("Disconnecting Socket but it was not validated before...", socket.node.sckAddress.getAddress());
+
         socket.disconnect(true);
         return false;
     }

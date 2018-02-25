@@ -304,16 +304,16 @@ class InterfaceBlockchain {
             return false;
         }
 
-        console.warn("validateLastBlocks", numBlocks)
-        console.warn("validateLastBlocks", numBlocks)
-        console.warn("validateLastBlocks", numBlocks)
-        console.warn("validateLastBlocks", numBlocks)
+        console.warn("validateLastBlocks", numBlocks);
+        console.warn("validateLastBlocks", numBlocks);
+        console.warn("validateLastBlocks", numBlocks);
 
         this.blocks.clear();
 
         try {
 
             let indexStart = 0;
+            let difficultyNotValidated = false;
 
             if (this.agent !== undefined && this.agent.light === true) {
 
@@ -326,11 +326,26 @@ class InterfaceBlockchain {
 
                 let validationType = {};
 
-                if (onlyLastBlocks !== undefined && i < numBlocks -1 - onlyLastBlocks )
-                    validationType["skip-validation"] = true;
+                if ( this.agent !== undefined && this.agent.light === true) {
 
-                if (i === numBlocks-1)
-                    validationType['validation-timestamp-adjusted-time'] = true;
+                    //I can not validate timestamp for the first consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS blocks
+                    if (i < numBlocks - onlyLastBlocks - 1 + consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS)
+                        validationType["skip-validation-timestamp"] = true;
+
+                    if (!difficultyNotValidated)
+                        validationType["skip-difficulty-recalculation"] = true;
+
+                    if ( (i+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS && (i-indexStart) > consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )
+                        difficultyNotValidated = true;
+                }
+
+                //fork 3.1, it must be deleted after
+                if ( i < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK ) {
+                    validationType["skip-validation-timestamp"] = true;
+                    validationType["skip-difficulty-recalculation"] = false;
+                }
+
+                console.log("validationType", validationType);
 
                 let blockValidation = new InterfaceBlockchainBlockValidation(this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
 

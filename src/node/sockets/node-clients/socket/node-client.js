@@ -46,7 +46,7 @@ class NodeClient {
                 if (address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
                 if (address.indexOf("http://") === -1 )  address = "http://"+address;
 
-                console.log("connecting... to address", address);
+                console.log("connecting... to:                ", address);
 
                 let socket = null;
                 try {
@@ -85,14 +85,15 @@ class NodeClient {
 
                 socket.once("connect_error", (response) =>{
 
-                    console.log("Client error connecting", address);
-                    //NodesList.disconnectSocket(this.socket);
+                    //console.log("Client error connecting", address, response);
+                    NodesList.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
 
                 socket.once("connect_failed", (response) =>{
-                    console.log("Client error connecting (connect_failed) ", address);
+
+                    //console.log("Client error connecting (connect_failed) ", address, response);
                     NodesList.disconnectSocket(this.socket);
 
                     resolve(false);
