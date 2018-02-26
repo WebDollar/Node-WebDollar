@@ -166,17 +166,18 @@ class InterfaceBlockchainBlock {
     _validateBlockTimeStamp(){
 
         // A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
-        if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS) {
+        if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3)
+            if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS) {
 
-            let medianTimestamp = 0;
-            for (let i=this.height; i > this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i++){
-                medianTimestamp += this.blockValidation.getTimeStampCallback(i);
+                let medianTimestamp = 0;
+                for (let i=this.height; i > this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i++){
+                    medianTimestamp += this.blockValidation.getTimeStampCallback(i);
+                }
+                medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
+
+                if (this.timeStamp < medianTimestamp) throw "Block Timestamp is not bigger than the previous 10 blocks";
+
             }
-            medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
-
-            if (this.timeStamp < medianTimestamp) throw "Block Timestamp is not bigger than the previous 10 blocks";
-
-        }
 
         if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true ) {
 

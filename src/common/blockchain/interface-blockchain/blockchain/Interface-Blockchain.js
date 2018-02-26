@@ -340,10 +340,8 @@ class InterfaceBlockchain {
                 }
 
                 //fork 3.1, it must be deleted after
-                if ( i < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK ) {
-                    validationType["skip-validation-timestamp"] = true;
+                if ( i < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK )
                     validationType["skip-difficulty-recalculation"] = false;
-                }
 
                 console.log("validationType", validationType);
 

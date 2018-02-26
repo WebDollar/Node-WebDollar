@@ -20,6 +20,7 @@ class BlockchainGenesis{
 
         if ( block.timeStamp.length !== this.timeStamp.length )
             throw "Timestamp doesn't match";
+
         if ( block.timeStamp > 0x000FFFFF)
             throw "Timestamp is too old "+block.timeStamp.toString();
     }

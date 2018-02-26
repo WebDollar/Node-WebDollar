@@ -76,6 +76,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (height === this.forkChainLength-1)
             validationType["validation-timestamp-adjusted-time"] = true;
 
+        //it's a new light fork && i have less than forkHeight
+        if (this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
+            validationType["skip-validation-timestamp"] = true;
+
         return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
@@ -87,6 +91,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         if (height === this.forkChainLength-1)
             validationType["validation-timestamp-adjusted-time"] = true;
+
+        //it's a new light fork && i have less than forkHeight
+        if (this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
+            validationType["skip-validation-timestamp"] = true;
 
         return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
