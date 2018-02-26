@@ -1,14 +1,15 @@
-import NodesList from 'node/lists/nodes-list';
-import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
-
-import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
-
 const BigNumber = require('bignumber.js');
 const BigInteger = require('big-integer');
 
+import consts from 'consts/const_global';
+import NodesList from 'node/lists/nodes-list';
+import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
+
+
 class PoolLeaderProtocol {
 
-    constructor(dataBase) {
+    constructor(dataBase = consts.DATABASE_NAMES.POOL_DATABASE, poolLeaderFee = 5) {
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeMiner(result)
@@ -22,12 +23,14 @@ class PoolLeaderProtocol {
         this.difficultyTarget = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"); //target difficulty;
 
         this.poolData = new PoolData(dataBase);
+        
+        this._poolLeaderFee = poolLeaderFee;
 
         //TODO: Check is needed to store/load from database
         this.leaderReward = new BigNumber(0);
 
         //TODO: Check is needed to store/load from database, Update hardcoded value
-        this.bestHash = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex");
+        this._bestHash = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex");
 
         //TODO: create an address which will be used to store miners reward
         this.rewardsAddress = null;
@@ -76,8 +79,8 @@ class PoolLeaderProtocol {
 
     /**
      * Divides 2 big integers
-     * @param divident
-     * @param divisor
+     * @param divident is BigInteger
+     * @param divisor is BigInteger
      * @returns {number}
      */
     static divideBigInteger(divident, divisor) {
@@ -95,35 +98,42 @@ class PoolLeaderProtocol {
     }
 
     /**
-     * Updates and returns best hash from miners
-     * @returns {*} best hash from miners
+     * Compute and set best hash from miners
+     * @returns {*} the new computed best hash
      */
-    updateBeshHash() {
+    computeBestHash() {
 
         let minersList = this.poolData.getMinersList();
-        let bestHash = minersList[0].beshHash;
+        
+        if (minersList.length === 0)
+            return this._bestHash;
+        
+        let bestHash = minersList[0].bestHash;
 
         for (let i = 1; i < minersList.length; ++i) {
             if (bestHash.compare(minersList[i].bestHash) < 0)
                 bestHash = minersList[i].bestHash;
         }
+        
+        this._bestHash = bestHash;
 
         return bestHash;
     }
 
     /**
-     * Calculate difficulty for all miner's hashed. Each miner hash associated a hash difficulty number
-     * @returns {*}
+     * Calculate difficulty for all miner's hashed.
+     * Each miner has associated a bestHash difficulty number
+     * @returns {*} difficultyList of miners and sum(difficultyList)
      */
     computeHashDifficulties() {
 
-        let bestHashNumber = new BigInteger(this.bestHash.toString('hex'), 16);
+        let bestHashNumber = new BigInteger(this._bestHash.toString('hex'), 16);
         let minersList = this.poolData.getMinersList();
         let difficultyList = [];
         let sum = 0;
 
         for (let i = 0; i < minersList.length; ++i) {
-            let currentHash = new BigInteger(minersList[i].hash.toString('hex'), 16);
+            let currentHash = new BigInteger(minersList[i].bestHash.toString('hex'), 16);
             difficultyList[i] = this.divideBigInteger(bestHashNumber, currentHash);
 
             sum += difficultyList[i];
@@ -192,13 +202,57 @@ class PoolLeaderProtocol {
         await this.sendRewardsToMiners();
 
     }
+    
+    /**
+     * Insert a new miner if not exists. Synchronizes with DB.
+     * @param minerAddress
+     * @returns true/false
+     */
+    addMiner(minerAddress) {
+        
+        return this.poolData.setMiner(minerAddress);
+    }
+    
+    /**
+     * Remove a miner if exists. Synchronizes with DB.
+     * @param minerAddress
+     * @returns true/false 
+     */
+    removeMiner(minerAddress) {
+        
+        return this.poolData.removeMiner(minerAddress);
+    }
 
+    /**
+     * Set poolLeaderFee in percentage
+     * @param fee
+     */
+    setPoolLeaderFee(fee) {
+        this._poolLeaderFee = fee;
+    }
+
+    /**
+     * @returns the poolLeader's fee
+     */
     getPoolLeaderFee() {
         return this._poolLeaderFee;
     }
+    
+    /**
+     * Set pool's best hash
+     * @param fee
+     */
+    setBestHash(bestHash) {
 
-    setPoolLeaderFee(fee) {
-        this._poolLeaderFee = fee;
+        this._bestHash = bestHash;
+    }
+    
+    /**
+     * @returns the pool's best hash
+     */
+    getBestHash() {
+
+        return this._bestHash;
     }
 
     createMinerTask() {
