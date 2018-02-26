@@ -151,14 +151,15 @@ class BlockchainDifficulty{
             ratio = BigNumber.minimum(ratio, 10);
             ratio = BigNumber.maximum(ratio, 0.01);
 
-            console.warn("ratio2", ratio, ratio.toString());
-            console.warn("how_much_it_should_have_taken_X_Blocks", how_much_it_should_have_taken_X_Blocks);
-            console.warn("how_much_it_took_to_mine_X_Blocks", how_much_it_took_to_mine_X_Blocks);
+            console.warn( "ratio2", ratio, ratio.toString() );
+            console.warn( "how_much_it_should_have_taken_X_Blocks", how_much_it_should_have_taken_X_Blocks );
+            console.warn( "how_much_it_took_to_mine_X_Blocks", how_much_it_took_to_mine_X_Blocks );
 
             let newBlockDifficulty = prevBlockDifficulty.multipliedBy(ratio);
             newBlockDifficulty = newBlockDifficulty.decimalPlaces(0);
 
-            console.warn("newBlockDifficulty2", newBlockDifficulty, newBlockDifficulty.toString(16));
+            console.warn( "newBlockDifficulty2", newBlockDifficulty, newBlockDifficulty.toString(16) );
+            console.warn( "newBlockDifficulty was calculated", Math.floor( new Date().getTime() / 1000), "    ", new Date() );
             return BigInteger( newBlockDifficulty.toString(16), 16 );
             //return prevBlockDifficulty.multiply(ratio.toString());
         }

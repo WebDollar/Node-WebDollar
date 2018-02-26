@@ -10,18 +10,12 @@ class BlockchainNetworkAdjustedTime {
         this.blockchainTimestamp = blockchainTimestamp;
         this.networkAdjustedTimeClusters = new NetworkAdjustedTimeClusters();
 
-        NodesList.emitter.on("nodes-list/connected", async (result) => { await this.initializingNewNode(result); } );
+        NodesList.emitter.on("nodes-list/connected", async (result) => { await this._initializingNewNode(result); } );
 
-        NodesList.emitter.on("nodes-list/disconnected", async (result) => { await this._removeNodeTimeAdjusted(result); });
+        NodesList.emitter.on("nodes-list/disconnected", async (result) => { await this._desinitializeNode(result); });
     }
 
     get networkAdjustedTime(){
-
-        if (this.networkAdjustedTimeClusters.clusterBest !== null)
-            console.warn("this.networkAdjustedTimeClusters.clusterBest.meanTimeUTCOffset", this.networkAdjustedTimeClusters.clusterBest.meanTimeUTCOffset);
-
-        console.warn("this.blockchainTimestamp.timeUTC", this.blockchainTimestamp.timeUTC);
-        console.warn("this.blockchainTimestamp.timeUTC", this.networkAdjustedTimeClusters);
 
         if (this.networkAdjustedTimeClusters.clusterBest !== null )
             return ( this.networkAdjustedTimeClusters.clusterBest.meanTimeUTCOffset +  this.blockchainTimestamp.timeUTC );
@@ -31,7 +25,7 @@ class BlockchainNetworkAdjustedTime {
     }
 
 
-    async initializingNewNode(nodesListObject){
+    async _initializingNewNode(nodesListObject){
 
         let socket = nodesListObject.socket;
 
@@ -55,6 +49,12 @@ class BlockchainNetworkAdjustedTime {
 
     }
 
+    _desinitializeNode(nodesListObject) {
+
+        let socket = nodesListObject.socket;
+
+        this._removeNodeTimeAdjusted(socket);
+    }
 
     _addNodeTimeAdjusted(socket, socketTimeUTC ){
 
