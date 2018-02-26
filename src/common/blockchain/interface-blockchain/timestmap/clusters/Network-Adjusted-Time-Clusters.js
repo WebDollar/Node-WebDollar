@@ -87,6 +87,8 @@ class NetworkAdjustedTimeClusters{
 
             }
         }
+
+        return bestCluster;
     }
 
 

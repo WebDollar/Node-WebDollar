@@ -17,6 +17,12 @@ class BlockchainNetworkAdjustedTime {
 
     get networkAdjustedTime(){
 
+        if (this.networkAdjustedTimeClusters.clusterBest !== null)
+            console.warn("this.networkAdjustedTimeClusters.clusterBest.meanTimeUTCOffset", this.networkAdjustedTimeClusters.clusterBest.meanTimeUTCOffset);
+
+        console.warn("this.blockchainTimestamp.timeUTC", this.blockchainTimestamp.timeUTC);
+        console.warn("this.blockchainTimestamp.timeUTC", this.networkAdjustedTimeClusters);
+
         if (this.networkAdjustedTimeClusters.clusterBest !== null )
             return ( this.networkAdjustedTimeClusters.clusterBest.meanTimeUTCOffset +  this.blockchainTimestamp.timeUTC );
         else
@@ -33,15 +39,18 @@ class BlockchainNetworkAdjustedTime {
 
             let answer = await socket.node.sendRequestWaitOnce( "timestamp/request-timeUTC", {}, 'answer' );
 
-            if (typeof answer !== "number")
-                return "The node didn't answer to my request-timeUTC";
+            if (answer === null || answer === undefined) throw "The node answer for timestamp returned null or empty";
+
+            if (answer.result === false) throw "The node answer for timestamp is false";
+
+            if (typeof answer.timeUTC !== "number") throw "The node didn't answer to my request-timeUTC";
 
             //avoiding double couting the same timestamp from the same node
-            this._addNodeTimeAdjusted(socket, answer);
+            this._addNodeTimeAdjusted(socket, answer.timeUTC);
 
 
         } catch (exception){
-            console.error("Error includeNodeNetworkAdjustedTime to the node", exception, nodesListObject);
+            console.error("Error includeNodeNetworkAdjustedTime to the node", exception, nodesListObject.socket.node.sckAddress.toString());
         }
 
     }
