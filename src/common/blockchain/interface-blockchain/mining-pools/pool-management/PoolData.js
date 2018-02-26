@@ -1,6 +1,6 @@
 const BigNumber = require('bignumber.js');
 
-import consts from 'consts/const_global'
+import consts from 'consts/const_global';
 import Serialization from "common/utils/Serialization";
 import BufferExtended from 'common/utils/BufferExtended';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';

@@ -11,19 +11,19 @@ describe('test pool leader DB', () => {
         {
             address: "WEBD$gDDEDYafT8ur7EkSQzkVAZU4egSgEkH25#9TM3zKKN#Yj#eH@HsPw==",
             reward: new BigNumber(100),
-            hash: TestsHelper.makeIdHex(32),
+            bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
         {
             address: "WEBD$gD$q9AkZPN29xeHnuS$ykXHCqpv1@NT@R5yn4PkY#9bcxztwcDsPw==",
             reward: new BigNumber(20.1243),
-            hash: TestsHelper.makeIdHex(32),
+            bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
         {
             address: "WEBD$gCBzvQdKroa&yU4sp2X3y8*mf#q&r5k3BG3J3mBvogbE3U$SPHsPw==",
             reward: new BigNumber(30.34556),
-            hash: TestsHelper.makeIdHex(32),
+            bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
     ];

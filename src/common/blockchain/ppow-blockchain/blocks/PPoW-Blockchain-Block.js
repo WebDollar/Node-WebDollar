@@ -25,7 +25,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             return this.level;
 
         let T = this.difficultyTarget;
-        if (Buffer.isBuffer(T)) T = new BigInteger(this.difficultyTarget.toString("hex"), 16);
+        if (Buffer.isBuffer(T))
+            T = new BigInteger(this.difficultyTarget.toString("hex"), 16);
 
         let id = new BigInteger(this.hash.toString('hex'), 16);
         
