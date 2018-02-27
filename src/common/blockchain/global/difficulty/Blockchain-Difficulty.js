@@ -2,6 +2,7 @@ var BigInteger = require('big-integer');
 var BigNumber = require('bignumber.js');
 import consts from 'consts/const_global'
 
+
 class BlockchainDifficulty{
 
     static getDifficulty(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){

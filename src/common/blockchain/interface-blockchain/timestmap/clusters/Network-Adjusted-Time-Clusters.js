@@ -3,9 +3,14 @@ import NetworkAdjustedTimeCluster from "./Network-Adjusted-Time-Cluster"
 
 class NetworkAdjustedTimeClusters{
 
-    constructor(){
+    constructor(emitter){
 
+        this._emitter = emitter;
+
+        this._clusterInitialization = false;
         this.clearClusters();
+
+        setTimeout( ()=>{ this._clusterInitialization = true }, 5000);
 
     }
 
@@ -104,7 +109,16 @@ class NetworkAdjustedTimeClusters{
             }
 
 
-        this.clusterBest = bestCluster;
+        if (this.clusterBest !== bestCluster) {
+            this.clusterBest = bestCluster;
+
+
+
+        }
+
+    }
+
+    _refreshClusterStatus(){
 
     }
 

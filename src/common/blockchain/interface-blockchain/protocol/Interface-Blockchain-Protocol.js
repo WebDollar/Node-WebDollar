@@ -5,7 +5,6 @@ import InterfaceBlockchainProtocolTipsManager from "./Interface-Blockchain-Proto
 import Serialization from 'common/utils/Serialization';
 import NodeProtocol from 'common/sockets/protocol/node-protocol'
 
-const colors = require('colors/safe');
 
 /**
  * Blockchain Protocol

@@ -1,4 +1,3 @@
-const colors = require('colors/safe');
 import InterfaceBlockchainProtocol from 'common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol'
 import Serialization from 'common/utils/Serialization'
 import consts from "consts/const_global";

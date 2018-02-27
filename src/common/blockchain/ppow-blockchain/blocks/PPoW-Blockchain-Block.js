@@ -1,5 +1,4 @@
 const BigInteger = require('big-integer');
-const colors = require('colors/safe');
 
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'

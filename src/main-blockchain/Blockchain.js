@@ -6,6 +6,7 @@ import MainBlockchainAgent from 'main-blockchain/agents/Main-Blockchain-Agent'
 import MainBlockchainBalances from "main-blockchain/balances/Main-Blockchain-Balances";
 import ValidationsUtils from "common/utils/validation/Validations-Utils";
 import NodesList from 'node/lists/nodes-list'
+import StatusEvents from "common/events/Status-Events";
 
 class Blockchain{
 
@@ -13,8 +14,6 @@ class Blockchain{
 
         this.Chain = new MainBlockchain(undefined);
         this.blockchain = this.Chain;
-
-        this.emitter = this.blockchain.emitter;
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
 
@@ -33,7 +32,7 @@ class Blockchain{
             if (NodesList.nodes.length === 0) { //no more sockets, maybe I no longer have internet
                 console.log("################### RESYNCHRONIZATION STARTED ##########");
                 this.Mining.stopMining();
-                this.emitter.emit('blockchain/status-webdollar', {message: "No Internet Access"});
+                StatusEvents.emit('blockchain/status-webdollar', {message: "No Internet Access"});
                 await this.synchronizeBlockchain();
             }
         });
@@ -52,7 +51,7 @@ class Blockchain{
         let validation;
         try {
 
-            validation = new ValidationsUtils(this.emitter);
+            validation = new ValidationsUtils();
 
             await validation.validate();
 
@@ -61,9 +60,9 @@ class Blockchain{
         }
 
         await validation.waitSingleTab( () => {
-            this.emitter.emit('blockchain/status-webdollar', {message: "Multiple Windows Detected"});
+            StatusEvents.emit('blockchain/status-webdollar', {message: "Multiple Windows Detected"});
         });
-        this.emitter.emit('blockchain/status-webdollar', {message: "Single Window"});
+        StatusEvents.emit('blockchain/status-webdollar', {message: "Single Window"});
 
         if (typeof initializationCallback === "function")
             initializationCallback();
@@ -93,7 +92,7 @@ class Blockchain{
 
     async initializeMining(){
 
-        this.emitter.emit('blockchain/status', {message: "Mining Setting Address"});
+        StatusEvents.emit('blockchain/status', {message: "Mining Setting Address"});
 
     }
 
@@ -106,11 +105,11 @@ class Blockchain{
 
     async loadBlockchain(){
 
-        this.emitter.emit('blockchain/status', {message: "Blockchain Loading"});
+        StatusEvents.emit('blockchain/status', {message: "Blockchain Loading"});
 
         let chainLoaded = await this.Chain.loadBlockchain();
 
-        this.emitter.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
+        StatusEvents.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
         return chainLoaded;
     }
 
@@ -120,25 +119,25 @@ class Blockchain{
      */
     async synchronizeBlockchain(firstTime){
 
-        this.emitter.emit('blockchain/status', {message: "Start Synchronizing"});
+        StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});
         let agentInitialization = false;
 
         while (!agentInitialization){
 
-            this.emitter.emit('blockchain/status', {message: "Synchronizing"});
+            StatusEvents.emit('blockchain/status', {message: "Synchronizing"});
 
             let resultAgentStarted = await this.Agent.startAgent(firstTime);
             firstTime = false;
 
             if (resultAgentStarted.result){
 
-                this.emitter.emit('blockchain/status', {message: "Synchronization Successful"});
+                StatusEvents.emit('blockchain/status', {message: "Synchronization Successful"});
                 agentInitialization = true;
 
             } else {
 
-                this.emitter.emit('blockchain/status', { message: "Error Synchronizing" });
-                this.emitter.emit('blockchain/status-webdollar', {message: "Error Synchronizing"});
+                StatusEvents.emit('blockchain/status', { message: "Error Synchronizing" });
+                StatusEvents.emit('blockchain/status-webdollar', {message: "Error Synchronizing"});
 
                 this.Agent.initializeAgentPromise();
             }
@@ -147,9 +146,9 @@ class Blockchain{
 
         await this.startMining();
 
-        this.emitter.emit('blockchain/status', {message: "Blockchain Ready to Mine"} );
+        StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"} );
 
-        this.emitter.emit('blockchain/status-webdollar', {message: "Ready"} );
+        StatusEvents.emit('blockchain/status-webdollar', {message: "Ready"} );
 
     }
 

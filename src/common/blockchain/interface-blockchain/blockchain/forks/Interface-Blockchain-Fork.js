@@ -1,6 +1,5 @@
 import InterfaceBlockchainBlockValidation from "../../blocks/validation/Interface-Blockchain-Block-Validation";
 
-const colors = require('colors/safe');
 import global from "consts/global"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 

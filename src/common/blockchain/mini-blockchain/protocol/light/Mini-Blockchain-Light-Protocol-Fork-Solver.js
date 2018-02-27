@@ -1,4 +1,3 @@
-const colors = require('colors/safe');
 import InterfaceBlockchainProtocolForkSolver from 'common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol-Fork-Solver'
 import PPowBlockchainProtocolForkSolver from 'common/blockchain/ppow-blockchain/protocol/PPoW-Blockchain-Protocol-Fork-Solver'
 import consts from 'consts/const_global'
@@ -35,7 +34,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             let result = await inheritForkSolver.prototype._calculateForkBinarySearch.call(this, socket, newChainStartingPoint, newChainLength, currentBlockchainLength);
 
-            console.log(colors.yellow("_calculateForkBinarySearch"), result);
+            console.warn("_calculateForkBinarySearch", result);
 
             if (this.blockchain.agent.light){
 
@@ -138,7 +137,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
         //download the new Accountant Tree, in case there is a new fork and I don't have anything in common
-        console.log(colors.yellow(" fork.forkChainStartingPoint "+ fork.forkChainStartingPoint + "  "+ "fork.forkStartingHeight "+ fork.forkStartingHeight + " length "+ fork.forkChainLength));
+        console.warn(" fork.forkChainStartingPoint "+ fork.forkChainStartingPoint + "  "+ "fork.forkStartingHeight "+ fork.forkStartingHeight + " length "+ fork.forkChainLength);
 
         if (fork.forkChainStartingPoint === fork.forkStartingHeight) {
 
@@ -153,7 +152,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             if (answer === null)
                 throw "get-accountant-tree never received " + (fork.forkStartingHeight);
-            
+
             if (!answer.result)
                 throw "get-accountant-tree return false "+ answer.message;
 
@@ -164,16 +163,16 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             if (answer === null)
                 throw "get-light-settings never received " + (fork.forkChainStartingPoint);
-            
+
             if (answer.result === false)
                 throw "get-light-settings return false "+ answer.message;
 
             if (answer.difficultyTarget === null )
                 throw "get-light-settings difficultyTarget is null";
-            
+
             if (answer.timeStamp === null )
                 throw "get-light-settings timeStamp is null";
-            
+
             if (answer.hashPrev === null )
                 throw "get-light-settings hashPrev is null";
 

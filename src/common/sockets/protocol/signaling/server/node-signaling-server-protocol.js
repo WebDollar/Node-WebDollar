@@ -1,4 +1,3 @@
-const colors = require('colors/safe');
 import consts from 'consts/const_global'
 
 import NodesList from 'node/lists/nodes-list'

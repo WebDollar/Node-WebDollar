@@ -1,4 +1,3 @@
-const colors = require('colors/safe');
 import MiniBlockchainProtocol from "../Mini-Blockchain-Protocol";
 import MiniBlockchainLightProtocolForkSolver from "./Mini-Blockchain-Light-Protocol-Fork-Solver"
 import consts from 'consts/const_global'

@@ -1,5 +1,4 @@
 import * as io from 'socket.io-client';
-const colors = require('colors/safe');
 
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
@@ -72,7 +71,7 @@ class NodeClient {
 
                     SocketExtend.extendSocket( socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
 
-                    console.log(colors.blue("Client connected to " + socket.node.sckAddress.getAddress(true) ));
+                    console.warn("Client connected to " + socket.node.sckAddress.getAddress(true) );
 
                     socket.node.protocol.sendHello(["ip","uuid"]).then( (answer)=>{
 
@@ -103,7 +102,7 @@ class NodeClient {
 
                     //disconnect over the time, so it was connected before
 
-                    console.log(colors.green("Client disconnected ", address));
+                    console.warn("Client disconnected ", address);
                     NodesList.disconnectSocket(this.socket);
 
                 });
@@ -131,7 +130,7 @@ class NodeClient {
             return false;
         }
 
-        console.log(colors.white('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true)));
+        console.log('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true));
 
         this.socket.node.protocol.propagation.initializePropagation();
 

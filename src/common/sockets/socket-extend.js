@@ -6,7 +6,6 @@ import NodesList from 'node/lists/nodes-list'
 import SocketAddress from 'common/sockets/socket-address'
 import isArrayBuffer from 'is-array-buffer';
 import global from "consts/global"
-const colors = require('colors/safe');
 
 // Extending Socket / Simple Peer
 

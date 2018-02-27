@@ -1,11 +1,10 @@
-const colors = require('colors/safe');
-
 import consts from 'consts/const_global'
 import global from "consts/global"
 import Serialization from "common/utils/Serialization";
 import MiniBlockchain from "./Mini-Blockchain"
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -144,17 +143,17 @@ class MiniBlockchainLight extends  MiniBlockchain{
             if (this.lightPrevDifficultyTargets[diffIndex] === undefined)
                 throw "_saveLightSettings is undefined "+diffIndex;
 
-            // console.log(colors.blue("this.blocks.blocksStartingPoint "), this.blocks.blocksStartingPoint );
+            // console.warn("this.blocks.blocksStartingPoint ", this.blocks.blocksStartingPoint );
 
             let treeSerialization = this.getSerializedAccountantTree(diffIndex);
-            //console.log(colors.blue("this.getSerializedAccountantTree "), colors.yellow(diffIndex), treeSerialization !== undefined ? treeSerialization.toString('hex') : '');
+            //console.warn("this.getSerializedAccountantTree ", diffIndex, treeSerialization !== undefined ? treeSerialization.toString('hex') : '');
 
             if (! (await this.accountantTree.saveMiniAccountant(true, undefined, treeSerialization)))
                 throw "saveMiniAccountant";
 
-            // console.log(colors.blue("this.lightPrevDifficultyTarget"), this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
-            // console.log(colors.blue("this.lightPrevTimestamp"), this.lightPrevTimeStamps[diffIndex]);
-            // console.log(colors.blue("this.lightPrevHashPrev"), this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex") : '');
+            // console.warn("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
+            // console.warn("this.lightPrevTimestamp", this.lightPrevTimeStamps[diffIndex]);
+            // console.warn("this.lightPrevHashPrev", this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex") : '');
 
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex])))
                 throw "Couldn't be saved _LightSettings_prevDifficultyTarget";

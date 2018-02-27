@@ -7,7 +7,8 @@ import consts from "../../consts/const_global";
 import BufferExtend from "../../common/utils/BufferExtended";
 import InterfaceBlockchainAddressHelper from "../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
-const colors = require('colors/safe');
+import StatusEvents from "common/events/Status-Events.js"
+
 const md5 = require('md5');
 const EventEmitter = require('events');
 const FileSystem = require('fs');
@@ -559,14 +560,14 @@ class MainBlockchainWallet{
     async loadWallet(){
 
         //loading the Wallet
-        this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Loading"});
+        StatusEvents.emit('blockchain/status', {message: "Wallet Loading"});
 
         try{
 
             let response = await this.loadAddresses();
 
             if (response === true)
-                this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Loaded Successfully"});
+                StatusEvents.emit('blockchain/status', {message: "Wallet Loaded Successfully"});
 
             if (response === false || this.addresses.length === 0) {
 
@@ -574,14 +575,14 @@ class MainBlockchainWallet{
                 await this.createNewAddress(); //it will save automatically
                 console.error("create this.Wallet.createNewAddress done");
 
-                this.blockchain.emitter.emit('blockchain/status', {message: "Wallet Creating New Wallet"});
+                StatusEvents.emit('blockchain/status', {message: "Wallet Creating New Wallet"});
             }
 
         } catch (exception){
 
             console.error("exception loading Wallet.Addresses");
 
-            this.blockchain.emitter.emit('validation/status', {message: "IndexedDB - Wallet couldn't be imported"});
+            StatusEvents.emit('validation/status', {message: "IndexedDB - Wallet couldn't be imported"});
 
             await this.createNewAddress(); //it will save automatically
         }

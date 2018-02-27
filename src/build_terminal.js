@@ -1,4 +1,3 @@
-const colors = require('colors/safe');
 import {Node, Blockchain} from './index.js';
 import global from "consts/global.js";
 
@@ -13,7 +12,7 @@ Blockchain.createBlockchain("light-node",()=>{
 
 process.on('SIGINT', function() {
 
-    console.log(colors.yellow("SIGINT FIRED"))
+    console.warn("SIGINT FIRED")
     global.TERMINATED = true;
 
     setInterval(()=>{
@@ -21,11 +20,11 @@ process.on('SIGINT', function() {
              global.SEMAPHORE_PROCESS_DONE &&
              global.MINIBLOCKCHAIN_LIGHT_SAVED) {
 
-            console.log(global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED)
-            console.log(global.SEMAPHORE_PROCESS_DONE)
-            console.log(global.MINIBLOCKCHAIN_LIGHT_SAVED)
+            console.log(global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED);
+            console.log(global.SEMAPHORE_PROCESS_DONE);
+            console.log(global.MINIBLOCKCHAIN_LIGHT_SAVED);
 
-            console.log(colors.yellow("process.exit(0)"));
+            console.warn("process.exit(0)");
             process.exit(0);
         }
     })

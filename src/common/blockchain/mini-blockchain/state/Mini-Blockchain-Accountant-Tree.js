@@ -1,4 +1,3 @@
-const colors = require('colors/safe');
 const BigNumber = require('bignumber.js');
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'

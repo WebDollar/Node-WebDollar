@@ -1,5 +1,4 @@
 var BigInteger = require('big-integer');
-const colors = require('colors/safe');
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'

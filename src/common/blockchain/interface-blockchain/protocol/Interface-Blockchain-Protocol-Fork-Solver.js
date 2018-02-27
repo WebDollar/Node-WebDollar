@@ -1,9 +1,8 @@
 import InterfaceBlockchainFork from "../blockchain/forks/Interface-Blockchain-Fork";
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
-const colors = require('colors/safe');
 import global from "consts/global"
 import consts from 'consts/const_global'
-import InterfaceBlockchainBlockValidation from "../blocks/validation/Interface-Blockchain-Block-Validation";
+
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
@@ -128,7 +127,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             // in case it was you solved previously && there is something in the blockchain
 
-            console.log(colors.yellow("discoverFork 555" ), binarySearchResult)
+            console.warn("discoverFork 555" , binarySearchResult);
 
             if ( binarySearchResult.position === -1 ) {
 
@@ -146,7 +145,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         newChainStartingPoint = newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1;
                     }
 
-                console.log(colors.yellow("discoverFork 6666" + newChainStartingPoint))
+                console.warn("discoverFork 6666" + newChainStartingPoint)
 
                 binarySearchResult = await this._calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength );
 
@@ -156,7 +155,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 // console.log("binary search ", binarySearchResult)
             }
 
-            console.log(colors.yellow("discoverFork 7777" ), binarySearchResult)
+            console.warn("discoverFork 7777" , binarySearchResult);
 
             // it has a ground-new blockchain
             // very skeptical when the blockchain becomes bigger

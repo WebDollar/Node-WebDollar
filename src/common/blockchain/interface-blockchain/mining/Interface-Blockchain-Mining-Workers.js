@@ -3,6 +3,7 @@ import InterfaceBlockchainMiningWorkersList from "./Interface-Blockchain-Mining-
 
 import Serialization from 'common/utils/Serialization';
 import SemaphoreProcessing from "common/utils/Semaphore-Processing";
+import StatusEvents from "common/events/Status-Events";
 
 const SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL = 20;
 
@@ -171,13 +172,13 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             if (event.data.answer === "WebAssembly supported" || event.data.answer === "ASM.JS supported" ){
 
                 if (event.data.answer === "ASM.JS supported")
-                    this.blockchain.emitter.emit("validation/status", {type: "MINING", message: "WebAssembly not supported"});
+                    StatusEvents.emit("validation/status", {type: "MINING", message: "WebAssembly not supported"});
 
                 this.workers._initializeWorker( worker );
 
             } else { // Argon2 is not supported in Browser
 
-                this.blockchain.emitter.emit("validation/status", {type: "MINING", message: "ASM.JS not supported"});
+                StatusEvents.emit("validation/status", {type: "MINING", message: "ASM.JS not supported"});
 
                 this.stopMining();
             }

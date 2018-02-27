@@ -2,6 +2,8 @@ import consts from 'consts/const_global'
 import {setCookie, getCookie} from "../cookies/Cookies"
 import DetectMultipleWindows from "./Detect-Multiple-Windows"
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
+import StatusEvents from "common/events/Status-Events";
+
 let PounchDB;
 
 if (process.env.BROWSER) PounchDB = require('pouchdb').default;
@@ -13,9 +15,7 @@ const TIME_OUT_DESTROY = 1000;
 
 class ValidationsUtils{
 
-    constructor(emitter){
-
-        this._emitter = emitter;
+    constructor(){
 
     }
 
@@ -26,6 +26,7 @@ class ValidationsUtils{
     }
 
     _pouchDestroy(dbName){
+
         return new Promise(async (resolve)=>{
 
             let poucbdb = new PounchDB(dbName);
@@ -91,11 +92,11 @@ class ValidationsUtils{
             window.msIndexedDB;
 
         if (indexedDB) {
-            this._emitter.emit("validation/status", {result: true, message: "IndexedDB is available"})
+            StatusEvents.emit("validation/status", {result: true, message: "IndexedDB is available"})
             return true;
         }
         else {
-            this._emitter.emit("validation/status", {result: false, message: "IndexedDB is not supported"})
+            StatusEvents.emit("validation/status", {result: false, message: "IndexedDB is not supported"})
             return false;
         }
 
@@ -142,7 +143,7 @@ class ValidationsUtils{
                 let number = Math.floor(Math.random()*100000000).toString();
 
                 timeout = setTimeout(()=>{
-                    this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName + " - PouchDB 1 directly TIMEOUT" });
+                    StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName + " - PouchDB 1 directly TIMEOUT" });
                     resolve(false);
                 }, timeoutTime);
 
@@ -162,10 +163,10 @@ class ValidationsUtils{
                 if (number !== number2 || number === null || number2 === null)
                     throw (number === undefined ? 'undefined' : number.toString())+" !== "+ (number2 === undefined ? 'undefined' : number2.toString());
 
-                this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB works", dbName: dbName});
+                StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB works", dbName: dbName});
                 result = true;
             } catch (exception){
-                this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName + " - PouchDB 1 directly " + exception.toString() + " JSON" + JSON.stringify(data) });
+                StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName + " - PouchDB 1 directly " + exception.toString() + " JSON" + JSON.stringify(data) });
             }
 
             clearTimeout(timeout);
@@ -191,10 +192,10 @@ class ValidationsUtils{
                 throw (number === null ? 'null' : number.toString())+" !== "+ (number2 === null ? 'null' : number2.toString());
 
 
-            this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB works", dbName: dbName});
+            StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB works", dbName: dbName});
             result = true;
         } catch (exception){
-            this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName  +" 2 "+ exception.toString() });
+            StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName  +" 2 "+ exception.toString() });
         }
 
         db.close();
@@ -215,10 +216,10 @@ class ValidationsUtils{
             if (number !== number2 || number === null || number2 === null)
                 throw (number === null ? 'null' : number.toString())+" !== "+ (number2 === null ? 'null' : number2.toString());
 
-            this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB 3 works", dbName: dbName});
+            StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB 3 works", dbName: dbName});
             result = true;
         } catch (exception){
-            this._emitter.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName +" 3 " + exception.toString() });
+            StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName +" 3 " + exception.toString() });
         }
 
         db.close();
@@ -236,10 +237,10 @@ class ValidationsUtils{
         } else {
             fs(window.TEMPORARY, 100,
                 ()=>{
-                    this._emitter.emit("validation/status", {result: true, message: "Not incognito mode"})
+                    StatusEvents.emit("validation/status", {result: true, message: "Not incognito mode"})
                 },
                 ()=>{
-                    this._emitter.emit("validation/status", {result: false, message: "Incognito mode"})
+                    StatusEvents.emit("validation/status", {result: false, message: "Incognito mode"})
                 });
         }
     }

@@ -1,4 +1,5 @@
 import consts from 'consts/const_global'
+import StatusEvents from "common/events/Status-Events.js"
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
  **/
@@ -18,8 +19,8 @@ class InterfaceBlockchainBlocks{
         this[this.length] =  block;
         this.length += 1;
 
-        this.blockchain.emitter.emit("blockchain/blocks-count-changed", this.length);
-        this.blockchain.emitter.emit("blockchain/block-inserted", block);
+        StatusEvents.emit("blockchain/blocks-count-changed", this.length);
+        StatusEvents.emit("blockchain/block-inserted", block);
 
         //delete old blocks when I am in light node
         if (this.blockchain.agent.light){
@@ -46,7 +47,7 @@ class InterfaceBlockchainBlocks{
 
         this.length = after;
 
-        this.blockchain.emitter.emit("blockchain/blocks-count-changed", this.length);
+        StatusEvents.emit("blockchain/blocks-count-changed", this.length);
     }
 
     clear(){

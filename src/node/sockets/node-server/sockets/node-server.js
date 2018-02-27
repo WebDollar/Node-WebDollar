@@ -1,5 +1,4 @@
 let io = require('socket.io');
-const colors = require('colors/safe');
 
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
@@ -50,7 +49,7 @@ class NodeServer {
 
                 SocketExtend.extendSocket(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort, undefined, 1);
 
-                console.log(colors.blue('New connection from ' + socket.node.sckAddress.getAddress(true)));
+                console.warn('New connection from ' + socket.node.sckAddress.getAddress(true));
 
                 socket.node.protocol.sendHello(["uuid"]).then( (answer)=>{
                     this.initializeSocket(socket, ["uuid"]);
@@ -98,7 +97,7 @@ class NodeServer {
             return false;
         }
 
-        console.log(colors.white('Socket Server Initialized ' + socket.node.sckAddress.getAddress(true)));
+        console.log('Socket Server Initialized ' + socket.node.sckAddress.getAddress(true));
 
 
         socket.node.protocol.propagation.initializePropagation();

@@ -1,8 +1,7 @@
-import BufferExtended from "../../../utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
+import StatusEvents from "common/events/Status-Events";
 
 const BigInteger = require('big-integer');
-const colors = require('colors/safe');
-const EventEmitter = require('events');
 
 import consts from 'consts/const_global'
 import global from 'consts/global'
@@ -19,8 +18,6 @@ class InterfaceBlockchainMining{
 
 
     constructor (blockchain, minerAddress){
-
-        this.emitter = new EventEmitter();
 
         this._minerAddress = undefined;
         this._unencodedMinerAddress = undefined;
@@ -123,7 +120,7 @@ class InterfaceBlockchainMining{
             this._unencodedMinerAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(newAddress);
 
 
-        this.blockchain.emitter.emit( 'blockchain/mining/address', { address: this._minerAddress, unencodedAddress: this._unencodedMinerAddress});
+        StatusEvents.emit( 'blockchain/mining/address', { address: this._minerAddress, unencodedAddress: this._unencodedMinerAddress});
 
         if (!save)
             return true;
@@ -136,7 +133,7 @@ class InterfaceBlockchainMining{
         this.started = true;
         this.reset = false;
 
-        this.emitter.emit('mining/status-changed', true);
+        StatusEvents.emit('mining/status-changed', true);
 
         await this.mineNextBlock(true);
     }
@@ -144,12 +141,12 @@ class InterfaceBlockchainMining{
     stopMining(){
 
         this.started = false;
-        this.emitter.emit('mining/status-changed', false);
+        StatusEvents.emit('mining/status-changed', false);
     }
 
     resetMining(){
         this.reset = true;
-        this.emitter.emit('mining/reset', true);
+        StatusEvents.emit('mining/reset', true);
     }
 
     _selectNextTransactions(){
@@ -367,7 +364,7 @@ class InterfaceBlockchainMining{
         return setInterval(() => {
             console.log( this._hashesPerSecond+ " hashes/s");
 
-            this.emitter.emit("mining/hash-rate", this._hashesPerSecond );
+            StatusEvents.emit("mining/hash-rate", this._hashesPerSecond );
 
             this._hashesPerSecond = 0;
 

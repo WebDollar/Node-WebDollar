@@ -23,7 +23,6 @@ import InterfaceBlockchainBlockValidation from "common/blockchain/interface-bloc
 
 import BlockchainTimestamp from "common/blockchain/interface-blockchain/timestmap/Blockchain-Timestamp"
 
-const EventEmitter = require('events');
 
 const SEMAPHORE_PROCESSING_INTERVAL = 10;
 
@@ -34,8 +33,6 @@ class InterfaceBlockchain {
 
 
     constructor (agent){
-
-        this.emitter = new EventEmitter();
 
         this.agent = agent;
 

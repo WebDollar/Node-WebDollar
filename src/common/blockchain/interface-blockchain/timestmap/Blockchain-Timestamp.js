@@ -4,9 +4,9 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class BlockchainTimestamp{
 
-    constructor(){
+    constructor(emitter){
 
-        this._networkAdjustedTime = new BlockchainnetworkTime(this);
+        this._networkAdjustedTime = new BlockchainnetworkTime(this, emitter);
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._initializeNewSocket(result)

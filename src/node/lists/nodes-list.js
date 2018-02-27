@@ -2,7 +2,6 @@ import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import SocketAddress from 'common/sockets/socket-address'
 import NodesListObject from './node-list-object.js';
 
-const colors = require('colors/safe');
 const EventEmitter = require('events');
 
 /*

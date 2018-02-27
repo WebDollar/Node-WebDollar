@@ -3,8 +3,6 @@ import SignalingClientPeerObject from './signaling-client-peer-object';
 //import NodeWebPeer from "node/webrtc/web-peer/node-web-peer";
 import NodeWebPeerRTC from "node/webrtc/web-peer/node-web-peer-webRTC";
 
-const colors = require('colors/safe');
-
 /*
     The List is populated with Node Sockets who are available for WebRTC
  */

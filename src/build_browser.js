@@ -1,4 +1,3 @@
-const colors = require('colors/safe');
 import {Node, Blockchain} from './index.js';
 import global from "consts/global.js";
 
@@ -11,7 +10,7 @@ Blockchain.createBlockchain("light-node", ()=>{
 });
 
 window.onbeforeunload = () => {
-    console.log(colors.yellow("SIGINT FIRED"))
+    console.warn("SIGINT FIRED")
     global.TERMINATED = true;
 
     setInterval(()=>{
@@ -23,7 +22,7 @@ window.onbeforeunload = () => {
             console.log(global.SEMAPHORE_PROCESS_DONE)
             console.log(global.MINIBLOCKCHAIN_LIGHT_SAVED)
 
-            console.log(colors.yellow("process.exit(0)"));
+            console.warn("process.exit(0)");
         }
     })
 }

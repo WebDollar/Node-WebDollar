@@ -2,8 +2,6 @@ import SocketAddress from 'common/sockets/socket-address'
 import SignalingServerRoomConnectionObject from './signaling-server-room-connection-object';
 import NodesList from 'node/lists/nodes-list'
 
-const colors = require('colors/safe');
-
 /*
     The List is populated with Node Sockets who are available for WebRTC
  */

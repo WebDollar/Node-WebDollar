@@ -1,6 +1,5 @@
 var assert = require('assert')
 var BigNumber = require('bignumber.js');
-const colors = require('colors/safe');
 
 import TestsHelper from 'tests/Tests.helper'
 import Blockchain from 'main-blockchain/Blockchain';

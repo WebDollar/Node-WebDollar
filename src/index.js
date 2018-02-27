@@ -3,8 +3,14 @@ if(( typeof window !== 'undefined' && !window._babelPolyfill) ||
     require('babel-polyfill')
 }
 
+if ( !process.env.BROWSER ) {
+    require('console-warn');
+    require('console-info');
+    require('console-error');
+}
+
 console.log(""); console.log(""); console.log("");
-console.log("Node WebDollar");
+console.warn("Node WebDollar");
 console.log(""); console.log(""); console.log("");
 
 let Main = require('./main.js').default;

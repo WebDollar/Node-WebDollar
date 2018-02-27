@@ -1,4 +1,3 @@
-const colors = require('colors/safe');
 
 import InterfaceBlockchainTransactionFrom from './Interface-Blockchain-Transaction-From'
 import InterfaceBlockchainTransactionTo from './Interface-Blockchain-Transaction-To'

@@ -1,17 +1,10 @@
-const colors = require('colors/safe');
-
 import consts from "consts/const_global";
-import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import PPoWBlockchain from 'common/blockchain/ppow-blockchain/blockchain/PPoW-Blockchain'
 import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockchain/Interface-Blockchain'
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import MiniBlockchainBlock from '../blocks/Mini-Blockchain-Block'
 import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
-import MiniBlockchainFork from '../protocol/Mini-Blockchain-Fork'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
-import InterfaceBlockchainForksAdministrator from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Forks-Administrator'
-import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
-import MiniBlockchainAgentLightNode from "./../agents/Mini-Blockchain-Agent-Light-Node"
 
 
 let inheritBlockchain;
@@ -55,7 +48,7 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
             //updating reward
-            //console.log(colors.green("block.data.minerAddress"),block.data.minerAddress, colors.yellow(block.reward));
+            //console.warn("block.data.minerAddress",block.data.minerAddress, block.reward);
 
             result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
 

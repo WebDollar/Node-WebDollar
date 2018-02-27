@@ -1,4 +1,3 @@
-const colors = require('colors/safe');
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
 import MiniBlockchainProtocol from "common/blockchain/mini-blockchain/protocol/Mini-Blockchain-Protocol"
@@ -95,7 +94,7 @@ class InterfaceBlockchainAgent{
                 let resolver = this.startAgentResolver;
                 this.startAgentResolver = undefined;
 
-                console.log(colors.green("Synchronization done"));
+                console.warn("Synchronization done");
 
                 resolver({
                     result: true,
@@ -146,7 +145,7 @@ class InterfaceBlockchainAgent{
     }
 
     async startAgent(firsTime){
-        console.log(colors.yellow("startAgent was started"));
+        console.warn("startAgent was started");
 
         this.initializeAgentPromise();
 
@@ -171,7 +170,7 @@ class InterfaceBlockchainAgent{
             let resolver = this.startAgentResolver;
             this.startAgentResolver = undefined;
 
-            console.log( colors.green("Synchronization done FAILED") );
+            console.warn( "Synchronization done FAILED");
 
             this._startAgentTimeOut = undefined;
 

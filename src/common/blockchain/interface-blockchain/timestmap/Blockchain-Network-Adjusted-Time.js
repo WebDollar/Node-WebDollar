@@ -5,10 +5,10 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class BlockchainNetworkAdjustedTime {
 
-    constructor(blockchainTimestamp){
+    constructor(blockchainTimestamp, emitter){
 
         this.blockchainTimestamp = blockchainTimestamp;
-        this.networkAdjustedTimeClusters = new NetworkAdjustedTimeClusters();
+        this.networkAdjustedTimeClusters = new NetworkAdjustedTimeClusters(emitter);
 
         NodesList.emitter.on("nodes-list/connected", async (result) => { await this._initializingNewNode(result); } );
 
@@ -39,7 +39,7 @@ class BlockchainNetworkAdjustedTime {
 
             if (typeof answer.timeUTC !== "number") throw "The node didn't answer to my request-timeUTC";
 
-            //avoiding double couting the same timestamp from the same node
+            //avoiding double counting the same timestamp from the same node
             this._addNodeTimeAdjusted(socket, answer.timeUTC);
 
 
