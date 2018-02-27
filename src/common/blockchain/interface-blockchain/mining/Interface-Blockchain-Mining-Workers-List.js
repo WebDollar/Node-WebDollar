@@ -1,3 +1,5 @@
+import StatusEvents from "common/events/Status-Events";
+
 class InterfaceBlockchainMiningWorkersList{
 
     constructor(mining){
@@ -27,7 +29,7 @@ class InterfaceBlockchainMiningWorkersList{
         if (this.workers > this.WORKERS_MAX)
             this.workers = this.WORKERS_MAX;
 
-        this.mining.emitter.emit('mining/workers-changed', this.workers);
+        StatusEvents.emit('mining/workers-changed', this.workers);
     }
 
     initializeWorkerFirstTime(worker){

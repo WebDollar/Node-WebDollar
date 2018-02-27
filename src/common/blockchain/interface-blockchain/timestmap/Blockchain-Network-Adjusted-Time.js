@@ -5,10 +5,10 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class BlockchainNetworkAdjustedTime {
 
-    constructor(blockchainTimestamp, emitter){
+    constructor(blockchainTimestamp){
 
         this.blockchainTimestamp = blockchainTimestamp;
-        this.networkAdjustedTimeClusters = new NetworkAdjustedTimeClusters(emitter);
+        this.networkAdjustedTimeClusters = new NetworkAdjustedTimeClusters();
 
         NodesList.emitter.on("nodes-list/connected", async (result) => { await this._initializingNewNode(result); } );
 

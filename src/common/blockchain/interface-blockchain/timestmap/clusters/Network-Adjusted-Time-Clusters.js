@@ -1,16 +1,18 @@
 import consts from 'consts/const_global'
 import NetworkAdjustedTimeCluster from "./Network-Adjusted-Time-Cluster"
+import StatusEvents from "common/events/Status-Events.js"
 
 class NetworkAdjustedTimeClusters{
 
-    constructor(emitter){
-
-        this._emitter = emitter;
+    constructor(){
 
         this._clusterInitialization = false;
         this.clearClusters();
 
-        setTimeout( ()=>{ this._clusterInitialization = true }, 5000);
+        setTimeout( ()=>{
+            this._clusterInitialization = true;
+            this._refreshClusterStatus();
+        }, 5000);
 
     }
 
@@ -109,17 +111,36 @@ class NetworkAdjustedTimeClusters{
             }
 
 
-        if (this.clusterBest !== bestCluster) {
+        if (this.clusterBest !== bestCluster)
             this.clusterBest = bestCluster;
 
-
-
-        }
-
+        this._refreshClusterStatus();
     }
 
     _refreshClusterStatus(){
 
+        if (!this._clusterInitialization) return;
+
+        if (this.clusterBest === null)
+            return StatusEvents.emit("blockchain/logs", {message: "Network Adjusted Time Error", reason: "ClusterBest is Empty"});
+
+
+        // if (Math.abs(this.clusterBest.meanTimeUTCOffset) > consts.BLOCKCHAIN.NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE)
+        //     return StatusEvents.emit("blockchain/logs", {message: "Network Adjusted Time Error", reason: "Your timestamp is not set correctly. The UTC timestamp should have been: "+ this._timeConverter( new Date().getTime() + this.clusterBest.meanTimeUTCOffset ) });
+
+    }
+
+    _timeConverter(UNIX_timestamp){
+        let a = new Date(UNIX_timestamp * 1000);
+        let months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        let year = a.getFullYear();
+        let month = months[a.getMonth()];
+        let date = a.getDate();
+        let hour = a.getHours();
+        let min = a.getMinutes();
+        let sec = a.getSeconds();
+        let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+        return time;
     }
 
 }
