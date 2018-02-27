@@ -192,6 +192,12 @@ class NodesWaitlist {
     }
 
 
+    resetWaitlist(){
+
+        for (let i=0; i<this.waitlist.length; i++)
+            this.waitlist[i].resetWaitlistNode();
+
+    }
 
 }
 

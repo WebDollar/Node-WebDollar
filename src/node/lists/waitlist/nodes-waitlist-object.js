@@ -72,6 +72,14 @@ class NodesWaitlistObject {
 
     }
 
+
+    resetWaitlistNode(){
+
+        this.lastTimeChecked = 0;
+        this.errorTrial = 0;
+
+    }
+
 }
 
 NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE = NODES_WAITLIST_OBJECT_TYPE;

@@ -7,6 +7,7 @@ import MainBlockchainBalances from "main-blockchain/balances/Main-Blockchain-Bal
 import ValidationsUtils from "common/utils/validation/Validations-Utils";
 import NodesList from 'node/lists/nodes-list'
 import StatusEvents from "common/events/Status-Events";
+import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 
 class Blockchain{
 
@@ -32,7 +33,7 @@ class Blockchain{
             if (NodesList.nodes.length === 0) { //no more sockets, maybe I no longer have internet
                 console.log("################### RESYNCHRONIZATION STARTED ##########");
                 this.Mining.stopMining();
-                StatusEvents.emit('blockchain/status-webdollar', {message: "No Internet Access"});
+                StatusEvents.emit('blockchain/status', {message: "No Internet Access"});
                 await this.synchronizeBlockchain();
             }
         });
@@ -60,9 +61,9 @@ class Blockchain{
         }
 
         await validation.waitSingleTab( () => {
-            StatusEvents.emit('blockchain/status-webdollar', {message: "Multiple Windows Detected"});
+            StatusEvents.emit('blockchain/status', {message: "Multiple Windows Detected"});
         });
-        StatusEvents.emit('blockchain/status-webdollar', {message: "Single Window"});
+        StatusEvents.emit('blockchain/status', {message: "Single Window"});
 
         if (typeof initializationCallback === "function")
             initializationCallback();
@@ -137,7 +138,9 @@ class Blockchain{
             } else {
 
                 StatusEvents.emit('blockchain/status', { message: "Error Synchronizing" });
-                StatusEvents.emit('blockchain/status-webdollar', {message: "Error Synchronizing"});
+
+                if (NodesList.nodes.length === 0)
+                    NodesWaitlist.resetWaitlist();
 
                 this.Agent.initializeAgentPromise();
             }
@@ -147,8 +150,6 @@ class Blockchain{
         await this.startMining();
 
         StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"} );
-
-        StatusEvents.emit('blockchain/status-webdollar', {message: "Ready"} );
 
     }
 

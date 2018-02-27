@@ -130,7 +130,7 @@ class InterfaceBlockchainAgent{
     initializeAgentPromise(){
 
         this._startAgentPromise = new Promise((resolve)=>{
-            console.log("initializeStartAgent() this.startAgentResolver")
+            console.log("initializeStartAgent() this.startAgentResolver");
             this.startAgentResolver = resolve;
         });
 

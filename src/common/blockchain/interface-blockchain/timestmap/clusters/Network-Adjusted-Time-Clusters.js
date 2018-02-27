@@ -1,6 +1,6 @@
 import consts from 'consts/const_global'
 import NetworkAdjustedTimeCluster from "./Network-Adjusted-Time-Cluster"
-import StatusEvents from "common/events/Status-Events.js"
+import StatusEvents from "common/events/Status-Events"
 
 class NetworkAdjustedTimeClusters{
 
@@ -127,6 +127,8 @@ class NetworkAdjustedTimeClusters{
 
         // if (Math.abs(this.clusterBest.meanTimeUTCOffset) > consts.BLOCKCHAIN.NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE)
         //     return StatusEvents.emit("blockchain/logs", {message: "Network Adjusted Time Error", reason: "Your timestamp is not set correctly. The UTC timestamp should have been: "+ this._timeConverter( new Date().getTime() + this.clusterBest.meanTimeUTCOffset ) });
+
+        return StatusEvents.emit("blockchain/logs", {message: "Network Adjusted Time Success"});
 
     }
 
