@@ -161,7 +161,7 @@ class NodesWaitlist {
                 return answer;
             }
             catch (Exception) {
-                console.log("Error connecting to new protocol waitlist", Exception.toString())
+                console.log("Error connecting to new protocol waitlist", Exception)
             }
 
         }

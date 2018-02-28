@@ -93,7 +93,7 @@ class SocketExtend{
             }
 
         } catch (exception){
-            console.error("Error sending request" + exception.toString(), exception);
+            console.error("Error sending request" + exception, exception);
             return null;
         }
 

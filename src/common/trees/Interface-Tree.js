@@ -312,7 +312,7 @@ class InterfaceTree{
 
                 } catch (exception){
                     dataString += "invalid";
-                    console.log("interface tree to json, exception" , exception.toString(), element.value);
+                    console.error("interface tree to json, exception" , exception, element.value);
                 }
 
                 dataString += " , ";
@@ -333,7 +333,7 @@ class InterfaceTree{
 
                 } catch (exception){
                     dataString += "invalid";
-                    console.log("interface tree to json, exception" , exception.toString(), element.sum);
+                    console.log("interface tree to json, exception" , exception, element.sum);
                 }
 
                 dataString += " , ";

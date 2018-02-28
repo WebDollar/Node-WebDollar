@@ -269,7 +269,7 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.error("Socket Error - blockchain/headers-info/request-header-info-by-height", exception.toString);
+                    console.error("Socket Error - blockchain/headers-info/request-header-info-by-height", exception);
                     socket.node.sendRequest("blockchain/headers-info/request-header-info-by-height/" + data.height || 0, {
                         result: false,
                         message: exception.toString()

@@ -146,7 +146,7 @@ class SocketAddress {
             return this.address.toString() + (includePort ? ':'+this.port : '');
 
         } catch(Exception){
-            console.log("getAddress exception", Exception.toString(), this.address);
+            console.error("getAddress exception", Exception, this.address);
             throw("EXCEPTION getAddress")
         }
     }
