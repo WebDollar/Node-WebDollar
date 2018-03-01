@@ -23,7 +23,7 @@ consts.BLOCKCHAIN = {
         NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE: 10*60*1000,
     },
 
-    DIFFICULTY_TIME : 200, //in ms, timestamp in UNIX format
+    DIFFICULTY_TIME : 200, //in s, timestamp in UNIX format
 
     BLOCKS_POW_LENGTH: 32,
     BLOCKS_NONCE : 4,

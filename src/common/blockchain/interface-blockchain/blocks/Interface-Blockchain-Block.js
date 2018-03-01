@@ -181,8 +181,8 @@ class InterfaceBlockchainBlock {
         if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK)
             if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true ) {
 
-                if (this.timeStamp < this.blockchain.timestamp.networkAdjustedTime + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET)
-                    throw "Timestamp of block is less than the network-adjusted time "+consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET
+                if (this.timeStamp < this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET)
+                    throw "Timestamp of block is less than the network-adjusted time "+this.timeStamp+"  "+" "+this.blockchain.timestamp.networkAdjustedTime+" "+consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET
             }
 
     }
