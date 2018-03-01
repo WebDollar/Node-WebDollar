@@ -118,7 +118,7 @@ class InterfaceBlockchainBlock {
             //validate hashPrev
             let previousHash = this.blockValidation.getHashPrevCallback(this.height);
             if ( previousHash === null || !Buffer.isBuffer(previousHash))
-                throw 'previous hash is not given'
+                throw 'previous hash is not given';
 
             if (! previousHash.equals(this.hashPrev))
                 throw "block prevHash doesn't match " + previousHash.toString("hex") + " " + this.hashPrev.toString("hex") ;
@@ -151,8 +151,8 @@ class InterfaceBlockchainBlock {
         if (prevDifficultyTarget instanceof BigInteger)
             prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
 
-        if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget))
-            throw 'previousDifficultyTarget is not given';
+        if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget) )
+            throw 'previousDifficultyTarget is not given';g
 
         //console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
 
