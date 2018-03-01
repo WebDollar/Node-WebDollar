@@ -6,8 +6,8 @@ consts.TERMINATED = false;
 
 consts.UUID = uuid.v4();
 
-consts.NODE_VERSION = "0.251";
-consts.NODE_VERSION_COMPATIBILITY = "0.251";
+consts.NODE_VERSION = "0.252";
+consts.NODE_VERSION_COMPATIBILITY = "0.252";
 
 consts.WALLET_VERSION = "0.1";
 
