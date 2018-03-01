@@ -152,7 +152,7 @@ class InterfaceBlockchainBlock {
             prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
 
         if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget) )
-            throw 'previousDifficultyTarget is not given';g
+            throw 'previousDifficultyTarget is not given';
 
         //console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
 
