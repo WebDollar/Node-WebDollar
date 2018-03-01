@@ -329,15 +329,15 @@ class InterfaceBlockchain {
                     if (i < numBlocks - onlyLastBlocks - 1 + consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS)
                         validationType["skip-validation-timestamp"] = true;
 
-                    if (!difficultyNotValidated)
+                    if ( !difficultyNotValidated )
                         validationType["skip-difficulty-recalculation"] = true;
 
-                    if ( (i+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS && (i-indexStart) > consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )
+                    if ( (i+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 0 && (i-indexStart) >= consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )
                         difficultyNotValidated = true;
                 }
 
                 //fork 3.1, it must be deleted after
-                if ( i < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK )
+                if ( i <= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK )
                     validationType["skip-difficulty-recalculation"] = false;
 
                 console.log("validationType", validationType);
