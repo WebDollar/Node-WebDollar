@@ -133,6 +133,7 @@ class NetworkAdjustedTimeClusters{
     }
 
     _timeConverter(UNIX_timestamp){
+
         let a = new Date(UNIX_timestamp * 1000);
         let months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         let year = a.getFullYear();
