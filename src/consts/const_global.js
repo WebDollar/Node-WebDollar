@@ -115,9 +115,11 @@ consts.BLOCKS_MAX_SIZE_BYTES = 1024 * 1024 * 1; // in bytes
 consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
 
 
+//
 consts.DATABASE_NAMES={
     DEFAULT_DATABASE: "defaultDB",
-    WALLET_DATABASE: "walletDB",
+    WALLET_DATABASE: "defaultDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
+    //TODO REPLACE with "walletDB"
     BLOCKCHAIN_DATABASE: "blockchainDB3",
     BLOCKCHAIN_DATABASE_FILE_NAME : 'blockchain4.bin',
     POOL_DATABASE: "poolDB",
