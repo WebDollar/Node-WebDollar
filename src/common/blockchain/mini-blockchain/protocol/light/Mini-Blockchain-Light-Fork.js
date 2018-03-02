@@ -15,6 +15,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         this.forkDifficultyCalculation = {
             difficultyAdditionalBlocks: [],
+            difficultyAdditionalBlockFirstDifficulty: null,
             difficultyCalculationStarts: 0,
         };
 
@@ -186,6 +187,20 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
     }
+
+    async saveIncludeBlock(index){
+
+        let answer = await MiniBlockchainFork.prototype.saveIncludeBlock.call(this, index);
+
+        if (answer){
+
+            if (this.forkChainStartingPoint === this.forkStartingHeight && index === 0 && this.forkBlocks[index].height >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3)
+                this.forkBlocks[index].difficultyTarget = this.forkDifficultyCalculation.difficultyAdditionalBlockFirstDifficulty
+        }
+
+        return answer;
+    }
+
 
 }
 

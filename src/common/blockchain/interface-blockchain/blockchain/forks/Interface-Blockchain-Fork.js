@@ -201,7 +201,7 @@ class InterfaceBlockchainFork {
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
 
-                    if (! (await this.blockchain.includeBlockchainBlock(this.forkBlocks[index], false, "all", false))) {
+                    if (! (await this.saveIncludeBlock(index)) ) {
                         console.error("fork couldn't be included in main Blockchain ", index);
                         forkedSuccessfully = false;
                         break;
@@ -224,7 +224,7 @@ class InterfaceBlockchainFork {
                 try {
 
                     for (let i = 0; i < this._blocksCopy.length; i++)
-                        if (! await this.blockchain.includeBlockchainBlock(this._blocksCopy[index], false, "all", false)) {
+                        if (! (await this.blockchain.includeBlockchainBlock(this._blocksCopy[index], false, "all", false))) {
                             console.error("blockchain couldn't restored after fork included in main Blockchain ", i);
                             break;
                         }
@@ -279,6 +279,18 @@ class InterfaceBlockchainFork {
     postFork(forkedSuccessfully){
 
     }
+
+
+    async saveIncludeBlock(index){
+
+        if (! (await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", false))) {
+            console.error("fork couldn't be included in main Blockchain ", index);
+            return false;
+        }
+
+        return true;
+    }
+
 
 
 }

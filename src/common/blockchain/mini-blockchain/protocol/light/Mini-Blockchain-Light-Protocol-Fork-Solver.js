@@ -47,7 +47,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
     }
 
-    _calculateBlockRequestsForLight(fork){
+    async _calculateBlockRequestsForLight(socket, fork){
 
         /**
 
@@ -125,8 +125,20 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         for (let i = forkPosition - (forkPosition+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ; i < forkPosition; i++)
             forkAdditionalBlocksBlocksRequired.push(i);
 
+
+
+        //downloading the difficulty for the first element
+        let blockFirstPosition = forkAdditionalBlocksBlocksRequired[0];
+        let answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: blockFirstPosition+1 }, blockFirstPosition+1 );
+        if (answer === null) throw "get-accountant-tree[0] never received " + (blockFirstPosition+1);
+        if (!answer.result) throw "get-accountant-tree[0] return false "+ answer.message;
+
+        if (answer.result === false) throw "get-light-settings return false "+ answer.message;
+        if (answer.difficultyTarget === null ) throw "get-light-settings difficultyTarget is null";
+
         return {
             difficultyAdditionalBlocks: forkAdditionalBlocksBlocksRequired,
+            difficultyAdditionalBlockFirstDifficulty: answer.difficultyTarget,
             difficultyCalculationStarts: forkPosition - (forkPosition+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS,
         }
 
@@ -142,7 +154,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         if (fork.forkChainStartingPoint === fork.forkStartingHeight) {
 
             //light solutions requires more blocks
-            fork.forkDifficultyCalculation = this._calculateBlockRequestsForLight(fork);
+            fork.forkDifficultyCalculation = await this._calculateBlockRequestsForLight(socket, fork);
 
             fork.forkStartingHeight = fork.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
             fork.forkChainStartingPoint = fork.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
@@ -150,38 +162,26 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             //downloading the accountant tree
             let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {height: fork.forkStartingHeight }, fork.forkStartingHeight );
 
-            if (answer === null)
-                throw "get-accountant-tree never received " + (fork.forkStartingHeight);
-
-            if (!answer.result)
-                throw "get-accountant-tree return false "+ answer.message;
+            if (answer === null) throw "get-accountant-tree never received " + (fork.forkStartingHeight);
+            if (!answer.result) throw "get-accountant-tree return false "+ answer.message;
 
             fork.forkPrevAccountantTree = answer.accountantTree;
 
             //downloading the light settings
             answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkStartingHeight  }, fork.forkStartingHeight );
 
-            if (answer === null)
-                throw "get-light-settings never received " + (fork.forkChainStartingPoint);
+            if (answer === null) throw "get-light-settings never received " + (fork.forkChainStartingPoint);
 
-            if (answer.result === false)
-                throw "get-light-settings return false "+ answer.message;
+            if (answer.result === false) throw "get-light-settings return false "+ answer.message;
+            if (answer.difficultyTarget === null ) throw "get-light-settings difficultyTarget is null";
+            if (answer.timeStamp === null ) throw "get-light-settings timeStamp is null";
+            if (answer.hashPrev === null ) throw "get-light-settings hashPrev is null";
 
-            if (answer.difficultyTarget === null )
-                throw "get-light-settings difficultyTarget is null";
-
-            if (answer.timeStamp === null )
-                throw "get-light-settings timeStamp is null";
-
-            if (answer.hashPrev === null )
-                throw "get-light-settings hashPrev is null";
-
-            console.log("answer.difficultyTarget",answer.difficultyTarget);
+            console.log("answer.difficultyTarget", fork.forkStartingHeight, answer.difficultyTarget.toString("hex"));
 
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;
             fork.forkPrevHashPrev = answer.hashPrev;
-
 
             //let's download the requested blocks for proving the difficulty
             for (let i = 0; i < fork.forkDifficultyCalculation.difficultyAdditionalBlocks.length; i++ ){
@@ -201,11 +201,13 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
                 let block = this._deserializeForkBlock( answer.block, blockRequested , blockValidation);
 
                 if (blockRequested < fork.forkDifficultyCalculation.difficultyCalculationStarts)
-                    block.difficultyTarget = fork.forkPrevDifficultyTarget;
+                    block.difficultyTarget = fork.forkDifficultyCalculation.difficultyAdditionalBlockFirstDifficulty;
 
                 try {
-
                     let result = await fork.includeForkBlock(block);
+
+                    if (blockRequested === fork.forkDifficultyCalculation.difficultyAdditionalBlocks[0])
+                        block.difficultyTarget = fork.forkDifficultyCalculation.difficultyAdditionalBlockFirstDifficulty;
 
                     if (!result )
                         throw "The block "+ blockRequested+" was not includedForkBlock successfully"

@@ -133,7 +133,7 @@ class InterfaceBlockchainBlock {
             let hash = await this.computeHash();
 
             if (!hash.equals(this.hash))
-                throw "block hash is not right (" + this.nonce + ")" + this.hash.toString("hex") + " " + hash.toString("hex") + "    " + "difficultyTargetPrev" + this.difficultyTargetPrev.toString("hex")+ "    "+ Buffer.concat([this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)]).toString("hex");
+                throw "block "+this.height+" hash is not right (" + this.nonce + ")" + this.hash.toString("hex") + " " + hash.toString("hex") + "    " + "difficultyTargetPrev" + this.difficultyTargetPrev.toString("hex")+ "    "+ Buffer.concat([this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)]).toString("hex");
 
         }
 
@@ -238,6 +238,8 @@ class InterfaceBlockchainBlock {
                                        this.computedBlockPrefix,
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );
+
+        console.warn("computeHash", this.height,"   " ,buffer.toString("hex"));
 
         return  await WebDollarCrypto.hashPOW(buffer);
     }
