@@ -28,6 +28,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         this.lightPrevDifficultyTargets = {};
         this.lightPrevTimeStamps = {};
         this.lightPrevHashPrevs = {};
+
     }
 
     /**
@@ -157,6 +158,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex])))
                 throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
+
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart", this.lightPrevDifficultyTargets[diffIndex+1])))
+                throw "Couldn't be saved _LightSettings_prevDifficultyTargetStart";
             
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex])))
                 throw "Couldn't be saved _LightSettings_prevTimestamp ";
@@ -200,11 +204,12 @@ class MiniBlockchainLight extends  MiniBlockchain{
             this.lightAccountantTreeSerializations[diffIndex] = serializationAccountantTreeInitial;
 
             this.lightPrevDifficultyTargets[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTarget");
-
             if (this.lightPrevDifficultyTargets[diffIndex] === null) {
                 console.error("_LightSettings_prevDifficultyTarget was not found");
                 return false;
             }
+
+            this.lightPrevDifficultyTargets[diffIndex+1] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart");
 
             this.lightPrevTimeStamps[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevTimestamp");
             if (this.lightPrevTimeStamps[diffIndex] === null) {
@@ -289,6 +294,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
             if (! (await this._loadLightSettings(serializationAccountantTreeInitial)))
                 throw "couldn't load the Light Settings";
 
+            this._difficultyNotValidated = false;
+
             if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS  )))
                 throw "Problem loading the blockchain";
 
@@ -305,6 +312,44 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             return false;
         }
+    }
+
+    _getLoadBlockchainValidationType(indexStart, i, numBlocks, onlyLastBlocks){
+
+        let validationType = {};
+
+        if ( this.agent !== undefined && this.agent.light === true) {
+
+            //I can not validate timestamp for the first consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS blocks
+            if (i < numBlocks - onlyLastBlocks - 1 + consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS)
+                validationType["skip-validation-timestamp"] = true;
+
+            if ( !this._difficultyNotValidated )
+                validationType["skip-difficulty-recalculation"] = true;
+
+            if ( (i+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 0 && (i-indexStart) >= consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )
+                this._difficultyNotValidated = true;
+        }
+
+        //fork 3.1, it must be deleted after
+        if ( i <= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK )
+            validationType["skip-difficulty-recalculation"] = false;
+
+        return validationType;
+    }
+
+    async _loadBlock(indexStart, i, blockValidation){
+
+        let block = await MiniBlockchain.prototype._loadBlock.call(this, indexStart, i, blockValidation);
+
+        if ( (block.height +1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS  === 0 && i === indexStart){
+
+            block.difficultyTargetPrev = block.difficultyTarget;
+            block.difficultyTarget = this.lightPrevDifficultyTargets[i+1];
+
+        }
+
+        return block;
     }
 
 
@@ -382,6 +427,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         return MiniBlockchain.prototype.getHashPrev.call(this, height);
     }
+
 
 
 }

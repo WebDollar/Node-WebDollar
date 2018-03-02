@@ -289,6 +289,12 @@ class InterfaceBlockchain {
         return result;
     }
 
+    _getLoadBlockchainValidationType(indexStart, i, numBlocks, onlyLastBlocks){
+
+        return {};
+
+    }
+
     async loadBlockchain(onlyLastBlocks = undefined){
 
         if (process.env.BROWSER)
@@ -310,7 +316,6 @@ class InterfaceBlockchain {
         try {
 
             let indexStart = 0;
-            let difficultyNotValidated = false;
 
             if (this.agent !== undefined && this.agent.light === true) {
 
@@ -321,52 +326,13 @@ class InterfaceBlockchain {
 
             for (let i = indexStart; i < numBlocks; ++i) {
 
-                let validationType = {};
-
-                if ( this.agent !== undefined && this.agent.light === true) {
-
-                    //I can not validate timestamp for the first consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS blocks
-                    if (i < numBlocks - onlyLastBlocks - 1 + consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS)
-                        validationType["skip-validation-timestamp"] = true;
-
-                    if ( !difficultyNotValidated )
-                        validationType["skip-difficulty-recalculation"] = true;
-
-                    if ( (i+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 0 && (i-indexStart) >= consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )
-                        difficultyNotValidated = true;
-                }
-
-                //fork 3.1, it must be deleted after
-                if ( i <= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK )
-                    validationType["skip-difficulty-recalculation"] = false;
+                let validationType = this._getLoadBlockchainValidationType(indexStart, i, numBlocks, onlyLastBlocks);
 
                 console.log("validationType", validationType);
 
                 let blockValidation = new InterfaceBlockchainBlockValidation(this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
 
-                let block = this.blockCreator.createEmptyBlock(i, blockValidation);
-                block.height = i;
-
-                try{
-
-                    if (await block.loadBlock() === false)
-                        throw "no block to load was found";
-
-                    //it will include the block, but it will not ask to save, because it was already saved before
-
-                    if (await this.includeBlockchainBlock(block, undefined, "all", false) ) {
-                        console.warn("blockchain loaded successfully index ", i);
-                    }
-                    else {
-                        console.error("blockchain is invalid at index " + i);
-                        throw "blockchain is invalid at index "+i;
-                    }
-
-
-                } catch (exception){
-                    console.error("blockchain LOADING stopped at " + i, exception);
-                    throw exception;
-                }
+                await this._loadBlock(indexStart, i, blockValidation);
 
             }
 
@@ -376,6 +342,36 @@ class InterfaceBlockchain {
         }
 
         return true;
+    }
+
+
+    async _loadBlock(indexStart, i, blockValidation){
+
+        let block = this.blockCreator.createEmptyBlock(i, blockValidation);
+        block.height = i;
+
+        try{
+
+            if (await block.loadBlock() === false)
+            throw "no block to load was found";
+
+            //it will include the block, but it will not ask to save, because it was already saved before
+
+            if (await this.includeBlockchainBlock(block, undefined, "all", false) ) {
+                console.warn("blockchain loaded successfully index ", i);
+            }
+        else {
+                console.error("blockchain is invalid at index " + i);
+                throw "blockchain is invalid at index "+i;
+            }
+
+
+        } catch (exception){
+            console.error("blockchain LOADING stopped at " + i, exception);
+            throw exception;
+        }
+
+        return block;
     }
 
     async removeBlockchain(index, removeFiles = true){

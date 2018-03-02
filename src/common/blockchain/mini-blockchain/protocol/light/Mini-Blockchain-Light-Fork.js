@@ -15,7 +15,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         this.forkDifficultyCalculation = {
             difficultyAdditionalBlocks: [],
-            difficultyAdditionalBlockFirstDifficulty: null,
             difficultyCalculationStarts: 0,
         };
 
