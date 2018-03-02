@@ -330,7 +330,7 @@ class InterfaceBlockchain {
 
                 console.log("validationType", validationType);
 
-                let blockValidation = new InterfaceBlockchainBlockValidation(this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
+                let blockValidation = new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
 
                 await this._loadBlock(indexStart, i, blockValidation);
 
@@ -353,14 +353,14 @@ class InterfaceBlockchain {
         try{
 
             if (await block.loadBlock() === false)
-            throw "no block to load was found";
+                throw "no block to load was found";
 
             //it will include the block, but it will not ask to save, because it was already saved before
 
             if (await this.includeBlockchainBlock(block, undefined, "all", false) ) {
                 console.warn("blockchain loaded successfully index ", i);
             }
-        else {
+            else {
                 console.error("blockchain is invalid at index " + i);
                 throw "blockchain is invalid at index "+i;
             }

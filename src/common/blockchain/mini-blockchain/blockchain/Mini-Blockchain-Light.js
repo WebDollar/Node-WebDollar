@@ -31,6 +31,14 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     }
 
+    getSavingSafePosition(height){
+
+        if (height === undefined) height = this.blocks.length-1;
+
+        height = height - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS;
+        return height - (height +1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS
+    }
+
     /**
      * operate the mini-blockchain accountant tree
      * mini-blockchain, will update reward and take in consideration all transactions
@@ -115,8 +123,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
         try {
 
             if (this.agent.light && save)
-                if (this.lightPrevDifficultyTargets[height - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS] !== undefined)
-                    await this._saveLightSettings(height - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS);
+                if (this.lightPrevDifficultyTargets[ this.getSavingSafePosition(height) ] !== undefined)
+                    await this._saveLightSettings( this.getSavingSafePosition(height) );
 
         } catch (exception){
             console.error("Couldn't save Light Settings _saveLightSettings", exception);
@@ -136,7 +144,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log("_LightPrevDifficultyTarget saved");
 
             if (diffIndex === undefined)
-                diffIndex = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 1;
+                diffIndex = this.getSavingSafePosition() ;
 
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_diffIndex", diffIndex)))
                 throw "Couldn't be saved _LightSettings_diffIndex";
@@ -188,14 +196,18 @@ class MiniBlockchainLight extends  MiniBlockchain{
         let numBlocks = await this.db.get(this._blockchainFileName);
         if (numBlocks === null ) {
             console.error("numBlocks was not found");
-            return false;
+            return {result:false};
         }
 
         // trying to read the diffIndex
         let diffIndex = await this.db.get(this._blockchainFileName + "_LightSettings_diffIndex");
 
-        if ( diffIndex === null || diffIndex === undefined || diffIndex > numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 1)
-            diffIndex = numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS -1 ;
+        if ( diffIndex === null || diffIndex === undefined)
+
+            if (diffIndex < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3)
+                diffIndex = numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS -1 ;
+            else
+                diffIndex = this.getSavingSafePosition(numBlocks-1);
 
         console.log("DIFFFINDEXAFTER", diffIndex);
 
@@ -206,7 +218,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             this.lightPrevDifficultyTargets[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTarget");
             if (this.lightPrevDifficultyTargets[diffIndex] === null) {
                 console.error("_LightSettings_prevDifficultyTarget was not found");
-                return false;
+                return {result:false};
             }
 
             this.lightPrevDifficultyTargets[diffIndex+1] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart");
@@ -214,19 +226,19 @@ class MiniBlockchainLight extends  MiniBlockchain{
             this.lightPrevTimeStamps[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevTimestamp");
             if (this.lightPrevTimeStamps[diffIndex] === null) {
                 console.error("_LightSettings_prevTimestamp was not found");
-                return false;
+                return {result:false};
             }
 
             this.lightPrevHashPrevs[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevHashPrev");
             if (this.lightPrevHashPrevs[diffIndex] === null) {
                 console.error("_LightSettings_prevHashPrev was not found");
-                return false;
+                return {result:false};
             }
 
         } else throw "Error Loading Light Settings";
 
-        if (this.agent.light === true)
-            this.blocks.blocksStartingPoint = numBlocks - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS -1  ;
+
+        this.blocks.blocksStartingPoint = diffIndex  ;
 
         console.log("diffIndex", diffIndex);
         console.log("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
@@ -235,7 +247,11 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log("this.lightPrevHashPrev", this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex")  : '');
 
 
-        return true;
+        return {
+            result:true,
+            numBlocks: numBlocks,
+            diffIndex: diffIndex
+        };
 
     }
 
@@ -254,7 +270,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             await this._saveLightSettings();
 
-            if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS )))
+            if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, this.blocks.length - this.getSavingSafePosition() )))
                 throw "couldn't save the blockchain";
 
         } catch (exception){
@@ -291,12 +307,14 @@ class MiniBlockchainLight extends  MiniBlockchain{
             //console.log("this.accountantTree initial ", this.accountantTree.root.hash.sha256);
 
             //load the number of blocks
-            if (! (await this._loadLightSettings(serializationAccountantTreeInitial)))
+            let answer = await this._loadLightSettings(serializationAccountantTreeInitial)
+
+            if (!answer.result)
                 throw "couldn't load the Light Settings";
 
             this._difficultyNotValidated = false;
 
-            if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS  )))
+            if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, answer.numBlocks - answer.diffIndex -1 )))
                 throw "Problem loading the blockchain";
 
             //check the accountant Tree if matches
@@ -312,6 +330,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             return false;
         }
+
     }
 
     _getLoadBlockchainValidationType(indexStart, i, numBlocks, onlyLastBlocks){
@@ -327,6 +346,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             if ( !this._difficultyNotValidated )
                 validationType["skip-difficulty-recalculation"] = true;
 
+            console.log("_getLoadBlockchainValidationType", i, (i-indexStart));
             if ( (i+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 0 && (i-indexStart) >= consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )
                 this._difficultyNotValidated = true;
         }
@@ -342,12 +362,13 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         let block = await MiniBlockchain.prototype._loadBlock.call(this, indexStart, i, blockValidation);
 
-        if ( (block.height +1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS  === 0 && i === indexStart){
+        if (i >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3) // must be deleted the verification
+            if ( (i + 1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS  === 0 && i === indexStart){
 
-            block.difficultyTargetPrev = block.difficultyTarget;
-            block.difficultyTarget = this.lightPrevDifficultyTargets[i+1];
+                block.difficultyTargetPrev = block.difficultyTarget;
+                block.difficultyTarget = this.lightPrevDifficultyTargets[i+1];
 
-        }
+            }
 
         return block;
     }
@@ -357,7 +378,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         //delete serializations older than [:-m]
 
-        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 3;
+        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
+
         while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
             delete this.lightAccountantTreeSerializations[index];
             delete this.lightPrevDifficultyTargets[index];
@@ -378,7 +400,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             return emptyAccountantTree.serializeMiniAccountant();
         }
 
-        if (Buffer.isBuffer(this.lightAccountantTreeSerializations[height]))
+        if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) )
             return this.lightAccountantTreeSerializations[height];
 
         // else I need to compute it, by removing n-1..n
