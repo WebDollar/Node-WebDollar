@@ -107,9 +107,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
         this.lightPrevTimeStamps[height+1] =  block.timeStamp;
         this.lightPrevHashPrevs[height+1] =  block.hash;
 
-        console.log("diffIndex", height);
-        console.log("block.hash", block.hash.toString("hex"));
-
         if (this.agent.light === true)
             this.blocks.blocksStartingPoint = height - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS ;
 

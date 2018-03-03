@@ -56,3 +56,5 @@ blockchainDB2/
 blockchainDB3/
 
 walletDB/
+
+transactionsDB/

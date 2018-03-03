@@ -239,7 +239,7 @@ class InterfaceBlockchainBlock {
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );
 
-        console.warn("computeHash", this.height,"   " ,buffer.toString("hex"));
+        //console.warn("computeHash", this.height,"   " ,buffer.toString("hex"));
 
         return  await WebDollarCrypto.hashPOW(buffer);
     }

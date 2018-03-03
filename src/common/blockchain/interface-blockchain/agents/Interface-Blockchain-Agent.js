@@ -60,7 +60,7 @@ class InterfaceBlockchainAgent{
             let queueIndex = this.agentQueueProcessing.length-1;
             this.agentQueueProcessing.push(true);
             let answerBlockchain = await this.protocol.askBlockchain(result.socket);
-            console.log("answerBlockchain");
+            console.log("answerBlockchain", this.agentQueueProcessing.length);
             this.agentQueueProcessing.splice(queueIndex, 1);
 
         } catch (exception) {

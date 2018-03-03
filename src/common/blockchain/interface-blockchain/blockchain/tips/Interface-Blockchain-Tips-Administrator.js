@@ -103,6 +103,7 @@ class InterfaceBlockchainTipsAdministrator {
             this.tips[i].updateToDo();
 
             if (!this.tips[i].validateTip()){
+                this.tips[i].forkResolve(true);
                 this.tips.splice(i,1);
             }
 

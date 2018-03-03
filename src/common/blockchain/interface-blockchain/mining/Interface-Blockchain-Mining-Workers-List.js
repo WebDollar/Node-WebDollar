@@ -8,7 +8,7 @@ class InterfaceBlockchainMiningWorkersList{
 
         this._workersList = [];
 
-        this.WORKERS_MAX = 64;
+        this.WORKERS_MAX = 100;
 
         this.block = undefined;
         this.difficultyTarget = undefined;
