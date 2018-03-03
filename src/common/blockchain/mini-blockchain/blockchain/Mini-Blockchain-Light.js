@@ -422,7 +422,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         console.warn("difficultyTarget", height, this.blocks.blocksStartingPoint , this.blocks.length, this.lightPrevDifficultyTargets[height] !== undefined ? this.lightPrevDifficultyTargets[height].toString("hex") : '');
 
-        if (this.agent.light === true && height !== 0) {
+        if (this.agent !== undefined && this.agent.light === true && height !== 0) {
 
             if (this.lightPrevDifficultyTargets[height] !== undefined )
                 return this.lightPrevDifficultyTargets[height];
