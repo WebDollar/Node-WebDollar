@@ -532,18 +532,19 @@ class MainBlockchainWallet{
 
         if(ask){
 
-            let addressDeleted = this.addresses[index];
+            let addressToDelete = this.addresses[index];
 
             this.addresses.splice(index, 1);
 
             //setting the next minerAddress
-            console.log("addressDeleted", addressDeleted);
-            if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.unencodedAddress.equals(addressDeleted.unencodedAddress) ) {
+            console.log("addressDeleted", addressToDelete);
+            if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.unencodedMinerAddress.equals(addressToDelete.unencodedAddress) ) {
                 this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
                 this.blockchain.mining.resetMining();
             }
 
             await this.saveWallet();
+
             this.emitter.emit('wallet/changes', this.addresses );
 
             return {result:true, length: this.addresses.length }

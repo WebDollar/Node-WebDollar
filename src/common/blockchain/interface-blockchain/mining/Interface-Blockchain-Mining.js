@@ -76,8 +76,10 @@ class InterfaceBlockchainMining{
 
                     let confirmation = confirm("You are mining on an address that is not in your wallet. Do you want to change the mining address on your wallet?");
 
-                    if (confirmation)
+                    if (confirmation) {
                         minerAddress = Wallet.addresses[0];
+                        this._setAddress(minerAddress, true);
+                    }
                 }
 
             }
@@ -105,12 +107,13 @@ class InterfaceBlockchainMining{
         return this._setAddress(newAddress, true)
     }
 
-    _setAddress(newAddress, save=true){
+    _setAddress(newAddress, save = true){
 
         if (typeof newAddress === "object" && newAddress.hasOwnProperty("address"))
             newAddress = newAddress.address;
 
-        if (Buffer.isBuffer(newAddress)) newAddress = BufferExtended.toBase(newAddress);
+        if (Buffer.isBuffer(newAddress))
+            newAddress = BufferExtended.toBase(newAddress);
 
         this._minerAddress = newAddress;
 
@@ -118,7 +121,6 @@ class InterfaceBlockchainMining{
             this._unencodedMinerAddress = undefined;
         else
             this._unencodedMinerAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(newAddress);
-
 
         StatusEvents.emit( 'blockchain/mining/address', { address: this._minerAddress, unencodedAddress: this._unencodedMinerAddress});
 
