@@ -2,7 +2,7 @@ import InterfaceBlockchainFork from "../blockchain/forks/Interface-Blockchain-Fo
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 import global from "consts/global"
 import consts from 'consts/const_global'
-
+import StatusEvents from "common/events/Status-Events"
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
@@ -253,8 +253,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
-            console.log("fork.forkStartingHeight", fork.forkStartingHeight, "fork.forkBlocks.length", fork.forkBlocks.length);
-            console.log(" < fork.forkChainLength", fork.forkChainLength);
+            console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
             //in case I didn't check this socket for the same block
             while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength && !global.TERMINATED ) {
@@ -264,7 +263,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 console.log("nextBlockHeight", nextBlockHeight);
 
-                let answer;
+                if (nextBlockHeight % 2 === 0)
+                    StatusEvents.emit( "agent/status", {message: "Synchronizing - Downloading Block", blockHeight: nextBlockHeight, blockHeightMax: fork.forkChainLength } );
 
                 //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
@@ -276,7 +276,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     onlyHeader = true;
 
 
-                answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight);
+                let answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight);
 
                 if (answer === null || answer === undefined)
                     throw "block never received "+ nextBlockHeight;

@@ -1,6 +1,7 @@
 import InterfaceBlockchainProtocolForkSolver from 'common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol-Fork-Solver'
 import PPowBlockchainProtocolForkSolver from 'common/blockchain/ppow-blockchain/protocol/PPoW-Blockchain-Protocol-Fork-Solver'
 import consts from 'consts/const_global'
+import StatusEvents from "common/events/Status-Events"
 
 let inheritForkSolver;
 
@@ -187,6 +188,9 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             for (let i = 0; i < fork.forkDifficultyCalculation.difficultyAdditionalBlocks.length; i++ ){
 
                 let blockRequested = fork.forkDifficultyCalculation.difficultyAdditionalBlocks[i];
+
+                if (blockRequested % 2 === 0)
+                    StatusEvents.emit( "agent/status", {message: "Synchronizing - Downloading First Blocks", blockHeight: blockRequested, blockHeightMax: fork.forkChainLength } );
 
                 //TODO it is not necessary to download full blocks, but rather also other nodes will require
                 answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: blockRequested, onlyHeader: false }, blockRequested );

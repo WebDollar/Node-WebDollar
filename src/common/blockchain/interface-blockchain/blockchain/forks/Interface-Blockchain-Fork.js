@@ -201,7 +201,7 @@ class InterfaceBlockchainFork {
                 for (index = 0; index < this.forkBlocks.length; index++) {
 
                     if (index % 2 === 0)
-                        StatusEvents.emit( "agent/status", {message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkBlocks[this.forkBlocks.length-1].height } );
+                        StatusEvents.emit( "agent/status", {message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
 

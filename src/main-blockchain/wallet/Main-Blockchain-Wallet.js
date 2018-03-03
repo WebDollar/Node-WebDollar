@@ -7,7 +7,7 @@ import consts from "../../consts/const_global";
 import BufferExtend from "../../common/utils/BufferExtended";
 import InterfaceBlockchainAddressHelper from "../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
-import StatusEvents from "common/events/Status-Events.js"
+import StatusEvents from "common/events/Status-Events"
 
 const md5 = require('md5');
 const EventEmitter = require('events');

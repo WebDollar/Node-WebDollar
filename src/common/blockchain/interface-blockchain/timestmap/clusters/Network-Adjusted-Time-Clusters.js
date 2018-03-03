@@ -12,7 +12,7 @@ class NetworkAdjustedTimeClusters{
         setTimeout( ()=>{
             this._clusterInitialization = true;
             this._refreshClusterStatus();
-        }, 8000);
+        }, 15000);
 
     }
 
