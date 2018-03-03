@@ -29,6 +29,8 @@ class MiniBlockchainLight extends  MiniBlockchain{
         this.lightPrevTimeStamps = {};
         this.lightPrevHashPrevs = {};
 
+        this._lightLoadingDifficultyNextDifficulty = null;
+
     }
 
     getSavingSafePosition(height){
@@ -221,7 +223,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 return {result:false};
             }
 
-            this.lightPrevDifficultyTargets[diffIndex+1] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart");
+            this._lightLoadingDifficultyNextDifficulty = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart");
 
             this.lightPrevTimeStamps[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevTimestamp");
             if (this.lightPrevTimeStamps[diffIndex] === null) {
@@ -245,7 +247,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
         console.log("", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
         console.log("this.lightPrevTimestamp", this.lightPrevTimeStamps[diffIndex]);
         console.log("this.lightPrevHashPrev", this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex")  : '');
-
 
         return {
             result:true,
@@ -340,20 +341,24 @@ class MiniBlockchainLight extends  MiniBlockchain{
         if ( this.agent !== undefined && this.agent.light === true) {
 
             //I can not validate timestamp for the first consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS blocks
-            if (i < numBlocks - onlyLastBlocks - 1 + consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS)
+            if (i - indexStart < numBlocks + consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS)
                 validationType["skip-validation-timestamp"] = true;
 
             if ( !this._difficultyNotValidated )
                 validationType["skip-difficulty-recalculation"] = true;
 
-            console.log("_getLoadBlockchainValidationType", i, (i-indexStart));
-            if ( (i+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 0 && (i-indexStart) >= consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )
+            if ( (i+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 0 && (i-indexStart) >= consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ) {
                 this._difficultyNotValidated = true;
+                validationType["skip-difficulty-recalculation"] = false;
+            }
+
+            console.log( "_getLoadBlockchainValidationType", i, (i-indexStart), this._difficultyNotValidated );
         }
 
         //fork 3.1, it must be deleted after
-        if ( i <= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK )
+        if ( i <= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK ) {
             validationType["skip-difficulty-recalculation"] = false;
+        }
 
         return validationType;
     }
@@ -362,11 +367,13 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         let block = await MiniBlockchain.prototype._loadBlock.call(this, indexStart, i, blockValidation);
 
-        if (i >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3) // must be deleted the verification
+        if (i >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK) // must be deleted the verification
             if ( (i + 1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS  === 0 && i === indexStart){
 
                 block.difficultyTargetPrev = block.difficultyTarget;
-                block.difficultyTarget = this.lightPrevDifficultyTargets[i+1];
+                block.difficultyTarget = this._lightLoadingDifficultyNextDifficulty;
+
+                this.lightPrevDifficultyTargets[i+1] = this._lightLoadingDifficultyNextDifficulty;
 
             }
 

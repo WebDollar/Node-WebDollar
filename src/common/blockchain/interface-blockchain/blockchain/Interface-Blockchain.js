@@ -207,10 +207,10 @@ class InterfaceBlockchain {
             return BlockchainGenesis.timeStamp;
         else{
             if (height > this.blocks.length )
-                throw "getTimeStamp invalid height";
+                throw "getTimeStamp invalid height " + height;
             else
             if (this.blocks[height-1] === undefined)
-                throw "getTimeStamp invalid height";
+                throw "getTimeStamp invalid height " + height;
 
             return this.blocks[height-1].timeStamp;
         }

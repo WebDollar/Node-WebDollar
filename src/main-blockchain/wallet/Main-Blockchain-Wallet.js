@@ -538,7 +538,7 @@ class MainBlockchainWallet{
 
             //setting the next minerAddress
             console.log("addressDeleted", addressDeleted);
-            if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.minerAddress.equals(addressDeleted.unencodedAddress) ) {
+            if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.unencodedAddress.equals(addressDeleted.unencodedAddress) ) {
                 this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
                 this.blockchain.mining.resetMining();
             }
