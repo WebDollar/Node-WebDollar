@@ -37,7 +37,7 @@ consts.BLOCKCHAIN = {
     HARD_FORKS : {
 
         TEST_NET_3:{
-            DIFFICULTY_HARD_FORK: 121909
+            DIFFICULTY_HARD_FORK: 121789
             //DIFFICULTY_HARD_FORK: 83949
         },
 
