@@ -19,7 +19,9 @@ class Blockchain{
         this.Wallet = new MainBlockchainWallet(this.Chain);
 
         this.Mining = new MainBlockchainMining(this.Chain, undefined );
+
         this.Transactions = this.Chain.transactions;
+        this.Transactions.wallet = this.Wallet;
 
         this.Balances = new MainBlockchainBalances(this.Chain);
 

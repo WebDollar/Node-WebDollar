@@ -5,7 +5,7 @@ import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
 import consts from "../../consts/const_global";
 import BufferExtend from "../../common/utils/BufferExtended";
-import InterfaceBlockchainAddressHelper from "../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 import StatusEvents from "common/events/Status-Events"
 
@@ -142,6 +142,7 @@ class MainBlockchainWallet{
 
         let answer = await this.db.remove(this.walletFileName);
         this.addresses = [];
+        this.addresses = [];
 
         this.emitter.emit('wallet/changes', this.addresses);
 
@@ -154,6 +155,9 @@ class MainBlockchainWallet{
      * @returns {*}
      */
     getAddress(address){
+
+        if (typeof address === "object" && address.hasOwnProperty("address"))
+            return address.address;
 
         let index = this.getAddressIndex(address);
         if (index === -1)
@@ -399,27 +403,6 @@ class MainBlockchainWallet{
         return blockchainAddress;
     }  
     
-    /**
-     * @param address
-     * @param password
-     * @returns {Promise<boolean>}
-     */
-    async signTransaction(address, password, transaction){
-
-        address = this.getAddress(address);
-        if (address === null)
-            throw "address not found";
-
-        if (await address.isPrivateKeyEncrypted(password) === false) {
-            let privateKey = await address.getPrivateKey(password);
-            //TODO: Sign transaction code
-            return true;
-        } else {
-            let privateKey = await address.getPrivateKey(password);
-            //TODO: Sign transaction code here
-            return true;
-        }
-    }
 
     /**
      * 
@@ -455,30 +438,21 @@ class MainBlockchainWallet{
      */
     async encryptAddress(address, newPassword, oldPassword = undefined){
 
-        if (typeof address === "object" && address.hasOwnProperty("address"))
-            address = address.address;
+        address = this.getAddress(address);
         
         if (await this.isAddressEncrypted(address)  && process.env.BROWSER) {
 
-            let response = prompt("Please enter your last password (12 words separated by space)");
-            oldPassword = response.trim().split(' ');
-
-            if (oldPassword.length !== 12) {
-                alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
-                return false;
-            }
+            oldPassword = InterfaceBlockchainAddressHelper.askForPassword();
+            if (oldPassword === null) return false;
 
         }
-
-        address = this.getAddress(address);
 
         let privateKey = await address.getPrivateKey(oldPassword);
 
 
         try {
-            if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
+            if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
                 return (await address.savePrivateKey(privateKey, newPassword));
-            }
         } catch (exception) {
             alert('Your old password is incorrect!!!');
             return false;
@@ -500,12 +474,12 @@ class MainBlockchainWallet{
 
             for (let tries = 3; tries >= 1; --tries) {
 
-                let response = prompt("Please enter your last password (12 words separated by space).  " +  tries + " tries left.");
-                let oldPassword = response.trim().split(' ');
+                let oldPassword = InterfaceBlockchainAddressHelper.askForPassword("Please enter your last password (12 words separated by space).  " +  tries + " tries left.");
 
-                if (oldPassword.length !== 12) {
+                if (oldPassword === null){
 
                     alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+
                     if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};
 
@@ -516,9 +490,8 @@ class MainBlockchainWallet{
                 let privateKey = await address.getPrivateKey(oldPassword);
 
                 try {
-                    if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
+                    if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
                         break;
-                    }
                 } catch (exception) {
                     alert('Your old password is incorrect!!!');
                     if (tries === 1)

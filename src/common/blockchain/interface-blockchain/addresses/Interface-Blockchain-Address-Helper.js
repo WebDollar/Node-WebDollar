@@ -413,6 +413,18 @@ class InterfaceBlockchainAddressHelper{
         return {result: true, address: addressWIF};
     }
 
+    static askForPassword(message){
+
+        let response = prompt(message||"Please enter your last password (12 words separated by space)");
+        let oldPassword = response.trim().split(' ');
+
+        if (oldPassword.length !== 12) {
+            alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+            return null;
+        }
+
+        return oldPassword;
+    }
 
 }
 

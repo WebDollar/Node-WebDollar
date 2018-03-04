@@ -137,7 +137,9 @@ class InterfaceBlockchainAddress{
 
         try {
             let value = await this.db.get(key);
-            value = this.decrypt(value, password);
+
+            if (password !== undefined)
+                value = this.decrypt(value, password);
 
             return value;
         }
@@ -289,12 +291,14 @@ class InterfaceBlockchainAddress{
         }
 
         return Buffer.concat( [
+
                                 Serialization.serializeNumber1Byte(BufferExtended.fromBase(this.address).length),
                                 BufferExtended.fromBase(this.address),
                                 Serialization.serializeNumber1Byte(this.unencodedAddress.length),
                                 this.unencodedAddress,
                                 Serialization.serializeNumber1Byte(this.publicKey.length),
                                 this.publicKey
+
                               ].concat(privateKeyArray) );
     }
 
@@ -397,6 +401,40 @@ class InterfaceBlockchainAddress{
         }
     }
 
+    async getPublicKey(password){
+
+        let privateKey;
+
+        if (await this.isPrivateKeyEncrypted()) {
+            if (password === undefined)
+                password = InterfaceBlockchainAddressHelper.askForPassword();
+
+            if (password === null)
+                return null;
+
+            privateKey = await address.getPrivateKey(password);
+
+        } else
+            privateKey = await address.getPrivateKey(undefined);
+
+        try {
+
+            let answer = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey);
+
+            if (!answer.result) throw "private key is invalid";
+
+            privateKey = answer.privateKey;
+
+            answer = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
+
+            return answer.publicKey;
+
+        } catch (exception) {
+            alert('Your password is incorrect!!!');
+            return null;
+        }
+    }
+
     async _toStringDebug(){
 
         let privateKey = await this.getPrivateKey();
@@ -407,7 +445,6 @@ class InterfaceBlockchainAddress{
     }
 
     toString(){
-
         return this.address.toString()
     }
 
