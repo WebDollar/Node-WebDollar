@@ -404,7 +404,7 @@ class MainBlockchainWallet{
      * @param password
      * @returns {Promise<boolean>}
      */
-    async signTransaction(address, password){
+    async signTransaction(address, password, transaction){
 
         address = this.getAddress(address);
         if (address === null)

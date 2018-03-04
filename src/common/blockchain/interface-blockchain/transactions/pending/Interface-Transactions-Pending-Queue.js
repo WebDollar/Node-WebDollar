@@ -9,7 +9,7 @@ class InterfaceTransactionsPendingQueue {
         this.db = db;
     }
 
-    includePendingTransaction(transaction){
+    includePendingTransaction (transaction){
 
         if (this.findTransaction(transaction) === null){
             return false;

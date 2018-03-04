@@ -21,9 +21,7 @@ class InterfaceBlockchainTransaction{
      *
      */
 
-    constructor(blockchain, from, to, digitalSignature, nonce, txId){
-
-        this.blockchain  = blockchain;
+    constructor(from, to, digitalSignature, nonce, txId){
 
         this.from = null;
         this.to = null;

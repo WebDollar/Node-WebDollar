@@ -1,6 +1,10 @@
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction'
 
+/**
+ * TODO: this Radix Tree is not activated at the moment.
+ */
+
 class InterfaceTransactionsUniqueness extends InterfaceRadixTree {
 
     addTransactionUniqueness(txId){
