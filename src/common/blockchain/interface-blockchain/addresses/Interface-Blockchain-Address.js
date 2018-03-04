@@ -402,37 +402,6 @@ class InterfaceBlockchainAddress{
         }
     }
 
-    async getPublicKey(password){
-
-        let privateKey;
-
-        if (await this.isPrivateKeyEncrypted()) {
-
-            if (password === undefined) password = InterfaceBlockchainAddressHelper.askForPassword();
-            if (password === null) return null;
-
-        } else password = undefined;
-
-        privateKey = await address.getPrivateKey(password);
-
-        try {
-
-            let answer = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey);
-
-            if (!answer.result) throw "private key is invalid";
-
-            privateKey = answer.privateKey;
-
-            answer = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
-
-            return answer.publicKey;
-
-        } catch (exception) {
-            alert('Your password is incorrect!!!');
-            return null;
-        }
-    }
-
     async signTransaction(transaction, password){
 
         let privateKey;
@@ -454,15 +423,26 @@ class InterfaceBlockchainAddress{
 
             privateKey = answer.privateKey;
 
-            answer = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
+        } catch (exception) {
+            alert('Your password is incorrect!!! ' + exception.toString());
+            return null;
+        }
 
-            schnorr.sign( serialization, key );
+        try{
+            let answer = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
 
-            return answer.publicKey;
+            let index = transaction.from.findAddressIndex(answer.unencodedAddress);
+
+            if (index === -1) throw "transaction not found";
+
+            transaction.from.addresses[index].publicKey = answer.publicKey;
+
+            let serialization = transaction.from.serializeForSignature (answer.unencodedAddress, transaction.version, transaction.nonce, transaction.to);
+
+            return schnorr.sign( serialization, answer.privateKey );
 
         } catch (exception) {
-            alert('Your password is incorrect!!!');
-            return null;
+            console.error(exception);
         }
     }
 
