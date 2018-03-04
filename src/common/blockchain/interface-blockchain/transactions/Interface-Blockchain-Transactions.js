@@ -16,9 +16,11 @@ class InterfaceBlockchainTransactions {
 
     }
 
-    createTransaction(address, to){
+    createTransactionSimple(address, toAddress, toAmount, toCurrency){
 
-        let transaction = new InterfaceTransaction(address, to, undefined, undefined, undefined);
+        let transaction = new InterfaceTransaction( { address: address, publicKey: publicKey }, to, undefined, undefined, undefined);
+
+        this.pendingQueue.includePendingTransaction(transaction);
 
     }
 
