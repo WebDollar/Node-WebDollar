@@ -6,21 +6,15 @@ import consts from "consts/const_global"
 
 class InterfaceBlockchainTransactionTo{
 
-
     /*
-
         addresses: [ { address: Addr1,  amount: amount}, ... ]
-        fee: amount
-
      */
 
-    constructor (addresses, fee){
-
-        this.setTo(addresses, fee);
-
+    constructor (addresses){
+        this.setTo(addresses);
     }
 
-    setTo(addresses, fee){
+    setTo(addresses){
 
         if (Array.isArray(addresses))
             addresses = [addresses];
@@ -33,18 +27,13 @@ class InterfaceBlockchainTransactionTo{
                 addresses[i].amount = new BigNumber(addresses[i].amount);
         }
 
-        if (typeof fee === "string" || typeof fee === "number")
-            fee = new BigNumber(fee);
-
         this.addresses = addresses;
-        this.fee = fee;
 
     }
 
     toJSON(){
         return {
             addresses: this.addresses,
-            fee: this.fee,
         }
     }
 
@@ -70,12 +59,6 @@ class InterfaceBlockchainTransactionTo{
 
         });
 
-        if (!this.fee || this.fee instanceof BigNumber === false )
-            throw 'To.fee is not valid ';
-
-        if (this.fee.isLessThan(0) )
-            throw "To.fee is smaller than 0";
-
         //Validate to.currency
 
         return true;
@@ -93,7 +76,6 @@ class InterfaceBlockchainTransactionTo{
 
         return Buffer.concat ([
 
-            Serialization.serializeBigNumber( this.fee),
             Serialization.serializeNumber1Byte( this.addresses.length ),
             addressesBuffer,
 
@@ -102,11 +84,6 @@ class InterfaceBlockchainTransactionTo{
     }
 
     deserializeTo(buffer, offset){
-
-        let result = Serialization.deserializeBigNumber(buffer, offset);
-
-        this.fee = result.number;
-        offset = result.newOffset;
 
         let length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
         offset += 1;

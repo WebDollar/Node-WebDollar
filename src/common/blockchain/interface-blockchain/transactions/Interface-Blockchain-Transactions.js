@@ -4,6 +4,7 @@ import InterfaceTransactionsUniqueness from './uniqueness/Interface-Transactions
 import InterfaceTransaction from "./transaction/Interface-Blockchain-Transaction"
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+const schnorr = require('schnorr');
 
 class InterfaceBlockchainTransactions {
 
@@ -20,14 +21,16 @@ class InterfaceBlockchainTransactions {
 
     createTransactionSimple(address, toAddress, toAmount, fee, currency){
 
-        let transaction = new InterfaceTransaction( undefined , { address: toAddress, amount: toAmount}, undefined, undefined, undefined);
-
         address = this.wallet.getAddress(address);
 
-        let publicKey = address.getPublicKey(undefined);
+        let transaction = new InterfaceTransaction(
+            { addresses: { address: address, publicKey: 666 }, currency: currency },
+            { addresses: { address: toAddress, amount: toAmount }, fee: fee }, undefined, undefined, undefined );
 
-        transaction.from.setFrom( {address: address, publicKey: publicKey }, currency );
-        transaction.to.setTo( {address: toAddress, amount: toAddress}, fee);
+        let publicKey = address.signTransaction(undefined);
+        let serialization = transaction.serializeTransaction(false);
+
+        let  digitalSignature = schnorr.sign( serialization, key );
 
         this.pendingQueue.includePendingTransaction(transaction);
 
@@ -38,7 +41,7 @@ class InterfaceBlockchainTransactions {
         if (toAmount < 0)
             return 0;
 
-        return Math.min( Math.floor(0.1 * toAmount) + 1, 10);
+        return Math.min( Math.floor (0.1 * toAmount) + 1, 10 );
 
     }
 
@@ -56,9 +59,9 @@ class InterfaceBlockchainTransactions {
 
         let privateKey;
 
-        if (await this.wallet.isAddressEncrypted(address)) {
+        if (await this.wallet.isAddressEncrypted(address))
             privateKey = await address.getPrivateKey(password);
-        } else
+        else
             privateKey = await address.getPrivateKey(undefined);
 
         //TODO: Sign transaction code

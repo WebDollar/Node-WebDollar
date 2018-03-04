@@ -68,6 +68,7 @@
     "pouchdb": "^6.4.3",
     "pouchdb-node": "^6.4.3",
     "save": "^2.3.2",
+    "schnorr": "0.0.2",
     "secp256k1": "^3.5.0",
     "socket.io": "^2.0.4",
     "socket.io-client": "^2.0.4",

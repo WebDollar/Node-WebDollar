@@ -1,4 +1,5 @@
 const FileSystem = require('fs');
+const schnorr = require('schnorr');
 
 import consts from 'consts/const_global'
 import InterfaceBlockchainAddressHelper from './Interface-Blockchain-Address-Helper';
@@ -406,16 +407,13 @@ class InterfaceBlockchainAddress{
         let privateKey;
 
         if (await this.isPrivateKeyEncrypted()) {
-            if (password === undefined)
-                password = InterfaceBlockchainAddressHelper.askForPassword();
 
-            if (password === null)
-                return null;
+            if (password === undefined) password = InterfaceBlockchainAddressHelper.askForPassword();
+            if (password === null) return null;
 
-            privateKey = await address.getPrivateKey(password);
+        } else password = undefined;
 
-        } else
-            privateKey = await address.getPrivateKey(undefined);
+        privateKey = await address.getPrivateKey(password);
 
         try {
 
@@ -426,6 +424,39 @@ class InterfaceBlockchainAddress{
             privateKey = answer.privateKey;
 
             answer = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
+
+            return answer.publicKey;
+
+        } catch (exception) {
+            alert('Your password is incorrect!!!');
+            return null;
+        }
+    }
+
+    async signTransaction(transaction, password){
+
+        let privateKey;
+
+        if (await this.isPrivateKeyEncrypted()) {
+
+            if (password === undefined) password = InterfaceBlockchainAddressHelper.askForPassword();
+            if (password === null) return null;
+
+        } else password = undefined;
+
+        privateKey = await address.getPrivateKey(password);
+
+        try {
+
+            let answer = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey);
+
+            if (! answer.result) throw "private key is invalid";
+
+            privateKey = answer.privateKey;
+
+            answer = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
+
+            schnorr.sign( serialization, key );
 
             return answer.publicKey;
 

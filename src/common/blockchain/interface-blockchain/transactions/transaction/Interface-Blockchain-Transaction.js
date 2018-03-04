@@ -36,10 +36,14 @@ class InterfaceBlockchainTransaction{
         this.nonce = nonce; //2 bytes
 
         if (! from instanceof InterfaceBlockchainTransactionFrom)
-            this.from = new InterfaceBlockchainTransactionFrom(from);
+            from = new InterfaceBlockchainTransactionFrom(from);
+
+        this.from = from;
 
         if (! to instanceof InterfaceBlockchainTransactionTo)
-            this.to = new InterfaceBlockchainTransactionTo(to);
+            to = new InterfaceBlockchainTransactionTo(to);
+
+        this.to = to;
 
         if (txId === undefined || txId === null)
             txId = this._computeTxId();
@@ -100,17 +104,20 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    serializeTransaction(){
+    serializeTransaction(includeSignature=true){
 
-        return Buffer.concat ([
-
+        let array = [
             Serialization.serializeNumber1Byte( this.version ),
-            Serialization.serializeNumber2Bytes( this.nonce ),
-            Serialization.serializeToFixedBuffer( 32, this.digitalSignature ),
-
+            Serialization.serializeNumber1Byte( this.nonce ),
             this.from.serializeFrom(),
             this.to.serializeTo(),
-        ]);
+        ];
+
+        if (includeSignature){
+            array.push( Serialization.serializeToFixedBuffer( 32, this.digitalSignature ) );
+        }
+
+        return Buffer.concat (array);
     }
 
     deserializeTransaction(buffer, offset){
@@ -128,11 +135,12 @@ class InterfaceBlockchainTransaction{
             this.nonce =   Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
             offset += 1;
 
-            this.digitalSignature = BufferExtended.substr(buffer, offset, 32);
-            offset += 32;
 
             offset = this.from.deserializeFrom(buffer, offset);
             offset = this.to.deserializeTo(buffer, offset);
+
+            this.digitalSignature = BufferExtended.substr(buffer, offset, 32);
+            offset += 32;
 
         } catch (exception){
             console.error("error deserializing a transaction ", exception);
