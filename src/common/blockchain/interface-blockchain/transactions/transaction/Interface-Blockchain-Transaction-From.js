@@ -66,7 +66,6 @@ class InterfaceBlockchainTransactionFrom{
 
         this.addresses.forEach ( (fromObject, index) =>{
 
-
             if (! fromObject.address || fromObject.address === null)
                 throw 'From.address.address is not specified';
 
@@ -79,40 +78,57 @@ class InterfaceBlockchainTransactionFrom{
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.PUBLIC_KEY_LENGTH)
                 throw "From.address.publicAddress is not a buffer";
 
-
         });
         
         if (!this.currency || this.currency === null) throw 'From.currency is not specified';
 
         if (!Buffers.isBuffer(this.currency))
             throw 'To.currency is not  a buffer';
-        //Validate to.currency
+
+        //TODO validate currency
 
         return true;
     }
 
     serializeFrom(){
 
+        let addressesBuffer = [];
+
+        for (let i = 0; i < this.addresses.length; i++){
+            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].address ));
+            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_KEY_LENGTH, this.addresses[i].publicKey ));
+        }
+
         return Buffer.concat ([
 
-            Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.address.publicAddress ),
-            Serialization.serializeToFixedBuffer( consts.PUBLIC_KEY_LENGTH, this.address.publicKey ),
+            Serialization.serializeNumber1Byte( this.addresses.length ),
+            addressesBuffer,
 
             Serialization.serializeNumber1Byte( this.currency.length ),
             this.currency,
-
         ]);
 
     }
 
     deserializeFrom(buffer, offset){
 
-        this.address = {};
-        this.address.publicAddress = BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);
-        offset += consts.PUBLIC_ADDRESS_LENGTH;
+        this.addresses = [];
 
-        this.address.publicKey = BufferExtended.substr(buffer, offset, consts.PUBLIC_KEY_LENGTH);
-        offset += consts.PUBLIC_KEY_LENGTH;
+        let length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+        offset += 1;
+
+        for (let i = 0; i < length; i++){
+
+            let address = {};
+
+            address.address= BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);
+            offset += consts.PUBLIC_ADDRESS_LENGTH;
+
+            address.address= BufferExtended.substr(buffer, offset, consts.PUBLIC_KEY_LENGTH);
+            offset += consts.PUBLIC_KEY_LENGTH;
+
+            this.addresses.push(address);
+        }
 
         let currencyLength =  Serialization.deserializeNumber( buffer, offset, 1 );
 
