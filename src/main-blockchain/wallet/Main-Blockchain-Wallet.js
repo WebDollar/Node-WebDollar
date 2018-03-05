@@ -157,7 +157,7 @@ class MainBlockchainWallet{
     getAddress(address){
 
         if (typeof address === "object" && address.hasOwnProperty("address"))
-            return address.address;
+            address = address.address;
 
         let index = this.getAddressIndex(address);
         if (index === -1)
@@ -438,17 +438,19 @@ class MainBlockchainWallet{
      */
     async encryptAddress(address, newPassword, oldPassword = undefined){
 
+	    if (typeof address === "object" && address.hasOwnProperty("address"))
+            address = address.address;
+
         address = this.getAddress(address);
-        
+
         if (await this.isAddressEncrypted(address)  && process.env.BROWSER) {
 
             oldPassword = InterfaceBlockchainAddressHelper.askForPassword();
-            if (oldPassword === null) return false;
-
+            if (oldPassword === null)
+                return false;
         }
 
         let privateKey = await address.getPrivateKey(oldPassword);
-
 
         try {
             if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
@@ -461,7 +463,6 @@ class MainBlockchainWallet{
     }
 
     async deleteAddress(address){
-
 
         if (typeof address === "object" && address.hasOwnProperty("address"))
             address = address.address;
