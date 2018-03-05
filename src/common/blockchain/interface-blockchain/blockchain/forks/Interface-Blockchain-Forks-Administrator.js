@@ -18,11 +18,6 @@ class InterfaceBlockchainForksAdministrator {
         this.socketsProcessing = [];
     }
 
-    initialize(blockchain){
-        this.blockchain = blockchain;
-        this.forks = []
-    }
-
     createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header){
 
         if (!Array.isArray(sockets)) sockets = [sockets];

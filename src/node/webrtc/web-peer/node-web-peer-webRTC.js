@@ -304,7 +304,6 @@ class NodeWebPeerRTC {
         console.log('WebRTC channel state is:', this.peer.dataChannel.readyState);
 
         if (this.peer.dataChannel.readyState === 'open') {
-            console.log('WebRTC data channel is now open');
             if (!this.peer.connected ) {
                 this.peer.connected = true;
                 this.callEvents("connect", {});
@@ -336,6 +335,7 @@ class NodeWebPeerRTC {
             this.peer.signaling.socketSignaling.node.sendRequest("signals/server/connections/established-connection-was-dropped", {address: this.peer.remoteAddress, connectionId: this.peer.signaling.connectionId} );
 
             NodesList.disconnectSocket(this.peer);
+
         });
 
     }
@@ -366,6 +366,11 @@ class NodeWebPeerRTC {
         this.peer.send = (name, value) =>{
 
             let data = {name: name, value: value};
+
+            if (this.peer.dataChannel.readyState !== "open") {
+                console.error("Error sending data to webRTC because it is not open", data);
+                return null;
+            }
 
             this.peer.dataChannel.send(JSON.stringify(data));
         };

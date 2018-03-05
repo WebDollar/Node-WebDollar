@@ -1,3 +1,4 @@
+import NodesList from 'node/lists/nodes-list'
 
 class InterfaceBlockchainProtocolTipsManager {
 
@@ -7,7 +8,9 @@ class InterfaceBlockchainProtocolTipsManager {
         this.protocol = protocol;
 
         setTimeout(async () => { return await this.processTips(); }, 50);
+
     }
+
 
 
     async processTips(){
@@ -22,10 +25,12 @@ class InterfaceBlockchainProtocolTipsManager {
         let bestTip = this.blockchain.tipsAdministrator.getBestTip();
         let result = false;
 
-        // for (let i=0; i<this.blockchain.tipsAdministrator.tips.length; i++)
-        //     console.log("tip: ",this.blockchain.tipsAdministrator.tips[i].toString());
+        console.warn("this.blockchain.tipsAdministrator.tips.length", this.blockchain.tipsAdministrator.tips.length);
+        for (let i=0; i<this.blockchain.tipsAdministrator.tips.length; i++)
+            console.log("tip: ",this.blockchain.tipsAdministrator.tips[i].toString());
         //
         // console.log("bestTip", bestTip !== null ? bestTip.toString() : "null");
+
 
         if (bestTip !== null) {
 

@@ -1,5 +1,6 @@
 import InterfaceBlockchainTip from './Interface-Blockchain-Tip'
 import InterfaceBlockchainTipBan from './Interface-Blockchain-Tip-Ban'
+import NodesList from 'node/lists/nodes-list'
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -15,11 +16,22 @@ class InterfaceBlockchainTipsAdministrator {
 
         this.tips = [];
         this.bans = [];
+
+        this._initializeProtocol();
     }
 
-    initialize(blockchain){
-        this.blockchain = blockchain;
-        this.tips = []
+    _initializeProtocol(){
+
+        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject) => {
+
+            for (let i = 0; i < this.tips.length; i++)
+                if (this.tips[i].socket.node.sckAddress.matchAddress(nodesListObject.socket.node.sckAddress, ["uuid"])) {
+                    this.tips[i].forkResolve(true);
+                    this.tips.splice(i,1);
+                    return true;
+                }
+
+        });
     }
 
     getBestTip(){

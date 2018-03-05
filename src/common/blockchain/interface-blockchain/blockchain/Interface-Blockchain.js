@@ -57,10 +57,7 @@ class InterfaceBlockchain {
     }
 
     _setAgent(newAgent){
-
         this.agent = newAgent;
-        this.forksAdministrator.initialize(this);
-        this.tipsAdministrator.initialize(this);
     }
 
     async validateBlockchain(){

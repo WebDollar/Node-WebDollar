@@ -174,7 +174,7 @@ class MainBlockchainWallet{
     getAddressIndex(address){
 
         for (let i = 0; i < this.addresses.length; i++)
-            if (address === this.addresses[i].address)
+            if (address === this.addresses[i].address || address === this.addresses[i])
                 return i;
             else
             if (typeof address ==="object" && (this.addresses[i].address === address.address || this.addresses[i].unencodedAddress === address.unencodedAddress))

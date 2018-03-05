@@ -123,9 +123,6 @@ class InterfaceBlockchainProtocol {
 
                     console.log("get/blockchain/header/last-block length", this.blockchain.blocks.length);
                     console.log("get/blockchain/header/last-block last", this.blockchain.last === undefined);
-                    for (let i = this.blockchain.blocks.length - 10; i < this.blockchain.blocks.length; i++)
-                        if (this.blockchain.blocks[i] === undefined)
-                            console.log("get/blockchain/header/last-block", i, this.blockchain.blocks[i]);
 
                     if (this.blockchain.blocks.length > 0 && this.blockchain.last !== undefined)
                         answer = {
@@ -185,7 +182,7 @@ class InterfaceBlockchainProtocol {
                             //you are ok
                         } else
                         if (this.blockchain.blocks[data.height].hash.equals(data.header.hash) === true)
-                            throw "your block is not new, because I have a valid block at same height ";
+                            throw "your block is not new, because I have the same block at same height ";
 
                     }
 
@@ -347,7 +344,7 @@ class InterfaceBlockchainProtocol {
                 //in case the hashes are exactly the same, there is no reason why we should download it
                 let myHash = this.blockchain.getHashPrev(data.height+1);
                 if ( myHash !== undefined && myHash !== null && myHash.equals(data.header.hash) === true )
-                    throw "your block is not new, because I have a valid block at same height ";
+                    throw "your block is not new, because I have the same block at same height ";
 
             }
             let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.header);

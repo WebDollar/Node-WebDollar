@@ -74,6 +74,7 @@ class InterfaceBlockchainAgent{
 
         console.log("this.startAgentResolver",this.startAgentResolver !== undefined);
         console.log("this.agentQueueProcessing", this.agentQueueProcessing .length);
+
         if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0) {
 
             let done = true;

@@ -10,9 +10,9 @@ class BlockchainNetworkAdjustedTime {
         this.blockchainTimestamp = blockchainTimestamp;
         this.networkAdjustedTimeClusters = new NetworkAdjustedTimeClusters();
 
-        NodesList.emitter.on("nodes-list/connected", async (result) => { await this._initializingNewNode(result); } );
+        NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => { await this._initializingNewNode(nodesListObject); } );
 
-        NodesList.emitter.on("nodes-list/disconnected", async (result) => { await this._desinitializeNode(result); });
+        NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => { await this._desinitializeNode(nodesListObject); });
     }
 
     get networkAdjustedTime(){
