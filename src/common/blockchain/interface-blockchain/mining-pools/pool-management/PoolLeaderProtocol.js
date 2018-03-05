@@ -83,7 +83,7 @@ class PoolLeaderProtocol {
      * @param divisor is BigInteger
      * @returns {number}
      */
-    static divideBigInteger(divident, divisor) {
+    divideBigInteger(divident, divisor) {
 
         let result = 1;
         let X = new BigInteger(divisor);
@@ -104,7 +104,7 @@ class PoolLeaderProtocol {
     computeBestHash() {
 
         let minersList = this.poolData.getMinersList();
-        
+
         if (minersList.length === 0)
             return this._bestHash;
         

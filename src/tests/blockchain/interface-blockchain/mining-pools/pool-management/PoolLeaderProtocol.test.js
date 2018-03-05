@@ -1,16 +1,17 @@
-
 const assert = require('assert');
+const BigInteger = require('big-integer');
 const BigNumber = require('bignumber.js');
 
-import PoolLeaderProtocol from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolLeaderProtocol';
-import TestsHelper from 'tests/Tests.helper';
 import consts from 'consts/const_global';
+import TestsHelper from 'tests/Tests.helper';
+import Convert from 'common/utils/Convert';
+import PoolLeaderProtocol from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolLeaderProtocol';
 
 describe('test pool leader protocol', () => {
 
-    let targetHash = new Buffer("00098112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" );
+    let testTargetHash = new Buffer("00098112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" );
     
-    let minersList = [
+    let testMinersList = [
         {
             address: "WEBD$gDDEDYafT8ur7EkSQzkVAZU4egSgEkH25#9TM3zKKN#Yj#eH@HsPw==",
             reward: new BigNumber(100),
@@ -31,13 +32,23 @@ describe('test pool leader protocol', () => {
         },
     ];
 
-    it('test generate hash difficulties', () => {
+    it('test computeHashDifficulties', () => {
         
         let poolLeaderFee = 10;
         let poolLeader = new PoolLeaderProtocol(consts.DATABASE_NAMES.POOL_DATABASE, poolLeaderFee);
-        let response = poolLeader.computeHashDifficulties();
         
-        poolLeader.setBestHash(targetHash);
+        poolLeader.setBestHash(testTargetHash);
+        
+        let minersList = poolLeader.poolData.getMinersList();
+        assert(minersList.length === 0, "Initial minersList should be []");
+        
+        for (let i = 0; i < testMinersList.length; ++i) {
+            minersList.push(testMinersList[i]);
+        }
+        
+        assert(minersList.length === testMinersList.length, "minersList should be equal with testMinersList");
+        
+        //let response = poolLeader.computeHashDifficulties();
 
         //assert(response, "Wrong hash difficulties:" + response);
 
@@ -86,7 +97,7 @@ describe('test pool leader protocol', () => {
 
                 let bestHash=TestsHelper.makeIdHex(32);
 
-                let respose = miner.getMinerReward(bestHash,targetHash,reward,hashsNumberLastTime);
+                let respose = miner.getMinerReward(bestHash, testTargetHash, reward, hashsNumberLastTime);
 
             }
 
