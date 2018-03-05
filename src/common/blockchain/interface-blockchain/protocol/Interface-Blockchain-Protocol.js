@@ -347,6 +347,7 @@ class InterfaceBlockchainProtocol {
                     throw "your block is not new, because I have the same block at same height ";
 
             }
+
             let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.header);
 
             socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {

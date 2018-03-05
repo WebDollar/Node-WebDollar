@@ -25,9 +25,8 @@ class InterfaceBlockchainProtocolTipsManager {
         let bestTip = this.blockchain.tipsAdministrator.getBestTip();
         let result = false;
 
-        console.warn("this.blockchain.tipsAdministrator.tips.length", this.blockchain.tipsAdministrator.tips.length);
-        for (let i=0; i<this.blockchain.tipsAdministrator.tips.length; i++)
-            console.log("tip: ",this.blockchain.tipsAdministrator.tips[i].toString());
+        // for (let i=0; i<this.blockchain.tipsAdministrator.tips.length; i++)
+        //     console.log("tip: ",this.blockchain.tipsAdministrator.tips[i].toString());
         //
         // console.log("bestTip", bestTip !== null ? bestTip.toString() : "null");
 
@@ -56,6 +55,8 @@ class InterfaceBlockchainProtocolTipsManager {
                 bestTip.forkResolve(false);
             }
 
+            bestTip.forkResolve = null;
+
             result = true;
         }
 
@@ -79,10 +80,12 @@ class InterfaceBlockchainProtocolTipsManager {
 
         let tip = this.blockchain.tipsAdministrator.getTip(socket);
 
-        if (tip !== null)
+        if (tip !== null) {
             this.blockchain.tipsAdministrator.updateTipNewForkLength(tip, newChainLength, forkLastBlockHeader);
-        else
-            tip =  this.blockchain.tipsAdministrator.addTip(socket, newChainLength, forkLastBlockHeader);
+            return tip.forkToDoPromise;
+        }
+
+        tip = this.blockchain.tipsAdministrator.addTip(socket, newChainLength, forkLastBlockHeader);
 
         if (tip === null)
             return false; // the tip is not valid

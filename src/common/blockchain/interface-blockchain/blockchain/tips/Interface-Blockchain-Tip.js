@@ -22,8 +22,11 @@ class InterfaceBlockchainTip{
 
         if ( this.forkToDoChainLength > 0 && this.forkToDoChainLength > this.forkChainLength) {
 
+            if (this.forkResolve !== null)
+                this.forkResolve(false);
+
             this.forkChainLength = this.forkToDoChainLength;
-            this.forkLastBlockHeader = this.forkToDoLastBlockHeader
+            this.forkLastBlockHeader = this.forkToDoLastBlockHeader;
             this.forkPromise = this.forkToDoPromise;
             this.forkResolve = this.forkToDoResolve;
 
