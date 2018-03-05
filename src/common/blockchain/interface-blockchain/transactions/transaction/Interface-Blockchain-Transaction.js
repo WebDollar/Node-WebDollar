@@ -35,12 +35,12 @@ class InterfaceBlockchainTransaction{
 
         this.nonce = nonce; //2 bytes
 
-        if (! from instanceof InterfaceBlockchainTransactionFrom)
+        if (! (from instanceof InterfaceBlockchainTransactionFrom))
             from = new InterfaceBlockchainTransactionFrom(from);
 
         this.from = from;
 
-        if (! to instanceof InterfaceBlockchainTransactionTo)
+        if (! (to instanceof InterfaceBlockchainTransactionTo))
             to = new InterfaceBlockchainTransactionTo(to);
 
         this.to = to;

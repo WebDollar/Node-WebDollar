@@ -16,7 +16,7 @@ class InterfaceBlockchainTransactions {
 
         this.pendingQueue = new InterfaceTransactionsPendingQueue(db);
 
-        //this.uniqueness = new InterfaceTransactionsUniqueness(db);
+        this.uniqueness = new InterfaceTransactionsUniqueness();
     }
 
     createTransactionSimple(address, toAddress, toAmount, fee, currency){
@@ -27,7 +27,7 @@ class InterfaceBlockchainTransactions {
             { addresses: { address: address, publicKey: 666 }, currency: currency },
             { addresses: { address: toAddress, amount: toAmount }, fee: fee }, undefined, undefined, undefined );
 
-        let publicKey = address.signTransaction(undefined);
+        let publicKey = address.signTransaction( undefined );
         let serialization = transaction.serializeTransaction(false);
 
         let  digitalSignature = schnorr.sign( serialization, key );

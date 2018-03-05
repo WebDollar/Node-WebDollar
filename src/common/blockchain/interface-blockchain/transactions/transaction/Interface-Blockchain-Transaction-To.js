@@ -16,7 +16,7 @@ class InterfaceBlockchainTransactionTo{
 
     setTo(addresses){
 
-        if (Array.isArray(addresses))
+        if (!Array.isArray(addresses))
             addresses = [addresses];
 
         for (let i = 0; i < addresses.length; i++) {

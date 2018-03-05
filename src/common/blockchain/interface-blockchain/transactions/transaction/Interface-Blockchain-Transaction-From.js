@@ -39,11 +39,11 @@ class InterfaceBlockchainTransactionFrom{
         }
 
 
-        if (Array.isArray(addresses))
+        if (!Array.isArray(addresses))
             addresses = [addresses];
 
 
-        this.addresses.forEach ( (fromObject, index) =>{
+        addresses.forEach ( (fromObject, index) =>{
 
             if (typeof fromObject.unencodedAddress === "string")
                 fromObject.unencodedAddress = BufferExtended.fromBase(fromObject.unencodedAddress);
