@@ -31,7 +31,7 @@ describe('test pool leader protocol', () => {
             difficulty: 0
         },
     ];
-    
+
 
     it('test computeHashDifficulties', () => {
         
@@ -70,20 +70,30 @@ describe('test pool leader protocol', () => {
         let poolLeaderFee = 10;
         let poolLeader = new PoolLeaderProtocol(consts.DATABASE_NAMES.POOL_DATABASE, poolLeaderFee);
 
-        let response = miner.rewardsDistribution(reward,leaderCommissionPercentage,hashList);
+        poolLeader.setBestHash(testTargetHash);
 
-        assert(response.poolLeaderReward === reward / leaderCommissionPercentage, "Bad Pool leader reward: " + respose.poolLeaderReward + "!==" + reward);
+        let minersList = poolLeader.poolData.getMinersList();
+        assert(minersList.length === 0, "Initial minersList should be []");
 
-        let totalMinersReward = new BigNumber(response.minnersReward[0].reward);
-
-        for (let i = 0; i < response.minnersReward.length; i++){
-
-            totalMinersReward = totalMinersReward.plus(response.minnersReward[i].reward);
-
+        for (let i = 0; i < testMinersList.length; ++i){
+            minersList.push(testMinersList[i]);
         }
 
-        assert(totalMinersReward === reward - response.poolLeaderReward, "Bad miners reward distribution with " + totalMinersReward + " WEBD");
+        //set best hashes of miners
+        let testTargetHashInt = Convert.bufferToBigIntegerHex(testTargetHash);
+        let diff = [1, 5, 9];
 
+        minersList[0].bestHash = testTargetHash;
+        for (let i = 1; i < minersList.length; ++i){
+            let num = testTargetHashInt.divide(diff[i]);
+            minersList[i].bestHash = Convert.toBufferHex(num);
+        }
+
+        let newReward = new BigNumber(15000, 16);
+        poolLeader.updateRewards(newReward);
+
+        let leaderTargetReward = new BigNumber(1500, 16);
+        assert(poolLeader.leaderReward.eq(leaderTargetReward), "Pool leader reward is wrong: " + poolLeader.leaderReward.toString(16) + " !== " + leaderTargetReward.toString(16));
     });
 
     it('test Budisteanu Formula', () => {
