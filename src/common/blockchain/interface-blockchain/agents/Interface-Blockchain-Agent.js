@@ -57,11 +57,22 @@ class InterfaceBlockchainAgent{
 
         try {
 
-            let queueIndex = this.agentQueueProcessing.length-1;
+            let queueIndex = this.agentQueueProcessing.length;
             this.agentQueueProcessing.push(true);
             let answerBlockchain = await this.protocol.askBlockchain(result.socket);
-            console.log("answerBlockchain", this.agentQueueProcessing.length);
-            this.agentQueueProcessing.splice(queueIndex, 1);
+            console.log("answerBlockchain", this.agentQueueProcessing.length, queueIndex);
+
+            this.agentQueueProcessing[queueIndex] = undefined;
+
+            let index = this.agentQueueProcessing.length;
+            while (index > 0 && this.agentQueueProcessing[index-1] === undefined){
+                index --;
+            }
+
+            if (index !== this.agentQueueProcessing.length)
+                this.agentQueueProcessing.splice(index);
+
+            console.log("this.agentQueueProcessing", this.agentQueueProcessing);
 
         } catch (exception) {
             console.error("Error asking for Blockchain", exception);
