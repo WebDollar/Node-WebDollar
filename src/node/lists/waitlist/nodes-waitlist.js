@@ -30,7 +30,7 @@ class NodesWaitlist {
     }
 
 
-    async startConnecting(){
+    startConnecting(){
 
         if (this.started === false) {
             this.started = true;

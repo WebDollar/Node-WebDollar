@@ -1,7 +1,5 @@
-import NodeWebPeer from 'node/webrtc/web-peer/node-web-peer'
 import NodeWebPeersDiscoveryService from 'node/webrtc/service/discovery/node-web-peers-discovery-service'
-import NodesList from 'node/lists/nodes-list'
-import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
+
 
 
 class NodeWebPeersService {
@@ -12,9 +10,7 @@ class NodeWebPeersService {
 
 
     startService(){
-
         NodeWebPeersDiscoveryService.startDiscovery();
-        NodesWaitlist.startConnecting();
     }
 
 

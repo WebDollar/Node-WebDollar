@@ -132,7 +132,7 @@ class NodeSignalingServerProtocol {
                                     if ( answer === null || answer === undefined || answer.answerSignal === undefined )
                                         SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
                                     else
-                                    if ( ((answer.accepted||false) === false) && ((answer.message || '') === "Already connected"))
+                                    if ( ((answer.accepted||false) === false) && (answer.message === "Already connected"))
                                         SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
                                     else
                                     if ( (answer.accepted||false) === true) {

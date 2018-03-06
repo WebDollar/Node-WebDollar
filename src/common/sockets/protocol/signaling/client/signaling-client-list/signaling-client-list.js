@@ -19,19 +19,14 @@ class SignalingClientList {
         this.events = [];
     }
 
-    registerWebPeerSignalingClientListBySignal(signalToSearch) {
+    registerWebPeerSignalingClientListBySignal(signalInitiator, signalAnswer, uuid) {
 
-        let signalingClientPeerObject = null;
-
-        if ( signalToSearch === undefined)
-            signalingClientPeerObject = null;
-        else
-            signalingClientPeerObject = this.searchWebPeerSignalingClientList(signalToSearch);
+        let signalingClientPeerObject = this.searchWebPeerSignalingClientList(signalInitiator, signalAnswer, uuid);
 
         if (signalingClientPeerObject === null){
 
             let webPeer = new NodeWebPeerRTC();
-            signalingClientPeerObject = new SignalingClientPeerObject(webPeer);
+            signalingClientPeerObject = new SignalingClientPeerObject(webPeer, uuid);
 
             this.list.push(signalingClientPeerObject);
 
@@ -40,17 +35,23 @@ class SignalingClientList {
         return signalingClientPeerObject;
     }
 
-    searchWebPeerSignalingClientList(data){
-
-        if (data === null)
-            return null;
+    searchWebPeerSignalingClientList(signalInitiator, signalAnswer, uuid){
 
         //previous established connection
-        for (let i = 0; i < this.list.length; i++) {
+        for (let i = 0; i < this.list.length; i++)
+            if (this.list[i].webPeer.peer !== null && this.list[i].webPeer.peer !== undefined ) {
+
             //console.log("searchWebPeerSignalingClientList", this.list[i].webPeer.peer.signalData, data, JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(data));
-            if (this.list[i].webPeer === data || (this.list[i].webPeer.peer !== null && (JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(data)) || (JSON.stringify(this.list[i].webPeer.peer.signalInitiatorData) === JSON.stringify(data)))) {
+
+            if ( signalInitiator !== undefined && JSON.stringify(this.list[i].webPeer.peer.signalInitiatorData) === JSON.stringify(signalInitiator))
                 return this.list[i];
-            }
+
+            if ( signalAnswer !== undefined && JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(signalAnswer))
+                return this.list[i];
+
+            if ( uuid !== undefined && this.list[i].uuid === uuid)
+                return this.list[i];
+
         }
 
 
