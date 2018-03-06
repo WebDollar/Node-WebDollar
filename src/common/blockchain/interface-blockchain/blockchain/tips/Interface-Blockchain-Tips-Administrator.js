@@ -93,10 +93,15 @@ class InterfaceBlockchainTipsAdministrator {
         if (tip.forkChainLength > forkToDoChainLength) //nothing to update
             return null;
 
+        if (tip.forkToDoResolve !== undefined){
+            tip.forkToDoResolve(false);
+            tip.forkToDoResolve = undefined;
+        }
+
         tip.forkToDoChainLength = forkToDoChainLength;
         tip.forkToDoLastBlockHeader = forkToDoLastBlockHeader;
 
-        if (tip.forkToDoPromise === null){
+        if (tip.forkToDoPromise === undefined){
             tip.forkToDoPromise = new Promise((resolve)=>{
                 tip.forkToDoResolve = resolve;
             })
@@ -116,7 +121,7 @@ class InterfaceBlockchainTipsAdministrator {
 
             if (!this.tips[i].validateTip()){
 
-                if (this.tips[i].forkResolve !== null)
+                if (this.tips[i].forkResolve !== undefined)
                     this.tips[i].forkResolve(false);
 
                 this.tips.splice(i,1);

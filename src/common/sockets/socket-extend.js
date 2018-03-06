@@ -2,7 +2,6 @@ import NodeProtocol from 'common/sockets/protocol/node-protocol';
 import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
 import NodeSignalingServerProtocol from 'common/sockets/protocol/signaling/server/node-signaling-server-protocol';
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/node-signaling-client-protocol';
-import NodesList from 'node/lists/nodes-list'
 import SocketAddress from 'common/sockets/socket-address'
 import isArrayBuffer from 'is-array-buffer';
 import global from "consts/global"

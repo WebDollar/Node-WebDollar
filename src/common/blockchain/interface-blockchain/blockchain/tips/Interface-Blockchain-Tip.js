@@ -13,16 +13,16 @@ class InterfaceBlockchainTip{
         })
 
         this.forkToDoChainLength = -1;
-        this.forkToDoLastBlockHeader = null;
-        this.forkToDoPromise = null;
-        this.forkToDoResolve = null;
+        this.forkToDoLastBlockHeader = undefined;
+        this.forkToDoPromise = undefined;
+        this.forkToDoResolve = undefined;
     }
 
     updateToDo(){
 
         if ( this.forkToDoChainLength > 0 && this.forkToDoChainLength > this.forkChainLength) {
 
-            if (this.forkResolve !== null)
+            if (this.forkResolve !== undefined)
                 this.forkResolve(false);
 
             this.forkChainLength = this.forkToDoChainLength;
@@ -32,9 +32,9 @@ class InterfaceBlockchainTip{
 
 
             this.forkToDoChainLength = -1;
-            this.forkToDoLastBlockHeader = null;
-            this.forkToDoPromise = null;
-            this.forkToDoResolve = null;
+            this.forkToDoLastBlockHeader = undefined;
+            this.forkToDoPromise = undefined;
+            this.forkToDoResolve = undefined;
 
             return true;
         }

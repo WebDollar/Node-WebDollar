@@ -21,8 +21,12 @@ class InterfaceBlockchainAgent{
         this.agentQueueCount = 0;
 
         this.AGENT_TIME_OUT = 40000;
+        this.AGENT_TIME_OUT_NEW_CONNECTIONS = 20000;
+
         this.AGENT_QUEUE_COUNT_MAX = 1;
         this.NODES_LIST_MINIM_LENGTH = 1;
+
+        this._startAgentTimestamp = undefined;
 
         this.newFork();
         this.newProtocol();
@@ -49,6 +53,12 @@ class InterfaceBlockchainAgent{
     }
 
     async _requestBlockchainForNewPeer(result) {
+
+        //AGENT_TIME_OUT_NEW_CONNECTIONS
+        if (new Date().getTime() - this._startAgentTimestamp >= this.AGENT_TIME_OUT_NEW_CONNECTIONS){
+            console.warn("too late for Agent");
+            return false;
+        }
 
         // let's ask everybody
 
@@ -147,6 +157,7 @@ class InterfaceBlockchainAgent{
         });
 
         clearTimeout(this._startAgentTimeOut);
+        this._startAgentTimestamp = new Date().getTime();
         this._startAgentTimeOut = undefined;
 
         this._setStartAgentTimeOut();

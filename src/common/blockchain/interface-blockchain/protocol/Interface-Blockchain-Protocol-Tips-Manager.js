@@ -48,14 +48,16 @@ class InterfaceBlockchainProtocolTipsManager {
                 console.log("BANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
                 this.blockchain.tipsAdministrator.addBan(bestTip.socket.node.sckAddress);
 
-                bestTip.forkResolve(true);
+                if (bestTip.forkResolve !== undefined)
+                    bestTip.forkResolve(true);
             } else {
                 this.blockchain.tipsAdministrator.deleteBan(bestTip.socket.node.sckAddress);
 
-                bestTip.forkResolve(false);
+                if (bestTip.forkResolve !== undefined)
+                    bestTip.forkResolve(false);
             }
 
-            bestTip.forkResolve = null;
+            bestTip.forkResolve = undefined;
 
             result = true;
         }
