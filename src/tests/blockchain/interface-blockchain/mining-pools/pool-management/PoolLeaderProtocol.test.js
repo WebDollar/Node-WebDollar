@@ -65,25 +65,25 @@ describe('test pool leader protocol', () => {
         }
     });
 
-    it('test create reward distribution', () => {
+    it('test updateRewards', () => {
 
-        /*let poolLeaderFee = 10;
-        let miner = new PoolLeaderProtocol(consts.DATABASE_NAMES.POOL_DATABASE, poolLeaderFee);
+        let poolLeaderFee = 10;
+        let poolLeader = new PoolLeaderProtocol(consts.DATABASE_NAMES.POOL_DATABASE, poolLeaderFee);
 
-        let respose = miner.rewardsDistribution(reward,leaderCommissionPercentage,hashList);
+        let response = miner.rewardsDistribution(reward,leaderCommissionPercentage,hashList);
 
-        assert(respose.poolLeaderReward === reward / leaderCommissionPercentage, "Bad Pool leader reward: " + respose.poolLeaderReward + "!==" + reward);
+        assert(response.poolLeaderReward === reward / leaderCommissionPercentage, "Bad Pool leader reward: " + respose.poolLeaderReward + "!==" + reward);
 
-        let totalMinersReward = new BigNumber(respose.minnersReward[0].reward);
+        let totalMinersReward = new BigNumber(response.minnersReward[0].reward);
 
-        for (let i = 0; i < respose.minnersReward.length; i++){
+        for (let i = 0; i < response.minnersReward.length; i++){
 
-            totalMinersReward = totalMinersReward.plus(respose.minnersReward[i].reward);
+            totalMinersReward = totalMinersReward.plus(response.minnersReward[i].reward);
 
         }
 
-        assert(totalMinersReward === reward - respose.poolLeaderReward, "Bad miners reward distribution with " + totalMinersReward + " WEBD");
-*/
+        assert(totalMinersReward === reward - response.poolLeaderReward, "Bad miners reward distribution with " + totalMinersReward + " WEBD");
+
     });
 
     it('test Budisteanu Formula', () => {
@@ -91,7 +91,7 @@ describe('test pool leader protocol', () => {
       /*  let bestHash = TestsHelper.makeIdHex(32);
         let numberHashedLastTime = 250;
 
-        let respose = miner.getMinerReward(bestHash, targetHash, reward, numberHashedLastTime);
+        let response = miner.getMinerReward(bestHash, targetHash, reward, numberHashedLastTime);
 */
     });
 
