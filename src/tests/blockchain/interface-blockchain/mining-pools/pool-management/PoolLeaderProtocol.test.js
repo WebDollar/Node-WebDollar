@@ -31,6 +31,7 @@ describe('test pool leader protocol', () => {
             difficulty: 0
         },
     ];
+    
 
     it('test computeHashDifficulties', () => {
         
@@ -42,16 +43,26 @@ describe('test pool leader protocol', () => {
         let minersList = poolLeader.poolData.getMinersList();
         assert(minersList.length === 0, "Initial minersList should be []");
         
-        for (let i = 0; i < testMinersList.length; ++i) {
+        for (let i = 0; i < testMinersList.length; ++i){
             minersList.push(testMinersList[i]);
         }
-        
-        assert(minersList.length === testMinersList.length, "minersList should be equal with testMinersList");
-        
-        //let response = poolLeader.computeHashDifficulties();
 
-        //assert(response, "Wrong hash difficulties:" + response);
+        //set best hashes of miners
+        let testTargetHashInt = Convert.bufferToBigIntegerHex(testTargetHash);
+        let diff = [1, 5, 9];
+        
+        minersList[0].bestHash = testTargetHash;
+        for (let i = 1; i < minersList.length; ++i){
+            let num = testTargetHashInt.divide(diff[i]);
+            minersList[i].bestHash = Convert.toBufferHex(num);
+        }
+    
+        let response = poolLeader.computeHashDifficulties();
+        let difficultyList = response.difficultyList;
 
+        for (let i = 0; i < minersList.length; ++i){
+            assert(difficultyList[i] === diff[i], "Difficulty level differ: " + difficultyList[i] +" !== " + diff[i]);
+        }
     });
 
     it('test create reward distribution', () => {

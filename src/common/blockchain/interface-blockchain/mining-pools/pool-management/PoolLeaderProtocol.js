@@ -2,6 +2,7 @@ const BigNumber = require('bignumber.js');
 const BigInteger = require('big-integer');
 
 import consts from 'consts/const_global';
+import Convert from 'common/utils/Convert';
 import NodesList from 'node/lists/nodes-list';
 import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
@@ -83,18 +84,41 @@ class PoolLeaderProtocol {
      * @param divisor is BigInteger
      * @returns {number}
      */
-    divideBigInteger(divident, divisor) {
+    divideBigIntegers(divident, divisor) {
 
         let result = 1;
         let X = new BigInteger(divisor);
 
         //TODO: binary search for result
-        while(X.compare(divident) < 0) {
+        while(X.compare(divident) <= 0) {
             X = X.plus(divisor);
             result++;
         }
 
-        return result;
+        return result-1;
+    }
+    
+    /**
+     * Compute and set worst hash from miners
+     * @returns {*} the new computed worst hash
+     */
+    computeWorstHash() {
+
+        let minersList = this.poolData.getMinersList();
+
+        if (minersList.length === 0)
+            return this._worstHash;
+        
+        let worstHash = minersList[0].bestHash;
+
+        for (let i = 1; i < minersList.length; ++i) {
+            if (worstHash.compare(minersList[i].bestHash) > 0)
+                worstHash = minersList[i].bestHash;
+        }
+        
+        this._worstHash = worstHash;
+
+        return worstHash;
     }
 
     /**
@@ -127,19 +151,25 @@ class PoolLeaderProtocol {
      */
     computeHashDifficulties() {
 
-        let bestHashNumber = new BigInteger(this._bestHash.toString('hex'), 16);
+        this.computeBestHash();
+        this.computeWorstHash();
+        
         let minersList = this.poolData.getMinersList();
+        
+        let bestHashInt = Convert.bufferToBigIntegerHex(this._bestHash);
+        let worstHashInt = Convert.bufferToBigIntegerHex(this._worstHash);
+        
         let difficultyList = [];
         let sum = 0;
 
         for (let i = 0; i < minersList.length; ++i) {
-            let currentHash = new BigInteger(minersList[i].bestHash.toString('hex'), 16);
-            difficultyList[i] = this.divideBigInteger(bestHashNumber, currentHash);
+            let currentHashInt = Convert.bufferToBigIntegerHex(minersList[i].bestHash);
+            difficultyList[i] = this.divideBigIntegers(bestHashInt, currentHashInt);
 
             sum += difficultyList[i];
         }
 
-        return {list: difficultyList, sum: sum};
+        return {difficultyList: difficultyList, sum: sum};
     }
 
     /**
@@ -154,7 +184,7 @@ class PoolLeaderProtocol {
         let minersReward = newReward.minus(leadReward);
 
         let response = this.computeHashDifficulties();
-        let difficultyList = response.list;
+        let difficultyList = response.difficultyList;
         let difficultySum = response.sum;
         let rewardPerDifficultyLevel = new BigNumber(minersReward.dividedBy(difficultySum));
 
