@@ -1,10 +1,12 @@
-import consts from "consts/const_global"
+const bs58 = require('bs58');
+
+import consts from "consts/const_global";
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
-const bs58 = require('bs58')
 
 class BufferExtended {
 
     substr(buffer, index, count){
+
         if (count === undefined)
             count = buffer.length;
 

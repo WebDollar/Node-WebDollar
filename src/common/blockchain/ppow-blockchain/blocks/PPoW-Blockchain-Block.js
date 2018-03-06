@@ -1,11 +1,12 @@
 const BigInteger = require('big-integer');
 
-import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
-import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import consts from 'consts/const_global';
+import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block';
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
+import Convert from 'common/utils/Convert';
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
-import consts from 'consts/const_global'
+import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data';
 
 class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
@@ -25,9 +26,9 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         let T = this.difficultyTarget;
         if (Buffer.isBuffer(T))
-            T = new BigInteger(this.difficultyTarget.toString("hex"), 16);
+            T = Convert.bufferToBigIntegerHex(this.difficultyTarget);
 
-        let id = new BigInteger(this.hash.toString('hex'), 16);
+        let id = Convert.bufferToBigIntegerHex(this.hash);
         
         //If id <= T/2^u the block is of level u => block level is max(u) for 2^u * id <= T
         // T -> inf => u -> 255
