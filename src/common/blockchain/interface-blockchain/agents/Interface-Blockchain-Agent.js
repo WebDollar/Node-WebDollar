@@ -21,12 +21,12 @@ class InterfaceBlockchainAgent{
         this.agentQueueCount = 0;
 
         this.AGENT_TIME_OUT = 40000;
-        this.AGENT_TIME_OUT_NEW_CONNECTIONS = 20000;
+        this.AGENT_TIME_OUT_NEW_CONNECTIONS = 15000;
 
         this.AGENT_QUEUE_COUNT_MAX = 1;
         this.NODES_LIST_MINIM_LENGTH = 1;
 
-        this._startAgentTimestamp = undefined;
+        this._startAgentTimestamp = new Date().getTime();
 
         this.newFork();
         this.newProtocol();
@@ -79,10 +79,14 @@ class InterfaceBlockchainAgent{
                 index --;
             }
 
+            console.log("this.agentQueueProcessing1", this.agentQueueProcessing);
+            if (index <= 0)
+                this.agentQueueProcessing = [];
+            else
             if (index !== this.agentQueueProcessing.length)
-                this.agentQueueProcessing.splice(index);
+                this.agentQueueProcessing.splice(index-1);
 
-            console.log("this.agentQueueProcessing", this.agentQueueProcessing);
+            console.log("this.agentQueueProcessing2", this.agentQueueProcessing);
 
         } catch (exception) {
             console.error("Error asking for Blockchain", exception);
