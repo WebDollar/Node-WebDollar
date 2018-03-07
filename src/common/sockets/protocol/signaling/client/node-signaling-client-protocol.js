@@ -29,7 +29,7 @@ class NodeSignalingClientProtocol {
                     return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
 
                 if (SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) !== null){
-                    console.error("data.remoteUUID 1 already connected", data.remoteUUID);
+                    //console.error("data.remoteUUID 1 already connected", data.remoteUUID);
                     return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
                 }
 

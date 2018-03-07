@@ -25,9 +25,19 @@ class InterfaceBlockchainTransactions {
 
             address = this.wallet.getAddress(address);
 
+        } catch (exception){
+
+            console.error("Creating a new transaction raised an exception - Getting Address", exception.toString());
+            return { result:false,  message: "Get Address failed", reason: exception.toString() }
+
+        }
+
+        try {
+
             let transaction = new InterfaceTransaction(
                 {addresses: {unencodedAddress: address, publicKey: 666}, currency: currency},
-                {addresses: {unencodedAddress: toAddress, amount: toAmount}, fee: fee}, undefined, undefined, undefined);
+                {addresses: {unencodedAddress: toAddress, amount: toAmount}, fee: fee}, undefined, undefined, undefined
+            );
 
             let signature = address.signTransaction(transaction, password);
 
@@ -40,11 +50,8 @@ class InterfaceBlockchainTransactions {
 
         } catch (exception){
 
-            return {
-                result:false,
-                message: exception.toString()
-            }
-
+            console.error("Creating a new exception raised an error", exception);
+            return { result:false,  message: exception.toString() }
         }
     }
 

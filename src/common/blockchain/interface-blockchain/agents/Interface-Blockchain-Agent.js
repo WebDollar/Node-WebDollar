@@ -117,7 +117,7 @@ class InterfaceBlockchainAgent{
                         break;
                     }
 
-            console.log("done param", done)
+            console.log("done param", done);
             console.log("this._startAgentResolver !== undefined", this._startAgentResolver !== undefined)
 
             //in case the agent is done and at least 4 nodes were tested
