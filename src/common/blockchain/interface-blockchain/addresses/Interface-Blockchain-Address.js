@@ -441,6 +441,10 @@ class InterfaceBlockchainAddress{
 
             let signature = schnorr.sign( serialization, answer.privateKey );
 
+            transaction.from.addresses[index].signature = signature;
+
+            return signature;
+
         } catch (exception) {
             console.error(exception);
         }

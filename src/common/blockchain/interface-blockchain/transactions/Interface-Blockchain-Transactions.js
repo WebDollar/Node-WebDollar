@@ -19,7 +19,7 @@ class InterfaceBlockchainTransactions {
         this.uniqueness = new InterfaceTransactionsUniqueness();
     }
 
-    createTransactionSimple(address, toAddress, toAmount, fee, currency){
+    createTransactionSimple(address, toAddress, toAmount, fee, currency, password = undefined){
 
         address = this.wallet.getAddress(address);
 
@@ -27,10 +27,14 @@ class InterfaceBlockchainTransactions {
             { addresses: { address: address, publicKey: 666 }, currency: currency },
             { addresses: { address: toAddress, amount: toAmount }, fee: fee }, undefined, undefined, undefined );
 
-        let signature = address.signTransaction( undefined );
+        let signature = address.signTransaction( transaction, password );
 
         this.pendingQueue.includePendingTransaction(transaction);
 
+        return {
+            result: true,
+            signature: signature
+        }
     }
 
     calculateFeeSimple(toAmount){
@@ -42,28 +46,6 @@ class InterfaceBlockchainTransactions {
 
     }
 
-
-    /**
-     * @param address
-     * @param password
-     * @returns {Promise<boolean>}
-     */
-    async signTransaction(address, password, transaction){
-
-        address = this.wallet.getAddress(address);
-        if (address === null)
-            throw "address not found";
-
-        let privateKey;
-
-        if (await this.wallet.isAddressEncrypted(address))
-            privateKey = await address.getPrivateKey(password);
-        else
-            privateKey = await address.getPrivateKey(undefined);
-
-        //TODO: Sign transaction code
-        return true;
-    }
 
 
 

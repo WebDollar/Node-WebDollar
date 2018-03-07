@@ -14,19 +14,17 @@ class InterfaceBlockchainTransaction{
      * Transaction Class enables to create a new Transaction
      * @param from  must be an Array[ object {address: object , publicKey: object } ]
      * @param to  must be an Array [ object {address: object , amount, currency } }
-     * @param digitalSignature - using Elliptic Curve to digital sign the transaction
      * @param nonce - usually null
      * @param txId - usually null
      *
      *
      */
 
-    constructor(from, to, digitalSignature, nonce, txId){
+    constructor(from, to, nonce, txId){
 
         this.from = null;
         this.to = null;
 
-        this.digitalSignature = digitalSignature;
 
         this.version = 0x00; //version
 
@@ -117,8 +115,6 @@ class InterfaceBlockchainTransaction{
             this.to.serializeTo(),
         ];
 
-        array.push( Serialization.serializeToFixedBuffer( 32, this.digitalSignature ) );
-
         return Buffer.concat (array);
     }
 
@@ -141,8 +137,6 @@ class InterfaceBlockchainTransaction{
             offset = this.from.deserializeFrom(buffer, offset);
             offset = this.to.deserializeTo(buffer, offset);
 
-            this.digitalSignature = BufferExtended.substr(buffer, offset, 32);
-            offset += 32;
 
         } catch (exception){
             console.error("error deserializing a transaction ", exception);
@@ -162,7 +156,6 @@ class InterfaceBlockchainTransaction{
         let result = {
             from: this.from.toJSON(),
             to: this.to.toJSON(), //address,
-            digitalSignature: this.digitalSignature,
             nonce: this.nonce,
         };
 
