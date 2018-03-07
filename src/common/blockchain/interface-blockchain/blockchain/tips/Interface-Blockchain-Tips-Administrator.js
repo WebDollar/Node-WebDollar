@@ -26,7 +26,10 @@ class InterfaceBlockchainTipsAdministrator {
 
             for (let i = 0; i < this.tips.length; i++)
                 if (this.tips[i].socket.node.sckAddress.matchAddress(nodesListObject.socket.node.sckAddress, ["uuid"])) {
-                    this.tips[i].forkResolve(true);
+
+                    if (this.tips[i].forkResolve !== undefined)
+                        this.tips[i].forkResolve(true);
+
                     this.tips.splice(i,1);
                     return true;
                 }
