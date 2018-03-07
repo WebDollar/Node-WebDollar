@@ -1,6 +1,7 @@
 import BufferExtended from "common/utils/BufferExtended"
 import Serialization from "common/utils/Serialization"
 import consts from "consts/const_global"
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
 //TODO MULTISIG TUTORIAL https://www.youtube.com/watch?v=oTsjMz3DaLs
 
@@ -45,8 +46,7 @@ class InterfaceBlockchainTransactionFrom{
 
         addresses.forEach ( (fromObject, index) =>{
 
-            if (typeof fromObject.unencodedAddress === "string")
-                fromObject.unencodedAddress = BufferExtended.fromBase(fromObject.unencodedAddress);
+            fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(fromObject.unencodedAddress);
 
             if (typeof fromObject.publicKey === "string")
                 fromObject.publicKey = new Buffer (fromObject.publicKey, "hex");
@@ -57,7 +57,7 @@ class InterfaceBlockchainTransactionFrom{
         });
 
         if (currency === undefined){
-            currency = new Buffer(1);
+            currency = new Buffer(consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH);
             currency[0] = 0x01;
         }
 
@@ -82,29 +82,35 @@ class InterfaceBlockchainTransactionFrom{
         this.addresses.forEach ( (fromObject, index) =>{
 
             if (! fromObject.unencodedAddress || fromObject.unencodedAddress === null)
-                throw 'From.address.unencodedAddress is not specified';
+                throw 'From.address.unencodedAddress '+index+' is not specified';
+
+            if (! InterfaceBlockchainAddressHelper.validateAddressChecksum(fromObject.unencodedAddress) )
+                throw "From.address.unencodedAddress "+index+" is not a valid address";
 
             if (! fromObject.publicKey || fromObject.publicKey === null)
-                throw 'From.address.publicKey is not specified';
+                throw 'From.address.publicKey '+index+' is not specified';
 
             if (! fromObject.signature || fromObject.signature === null)
-                throw 'From.address.signature is not specified';
+                throw 'From.address.signature '+index+' is not specified';
 
             if (!Buffer.isBuffer(fromObject.unencodedAddress) || fromObject.unencodedAddress.length !== consts.PUBLIC_ADDRESS_LENGTH )
-                throw "From.address.unencodedAddress is not a buffer";
+                throw "From.address.unencodedAddress "+index+" is not a buffer";
 
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.PUBLIC_KEY_LENGTH)
-                throw "From.address.publicAddress is not a buffer";
+                throw "From.address.publicAddress "+index+" is not a buffer";
 
             if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
-                throw "From.address.signature is not a buffer";
+                throw "From.address.signature "+index+" is not a buffer";
 
         });
         
         if (!this.currency || this.currency === null) throw 'From.currency is not specified';
 
         if (!Buffers.isBuffer(this.currency))
-            throw 'To.currency is not  a buffer';
+            throw 'To.currency is not a buffer';
+
+        if (! (this.currency.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH || this.currency.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH) )
+            throw "To.currency is not valid";
 
         //TODO validate currency
 

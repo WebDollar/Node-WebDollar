@@ -13,7 +13,7 @@ import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/bloc
 
 class InterfaceBlockchainAgent{
 
-    constructor( blockchain){
+    constructor( blockchain ){
 
         this.blockchain = blockchain;
 
@@ -21,12 +21,16 @@ class InterfaceBlockchainAgent{
         this.agentQueueCount = 0;
 
         this.AGENT_TIME_OUT = 40000;
-        this.AGENT_TIME_OUT_NEW_CONNECTIONS = 15000;
+        this.AGENT_TIME_OUT_NEW_CONNECTIONS = 10000;
 
-        this.AGENT_QUEUE_COUNT_MAX = 1;
+        this.AGENT_QUEUE_COUNT_MIN = 1;
         this.NODES_LIST_MINIM_LENGTH = 1;
 
         this._startAgentTimestamp = new Date().getTime();
+        this._synchronizeComplete = false;
+
+        this._startAgentResolver = null;
+        this._startAgentPromise = null;
 
         this.newFork();
         this.newProtocol();
@@ -70,6 +74,7 @@ class InterfaceBlockchainAgent{
             let queueIndex = this.agentQueueProcessing.length;
             this.agentQueueProcessing.push(true);
             let answerBlockchain = await this.protocol.askBlockchain(result.socket);
+
             console.log("answerBlockchain", this.agentQueueProcessing.length, queueIndex);
 
             this.agentQueueProcessing[queueIndex] = undefined;
@@ -79,7 +84,6 @@ class InterfaceBlockchainAgent{
                 index --;
             }
 
-            console.log("this.agentQueueProcessing1", this.agentQueueProcessing);
             if (index <= 0)
                 this.agentQueueProcessing = [];
             else
@@ -97,30 +101,35 @@ class InterfaceBlockchainAgent{
 
         //check if start Agent is finished
 
-        console.log("this.startAgentResolver",this.startAgentResolver !== undefined);
-        console.log("this.agentQueueProcessing", this.agentQueueProcessing .length);
+        console.log("this.startAgentResolver",this._startAgentResolver !== undefined);
+        console.log("this.agentQueueProcessing", this.agentQueueProcessing.length);
+        console.log("this.blockchain.blocks.length", this.blockchain.blocks.length);
 
-        if (this.startAgentResolver !== undefined && this.agentQueueProcessing.length === 0) {
+        if ( this._startAgentResolver !== undefined && this.blockchain.blocks.length > 0 ) {
 
             let done = true;
-            for (let i = 0; i < NodesList.nodes.length; i++)
-                if (NodesList.nodes[i].socket.level <= 2 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
 
-                    done = false;
-                    // console.log("not done", NodesList.nodes[i]);
-                    break;
-                }
+            if (this._synchronizeComplete)
+                for (let i = 0; i < NodesList.nodes.length; i++)
+                    if (NodesList.nodes[i].socket.level <= 2 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
+
+                        done = false;
+                        break;
+                    }
+
+            console.log("done param", done)
+            console.log("this._startAgentResolver !== undefined", this._startAgentResolver !== undefined)
 
             //in case the agent is done and at least 4 nodes were tested
-            if (done === true && this.startAgentResolver !== undefined &&
-                NodesList.nodes.length >= this.NODES_LIST_MINIM_LENGTH && this.agentQueueCount >= this.AGENT_QUEUE_COUNT_MAX) {
+            if (done === true && this._startAgentPromise !== undefined &&
+                NodesList.nodes.length >= this.NODES_LIST_MINIM_LENGTH && this.agentQueueCount >= this.AGENT_QUEUE_COUNT_MIN) {
 
-                if (this.startAgentResolver === undefined) return;
+                if (this._startAgentResolver === undefined) return;
 
-                let resolver = this.startAgentResolver;
-                this.startAgentResolver = undefined;
+                let resolver = this._startAgentResolver;
+                this._startAgentResolver = undefined;
 
-                console.warn("Synchronization done");
+                console.warn("Synchronization done", resolver);
 
                 resolver({
                     result: true,
@@ -156,11 +165,14 @@ class InterfaceBlockchainAgent{
     initializeAgentPromise(){
 
         this._startAgentPromise = new Promise((resolve)=>{
-            console.log("initializeStartAgent() this.startAgentResolver");
-            this.startAgentResolver = resolve;
+            console.log("initializeStartAgent() this._startAgentResolver");
+            this._startAgentResolver = resolve;
         });
+        console.log("initializeAgentPromise FINISHED", this._startAgentPromise);
 
         clearTimeout(this._startAgentTimeOut);
+
+        console.warn("new this._startAgentTimestamp");
         this._startAgentTimestamp = new Date().getTime();
         this._startAgentTimeOut = undefined;
 
@@ -171,9 +183,11 @@ class InterfaceBlockchainAgent{
         this._initializeProtocol();
     }
 
-    async startAgent(firsTime){
+    async startAgent(firsTime, synchronizeComplete=false){
+
         console.warn("startAgent was started");
 
+        this._synchronizeComplete = synchronizeComplete;
         this.initializeAgentPromise();
 
         if (firsTime)
@@ -191,11 +205,11 @@ class InterfaceBlockchainAgent{
 
         this._startAgentTimeOut = setTimeout( () => {
 
-            if (this.startAgentResolver === undefined)
+            if (this._startAgentResolver === undefined)
                 return;
 
-            let resolver = this.startAgentResolver;
-            this.startAgentResolver = undefined;
+            let resolver = this._startAgentResolver;
+            this._startAgentResolver = undefined;
 
             console.warn( "Synchronization done FAILED");
 

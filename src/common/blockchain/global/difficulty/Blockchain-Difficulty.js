@@ -136,21 +136,33 @@ class BlockchainDifficulty{
             let firstBlock = (blockNumber+1) - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; // blockNumber is not included
 
             //adding 0..8
-            for (let i = firstBlock; i < blockNumber; i++)
+            console.warn("getTimeStampCallback(firstBlock);", getTimeStampCallback(firstBlock));
+            for (let i = firstBlock; i < blockNumber; i++) {
+                console.warn("getTimeStampCallback",  getTimeStampCallback(i));
                 how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i);
+            }
 
             //adding 9
             how_much_it_took_to_mine_X_Blocks += blockTimestamp;
 
+            if ( how_much_it_took_to_mine_X_Blocks <= 0 )
+                throw "how_much_it_took_to_mine_X_Blocks is negative " + how_much_it_took_to_mine_X_Blocks;
+
+            console.warn("blocktimestamp", blockTimestamp)
+            console.warn("how_much_it_took_to_mine_X_Blocks ", how_much_it_took_to_mine_X_Blocks );
+
             //It should substitute, the number of Blocks * Initial Block
             how_much_it_took_to_mine_X_Blocks -= (consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS) * getTimeStampCallback(firstBlock);
+
+            if ( how_much_it_took_to_mine_X_Blocks <= 0 )
+                throw "how_much_it_took_to_mine_X_Blocks is negative " + how_much_it_took_to_mine_X_Blocks;
 
             let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks);
 
             ratio = ratio.decimalPlaces(8);
 
-            ratio = BigNumber.minimum(ratio, 10);
-            ratio = BigNumber.maximum(ratio, 0.01);
+            ratio = BigNumber.minimum(ratio, 8);
+            ratio = BigNumber.maximum(ratio, 0.05);
 
             console.warn( "ratio2", ratio, ratio.toString() );
             console.warn( "how_much_it_should_have_taken_X_Blocks", how_much_it_should_have_taken_X_Blocks );

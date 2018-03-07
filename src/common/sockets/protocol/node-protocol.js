@@ -75,8 +75,7 @@ class NodeProtocol {
             exceptSockets = [exceptSockets];
 
         //console.log("request nodes.length", nodes.length, request, data, )
-
-        console.log("nodes.length", nodes.length );
+        //console.log("nodes.length", nodes.length );
 
         for (let i=0; i < nodes.length; i++) {
 

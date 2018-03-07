@@ -121,7 +121,7 @@ class Blockchain{
      * it tries synchronizing multiple times
      * @returns {Promise.<void>}
      */
-    async synchronizeBlockchain(firstTime){
+    async synchronizeBlockchain(firstTime, synchronizeComplete=false){
 
         StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});
         let agentInitialization = false;
@@ -130,7 +130,7 @@ class Blockchain{
 
             StatusEvents.emit('blockchain/status', {message: "Synchronizing"});
 
-            let resultAgentStarted = await this.Agent.startAgent(firstTime);
+            let resultAgentStarted = await this.Agent.startAgent(firstTime, synchronizeComplete);
             firstTime = false;
 
             if (resultAgentStarted.result){

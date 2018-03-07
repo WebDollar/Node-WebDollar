@@ -21,19 +21,30 @@ class InterfaceBlockchainTransactions {
 
     createTransactionSimple(address, toAddress, toAmount, fee, currency, password = undefined){
 
-        address = this.wallet.getAddress(address);
+        try {
 
-        let transaction = new InterfaceTransaction(
-            { addresses: { address: address, publicKey: 666 }, currency: currency },
-            { addresses: { address: toAddress, amount: toAmount }, fee: fee }, undefined, undefined, undefined );
+            address = this.wallet.getAddress(address);
 
-        let signature = address.signTransaction( transaction, password );
+            let transaction = new InterfaceTransaction(
+                {addresses: {unencodedAddress: address, publicKey: 666}, currency: currency},
+                {addresses: {unencodedAddress: toAddress, amount: toAmount}, fee: fee}, undefined, undefined, undefined);
 
-        this.pendingQueue.includePendingTransaction(transaction);
+            let signature = address.signTransaction(transaction, password);
 
-        return {
-            result: true,
-            signature: signature
+            this.pendingQueue.includePendingTransaction(transaction);
+
+            return {
+                result: true,
+                signature: signature
+            }
+
+        } catch (exception){
+
+            return {
+                result:false,
+                message: exception.toString()
+            }
+
         }
     }
 

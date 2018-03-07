@@ -3,11 +3,15 @@ const BigNumber = require('bignumber.js');
 import BufferExtended from "common/utils/BufferExtended"
 import Serialization from "common/utils/Serialization"
 import consts from "consts/const_global"
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 
 class InterfaceBlockchainTransactionTo{
 
     /*
-        addresses: [ { address: Addr1,  amount: amount}, ... ]
+        addresses: [ {
+        address: Addr1,
+        amount: amount
+        }, ... ]
      */
 
     constructor (addresses){
@@ -21,8 +25,7 @@ class InterfaceBlockchainTransactionTo{
 
         for (let i = 0; i < addresses.length; i++) {
 
-            if (typeof addresses[i].address === "string")
-                addresses[i].address = BufferExtended.fromBase(addresses[i].address);
+            addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(addresses[i].unencodedAddress);
 
             if (typeof addresses[i].amount === "string" || typeof addresses[i].amount === "number")
                 addresses[i].amount = new BigNumber(addresses[i].amount);
@@ -49,7 +52,7 @@ class InterfaceBlockchainTransactionTo{
 
         this.addresses.forEach ( (toObject, index) =>{
 
-            if (!toObject.address || toObject.address === null || !Buffer.isBuffer(toObject.address))
+            if (!toObject.unencodedAddress || toObject.unencodedAddress === null || !Buffer.isBuffer(toObject.unencodedAddress))
                 throw 'To.Object Address is not specified';
 
             if (!toObject.amount ||  toObject.amount instanceof BigNumber === false )
@@ -72,7 +75,7 @@ class InterfaceBlockchainTransactionTo{
         Serialization.serializeNumber1Byte( this.addresses.length );
 
         for (let i = 0; i < this.addresses.length; i++){
-            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].address ));
+            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].unencodedAddress ));
             addressesBuffer.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
         }
 
@@ -88,7 +91,7 @@ class InterfaceBlockchainTransactionTo{
         for (let i = 0; i < length; i++){
             let address = {};
 
-            address.address= BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);
+            address.unencodedAddress= BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);
             offset += consts.PUBLIC_ADDRESS_LENGTH;
 
             let result = Serialization.deserializeBigNumber(buffer, offset);

@@ -1,10 +1,12 @@
 const BigNumber = require('bignumber.js');
+
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
 import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 
 import BufferExtended from "common/utils/BufferExtended"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
+import consts from 'consts/const_global'
 
 const EventEmitter = require('events');
 
@@ -33,8 +35,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     updateAccount(address, value, tokenId){
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) {
-            tokenId = Buffer.from([1]);
-            tokenId[0] = 1;
+            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH);
+            tokenId[0] = 0x01;
         }
 
         address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
@@ -209,8 +211,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     calculateNodeCoins(tokenId , node){
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) {
-            tokenId = Buffer.from([1]);
-            tokenId[0] = 1;
+            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH);
+            tokenId[0] = 0x01;
         }
 
         if (node === undefined) node = this.root;
