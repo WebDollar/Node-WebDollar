@@ -104,7 +104,11 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    serializeTransaction(includeSignature=true){
+    serializeFromForSigning(unencodedAddress){
+        return this.from.serializeForSigning( unencodedAddress, this.version, this.nonce, this.to );
+    }
+
+    serializeTransaction(){
 
         let array = [
             Serialization.serializeNumber1Byte( this.version ),
@@ -113,9 +117,7 @@ class InterfaceBlockchainTransaction{
             this.to.serializeTo(),
         ];
 
-        if (includeSignature){
-            array.push( Serialization.serializeToFixedBuffer( 32, this.digitalSignature ) );
-        }
+        array.push( Serialization.serializeToFixedBuffer( 32, this.digitalSignature ) );
 
         return Buffer.concat (array);
     }

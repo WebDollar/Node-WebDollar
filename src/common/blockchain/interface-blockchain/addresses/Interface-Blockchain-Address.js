@@ -437,9 +437,9 @@ class InterfaceBlockchainAddress{
 
             transaction.from.addresses[index].publicKey = answer.publicKey;
 
-            let serialization = transaction.from.serializeForSignature (answer.unencodedAddress, transaction.version, transaction.nonce, transaction.to);
+            let serialization = transaction.serializeFromForSigning (answer.unencodedAddress);
 
-            return schnorr.sign( serialization, answer.privateKey );
+            let signature = schnorr.sign( serialization, answer.privateKey );
 
         } catch (exception) {
             console.error(exception);

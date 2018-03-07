@@ -27,10 +27,7 @@ class InterfaceBlockchainTransactions {
             { addresses: { address: address, publicKey: 666 }, currency: currency },
             { addresses: { address: toAddress, amount: toAmount }, fee: fee }, undefined, undefined, undefined );
 
-        let publicKey = address.signTransaction( undefined );
-        let serialization = transaction.serializeTransaction(false);
-
-        let  digitalSignature = schnorr.sign( serialization, key );
+        let signature = address.signTransaction( undefined );
 
         this.pendingQueue.includePendingTransaction(transaction);
 

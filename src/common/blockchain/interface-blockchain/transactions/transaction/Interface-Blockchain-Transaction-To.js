@@ -20,10 +20,11 @@ class InterfaceBlockchainTransactionTo{
             addresses = [addresses];
 
         for (let i = 0; i < addresses.length; i++) {
+
             if (typeof addresses[i].address === "string")
                 addresses[i].address = BufferExtended.fromBase(addresses[i].address);
 
-            if (typeof addresses[i].amount === "string" || typeof addresses[i].addresses[i].amount === "number")
+            if (typeof addresses[i].amount === "string" || typeof addresses[i].amount === "number")
                 addresses[i].amount = new BigNumber(addresses[i].amount);
         }
 
@@ -68,18 +69,14 @@ class InterfaceBlockchainTransactionTo{
 
         let addressesBuffer = [];
 
+        Serialization.serializeNumber1Byte( this.addresses.length );
 
         for (let i = 0; i < this.addresses.length; i++){
             addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].address ));
             addressesBuffer.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
         }
 
-        return Buffer.concat ([
-
-            Serialization.serializeNumber1Byte( this.addresses.length ),
-            addressesBuffer,
-
-        ]);
+        return Buffer.concat (addressesBuffer);
 
     }
 

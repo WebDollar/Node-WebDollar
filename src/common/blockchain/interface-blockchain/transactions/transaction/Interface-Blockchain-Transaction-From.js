@@ -56,6 +56,11 @@ class InterfaceBlockchainTransactionFrom{
 
         });
 
+        if (currency === undefined){
+            currency = new Buffer(1);
+            currency[0] = 0x01;
+        }
+
         this.addresses = addresses;
         this.currency = currency;
     }
@@ -115,7 +120,7 @@ class InterfaceBlockchainTransactionFrom{
         return -1;
     }
 
-    serializeForSignature( unencodedAddress, version, nonce, transactionTo ){
+    serializeForSigning( unencodedAddress, version, nonce, transactionTo ){
 
         let position = this.findAddressIndex(unencodedAddress);
 
@@ -136,22 +141,19 @@ class InterfaceBlockchainTransactionFrom{
 
     serializeFrom(){
 
-        let addressesBuffer = [];
+        let array = [];
 
+        array.push( Serialization.serializeNumber1Byte( this.addresses.length ));
         for (let i = 0; i < this.addresses.length; i++){
-            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].unencodedAddress ));
-            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_KEY_LENGTH, this.addresses[i].publicKey ));
-            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS_SIGNATURE_LENGTH, this.addresses[i].signature ));
+            array.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].unencodedAddress ));
+            array.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_KEY_LENGTH, this.addresses[i].publicKey ));
+            array.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS_SIGNATURE_LENGTH, this.addresses[i].signature ));
         }
 
-        return Buffer.concat ([
+        array.push(Serialization.serializeNumber1Byte( this.currency.length ));
+        array.push(Serialization.serializeNumber1Byte( this.currency ));
 
-            Serialization.serializeNumber1Byte( this.addresses.length ),
-            addressesBuffer,
-
-            Serialization.serializeNumber1Byte( this.currency.length ),
-            this.currency,
-        ]);
+        return Buffer.concat (array);
 
     }
 
