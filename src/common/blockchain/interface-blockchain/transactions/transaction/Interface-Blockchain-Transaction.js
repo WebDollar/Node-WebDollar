@@ -33,15 +33,35 @@ class InterfaceBlockchainTransaction{
 
         this.nonce = nonce; //2 bytes
 
-        if (! (from instanceof InterfaceBlockchainTransactionFrom))
-            from = new InterfaceBlockchainTransactionFrom(from);
+        try {
 
-        this.from = from;
+            if (!(from instanceof InterfaceBlockchainTransactionFrom))
+                from = new InterfaceBlockchainTransactionFrom(from);
 
-        if (! (to instanceof InterfaceBlockchainTransactionTo))
-            to = new InterfaceBlockchainTransactionTo(to);
+            this.from = from;
 
-        this.to = to;
+            this.from.validateFrom();
+        } catch (exception){
+
+            console.error("Transaction From Error", exception);
+            throw exception;
+
+        }
+
+        try{
+
+            if (! (to instanceof InterfaceBlockchainTransactionTo))
+                to = new InterfaceBlockchainTransactionTo(to);
+
+            this.to = to;
+
+            this.to.validateTo();
+
+        } catch (exception){
+
+            console.error("Transaction From Error", exception);
+            throw exception;
+        }
 
         if (txId === undefined || txId === null)
             txId = this._computeTxId();

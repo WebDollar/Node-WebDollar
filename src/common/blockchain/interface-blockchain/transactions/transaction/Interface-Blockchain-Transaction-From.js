@@ -46,6 +46,9 @@ class InterfaceBlockchainTransactionFrom{
 
         addresses.forEach ( (fromObject, index) =>{
 
+            if (typeof fromObject.unencodedAddress === "object" && fromObject.hasOwnProperty("unencodedAddress"))
+                fromObject.unencodedAddress = fromObject.unencodedAddress.unencodedAddress;
+
             fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(fromObject.unencodedAddress);
 
             if (typeof fromObject.publicKey === "string")
@@ -76,7 +79,7 @@ class InterfaceBlockchainTransactionFrom{
      * valdiateFrom object
      * @returns from
      */
-    validateFrom(){
+    validateFrom(validateSignature=true){
 
 
         this.addresses.forEach ( (fromObject, index) =>{
@@ -90,17 +93,20 @@ class InterfaceBlockchainTransactionFrom{
             if (! fromObject.publicKey || fromObject.publicKey === null)
                 throw 'From.address.publicKey '+index+' is not specified';
 
-            if (! fromObject.signature || fromObject.signature === null)
-                throw 'From.address.signature '+index+' is not specified';
-
             if (!Buffer.isBuffer(fromObject.unencodedAddress) || fromObject.unencodedAddress.length !== consts.PUBLIC_ADDRESS_LENGTH )
                 throw "From.address.unencodedAddress "+index+" is not a buffer";
 
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.PUBLIC_KEY_LENGTH)
                 throw "From.address.publicAddress "+index+" is not a buffer";
 
-            if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
-                throw "From.address.signature "+index+" is not a buffer";
+            if (validateSignature){
+                
+                if (! fromObject.signature || fromObject.signature === null)
+                    throw 'From.address.signature '+index+' is not specified';
+
+                if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
+                    throw "From.address.signature "+index+" is not a buffer";
+            }
 
         });
         

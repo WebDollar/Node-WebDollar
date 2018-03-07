@@ -26,32 +26,46 @@ class InterfaceBlockchainTransactions {
             address = this.wallet.getAddress(address);
 
         } catch (exception){
-
             console.error("Creating a new transaction raised an exception - Getting Address", exception.toString());
             return { result:false,  message: "Get Address failed", reason: exception.toString() }
-
         }
+
+        let transaction = undefined;
 
         try {
 
-            let transaction = new InterfaceTransaction(
+            transaction = new InterfaceTransaction(
                 {addresses: {unencodedAddress: address, publicKey: 666}, currency: currency},
                 {addresses: {unencodedAddress: toAddress, amount: toAmount}, fee: fee}, undefined, undefined, undefined
             );
 
-            let signature = address.signTransaction(transaction, password);
+        } catch (exception) {
+            console.error("Creating a new transaction raised an exception - Failed Creating a transaction", exception.toString());
+            return { result:false,  message: "Failed Creating a transaction", reason: exception.toString() }
+        }
+
+
+        let signature;
+        try{
+            signature = address.signTransaction(transaction, password);
+        } catch (exception){
+            console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception.toString());
+            return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }
+        }
+
+        try{
 
             this.pendingQueue.includePendingTransaction(transaction);
 
-            return {
-                result: true,
-                signature: signature
-            }
-
         } catch (exception){
 
-            console.error("Creating a new exception raised an error", exception);
-            return { result:false,  message: exception.toString() }
+            console.error("Creating a new transaction raised an exception - Including Pending Transaction", exception.toString());
+            return { result:false,  message: "Including Pending Transaction", reason: exception.toString() }
+        }
+
+        return {
+            result: true,
+            signature: signature
         }
     }
 
