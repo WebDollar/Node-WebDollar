@@ -178,7 +178,7 @@ class PoolLeaderProtocol {
      */
     updateRewards(newReward) {
 
-        let leadReward = newReward.mul(100 - this._poolLeaderFee).dividedBy(100);
+        let leadReward = newReward.multipliedBy(100 - this._poolLeaderFee).dividedBy(100);
         this.leaderReward = this.leaderReward.plus(leadReward);
 
         let minersReward = newReward.minus(leadReward);
@@ -190,7 +190,7 @@ class PoolLeaderProtocol {
 
         //update rewards for each miner
         for (let i = 0; i < difficultyList.length; ++i) {
-            let incReward = new BigNumber(rewardPerDifficultyLevel.mul(difficultyList[i]));
+            let incReward = new BigNumber(rewardPerDifficultyLevel.multipliedBy(difficultyList[i]));
             this.poolData.increaseMinerRewardById(i, incReward);
         }
 
