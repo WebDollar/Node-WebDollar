@@ -332,7 +332,7 @@ class InterfaceBlockchainAddressHelper{
     static _validateAddressWIF(addressWIF){
 
         if (addressWIF === null || !Buffer.isBuffer(addressWIF) ){
-            throw ('privateKeyWIF must be a Buffer');
+            throw ('addressWIF must be a Buffer');
         }
 
         //contains VERSION prefix

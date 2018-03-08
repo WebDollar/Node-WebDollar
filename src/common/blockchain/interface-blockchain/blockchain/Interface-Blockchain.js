@@ -44,7 +44,7 @@ class InterfaceBlockchain {
         this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE);
 
 
-        this.transactions = new InterfaceBlockchainTransactions();
+        this.transactions = new InterfaceBlockchainTransactions(this);
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
         this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator( this );

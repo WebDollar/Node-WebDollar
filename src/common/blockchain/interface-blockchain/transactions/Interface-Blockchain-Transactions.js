@@ -8,8 +8,9 @@ const schnorr = require('schnorr');
 
 class InterfaceBlockchainTransactions {
 
-    constructor( wallet ){
+    constructor( blockchain, wallet ){
 
+        this.blockchain = blockchain;
         this.wallet = wallet;
 
         let db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.TRANSACTIONS_DATABASE);
@@ -19,7 +20,21 @@ class InterfaceBlockchainTransactions {
         this.uniqueness = new InterfaceTransactionsUniqueness();
     }
 
-    createTransactionSimple(address, toAddress, toAmount, fee, currency, password = undefined){
+    createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined){
+
+        if (fee === undefined) fee = this.calculateFeeSimple(toAmount);
+
+        try {
+            if (!(toAmount instanceof BigNumber)) toAmount = new BigNumber(toAmount);
+        } catch (exception){
+            return { result:false,  message: "Amount is not a valid number", reason: exception.toString() }
+        }
+
+        try {
+            if (!(fee instanceof BigNumber)) fee = new BigNumber(fee);
+        } catch (exception){
+            return { result:false,  message: "Fee is not a valid number", reason: exception.toString() }
+        }
 
         try {
 
@@ -30,13 +45,29 @@ class InterfaceBlockchainTransactions {
             return { result:false,  message: "Get Address failed", reason: exception.toString() }
         }
 
+
         let transaction = undefined;
 
         try {
 
             transaction = new InterfaceTransaction(
-                {addresses: {unencodedAddress: address, publicKey: 666}, currency: currency},
-                {addresses: {unencodedAddress: toAddress, amount: toAmount}, fee: fee}, undefined, undefined,
+
+                //from
+                {addresses: {unencodedAddress: address, publicKey: 666}, currencyTokenId: currencyTokenId},
+
+                //to
+                {addresses: [
+                    {
+                         unencodedAddress: toAddress,
+                         amount: toAmount
+                    },
+                    {
+                        unencodedAddress: address,
+                        amount:
+                    }
+
+                ]}
+                , undefined, undefined,
                 false, false
             );
 
@@ -74,6 +105,7 @@ class InterfaceBlockchainTransactions {
 
         return {
             result: true,
+            message: "Your transaction is pending...",
             signature: signature
         }
     }

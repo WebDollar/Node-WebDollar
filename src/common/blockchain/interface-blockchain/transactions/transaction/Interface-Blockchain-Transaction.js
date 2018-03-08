@@ -20,8 +20,9 @@ class InterfaceBlockchainTransaction{
      *
      */
 
-    constructor(from, to, nonce, txId, validateFrom=true, validateTo=true){
+    constructor(blockchain, from, to, nonce, txId, validateFrom=true, validateTo=true){
 
+        this.blockchain = blockchain;
         this.from = null;
         this.to = null;
 
@@ -36,7 +37,7 @@ class InterfaceBlockchainTransaction{
         try {
 
             if (!(from instanceof InterfaceBlockchainTransactionFrom))
-                from = new InterfaceBlockchainTransactionFrom(from);
+                from = new InterfaceBlockchainTransactionFrom(this.blockchain, from);
 
             this.from = from;
 
@@ -46,14 +47,14 @@ class InterfaceBlockchainTransaction{
         } catch (exception){
 
             console.error("Transaction From Error", exception);
-            throw exception;
+            throw typeof exception === "string" ? "Transaction From Error " + exception : exception;
 
         }
 
         try{
 
-            if (! (to instanceof InterfaceBlockchainTransactionTo))
-                to = new InterfaceBlockchainTransactionTo(to);
+            if (! (to instanceof InterfaceBlockchainTransactionTo) )
+                to = new InterfaceBlockchainTransactionTo(this.blockchain, to);
 
             this.to = to;
 
@@ -63,7 +64,7 @@ class InterfaceBlockchainTransaction{
         } catch (exception){
 
             console.error("Transaction To Error", exception);
-            throw exception;
+            throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
         }
 
         if (txId === undefined || txId === null)
@@ -120,6 +121,23 @@ class InterfaceBlockchainTransaction{
 
         this.from.validateFrom();
         this.to.validateTo();
+
+        //validate amount
+        let inputValues = [], inputSum = BigNumber(0);
+
+        for (let i=0; i<this.from.addresses.length; i++ ){
+            let value = this.blockchain.accountantTree.getBalance( this.from.addresses[i].unencodedAddress, this.from.currencyTokenId );
+            inputValues.push( value );
+            inputSum = inputSum.sum(value);
+        }
+
+        let outputValues = []
+
+        if (inputSum.isLessThan())
+
+        if (value === null || value.isLessThan( toAmount.plus(fee) ) ){
+            return {result:false, message: "Insufficient funds"}
+        }
 
         return true;
 

@@ -24,19 +24,21 @@ class InterfaceBlockchainTransactionFrom{
 
         ]
 
-        currency: TokenObject,
+        currencyTokenId: TokenObject,
 
      */
 
-    constructor (addresses, currency){
-        this.setFrom(addresses, currency);
+    constructor (blockchain, addresses, currencyTokenId){
+        this.blockchain = blockchain;
+
+        this.setFrom(addresses, currencyTokenId);
     }
 
-    setFrom(addresses, currency){
+    setFrom(addresses, currencyTokenId){
 
-        if (typeof addresses === "object" && currency === undefined && addresses.hasOwnProperty('addresses') && addresses.hasOwnProperty('currency') ){
+        if (typeof addresses === "object" && currencyTokenId === undefined && addresses.hasOwnProperty('addresses') && addresses.hasOwnProperty('currencyTokenId') ){
             addresses = addresses.addresses;
-            currency = addresses.currency;
+            currencyTokenId = addresses.currencyTokenId;
         }
 
 
@@ -59,13 +61,13 @@ class InterfaceBlockchainTransactionFrom{
 
         });
 
-        if (currency === undefined){
-            currency = new Buffer(consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH);
-            currency[0] = 0x01;
+        if (currencyTokenId === undefined){
+            currencyTokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH);
+            currencyTokenId[0] = 0x01;
         }
 
         this.addresses = addresses;
-        this.currency = currency;
+        this.currencyTokenId = currencyTokenId;
     }
 
     toJSON(){
@@ -81,6 +83,8 @@ class InterfaceBlockchainTransactionFrom{
      */
     validateFrom(){
 
+        if (this.addresses.length === 0)
+            throw "From.addresses is empty";
 
         this.addresses.forEach ( (fromObject, index) =>{
 
@@ -108,22 +112,36 @@ class InterfaceBlockchainTransactionFrom{
 
         });
         
-        if (!this.currency || this.currency === null) throw 'From.currency is not specified';
+        if (!this.currencyTokenId || this.currencyTokenId === null) throw 'From.currency is not specified';
 
-        if (!Buffers.isBuffer(this.currency))
-            throw 'To.currency is not a buffer';
+        if (!Buffers.isBuffer(this.currencyTokenId))
+            throw 'To.currencyTokenId is not a buffer';
 
-        if (! (this.currency.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH || this.currency.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH) )
-            throw "To.currency is not valid";
+        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH) )
+            throw "To.currencyTokenId is not valid";
 
         //TODO validate currency
 
         return true;
     }
 
+    calculateInputSum(){
+
+        //validate amount
+        let inputValues = [], inputSum = BigNumber(0);
+
+        for (let i=0; i<this.addresses.length; i++ ){
+            let value = this.blockchain.accountantTree.getBalance( this.addresses[i].unencodedAddress, this.currencyTokenId );
+            inputValues.push( value );
+            inputSum = inputSum.plus(value);
+        }
+
+        return inputSum;
+    }
+
     findAddressIndex( unencodedAddress ){
         for (let i = 0; i<this.addresses.length; i++)
-            if (address[i].unencodedAddress.equals( unencodedAddress ) ){
+            if (this.addresses[i].unencodedAddress.equals( unencodedAddress ) ){
                 return i;
                 break;
             }
@@ -160,8 +178,8 @@ class InterfaceBlockchainTransactionFrom{
             array.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS_SIGNATURE_LENGTH, this.addresses[i].signature ));
         }
 
-        array.push(Serialization.serializeNumber1Byte( this.currency.length ));
-        array.push(Serialization.serializeNumber1Byte( this.currency ));
+        array.push(Serialization.serializeNumber1Byte( this.currencyTokenId.length ));
+        array.push(Serialization.serializeNumber1Byte( this.currencyTokenId ));
 
         return Buffer.concat (array);
 
@@ -192,7 +210,7 @@ class InterfaceBlockchainTransactionFrom{
 
         let currencyLength =  Serialization.deserializeNumber( buffer, offset, 1 );
 
-        this.currency = BufferExtended.substr(buffer, offset, currencyLength );
+        this.currencyTokenId = BufferExtended.substr(buffer, offset, currencyLength );
         offset += currencyLength;
 
         return offset;

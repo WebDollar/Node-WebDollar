@@ -14,11 +14,17 @@ class InterfaceBlockchainTransactionTo{
         }, ... ]
      */
 
-    constructor (addresses){
+    constructor (blockchain, addresses){
+
+        this.blockchain = blockchain;
         this.setTo(addresses);
     }
 
     setTo(addresses){
+
+        if (typeof addresses === "object" && addresses.hasOwnProperty("addresses")) {
+            addresses = addresses.addresses;
+        }
 
         if (!Array.isArray(addresses))
             addresses = [addresses];
@@ -70,6 +76,21 @@ class InterfaceBlockchainTransactionTo{
 
         return true;
     }
+
+    calculateOutputSum(from){
+
+        //validate amount
+        let outputValues = [], outputSum = BigNumber(0);
+
+        for (let i=0; i<this.addresses.length; i++ ){
+            let value = this.blockchain.accountantTree.getBalance( this.addresses[i].unencodedAddress, from.currencyTokenId );
+            outputValues.push( value );
+            outputSum = outputSum.plus(value);
+        }
+
+        return outputSum;
+    }
+
 
     serializeTo(){
 
