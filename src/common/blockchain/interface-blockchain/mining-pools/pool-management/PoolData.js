@@ -7,15 +7,11 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 
 class PoolData {
 
-    constructor(dataBase) {
+    constructor(databaseName) {
 
-        if (dataBase === undefined)
-            this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.POOL_DATABASE);
-        else
-            this.db = dataBase;
+        this.db = new InterfaceSatoshminDB(databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE);
 
         this._minersList = [];
-
     }
     
     /**

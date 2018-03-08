@@ -10,7 +10,7 @@ import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-R
 
 class PoolLeaderProtocol {
 
-    constructor(dataBase = consts.DATABASE_NAMES.POOL_DATABASE, poolLeaderFee = 5) {
+    constructor(poolLeaderFee = 5, databaseName = consts.DATABASE_NAMES.POOL_DATABASE) {
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeMiner(result)
@@ -21,20 +21,23 @@ class PoolLeaderProtocol {
         });
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
-        this.difficultyTarget = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"); //target difficulty;
+        this._difficultyTarget = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"); //target difficulty;
 
-        this.poolData = new PoolData(dataBase);
+        this._poolData = new PoolData(databaseName);
         
         this._poolLeaderFee = poolLeaderFee;
 
         //TODO: Check is needed to store/load from database
-        this.leaderReward = new BigNumber(0);
+        this._poolLeaderReward = new BigNumber(0);
 
         //TODO: Check is needed to store/load from database, Update hardcoded value
         this._bestHash = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex");
 
-        //TODO: create an address which will be used to store miners reward
-        this.rewardsAddress = null;
+        //TODO: this stores the entire reward of pool(miners + poolLeader), this goes to Accountant Tree
+        this._poolRewardsAddress = null;
+        
+        //TODO: this stores pool leader's reward, this goes to Accountant Tree
+        this._poolLeaderRewardAddress = null;
     }
 
     _subscribeMiner(nodesListObject) {
@@ -104,7 +107,7 @@ class PoolLeaderProtocol {
      */
     computeWorstHash() {
 
-        let minersList = this.poolData.getMinersList();
+        let minersList = this._poolData.getMinersList();
 
         if (minersList.length === 0)
             return this._worstHash;
@@ -127,7 +130,7 @@ class PoolLeaderProtocol {
      */
     computeBestHash() {
 
-        let minersList = this.poolData.getMinersList();
+        let minersList = this._poolData.getMinersList();
 
         if (minersList.length === 0)
             return this._bestHash;
@@ -154,7 +157,7 @@ class PoolLeaderProtocol {
         this.computeBestHash();
         this.computeWorstHash();
         
-        let minersList = this.poolData.getMinersList();
+        let minersList = this._poolData.getMinersList();
         
         let bestHashInt = Convert.bufferToBigIntegerHex(this._bestHash);
         let worstHashInt = Convert.bufferToBigIntegerHex(this._worstHash);
@@ -178,20 +181,20 @@ class PoolLeaderProtocol {
      */
     updateRewards(newReward) {
 
-        let leadReward = newReward.multipliedBy(100 - this._poolLeaderFee).dividedBy(100);
-        this.leaderReward = this.leaderReward.plus(leadReward);
+        let newLeaderReward = newReward.multipliedBy(this._poolLeaderFee).dividedBy(100);
+        this._poolLeaderReward = this._poolLeaderReward.plus(newLeaderReward);
 
-        let minersReward = newReward.minus(leadReward);
+        let minersReward = newReward.minus(newLeaderReward);
 
         let response = this.computeHashDifficulties();
         let difficultyList = response.difficultyList;
         let difficultySum = response.sum;
-        let rewardPerDifficultyLevel = new BigNumber(minersReward.dividedBy(difficultySum));
+        let rewardPerDifficultyLevel = new BigNumber( minersReward.dividedBy(difficultySum) );
 
         //update rewards for each miner
         for (let i = 0; i < difficultyList.length; ++i) {
-            let incReward = new BigNumber(rewardPerDifficultyLevel.multipliedBy(difficultyList[i]));
-            this.poolData.increaseMinerRewardById(i, incReward);
+            let incReward = new BigNumber( rewardPerDifficultyLevel.multipliedBy(difficultyList[i]) );
+            this._poolData.increaseMinerRewardById(i, incReward);
         }
 
     }
@@ -212,14 +215,14 @@ class PoolLeaderProtocol {
      */
     async sendRewardsToMiners() {
 
-        let minersList = this.poolData.getMinersList();
+        let minersList = this._poolData.getMinersList();
 
         for (let i = 0; i < minersList.length; ++i) {
             this.sendReward(minersList[i]);
         }
 
         //After sending rewards we must reset rewards
-        await this.poolData.resetRewards();
+        await this._poolData.resetRewards();
     }
 
     /**
@@ -240,7 +243,7 @@ class PoolLeaderProtocol {
      */
     addMiner(minerAddress) {
         
-        return this.poolData.setMiner(minerAddress);
+        return this._poolData.setMiner(minerAddress);
     }
     
     /**
@@ -250,7 +253,16 @@ class PoolLeaderProtocol {
      */
     removeMiner(minerAddress) {
         
-        return this.poolData.removeMiner(minerAddress);
+        return this._poolData.removeMiner(minerAddress);
+    }
+    
+    /**
+     * Reset the rewards that must be sent(pool leader + miners)
+     */
+    async resetRewards() {
+        
+        this._poolLeaderReward = new BigNumber(0);
+        await this._poolData.resetRewards();
     }
 
     /**
@@ -262,7 +274,7 @@ class PoolLeaderProtocol {
     }
 
     /**
-     * @returns the poolLeader's fee
+     * @returns poolLeader's fee
      */
     getPoolLeaderFee() {
         return this._poolLeaderFee;
@@ -278,11 +290,27 @@ class PoolLeaderProtocol {
     }
     
     /**
-     * @returns the pool's best hash
+     * @returns pool's best hash
      */
     getBestHash() {
 
         return this._bestHash;
+    }
+    
+    /**
+     * @returns pool leader's reward
+     */
+    getPoolLeaderReward() {
+        
+        return this._poolLeaderReward;
+    }
+   
+    /**
+     * @returns pool's miner list
+     */
+    getMinersList() {
+        
+        return this._poolData.getMinersList();
     }
 
     createMinerTask() {

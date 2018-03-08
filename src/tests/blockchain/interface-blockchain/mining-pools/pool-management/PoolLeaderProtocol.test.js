@@ -36,11 +36,11 @@ describe('test pool leader protocol', () => {
     it('test computeHashDifficulties', () => {
         
         let poolLeaderFee = 10;
-        let poolLeader = new PoolLeaderProtocol(consts.DATABASE_NAMES.POOL_DATABASE, poolLeaderFee);
+        let poolLeader = new PoolLeaderProtocol(poolLeaderFee);
         
         poolLeader.setBestHash(testTargetHash);
         
-        let minersList = poolLeader.poolData.getMinersList();
+        let minersList = poolLeader.getMinersList();
         assert(minersList.length === 0, "Initial minersList should be []");
         
         for (let i = 0; i < testMinersList.length; ++i){
@@ -65,14 +65,14 @@ describe('test pool leader protocol', () => {
         }
     });
 
-    it('test updateRewards', () => {
+    it('test updateRewards(leader reward + miners reward)', async () => {
 
         let poolLeaderFee = 10;
-        let poolLeader = new PoolLeaderProtocol(consts.DATABASE_NAMES.POOL_DATABASE, poolLeaderFee);
+        let poolLeader = new PoolLeaderProtocol(poolLeaderFee);
 
         poolLeader.setBestHash(testTargetHash);
 
-        let minersList = poolLeader.poolData.getMinersList();
+        let minersList = poolLeader.getMinersList();
         assert(minersList.length === 0, "Initial minersList should be []");
 
         for (let i = 0; i < testMinersList.length; ++i){
@@ -89,11 +89,21 @@ describe('test pool leader protocol', () => {
             minersList[i].bestHash = Convert.toBufferHex(num);
         }
 
-        let newReward = new BigNumber(15000, 16);
+        //reset miners reward
+        await poolLeader.resetRewards();
+        
+        let newReward = new BigNumber(15000);
         poolLeader.updateRewards(newReward);
 
-        let leaderTargetReward = new BigNumber(1500, 16);
-        assert(poolLeader.leaderReward.eq(leaderTargetReward), "Pool leader reward is wrong: " + poolLeader.leaderReward.toString(16) + " !== " + leaderTargetReward.toString(16));
+        //check leader reward
+        let leaderTargetReward = newReward.multipliedBy(poolLeader.getPoolLeaderFee()).dividedBy(100);
+        assert(poolLeader.getPoolLeaderReward().eq(leaderTargetReward), "Pool leader reward is wrong: " + poolLeader.getPoolLeaderReward().toString() + " !== " + leaderTargetReward.toString());
+        
+        //check miners reward
+        for (let i = 0; i < minersList.length; ++i){
+            //TODO: assert
+        }
+        
     });
 
     it('test Budisteanu Formula', () => {
