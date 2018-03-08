@@ -31,7 +31,7 @@ class Convert{
     
     bigIntegerToBigNumberHex(data){
         
-        return new BigNumber(data.toString(16), 16 );
+        return new BigNumber(data.toString(16), 16);
     }
     
     bigNumberToBigIntegerHex(data){
