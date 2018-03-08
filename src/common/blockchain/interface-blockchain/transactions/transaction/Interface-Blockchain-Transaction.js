@@ -111,33 +111,23 @@ class InterfaceBlockchainTransaction{
             throw ('nonce is empty');
 
         if (!this.from)
-            throw 'Validation Invalid: From was not specified';
+            throw 'Transaction Validation Invalid: From was not specified';
         
         if (!this.from.address)
-            throw 'Validation Invalid: from.Address was not specified'
+            throw 'Transaction Validation Invalid: from.Address was not specified'
 
         if (!this.to)
-            throw 'Validation Invalid: To was not specified'
+            throw 'Transaction Validation Invalid: To was not specified'
 
         this.from.validateFrom();
         this.to.validateTo();
 
         //validate amount
-        let inputValues = [], inputSum = BigNumber(0);
+        let inputSum = this.from.calculateInputSum();
+        let outputSum = this.to.calculateOutputSum(this.from);
 
-        for (let i=0; i<this.from.addresses.length; i++ ){
-            let value = this.blockchain.accountantTree.getBalance( this.from.addresses[i].unencodedAddress, this.from.currencyTokenId );
-            inputValues.push( value );
-            inputSum = inputSum.sum(value);
-        }
-
-        let outputValues = []
-
-        if (inputSum.isLessThan())
-
-        if (value === null || value.isLessThan( toAmount.plus(fee) ) ){
-            return {result:false, message: "Insufficient funds"}
-        }
+        if (inputSum.isLessThan(outputSum))
+            throw "Transaction Validation Input is smaller than Output";
 
         return true;
 

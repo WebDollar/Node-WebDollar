@@ -229,6 +229,9 @@ class InterfaceBlockchainAddressHelper{
         if (typeof address === "string")  //base
             address = BufferExtended.fromBase(address);
 
+        if (typeof address === "object" && address.hasOwnProperty("unencodedAddress"))
+            address = address.unencodedAddress;
+
         let result = this._validateAddressWIF(address);
 
         if (result.result === true)

@@ -31,7 +31,7 @@ class InterfaceBlockchainTransactionTo{
 
         for (let i = 0; i < addresses.length; i++) {
 
-            if (typeof addresses[i].unencodedAddress === "object" && addresses[i].hasOwnProperty("unencodedAddress"))
+            if (typeof addresses[i].unencodedAddress === "object" && addresses[i].unencodedAddress.hasOwnProperty("unencodedAddress"))
                 addresses[i].unencodedAddress = addresses[i].unencodedAddress.unencodedAddress;
 
             addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(addresses[i].unencodedAddress);

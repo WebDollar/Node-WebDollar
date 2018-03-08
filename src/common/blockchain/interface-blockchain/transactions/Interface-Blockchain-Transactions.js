@@ -5,6 +5,7 @@ import InterfaceTransaction from "./transaction/Interface-Blockchain-Transaction
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 const schnorr = require('schnorr');
+const BigNumber = require('bignumber.js');
 
 class InterfaceBlockchainTransactions {
 
@@ -50,24 +51,34 @@ class InterfaceBlockchainTransactions {
 
         try {
 
+            let value = this.blockchain.accountantTree.getBalance( address, currencyTokenId );
+
+            let from = {addresses: {unencodedAddress: address, publicKey: 666}, currencyTokenId: currencyTokenId};
+
+            let change = value.minus ( toAmount.plus(fee) );
+
+            let to = {addresses: [
+                {
+                    unencodedAddress: toAddress,
+                    amount: toAmount
+                },
+            ]};
+
+            if (change.isGreaterThan(0)){
+                to.addresses.push({
+                    unencodedAddress: address,
+                    amount: change
+                });
+            }
+
             transaction = new InterfaceTransaction(
 
                 //from
-                {addresses: {unencodedAddress: address, publicKey: 666}, currencyTokenId: currencyTokenId},
+                from,
 
                 //to
-                {addresses: [
-                    {
-                         unencodedAddress: toAddress,
-                         amount: toAmount
-                    },
-                    {
-                        unencodedAddress: address,
-                        amount:
-                    }
-
-                ]}
-                , undefined, undefined,
+                to,
+                undefined, undefined,
                 false, false
             );
 
@@ -86,8 +97,10 @@ class InterfaceBlockchainTransactions {
         }
 
         try{
+
             transaction.validateFrom();
             transaction.validateTo();
+
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception.toString());
             return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }

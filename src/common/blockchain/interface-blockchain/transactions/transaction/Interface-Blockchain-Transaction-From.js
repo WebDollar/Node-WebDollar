@@ -48,7 +48,7 @@ class InterfaceBlockchainTransactionFrom{
 
         addresses.forEach ( (fromObject, index) =>{
 
-            if (typeof fromObject.unencodedAddress === "object" && fromObject.hasOwnProperty("unencodedAddress"))
+            if (typeof fromObject.unencodedAddress === "object" && fromObject.unencodedAddress.hasOwnProperty("unencodedAddress"))
                 fromObject.unencodedAddress = fromObject.unencodedAddress.unencodedAddress;
 
             fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(fromObject.unencodedAddress);
