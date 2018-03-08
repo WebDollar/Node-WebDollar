@@ -24,9 +24,9 @@ class InterfaceSatoshminDB {
 
     }
 
-    async createDocument(key, value) {
+    async _createDocument(key, value) {
 
-        await this.deleteDocumentAttachmentIfExist(key);
+        await this._deleteDocumentAttachmentIfExist(key);
 
         try {
             let response = await this.db.put({_id: key, value: value});
@@ -34,16 +34,16 @@ class InterfaceSatoshminDB {
             return true;
         } catch (err) {
             if (err.status === 409)
-                return await this.updateDocument(key, value);
+                return await this._updateDocument(key, value);
             else {
-                console.error("createDocument raised exception", key, err);
+                console.error("_createDocument raised exception", key, err);
                 throw err;
             }
         }
 
     }
 
-    async updateDocument(key, value) {
+    async _updateDocument(key, value) {
 
         try {
             let doc = await this.db.get(key);
@@ -56,13 +56,13 @@ class InterfaceSatoshminDB {
 
             return true;
         } catch (exception) {
-            console.error("updateDocument error" + key, exception);
+            console.error("_updateDocument error" + key, exception);
             throw exception;
         }
 
     }
 
-    async getDocument(key) {
+    async _getDocument(key) {
 
         try {
             let response = await this.db.get(key, {attachments: true});
@@ -79,14 +79,14 @@ class InterfaceSatoshminDB {
             if (Exception.status === 404) //NOT FOUND
                 return null;
             else {
-                console.error("error getDocument ", Exception);
+                console.error("error _getDocument ", Exception);
                 throw Exception;
             }
         }
 
     }
 
-    async deleteDocument(key) {
+    async _deleteDocument(key) {
 
         try {
             let doc = await this.db.get(key, {attachments: true});
@@ -99,14 +99,14 @@ class InterfaceSatoshminDB {
             if (err.status === 404) //NOT FOUND
                 return null;
             else {
-                console.error("deleteDocument raised an error ", key);
+                console.error("_deleteDocument raised an error ", key);
                 return err;
             }
         }
 
     }
 
-    async saveDocumentAttachment(key, value) {
+    async _saveDocumentAttachment(key, value) {
 
         let attachment = value;
         // we need blob in browser
@@ -118,7 +118,7 @@ class InterfaceSatoshminDB {
 
         try {
 
-            await this.createDocument(key, null);
+            await this._createDocument(key, null);
 
             let result = await this.db.put({
                 _id: key,
@@ -136,22 +136,22 @@ class InterfaceSatoshminDB {
 
 
             if (err.status === 409) {
-                return await this.updateDocumentAttachment(key, attachment);
+                return await this._updateDocumentAttachment(key, attachment);
             } else {
                 if (err.status === 404) {
 
                     //if document not exist, create it and recall attachment
                     try {
-                        let response = this.createDocument(key, null);
+                        let response = this._createDocument(key, null);
 
-                        return await this.saveDocumentAttachment(key, value);
+                        return await this._saveDocumentAttachment(key, value);
                     } catch (exception) {
 
-                        console.error('saveDocumentAttachment raised an error for key ' + key, exception);
+                        console.error('_saveDocumentAttachment raised an error for key ' + key, exception);
                     }
 
                 } else {
-                    console.error('saveDocumentAttachment 222 raised an error for key ' + key, err);
+                    console.error('_saveDocumentAttachment 222 raised an error for key ' + key, err);
                     throw err;
                 }
             }
@@ -160,7 +160,7 @@ class InterfaceSatoshminDB {
 
     }
 
-    async updateDocumentAttachment(key, value) {
+    async _updateDocumentAttachment(key, value) {
 
         try {
             let doc = await this.db.get(key, {attachments: true});
@@ -178,18 +178,18 @@ class InterfaceSatoshminDB {
                 });
                 return true;
             } catch (err) {
-                console.error("error updateDocumentAttachment1 " + key, err);
+                console.error("error _updateDocumentAttachment1 " + key, err);
                 throw err;
             }
 
 
         } catch (err) {
-            console.error("error updateDocumentAttachment2  " + key, err);
+            console.error("error _updateDocumentAttachment2  " + key, err);
             throw err;
         }
     }
 
-    async deleteDocumentAttachment(key) {
+    async _deleteDocumentAttachment(key) {
         try {
             let doc = await this.db.get(key);
 
@@ -203,13 +203,13 @@ class InterfaceSatoshminDB {
         }
     }
 
-    async deleteDocumentAttachmentIfExist(key) {
+    async _deleteDocumentAttachmentIfExist(key) {
 
         try {
-            let value = await this.getDocument(key);
-            return await this.deleteDocumentAttachment(key);
+            let value = await this._getDocument(key);
+            return await this._deleteDocumentAttachment(key);
         } catch (err) {
-            console.error("deleteDocumentAttachmentIfExist raised an error", err);
+            console.error("_deleteDocumentAttachmentIfExist raised an error", err);
             return false;
         }
     }
@@ -228,9 +228,9 @@ class InterfaceSatoshminDB {
 
             try {
                 if (Buffer.isBuffer(value))
-                    resolve(await this.saveDocumentAttachment(key, value));
+                    resolve(await this._saveDocumentAttachment(key, value));
                 else
-                    resolve(await this.createDocument(key, value));
+                    resolve(await this._createDocument(key, value));
 
                 clearTimeout(timeoutInterval);
             } catch (exception) {
@@ -255,7 +255,7 @@ class InterfaceSatoshminDB {
                 resolve(null);
             }, timeout);
 
-            this.getDocument(key).then((answer)=>{
+            this._getDocument(key).then((answer)=>{
 
                 clearTimeout(timeoutInterval);
                 resolve(answer);
@@ -278,7 +278,7 @@ class InterfaceSatoshminDB {
 
     async remove(key) {
         try {
-            let result = await this.deleteDocument(key);
+            let result = await this._deleteDocument(key);
             return result;
         } catch (exception) {
             console.error("db.remove error " + key, exception);
