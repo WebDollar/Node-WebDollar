@@ -79,7 +79,7 @@ class InterfaceBlockchainTransactionFrom{
      * valdiateFrom object
      * @returns from
      */
-    validateFrom(validateSignature=true){
+    validateFrom(){
 
 
         this.addresses.forEach ( (fromObject, index) =>{
@@ -99,14 +99,12 @@ class InterfaceBlockchainTransactionFrom{
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.PUBLIC_KEY_LENGTH)
                 throw "From.address.publicAddress "+index+" is not a buffer";
 
-            if (validateSignature){
-                
-                if (! fromObject.signature || fromObject.signature === null)
-                    throw 'From.address.signature '+index+' is not specified';
+            if (! fromObject.signature || fromObject.signature === null)
+                throw 'From.address.signature '+index+' is not specified';
 
-                if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
-                    throw "From.address.signature "+index+" is not a buffer";
-            }
+            if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
+                throw "From.address.signature "+index+" is not a buffer";
+
 
         });
         

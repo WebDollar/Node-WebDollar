@@ -36,7 +36,8 @@ class InterfaceBlockchainTransactions {
 
             transaction = new InterfaceTransaction(
                 {addresses: {unencodedAddress: address, publicKey: 666}, currency: currency},
-                {addresses: {unencodedAddress: toAddress, amount: toAmount}, fee: fee}, undefined, undefined, undefined
+                {addresses: {unencodedAddress: toAddress, amount: toAmount}, fee: fee}, undefined, undefined,
+                false, false
             );
 
         } catch (exception) {
@@ -50,6 +51,14 @@ class InterfaceBlockchainTransactions {
             signature = address.signTransaction(transaction, password);
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception.toString());
+            return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }
+        }
+
+        try{
+            transaction.validateFrom();
+            transaction.validateTo();
+        } catch (exception){
+            console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception.toString());
             return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }
         }
 

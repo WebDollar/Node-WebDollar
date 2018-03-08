@@ -20,7 +20,7 @@ class InterfaceBlockchainTransaction{
      *
      */
 
-    constructor(from, to, nonce, txId){
+    constructor(from, to, nonce, txId, validateFrom=true, validateTo=true){
 
         this.from = null;
         this.to = null;
@@ -40,7 +40,9 @@ class InterfaceBlockchainTransaction{
 
             this.from = from;
 
-            this.from.validateFrom();
+            if (validateFrom)
+                this.from.validateFrom();
+
         } catch (exception){
 
             console.error("Transaction From Error", exception);
@@ -55,11 +57,12 @@ class InterfaceBlockchainTransaction{
 
             this.to = to;
 
-            this.to.validateTo();
+            if (validateTo)
+                this.to.validateTo();
 
         } catch (exception){
 
-            console.error("Transaction From Error", exception);
+            console.error("Transaction To Error", exception);
             throw exception;
         }
 
