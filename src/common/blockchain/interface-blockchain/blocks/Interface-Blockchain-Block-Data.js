@@ -5,7 +5,7 @@ import Serialization from 'common/utils/Serialization'
 
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
-import InterfaceBlockchainTransaction from "../transactions/transaction/Interface-Blockchain-Transaction";
+import InterfaceBlockchanBlockDataTransactions from "./Interface-Blockchain-Block-Data-Transactions";
 
 class InterfaceBlockchainBlockData {
 
@@ -20,12 +20,7 @@ class InterfaceBlockchainBlockData {
 
         this.setMinerAddress(minerAddress);
 
-        this.transactions = transactions||[];
-
-        if (hashTransactions === undefined)
-            hashTransactions = this.calculateHashTransactions();
-
-        this.hashTransactions = hashTransactions;
+        this.transactions = new InterfaceBlockchanBlockDataTransactions(this, transactions, hashTransactions);
 
         this.hashData = hashData;
 
@@ -60,46 +55,14 @@ class InterfaceBlockchainBlockData {
         return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataHeaderPrefix(true) ));
     }
 
-    calculateHashTransactions (){
-
-        if (this._onlyHeader)
-            return this.hashTransactions;
-        else
-            return WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( this._computeBlockDataTransactionsConcatenate() ));
-    }
-
-    _computeBlockDataTransactionsConcatenate(){
-
-        let bufferList = [];
-
-        for (let i = 0; i < this.transactions.length; i++)
-            bufferList.push( this.transactions[i].serializeTransaction() );
-
-        return Buffer.concat( bufferList )
-
-    }
-
-    _serializeTransactions(onlyHeader = false){
-
-        let list = [ Serialization.serializeToFixedBuffer( 32, this.hashTransactions ) ];
-
-        if ( !onlyHeader  && !this._onlyHeader ) {
-            list.push(Serialization.serializeNumber4Bytes(this.transactions.length));
-            for (let i = 0; i < this.transactions.length; i++)
-                list.push(this.transactions[i].serializeTransaction());
-        }
-
-        return Buffer.concat(list);
-    }
-
     _computeBlockDataHeaderPrefix(onlyHeader = false){
 
-        if (this.hashTransactions === undefined || this.hashTransactions === null)
-            this.hashTransactions = this.calculateHashTransactions();
+        if (this.transactions.hashTransactions === undefined || this.transactions.hashTransactions === null)
+            this.transactions.hashTransactions = this.transactions.calculateHashTransactions();
 
         return Buffer.concat ( [
             Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress ),
-            this._serializeTransactions(onlyHeader),
+            this.transactions.serializeTransactions(onlyHeader),
         ]);
 
     }
@@ -127,28 +90,11 @@ class InterfaceBlockchainBlockData {
         this.minerAddress = BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH );
         offset += consts.PUBLIC_ADDRESS_LENGTH;
 
-        offset = this._deserializeTransactions(buffer, offset, onlyHeader);
+        offset = this.transactions.deserializeTransactions(buffer, offset, onlyHeader);
 
         return offset;
     }
 
-    _deserializeTransactions(buffer, offset, onlyHeader = false){
-
-        this.hashTransactions = BufferExtended.substr(buffer, offset, 32 );
-        offset += 32;
-
-        if (!onlyHeader && !this._onlyHeader) {
-            let length = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 4));
-            offset += 4;
-
-            for (let i = 0; i < length; i++) {
-                let transaction = new InterfaceBlockchainTransaction(this.blockchain, undefined, undefined, undefined, undefined, undefined);
-                offset = transaction.deserializeTransaction(buffer, offset);
-            }
-        }
-
-        return offset;
-    }
 
     toString(){
 

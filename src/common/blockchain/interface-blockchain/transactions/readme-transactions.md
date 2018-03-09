@@ -2,7 +2,7 @@
 
 Transaction:
 
-from => to
+[from] => [to]
 
 Transaction (from, to)
 
@@ -10,7 +10,7 @@ Transaction (from, to)
 
 ```
 {
-    addresses: [Addr1, Addr2, Addr3], - Array of Addresses 
+    addresses: [Addr1, Addr2, Addr3], - Array of Addresses
     currency: WEBD or Token   
 }
 ```
@@ -20,7 +20,7 @@ Where Addr1, Addr2, Addr3 are objects
 {
     publicAddress
     publicKey, 
-    digital signed          
+    digital signatures for the outputs
 }
 ```        
 
@@ -34,12 +34,6 @@ Where Addr1, Addr2, Addr3 are objects
             amount: amount
           }, etc... 
         ]
-        
-    fee: { 
-        amount: amount
-        }    
-        
-        
 }
 
 ```

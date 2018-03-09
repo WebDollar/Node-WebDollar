@@ -1,4 +1,3 @@
-
 import InterfaceBlockchainTransactionFrom from './Interface-Blockchain-Transaction-From'
 import InterfaceBlockchainTransactionTo from './Interface-Blockchain-Transaction-To'
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
@@ -192,7 +191,6 @@ class InterfaceBlockchainTransaction{
             result.txId = this.txId;
 
         return result;
-
     }
 
 }

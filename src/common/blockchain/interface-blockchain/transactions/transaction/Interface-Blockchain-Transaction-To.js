@@ -9,8 +9,8 @@ class InterfaceBlockchainTransactionTo{
 
     /*
         addresses: [ {
-        address: Addr1,
-        amount: amount
+            address: Addr1,
+            amount: amount
         }, ... ]
      */
 

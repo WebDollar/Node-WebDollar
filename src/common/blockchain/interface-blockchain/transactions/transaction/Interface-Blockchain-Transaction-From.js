@@ -3,6 +3,8 @@ import Serialization from "common/utils/Serialization"
 import consts from "consts/const_global"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
+const schnorr = require('schnorr');
+
 //TODO MULTISIG TUTORIAL https://www.youtube.com/watch?v=oTsjMz3DaLs
 
 class InterfaceBlockchainTransactionFrom{
@@ -73,7 +75,7 @@ class InterfaceBlockchainTransactionFrom{
     toJSON(){
         return {
             addresses: this.addresses,
-            currency: this.currency,
+            currencyTokenId: this.currencyTokenId,
         }
     }
 
@@ -178,7 +180,11 @@ class InterfaceBlockchainTransactionFrom{
             if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
                 throw "From.address.signature "+index+" is not a buffer";
 
-            schnorr.verify( this.serializeForSigning(index) , fromObject.signature, fromObject.publicKey )
+            let verification = schnorr.verify( this.serializeForSigning(index) , fromObject.signature, fromObject.publicKey );
+
+            if (!verification){
+                throw "From.address.signature "+index+" is not correct";
+            }
 
         });
 

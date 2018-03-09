@@ -9,14 +9,14 @@ class InterfaceTransactionsPendingQueue {
         this.db = db;
     }
 
-    includePendingTransaction (transaction){
+    includePendingTransaction (transaction, exceptSockets){
 
         if (this.findTransaction(transaction) === -1){
             return false;
         }
 
         this.list.push(transaction);
-        transaction.propagateTransaction();
+        transaction.propagateTransaction(exceptSockets);
 
         return true;
 
@@ -43,8 +43,8 @@ class InterfaceTransactionsPendingQueue {
 
     }
 
-    propagateTransaction(transaction){
-        NodePropagationProtocol.propagateNewPendingTransaction(transaction)
+    propagateTransaction(transaction, exceptSocket){
+        NodePropagationProtocol.propagateNewPendingTransaction(transaction, exceptSocket)
     }
 
 
