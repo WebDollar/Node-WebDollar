@@ -71,7 +71,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
                         transaction.updateAccountantTree();
 
-                        revert.transactions.end = i;
+                        revert.transactions.end = index;
                     }
                     else
                         throw "couldn't process the transaction " + index;

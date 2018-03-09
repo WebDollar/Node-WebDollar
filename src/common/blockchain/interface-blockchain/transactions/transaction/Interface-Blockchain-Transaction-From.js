@@ -243,19 +243,18 @@ class InterfaceBlockchainTransactionFrom{
     updateAccountantTreeFrom(){
 
         let revertValues = [];
+
         try {
 
             for (let i = 0; i < this.addresses.length; i++) {
 
                 let addressValue = this.transaction.blockchain.accountantTree.getBalance(this.addresses[i].unencodedAddress, this.currencyTokenId);
 
-                if (addressValue === null)
-                    throw "value is empty";
+                if (addressValue === null) throw "value is empty";
 
                 let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, addressValue.negated(), this.currencyTokenId);
 
-                if (result !== null)
-                    throw "error Updating Account";
+                if (result !== null) throw "error Updating Account";
 
                 revertValues.push({index: i, addressValue: addressValue});
 
@@ -263,11 +262,10 @@ class InterfaceBlockchainTransactionFrom{
 
         } catch (exception){
 
-            for (let i=revertValues.length; i >= 0 ; i--) {
+            for (let i=revertValues.length-1; i >= 0 ; i--) {
                 let result = this.transaction.blockchain.updateAccount(this.addresses[revertValues[i].index].unencodedAddress, revertValues[i].addressValue, this.currencyTokenId);
 
-                if (result !== null)
-                    throw "error Updating Account";
+                if (result !== null) throw "error Updating Account";
             }
 
         }

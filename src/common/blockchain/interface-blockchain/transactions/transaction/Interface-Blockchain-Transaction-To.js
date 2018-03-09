@@ -130,6 +130,31 @@ class InterfaceBlockchainTransactionTo{
 
     updateAccountantTreeTo(){
 
+        let lastPosition;
+
+        try {
+
+            for (let i = 0; i < this.addresses.length; i++) {
+
+                if (this.addresses[i].amount instanceof BigNumber === false) throw "amount is not BigNumber";
+
+                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount, this.transaction.from.currencyTokenId);
+
+                if (result !== null) throw "error Updating Account";
+
+                lastPosition = i;
+            }
+
+        } catch (exception){
+
+            for (let i=lastPosition; i >= 0 ; i--) {
+                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount, this.transaction.from.currencyTokenId);
+
+                if (result !== null) throw "error Updating Account";
+            }
+
+        }
+
     }
 
 }
