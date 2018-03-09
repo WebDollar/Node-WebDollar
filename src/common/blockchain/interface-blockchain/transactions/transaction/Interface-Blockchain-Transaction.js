@@ -37,7 +37,7 @@ class InterfaceBlockchainTransaction{
         try {
 
             if (!(from instanceof InterfaceBlockchainTransactionFrom))
-                from = new InterfaceBlockchainTransactionFrom(this.blockchain, from);
+                from = new InterfaceBlockchainTransactionFrom(this, from);
 
             this.from = from;
 
@@ -54,7 +54,7 @@ class InterfaceBlockchainTransaction{
         try{
 
             if (! (to instanceof InterfaceBlockchainTransactionTo) )
-                to = new InterfaceBlockchainTransactionTo(this.blockchain, to);
+                to = new InterfaceBlockchainTransactionTo(this, to);
 
             this.to = to;
 
@@ -94,7 +94,6 @@ class InterfaceBlockchainTransaction{
     }
 
     setTransactionAddressesTo( addresses, fee ){
-
         //validate addresses
         this.to = this.to.setTo( addresses, fee );
     }
@@ -124,7 +123,7 @@ class InterfaceBlockchainTransaction{
 
         //validate amount
         let inputSum = this.from.calculateInputSum();
-        let outputSum = this.to.calculateOutputSum(this.from);
+        let outputSum = this.to.calculateOutputSum();
 
         if (inputSum.isLessThan(outputSum))
             throw "Transaction Validation Input is smaller than Output";
@@ -167,7 +166,6 @@ class InterfaceBlockchainTransaction{
 
             offset = this.from.deserializeFrom(buffer, offset);
             offset = this.to.deserializeTo(buffer, offset);
-
 
         } catch (exception){
             console.error("error deserializing a transaction ", exception);

@@ -14,9 +14,9 @@ class InterfaceBlockchainTransactionTo{
         }, ... ]
      */
 
-    constructor (blockchain, addresses){
+    constructor (transaction, addresses){
 
-        this.blockchain = blockchain;
+        this.transaction = transaction;
         this.setTo(addresses);
     }
 
@@ -77,13 +77,13 @@ class InterfaceBlockchainTransactionTo{
         return true;
     }
 
-    calculateOutputSum(from){
+    calculateOutputSum(){
 
         //validate amount
         let outputValues = [], outputSum = BigNumber(0);
 
         for (let i=0; i<this.addresses.length; i++ ){
-            let value = this.blockchain.accountantTree.getBalance( this.addresses[i].unencodedAddress, from.currencyTokenId );
+            let value = this.transaction.blockchain.accountantTree.getBalance( this.addresses[i].unencodedAddress, this.transaction.from.currencyTokenId );
             outputValues.push( value );
             outputSum = outputSum.plus(value);
         }
@@ -113,6 +113,7 @@ class InterfaceBlockchainTransactionTo{
         offset += 1;
 
         for (let i = 0; i < length; i++){
+
             let address = {};
 
             address.unencodedAddress= BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);

@@ -28,8 +28,9 @@ class InterfaceBlockchainTransactionFrom{
 
      */
 
-    constructor (blockchain, addresses, currencyTokenId){
-        this.blockchain = blockchain;
+    constructor (transaction, addresses, currencyTokenId){
+
+        this.transaction = transaction;
 
         this.setFrom(addresses, currencyTokenId);
     }
@@ -44,7 +45,6 @@ class InterfaceBlockchainTransactionFrom{
 
         if (!Array.isArray(addresses))
             addresses = [addresses];
-
 
         addresses.forEach ( (fromObject, index) =>{
 
@@ -103,14 +103,10 @@ class InterfaceBlockchainTransactionFrom{
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.PUBLIC_KEY_LENGTH)
                 throw "From.address.publicAddress "+index+" is not a buffer";
 
-            if (! fromObject.signature || fromObject.signature === null)
-                throw 'From.address.signature '+index+' is not specified';
-
-            if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
-                throw "From.address.signature "+index+" is not a buffer";
-
 
         });
+
+        this.validateSignatures();
         
         if (!this.currencyTokenId || this.currencyTokenId === null) throw 'From.currency is not specified';
 
@@ -131,7 +127,7 @@ class InterfaceBlockchainTransactionFrom{
         let inputValues = [], inputSum = BigNumber(0);
 
         for (let i=0; i<this.addresses.length; i++ ){
-            let value = this.blockchain.accountantTree.getBalance( this.addresses[i].unencodedAddress, this.currencyTokenId );
+            let value = this.transaction.blockchain.accountantTree.getBalance( this.addresses[i].unencodedAddress, this.currencyTokenId );
             inputValues.push( value );
             inputSum = inputSum.plus(value);
         }
@@ -148,22 +144,43 @@ class InterfaceBlockchainTransactionFrom{
         return -1;
     }
 
-    serializeForSigning( unencodedAddress, version, nonce, transactionTo ){
+    serializeForSigning( unencodedAddress){
 
-        let position = this.findAddressIndex(unencodedAddress);
+        let position;
 
-        if (position === -1)
+        if (typeof unencodedAddress === "number")
+            position = unencodedAddress;
+        else
+            position = this.findAddressIndex(unencodedAddress);
+
+        if (position < 0 || position > this.addresses.length)
             throw "address was not found";
 
         return Buffer.concat ([
 
-            Serialization.serializeNumber1Byte( version ),
-            Serialization.serializeNumber1Byte( nonce ),
+            Serialization.serializeNumber1Byte( this.transaction.version ),
+            Serialization.serializeNumber1Byte( this.transaction.nonce ),
             Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[position].unencodedAddress ),
             Serialization.serializeToFixedBuffer( consts.PUBLIC_KEY_LENGTH, this.addresses[position].publicKey ),
-            transactionTo.serializeTo(),
+            this.transaction.to.serializeTo(),
 
         ]) ;
+
+    }
+
+    validateSignatures(){
+
+        this.addresses.forEach( (fromObject, index) =>{
+
+            if (! fromObject.signature || fromObject.signature === null)
+                throw 'From.address.signature '+index+' is not specified';
+
+            if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
+                throw "From.address.signature "+index+" is not a buffer";
+
+            schnorr.verify( this.serializeForSigning(index) , fromObject.signature, fromObject.publicKey )
+
+        });
 
     }
 

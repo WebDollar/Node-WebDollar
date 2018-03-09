@@ -97,10 +97,7 @@ class InterfaceBlockchainTransactions {
         }
 
         try{
-
-            transaction.validateFrom();
-            transaction.validateTo();
-
+            transaction.validateTransaction();
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception.toString());
             return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }
