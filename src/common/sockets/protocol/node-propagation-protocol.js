@@ -74,7 +74,6 @@ class NodePropagationProtocol {
 
                             let transaction = new InterfaceBlockchainTransaction(Blockchain.blockchain, from, to, nonce);
 
-                            alert('it must verify if it already exists');
                             if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction))
                                 throw "i already have this transaction";
 

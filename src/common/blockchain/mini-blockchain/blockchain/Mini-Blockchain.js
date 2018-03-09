@@ -6,7 +6,6 @@ import MiniBlockchainBlock from '../blocks/Mini-Blockchain-Block'
 import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 
-
 let inheritBlockchain;
 
 if (consts.POPOW_PARAMS.ACTIVATED)
@@ -63,13 +62,26 @@ class MiniBlockchain extends  inheritBlockchain{
 
             //validate transactions & tree
             revert.transactions.start = 0;
-            for (let i = 0; i < block.data.transactions.length; i++) {
+
+            block.data.transactions.transactions.forEach((transaction, index)=>{
                 //TO DO
-                if (1===1){
-                    revert.transactions.end = i;
-                } else
-                    throw "couldn't process the transaction "+i;
-            }
+                try {
+
+                    if ( transaction.validateTransaction() ) {
+
+                        transaction.updateAccountantTree();
+
+                        revert.transactions.end = i;
+                    }
+                    else
+                        throw "couldn't process the transaction " + index;
+
+                } catch (exception){
+                    console.error("couldn't process the transaction " + index, exception)
+                }
+
+            });
+
 
             //inheriting blockchain includeBlockchainBlock
             result = await callback();

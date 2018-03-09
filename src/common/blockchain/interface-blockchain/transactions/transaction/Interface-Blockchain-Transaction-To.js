@@ -128,6 +128,10 @@ class InterfaceBlockchainTransactionTo{
         return offset;
     }
 
+    updateAccountantTreeTo(){
+
+    }
+
 }
 
 export default InterfaceBlockchainTransactionTo;

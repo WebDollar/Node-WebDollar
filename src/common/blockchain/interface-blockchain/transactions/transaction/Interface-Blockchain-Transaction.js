@@ -193,6 +193,19 @@ class InterfaceBlockchainTransaction{
         return result;
     }
 
+    /**
+     * It will update the Accountant Tree
+     */
+
+    updateAccountantTree(){
+
+        this.from.updateAccountantTreeFrom();
+        this.to.updateAccountantTreeTo();
+
+        return true;
+
+    }
+
 }
 
 export default InterfaceBlockchainTransaction
