@@ -1,12 +1,11 @@
-const axios = require('axios');
 const ipaddr = require('ipaddr.js');
+
 import {getContinentFromCountry} from './data/continents.js';
 import SocketAddress from 'common/sockets/socket-address'
 
-class GeoHelper {
+import DownloadHelper from "common/utils/helpers/Download-Helper"
 
-    constructor(){
-    }
+class GeoHelper {
 
     async getLocationFromAddress(address, skipSocketAddress){
 
@@ -30,11 +29,9 @@ class GeoHelper {
                 localIP = true;
             }
 
-            let data = await this.downloadFile("http://ip-api.com/json/"+address, 40*1000);
-            if (data === null)
-                data = await this.downloadFile("http://freegeoip.net/json/"+address, 40*1000);
+            let data = await DownloadHelper.downloadMultipleFiles(["http://ip-api.com/json/"+address, "http://freegeoip.net/json/"+address ], 30000);
 
-            if (data !== null){
+            if (data !== null && data !== undefined){
 
                 let countryCode = '';
                 let country = '';
@@ -83,35 +80,7 @@ class GeoHelper {
 
     }
 
-    async downloadFile(address, timeout){
-        try{
-            let axiosInstance = axios.create({
-                timeout: timeout,
-            });
 
-            let response = await axiosInstance.get(address);
-            if (response === null) return null;
-
-            let data = response.data;
-
-            if (typeof data === 'string'){
-                try {
-                    data = JSON.parse(data);
-                } catch (exception){
-                    console.error("Error processing downloadFile data", data, exception);
-                }
-            }
-
-            if (typeof data === 'object') return data;
-
-            return null;
-        }
-        catch(Exception){
-            console.log("ERROR downloading list: ", address);
-            console.log(Exception.toString());
-            return null;
-        }
-    }
 
 }
 
