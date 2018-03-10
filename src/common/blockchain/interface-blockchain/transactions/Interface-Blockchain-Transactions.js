@@ -53,23 +53,22 @@ class InterfaceBlockchainTransactions {
 
             let value = this.blockchain.accountantTree.getBalance( address, currencyTokenId );
 
-            let from = {addresses: {unencodedAddress: address, publicKey: 666}, currencyTokenId: currencyTokenId};
+            let from = {
+                addresses: {
+                    unencodedAddress: address,
+                    publicKey: undefined,
+                    amount: toAmount.plus(fee)
+                },
+                currencyTokenId: currencyTokenId
+            };
 
-            let change = value.minus ( toAmount.plus(fee) );
-
-            let to = {addresses: [
+            let to = {
+                addresses: [
                 {
                     unencodedAddress: toAddress,
                     amount: toAmount
                 },
             ]};
-
-            if (change.isGreaterThan(0)){
-                to.addresses.push({
-                    unencodedAddress: address,
-                    amount: change
-                });
-            }
 
             transaction = new InterfaceTransaction(
 

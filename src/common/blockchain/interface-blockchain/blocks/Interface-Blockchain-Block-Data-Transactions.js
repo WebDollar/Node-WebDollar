@@ -75,4 +75,4 @@ class InterfaceBlockchainBlockDataTransactions {
 
 }
 
-export default new InterfaceBlockchainBlockDataTransactions();
+export default InterfaceBlockchainBlockDataTransactions;

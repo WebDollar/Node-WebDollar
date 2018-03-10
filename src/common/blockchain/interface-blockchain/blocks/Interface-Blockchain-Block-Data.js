@@ -5,7 +5,7 @@ import Serialization from 'common/utils/Serialization'
 
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
-import InterfaceBlockchanBlockDataTransactions from "./Interface-Blockchain-Block-Data-Transactions";
+import InterfaceBlockchainBlockDataTransactions from "./Interface-Blockchain-Block-Data-Transactions";
 
 class InterfaceBlockchainBlockData {
 
@@ -20,7 +20,7 @@ class InterfaceBlockchainBlockData {
 
         this.setMinerAddress(minerAddress);
 
-        this.transactions = new InterfaceBlockchanBlockDataTransactions(this, transactions, hashTransactions);
+        this.transactions = new InterfaceBlockchainBlockDataTransactions(this, transactions, hashTransactions);
 
         this.hashData = hashData;
 

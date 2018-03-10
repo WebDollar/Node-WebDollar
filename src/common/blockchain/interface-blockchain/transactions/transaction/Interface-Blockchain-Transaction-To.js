@@ -62,13 +62,13 @@ class InterfaceBlockchainTransactionTo{
         this.addresses.forEach ( (toObject, index) =>{
 
             if (!toObject.unencodedAddress || toObject.unencodedAddress === null || !Buffer.isBuffer(toObject.unencodedAddress))
-                throw 'To.Object Address is not specified';
+                throw {message: 'To.Object Address is not specified', address: toObject, index:index} ;
 
             if (!toObject.amount ||  toObject.amount instanceof BigNumber === false )
-                throw 'To.Object Amount is not specified';
+                throw {message: 'To.Object Amount is not specified', address: toObject, index:index} ;
 
-            if ( toObject.amount.isLessThan(0) )
-                throw "To.Object Amount is an invalid number";
+            if ( toObject.amount.isLessThanOrEqualTo(0) )
+                throw {message: "To.Object Amount is an invalid number", address: toObject, index:index} ;
 
         });
 
@@ -128,7 +128,7 @@ class InterfaceBlockchainTransactionTo{
         return offset;
     }
 
-    updateAccountantTreeTo(){
+    updateAccountantTreeTo(multiplicationFactor=1){
 
         let lastPosition;
 
@@ -136,11 +136,11 @@ class InterfaceBlockchainTransactionTo{
 
             for (let i = 0; i < this.addresses.length; i++) {
 
-                if (this.addresses[i].amount instanceof BigNumber === false) throw "amount is not BigNumber";
+                if (this.addresses[i].amount instanceof BigNumber === false) throw {message: "amount is not BigNumber", address: this.addresses[i]};
 
-                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount, this.transaction.from.currencyTokenId);
+                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor), this.transaction.from.currencyTokenId);
 
-                if (result !== null) throw "error Updating Account";
+                if (result !== null) throw {message: "error Updating Account", address: this.addresses[i]}
 
                 lastPosition = i;
             }
@@ -148,9 +148,9 @@ class InterfaceBlockchainTransactionTo{
         } catch (exception){
 
             for (let i=lastPosition; i >= 0 ; i--) {
-                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount, this.transaction.from.currencyTokenId);
+                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor).negated(), this.transaction.from.currencyTokenId);
 
-                if (result !== null) throw "error Updating Account";
+                if (result !== null) throw {message: "error Updating Account", address: this.addresses[i]};
             }
 
         }

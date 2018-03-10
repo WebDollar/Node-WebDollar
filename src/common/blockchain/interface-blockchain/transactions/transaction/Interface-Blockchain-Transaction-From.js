@@ -17,11 +17,13 @@ class InterfaceBlockchainTransactionFrom{
                 unencodedAddress1,
                 publicKey1,
                 signature
+                amount
             },
             {
                 unencodedAddress2,
                 publicKey2
                 signature
+                amount
             }
 
         ]
@@ -61,6 +63,9 @@ class InterfaceBlockchainTransactionFrom{
             if (typeof fromObject.signature === "string")
                 fromObject.signature = new Buffer (fromObject.signature, "hex");
 
+            if (fromObject.amount  instanceof BigNumber === false)
+                fromObject.amount = new BigNumber(fromObject.amount);
+
         });
 
         if (currencyTokenId === undefined){
@@ -86,39 +91,52 @@ class InterfaceBlockchainTransactionFrom{
     validateFrom(){
 
         if (this.addresses.length === 0)
-            throw "From.addresses is empty";
+            throw {message: "From.addresses is empty", addresses: this.addresses};
+
+        if (!this.currencyTokenId || this.currencyTokenId === null) throw {message: 'From.currency is not specified', currencyTokenId: this.currencyTokenId};
+
+        if (!Buffers.isBuffer(this.currencyTokenId))
+            throw {message: 'To.currencyTokenId is not a buffer', currencyTokenId: this.currencyTokenId};
+
+        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH) )
+            throw { message: "To.currencyTokenId is not valid", currencyTokenId: this.currencyTokenId };
+
+        //TODO validate currency
+
+
 
         this.addresses.forEach ( (fromObject, index) =>{
 
             if (! fromObject.unencodedAddress || fromObject.unencodedAddress === null)
-                throw 'From.address.unencodedAddress '+index+' is not specified';
+                throw { message: 'From.address.unencodedAddress is not specified', address: fromObject, index: index };
 
             if (! InterfaceBlockchainAddressHelper.validateAddressChecksum(fromObject.unencodedAddress) )
-                throw "From.address.unencodedAddress "+index+" is not a valid address";
+                throw { message: "From.address.unencodedAddress is not a valid address", address: fromObject, index: index };
 
             if (! fromObject.publicKey || fromObject.publicKey === null)
-                throw 'From.address.publicKey '+index+' is not specified';
+                throw { message: 'From.address.publicKey '+index+' is not specified', address: fromObject, index: index };
 
             if (!Buffer.isBuffer(fromObject.unencodedAddress) || fromObject.unencodedAddress.length !== consts.PUBLIC_ADDRESS_LENGTH )
-                throw "From.address.unencodedAddress "+index+" is not a buffer";
+                throw { message: "From.address.unencodedAddress "+index+" is not a buffer", address: fromObject, index: index };
 
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.PUBLIC_KEY_LENGTH)
-                throw "From.address.publicAddress "+index+" is not a buffer";
+                throw { message: "From.address.publicAddress "+index+" is not a buffer", address: fromObject, index: index };
+
+            if (fromObject.amount instanceof BigNumber === false )
+                throw { message: "From.address.amount "+index+" is not a number", address: fromObject, index: index };
+
+            let value = this.transaction.blockchain.accountantTree.getBalance( fromObject.unencodedAddress, this.currencyTokenId );
+            if (value.isLessThan(fromObject.amount))
+                throw { message: "Value is Less than From.address.amount", address: fromObject, index: index };
+
+            if ( fromObject.amount.isLessThanOrEqualTo(0) )
+                throw {message: "Amount is an invalid number", address: fromObject, index: index };
 
 
         });
 
         this.validateSignatures();
-        
-        if (!this.currencyTokenId || this.currencyTokenId === null) throw 'From.currency is not specified';
 
-        if (!Buffers.isBuffer(this.currencyTokenId))
-            throw 'To.currencyTokenId is not a buffer';
-
-        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH) )
-            throw "To.currencyTokenId is not valid";
-
-        //TODO validate currency
 
         return true;
     }
@@ -129,9 +147,8 @@ class InterfaceBlockchainTransactionFrom{
         let inputValues = [], inputSum = BigNumber(0);
 
         for (let i=0; i<this.addresses.length; i++ ){
-            let value = this.transaction.blockchain.accountantTree.getBalance( this.addresses[i].unencodedAddress, this.currencyTokenId );
-            inputValues.push( value );
-            inputSum = inputSum.plus(value);
+            inputValues.push( this.addresses[i].amount );
+            inputSum = inputSum.plus( this.addresses[i].amount );
         }
 
         return inputSum;
@@ -175,15 +192,15 @@ class InterfaceBlockchainTransactionFrom{
         this.addresses.forEach( (fromObject, index) =>{
 
             if (! fromObject.signature || fromObject.signature === null)
-                throw 'From.address.signature '+index+' is not specified';
+                throw {message: 'From.address.signature is not specified' , address: fromObject, index: index };
 
             if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
-                throw "From.address.signature "+index+" is not a buffer";
+                throw {message: "From.address.signature "+index+" is not a buffer", address: fromObject, index: index };
 
             let verification = schnorr.verify( this.serializeForSigning(index) , fromObject.signature, fromObject.publicKey );
 
             if (!verification){
-                throw "From.address.signature "+index+" is not correct";
+                throw {message: "From.address.signature "+index+" is not correct", address: fromObject, index: index };
             }
 
         });
@@ -199,6 +216,7 @@ class InterfaceBlockchainTransactionFrom{
             array.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].unencodedAddress ));
             array.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_KEY_LENGTH, this.addresses[i].publicKey ));
             array.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS_SIGNATURE_LENGTH, this.addresses[i].signature ));
+            array.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
         }
 
         array.push(Serialization.serializeNumber1Byte( this.currencyTokenId.length ));
@@ -228,6 +246,13 @@ class InterfaceBlockchainTransactionFrom{
             address.signature= BufferExtended.substr(buffer, offset, consts.TRANSACTIONS_SIGNATURE_LENGTH);
             offset += consts.TRANSACTIONS_SIGNATURE_LENGTH;
 
+            address.signature = BufferExtended.substr(buffer, offset, consts.TRANSACTIONS_SIGNATURE_LENGTH);
+            offset += consts.TRANSACTIONS_SIGNATURE_LENGTH;
+
+            let result = Serialization.deserializeBigNumber(buffer, offset);
+            address.amount = result.number;
+            offset += result.newOffset;
+
             this.addresses.push(address);
         }
 
@@ -240,32 +265,28 @@ class InterfaceBlockchainTransactionFrom{
 
     }
 
-    updateAccountantTreeFrom(){
+    updateAccountantTreeFrom(multiplicationFactor=1){
 
-        let revertValues = [];
+        let lastPosition;
 
         try {
 
             for (let i = 0; i < this.addresses.length; i++) {
 
-                let addressValue = this.transaction.blockchain.accountantTree.getBalance(this.addresses[i].unencodedAddress, this.currencyTokenId);
+                if (this.addresses[i].amount instanceof BigNumber === false) throw {message: "amount is not BigNumber",  address: this.addresses[i]};
 
-                if (addressValue === null) throw "value is empty";
+                let result = this.transaction.blockchain.updateAccount( this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor).negated(), this.currencyTokenId);
 
-                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, addressValue.negated(), this.currencyTokenId);
-
-                if (result !== null) throw "error Updating Account";
-
-                revertValues.push({index: i, addressValue: addressValue});
+                if (result !== null) throw {message: "error Updating Account", address: this.addresses[i]};
 
             }
 
         } catch (exception){
 
-            for (let i=revertValues.length-1; i >= 0 ; i--) {
-                let result = this.transaction.blockchain.updateAccount(this.addresses[revertValues[i].index].unencodedAddress, revertValues[i].addressValue, this.currencyTokenId);
+            for (let i=lastPosition; i >= 0 ; i--) {
+                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor), this.currencyTokenId);
 
-                if (result !== null) throw "error Updating Account";
+                if (result !== null) throw {message: "error Updating Account", address: this.addresses[i]};
             }
 
         }

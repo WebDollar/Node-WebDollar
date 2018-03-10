@@ -41,7 +41,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         }
 
         if (this.balances === undefined || this.balances === null)
-            throw 'balances is null';
+            throw {message: 'balances is null', amount: value, tokenId: tokenId };
 
         if (!Buffer.isBuffer(tokenId))
             tokenId = BufferExtended.fromBase(tokenId);
@@ -69,11 +69,11 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             result = this.balances[this.balances.length-1];
         }
 
-        if (result === undefined)
-            throw 'token is empty';
+        if ( result === undefined)
+            throw { message: 'token is empty',  amount: value, tokenId: tokenId };
 
-        if (result.amount.isLessThan(0) )
-            throw 'balances became negative';
+        if ( result.amount.isLessThan(0) )
+            throw { message: 'balances became negative', amount: value, tokenId: tokenId };
 
         this._deleteBalancesEmpty();
 
@@ -83,7 +83,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         return {
             tokenId: result.id,
             amount: result.amount,
-        };
+        }
 
     }
 

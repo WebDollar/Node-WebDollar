@@ -109,13 +109,10 @@ class InterfaceBlockchainTransaction{
             throw ('nonce is empty');
 
         if (!this.from)
-            throw 'Transaction Validation Invalid: From was not specified';
-        
-        if (!this.from.address)
-            throw 'Transaction Validation Invalid: from.Address was not specified'
+            throw { message: 'Transaction Validation Invalid: From was not specified', from: this.from };
 
         if (!this.to)
-            throw 'Transaction Validation Invalid: To was not specified'
+            throw { message: 'Transaction Validation Invalid: To was not specified', to: this.to };
 
         this.from.validateFrom();
         this.to.validateTo();
@@ -125,10 +122,9 @@ class InterfaceBlockchainTransaction{
         let outputSum = this.to.calculateOutputSum();
 
         if (inputSum.isLessThan(outputSum))
-            throw "Transaction Validation Input is smaller than Output";
+            throw {message: "Transaction Validation Input is smaller than Output", input: inputSum, output: outputSum};
 
         return true;
-
     }
 
     serializeFromForSigning(unencodedAddress){
@@ -197,10 +193,10 @@ class InterfaceBlockchainTransaction{
      * It will update the Accountant Tree
      */
 
-    updateAccountantTree(){
+    updateAccountantTree(multiplicationFactor=1){
 
-        this.from.updateAccountantTreeFrom();
-        this.to.updateAccountantTreeTo();
+        this.from.updateAccountantTreeFrom(multiplicationFactor);
+        this.to.updateAccountantTreeTo(multiplicationFactor);
 
         return true;
 

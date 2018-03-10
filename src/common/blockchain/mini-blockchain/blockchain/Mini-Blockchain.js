@@ -63,24 +63,19 @@ class MiniBlockchain extends  inheritBlockchain{
             //validate transactions & tree
             revert.transactions.start = 0;
 
-            block.data.transactions.transactions.forEach((transaction, index)=>{
-                //TO DO
+            for (let i=0; i<block.data.transactions.transactions.length; i++)
                 try {
 
-                    if ( transaction.validateTransaction() ) {
+                    if ( ! block.data.transactions.transactions[i].validateTransaction() )
+                        throw "couldn't process the transaction " + i;
 
-                        transaction.updateAccountantTree();
+                    block.data.transactions.transactions[i].updateAccountantTree(1);
 
-                        revert.transactions.end = index;
-                    }
-                    else
-                        throw "couldn't process the transaction " + index;
-
+                    revert.transactions.end = i;
                 } catch (exception){
-                    console.error("couldn't process the transaction " + index, exception)
+                    console.error("couldn't process the transaction " + i, exception)
                 }
 
-            });
 
 
             //inheriting blockchain includeBlockchainBlock
@@ -102,13 +97,22 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
             //revert back the database
-            console.log("reveting", revert.revertNow, revertAutomatically)
+            console.log("reverting", revert.revertNow, revertAutomatically)
+
             if (revert.revertNow || revertAutomatically){
 
                 //revert transactions
-                for (let i = revert.transactions.end; i >= revert.transactions.start; i--) {
-                    // TO DO
-                }
+                for (let i = revert.transactions.end; i >= revert.transactions.start; i--)
+                    try {
+
+                        if ( ! block.data.transactions.transactions[i].validateTransaction() )
+                            throw "couldn't process the transaction " + i;
+
+                        block.data.transactions.transactions[i].updateAccountantTree(-1); //negated
+
+                    } catch (exception){
+                        console.error("couldn't process the transaction " + i, "it is impossible because previously it was correct", exception)
+                    }
 
                 //revert reward
                 if (revert.reward)
