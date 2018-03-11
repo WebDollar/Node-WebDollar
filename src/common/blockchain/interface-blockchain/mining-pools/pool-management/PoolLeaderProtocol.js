@@ -25,6 +25,7 @@ class PoolLeaderProtocol {
 
         this._poolData = new PoolData(databaseName);
         
+        // is the fee percent that the pool leader receives for each mined block
         this._poolLeaderFee = poolLeaderFee;
 
         //TODO: Check is needed to store/load from database
@@ -38,6 +39,8 @@ class PoolLeaderProtocol {
         
         //TODO: this stores pool leader's reward, this goes to Accountant Tree
         this._poolLeaderRewardAddress = null;
+        
+        this._resetBlockStatistics();
     }
 
     _subscribeMiner(nodesListObject) {
@@ -226,14 +229,40 @@ class PoolLeaderProtocol {
     }
 
     /**
-     * Pool has received a new reward. It must send rewards to miners
+     * Pool has mined a new block and has received a new reward. 
+     * The new reward must be shared with miners.
      * @param newReward
      */
-    async receiveNewPoolRewardFromBlockchain(newReward) {
+    async onMinedBlock(newReward) {
 
+        this._logMinedBlockStatistics();
+        
         this.updateRewards(newReward);
         await this.sendRewardsToMiners();
 
+    }
+    
+    /**
+     * This function updates the mining statistics for the last mined blocks.
+     * The PoolData class manages the statistics
+     */
+    _logMinedBlockStatistics() {
+        
+        this._poolData.addMinedBlockStatistics( this._currentBlockStatistics );
+        this._resetBlockStatistics();
+    }
+    
+    _resetBlockStatistics() {
+        /**
+         * To be able to mine a block, the pool should generate ~ numBaseHashes of difficulty baseHashDifficulty
+         * In other words: The arithmetic mean of all generated hashes by pool to mine a block should be 
+         * equal with numBaseHashes * baseHashDifficulty
+         * Each miner will receive a reward wighted on the number of baseHashDifficulty sent to pool leader.
+         */
+        this._currentBlockStatistics = {
+            baseHashDifficulty: new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            numBaseHashes: 0
+        };
     }
     
     /**

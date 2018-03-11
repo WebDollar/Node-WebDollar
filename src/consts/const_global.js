@@ -139,7 +139,7 @@ consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
 
 
 //
-consts.DATABASE_NAMES={
+consts.DATABASE_NAMES = {
     DEFAULT_DATABASE: "defaultDB",
     WALLET_DATABASE: "defaultDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
     //TODO REPLACE with "walletDB"
@@ -149,6 +149,10 @@ consts.DATABASE_NAMES={
     VALIDATE_DATABASE: "validateDB",
     TESTS_DATABASE: "testDB",
     TRANSACTIONS_DATABASE: "transactionsDB"
+};
+
+consts.MINING_POOL = {
+    LAST_K_BLOCKS: 16
 };
 
 export default consts
