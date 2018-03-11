@@ -74,7 +74,11 @@ consts.NODES_WAITLIST_INTERVAL =  5*1000; //miliseconds
 
 consts.NODES_SIGNALING_SERVER_PROTOCOL_CONNECTING_WEB_PEERS_INTERVAL = 2*1000;
 
-consts.TRANSACTIONS_SIGNATURE_LENGTH = 32;
+consts.TRANSACTIONS = {
+    SIGNATURE_SCHNORR:{
+        LENGTH : 64
+    },
+};
 
 consts.ADDRESSES = {
 
@@ -88,10 +92,12 @@ consts.ADDRESSES = {
         },
     },
     PUBLIC_KEY:{
-        LENGTH : 33, //ending BASE64 HEX
+        LENGTH : 32, //ending BASE64 HEX
     },
     ADDRESS:{
+
         LENGTH : 32,
+
         WIF:{
             VERSION_PREFIX : "00", //ending BASE64 HEX
             LENGTH : 32, //ending BASE64 HEX

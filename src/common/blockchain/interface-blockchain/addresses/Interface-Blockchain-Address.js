@@ -1,5 +1,5 @@
 const FileSystem = require('fs');
-const schnorr = require('schnorr');
+import ed25519 from "common/crypto/ed25519";
 
 import consts from 'consts/const_global'
 import InterfaceBlockchainAddressHelper from './Interface-Blockchain-Address-Helper';
@@ -10,7 +10,6 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto';
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data';
 import BufferExtended from 'common/utils/BufferExtended';
 import MultiSig from "./MultiSig";
-import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
 
 class InterfaceBlockchainAddress{
@@ -439,7 +438,8 @@ class InterfaceBlockchainAddress{
 
             let serialization = transaction.serializeFromForSigning (answer.unencodedAddress);
 
-            let signature = schnorr.sign( serialization, answer.privateKey.privateKey );
+            //let signature = schnorr.sign( serialization, answer.privateKey.privateKey );
+            let signature = ed25519.sign( serialization, answer.privateKey.privateKey );
 
             let signatureFinal = new Buffer( signature.s.toString(16), 16 );
 

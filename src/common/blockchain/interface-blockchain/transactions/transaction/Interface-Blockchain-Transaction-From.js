@@ -3,7 +3,8 @@ import Serialization from "common/utils/Serialization"
 import consts from "consts/const_global"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
-const schnorr = require('schnorr');
+import ed25519 from "common/crypto/ed25519";
+
 const BigNumber = require('bignumber.js');
 
 //TODO MULTISIG TUTORIAL https://www.youtube.com/watch?v=oTsjMz3DaLs
@@ -198,16 +199,21 @@ class InterfaceBlockchainTransactionFrom{
             if (! fromObject.signature || fromObject.signature === null)
                 throw {message: 'From.address.signature is not specified' , address: fromObject, index: index };
 
-            if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS_SIGNATURE_LENGTH)
+            if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH)
                 throw {message: "From.address.signature "+index+" is not a buffer", address: fromObject, index: index };
 
-            let verification = schnorr.verify( this.serializeForSigning(index) , fromObject.signature, fromObject.publicKey );
+            let verification =  ed25519.verify(fromObject.signature, this.serializeForSigning(index), fromObject.publicKey );
+
+            // let signature = schnorr.recover(fromObject.signature, this.serializeForSigning(index) );
+            // let verification = schnorr.verify( this.serializeForSigning(index) , signature, fromObject.publicKey );
 
             if (!verification){
                 throw {message: "From.address.signature "+index+" is not correct", address: fromObject, index: index };
             }
 
         });
+
+        return true;
 
     }
 
@@ -219,7 +225,7 @@ class InterfaceBlockchainTransactionFrom{
         for (let i = 0; i < this.addresses.length; i++){
             array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.WIF.LENGTH, this.addresses[i].unencodedAddress ));
             array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[i].publicKey ));
-            array.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS_SIGNATURE_LENGTH, this.addresses[i].signature ));
+            array.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH, this.addresses[i].signature ));
             array.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
         }
 
@@ -247,11 +253,11 @@ class InterfaceBlockchainTransactionFrom{
             address.publicKey= BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
             offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
 
-            address.signature= BufferExtended.substr(buffer, offset, consts.TRANSACTIONS_SIGNATURE_LENGTH);
-            offset += consts.TRANSACTIONS_SIGNATURE_LENGTH;
+            address.signature= BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
+            offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
 
-            address.signature = BufferExtended.substr(buffer, offset, consts.TRANSACTIONS_SIGNATURE_LENGTH);
-            offset += consts.TRANSACTIONS_SIGNATURE_LENGTH;
+            address.signature = BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
+            offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
 
             let result = Serialization.deserializeBigNumber(buffer, offset);
             address.amount = result.number;

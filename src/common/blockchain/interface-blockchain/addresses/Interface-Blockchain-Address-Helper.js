@@ -1,4 +1,5 @@
-const secp256k1 = require('secp256k1');
+import ed25519 from "common/crypto/ed25519";
+
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BufferExtended from 'common/utils/BufferExtended';
 
@@ -87,7 +88,7 @@ class InterfaceBlockchainAddressHelper{
         // Tutorial based on https://github.com/cryptocoinjs/secp256k1-node
 
         if (privateKeyWIF === null || privateKeyWIF === undefined || !Buffer.isBuffer(privateKeyWIF) ){
-            console.log("ERROR! ",  privateKeyWIF, " is not a Buffer");
+            console.error("ERROR! ",  privateKeyWIF, " is not a Buffer");
             throw 'privateKeyWIF must be a Buffer';
         }
 
@@ -96,57 +97,29 @@ class InterfaceBlockchainAddressHelper{
         if (showDebug)
             console.log("VALIDATION", validation);
 
-        if (validation.result === false){
-            return validation;
-        } else{
-            privateKeyWIF = validation.privateKey;
-        }
+        let privateKey = undefined;
 
-        if (showDebug) {
-            console.log("privateKeyWIF", privateKeyWIF, typeof privateKeyWIF);
-            console.log("secp256k1.privateKeyVerify", secp256k1.privateKeyVerify(privateKeyWIF));
-        }
+        if (validation.result === false) return validation;
+        else privateKey = validation.privateKey;
+
+        if (showDebug)
+            console.log("privateKey", privateKey, typeof privateKey);
 
         // get the public key in a compressed format
-        const pubKey = secp256k1.publicKeyCreate(privateKeyWIF);
+        const pubKey = ed25519.generatePublicKey(privateKey);
 
         if (showDebug)
             console.log("pubKey", pubKey);
 
         return new Buffer(pubKey);
-
-        // sign the message
-
-        let msg = WebDollarCrypto.getBufferRandomValues(32);
-
-        // sign the message
-        const sigObj = secp256k1.sign(msg, privateKeyWIF);
-
-        // verify the signature
-        if (showDebug)
-            console.log("secp256k1.verify", secp256k1.verify(msg, sigObj.signature, pubKey))
-
     }
 
     static verifySignedData(msg, signature, pubKey){
-
-        if (pubKey === null || !Buffer.isBuffer(pubKey) ){
-            console.log("ERROR! ",  pubKey, " is not a Buffer")
-            throw 'privateKey must be a Buffer';
-        }
-
-        if ( signature.signature !== undefined)
-            signature = signature.signature;
-
-        return secp256k1.verify(msg, signature, pubKey);
+        return ed25519.verify(signature, msg, pubKey)
     }
 
     static signMessage(msg, privateKey){
-
-        // sign the message
-        const sigObj = secp256k1.sign(msg, privateKey);
-
-        return sigObj;
+        return ed25519.sign(msg, privateKey);
     }
 
     static _generateAddressFromPublicKey(publicKey, showDebug){
