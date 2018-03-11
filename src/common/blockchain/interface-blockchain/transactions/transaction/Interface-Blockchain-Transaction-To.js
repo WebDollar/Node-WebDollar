@@ -70,6 +70,16 @@ class InterfaceBlockchainTransactionTo{
             if ( toObject.amount.isLessThanOrEqualTo(0) )
                 throw {message: "To.Object Amount is an invalid number", address: toObject, index:index} ;
 
+            let addressFound = false;
+            for (let i=0; i<this.transaction.from.addresses.length; i++)
+                if (this.transaction.from.addresses[i].unencodedAddress.equals( toObject.unencodedAddress )){
+                    addressFound = true;
+                    break;
+                }
+
+            if (addressFound)
+                throw {message: "To.Object Address is included in the input and it should not be", address: toObject}
+
         });
 
         //Validate to.currency
@@ -99,7 +109,7 @@ class InterfaceBlockchainTransactionTo{
         Serialization.serializeNumber1Byte( this.addresses.length );
 
         for (let i = 0; i < this.addresses.length; i++){
-            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.addresses[i].unencodedAddress ));
+            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.WIF.LENGTH, this.addresses[i].unencodedAddress ));
             addressesBuffer.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
         }
 
@@ -116,8 +126,8 @@ class InterfaceBlockchainTransactionTo{
 
             let address = {};
 
-            address.unencodedAddress= BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH);
-            offset += consts.PUBLIC_ADDRESS_LENGTH;
+            address.unencodedAddress= BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.WIF.LENGTH);
+            offset += consts.ADDRESSES.ADDRESS.WIF.LENGTH;
 
             let result = Serialization.deserializeBigNumber(buffer, offset);
             address.amount = result.number;

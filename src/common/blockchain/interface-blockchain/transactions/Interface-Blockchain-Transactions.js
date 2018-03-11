@@ -21,7 +21,7 @@ class InterfaceBlockchainTransactions {
         this.uniqueness = new InterfaceTransactionsUniqueness();
     }
 
-    createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined){
+    async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined){
 
         if (fee === undefined) fee = this.calculateFeeSimple(toAmount);
 
@@ -51,14 +51,14 @@ class InterfaceBlockchainTransactions {
 
         try {
 
-            let value = this.blockchain.accountantTree.getBalance( address, currencyTokenId );
-
             let from = {
-                addresses: {
-                    unencodedAddress: address,
-                    publicKey: undefined,
-                    amount: toAmount.plus(fee)
-                },
+                addresses: [
+                    {
+                        unencodedAddress: address,
+                        publicKey: undefined,
+                        amount: toAmount.plus(fee)
+                    }
+                ],
                 currencyTokenId: currencyTokenId
             };
 
@@ -70,7 +70,7 @@ class InterfaceBlockchainTransactions {
                 },
             ]};
 
-            transaction = new InterfaceTransaction(
+            transaction = new InterfaceTransaction( this.blockchain,
 
                 //from
                 from,
@@ -89,7 +89,7 @@ class InterfaceBlockchainTransactions {
 
         let signature;
         try{
-            signature = address.signTransaction(transaction, password);
+            signature = await address.signTransaction(transaction, password);
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception.toString());
             return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }

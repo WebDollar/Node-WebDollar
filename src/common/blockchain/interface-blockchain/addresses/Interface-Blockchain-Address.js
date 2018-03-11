@@ -413,13 +413,13 @@ class InterfaceBlockchainAddress{
 
         } else password = undefined;
 
-        privateKey = await address.getPrivateKey(password);
+        privateKey = await this.getPrivateKey(password);
 
         try {
 
             let answer = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey);
 
-            if (! answer.result) throw "private key is invalid";
+            if (! answer.result) throw { message: "private key is invalid" };
 
             privateKey = answer.privateKey;
 
@@ -433,17 +433,19 @@ class InterfaceBlockchainAddress{
 
             let index = transaction.from.findAddressIndex(answer.unencodedAddress);
 
-            if (index === -1) throw "transaction not found";
+            if (index === -1) throw {message: "transaction not found"};
 
             transaction.from.addresses[index].publicKey = answer.publicKey;
 
             let serialization = transaction.serializeFromForSigning (answer.unencodedAddress);
 
-            let signature = schnorr.sign( serialization, answer.privateKey );
+            let signature = schnorr.sign( serialization, answer.privateKey.privateKey );
 
-            transaction.from.addresses[index].signature = signature;
+            let signatureFinal = new Buffer( signature.s.toString(16), 16 );
 
-            return signature;
+            transaction.from.addresses[index].signature = signatureFinal;
+
+            return signatureFinal;
 
         } catch (exception) {
             console.error(exception);

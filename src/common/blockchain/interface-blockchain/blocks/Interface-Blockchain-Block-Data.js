@@ -61,7 +61,7 @@ class InterfaceBlockchainBlockData {
             this.transactions.hashTransactions = this.transactions.calculateHashTransactions();
 
         return Buffer.concat ( [
-            Serialization.serializeToFixedBuffer( consts.PUBLIC_ADDRESS_LENGTH, this.minerAddress ),
+            Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.WIF.LENGTH, this.minerAddress ),
             this.transactions.serializeTransactions(onlyHeader),
         ]);
 
@@ -87,8 +87,8 @@ class InterfaceBlockchainBlockData {
         this.hashData = BufferExtended.substr(buffer, offset, 32);
         offset += 32;
 
-        this.minerAddress = BufferExtended.substr(buffer, offset, consts.PUBLIC_ADDRESS_LENGTH );
-        offset += consts.PUBLIC_ADDRESS_LENGTH;
+        this.minerAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.WIF.LENGTH );
+        offset += consts.ADDRESSES.ADDRESS.WIF.LENGTH;
 
         offset = this.transactions.deserializeTransactions(buffer, offset, onlyHeader);
 

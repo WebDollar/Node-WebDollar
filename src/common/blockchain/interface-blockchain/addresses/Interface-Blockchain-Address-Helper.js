@@ -30,7 +30,7 @@ class InterfaceBlockchainAddressHelper{
         }
 
         if (privateKey === undefined)
-            privateKey = WebDollarCrypto.getBufferRandomValues(consts.PRIVATE_KEY_LENGTH);
+            privateKey = WebDollarCrypto.getBufferRandomValues(consts.ADDRESSES.PRIVATE_KEY.WIF.PRIVATE_KEY_LENGTH);
 
 
         //if you want to follow the step-by-step results in this article, comment the
@@ -47,7 +47,7 @@ class InterfaceBlockchainAddressHelper{
          */
 
             //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
-        let privateKeyAndVersion = Buffer.concat( [ Buffer.from(consts.PRIVATE_KEY_VERSION_PREFIX, "hex"),  privateKey] );
+        let privateKeyAndVersion = Buffer.concat( [ Buffer.from(consts.ADDRESSES.PRIVATE_KEY.WIF.VERSION_PREFIX, "hex"),  privateKey] );
         let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(privateKeyAndVersion, showDebug);
 
 
@@ -185,14 +185,14 @@ class InterfaceBlockchainAddressHelper{
         if (!Buffer.isBuffer(address))
             address = BufferExtended.fromBase(address);
 
-        let prefix = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_PREFIX_BASE64 : consts.PUBLIC_ADDRESS_PREFIX_BASE58);
-        let suffix = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58);
+        let prefix = ( consts.ADDRESSES.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
+        let suffix = ( consts.ADDRESSES.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
 
         //maybe address is already a
-        if (address.length === consts.PUBLIC_KEY_LENGTH + consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH  + consts.PUBLIC_ADDRESS_VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2)
+        if (address.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2)
             return address;
 
-        address = Buffer.concat ( [ Buffer.from(consts.PUBLIC_ADDRESS_VERSION_PREFIX,"hex"), address ]) ; //if using testnet, would use 0x6F or 111.
+        address = Buffer.concat ( [ Buffer.from(consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX,"hex"), address ]) ; //if using testnet, would use 0x6F or 111.
 
         let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(address, showDebug);
 
@@ -248,7 +248,7 @@ class InterfaceBlockchainAddressHelper{
             privateKeyAndVersion = Buffer.from(privateKeyAndVersion, 'hex');
 
         let secondSHA = WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(privateKeyAndVersion));
-        let checksum = BufferExtended.substr(secondSHA, 0, consts.PRIVATE_KEY_CHECK_SUM_LENGTH );
+        let checksum = BufferExtended.substr(secondSHA, 0, consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH );
 
         if (showDebug)
             console.log("checksum", checksum.toString("hex")); //"206EC97E"
@@ -274,27 +274,27 @@ class InterfaceBlockchainAddressHelper{
         let versionDetected = false;
         let versionDetectedBuffer = '';
 
-        if (privateKeyWIF.length === consts.PRIVATE_KEY_LENGTH + consts.PRIVATE_KEY_CHECK_SUM_LENGTH  + consts.PRIVATE_KEY_VERSION_PREFIX.length/2 ){
+        if (privateKeyWIF.length === consts.ADDRESSES.PRIVATE_KEY.WIF.PRIVATE_KEY_LENGTH + consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.PRIVATE_KEY.WIF.VERSION_PREFIX.length/2 ){
 
-            //console.log("Buffer.IndexOf", privateKeyWIF.indexOf( Buffer.from(PRIVATE_KEY_VERSION_PREFIX, "hex") ))
+            //console.log("Buffer.IndexOf", privateKeyWIF.indexOf( Buffer.from(ADDRESSES.PRIVATE_KEY.VERSION_PREFIX, "hex") ))
 
-            if (privateKeyWIF.indexOf( Buffer.from(consts.PRIVATE_KEY_VERSION_PREFIX, "hex") ) === 0){
+            if (privateKeyWIF.indexOf( Buffer.from(consts.ADDRESSES.PRIVATE_KEY.WIF.VERSION_PREFIX, "hex") ) === 0){
                 versionDetected = true;
 
-                versionDetectedBuffer = BufferExtended.substr(privateKeyWIF, 0, consts.PRIVATE_KEY_VERSION_PREFIX.length/2 );
-                privateKeyWIF = BufferExtended.substr(privateKeyWIF, consts.PRIVATE_KEY_VERSION_PREFIX.length/2);
+                versionDetectedBuffer = BufferExtended.substr(privateKeyWIF, 0, consts.ADDRESSES.PRIVATE_KEY.WIF.VERSION_PREFIX.length/2 );
+                privateKeyWIF = BufferExtended.substr(privateKeyWIF, consts.ADDRESSES.PRIVATE_KEY.WIF.VERSION_PREFIX.length/2);
             }
 
         }
 
         let checkSumDetected = false;
 
-        if (privateKeyWIF.length === consts.PRIVATE_KEY_LENGTH + consts.PRIVATE_KEY_CHECK_SUM_LENGTH ) {
+        if (privateKeyWIF.length === consts.ADDRESSES.PRIVATE_KEY.WIF.PRIVATE_KEY_LENGTH + consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH ) {
 
-            //console.log(privateKeyWIF, privateKeyWIF.length, 32 + consts.PRIVATE_KEY_CHECK_SUM_LENGTH );
-            let privateKeyWIFCheckSum = BufferExtended.substr(privateKeyWIF, privateKeyWIF.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH );
+            //console.log(privateKeyWIF, privateKeyWIF.length, 32 + consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH );
+            let privateKeyWIFCheckSum = BufferExtended.substr(privateKeyWIF, privateKeyWIF.length - consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH );
 
-            let privateKeyWithoutCheckSum = BufferExtended.substr(privateKeyWIF, 0, privateKeyWIF.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH );
+            let privateKeyWithoutCheckSum = BufferExtended.substr(privateKeyWIF, 0, privateKeyWIF.length - consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH );
 
             //versionDetectedBuffer + privateKeyWIFWithoutCheckSum;
             let privateKeyJustVersionHex = Buffer.concat([versionDetectedBuffer, privateKeyWithoutCheckSum]);
@@ -308,12 +308,12 @@ class InterfaceBlockchainAddressHelper{
             if (checksum.equals(privateKeyWIFCheckSum) ) {
                 checkSumDetected = true;
 
-                privateKeyWIF = BufferExtended.substr(privateKeyWIF, 0, privateKeyWIF.length - consts.PRIVATE_KEY_CHECK_SUM_LENGTH )
+                privateKeyWIF = BufferExtended.substr(privateKeyWIF, 0, privateKeyWIF.length - consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH )
             }
         }
 
 
-        if (privateKeyWIF.length !== consts.PRIVATE_KEY_LENGTH){
+        if (privateKeyWIF.length !== consts.ADDRESSES.PRIVATE_KEY.WIF.PRIVATE_KEY_LENGTH){
 
             if (!checkSumDetected) throw "PRIVATE KEY  CHECK SUM is not right";
 
@@ -335,7 +335,7 @@ class InterfaceBlockchainAddressHelper{
     static _validateAddressWIF(addressWIF){
 
         if (addressWIF === null || !Buffer.isBuffer(addressWIF) ){
-            throw ('addressWIF must be a Buffer');
+            throw { message: 'addressWIF must be a Buffer', addressWIF: addressWIF };
         }
 
         //contains VERSION prefix
@@ -344,11 +344,11 @@ class InterfaceBlockchainAddressHelper{
         let suffixDetected = false;
         let versionDetectedBuffer = '';
 
-        let prefix = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_PREFIX_BASE64 : consts.PUBLIC_ADDRESS_PREFIX_BASE58);
-        let suffix = ( consts.PRIVATE_KEY_USE_BASE64 ? consts.PUBLIC_ADDRESS_SUFFIX_BASE64 : consts.PUBLIC_ADDRESS_SUFFIX_BASE58);
+        let prefix = ( consts.ADDRESSES.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
+        let suffix = ( consts.ADDRESSES.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
 
         //prefix
-        if ( addressWIF.length === consts.PUBLIC_KEY_LENGTH + consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH  + consts.PUBLIC_ADDRESS_VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2 ){
+        if ( addressWIF.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2 ){
 
             if ( addressWIF.indexOf( Buffer.from(prefix, "hex") ) === 0 ) {
                 prefixDetected = true;
@@ -357,7 +357,7 @@ class InterfaceBlockchainAddressHelper{
 
         }
 
-        if ( addressWIF.length === consts.PUBLIC_KEY_LENGTH + consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH  + consts.PUBLIC_ADDRESS_VERSION_PREFIX.length/2 + suffix.length/2 ) {
+        if ( addressWIF.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + suffix.length/2 ) {
 
             if ( addressWIF.indexOf( Buffer.from(suffix, "hex") ) === addressWIF.length - suffix.length/2 ) {
                 suffixDetected = true;
@@ -366,13 +366,13 @@ class InterfaceBlockchainAddressHelper{
         }
 
 
-        if (addressWIF.length === consts.PUBLIC_KEY_LENGTH + consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH  + consts.PUBLIC_ADDRESS_VERSION_PREFIX.length/2  ){
+        if (addressWIF.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2  ){
 
-            if (addressWIF.indexOf( Buffer.from(consts.PUBLIC_ADDRESS_VERSION_PREFIX, "hex") ) === 0){
+            if (addressWIF.indexOf( Buffer.from(consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX, "hex") ) === 0){
                 versionDetected = true;
 
-                versionDetectedBuffer = BufferExtended.substr(addressWIF, 0, consts.PUBLIC_ADDRESS_VERSION_PREFIX.length/2 );
-                addressWIF = BufferExtended.substr(addressWIF, consts.PUBLIC_ADDRESS_VERSION_PREFIX.length/2);
+                versionDetectedBuffer = BufferExtended.substr(addressWIF, 0, consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 );
+                addressWIF = BufferExtended.substr(addressWIF, consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2);
             }
 
         }
@@ -380,11 +380,11 @@ class InterfaceBlockchainAddressHelper{
 
         let checkSumDetected = false;
 
-        if (addressWIF.length === consts.PUBLIC_KEY_LENGTH + consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH ) {
+        if (addressWIF.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH ) {
 
-            let addressWIFCheckSum = BufferExtended.substr(addressWIF, addressWIF.length - consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH );
+            let addressWIFCheckSum = BufferExtended.substr(addressWIF, addressWIF.length - consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH );
 
-            let privateKeyWithoutCheckSum = BufferExtended.substr(addressWIF, 0, addressWIF.length - consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH );
+            let privateKeyWithoutCheckSum = BufferExtended.substr(addressWIF, 0, addressWIF.length - consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH );
 
             let privateKeyJustVersionHex = Buffer.concat([versionDetectedBuffer, privateKeyWithoutCheckSum]);
 
@@ -393,12 +393,12 @@ class InterfaceBlockchainAddressHelper{
             if (checksum.equals(addressWIFCheckSum) ) {
                 checkSumDetected = true;
 
-                addressWIF = BufferExtended.substr(addressWIF, 0, addressWIF.length - consts.PUBLIC_ADDRESS_CHECK_SUM_LENGTH )
+                addressWIF = BufferExtended.substr(addressWIF, 0, addressWIF.length - consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH )
             }
         }
 
 
-        if (addressWIF.length !== consts.PUBLIC_KEY_LENGTH){
+        if (addressWIF.length !== consts.ADDRESSES.ADDRESS.LENGTH){
 
             if (!prefixDetected) 
                 throw "ADDRESS KEY  PREFIX  is not right";

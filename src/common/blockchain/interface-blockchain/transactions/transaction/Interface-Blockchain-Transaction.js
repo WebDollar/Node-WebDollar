@@ -78,7 +78,7 @@ class InterfaceBlockchainTransaction{
     }
 
     _computeTxId(){
-        this.txId = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( this.serializeTransaction() ));
+        return WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( this.serializeTransaction() ));
     }
 
     /**
