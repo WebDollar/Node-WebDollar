@@ -7,7 +7,13 @@ import NodesList from 'node/lists/nodes-list';
 import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
-
+/*
+ * Miners earn shares until the pool finds a block (the end of the mining round).
+ * After that each user gets reward R = B * n / N, 
+ * where n is amount of his own shares,
+ * and N is amount of all shares in this round. 
+ * In other words, all shares are equal, but its cost is calculated only in the end of a round.
+ */
 class PoolLeaderProtocol {
 
     constructor(poolLeaderFee = 5, databaseName = consts.DATABASE_NAMES.POOL_DATABASE) {
@@ -73,17 +79,6 @@ class PoolLeaderProtocol {
         let socket = nodesListObject.socket;
     }
 
-    poolHigherHashesList(hash, minerAddress) {
-
-        let higherHashList;
-
-    }
-
-    setMinnersRewardPrecentage() {
-
-
-    }
-
     /**
      * Divides 2 big integers
      * @param divident is BigInteger
@@ -101,7 +96,7 @@ class PoolLeaderProtocol {
             result++;
         }
 
-        return result-1;
+        return result - 1;
     }
     
     /**
