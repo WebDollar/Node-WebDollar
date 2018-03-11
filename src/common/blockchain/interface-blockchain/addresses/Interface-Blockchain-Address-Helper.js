@@ -31,7 +31,7 @@ class InterfaceBlockchainAddressHelper{
         }
 
         if (privateKey === undefined)
-            privateKey = WebDollarCrypto.getBufferRandomValues(consts.ADDRESSES.PRIVATE_KEY.WIF.PRIVATE_KEY_LENGTH);
+            privateKey = WebDollarCrypto.getBufferRandomValues(consts.ADDRESSES.PRIVATE_KEY.WIF.LENGTH);
 
 
         //if you want to follow the step-by-step results in this article, comment the
@@ -247,7 +247,7 @@ class InterfaceBlockchainAddressHelper{
         let versionDetected = false;
         let versionDetectedBuffer = '';
 
-        if (privateKeyWIF.length === consts.ADDRESSES.PRIVATE_KEY.WIF.PRIVATE_KEY_LENGTH + consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.PRIVATE_KEY.WIF.VERSION_PREFIX.length/2 ){
+        if (privateKeyWIF.length === consts.ADDRESSES.PRIVATE_KEY.WIF.LENGTH + consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.PRIVATE_KEY.WIF.VERSION_PREFIX.length/2 ){
 
             //console.log("Buffer.IndexOf", privateKeyWIF.indexOf( Buffer.from(ADDRESSES.PRIVATE_KEY.VERSION_PREFIX, "hex") ))
 
@@ -262,7 +262,7 @@ class InterfaceBlockchainAddressHelper{
 
         let checkSumDetected = false;
 
-        if (privateKeyWIF.length === consts.ADDRESSES.PRIVATE_KEY.WIF.PRIVATE_KEY_LENGTH + consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH ) {
+        if (privateKeyWIF.length === consts.ADDRESSES.PRIVATE_KEY.WIF.LENGTH + consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH ) {
 
             //console.log(privateKeyWIF, privateKeyWIF.length, 32 + consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH );
             let privateKeyWIFCheckSum = BufferExtended.substr(privateKeyWIF, privateKeyWIF.length - consts.ADDRESSES.PRIVATE_KEY.WIF.CHECK_SUM_LENGTH );
@@ -286,7 +286,7 @@ class InterfaceBlockchainAddressHelper{
         }
 
 
-        if (privateKeyWIF.length !== consts.ADDRESSES.PRIVATE_KEY.WIF.PRIVATE_KEY_LENGTH){
+        if (privateKeyWIF.length !== consts.ADDRESSES.PRIVATE_KEY.WIF.LENGTH){
 
             if (!checkSumDetected) throw "PRIVATE KEY  CHECK SUM is not right";
 

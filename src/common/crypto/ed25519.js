@@ -36,7 +36,7 @@ class ED25519{
         }
 
 
-        let signature = nacl.sign.detached(data, secretKey);
+        let signature = nacl.sign.detached( data, secretKey );
 
         return signature;
     }

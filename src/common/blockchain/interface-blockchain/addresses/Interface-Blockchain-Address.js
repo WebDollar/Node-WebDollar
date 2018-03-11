@@ -436,20 +436,21 @@ class InterfaceBlockchainAddress{
 
             transaction.from.addresses[index].publicKey = answer.publicKey;
 
-            let serialization = transaction.serializeFromForSigning (answer.unencodedAddress);
+            let serialization = transaction.serializeFromForSigning ( answer.unencodedAddress );
 
-            //let signature = schnorr.sign( serialization, answer.privateKey.privateKey );
+            //let signatureObj = schnorr.sign( serialization, answer.privateKey.privateKey );
+            //let signature = new Buffer( signatureObj.s.toString(16), 16 );
+
             let signature = ed25519.sign( serialization, answer.privateKey.privateKey );
 
-            let signatureFinal = new Buffer( signature.s.toString(16), 16 );
+            transaction.from.addresses[index].signature = signature;
 
-            transaction.from.addresses[index].signature = signatureFinal;
-
-            return signatureFinal;
+            return signature;
 
         } catch (exception) {
             console.error(exception);
         }
+
     }
 
     async _toStringDebug(){

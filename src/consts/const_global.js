@@ -68,7 +68,6 @@ consts.NODE_FALLBACK_INTERVAL =  10*1000; //miliseconds
 consts.NODE_PORT =  12320; //port
 consts.NODE_STATUS_INTERVAL =  60*1000; //miliseconds
 
-
 consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN =  60*1000; //miliseconds
 consts.NODES_WAITLIST_INTERVAL =  5*1000; //miliseconds
 
@@ -88,7 +87,7 @@ consts.ADDRESSES = {
         WIF:{
             VERSION_PREFIX : "80", //it is in HEX
             CHECK_SUM_LENGTH : 4, //in bytes
-            PRIVATE_KEY_LENGTH : 32, //ending BASE64 HEX
+            LENGTH : 32, //ending BASE64 HEX
         },
     },
     PUBLIC_KEY:{
@@ -115,6 +114,7 @@ consts.ADDRESSES = {
             PREFIX_BASE58 : "00", //BASE58 HEX and it will be converted to Base64/58
             SUFFIX_BASE58 : "",
         }
+
     },
 
 
@@ -133,7 +133,7 @@ consts.HASH_ARGON2_PARAMS = {
     algoBrowser: 0,
     hashLen: 32,
     distPath: 'https://antelle.github.io/argon2-browser/dist'
-}
+};
 
 // change also to Browser-Mining-WebWorker.js
 
@@ -144,8 +144,10 @@ consts.BLOCKS_MAX_SIZE_BYTES = 1024 * 1024 * 1; // in bytes
 consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
 
 
-//
-consts.DATABASE_NAMES={
+//DATABASE NAMES
+
+consts.DATABASE_NAMES = {
+
     DEFAULT_DATABASE: "defaultDB",
     WALLET_DATABASE: "defaultDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
     //TODO REPLACE with "walletDB"
@@ -155,6 +157,7 @@ consts.DATABASE_NAMES={
     VALIDATE_DATABASE: "validateDB",
     TESTS_DATABASE: "testDB",
     TRANSACTIONS_DATABASE: "transactionsDB"
+
 };
 
 export default consts
