@@ -68,7 +68,7 @@ class PoolData {
     }
     
     /**
-     * Set a list of active miners
+     * Set the list of active miners
      */
     setMinersList(minersList) {
         this._minersList = minersList;
@@ -82,14 +82,14 @@ class PoolData {
     }
     
     /**
-     * Set a list with statistics for the last X mined blocks
+     * Set the list with statistics for the last X mined blocks
      */
     setBlocksMiningInfo(blocksMiningInfo) {
         this._blocksMiningInfo = blocksMiningInfo;
     }
     
     /**
-     * @returns a list with statistics for the last X mined blocks
+     * @returns the list with statistics for the last X mined blocks
      */
     getBlocksMiningInfo() {
         return this._blocksMiningInfo;

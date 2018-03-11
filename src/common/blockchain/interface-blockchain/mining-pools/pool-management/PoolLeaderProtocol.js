@@ -40,7 +40,7 @@ class PoolLeaderProtocol {
         //TODO: this stores pool leader's reward, this goes to Accountant Tree
         this._poolLeaderRewardAddress = null;
         
-        this._resetBlockStatistics();
+        this._resetMinedBlockStatistics();
     }
 
     _subscribeMiner(nodesListObject) {
@@ -249,10 +249,10 @@ class PoolLeaderProtocol {
     _logMinedBlockStatistics() {
         
         this._poolData.addMinedBlockStatistics( this._currentBlockStatistics );
-        this._resetBlockStatistics();
+        this._resetMinedBlockStatistics();
     }
     
-    _resetBlockStatistics() {
+    _resetMinedBlockStatistics() {
         /**
          * To be able to mine a block, the pool should generate ~ numBaseHashes of difficulty baseHashDifficulty
          * In other words: The arithmetic mean of all generated hashes by pool to mine a block should be 
