@@ -27,7 +27,7 @@ class PoolLeaderProtocol {
         });
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
-        this._difficultyTarget = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"); //target difficulty;
+        this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
 
         this._poolData = new PoolData(databaseName);
         
@@ -255,7 +255,7 @@ class PoolLeaderProtocol {
          * Each miner will receive a reward wighted on the number of baseHashDifficulty sent to pool leader.
          */
         this._currentBlockStatistics = {
-            baseHashDifficulty: new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            baseHashDifficulty: Buffer.from(this._baseHash),
             numBaseHashes: 0
         };
     }

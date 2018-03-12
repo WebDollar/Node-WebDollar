@@ -152,7 +152,8 @@ consts.DATABASE_NAMES = {
 };
 
 consts.MINING_POOL = {
-    LAST_K_BLOCKS: 16
+    WINDOW_SIZE: 16,
+    BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
 };
 
 export default consts

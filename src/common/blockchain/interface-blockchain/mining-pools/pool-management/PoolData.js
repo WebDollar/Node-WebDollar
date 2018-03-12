@@ -11,7 +11,7 @@ class PoolData {
 
         this._db = new InterfaceSatoshminDB(databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE);
         
-        this._statsBufferSize = consts.MINING_POOL.LAST_K_BLOCKS;
+        this._statsBufferSize = consts.MINING_POOL.WINDOW_SIZE;
         this._currentBlockPos = 0;
         
         this._minersList = [];
