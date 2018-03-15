@@ -7,7 +7,13 @@ import NodesList from 'node/lists/nodes-list';
 import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
-
+/*
+ * Miners earn shares until the pool finds a block (the end of the mining round).
+ * After that each user gets reward R = B * n / N, 
+ * where n is amount of his own shares,
+ * and N is amount of all shares in this round. 
+ * In other words, all shares are equal, but its cost is calculated only in the end of a round.
+ */
 class PoolLeaderProtocol {
 
     constructor(poolLeaderFee = 5, databaseName = consts.DATABASE_NAMES.POOL_DATABASE) {
@@ -21,10 +27,11 @@ class PoolLeaderProtocol {
         });
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
-        this._difficultyTarget = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"); //target difficulty;
+        this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
 
         this._poolData = new PoolData(databaseName);
         
+        // is the fee percent that the pool leader receives for each mined block
         this._poolLeaderFee = poolLeaderFee;
 
         //TODO: Check is needed to store/load from database
@@ -38,6 +45,8 @@ class PoolLeaderProtocol {
         
         //TODO: this stores pool leader's reward, this goes to Accountant Tree
         this._poolLeaderRewardAddress = null;
+        
+        this._resetMinedBlockStatistics();
     }
 
     _subscribeMiner(nodesListObject) {
@@ -70,17 +79,6 @@ class PoolLeaderProtocol {
         let socket = nodesListObject.socket;
     }
 
-    poolHigherHashesList(hash, minerAddress) {
-
-        let higherHashList;
-
-    }
-
-    setMinnersRewardPrecentage() {
-
-
-    }
-
     /**
      * Divides 2 big integers
      * @param divident is BigInteger
@@ -98,7 +96,7 @@ class PoolLeaderProtocol {
             result++;
         }
 
-        return result-1;
+        return result - 1;
     }
     
     /**
@@ -226,14 +224,40 @@ class PoolLeaderProtocol {
     }
 
     /**
-     * Pool has received a new reward. It must send rewards to miners
+     * Pool has mined a new block and has received a new reward. 
+     * The new reward must be shared with miners.
      * @param newReward
      */
-    async receiveNewPoolRewardFromBlockchain(newReward) {
+    async onMinedBlock(newReward) {
 
+        this._logMinedBlockStatistics();
+        
         this.updateRewards(newReward);
         await this.sendRewardsToMiners();
 
+    }
+    
+    /**
+     * This function updates the mining statistics for the last mined blocks.
+     * The PoolData class manages the statistics
+     */
+    _logMinedBlockStatistics() {
+        
+        this._poolData.addMinedBlockStatistics( this._currentBlockStatistics );
+        this._resetMinedBlockStatistics();
+    }
+    
+    _resetMinedBlockStatistics() {
+        /**
+         * To be able to mine a block, the pool should generate ~ numBaseHashes of difficulty baseHashDifficulty
+         * In other words: The arithmetic mean of all generated hashes by pool to mine a block should be 
+         * equal with numBaseHashes * baseHashDifficulty
+         * Each miner will receive a reward wighted on the number of baseHashDifficulty sent to pool leader.
+         */
+        this._currentBlockStatistics = {
+            baseHashDifficulty: Buffer.from(this._baseHash),
+            numBaseHashes: 0
+        };
     }
     
     /**

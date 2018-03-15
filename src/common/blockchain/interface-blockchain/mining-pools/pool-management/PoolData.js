@@ -9,9 +9,13 @@ class PoolData {
 
     constructor(databaseName) {
 
-        this.db = new InterfaceSatoshminDB(databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE);
-
+        this._db = new InterfaceSatoshminDB(databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE);
+        
+        this._statsBufferSize = consts.MINING_POOL.WINDOW_SIZE;
+        this._currentBlockPos = 0;
+        
         this._minersList = [];
+        this._blocksMiningInfo = [];
     }
     
     /**
@@ -63,12 +67,43 @@ class PoolData {
         return (await this.saveMinersList());
     }
     
+    /**
+     * Set the list of active miners
+     */
+    setMinersList(minersList) {
+        this._minersList = minersList;
+    }
+    
+    /**
+     * @returns the list with active miners
+     */
     getMinersList() {
         return this._minersList;
     }
     
-    setMinersList(rewardList) {
-        this._minersList = rewardList;
+    /**
+     * Set the list with statistics for the last X mined blocks
+     */
+    setBlocksMiningInfo(blocksMiningInfo) {
+        this._blocksMiningInfo = blocksMiningInfo;
+    }
+    
+    /**
+     * @returns the list with statistics for the last X mined blocks
+     */
+    getBlocksMiningInfo() {
+        return this._blocksMiningInfo;
+    }
+    
+    /**
+     * Add a new mined block statistics to _blocksMiningInfo circular buffer
+     * @param newStatistic
+     */
+    addMinedBlockStatistics(newStatistic) {
+        
+        this._blocksMiningInfo[this._currentBlockPos++] = newStatistic;
+        if (this._currentBlockPos === this._statsBufferSize)
+            this._currentBlockPos = 0;
     }
 
     /**
@@ -191,7 +226,7 @@ class PoolData {
         
         try{
 
-            let buffer = await this.db.get("minersList");
+            let buffer = await this._db.get("minersList");
             let response = this._deserializeMiners(buffer);
             
             if (response !== true){
@@ -218,7 +253,7 @@ class PoolData {
 
             let buffer = this._serializeMiners();
             
-            let response = await this.db.save("minersList", buffer);
+            let response = await this._db.save("minersList", buffer);
             if (response !== true) {
                 console.log('Unable to save _minersList to DB');
                 return false;

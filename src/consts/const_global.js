@@ -90,7 +90,7 @@ consts.ADDRESSES = {
         LENGTH : 32, //ending BASE64 HEX
     },
     PUBLIC_KEY:{
-        LENGTH : 32, //ending BASE64 HEX
+        LENGTH : 33, //ending BASE64 HEX
     },
     ADDRESS:{
 
@@ -157,6 +157,11 @@ consts.DATABASE_NAMES = {
     TESTS_DATABASE: "testDB",
     TRANSACTIONS_DATABASE: "transactionsDB"
 
+};
+
+consts.MINING_POOL = {
+    WINDOW_SIZE: 16,
+    BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
 };
 
 export default consts
