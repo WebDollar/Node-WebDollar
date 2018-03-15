@@ -59,10 +59,7 @@ class MiniBlockchainFork extends inheritFork{
         console.log("preFork root after ", this.blockchain.accountantTree.calculateNodeCoins());
     }
 
-    revertFork(forkedSuccessfully){
-
-        if (forkedSuccessfully)
-            return true;
+    revertFork(){
 
         //recover to the original Accountant Tree
         this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);

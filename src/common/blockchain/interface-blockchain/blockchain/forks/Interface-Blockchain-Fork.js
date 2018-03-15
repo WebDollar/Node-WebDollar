@@ -201,7 +201,7 @@ class InterfaceBlockchainFork {
             try {
                 this.preFork();
             } catch (exception){
-                this.revertFork(false);
+                this.revertFork();
                 console.error("preFork raised an error");
             }
 
@@ -220,8 +220,7 @@ class InterfaceBlockchainFork {
 
                 for (index = 0; index < this.forkBlocks.length; index++) {
 
-                    if (index % 2 === 0)
-                        StatusEvents.emit( "agent/status", {message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
+                    StatusEvents.emit( "agent/status", {message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
 
@@ -237,8 +236,9 @@ class InterfaceBlockchainFork {
                 forkedSuccessfully = false;
             }
 
-
-            await this.revertFork(forkedSuccessfully);
+            //reverting back to the clones
+            if (!forkedSuccessfully)
+                await this.revertFork();
 
             //revert the last K blocks
             if (!forkedSuccessfully) {
@@ -280,12 +280,8 @@ class InterfaceBlockchainFork {
         console.log("FORK SOLVER SUCCESS", success);
 
         if (success){
-
             //propagate last block
             this.blockchain.propagateBlocks( this.blockchain.blocks.length-1, this.sockets );
-
-            //this.blockchain.propagateBlocks(this.forkStartingHeight, this.sockets);
-
         }
 
         return success;
@@ -300,7 +296,7 @@ class InterfaceBlockchainFork {
     }
 
 
-    revertFork(forkedSuccessfully){
+    revertFork(){
 
     }
 

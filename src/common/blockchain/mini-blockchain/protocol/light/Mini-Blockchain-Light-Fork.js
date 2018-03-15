@@ -141,7 +141,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             let sum = this.blockchain.accountantTree.calculateNodeCoins();
             console.log("preFork2 accountantTree sum all", sum );
 
-            if (sum.isLessThanOrEqualTo(currentSum)){
+            if (sum.isLessThanOrEqualTo(currentSum) || sum.isLessThanOrEqualTo(0)){
                 throw "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible";
             }
 
@@ -161,10 +161,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             return MiniBlockchainFork.prototype.preFork.call(this);
     }
 
-    revertFork(forkedSuccessfully){
-
-        if (forkedSuccessfully)
-            return true;
+    revertFork(){
 
         //recover to the original Accountant Tree & state
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
@@ -176,7 +173,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             this.blockchain.blocks.blocksStartingPoint = this._blocksStartingPointClone;
 
-            let diffIndex = this.forkStartingHeight ;
+            let diffIndex = this.forkStartingHeight;
 
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this._lightPrevDifficultyTargetClone;
             this.blockchain.lightPrevTimeStamps[diffIndex] = this._lightPrevTimeStampClone;
@@ -185,7 +182,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             //if (! (await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1))) throw "_recalculateLightPrevs failed";
         } else
-            return MiniBlockchainFork.prototype.revertFork.call(this, forkedSuccessfully);
+            return MiniBlockchainFork.prototype.revertFork.call(this);
     }
 
     async postFork(forkedSuccessfully){
@@ -193,7 +190,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (forkedSuccessfully) {
 
             //saving the Light Settings
-
             return true;
         }
 
