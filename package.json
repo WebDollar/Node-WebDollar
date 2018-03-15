@@ -15,7 +15,7 @@
     "start_mining": "webpack --config build_webpack/webpack.terminal-mining.config.js && node dist_bundle/terminal-bundle.js ",
     "test": "webpack --config build_webpack/tests/webpack.terminal.test.config.js && mocha --exit --timeout 10000 dist_bundle/terminal-mocha-bundle.js --reporter mochawesome && npm run show_mocha_report",
     "test_browser": "webpack --config build_webpack/tests/webpack.browser.test.config.js && npm run show_browser_test",
-    "show_mocha_report": "node src/testnpm runs/browser/show-mocha.test.js",
+    "show_mocha_report": "node src/tests/browser/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
     "show_coverage": "node src/tests/browser/show-coverage.test.js"
   },

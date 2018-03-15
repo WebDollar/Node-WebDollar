@@ -99,37 +99,55 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
-    preFork() {
+    preForkClone(){
 
-        // I have a new accountant Tree, so it is a new [:-m] light proof
         if (this.forkChainStartingPoint === this.forkStartingHeight &&
             this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
             console.log("preFork!!!!!!!!!!!!!!!!!! 2222222");
             let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
-            console.log("this.forkDiff", diffIndex);
 
             this._accountantTreeClone = this.blockchain.lightAccountantTreeSerializations[diffIndex];
+
             if (this._accountantTreeClone === undefined || this._accountantTreeClone === null)
                 this._accountantTreeClone = new Buffer(0);
-
-            console.log("preFork1 accountantTree sum all", this.blockchain.accountantTree.calculateNodeCoins() );
-            //console.log("preFork hashAccountantTree", this.forkPrevAccountantTree.toString("hex"));
-
-            this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
-
-            //console.log("preFork hashAccountantTree", this.blockchain.accountantTree.root.hash.sha256.toString("hex"));
-            console.log("preFork2 accountantTree sum all", this.blockchain.accountantTree.calculateNodeCoins() );
-
-            console.log("this.forkPrevDifficultyTarget", this.forkPrevDifficultyTarget.toString("hex"));
-            console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp);
-            console.log("this.forkPrevHashPrev", this.forkPrevHashPrev.toString("hex"));
 
             this._lightAccountantTreeSerializationsHeightClone = new Buffer(this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializations[diffIndex] : 0);
             this._blocksStartingPointClone = this.blockchain.blocks.blocksStartingPoint;
             this._lightPrevDifficultyTargetClone = new Buffer(this.blockchain.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.blockchain.lightPrevDifficultyTargets[diffIndex] : 0);
             this._lightPrevTimeStampClone = this.blockchain.lightPrevTimeStamps[diffIndex];
             this._lightPrevHashPrevClone = new Buffer(this.blockchain.lightPrevHashPrevs[diffIndex] !== undefined ? this.blockchain.lightPrevHashPrevs[diffIndex] : 0);
+
+        } else
+        //it is just a simple fork
+            return MiniBlockchainFork.prototype.preForkClone.call(this);
+
+    }
+
+    preFork() {
+
+        // I have a new accountant Tree, so it is a new [:-m] light proof
+
+        if (this.forkChainStartingPoint === this.forkStartingHeight &&
+            this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
+
+            let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
+
+            let currentSum = this.blockchain.accountantTree.calculateNodeCoins();
+
+            //validate sum
+            this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
+
+            let sum = this.blockchain.accountantTree.calculateNodeCoins();
+            console.log("preFork2 accountantTree sum all", sum );
+
+            if (sum.isLessThanOrEqualTo(currentSum)){
+                throw "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible";
+            }
+
+            console.log("this.forkPrevDifficultyTarget", this.forkPrevDifficultyTarget.toString("hex") );
+            console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp );
+            console.log("this.forkPrevHashPrev", this.forkPrevHashPrev.toString("hex") );
 
             this.blockchain.blocks.blocksStartingPoint = this.forkChainStartingPoint;
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;
@@ -138,16 +156,12 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this.forkPrevAccountantTree;
 
-            //add dummy blocks between [beginning to where it starts]
-            // while (this.blockchain.blocks.length < this.forkStartingHeight)
-            //     this.blockchain.addBlock(undefined);
-
         } else
             //it is just a simple fork
             return MiniBlockchainFork.prototype.preFork.call(this);
     }
 
-    postForkBefore(forkedSuccessfully){
+    revertFork(forkedSuccessfully){
 
         if (forkedSuccessfully)
             return true;
@@ -156,9 +170,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
             //recover to the original Accountant Tree
-            console.log("postForkBefore1 accountantTree sum all", this.blockchain.accountantTree.calculateNodeCoins() );
+            //console.log("revertFork1 accountantTree sum all", this.blockchain.accountantTree.calculateNodeCoins() );
             this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
-            console.log("postForkBefore2 accountantTree sum all", this.blockchain.accountantTree.calculateNodeCoins() );
+            //console.log("revertFork2 accountantTree sum all", this.blockchain.accountantTree.calculateNodeCoins() );
 
             this.blockchain.blocks.blocksStartingPoint = this._blocksStartingPointClone;
 
@@ -171,7 +185,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             //if (! (await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1))) throw "_recalculateLightPrevs failed";
         } else
-            return MiniBlockchainFork.prototype.postForkBefore.call(this, forkedSuccessfully);
+            return MiniBlockchainFork.prototype.revertFork.call(this, forkedSuccessfully);
     }
 
     async postFork(forkedSuccessfully){

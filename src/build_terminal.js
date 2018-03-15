@@ -3,7 +3,7 @@ import global from "consts/global.js";
 
 console.log("TESTING MODE");
 
-//Blockchain.createBlockchain("full-node");
+//Blockchain.createBlockchain("full-node", ()=>{
 Blockchain.createBlockchain("light-node",()=>{
     Node.NodeServer.startServer();
     Node.NodeClientsService.startService();

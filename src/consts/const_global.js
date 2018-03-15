@@ -6,8 +6,8 @@ consts.TERMINATED = false;
 
 consts.UUID = uuid.v4();
 
-consts.NODE_VERSION = "0.254";
-consts.NODE_VERSION_COMPATIBILITY = "0.254";
+consts.NODE_VERSION = "0.255";
+consts.NODE_VERSION_COMPATIBILITY = "0.255";
 
 consts.WALLET_VERSION = "0.1";
 
@@ -45,7 +45,6 @@ consts.BLOCKCHAIN = {
 };
 
 consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 1 ;
-consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS + 2* consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ;
 consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS + 2* consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ;
 
 consts.MINI_BLOCKCHAIN = {
@@ -87,8 +86,8 @@ consts.ADDRESSES = {
         WIF:{
             VERSION_PREFIX : "80", //it is in HEX
             CHECK_SUM_LENGTH : 4, //in bytes
-            LENGTH : 32, //ending BASE64 HEX
         },
+        LENGTH : 32, //ending BASE64 HEX
     },
     PUBLIC_KEY:{
         LENGTH : 32, //ending BASE64 HEX
@@ -140,8 +139,8 @@ consts.HASH_ARGON2_PARAMS = {
 
 consts.MAX_UINT32 = 1 << 30;
 
-consts.BLOCKS_MAX_SIZE_BYTES = 1024 * 1024 * 1; // in bytes
-consts.SOCKET_MAX_SIZE_BYRES = consts.BLOCKS_MAX_SIZE_BYTES + 20;
+consts.BLOCKS_MAX_SIZE_BYTES = 1024 * 1024 * 1; // in bytesnu
+consts.SOCKET_MAX_SIZE_BYRES = 3*consts.BLOCKS_MAX_SIZE_BYTES + 20;
 
 
 //DATABASE NAMES

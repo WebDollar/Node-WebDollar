@@ -168,6 +168,7 @@ class InterfaceBlockchainFork {
         // It don't validate the Fork Blocks again
 
         console.log("save Fork before validateFork");
+
         if (! (await this._validateFork(false))) {
             console.error("validateFork was not passed");
             return false
@@ -179,12 +180,30 @@ class InterfaceBlockchainFork {
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
             //making a copy of the current blockchain
-            this._blocksCopy = [];
-            for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++) {
-                this._blocksCopy.push(this.blockchain.blocks[i]);
+
+            try {
+                this._blocksCopy = [];
+
+                for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++)
+                    this._blocksCopy.push(this.blockchain.blocks[i]);
+
+            } catch (exception){
+                console.error("_blockCopy raised an error");
+                return false;
             }
 
-            this.preFork();
+            try {
+                this.preForkClone();
+            } catch (exception){
+                console.error("preForkBefore raised an error");
+            }
+
+            try {
+                this.preFork();
+            } catch (exception){
+                this.revertFork(false);
+                console.error("preFork raised an error");
+            }
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight);
 
@@ -194,6 +213,7 @@ class InterfaceBlockchainFork {
             console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
             console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
             console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+
 
             let index;
             try {
@@ -218,7 +238,7 @@ class InterfaceBlockchainFork {
             }
 
 
-            await this.postForkBefore(forkedSuccessfully);
+            await this.revertFork(forkedSuccessfully);
 
             //revert the last K blocks
             if (!forkedSuccessfully) {
@@ -271,12 +291,16 @@ class InterfaceBlockchainFork {
         return success;
     }
 
+    preForkClone(){
+
+    }
+
     preFork(){
 
     }
 
 
-    postForkBefore(forkedSuccessfully){
+    revertFork(forkedSuccessfully){
 
     }
 

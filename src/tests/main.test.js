@@ -3,9 +3,6 @@ if(( typeof window !== 'undefined' && !window._babelPolyfill) ||
     require('babel-polyfill')
 }
 
-import Blockchain from 'main-blockchain/Blockchain'
-
-
 if ( typeof describe !== 'undefined') {
 
     require('tests/blockchain/mini-blockchain/Mini-Blockchain-Accountant-Tree.test');
