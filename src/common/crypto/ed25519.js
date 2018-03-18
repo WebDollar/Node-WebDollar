@@ -19,7 +19,7 @@ class ED25519{
             throw 'privateKey must be a Buffer';
         }
 
-        return nacl.box.keyPair.fromSecretKey(secretKey).publicKey;
+        return nacl.sign.keyPair.fromSecretKey(secretKey).publicKey;
 
     }
 

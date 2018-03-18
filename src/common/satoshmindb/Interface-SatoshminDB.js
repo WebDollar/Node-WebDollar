@@ -237,7 +237,7 @@ class InterfaceSatoshminDB {
                 console.error("db.save error " + key, exception);
 
                 if (exception.status === 500)
-                    StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason});
+                    StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
                 resolve(null);
             }
@@ -266,7 +266,7 @@ class InterfaceSatoshminDB {
                 console.error("db.get error " + key, exception);
 
                 if (exception.status === 500)
-                    StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason});
+                    StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: eexception.reason.toString() });
 
                 resolve(null);
             });
@@ -284,7 +284,7 @@ class InterfaceSatoshminDB {
             console.error("db.remove error " + key, exception);
 
             if (exception.status === 500)
-                StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason});
+                StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
             return null;
         }

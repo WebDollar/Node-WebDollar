@@ -4,7 +4,6 @@ import InterfaceTransactionsUniqueness from './uniqueness/Interface-Transactions
 import InterfaceTransaction from "./transaction/Interface-Blockchain-Transaction"
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-const schnorr = require('schnorr');
 const BigNumber = require('bignumber.js');
 
 class InterfaceBlockchainTransactions {

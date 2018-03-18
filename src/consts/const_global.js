@@ -88,11 +88,12 @@ consts.ADDRESSES = {
             VERSION_PREFIX : "80", //it is in HEX
             CHECK_SUM_LENGTH : 4, //in bytes
         },
-        LENGTH : 32, //ending BASE64 HEX
+        LENGTH : 64, //ending BASE64 HEX
     },
     PUBLIC_KEY:{
-        LENGTH : 33, //ending BASE64 HEX
+        LENGTH : 32, //ending BASE64 HEX
     },
+
     ADDRESS:{
 
         LENGTH : 32,

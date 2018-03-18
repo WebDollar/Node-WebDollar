@@ -427,28 +427,39 @@ class InterfaceBlockchainAddress{
             return null;
         }
 
+
+        let serialization, addressIndex, addressGenerated;
         try{
-            let answer = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
+            addressGenerated = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
 
-            let index = transaction.from.findAddressIndex(answer.unencodedAddress);
+            addressIndex = transaction.from.findAddressIndex(addressGenerated.unencodedAddress);
 
-            if (index === -1) throw {message: "transaction not found"};
+            if (addressIndex === -1) throw {message: "transaction not found"};
 
-            transaction.from.addresses[index].publicKey = answer.publicKey;
+            transaction.from.addresses[addressIndex].publicKey = addressGenerated.publicKey;
 
-            let serialization = transaction.serializeFromForSigning ( answer.unencodedAddress );
+            serialization = transaction.serializeFromForSigning ( addressGenerated.unencodedAddress );
 
+        } catch (exception) {
+            console.error("Error Serializing the Transaction", exception);
+            throw exception;
+        }
+
+        try{
             //let signatureObj = schnorr.sign( serialization, answer.privateKey.privateKey );
             //let signature = new Buffer( signatureObj.s.toString(16), 16 );
 
-            let signature = ed25519.sign( serialization, answer.privateKey.privateKey );
 
-            transaction.from.addresses[index].signature = signature;
+            //addressGenerated.privateKey.privateKey = new Buffer(64);
+            let signature = ed25519.sign( serialization, addressGenerated.privateKey.privateKey );
+
+            transaction.from.addresses[addressIndex].signature = signature;
 
             return signature;
 
-        } catch (exception) {
-            console.error(exception);
+        } catch (exception){
+            console.error("Error Signing the Transaction", exception);
+            throw exception;
         }
 
     }
