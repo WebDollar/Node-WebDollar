@@ -10,8 +10,6 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction{
         if (!result)
             return result;
 
-        //check balance in accountant tree
-
     }
 
 }

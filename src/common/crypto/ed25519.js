@@ -38,6 +38,9 @@ class ED25519{
 
         let signature = nacl.sign.detached( data, secretKey );
 
+        if ( !Buffer.isBuffer(signature) )
+            signature = new Buffer(signature);
+
         return signature;
     }
 

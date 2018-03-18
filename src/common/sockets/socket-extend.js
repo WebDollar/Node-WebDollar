@@ -47,7 +47,7 @@ class SocketExtend{
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port, uuid);
 
         socket.node.sendRequest = (request, requestData) => { return this.sendRequest(socket, request, requestData) };
-        socket.node.sendRequestWaitOnce = (request, requestData, answerPrefix) => {return this.sendRequestWaitOnce(socket, request, requestData, answerPrefix) };
+        socket.node.sendRequestWaitOnce = (request, requestData, answerSuffix) => {return this.sendRequestWaitOnce(socket, request, requestData, answerSuffix) };
         socket.node.broadcastRequest = (request, data, type, exceptSockets) => {
 
             if (exceptSockets !== undefined && exceptSockets !== null && !Array.isArray(exceptSockets))
@@ -105,17 +105,17 @@ class SocketExtend{
         Sending the Request and return the Promise to Wait Async
     */
 
-    sendRequestWaitOnce (socket, request, requestData, answerPrefix, timeOutInterval=3000) {
+    sendRequestWaitOnce (socket, request, requestData, answerSuffix, timeOutInterval=3000) {
 
-        if ( answerPrefix !== undefined) answerPrefix = String(answerPrefix); //in case it is a number
+        if ( answerSuffix !== undefined) answerSuffix = String(answerSuffix); //in case it is a number
 
         return new Promise((resolve) => {
 
             let requestAnswer = request;
             let timeoutId;
 
-            if ( typeof answerPrefix === 'string' && answerPrefix.length > 0 ) {
-                requestAnswer += (answerPrefix[1] !== '/' ? '/' : '') + answerPrefix;
+            if ( typeof answerSuffix === 'string' && answerSuffix.length > 0 ) {
+                requestAnswer += (answerSuffix[1] !== '/' ? '/' : '') + answerSuffix;
                 //console.log("sendRequestWaitOnce", request)
             }
 

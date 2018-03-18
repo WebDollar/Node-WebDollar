@@ -106,7 +106,6 @@ class InterfaceBlockchainTransactionFrom{
         //TODO validate currency
 
 
-
         this.addresses.forEach ( (fromObject, index) =>{
 
             if (! fromObject.unencodedAddress || fromObject.unencodedAddress === null)
@@ -127,15 +126,15 @@ class InterfaceBlockchainTransactionFrom{
             if (fromObject.amount instanceof BigNumber === false )
                 throw { message: "From.address.amount "+index+" is not a number", address: fromObject, index: index };
 
-            let value = this.transaction.blockchain.accountantTree.getBalance( fromObject.unencodedAddress, this.currencyTokenId );
-            if (value.isLessThan(fromObject.amount))
-                throw { message: "Value is Less than From.address.amount", address: fromObject, index: index };
-
             if ( fromObject.amount.isLessThanOrEqualTo(0) )
                 throw {message: "Amount is an invalid number", address: fromObject, index: index };
 
 
         });
+
+
+        //validate of the value is done in the Mini Blockchain Transaction From
+
 
         this.validateSignatures();
 
@@ -199,9 +198,11 @@ class InterfaceBlockchainTransactionFrom{
             if (! fromObject.signature || fromObject.signature === null)
                 throw {message: 'From.address.signature is not specified' , address: fromObject, index: index };
 
-            if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH)
+
+            if (! Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH)
                 throw {message: "From.address.signature "+index+" is not a buffer", address: fromObject, index: index };
 
+            console.log()
             let verification =  ed25519.verify(fromObject.signature, this.serializeForSigning(index), fromObject.publicKey );
 
             // let signature = schnorr.recover(fromObject.signature, this.serializeForSigning(index) );

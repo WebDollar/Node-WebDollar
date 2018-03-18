@@ -93,9 +93,8 @@ class InterfaceBlockchainTransactionTo{
         let outputValues = [], outputSum = BigNumber(0);
 
         for (let i=0; i<this.addresses.length; i++ ){
-            let value = this.transaction.blockchain.accountantTree.getBalance( this.addresses[i].unencodedAddress, this.transaction.from.currencyTokenId );
-            outputValues.push( value );
-            outputSum = outputSum.plus(value);
+            outputValues.push( this.addresses[i].amount );
+            outputSum = outputSum.plus(this.addresses[i].amount);
         }
 
         return outputSum;
