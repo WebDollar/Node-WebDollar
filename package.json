@@ -17,11 +17,7 @@
     "show_mocha_report": "node src/tests/browser/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
     "show_coverage": "node src/tests/browser/show-coverage.test.js",
-    "show_cmd": "node src/node/cmd/show_cmd.js",
-    "export_address": "node src/node/cmd/export_address.js",
-    "import_address": "node src/node/cmd/import_address.js",
-    "set_mining_address": "node src/node/cmd/set_mining_address.js",
-    "show_wallet": "node src/node/cmd/show_wallet.js"
+    "commands": "node src/node/cmd/interactive_menu.js"
   },
   "repository": {
     "type": "git",
