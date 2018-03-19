@@ -163,7 +163,7 @@ class InterfaceBlockchainProtocol {
 
                     console.log("blockchain/header/new-block received", data.chainLength||0);
 
-                    this._validateBlockchainHeader(data)
+                    this._validateBlockchainHeader(data);
 
                     console.log("blockchain/header/new-block validated");
 
@@ -198,7 +198,9 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    console.error("Socket Error - blockchain/new-block-header", exception, data);
+                    try {
+                        console.error("Socket Error - blockchain/new-block-header", exception, data.header.hash.toString("hex"));
+                    } catch (exception) {}
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: false,

@@ -20,7 +20,6 @@ class InterfaceBlockchainAddressHelper{
 
         //tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 
-        //some Bitcoin and Crypto methods don't like Uint8Array for input. They expect regular JS arrays.
         let privateKey;
 
         if (privateKeyWIF !== undefined && privateKeyWIF !== null) {
@@ -30,13 +29,13 @@ class InterfaceBlockchainAddressHelper{
             }
         }
 
-        if (privateKey === undefined)
-            privateKey = WebDollarCrypto.getBufferRandomValues(consts.ADDRESSES.PRIVATE_KEY.LENGTH);
+        if (privateKey === undefined) {
+            privateKey = ed25519.generatePrivateKey();
+        }
 
 
         //if you want to follow the step-by-step results in this article, comment the
         //previous code and uncomment the following
-        //var privateKeyBytes = Crypto.util.hexToBytes("1184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD")
 
         if (showDebug) {
             console.log("privateKeyHex", privateKey.toString("hex"), "length", privateKey.length) //1184CD2CDD640CA42CFC3A091C51D549B2F016D454B2774019C2B2D2E08529FD
@@ -47,7 +46,7 @@ class InterfaceBlockchainAddressHelper{
          * Let's calculate the PrivateKeyWIF (with checksum)
          */
 
-            //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
+        //add 0x80 to the front, https://en.bitcoin.it/wiki/List_of_address_prefixes
         let privateKeyAndVersion = Buffer.concat( [ Buffer.from(consts.ADDRESSES.PRIVATE_KEY.WIF.VERSION_PREFIX, "hex"),  privateKey] );
         let checksum = InterfaceBlockchainAddressHelper._calculateChecksum(privateKeyAndVersion, showDebug);
 

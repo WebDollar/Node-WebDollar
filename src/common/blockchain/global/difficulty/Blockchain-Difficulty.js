@@ -136,9 +136,9 @@ class BlockchainDifficulty{
             let firstBlock = (blockNumber+1) - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; // blockNumber is not included
 
             //adding 0..8
-            console.warn("getTimeStampCallback(firstBlock);", getTimeStampCallback(firstBlock));
+            //console.warn("getTimeStampCallback(firstBlock);", getTimeStampCallback(firstBlock));
             for (let i = firstBlock; i < blockNumber; i++) {
-                console.warn("getTimeStampCallback",  getTimeStampCallback(i));
+                //console.warn("getTimeStampCallback",  getTimeStampCallback(i));
                 how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i);
             }
 

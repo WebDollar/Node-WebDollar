@@ -431,7 +431,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
     getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
-        console.warn("getTimeStamp", height, this.blocks.blocksStartingPoint, this.lightPrevTimeStamps[height])
+        //console.warn("getTimeStamp", height, this.blocks.blocksStartingPoint, this.lightPrevTimeStamps[height])
 
         if (this.agent.light === true && height !== 0) {
             if ( this.lightPrevTimeStamps[height] !== undefined )
