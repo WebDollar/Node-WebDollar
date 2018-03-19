@@ -124,7 +124,7 @@ class InterfaceBlockchainBlockData {
         let result = InterfaceBlockchainAddressHelper.validateAddressChecksum(minerAddressWIF);
 
         if (result === null)
-            throw 'Miner address is not a valid WIF';
+            throw {message: "Miner address is not a valid WIF", address: minerAddressWIF};
 
         this.minerAddress = result;
 

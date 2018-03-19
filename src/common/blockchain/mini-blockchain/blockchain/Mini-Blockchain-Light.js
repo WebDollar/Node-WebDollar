@@ -58,9 +58,9 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             console.log("block.height > ", block.height);
 
-            if (! (await this.simulateNewBlock(block, false, async () => {
+            if ( await this.simulateNewBlock(block, false, async () => {
                 return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock );
-            }))) throw "Error Including Blockchain Light Block";
+            }) === false) throw {message: "Error Including Blockchain Light Block"};
 
             console.log("this.blocks.height",block.height);
             //console.log("this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 2", this.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 2);
@@ -75,13 +75,13 @@ class MiniBlockchainLight extends  MiniBlockchain{
         } else {
 
             if (! (await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock )))
-                throw "Error Including Blockchain Light Block";
+                throw {message: "Error Including Blockchain Light Block"};
 
             //for debugging only
         }
 
         if (! (await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)))
-            throw "_recalculateLightPrevs failed";
+            throw {message: "_recalculateLightPrevs failed"};
 
         //console.log("BLOCK ", block.serializeBlock().toString("hex"));
         console.log(" hash", block.hash.toString("hex"));
@@ -146,10 +146,10 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 diffIndex = this.getSavingSafePosition() ;
 
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_diffIndex", diffIndex)))
-                throw "Couldn't be saved _LightSettings_diffIndex";
+                throw {message: "Couldn't be saved _LightSettings_diffIndex", diffIndex};
 
             if (this.lightPrevDifficultyTargets[diffIndex] === undefined)
-                throw "_saveLightSettings is undefined "+diffIndex;
+                throw {message: "_saveLightSettings is undefined ", diffIndex: diffIndex};
 
             // console.warn("this.blocks.blocksStartingPoint ", this.blocks.blocksStartingPoint );
 
@@ -157,26 +157,14 @@ class MiniBlockchainLight extends  MiniBlockchain{
             //console.warn("this.getSerializedAccountantTree ", diffIndex, treeSerialization !== undefined ? treeSerialization.toString('hex') : '');
 
             if (! (await this.accountantTree.saveMiniAccountant(true, undefined, treeSerialization)))
-                throw "saveMiniAccountant";
+                throw {message: "saveMiniAccountant", diffIndex};
 
-            // console.warn("this.lightPrevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.lightPrevDifficultyTargets[diffIndex].toString("hex") : '');
-            // console.warn("this.lightPrevTimestamp", this.lightPrevTimeStamps[diffIndex]);
-            // console.warn("this.lightPrevHashPrev", this.lightPrevHashPrevs[diffIndex] !== undefined ? this.lightPrevHashPrevs[diffIndex].toString("hex") : '');
-
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex])))
-                throw "Couldn't be saved _LightSettings_prevDifficultyTarget";
-
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart", this.lightPrevDifficultyTargets[diffIndex+1])))
-                throw "Couldn't be saved _LightSettings_prevDifficultyTargetStart";
-            
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex])))
-                throw "Couldn't be saved _LightSettings_prevTimestamp ";
-            
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex])))
-                throw "Couldn't be saved _LightSettings_prevHashPrev ";
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex]))) throw {message: "Couldn't be saved _LightSettings_prevDifficultyTarget", diffIndex: diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart", this.lightPrevDifficultyTargets[diffIndex+1]))) throw {message: "Couldn't be saved _LightSettings_prevDifficultyTargetStart", diffIndex: diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex]))) throw {message: "Couldn't be saved _LightSettings_prevTimestamp ", diffIndex: diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex]))) throw {message: "Couldn't be saved _LightSettings_prevHashPrev ", diffIndex:diffIndex};
 
         } catch (exception){
-            console.error("Error saving LIGHT SETTINGS", exception);
             console.error("Error saving LIGHT SETTINGS", exception);
             console.error("Error saving LIGHT SETTINGS", exception);
             global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED = true;
@@ -234,7 +222,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 return {result:false};
             }
 
-        } else throw "Error Loading Light Settings";
+        } else throw {message:"Error Loading Light Settings"};
 
 
         this.blocks.blocksStartingPoint = diffIndex  ;
@@ -264,12 +252,12 @@ class MiniBlockchainLight extends  MiniBlockchain{
             global.MINIBLOCKCHAIN_LIGHT_SAVED = false;
 
             if (this.blocks.length === 0)
-                throw "Nothing to Save";
+                throw {message: "Nothing to Save"};
 
             await this._saveLightSettings();
 
             if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, this.blocks.length - this.getSavingSafePosition() )))
-                throw "couldn't save the blockchain";
+                throw {message: "couldn't save the blockchain"};
 
         } catch (exception){
             console.error("Couldn't save MiniBlockchain", exception);
@@ -294,7 +282,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             //AccountantTree[:-BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS]
             if (! (await this.accountantTree.loadMiniAccountant(undefined, undefined, true)))
-                throw "Problem Loading Mini Accountant Tree Initial";
+                throw {message: "Problem Loading Mini Accountant Tree Initial"};
 
             console.log("loading blockchain balances ",  this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex") );
 
@@ -308,12 +296,12 @@ class MiniBlockchainLight extends  MiniBlockchain{
             let answer = await this._loadLightSettings(serializationAccountantTreeInitial)
 
             if (!answer.result)
-                throw "couldn't load the Light Settings";
+                throw {message: "couldn't load the Light Settings"};
 
             this._difficultyNotValidated = false;
 
             if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, answer.numBlocks - answer.diffIndex -1 )))
-                throw "Problem loading the blockchain";
+                throw {message: "Problem loading the blockchain"};
 
             //check the accountant Tree if matches
             console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
@@ -408,7 +396,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             return this.lightAccountantTreeSerializations[height];
 
         // else I need to compute it, by removing n-1..n
-        throw "not computed "+height;
+        throw {message: "not computed ", height:height};
 
     }
 
@@ -417,7 +405,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         if (height === undefined )
             height = this.blocks.length;
 
-        console.warn("difficultyTarget", height, this.blocks.blocksStartingPoint , this.blocks.length, this.lightPrevDifficultyTargets[height] !== undefined ? this.lightPrevDifficultyTargets[height].toString("hex") : '');
+        //console.warn("difficultyTarget", height, this.blocks.blocksStartingPoint , this.blocks.length, this.lightPrevDifficultyTargets[height] !== undefined ? this.lightPrevDifficultyTargets[height].toString("hex") : '');
 
         if (this.agent !== undefined && this.agent.light === true && height !== 0) {
 
@@ -445,7 +433,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         if (height === undefined) height = this.blocks.length;
 
-        console.warn("getHashPrev", height, this.blocks.blocksStartingPoint, this.lightPrevHashPrevs[height] !== undefined ? this.lightPrevHashPrevs[height].toString("hex") : '')
+        //console.warn("getHashPrev", height, this.blocks.blocksStartingPoint, this.lightPrevHashPrevs[height] !== undefined ? this.lightPrevHashPrevs[height].toString("hex") : '')
 
         if (this.agent.light === true && height !== 0)
             if ( this.lightPrevHashPrevs[height] !== undefined )

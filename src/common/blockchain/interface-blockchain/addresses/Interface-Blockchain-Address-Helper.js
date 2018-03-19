@@ -88,7 +88,7 @@ class InterfaceBlockchainAddressHelper{
 
         if (privateKeyWIF === null || privateKeyWIF === undefined || !Buffer.isBuffer(privateKeyWIF) ){
             console.error("ERROR! ",  privateKeyWIF, " is not a Buffer");
-            throw 'privateKeyWIF must be a Buffer';
+            throw {message: 'privateKeyWIF must be a Buffer', privateKeyWIF: privateKeyWIF};
         }
 
         let validation = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKeyWIF);
@@ -123,10 +123,8 @@ class InterfaceBlockchainAddressHelper{
 
     static _generateAddressFromPublicKey(publicKey, showDebug){
 
-        if (!Buffer.isBuffer(publicKey)){
-            console.log("ERROR! ",  publicKey, " is not a Buffer");
-            throw 'publicKey must be a Buffer';
-        }
+        if (!Buffer.isBuffer(publicKey))
+            throw {message: 'publicKey must be a Buffer', publicKey: publicKey};
 
         //could use publicKeyBytesCompressed as well
 
@@ -287,9 +285,9 @@ class InterfaceBlockchainAddressHelper{
 
         if (privateKeyWIF.length !== consts.ADDRESSES.PRIVATE_KEY.LENGTH){
 
-            if (!checkSumDetected) throw "PRIVATE KEY  CHECK SUM is not right";
+            if (!checkSumDetected) throw {message: "PRIVATE KEY  CHECK SUM is not right"};
 
-            if (!versionDetected) throw "PRIVATE KEY  VERSION PREFIX is not recognized";
+            if (!versionDetected) throw {message: "PRIVATE KEY  VERSION PREFIX is not recognized"};
         }
         
         return {result: true, privateKey: privateKeyWIF};
@@ -373,16 +371,16 @@ class InterfaceBlockchainAddressHelper{
         if (addressWIF.length !== consts.ADDRESSES.ADDRESS.LENGTH){
 
             if (!prefixDetected) 
-                throw "ADDRESS KEY  PREFIX  is not right";
+                throw {message: "ADDRESS KEY  PREFIX  is not right"};
 
             if (!suffixDetected)
-                throw "ADDRESS KEY  SUFFIX is not right";
+                throw {message: "ADDRESS KEY  SUFFIX is not right"};
 
             if (!checkSumDetected)
-                throw "ADDRESS KEY  CHECK SUM is not right";
+                throw {message: "ADDRESS KEY  CHECK SUM is not right"};
 
             if (!versionDetected)
-                throw "ADDRESS KEY  VERSION PREFIX is not recognized";
+                throw {message: "ADDRESS KEY  VERSION PREFIX is not recognized"};
         }
         
         return {result: true, address: addressWIF};

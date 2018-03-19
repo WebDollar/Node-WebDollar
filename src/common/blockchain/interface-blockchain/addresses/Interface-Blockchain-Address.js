@@ -327,7 +327,7 @@ class InterfaceBlockchainAddress{
 
             //calcuating the address from the unencodedAddress
             if (InterfaceBlockchainAddressHelper.validateAddressChecksum(this.address).result === false)
-                throw "address didn't pass the valdiateAddressChecksum ";
+                throw {message: "address didn't pass the valdiateAddressChecksum "};
 
             len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
             offset += 1;

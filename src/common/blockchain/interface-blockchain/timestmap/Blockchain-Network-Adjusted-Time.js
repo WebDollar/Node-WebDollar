@@ -33,11 +33,11 @@ class BlockchainNetworkAdjustedTime {
 
             let answer = await socket.node.sendRequestWaitOnce( "timestamp/request-timeUTC", {}, 'answer' );
 
-            if (answer === null || answer === undefined) throw "The node answer for timestamp returned null or empty";
+            if (answer === null || answer === undefined) throw {message: "The node answer for timestamp returned null or empty"};
 
-            if (answer.result === false) throw "The node answer for timestamp is false";
+            if (answer.result === false) throw {message: "The node answer for timestamp is false"};
 
-            if (typeof answer.timeUTC !== "number") throw "The node didn't answer to my request-timeUTC";
+            if (typeof answer.timeUTC !== "number") throw {message: "The node didn't answer to my request-timeUTC"};
 
             //avoiding double counting the same timestamp from the same node
             this._addNodeTimeAdjusted(socket, answer.timeUTC);

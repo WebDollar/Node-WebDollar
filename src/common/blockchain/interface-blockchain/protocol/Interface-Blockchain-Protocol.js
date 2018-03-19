@@ -74,17 +74,11 @@ class InterfaceBlockchainProtocol {
     _validateBlockchainHeader(data){
 
         // validating data
-        if (typeof data.chainLength !== 'number')
-            throw 'chainLength is not specified';
-        if (typeof data.height !== 'number')
-            throw 'height is not specified';
-
-        if (typeof data.header !== 'object')
-            throw 'header is not specified';
-        if (data.header.hashPrev === undefined )
-            throw 'header.hashPrev is not specified';
-        if (data.header.hash === undefined)
-            throw 'header.hash is not specified';
+        if (typeof data.chainLength !== 'number') throw {message: 'chainLength is not specified'};
+        if (typeof data.height !== 'number') throw {message: 'height is not specified'};
+        if (typeof data.header !== 'object') throw {message: 'header is not specified'};
+        if (data.header.hashPrev === undefined ) throw {message:'header.hashPrev is not specified'};
+        if (data.header.hash === undefined) throw {message: 'header.hash is not specified'};
 
         if (typeof data.header.hashPrev === 'string')
             data.header.hashPrev = Serialization.fromBase(data.header.hashPrev);
@@ -97,7 +91,7 @@ class InterfaceBlockchainProtocol {
             data.header.hash = new Buffer(data.header.hash);
 
         if ((typeof data.header.nonce === 'number' || Buffer.isBuffer(data.header.nonce)) === false)
-            throw 'nonce is not specified';
+            throw {message: 'nonce is not specified'};
 
         if (typeof data.header.data.hashData === 'string')
             data.header.data.hashData = Serialization.fromBase(data.header.data.hashData);
@@ -105,7 +99,7 @@ class InterfaceBlockchainProtocol {
             data.header.data.hashData = new Buffer(data.header.data.hashData);
 
         if (data.header.chainLength < data.header.height)
-            throw ('chainLength is smaller than block height ?? ');
+            throw {message: 'chainLength is smaller than block height ?? ', dataHeaderChainLength: data.header.chainLength, dataHeaderHeight: data.header.height};
 
     }
 
@@ -171,7 +165,7 @@ class InterfaceBlockchainProtocol {
                     //TODO !!!
 
                     if (data.height < 0)
-                        throw "your block is invalid";
+                        throw {message: "your block is invalid"};
 
                     //in case the hashes are the same, and I have already the block
                     if (( data.height >= 0 && this.blockchain.blocks.length - 1 >= data.height && this.blockchain.blocks.length >= data.chainLength )) {
@@ -182,7 +176,7 @@ class InterfaceBlockchainProtocol {
                             //you are ok
                         } else
                         if (this.blockchain.blocks[data.height].hash.equals(data.header.hash) === true)
-                            throw "your block is not new, because I have the same block at same height ";
+                            throw {message: "your block is not new, because I have the same block at same height "};
 
                     }
 
@@ -241,16 +235,16 @@ class InterfaceBlockchainProtocol {
                 try {
 
                     if (typeof data.height !== 'number')
-                        throw "data.height is not defined";
+                        throw {message: "data.height is not defined"};
 
                     if (this.blockchain.blocks.length <= data.height)
-                        throw "data.height is higher than I have " + this.blockchain.blocks.length + " < " +data.height;
+                        throw {message: "data.height is higher than I have ", myBlockchainLength: this.blockchain.blocks.length, height: data.height};
 
 
                     let block = this.blockchain.blocks[data.height];
 
                     if (block === undefined)
-                        throw "Block not found: "+data.height;
+                        throw {message: "Block not found: ", height:data.height};
 
                     //console.log("blooock", block);
 
@@ -287,15 +281,15 @@ class InterfaceBlockchainProtocol {
                 try {
 
                     if (typeof data.height !== 'number')
-                        throw "data.height is not defined";
+                        throw {message: "data.height is not defined"};
 
                     if (this.blockchain.blocks.length <= data.height)
-                        throw "data.height is higher than I have "+this.blockchain.blocks.length + " < " +data.height;
+                        throw {message: "data.height is higher than I have ", blockchainLength:this.blockchain.blocks.length, clientHeight:data.height};
 
                     let block = this.blockchain.blocks[data.height];
 
                     if (block === undefined)
-                        throw "block is empty at "+data.height;
+                        throw {message: "block is empty", height: data.height};
 
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                         result: true,
@@ -332,7 +326,7 @@ class InterfaceBlockchainProtocol {
         try {
 
             if (data === null || data.result !== true)
-                throw "last block is not valid";
+                throw {message: "last block is not valid"};
 
             data = data.data;
 
@@ -346,7 +340,7 @@ class InterfaceBlockchainProtocol {
                 //in case the hashes are exactly the same, there is no reason why we should download it
                 let myHash = this.blockchain.getHashPrev(data.height+1);
                 if ( myHash !== undefined && myHash !== null && myHash.equals(data.header.hash) === true )
-                    throw "your block is not new, because I have the same block at same height ";
+                    throw {message: "your block is not new, because I have the same block at same height "};
 
             }
 

@@ -127,14 +127,14 @@ class Argon2BrowserWebAssembly{
             //let result = await this._calcBest(params);
             let result = await this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs, params);
 
-            if (result === null) throw("Argon2 returned empty");
+            if (result === null) throw {message: "Argon2 returned empty"};
 
             //console.log("result", result)
 
             return new Buffer(result.hash);
 
         } catch (Exception){
-            console.log("Argon2 exception hash", Exception)
+            console.error("Argon2 exception hash", Exception)
             return null;
         }
 
@@ -150,7 +150,7 @@ class Argon2BrowserWebAssembly{
             let result = await this._calcBest( params );
 
             // console.log("ARgon2Browser String", result);
-            if (result === null) throw("Argon2 returned empty");
+            if (result === null) throw {message:"Argon2 returned empty"};
 
             return Buffer.from(result.hash).toString("hex");
 
@@ -162,9 +162,8 @@ class Argon2BrowserWebAssembly{
             // return hash
 
         } catch (Exception){
-            console.log("Argon2 exception hashString", Exception)
-
-            throw Exception
+            console.error("Argon2 exception hashString", Exception);
+            return null;
         }
 
     }

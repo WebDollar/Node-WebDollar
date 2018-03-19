@@ -90,7 +90,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
     _computeAccount(node){
 
         if (node === null || node === undefined)
-            throw "Couldn't compute the Sum because Node is empty";
+            throw {message: "Couldn't compute the Sum because Node is empty"};
 
         let sum;
 
@@ -121,7 +121,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
     refreshAccount(node, forced){
 
         if (node === null || node === undefined)
-            throw "Couldn't compute the Sum because Node is empty";
+            throw {message: "Couldn't compute the Sum because Node is empty"};
 
         let result = false;
 

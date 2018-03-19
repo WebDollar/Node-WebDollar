@@ -115,7 +115,7 @@ class InterfaceMerkleTree extends InterfaceTree{
     _computeHash(node){
 
         if (node === null ||  node === undefined)
-            throw "Couldn't compute hash because Node is empty";
+            throw {message: "Couldn't compute hash because Node is empty"};
 
         if (node === this.root && node.edges.length === 0){
             node.hash = { sha256: new Buffer(32) };
@@ -181,7 +181,7 @@ class InterfaceMerkleTree extends InterfaceTree{
     _refreshHash(node, forced){
 
         if (node === null ||  node === undefined)
-            throw "Couldn't compute hash because Node is empty";
+            throw {message: "Couldn't compute hash because Node is empty"};
 
         let result = false;
         let hashAlreadyComputed = false;
@@ -222,11 +222,11 @@ class InterfaceMerkleTree extends InterfaceTree{
 
         if (includeHashes) {
             if (!this.validateRoot())
-                throw "Refresh Hash didn't work";
+                throw {message: "Refresh Hash didn't work"};
         }
         else { //let's recalculate
             if (! this._refreshHash(this.root, true) )
-                throw "Refresh Hash2 didn't work";
+                throw {message: "Refresh Hash2 didn't work"};
         }
 
         return offset;

@@ -135,8 +135,7 @@ class SocketAddress {
                     }
                 } else {
                     // ipString is invalid
-                    console.log("getAddress NOT VALID IP !!!!!", this.address);
-                    throw("NO VALID IP");
+                    throw {message: "NO VALID IP", address: this.address};
                 }
 
 
@@ -147,7 +146,7 @@ class SocketAddress {
 
         } catch(Exception){
             console.error("getAddress exception", Exception, this.address);
-            throw("EXCEPTION getAddress")
+            return '';
         }
     }
 
@@ -179,10 +178,7 @@ class SocketAddress {
             return false;
 
         } catch (Exception){
-
-            console.log("isLocalHost exception", Exception.toString(), this.address);
-            throw("EXCEPTION isLocalHost")
-
+            throw {message: "EXCEPTION isLocalHost", address: this.address}
         }
 
     }

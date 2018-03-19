@@ -57,7 +57,7 @@ class InterfaceBlockchainTransactionTo{
      */
     validateTo(){
 
-        if (this.addresses.length === 0) throw 'To is empty Array';
+        if (this.addresses.length === 0) throw {message: 'To is empty Array'};
 
         this.addresses.forEach ( (toObject, index) =>{
 

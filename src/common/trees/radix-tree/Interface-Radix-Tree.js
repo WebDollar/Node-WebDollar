@@ -38,7 +38,7 @@ class InterfaceRadixTree extends InterfaceTree{
         if (!this._checkInvalidNode(node)) {
             console.log("Invalid Radix Tree", node)
             //this.printLevelSearch();
-            throw( 'The Radix Tree is no longer valid at the node ' + JSON.stringify(node))
+            throw {message: 'The Radix Tree is no longer valid at the node ' ,node:node}
         }
     }
 
@@ -84,7 +84,7 @@ class InterfaceRadixTree extends InterfaceTree{
             input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer
 
         if (input.length === 0)
-            throw 'No input';
+            throw {message: 'No input'};
 
         let nodeCurrent = this.root;
 
@@ -390,7 +390,7 @@ class InterfaceRadixTree extends InterfaceTree{
             input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer
 
         if (input.length === 0)
-            throw 'No input';
+            throw {message: 'No input'};
 
         let nodeCurrent = this.root;
 

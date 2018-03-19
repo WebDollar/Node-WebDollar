@@ -53,7 +53,7 @@ class InterfaceTransactionsPendingQueue {
     }
 
     _removeOldTransactions (){
-        for (let i=this.list.length; i >= 0; i--)
+        for (let i=this.list.length-1; i >= 0; i--)
             //TimeLock to old
             if (this.list[i].timeLock !== 0 && this.list[i].timeLock < this.blockchain.blocks.length-1 - consts.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION ){
 

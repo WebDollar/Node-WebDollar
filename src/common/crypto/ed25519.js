@@ -24,10 +24,7 @@ class ED25519{
 
     static generatePublicKey(secretKey){
 
-        if (secretKey === null || !Buffer.isBuffer(secretKey) ){
-            console.error("ERROR! ",  secretKey, " is not a Buffer");
-            throw 'privateKey must be a Buffer';
-        }
+        if (secretKey === null || !Buffer.isBuffer(secretKey) ) throw { message: 'privateKey must be a Buffer', secretKey: secretKey};
 
         let publicKey = nacl.sign.keyPair.fromSecretKey(secretKey).publicKey;
 
@@ -40,15 +37,8 @@ class ED25519{
 
     static sign(data, secretKey){
 
-        if (secretKey === null || !Buffer.isBuffer(secretKey) ){
-            console.error("ERROR! secretKey ",  secretKey, " is not a Buffer");
-            throw 'secretKey must be a Buffer';
-        }
-
-        if (data === null || !Buffer.isBuffer(data) ){
-            console.error("ERROR! data ",  secretKey, " is not a Buffer");
-            throw 'data must be a Buffer';
-        }
+        if (secretKey === null || !Buffer.isBuffer(secretKey) ) throw {message: 'secretKey must be a Buffer', secretKey: secretKey};
+        if (data === null || !Buffer.isBuffer(data) ) throw {message: 'data must be a Buffer', data: data};
 
         let signature = nacl.sign.detached( data, secretKey );
 
@@ -61,20 +51,9 @@ class ED25519{
 
     static verify(signature, data, publicKey){
 
-        if (signature === null || !Buffer.isBuffer(signature) ){
-            console.error("ERROR! signature ",  signature, " is not a Buffer");
-            throw 'signature must be a Buffer';
-        }
-
-        if (data === null || !Buffer.isBuffer(data) ){
-            console.error("ERROR! data ",  secretKey, " is not a Buffer");
-            throw 'data must be a Buffer';
-        }
-
-        if (publicKey === null || !Buffer.isBuffer(publicKey) ){
-            console.error("ERROR! data ",  publicKey, " is not a Buffer");
-            throw 'publicKey must be a Buffer';
-        }
+        if (signature === null || !Buffer.isBuffer(signature) ) throw {message: 'signature must be a Buffer', signature: signature};
+        if (data === null || !Buffer.isBuffer(data) ) throw {message: 'data must be a Buffer', data:data};
+        if (publicKey === null || !Buffer.isBuffer(publicKey) ) throw {message: 'publicKey must be a Buffer', publicKey: publicKey};
 
         return nacl.sign.detached.verify(data, signature, publicKey)
 

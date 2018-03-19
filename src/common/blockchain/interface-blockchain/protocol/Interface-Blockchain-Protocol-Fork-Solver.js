@@ -97,7 +97,7 @@ class InterfaceBlockchainProtocolForkSolver{
         try{
 
             if (currentBlockchainLength > newChainLength)
-                throw "discoverAndProcessFork a smaller fork than I have";
+                throw {message: "discoverAndProcessFork a smaller fork than I have"};
 
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
 
@@ -112,9 +112,9 @@ class InterfaceBlockchainProtocolForkSolver{
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-1 }, currentBlockchainLength-1 );
 
                 if (answer === null || answer === undefined)
-                    throw "connection dropped headers-info";
+                    throw {message: "connection dropped headers-info"};
                 if (answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) )
-                    throw "connection headers-info malformed";
+                    throw {message: "connection headers-info malformed"};
 
                 if (answer.header.hash.equals( this.blockchain.last.hash ))
 
@@ -134,9 +134,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
 
-                if (answer === null) throw "connection dropped info";
+                if (answer === null) throw {message: "connection dropped info"};
                 if (answer === undefined || typeof answer.chainStartingPoint !== "number" )
-                    throw "request-blockchain-info couldn't return real values";
+                    throw {message: "request-blockchain-info couldn't return real values"};
 
                 newChainStartingPoint = answer.chainStartingPoint;
 
@@ -151,7 +151,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 binarySearchResult = await this._calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength );
 
                 if (binarySearchResult.position === null)
-                    throw "connection dropped discoverForkBinarySearch"
+                    throw {message: "connection dropped discoverForkBinarySearch"}
 
                 // console.log("binary search ", binarySearchResult)
             }
@@ -167,9 +167,9 @@ class InterfaceBlockchainProtocolForkSolver{
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: newChainStartingPoint }, newChainStartingPoint );
 
                 if (answer === null || answer === undefined )
-                    throw "connection dropped headers-info newChainStartingPoint";
+                    throw {message: "connection dropped headers-info newChainStartingPoint"};
                 if (answer.result !== true || answer.header === undefined)
-                    throw "headers-info 0 malformed"
+                    throw {message: "headers-info 0 malformed"}
 
                 binarySearchResult = {position: newChainStartingPoint, header: answer.header};
 
@@ -279,11 +279,11 @@ class InterfaceBlockchainProtocolForkSolver{
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight);
 
                 if (answer === null || answer === undefined)
-                    throw "block never received "+ nextBlockHeight;
+                    throw {message: "block never received "+ nextBlockHeight};
 
                 if ( !answer.result || answer.block === undefined  || !Buffer.isBuffer(answer.block) ) {
                     console.log("Fork Answer received ", answer);
-                    throw "Fork Answer is not Buffer";
+                    throw {message: "Fork Answer is not Buffer"};
                 }
 
 
@@ -314,7 +314,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (result)
                     nextBlockHeight++;
                 else
-                    throw "Fork didn't work at height "+nextBlockHeight;
+                    throw {message: "Fork didn't work at height ", nextBlockHeight};
 
             }
 

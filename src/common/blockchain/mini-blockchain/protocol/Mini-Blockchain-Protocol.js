@@ -42,11 +42,11 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
                 console.log("get-light-settings111")
 
-                if (typeof data.height !== "number" ) throw "data.height is not a number";
-                if (data.height < 0) throw "height is not valid";
+                if (typeof data.height !== "number" ) throw {message: "data.height is not a number"};
+                if (data.height < 0) throw {message: "height is not valid"};
 
                 if (this.blockchain.blocks.length < data.height)
-                    throw "height is not valid";
+                    throw {message: "height is not valid"};
 
                 let difficultyTarget = this.blockchain.getDifficultyTarget(data.height);
                 let timestamp = this.blockchain.getTimeStamp(data.height);

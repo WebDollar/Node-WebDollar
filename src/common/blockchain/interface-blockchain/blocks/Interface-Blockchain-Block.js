@@ -254,15 +254,10 @@ class InterfaceBlockchainBlock {
         if (!Buffer.isBuffer(buffer))
             buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
 
-        if (height !== undefined)
-            this.height = height;
-        if (reward !== undefined)
-            this.reward = reward;
-        if (difficultyTarget !== undefined)
-            this.difficultyTarget = difficultyTarget;
-
-        if (offset === undefined)
-            offset = 0;
+        if (height !== undefined)  this.height = height;
+        if (reward !== undefined) this.reward = reward;
+        if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
+        if (offset === undefined) offset = 0;
 
         try {
 

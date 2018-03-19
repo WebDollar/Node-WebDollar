@@ -116,7 +116,7 @@ class InterfaceBlockchainTransaction{
 
         if (typeof this.nonce !== 'number') throw {message: 'nonce is empty', nonce: this.nonce};
         if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
-        if (typeof this.timeLock !== "number") throw {timeLock: 'timeLock is empty', timeLock:this.timeLock};
+        if (typeof this.timeLock !== "number") throw {message: 'timeLock is empty', timeLock:this.timeLock};
 
         if (this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
@@ -206,6 +206,7 @@ class InterfaceBlockchainTransaction{
             from: this.from.toJSON(),
             to: this.to.toJSON(), //address,
             nonce: this.nonce,
+            version: this.version,
             timeLock: this.timeLock,
         };
 

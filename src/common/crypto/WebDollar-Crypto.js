@@ -39,7 +39,7 @@ class WebDollarCrypto {
      */
     static  decodeBase64(str) {
 
-        if (typeof str !== "string") throw "input is not string for base decoding" + typeof str;
+        if (typeof str !== "string") throw {message: "input is not string for base decoding", str:str};
 
         let newStr = '';
         for (let i = 0; i < str.length; i++) {
@@ -105,7 +105,7 @@ class WebDollarCrypto {
     static encryptAES(buffer, password){
 
         if (!Buffer.isBuffer(buffer))
-            throw "buffer argument is not a buffer";
+            throw {message: "buffer argument is not a buffer"};
 
         try {
             let cipher = crypto.createCipher('aes-256-cbc', password);
@@ -121,7 +121,7 @@ class WebDollarCrypto {
     static decryptAES(buffer, password) {
 
         if (!Buffer.isBuffer(buffer))
-            throw "buffer argument is not a buffer";
+            throw {message: "buffer argument is not a buffer"};
 
         try {
             let decipher = crypto.createDecipher('aes-256-cbc', password);

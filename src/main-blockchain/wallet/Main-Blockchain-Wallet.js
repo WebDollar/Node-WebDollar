@@ -45,7 +45,7 @@ class MainBlockchainWallet{
         let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
         if (! (await this._insertAddress(blockchainAddress)))
-            throw "Address already exists";
+            throw {message: "Address already exists"};
 
         return blockchainAddress;
     }
@@ -55,7 +55,7 @@ class MainBlockchainWallet{
         let blockchainAddress = await this._justCreateNewAddress(salt, false);
 
         if (! (await this._insertAddress(blockchainAddress)))
-            throw "Address already exists";
+            throw {message: "Address already exists"};
 
         return blockchainAddress;
     }
@@ -210,7 +210,7 @@ class MainBlockchainWallet{
 
         address = this.getAddress(address);
         if (address === null)
-            throw "address not found";
+            throw {message: "address not found", address:address};
 
         return (await address.isPrivateKeyEncrypted());
     }
@@ -308,15 +308,13 @@ class MainBlockchainWallet{
 
             //private Key object {version: "xxx", address: "HEX", publicKet: "HEX", privateKey: "HEX" }
             if (typeof inputData === "object"){
-                if (!inputData.hasOwnProperty("version"))
-                    throw ".version not specified";
-                if (!inputData.hasOwnProperty("privateKey"))
-                    throw ".privateKey not specified";
+                if (!inputData.hasOwnProperty("version")) throw {message:"address.version not specified", inputData: inputData};
+                if (!inputData.hasOwnProperty("privateKey")) throw {message: "address.privateKey not specified", inputData: inputData};
 
                 if (inputData.version === "0.1"){
                     privateKey = inputData.privateKey;
                 } else
-                    throw "privateKey version is not good " + inputData.version;
+                    throw {message: "privateKey version is not good ", inputData: inputData.version};
 
                 if (inputData.hasOwnProperty('address'))
                     address = inputData.address;
@@ -343,7 +341,7 @@ class MainBlockchainWallet{
             }
 
             if (! (await this._insertAddress(blockchainAddress)))
-                throw "Address already exists";
+                throw {message:"Address already exists", address: blockchainAddress};
 
             return {
                 result: true,

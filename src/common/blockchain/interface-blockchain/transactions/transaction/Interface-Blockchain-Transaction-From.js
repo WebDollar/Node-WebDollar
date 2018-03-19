@@ -178,7 +178,7 @@ class InterfaceBlockchainTransactionFrom{
             position = this.findAddressIndex(unencodedAddress);
 
         if (position < 0 || position > this.addresses.length)
-            throw "address was not found";
+            throw {message: "address was not found"};
 
         return Buffer.concat ([
 

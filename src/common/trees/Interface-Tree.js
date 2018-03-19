@@ -28,12 +28,11 @@ class InterfaceTree{
 
         for (let i = 0; i < node.edges.length; i++) {
 
-            if (  node.edges[i].targetNode === undefined || node.edges[i].targetNode === null ){
-                console.log("Edge target node is Null", node, node.edges[i], i)
-                throw('Edge target node is Null')
-            }
+            if (  node.edges[i].targetNode === undefined || node.edges[i].targetNode === null )
+                throw {message: 'Edge target node is Null', node: node, edge: node.edges[i], edgeIndex:i}
+
             if (node.edges[i].targetNode.parent !== node)
-                throw ('Edge target node parent is different that current node');
+                throw {message:'Edge target node parent is different that current node', node:node};
 
             if (typeof callback === 'function') {
                 let result = this.validateTree(node.edges[i].targetNode, callback);
@@ -91,7 +90,8 @@ class InterfaceTree{
             value = WebDollarCryptoData.createWebDollarCryptoData(value).buffer
 
         if (value.length === 0)
-            throw 'No input';
+            throw {message: 'No input to be deleted', value};
+
         let searchResult = this.search(value);
 
         //console.log("searchResult", searchResult)
@@ -392,7 +392,7 @@ class InterfaceTree{
         if (buffer === undefined)
             buffer = await this.db.get(key);
 
-        if (! Buffer.isBuffer(buffer) ) throw "InterfaceTree - buffer is not Buffer"
+        if (! Buffer.isBuffer(buffer) ) throw {message: "InterfaceTree - buffer is not Buffer"}
 
         //console.log("loadTree", buffer.length, "   ",buffer.toString("hex") );
 

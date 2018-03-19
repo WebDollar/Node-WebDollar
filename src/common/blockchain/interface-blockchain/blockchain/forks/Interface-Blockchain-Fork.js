@@ -56,7 +56,7 @@ class InterfaceBlockchainFork {
             for (let i = 0; i < this.forkBlocks.length; i++){
 
                 if (! (await this._validateForkBlock( this.forkBlocks[i], this.forkStartingHeight + i )))
-                    throw "validateForkBlock failed for " + i;
+                    throw {message:"validateForkBlock failed for ", index:i};
 
             }
 
@@ -66,7 +66,7 @@ class InterfaceBlockchainFork {
     async includeForkBlock(block, ){
 
         if (! (await this._validateForkBlock(block, block.height)) )
-            throw "includeForkBlock failed for "+block.height;
+            throw {message: "includeForkBlock failed for ", height:block.height};
 
         this.forkBlocks.push(block);
 
@@ -81,10 +81,8 @@ class InterfaceBlockchainFork {
         //calculate the forkHeight
         let forkHeight = block.height - this.forkStartingHeight;
 
-        if (block.height < this.forkStartingHeight)
-            throw 'block height is smaller than the fork itself';
-        if (block.height !== height)
-            throw "block height is different than block's height";
+        if (block.height < this.forkStartingHeight) throw {message: 'block height is smaller than the fork itself', blockHeight: block.height, height:height};
+        if (block.height !== height) throw {message:"block height is different than block's height", blockHeight: block.height, height:height};
 
         let result = await this.blockchain.validateBlockchainBlock( block );
 

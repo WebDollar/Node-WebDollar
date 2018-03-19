@@ -15,10 +15,8 @@ class Serialization{
         // e: 9  - it can also be negative
         // s: 1
 
-        if (data instanceof BigNumber === false)
-            throw 'data is not big decimal';
-        if ( data.c.length === 0 )
-            throw "data is 0 and can't be ";
+        if (data instanceof BigNumber === false) throw {message:'data is not big decimal'};
+        if ( data.c.length === 0 ) throw {message:"data is 0 and can't be "};
 
         let buffer = new Buffer( 1 + 1 + data.c.length*6 );
 
@@ -70,7 +68,7 @@ class Serialization{
         let bigNumber = {e:0, s:0, c: []};
 
         if (!Buffer.isBuffer(buffer))
-            throw "Can't deserialize Big Number because it is not a buffer";
+            throw {message: "Can't deserialize Big Number because it is not a buffer"};
 
         bigNumber.e = buffer[0 + offset ] % 128;
         bigNumber.e *= Math.floor(buffer[0 + offset] / 128) === 0 ? 1 : -1;

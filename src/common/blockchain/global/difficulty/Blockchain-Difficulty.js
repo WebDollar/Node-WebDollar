@@ -9,7 +9,7 @@ class BlockchainDifficulty{
 
         // difficulty algorithm is based on blockNumber
         if (!( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.isGreaterThanOrEqualTo(0))))
-            throw "invalid block number";
+            throw {message: "invalid block number"};
 
         // console.log("prevBlockTimestamp", prevBlockTimestamp.toString(16));
         // console.log("blockTimestamp", blockTimestamp.toString(16));
@@ -146,7 +146,7 @@ class BlockchainDifficulty{
             how_much_it_took_to_mine_X_Blocks += blockTimestamp;
 
             if ( how_much_it_took_to_mine_X_Blocks <= 0 )
-                throw "how_much_it_took_to_mine_X_Blocks is negative " + how_much_it_took_to_mine_X_Blocks;
+                throw {message: "how_much_it_took_to_mine_X_Blocks is negative ", how_much_it_took_to_mine_X_Blocks: how_much_it_took_to_mine_X_Blocks};
 
             console.warn("blocktimestamp", blockTimestamp)
             console.warn("how_much_it_took_to_mine_X_Blocks ", how_much_it_took_to_mine_X_Blocks );
@@ -155,7 +155,7 @@ class BlockchainDifficulty{
             how_much_it_took_to_mine_X_Blocks -= (consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS) * getTimeStampCallback(firstBlock);
 
             if ( how_much_it_took_to_mine_X_Blocks <= 0 )
-                throw "how_much_it_took_to_mine_X_Blocks is negative " + how_much_it_took_to_mine_X_Blocks;
+                throw {message: "how_much_it_took_to_mine_X_Blocks is negative ", how_much_it_took_to_mine_X_Blocks:how_much_it_took_to_mine_X_Blocks };
 
             let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks);
 

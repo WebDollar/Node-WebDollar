@@ -111,11 +111,11 @@ class ValidationsUtils{
             if (initialTest) {
                 for (let i = 0; i < DATABASES.length; i++) {
 
-                    if (!(await this.testPounchDB(DATABASES[i], TIME_OUT))) throw "it didn't work";
+                    if (!(await this.testPounchDB(DATABASES[i], TIME_OUT))) throw {message: "it didn't work"};
                     alert(DATABASES[i] + "   " + i + "  merge 1")
-                    if (!(await this.testPounchDB2(DATABASES[i], TIME_OUT))) throw "it didn't work";
+                    if (!(await this.testPounchDB2(DATABASES[i], TIME_OUT))) throw {message: "it didn't work"};
                     alert(DATABASES[i] + "   " + i + "  merge 2")
-                    if (!(await this.testPounchDB3(DATABASES[i], TIME_OUT))) throw "it didn't work";
+                    if (!(await this.testPounchDB3(DATABASES[i], TIME_OUT))) throw {message: "it didn't work"};
                     alert(DATABASES[i] + "   " + i + "  merge 3")
                 }
             }

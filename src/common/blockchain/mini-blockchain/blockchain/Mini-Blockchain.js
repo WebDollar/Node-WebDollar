@@ -60,7 +60,7 @@ class MiniBlockchain extends  inheritBlockchain{
             if (result !== null && result !== undefined)
                 revert.reward = true;
             else
-                throw "reward couldn't be set to the minerAddress";
+                throw {message: "reward couldn't be set to the minerAddress"};
 
             //validate transactions & tree
             revert.transactions.start = 0;
@@ -69,7 +69,7 @@ class MiniBlockchain extends  inheritBlockchain{
                 try {
 
                     if ( ! block.data.transactions.transactions[i].validateTransaction( block.height ) )
-                        throw "couldn't process the transaction " + i;
+                        throw {message: "couldn't process the transaction ", transaction: block.data.transactions.transactions[i]};
 
                     block.data.transactions.transactions[i].processTransaction(1);
 
@@ -84,7 +84,7 @@ class MiniBlockchain extends  inheritBlockchain{
             result = await callback();
 
             if (result === false)
-                throw "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock";
+                throw {message: "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock"};
 
 
         } catch (ex){
@@ -108,7 +108,7 @@ class MiniBlockchain extends  inheritBlockchain{
                     try {
 
                         if ( ! block.data.transactions.transactions[i].validateTransaction( block.height ) )
-                            throw "couldn't process the transaction " + i;
+                            throw {message: "couldn't process the transaction ", transaction: block.data.transactions.transactions[i]};
 
                         block.data.transactions.transactions[i].processTransaction(-1); //negated
 
@@ -146,9 +146,9 @@ class MiniBlockchain extends  inheritBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
 
-        if (! (await this.simulateNewBlock(block, false, async ()=>{
+        if (await this.simulateNewBlock(block, false, async ()=>{
             return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock );
-        }))) throw "Error includeBlockchainBlock MiniBlockchain ";
+        })===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
 
         if (! (await this.accountantTree.saveMiniAccountant(true)))
             console.error("Error Saving Mini Accountant Tree");
@@ -172,10 +172,10 @@ class MiniBlockchain extends  inheritBlockchain{
                 return false;
 
             if (! (await this.accountantTree.saveMiniAccountant( true )))
-                throw "Couldn't save the Account Tree"
+                throw {message: "Couldn't save the Account Tree"}
 
             if (! (await inheritBlockchain.prototype.saveBlockchain.call(this)))
-                throw "couldn't sae the blockchain"
+                throw {message: "couldn't sae the blockchain"}
 
             return true;
 
@@ -203,7 +203,7 @@ class MiniBlockchain extends  inheritBlockchain{
             result = result && await inheritBlockchain.prototype.loadBlockchain.call( this  );
 
             if (result === false){
-                throw "Problem loading the blockchain";
+                throw {message: "Problem loading the blockchain"};
             }
 
             //check the accountant Tree if matches
@@ -211,7 +211,7 @@ class MiniBlockchain extends  inheritBlockchain{
             console.log("finalAccountantTree final", finalAccountantTree.root.hash.sha256);
 
             if (this.accountantTree.root.hash.sha256.compare(finalAccountantTree.root.hash.sha256) !== 0){
-                throw "Accountant Trees are different";
+                throw {message: "Accountant Trees are different"};
             }
 
             return result;

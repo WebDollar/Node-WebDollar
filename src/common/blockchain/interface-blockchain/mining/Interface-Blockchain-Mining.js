@@ -202,11 +202,11 @@ class InterfaceBlockchainMining{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                if (! (await this.blockchain.semaphoreProcessing.processSempahoreCallback(  ()=>{
+                if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(  ()=>{
                         return  this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
                             return this._simulatedNextBlockMining(nextBlock);
                         });
-                    }))) throw "Mining1 returned False";
+                    }) === false) throw {message: "Mining1 returned False"};
 
 
             } catch (Exception){
@@ -242,13 +242,13 @@ class InterfaceBlockchainMining{
             console.log("difficultydifficultydifficulty", difficulty === undefined || difficulty === null);
 
             if (difficulty === undefined || difficulty === null)
-                throw 'difficulty not specified';
+                throw {message: 'difficulty not specified'};
 
             if (difficulty instanceof BigInteger)
                 difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
 
             if (block === undefined || block === null)
-                throw "block is undefined";
+                throw {message: "block is undefined"};
 
             block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
 
@@ -277,7 +277,7 @@ class InterfaceBlockchainMining{
 
                 try {
 
-                    if (! (await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
+                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
                             block.hash = answer.hash;
                             block.nonce = answer.nonce;
 
@@ -286,7 +286,7 @@ class InterfaceBlockchainMining{
                                 return false;
 
                             return this.blockchain.includeBlockchainBlock(block, false, [], true);
-                        }))) throw "Mining2 returned false";
+                        }) === false) throw {message: "Mining2 returned false"};
 
                 } catch (exception){
 

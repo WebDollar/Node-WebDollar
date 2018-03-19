@@ -31,7 +31,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         let forkHeight = height - this.forkStartingHeight;
 
         if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
-            if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined) throw "forkPrevDifficultyTarget was not specified";
+            if (this.forkPrevDifficultyTarget === null || this.forkPrevDifficultyTarget === undefined) throw {message: "forkPrevDifficultyTarget was not specified"};
             return this.forkPrevDifficultyTarget;
         }
 
@@ -45,7 +45,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
             if (this.forkPrevTimeStamp === null || this.forkPrevTimeStamp === undefined)
-                throw "forkPrevTimeStamp was not specified";
+                throw {message: "forkPrevTimeStamp was not specified"};
             return this.forkPrevTimeStamp;
         }
 
@@ -59,7 +59,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
             if (this.forkPrevHashPrev === null || this.forkPrevHashPrev === undefined)
-                throw "forkPrevHashPrev was not specified";
+                throw {message: "forkPrevHashPrev was not specified"};
             return this.forkPrevHashPrev;
         }
 
@@ -142,7 +142,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             console.log("preFork2 accountantTree sum all", sum );
 
             if (sum.isLessThanOrEqualTo(currentSum) || sum.isLessThanOrEqualTo(0)){
-                throw "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible";
+                throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible"};
             }
 
             console.log("this.forkPrevDifficultyTarget", this.forkPrevDifficultyTarget.toString("hex") );
@@ -180,7 +180,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrevs[diffIndex] = this._lightPrevHashPrevClone;
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this._lightAccountantTreeSerializationsHeightClone;
 
-            //if (! (await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1))) throw "_recalculateLightPrevs failed";
+            //if (! (await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1))) throw {message: "_recalculateLightPrevs failed"};
         } else
             return MiniBlockchainFork.prototype.revertFork.call(this);
     }

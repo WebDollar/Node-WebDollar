@@ -307,7 +307,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         for (max = M.length - 1; M[max] !== undefined && max >= 0; --max);
 
         if (max === 0)
-            throw 'max === 0';
+            throw {message: 'max === 0', max};
 
 
         // ρ ← 1/ max(M)

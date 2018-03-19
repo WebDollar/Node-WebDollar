@@ -113,7 +113,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             throw {message: "address not found", address: address};
 
         if (!node.isLeaf())
-            throw "couldn't list because input is not a leaf node";
+            throw {message: "couldn't list because input is not a leaf node"};
 
         return node.getBalances();
     }

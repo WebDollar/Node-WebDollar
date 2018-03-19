@@ -77,7 +77,7 @@ class NodePropagationProtocol {
                             let transaction = Blockchain.blockchain.transactions._createTransaction(from, to, nonce, timeLock, version);
 
                             if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction))
-                                throw "I already have this transaction";
+                                throw {message: "I already have this transaction"};
 
                         } catch (exception) {
                             console.error("Transaction is wrong. It should ban the user");

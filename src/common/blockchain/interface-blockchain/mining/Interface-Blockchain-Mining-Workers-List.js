@@ -100,7 +100,7 @@ class InterfaceBlockchainMiningWorkersList{
         console.log("worker created",worker);
 
         if (worker === undefined || worker === null)
-            throw 'No Worker specified';
+            throw {message: 'No Worker specified'};
 
         this._workersList.push(worker);
 
