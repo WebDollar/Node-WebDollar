@@ -64,16 +64,12 @@ class InterfaceBlockchainBlockDataTransactions {
             offset += 4;
 
             for (let i = 0; i < length; i++) {
-                let transaction = new InterfaceBlockchainTransaction( this.blockData.blockchain);
+                let transaction = this.blockData.blockchain.transactions._createTransaction();
                 offset = transaction.deserializeTransaction(buffer, offset);
             }
         }
 
         return offset;
-    }
-
-    _createBlockchainTransaction(){
-
     }
 
 

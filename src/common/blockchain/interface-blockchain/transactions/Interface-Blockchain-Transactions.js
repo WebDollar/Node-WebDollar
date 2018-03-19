@@ -1,6 +1,5 @@
 import consts from 'consts/const_global'
 import InterfaceTransactionsPendingQueue from './pending/Interface-Transactions-Pending-Queue'
-import InterfaceTransactionsUniqueness from './uniqueness/Interface-Transactions-Uniqueness'
 import InterfaceTransaction from "./transaction/Interface-Blockchain-Transaction"
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
@@ -17,10 +16,9 @@ class InterfaceBlockchainTransactions {
 
         this.pendingQueue = new InterfaceTransactionsPendingQueue(db);
 
-        this.uniqueness = new InterfaceTransactionsUniqueness();
     }
 
-    async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined){
+    async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
 
         if (fee === undefined) fee = this.calculateFeeSimple(toAmount);
 
@@ -79,8 +77,9 @@ class InterfaceBlockchainTransactions {
 
                 //to
                 to,
-                this.blockchain.blocks.length-1,
-                undefined, undefined,
+                undefined, //nonce
+                undefined, //txId
+                timeLock, //timeLock
                 false, false
             );
 

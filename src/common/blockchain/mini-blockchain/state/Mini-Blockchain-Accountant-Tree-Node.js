@@ -1,14 +1,7 @@
-import InterfaceMerkleAccountantRadixTree from 'common/trees/radix-tree/accountant-tree/merkle-tree/Interface-Merkle-Accountant-Radix-Tree'
-import InterfaceMerkeRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
-import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
-import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree-Node'
 import BufferExtended from "common/utils/BufferExtended";
 import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
-import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import InterfaceMerkleRadixTreeNode from "common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree-Node"
-import InterfaceRadixTreeEdge from "common/trees/radix-tree/Interface-Radix-Tree-Edge";
-import InterfaceMerkleTreeNode from "common/trees/merkle-tree/Interface-Merkle-Tree-Node"
 
 let BigNumber = require('bignumber.js');
 
@@ -21,6 +14,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         //console.log("value", value);
         this.hash = { sha256: new Buffer(32) };
         this.total = new BigNumber(0);
+
+        this.nonce = 0;
 
         if (value !== undefined) {
             value = value || {};

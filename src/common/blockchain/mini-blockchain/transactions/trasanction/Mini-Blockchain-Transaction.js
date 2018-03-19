@@ -3,7 +3,7 @@ import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockcha
 import MiniBlockchainTransactionFrom from './Mini-Blockchain-Transaction-From'
 import MiniBlockchainTransactionTo from './Mini-Blockchain-Transaction-To'
 
-class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction{
+class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
     _createTransactionFrom(from){
         return new MiniBlockchainTransactionFrom(this, from);
@@ -11,6 +11,11 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction{
 
     _createTransactionTo(to){
         return new MiniBlockchainTransactionTo(this, to);
+    }
+
+
+    _computeNonce(){
+        return this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
     }
 
 }

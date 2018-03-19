@@ -120,7 +120,15 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         return node.getBalance(tokenId);
     }
 
+    getAccountNonce(address){
+        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        if (address === null) throw {message: "getAccountNonce - Your address is invalid", address: address };
 
+        let node = this.search(address).node;
+        if (node === undefined || node === null) throw {message: "getAccountNonce - address not found", address: address };
+
+        return node.nonce % 0xFF;
+    }
 
     _changedNode(node){
 

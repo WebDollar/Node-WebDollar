@@ -184,6 +184,7 @@ class InterfaceBlockchainTransactionFrom{
 
             Serialization.serializeNumber1Byte( this.transaction.version ),
             Serialization.serializeNumber1Byte( this.transaction.nonce ),
+            Serialization.serializeNumber3Bytes( this.transaction.timeLock ),
             Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.WIF.LENGTH, this.addresses[position].unencodedAddress ),
             Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[position].publicKey ),
             this.transaction.to.serializeTo(),
