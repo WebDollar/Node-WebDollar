@@ -16,7 +16,8 @@
     "test_browser": "webpack --config build_webpack/tests/webpack.browser.test.config.js && npm run show_browser_test",
     "show_mocha_report": "node src/tests/browser/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
-    "show_coverage": "node src/tests/browser/show-coverage.test.js"
+    "show_coverage": "node src/tests/browser/show-coverage.test.js",
+    "commands": "node src/node/cmd/Interactive-Menu.js"
   },
   "repository": {
     "type": "git",
