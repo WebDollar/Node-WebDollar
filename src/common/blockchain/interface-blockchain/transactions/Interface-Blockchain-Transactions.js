@@ -27,6 +27,8 @@ class InterfaceBlockchainTransactions {
         try {
             if (!(toAmount instanceof BigNumber)) toAmount = new BigNumber(toAmount);
         } catch (exception){
+            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
+
             return { result:false,  message: "Amount is not a valid number", reason: exception.toString() }
         }
 
@@ -41,6 +43,7 @@ class InterfaceBlockchainTransactions {
             address = this.wallet.getAddress(address);
 
         } catch (exception){
+            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
             console.error("Creating a new transaction raised an exception - Getting Address", exception.toString());
             return { result:false,  message: "Get Address failed", reason: exception.toString() }
         }
@@ -76,11 +79,13 @@ class InterfaceBlockchainTransactions {
 
                 //to
                 to,
+                this.blockchain.blocks.length-1,
                 undefined, undefined,
                 false, false
             );
 
         } catch (exception) {
+            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
             console.error("Creating a new transaction raised an exception - Failed Creating a transaction", exception.toString());
             return { result:false,  message: "Failed Creating a transaction", reason: exception.toString() }
         }
@@ -90,13 +95,15 @@ class InterfaceBlockchainTransactions {
         try{
             signature = await address.signTransaction(transaction, password);
         } catch (exception){
+            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
             console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception.toString());
             return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }
         }
 
         try{
-            transaction.validateTransaction();
+            transaction.validateTransaction( this.blockchain.blocks.length-1 );
         } catch (exception){
+            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
             console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception.toString());
             return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }
         }
@@ -106,7 +113,7 @@ class InterfaceBlockchainTransactions {
             this.pendingQueue.includePendingTransaction(transaction);
 
         } catch (exception){
-
+            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
             console.error("Creating a new transaction raised an exception - Including Pending Transaction", exception.toString());
             return { result:false,  message: "Including Pending Transaction", reason: exception.toString() }
         }
@@ -128,8 +135,8 @@ class InterfaceBlockchainTransactions {
     }
 
 
-    _createTransaction(from, to, nonce, txId, validateFrom, validateTo){
-        return new InterfaceTransaction(this.blockchain, from, to, nonce, txId, validateFrom, validateTo);
+    _createTransaction( from, to, nonce, timeLock, txId, validateFrom, validateTo ){
+        return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo);
     }
 
 

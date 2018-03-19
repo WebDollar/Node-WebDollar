@@ -64,7 +64,7 @@ class InterfaceBlockchainBlockDataTransactions {
             offset += 4;
 
             for (let i = 0; i < length; i++) {
-                let transaction = new InterfaceBlockchainTransaction( this.blockData.blockchain, undefined, undefined, undefined, undefined, undefined);
+                let transaction = new InterfaceBlockchainTransaction( this.blockData.blockchain);
                 offset = transaction.deserializeTransaction(buffer, offset);
             }
         }

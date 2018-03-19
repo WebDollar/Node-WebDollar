@@ -69,10 +69,11 @@ class NodePropagationProtocol {
                         let from = response.transaction.from;
                         let to = response.transaction.to;
                         let nonce = response.transaction.nonce;
+                        let height = response.transaction.height;
 
                         try {
 
-                            let transaction = new InterfaceBlockchainTransaction(Blockchain.blockchain, from, to, nonce);
+                            let transaction = new InterfaceBlockchainTransaction(Blockchain.blockchain, from, to, nonce, height);
 
                             if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction))
                                 throw "i already have this transaction";

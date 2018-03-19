@@ -145,6 +145,16 @@ class Serialization{
         return  buffer;
     }
 
+    serializeNumber3Bytes(data){
+        //converting number value into a buffer
+        let buffer = Buffer(3);
+        buffer[2] = data & 0xff;
+        buffer[1] = data>>8 & 0xff;
+        buffer[0] = data>>16 & 0xff;
+
+        return  buffer;
+    }
+
     serializeNumber4Bytes(data){
         //converting number value into a buffer
         let buffer = Buffer(4);

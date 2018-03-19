@@ -68,7 +68,7 @@ class MiniBlockchain extends  inheritBlockchain{
             for (let i=0; i<block.data.transactions.transactions.length; i++)
                 try {
 
-                    if ( ! block.data.transactions.transactions[i].validateTransaction() )
+                    if ( ! block.data.transactions.transactions[i].validateTransaction( block.height ) )
                         throw "couldn't process the transaction " + i;
 
                     block.data.transactions.transactions[i].updateAccountantTree(1);
@@ -107,7 +107,7 @@ class MiniBlockchain extends  inheritBlockchain{
                 for (let i = revert.transactions.end; i >= revert.transactions.start; i--)
                     try {
 
-                        if ( ! block.data.transactions.transactions[i].validateTransaction() )
+                        if ( ! block.data.transactions.transactions[i].validateTransaction( block.height ) )
                             throw "couldn't process the transaction " + i;
 
                         block.data.transactions.transactions[i].updateAccountantTree(-1); //negated

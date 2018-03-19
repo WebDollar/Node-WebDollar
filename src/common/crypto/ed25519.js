@@ -29,9 +29,6 @@ class ED25519{
             throw 'privateKey must be a Buffer';
         }
 
-        console.warn("SCHNORR generate secretKey", secretKey.toString("hex") )
-        console.warn("SCHNORR generate publicKey", nacl.sign.keyPair.fromSecretKey(secretKey).publicKey.toString("hex") )
-
         let publicKey = nacl.sign.keyPair.fromSecretKey(secretKey).publicKey;
 
         if (!Buffer.isBuffer(publicKey))
@@ -58,8 +55,6 @@ class ED25519{
         if ( !Buffer.isBuffer(signature) )
             signature = new Buffer(signature);
 
-        console.warn("SCHNORR data", data.toString("hex") )
-        console.warn("SCHNORR signature", signature.toString("hex") )
 
         return signature;
     }
@@ -80,10 +75,6 @@ class ED25519{
             console.error("ERROR! data ",  publicKey, " is not a Buffer");
             throw 'publicKey must be a Buffer';
         }
-
-        console.warn("SCHNORR data", data.toString("hex") )
-        console.warn("SCHNORR signature", signature.toString("hex") )
-        console.warn("SCHNORR publicKey", publicKey.toString("hex") )
 
         return nacl.sign.detached.verify(data, signature, publicKey)
 

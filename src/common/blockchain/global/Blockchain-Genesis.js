@@ -19,10 +19,13 @@ class BlockchainGenesis{
     validateGenesis(block){
 
         if ( block.timeStamp.length !== this.timeStamp.length )
-            throw "Timestamp doesn't match";
+            throw {message: "Timestamp doesn't match", timestamp: block.timeStamp};
 
         if ( block.timeStamp > 0x000FFFFF)
-            throw "Timestamp is too old "+block.timeStamp.toString();
+            throw {message: "Timestamp is too old ", timestamp: block.timeStamp};
+
+        if (block.timeStamp < 0)
+            throw {message: "Timestamp is invalid", timeStamp: block.timeStamp}
     }
 
     getLevel(){

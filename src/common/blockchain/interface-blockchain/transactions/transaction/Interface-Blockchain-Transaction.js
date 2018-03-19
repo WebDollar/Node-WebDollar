@@ -5,6 +5,7 @@ import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
 
 import Serialization from "common/utils/Serialization"
 import BufferExtended from "common/utils/BufferExtended"
+import consts from "../../../../../consts/const_global";
 
 class InterfaceBlockchainTransaction{
 
@@ -19,14 +20,16 @@ class InterfaceBlockchainTransaction{
      *
      */
 
-    constructor(blockchain, from, to, nonce, txId, validateFrom=true, validateTo=true){
+    constructor(blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true){
 
         this.blockchain = blockchain;
         this.from = null;
         this.to = null;
 
+        if (timeLock === undefined)
+            this.timeLock = blockchain.blocks.length-1;
 
-        this.version = 0x00; //version
+        this.version = version||0x00; //version
 
         if (nonce === undefined || nonce === null)
             nonce = this._computeRandomNonce();
@@ -82,7 +85,7 @@ class InterfaceBlockchainTransaction{
     }
 
     _computeRandomNonce(){
-        return Math.floor(Math.random() * 0xffff);
+        return Math.floor(Math.random() * 0xFF);
     }
 
     _computeTxId(){
@@ -111,10 +114,15 @@ class InterfaceBlockchainTransaction{
      * @param silent
      * @returns {*}
      */
-    validateTransaction(){
+    validateTransaction( blockHeight ){
 
-        if (this.nonce === undefined || this.nonce === null || typeof this.nonce !== 'number')
-            throw ('nonce is empty');
+        if (typeof this.nonce !== 'number') throw {message: 'nonce is empty', nonce: this.nonce};
+        if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
+        if (typeof this.timeLock !== "number") throw {timeLock: 'timeLock is empty', timeLock:this.timeLock};
+
+        if (this.nonce <0 || this.nonce > 0xFF) throw {message: "nocne is invalid", nonce: this.nonce};
+        if (this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
+        if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
 
         if (!this.from)
             throw { message: 'Transaction Validation Invalid: From was not specified', from: this.from };
@@ -144,6 +152,8 @@ class InterfaceBlockchainTransaction{
         let array = [
             Serialization.serializeNumber1Byte( this.version ),
             Serialization.serializeNumber1Byte( this.nonce ),
+            Serialization.serializeNumber3Bytes( this.timeLock ), //16777216 it should be to 4 bytes afterwards
+
             this.from.serializeFrom(),
             this.to.serializeTo(),
         ];
@@ -166,6 +176,8 @@ class InterfaceBlockchainTransaction{
             this.nonce =   Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
             offset += 1;
 
+            this.timeLock =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 3) );
+            offset += 3;
 
             offset = this.from.deserializeFrom(buffer, offset);
             offset = this.to.deserializeTo(buffer, offset);
@@ -189,6 +201,7 @@ class InterfaceBlockchainTransaction{
             from: this.from.toJSON(),
             to: this.to.toJSON(), //address,
             nonce: this.nonce,
+            timeLock: this.timeLock,
         };
 
         if (!dontIncludeTxId )
@@ -208,6 +221,15 @@ class InterfaceBlockchainTransaction{
 
         return true;
 
+    }
+
+    validateTimeLock(blockHeight){
+
+        if (blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock};
+
+        if (blockHeight > this.timeLock + consts.TRANSACTIONS.TIME_LOCK_MAX_TIME) throw {message: "blockHeight > timeLock + TIME_LOCK_MAX_TIME", timeLock: this.timeLock}
+
+        return true;
     }
 
 }

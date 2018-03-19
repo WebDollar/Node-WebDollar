@@ -21,6 +21,7 @@ class InterfaceBlockchainTransactionFrom{
                 signature
                 amount
             },
+
             {
                 unencodedAddress2,
                 publicKey2
