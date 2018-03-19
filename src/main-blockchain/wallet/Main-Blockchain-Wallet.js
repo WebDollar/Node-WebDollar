@@ -351,7 +351,8 @@ class MainBlockchainWallet{
             }
 
         } catch (exception){
-            return {result:false, message: exception.toString()};
+            console.error("importAddressFromPrivateKey raised an error", exception);
+            return {result:false, message: JSON.stringify(exception) };
         }
 
     }

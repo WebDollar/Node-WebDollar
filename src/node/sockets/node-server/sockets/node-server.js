@@ -41,7 +41,7 @@ class NodeServer {
                 });
 
             } catch(Exception){
-                console.log("Error Importing io() library", Exception.toString());
+                console.log("Error Importing io() library", Exception);
             }
             this.nodeServer = server;
 
@@ -75,12 +75,12 @@ class NodeServer {
                     server.listen (port+1);
                 }
             } catch(Exception){
-                console.log("Error Calling node_server.listen", Exception.toString());
+                console.error("Error Calling node_server.listen", Exception);
             }
 
         }
         catch(Exception){
-            console.log("Error Starting Node Server ", Exception.toString());
+            console.error("Error Starting Node Server ", Exception);
             return false;
         }
 

@@ -25,15 +25,13 @@ class InterfaceBlockchainTransactions {
         try {
             if (!(toAmount instanceof BigNumber)) toAmount = new BigNumber(toAmount);
         } catch (exception){
-            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
-
-            return { result:false,  message: "Amount is not a valid number", reason: exception.toString() }
+            return { result:false,  message: "Amount is not a valid number", reason: exception }
         }
 
         try {
             if (!(fee instanceof BigNumber)) fee = new BigNumber(fee);
         } catch (exception){
-            return { result:false,  message: "Fee is not a valid number", reason: exception.toString() }
+            return { result:false,  message: "Fee is not a valid number", reason: exception }
         }
 
         try {
@@ -41,9 +39,8 @@ class InterfaceBlockchainTransactions {
             address = this.wallet.getAddress(address);
 
         } catch (exception){
-            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
-            console.error("Creating a new transaction raised an exception - Getting Address", exception.toString());
-            return { result:false,  message: "Get Address failed", reason: exception.toString() }
+            console.error("Creating a new transaction raised an exception - Getting Address", exception);
+            return { result:false,  message: "Get Address failed", reason: exception }
         }
 
 
@@ -85,9 +82,8 @@ class InterfaceBlockchainTransactions {
             );
 
         } catch (exception) {
-            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
-            console.error("Creating a new transaction raised an exception - Failed Creating a transaction", exception.toString());
-            return { result:false,  message: "Failed Creating a transaction", reason: exception.toString() }
+            console.error("Creating a new transaction raised an exception - Failed Creating a transaction", exception);
+            return { result:false,  message: "Failed Creating a transaction", reason: exception }
         }
 
 
@@ -95,17 +91,15 @@ class InterfaceBlockchainTransactions {
         try{
             signature = await address.signTransaction(transaction, password);
         } catch (exception){
-            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
-            console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception.toString());
-            return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }
+            console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception);
+            return { result:false,  message: "Failed Signing the transaction", reason: exception }
         }
 
         try{
             transaction.validateTransaction( this.blockchain.blocks.length-1 );
         } catch (exception){
-            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
-            console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception.toString());
-            return { result:false,  message: "Failed Signing the transaction", reason: exception.toString() }
+            console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception);
+            return { result:false,  message: "Failed Signing the transaction", reason: exception }
         }
 
         try{
@@ -113,9 +107,8 @@ class InterfaceBlockchainTransactions {
             this.pendingQueue.includePendingTransaction(transaction);
 
         } catch (exception){
-            if (typeof exception === "object" && exception.hasOwnProperty("message")) exception = exception.message;
-            console.error("Creating a new transaction raised an exception - Including Pending Transaction", exception.toString());
-            return { result:false,  message: "Including Pending Transaction", reason: exception.toString() }
+            console.error("Creating a new transaction raised an exception - Including Pending Transaction", exception);
+            return { result:false,  message: "Including Pending Transaction", reason: exception }
         }
 
         return {

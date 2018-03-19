@@ -66,7 +66,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
                 socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
                     result: false,
-                    message: exception.toString()
+                    message: exception
                 });
 
             }

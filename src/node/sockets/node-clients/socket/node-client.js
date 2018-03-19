@@ -56,7 +56,7 @@ class NodeClient {
                     });
 
                 }  catch (Exception){
-                    console.log("Error Connecting Node to ", address," ", Exception.toString());
+                    console.error("Error Connecting Node to ", address," ", Exception);
                     resolve(false);
                     return false;
                 }
@@ -110,7 +110,7 @@ class NodeClient {
 
             }
             catch(Exception){
-                console.log("Error Raised when connecting Node to ", address," ", Exception.toString());
+                console.error("Error Raised when connecting Node to ", address, Exception);
                 resolve(false);
             }
 

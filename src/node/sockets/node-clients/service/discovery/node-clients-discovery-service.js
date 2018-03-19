@@ -88,7 +88,7 @@ class NodeDiscoveryService {
             return response.data;
         }
         catch(Exception){
-            console.log("ERROR downloading list: ", url, Exception.toString());
+            console.error("ERROR downloading list: ", url, Exception);
             fallbackItem.errorTrials++;
         }
 

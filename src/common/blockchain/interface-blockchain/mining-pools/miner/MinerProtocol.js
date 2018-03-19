@@ -91,7 +91,7 @@ class MinerProtocol {
         try {
             answer = await this.mine(block, difficulty);
         } catch (exception){
-            console.error("Couldn't mine block " + block.height + exception.toString(), exception);
+            console.error("Couldn't mine block ", block.height, exception);
             answer.result = false;
         }
 

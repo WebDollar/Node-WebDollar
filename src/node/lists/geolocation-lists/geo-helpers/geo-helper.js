@@ -74,7 +74,7 @@ class GeoHelper {
             }
         }
         catch(Exception){
-            console.log(Exception.toString());
+            console.error("GeoHelper getLocationFromAddress raised an error ",Exception);
             return null;
         }
 

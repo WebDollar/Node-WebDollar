@@ -92,7 +92,7 @@ class Argon2BrowserWebAssembly{
         try {
             return Argon2WebAssemblyCalc.calcWorker(method, params)
         } catch (Exception){
-            console.log('_calculateHashWorker raised exception', Exception.toString())
+            console.error('_calculateHashWorker raised exception', Exception)
             return null;
         }
     }

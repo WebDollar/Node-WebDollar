@@ -166,7 +166,8 @@ class ValidationsUtils{
                 StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB works", dbName: dbName});
                 result = true;
             } catch (exception){
-                StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName + " - PouchDB 1 directly " + exception.toString() + " JSON" + JSON.stringify(data) });
+                console.error("PouchDB doesn't work well", exception, "data", data);
+                StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName + " - PouchDB 1 directly "+ JSON.stringify(data) });
             }
 
             clearTimeout(timeout);
@@ -195,7 +196,8 @@ class ValidationsUtils{
             StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB works", dbName: dbName});
             result = true;
         } catch (exception){
-            StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName  +" 2 "+ exception.toString() });
+            console.error("PouchDB doesn't work well 2", exception);
+            StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName  +" 2 " });
         }
 
         db.close();
@@ -219,7 +221,8 @@ class ValidationsUtils{
             StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB 3 works", dbName: dbName});
             result = true;
         } catch (exception){
-            StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName +" 3 " + exception.toString() });
+            console.error("PouchDB doesn't work well 3", exception);
+            StatusEvents.emit("validation/status", {result: true, message: "IndexedDB - PouchDB doesn't work", dbName: dbName +" 3 "});
         }
 
         db.close();

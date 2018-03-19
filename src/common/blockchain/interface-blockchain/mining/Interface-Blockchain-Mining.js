@@ -210,7 +210,7 @@ class InterfaceBlockchainMining{
 
 
             } catch (Exception){
-                console.error("Error processBlocksSempahoreCallback "+Exception.toString(), Exception, nextBlock);
+                console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);
             }
 
             try {
@@ -268,7 +268,7 @@ class InterfaceBlockchainMining{
             try {
                 answer = await this.mine(block, difficulty);
             } catch (exception){
-                console.error("Couldn't mine block " + block.height + exception.toString(), exception);
+                console.error("Couldn't mine block " + block.height, exception);
                 answer.result = false;
             }
 
@@ -290,7 +290,7 @@ class InterfaceBlockchainMining{
 
                 } catch (exception){
 
-                    console.error("Mining processBlocksSempahoreCallback raised an error " + block.height + exception.toString(), exception);
+                    console.error("Mining processBlocksSempahoreCallback raised an error ",block.height, exception);
                 }
 
             } else

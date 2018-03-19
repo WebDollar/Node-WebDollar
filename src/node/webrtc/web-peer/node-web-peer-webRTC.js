@@ -247,8 +247,8 @@ class NodeWebPeerRTC {
                     this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
                     resolve({result: true, message:"iceCandidate successfully introduced"});
                 } catch (Exception){
-                    resolve({result:false, message: "iceCandidate error "+ Exception.toString() });
-                    console.log("iceCandidate error", inputSignal.candidate);
+                    resolve({result:false, message: "iceCandidate error ", exception: Exception });
+                    console.error("iceCandidate error", inputSignal.candidate);
                 }
             }
 

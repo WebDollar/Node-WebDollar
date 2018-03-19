@@ -49,7 +49,7 @@ class MiniBlockchainLightProtocol extends MiniBlockchainProtocol{
 
                 socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
                     result: false,
-                    message: exception.toString()
+                    message: exception
                 });
 
             }

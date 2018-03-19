@@ -423,7 +423,10 @@ class InterfaceBlockchainAddress{
             privateKey = answer.privateKey;
 
         } catch (exception) {
-            alert('Your password is incorrect!!! ' + exception.toString());
+
+            console.error("getPrivateKey failed signing", exception);
+            alert('Your password is incorrect!!! ');
+
             return null;
         }
 
