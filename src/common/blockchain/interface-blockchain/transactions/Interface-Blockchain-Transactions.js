@@ -69,7 +69,7 @@ class InterfaceBlockchainTransactions {
                 },
             ]};
 
-            transaction = new InterfaceTransaction( this.blockchain,
+            transaction = this._createTransaction(
 
                 //from
                 from,
@@ -128,6 +128,9 @@ class InterfaceBlockchainTransactions {
     }
 
 
+    _createTransaction(from, to, nonce, txId, validateFrom, validateTo){
+        return new InterfaceTransaction(this.blockchain, from, to, nonce, txId, validateFrom, validateTo);
+    }
 
 
 }

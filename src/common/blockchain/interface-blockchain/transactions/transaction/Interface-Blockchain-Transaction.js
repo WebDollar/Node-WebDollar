@@ -36,7 +36,7 @@ class InterfaceBlockchainTransaction{
         try {
 
             if (!(from instanceof InterfaceBlockchainTransactionFrom))
-                from = new InterfaceBlockchainTransactionFrom(this, from);
+                from = this._createTransactionFrom(from);
 
             this.from = from;
 
@@ -53,7 +53,7 @@ class InterfaceBlockchainTransaction{
         try{
 
             if (! (to instanceof InterfaceBlockchainTransactionTo) )
-                to = new InterfaceBlockchainTransactionTo(this, to);
+                to = this._createTransactionTo(to);
 
             this.to = to;
 
@@ -71,6 +71,14 @@ class InterfaceBlockchainTransaction{
 
         this.txId = txId;
 
+    }
+
+    _createTransactionFrom(from){
+        return new InterfaceBlockchainTransactionFrom(this, from);
+    }
+
+    _createTransactionTo(to){
+        return new InterfaceBlockchainTransactionTo(this, to);
     }
 
     _computeRandomNonce(){

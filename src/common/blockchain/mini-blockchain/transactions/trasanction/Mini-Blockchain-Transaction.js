@@ -1,15 +1,16 @@
-
 import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction'
+
+import MiniBlockchainTransactionFrom from './Mini-Blockchain-Transaction-From'
+import MiniBlockchainTransactionTo from './Mini-Blockchain-Transaction-To'
 
 class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction{
 
-    validateTransaction(){
+    _createTransactionFrom(from){
+        return new MiniBlockchainTransactionFrom(this, from);
+    }
 
-        let result = InterfaceBlockchainTransaction.prototype.validateTransaction.call(this);
-
-        if (!result)
-            return result;
-
+    _createTransactionTo(to){
+        return new MiniBlockchainTransactionTo(this, to);
     }
 
 }

@@ -43,13 +43,10 @@ class InterfaceBlockchain {
         this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE_FILE_NAME;
         this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE);
 
-
-        this.transactions = new InterfaceBlockchainTransactions(this);
-
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
         this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator( this );
 
-        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
+        this._createBlockchainElements();
 
         this.timestamp = new BlockchainTimestamp();
 
@@ -58,6 +55,11 @@ class InterfaceBlockchain {
 
     _setAgent(newAgent){
         this.agent = newAgent;
+    }
+
+    _createBlockchainElements(){
+        this.transactions = new InterfaceBlockchainTransactions(this);
+        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
     }
 
     async validateBlockchain(){

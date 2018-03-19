@@ -5,6 +5,7 @@ import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tr
 import MiniBlockchainBlock from '../blocks/Mini-Blockchain-Block'
 import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
+import MiniBlockchainTransactions from "../transactions/Mini-Blockchain-Transactions"
 
 let inheritBlockchain;
 
@@ -23,11 +24,12 @@ class MiniBlockchain extends  inheritBlockchain{
         this.accountantTree = new MiniBlockchainAccountantTree(this.db);
 
         this.inheritBlockchain = inheritBlockchain;
-
-        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
     }
 
-
+    _createBlockchainElements(){
+        this.transactions = new MiniBlockchainTransactions(this);
+        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
+    }
 
     async simulateNewBlock(block, revertAutomatically, callback){
 

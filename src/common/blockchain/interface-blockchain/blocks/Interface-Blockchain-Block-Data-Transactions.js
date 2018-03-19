@@ -72,6 +72,10 @@ class InterfaceBlockchainBlockDataTransactions {
         return offset;
     }
 
+    _createBlockchainTransaction(){
+
+    }
+
 
 }
 
