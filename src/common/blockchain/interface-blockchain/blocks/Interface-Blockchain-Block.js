@@ -61,46 +61,35 @@ class InterfaceBlockchainBlock {
 
     async validateBlock(height){
 
-        if (typeof this.version !== 'number')
-            throw ('version is empty');
+        if (typeof this.version !== 'number') throw {message: 'version is empty'};
+        if (typeof this.nonce !== 'number') throw {message: 'nonce is empty'};
+        if (typeof this.timeStamp !== 'number') throw {message: 'timeStamp is empty'};
 
-        if (this.hash === undefined || this.hash === null || !Buffer.isBuffer(this.hash) )
-            throw ('hash is empty');
-        
-        if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) )
-            throw ('hashPrev is empty');
-        
-        if (typeof this.nonce !== 'number')
-            throw ('nonce is empty');
-        
-        if (typeof this.timeStamp !== 'number')
-            throw ('timeStamp is empty');
+        if (this.hash === undefined || this.hash === null || !Buffer.isBuffer(this.hash) ) throw {message: 'hash is empty'};
+        if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw {message: 'hashPrev is empty'};
 
         //timestamp must be on 4 bytes
-        if (this.timeStamp >= 0xFFFFFFFF)
-            throw ('timeStamp is invalid');
+        if (this.timeStamp < 0 || this.timeStamp >= 0xFFFFFFFF) throw {message: 'timeStamp is invalid'};
 
         if (height >= 0) {
-            if (this.version !== 0x01)
-                throw ('invalid version '+this.version);
+            if (this.version !== 0x01) throw {message: 'invalid version ', version: this.version};
         }
 
         if (height !== this.height)
-            throw 'height is different' + height+ " "+ this.height ;
+            throw {message: 'height is different', height: height, myHeight: this.height};
 
         if (! (await this._validateBlockHash()))
-            throw "validateBlockchain return false";
+            throw {message: "validateBlockchain returned false"};
 
         this._validateTargetDifficulty();
 
         this._validateBlockTimeStamp();
 
-
         if (this.reward.isEqualTo( BlockchainMiningReward.getReward(this.height) ) === false )
-            throw 'reward is not right: '+this.reward +' vs '+BlockchainMiningReward.getReward( this.height );
+            throw {message: 'reward is not right: ', myReward: this.reward, reward: BlockchainMiningReward.getReward( this.height ) };
 
         if (this._supplementaryValidation() === false)
-            throw "supplementaryValidation failed";
+            throw {message: "supplementaryValidation failed"};
 
         return true;
     }
@@ -118,10 +107,10 @@ class InterfaceBlockchainBlock {
             //validate hashPrev
             let previousHash = this.blockValidation.getHashPrevCallback(this.height);
             if ( previousHash === null || !Buffer.isBuffer(previousHash))
-                throw 'previous hash is not given';
+                throw {message: 'previous hash is not given'};
 
             if (! previousHash.equals(this.hashPrev))
-                throw "block prevHash doesn't match " + previousHash.toString("hex") + " " + this.hashPrev.toString("hex") ;
+                throw {message: "block prevHash doesn't match ", prevHash: previousHash.toString("hex"), hashPrev: this.hashPrev.toString("hex")};
         }
 
         //validate hash
@@ -133,7 +122,8 @@ class InterfaceBlockchainBlock {
             let hash = await this.computeHash();
 
             if (!hash.equals(this.hash))
-                throw "block "+this.height+" hash is not right (" + this.nonce + ")" + this.hash.toString("hex") + " " + hash.toString("hex") + "    " + "difficultyTargetPrev" + this.difficultyTargetPrev.toString("hex")+ "    "+ Buffer.concat([this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)]).toString("hex");
+                throw {message: "block hash is not right", nonce: this.nonce, height: this.height, myHash:this.hash.toString("hex"), hash:hash.toString("hex"),
+                       difficultyTargetPrev: this.difficultyTargetPrev.toString("hex"), serialization: Buffer.concat( [this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)] ).toString("hex")};
 
         }
 
@@ -152,12 +142,12 @@ class InterfaceBlockchainBlock {
             prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
 
         if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget) )
-            throw 'previousDifficultyTarget is not given';
+            throw {message: 'previousDifficultyTarget is not given'};
 
         //console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
 
         if (! (this.hash.compare( prevDifficultyTarget ) <= 0))
-            throw "block doesn't match the difficulty target is not ";
+            throw {message: "block doesn't match the difficulty target is not ", hash:this.hash, prevDifficultyTarget: prevDifficultyTarget};
 
         return true;
     }
@@ -169,12 +159,12 @@ class InterfaceBlockchainBlock {
             if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1) {
 
                 let medianTimestamp = 0;
-                for (let i=this.height-1; i >= this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--){
+                for (let i=this.height-1; i >= this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--)
                     medianTimestamp += this.blockValidation.getTimeStampCallback(i);
-                }
                 medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
 
-                if (this.timeStamp < medianTimestamp) throw "Block Timestamp is not bigger than the previous 10 blocks";
+                if (this.timeStamp < medianTimestamp)
+                    throw {message: "Block Timestamp is not bigger than the previous 10 blocks"};
 
             }
 
@@ -182,15 +172,13 @@ class InterfaceBlockchainBlock {
             if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true ) {
 
                 if (this.timeStamp > this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET)
-                    throw "Timestamp of block is less than the network-adjusted time "+this.timeStamp+"  "+" "+this.blockchain.timestamp.networkAdjustedTime+" "+consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET
+                    throw { message: "Timestamp of block is less than the network-adjusted time", timeStamp: this.timeStamp, networkAdjustedTime: this.blockchain.timestamp.networkAdjustedTime, NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET }
             }
 
     }
 
     toString(){
-
         return this.hashPrev.toString() + this.data.toString();
-
     }
 
     toJSON(){

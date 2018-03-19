@@ -95,19 +95,15 @@ class InterfaceBlockchain {
         if (saveBlock === undefined)
             saveBlock = true;
 
-        if (this.transactions.uniqueness.searchTransactionsUniqueness(block.data.transactions))
-            throw "transaction already processed";
-
         if (block.blockValidation === undefined)
             block.blockValidation = this.createBlockValidation();
 
         if (! (await this.validateBlockchainBlock(block)) ) // the block has height === this.blocks.length
             return false;
 
-
         //let's check again the heights
         if (block.height !== this.blocks.length)
-            throw ('height of a new block is not good... '+ block.height + " "+ this.blocks.length);
+            throw {message: 'height of a new block is not good... ', height: block.height, blocksLength: this.blocks.length};
 
         this.blocks.addBlock(block);
 
@@ -190,9 +186,9 @@ class InterfaceBlockchain {
             return BlockchainGenesis.difficultyTarget;
         else{
             if (height > this.blocks.length )
-                throw "getDifficultyTarget invalid height "+height+" "+this.blocks.length; else
+                throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
             if (this.blocks[height-1] === undefined)
-                throw "getDifficultyTarget invalid height"+height+" "+this.blocks.length;
+                throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
 
             return this.blocks[height-1].difficultyTarget;
         }
@@ -206,10 +202,10 @@ class InterfaceBlockchain {
             return BlockchainGenesis.timeStamp;
         else{
             if (height > this.blocks.length )
-                throw "getTimeStamp invalid height " + height;
+                throw {message: "getTimeStamp invalid height ", height: height};
             else
             if (this.blocks[height-1] === undefined)
-                throw "getTimeStamp invalid height " + height;
+                throw {message: "getTimeStamp invalid height ", height: height};
 
             return this.blocks[height-1].timeStamp;
         }
@@ -224,21 +220,19 @@ class InterfaceBlockchain {
             return BlockchainGenesis.hashPrev;
         else {
             if (height > this.blocks.length )
-                throw "getHashPrev invalid height";
+                throw {message: "getHashPrev invalid height", height: height};
             else
             if (this.blocks[height-1] === undefined)
-                throw "getHashPrev invalid height";
+                throw {message: "getHashPrev invalid height", height: height};
 
             return this.blocks[height-1].hash;
         }
     }
 
     toString(){
-
     }
 
     toJSON(){
-
     }
 
     async saveNewBlock(block){
@@ -264,20 +258,19 @@ class InterfaceBlockchain {
         //save the number of blocks
         let result = true;
 
-        if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
+        if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true)
             console.error("Error saving the blocks.length");
-        } else {
+        else {
 
             let indexStart = 0;
 
-            if (onlyLastBlocks !== undefined){
+            if (onlyLastBlocks !== undefined)
                 indexStart = this.blocks.length - onlyLastBlocks;
-            }
-
 
             for (let i = indexStart; i < this.blocks.length; ++i)
 
                 if (this.blocks[i] !== undefined && this.blocks[i] !== null) {
+
                     let response = await this.blocks[i].saveBlock();
 
                     if (response !== true)
@@ -352,16 +345,15 @@ class InterfaceBlockchain {
         try{
 
             if (await block.loadBlock() === false)
-                throw "no block to load was found";
+                throw {message: "no block to load was found"};
 
             //it will include the block, but it will not ask to save, because it was already saved before
 
-            if (await this.includeBlockchainBlock(block, undefined, "all", false) ) {
+            if (await this.includeBlockchainBlock(block, undefined, "all", false) )
                 console.warn("blockchain loaded successfully index ", i);
-            }
             else {
                 console.error("blockchain is invalid at index " + i);
-                throw "blockchain is invalid at index "+i;
+                throw {message: "blockchain is invalid at index ", height: i};
             }
 
 

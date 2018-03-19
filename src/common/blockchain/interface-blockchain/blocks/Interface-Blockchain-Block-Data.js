@@ -29,19 +29,22 @@ class InterfaceBlockchainBlockData {
 
     }
 
-    validateBlockData(height, blockValidation){
+    validateBlockData(blockHeight, blockValidation){
 
         if (this.minerAddress === undefined || this.minerAddress === null || !Buffer.isBuffer(this.minerAddress)  )
-            throw ('data.minerAddress is empty');
+            throw {message: 'data.minerAddress is empty'};
 
         if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData))
-            throw ('hashData is empty');
+            throw {message: 'hashData is empty'};
 
         //validate hash
         let hashData = this.calculateHashBlockData();
 
         if (!hashData.equals(this.hashData))
-            throw "block.data hashData is not right";
+            throw {message: "block.data hashData is not right"}
+
+        if (!this.transactions.validateTransactions(blockHeight, blockValidation))
+            throw {message: "transactions failed to validate"}
 
         return true;
     }
