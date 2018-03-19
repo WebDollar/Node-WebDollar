@@ -278,32 +278,8 @@ class InterfaceBlockchainTransactionFrom{
 
     }
 
-    updateAccountantTreeFrom(multiplicationFactor=1){
-
-        let lastPosition;
-
-        try {
-
-            for (let i = 0; i < this.addresses.length; i++) {
-
-                if (this.addresses[i].amount instanceof BigNumber === false) throw {message: "amount is not BigNumber",  address: this.addresses[i]};
-
-                let result = this.transaction.blockchain.updateAccount( this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor).negated(), this.currencyTokenId);
-
-                if (result !== null) throw {message: "error Updating Account", address: this.addresses[i]};
-
-            }
-
-        } catch (exception){
-
-            for (let i=lastPosition; i >= 0 ; i--) {
-                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor), this.currencyTokenId);
-
-                if (result !== null) throw {message: "error Updating Account", address: this.addresses[i]};
-            }
-
-        }
-
+    processTransactionFrom(multiplicationFactor=1){
+        // overwritten in Mini Blockchain
     }
 
 }

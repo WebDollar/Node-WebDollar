@@ -50,7 +50,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             node = this.add(address, {balances: [] });
 
         if (!node.isLeaf())
-            throw "couldn't delete because input is not a leaf node";
+            throw {message: "couldn't updateAccount because node is not leaf", address: address};
 
         let resultUpdate = node.updateBalanceToken(value, tokenId);
 
@@ -74,6 +74,26 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         this._changedNode( node );
 
         return resultUpdate;
+    }
+
+    updateAccountNonce(address, nonceChange){
+
+        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        if (address === null)
+            throw {message: "Your address is invalid", address: address };
+
+        let node = this.search(address).node;
+
+        // in case it doesn't exist, let's create it
+        if ( node === undefined || node === null)
+            throw {message: "Address was not found", address: address};
+
+        if (!node.isLeaf())
+            throw {message: "couldn't updateAccountNonce because node is not leaf", address: address};
+
+        node.nonce += nonceChange;
+
+        return node.nonce;
     }
 
     /**

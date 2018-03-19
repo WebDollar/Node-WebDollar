@@ -5,7 +5,7 @@ import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
 
 import Serialization from "common/utils/Serialization"
 import BufferExtended from "common/utils/BufferExtended"
-import consts from "../../../../../consts/const_global";
+import consts from "consts/const_global";
 
 class InterfaceBlockchainTransaction{
 
@@ -16,11 +16,9 @@ class InterfaceBlockchainTransaction{
      * @param to  must be an Array [ object {address: object , amount, currency } }
      * @param nonce - usually null
      * @param txId - usually null
-     *
-     *
      */
 
-    constructor(blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true){
+    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true){
 
         this.blockchain = blockchain;
         this.from = null;
@@ -221,14 +219,18 @@ class InterfaceBlockchainTransaction{
      * It will update the Accountant Tree
      */
 
-    updateAccountantTree(multiplicationFactor=1){
+    processTransaction(multiplicationFactor=1){
 
-        this.from.updateAccountantTreeFrom(multiplicationFactor);
-        this.to.updateAccountantTreeTo(multiplicationFactor);
+        this.from.processTransactionFrom(multiplicationFactor);
+        this.to.processTransactionTo(multiplicationFactor);
 
         return true;
-
     }
+
+    _validateNonce(){
+        //
+    }
+
 
 }
 
