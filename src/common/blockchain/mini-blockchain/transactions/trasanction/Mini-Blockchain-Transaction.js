@@ -15,7 +15,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
     processTransaction(multiplicationFactor = 1){
 
-        this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress, multiplicationFactor )
+        this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress, multiplicationFactor );
 
         return InterfaceBlockchainTransaction.prototype.processTransaction.call(this);
     }
