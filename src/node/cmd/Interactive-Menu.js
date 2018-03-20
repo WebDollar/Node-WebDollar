@@ -10,16 +10,24 @@ const commands = [
         '4. Set mining address'
     ];
 
-const RL = readline.createInterface({
+const lineSeparator = 
+"\n|________________________________________________________________|_________________|";
+
+const addressHeader = 
+"\n __________________________________________________________________________________" + 
+"\n|                            ADDRESS                             |      WEBD       |" + 
+lineSeparator;
+
+const WEBD_CLI = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
     prompt: 'WEBD_CLI:> '
 });
 
 showCommands();
-RL.prompt();
+WEBD_CLI.prompt();
 
-RL.on('line', (line) => {
+WEBD_CLI.on('line', (line) => {
 
     switch(line.trim()) {
         case '1':
@@ -38,7 +46,8 @@ RL.on('line', (line) => {
             showCommands();
         break;
     }
-    RL.prompt();
+    WEBD_CLI.setPrompt('WEBD_CLI:> ');
+    WEBD_CLI.prompt();
 }).on('close', () => {
 
     console.log('You have exited from WEBD CLI');
@@ -57,10 +66,16 @@ function showCommands() {
 }
 
 function listAddresses() {
-    console.log('List addresses:');
+    console.log('\nWallet addresses:');
+    
     Blockchain.Wallet.createNewAddress();
+    
+    console.log(addressHeader);
     for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
-        console.log(i + ": " + Blockchain.Wallet.addresses[i].toString());
+        let address = Blockchain.Wallet.addresses[i].address;
+        let balance = 1000000000.3354;//Blockchain.accountantTree.getBalance(address, undefined);
+
+        console.log("|  " + address + "  | " + balance + lineSeparator);
     }
 
     return true;
@@ -69,12 +84,19 @@ function listAddresses() {
 function exportAddress() {
     console.log('Export address:');
     
+    /*WEBD_CLI.setPrompt("Enter address:");
+
+    WEBD_CLI.on('line', (line) => {
+        console.log("your address is" + line);
+    });*/
+
+    console.log('Export address:2');
     return true;
 }
 
 function importAddress() {
     console.log('Import address:');
-    
+
     return true;
 }
 

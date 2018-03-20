@@ -1,6 +1,6 @@
 # Node.js installation using NVM
 
-For unix machines, we recommend you to intall node.js and npm using nvm using this tutorial
+For unix machines, we recommend you to install node.js and npm using nvm using this tutorial
 
 source: https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04
 
