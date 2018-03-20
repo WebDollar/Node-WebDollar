@@ -2,53 +2,6 @@ const uuid = require('uuid');
 
 let consts = {};
 
-consts.SETTINGS = {
-    UUID: uuid.v4(),
-
-    NODE: {
-        VERSION: "0.258",
-        VERSION_COMPATIBILITY: "0.258",
-        PROTOCOL: "WebDollar",
-
-
-        PORT: 12320, //port
-    },
-
-    PARAMS: {
-        FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
-        STATUS_INTERVAL: 60 * 1000,                      //miliseconds
-
-        WAITLIST: {
-            TRY_RECONNECT_AGAIN: 60 * 1000,             //miliseconds
-            INTERVAL: 5 * 1000,                         //miliseconds
-        },
-
-        SIGNALING: {
-            SERVER_PROTOCOL_CONNECTING_WEB_PEERS_INTERVAL: 2 * 1000,
-        },
-
-        MAX_SIZE: {
-            BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,       // in bytes
-            SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50    // in bytes
-        },
-
-        WALLET:{
-            VERSION: "0.1"
-        },
-    },
-
-    MEM_POOL : {
-
-        TIME_LOCK : {
-            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
-        }
-
-    },
-
-    MAX_UINT32: 1 << 30,
-
-};
-
 consts.BLOCKCHAIN = {
 
     DIFFICULTY:{
@@ -171,7 +124,6 @@ consts.HASH_ARGON2_PARAMS = {
 
 
 //DATABASE NAMES
-
 consts.DATABASE_NAMES = {
 
     DEFAULT_DATABASE: "defaultDB",
@@ -190,5 +142,61 @@ consts.MINING_POOL = {
     WINDOW_SIZE: 16,
     BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
 };
+
+
+
+
+
+consts.SETTINGS = {
+    UUID: uuid.v4(),
+
+    NODE: {
+        VERSION: "0.258",
+        VERSION_COMPATIBILITY: "0.258",
+        PROTOCOL: "WebDollar",
+
+
+        PORT: 12320, //port
+    },
+
+    PARAMS: {
+        FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
+        STATUS_INTERVAL: 60 * 1000,                      //miliseconds
+
+        WAITLIST: {
+            TRY_RECONNECT_AGAIN: 60 * 1000,             //miliseconds
+            INTERVAL: 5 * 1000,                         //miliseconds
+        },
+
+        SIGNALING: {
+            SERVER_PROTOCOL_CONNECTING_WEB_PEERS_INTERVAL: 2 * 1000,
+        },
+
+        MAX_SIZE: {
+            BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,       // in bytes
+            SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50    // in bytes
+        },
+
+        WALLET:{
+            VERSION: "0.1"
+        },
+    },
+
+    MEM_POOL : {
+
+        TIME_LOCK : {
+            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
+        }
+
+    },
+
+    MAX_UINT32: 1 << 30,
+
+};
+
+
+
+
+
 
 export default consts

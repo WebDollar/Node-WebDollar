@@ -227,8 +227,6 @@ class InterfaceBlockchainBlock {
                                        Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
                                      ] );
 
-        //console.warn("computeHash", this.height,"   " ,buffer.toString("hex"));
-
         return  await WebDollarCrypto.hashPOW(buffer);
     }
 
@@ -252,12 +250,16 @@ class InterfaceBlockchainBlock {
     deserializeBlock(buffer, height, reward, difficultyTarget, offset){
 
         if (!Buffer.isBuffer(buffer))
-            buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
+            if (typeof buffer === "string")
+                buffer = new Buffer(buffer, "hex");
 
         if (height !== undefined)  this.height = height;
         if (reward !== undefined) this.reward = reward;
         if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
         if (offset === undefined) offset = 0;
+
+        if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
+            throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
 
         try {
 

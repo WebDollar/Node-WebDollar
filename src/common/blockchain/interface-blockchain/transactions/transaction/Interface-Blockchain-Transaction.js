@@ -72,6 +72,7 @@ class InterfaceBlockchainTransaction{
 
         this.txId = txId;
 
+        this.size = undefined;
     }
 
     _createTransactionFrom(from){
@@ -231,7 +232,6 @@ class InterfaceBlockchainTransaction{
     _validateNonce(){
         //
     }
-
 
 }
 
