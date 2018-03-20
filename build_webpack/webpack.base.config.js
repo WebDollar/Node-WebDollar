@@ -1,10 +1,10 @@
 const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin');
 var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === 'production';
 //const isAnalyze = process.argv.includes('--analyze') || process.argv.includes('--analyse');
 const isAnalyze = false;
 

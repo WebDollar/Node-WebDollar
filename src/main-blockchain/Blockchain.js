@@ -1,13 +1,13 @@
-import MainBlockchainWallet from 'main-blockchain/wallet/Main-Blockchain-Wallet'
-import MainBlockchain from 'main-blockchain/chain/Main-Blockchain'
-import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining'
-import MainBlockchainProtocol from 'main-blockchain/blockchain-protocol/Main-Blockchain-Protocol'
-import MainBlockchainAgent from 'main-blockchain/agents/Main-Blockchain-Agent'
+import MainBlockchainWallet from 'main-blockchain/wallet/Main-Blockchain-Wallet';
+import MainBlockchain from 'main-blockchain/chain/Main-Blockchain';
+import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining';
+import MainBlockchainProtocol from 'main-blockchain/blockchain-protocol/Main-Blockchain-Protocol';
+import MainBlockchainAgent from 'main-blockchain/agents/Main-Blockchain-Agent';
 import MainBlockchainBalances from "main-blockchain/balances/Main-Blockchain-Balances";
 import ValidationsUtils from "common/utils/validation/Validations-Utils";
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/nodes-list';
 import StatusEvents from "common/events/Status-Events";
-import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
+import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist';
 
 class Blockchain{
 
