@@ -33,7 +33,7 @@ class SocketAddress {
             return address;
 
         if (  port === undefined || port === '')
-            port = consts.NODE_PORT;
+            port = consts.SETTINGS.NODE.PORT;
 
         return new SocketAddress(address, port, uuid);
     }
@@ -48,7 +48,7 @@ class SocketAddress {
             address = address.toLowerCase();
 
         if (port === undefined)
-            port = consts.NODE_PORT;
+            port = consts.SETTINGS.NODE.PORT;
 
         try {
             if (typeof address === 'string')

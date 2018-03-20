@@ -109,7 +109,7 @@ class NodesWaitlist {
 
 
         if (setTimeOut === true)
-            setTimeout(()=>{ return this._connectNewNodesWaitlist( true ) }, consts.NODES_WAITLIST_INTERVAL);
+            setTimeout(()=>{ return this._connectNewNodesWaitlist( true ) }, consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
     }
 
     _tryToConnectNextNode(nextWaitListObject){
@@ -117,7 +117,7 @@ class NodesWaitlist {
         //connect only to TERMINAL NODES
         if (nextWaitListObject.type === NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER) {
 
-            if (nextWaitListObject.checkLastTimeChecked(consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN) && nextWaitListObject.blocked === false &&
+            if (nextWaitListObject.checkLastTimeChecked(consts.SETTINGS.PARAMS.WAITLIST.TRY_RECONNECT_AGAIN) && nextWaitListObject.blocked === false &&
                 nextWaitListObject.connecting === false && nextWaitListObject.checkIsConnected() === null) {
 
                 nextWaitListObject.blocked = true;

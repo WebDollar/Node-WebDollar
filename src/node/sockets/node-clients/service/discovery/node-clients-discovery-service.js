@@ -48,7 +48,7 @@ class NodeDiscoveryService {
         if (NodesList.nodes !== null && NodesList.nodes.length < 5 ){
 
             for (let i=0; i<this.fallbackLists.length; i++)
-                if ( this.fallbackLists[i].checked === false && this.fallbackLists[i].checkLastTimeChecked(consts.NODE_FALLBACK_INTERVAL) )
+                if ( this.fallbackLists[i].checked === false && this.fallbackLists[i].checkLastTimeChecked(consts.SETTINGS.PARAMS.FALLBACK_INTERVAL) )
                 {
                     let answer = await this._downloadFallBackList(this.fallbackLists[i]);
 
@@ -118,7 +118,7 @@ class NodeDiscoveryService {
                 //console.log((data.hasOwnProperty('protocol')));
                 //console.log(((data['protocol'] === nodeProtocol)));
 
-                if ((data.hasOwnProperty('protocol')) && (data['protocol'] === consts.NODE_PROTOCOL)) {
+                if ((data.hasOwnProperty('protocol')) && (data['protocol'] === consts.SETTINGS.NODE.PROTOCOL)) {
                     name = data.name || '';
                     nodes = data.nodes || [];
 

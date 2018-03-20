@@ -12,8 +12,8 @@ class NodeProtocol {
 
         // Waiting for Protocol Confirmation
         let response = await node.sendRequestWaitOnce("HelloNode", {
-            version: consts.NODE_VERSION,
-            uuid: consts.UUID,
+            version: consts.SETTINGS.NODE.VERSION,
+            uuid: consts.SETTINGS.UUID,
         });
 
         if (typeof response !== "object")
@@ -26,9 +26,9 @@ class NodeProtocol {
 
         if (response.hasOwnProperty("version")){
 
-            if (response.version < consts.NODE_VERSION_COMPATIBILITY){
+            if (response.version < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
 
-                console.log("hello received, VERSION is not right", response.version, consts.NODE_VERSION_COMPATIBILITY);
+                console.log("hello received, VERSION is not right", response.version, consts.SETTINGS.NODE.VERSION_COMPATIBILITY);
                 return false;
 
             }

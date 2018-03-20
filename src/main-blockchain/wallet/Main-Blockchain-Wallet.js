@@ -370,7 +370,7 @@ class MainBlockchainWallet{
                     result:true,
 
                     data: {
-                        version: consts.WALLET_VERSION,
+                        version: consts.SETTINGS.PARAMS.WALLET.VERSION,
                         address: this.addresses[i].address,
                         publicKey: this.addresses[i].publicKey.toString("hex"),
                         privateKey: (await this.addresses[i].exportAddressPrivateKeyToHex())

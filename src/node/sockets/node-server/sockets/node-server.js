@@ -67,7 +67,7 @@ class NodeServer {
 
                 //multiple ports, but doesn't work
 
-                let port = process.env.SERVER_PORT||consts.NODE_PORT;
+                let port = process.env.SERVER_PORT||consts.SETTINGS.NODE.PORT;
                 try{
                     server.listen (port);
                 } catch (Exception) {

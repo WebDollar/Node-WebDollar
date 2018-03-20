@@ -134,7 +134,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
             //optimize storage
             if (i > 0 && this.interlink[i-1].height === this.interlink[i].height){
-                list.push(Serialization.serializeNumber4Bytes(consts.MAX_UINT32));
+                list.push(Serialization.serializeNumber4Bytes(consts.SETTINGS.MAX_UINT32));
             } else {
                 let heightBuffer = Serialization.serializeNumber4Bytes(this.interlink[i].height + 1);
                 let blockIdBuffer = this.interlink[i].blockId;
@@ -160,7 +160,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
                 offset += 4;
 
-                if (height === consts.MAX_UINT32) {
+                if (height === consts.SETTINGS.MAX_UINT32) {
                     this.interlink.push(this.interlink[i-1]);
                 } else {
                     let blockId = BufferExtended.substr(buffer, offset, 32);

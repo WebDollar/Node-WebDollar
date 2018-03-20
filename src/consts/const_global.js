@@ -2,14 +2,52 @@ const uuid = require('uuid');
 
 let consts = {};
 
-consts.TERMINATED = false;
+consts.SETTINGS = {
+    UUID: uuid.v4(),
 
-consts.UUID = uuid.v4();
+    NODE: {
+        VERSION: "0.258",
+        VERSION_COMPATIBILITY: "0.258",
+        PROTOCOL: "WebDollar",
 
-consts.NODE_VERSION = "0.258";
-consts.NODE_VERSION_COMPATIBILITY = "0.258";
 
-consts.WALLET_VERSION = "0.1";
+        PORT: 12320, //port
+    },
+
+    PARAMS: {
+        FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
+        STATUS_INTERVAL: 60 * 1000,                      //miliseconds
+
+        WAITLIST: {
+            TRY_RECONNECT_AGAIN: 60 * 1000,             //miliseconds
+            INTERVAL: 5 * 1000,                         //miliseconds
+        },
+
+        SIGNALING: {
+            SERVER_PROTOCOL_CONNECTING_WEB_PEERS_INTERVAL: 2 * 1000,
+        },
+
+        MAX_SIZE: {
+            BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,       // in bytes
+            SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50    // in bytes
+        },
+
+        WALLET:{
+            VERSION: "0.1"
+        },
+    },
+
+    MEM_POOL : {
+
+        TIME_LOCK : {
+            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
+        }
+
+    },
+
+    MAX_UINT32: 1 << 30,
+
+};
 
 consts.BLOCKCHAIN = {
 
@@ -62,23 +100,6 @@ consts.POPOW_PARAMS={
     ACTIVATED : false,
 };
 
-
-consts.NODE_PROTOCOL = "WebDollar";
-consts.NODE_FALLBACK_INTERVAL =  10*1000; //miliseconds
-consts.NODE_PORT =  12320; //port
-consts.NODE_STATUS_INTERVAL =  60*1000; //miliseconds
-
-consts.NODES_WAITLIST_TRY_RECONNECT_AGAIN =  60*1000; //miliseconds
-consts.NODES_WAITLIST_INTERVAL =  5*1000; //miliseconds
-
-consts.NODES_SIGNALING_SERVER_PROTOCOL_CONNECTING_WEB_PEERS_INTERVAL = 2*1000;
-
-consts.MEM_POOL = {
-
-    TIME_LOCK : {
-        TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
-    }
-};
 
 consts.TRANSACTIONS = {
 
@@ -147,11 +168,6 @@ consts.HASH_ARGON2_PARAMS = {
 
 // change also to Browser-Mining-WebWorker.js
 
-
-consts.MAX_UINT32 = 1 << 30;
-
-consts.BLOCKS_MAX_SIZE_BYTES = 1024 * 1024 * 1; // in bytesnu
-consts.SOCKET_MAX_SIZE_BYRES = 3*consts.BLOCKS_MAX_SIZE_BYTES + 20;
 
 
 //DATABASE NAMES

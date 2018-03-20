@@ -19,7 +19,7 @@ class NodesStats {
 
         NodesWaitlist.emitter.on("waitlist/new-node", (result ) => { this._recalculateStats(result ) });
 
-        setInterval( () => { return this._printStats() }, consts.NODE_STATUS_INTERVAL)
+        setInterval( () => { return this._printStats() }, consts.SETTINGS.PARAMS.STATUS_INTERVAL)
     }
 
 
