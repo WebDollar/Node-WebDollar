@@ -1,3 +1,6 @@
+import {Node, Blockchain} from '../../index.js';
+import global from "consts/global.js";
+
 const readline = require('readline');
 
 const commands = [
@@ -10,9 +13,10 @@ const commands = [
 const RL = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
-    prompt: 'WEBD CLI:> '
+    prompt: 'WEBD_CLI:> '
 });
 
+showCommands();
 RL.prompt();
 
 RL.on('line', (line) => {
@@ -42,17 +46,23 @@ RL.on('line', (line) => {
 });
 
 function showCommands() {
-    console.log('Choose one of the following commands:');
+    console.log('\nChoose one of the following commands:');
+    
     for (let i = 0; i < commands.length; ++i){
         console.log(commands[i]);
     }
+    console.log();
     
     return true;
 }
 
 function listAddresses() {
     console.log('List addresses:');
-    
+    Blockchain.Wallet.createNewAddress();
+    for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
+        console.log(i + ": " + Blockchain.Wallet.addresses[i].toString());
+    }
+
     return true;
 }
 

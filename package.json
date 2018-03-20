@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build_terminal": "webpack --config build_webpack/webpack.terminal.config.js",
+    "build_terminal_menu": "webpack --config build_webpack/webpack.terminal.menu.config.js",
     "build_browser": "webpack --config build_webpack/webpack.browser.config.js",
     "build_browser_user_interface": "cross-env WEBPACK_TYPE=user_interface webpack --config build_webpack/webpack.browser.config.js ",
     "show_browser_test": "node src/tests/browser/show-browser.test.js",
@@ -17,7 +18,7 @@
     "show_mocha_report": "node src/tests/browser/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
     "show_coverage": "node src/tests/browser/show-coverage.test.js",
-    "commands": "node src/node/cmd/Interactive-Menu.js"
+    "commands": "npm run build_terminal_menu && node dist_bundle/terminal-menu-bundle.js"
   },
   "repository": {
     "type": "git",

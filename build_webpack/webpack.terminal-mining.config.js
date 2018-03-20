@@ -1,6 +1,6 @@
-const webpack = require('webpack')
-const base = require('./webpack.terminal.config')
-const merge = require('webpack-merge')
+const webpack = require('webpack');
+const base = require('./webpack.terminal.config');
+const merge = require('webpack-merge');
 
 const config = merge(base, {
 
