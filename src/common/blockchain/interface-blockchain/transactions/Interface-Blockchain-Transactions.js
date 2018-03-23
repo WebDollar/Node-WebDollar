@@ -14,6 +14,7 @@ class InterfaceBlockchainTransactions {
 
         let db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.TRANSACTIONS_DATABASE);
 
+        //the Queue is an inverted Queue, because elements are added at the end of the List (queue)
         this.pendingQueue = new InterfaceTransactionsPendingQueue(db);
 
     }

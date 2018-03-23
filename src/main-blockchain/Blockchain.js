@@ -30,6 +30,7 @@ class Blockchain{
         this.onLoaded = new Promise((resolve)=>{
             this._onLoadedResolver = resolve;
         });
+        this._loaded = false;
 
         NodesList.emitter.on("nodes-list/disconnected", async (result) => {
 
@@ -89,9 +90,7 @@ class Blockchain{
         //it tries synchronizing multiple times
         await this.synchronizeBlockchain(true);
 
-        this._onLoadedResolver("Ready");
-        this._onLoadedResolver = "done";
-
+        this.loaded = true;
     }
 
     async initializeMining(){
@@ -154,6 +153,15 @@ class Blockchain{
 
         StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"} );
 
+    }
+
+    get loaded(){
+        return this._loaded;
+    }
+
+    set loaded(newValue){
+        this._loaded = newValue;
+        this._onLoadedResolver(newValue);
     }
 
 }

@@ -26,9 +26,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         while (size > 0 && i >= 0){
             let transaction = this.blockchain.transactions.pendingQueue[i];
-            if ( transaction.validateTransaction( this.blockchain.blocks.length-1 ) ){
+            if ( transaction.validateTransaction( this.blockchain.blocks.length - 1 ) ){
 
-                size += 10;
+                transactions.push();
+                size += transaction.serializeTransaction().length;
 
             }
             i--;
