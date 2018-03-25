@@ -2,7 +2,6 @@ import consts from 'consts/const_global'
 
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodeProtocol from 'common/sockets/protocol/node-protocol';
-import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction'
 
 import Blockchain from "main-blockchain/Blockchain"
 
@@ -16,7 +15,6 @@ class NodePropagationProtocol {
     initializeSocketForPropagation(node){
 
         this.initializeNodesPropagation(node);
-        this.initializeTransactionsPropagation(node);
 
     }
 
@@ -55,44 +53,7 @@ class NodePropagationProtocol {
         });
     }
 
-    initializeTransactionsPropagation(node){
 
-        node.on("propagation/transactions", response => {
-
-            try {
-                console.log("Propagation New Transaction", node.sckAddress.getAddress());
-
-                let instruction = response.instruction || '';
-                switch (instruction) {
-                    case "new-pending-transaction":
-
-                        let from = response.transaction.from;
-                        let to = response.transaction.to;
-                        let nonce = response.transaction.nonce;
-                        let timeLock = response.transaction.timeLock;
-                        let version = response.transaction.version;
-
-                        try {
-
-                            let transaction = Blockchain.blockchain.transactions._createTransaction(from, to, nonce, timeLock, version);
-
-                            if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction))
-                                throw {message: "I already have this transaction"};
-
-                        } catch (exception) {
-                            console.error("Transaction is wrong. It should ban the user");
-                        }
-
-                        break;
-                }
-
-            } catch (exception){
-
-            }
-
-        });
-
-    }
 
     propagateNewNodes(nodes, exceptSockets){
 
@@ -102,11 +63,6 @@ class NodePropagationProtocol {
 
     }
 
-    propagateNewPendingTransaction(transaction, exceptSockets){
-
-        NodeProtocol.broadcastRequest("propagation/transactions", { instruction: "new-pending-transaction",  transaction: transaction.toJSON() }, undefined, exceptSockets );
-
-    }
 
 }
 

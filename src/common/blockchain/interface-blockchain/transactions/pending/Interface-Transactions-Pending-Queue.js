@@ -1,4 +1,5 @@
-import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
+import InterfaceBlockchainTransactionsProtocol from "../protocol/Interface-Blockchain-Transactions-Protocol"
+
 import consts from 'consts/const_global'
 
 class InterfaceTransactionsPendingQueue {
@@ -22,6 +23,8 @@ class InterfaceTransactionsPendingQueue {
         if (this.findPendingTransaction(transaction) === -1){
             return false;
         }
+
+        transaction.validateTransaction(this.blockchain.blocks.length-1);
 
         this.list.push(transaction);
         transaction.propagateTransaction(exceptSockets);
@@ -53,6 +56,7 @@ class InterfaceTransactionsPendingQueue {
     }
 
     _removeOldTransactions (){
+
         for (let i=this.list.length-1; i >= 0; i--)
             //TimeLock to old
             if (this.list[i].timeLock !== 0 && this.list[i].timeLock < this.blockchain.blocks.length-1 - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION ){
@@ -63,7 +67,7 @@ class InterfaceTransactionsPendingQueue {
     }
 
     propagateTransaction(transaction, exceptSocket){
-        NodePropagationProtocol.propagateNewPendingTransaction(transaction, exceptSocket)
+        InterfaceBlockchainTransactionsProtocol.propagateNewPendingTransaction(transaction, exceptSocket)
     }
 
 

@@ -5,7 +5,8 @@ let consts = {};
 consts.BLOCKCHAIN = {
 
     DIFFICULTY:{
-        NO_BLOCKS : 10
+        NO_BLOCKS : 10,
+        TIME_PER_BLOCK : 200, //in s, timestamp in UNIX format
     },
 
     TIMESTAMP:{
@@ -13,8 +14,6 @@ consts.BLOCKCHAIN = {
         NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: 10*60,
         NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE: 10*60,
     },
-
-    DIFFICULTY_TIME : 200, //in s, timestamp in UNIX format
 
     BLOCKS_POW_LENGTH: 32,
     BLOCKS_NONCE : 4,

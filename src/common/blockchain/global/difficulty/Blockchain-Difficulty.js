@@ -15,20 +15,10 @@ class BlockchainDifficulty{
         // console.log("blockTimestamp", blockTimestamp.toString(16));
         // console.log("blockNumber", blockNumber.toString(16));
 
-        // try {
-        //     console.warn("new difficulty mean", this.getDifficultyMean(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber));
-        // } catch (exception){
-        //     console.error("couldn't calculate the getDifficultyMean for", blockNumber, exception);
-        // }
-
         if (blockNumber < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK)
             return this.calculateBlockDifficultyETH(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
         else
             return this.getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
-
-        // console.log("difficulty0",  rez.toString() );
-        // console.log("difficulty1",  Serialization.serializeBigInteger( rez ).length, Serialization.serializeBigInteger( rez ) );
-        // console.log("difficulty2", Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez )).length, Serialization.serializeToFixedBuffer( 32, Serialization.serializeBigInteger( rez ) ));
 
     }
 
@@ -129,7 +119,7 @@ class BlockchainDifficulty{
 
             console.warn("new difficulty mean recalculated", blockNumber);
 
-            let how_much_it_should_have_taken_X_Blocks = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * consts.BLOCKCHAIN.DIFFICULTY_TIME;
+            let how_much_it_should_have_taken_X_Blocks = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
             let how_much_it_took_to_mine_X_Blocks = 0;
 
             //calculating 0, when blockNumber = 9

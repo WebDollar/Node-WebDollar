@@ -113,7 +113,9 @@ class InterfaceBlockchainTransaction{
      * @param silent
      * @returns {*}
      */
-    validateTransaction( blockHeight ){
+    validateTransaction( blockHeight, validateEnoughMoney = true ){
+
+        if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
         if (typeof this.nonce !== 'number') throw {message: 'nonce is empty', nonce: this.nonce};
         if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
@@ -135,7 +137,7 @@ class InterfaceBlockchainTransaction{
         if (!this.to)
             throw { message: 'Transaction Validation Invalid: To was not specified', to: this.to };
 
-        this.from.validateFrom();
+        this.from.validateFrom(validateEnoughMoney);
         this.to.validateTo();
 
         //validate amount

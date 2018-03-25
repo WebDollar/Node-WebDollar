@@ -2,9 +2,17 @@ import InterfaceBlockchainTransactionFrom from 'common/blockchain/interface-bloc
 
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
-    validateFrom(){
+    validateFrom(validateEnoughMoney = true){
 
         let result = InterfaceBlockchainTransactionFrom.prototype.validateFrom.call(this);
+
+        if (validateEnoughMoney)
+            result = result && this.validateFromEnoughMoney();
+
+        return result;
+    }
+
+    validateFromEnoughMoney(){
 
         this.addresses.forEach ( (fromObject, index) =>{
 
@@ -16,7 +24,6 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
         });
 
         return true;
-
     }
 
 
