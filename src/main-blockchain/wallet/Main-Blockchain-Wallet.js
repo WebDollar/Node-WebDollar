@@ -297,7 +297,7 @@ class MainBlockchainWallet{
      * import an Address from a PrivateKey/WIF
      * @param inputData is JSON or String
      */
-    async importAddressFromPrivateKey(inputData){
+    async importAddressFromJSON(inputData){
 
         let blockchainAddress = new MiniBlockchainAddress(this.db);
 
@@ -308,19 +308,23 @@ class MainBlockchainWallet{
 
             //private Key object {version: "xxx", address: "HEX", publicKet: "HEX", privateKey: "HEX" }
             if (typeof inputData === "object"){
-                if (!inputData.hasOwnProperty("version")) throw {message:"address.version not specified", inputData: inputData};
-                if (!inputData.hasOwnProperty("privateKey")) throw {message: "address.privateKey not specified", inputData: inputData};
+                if (!inputData.hasOwnProperty("version"))
+                    throw {message:"address.version not specified", inputData: inputData};
+
+                if (!inputData.hasOwnProperty("privateKey"))
+                    throw {message: "address.privateKey not specified", inputData: inputData};
 
                 if (inputData.version === "0.1"){
                     privateKey = inputData.privateKey;
-                } else
+                } else {
                     throw {message: "privateKey version is not good ", inputData: inputData.version};
+                }
 
                 if (inputData.hasOwnProperty('address'))
                     address = inputData.address;
+
                 if (inputData.hasOwnProperty('publicKey'))
                     publicKey = inputData.publicKey;
-
             }
 
             if (typeof inputData === "string")
@@ -337,11 +341,17 @@ class MainBlockchainWallet{
                 blockchainAddress.address = address;
                 blockchainAddress.unencodedAddress = BufferExtended.fromBase(blockchainAddress.address);
 
-                await blockchainAddress.savePrivateKey(Buffer.from(privateKey, "hex"));
+                try {
+                    await blockchainAddress.savePrivateKey(Buffer.from(privateKey, "hex"));
+                } catch(err) {
+                    return {result: false, message:"Address already exists!", address: blockchainAddress};
+                }
+
             }
 
-            if (! (await this._insertAddress(blockchainAddress)))
-                throw {message:"Address already exists", address: blockchainAddress};
+            if ( !(await this._insertAddress(blockchainAddress)) ) {
+                return {result: false, message:"Address already exists!", address: blockchainAddress};
+            }
 
             return {
                 result: true,
@@ -351,7 +361,7 @@ class MainBlockchainWallet{
             }
 
         } catch (exception){
-            console.error("importAddressFromPrivateKey raised an error", exception);
+            console.error("importAddressFromJSON raised an exception", exception);
             return {result:false, message: JSON.stringify(exception) };
         }
 
