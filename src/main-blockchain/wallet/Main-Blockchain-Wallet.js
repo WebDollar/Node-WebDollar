@@ -361,7 +361,7 @@ class MainBlockchainWallet{
             }
 
         } catch (exception){
-            console.error("importAddressFromJSON raised an error", exception);
+            console.error("importAddressFromJSON raised an exception", exception);
             return {result:false, message: JSON.stringify(exception) };
         }
 

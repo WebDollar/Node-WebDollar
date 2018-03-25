@@ -1,6 +1,5 @@
 import {Node, Blockchain} from '../../index.js';
-import global from "consts/global.js";
-
+const FileSystem = require('fs');
 const readline = require('readline');
 
 const commands = [
@@ -12,12 +11,12 @@ const commands = [
     ];
 
 const lineSeparator = 
-"\n|________________________________________________________________|_________________|";
+    "\n|________________________________________________________________|_________________|";
 
 const addressHeader = 
-"\n __________________________________________________________________________________" + 
-"\n|                            ADDRESS                             |      WEBD       |" + 
-lineSeparator;
+    "\n __________________________________________________________________________________" +
+    "\n|                            ADDRESS                             |      WEBD       |" +
+    lineSeparator;
 
 const WEBD_CLI = readline.createInterface({
     input: process.stdin,
@@ -28,35 +27,37 @@ const WEBD_CLI = readline.createInterface({
 showCommands();
 WEBD_CLI.prompt();
 
-WEBD_CLI.on('line', async (line) => {
+let runMenu = function () {
+    WEBD_CLI.question('Command: ', async (answer) => {
+        switch(answer.trim()) {
+            case '1':
+                listAddresses();
+                break;
+            case '2':
+                exportAddress();
+                break;
+            case '3':
+                await importAddress();
+                break;
+            case '4':
+                deleteAddress();
+                break;
+            case '5':
+                setMiningAddress();
+                break;
+            case 'exit':
+                break;
+            default:
+                showCommands();
+                break;
+        }
+        WEBD_CLI.setPrompt('WEBD_CLI:> ');
+        WEBD_CLI.prompt();
+        runMenu();
+    });
+};
 
-    switch(line.trim()) {
-        case '1':
-            listAddresses();
-        break;
-        case '2':
-            exportAddress();
-        break;
-        case '3':
-            await importAddress();
-        break;
-        case '4':
-            deleteAddress();
-        break;
-        case '5':
-            setMiningAddress();
-        break;
-        default:
-            showCommands();
-        break;
-    }
-    WEBD_CLI.setPrompt('WEBD_CLI:> ');
-    WEBD_CLI.prompt();
-}).on('close', () => {
-
-    console.log('You have exited from WEBD CLI');
-    process.exit(0);
-});
+runMenu();
 
 function showCommands() {
     console.log('\nChoose one of the following commands:');
@@ -99,23 +100,36 @@ function exportAddress() {
 
 async function importAddress() {
     console.log('Import address.');
-    
-    let path = "D:\\WEBD$gBbn$FFYfsGyPVTCK$i$XPHVDcmqFDRq47p&TSG@LWCq7Au3nDsPw==.webd";
-    let data = {"version":"0.1","address":"WEBD$gB*q&9NekdNWgjzaEx%QKKLuaPrm2JidqzCZ#GVP5scVsbx9EbsPw==","publicKey":"53dacac6760a83469f49ef9e91037d4ff9bbf684f4a914aa517a56bf1506011d","privateKey":"802542af7f7396f7bf016d920c4896e253d70d7417e77415e5729b277d09b1ee306025e24b"};
 
-    try {
-        let answer = await Blockchain.Wallet.importAddressFromJSON(data);
+    let addressPath = "D:\\WEBD$gBugUC6mM2rPLpHRKsALKqwaHgCjj%y&U$#4@MfVT6Vk%W3gSbsPw==.webd";
 
-        if (answer.result === true) {
-            console.log("Address Imported", answer.address);
-        } else {
-            console.error(answer.message);
+    /*await WEBD_CLI.question('Enter address path: ', async (answer) => {
+        addressPath = answer;
+    });*/
+
+    FileSystem.readFile(addressPath, 'utf8', async function(err, content) {
+
+        if (err) {
+            console.error(err);
+            return false;
         }
-    } catch(err) {
-        console.log(err.message);
-    }
-    
-    return true;
+
+        try {
+            let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
+
+            if (answer.result === true) {
+                console.log("Address Imported", answer.address);
+            } else {
+                console.error(answer.message);
+                return false;
+            }
+        } catch(err) {
+            console.log(err.message);
+            return false;
+        }
+
+        return true;
+    });
 }
 
 function deleteAddress() {
