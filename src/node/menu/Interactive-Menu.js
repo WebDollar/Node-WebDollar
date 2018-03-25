@@ -100,10 +100,20 @@ function exportAddress() {
 async function importAddress() {
     console.log('Import address.');
     
-    let path = "D:\\WEBD$gB_q&9NekdNWgjzaEx%QKKLuaPrm2JidqzCZ#GVP5scVsbx9EbsPw==.webd";
+    let path = "D:\\WEBD$gBbn$FFYfsGyPVTCK$i$XPHVDcmqFDRq47p&TSG@LWCq7Au3nDsPw==.webd";
     let data = {"version":"0.1","address":"WEBD$gB*q&9NekdNWgjzaEx%QKKLuaPrm2JidqzCZ#GVP5scVsbx9EbsPw==","publicKey":"53dacac6760a83469f49ef9e91037d4ff9bbf684f4a914aa517a56bf1506011d","privateKey":"802542af7f7396f7bf016d920c4896e253d70d7417e77415e5729b277d09b1ee306025e24b"};
-    await Blockchain.Wallet.importAddressFromPrivateKey(data);
-    
+
+    try {
+        let answer = await Blockchain.Wallet.importAddressFromJSON(data);
+
+        if (answer.result === true) {
+            console.log("Address Imported", answer.address);
+        } else {
+            console.error(answer.message);
+        }
+    } catch(err) {
+        console.log(err.message);
+    }
     
     return true;
 }
