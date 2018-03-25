@@ -7,7 +7,8 @@ const commands = [
         '1. List addresses',
         '2. Export address',
         '3. Import address',
-        '4. Set mining address'
+        '4. Delete address',
+        '5. Set mining address'
     ];
 
 const lineSeparator = 
@@ -27,7 +28,7 @@ const WEBD_CLI = readline.createInterface({
 showCommands();
 WEBD_CLI.prompt();
 
-WEBD_CLI.on('line', (line) => {
+WEBD_CLI.on('line', async (line) => {
 
     switch(line.trim()) {
         case '1':
@@ -37,9 +38,12 @@ WEBD_CLI.on('line', (line) => {
             exportAddress();
         break;
         case '3':
-            importAddress();
+            await importAddress();
         break;
         case '4':
+            deleteAddress();
+        break;
+        case '5':
             setMiningAddress();
         break;
         default:
@@ -68,7 +72,7 @@ function showCommands() {
 function listAddresses() {
     console.log('\nWallet addresses:');
     
-    Blockchain.Wallet.createNewAddress();
+    //Blockchain.Wallet.createNewAddress();
     
     console.log(addressHeader);
     for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
@@ -82,7 +86,7 @@ function listAddresses() {
 }
 
 function exportAddress() {
-    console.log('Export address:');
+    console.log('Export address.');
     
     /*WEBD_CLI.setPrompt("Enter address:");
 
@@ -90,12 +94,23 @@ function exportAddress() {
         console.log("your address is" + line);
     });*/
 
-    console.log('Export address:2');
     return true;
 }
 
-function importAddress() {
-    console.log('Import address:');
+async function importAddress() {
+    console.log('Import address.');
+    
+    let path = "D:\\WEBD$gB_q&9NekdNWgjzaEx%QKKLuaPrm2JidqzCZ#GVP5scVsbx9EbsPw==.webd";
+    let data = {"version":"0.1","address":"WEBD$gB*q&9NekdNWgjzaEx%QKKLuaPrm2JidqzCZ#GVP5scVsbx9EbsPw==","publicKey":"53dacac6760a83469f49ef9e91037d4ff9bbf684f4a914aa517a56bf1506011d","privateKey":"802542af7f7396f7bf016d920c4896e253d70d7417e77415e5729b277d09b1ee306025e24b"};
+    await Blockchain.Wallet.importAddressFromPrivateKey(data);
+    
+    
+    return true;
+}
+
+function deleteAddress() {
+    console.log('Delete address.');
+
 
     return true;
 }
