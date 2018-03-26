@@ -27,7 +27,7 @@ const WEBD_CLI = readline.createInterface({
 showCommands();
 WEBD_CLI.prompt();
 
-let runMenu = function () {
+let runMenu = async function () {
     WEBD_CLI.question('Command: ', async (answer) => {
         switch(answer.trim()) {
             case '1':
@@ -53,7 +53,7 @@ let runMenu = function () {
         }
         WEBD_CLI.setPrompt('WEBD_CLI:> ');
         WEBD_CLI.prompt();
-        runMenu();
+        await runMenu();
     });
 };
 
@@ -98,38 +98,47 @@ function exportAddress() {
     return true;
 }
 
-async function importAddress() {
+function importAddress() {
     console.log('Import address.');
 
-    let addressPath = "D:\\WEBD$gBugUC6mM2rPLpHRKsALKqwaHgCjj%y&U$#4@MfVT6Vk%W3gSbsPw==.webd";
+    return new Promise(resolve => {
 
-    /*await WEBD_CLI.question('Enter address path: ', async (answer) => {
-        addressPath = answer;
-    });*/
+        WEBD_CLI.question('Enter address path: ', (addressPath) => {
+            
+            FileSystem.readFile(addressPath, 'utf8', async function(err, content) {
 
-    FileSystem.readFile(addressPath, 'utf8', async function(err, content) {
+                if (err) {
+                    console.error(err);
+                    resolve(false);
+                    return;
+                }
 
-        if (err) {
-            console.error(err);
-            return false;
-        }
+                try {
+                    let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
 
-        try {
-            let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
+                    if (answer.result === true) {
+                        console.log("Address Imported", answer.address);
+                        resolve(true);
+                        return;
+                    } else {
+                        console.error(answer.message);
+                        resolve(false);
+                        return;
+                    }
+                } catch(err) {
+                    console.log(err.message);
+                    resolve(false);
+                    return;
+                }
 
-            if (answer.result === true) {
-                console.log("Address Imported", answer.address);
-            } else {
-                console.error(answer.message);
-                return false;
-            }
-        } catch(err) {
-            console.log(err.message);
-            return false;
-        }
+                resolve(false);
+                return;
+            });
 
-        return true;
+        });
+
     });
+    
 }
 
 function deleteAddress() {
