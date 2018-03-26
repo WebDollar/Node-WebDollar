@@ -45,7 +45,7 @@ let runMenu = async function () {
                 deleteAddress();
                 break;
             case '5':
-                setMiningAddress();
+                await setMiningAddress();
                 break;
             case 'exit':
                 break;
@@ -65,13 +65,13 @@ function _chooseAddress() {
     
     return new Promise(resolve => {
         
-        this.listAddresses();
-        
-        WEBD_CLI.question('Choose the address number: ', (answer) => {
-            
-            console.log("You choosed " + answer);
-            resolve(1);
-        });
+        listAddresses().then( () => {
+            WEBD_CLI.question('Choose the address number: ', (answer) => {
+
+                resolve(parseInt(answer));
+            });
+        }) ;
+
     });
 }
 
@@ -88,10 +88,9 @@ function _showCommands() {
 
 async function listAddresses() {
     console.log('\nWallet addresses:');
-    
-    //Blockchain.Wallet.createNewAddress();
-    let miningAddress = await Blockchain.Wallet.getMiningAddress();
-    
+
+    let miningAddress = Blockchain.Wallet.getMiningAddress();
+
     console.log(addressHeader);
     for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
         let address = Blockchain.Wallet.addresses[i].address;
@@ -170,8 +169,15 @@ function deleteAddress() {
     return true;
 }
 
-function setMiningAddress() {
-    console.log('Set mining address:');
+async function setMiningAddress() {
+    console.log('Set mining address.');
     
-    return true;
+    let addressId = await _chooseAddress();
+    
+    if (addressId === NaN) {
+        console.log("You must enter a number.");
+        return false;
+    }
+    
+    
 }
