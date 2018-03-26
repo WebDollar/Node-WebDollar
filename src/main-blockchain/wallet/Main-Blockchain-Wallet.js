@@ -544,7 +544,7 @@ class MainBlockchainWallet{
     async loadWallet(){
 
         //loading the Wallet
-        StatusEvents.emit('blockchain/status', {message: "Wallet Loading"});
+        StatusEvents.emit('blockchain/status', {message: "Loading Wallet..."});
 
         try{
 

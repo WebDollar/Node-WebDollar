@@ -11,11 +11,11 @@ const commands = [
     ];
 
 const lineSeparator = 
-    "\n|________________________________________________________________|_________________|";
+    "\n|_______|________________________________________________________________|_________________|";
 
 const addressHeader = 
-    "\n __________________________________________________________________________________" +
-    "\n|                            ADDRESS                             |      WEBD       |" +
+    "\n __________________________________________________________________________________________" +
+    "\n|  NUM  |                            ADDRESS                             |      WEBD       |" +
     lineSeparator;
 
 const WEBD_CLI = readline.createInterface({
@@ -24,14 +24,16 @@ const WEBD_CLI = readline.createInterface({
     prompt: 'WEBD_CLI:> '
 });
 
-showCommands();
+_showCommands();
 WEBD_CLI.prompt();
 
-let runMenu = function () {
+let runMenu = async function () {
+    await Blockchain.Wallet.loadWallet();
+
     WEBD_CLI.question('Command: ', async (answer) => {
         switch(answer.trim()) {
             case '1':
-                listAddresses();
+                await listAddresses();
                 break;
             case '2':
                 exportAddress();
@@ -43,23 +45,37 @@ let runMenu = function () {
                 deleteAddress();
                 break;
             case '5':
-                setMiningAddress();
+                await setMiningAddress();
                 break;
             case 'exit':
                 break;
             default:
-                showCommands();
+                _showCommands();
                 break;
         }
         WEBD_CLI.setPrompt('WEBD_CLI:> ');
         WEBD_CLI.prompt();
-        runMenu();
+        await runMenu();
     });
 };
 
 runMenu();
 
-function showCommands() {
+function _chooseAddress() {
+    
+    return new Promise(resolve => {
+        
+        listAddresses().then( () => {
+            WEBD_CLI.question('Choose the address number: ', (answer) => {
+
+                resolve(parseInt(answer));
+            });
+        }) ;
+
+    });
+}
+
+function _showCommands() {
     console.log('\nChoose one of the following commands:');
     
     for (let i = 0; i < commands.length; ++i){
@@ -70,17 +86,21 @@ function showCommands() {
     return true;
 }
 
-function listAddresses() {
+async function listAddresses() {
     console.log('\nWallet addresses:');
-    
-    //Blockchain.Wallet.createNewAddress();
-    
+
+    let miningAddress = Blockchain.Wallet.getMiningAddress();
+
     console.log(addressHeader);
     for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
         let address = Blockchain.Wallet.addresses[i].address;
         let balance = 1000000000.3354;//Blockchain.accountantTree.getBalance(address, undefined);
-
-        console.log("|  " + address + "  | " + balance + lineSeparator);
+        
+        if (address === miningAddress) {
+            console.log("|  *" + i + "   |  " + address + "  | " + balance + lineSeparator);
+        } else {
+            console.log("|   " + i + "   |  " + address + "  | " + balance + lineSeparator);
+        }
     }
 
     return true;
@@ -98,38 +118,48 @@ function exportAddress() {
     return true;
 }
 
-async function importAddress() {
+function importAddress() {
     console.log('Import address.');
 
-    let addressPath = "D:\\WEBD$gBugUC6mM2rPLpHRKsALKqwaHgCjj%y&U$#4@MfVT6Vk%W3gSbsPw==.webd";
+    return new Promise(resolve => {
 
-    /*await WEBD_CLI.question('Enter address path: ', async (answer) => {
-        addressPath = answer;
-    });*/
+        WEBD_CLI.question('Enter address path: ', (addressPath) => {
+            
+            FileSystem.readFile(addressPath, 'utf8', async function(err, content) {
 
-    FileSystem.readFile(addressPath, 'utf8', async function(err, content) {
+                if (err) {
+                    console.error(err);
+                    resolve(false);
+                    return;
+                }
 
-        if (err) {
-            console.error(err);
-            return false;
-        }
+                try {
+                    let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
 
-        try {
-            let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
+                    if (answer.result === true) {
+                        console.log("Address Imported", answer.address);
+                        await Blockchain.Wallet.saveWallet();
+                        resolve(true);
+                        return;
+                    } else {
+                        console.error(answer.message);
+                        resolve(false);
+                        return;
+                    }
+                } catch(err) {
+                    console.log(err.message);
+                    resolve(false);
+                    return;
+                }
 
-            if (answer.result === true) {
-                console.log("Address Imported", answer.address);
-            } else {
-                console.error(answer.message);
-                return false;
-            }
-        } catch(err) {
-            console.log(err.message);
-            return false;
-        }
+                resolve(false);
+                return;
+            });
 
-        return true;
+        });
+
     });
+    
 }
 
 function deleteAddress() {
@@ -139,8 +169,15 @@ function deleteAddress() {
     return true;
 }
 
-function setMiningAddress() {
-    console.log('Set mining address:');
+async function setMiningAddress() {
+    console.log('Set mining address.');
     
-    return true;
+    let addressId = await _chooseAddress();
+    
+    if (addressId === NaN) {
+        console.log("You must enter a number.");
+        return false;
+    }
+    
+    
 }
