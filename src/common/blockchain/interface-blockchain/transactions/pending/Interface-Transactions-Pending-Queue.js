@@ -47,7 +47,9 @@ class InterfaceTransactionsPendingQueue {
 
     removePendingTransaction (transaction){
 
-        let index = this.findPendingTransaction(transaction);
+        let index = transaction;
+
+        if (typeof transaction === "object") index = this.findPendingTransaction(transaction);
 
         if (index === -1)
             return true;

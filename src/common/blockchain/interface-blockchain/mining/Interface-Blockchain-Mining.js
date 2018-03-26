@@ -22,15 +22,17 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     _selectNextTransactions(){
 
         let transactions = [], size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
-        let i = this.blockchain.transactions.pendingQueue.length-1;
+        let i = this.blockchain.transactions.pendingQueue.list.length-1;
 
         while (size > 0 && i >= 0){
-            let transaction = this.blockchain.transactions.pendingQueue[i];
+            let transaction = this.blockchain.transactions.pendingQueue.list[i];
             if ( transaction.validateTransaction( this.blockchain.blocks.length - 1 ) ){
 
                 transactions.push();
                 size += transaction.serializeTransaction().length;
 
+            } else {
+                this.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
             }
             i--;
         }
