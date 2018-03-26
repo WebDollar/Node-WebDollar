@@ -11,11 +11,11 @@ const commands = [
     ];
 
 const lineSeparator = 
-    "\n|________________________________________________________________|_________________|";
+    "\n|_______|________________________________________________________________|_________________|";
 
 const addressHeader = 
-    "\n __________________________________________________________________________________" +
-    "\n|                            ADDRESS                             |      WEBD       |" +
+    "\n __________________________________________________________________________________________" +
+    "\n|  NUM  |                            ADDRESS                             |      WEBD       |" +
     lineSeparator;
 
 const WEBD_CLI = readline.createInterface({
@@ -24,7 +24,7 @@ const WEBD_CLI = readline.createInterface({
     prompt: 'WEBD_CLI:> '
 });
 
-showCommands();
+_showCommands();
 WEBD_CLI.prompt();
 
 let runMenu = async function () {
@@ -48,7 +48,7 @@ let runMenu = async function () {
             case 'exit':
                 break;
             default:
-                showCommands();
+                _showCommands();
                 break;
         }
         WEBD_CLI.setPrompt('WEBD_CLI:> ');
@@ -59,7 +59,21 @@ let runMenu = async function () {
 
 runMenu();
 
-function showCommands() {
+function _chooseAddress() {
+    
+    return new Promise(resolve => {
+        
+        this.listAddresses();
+        
+        WEBD_CLI.question('Choose the address number: ', (answer) => {
+            
+            console.log("You choosed " + answer);
+            resolve(1);
+        });
+    });
+}
+
+function _showCommands() {
     console.log('\nChoose one of the following commands:');
     
     for (let i = 0; i < commands.length; ++i){
@@ -79,8 +93,12 @@ function listAddresses() {
     for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
         let address = Blockchain.Wallet.addresses[i].address;
         let balance = 1000000000.3354;//Blockchain.accountantTree.getBalance(address, undefined);
-
-        console.log("|  " + address + "  | " + balance + lineSeparator);
+        
+        if (0 /*is the mining address*/) {
+            console.log("|  *" + i + "   |  " + address + "  | " + balance + lineSeparator);
+        } else {
+            console.log("|   " + i + "   |  " + address + "  | " + balance + lineSeparator);
+        }
     }
 
     return true;
