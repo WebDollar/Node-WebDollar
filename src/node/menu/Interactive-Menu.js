@@ -28,6 +28,8 @@ _showCommands();
 WEBD_CLI.prompt();
 
 let runMenu = async function () {
+    await Blockchain.Wallet.loadWallet();
+
     WEBD_CLI.question('Command: ', async (answer) => {
         switch(answer.trim()) {
             case '1':
@@ -136,6 +138,7 @@ function importAddress() {
 
                     if (answer.result === true) {
                         console.log("Address Imported", answer.address);
+                        await Blockchain.Wallet.saveWallet();
                         resolve(true);
                         return;
                     } else {
