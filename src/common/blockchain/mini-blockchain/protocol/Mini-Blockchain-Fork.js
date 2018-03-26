@@ -31,10 +31,25 @@ class MiniBlockchainFork extends inheritFork{
         return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
-    preForkClone(){
+    _preForkCloneAccounantTree(){
 
-        //clone the Accountant Tree
-        this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
+    }
+
+    preForkClone(cloneBlocks=true, cloneAccountantTree=true){
+
+        InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
+
+        if (cloneAccountantTree) {
+
+            try {
+                //clone the Accountant Tree
+                this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
+            } catch (exception){
+                console.error("Error cloding Accountant Tree", exception);
+                return false;
+            }
+        }
+
 
     }
 
@@ -46,12 +61,17 @@ class MiniBlockchainFork extends inheritFork{
         //remove transactions and rewards from each blocks
         for (let i = this.blockchain.blocks.length - 1; i >= this.forkStartingHeight; i--) {
 
-            //remove reward
+            let block = this.blockchain.blocks[i];
 
-            console.log("preFork block ", this.blockchain.blocks[i].reward.toString(),"+");
-            this.blockchain.accountantTree.updateAccount(this.blockchain.blocks[i].data.minerAddress, this.blockchain.blocks[i].reward.negated() );
+            // remove reward
 
-            //TODO remove transactions
+            this.blockchain.accountantTree.updateAccount(block.data.minerAddress, block.reward.negated() );
+
+            // remove transactions
+            for (let j=block.transactions.transactions.length-1; j>=0; j--){
+                let transaction = block.transactions.transactions[j];
+                transaction.processTransaction(-1);
+            }
 
         }
 
@@ -67,6 +87,8 @@ class MiniBlockchainFork extends inheritFork{
     }
 
     postFork(forkedSuccessfully){
+
+        return InterfaceBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
 
     }
 

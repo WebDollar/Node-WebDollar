@@ -96,12 +96,12 @@ class InterfaceBlockchainTransactionsProtocol{
                 transaction.validateTransaction(undefined, false);
 
                 try {
-                    transaction.validateFromEnoughMoney();
+
+                    transaction.validateTransactionEnoughMoney();
 
                 } catch (exception){
 
-                    console.warn ("Transaction had not enough money, so I am skipping it");
-
+                    console.warn ("Transaction had not enough money, so I am skipping it", exception);
                     continue;
                 }
 

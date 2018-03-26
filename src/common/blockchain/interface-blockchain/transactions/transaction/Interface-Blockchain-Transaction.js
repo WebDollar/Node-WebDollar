@@ -129,15 +129,13 @@ class InterfaceBlockchainTransaction{
         let txId = this._computeTxId();
         if (txId.equals( this.txId ) ) throw {message: "txid don't match"};
 
-        //Validate nonce
-
         if (!this.from)
             throw { message: 'Transaction Validation Invalid: From was not specified', from: this.from };
 
         if (!this.to)
             throw { message: 'Transaction Validation Invalid: To was not specified', to: this.to };
 
-        this.from.validateFrom(validateEnoughMoney);
+        this.from.validateFrom();
         this.to.validateTo();
 
         //validate amount
@@ -147,7 +145,20 @@ class InterfaceBlockchainTransaction{
         if (inputSum.isLessThan(outputSum))
             throw {message: "Transaction Validation Input is smaller than Output", input: inputSum, output: outputSum};
 
+        if (!this.validateTransactionEnoughMoney())
+            return false;
+
         return true;
+    }
+
+    validateTransactionEnoughMoney( ){
+
+        //Validate nonce
+        let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
+        if (nonce !== this.nonce)
+            throw {message: "Nonce is invalid", myNonce: this.nonce, nonce: nonce }
+
+        return this.from.validateFromEnoughMoney();
     }
 
     serializeFromForSigning(unencodedAddress){

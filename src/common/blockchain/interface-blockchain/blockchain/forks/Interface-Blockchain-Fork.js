@@ -180,17 +180,6 @@ class InterfaceBlockchainFork {
             //making a copy of the current blockchain
 
             try {
-                this._blocksCopy = [];
-
-                for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++)
-                    this._blocksCopy.push(this.blockchain.blocks[i]);
-
-            } catch (exception){
-                console.error("_blockCopy raised an error");
-                return false;
-            }
-
-            try {
                 this.preForkClone();
             } catch (exception){
                 console.error("preForkBefore raised an error");
@@ -207,11 +196,8 @@ class InterfaceBlockchainFork {
 
             let forkedSuccessfully = true;
 
-
             console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
             console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-            console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-
 
             let index;
             try {
@@ -285,8 +271,24 @@ class InterfaceBlockchainFork {
         return success;
     }
 
-    preForkClone(){
 
+    preForkClone(cloneBlocks=true){
+
+        try {
+
+            if (!cloneBlocks) return true;
+
+            this._blocksCopy = [];
+
+            for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++)
+                this._blocksCopy.push(this.blockchain.blocks[i]);
+
+        } catch (exception){
+            console.error("_blockCopy raised an error", exception);
+            throw exception;
+        }
+
+        return true;
     }
 
     preFork(){
@@ -299,6 +301,27 @@ class InterfaceBlockchainFork {
     }
 
     postFork(forkedSuccessfully){
+
+        //move the transactions to pending
+        for (let i = this._blocksCopy.length - 1; i >= 0; i--) {
+
+            let block = this._blocksCopy[i];
+
+            // remove transactions
+            for (let j = block.transactions.transactions.length - 1; j >= 0; j--) {
+
+                let transaction = block.transactions.transactions[j];
+
+                try {
+                    if (transaction.validateTransactionEnoughMoney())
+                        this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
+                }
+                catch (exception){
+
+                }
+
+            }
+        }
 
     }
 

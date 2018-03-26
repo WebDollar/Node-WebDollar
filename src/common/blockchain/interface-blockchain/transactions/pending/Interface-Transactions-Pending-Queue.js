@@ -20,14 +20,14 @@ class InterfaceTransactionsPendingQueue {
 
     includePendingTransaction (transaction, exceptSockets){
 
-        if (this.findPendingTransaction(transaction) === -1){
+        if (this.findPendingTransaction(transaction) !== -1){
             return false;
         }
 
         transaction.validateTransaction(this.blockchain.blocks.length-1);
 
         this.list.push(transaction);
-        transaction.propagateTransaction(exceptSockets);
+        this.propagateTransaction(transaction, exceptSockets);
 
 
         this._removeOldTransactions();
@@ -59,13 +59,21 @@ class InterfaceTransactionsPendingQueue {
 
     _removeOldTransactions (){
 
-        for (let i=this.list.length-1; i >= 0; i--)
+        for (let i=this.list.length-1; i >= 0; i--) {
             //TimeLock to old
-            if (this.list[i].timeLock !== 0 && this.list[i].timeLock < this.blockchain.blocks.length-1 - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION ){
+            if ( (this.list[i].timeLock !== 0 && this.list[i].timeLock < this.blockchain.blocks.length - 1 - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) )
+                this.list.splice(i, 1);
 
-                this.list.splice(i,1);
-
+            try{
+                if (!this.list[i].validateTransactionEnoughMoney())
+                    this.list.splice(i, 1);
+            } catch (exception){
+                console.warn("Old Transaction removed because of exception ", exception)
+                this.list.splice(i, 1);
             }
+
+        }
+
     }
 
     propagateTransaction(transaction, exceptSocket){
