@@ -87,9 +87,7 @@ class MiniBlockchainFork extends inheritFork{
     }
 
     postFork(forkedSuccessfully){
-
         return InterfaceBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
-
     }
 
 }

@@ -153,10 +153,8 @@ class InterfaceBlockchainTransaction{
 
     validateTransactionEnoughMoney( ){
 
-        //Validate nonce
-        let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
-        if (nonce !== this.nonce)
-            throw {message: "Nonce is invalid", myNonce: this.nonce, nonce: nonce }
+        if (!this._validateNonce())
+            return false;
 
         return this.from.validateFromEnoughMoney();
     }
@@ -243,7 +241,7 @@ class InterfaceBlockchainTransaction{
     }
 
     _validateNonce(){
-        //
+        return true;
     }
 
 }
