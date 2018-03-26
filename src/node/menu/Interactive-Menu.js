@@ -33,7 +33,7 @@ let runMenu = async function () {
     WEBD_CLI.question('Command: ', async (answer) => {
         switch(answer.trim()) {
             case '1':
-                listAddresses();
+                await listAddresses();
                 break;
             case '2':
                 exportAddress();
@@ -86,17 +86,18 @@ function _showCommands() {
     return true;
 }
 
-function listAddresses() {
+async function listAddresses() {
     console.log('\nWallet addresses:');
     
     //Blockchain.Wallet.createNewAddress();
+    let miningAddress = await Blockchain.Wallet.getMiningAddress();
     
     console.log(addressHeader);
     for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
         let address = Blockchain.Wallet.addresses[i].address;
         let balance = 1000000000.3354;//Blockchain.accountantTree.getBalance(address, undefined);
         
-        if (0 /*is the mining address*/) {
+        if (address === miningAddress) {
             console.log("|  *" + i + "   |  " + address + "  | " + balance + lineSeparator);
         } else {
             console.log("|   " + i + "   |  " + address + "  | " + balance + lineSeparator);
