@@ -48,7 +48,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 if (transaction === undefined) throw {message: "Transaction was not specified"};
 
-                transaction.validateTransaction();
+                transaction.validateTransactionOnce();
 
                 if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction))
                     throw {message: "I already have this transaction"};
@@ -93,11 +93,11 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 let transaction = Blockchain.blockchain.transactions.createTransactionFromBuffer(transactions[i]);
 
-                transaction.validateTransaction(undefined, false);
+                transaction.validateTransactionOnce(undefined, false);
 
                 try {
 
-                    transaction.validateTransactionEnoughMoney();
+                    transaction.validateTransactionEveryTime();
 
                 } catch (exception){
 

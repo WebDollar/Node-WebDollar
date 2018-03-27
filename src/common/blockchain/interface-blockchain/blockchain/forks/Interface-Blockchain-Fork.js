@@ -313,7 +313,7 @@ class InterfaceBlockchainFork {
                 let transaction = block.transactions.transactions[j];
 
                 try {
-                    if (transaction.validateTransactionEnoughMoney())
+                    if (transaction.validateTransactionEveryTime())
                         this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
                 }
                 catch (exception){
