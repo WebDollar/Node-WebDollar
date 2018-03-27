@@ -388,11 +388,21 @@ class InterfaceBlockchainAddressHelper{
 
     static askForPassword(message){
 
-        let response = prompt(message||"Please enter your last password (12 words separated by space)");
+        let response = "";
+        if (process.env.BROWSER){
+            response =  prompt(message||"Please enter your last password (12 words separated by space)");
+        }
+        else {
+            //TODO: code for read 12 words from console.
+        }
         let oldPassword = response.trim().split(' ');
 
         if (oldPassword.length !== 12) {
-            alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+            if (process.env.BROWSER)
+                alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+            else
+                console.log('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+
             return null;
         }
 
