@@ -28,6 +28,8 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         if (nonce !== this.nonce)
             throw {message: "Nonce is invalid", myNonce: this.nonce, nonce: nonce }
 
+        return true;
+
     }
 
     _computeNonce(){

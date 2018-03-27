@@ -20,11 +20,11 @@ class InterfaceTransactionsPendingQueue {
 
     includePendingTransaction (transaction, exceptSockets){
 
-        if (this.findPendingTransaction(transaction) !== -1){
+        if (this.findPendingTransaction(transaction) !== -1)
             return false;
-        }
 
-        transaction.validateTransaction(this.blockchain.blocks.length-1);
+        if (!transaction.validateTransaction(this.blockchain.blocks.length-1))
+            return false;
 
         this.list.push(transaction);
         this.propagateTransaction(transaction, exceptSockets);
@@ -37,6 +37,7 @@ class InterfaceTransactionsPendingQueue {
     }
 
     findPendingTransaction(transaction){
+
 
         for (let i = 0; i < this.list.length; i++)
             if (this.list[i] === transaction)
