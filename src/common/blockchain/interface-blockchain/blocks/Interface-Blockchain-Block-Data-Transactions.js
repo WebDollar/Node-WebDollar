@@ -105,7 +105,7 @@ class InterfaceBlockchainBlockDataTransactions {
     processBlockDataTransactions(block, multiplicationFactor = 1){
 
         for (let i=0; i<block.data.transactions.transactions.length; i++)
-            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.minerAddress))
+            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
                 return i;
 
     }
@@ -113,7 +113,7 @@ class InterfaceBlockchainBlockDataTransactions {
     processBlockDataTransactionsRevert(endPos, startPos, block, multiplicationFactor = -1){
 
         for (let i = endPos; i >= startPos; i--)
-            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.minerAddress))
+            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
                 return i;
 
     }

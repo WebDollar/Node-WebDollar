@@ -39,7 +39,7 @@ class InterfaceBlockchainBlockData {
     validateBlockData(blockHeight, blockValidation){
 
         if (!Buffer.isBuffer(this.minerAddress) || this.minerAddress.length !=  consts.ADDRESSES.ADDRESS.LENGTH )
-            throw {message: 'data.unencodedMinerAddress is empty'};
+            throw {message: 'data.minerAddress is empty'};
 
         if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData))
             throw {message: 'hashData is empty'};
@@ -71,7 +71,7 @@ class InterfaceBlockchainBlockData {
             this.transactions.hashTransactions = this.transactions.calculateHashTransactions();
 
         return Buffer.concat ( [
-            Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.unencodedMinerAddress ),
+            Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.minerAddress ),
             this.transactions.serializeTransactions(onlyHeader),
         ]);
 
@@ -97,7 +97,7 @@ class InterfaceBlockchainBlockData {
         this.hashData = BufferExtended.substr(buffer, offset, 32);
         offset += 32;
 
-        this.unencodedMinerAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+        this.minerAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
         offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         offset = this.transactions.deserializeTransactions(buffer, offset, onlyHeader);
@@ -108,7 +108,7 @@ class InterfaceBlockchainBlockData {
 
     toString(){
 
-        return this.unencodedMinerAddress.toString("hex") + this.hashData.toString("hex")
+        return this.minerAddress.toString("hex") + this.hashData.toString("hex")
 
     }
 

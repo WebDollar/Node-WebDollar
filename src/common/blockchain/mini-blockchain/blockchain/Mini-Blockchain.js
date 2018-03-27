@@ -57,11 +57,11 @@ class MiniBlockchain extends  inheritBlockchain{
             // console.log("balances", balances );
 
             //reward
-            if (result !== null && result !== undefined)
-                revert.reward = true;
-            else
+            if (result === null || result === undefined)
                 throw {message: "reward couldn't be set to the minerAddress"};
 
+
+            revert.reward = true;
             //validate transactions & tree
             revert.transactions.start = 0;
 

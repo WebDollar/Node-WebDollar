@@ -3,6 +3,8 @@ import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockcha
 import MiniBlockchainTransactionFrom from './Mini-Blockchain-Transaction-From'
 import MiniBlockchainTransactionTo from './Mini-Blockchain-Transaction-To'
 
+const BigNumber = require('bignumber.js');
+
 class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
     _createTransactionFrom(from){
@@ -42,7 +44,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 
-        let diffInFees = outputSum.minus(inputSum);
+        let diffInFees = inputSum.minus(outputSum);
 
         if (diffInFees instanceof BigNumber === false)
             throw {message: "diffInFees is not BigNumber",  address: minerAddress };
@@ -52,9 +54,9 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
         try{
 
-            let result = this.transaction.blockchain.accountantTree.updateAccount( minerAddress, diffInFees.multipliedBy(multiplicationFactor), this.from.currencyTokenId);
+            let result = this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees.multipliedBy(multiplicationFactor), this.from.currencyTokenId);
 
-            if (result === null) throw {message: "error Updating Account Fees", address: this.addresses[i]};
+            if (result === null) throw {message: "Error Updating Account for Fees", address: this.addresses[i]};
 
         } catch (exception){
             console.error("processTransactionFees error ", exception)
