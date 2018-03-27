@@ -34,7 +34,7 @@ class InterfaceBlockchainTransactionTo{
             if (typeof addresses[i].unencodedAddress === "object" && addresses[i].unencodedAddress.hasOwnProperty("unencodedAddress"))
                 addresses[i].unencodedAddress = addresses[i].unencodedAddress.unencodedAddress;
 
-            addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(addresses[i].unencodedAddress);
+            addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addresses[i].unencodedAddress);
 
             if (typeof addresses[i].amount === "string" || typeof addresses[i].amount === "number")
                 addresses[i].amount = new BigNumber(addresses[i].amount);
@@ -108,7 +108,7 @@ class InterfaceBlockchainTransactionTo{
         Serialization.serializeNumber1Byte( this.addresses.length );
 
         for (let i = 0; i < this.addresses.length; i++){
-            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.WIF.LENGTH, this.addresses[i].unencodedAddress ));
+            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
             addressesBuffer.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
         }
 
@@ -125,8 +125,8 @@ class InterfaceBlockchainTransactionTo{
 
             let address = {};
 
-            address.unencodedAddress= BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.WIF.LENGTH);
-            offset += consts.ADDRESSES.ADDRESS.WIF.LENGTH;
+            address.unencodedAddress= BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+            offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
             let result = Serialization.deserializeBigNumber(buffer, offset);
             address.amount = result.number;

@@ -36,6 +36,34 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
     }
 
+    processTransactionFees(multiplicationFactor=1, minerAddress = undefined){
+
+        //validate amount
+        let inputSum = this.from.calculateInputSum();
+        let outputSum = this.to.calculateOutputSum();
+
+        let diffInFees = outputSum.minus(inputSum);
+
+        if (diffInFees instanceof BigNumber === false)
+            throw {message: "diffInFees is not BigNumber",  address: minerAddress };
+
+        if (diffInFees.isLessThan(0))
+            throw {message: "Accountant Tree is negative" };
+
+        try{
+
+            let result = this.transaction.blockchain.accountantTree.updateAccount( minerAddress, diffInFees.multipliedBy(multiplicationFactor), this.from.currencyTokenId);
+
+            if (result === null) throw {message: "error Updating Account Fees", address: this.addresses[i]};
+
+        } catch (exception){
+            console.error("processTransactionFees error ", exception)
+        }
+
+        return {fees: diffInFees, currencyTokenId: this.currencyTokenId};
+
+    }
+
 }
 
 export default MiniBlockchainTransaction

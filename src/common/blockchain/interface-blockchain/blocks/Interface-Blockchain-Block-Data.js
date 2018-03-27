@@ -7,18 +7,25 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
 import InterfaceBlockchainBlockDataTransactions from "./Interface-Blockchain-Block-Data-Transactions";
 
+
 class InterfaceBlockchainBlockData {
+
+
+    /**
+        miner address is unencodedAddress
+     **/
 
     constructor(blockchain, minerAddress, transactions, hashTransactions, hashData){
 
         this.blockchain = blockchain;
 
         this._onlyHeader = false;
+        this._minerAddress = undefined;
 
         if (minerAddress === undefined)
             minerAddress = BlockchainGenesis.address;
 
-        this.setMinerAddress(minerAddress);
+        this.minerAddress = minerAddress;
 
         this.transactions = new InterfaceBlockchainBlockDataTransactions(this, transactions, hashTransactions);
 
@@ -31,8 +38,8 @@ class InterfaceBlockchainBlockData {
 
     validateBlockData(blockHeight, blockValidation){
 
-        if (this.minerAddress === undefined || this.minerAddress === null || !Buffer.isBuffer(this.minerAddress)  )
-            throw {message: 'data.minerAddress is empty'};
+        if (!Buffer.isBuffer(this.minerAddress) || this.minerAddress.length !=  consts.ADDRESSES.ADDRESS.LENGTH )
+            throw {message: 'data.unencodedMinerAddress is empty'};
 
         if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData))
             throw {message: 'hashData is empty'};
@@ -41,10 +48,10 @@ class InterfaceBlockchainBlockData {
         let hashData = this.calculateHashBlockData();
 
         if (!hashData.equals(this.hashData))
-            throw {message: "block.data hashData is not right"}
+            throw {message: "block.data hashData is not right"};
 
         if (!this.transactions.validateTransactions(blockHeight, blockValidation))
-            throw {message: "transactions failed to validate"}
+            throw {message: "transactions failed to validate"};
 
         return true;
     }
@@ -64,7 +71,7 @@ class InterfaceBlockchainBlockData {
             this.transactions.hashTransactions = this.transactions.calculateHashTransactions();
 
         return Buffer.concat ( [
-            Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.WIF.LENGTH, this.minerAddress ),
+            Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.unencodedMinerAddress ),
             this.transactions.serializeTransactions(onlyHeader),
         ]);
 
@@ -90,8 +97,8 @@ class InterfaceBlockchainBlockData {
         this.hashData = BufferExtended.substr(buffer, offset, 32);
         offset += 32;
 
-        this.minerAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.WIF.LENGTH );
-        offset += consts.ADDRESSES.ADDRESS.WIF.LENGTH;
+        this.unencodedMinerAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+        offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         offset = this.transactions.deserializeTransactions(buffer, offset, onlyHeader);
 
@@ -101,13 +108,13 @@ class InterfaceBlockchainBlockData {
 
     toString(){
 
-        return this.minerAddress.toString("hex") + this.hashData.toString("hex")
+        return this.unencodedMinerAddress.toString("hex") + this.hashData.toString("hex")
 
     }
 
     toJSON(){
         return {
-            minerAddress:this.minerAddress,
+            minerAddress: this.minerAddress,
             hashData: this.hashData.toString("hex"),
         };
     }
@@ -116,18 +123,25 @@ class InterfaceBlockchainBlockData {
         return this.hashData.equals(data.hashData);
     }
 
-    setMinerAddress(minerAddressWIF){
+    get minerAddress(){
+        return this._minerAddress;
+    }
+
+    set minerAddress(minerAddress){
+        this._setMinerAddress(minerAddress);
+    }
+
+    _setMinerAddress(minerAddressWIF){
 
         if (!Buffer.isBuffer(minerAddressWIF))
             minerAddressWIF = BufferExtended.fromBase(minerAddressWIF);
 
-        let result = InterfaceBlockchainAddressHelper.validateAddressChecksum(minerAddressWIF);
+        let result = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(minerAddressWIF);
 
         if (result === null)
             throw {message: "Miner address is not a valid WIF", address: minerAddressWIF};
 
-        this.minerAddress = result;
-
+        this._minerAddress = result;
     }
 }
 

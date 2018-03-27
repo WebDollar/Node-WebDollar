@@ -82,8 +82,8 @@ consts.ADDRESSES = {
 
         WIF:{
             VERSION_PREFIX : "00", //ending BASE64 HEX
-            LENGTH : 32, //ending BASE64 HEX
-            CHECK_SUM_LENGTH : 4, //in bytes
+            LENGTH : 32,
+            CHECK_SUM_LENGTH : 4, //in bytes   //ending BASE64 HEX
 
 
             PREFIX_BASE64 : "584043fe", //BASE64 HEX  WEBD$

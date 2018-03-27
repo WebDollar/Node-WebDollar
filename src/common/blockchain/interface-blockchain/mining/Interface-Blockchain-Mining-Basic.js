@@ -52,7 +52,7 @@ class InterfaceBlockchainMiningBasic {
         if (newAddress === undefined)
             this._unencodedMinerAddress = undefined;
         else
-            this._unencodedMinerAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(newAddress);
+            this._unencodedMinerAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(newAddress);
 
         StatusEvents.emit( 'blockchain/mining/address', { address: this._minerAddress, unencodedAddress: this._unencodedMinerAddress});
 

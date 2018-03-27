@@ -65,19 +65,7 @@ class MiniBlockchain extends  inheritBlockchain{
             //validate transactions & tree
             revert.transactions.start = 0;
 
-            for (let i=0; i<block.data.transactions.transactions.length; i++)
-                try {
-
-                    if ( ! block.data.transactions.transactions[i].validateTransactionOnce( block.height ) )
-                        throw {message: "couldn't process the transaction ", transaction: block.data.transactions.transactions[i]};
-
-                    block.data.transactions.transactions[i].processTransaction(1);
-
-                    revert.transactions.end = i;
-                } catch (exception){
-                    console.error("couldn't process the transaction " + i, exception)
-                }
-
+            revert.transactions.end = block.data.transactions.processBlockDataTransactions(block, 1);
 
 
             //inheriting blockchain includeBlockchainBlock

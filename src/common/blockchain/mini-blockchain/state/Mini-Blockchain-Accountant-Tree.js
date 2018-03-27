@@ -39,7 +39,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             tokenId[0] = 0x01;
         }
 
-        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null)
             throw {message: "Your address is invalid", address: address };
 
@@ -78,7 +78,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
     updateAccountNonce(address, nonceChange){
 
-        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null)
             throw {message: "Your address is invalid", address: address };
 
@@ -103,7 +103,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
      */
     listBalances(address){
 
-        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null)
             throw {message: "Your address is invalid", address: address };
 
@@ -125,7 +125,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
      */
     getBalance(address, tokenId){
 
-        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null)
             throw {message: "Your address is invalid", address: address };
 
@@ -141,7 +141,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     }
 
     getAccountNonce(address){
-        address = InterfaceBlockchainAddressHelper.validateAddressChecksum(address);
+        address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null) throw {message: "getAccountNonce - Your address is invalid", address: address };
 
         let node = this.search(address).node;

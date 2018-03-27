@@ -1,5 +1,7 @@
 import InterfaceBlockchainTransactionFrom from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction-From'
 
+const BigNumber = require('bignumber.js');
+
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
     validateFrom(validateEnoughMoney = true){
@@ -37,18 +39,18 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
                 if (this.addresses[i].amount instanceof BigNumber === false) throw {message: "amount is not BigNumber",  address: this.addresses[i]};
 
-                let result = this.transaction.blockchain.updateAccount( this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor).negated(), this.currencyTokenId);
+                let result = this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor).negated(), this.currencyTokenId);
 
-                if (result !== null) throw {message: "error Updating Account", address: this.addresses[i]};
+                if (result === null) throw {message: "error Updating Account", address: this.addresses[i]};
 
             }
 
         } catch (exception){
 
             for (let i=lastPosition; i >= 0 ; i--) {
-                let result = this.transaction.blockchain.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor), this.currencyTokenId);
+                let result = this.transaction.blockchain.accountantTree.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor), this.currencyTokenId);
 
-                if (result !== null) throw {message: "error Updating Account", address: this.addresses[i]};
+                if (result === null) throw {message: "error Updating Account", address: this.addresses[i]};
             }
 
         }

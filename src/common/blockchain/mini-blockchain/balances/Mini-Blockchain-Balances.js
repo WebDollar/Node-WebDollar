@@ -32,7 +32,7 @@ class MiniBlockchainBalances{
         if (!Buffer.isBuffer(addressWIF) && addressWIF !== '' && addressWIF !== undefined)
             addressWIF = BufferExtended.fromBase(addressWIF);
 
-        let address = InterfaceBlockchainAddressHelper.validateAddressChecksum(addressWIF);
+        let address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addressWIF);
 
         console.log("subscribeBalanceChanges",BufferExtended.toBase(addressWIF) );
 

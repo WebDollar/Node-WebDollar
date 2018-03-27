@@ -58,7 +58,7 @@ class InterfaceBlockchainTransactionFrom{
             if (typeof fromObject.unencodedAddress === "object" && fromObject.unencodedAddress.hasOwnProperty("unencodedAddress"))
                 fromObject.unencodedAddress = fromObject.unencodedAddress.unencodedAddress;
 
-            fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(fromObject.unencodedAddress);
+            fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress);
 
             if (typeof fromObject.publicKey === "string")
                 fromObject.publicKey = new Buffer (fromObject.publicKey, "hex");
@@ -112,13 +112,13 @@ class InterfaceBlockchainTransactionFrom{
             if (! fromObject.unencodedAddress || fromObject.unencodedAddress === null)
                 throw { message: 'From.address.unencodedAddress is not specified', address: fromObject, index: index };
 
-            if (! InterfaceBlockchainAddressHelper.validateAddressChecksum(fromObject.unencodedAddress) )
+            if (! InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress) )
                 throw { message: "From.address.unencodedAddress is not a valid address", address: fromObject, index: index };
 
             if (! fromObject.publicKey || fromObject.publicKey === null)
                 throw { message: 'From.address.publicKey '+index+' is not specified', address: fromObject, index: index };
 
-            if (!Buffer.isBuffer(fromObject.unencodedAddress) || fromObject.unencodedAddress.length !== consts.ADDRESSES.ADDRESS.WIF.LENGTH )
+            if (!Buffer.isBuffer(fromObject.unencodedAddress) || fromObject.unencodedAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
                 throw { message: "From.address.unencodedAddress "+index+" is not a buffer", address: fromObject, index: index };
 
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH)
@@ -159,7 +159,7 @@ class InterfaceBlockchainTransactionFrom{
     findAddressIndex( unencodedAddress ){
 
         //in case it is a WIF address
-        unencodedAddress = InterfaceBlockchainAddressHelper.validateAddressChecksum(unencodedAddress);
+        unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(unencodedAddress);
 
         for (let i = 0; i<this.addresses.length; i++)
             if (this.addresses[i].unencodedAddress.equals( unencodedAddress ) )
@@ -185,7 +185,7 @@ class InterfaceBlockchainTransactionFrom{
             Serialization.serializeNumber1Byte( this.transaction.version ),
             Serialization.serializeNumber1Byte( this.transaction.nonce ),
             Serialization.serializeNumber3Bytes( this.transaction.timeLock ),
-            Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.WIF.LENGTH, this.addresses[position].unencodedAddress ),
+            Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[position].unencodedAddress ),
             Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[position].publicKey ),
             this.transaction.to.serializeTo(),
 
@@ -226,7 +226,7 @@ class InterfaceBlockchainTransactionFrom{
 
         array.push( Serialization.serializeNumber1Byte( this.addresses.length ));
         for (let i = 0; i < this.addresses.length; i++){
-            array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.WIF.LENGTH, this.addresses[i].unencodedAddress ));
+            array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
             array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[i].publicKey ));
             array.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH, this.addresses[i].signature ));
             array.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
@@ -250,8 +250,8 @@ class InterfaceBlockchainTransactionFrom{
 
             let address = {};
 
-            address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.WIF.LENGTH);
-            offset += consts.ADDRESSES.ADDRESS.WIF.LENGTH;
+            address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+            offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
             address.publicKey= BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
             offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;

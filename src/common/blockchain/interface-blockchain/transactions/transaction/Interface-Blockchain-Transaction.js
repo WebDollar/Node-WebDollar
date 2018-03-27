@@ -244,6 +244,15 @@ class InterfaceBlockchainTransaction{
         return true;
     }
 
+    processTransactionFees(){
+        let inputSum = this.from.calculateInputSum();
+        let outputSum = this.to.calculateOutputSum();
+
+        let diffInFees = outputSum.minus(inputSum);
+
+        return {fees: diffInFees, currencyTokenId: this.from.currencyTokenId};
+    }
+
     _validateNonce(){
         return true;
     }

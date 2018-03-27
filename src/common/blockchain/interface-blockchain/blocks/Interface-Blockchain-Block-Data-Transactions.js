@@ -84,6 +84,28 @@ class InterfaceBlockchainBlockDataTransactions {
         return offset;
     }
 
+    _processBlockDataTransaction(blockHeight, transaction, minerAddress){
+
+        try {
+
+            if ( ! transaction.validateTransactionOnce( blockHeight ) )
+                throw {message: "couldn't process the transaction ", transaction: transaction};
+
+            transaction.processTransaction(1);
+
+            return true;
+        } catch (exception){
+            console.error("couldn't process the transaction ", transaction, exception);
+        }
+    }
+
+    processBlockDataTransactions(block, multiplicationFactor = 1){
+
+        for (let i=0; i<block.data.transactions.transactions.length; i++){
+            this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], block.minerAddress )
+        }
+    }
+
 
 }
 

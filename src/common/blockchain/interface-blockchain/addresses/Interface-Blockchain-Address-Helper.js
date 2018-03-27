@@ -194,7 +194,7 @@ class InterfaceBlockchainAddressHelper{
      * address is usually a Base string and it coins Version+Checksum+Address
      * @param address
      */
-    static validateAddressChecksum(address){
+    static getUnencodedAddressFromWIF(address){
 
         if (typeof address === "string")  //base
             address = BufferExtended.fromBase(address);
@@ -205,7 +205,7 @@ class InterfaceBlockchainAddressHelper{
         let result = this._validateAddressWIF(address);
 
         if (result.result === true)
-            return result.address;
+            return result.unencodedAddress;
         else
             return null;
     }
@@ -382,8 +382,8 @@ class InterfaceBlockchainAddressHelper{
             if (!versionDetected)
                 throw {message: "ADDRESS KEY  VERSION PREFIX is not recognized"};
         }
-        
-        return {result: true, address: addressWIF};
+
+        return {result: true, unencodedAddress: addressWIF};
     }
 
     static askForPassword(message){
