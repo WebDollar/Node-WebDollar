@@ -67,7 +67,6 @@ class MiniBlockchain extends  inheritBlockchain{
 
             revert.transactions.end = block.data.transactions.processBlockDataTransactions(block, 1);
 
-
             //inheriting blockchain includeBlockchainBlock
             result = await callback();
 
@@ -92,17 +91,7 @@ class MiniBlockchain extends  inheritBlockchain{
             if (revert.revertNow || revertAutomatically){
 
                 //revert transactions
-                for (let i = revert.transactions.end; i >= revert.transactions.start; i--)
-                    try {
-
-                        if ( ! block.data.transactions.transactions[i].validateTransactionOnce( block.height ) )
-                            throw {message: "couldn't process the transaction ", transaction: block.data.transactions.transactions[i]};
-
-                        block.data.transactions.transactions[i].processTransaction(-1); //negated
-
-                    } catch (exception){
-                        console.error("couldn't process the transaction " + i, "it is impossible because previously it was correct", exception)
-                    }
+                block.data.transactions.processBlockDataTransactionsRevert(revert.transactions.end, revert.transactions.start, block, -1);
 
                 //revert reward
                 if (revert.reward)

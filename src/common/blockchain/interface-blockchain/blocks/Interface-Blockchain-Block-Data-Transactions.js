@@ -84,26 +84,38 @@ class InterfaceBlockchainBlockDataTransactions {
         return offset;
     }
 
-    _processBlockDataTransaction(blockHeight, transaction, minerAddress){
+    _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined ){
 
         try {
 
             if ( ! transaction.validateTransactionOnce( blockHeight ) )
-                throw {message: "couldn't process the transaction ", transaction: transaction};
+                throw { message: "couldn't process the transaction ", transaction: transaction };
 
-            transaction.processTransaction(1);
+            transaction.processTransaction (multiplicationFactor);
+
+            transaction.processTransactionFees(multiplicationFactor, minerAddress);
 
             return true;
         } catch (exception){
             console.error("couldn't process the transaction ", transaction, exception);
+            return false;
         }
     }
 
     processBlockDataTransactions(block, multiplicationFactor = 1){
 
-        for (let i=0; i<block.data.transactions.transactions.length; i++){
-            this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], block.minerAddress )
-        }
+        for (let i=0; i<block.data.transactions.transactions.length; i++)
+            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.minerAddress))
+                return i;
+
+    }
+
+    processBlockDataTransactionsRevert(endPos, startPos, block, multiplicationFactor = -1){
+
+        for (let i = endPos; i >= startPos; i--)
+            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.minerAddress))
+                return i;
+
     }
 
 
