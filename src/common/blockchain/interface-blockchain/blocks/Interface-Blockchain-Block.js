@@ -102,7 +102,7 @@ class InterfaceBlockchainBlock {
         if (this.computedBlockPrefix === null)
             this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
-        if ( this.blockValidation.blockValidationType["skip-prev-hash-validation"] === undefined ){
+        if ( ! this.blockValidation.blockValidationType["skip-prev-hash-validation"] ){
 
             //validate hashPrev
             let previousHash = this.blockValidation.getHashPrevCallback(this.height);

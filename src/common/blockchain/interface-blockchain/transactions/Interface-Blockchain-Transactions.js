@@ -133,7 +133,7 @@ class InterfaceBlockchainTransactions {
     }
 
     createTransactionFromBuffer(buffer, offset = 0){
-        let transaction = new InterfaceTransaction(this.blockchain);
+        let transaction = new InterfaceTransaction(this.blockchain, undefined, undefined, 0, 0xFFFFFFFF, 0x00, new Buffer(32), false, false );
         transaction.deserializeTransaction(buffer, offset);
         return transaction;
     }

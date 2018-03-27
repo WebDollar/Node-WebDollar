@@ -44,6 +44,8 @@ class InterfaceBlockchainTransactionFrom{
 
     setFrom(addresses, currencyTokenId){
 
+        if (addresses === undefined) return false;
+
         if (typeof addresses === "object" && currencyTokenId === undefined && addresses.hasOwnProperty('addresses') && addresses.hasOwnProperty('currencyTokenId') ){
             addresses = addresses.addresses;
             currencyTokenId = addresses.currencyTokenId;
@@ -204,7 +206,6 @@ class InterfaceBlockchainTransactionFrom{
             if (! Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH)
                 throw {message: "From.address.signature "+index+" is not a buffer", address: fromObject, index: index };
 
-            console.log()
             let verification =  ed25519.verify(fromObject.signature, this.serializeForSigning(index), fromObject.publicKey );
 
             // let signature = schnorr.recover(fromObject.signature, this.serializeForSigning(index) );
@@ -225,6 +226,7 @@ class InterfaceBlockchainTransactionFrom{
         let array = [];
 
         array.push( Serialization.serializeNumber1Byte( this.addresses.length ));
+
         for (let i = 0; i < this.addresses.length; i++){
             array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
             array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[i].publicKey ));

@@ -89,7 +89,7 @@ class InterfaceBlockchainTransactionsProtocol{
         if ( answer.result && answer.transactions !== null && Array.isArray(answer.transactions) ){
             let transactions = answer.transactions;
 
-            for (let i=0; transactions.length ;i++){
+            for (let i=0; i< transactions.length ;i++){
 
                 let transaction = Blockchain.blockchain.transactions.createTransactionFromBuffer(transactions[i]);
 

@@ -26,7 +26,7 @@ class InterfaceBlockchainBlockDataTransactions {
             throw {message: "hash transaction is invalid at", hashTransactionsOriginal: this.hashTransactions, hashTransactions: hashTransactions, };
 
         for (let i=0; i<this.transactions.length; i++)
-            if (!this.transactions[i].validateTransactionOnce(blockHeight))
+            if (!this.transactions[i].validateTransactionOnce(blockHeight, false))
                 throw {message: "validation failed at transaction", transaction: this.transactions[i]};
 
         return true;
@@ -88,8 +88,11 @@ class InterfaceBlockchainBlockDataTransactions {
 
         try {
 
-            if ( ! transaction.validateTransactionOnce( blockHeight ) )
-                throw { message: "couldn't process the transaction ", transaction: transaction };
+            //skipping checking the Transaction in case it requires reverting
+            if (multiplicationFactor === 1) {
+                if (!transaction.validateTransactionOnce(blockHeight))
+                    throw {message: "couldn't process the transaction ", transaction: transaction};
+            }
 
             transaction.processTransaction (multiplicationFactor);
 
@@ -104,17 +107,22 @@ class InterfaceBlockchainBlockDataTransactions {
 
     processBlockDataTransactions(block, multiplicationFactor = 1){
 
-        for (let i=0; i<block.data.transactions.transactions.length; i++)
+        let i;
+        for (i=0; i<block.data.transactions.transactions.length; i++)
             if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
                 return i;
 
+        return i-1;
     }
 
     processBlockDataTransactionsRevert(endPos, startPos, block, multiplicationFactor = -1){
 
-        for (let i = endPos; i >= startPos; i--)
+        let i;
+        for (i = endPos; i >= startPos; i--)
             if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
                 return i;
+
+        return i+1;
 
     }
 

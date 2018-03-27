@@ -19,7 +19,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
         this.blockchain.accountantTree.updateAccountNonce( this.from.addresses[0].unencodedAddress, multiplicationFactor );
 
-        return InterfaceBlockchainTransaction.prototype.processTransaction.call(this);
+        return InterfaceBlockchainTransaction.prototype.processTransaction.call(this, multiplicationFactor);
     }
 
     _validateNonce(){
@@ -56,7 +56,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
             let result = this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees.multipliedBy(multiplicationFactor), this.from.currencyTokenId);
 
-            if (result === null) throw {message: "Error Updating Account for Fees", address: this.addresses[i]};
+            if (result === null) throw {message: "Error Updating Account for Fees"};
 
         } catch (exception){
             console.error("processTransactionFees error ", exception)

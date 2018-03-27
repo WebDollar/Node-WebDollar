@@ -113,7 +113,7 @@ class InterfaceBlockchainTransaction{
      * @param silent
      * @returns {*}
      */
-    validateTransactionOnce( blockHeight ){
+    validateTransactionOnce( blockHeight, validateTransactionAsWell = true ){
 
         if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
@@ -145,17 +145,20 @@ class InterfaceBlockchainTransaction{
         if (inputSum.isLessThan(outputSum))
             throw {message: "Transaction Validation Input is smaller than Output", input: inputSum, output: outputSum};
 
-        if (!this.validateTransactionEveryTime(blockHeight))
+        if (!this.validateTransactionEveryTime(blockHeight, validateTransactionAsWell))
             return false;
 
         return true;
     }
 
-    validateTransactionEveryTime( blockHeight ){
+    validateTransactionEveryTime( blockHeight , validateTransactionAsWell = true){
 
         if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
-        if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock};
+        if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
+
+        if (validateTransactionAsWell === false)
+            return true;
 
         if (!this._validateNonce())
             return false;

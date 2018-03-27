@@ -22,6 +22,8 @@ class InterfaceBlockchainTransactionTo{
 
     setTo(addresses){
 
+        if (addresses === undefined) return false;
+
         if (typeof addresses === "object" && addresses.hasOwnProperty("addresses")) {
             addresses = addresses.addresses;
         }
