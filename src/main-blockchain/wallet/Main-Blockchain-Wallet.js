@@ -452,7 +452,7 @@ class MainBlockchainWallet{
 
         address = this.getAddress(address);
 
-        if (await this.isAddressEncrypted(address)  && process.env.BROWSER) {
+        if (await this.isAddressEncrypted(address) && process.env.BROWSER) {
 
             oldPassword = InterfaceBlockchainAddressHelper.askForPassword();
             if (oldPassword === null)
@@ -488,8 +488,6 @@ class MainBlockchainWallet{
 
                 if (oldPassword === null){
 
-                    alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
-
                     if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};
 
@@ -503,15 +501,21 @@ class MainBlockchainWallet{
                     if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
                         break;
                 } catch (exception) {
-                    alert('Your old password is incorrect!!!');
+                    if (process.env.BROWSER)
+                        alert('Your old password is incorrect!!!');
+                    else
+                        console.log('Your old password is incorrect!!!');
+
                     if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};
                 }
 
             }
         }
-
-        let ask = confirm("Are you sure you want to delete " + address);
+        
+        let ask = 0;
+        if (process.env.BROWSER)
+            ask = confirm("Are you sure you want to delete " + address);
 
         if(ask){
 
