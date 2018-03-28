@@ -38,7 +38,7 @@ class InterfaceBlockchainBlockData {
 
     validateBlockData(blockHeight, blockValidation){
 
-        if (!Buffer.isBuffer(this.minerAddress) || this.minerAddress.length !=  consts.ADDRESSES.ADDRESS.LENGTH )
+        if (!Buffer.isBuffer(this.minerAddress) || this.minerAddress.length !==  consts.ADDRESSES.ADDRESS.LENGTH )
             throw {message: 'data.minerAddress is empty'};
 
         if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData))

@@ -26,7 +26,7 @@ class InterfaceBlockchainBlockDataTransactions {
             throw {message: "hash transaction is invalid at", hashTransactionsOriginal: this.hashTransactions, hashTransactions: hashTransactions, };
 
         for (let i=0; i<this.transactions.length; i++)
-            if (!this.transactions[i].validateTransactionOnce(blockHeight, false))
+            if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidation))
                 throw {message: "validation failed at transaction", transaction: this.transactions[i]};
 
         return true;

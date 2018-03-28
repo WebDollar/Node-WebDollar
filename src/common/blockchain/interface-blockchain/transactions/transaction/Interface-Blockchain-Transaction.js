@@ -113,7 +113,7 @@ class InterfaceBlockchainTransaction{
      * @param silent
      * @returns {*}
      */
-    validateTransactionOnce( blockHeight, validateTransactionAsWell = true ){
+    validateTransactionOnce( blockHeight, blockValidation = {} ){
 
         if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
@@ -145,25 +145,45 @@ class InterfaceBlockchainTransaction{
         if (inputSum.isLessThan(outputSum))
             throw {message: "Transaction Validation Input is smaller than Output", input: inputSum, output: outputSum};
 
-        if (!this.validateTransactionEveryTime(blockHeight, validateTransactionAsWell))
+        if (!this.validateTransactionEveryTime(blockHeight, blockValidation))
             return false;
 
         return true;
     }
 
-    validateTransactionEveryTime( blockHeight , validateTransactionAsWell = true){
+    validateTransactionEveryTime( blockHeight , blockValidation = {}){
 
         if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
-        if (validateTransactionAsWell === false)
-            return true;
+        console.log( "blockValidation", blockValidation);
 
-        if (!this._validateNonce())
+        if (blockValidation.blockValidationType === undefined || !blockValidation.blockValidationType['skip-validation-transactions-from-values']){
+
+            if (!this._validateNonce())
+                return false;
+
+            return this.from.validateFromEnoughMoney();
+
+        }
+
+        return true;
+    }
+
+
+    isTransactionOK(){
+
+        this.validateTransactionOnce(undefined, {blockValidationType: { 'skip-validation-transactions-from-values': true} } );
+
+        try {
+            this.validateTransactionEveryTime();
+        } catch (exception){
+            console.warn ("Transaction had not enough money, so I am skipping it", exception);
             return false;
+        }
 
-        return this.from.validateFromEnoughMoney();
+        return true;
     }
 
     serializeFromForSigning(unencodedAddress){

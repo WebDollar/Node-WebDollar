@@ -93,15 +93,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 let transaction = Blockchain.blockchain.transactions.createTransactionFromBuffer(transactions[i]).transaction;
 
-                transaction.validateTransactionOnce(undefined, false);
-
-                try {
-
-                    transaction.validateTransactionEveryTime();
-
-                } catch (exception){
-
-                    console.warn ("Transaction had not enough money, so I am skipping it", exception);
+                if (!transaction.isTransactionOK()){
                     continue;
                 }
 

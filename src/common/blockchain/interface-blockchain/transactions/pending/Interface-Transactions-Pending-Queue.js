@@ -11,11 +11,6 @@ class InterfaceTransactionsPendingQueue {
 
         this.db = db;
 
-
-        setInterval( ()=>{
-            this._removeOldTransactions();
-        }, 10000);
-
     }
 
     includePendingTransaction (transaction, exceptSockets){
@@ -40,7 +35,7 @@ class InterfaceTransactionsPendingQueue {
 
 
         for (let i = 0; i < this.list.length; i++)
-            if (this.list[i] === transaction)
+            if (! this.list[i].txId.equals( transaction.txId) )
                 return i;
 
         return -1;

@@ -98,6 +98,7 @@ class InterfaceBlockchain {
         if (block.blockValidation === undefined)
             block.blockValidation = this.createBlockValidation();
 
+
         if (! (await this.validateBlockchainBlock(block)) ) // the block has height === this.blocks.length
             return false;
 
@@ -151,7 +152,7 @@ class InterfaceBlockchain {
 
         //for fork 3.1
         if ( block.height < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK )
-            block.blockValidation['skip-validation-timestamp'] = true;
+            block.blockValidation.blockValidationType['skip-validation-timestamp'] = true;
 
         //validate difficulty & hash
         if (! (await block.validateBlock(block.height)))

@@ -4,15 +4,6 @@ const BigNumber = require('bignumber.js');
 
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
-    validateFrom(validateEnoughMoney = true){
-
-        let result = InterfaceBlockchainTransactionFrom.prototype.validateFrom.call(this);
-
-        if (validateEnoughMoney)
-            result = result && this.validateFromEnoughMoney();
-
-        return result;
-    }
 
     validateFromEnoughMoney(){
 

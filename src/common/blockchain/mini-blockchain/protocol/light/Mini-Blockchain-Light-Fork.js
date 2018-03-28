@@ -68,7 +68,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     _createBlockValidation_ForkValidation(height, forkHeight){
 
-        let validationType = {"skip-accountant-tree-validation": true,};
+        let validationType = {
+            "skip-accountant-tree-validation": true,
+            "skip-validation-transactions-from-values": true,
+        };
 
         if ( height < this.forkDifficultyCalculation.difficultyCalculationStarts)
             validationType["skip-difficulty-recalculation"] = true;

@@ -65,6 +65,11 @@ class MiniBlockchain extends  inheritBlockchain{
             //validate transactions & tree
             revert.transactions.start = 0;
 
+            if (!block.data.transactions.validateTransactions(block.height, block.blockValidationType))
+                throw {message: "Validate Transactions is wrong"};
+
+
+            block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = true;
             revert.transactions.end = block.data.transactions.processBlockDataTransactions(block, 1);
 
             //inheriting blockchain includeBlockchainBlock
@@ -91,7 +96,8 @@ class MiniBlockchain extends  inheritBlockchain{
             if (revert.revertNow || revertAutomatically){
 
                 //revert transactions
-                block.data.transactions.processBlockDataTransactionsRevert(revert.transactions.end, revert.transactions.start, block, -1);
+                block.data.transactions.processBlockDataTransactionsRevert(revert.transactions.end, revert.transactions.start, block, - 1);
+                block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = undefined;
 
                 //revert reward
                 if (revert.reward)

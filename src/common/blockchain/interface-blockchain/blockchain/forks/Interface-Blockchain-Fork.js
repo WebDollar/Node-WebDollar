@@ -308,9 +308,9 @@ class InterfaceBlockchainFork {
             let block = this._blocksCopy[i];
 
             // remove transactions
-            for (let j = block.transactions.transactions.length - 1; j >= 0; j--) {
+            for (let j = block.data.transactions.transactions.length - 1; j >= 0; j--) {
 
-                let transaction = block.transactions.transactions[j];
+                let transaction = block.data.transactions.transactions[j];
 
                 try {
                     if (transaction.validateTransactionEveryTime())
