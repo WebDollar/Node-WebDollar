@@ -165,16 +165,17 @@ class Serialization{
     }
 
     deserializeNumber(buffer){
-        if(buffer.length === 1){
-            return buffer[0];
-        } else if (buffer.length === 2){
-            return buffer[1] | (buffer[0] << 8);
-        } else if (buffer.length === 4){
-            return buffer[3] | (buffer[2] << 8) | (buffer[1] << 16) | (buffer[0] << 24);
 
-        } else if (buffer.length === 6){
-            return buffer[5] | (buffer[4] << 8) | (buffer[3] << 16) | (buffer[2] << 24) | (buffer[1] << 32) | (buffer[0] << 40);
-        }
+        if(buffer.length === 1) return buffer[0]; else
+
+        if (buffer.length === 2) return buffer[1] | (buffer[0] << 8); else
+
+        if (buffer.length === 3) return buffer[2] | (buffer[1] << 8) | (buffer[0] << 16); else
+
+        if (buffer.length === 4) return buffer[3] | (buffer[2] << 8) | (buffer[1] << 16) | (buffer[0] << 24); else
+
+        if (buffer.length === 6) return buffer[5] | (buffer[4] << 8) | (buffer[3] << 16) | (buffer[2] << 24) | (buffer[1] << 32) | (buffer[0] << 40);
+
     }
 
     /**

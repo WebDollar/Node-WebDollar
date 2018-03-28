@@ -8,12 +8,6 @@ class MiniBlockchainTransactions extends InterfaceBlockchainTransactions {
         return new MiniBlockchainTransaction(this.blockchain, from, to, nonce, timeLock, version, txId, validateFrom, validateTo);
     }
 
-    createTransactionFromBuffer(buffer, offset = 0){
-        let transaction = new MiniBlockchainTransaction(this.blockchain, undefined, undefined, 0, 0xFFFFFFFF, 0x00, new Buffer(32), false, false );
-        transaction.deserializeTransaction(buffer, offset);
-        return transaction;
-    }
-
 }
 
 export default MiniBlockchainTransactions;

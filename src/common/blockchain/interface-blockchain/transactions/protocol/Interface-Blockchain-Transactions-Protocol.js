@@ -43,7 +43,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 } else
                 if (response.format === 'buffer')
-                    transaction = Blockchain.blockchain.transactions.createTransactionFromBuffer(response.buffer);
+                    transaction = Blockchain.blockchain.transactions.createTransactionFromBuffer(response.buffer).transaction;
 
 
                 if (transaction === undefined) throw {message: "Transaction was not specified"};
@@ -91,7 +91,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
             for (let i=0; i< transactions.length ;i++){
 
-                let transaction = Blockchain.blockchain.transactions.createTransactionFromBuffer(transactions[i]);
+                let transaction = Blockchain.blockchain.transactions.createTransactionFromBuffer(transactions[i]).transaction;
 
                 transaction.validateTransactionOnce(undefined, false);
 

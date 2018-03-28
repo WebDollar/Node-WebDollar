@@ -57,7 +57,8 @@ class InterfaceBlockchainBlockDataTransactions {
         let list = [ Serialization.serializeToFixedBuffer( 32, this.hashTransactions ) ];
 
         if ( !onlyHeader  && !this.blockData._onlyHeader ) {
-            list.push(Serialization.serializeNumber4Bytes(this.transactions.length));
+            list.push(Serialization.serializeNumber2Bytes(this.transactions.length));
+
             for (let i = 0; i < this.transactions.length; i++)
                 list.push(this.transactions[i].serializeTransaction());
         }
@@ -72,12 +73,18 @@ class InterfaceBlockchainBlockDataTransactions {
         offset += 32;
 
         if (!onlyHeader && !this.blockData._onlyHeader) {
-            let length = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 4));
-            offset += 4;
+
+            let length = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 2));
+            offset += 2 ;
 
             for (let i = 0; i < length; i++) {
-                let transaction = this.blockData.blockchain.transactions._createTransaction();
-                offset = transaction.deserializeTransaction(buffer, offset);
+
+                let answer = this.blockData.blockchain.transactions.createTransactionFromBuffer(buffer);
+
+                let transaction = answer.transaction;
+                offset = answer.offset;
+
+                this.transactions.push(transaction);
             }
         }
 

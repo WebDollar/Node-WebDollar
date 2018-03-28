@@ -235,7 +235,7 @@ class InterfaceBlockchainTransactionFrom{
         }
 
         array.push(Serialization.serializeNumber1Byte( this.currencyTokenId.length ));
-        array.push(Serialization.serializeNumber1Byte( this.currencyTokenId ));
+        array.push( this.currencyTokenId );
 
         return Buffer.concat (array);
 
@@ -245,7 +245,7 @@ class InterfaceBlockchainTransactionFrom{
 
         this.addresses = [];
 
-        let length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+        let length =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
         offset += 1;
 
         for (let i = 0; i < length; i++){
@@ -261,17 +261,15 @@ class InterfaceBlockchainTransactionFrom{
             address.signature= BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
             offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
 
-            address.signature = BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
-            offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
-
             let result = Serialization.deserializeBigNumber(buffer, offset);
             address.amount = result.number;
-            offset += result.newOffset;
+            offset = result.newOffset;
 
             this.addresses.push(address);
         }
 
-        let currencyLength =  Serialization.deserializeNumber( buffer, offset, 1 );
+        let currencyLength =  Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+        offset += 1;
 
         this.currencyTokenId = BufferExtended.substr(buffer, offset, currencyLength );
         offset += currencyLength;
