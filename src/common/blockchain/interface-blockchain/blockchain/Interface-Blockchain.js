@@ -396,7 +396,6 @@ class InterfaceBlockchain {
 
         if (this.agent !== undefined) {
             for (let i = Math.max(0, height); i < this.blocks.length; i++) {
-                console.log("PROPAGATE " ,height, " sockets", socketsAvoidBroadcast.length);
 
                 if (this.blocks[i] === undefined)
                     console.error("PROPAGATE ERROR"+i, this.blocks[i]);
@@ -404,6 +403,7 @@ class InterfaceBlockchain {
                     console.log("PROPAGATING", this.blocks[i].hash.toString("hex"));
                     this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
                 }
+
             }
 
         }

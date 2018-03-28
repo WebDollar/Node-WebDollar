@@ -63,11 +63,9 @@ class InterfaceBlockchainProtocol {
     }
 
     propagateHeader(block, chainLength, socketsAvoidBroadcast){
+
         // broadcasting the new block, to everybody else
-
         NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeader(), "all", socketsAvoidBroadcast);
-
-        //console.log("WEbDollar Hash", block.serializeBlock().toString("hex"));
 
     }
 
