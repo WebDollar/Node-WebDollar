@@ -79,7 +79,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
             for (let i = 0; i < length; i++) {
 
-                let answer = this.blockData.blockchain.transactions.createTransactionFromBuffer(buffer);
+                let answer = this.blockData.blockchain.transactions.createTransactionFromBuffer(buffer, offset);
 
                 let transaction = answer.transaction;
                 offset = answer.offset;

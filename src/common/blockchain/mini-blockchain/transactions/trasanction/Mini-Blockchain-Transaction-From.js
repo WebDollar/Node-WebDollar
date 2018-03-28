@@ -20,6 +20,8 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
             let value = this.transaction.blockchain.accountantTree.getBalance( fromObject.unencodedAddress, this.currencyTokenId );
 
+            if (value === null) throw {message: "Accountant Tree Input doesn't exist", unencodedAddress: fromObject.unencodedAddress}
+
             if (value.isLessThan(fromObject.amount))
                 throw { message: "Value is Less than From.address.amount", address: fromObject, index: index };
 
