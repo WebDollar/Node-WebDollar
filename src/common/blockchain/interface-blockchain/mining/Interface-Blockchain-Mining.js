@@ -8,7 +8,7 @@ import Serialization from 'common/utils/Serialization'
 
 import InterfaceBlockchainMiningBasic from "./Interface-Blockchain-Mining-Basic";
 
-
+import AdvancedMessages from "node/menu/Advanced-Messages"
 
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
@@ -62,8 +62,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         while (this.started && !global.TERMINATED){
 
             if (this.minerAddress === undefined){
-                alert("Mining suspended. No Mining Address");
+
+                AdvancedMessages.alert("Mining suspended. No Mining Address");
                 this.stopMining();
+
                 return;
             }
 

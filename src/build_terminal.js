@@ -1,5 +1,6 @@
 import {Node, Blockchain} from './index.js';
 import global from "consts/global.js";
+import CLI from "node/menu/CLI-Menu";
 
 console.log("TESTING MODE");
 

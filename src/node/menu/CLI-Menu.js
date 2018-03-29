@@ -2,7 +2,7 @@ import {Node, Blockchain} from '../../index.js';
 const FileSystem = require('fs');
 const readline = require('readline');
 
-class InteractiveMenu{
+class CLI{
 
     constructor(){
 
@@ -50,6 +50,12 @@ class InteractiveMenu{
                     break;
                 case '7':
                     await this.setMiningAddress();
+                    break;
+                case '8':
+                    await this.startMining();
+                    break;
+                case '9':
+                    await this.startMining(true);
                     break;
                 case 'exit':
                     this.exitMenu = true;
@@ -159,38 +165,36 @@ class InteractiveMenu{
 
         console.warn('Import address.');
 
-        return new Promise(resolve => {
+        return new Promise( async (resolve) => {
 
-            this.WEBD_CLI.question('Enter address path: ', (addressPath) => {
+            let addressPath = await this.WEBD_CLI.question('Enter address path: ');
 
-                FileSystem.readFile(addressPath, 'utf8', async (err, content) => {
+            FileSystem.readFile(addressPath, 'utf8', async (err, content) => {
 
-                    if (err) {
-                        console.error(err);
-                        resolve(false);
-                        return;
-                    }
+                if (err) {
+                    console.error(err);
+                    resolve(false);
+                    return;
+                }
 
-                    try {
+                try {
 
-                        let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
+                    let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
 
-                        if (answer.result === true) {
-                            console.log("Address successfully imported", answer.address);
-                            await Blockchain.Wallet.saveWallet();
-                            resolve(true);
-                        } else {
-                            console.error(answer.message);
-                            resolve(false);
-                        }
-
-                    } catch(err) {
-                        console.error(err.message);
+                    if (answer.result === true) {
+                        console.log("Address successfully imported", answer.address);
+                        await Blockchain.Wallet.saveWallet();
+                        resolve(true);
+                    } else {
+                        console.error(answer.message);
                         resolve(false);
                     }
 
+                } catch(err) {
+                    console.error(err.message);
+                    resolve(false);
+                }
 
-                });
 
             });
 
@@ -279,6 +283,24 @@ class InteractiveMenu{
         return true;
     }
 
+    async startMining(instantly){
+
+        Blockchain.createBlockchain("light-node",()=>{
+            Node.NodeServer.startServer();
+            Node.NodeClientsService.startService();
+        });
+
+        if (instantly)
+            Blockchain.startMiningInstantly();
+        else
+            Blockchain.startMiningSynchronizeNextTime = true;
+
+    }
+
+    question(message){
+        return this.WEBD_CLI.question(message);
+    }
+
 }
 
 const commands = [
@@ -288,7 +310,9 @@ const commands = [
         '4. Import address',
         '5. Export address',
         '6. Encrypt address',
-        '7. Set mining address'
+        '7. Set mining address',
+        '8. Start Mining',
+        '9. Start Mining Instantly',
     ];
 
 const lineSeparator =
@@ -301,4 +325,4 @@ const addressHeader =
 
 
 
-export default new InteractiveMenu();
+export default new CLI();

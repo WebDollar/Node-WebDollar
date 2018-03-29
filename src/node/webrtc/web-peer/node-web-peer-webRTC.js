@@ -267,7 +267,7 @@ class NodeWebPeerRTC {
         this.checkDataChannelState();
         this.peer.dataChannel.onopen = ()=>{this.checkDataChannelState()};
         this.peer.dataChannel.onclose = ()=>{ this.checkDataChannelState()};
-        this.peer.dataChannel.onerror = ()=>{alert('error'); this.checkDataChannelState()};
+        this.peer.dataChannel.onerror = ()=>{ this.checkDataChannelState()};
 
         this.peer.oniceconnectionstatechange = () => {
 

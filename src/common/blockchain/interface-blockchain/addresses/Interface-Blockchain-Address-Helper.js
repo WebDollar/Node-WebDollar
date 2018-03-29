@@ -2,13 +2,14 @@ import ed25519 from "common/crypto/ed25519";
 
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BufferExtended from 'common/utils/BufferExtended';
+import AdvancedMessages from "node/menu/Advanced-Messages"
 
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
 
 //video tutorial https://asecuritysite.com/encryption/base58
 
-import InteractiveMenu from 'node/menu/Interactive-Menu';
+import CLI from 'node/menu/CLI-Menu';
 import consts from 'consts/const_global';
 
 class InterfaceBlockchainAddressHelper{
@@ -394,8 +395,9 @@ class InterfaceBlockchainAddressHelper{
                 let answer =  prompt(message||"Please enter your last password (12 words separated by space):");
                 
                 let oldPassword = answer.trim().split(' ');
+
                 if (oldPassword.length !== 12) {
-                    alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                    AdvancedMessages.alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
                     resolve(null);
                     return;
                 }
@@ -404,7 +406,7 @@ class InterfaceBlockchainAddressHelper{
                 return;
             }
             else {
-                InteractiveMenu.WEBD_CLI.question(message||"Please enter your last password (12 words separated by space):", (answer) => {
+                CLI.WEBD_CLI.question(message||"Please enter your last password (12 words separated by space):", (answer) => {
                     
                     let oldPassword = answer.trim().split(' ');
                     
@@ -422,28 +424,8 @@ class InterfaceBlockchainAddressHelper{
 
     }
 
-    static askForConfirmation(message){
 
-        return new Promise(resolve => {
-            if (process.env.BROWSER) {
-                resolve(confirm(message));
-                return;
-            } else {
-                InteractiveMenu.WEBD_CLI.question(message + " (yes/no) ? ", (answer) => {
-                    resolve(answer === "yes" ? true : false);
-                    return;
-                });
-            }
-        });
-    }
-    
-    static showException(message) {
-        
-        if (process.env.BROWSER)
-            alert(message);
-        else
-            console.log(message);
-    }
+
 
 }
 

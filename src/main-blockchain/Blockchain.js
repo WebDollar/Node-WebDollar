@@ -13,6 +13,8 @@ class Blockchain{
 
     constructor(){
 
+        this.startMiningSynchronizeNextTime = false;
+
         this.Chain = new MainBlockchain(undefined);
         this.blockchain = this.Chain;
 
@@ -101,9 +103,13 @@ class Blockchain{
 
     async startMining(){
 
-        if (process.env.START_MINING)
+        if (process.env.START_MINING || this.startMiningSynchronizeNextTime)
             this.Mining.startMining();
 
+    }
+
+    async startMiningInstantly(){
+        this.Mining.startMining();
     }
 
     async loadBlockchain(){
@@ -149,7 +155,7 @@ class Blockchain{
 
         }
 
-        await this.startMining();
+        this.startMining();
 
         StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"} );
 

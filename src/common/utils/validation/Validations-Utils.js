@@ -13,6 +13,8 @@ const DATABASES = ["validateDB", "defaultDB", consts.DATABASE_NAMES.BLOCKCHAIN_D
 const TIME_OUT = 10000;
 const TIME_OUT_DESTROY = 1000;
 
+import AdvancedMessages from "node/menu/Advanced-Messages"
+
 class ValidationsUtils{
 
     constructor(){
@@ -69,7 +71,6 @@ class ValidationsUtils{
 
         if ( process.env.BROWSER) {
 
-            alert('1');
             for (let i=0; i<DATABASES.length; i++) {
                 window.indexedDB.deleteDatabase('_pouch_' + DATABASES[i]);
                 window.localStorage.removeItem("_pouch_" + DATABASES[i]);
@@ -77,7 +78,7 @@ class ValidationsUtils{
 
             window.localStorage.removeItem("_pouch_check_localstorage");
             window.localStorage.clear();
-            alert("am sters tot");
+            AdvancedMessages.alert("am sters tot");
         }
 
         return error;
@@ -108,16 +109,15 @@ class ValidationsUtils{
 
         try {
 
-
             if (initialTest) {
                 for (let i = 0; i < DATABASES.length; i++) {
 
                     if (!(await this.testPounchDB(DATABASES[i], TIME_OUT))) throw {message: "it didn't work"};
-                    alert(DATABASES[i] + "   " + i + "  merge 1")
+                    AdvancedMessages.alert(DATABASES[i] + "   " + i + "  merge 1")
                     if (!(await this.testPounchDB2(DATABASES[i], TIME_OUT))) throw {message: "it didn't work"};
-                    alert(DATABASES[i] + "   " + i + "  merge 2")
+                    AdvancedMessages.alert(DATABASES[i] + "   " + i + "  merge 2")
                     if (!(await this.testPounchDB3(DATABASES[i], TIME_OUT))) throw {message: "it didn't work"};
-                    alert(DATABASES[i] + "   " + i + "  merge 3")
+                    AdvancedMessages.alert(DATABASES[i] + "   " + i + "  merge 3")
                 }
             }
         } catch (exception){
@@ -159,8 +159,6 @@ class ValidationsUtils{
 
                 db.remove("validate_test"+number );
 
-                // alert(number);
-                // alert(JSON.stringify(data));
                 if (number !== number2 || number === null || number2 === null)
                     throw (number === undefined ? 'undefined' : number.toString())+" !== "+ (number2 === undefined ? 'undefined' : number2.toString());
 

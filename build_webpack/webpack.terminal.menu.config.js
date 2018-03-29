@@ -8,7 +8,7 @@ const config = merge(base, {
 
     //define entry point
     entry: {
-        app: "./src/node/menu/Interactive-Menu.js",
+        app: "./src/node/menu/CLI-Menu.js",
     },
     output: {
         filename: 'terminal-menu-bundle.js',

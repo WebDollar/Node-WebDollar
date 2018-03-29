@@ -13,6 +13,8 @@ const md5 = require('md5');
 const EventEmitter = require('events');
 const FileSystem = require('fs');
 
+import AdvancedMessages from "node/menu/Advanced-Messages"
+
 class MainBlockchainWallet{
 
     constructor(blockchain, db){
@@ -126,9 +128,11 @@ class MainBlockchainWallet{
             return false;
 
         try {
+
             await this.deserialize(buffer);
+
         } catch (exception){
-            alert('Wallet was not imported successfully');
+            AdvancedMessages.alert('Wallet was not imported successfully');
             this.addresses = [];
         }
 
@@ -465,7 +469,8 @@ class MainBlockchainWallet{
             if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
                 return (await address.savePrivateKey(privateKey, newPassword));
         } catch (exception) {
-            alert('Your old password is incorrect!!!');
+
+            AdvancedMessages.alert('Your old password is incorrect!!!');
             return false;
         }
 
@@ -502,7 +507,7 @@ class MainBlockchainWallet{
                         break;
                 } catch (exception) {
                     
-                    InterfaceBlockchainAddressHelper.showException('Your old password is incorrect!!!');
+                    AdvancedMessages.alert('Your old password is incorrect!!!');
 
                     if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};
@@ -511,7 +516,7 @@ class MainBlockchainWallet{
             }
         }
         
-        let ask = await InterfaceBlockchainAddressHelper.askForConfirmation("Are you sure you want to delete " + address);
+        let ask = await AdvancedMessages.confirm("Are you sure you want to delete " + address);
 
         if(ask){
 

@@ -1,3 +1,5 @@
+import AdvancedMessages from "node/menu/Advanced-Messages"
+
 const FileSystem = require('fs');
 import ed25519 from "common/crypto/ed25519";
 
@@ -424,8 +426,7 @@ class InterfaceBlockchainAddress{
 
         } catch (exception) {
 
-            console.error("getPrivateKey failed signing", exception);
-            alert('Your password is incorrect!!! ');
+            AdvancedMessages.alert('Your password is incorrect!!! ');
 
             return null;
         }
