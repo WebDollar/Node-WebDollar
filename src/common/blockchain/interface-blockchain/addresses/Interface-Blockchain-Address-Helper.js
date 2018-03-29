@@ -8,7 +8,8 @@ import BufferExtended from 'common/utils/BufferExtended';
 
 //video tutorial https://asecuritysite.com/encryption/base58
 
-import consts from 'consts/const_global'
+import WEBD_CLI from 'node/menu/Interactive-Menu';
+import consts from 'consts/const_global';
 
 class InterfaceBlockchainAddressHelper{
 
@@ -347,7 +348,6 @@ class InterfaceBlockchainAddressHelper{
 
         }
 
-
         let checkSumDetected = false;
 
         if (addressWIF.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH ) {
@@ -388,25 +388,60 @@ class InterfaceBlockchainAddressHelper{
 
     static askForPassword(message){
 
-        let response = "";
-        if (process.env.BROWSER){
-            response =  prompt(message||"Please enter your last password (12 words separated by space)");
-        }
-        else {
-            //TODO: code for read 12 words from console.
-        }
-        let oldPassword = response.trim().split(' ');
+        return new Promise(resolve => {
+            if (process.env.BROWSER){
+                let answer =  prompt(message||"Please enter your last password (12 words separated by space):");
+                
+                let oldPassword = answer.trim().split(' ');
+                if (oldPassword.length !== 12) {
+                    alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                    resolve(null);
+                    return;
+                }
+                
+                resolve(oldPassword);
+                return;
+            }
+            else {
+                WEBD_CLI.question(message||"Please enter your last password (12 words separated by space):", (answer) => {
+                    
+                    let oldPassword = answer.trim().split(' ');
+                    
+                    if (oldPassword.length !== 12) {
+                        console.log('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                        resolve(null);
+                        return;
+                    }
 
-        if (oldPassword.length !== 12) {
-            if (process.env.BROWSER)
-                alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
-            else
-                console.log('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                    resolve(oldPassword);
+                    return;
+                });
+            }
+        });
 
-            return null;
-        }
+    }
 
-        return oldPassword;
+    static askForConfirmation(message){
+
+        return new Promise(resolve => {
+            if (process.env.BROWSER) {
+                resolve(confirm(message));
+                return;
+            } else {
+                WEBD_CLI.question(message + " (yes/no) ? ", (answer) => {
+                    resolve(answer === "yes" ? true : false);
+                    return;
+                });
+            }
+        });
+    }
+    
+    static showException(message) {
+        
+        if (process.env.BROWSER)
+            alert(message);
+        else
+            console.log(message);
     }
 
 }

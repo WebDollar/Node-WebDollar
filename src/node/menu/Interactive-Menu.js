@@ -8,7 +8,8 @@ const commands = [
         '3. Delete address',
         '4. Import address',
         '5. Export address',
-        '6. Set mining address',
+        '6. Encrypt address',
+        '7. Set mining address'
     ];
 
 const lineSeparator = 
@@ -51,6 +52,9 @@ let _runMenu = async function () {
                 await exportAddress();
                 break;
             case '6':
+                await encryptAddress();
+                break;
+            case '7':
                 await setMiningAddress();
                 break;
             case 'exit':
@@ -88,7 +92,7 @@ function _chooseAddress() {
 
                 resolve(addressId);
             });
-        }) ;
+        });
 
     });
 }
@@ -115,9 +119,9 @@ async function listAddresses() {
         let balance = 1000000000.3354;//Blockchain.accountantTree.getBalance(address, undefined);
         
         if (address === miningAddress) {
-            console.log("|  *" + i + "   |  " + address + "  | " + balance + lineSeparator);
+            console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
         } else {
-            console.log("|   " + i + "   |  " + address + "  | " + balance + lineSeparator);
+            console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
         }
     }
 
@@ -144,12 +148,8 @@ async function deleteAddress() {
 
     let response = await Blockchain.Wallet.deleteAddress(Blockchain.Wallet.addresses[addressId].address);
 
-    if (response.result === true) {
-        console.log(response.message);
-    } else {
-        console.log(response.message);
-    }
-    
+    console.log(response.message);
+
     return response.result;
 }
 
@@ -172,7 +172,7 @@ function importAddress() {
                     let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
 
                     if (answer.result === true) {
-                        console.log("Address Imported", answer.address);
+                        console.log("Address successfully imported", answer.address);
                         await Blockchain.Wallet.saveWallet();
                         resolve(true);
                         return;
@@ -197,8 +197,52 @@ function importAddress() {
     
 }
 
-async function exportAddress() {
+function exportAddress() {
     console.log('Export address.');
+    
+    return new Promise(resolve => {
+        _chooseAddress().then( (addressId) => {
+            if (addressId < 0) {
+                console.log("You must enter a valid number.");
+                resolve(false);
+                return;
+            }
+
+            WEBD_CLI.question('Enter path for saving address: ', async (addressPath) => {
+                
+                let addressString = Blockchain.Wallet.addresses[addressId].address;
+                let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
+                
+                if (answer.result === false) {
+                    console.log("Address was not exported. :(. " + answer.message);
+                    resolve(false);
+                    return;
+                }
+                
+                let jsonAddress = JSON.stringify(answer.data);
+                
+                FileSystem.writeFile(addressPath + addressString + ".webd", jsonAddress, function (err) {
+                    if (err) {
+                        console.error(err);
+                        resolve(false);
+                        return;
+                    }
+
+                    console.log("Address successfully exported", addressString);
+                    resolve(true);
+                    return;
+                });
+
+                resolve(true);
+                return;
+            });
+
+        });
+    });
+}
+
+async function encryptAddress() {
+    console.log('Encrypt address.');
     
     let addressId = await _chooseAddress();
     
@@ -206,10 +250,14 @@ async function exportAddress() {
         console.log("You must enter a valid number.");
         return false;
     }
-
-    await Blockchain.Wallet.deleteAddress(Blockchain.Wallet.addresses[addressId].address);
-
+    
     return true;
+    let addressString = Blockchain.Wallet.addresses[addressId].address;
+    let response = await Blockchain.Wallet.encryptAddress(addressString, newPassword, oldPassword = undefined)
+
+    console.log(response.message);
+
+    return response.result;
 }
 
 async function setMiningAddress() {
@@ -224,3 +272,5 @@ async function setMiningAddress() {
     
     return true;
 }
+
+export default WEBD_CLI;

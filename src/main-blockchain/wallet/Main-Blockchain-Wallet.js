@@ -372,7 +372,7 @@ class MainBlockchainWallet{
      * @param address
      * @returns privateKeyWIF as Hex
      */
-    async exportPrivateKeyFromAddress(address){
+    async exportAddressToJSON(address){
 
         for (let i = 0; i < this.addresses.length; i++)
             if (address === this.addresses[i].address || address === this.addresses[i].unencodedAddress){
@@ -454,7 +454,7 @@ class MainBlockchainWallet{
 
         if (await this.isAddressEncrypted(address) && process.env.BROWSER) {
 
-            oldPassword = InterfaceBlockchainAddressHelper.askForPassword();
+            oldPassword = await InterfaceBlockchainAddressHelper.askForPassword();
             if (oldPassword === null)
                 return false;
         }
@@ -484,7 +484,7 @@ class MainBlockchainWallet{
 
             for (let tries = 3; tries >= 1; --tries) {
 
-                let oldPassword = InterfaceBlockchainAddressHelper.askForPassword("Please enter your last password (12 words separated by space).  " +  tries + " tries left.");
+                let oldPassword = await InterfaceBlockchainAddressHelper.askForPassword("Please enter your last password (12 words separated by space).  " +  tries + " tries left:");
 
                 if (oldPassword === null){
 
@@ -501,10 +501,8 @@ class MainBlockchainWallet{
                     if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
                         break;
                 } catch (exception) {
-                    if (process.env.BROWSER)
-                        alert('Your old password is incorrect!!!');
-                    else
-                        console.log('Your old password is incorrect!!!');
+                    
+                    InterfaceBlockchainAddressHelper.showException('Your old password is incorrect!!!');
 
                     if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};
@@ -513,9 +511,7 @@ class MainBlockchainWallet{
             }
         }
         
-        let ask = 0;
-        if (process.env.BROWSER)
-            ask = confirm("Are you sure you want to delete " + address);
+        let ask = await InterfaceBlockchainAddressHelper.askForConfirmation("Are you sure you want to delete " + address);
 
         if(ask){
 
@@ -523,8 +519,14 @@ class MainBlockchainWallet{
 
             this.addresses.splice(index, 1);
 
+            if (process.env.BROWSER) {
+                console.log("addressDeleted", addressToDelete);
+            } else {
+                //this is for better user experience
+                console.log("addressDeleted", addressToDelete.toString());
+            }
+
             //setting the next minerAddress
-            console.log("addressDeleted", addressToDelete);
             if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.unencodedMinerAddress.equals(addressToDelete.unencodedAddress) ) {
                 this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
                 this.blockchain.mining.resetMining();

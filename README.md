@@ -78,8 +78,8 @@ if ( options.salt !== undefined)
 salt = options.salt;		
 ```
 
-## Testing in console
-Mocha Tests
+## 3. **Console commands**
+Run Mocha Tests
 ```
 npm test                                                       
 ```
@@ -94,16 +94,29 @@ just, run ```npm install name_missing_package```
 
 ## Building Dist
 
-### Building Dist for Browser (browserify)
-
+### Building Dist for Browser (webpack)
 ```
 npm run build_browser
 ```
 
 #### Building Dist for Browser TEST (dist_bundle/browser/browser.html)
-
 ```
 npm run test_browser
+```
+
+### Building Dist for User-Interface
+```
+npm run build_browser_user_interface
+```
+
+### Run terminal mining
+```
+npm run start_mining
+```
+
+### Run terminal interactive menu
+```
+npm run commands
 ```
 
 open web page `dist_bundle/browser/browser.html`
@@ -115,11 +128,11 @@ npm run start_double_connections
 npm run start
 ```
 
-We use browserify
+We use WebPack
 
 ```
-npm install -g browerfiy
-browserify dist/index.js > dist_bundle/bundle.js
+npm install -g webpack
+webpack dist/index.js > dist_bundle/bundle.js
 npm install bufferutil utf-8-validate
 ``` 
 
