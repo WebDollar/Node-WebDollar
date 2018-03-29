@@ -437,12 +437,20 @@ class InterfaceBlockchainAddressHelper{
         });
     }
     
-    static showException(message) {
+    static showException(cliMsg, browserMsg) {
         
         if (process.env.BROWSER)
-            alert(message);
+            alert(browserMsg || cliMsg);
         else
-            console.log(message);
+            console.warn(cliMsg);
+    }
+    
+    static logInfo(cliMsg, browserMsg) {
+        
+        if (process.env.BROWSER)
+            console.info(browserMsg || cliMsg);
+        else
+            console.info(cliMsg);        
     }
 
 }

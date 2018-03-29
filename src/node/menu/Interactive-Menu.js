@@ -15,7 +15,7 @@ class InteractiveMenu{
             prompt: 'WEBD_CLI:> '
         });
 
-        this.exitMenu = undefined;
+        this._exitMenu = undefined;
 
         this._start();
 
@@ -23,7 +23,7 @@ class InteractiveMenu{
 
     async _runMenu() {
 
-        if (this.exitMenu === true) {
+        if (this._exitMenu === true) {
             this.WEBD_CLI.close();
             return;
         }
@@ -51,8 +51,8 @@ class InteractiveMenu{
                 case '7':
                     await this.setMiningAddress();
                     break;
-                case 'exit':
-                    this.exitMenu = true;
+                case '8':
+                    this._exitMenu = true;
                     break;
                 default:
                     this._showCommands();
@@ -94,7 +94,7 @@ class InteractiveMenu{
 
     _showCommands() {
 
-        console.warn('\nChoose one of the following commands:');
+        console.info('\nChoose one of the following commands:');
 
         for (let i = 0; i < commands.length; ++i){
             console.info(commands[i]);
@@ -104,12 +104,12 @@ class InteractiveMenu{
         return true;
     }
 
-    async  listAddresses() {
+    async listAddresses() {
 
-        console.warn('\nWallet addresses:');
+        console.info('\nWallet addresses:');
 
-        let miningAddress = Blockchain.Wallet.getMiningAddress();
-
+        let miningAddress = "";//Blockchain.blockchain.mining.minerAddress;
+        //console.log("min=" + minerAddress);
         console.log(addressHeader);
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
 
@@ -128,18 +128,22 @@ class InteractiveMenu{
         return true;
     }
 
-    async  createNewAddress() {
+    async createNewAddress() {
 
-        console.warn('Create new address.');
-
-        await Blockchain.Wallet.createNewAddress();
+        console.info('Create new address.');
+        try {
+            let address = await Blockchain.Wallet.createNewAddress();
+            console.info("Address was created: " + address.address);
+        } catch(err) {
+            console.err(err);
+        }
 
         return true;
     }
 
-    async  deleteAddress() {
+    async deleteAddress() {
 
-        console.warn('Delete address.');
+        console.info('Delete address.');
 
         let addressId = await this._chooseAddress();
 
@@ -150,14 +154,12 @@ class InteractiveMenu{
 
         let response = await Blockchain.Wallet.deleteAddress(Blockchain.Wallet.addresses[addressId].address);
 
-        console.log(response.message);
-
         return response.result;
     }
 
-     importAddress() {
+    importAddress() {
 
-        console.warn('Import address.');
+        console.info('Import address.');
 
         return new Promise(resolve => {
 
@@ -176,7 +178,7 @@ class InteractiveMenu{
                         let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
 
                         if (answer.result === true) {
-                            console.log("Address successfully imported", answer.address);
+                            console.info("Address successfully imported", answer.address);
                             await Blockchain.Wallet.saveWallet();
                             resolve(true);
                         } else {
@@ -198,27 +200,28 @@ class InteractiveMenu{
 
     }
 
-     exportAddress() {
+    exportAddress() {
 
-        console.log('Export address.');
+        console.info('Export address.');
 
         return new Promise( async (resolve) => {
 
             let addressId = await this._chooseAddress();
 
             if (addressId < 0) {
-                console.log("You must enter a valid number.");
+                console.warn("You must enter a valid number.");
                 resolve(false);
                 return;
             }
 
-            let addressPath = await WEBD_CLI.question('Enter path for saving address: ');
-
+            let addressPath = await this.WEBD_CLI.question('Enter path for saving address: ');
+            console.log();
+            
             let addressString = Blockchain.Wallet.addresses[addressId].address;
             let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
 
             if (answer.result === false) {
-                console.log("Address was not exported. :(. " + answer.message);
+                console.warn("Address was not exported. :(. " + answer.message);
                 resolve(false);
                 return;
             }
@@ -233,7 +236,7 @@ class InteractiveMenu{
                     return;
                 }
 
-                console.log("Address successfully exported", addressString);
+                console.info("Address successfully exported", addressString);
                 resolve(true);
                 return;
 
@@ -246,13 +249,13 @@ class InteractiveMenu{
 
     }
 
-    async  encryptAddress() {
-        console.log('Encrypt address.');
+    async encryptAddress() {
+        console.info('Encrypt address.');
 
         let addressId = await this._chooseAddress();
 
         if (addressId < 0) {
-            console.log("You must enter a valid number.");
+            console.warn("You must enter a valid number.");
             return false;
         }
 
@@ -261,18 +264,18 @@ class InteractiveMenu{
         let addressString = Blockchain.Wallet.addresses[addressId].address;
         let response = await Blockchain.Wallet.encryptAddress(addressString, newPassword, oldPassword)
 
-        console.log(response.message);
+        console.info(response.message);
 
         return response.result;
     }
 
     async  setMiningAddress() {
-        console.log('Set mining address.');
+        console.info('Set mining address.');
 
         let addressId = await this._chooseAddress();
 
         if (addressId < 0) {
-            console.log("You must enter a valid number.");
+            console.warn("You must enter a valid number.");
             return false;
         }
 
@@ -288,7 +291,8 @@ const commands = [
         '4. Import address',
         '5. Export address',
         '6. Encrypt address',
-        '7. Set mining address'
+        '7. Set mining address',
+        '8. Exit menu'
     ];
 
 const lineSeparator =
@@ -298,7 +302,6 @@ const addressHeader =
     "\n __________________________________________________________________________________________" +
     "\n|  NUM  |                            ADDRESS                             |      WEBD       |" +
     lineSeparator;
-
 
 
 export default new InteractiveMenu();

@@ -519,12 +519,7 @@ class MainBlockchainWallet{
 
             this.addresses.splice(index, 1);
 
-            if (process.env.BROWSER) {
-                console.log("addressDeleted", addressToDelete);
-            } else {
-                //this is for better user experience
-                console.log("addressDeleted", addressToDelete.toString());
-            }
+            InterfaceBlockchainAddressHelper.logInfo("Address deleted " + addressToDelete, "Address deleted " + addressToDelete.toString());
 
             //setting the next minerAddress
             if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.unencodedMinerAddress.equals(addressToDelete.unencodedAddress) ) {
