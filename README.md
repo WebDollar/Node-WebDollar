@@ -78,8 +78,8 @@ if ( options.salt !== undefined)
 salt = options.salt;		
 ```
 
-## Testing in console
-Mocha Tests
+## 3. **Console commands**
+Run Mocha Tests
 ```
 npm test                                                       
 ```
@@ -95,15 +95,28 @@ just, run ```npm install name_missing_package```
 ## Building Dist
 
 ### Building Dist for Browser (browserify)
-
 ```
 npm run build_browser
 ```
 
 #### Building Dist for Browser TEST (dist_bundle/browser/browser.html)
-
 ```
 npm run test_browser
+```
+
+### Building Dist for User-Interface
+```
+npm run build_browser_user_interface
+```
+
+### Run terminal mining
+```
+npm run start_mining
+```
+
+### Run terminal interactive menu
+```
+npm run commands
 ```
 
 open web page `dist_bundle/browser/browser.html`
