@@ -137,12 +137,15 @@ class InterfaceTreeNode {
         return true;
     }
 
+    /**
+     * It will also Validate its children automatically
+     */
     validateCompleteTreeNode(){
 
         if (!this.validateTreeNode()) return false;
 
         for (let i = 0; i < this.edges.length; i++) {
-            if (!this.edges[i].validateCompleteTreeNode())
+            if (!this.edges[i].targetNode.validateCompleteTreeNode())
                 return false;
         }
 

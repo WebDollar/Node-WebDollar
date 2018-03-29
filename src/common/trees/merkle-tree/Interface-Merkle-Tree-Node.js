@@ -50,10 +50,10 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
      * When an Operation is done to a done, let's calculate its hash
      * @param node
      */
-    _changedNode(node){
+    _changedNode(){
 
         if (this.root.autoMerklify)
-            this.node._refreshHash(true);
+            this._refreshHash(true);
     }
 
 
@@ -203,9 +203,12 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
             if (!hashAlreadyComputed)
                 this._computeHash();
 
-            if (this.parent !== null && this.parent !== undefined) throw {message: "Couldn't compute hash because Node parent is empty"};
+            if (this.root !== this) {
+                if (this.parent === null || this.parent === undefined)
+                    throw {message: "Couldn't compute hash because Node parent is empty"};
 
-            result = result && this.parent._refreshHash(true);
+                result = result && this.parent._refreshHash(true);
+            }
 
         }
 

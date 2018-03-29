@@ -83,6 +83,8 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
     _changedNode(){
         InterfaceMerkleTreeNode.prototype._changedNode.call(this); //computing hash
         InterfaceRadixTreeNode.prototype._changedNode.call(this); //verifying hash and propagating it
+
+        return true;
     }
 
 

@@ -26,7 +26,7 @@ class InterfaceMerkleTree extends InterfaceTree{
                 throw {message: "Refresh Hash didn't work"};
         }
         else { //let's recalculate
-            if (! this._refreshHash(this.root, true) )
+            if (! this.root._refreshHash(true) )
                 throw {message: "Refresh Hash2 didn't work"};
         }
 
