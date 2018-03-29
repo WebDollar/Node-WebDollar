@@ -405,19 +405,18 @@ class InterfaceBlockchainAddressHelper{
                 return;
             }
             else {
-                CLI.WEBD_CLI.question(message||"Please enter your last password (12 words separated by space):", (answer) => {
+                let answer = CLI.question(message||"Please enter your last password (12 words separated by space):");
                     
-                    let oldPassword = answer.trim().split(' ');
-                    
-                    if (oldPassword.length !== 12) {
-                        console.log('Your old password has ' + oldPassword.length + ' words. It must have 12!');
-                        resolve(null);
-                        return;
-                    }
+                let oldPassword = answer.trim().split(' ');
 
-                    resolve(oldPassword);
+                if (oldPassword.length !== 12) {
+                    console.log('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                    resolve(null);
                     return;
-                });
+                }
+
+                resolve(oldPassword);
+                return;
             }
         });
 

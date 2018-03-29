@@ -28,7 +28,7 @@ class CLI{
             return;
         }
 
-        this.WEBD_CLI.question('Command: ', async (answer) => {
+        this.question('Command: ', async (answer) => {
             switch(answer.trim()) {
                 case '1':
                     await this.listAddresses();
@@ -86,7 +86,7 @@ class CLI{
 
             await this.listAddresses();
 
-            this.WEBD_CLI.question('Choose the address number: ', (answer) => {
+            this.question('Choose the address number: ', (answer) => {
 
                 let addressId = parseInt(answer);
                 if (addressId === NaN || addressId < 0 || Blockchain.Wallet.addresses.length < addressId)
@@ -169,7 +169,7 @@ class CLI{
 
         return new Promise( async (resolve) => {
 
-            let addressPath = await this.WEBD_CLI.question('Enter address path: ');
+            let addressPath = await this.question('Enter address path: ');
 
             FileSystem.readFile(addressPath, 'utf8', async (err, content) => {
 
@@ -218,7 +218,7 @@ class CLI{
                 return;
             }
 
-            let addressPath = await WEBD_CLI.question('Enter path for saving address: ');
+            let addressPath = await this.question('Enter path for saving address: ');
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
             let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
@@ -289,6 +289,7 @@ class CLI{
 
     async startMining(instantly){
 
+        if (Blockchain.created)
         Blockchain.createBlockchain("light-node",()=>{
             Node.NodeServer.startServer();
             Node.NodeClientsService.startService();
@@ -297,12 +298,18 @@ class CLI{
         if (instantly)
             Blockchain.startMiningInstantly();
         else
-            Blockchain.startMiningSynchronizeNextTime = true;
+            Blockchain.startMiningNextTimeSynchronized = true;
 
     }
 
     question(message){
-        return this.WEBD_CLI.question(message);
+
+        return new Promise ((resolve)=> {
+            this.WEBD_CLI.question(message, (answer)=>{
+                resolve(answer);
+            });
+        });
+
     }
 
 }

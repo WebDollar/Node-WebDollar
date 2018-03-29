@@ -13,7 +13,8 @@ class Blockchain{
 
     constructor(){
 
-        this.startMiningSynchronizeNextTime = false;
+        this._startMiningNextTimeSynchronized = false;
+        this._blockchainInitiated = false;
 
         this.Chain = new MainBlockchain(undefined);
         this.blockchain = this.Chain;
@@ -48,9 +49,10 @@ class Blockchain{
 
     async createBlockchain(agentName, initializationCallback){
 
+        this._blockchainInitiated = true;
 
         this.Agent = MainBlockchainAgent.createAgent(agentName, this.blockchain);
-        this.Agent.setBlockchain(this.blockchain)
+        this.Agent.setBlockchain(this.blockchain);
 
         this.blockchain._setAgent(this.Agent);
 
@@ -103,7 +105,7 @@ class Blockchain{
 
     async startMining(){
 
-        if (process.env.START_MINING || this.startMiningSynchronizeNextTime)
+        if (process.env.START_MINING || this._startMiningNextTimeSynchronized)
             this.Mining.startMining();
 
     }
@@ -170,6 +172,18 @@ class Blockchain{
         this._onLoadedResolver(newValue);
     }
 
+    set startMiningNextTimeSynchronized(newValue){
+        this._startMiningNextTimeSynchronized = newValue;
+
+        if (newValue && this.){
+
+        }
+
+    }
+
+    get blockchainInitiated(){
+        return this._blockchainInitiated;
+    }
 }
 
 export default new Blockchain()

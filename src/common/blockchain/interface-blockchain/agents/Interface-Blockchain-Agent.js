@@ -29,6 +29,8 @@ class InterfaceBlockchainAgent{
         this._startAgentTimestamp = new Date().getTime();
         this._synchronizeComplete = false;
 
+        this.synchronized = false;
+
         this._startAgentResolver = null;
         this._startAgentPromise = null;
 
@@ -130,6 +132,7 @@ class InterfaceBlockchainAgent{
                 this._startAgentResolver = undefined;
 
                 console.warn("Synchronization done", resolver);
+                this.synchronized = true;
 
                 resolver({
                     result: true,
@@ -187,6 +190,7 @@ class InterfaceBlockchainAgent{
 
         console.warn("startAgent was started");
 
+        this.synchronized = false;
         this._synchronizeComplete = synchronizeComplete;
         this.initializeAgentPromise();
 
