@@ -513,9 +513,7 @@ class MainBlockchainWallet{
             }
         }
         
-        let ask = 0;
-        if (process.env.BROWSER)
-            ask = confirm("Are you sure you want to delete " + address);
+        let ask = await InterfaceBlockchainAddressHelper.askForConfirmation("Are you sure you want to delete " + address);
 
         if(ask){
 
@@ -523,8 +521,14 @@ class MainBlockchainWallet{
 
             this.addresses.splice(index, 1);
 
+            if (process.env.BROWSER) {
+                console.log("addressDeleted", addressToDelete);
+            } else {
+                //this is for better user experience
+                console.log("addressDeleted", addressToDelete.toString());
+            }
+
             //setting the next minerAddress
-            console.log("addressDeleted", addressToDelete);
             if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.unencodedMinerAddress.equals(addressToDelete.unencodedAddress) ) {
                 this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
                 this.blockchain.mining.resetMining();

@@ -8,7 +8,8 @@ import BufferExtended from 'common/utils/BufferExtended';
 
 //video tutorial https://asecuritysite.com/encryption/base58
 
-import consts from 'consts/const_global'
+import WEBD_CLI from 'node/menu/Interactive-Menu';
+import consts from 'consts/const_global';
 
 class InterfaceBlockchainAddressHelper{
 
@@ -347,7 +348,6 @@ class InterfaceBlockchainAddressHelper{
 
         }
 
-
         let checkSumDetected = false;
 
         if (addressWIF.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH ) {
@@ -407,6 +407,21 @@ class InterfaceBlockchainAddressHelper{
         }
 
         return oldPassword;
+    }
+
+    static askForConfirmation(message){
+
+        return new Promise(resolve => {
+            if (process.env.BROWSER) {
+                resolve(confirm(message));
+                return;
+            } else {
+                WEBD_CLI.question(message + " (yes/no) ? ", (answer) => {
+                    resolve(answer === "yes" ? true : false);
+                    return;
+                });
+            }
+        });
     }
 
 }

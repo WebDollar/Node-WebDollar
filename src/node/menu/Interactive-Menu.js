@@ -115,9 +115,9 @@ async function listAddresses() {
         let balance = 1000000000.3354;//Blockchain.accountantTree.getBalance(address, undefined);
         
         if (address === miningAddress) {
-            console.log("|  *" + i + "   |  " + address + "  | " + balance + lineSeparator);
+            console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
         } else {
-            console.log("|   " + i + "   |  " + address + "  | " + balance + lineSeparator);
+            console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
         }
     }
 
@@ -206,9 +206,7 @@ async function exportAddress() {
         console.log("You must enter a valid number.");
         return false;
     }
-
-    await Blockchain.Wallet.deleteAddress(Blockchain.Wallet.addresses[addressId].address);
-
+    
     return true;
 }
 
@@ -224,3 +222,5 @@ async function setMiningAddress() {
     
     return true;
 }
+
+export default WEBD_CLI;
