@@ -58,7 +58,7 @@ class CLI{
                     await this.startMining(true);
                     break;
                 case 'exit':
-                    this.exitMenu = true;
+                    this._exitMenu = true;
                     break;
                 default:
                     this._showCommands();
@@ -76,7 +76,7 @@ class CLI{
         this._showCommands();
         this.WEBD_CLI.prompt();
 
-        this.exitMenu = false;
+        this._exitMenu = false;
         this._runMenu();
     }
 
