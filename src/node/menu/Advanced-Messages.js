@@ -11,17 +11,15 @@ class AdvancedMessages{
     }
 
     //askForConfirmation
-    confirm(message){
+    async confirm(message){
 
-        return new Promise(resolve => {
-            if (process.env.BROWSER) {
-                resolve(confirm(message));
-            } else {
-                CLI.WEBD_CLI.question(message + " (yes/no) ? ", (answer) => {
-                    resolve(answer === "yes");
-                });
-            }
-        });
+        if (process.env.BROWSER) {
+            return confirm(message);
+        } else {
+            let answer = await CLI.question(message + " (yes/no) ? ");
+
+            return answer === "yes";
+        }
 
     }
 

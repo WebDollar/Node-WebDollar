@@ -28,45 +28,45 @@ class CLI{
             return;
         }
 
-        this.question('Command: ', async (answer) => {
-            switch(answer.trim()) {
-                case '1':
-                    await this.listAddresses();
-                    break;
-                case '2':
-                    await this.createNewAddress();
-                    break;
-                case '3':
-                    await this.deleteAddress();
-                    break;
-                case '4':
-                    await this.importAddress();
-                    break;
-                case '5':
-                    await this.exportAddress();
-                    break;
-                case '6':
-                    await this.encryptAddress();
-                    break;
-                case '7':
-                    await this.setMiningAddress();
-                    break;
-                case '8':
-                    await this.startMining();
-                    break;
-                case '9':
-                    await this.startMining(true);
-                    break;
-                case 'exit':
-                    this._exitMenu = true;
-                    break;
-                default:
-                    this._showCommands();
-                    break;
-            }
+        let answer = this.question('Command: ');
 
-            await this._runMenu();
-        });
+        switch(answer.trim()) {
+            case '1':
+                await this.listAddresses();
+                break;
+            case '2':
+                await this.createNewAddress();
+                break;
+            case '3':
+                await this.deleteAddress();
+                break;
+            case '4':
+                await this.importAddress();
+                break;
+            case '5':
+                await this.exportAddress();
+                break;
+            case '6':
+                await this.encryptAddress();
+                break;
+            case '7':
+                await this.setMiningAddress();
+                break;
+            case '8':
+                await this.startMining();
+                break;
+            case '9':
+                await this.startMining(true);
+                break;
+            case 'exit':
+                this._exitMenu = true;
+                break;
+            default:
+                this._showCommands();
+                break;
+        }
+
+        await this._runMenu();
     };
 
     async _start() {
@@ -82,20 +82,16 @@ class CLI{
 
     async _chooseAddress() {
 
-        return new Promise( async (resolve) => {
+        await this.listAddresses();
 
-            await this.listAddresses();
+        let answer = await this.question('Choose the address number: ');
 
-            this.question('Choose the address number: ', (answer) => {
+        let addressId = parseInt(answer);
+        if (addressId === NaN || addressId < 0 || Blockchain.Wallet.addresses.length < addressId)
+            addressId = -1;
 
-                let addressId = parseInt(answer);
-                if (addressId === NaN || addressId < 0 || Blockchain.Wallet.addresses.length < addressId)
-                    addressId = -1;
+        return addressId;
 
-                resolve(addressId);
-            });
-
-        });
     }
 
     _showCommands() {
@@ -293,7 +289,7 @@ class CLI{
             Blockchain.createBlockchain("light-node",()=>{
                 Node.NodeServer.startServer();
                 Node.NodeClientsService.startService();
-            });
+            });1
 
         if (instantly)
             Blockchain.startMiningInstantly();

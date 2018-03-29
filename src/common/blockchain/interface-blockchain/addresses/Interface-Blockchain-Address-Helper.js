@@ -388,7 +388,7 @@ class InterfaceBlockchainAddressHelper{
 
     static askForPassword(message){
 
-        return new Promise(resolve => {
+        return new Promise( async (resolve) => {
 
             if (process.env.BROWSER){
                 let answer =  prompt(message||"Please enter your last password (12 words separated by space):");
@@ -402,10 +402,9 @@ class InterfaceBlockchainAddressHelper{
                 }
                 
                 resolve(oldPassword);
-                return;
             }
             else {
-                let answer = CLI.question(message||"Please enter your last password (12 words separated by space):");
+                let answer =  await CLI.question(message||"Please enter your last password (12 words separated by space):");
                     
                 let oldPassword = answer.trim().split(' ');
 
@@ -416,7 +415,6 @@ class InterfaceBlockchainAddressHelper{
                 }
 
                 resolve(oldPassword);
-                return;
             }
         });
 
