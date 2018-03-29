@@ -15,10 +15,7 @@ class BlockchainDifficulty{
         // console.log("blockTimestamp", blockTimestamp.toString(16));
         // console.log("blockNumber", blockNumber.toString(16));
 
-        if (blockNumber < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK)
-            return this.calculateBlockDifficultyETH(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
-        else
-            return this.getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
+        return this.getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
 
     }
 

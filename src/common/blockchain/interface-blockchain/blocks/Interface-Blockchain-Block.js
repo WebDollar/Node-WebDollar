@@ -156,26 +156,26 @@ class InterfaceBlockchainBlock {
 
         // BITCOIN: A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
 
-        if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK + consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1)
-            if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1) {
 
-                let medianTimestamp = 0;
-                for (let i=this.height-1; i >= this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--)
-                    medianTimestamp += this.blockValidation.getTimeStampCallback(i+1);
+        if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1) {
 
-                medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
+            let medianTimestamp = 0;
+            for (let i=this.height-1; i >= this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--)
+                medianTimestamp += this.blockValidation.getTimeStampCallback(i+1);
 
-                if (this.timeStamp < medianTimestamp)
-                    throw {message: "Block Timestamp is not bigger than the previous 10 blocks"};
+            medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
 
-            }
+            if (this.timeStamp < medianTimestamp)
+                throw {message: "Block Timestamp is not bigger than the previous 10 blocks"};
 
-        if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK)
-            if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true ) {
+        }
 
-                if (this.timeStamp > this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET)
-                    throw { message: "Timestamp of block is less than the network-adjusted time", timeStamp: this.timeStamp, networkAdjustedTime: this.blockchain.timestamp.networkAdjustedTime, NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET }
-            }
+
+        if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true ) {
+
+            if (this.timeStamp > this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET)
+                throw { message: "Timestamp of block is less than the network-adjusted time", timeStamp: this.timeStamp, networkAdjustedTime: this.blockchain.timestamp.networkAdjustedTime, NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET }
+        }
 
     }
 

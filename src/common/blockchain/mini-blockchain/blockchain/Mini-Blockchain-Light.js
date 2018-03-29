@@ -339,11 +339,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
             console.log( "_getLoadBlockchainValidationType", i, (i-indexStart), this._difficultyNotValidated );
         }
 
-        //fork 3.1, it must be deleted after
-        if ( i <= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK ) {
-            validationType["skip-difficulty-recalculation"] = false;
-        }
-
         return validationType;
     }
 
@@ -351,15 +346,14 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
         let block = await MiniBlockchain.prototype._loadBlock.call(this, indexStart, i, blockValidation);
 
-        if (i >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK) // must be deleted the verification
-            if ( (i + 1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS  === 0 && i === indexStart){
+        if ( (i + 1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS  === 0 && i === indexStart){
 
-                block.difficultyTargetPrev = block.difficultyTarget;
-                block.difficultyTarget = this._lightLoadingDifficultyNextDifficulty;
+            block.difficultyTargetPrev = block.difficultyTarget;
+            block.difficultyTarget = this._lightLoadingDifficultyNextDifficulty;
 
-                this.lightPrevDifficultyTargets[i+1] = this._lightLoadingDifficultyNextDifficulty;
+            this.lightPrevDifficultyTargets[i+1] = this._lightLoadingDifficultyNextDifficulty;
 
-            }
+        }
 
         return block;
     }

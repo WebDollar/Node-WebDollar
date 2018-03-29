@@ -185,10 +185,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 balancesBuffers = Buffer.concat(balancesBuffers);
             }
 
-            if (Blockchain.blockchain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3_TRANSACTIONS.ACCOUNTANT_TREE)
-                return Buffer.concat( [ hash, Serialization.serializeNumber2Bytes(this.nonce), Serialization.serializeNumber1Byte(balancesCount), balancesBuffers ] );
-            else
-                return Buffer.concat( [ hash, Serialization.serializeNumber1Byte(balancesCount), balancesBuffers ] );
+
+            return Buffer.concat( [ hash, Serialization.serializeNumber2Bytes(this.nonce), Serialization.serializeNumber2Bytes(balancesCount), balancesBuffers ] );
 
         } catch (exception){
             console.log("Error Serializing MiniAccountantTree NodeData", exception);
@@ -203,7 +201,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeDataHash.apply(this, arguments);
 
         if (Blockchain.blockchain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3_TRANSACTIONS.ACCOUNTANT_TREE){
-            this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //1 byte
+            this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 byte
             offset += 2;
         }
 
@@ -211,8 +209,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             offset = offset || 0;
 
-            let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
-            offset += 1;
+            let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 byte
+            offset += 2;
 
             if (balancesLength > 0){
 

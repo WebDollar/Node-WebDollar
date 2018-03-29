@@ -150,16 +150,13 @@ class InterfaceBlockchain {
 
         block.difficultyTargetPrev = block.blockValidation.getDifficultyCallback(block.height);
 
-        //for fork 3.1
-        if ( block.height < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK )
-            block.blockValidation.blockValidationType['skip-validation-timestamp'] = true;
 
         //validate difficulty & hash
         if (! (await block.validateBlock(block.height)))
             throw ('block validation failed');
 
         //recalculate next target difficulty
-        if ( block.height < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK || !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] ){
+        if ( !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] ){
 
             //console.log("block.difficultyTarget", prevDifficultyTarget.toString("hex"), prevTimeStamp, block.timeStamp, block.height);
 
