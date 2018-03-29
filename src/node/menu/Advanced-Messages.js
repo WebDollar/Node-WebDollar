@@ -18,11 +18,19 @@ class AdvancedMessages{
                 resolve(confirm(message));
             } else {
                 CLI.WEBD_CLI.question(message + " (yes/no) ? ", (answer) => {
-                    resolve(answer === "yes" ? true : false);
+                    resolve(answer === "yes");
                 });
             }
         });
 
+    }
+
+    logInfo(cliMsg, browserMsg) {
+
+       if (process.env.BROWSER)
+           console.info(browserMsg || cliMsg);
+       else
+           console.info(cliMsg);
     }
 
 }

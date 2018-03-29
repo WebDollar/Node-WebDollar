@@ -524,7 +524,7 @@ class MainBlockchainWallet{
 
             this.addresses.splice(index, 1);
 
-            InterfaceBlockchainAddressHelper.logInfo("Address deleted " + addressToDelete, "Address deleted " + addressToDelete.toString());
+            AdvancedMessages.logInfo("Address deleted " + addressToDelete, "Address deleted " + addressToDelete.toString());
 
             //setting the next minerAddress
             if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.unencodedMinerAddress.equals(addressToDelete.unencodedAddress) ) {
