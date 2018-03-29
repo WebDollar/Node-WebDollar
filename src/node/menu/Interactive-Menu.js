@@ -109,7 +109,7 @@ class InteractiveMenu{
         console.info('\nWallet addresses:');
 
         let miningAddress = "";//Blockchain.blockchain.mining.minerAddress;
-        //console.log("min=" + minerAddress);
+
         console.log(addressHeader);
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
 
@@ -214,36 +214,35 @@ class InteractiveMenu{
                 return;
             }
 
-            let addressPath = await this.WEBD_CLI.question('Enter path for saving address: ');
-            console.log();
-            
-            let addressString = Blockchain.Wallet.addresses[addressId].address;
-            let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
+            this.WEBD_CLI.question('Enter path for saving address: ', async (addressPath) => {
+                
+                let addressString = Blockchain.Wallet.addresses[addressId].address;
+                let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
 
-            if (answer.result === false) {
-                console.warn("Address was not exported. :(. " + answer.message);
-                resolve(false);
-                return;
-            }
-
-            let jsonAddress = JSON.stringify(answer.data);
-
-            FileSystem.writeFile(addressPath + addressString + ".webd", jsonAddress, (err) => {
-
-                if (err) {
-                    console.error(err);
+                if (answer.result === false) {
+                    console.warn("Address was not exported. :(. " + answer.message);
                     resolve(false);
                     return;
                 }
 
-                console.info("Address successfully exported", addressString);
+                let jsonAddress = JSON.stringify(answer.data);
+
+                FileSystem.writeFile(addressPath + addressString + ".webd", jsonAddress, (err) => {
+                    if (err) {
+                        console.error(err);
+                        resolve(false);
+                        return;
+                    }
+
+                    console.info("Address successfully exported", addressString);
+                    resolve(true);
+                    return;
+
+                });
+
                 resolve(true);
                 return;
-
             });
-
-            resolve(true);
-            return;
 
         });
 
@@ -269,7 +268,7 @@ class InteractiveMenu{
         return response.result;
     }
 
-    async  setMiningAddress() {
+    async setMiningAddress() {
         console.info('Set mining address.');
 
         let addressId = await this._chooseAddress();
@@ -278,7 +277,9 @@ class InteractiveMenu{
             console.warn("You must enter a valid number.");
             return false;
         }
-
+        
+        //await Blockchain.blockchain.mining.minerAddress = Blockchain.Wallet.addresses[addressId].address;
+        
         return true;
     }
 
