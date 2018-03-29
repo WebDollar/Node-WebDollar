@@ -15,7 +15,9 @@ class Blockchain{
 
         this._startMiningNextTimeSynchronized = false;
         this._blockchainInitiated = false;
+
         this.synchronized = false;
+        this._walletLoaded = false;
 
         this.Chain = new MainBlockchain(undefined);
         this.blockchain = this.Chain;
@@ -80,12 +82,21 @@ class Blockchain{
         await this.initializeBlockchain();
     }
 
+    async loadWallet(){
+
+        if (!this._walletLoaded) {
+            await this.Wallet.loadWallet();
+
+            //starting mining
+            await this.Mining.loadMinerAddress(this.Wallet.addresses[0], this.Wallet);
+
+            this._walletLoaded = true;
+        }
+    }
+
     async initializeBlockchain(){
 
-        await this.Wallet.loadWallet();
-
-        //starting mining
-        await this.Mining.loadMinerAddress(this.Wallet.addresses[0], this.Wallet);
+        await this.loadWallet();
 
         //loading the blockchain
         await this.loadBlockchain();

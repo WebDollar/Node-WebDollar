@@ -71,7 +71,7 @@ class CLI{
 
     async _start() {
 
-        await Blockchain.Wallet.loadWallet();
+        await Blockchain.loadWallet();
 
         this._showCommands();
         this.WEBD_CLI.prompt();
@@ -110,7 +110,10 @@ class CLI{
 
         console.info('\nWallet addresses:');
 
-        let miningAddress = "";//Blockchain.blockchain.mining.minerAddress;
+        let miningAddress = Blockchain.blockchain.mining.minerAddress;
+        if (miningAddress === undefined) miningAddress = 'not specified';
+
+        console.log("miningAddress", miningAddress);
 
         console.log(addressHeader);
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
@@ -126,6 +129,13 @@ class CLI{
                 console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
             }
         }
+
+        let balance = 0;
+        if (miningAddress !== 'not specified') {
+            balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
+            if (balance === null) balance = 0;
+        }
+        console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
 
         return true;
     }
