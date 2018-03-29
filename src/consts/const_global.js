@@ -6,7 +6,7 @@ consts.BLOCKCHAIN = {
 
     DIFFICULTY:{
         NO_BLOCKS : 10,
-        TIME_PER_BLOCK : 200, //in s, timestamp in UNIX format
+        TIME_PER_BLOCK : 20, //in s, timestamp in UNIX format
     },
 
     TIMESTAMP:{

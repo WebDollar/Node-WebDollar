@@ -128,11 +128,13 @@ class BlockchainDifficulty{
 
             //adding blocks 0..8
             for (let i = firstBlock; i < blockNumber; i++) {
-                how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i+1);
+
+                //the difference between Ti-(Ti-1) is actually the time for Ti
+                how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i+1) - getTimeStampCallback(i);
             }
 
             //adding block 9
-            how_much_it_took_to_mine_X_Blocks += blockTimestamp;
+            how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
 
             if ( how_much_it_took_to_mine_X_Blocks <= 0 )
                 throw {message: "how_much_it_took_to_mine_X_Blocks is negative ", how_much_it_took_to_mine_X_Blocks: how_much_it_took_to_mine_X_Blocks};
@@ -140,27 +142,6 @@ class BlockchainDifficulty{
             console.warn("blocktimestamp", blockTimestamp);
             console.warn("how_much_it_took_to_mine_X_Blocks ", how_much_it_took_to_mine_X_Blocks );
 
-            //It should substitute, the number of Blocks * Initial Block
-            how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * getTimeStampCallback(firstBlock+1); //it will include 10*T
-
-            /**
-                block 0 => T
-                block 1 => T+20
-                block 2 => T+40
-                block 3 => T+60
-                block 4 => T+80
-                block 5 => T+100
-                block 6 => T+120
-                block 7 => T+140
-                block 8 => T+160
-                block 9 => T+180
-
-                so there will be (9*10/2)*20 sec
-             **/
-            how_much_it_took_to_mine_X_Blocks -= (consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS-1)*consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS/2 * consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ; //it will include (9*10/2)*20 sec
-
-            if ( how_much_it_took_to_mine_X_Blocks <= 0 )
-                throw {message: "how_much_it_took_to_mine_X_Blocks is negative ", how_much_it_took_to_mine_X_Blocks:how_much_it_took_to_mine_X_Blocks };
 
             let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks);
 
