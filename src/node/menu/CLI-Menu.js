@@ -15,7 +15,7 @@ class CLI{
             prompt: 'WEBD_CLI:> '
         });
 
-        this.exitMenu = undefined;
+        this._exitMenu = undefined;
 
         this._start();
 
@@ -23,7 +23,7 @@ class CLI{
 
     async _runMenu() {
 
-        if (this.exitMenu === true) {
+        if (this._exitMenu === true) {
             this.WEBD_CLI.close();
             return;
         }
@@ -100,7 +100,7 @@ class CLI{
 
     _showCommands() {
 
-        console.warn('\nChoose one of the following commands:');
+        console.info('\nChoose one of the following commands:');
 
         for (let i = 0; i < commands.length; ++i){
             console.info(commands[i]);
@@ -110,11 +110,11 @@ class CLI{
         return true;
     }
 
-    async  listAddresses() {
+    async listAddresses() {
 
-        console.warn('\nWallet addresses:');
+        console.info('\nWallet addresses:');
 
-        let miningAddress = Blockchain.Wallet.getMiningAddress();
+        let miningAddress = "";//Blockchain.blockchain.mining.minerAddress;
 
         console.log(addressHeader);
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
@@ -134,18 +134,22 @@ class CLI{
         return true;
     }
 
-    async  createNewAddress() {
+    async createNewAddress() {
 
-        console.warn('Create new address.');
-
-        await Blockchain.Wallet.createNewAddress();
+        console.info('Create new address.');
+        try {
+            let address = await Blockchain.Wallet.createNewAddress();
+            console.info("Address was created: " + address.address);
+        } catch(err) {
+            console.err(err);
+        }
 
         return true;
     }
 
-    async  deleteAddress() {
+    async deleteAddress() {
 
-        console.warn('Delete address.');
+        console.info('Delete address.');
 
         let addressId = await this._chooseAddress();
 
@@ -156,14 +160,12 @@ class CLI{
 
         let response = await Blockchain.Wallet.deleteAddress(Blockchain.Wallet.addresses[addressId].address);
 
-        console.log(response.message);
-
         return response.result;
     }
 
-     importAddress() {
+    importAddress() {
 
-        console.warn('Import address.');
+        console.info('Import address.');
 
         return new Promise( async (resolve) => {
 
@@ -202,16 +204,16 @@ class CLI{
 
     }
 
-     exportAddress() {
+    exportAddress() {
 
-        console.log('Export address.');
+        console.info('Export address.');
 
         return new Promise( async (resolve) => {
 
             let addressId = await this._chooseAddress();
 
             if (addressId < 0) {
-                console.log("You must enter a valid number.");
+                console.warn("You must enter a valid number.");
                 resolve(false);
                 return;
             }
@@ -250,13 +252,13 @@ class CLI{
 
     }
 
-    async  encryptAddress() {
-        console.log('Encrypt address.');
+    async encryptAddress() {
+        console.info('Encrypt address.');
 
         let addressId = await this._chooseAddress();
 
         if (addressId < 0) {
-            console.log("You must enter a valid number.");
+            console.warn("You must enter a valid number.");
             return false;
         }
 
@@ -265,20 +267,22 @@ class CLI{
         let addressString = Blockchain.Wallet.addresses[addressId].address;
         let response = await Blockchain.Wallet.encryptAddress(addressString, newPassword, oldPassword)
 
-        console.log(response.message);
+        console.info(response.message);
 
         return response.result;
     }
 
-    async  setMiningAddress() {
-        console.log('Set mining address.');
+    async setMiningAddress() {
+        console.info('Set mining address.');
 
         let addressId = await this._chooseAddress();
 
         if (addressId < 0) {
-            console.log("You must enter a valid number.");
+            console.warn("You must enter a valid number.");
             return false;
         }
+
+        //await Blockchain.blockchain.mining.minerAddress = Blockchain.Wallet.addresses[addressId].address;
 
         return true;
     }

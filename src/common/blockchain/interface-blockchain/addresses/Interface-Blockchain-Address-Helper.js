@@ -2,7 +2,6 @@ import ed25519 from "common/crypto/ed25519";
 
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BufferExtended from 'common/utils/BufferExtended';
-import AdvancedMessages from "node/menu/Advanced-Messages"
 
 // tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 // full demo https://bstavroulakis.com/demos/billcoin/address.php
