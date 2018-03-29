@@ -94,7 +94,7 @@ just, run ```npm install name_missing_package```
 
 ## Building Dist
 
-### Building Dist for Browser (browserify)
+### Building Dist for Browser (webpack)
 ```
 npm run build_browser
 ```
@@ -128,11 +128,11 @@ npm run start_double_connections
 npm run start
 ```
 
-We use browserify
+We use WebPack
 
 ```
-npm install -g browerfiy
-browserify dist/index.js > dist_bundle/bundle.js
+npm install -g webpack
+webpack dist/index.js > dist_bundle/bundle.js
 npm install bufferutil utf-8-validate
 ``` 
 
