@@ -454,7 +454,7 @@ class MainBlockchainWallet{
 
         if (await this.isAddressEncrypted(address) && process.env.BROWSER) {
 
-            oldPassword = InterfaceBlockchainAddressHelper.askForPassword();
+            oldPassword = await InterfaceBlockchainAddressHelper.askForPassword();
             if (oldPassword === null)
                 return false;
         }
@@ -484,7 +484,7 @@ class MainBlockchainWallet{
 
             for (let tries = 3; tries >= 1; --tries) {
 
-                let oldPassword = InterfaceBlockchainAddressHelper.askForPassword("Please enter your last password (12 words separated by space).  " +  tries + " tries left.");
+                let oldPassword = await InterfaceBlockchainAddressHelper.askForPassword("Please enter your last password (12 words separated by space).  " +  tries + " tries left:");
 
                 if (oldPassword === null){
 
@@ -501,10 +501,8 @@ class MainBlockchainWallet{
                     if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
                         break;
                 } catch (exception) {
-                    if (process.env.BROWSER)
-                        alert('Your old password is incorrect!!!');
-                    else
-                        console.log('Your old password is incorrect!!!');
+                    
+                    InterfaceBlockchainAddressHelper.showException('Your old password is incorrect!!!');
 
                     if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};

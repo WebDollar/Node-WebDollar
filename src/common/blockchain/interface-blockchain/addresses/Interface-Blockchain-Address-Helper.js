@@ -388,25 +388,37 @@ class InterfaceBlockchainAddressHelper{
 
     static askForPassword(message){
 
-        let response = "";
-        if (process.env.BROWSER){
-            response =  prompt(message||"Please enter your last password (12 words separated by space)");
-        }
-        else {
-            //TODO: code for read 12 words from console.
-        }
-        let oldPassword = response.trim().split(' ');
+        return new Promise(resolve => {
+            if (process.env.BROWSER){
+                let answer =  prompt(message||"Please enter your last password (12 words separated by space):");
+                
+                let oldPassword = answer.trim().split(' ');
+                if (oldPassword.length !== 12) {
+                    alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                    resolve(null);
+                    return;
+                }
+                
+                resolve(oldPassword);
+                return;
+            }
+            else {
+                WEBD_CLI.question(message||"Please enter your last password (12 words separated by space):", (answer) => {
+                    
+                    let oldPassword = answer.trim().split(' ');
+                    
+                    if (oldPassword.length !== 12) {
+                        console.log('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                        resolve(null);
+                        return;
+                    }
 
-        if (oldPassword.length !== 12) {
-            if (process.env.BROWSER)
-                alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
-            else
-                console.log('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                    resolve(oldPassword);
+                    return;
+                });
+            }
+        });
 
-            return null;
-        }
-
-        return oldPassword;
     }
 
     static askForConfirmation(message){
@@ -422,6 +434,14 @@ class InterfaceBlockchainAddressHelper{
                 });
             }
         });
+    }
+    
+    static showException(message) {
+        
+        if (process.env.BROWSER)
+            alert(message);
+        else
+            console.log(message);
     }
 
 }

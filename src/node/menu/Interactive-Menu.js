@@ -144,12 +144,8 @@ async function deleteAddress() {
 
     let response = await Blockchain.Wallet.deleteAddress(Blockchain.Wallet.addresses[addressId].address);
 
-    if (response.result === true) {
-        console.log(response.message);
-    } else {
-        console.log(response.message);
-    }
-    
+    console.log(response.message);
+
     return response.result;
 }
 
