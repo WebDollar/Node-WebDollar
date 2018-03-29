@@ -111,8 +111,8 @@ class InterfaceRadixTree extends InterfaceTree{
 
                             // console.log("nodeCurrent",nodeCurrent.value);
                             // console.log("nodeMatch",nodeMatch.value);
-                            this._changedNode(nodeCurrent);
-                            this._changedNode(nodeMatch);
+                            nodeCurrent._changedNode();
+                            nodeMatch._changedNode();
 
                             // Marking that it is done
                             i = input.length + 1;
@@ -132,7 +132,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 //console.log("nodeCurrent_2",nodeCurrent.value, nodeCurrent);
 
-                                this._changedNode(nodeCurrent)
+                                nodeCurrent._changedNode()
                             }
 
                         }
@@ -156,7 +156,7 @@ class InterfaceRadixTree extends InterfaceTree{
                 nodeCurrent.edges.push( this.root.createNewEdge( BufferExtended.substr(input, i), nodeChild ));
 
                 //console.log("nodeChild2", nodeChild)
-                this._changedNode(nodeChild);
+                nodeChild._changedNode();
 
                 //console.log("nodeChild",nodeChild.value);
 
@@ -327,7 +327,7 @@ class InterfaceRadixTree extends InterfaceTree{
         //console.log("this.printLevelSearch() node", node);
         //this.printLevelSearch();
 
-        this._changedNode( node );
+        node._changedNode(  );
 
         return true;
     }
@@ -408,7 +408,7 @@ class InterfaceRadixTree extends InterfaceTree{
         let node = searchResult.node;
 
         node.value = value;
-        this._changedNode( node );
+        node._changedNode(  );
 
     }
 
