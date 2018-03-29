@@ -70,10 +70,38 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
     validateTreeNode() {
 
         if (!InterfaceRadixTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
-
         if (!InterfaceMerkleTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
 
+        return true;
+
     }
+
+    _getValueToHash(){
+        return this.serializeNode() ;
+    }
+
+    _changedNode(){
+        InterfaceMerkleTreeNode.prototype._changedNode.call(this); //computing hash
+        InterfaceRadixTreeNode.prototype._changedNode.call(this); //verifying hash and propagating it
+    }
+
+
+
+    /*
+        inherited
+    */
+    _validateHash(){
+        return InterfaceMerkleTreeNode.prototype._validateHash.call(this);
+    }
+
+    _computeHash() {
+        return InterfaceMerkleTreeNode.prototype._computeHash.call(this);
+    }
+
+    _refreshHash(forced){
+        return InterfaceMerkleTreeNode.prototype._refreshHash.call(this, forced);
+    }
+
 
 }
 

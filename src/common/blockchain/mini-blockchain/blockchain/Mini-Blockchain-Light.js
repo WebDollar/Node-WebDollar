@@ -310,7 +310,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
         } catch (exception){
 
             console.error("Couldn't load Light MiniBlockchain", exception);
-            this.accountantTree.root = this.accountantTree._createNode(null,  [], null )
+            this.accountantTree.createRoot();
             this._initializeMiniBlockchainLight();
 
             return false;

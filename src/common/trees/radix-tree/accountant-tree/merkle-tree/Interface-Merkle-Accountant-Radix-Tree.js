@@ -6,8 +6,6 @@ class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
 
     constructor(){
         super();
-
-        this.autoMerklify = true;
     }
 
     _changedNode(node){
@@ -44,10 +42,7 @@ class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
         return InterfaceMerkleTree.prototype._refreshHash.call(this, node,forced);
     }
 
-    _getValueToHash(node){
-        //return Buffer.concat ( [InterfaceMerkleTree.prototype._getValueToHash.call(this, node),  node.sum.buffer ]);
-        return node.serializeNode() ;
-    }
+
 
 
 }

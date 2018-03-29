@@ -93,9 +93,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
     }
 
     deserializeNode(buffer){
-
         // TO DO
-
     }
 
 

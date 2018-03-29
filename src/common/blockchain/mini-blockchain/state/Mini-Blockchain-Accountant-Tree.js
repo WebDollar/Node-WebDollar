@@ -16,23 +16,9 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         super(db);
 
-        this.autoMerklify = true;
-
         this.emitter = new EventEmitter();
     }
 
-    validateRoot(validateMerkleTree){
-
-        if (!InterfaceMerkleRadixTree.prototype.validateRoot.apply(this, arguments)) return false;
-
-        if (validateMerkleTree)
-            this._validateHash(validateMerkleTree);
-
-    }
-
-    _createNode(parent, edges, value){
-        return new MiniBlockchainAccountantTreeNode(parent, edges, value);
-    }
 
     /**
      *
@@ -171,11 +157,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         InterfaceMerkleTree.prototype._changedNode.call(this, node); //computing hash
     }
 
-    _checkInvalidNode(node){
-
-        //if (!InterfaceAccountantRadixTree.prototype._checkInvalidNode.call(this, node)) return false;
-        return InterfaceMerkleTree.prototype._checkInvalidNode.call(this, node);
-    }
 
     _validateHash(node){
         return InterfaceMerkleTree.prototype._validateHash.call(this, node);
@@ -186,9 +167,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     */
 
 
-    _getValueToHash(node){
-        return node.serializeNode(false, false);
-    }
 
     checkBalanceIsSubscribed(name){
 
@@ -294,6 +272,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
                 });
             }
     }
+
 
 }
 

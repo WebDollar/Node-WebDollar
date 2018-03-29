@@ -6,36 +6,25 @@ class InterfaceTree{
 
     constructor(db){
 
-        this.root = this._createNode(null,  [], null );
         this.db = db;
 
+        this.createRoot();
     }
 
-    validateRoot(){
+    createRoot(parent, edges, value){
+        this.root = new InterfaceTreeNode(null, parent, edges, value);
+        this.root.root = this.root;
+    }
+
+    validateRoot(arguments){
+
         if (this.root === undefined || this.root === null)
             throw {message: "root is invalid"};
 
-        return this.root.validateTreeNode(this.root);
+        return this.root.validateTreeNode.apply(this.root, arguments);
     }
 
-    /**
-     * valdiate Tree based on DFS (depth first search)
-     * @param node
-     * @param callback
-     * @returns {boolean}
-     */
 
-    _createNode(parent, edges, value){
-        return new InterfaceTreeNode(parent, edges, value);
-    }
-
-    _createEdge(targetNode){
-        return new InterfaceTreeEdge(targetNode);
-    }
-
-    _changedNode(node){
-        //no changes in a simple tree
-    }
 
     add(data, parent){
 
@@ -45,10 +34,10 @@ class InterfaceTree{
         if (parent === null || parent === undefined)
             parent = this.root;
 
-        let node = this._createNode( parent , [], data )
-        parent.edges.push( this._createEdge( node ) );
+        let node = this.root._createNode( parent , [], data )
+        parent.edges.push( this.root._createEdge( node ) );
 
-        this._changedNode(node);
+        node._changedNode();
         return node;
     }
 
@@ -101,7 +90,7 @@ class InterfaceTree{
             if (nodeParent === null ||  nodeParent === undefined)
                 nodeParent = this.root;
 
-            this._changedNode(nodeParent)
+            nodeParent._changedNode(nodeParent)
 
             return true;
         }
@@ -122,14 +111,11 @@ class InterfaceTree{
 
         if ( node === undefined || node === null)
             node = this.root;
-        //console.log("value1", value,  );
+
         if (!Buffer.isBuffer(value))
             value = WebDollarCryptoData.createWebDollarCryptoData(value).buffer
-        //console.log("value2", value, );
-
 
         if ( node.value !== undefined && node.value !== null && node.value.equals (value) ) {
-            //console.log("l-am gasit", node.value.toString());
             return { result: true, node: node, value: node.value }
         }
 
@@ -332,8 +318,8 @@ class InterfaceTree{
     }
 
     _deserializeTree(buffer, offset, includeHashes){
-        //console.log("_deserializeTree", this.root);
-        this.root = this._createNode(null,  [], null );
+
+        this.createRoot();
 
         if (buffer.length === 1) return true; // nothing to deserialize
         return this.root.deserializeNode(buffer, offset, true, includeHashes);
@@ -361,8 +347,6 @@ class InterfaceTree{
             buffer = await this.db.get(key);
 
         if (! Buffer.isBuffer(buffer) ) throw {message: "InterfaceTree - buffer is not Buffer"}
-
-        //console.log("loadTree", buffer.length, "   ",buffer.toString("hex") );
 
         return this._deserializeTree(buffer, offset||0, includeHashes);
     }

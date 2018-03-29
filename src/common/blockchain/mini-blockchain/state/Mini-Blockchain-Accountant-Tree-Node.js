@@ -261,15 +261,17 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     }
 
 
-    validateTreeNode(){
+    validateTreeNode(validateMerkleTree){
 
-        let answer = InterfaceMerkleRadixTreeNode.prototype.validateTreeNode.apply(this, arguments);
-        if (!answer) return false;
+        if (!InterfaceMerkleRadixTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
 
-        if (!Number.isNumber(this.nonce)) throw {message: "nonce is invalid"};
+        if (!Number.isInteger(this.nonce)) throw {message: "nonce is invalid"};
 
         if (this.nonce < 0) throw {message: "nonce is less than 0"};
         if (this.nonce > 0xFFFF) throw {message: "nonce is higher than 0xFFFF"};
+
+        if (validateMerkleTree)
+            return this._validateHash(this.root);
 
         return true;
 

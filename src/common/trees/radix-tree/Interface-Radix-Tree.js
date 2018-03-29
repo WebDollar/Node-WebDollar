@@ -20,56 +20,9 @@ import BufferExtended from "common/utils/BufferExtended"
 
 class InterfaceRadixTree extends InterfaceTree{
 
-
-    _createNode(parent, edges, value){
-        return new InterfaceRadixTreeNode(parent, edges, value);
-    }
-
-    _setNode(node, value){
-        node.value = value;
-    }
-
-    _createEdge(label, targetNode){
-        return new InterfaceRadixTreeEdge(label, targetNode);
-    }
-
-    _changedNode(node){
-
-        if (!this._checkInvalidNode(node)) {
-            console.log("Invalid Radix Tree", node)
-            //this.printLevelSearch();
-            throw {message: 'The Radix Tree is no longer valid at the node ' ,node:node}
-        }
-    }
-
-    _checkInvalidNode(node){
-
-        // Leaf nodes should have values
-        // Other nodes should not have values
-
-        if ( !node.isLeaf() )  {
-
-            if (node.isLeaf() !== false) //it should not be a leaf
-                return false;
-
-            return true;
-
-        } else {
-
-            if (node !== this.root){
-
-                if (node.isLeaf() !== true) // it should be a leaf
-                    return false;
-                if (node.value === null || node.value === undefined) //it should have a valid value
-                    return false;
-
-            } else
-            if (node === this.root){
-                return true;
-            }
-
-            return true;
-        }
+    createRoot(parent, edges, value){
+        this.root = new InterfaceRadixTreeNode(null, parent, edges, value);
+        this.root.root = this.root;
     }
 
 
@@ -81,7 +34,7 @@ class InterfaceRadixTree extends InterfaceTree{
     add(input, value){
 
         if (!Buffer.isBuffer(input))
-            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer
+            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
 
         if (input.length === 0)
             throw {message: 'No input'};
@@ -175,7 +128,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                 if (nodeCurrent.value !== null)
                                     throw ('the node already includes a value....');
                                 else
-                                    this._setNode(nodeCurrent, value);
+                                    nodeCurrent._setNodeValue(value);
 
                                 //console.log("nodeCurrent_2",nodeCurrent.value, nodeCurrent);
 

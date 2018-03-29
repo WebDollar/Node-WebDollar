@@ -87,6 +87,11 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
         return new InterfaceRadixTreeEdge(label, targetNode);
     }
 
+    _setNodeValue(value){
+        this.value = value;
+    }
+
+
 }
 
 export default InterfaceRadixTreeNode;
