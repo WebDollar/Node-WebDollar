@@ -65,7 +65,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                     arguments[1] = offset;
                     offset = targetNode.deserializeNode.apply(targetNode, arguments);
 
-                    this.edges.push( this._createEdge(label, targetNode) );
+                    this.edges.push( this.root.createNewEdge(label, targetNode) );
 
                 }
 
@@ -81,14 +81,13 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
     }
 
-    _createEdge(label, targetNode){
-        return new InterfaceRadixTreeEdge(label, targetNode);
-    }
-
     _setNodeValue(value){
         this.value = value;
     }
 
+    createNewEdge(label, node){
+        return new InterfaceRadixTreeEdge(label, node);
+    }
 
 }
 

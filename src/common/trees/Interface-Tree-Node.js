@@ -96,7 +96,7 @@ class InterfaceTreeNode {
 
                 for (let i = 0; i < length; i++) {
 
-                    let edge = new this.createNewEdge(null);
+                    let edge = new this.root.createNewEdge(null);
                     edge.deserializeEdge(buffer, offset, this.createNewNode);
                     this.edges.push(edge);
                 }

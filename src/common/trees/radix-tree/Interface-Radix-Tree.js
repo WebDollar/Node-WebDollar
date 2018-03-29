@@ -80,11 +80,11 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = this._createNode( nodeCurrent,  [], value);
-                                nodeCurrent.edges.push( this._createEdge( match, nodeMatch ));
+                                nodeMatch = this.root.createNewNode( nodeCurrent,  [], value);
+                                nodeCurrent.edges.push( this.root.createNewEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this._createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
+                                nodeMatch.edges.push( this.root.createNewEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
                                 edge.targetNode.parent = nodeMatch;
 
                                 nodeCurrent = edge.targetNode;
@@ -94,16 +94,16 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = this._createNode( nodeCurrent,  [], null);
-                                nodeCurrent.edges.push( this._createEdge( match, nodeMatch ));
+                                nodeMatch = this.root.createNewNode( nodeCurrent,  [], null);
+                                nodeCurrent.edges.push( this.root.createNewEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this._createEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
+                                nodeMatch.edges.push( this.root.createNewEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
                                 edge.targetNode.parent = nodeMatch;
 
                                 // Adding thew new nodeChild with current Value
-                                let nodeChild = this._createNode( nodeMatch, [], value);
-                                nodeMatch.edges.push( this._createEdge(BufferExtended.substr(input, i+match.length), nodeChild));
+                                let nodeChild = this.root.createNewNode( nodeMatch, [], value);
+                                nodeMatch.edges.push( this.root.createNewEdge(BufferExtended.substr(input, i+match.length), nodeChild));
 
                                 nodeCurrent = nodeChild;
 
@@ -152,11 +152,11 @@ class InterfaceRadixTree extends InterfaceTree{
 
                 // no more Children...
 
-                let nodeChild = this._createNode(nodeCurrent, [], value);
-                nodeCurrent.edges.push( this._createEdge( BufferExtended.substr(input, i), nodeChild ));
+                let nodeChild = this.root.createNewNode(nodeCurrent, [], value);
+                nodeCurrent.edges.push( this.root.createNewEdge( BufferExtended.substr(input, i), nodeChild ));
 
                 //console.log("nodeChild2", nodeChild)
-                this._changedNode(nodeChild)
+                this._changedNode(nodeChild);
 
                 //console.log("nodeChild",nodeChild.value);
 
@@ -236,7 +236,7 @@ class InterfaceRadixTree extends InterfaceTree{
                     // prefix slow => slowly
                     if ( node._previousEdges.length === 1 ){
 
-                        nodeParent.edges.push(  this._createEdge( Buffer.concat( [ deletedParentEdge.label,  node._previousEdges[0].label  ] ), node._previousEdges[0].targetNode) );
+                        nodeParent.edges.push(  this.root.createNewEdge( Buffer.concat( [ deletedParentEdge.label,  node._previousEdges[0].label  ] ), node._previousEdges[0].targetNode) );
 
                         node = node._previousEdges[0].targetNode;
                         node.parent = nodeParent;
