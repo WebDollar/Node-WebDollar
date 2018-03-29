@@ -9,10 +9,8 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
     // value : data
     // edges : [ of Edges]
 
-    constructor(parent, edges, value){
-
-        super(parent, edges, value);
-
+    constructor(root, parent, edges, value){
+        super(root, parent, edges, value);
     }
 
     serializeNode(includeEdges){

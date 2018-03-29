@@ -16,12 +16,12 @@ class InterfaceTree{
         this.root.root = this.root;
     }
 
-    validateRoot(arguments){
+    validateRoot(){
 
         if (this.root === undefined || this.root === null)
             throw {message: "root is invalid"};
 
-        return this.root.validateTreeNode.apply(this.root, arguments);
+        return this.root.validateCompleteTreeNode.apply(this.root, arguments);
     }
 
 
@@ -346,12 +346,13 @@ class InterfaceTree{
         if (buffer === undefined)
             buffer = await this.db.get(key);
 
-        if (! Buffer.isBuffer(buffer) ) throw {message: "InterfaceTree - buffer is not Buffer"}
+        if (! Buffer.isBuffer(buffer) ) throw {message: "InterfaceTree - buffer is not Buffer"};
 
         return this._deserializeTree(buffer, offset||0, includeHashes);
     }
 
     matches(tree){
+
         let result = this.validateRoot();
         result = result && tree.validateRoot();
 

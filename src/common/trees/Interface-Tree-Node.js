@@ -135,7 +135,18 @@ class InterfaceTreeNode {
         }
 
         return true;
+    }
 
+    validateCompleteTreeNode(){
+
+        if (!this.validateTreeNode()) return false;
+
+        for (let i = 0; i < this.edges.length; i++) {
+            if (!this.edges[i].validateCompleteTreeNode())
+                return false;
+        }
+
+        return true;
     }
 
     _changedNode(node){

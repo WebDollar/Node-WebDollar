@@ -66,7 +66,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             return null;
         }
 
-        this._changedNode( node );
+        node._changedNode();
 
         return resultUpdate;
     }
@@ -151,21 +151,10 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         return node.nonce;
     }
 
-    _changedNode(node){
-
-        // recalculate the balances
-        InterfaceMerkleTree.prototype._changedNode.call(this, node); //computing hash
-    }
-
-
-    _validateHash(node){
-        return InterfaceMerkleTree.prototype._validateHash.call(this, node);
-    }
 
     /*
         inherited
     */
-
 
 
     checkBalanceIsSubscribed(name){

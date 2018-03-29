@@ -8,9 +8,9 @@ let BigNumber = require('bignumber.js');
 
 class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
-    constructor (parent, edges, value){
+    constructor (root, parent, edges, value){
 
-        super(parent, edges);
+        super(root, parent, edges);
 
         //console.log("value", value);
         this.hash = { sha256: new Buffer(32) };
