@@ -4,17 +4,12 @@ import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import InterfaceTree from 'common/trees/Interface-Tree'
 import InterfaceMerkleTreeNode from './Interface-Merkle-Tree-Node'
 
-/*
-    it extends the Tree Node with hash {sha256: WebDollarCryptoData }
- */
-
 class InterfaceMerkleTree extends InterfaceTree{
 
     constructor(){
         super();
 
         this.autoMerklify = true;
-
     }
 
     _createNode(parent, edges, value){
@@ -32,20 +27,6 @@ class InterfaceMerkleTree extends InterfaceTree{
             this._refreshHash(node, true);
     }
 
-
-    /**
-     * Validate the Merkle Tree if the Hashes were calculated correctly
-     * @param node
-     * @returns {*}
-     */
-    _validateHash(node){
-
-        let result = InterfaceTree.prototype._validateHash.call(this, node, this._validateHash);
-        if (!result)
-            return false;
-
-        return true;
-    }
 
     _checkInvalidNode(node){
         //it should have a valid hash
@@ -98,11 +79,9 @@ class InterfaceMerkleTree extends InterfaceTree{
      * return buffer
      */
     _getValueToHash(node){
-        // if (!Buffer.isBuffer(node.value))
-        //     console.log("_getValueToHash", node.value);
 
         if (Buffer.isBuffer(node.value) )
-            return node.value
+            return node.value;
         else
             return WebDollarCryptoData.createWebDollarCryptoData(node.value, true).buffer;
     }
@@ -122,7 +101,7 @@ class InterfaceMerkleTree extends InterfaceTree{
             return node.hash;
         }
 
-        // calcuating the value to hash which must be a buffer
+        // calculating the value to hash which must be a buffer
         let valueToHash = this._getValueToHash(node); //getting the node data
 
         if (node.edges.length === 0){ //Leaf Node (terminal node)
@@ -167,10 +146,7 @@ class InterfaceMerkleTree extends InterfaceTree{
             return node.hash;
         }
 
-
-
         return node.hash;
-
     }
 
     /**
@@ -200,7 +176,7 @@ class InterfaceMerkleTree extends InterfaceTree{
             // console.log("sha_before", node.hash.sha256.toString("hex"));
 
             if (!hashAlreadyComputed)
-                this._computeHash(node)
+                this._computeHash(node);
 
             // console.log("sha_after", node.hash.sha256.toString("hex"));
 

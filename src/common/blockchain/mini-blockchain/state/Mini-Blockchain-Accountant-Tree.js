@@ -21,6 +21,15 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         this.emitter = new EventEmitter();
     }
 
+    validateRoot(validateMerkleTree){
+        InterfaceMerkleRadixTree.prototype.validateRoot.apply();
+
+        if (validateMerkleTree){
+
+        }
+
+    }
+
     _createNode(parent, edges, value){
         return new MiniBlockchainAccountantTreeNode(parent, edges, value);
     }
@@ -93,6 +102,11 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         node.nonce += nonceChange;
 
+        if (!Number.isNumber(node.nonce)) throw {message: "nonce is invalid"};
+
+        node.nonce = node.nonce % 0xFFFF;
+        if (node.nonce < 0) node.nonce = node.nonce + 0xFFFF;
+
         return node.nonce;
     }
 
@@ -141,13 +155,14 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     }
 
     getAccountNonce(address){
+
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null) throw {message: "getAccountNonce - Your address is invalid", address: address };
 
         let node = this.search(address).node;
         if (node === undefined || node === null) throw {message: "getAccountNonce - address not found", address: address };
 
-        return node.nonce % 0xFF;
+        return node.nonce;
     }
 
     _changedNode(node){
@@ -155,14 +170,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         // recalculate the balances
 
         InterfaceMerkleTree.prototype._changedNode.call(this, node); //computing hash
-    }
-
-    validateTree(node, callback){
-
-        if (!InterfaceMerkleTree.prototype.validateTree.call(this, node, callback)) //computing hash
-            return false;
-
-        return true;
     }
 
     _checkInvalidNode(node){

@@ -2,6 +2,7 @@ import BufferExtended from "common/utils/BufferExtended";
 import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
 import InterfaceMerkleRadixTreeNode from "common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree-Node"
+import Blockchain from "main-blockchain/Blockchain"
 
 let BigNumber = require('bignumber.js');
 
@@ -144,7 +145,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         try {
             let hash, balancesBuffers = [];
 
-            let hash = InterfaceMerkleRadixTreeNode.prototype.serializeNodeDataHash.apply(this, arguments);
+            hash = InterfaceMerkleRadixTreeNode.prototype.serializeNodeDataHash.apply(this, arguments);
 
             if (hash === null)
                 hash = new Buffer(0);
@@ -184,7 +185,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 balancesBuffers = Buffer.concat(balancesBuffers);
             }
 
-            return Buffer.concat( [ hash, Serialization.serializeNumber2Bytes(this.nonce), Serialization.serializeNumber1Byte(balancesCount), balancesBuffers ] );
+            if (Blockchain.blocks.length > consts.TEST_NET_3_TRANSACTIONS.ACCOUNTANT_TREE)
+                return Buffer.concat( [ hash, Serialization.serializeNumber2Bytes(this.nonce), Serialization.serializeNumber1Byte(balancesCount), balancesBuffers ] );
+            else
+                return Buffer.concat( [ hash, Serialization.serializeNumber1Byte(balancesCount), balancesBuffers ] );
 
         } catch (exception){
             console.log("Error Serializing MiniAccountantTree NodeData", exception);
@@ -197,6 +201,11 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         // deserializing this.value
         offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeDataHash.apply(this, arguments);
+
+        if (Blockchain.blocks.length > consts.TEST_NET_3_TRANSACTIONS.ACCOUNTANT_TREE){
+            this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //1 byte
+            offset += 2;
+        }
 
         try {
 
@@ -251,6 +260,20 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     }
 
+
+    validateTreeNode(){
+
+        let answer = InterfaceMerkleRadixTreeNode.prototype.validateTreeNode.apply(this, arguments);
+        if (!answer) return false;
+
+        if (!Number.isNumber(this.nonce)) throw {message: "nonce is invalid"};
+
+        if (this.nonce < 0) throw {message: "nonce is less than 0"};
+        if (this.nonce > 0xFFFF) throw {message: "nonce is higher than 0xFFFF"};
+
+        return true;
+
+    }
 
 
 }

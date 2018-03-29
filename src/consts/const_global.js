@@ -32,6 +32,10 @@ consts.BLOCKCHAIN = {
             //DIFFICULTY_HARD_FORK: 83949
         },
 
+        TEST_NET_3_TRANSACTIONS: {
+            ACCOUNTANT_TREE: 148189,
+        },
+
     }
 };
 

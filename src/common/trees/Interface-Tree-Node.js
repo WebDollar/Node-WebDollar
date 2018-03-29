@@ -117,6 +117,23 @@ class InterfaceTreeNode {
         return new this.constructor (this, [], null);
     }
 
+    validateTreeNode(){
+
+        if ( this === undefined || this === null)
+            throw ('Tree Validation Errror. Node is null');
+
+        for (let i = 0; i < this.edges.length; i++) {
+
+            if (  this.edges[i].targetNode === undefined || this.edges[i].targetNode === null )
+                throw {message: 'Edge target node is Null', node: this, edge: this.edges[i], edgeIndex:i}
+
+            if (this.edges[i].targetNode.parent !== this)
+                throw {message:'Edge target node parent is different that current node', node:this};
+
+        }
+
+    }
+
 }
 
 export default InterfaceTreeNode;

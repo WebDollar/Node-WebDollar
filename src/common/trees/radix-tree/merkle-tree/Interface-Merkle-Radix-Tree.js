@@ -29,14 +29,6 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         InterfaceRadixTree.prototype._changedNode.call(this, node); //verifying hash and propagating it
     }
 
-    validateTree(node, callback){
-
-        if (!InterfaceRadixTree.prototype.validateTree.call(this, node, callback)) //verifying hash and propagating it
-            return false;
-
-        return true;
-    }
-
     _checkInvalidNode(node){
 
         if (!InterfaceRadixTree.prototype._checkInvalidNode.call(this, node)) return false;

@@ -14,7 +14,8 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
         super(parent, edges, value);
 
         if (hash === undefined)
-            hash = {sha256: new Buffer(32)}
+            hash = {sha256: new Buffer(32)};
+
         this.hash = hash;
 
     }
@@ -40,6 +41,21 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
         offset = InterfaceTreeNode.prototype.deserializeNodeData.apply( this, arguments );
 
         return offset;
+    }
+
+
+    validateTreeNode(){
+
+        let answer = InterfaceTreeNode.prototype.validateTreeNode.apply(this, arguments);
+
+        if (!answer) return false;
+
+        if (typeof this.hash !== "object" || typeof this.hash.sha256 !== "object") return false;
+
+        if ( !Buffer.isBuffer(this.hash.sha256) || this.hash.sha256.length !== 32 ) false;
+
+        return true;
+
     }
 
 

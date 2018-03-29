@@ -48,14 +48,14 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         return true;
     }
 
-    validateTree(node){
-
-        let result = InterfaceRadixTree.prototype.validateTree.call(this, node, this.validateAccount);
-        if (!result)
-            return false;
-
-        return true;
-    }
+    // validateTree(node){
+    //
+    //     let result = InterfaceRadixTree.prototype.validateTree.call(this, node, this.validateAccount);
+    //     if (!result)
+    //         return false;
+    //
+    //     return true;
+    // }
 
     /**
      * Validate an Accountant (node)

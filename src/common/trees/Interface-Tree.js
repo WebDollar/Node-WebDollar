@@ -12,7 +12,10 @@ class InterfaceTree{
     }
 
     validateRoot(){
-        return this.validateTree(this.root);
+        if (this.root === undefined || this.root === null)
+            throw {message: "root is invalid"};
+
+        return this.root.validateTreeNode(this.root);
     }
 
     /**
@@ -21,41 +24,6 @@ class InterfaceTree{
      * @param callback
      * @returns {boolean}
      */
-    validateTree(node, callback){
-
-        if ( node === undefined || node === null)
-            throw ('Tree Validation Errror. Node is null');
-
-        for (let i = 0; i < node.edges.length; i++) {
-
-            if (  node.edges[i].targetNode === undefined || node.edges[i].targetNode === null )
-                throw {message: 'Edge target node is Null', node: node, edge: node.edges[i], edgeIndex:i}
-
-            if (node.edges[i].targetNode.parent !== node)
-                throw {message:'Edge target node parent is different that current node', node:node};
-
-            if (typeof callback === 'function') {
-                let result = this.validateTree(node.edges[i].targetNode, callback);
-
-                if (!result) {
-                    console.log("validateTree", node)
-                    return false;
-                }
-
-            }
-        }
-
-        if (typeof callback === 'function'){
-            let result = callback.call(this, node);
-
-            if (!result){
-                console.log("validateTree failed - callback ", node);
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     _createNode(parent, edges, value){
         return new InterfaceTreeNode(parent, edges, value);

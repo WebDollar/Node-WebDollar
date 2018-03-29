@@ -67,6 +67,13 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
         return offset;
     }
 
+    validateTreeNode() {
+
+        if (!InterfaceRadixTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
+
+        if (!InterfaceMerkleTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
+
+    }
 
 }
 
