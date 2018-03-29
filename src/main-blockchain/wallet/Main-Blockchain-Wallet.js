@@ -372,7 +372,7 @@ class MainBlockchainWallet{
      * @param address
      * @returns privateKeyWIF as Hex
      */
-    async exportPrivateKeyFromAddress(address){
+    async exportAddressToJSON(address){
 
         for (let i = 0; i < this.addresses.length; i++)
             if (address === this.addresses[i].address || address === this.addresses[i].unencodedAddress){

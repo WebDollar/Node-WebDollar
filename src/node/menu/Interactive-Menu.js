@@ -88,7 +88,7 @@ function _chooseAddress() {
 
                 resolve(addressId);
             });
-        }) ;
+        });
 
     });
 }
@@ -168,7 +168,7 @@ function importAddress() {
                     let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
 
                     if (answer.result === true) {
-                        console.log("Address Imported", answer.address);
+                        console.log("Address successfully imported", answer.address);
                         await Blockchain.Wallet.saveWallet();
                         resolve(true);
                         return;
@@ -193,17 +193,48 @@ function importAddress() {
     
 }
 
-async function exportAddress() {
+function exportAddress() {
     console.log('Export address.');
     
-    let addressId = await _chooseAddress();
-    
-    if (addressId < 0) {
-        console.log("You must enter a valid number.");
-        return false;
-    }
-    
-    return true;
+    return new Promise(resolve => {
+        _chooseAddress().then( (addressId) => {
+            if (addressId < 0) {
+                console.log("You must enter a valid number.");
+                resolve(false);
+                return;
+            }
+
+            WEBD_CLI.question('Enter path for saving address: ', async (addressPath) => {
+                
+                let addressString = Blockchain.Wallet.addresses[addressId].address;
+                let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
+                
+                if (answer.result === false) {
+                    console.log("Address was not exported. :(. " + answer.message);
+                    resolve(false);
+                    return;
+                }
+                
+                let jsonAddress = JSON.stringify(answer.data);
+                
+                FileSystem.writeFile(addressPath + addressString + ".webd", jsonAddress, function (err) {
+                    if (err) {
+                        console.error(err);
+                        resolve(false);
+                        return;
+                    }
+
+                    console.log("Address successfully exported", addressString);
+                    resolve(true);
+                    return;
+                });
+
+                resolve(true);
+                return;
+            });
+
+        });
+    });
 }
 
 async function setMiningAddress() {
