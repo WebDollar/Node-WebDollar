@@ -92,14 +92,17 @@ class BlockchainDifficulty{
     }
 
     /**
-     * like on BITCOIN
+     * like the difficulty used in BITCOIN based on the Last X Blocks
      *
      * every X Blocks,
      * newDiff = prevDifficulty * (how_much_it_should_have_taken_X_Blocks) / (how_much_it_took_to_mine_X_Blocks)
      *
+     *
+     * Issue #1: https://github.com/WebDollar/Node-WebDollar/issues/9
+     *
      */
 
-    //newDifficulty
+
     static getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 
         let prevBlockDifficulty = getDifficultyCallback(blockNumber);
@@ -122,27 +125,42 @@ class BlockchainDifficulty{
             let how_much_it_should_have_taken_X_Blocks = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
             let how_much_it_took_to_mine_X_Blocks = 0;
 
-            //calculating 0, when blockNumber = 9
+            // calculating 0, when blockNumber = 9
+            // first block will start in 0
             let firstBlock = (blockNumber+1) - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; // blockNumber is not included
 
-            //adding 0..8
-            //console.warn("getTimeStampCallback(firstBlock);", getTimeStampCallback(firstBlock));
+            //adding blocks 0..8
             for (let i = firstBlock; i < blockNumber; i++) {
-                //console.warn("getTimeStampCallback",  getTimeStampCallback(i));
-                how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i);
+                how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i+1);
             }
 
-            //adding 9
+            //adding block 9
             how_much_it_took_to_mine_X_Blocks += blockTimestamp;
 
             if ( how_much_it_took_to_mine_X_Blocks <= 0 )
                 throw {message: "how_much_it_took_to_mine_X_Blocks is negative ", how_much_it_took_to_mine_X_Blocks: how_much_it_took_to_mine_X_Blocks};
 
-            console.warn("blocktimestamp", blockTimestamp)
+            console.warn("blocktimestamp", blockTimestamp);
             console.warn("how_much_it_took_to_mine_X_Blocks ", how_much_it_took_to_mine_X_Blocks );
 
             //It should substitute, the number of Blocks * Initial Block
-            how_much_it_took_to_mine_X_Blocks -= (consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS) * getTimeStampCallback(firstBlock);
+            how_much_it_took_to_mine_X_Blocks -= consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * getTimeStampCallback(firstBlock+1); //it will include 10*T
+
+            /**
+                block 0 => T
+                block 1 => T+20
+                block 2 => T+40
+                block 3 => T+60
+                block 4 => T+80
+                block 5 => T+100
+                block 6 => T+120
+                block 7 => T+140
+                block 8 => T+160
+                block 9 => T+180
+
+                so there will be (9*10/2)*20 sec
+             **/
+            how_much_it_took_to_mine_X_Blocks -= (consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS-1)*consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS/2 * consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ; //it will include (9*10/2)*20 sec
 
             if ( how_much_it_took_to_mine_X_Blocks <= 0 )
                 throw {message: "how_much_it_took_to_mine_X_Blocks is negative ", how_much_it_took_to_mine_X_Blocks:how_much_it_took_to_mine_X_Blocks };
