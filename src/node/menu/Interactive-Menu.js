@@ -2,6 +2,285 @@ import {Node, Blockchain} from '../../index.js';
 const FileSystem = require('fs');
 const readline = require('readline');
 
+class InteractiveMenu{
+
+    constructor(){
+
+        if (typeof window !== "undefined")
+            return;
+
+        this.WEBD_CLI = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+            prompt: 'WEBD_CLI:> '
+        });
+
+        this.exitMenu = undefined;
+
+        this._start();
+
+    }
+
+    async _runMenu() {
+
+        if (this.exitMenu === true) {
+            this.WEBD_CLI.close();
+            return;
+        }
+
+        this.WEBD_CLI.question('Command: ', async (answer) => {
+            switch(answer.trim()) {
+                case '1':
+                    await this.listAddresses();
+                    break;
+                case '2':
+                    await this.createNewAddress();
+                    break;
+                case '3':
+                    await this.deleteAddress();
+                    break;
+                case '4':
+                    await this.importAddress();
+                    break;
+                case '5':
+                    await this.exportAddress();
+                    break;
+                case '6':
+                    await this.encryptAddress();
+                    break;
+                case '7':
+                    await this.setMiningAddress();
+                    break;
+                case 'exit':
+                    this.exitMenu = true;
+                    break;
+                default:
+                    this._showCommands();
+                    break;
+            }
+
+            await this._runMenu();
+        });
+    };
+
+    async _start() {
+
+        await Blockchain.Wallet.loadWallet();
+
+        this._showCommands();
+        this.WEBD_CLI.prompt();
+
+        this.exitMenu = false;
+        this._runMenu();
+    }
+
+    async _chooseAddress() {
+
+        return new Promise( async (resolve) => {
+
+            await this.listAddresses();
+
+            this.WEBD_CLI.question('Choose the address number: ', (answer) => {
+
+                let addressId = parseInt(answer);
+                if (addressId === NaN || addressId < 0 || Blockchain.Wallet.addresses.length < addressId)
+                    addressId = -1;
+
+                resolve(addressId);
+            });
+
+        });
+    }
+
+    _showCommands() {
+
+        console.warn('\nChoose one of the following commands:');
+
+        for (let i = 0; i < commands.length; ++i){
+            console.info(commands[i]);
+        }
+        console.log();
+
+        return true;
+    }
+
+    async  listAddresses() {
+
+        console.warn('\nWallet addresses:');
+
+        let miningAddress = Blockchain.Wallet.getMiningAddress();
+
+        console.log(addressHeader);
+        for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
+
+            let address = Blockchain.Wallet.addresses[i].address;
+
+            let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
+            if (balance === null) balance = 0;
+
+            if (address === miningAddress) {
+                console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
+            } else {
+                console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
+            }
+        }
+
+        return true;
+    }
+
+    async  createNewAddress() {
+
+        console.warn('Create new address.');
+
+        await Blockchain.Wallet.createNewAddress();
+
+        return true;
+    }
+
+    async  deleteAddress() {
+
+        console.warn('Delete address.');
+
+        let addressId = await this._chooseAddress();
+
+        if (addressId < 0) {
+            console.error("You must enter a valid number.");
+            return false;
+        }
+
+        let response = await Blockchain.Wallet.deleteAddress(Blockchain.Wallet.addresses[addressId].address);
+
+        console.log(response.message);
+
+        return response.result;
+    }
+
+     importAddress() {
+
+        console.warn('Import address.');
+
+        return new Promise(resolve => {
+
+            this.WEBD_CLI.question('Enter address path: ', (addressPath) => {
+
+                FileSystem.readFile(addressPath, 'utf8', async (err, content) => {
+
+                    if (err) {
+                        console.error(err);
+                        resolve(false);
+                        return;
+                    }
+
+                    try {
+
+                        let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
+
+                        if (answer.result === true) {
+                            console.log("Address successfully imported", answer.address);
+                            await Blockchain.Wallet.saveWallet();
+                            resolve(true);
+                        } else {
+                            console.error(answer.message);
+                            resolve(false);
+                        }
+
+                    } catch(err) {
+                        console.error(err.message);
+                        resolve(false);
+                    }
+
+
+                });
+
+            });
+
+        });
+
+    }
+
+     exportAddress() {
+
+        console.log('Export address.');
+
+        return new Promise( async (resolve) => {
+
+            let addressId = await this._chooseAddress();
+
+            if (addressId < 0) {
+                console.log("You must enter a valid number.");
+                resolve(false);
+                return;
+            }
+
+            let addressPath = await WEBD_CLI.question('Enter path for saving address: ');
+
+            let addressString = Blockchain.Wallet.addresses[addressId].address;
+            let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
+
+            if (answer.result === false) {
+                console.log("Address was not exported. :(. " + answer.message);
+                resolve(false);
+                return;
+            }
+
+            let jsonAddress = JSON.stringify(answer.data);
+
+            FileSystem.writeFile(addressPath + addressString + ".webd", jsonAddress, (err) => {
+
+                if (err) {
+                    console.error(err);
+                    resolve(false);
+                    return;
+                }
+
+                console.log("Address successfully exported", addressString);
+                resolve(true);
+                return;
+
+            });
+
+            resolve(true);
+            return;
+
+        });
+
+    }
+
+    async  encryptAddress() {
+        console.log('Encrypt address.');
+
+        let addressId = await this._chooseAddress();
+
+        if (addressId < 0) {
+            console.log("You must enter a valid number.");
+            return false;
+        }
+
+        return true;
+
+        let addressString = Blockchain.Wallet.addresses[addressId].address;
+        let response = await Blockchain.Wallet.encryptAddress(addressString, newPassword, oldPassword)
+
+        console.log(response.message);
+
+        return response.result;
+    }
+
+    async  setMiningAddress() {
+        console.log('Set mining address.');
+
+        let addressId = await this._chooseAddress();
+
+        if (addressId < 0) {
+            console.log("You must enter a valid number.");
+            return false;
+        }
+
+        return true;
+    }
+
+}
+
 const commands = [
         '1. List addresses',
         '2. Create new address',
@@ -12,265 +291,14 @@ const commands = [
         '7. Set mining address'
     ];
 
-const lineSeparator = 
+const lineSeparator =
     "\n|_______|________________________________________________________________|_________________|";
 
-const addressHeader = 
+const addressHeader =
     "\n __________________________________________________________________________________________" +
     "\n|  NUM  |                            ADDRESS                             |      WEBD       |" +
     lineSeparator;
 
-const WEBD_CLI = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    prompt: 'WEBD_CLI:> '
-});
-let exitMenu;
 
-let _runMenu = async function () {
 
-    if (exitMenu === true) {
-        return;
-        WEBD_CLI.close();
-    }
-
-    WEBD_CLI.question('Command: ', async (answer) => {
-        switch(answer.trim()) {
-            case '1':
-                await listAddresses();
-                break;
-            case '2':
-                await createNewAddress();
-                break;
-            case '3':
-                await deleteAddress();
-                break;
-            case '4':
-                await importAddress();
-                break;
-            case '5':
-                await exportAddress();
-                break;
-            case '6':
-                await encryptAddress();
-                break;
-            case '7':
-                await setMiningAddress();
-                break;
-            case 'exit':
-                exitMenu = true;
-                break;
-            default:
-                _showCommands();
-                break;
-        }
-
-        await _runMenu();
-    });
-};
-
-async function _start() {
-    await Blockchain.Wallet.loadWallet();
-    _showCommands();
-    WEBD_CLI.prompt();
-    exitMenu = false;
-    _runMenu();
-}
-
-_start();
-
-function _chooseAddress() {
-    
-    return new Promise(resolve => {
-        
-        listAddresses().then( () => {
-            WEBD_CLI.question('Choose the address number: ', (answer) => {
-                
-                let addressId = parseInt(answer);
-                if (addressId === NaN || addressId < 0 || Blockchain.Wallet.addresses.length < addressId)
-                    addressId = -1;
-
-                resolve(addressId);
-            });
-        });
-
-    });
-}
-
-function _showCommands() {
-    console.log('\nChoose one of the following commands:');
-    
-    for (let i = 0; i < commands.length; ++i){
-        console.log(commands[i]);
-    }
-    console.log();
-    
-    return true;
-}
-
-async function listAddresses() {
-    console.log('\nWallet addresses:');
-
-    let miningAddress = Blockchain.Wallet.getMiningAddress();
-
-    console.log(addressHeader);
-    for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
-        let address = Blockchain.Wallet.addresses[i].address;
-        let balance = 1000000000.3354;//Blockchain.accountantTree.getBalance(address, undefined);
-        
-        if (address === miningAddress) {
-            console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
-        } else {
-            console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
-        }
-    }
-
-    return true;
-}
-
-async function createNewAddress() {
-    console.log('Create new address.');
-    
-    await Blockchain.Wallet.createNewAddress();
-    
-    return true;
-}
-
-async function deleteAddress() {
-    console.log('Delete address.');
-
-    let addressId = await _chooseAddress();
-    
-    if (addressId < 0) {
-        console.log("You must enter a valid number.");
-        return false;
-    }
-
-    let response = await Blockchain.Wallet.deleteAddress(Blockchain.Wallet.addresses[addressId].address);
-
-    console.log(response.message);
-
-    return response.result;
-}
-
-function importAddress() {
-    console.log('Import address.');
-
-    return new Promise(resolve => {
-
-        WEBD_CLI.question('Enter address path: ', (addressPath) => {
-            
-            FileSystem.readFile(addressPath, 'utf8', async function(err, content) {
-
-                if (err) {
-                    console.error(err);
-                    resolve(false);
-                    return;
-                }
-
-                try {
-                    let answer = await Blockchain.Wallet.importAddressFromJSON(JSON.parse(content));
-
-                    if (answer.result === true) {
-                        console.log("Address successfully imported", answer.address);
-                        await Blockchain.Wallet.saveWallet();
-                        resolve(true);
-                        return;
-                    } else {
-                        console.error(answer.message);
-                        resolve(false);
-                        return;
-                    }
-                } catch(err) {
-                    console.log(err.message);
-                    resolve(false);
-                    return;
-                }
-
-                resolve(false);
-                return;
-            });
-
-        });
-
-    });
-    
-}
-
-function exportAddress() {
-    console.log('Export address.');
-    
-    return new Promise(resolve => {
-        _chooseAddress().then( (addressId) => {
-            if (addressId < 0) {
-                console.log("You must enter a valid number.");
-                resolve(false);
-                return;
-            }
-
-            WEBD_CLI.question('Enter path for saving address: ', async (addressPath) => {
-                
-                let addressString = Blockchain.Wallet.addresses[addressId].address;
-                let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
-                
-                if (answer.result === false) {
-                    console.log("Address was not exported. :(. " + answer.message);
-                    resolve(false);
-                    return;
-                }
-                
-                let jsonAddress = JSON.stringify(answer.data);
-                
-                FileSystem.writeFile(addressPath + addressString + ".webd", jsonAddress, function (err) {
-                    if (err) {
-                        console.error(err);
-                        resolve(false);
-                        return;
-                    }
-
-                    console.log("Address successfully exported", addressString);
-                    resolve(true);
-                    return;
-                });
-
-                resolve(true);
-                return;
-            });
-
-        });
-    });
-}
-
-async function encryptAddress() {
-    console.log('Encrypt address.');
-    
-    let addressId = await _chooseAddress();
-    
-    if (addressId < 0) {
-        console.log("You must enter a valid number.");
-        return false;
-    }
-    
-    return true;
-    let addressString = Blockchain.Wallet.addresses[addressId].address;
-    let response = await Blockchain.Wallet.encryptAddress(addressString, newPassword, oldPassword = undefined)
-
-    console.log(response.message);
-
-    return response.result;
-}
-
-async function setMiningAddress() {
-    console.log('Set mining address.');
-    
-    let addressId = await _chooseAddress();
-    
-    if (addressId < 0) {
-        console.log("You must enter a valid number.");
-        return false;
-    }
-    
-    return true;
-}
-
-export default WEBD_CLI;
+export default new InteractiveMenu();
