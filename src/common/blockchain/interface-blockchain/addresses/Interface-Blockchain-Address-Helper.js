@@ -8,7 +8,7 @@ import BufferExtended from 'common/utils/BufferExtended';
 
 //video tutorial https://asecuritysite.com/encryption/base58
 
-import WEBD_CLI from 'node/menu/Interactive-Menu';
+import InteractiveMenu from 'node/menu/Interactive-Menu';
 import consts from 'consts/const_global';
 
 class InterfaceBlockchainAddressHelper{
@@ -389,6 +389,7 @@ class InterfaceBlockchainAddressHelper{
     static askForPassword(message){
 
         return new Promise(resolve => {
+
             if (process.env.BROWSER){
                 let answer =  prompt(message||"Please enter your last password (12 words separated by space):");
                 
@@ -403,7 +404,7 @@ class InterfaceBlockchainAddressHelper{
                 return;
             }
             else {
-                WEBD_CLI.question(message||"Please enter your last password (12 words separated by space):", (answer) => {
+                InteractiveMenu.WEBD_CLI.question(message||"Please enter your last password (12 words separated by space):", (answer) => {
                     
                     let oldPassword = answer.trim().split(' ');
                     
@@ -428,7 +429,7 @@ class InterfaceBlockchainAddressHelper{
                 resolve(confirm(message));
                 return;
             } else {
-                WEBD_CLI.question(message + " (yes/no) ? ", (answer) => {
+                InteractiveMenu.WEBD_CLI.question(message + " (yes/no) ? ", (answer) => {
                     resolve(answer === "yes" ? true : false);
                     return;
                 });

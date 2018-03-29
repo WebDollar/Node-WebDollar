@@ -53,9 +53,10 @@ class ValidationsUtils{
 
     async clearIndexedDB(){
 
-        if (typeof window !== "undefined")
+        if ( process.env.BROWSER) return true;
             if (!confirm("Are you WANT TO DELETE YOUR WALLET?"))
                 return false;
+
         let error = false;
 
         for (let i = 0; i < DATABASES.length; i++) {
@@ -66,7 +67,7 @@ class ValidationsUtils{
             }
         }
 
-        if (typeof window !== "undefined") {
+        if ( process.env.BROWSER) {
 
             alert('1');
             for (let i=0; i<DATABASES.length; i++) {
@@ -231,7 +232,7 @@ class ValidationsUtils{
 
     _detectIncognito(){
 
-        if (typeof window === "undefined") return true;
+        if ( !process.env.BROWSER) return true;
 
         let fs = window.RequestFileSystem || window.webkitRequestFileSystem;
 
@@ -250,7 +251,7 @@ class ValidationsUtils{
 
     waitSingleTab(waitCallback){
 
-        if (typeof window === "undefined") return true;
+        if ( !process.env.BROWSER) return true;
 
         return DetectMultipleWindows.waitForSingleTabNow(waitCallback);
     }

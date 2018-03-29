@@ -2,7 +2,7 @@ class DetectMultipleWindows {
 
     constructor() {
 
-        if (typeof window === "undefined")
+        if ( process.env.BROWSER)
             return;
 
         window.addEventListener('storage', (data) => {

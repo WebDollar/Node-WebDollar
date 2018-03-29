@@ -6,7 +6,7 @@ class InteractiveMenu{
 
     constructor(){
 
-        if (typeof window !== "undefined")
+        if ( process.env.BROWSER)
             return;
 
         this.WEBD_CLI = readline.createInterface({
