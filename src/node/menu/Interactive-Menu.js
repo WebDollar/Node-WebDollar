@@ -8,7 +8,8 @@ const commands = [
         '3. Delete address',
         '4. Import address',
         '5. Export address',
-        '6. Set mining address',
+        '6. Encrypt address',
+        '7. Set mining address'
     ];
 
 const lineSeparator = 
@@ -51,6 +52,9 @@ let _runMenu = async function () {
                 await exportAddress();
                 break;
             case '6':
+                await encryptAddress();
+                break;
+            case '7':
                 await setMiningAddress();
                 break;
             case 'exit':
@@ -235,6 +239,25 @@ function exportAddress() {
 
         });
     });
+}
+
+async function encryptAddress() {
+    console.log('Encrypt address.');
+    
+    let addressId = await _chooseAddress();
+    
+    if (addressId < 0) {
+        console.log("You must enter a valid number.");
+        return false;
+    }
+    
+    return true;
+    let addressString = Blockchain.Wallet.addresses[addressId].address;
+    let response = await Blockchain.Wallet.encryptAddress(addressString, newPassword, oldPassword = undefined)
+
+    console.log(response.message);
+
+    return response.result;
 }
 
 async function setMiningAddress() {
