@@ -22,11 +22,11 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     }
 
     validateRoot(validateMerkleTree){
-        InterfaceMerkleRadixTree.prototype.validateRoot.apply();
 
-        if (validateMerkleTree){
+        if (!InterfaceMerkleRadixTree.prototype.validateRoot.apply(this, arguments)) return false;
 
-        }
+        if (validateMerkleTree)
+            this._validateHash(validateMerkleTree);
 
     }
 
@@ -168,7 +168,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     _changedNode(node){
 
         // recalculate the balances
-
         InterfaceMerkleTree.prototype._changedNode.call(this, node); //computing hash
     }
 
