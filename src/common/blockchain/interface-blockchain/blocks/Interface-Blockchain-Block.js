@@ -154,13 +154,15 @@ class InterfaceBlockchainBlock {
 
     _validateBlockTimeStamp(){
 
-        // A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
+        // BITCOIN: A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
+
         if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3.DIFFICULTY_HARD_FORK + consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1)
             if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1) {
 
                 let medianTimestamp = 0;
                 for (let i=this.height-1; i >= this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--)
-                    medianTimestamp += this.blockValidation.getTimeStampCallback(i);
+                    medianTimestamp += this.blockValidation.getTimeStampCallback(i+1);
+
                 medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
 
                 if (this.timeStamp < medianTimestamp)

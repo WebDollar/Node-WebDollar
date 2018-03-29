@@ -7,8 +7,8 @@ export default {
        "port": 80,
     },
     {
-        "addr": ["5.12.246.73"],
-        "port": 2095,
+        "addr": ["192.168.2.8"],
+        "port": 12320,
     },
     {
       "addr": ["webdollar.io", "149.56.14.37"],
