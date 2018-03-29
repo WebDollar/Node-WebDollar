@@ -183,7 +183,7 @@ class InterfaceTree{
         if (parent === undefined)
             parent = null;
 
-        if (node.parent !== parent)
+        if (node !== this.root && node.parent !== parent)
             return false;
 
         for (let i = 0; i < node.edges.length; i++) {
