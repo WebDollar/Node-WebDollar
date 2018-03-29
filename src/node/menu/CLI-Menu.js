@@ -289,11 +289,11 @@ class CLI{
 
     async startMining(instantly){
 
-        if (Blockchain.created)
-        Blockchain.createBlockchain("light-node",()=>{
-            Node.NodeServer.startServer();
-            Node.NodeClientsService.startService();
-        });
+        if (Blockchain._blockchainInitiated)
+            Blockchain.createBlockchain("light-node",()=>{
+                Node.NodeServer.startServer();
+                Node.NodeClientsService.startService();
+            });
 
         if (instantly)
             Blockchain.startMiningInstantly();

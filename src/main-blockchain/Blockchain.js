@@ -15,6 +15,7 @@ class Blockchain{
 
         this._startMiningNextTimeSynchronized = false;
         this._blockchainInitiated = false;
+        this.synchronized = false;
 
         this.Chain = new MainBlockchain(undefined);
         this.blockchain = this.Chain;
@@ -131,9 +132,10 @@ class Blockchain{
     async synchronizeBlockchain(firstTime, synchronizeComplete=false){
 
         StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});
-        let agentInitialization = false;
 
-        while (!agentInitialization){
+        this.synchronized = false;
+
+        while (!this.synchronized){
 
             StatusEvents.emit('blockchain/status', {message: "Synchronizing"});
 
@@ -143,7 +145,7 @@ class Blockchain{
             if (resultAgentStarted.result){
 
                 StatusEvents.emit('blockchain/status', {message: "Synchronization Successful"});
-                agentInitialization = true;
+                this.synchronized = true;
 
             } else {
 
@@ -175,15 +177,11 @@ class Blockchain{
     set startMiningNextTimeSynchronized(newValue){
         this._startMiningNextTimeSynchronized = newValue;
 
-        if (newValue && this.){
-
-        }
-
+        if (newValue && this.synchronized)
+            this.startMining();
     }
 
-    get blockchainInitiated(){
-        return this._blockchainInitiated;
-    }
+
 }
 
 export default new Blockchain()
