@@ -11,8 +11,8 @@ class InterfaceTree{
         this.createRoot();
     }
 
-    createRoot(parent, edges, value){
-        this.root = new InterfaceTreeNode(null, parent, edges, value);
+    createRoot(){
+        this.root = new InterfaceTreeNode(null, null, [], null);
         this.root.root = this.root;
     }
 
@@ -61,7 +61,7 @@ class InterfaceTree{
         let deleted = false;
 
         let nodeParent = node.parent;
-        while (nodeParent !== null && node.value === null){
+        while (nodeParent !== null && nodeParent !== undefined && node.value === null){
 
             //delete the edge from parent to deleted child
             for (let i = 0; i < nodeParent.edges.length; i++)

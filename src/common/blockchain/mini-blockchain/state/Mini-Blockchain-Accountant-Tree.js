@@ -19,8 +19,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         this.emitter = new EventEmitter();
     }
 
-    createRoot(parent, edges, value){
-        this.root = new MiniBlockchainAccountantTreeNode(null, parent, edges, value);
+    createRoot(){
+        this.root = new MiniBlockchainAccountantTreeNode(null, null, [], null);
         this.root.autoMerklify = true;
         this.root.root = this.root;
     }

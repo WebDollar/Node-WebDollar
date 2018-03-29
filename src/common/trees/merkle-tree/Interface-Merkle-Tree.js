@@ -10,8 +10,8 @@ class InterfaceMerkleTree extends InterfaceTree{
         super();
     }
 
-    createRoot(parent, edges, value){
-        this.root = new InterfaceMerkleTreeNode(null, parent, edges, value);
+    createRoot(){
+        this.root = new InterfaceMerkleTreeNode(null, null, [], null);
         this.root.autoMerklify = true;
         this.root.root = this.root;
     }

@@ -13,8 +13,8 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
         super(db);
     }
 
-    createRoot(parent, edges, value){
-        this.root = new InterfaceMerkleRadixTreeNode(null, parent, edges, value);
+    createRoot(){
+        this.root = new InterfaceMerkleRadixTreeNode(null, null, [], null);
         this.root.autoMerklify = true;
         this.root.root = this.root;
     }

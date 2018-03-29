@@ -35,16 +35,21 @@ class InterfaceTreeNode {
     }
 
     serializeNodeData(){
-        buffer.push(Serialization.serializeNumber2Bytes(this.value.length));
-        buffer.push(this.value);
+        let buffer = [];
+
+        if ( this.value !== undefined && Buffer.isBuffer(this.value) ) {
+            buffer.push(Serialization.serializeNumber2Bytes(this.value.length));
+            buffer.push( this.value );
+        } else
+            buffer.push (new Buffer(2));
+
+        return Buffer.concat(buffer);
     }
 
     serializeNode(includeEdges){
 
         try {
-            let buffer = [];
-
-            this.serializeNodeData.apply(this, arguments);
+            let buffer = this.serializeNodeData.apply(this, arguments);
 
             if (includeEdges) {
 
@@ -70,8 +75,8 @@ class InterfaceTreeNode {
         offset = offset || 0;
 
 
-        let valueLength = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 1));
-        offset += 1;
+        let valueLength = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 2));
+        offset += 2;
 
         let value = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, valueLength));
         offset += valueLength;
@@ -115,8 +120,10 @@ class InterfaceTreeNode {
         return new InterfaceTreeEdge(node);
     }
 
-    createNewNode(){
-        return new this.constructor (this.root, this, [], null);
+    createNewNode(parent, edges=[], value=null, hash = null){
+
+        if (parent === undefined ) parent = this;
+        return new this.constructor (this.root, parent, edges, value, hash);
     }
 
     validateTreeNode(){
