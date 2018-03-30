@@ -4,6 +4,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import PPoWBlockchainBlockData from 'common/blockchain/ppow-blockchain/blocks/PPoW-Blockchain-Block-Data'
 import Blockchain from 'main-blockchain/Blockchain';
+import consts from "consts/const_global"
 
 describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
 

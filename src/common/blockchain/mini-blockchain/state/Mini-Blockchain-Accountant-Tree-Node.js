@@ -225,7 +225,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
                 //webd token
                 if (webdId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)
-                    throw {message: "webd token is incorrect", token: webId };
+                    throw {message: "webd token is incorrect", token: webdId };
 
                 this.balances = [];
                 let result = Serialization.deserializeBigNumber(buffer, offset);

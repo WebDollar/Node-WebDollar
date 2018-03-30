@@ -4,6 +4,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 import Blockchain from 'main-blockchain/Blockchain';
+import consts from "consts/const_global"
 
 describe('test Interface-Block save/load/remove to/from local storage', () => {
 
