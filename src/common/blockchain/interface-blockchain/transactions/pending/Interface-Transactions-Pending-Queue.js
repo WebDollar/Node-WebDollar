@@ -35,7 +35,7 @@ class InterfaceTransactionsPendingQueue {
 
 
         for (let i = 0; i < this.list.length; i++)
-            if (! this.list[i].txId.equals( transaction.txId) )
+            if ( this.list[i].txId.equals( transaction.txId) )
                 return i;
 
         return -1;

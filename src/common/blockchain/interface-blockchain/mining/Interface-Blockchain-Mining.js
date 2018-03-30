@@ -46,6 +46,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             i--;
         }
 
+        console.warn("--------------------------------");
+        console.warn("Transactions selected for mining: ", transactions.length);
+        console.warn("--------------------------------");
+
         return transactions;
     }
 
