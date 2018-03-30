@@ -176,7 +176,13 @@ class InterfaceBlockchainTransaction{
         this.validateTransactionOnce(undefined,  {blockValidationType: {'skip-validation-transactions-from-values': true}} );
 
         try {
-            this.validateTransactionEveryTime(undefined, {blockValidationType: { 'take-transactions-list-in-consideration': {validation: true}} });
+            let blockValidation = { blockValidationType: {
+                "take-transactions-list-in-consideration": {
+                    validation: true
+                }
+            }};
+            this.validateTransactionEveryTime(undefined, blockValidation );
+
         } catch (exception){
             console.warn ("Transaction had not enough money, so I am skipping it", exception);
             return false;

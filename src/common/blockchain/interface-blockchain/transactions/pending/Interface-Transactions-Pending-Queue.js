@@ -18,7 +18,13 @@ class InterfaceTransactionsPendingQueue {
         if (this.findPendingTransaction(transaction) !== -1)
             return false;
 
-        if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, {blockValidationType: {"take-transactions-list-in-consideration": {validation: true} } }))
+        let blockValidation = { blockValidationType: {
+            "take-transactions-list-in-consideration": {
+                validation: true
+            }
+        }};
+
+        if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidation ))
             return false;
 
         this._insertPendingTransaction(transaction);
@@ -36,18 +42,22 @@ class InterfaceTransactionsPendingQueue {
     _insertPendingTransaction(transaction){
 
         for (let i=0; i<this.list.length; i++ ) {
-            let compare = transaction.from.addresses[0].unencodedAddress.compare(transaction.from.addresses[0].unencodedAddress);
+            let compare = transaction.from.addresses[0].unencodedAddress.compare(this.list[i].from.addresses[0].unencodedAddress);
 
             if (compare < 0) // next
                 continue;
             else
+            if (compare === 0){ //order by nonce
+
+                if (transaction.nonce > this.list[i].nonce){
+                    this.list.splice(i, 0, transaction);
+                }
+
+            }
+            else
             if (compare > 0) { // i will add it
                 this.list.splice(i, 0, transaction);
                 break;
-            }
-            else
-            if (compare === 0){ //order by nonce
-
             }
 
         }
@@ -83,7 +93,13 @@ class InterfaceTransactionsPendingQueue {
 
             try{
 
-                if (!this.list[i].validateTransactionEveryTime(undefined, {blockValidationType: {"take-transactions-list-in-consideration": {validation: true} } } ))
+                let blockValidation = { blockValidationType: {
+                    "take-transactions-list-in-consideration": {
+                        validation: true
+                    }
+                }};
+
+                if (!this.list[i].validateTransactionEveryTime(undefined, blockValidation ))
                     this.list.splice(i, 1);
 
             } catch (exception){
