@@ -57,7 +57,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
             }
 
         if (nonce !== this.nonce)
-            throw {message: "Nonce is invalid", myNonce: this.nonce, nonce: nonce };
+            throw {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce };
 
         return true;
 
@@ -72,7 +72,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
             this.blockchain.transactions.pendingQueue.list.forEach((pendingTransaction) => {
 
-                if (pendingTransaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress)) {
+                if (pendingTransaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress && pendingTransaction.nonce >= nonce) ) {
                     nonce++;
                 }
 

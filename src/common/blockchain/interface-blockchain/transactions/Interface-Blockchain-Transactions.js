@@ -24,14 +24,20 @@ class InterfaceBlockchainTransactions {
         if (fee === undefined) fee = this.calculateFeeSimple(toAmount);
 
         try {
+
             if (!(toAmount instanceof BigNumber)) toAmount = new BigNumber(toAmount);
+
         } catch (exception){
+
+            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Amount is not a valid number", reason: exception }
         }
 
         try {
             if (!(fee instanceof BigNumber)) fee = new BigNumber(fee);
         } catch (exception){
+
+            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Fee is not a valid number", reason: exception }
         }
 
@@ -41,6 +47,8 @@ class InterfaceBlockchainTransactions {
 
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Getting Address", exception);
+
+            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Get Address failed", reason: exception }
         }
 
@@ -84,6 +92,8 @@ class InterfaceBlockchainTransactions {
 
         } catch (exception) {
             console.error("Creating a new transaction raised an exception - Failed Creating a transaction", exception);
+
+            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Failed Creating a transaction", reason: exception }
         }
 
@@ -93,6 +103,8 @@ class InterfaceBlockchainTransactions {
             signature = await address.signTransaction(transaction, password);
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception);
+
+            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Failed Signing the transaction", reason: exception }
         }
 
@@ -106,6 +118,8 @@ class InterfaceBlockchainTransactions {
             transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidation );
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception);
+
+            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Failed Signing the transaction", reason: exception }
         }
 
@@ -115,6 +129,8 @@ class InterfaceBlockchainTransactions {
 
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Including Pending Transaction", exception);
+
+            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Including Pending Transaction", reason: exception }
         }
 

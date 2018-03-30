@@ -22,11 +22,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     _selectNextTransactions(){
 
         let transactions = [], size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
-        let i = this.blockchain.transactions.pendingQueue.list.length-1;
+        let i = 0;
 
-        while (size > 0 && i >= 0){
+        while (size > 0 && i < this.blockchain.transactions.pendingQueue.list.length ){
 
             let transaction = this.blockchain.transactions.pendingQueue.list[i];
+
+            let bRemoveTransaction = false;
 
             try {
 
@@ -45,13 +47,18 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                         transactions.push(transaction);
 
                 } else
-                    this.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
+                    bRemoveTransaction = true;
+
 
             } catch (exception){
-                this.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
+                console.warn('Error Including Transaction', exception);
+                bRemoveTransaction = true;
             }
 
-            i--;
+            if (bRemoveTransaction)
+                this.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
+
+            i++;
         }
 
         console.warn("--------------------------------");
@@ -185,7 +192,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             if (answer.result && this.blockchain.blocks.length === block.height ){
 
                 console.warn( "----------------------------------------------------------------------------");
-                console.warn( "WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress);
+                console.warn( "WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress.toString("hex"));
                 console.warn( "----------------------------------------------------------------------------");
 
                 try {

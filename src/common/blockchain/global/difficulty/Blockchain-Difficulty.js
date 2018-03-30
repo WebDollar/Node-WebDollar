@@ -86,7 +86,7 @@ class BlockchainDifficulty{
             let newBlockDifficulty = prevBlockDifficulty.multipliedBy(ratio);
             newBlockDifficulty = newBlockDifficulty.decimalPlaces(0);
 
-            console.warn( "newBlockDifficulty2", newBlockDifficulty, newBlockDifficulty.toString(16) );
+            console.warn( "newBlockDifficulty2",  newBlockDifficulty.toString(), newBlockDifficulty.toString(16) );
             console.warn( "newBlockDifficulty was calculated", Math.floor( new Date().getTime() / 1000), "    ", new Date() );
             return BigInteger( newBlockDifficulty.toString(16), 16 );
             //return prevBlockDifficulty.multiply(ratio.toString());

@@ -49,7 +49,6 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
             //updating reward
-            //console.warn("block.data.minerAddress",block.data.minerAddress, block.reward);
 
             result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
 
