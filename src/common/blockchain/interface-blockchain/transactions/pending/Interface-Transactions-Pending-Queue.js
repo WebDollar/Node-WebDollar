@@ -18,10 +18,12 @@ class InterfaceTransactionsPendingQueue {
         if (this.findPendingTransaction(transaction) !== -1)
             return false;
 
-        if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, {blockValidationType: {"take-pending-queue-transactions-list-consideration": true} }))
+        if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, {blockValidationType: {"take-transactions-list-in-consideration": {validation: true} } }))
             return false;
 
-        this.list.push(transaction);
+        this._insertPendingTransaction(transaction);
+
+
         this.propagateTransaction(transaction, exceptSockets);
 
 
@@ -29,6 +31,28 @@ class InterfaceTransactionsPendingQueue {
 
         return true;
 
+    }
+
+    _insertPendingTransaction(transaction){
+
+        for (let i=0; i<this.list.length; i++ ) {
+            let compare = transaction.from.addresses[0].unencodedAddress.compare(transaction.from.addresses[0].unencodedAddress);
+
+            if (compare < 0) // next
+                continue;
+            else
+            if (compare > 0) { // i will add it
+                this.list.splice(i, 0, transaction);
+                break;
+            }
+            else
+            if (compare === 0){ //order by nonce
+
+            }
+
+        }
+
+        this.list.push(transaction);
     }
 
     findPendingTransaction(transaction){
@@ -59,7 +83,7 @@ class InterfaceTransactionsPendingQueue {
 
             try{
 
-                if (!this.list[i].validateTransactionEveryTime(undefined, {blockValidationType: {"take-pending-queue-transactions-list-consideration": true} } ))
+                if (!this.list[i].validateTransactionEveryTime(undefined, {blockValidationType: {"take-transactions-list-in-consideration": {validation: true} } } ))
                     this.list.splice(i, 1);
 
             } catch (exception){

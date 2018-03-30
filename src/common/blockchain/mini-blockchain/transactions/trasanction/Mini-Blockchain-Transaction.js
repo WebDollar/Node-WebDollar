@@ -27,26 +27,34 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         //Validate nonce
         let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
 
-        if (blockValidation.blockValidationType['take-pending-queue-transactions-list-consideration'] && nonce < this.nonce){
+        if (nonce < this.nonce)
+            if (blockValidation.blockValidationType !== undefined && blockValidation.blockValidationType['take-transactions-list-in-consideration'] !== undefined &&
+                blockValidation.blockValidationType['take-transactions-list-in-consideration'].validation ){
 
-            let foundNonce = {};
-            for (let i=nonce; i<this.nonce; i++)
-                foundNonce[i] = false;
+                let foundNonce = {};
+                for (let i=nonce; i<this.nonce; i++)
+                    foundNonce[i] = false;
 
-            this.blockchain.transactions.pendingQueue.list.forEach((transaction)=>{
+                //fetching the transactions list
+                let transactionsList = blockValidation.blockValidationType['take-transactions-list-in-consideration'].transactionsList;
 
-                if (transaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress))
-                    foundNonce[ transaction.nonce ] = true;
+                if (transactionsList === undefined)
+                    transactionsList = this.blockchain.transactions.pendingQueue.list;
 
-            });
+                transactionsList.forEach((transaction)=>{
 
-            for (let i=nonce; i<this.nonce; i++)
-                if (!foundNonce[i])
-                    return false;
+                    if (transaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress))
+                        foundNonce[ transaction.nonce ] = true;
 
-            return true;
+                });
 
-        }
+                for (let i=nonce; i<this.nonce; i++)
+                    if (!foundNonce[i])
+                        return false;
+
+                return true;
+
+            }
 
         if (nonce !== this.nonce)
             throw {message: "Nonce is invalid", myNonce: this.nonce, nonce: nonce };

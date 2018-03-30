@@ -312,7 +312,7 @@ class InterfaceBlockchainFork {
                 block.data.transactions.transactions.forEach((transaction)=>{
 
                     try {
-                        if ( transaction.validateTransactionEveryTime(block.height, {blockValidationType: { 'take-pending-queue-transactions-list-consideration': true} }) )
+                        if ( transaction.validateTransactionEveryTime(block.height, {blockValidationType: { 'take-transactions-list-in-consideration': {validation: true} } }) )
                             this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
                     }
                     catch (exception){

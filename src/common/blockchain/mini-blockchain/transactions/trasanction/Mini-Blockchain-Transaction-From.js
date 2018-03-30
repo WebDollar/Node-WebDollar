@@ -5,7 +5,7 @@ const BigNumber = require('bignumber.js');
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
 
-    validateFromEnoughMoney(){
+    validateFromEnoughMoney(blockValidation){
 
         this.addresses.forEach ( (fromObject, index) =>{
 

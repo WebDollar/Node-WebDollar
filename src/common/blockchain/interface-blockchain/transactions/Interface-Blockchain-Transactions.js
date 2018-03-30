@@ -97,7 +97,7 @@ class InterfaceBlockchainTransactions {
         }
 
         try{
-            transaction.validateTransactionOnce( this.blockchain.blocks.length-1, {blockValidationType: {"take-pending-queue-transactions-list-consideration": true} } );
+            transaction.validateTransactionOnce( this.blockchain.blocks.length-1, {blockValidationType: {"take-transactions-list-in-consideration": {validation: true} } } );
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception);
             return { result:false,  message: "Failed Signing the transaction", reason: exception }
