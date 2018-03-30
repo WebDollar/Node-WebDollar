@@ -112,9 +112,10 @@ class CLI{
         console.info('\nWallet addresses:');
 
         let miningAddress = Blockchain.blockchain.mining.minerAddress;
-        if (miningAddress === undefined) miningAddress = 'not specified';
+        if (miningAddress === undefined)
+            miningAddress = 'not specified';
 
-        console.log("miningAddress", miningAddress);
+        console.log("miningAddress=", miningAddress);
 
         console.log(addressHeader);
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
@@ -161,7 +162,7 @@ class CLI{
         let addressId = await this._chooseAddress();
 
         if (addressId < 0) {
-            console.error("You must enter a valid number.");
+            console.warn("You must enter a valid number.");
             return false;
         }
 
@@ -238,7 +239,7 @@ class CLI{
 
             let jsonAddress = JSON.stringify(answer.data);
 
-            FileSystem.writeFile(addressPath + addressString + ".webd", jsonAddress, (err) => {
+            FileSystem.writeFile(addressPath+addressString+".webd", jsonAddress, 'utf8', (err) => {
 
                 if (err) {
                     console.error(err);
