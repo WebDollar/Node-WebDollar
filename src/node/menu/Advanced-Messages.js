@@ -10,7 +10,6 @@ class AdvancedMessages{
             console.warn(arguments);
     }
 
-    //askForConfirmation
     async confirm(message){
 
         if (process.env.BROWSER) {
@@ -23,7 +22,7 @@ class AdvancedMessages{
 
     }
 
-    logInfo(cliMsg, browserMsg) {
+    log(cliMsg, browserMsg) {
 
        if (process.env.BROWSER)
            console.info(browserMsg || cliMsg);
