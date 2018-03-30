@@ -11,82 +11,11 @@ class BlockchainDifficulty{
         if (!( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.isGreaterThanOrEqualTo(0))))
             throw {message: "invalid block number"};
 
-        // console.log("prevBlockTimestamp", prevBlockTimestamp.toString(16));
-        // console.log("blockTimestamp", blockTimestamp.toString(16));
-        // console.log("blockNumber", blockNumber.toString(16));
-
         return this.getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
 
     }
 
-    /**
-     * returns the Dificulty as a BigInteger
-     * @param prevBlockDifficulty
-     * @param prevBlockTimestamp
-     * @param blockTimestamp
-     * @param blockNumber
-     * @param includeBombFormula
-     */
-    static calculateBlockDifficultyETH( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber, includeBombFormula){
 
-        // difficulty function based on Ethereum
-        // https://ethereum.stackexchange.com/questions/5913/how-does-the-ethereum-homestead-difficulty-adjustment-algorithm-work
-
-
-        /*
-          block_diff = parent_diff + parent_diff // 2048 *
-                       max(1 - (block_timestamp - parent_timestamp) // 10, -99) +
-                       int(2**((block.number // 100000) - 2))                                                -- includeBombFormula
-         */
-
-        let prevBlockDifficulty = getDifficultyCallback(blockNumber);
-        let prevBlockTimestamp = getTimeStampCallback(blockNumber);
-
-        if (Buffer.isBuffer(prevBlockDifficulty))
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty.toString("hex"), 16);
-        else if (typeof prevBlockDifficulty === "string") // it must be hex
-            prevBlockDifficulty = BigInteger(prevBlockDifficulty.replace("0x",""), 16);
-
-
-        if (Buffer.isBuffer(prevBlockTimestamp))
-            prevBlockTimestamp = BigInteger(prevBlockTimestamp.toString("hex"), 16);
-        else if (typeof prevBlockTimestamp === "string")
-            prevBlockTimestamp = BigInteger(prevBlockTimestamp.replace("0x",""), 16);
-
-        if (Buffer.isBuffer(blockTimestamp))
-            blockTimestamp = BigInteger(blockTimestamp.toString("hex"), 16);
-        else
-        if (typeof blockTimestamp === "string"){
-            blockTimestamp = BigInteger(blockTimestamp.replace("0x",""), 16);
-        }
-
-        if (prevBlockTimestamp instanceof BigInteger === false)
-            prevBlockTimestamp = BigInteger(prevBlockTimestamp);
-        
-        if (blockTimestamp instanceof BigInteger === false)
-            blockTimestamp = BigInteger(blockTimestamp);
-        
-        if (blockNumber instanceof BigInteger === false)
-            blockNumber = BigInteger(blockNumber);
-
-        //console.log(blockTimestamp, prevBlockTimestamp)
-
-        let equationTwoPartA =  BigInteger(1).minus( blockTimestamp.minus( prevBlockTimestamp ).divide(10));    // max(1 - (block_timestamp - parent_timestamp) // 10, -99) +
-        let equationTwo = equationTwoPartA.greater( -99 ) ? equationTwoPartA : -99;
-
-        //console.log("equationTwo", equationTwo);
-
-        let blockDiff;
-
-        blockDiff = prevBlockDifficulty.minus(prevBlockDifficulty.divide(2048).times  //parent_diff + parent_diff // 2048 *
-            (equationTwo)
-        );
-
-        if (blockDiff.lesser(0))
-            return BigInteger("00148112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", 16);
-        else
-            return blockDiff;
-    }
 
     /**
      * like the difficulty used in BITCOIN based on the Last X Blocks
