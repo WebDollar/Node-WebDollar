@@ -8,7 +8,7 @@ import Blockchain from 'main-blockchain/Blockchain';
 describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
 
     let db = new InterfaceSatoshminDB();
-    let version = 0x01;
+    let version = consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION;
     let hash = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
     let interlinkHash1 = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d70b5462806b92be0cbccd30cb", "hex");
     let interlinkHash2 = new Buffer("7bb3e84e1234c7e76be2beedb94a5678b7f095d50b5462806b92be0cbccd30cc", "hex");

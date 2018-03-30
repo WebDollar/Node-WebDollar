@@ -108,6 +108,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         let list = { };
 
+        // Converting balances into Hex Object fo
         for (let i = 0; i < this.balances.length; i++)
             list[ "0x"+this.balances[i].id.toString("hex") ] = this.balances[i].amount.toString();
 
@@ -132,12 +133,17 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     _serializeBalance(balance){
 
-        return Buffer.concat(
-            [
+        return Buffer.concat([
                 Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH),
                 Serialization.serializeBigNumber(balance.amount)
             ]);
+    }
 
+    _serializeBalanceWEBDToken(balance){
+        return Buffer.concat([
+            Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH),
+            Serialization.serializeBigNumber(balance.amount)
+        ]);
     }
 
     serializeNodeData( includeEdges, includeHashes ){
@@ -150,41 +156,44 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             if (hash === null)
                 hash = new Buffer(0);
 
-            let balancesCount = 0;
+            let buffer = Buffer.concat( [hash, Serialization.serializeNumber2Bytes(this.nonce)] );
+
+            let balancesBuffered = new Buffer(0);
+
             if (this.balances !== undefined && this.balances !== null) {
 
-                //let serialize webd
-                let iWEBDSerialized = null;
+                //let serialize WEBD Token
+                let WEBDTokenIndex = null;
                 for (let i = 0; i < this.balances.length; i++)
-                    if ((this.balances[i].id.length === 1) && (this.balances[i].id[0] === 1)) {
-                        iWEBDSerialized = i;
+                    if ((this.balances[i].id.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) && (this.balances[i].id[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)) {
+                        WEBDTokenIndex = i;
                         break;
                     }
 
                 // in case it was not serialize d and it is empty
-                if (iWEBDSerialized === null) {
-                    let idWEBD = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
-                    idWEBD[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
+                if (WEBDTokenIndex === null) {
 
-                    balancesBuffers.push(this._serializeBalance({id: idWEBD, amount: new BigNumber(0)}));
+                    if (this.balances.length > 0) {
+                        let idWEBD = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+                        idWEBD[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
+
+                        balancesBuffers.push(this._serializeBalanceWEBDToken({id: idWEBD, amount: new BigNumber(0)}));
+                    }
+
                 } else {
-                    balancesBuffers.push(this._serializeBalance(this.balances[iWEBDSerialized]));
+                    balancesBuffers.push(this._serializeBalanceWEBDToken(this.balances[WEBDTokenIndex]));
                 }
-
-                balancesCount = 1;
 
                 //let serialize everything else
                 for (let i = 0; i < this.balances.length; i++)
-                    if (i !== iWEBDSerialized) {
+                    if (i !== WEBDTokenIndex)
                         balancesBuffers.push(this._serializeBalance(this.balances[i]));
-                        balancesCount++;
-                    }
 
-                balancesBuffers = Buffer.concat(balancesBuffers);
+                balancesBuffered = Buffer.concat(balancesBuffers);
             }
 
 
-            return Buffer.concat( [ hash, Serialization.serializeNumber2Bytes(this.nonce), Serialization.serializeNumber2Bytes(balancesCount), balancesBuffers ] );
+            return Buffer.concat( [ buffer, Serialization.serializeNumber1Byte(balancesBuffers.length), balancesBuffered ] );
 
         } catch (exception){
             console.log("Error Serializing MiniAccountantTree NodeData", exception);
@@ -195,6 +204,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     deserializeNodeData(buffer, offset, includeEdges, includeHashes){
 
+        offset = offset || 0;
+
         // deserializing this.value
         offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeDataHash.call(this, buffer, offset, includeHashes);
 
@@ -203,30 +214,29 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         try {
 
-            offset = offset || 0;
-
-            let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 byte
-            offset += 2;
+            let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
+            offset += 1;
 
             if (balancesLength > 0){
 
                 // webd balance
-                let webdId =  BufferExtended.substr(buffer, offset,1) ;
+                let webdId =  BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) ;
                 offset += 1;
 
                 //webd token
-                if (webdId[0] !== 1)
-                    throw {message: "webd token is incorrect", token: webId};
+                if (webdId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)
+                    throw {message: "webd token is incorrect", token: webId };
 
                 this.balances = [];
-                let result = Serialization.deserializeBigNumber( buffer, offset );
+                let result = Serialization.deserializeBigNumber(buffer, offset);
 
                 //console.log("result.number",result.number);
 
                 this.updateBalanceToken(result.number);
                 offset = result.newOffset;
 
-                if (balancesLength > 0) {
+
+                if (balancesLength > 1) {
 
                     //rest of tokens , in case there are
                     for (let i = 1; i < balancesLength; i++) {

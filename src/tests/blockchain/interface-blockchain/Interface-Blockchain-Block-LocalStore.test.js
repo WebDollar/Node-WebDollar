@@ -9,7 +9,7 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
 
 
     let db = new InterfaceSatoshminDB();
-    let version = 0x01;
+    let version = consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION;
     let hash = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
     let hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
     let timeStamp = Math.trunc(Math.random() * 100000);

@@ -57,6 +57,10 @@ consts.POPOW_PARAMS={
 
 consts.TRANSACTIONS = {
 
+    VERSIONS:{
+        SCHNORR_VERSION: 0x01,
+    },
+
     SIGNATURE_SCHNORR:{
         LENGTH : 64
     },

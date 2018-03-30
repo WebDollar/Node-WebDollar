@@ -72,7 +72,7 @@ class InterfaceBlockchainBlock {
         if (this.timeStamp < 0 || this.timeStamp >= 0xFFFFFFFF) throw {message: 'timeStamp is invalid'};
 
         if (height >= 0) {
-            if (this.version !== 0x01) throw {message: 'invalid version ', version: this.version};
+            if (this.version !== consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION) throw {message: 'invalid version ', version: this.version};
         }
 
         if (height !== this.height)

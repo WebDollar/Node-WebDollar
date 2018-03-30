@@ -16,10 +16,10 @@ describe('test Interface-Blockchain save/load/remove to/from local storage', () 
         //create dummy blocks
 
         //it requires real data
-        let b0 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), 0x01, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 0, blockchain.db );
-        let b1 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), 0x01, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 1, blockchain.db );
-        let b2 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), 0x01, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 2, blockchain.db );
-        let b3 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), 0x01, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 3, blockchain.db );
+        let b0 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 0, blockchain.db );
+        let b1 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 1, blockchain.db );
+        let b2 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 2, blockchain.db );
+        let b3 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 3, blockchain.db );
         blockchain.blocks = [b0, b1, b2, b3];
 
         response = await blockchain.saveBlockchain();
