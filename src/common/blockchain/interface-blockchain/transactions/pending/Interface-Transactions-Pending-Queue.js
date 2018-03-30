@@ -18,7 +18,7 @@ class InterfaceTransactionsPendingQueue {
         if (this.findPendingTransaction(transaction) !== -1)
             return false;
 
-        if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1))
+        if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, {blockValidationType: {"take-pending-queue-transactions-list-consideration": true} }))
             return false;
 
         this.list.push(transaction);
@@ -59,7 +59,7 @@ class InterfaceTransactionsPendingQueue {
 
             try{
 
-                if (!this.list[i].validateTransactionEveryTime())
+                if (!this.list[i].validateTransactionEveryTime(undefined, {blockValidationType: {"take-pending-queue-transactions-list-consideration": true} } ))
                     this.list.splice(i, 1);
 
             } catch (exception){

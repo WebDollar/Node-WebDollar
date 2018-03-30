@@ -161,7 +161,7 @@ class InterfaceBlockchainTransaction{
 
         if (blockValidation.blockValidationType === undefined || !blockValidation.blockValidationType['skip-validation-transactions-from-values']){
 
-            this._validateNonce();
+            this._validateNonce(blockValidation);
 
             return this.from.validateFromEnoughMoney();
 
@@ -173,10 +173,10 @@ class InterfaceBlockchainTransaction{
 
     isTransactionOK(){
 
-        this.validateTransactionOnce(undefined, {blockValidationType: { 'skip-validation-transactions-from-values': true} } );
+        this.validateTransactionOnce(undefined,  {blockValidationType: {'skip-validation-transactions-from-values': true}} );
 
         try {
-            this.validateTransactionEveryTime();
+            this.validateTransactionEveryTime(undefined, {blockValidationType: { 'take-pending-queue-transactions-list-consideration': true} });
         } catch (exception){
             console.warn ("Transaction had not enough money, so I am skipping it", exception);
             return false;
@@ -277,7 +277,7 @@ class InterfaceBlockchainTransaction{
         return {fees: diffInFees, currencyTokenId: this.from.currencyTokenId};
     }
 
-    _validateNonce(){
+    _validateNonce(blockValidation){
         return true;
     }
 

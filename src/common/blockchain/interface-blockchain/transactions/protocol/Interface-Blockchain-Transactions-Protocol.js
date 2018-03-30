@@ -48,7 +48,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 if (transaction === undefined) throw {message: "Transaction was not specified"};
 
-                transaction.validateTransactionOnce();
+                transaction.isTransactionOK();
 
                 if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction))
                     throw {message: "I already have this transaction"};

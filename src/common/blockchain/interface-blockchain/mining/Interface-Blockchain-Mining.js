@@ -29,7 +29,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             let transaction = this.blockchain.transactions.pendingQueue.list[i];
 
             try {
-                if (transaction.validateTransactionEveryTime(this.blockchain.blocks.length)) {
+                if (transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  { 'take-pending-queue-transactions-list-consideration': true} )) {
 
                     size -= transaction.serializeTransaction().length;
 
@@ -174,7 +174,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             }
 
             if (answer.result && this.blockchain.blocks.length === block.height ){
+
+                console.warn( "----------------------------------------------------------------------------");
                 console.warn( "WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress);
+                console.warn( "----------------------------------------------------------------------------");
 
                 try {
 

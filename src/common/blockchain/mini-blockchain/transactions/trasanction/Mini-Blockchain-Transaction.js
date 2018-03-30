@@ -22,13 +22,34 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return InterfaceBlockchainTransaction.prototype.processTransaction.call(this, multiplicationFactor);
     }
 
-    _validateNonce(){
+    _validateNonce(blockValidation){
 
         //Validate nonce
         let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
 
+        if (blockValidation.blockValidationType['take-pending-queue-transactions-list-consideration'] && nonce < this.nonce){
+
+            let foundNonce = {};
+            for (let i=nonce; i<this.nonce; i++)
+                foundNonce[i] = false;
+
+            this.blockchain.transactions.pendingQueue.list.forEach((transaction)=>{
+
+                if (transaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress))
+                    foundNonce[ transaction.nonce ] = true;
+
+            });
+
+            for (let i=nonce; i<this.nonce; i++)
+                if (!foundNonce[i])
+                    return false;
+
+            return true;
+
+        }
+
         if (nonce !== this.nonce)
-            throw {message: "Nonce is invalid", myNonce: this.nonce, nonce: nonce }
+            throw {message: "Nonce is invalid", myNonce: this.nonce, nonce: nonce };
 
         return true;
 
