@@ -74,8 +74,8 @@ class InterfaceBlockchainTransactionFrom{
         });
 
         if (currencyTokenId === undefined){
-            currencyTokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH);
-            currencyTokenId[0] = 0x01;
+            currencyTokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+            currencyTokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 
         this.addresses = addresses;
@@ -103,7 +103,7 @@ class InterfaceBlockchainTransactionFrom{
         if (!Buffer.isBuffer(this.currencyTokenId))
             throw {message: 'To.currencyTokenId is not a buffer', currencyTokenId: this.currencyTokenId};
 
-        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH) )
+        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH) )
             throw { message: "To.currencyTokenId is not valid", currencyTokenId: this.currencyTokenId };
 
         //TODO validate currency

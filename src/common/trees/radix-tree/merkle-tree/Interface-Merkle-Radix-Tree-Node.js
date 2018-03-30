@@ -40,12 +40,11 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
         return Buffer.concat ( list );
     }
 
-    deserializeNodeDataHash(buffer, offset, includeEdges, includeHashes){
+    deserializeNodeDataHash(buffer, offset, includeHashes){
 
-        offset = offset || 0;
-
-        //console.log("deserializeNodeData includeHashes", includeHashes)
         if (includeHashes) {
+
+            offset = offset || 0;
 
             let hashSha256 = BufferExtended.substr(buffer, offset, 32);
             offset += 32;
@@ -53,13 +52,13 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
             this.hash = {sha256: hashSha256};
 
         }
-        //console.log("deserializeNodeData includeHashes", this.hash.sha256.toString("hex"))
+
         return offset;
     }
 
     deserializeNodeData(buffer, offset, includeEdges, includeHashes){
 
-        offset = this.deserializeNodeDataHash.apply(this, arguments);
+        offset = this.deserializeNodeDataHash.call(this, buffer, offset, includeHashes);
 
         arguments[1] = offset;
         offset = InterfaceRadixTreeNode.prototype.deserializeNodeData.apply(this, arguments);

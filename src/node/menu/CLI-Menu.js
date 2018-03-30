@@ -28,7 +28,8 @@ class CLI{
             return;
         }
 
-        let answer = await this.question('Command: ');
+        //let answer = await this.question('Command: ');
+        let answer = '9';
 
         switch(answer.trim()) {
             case '1':
@@ -66,7 +67,7 @@ class CLI{
                 break;
         }
 
-        await this._runMenu();
+        //await this._runMenu();
     };
 
     async _start() {
@@ -295,16 +296,26 @@ class CLI{
 
     async startMining(instantly){
 
-        if (Blockchain._blockchainInitiated)
-            Blockchain.createBlockchain("light-node",()=>{
+        let callback = () => {
+
+            if (instantly)
+                Blockchain.startMiningInstantly();
+            else
+                Blockchain.startMiningNextTimeSynchronized = true;
+
+        };
+
+        if (!Blockchain._blockchainInitiated) {
+            Blockchain.createBlockchain("light-node", () => {
                 Node.NodeServer.startServer();
                 Node.NodeClientsService.startService();
-            });1
 
-        if (instantly)
-            Blockchain.startMiningInstantly();
-        else
-            Blockchain.startMiningNextTimeSynchronized = true;
+                callback();
+            });
+        }
+        else {
+            callback();
+        }
 
     }
 
@@ -329,7 +340,7 @@ const commands = [
         '6. Encrypt address',
         '7. Set mining address',
         '8. Start Mining',
-        '9. Start Mining Instantly',
+        '9. Start Mining Genesis Instantly',
     ];
 
 const lineSeparator =

@@ -26,15 +26,6 @@ consts.BLOCKCHAIN = {
 
     HARD_FORKS : {
 
-        TEST_NET_3:{
-            DIFFICULTY_HARD_FORK: 121769
-            //DIFFICULTY_HARD_FORK: 121789
-            //DIFFICULTY_HARD_FORK: 83949
-        },
-
-        TEST_NET_3_TRANSACTIONS: {
-            ACCOUNTANT_TREE: 148189,
-        },
 
     }
 };
@@ -43,8 +34,15 @@ consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_B
 consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS + 2* consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ;
 
 consts.MINI_BLOCKCHAIN = {
-    TOKEN_ID_LENGTH :32,
-    TOKEN_CURRENCY_ID_LENGTH : 1,
+
+    TOKENS: {
+        OTHER_TOKEN_LENGTH: 24,
+
+        WEBD_TOKEN:{
+            LENGTH: 1,
+            VALUE: 0x01,
+        },
+    }
 };
 
 

@@ -22,6 +22,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     createRoot(){
         this.root = new MiniBlockchainAccountantTreeNode(null, null, [], null);
         this.root.autoMerklify = true;
+        this.root.deleteEmptyAddresses = false;
         this.root.root = this.root;
     }
 
@@ -36,8 +37,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     updateAccount(address, value, tokenId){
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) {
-            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH);
-            tokenId[0] = 0x01;
+            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+            tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
@@ -67,7 +68,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
             this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {address: addressWIF, balances: (resultUpdate !== null ? node.getBalances() : null)});
         }
 
-        if (resultUpdate === null) {
+        if (this.root.deleteEmptyAddresses && resultUpdate === null) {
             this.delete(address);
             return null;
         }
@@ -94,7 +95,7 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         node.nonce += nonceChange;
 
-        if (!Number.isNumber(node.nonce)) throw {message: "nonce is invalid"};
+        if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid"};
 
         node.nonce = node.nonce % 0xFFFF;
         if (node.nonce < 0) node.nonce = node.nonce + 0xFFFF;
@@ -218,8 +219,8 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     calculateNodeCoins(tokenId , node){
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) {
-            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKEN_CURRENCY_ID_LENGTH);
-            tokenId[0] = 0x01;
+            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+            tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 
         if (node === undefined) node = this.root;

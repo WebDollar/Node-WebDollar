@@ -71,8 +71,6 @@ class InterfaceBlockchainTransaction{
             txId = this._computeTxId();
 
         this.txId = txId;
-
-        this.size = undefined;
     }
 
     _createTransactionFrom(from){
@@ -90,6 +88,10 @@ class InterfaceBlockchainTransaction{
 
     _computeTxId(){
         return WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( this.serializeTransaction() ));
+    }
+
+    recalculateTxId(){
+        this.txId = this._computeTxId();
     }
 
     /**
@@ -127,7 +129,7 @@ class InterfaceBlockchainTransaction{
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock};
 
         let txId = this._computeTxId();
-        if (txId.equals( this.txId ) ) throw {message: "txid don't match"};
+        if (!txId.equals( this.txId ) ) throw {message: "txid don't match"};
 
         if (!this.from)
             throw { message: 'Transaction Validation Invalid: From was not specified', from: this.from };
@@ -157,12 +159,9 @@ class InterfaceBlockchainTransaction{
 
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
-        console.log( "blockValidation", blockValidation);
-
         if (blockValidation.blockValidationType === undefined || !blockValidation.blockValidationType['skip-validation-transactions-from-values']){
 
-            if (!this._validateNonce())
-                return false;
+            this._validateNonce();
 
             return this.from.validateFromEnoughMoney();
 
@@ -230,6 +229,8 @@ class InterfaceBlockchainTransaction{
             console.error("error deserializing a transaction ", exception);
             throw exception;
         }
+
+        this.recalculateTxId();
 
         return offset;
 
