@@ -160,7 +160,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             let balancesBuffered = new Buffer(0);
 
-            if (this.balances !== undefined && this.balances !== null) {
+            if (this.balances !== undefined && this.balances !== null && this.balances.length > 0) {
 
                 //let serialize WEBD Token
                 let WEBDTokenIndex = null;
@@ -205,6 +205,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     deserializeNodeData(buffer, offset, includeEdges, includeHashes){
 
         offset = offset || 0;
+        this.balances = []; // initialization
 
         // deserializing this.value
         offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeDataHash.call(this, buffer, offset, includeHashes);
@@ -227,12 +228,11 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 if (webdId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)
                     throw {message: "webd token is incorrect", token: webdId };
 
-                this.balances = [];
                 let result = Serialization.deserializeBigNumber(buffer, offset);
 
                 //console.log("result.number",result.number);
 
-                this.updateBalanceToken(result.number);
+                this.updateBalanceToken(result.number, webdId);
                 offset = result.newOffset;
 
 
@@ -246,7 +246,6 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
                         result = Serialization.deserializeBigNumber(buffer, offset);
 
-                        //console.log("result.number2",result.number);
                         this.updateBalanceToken(result.number, tokenId);
 
                         offset = result.newOffset;

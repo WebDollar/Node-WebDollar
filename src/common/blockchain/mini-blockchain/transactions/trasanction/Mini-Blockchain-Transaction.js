@@ -35,7 +35,25 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
     }
 
     _computeNonce(){
-        return this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
+
+        let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
+
+        //calculate how many transactions we already have to increment the current nonce
+        try {
+
+            this.blockchain.transactions.pendingQueue.list.forEach((pendingTransaction) => {
+
+                if (pendingTransaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress)) {
+                    nonce++;
+                }
+
+            });
+
+        } catch (exception){
+            console.error("Error processing how many transactions we already have to increment the current nonce");
+        }
+
+        return nonce;
     }
 
     processTransactionFees(multiplicationFactor=1, minerAddress = undefined){
