@@ -16,7 +16,7 @@ class Blockchain{
         this._startMiningNextTimeSynchronized = false;
         this._blockchainInitiated = false;
 
-        this.synchronized = false;
+        this._synchronized = false;
         this._walletLoaded = false;
 
         this.Chain = new MainBlockchain(undefined);
@@ -31,7 +31,7 @@ class Blockchain{
 
         this.Balances = new MainBlockchainBalances(this.Chain);
 
-        this.Accountant = this.Chain.Accountant;
+        this.AccountantTree = this.Chain.accountantTree;
 
         this.onLoaded = new Promise((resolve)=>{
             this._onLoadedResolver = resolve;
@@ -41,10 +41,14 @@ class Blockchain{
         NodesList.emitter.on("nodes-list/disconnected", async (result) => {
 
             if (NodesList.nodes.length === 0) { //no more sockets, maybe I no longer have internet
-                console.log("################### RESYNCHRONIZATION STARTED ##########");
+
+                console.warn("################### RESYNCHRONIZATION STARTED ##########");
                 this.Mining.stopMining();
                 StatusEvents.emit('blockchain/status', {message: "No Internet Access"});
-                await this.synchronizeBlockchain();
+
+                if (this.synchronized)
+                    await this.synchronizeBlockchain();
+
             }
         });
 
@@ -99,27 +103,23 @@ class Blockchain{
         await this.loadWallet();
 
         //loading the blockchain
-        await this.loadBlockchain();
+        let blockchainLoaded = await this.loadBlockchain();
 
         await this.Agent.initializeStartAgent();
 
-        //it tries synchronizing multiple times
-        await this.synchronizeBlockchain(true);
+        if (process.env.BROWSER || !blockchainLoaded) {
+            //it tries synchronizing multiple times
+            await this.synchronizeBlockchain(true);
+        } else {
+            this.synchronized = true;
+        }
 
         this.loaded = true;
     }
 
-    async initializeMining(){
-
-        StatusEvents.emit('blockchain/status', {message: "Mining Setting Address"});
-
-    }
-
     async startMining(){
-
         if (process.env.START_MINING || this._startMiningNextTimeSynchronized)
             this.Mining.startMining();
-
     }
 
     async startMiningInstantly(){
@@ -143,7 +143,6 @@ class Blockchain{
     async synchronizeBlockchain(firstTime, synchronizeComplete=false){
 
         StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});
-
         this.synchronized = false;
 
         while (!this.synchronized){
@@ -170,10 +169,10 @@ class Blockchain{
 
         }
 
+        this.synchronized = true;
         this.startMining();
 
         StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"} );
-
     }
 
     get loaded(){
@@ -192,6 +191,17 @@ class Blockchain{
             this.startMining();
     }
 
+    get synchronized(){
+        return this._synchronized;
+    }
+
+    set synchronized(newValue){
+        this._synchronized = newValue;
+
+        StatusEvents.emit('blockchain/synchronizing', !newValue );
+        StatusEvents.emit('blockchain/synchronized', newValue );
+
+    }
 
 }
 

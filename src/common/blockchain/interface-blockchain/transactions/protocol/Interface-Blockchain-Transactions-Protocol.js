@@ -2,6 +2,7 @@ import NodeProtocol from 'common/sockets/protocol/node-protocol';
 import NodesList from 'node/lists/nodes-list'
 
 import Blockchain from "main-blockchain/Blockchain"
+import StatusEvents from "common/events/Status-Events";
 
 class InterfaceBlockchainTransactionsProtocol{
 
@@ -15,23 +16,22 @@ class InterfaceBlockchainTransactionsProtocol{
         let socket = nodesListObject.socket;
 
         if (Blockchain.synchronized){
-            this.initializeTransactionsPropagation(socket.node);
+            this.initializeTransactionsPropagation(socket);
             return;
         }
 
         //after
-        Blockchain.onLoaded.then((loaded)=>{
-
+        StatusEvents.on('blockchain/synchronized', ()=>{
             // in case the Blockchain was not loaded, I will not be interested in transactions
-            this.initializeTransactionsPropagation(socket.node);
-
-        })
+            this.initializeTransactionsPropagation(socket);
+        });
 
     }
 
-    initializeTransactionsPropagation(node){
+    initializeTransactionsPropagation(socket){
 
         // in case the Blockchain was not loaded, I will not be interested in transactions
+        let node = socket.node;
 
         node.on("transactions/new-pending-transaction", response =>{
 
@@ -55,7 +55,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 transaction.isTransactionOK();
 
-                if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction))
+                if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket))
                     throw {message: "I already have this transaction"};
 
             } catch (exception){

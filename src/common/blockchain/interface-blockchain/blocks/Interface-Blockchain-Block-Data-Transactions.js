@@ -27,6 +27,9 @@ class InterfaceBlockchainBlockDataTransactions {
 
         for (let i=0; i<this.transactions.length; i++) {
 
+            if (blockValidation === undefined ) blockValidation = {};
+            if (blockValidation.blockValidationType === undefined) blockValidation.blockValidationType = {};
+
             blockValidation.blockValidationType['take-transactions-list-in-consideration'] = {
                 validation: true,
                 transactions: this.transactions.slice(0, i-1),
