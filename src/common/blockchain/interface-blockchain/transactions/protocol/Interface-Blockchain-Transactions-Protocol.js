@@ -14,6 +14,11 @@ class InterfaceBlockchainTransactionsProtocol{
 
         let socket = nodesListObject.socket;
 
+        if (Blockchain.synchronized){
+            this.initializeTransactionsPropagation(socket.node);
+            return;
+        }
+
         //after
         Blockchain.onLoaded.then((loaded)=>{
 

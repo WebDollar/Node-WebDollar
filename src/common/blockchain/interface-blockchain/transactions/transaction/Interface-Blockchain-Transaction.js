@@ -164,7 +164,6 @@ class InterfaceBlockchainTransaction{
             this._validateNonce(blockValidation);
 
             return this.from.validateFromEnoughMoney(blockValidation);
-
         }
 
         return true;

@@ -41,6 +41,8 @@ class InterfaceTransactionsPendingQueue {
 
     _insertPendingTransaction(transaction){
 
+        let inserted = false;
+
         for (let i=0; i<this.list.length; i++ ) {
             let compare = transaction.from.addresses[0].unencodedAddress.compare(this.list[i].from.addresses[0].unencodedAddress);
 
@@ -49,20 +51,26 @@ class InterfaceTransactionsPendingQueue {
             else
             if (compare === 0){ //order by nonce
 
-                if (transaction.nonce > this.list[i].nonce){
+
+                if (transaction.nonce === this.list[i].nonce){
+                    this.list[i] = transaction;
+                    inserted = true;break;
+                } else if (transaction.nonce < this.list[i].nonce){
                     this.list.splice(i, 0, transaction);
+                    inserted = true;break;
                 }
 
             }
             else
             if (compare > 0) { // i will add it
                 this.list.splice(i, 0, transaction);
-                break;
+                inserted = true;break;
             }
 
         }
 
-        this.list.push(transaction);
+        if ( inserted === false)
+            this.list.push(transaction);
     }
 
     findPendingTransaction(transaction){

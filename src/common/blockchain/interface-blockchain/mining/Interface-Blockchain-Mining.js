@@ -55,6 +55,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         }
 
         console.warn("--------------------------------");
+        console.warn("pendingQueue", this.blockchain.transactions.pendingQueue.list.length);
         console.warn("Transactions selected for mining: ", transactions.length);
         console.warn("--------------------------------");
 

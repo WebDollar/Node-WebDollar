@@ -7,11 +7,62 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
     validateFromEnoughMoney(blockValidation){
 
+        let amounts = {};
+        if (blockValidation.blockValidationType !== undefined && blockValidation.blockValidationType['take-transactions-list-in-consideration'] !== undefined &&
+            blockValidation.blockValidationType['take-transactions-list-in-consideration'].validation ){
+
+            //fetching the transactions list
+            let transactionsList = blockValidation.blockValidationType['take-transactions-list-in-consideration'].transactions;
+
+            if (transactionsList === undefined)
+                transactionsList = this.transaction.blockchain.transactions.pendingQueue.list;
+
+            transactionsList.forEach((transaction)=>{
+
+                transaction.from.addresses.forEach((address)=>{
+
+                    let addr = address.unencodedAddress.toString("hex");
+
+                    if (amounts[addr] === undefined) amounts[addr] = BigNumber(0);
+
+                    amounts[addr] = amounts[addr].minus(address.amount);
+
+                });
+
+                transaction.to.addresses.forEach((address)=>{
+
+                    let addr = address.unencodedAddress.toString("hex");
+
+                    if (amounts[addr] === undefined) amounts[addr] = BigNumber(0);
+
+                    amounts[addr] = amounts[addr].plus(address.amount);
+
+                });
+
+            });
+
+        }
+
+
+
         this.addresses.forEach ( (fromObject, index) =>{
 
             let value = this.transaction.blockchain.accountantTree.getBalance( fromObject.unencodedAddress, this.currencyTokenId );
+            if (value === null) value = new BigNumber(0);
 
-            if (value === null) throw {message: "Accountant Tree Input doesn't exist", unencodedAddress: fromObject.unencodedAddress}
+            //simulation the transactions
+
+            if (blockValidation.blockValidationType !== undefined && blockValidation.blockValidationType['take-transactions-list-in-consideration'] !== undefined &&
+                blockValidation.blockValidationType['take-transactions-list-in-consideration'].validation ){
+
+                let addr = fromObject.unencodedAddress.toString("hex");
+
+                if (amounts[addr] !== undefined)
+                    value = value.plus ( amounts[addr] );
+
+            }
+
+            if (value.isLessThan(0)) throw {message: "Accountant Tree Input doesn't exist", unencodedAddress: fromObject.unencodedAddress}
 
             if (value.isLessThan(fromObject.amount))
                 throw { message: "Value is Less than From.address.amount", address: fromObject, index: index };
