@@ -6,7 +6,7 @@ describe('RewardSimulator', () => {
 
     it('reward simulator test - general formula', ()=>{
         
-        let T = 15; //Number of seconds per block
+        let T = 20; //Number of seconds per block
         let Y = 100; //Number of total mining years
         let TS = 100000000000; //Total Supply WEBDs
         let CP = 4; //Cycle period in years
@@ -35,7 +35,7 @@ describe('RewardSimulator', () => {
         //console.log("Total supply for Y years, CP year cycle, T seconds per block, SR starting reward: ~SR*(3600/T)*24*365*4*2");
         //console.log("Simplified formula and more accurate(using 1.9999999403953552 instead of 2): 252288000 * SR / T");
         
-        SR = 2500;
+        SR = 3000;
         let TOTALSUPPLY = 0.0;
         for (let i = 0; i < N; ++i){
             TOTALSUPPLY += (SR * BPC) / (1 << i);
