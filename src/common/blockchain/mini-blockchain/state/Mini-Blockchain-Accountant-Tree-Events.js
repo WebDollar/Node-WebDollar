@@ -13,12 +13,12 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
     }
 
 
-    checkBalanceIsSubscribed(address){
+    _checkBalanceIsSubscribed(address){
 
         let name;
 
         if (Buffer.isBuffer(address))
-            name = "balances/changes/"+BufferExtended.toBase(name);
+            name = "balances/changes/"+BufferExtended.toBase(address);
         else
             name = address;
 
@@ -59,17 +59,13 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
                 }
 
-                let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
-                this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {
-                    address: addressWIF,
-                    balances: balances
-                });
+                this.propagateBalanceChangeEvent(address, ()=>{return balances} );
             }
     }
 
     propagateBalanceChangeEvent(address, getBalanceCallback){
 
-        if (this.checkBalanceIsSubscribed(address)) {
+        if (this._checkBalanceIsSubscribed(address)) {
             let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
             this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {address: addressWIF, balances: getBalanceCallback() });
         }

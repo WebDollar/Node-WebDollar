@@ -1,6 +1,7 @@
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import BufferExtended from 'common/utils/BufferExtended';
 const EventEmitter = require('events');
+import consts from 'consts/const_global'
 
 class InterfaceBlockchainTransactionsEvents{
 
@@ -128,6 +129,27 @@ class InterfaceBlockchainTransactionsEvents{
             if (transaction.to.addresses[i].unencodedAddress.equals(unencodedAddress))
                 return true;
         }
+
+        return false;
+    }
+
+
+    _checkTransactionIsSubscribed(address){
+
+        let name;
+
+        if (Buffer.isBuffer(address))
+            name = "transactions/changes/"+BufferExtended.toBase(address);
+        else
+            name = address;
+
+        //not working
+        //TODO .eventNames() is not working
+        let list = this.emitter._events;
+
+        for (let key in list)
+            if (key === name)
+                return true;
 
         return false;
     }
