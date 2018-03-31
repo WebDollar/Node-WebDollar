@@ -298,7 +298,7 @@ class InterfaceBlockchainTransaction{
         if (this._confirmed !== newValue)
             this._confirmed = newValue;
 
-        this.blockchain.transactions.emitTransactionChangeEvent(this, true);
+        this.blockchain.transactions.emitTransactionChangeEvent(this);
 
     }
 

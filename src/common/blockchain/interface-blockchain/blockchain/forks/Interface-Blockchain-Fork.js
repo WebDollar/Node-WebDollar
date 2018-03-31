@@ -241,8 +241,12 @@ class InterfaceBlockchainFork {
                     console.error("saveFork includeBlockchainBlock2 raised exception", exception);
                 }
 
+            }
+
+            await this.postForkTransactions(forkedSuccessfully);
+
             //successfully, let's delete the backup blocks
-            } else {
+            if (forkedSuccessfully) {
                 for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++)
                     delete this._blocksCopy[i];
 
@@ -324,6 +328,9 @@ class InterfaceBlockchainFork {
             this.forkBlocks.forEach((block)=> {
                 block.data.transactions.transactions.forEach((transaction) => {
                     transaction.confirmed = true;
+
+                    this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+
                 });
             });
 
@@ -332,6 +339,9 @@ class InterfaceBlockchainFork {
             this._blocksCopy.forEach( (block) => {
                 block.data.transactions.transactions.forEach((transaction) => {
                     transaction.confirmed = true;
+
+                    this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+
                 });
             });
 
