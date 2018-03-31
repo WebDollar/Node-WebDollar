@@ -83,7 +83,7 @@ class InterfaceBlockchainTransactionsEvents{
 
     }
 
-    subscribeTransactionsChanges(addressWIF){
+    subscribeTransactionsChanges(addressWIF, callback){
 
         if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='') return {result: false, message: "address is invalid"};
 
@@ -96,12 +96,12 @@ class InterfaceBlockchainTransactionsEvents{
 
         console.log("subscribeTransactionsChanges",BufferExtended.toBase(addressWIF) );
 
-        let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(address),callback);
+        let subscription = this.emitter.on("transactions/changes/"+BufferExtended.toBase(address), callback);
 
         return {
             result: true,
             subscription: subscription,
-            balances: this.listBalances(addressWIF),
+            transactions: this.listTransactions(addressWIF),
         }
 
     }
@@ -133,3 +133,5 @@ class InterfaceBlockchainTransactionsEvents{
     }
 
 }
+
+export default InterfaceBlockchainTransactionsEvents

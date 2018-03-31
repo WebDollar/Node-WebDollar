@@ -10,30 +10,46 @@ Transaction (from, to)
 
 ```
 {
-    addresses: [Addr1, Addr2, Addr3], - Array of Addresses
+    addresses: [                                                             - Array of Addresses
+            {
+                unencodedAddress: Addr1,
+                publicKey, 
+                schnorrSignature
+                amount
+            }, 
+            {   
+                unencodedAddress: Addr2,
+                schnorrSignature 
+                amount
+            }
+            {
+                unencodedAddress: Addr3,
+                schnorrSignature
+                amount
+            }
+        ], 
     currency: WEBD or Token   
 }
 ```
 
-Where Addr1, Addr2, Addr3 are objects
-```       
-{
-    publicAddress
-    publicKey, 
-    digital signatures for the outputs
-}
-```        
 
 **to** is an Object
 
 ```
 {
     addresses: Array of Addresses & Amounts
-        [ { 
-            publicAddress: Addr1, 
-            amount: amount
-          }, etc... 
+        [ 
+            { 
+                unencodedAddress: Addr1, 
+                amount: amount
+            },
+            { 
+                unencodedAddress: Addr2, 
+                amount: amount
+            },    
         ]
 }
 
 ```
+
+The difference between **Sum(output) - Sum(input)** is the **fee** for the miner

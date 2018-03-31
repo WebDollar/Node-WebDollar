@@ -2,7 +2,7 @@ import consts from 'consts/const_global'
 import InterfaceTransactionsPendingQueue from './pending/Interface-Transactions-Pending-Queue'
 import InterfaceTransaction from "./transaction/Interface-Blockchain-Transaction"
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
-import InterfaceBlockchainTransactionsWizard from "./Interface-Blockchain-Transactions-Wizard";
+import InterfaceBlockchainTransactionsWizard from "./wizard/Interface-Blockchain-Transactions-Wizard";
 import InterfaceBlockchainTransactionsEvents from "./Interface-Blockchain-Transactions-Events";
 
 class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEvents {
