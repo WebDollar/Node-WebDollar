@@ -1,6 +1,5 @@
 import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
 import Serialization from 'common/utils/Serialization'
-var BigNumber = require('bignumber.js');
 
 class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
@@ -16,14 +15,15 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     setSum(sum){
 
-        if (typeof sum === "object"  && sum !== null && sum.constructor.name === "BigNumber")
+        if (typeof sum === "object"  && sum !== null && typeof sum === 'number')
             this.sum =  sum;
         else {
 
             if (sum === undefined || sum === null)
                 sum = 0;
 
-            this.sum = new BigNumber(sum);
+            this.sum = sum;
+
         }
 
     }
@@ -32,7 +32,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         if (this.sum === undefined && this.sum=== null)
             return false;
-        if (typeof this.sum !== "object"  || this.sum.constructor.name !== "BigNumber")
+        if (typeof this.sum !== "object"  || typeof this.sum !== "number")
             return false;
 
         return true;
@@ -44,14 +44,13 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         if (typeof value === 'object' && value !== null){
 
-            if (typeof value.balances === "object"  && value.balances !== null && value.balance.constructor.name === "BigNumber") { 
+            if (typeof value.balances === "object"  && value.balances !== null && typeof value.balance === "number") {
             }
             else {
 
                 if ( value.balances === undefined || value.balances === null)
                     value.balances = 0;
 
-                value.balances = new BigNumber(value.balances);
             }
 
         }
@@ -68,7 +67,7 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
         if ( this.value.balances === undefined && this.value.balances === null)
             return false;
 
-        if (typeof this.value.balances !== "object"  || this.value.balances.constructor.name !== "BigNumber")
+        if (typeof this.value.balances !== "object"  || this.value.balances !== "number")
             return false;
 
         return true;
@@ -80,10 +79,10 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         let array = [ ];
 
-        array.push( Serialization.serializeBigNumber(this.sum) );
+        array.push( Serialization.serializeNumber8Bytes(this.sum) );
 
         if (this.value !== null )
-            array.push(Serialization.serializeBigNumber(this.value.balances));
+            array.push(Serialization.serializeNumber8Bytes(this.value.balances));
 
         return Buffer.concat(
 

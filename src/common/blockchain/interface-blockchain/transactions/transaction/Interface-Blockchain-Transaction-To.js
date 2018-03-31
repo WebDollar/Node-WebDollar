@@ -1,5 +1,3 @@
-const BigNumber = require('bignumber.js');
-
 import BufferExtended from "common/utils/BufferExtended"
 import Serialization from "common/utils/Serialization"
 import consts from "consts/const_global"
@@ -38,8 +36,8 @@ class InterfaceBlockchainTransactionTo{
 
             addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addresses[i].unencodedAddress);
 
-            if (typeof addresses[i].amount === "string" || typeof addresses[i].amount === "number")
-                addresses[i].amount = new BigNumber(addresses[i].amount);
+            if (typeof addresses[i].amount === "string")
+                addresses[i].amount = parseInt(addresses[i].amount);
         }
 
         this.addresses = addresses;
@@ -76,10 +74,10 @@ class InterfaceBlockchainTransactionTo{
             if (!toObject.unencodedAddress || toObject.unencodedAddress === null || !Buffer.isBuffer(toObject.unencodedAddress))
                 throw {message: 'To.Object Address is not specified', address: toObject, index:index} ;
 
-            if (!toObject.amount ||  toObject.amount instanceof BigNumber === false )
+            if (!toObject.amount || typeof toObject.amount !== 'number' )
                 throw {message: 'To.Object Amount is not specified', address: toObject, index:index} ;
 
-            if ( toObject.amount.isLessThanOrEqualTo(0) )
+            if ( toObject.amount <= 0 )
                 throw {message: "To.Object Amount is an invalid number", address: toObject, index:index} ;
 
             let addressFound = false;
@@ -102,11 +100,11 @@ class InterfaceBlockchainTransactionTo{
     calculateOutputSum(){
 
         //validate amount
-        let outputValues = [], outputSum = BigNumber(0);
+        let outputValues = [], outputSum = 0;
 
         for (let i=0; i<this.addresses.length; i++ ){
             outputValues.push( this.addresses[i].amount );
-            outputSum = outputSum.plus(this.addresses[i].amount);
+            outputSum += this.addresses[i].amount;
         }
 
         return outputSum;
@@ -121,7 +119,7 @@ class InterfaceBlockchainTransactionTo{
 
         for (let i = 0; i < this.addresses.length; i++){
             addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
-            addressesBuffer.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
+            addressesBuffer.push( Serialization.serializeNumber8Bytes( this.addresses[i].amount ));
         }
 
         return Buffer.concat (addressesBuffer);
@@ -142,7 +140,7 @@ class InterfaceBlockchainTransactionTo{
             address.unencodedAddress= BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
             offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
-            let result = Serialization.deserializeBigNumber(buffer, offset);
+            let result = Serialization.deserializeNumber(buffer, offset);
             address.amount = result.number;
 
             offset = result.newOffset;

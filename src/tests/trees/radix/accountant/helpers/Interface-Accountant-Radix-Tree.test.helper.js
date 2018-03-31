@@ -1,5 +1,4 @@
 let assert = require('assert');
-let BigNumber = require('bignumber.js');
 
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import IntefaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
@@ -43,15 +42,15 @@ class InterfaceAccountantRadixTreeTestHelper {
 
         let result = accountantTree.levelSearch();
 
-        let sum = new BigNumber(0);
+        let sum = 0;
         for (let i = 0; i < accountantData.length; i++)
-            sum = sum.plus(new BigNumber(accountantData[i].value.toString()));
+            sum += accountantData[i].value.toString());
 
         // console.log("Accountant Tree sums");
         // console.log(sum);
         // console.log(result[0][0].sum);
 
-        assert(accountantTree.root.sum.isEqualTo(sum), "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].sum + "       " + sum + "       diff: " + accountantTree.root.sum.minus(sum).toString());
+        assert(accountantTree.root.sum === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].sum + "       " + sum + "       diff: " + (accountantTree.root.sum - sum).toString());
 
         //accountantTree.printLevelSearch();
 

@@ -1,5 +1,3 @@
-var BigNumber = require('bignumber.js');
-
 import InterfaceRadixTree from './../Interface-Radix-Tree'
 
 import InterfaceAccountRadixTreeNode from './Interface-Accountant-Radix-Tree-Node'
@@ -37,12 +35,12 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         if (node.isSumValid() === false)
             return false;
-        if (node.sum.isLessThan(0) )
+        if ( node.sum < 0 )
             return false;
 
         if (node.isLeaf() && (node.isBalancesValid() === false ) )
             return false;
-        if (node.isBalancesValid() && node.value.balances.isLessThan(0))
+        if (node.isBalancesValid() && node.value.balances < 0 )
             return false;
 
         return true;
@@ -69,7 +67,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
 
         if (node.isSumValid() === false)
             return false;
-        if (initialSum.isEqualTo(node.sum) === false)
+        if ((initialSum < node.sum) === false)
             return false; // different sum
 
         return true;
@@ -89,7 +87,7 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
         if ( node.isBalancesValid()  )
             sum = node.value.balances;
         else
-            sum = new BigNumber(0);
+            sum = 0;
 
 
         if ( node.edges.length > 0 ){
@@ -97,9 +95,9 @@ class InterfaceAccountantRadixTree extends InterfaceRadixTree{
             for (let i = 0; i < node.edges.length; i++){
 
                 if (node.edges[i].targetNode.isSumValid() === false )
-                    sum = sum.plus(this._computeAccount(node.edges[i].targetNode));
+                    sum += this._computeAccount(node.edges[i].targetNode);
                 else
-                    sum = sum.plus(node.edges[i].targetNode.sum);
+                    sum += node.edges[i].targetNode.sum;
             }
 
 

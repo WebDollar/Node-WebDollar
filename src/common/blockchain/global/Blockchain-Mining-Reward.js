@@ -1,5 +1,3 @@
-const BigNumber = require('bignumber.js');
-
 class BlockchainMiningReward{
 
     getReward(height){
@@ -9,11 +7,12 @@ class BlockchainMiningReward{
 
         if (height >= 0) {
 
+            // ToDO - Budisteanu shift
             let cicleNumber = Math.trunc(height / 8409600);
-            let reward = new BigNumber(2500).dividedBy(1 << cicleNumber);
-            let smallestReward = new BigNumber(0.0001);
+            let reward = 2500/(1 << cicleNumber);
+            let smallestReward = 0.0001;
 
-            if (reward.isLessThan(smallestReward))
+            if (reward < smallestReward)
                 reward = smallestReward;
 
             return reward;

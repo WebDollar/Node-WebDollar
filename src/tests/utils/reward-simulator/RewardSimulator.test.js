@@ -1,6 +1,5 @@
 let assert = require('assert');
 
-const BigNumber = require('bignumber.js');
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
 describe('RewardSimulator', () => {
@@ -50,29 +49,28 @@ describe('RewardSimulator', () => {
     it('reward simulator test - particular formula', ()=>{
 
         let reward = 0;
-        let smallestReward = new BigNumber(0.0001);
+        let smallestReward = 0.0001;
 
         for (let height = 0; height < 8409600; height += 1024) {
             reward = BlockchainMiningReward.getReward(height);
-            assert(reward.isEqualTo(new BigNumber(2500)), "Wrong reward for bock " + height + ": " + reward.toString() + "!==2500");
+            assert(reward === 2500), "Wrong reward for bock " + height + ": " + reward.toString() + "!==2500");
         }
 
+        //TODO Budisteanu Shifts
         for (let cycle = 1; cycle <= 25; ++cycle) {
             let height = cycle * (8409600) - 1;
             reward = BlockchainMiningReward.getReward(height);
-            let targetReward = new BigNumber(2500).dividedBy(1 << (cycle-1));
+            let targetReward = 2500 / (1 << (cycle-1));
 
-            if (targetReward.isLessThan(smallestReward))
-                targetReward = smallestReward;
-            assert(reward.isEqualTo(targetReward), "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
+            if (targetReward < smallestReward) targetReward = smallestReward;
+            assert(reward === targetReward, "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
 
             height = cycle * (8409600);
             reward = BlockchainMiningReward.getReward(height);
-            targetReward = new BigNumber(2500).dividedBy(1 << cycle);
+            targetReward = 2500 / (1 << cycle);
 
-            if (targetReward.isLessThan(smallestReward))
-                targetReward = smallestReward;
-            assert(reward.isEqualTo(targetReward), "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
+            if (targetReward < smallestReward) targetReward = smallestReward;
+            assert(reward === targetReward, "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
         }
 
     });

@@ -277,7 +277,7 @@ class InterfaceBlockchainTransaction{
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 
-        let diffInFees = inputSum.minus(outputSum);
+        let diffInFees = inputSum - outputSum;
 
         return {fees: diffInFees, currencyTokenId: this.from.currencyTokenId};
     }

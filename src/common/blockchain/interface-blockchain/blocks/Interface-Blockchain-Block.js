@@ -85,7 +85,7 @@ class InterfaceBlockchainBlock {
 
         this._validateBlockTimeStamp();
 
-        if (this.reward.isEqualTo( BlockchainMiningReward.getReward(this.height) ) === false )
+        if (this.reward === BlockchainMiningReward.getReward(this.height) === false )
             throw {message: 'reward is not right: ', myReward: this.reward, reward: BlockchainMiningReward.getReward( this.height ) };
 
         if (this._supplementaryValidation() === false)

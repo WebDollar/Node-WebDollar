@@ -1,5 +1,3 @@
-const BigNumber = require('bignumber.js');
-
 import consts from 'consts/const_global';
 import Serialization from "common/utils/Serialization";
 import BufferExtended from 'common/utils/BufferExtended';
@@ -37,7 +35,7 @@ class PoolData {
      * @param minerReward
      * @returns true/false
      */
-    async setMiner(minerAddress, minerReward = new BigNumber(0)){
+    async setMiner(minerAddress, minerReward = 0){
         
         if (this.getMiner(minerAddress) === null) {
             this._minersList.push( {address: minerAddress, reward: minerReward} );
@@ -113,7 +111,7 @@ class PoolData {
     async resetRewards() {
 
         for (let i = 0; i < this._minersList.length; ++i)
-            this._minersList[i].reward = new BigNumber(0);
+            this._minersList[i].reward = 0;
 
         return (await this.saveMinersList());
     }
@@ -126,8 +124,7 @@ class PoolData {
     getMinerReward(minerAddress) {
 
         let response = this.getMiner(minerAddress);
-        if (response === null)
-            return new BigNumber(0);
+        if (response === null) return 0;
         
         return response.miner.reward;
     }
@@ -157,7 +154,7 @@ class PoolData {
 
         for (let i = 0; i < this._minersList.length; ++i) {
             if (this._minersList[i].address === minerAddress){
-                this._minersList[i].reward = this._minersList[i].reward.plus(reward);
+                this._minersList[i].reward += reward;
                 break;
             }
         }
@@ -169,7 +166,7 @@ class PoolData {
      */
     increaseMinerRewardById(id, reward) {
 
-        this._minersList[id].reward = this._minersList[id].reward.plus(reward);
+        this._minersList[id].reward += reward;
     }
     
     _serializeMiners() {
@@ -181,7 +178,7 @@ class PoolData {
             list.push( Serialization.serializeNumber1Byte(BufferExtended.fromBase(this._minersList[i].address).length) );
             list.push( BufferExtended.fromBase(this._minersList[i].address) );
             
-            list.push ( Serialization.serializeBigNumber(this._minersList[i].reward) );
+            list.push ( Serialization.serializeNumber8Bytes(this._minersList[i].reward) );
         }
 
         return Buffer.concat(list);
@@ -203,7 +200,7 @@ class PoolData {
                 let minerAddress = BufferExtended.toBase( BufferExtended.substr(buffer, offset, len) );
                 offset += len;
                 
-                let response = Serialization.deserializeBigNumber(buffer, offset);
+                let response = Serialization.deserializeNumber(buffer, offset);
                 let minerReward = response.number;
                 offset = response.newOffset;
 
@@ -294,7 +291,7 @@ class PoolData {
 
         return !( typeof miner1 === typeof miner2 &&
             miner1.address === miner2.address &&
-            miner1.reward.isEqualTo(miner2.reward) );
+            miner1.reward === miner2.reward);
     }
 
 }

@@ -1,5 +1,3 @@
-const BigNumber = require('bignumber.js');
-
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
 
@@ -50,7 +48,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         //WEBD
         if (tokenId.length === 1 && tokenId[0] === 1){
-            this.root.total = this.root.total.plus( value );
+            this.root.total += value;
             this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
         }
 
@@ -203,11 +201,11 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         if (node === undefined) node = this.root;
 
-        let sum = new BigNumber(0).plus( node.getBalance(tokenId)  );
+        let sum = node.getBalance(tokenId);
 
         for (let i = 0; i < node.edges.length; i++)
             if (node.edges[i].targetNode !== undefined && node.edges[i].targetNode !== null)
-                sum = sum.plus( this.calculateNodeCoins( tokenId, node.edges[i].targetNode ) );
+                sum += this.calculateNodeCoins( tokenId, node.edges[i].targetNode );
 
         return sum;
 

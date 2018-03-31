@@ -2,7 +2,6 @@ var BigInteger = require('big-integer');
 var BigNumber = require('bignumber.js');
 import consts from 'consts/const_global'
 
-
 class BlockchainDifficulty{
 
     static getDifficulty(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
@@ -15,8 +14,6 @@ class BlockchainDifficulty{
 
     }
 
-
-
     /**
      * like the difficulty used in BITCOIN based on the Last X Blocks
      *
@@ -27,7 +24,6 @@ class BlockchainDifficulty{
      * Issue #1: https://github.com/WebDollar/Node-WebDollar/issues/9
      *
      */
-
 
     static getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 

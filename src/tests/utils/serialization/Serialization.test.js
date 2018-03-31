@@ -1,7 +1,6 @@
 import Serialization from 'common/utils/Serialization';
 
 var assert = require('assert')
-var BigNumber = require('bignumber.js');
 
 import TestsHelper from 'tests/Tests.helper'
 
@@ -9,24 +8,24 @@ describe('Serialization test', () => {
 
     it('Serialize Big Number - many random ', ()=>{
 
-        let v = TestsHelper.makeRandomBigNumbersArray(5000, true, true);
-        let sum1 = new BigNumber(0);
-        let sum2 = new BigNumber(0);
+        let v = TestsHelper.makeRandomNumbersArray(5000, true, true);
+        let sum1 = 0;
+        let sum2 = 0;
 
         for (let i=0; i<v.length; i++){
 
-            sum1 = sum1.plus(v[i]);
+            sum1 +=v[i];
 
-            let serialization = Serialization.serializeBigNumber(v[i]);
-            let deserialization = Serialization.deserializeBigNumber(serialization).number;
+            let serialization = Serialization.serializeNumber8Bytes(v[i]);
+            let deserialization = Serialization.deserializeNumber(serialization).number;
 
-            assert(deserialization.isEqualTo(v[i]), "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
+            assert(deserialization === v[i], "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
             //console.log(v[i],deserialization.toString());
 
-            sum2 = sum2.plus(deserialization);
+            sum2 += deserialization;
         }
 
-        assert(sum1.isEqualTo(sum2), "sum1 is not equal with sum 2");
+        assert(sum1 === sum2, "sum1 is not equal with sum 2");
 
     });
 
@@ -37,14 +36,14 @@ describe('Serialization test', () => {
 
         for (let i=0; i<v.length; i++){
 
-            x.push( new BigNumber(v[i]) );
+            x.push( v[i] );
 
-            let serialization = Serialization.serializeBigNumber(x[i]);
-            let deserialization = Serialization.deserializeBigNumber(serialization).number;
+            let serialization = Serialization.serializeNumber8Bytes(x[i]);
+            let deserialization = Serialization.deserializeNumber(serialization).number;
 
             //console.log(v[i], serialization.toString("hex"), deserialization);
 
-            assert(deserialization.isEqualTo(x[i]), "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
+            assert(deserialization === x[i], "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
 
         }
     });

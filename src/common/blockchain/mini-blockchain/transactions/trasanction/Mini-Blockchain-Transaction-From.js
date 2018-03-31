@@ -1,7 +1,5 @@
 import InterfaceBlockchainTransactionFrom from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction-From'
 
-const BigNumber = require('bignumber.js');
-
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
 
@@ -26,9 +24,9 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
                     let addr = address.unencodedAddress.toString("hex");
 
-                    if (amounts[addr] === undefined) amounts[addr] = BigNumber(0);
+                    if (amounts[addr] === undefined) amounts[addr] = 0;
 
-                    amounts[addr] = amounts[addr].minus(address.amount);
+                    amounts[addr] -= address.amount;
 
                 });
 
@@ -36,9 +34,9 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
                     let addr = address.unencodedAddress.toString("hex");
 
-                    if (amounts[addr] === undefined) amounts[addr] = BigNumber(0);
+                    if (amounts[addr] === undefined) amounts[addr] = 0;
 
-                    amounts[addr] = amounts[addr].plus(address.amount);
+                    amounts[addr] += address.amount;
 
                 });
 
@@ -51,7 +49,7 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
         this.addresses.forEach ( (fromObject, index) =>{
 
             let value = this.transaction.blockchain.accountantTree.getBalance( fromObject.unencodedAddress, this.currencyTokenId );
-            if (value === null) value = new BigNumber(0);
+            if (value === null) value = 0;
 
             //simulation the transactions
 
@@ -61,13 +59,13 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
                 let addr = fromObject.unencodedAddress.toString("hex");
 
                 if (amounts[addr] !== undefined)
-                    value = value.plus ( amounts[addr] );
+                    value += amounts[addr];
 
             }
 
-            if (value.isLessThan(0)) throw {message: "Accountant Tree Input doesn't exist", unencodedAddress: fromObject.unencodedAddress}
+            if (value < 0) throw {message: "Accountant Tree Input doesn't exist", unencodedAddress: fromObject.unencodedAddress}
 
-            if (value.isLessThan(fromObject.amount))
+            if (value < fromObject.amount)
                 throw { message: "Value is Less than From.address.amount", address: fromObject, index: index };
 
         });
@@ -84,9 +82,9 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
             for (let i = 0; i < this.addresses.length; i++) {
 
-                if (this.addresses[i].amount instanceof BigNumber === false) throw {message: "amount is not BigNumber",  address: this.addresses[i]};
+                if (typeof this.addresses[i].amount !== 'number') throw {message: "amount is not number",  address: this.addresses[i]};
 
-                let result = this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor).negated(), this.currencyTokenId);
+                let result = this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, this.addresses[i].amount * -multiplicationFactor, this.currencyTokenId);
 
                 if (result === null) throw {message: "error Updating Account", address: this.addresses[i]};
 
@@ -95,7 +93,7 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
         } catch (exception){
 
             for (let i=lastPosition; i >= 0 ; i--) {
-                let result = this.transaction.blockchain.accountantTree.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor), this.currencyTokenId);
+                let result = this.transaction.blockchain.accountantTree.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount * multiplicationFactor, this.currencyTokenId);
 
                 if (result === null) throw {message: "error Updating Account", address: this.addresses[i]};
             }

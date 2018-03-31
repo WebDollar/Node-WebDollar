@@ -4,8 +4,6 @@ import consts from 'consts/const_global'
 import InterfaceMerkleRadixTreeNode from "common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree-Node"
 import Blockchain from "main-blockchain/Blockchain"
 
-let BigNumber = require('bignumber.js');
-
 class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     constructor (root, parent, edges, value){
@@ -14,7 +12,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         //console.log("value", value);
         this.hash = { sha256: new Buffer(32) };
-        this.total = new BigNumber(0);
+        this.total = 0;
 
         this.nonce = 0;
 
@@ -42,14 +40,13 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         if (!Buffer.isBuffer(tokenId))
             tokenId = BufferExtended.fromBase(tokenId);
 
-        if (value instanceof BigNumber === false)
-            value = new BigNumber(value);
+        if (typeof value === 'string') value = parseInt(value);
 
         let result;
 
         for (let i = 0; i < this.balances.length; i++)
             if (this.balances[i].id.equals( tokenId )) {
-                this.balances[i].amount = this.balances[i].amount.plus(value) ;
+                this.balances[i].amount += value;
                 result = this.balances[i];
                 break;
             }
@@ -121,7 +118,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         let result = false;
         for (let i = this.balances.length - 1; i >= 0; i--) {
 
-            if (this.balances[i] === null || this.balances[i] === undefined || this.balances[i].amount.isEqualTo(0)) {
+            if (this.balances[i] === null || this.balances[i] === undefined || this.balances[i].amount == 0) {
                 this.balances.splice(i, 1);
                 result = true;
             }
@@ -135,14 +132,14 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         return Buffer.concat([
                 Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH),
-                Serialization.serializeBigNumber(balance.amount)
+                Serialization.serializeNumber8Bytes(balance.amount)
             ]);
     }
 
     _serializeBalanceWEBDToken(balance){
         return Buffer.concat([
             Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH),
-            Serialization.serializeBigNumber(balance.amount)
+            Serialization.serializeToFixedBuffer(balance.amount)
         ]);
     }
 
@@ -177,7 +174,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                         let idWEBD = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
                         idWEBD[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
 
-                        balancesBuffers.push(this._serializeBalanceWEBDToken({id: idWEBD, amount: new BigNumber(0)}));
+                        balancesBuffers.push(this._serializeBalanceWEBDToken({id: idWEBD, amount: 0}));
                     }
 
                 } else {
@@ -228,7 +225,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 if (webdId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)
                     throw {message: "webd token is incorrect", token: webdId };
 
-                let result = Serialization.deserializeBigNumber(buffer, offset);
+                let result = Serialization.deserializeNumber(buffer, offset);
 
                 //console.log("result.number",result.number);
 
@@ -244,7 +241,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                         let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH);
                         offset += consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH;
 
-                        result = Serialization.deserializeBigNumber(buffer, offset);
+                        result = Serialization.deserializeNumber(buffer, offset);
 
                         this.updateBalanceToken(result.number, tokenId);
 

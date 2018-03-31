@@ -1,5 +1,3 @@
-var BigNumber = require('bignumber.js');
-
 class TestsHelper {
 
     makeId(count, randomLengths, textPossible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
@@ -87,28 +85,28 @@ class TestsHelper {
         return Math.random()*biggestNumber +  300;
     }
 
-    makeRandomBigNumber(noDecimalDigits=10, decimalDigits=10, negative=false){
+    makeRandomNumber(noDecimalDigits=10, decimalDigits=10, negative=false){
 
         let nonDecimalPart = this.makeDigitId(noDecimalDigits, true, negative);
 
         if(decimalDigits > 0) {
             let decimalPart = this.makeDigitId(decimalDigits, false);
-            return new BigNumber(nonDecimalPart + "." + decimalPart);
+            return Number(nonDecimalPart + "." + decimalPart);
         } else {
-            return new BigNumber(noDecimalDigits);
+            return Number(noDecimalDigits);
         }
     }
 
-    makeRandomBigNumbersArray(count, isDecimal=false, negative=false){
+    makeRandomNumbersArray(count, isDecimal=false, negative=false){
 
         if ( count === undefined) count = 10;
 
         let result = [];
         for (let i = 0; i < count; ++i) {
             if (isDecimal === true)
-                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10), negative);
+                result[i] = this.makeRandomNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10), negative);
             else
-                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), 0, negative);
+                result[i] = this.makeRandomNumber(Math.floor(Math.random()*10), 0, negative);
         }
 
         return result;

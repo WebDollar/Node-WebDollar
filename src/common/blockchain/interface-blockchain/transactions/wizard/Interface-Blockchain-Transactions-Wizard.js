@@ -1,5 +1,3 @@
-const BigNumber = require('bignumber.js');
-
 class InterfaceBlockchainTransactionsWizard{
 
     constructor(transactions, blockchain, wallet, ){
@@ -16,7 +14,8 @@ class InterfaceBlockchainTransactionsWizard{
 
         try {
 
-            if (!(toAmount instanceof BigNumber)) toAmount = new BigNumber(toAmount);
+            if (typeof toAmount === 'string')
+                toAmount = parseInt(toAmount);
 
         } catch (exception){
 
@@ -25,7 +24,7 @@ class InterfaceBlockchainTransactionsWizard{
         }
 
         try {
-            if (!(fee instanceof BigNumber)) fee = new BigNumber(fee);
+            if (typeof fee ==='string') fee = parseInt(fee);
         } catch (exception){
 
             if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
@@ -53,7 +52,7 @@ class InterfaceBlockchainTransactionsWizard{
                     {
                         unencodedAddress: address,
                         publicKey: undefined,
-                        amount: toAmount.plus(fee)
+                        amount: toAmount +fee
                     }
                 ],
                 currencyTokenId: currencyTokenId

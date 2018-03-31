@@ -1,5 +1,4 @@
 const BigInteger = require('big-integer');
-const BigNumber = require('bignumber.js');
 
 import BufferExtended from "../utils/BufferExtended";
 import WebDollarCrypto from './WebDollar-Crypto';
@@ -70,7 +69,7 @@ class WebDollarCryptoData {
         else
         if (type === "object" || typeof data === "object"){
 
-            if (data instanceof BigNumber) { //converting Big Number Format
+            if (typeof data === 'number') { //converting Big Number Format
 
                 data = {s: data.s, e: data.e, c: data.c};
 
@@ -89,8 +88,8 @@ class WebDollarCryptoData {
                 return;
             }
 
-            if (data instanceof BigNumber){
-                this.buffer = Serialization.serializeBigNumber(data);
+            if (typeof data === 'number'){
+                this.buffer = Serialization.serializeNumber8Bytes(data);
                 return
             }
 
