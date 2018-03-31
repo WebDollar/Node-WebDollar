@@ -1,5 +1,5 @@
 const BigInteger = require('big-integer');
-const BigNumber = require('bignumber.js');
+
 
 import consts from 'consts/const_global'
 import global from 'consts/global'
@@ -15,10 +15,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
     constructor (blockchain, minerAddress, miningFeeThreshold){
-        super(blockchain, minerAddress);
 
-        if (miningFeeThreshold === undefined) miningFeeThreshold = consts.MINING_POOL.MINING_FEE_THRESHOLD;
-        this.miningFeeThreshold = new BigNumber(miningFeeThreshold);
+        super(blockchain, minerAddress, miningFeeThreshold);
 
     }
 
