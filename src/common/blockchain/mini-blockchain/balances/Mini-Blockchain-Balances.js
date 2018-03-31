@@ -26,19 +26,21 @@ class MiniBlockchainBalances{
 
     subscribeBalancesChanges(addressWIF, callback){
 
-        if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='')
-            return null;
+        if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='') return {result: false, message: "address is invalid"};
 
-        if (!Buffer.isBuffer(addressWIF))
+        if (!Buffer.isBuffer(addressWIF) && typeof addressWIF === "string")
             addressWIF = BufferExtended.fromBase(addressWIF);
 
         let address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addressWIF);
+
+        if (address === null) return {result:false, message: "invalid address"};
 
         console.log("subscribeBalanceChanges",BufferExtended.toBase(addressWIF) );
 
         let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(address),callback);
 
         return {
+            result: true,
             subscription: subscription,
             balances: this.listBalances(addressWIF),
         }

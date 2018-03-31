@@ -47,6 +47,7 @@ class InterfaceBlockchainTransactionTo{
     }
 
     toJSON(){
+
         let addresses = [];
 
         this.addresses.forEach((address)=>{

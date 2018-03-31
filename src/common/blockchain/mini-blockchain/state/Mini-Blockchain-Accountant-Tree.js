@@ -2,22 +2,14 @@ const BigNumber = require('bignumber.js');
 
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
-import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree";
 
 import BufferExtended from "common/utils/BufferExtended"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 import consts from 'consts/const_global'
 
-const EventEmitter = require('events');
+import MiniBlockchainAccountantTreeEvents from "./Mini-Blockchain-Accountant-Tree-Events"
 
-class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
-
-    constructor (db){
-
-        super(db);
-
-        this.emitter = new EventEmitter();
-    }
+class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
     createRoot(){
         this.root = new MiniBlockchainAccountantTreeNode(null, null, [], null);
@@ -63,11 +55,12 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
         }
 
         //optimization, but it doesn't work in browser
-        if (this.checkBalanceIsSubscribed(address)) {
-            let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
-            this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {address: addressWIF, balances: (resultUpdate !== null ? node.getBalances() : null)});
-        }
+        this.propagateBalanceChangeEvent(address, ()=>{
+            return (resultUpdate !== null ? node.getBalances() : null);
+        });
 
+        //purging empty addresses
+        //TODO Window Transactions for Purging
         if (this.root.deleteEmptyAddresses && resultUpdate === null) {
             this.delete(address);
             return null;
@@ -164,21 +157,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
     */
 
 
-    checkBalanceIsSubscribed(name){
-
-        if (Buffer.isBuffer(name))
-            name = "balances/changes/"+BufferExtended.toBase(name);
-
-        //not working
-        //TODO .eventNames() is not working
-        let list = this.emitter._events;
-
-        for (let key in list)
-            if (key === name)
-                return true;
-
-        return false;
-    }
 
     serializeMiniAccountant(includeHashes=true){
         return this._serializeTree(includeHashes);
@@ -233,40 +211,6 @@ class MiniBlockchainAccountantTree extends InterfaceMerkleRadixTree{
 
         return sum;
 
-    }
-
-    emitBalancesChanges(){
-
-        //TODO .eventNames() is not working
-        let list = this.emitter._events;
-
-        for (let key in list)
-            if (key.indexOf("balances/changes/") === 0) {
-
-                let address = BufferExtended.fromBase(key.replace("balances/changes/", ""));
-
-                let node = null;
-                let balances = null;
-
-                try {
-
-                    node = this.search(address).node;
-
-                    // in case it doesn't exist, let's create it
-                    if (node !== undefined && node !== null && node.isLeaf()) {
-                        balances = node.getBalances();
-                    }
-
-                } catch (exception) {
-
-                }
-
-                let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
-                this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {
-                    address: addressWIF,
-                    balances: balances
-                });
-            }
     }
 
 
