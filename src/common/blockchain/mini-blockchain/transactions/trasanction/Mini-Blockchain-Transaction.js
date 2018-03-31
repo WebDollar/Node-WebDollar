@@ -22,21 +22,20 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return InterfaceBlockchainTransaction.prototype.processTransaction.call(this, multiplicationFactor);
     }
 
-    _validateNonce(blockValidation){
+    _validateNonce(blockValidationType){
 
         //Validate nonce
         let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
 
         if (nonce < this.nonce)
-            if (blockValidation.blockValidationType !== undefined && blockValidation.blockValidationType['take-transactions-list-in-consideration'] !== undefined &&
-                blockValidation.blockValidationType['take-transactions-list-in-consideration'].validation ){
+            if (blockValidationType !== undefined && blockValidationType['take-transactions-list-in-consideration'] !== undefined && blockValidationType['take-transactions-list-in-consideration'].validation ){
 
                 let foundNonce = {};
                 for (let i=nonce; i<this.nonce; i++)
                     foundNonce[i] = false;
 
                 //fetching the transactions list
-                let transactionsList = blockValidation.blockValidationType['take-transactions-list-in-consideration'].transactions;
+                let transactionsList = blockValidationType['take-transactions-list-in-consideration'].transactions;
 
                 if (transactionsList === undefined)
                     transactionsList = this.blockchain.transactions.pendingQueue.list;

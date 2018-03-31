@@ -300,10 +300,61 @@ class InterfaceBlockchainFork {
 
     }
 
-    postFork(forkedSuccessfully){
+    postForkTransactions(forkedSuccessfully){
 
         //move the transactions to pending
-        this.blockchain.transactions.pendingQueue._removeOldTransactions();
+        if (forkedSuccessfully) {
+
+            // remove transactions and place them in the queue
+            this._blocksCopy.forEach((block) => {
+                block.data.transactions.transactions.forEach((transaction) => {
+
+                    transaction.confirmed = false;
+
+                    try {
+                        this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
+                    }
+                    catch (exception) {
+                        console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction);
+                    }
+
+                });
+            });
+
+            this.forkBlocks.forEach((block)=> {
+                block.data.transactions.transactions.forEach((transaction) => {
+                    transaction.confirmed = true;
+                });
+            });
+
+        } else {
+
+            this._blocksCopy.forEach( (block) => {
+                block.data.transactions.transactions.forEach((transaction) => {
+                    transaction.confirmed = true;
+                });
+            });
+
+            this.forkBlocks.forEach((block)=>{
+                block.data.transactions.transactions.forEach((transaction)=>{
+                    transaction.confirmed = false;
+
+                    try {
+                        this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
+                    }
+                    catch (exception) {
+                        console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction);
+                    }
+
+                });
+            })
+        }
+
+        this.blockchain.transactions.pendingQueue.removeOldTransactions();
+
+    }
+
+    postFork(forkedSuccessfully){
 
     }
 

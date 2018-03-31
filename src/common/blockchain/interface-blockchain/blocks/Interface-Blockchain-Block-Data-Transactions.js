@@ -19,7 +19,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    validateTransactions(blockHeight, blockValidation){
+    validateTransactions(blockHeight, blockValidationType){
 
         let hashTransactions = this.calculateHashTransactions();
         if (!this.hashTransactions.equals(hashTransactions))
@@ -27,15 +27,14 @@ class InterfaceBlockchainBlockDataTransactions {
 
         for (let i=0; i<this.transactions.length; i++) {
 
-            if (blockValidation === undefined ) blockValidation = {};
-            if (blockValidation.blockValidationType === undefined) blockValidation.blockValidationType = {};
+            if (blockValidationType === undefined) blockValidationType = {};
 
-            blockValidation.blockValidationType['take-transactions-list-in-consideration'] = {
+            blockValidationType['take-transactions-list-in-consideration'] = {
                 validation: true,
                 transactions: this.transactions.slice(0, i-1),
             };
 
-            if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidation))
+            if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidationType))
                 throw {message: "validation failed at transaction", transaction: this.transactions[i]};
         }
 

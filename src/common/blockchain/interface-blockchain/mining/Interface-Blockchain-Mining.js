@@ -32,14 +32,14 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             try {
 
-                let blockValidation = { blockValidationType: {
+                let blockValidationType = {
                     "take-transactions-list-in-consideration": {
                         validation: true,
                         transactions: transactions,
                     }
-                }};
+                };
 
-                if (transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidation )) {
+                if (transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidationType )) {
 
                     size -= transaction.serializeTransaction().length;
 
@@ -56,7 +56,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             }
 
             if (bRemoveTransaction)
-                this.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
+                ; //to nothing
 
             i++;
         }

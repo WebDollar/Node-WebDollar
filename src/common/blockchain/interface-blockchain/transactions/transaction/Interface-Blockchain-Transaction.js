@@ -24,6 +24,8 @@ class InterfaceBlockchainTransaction{
         this.from = null;
         this.to = null;
 
+        this._confirmed = false;
+
         if (timeLock === undefined)
             this.timeLock = blockchain.blocks.length-1;
 
@@ -115,7 +117,7 @@ class InterfaceBlockchainTransaction{
      * @param silent
      * @returns {*}
      */
-    validateTransactionOnce( blockHeight, blockValidation = {} ){
+    validateTransactionOnce( blockHeight, blockValidationType = {} ){
 
         if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
@@ -147,23 +149,23 @@ class InterfaceBlockchainTransaction{
         if (inputSum.isLessThan(outputSum))
             throw {message: "Transaction Validation Input is smaller than Output", input: inputSum, output: outputSum};
 
-        if (!this.validateTransactionEveryTime(blockHeight, blockValidation))
+        if (!this.validateTransactionEveryTime(blockHeight, blockValidationType))
             return false;
 
         return true;
     }
 
-    validateTransactionEveryTime( blockHeight , blockValidation = {}){
+    validateTransactionEveryTime( blockHeight , blockValidationType = {}){
 
         if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
-        if (blockValidation.blockValidationType === undefined || !blockValidation.blockValidationType['skip-validation-transactions-from-values']){
+        if (blockValidationType === undefined || !blockValidationType['skip-validation-transactions-from-values']){
 
-            this._validateNonce(blockValidation);
+            this._validateNonce(blockValidationType);
 
-            return this.from.validateFromEnoughMoney(blockValidation);
+            return this.from.validateFromEnoughMoney(blockValidationType);
         }
 
         return true;
@@ -175,12 +177,12 @@ class InterfaceBlockchainTransaction{
         this.validateTransactionOnce(undefined,  {blockValidationType: {'skip-validation-transactions-from-values': true}} );
 
         try {
-            let blockValidation = { blockValidationType: {
+            let blockValidationType = {
                 "take-transactions-list-in-consideration": {
                     validation: true
                 }
-            }};
-            this.validateTransactionEveryTime(undefined, blockValidation );
+            };
+            this.validateTransactionEveryTime(undefined, blockValidationType );
 
         } catch (exception){
             console.warn ("Transaction had not enough money, so I am skipping it", exception);
@@ -253,6 +255,7 @@ class InterfaceBlockchainTransaction{
             nonce: this.nonce,
             version: this.version,
             timeLock: this.timeLock,
+            confirmed: this.confirmed,
         };
 
         if (!dontIncludeTxId )
@@ -284,6 +287,19 @@ class InterfaceBlockchainTransaction{
 
     _validateNonce(blockValidation){
         return true;
+    }
+
+    get confirmed(){
+        return this._confirmed;
+    }
+
+    set confirmed(newValue){
+
+        if (this._confirmed !== newValue)
+            this._confirmed = newValue;
+
+        this.blockchain.transactions.emitTransactionChangeEvent(this, true);
+
     }
 
 }

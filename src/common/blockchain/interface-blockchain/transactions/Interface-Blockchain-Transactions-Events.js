@@ -47,30 +47,28 @@ class InterfaceBlockchainTransactionsEvents{
 
                     let txId = transaction.txId.toString("hex");
                     result[txId] = transaction.toJSON();
-                    result[txId].confirmed = true;
 
                 }
             });
         }
 
 
-        let blockValidation = { blockValidationType: {
+        let blockValidationType= {
             "take-transactions-list-in-consideration": {
                 validation: true
             }
-        }};
+        };
 
         //adding the valid Pending Transactions
         this.blockchain.transactions.pendingQueue.list.forEach((transaction)=>{
 
             try {
-                if (transaction.validateTransactionEveryTime(undefined, blockValidation)) {
+                if (transaction.validateTransactionEveryTime(undefined, blockValidationType)) {
 
                     if (this._searchAddressInTransaction(unencodedAddress, transaction)) {
 
                         let txId = transaction.txId.toString("hex");
                         result[txId.toString("hex")] = transaction.toJSON();
-                        result[txId.toString("hex")].confirmed = false;
                     }
 
                 }
@@ -120,15 +118,13 @@ class InterfaceBlockchainTransactionsEvents{
 
     _searchAddressInTransaction(unencodedAddress, transaction){
 
-        for (let i=0; i<transaction.from.addresses.length; i++){
+        for (let i=0; i<transaction.from.addresses.length; i++)
             if (transaction.from.addresses[i].unencodedAddress.equals(unencodedAddress))
                 return true;
-        }
 
-        for (let i=0; i<transaction.to.addresses.length; i++){
+        for (let i=0; i<transaction.to.addresses.length; i++)
             if (transaction.to.addresses[i].unencodedAddress.equals(unencodedAddress))
                 return true;
-        }
 
         return false;
     }
@@ -152,6 +148,26 @@ class InterfaceBlockchainTransactionsEvents{
                 return true;
 
         return false;
+    }
+
+    emitTransactionChangeEvent(transaction, deleted=false){
+
+        transaction.from.addresses.forEach((address)=>{
+            if (this._checkTransactionIsSubscribed(address.unencodedAddress)) {
+
+                let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
+                this.emitter.emit("transactions/changes/" + BufferExtended.toBase(address), { txId: transaction.txId.toString("hex"), address: addressWIF, transaction: deleted ? undefined : transaction.toJSON()});
+            }
+        });
+
+        transaction.to.addresses.forEach((address)=>{
+            if (this._checkTransactionIsSubscribed(address.unencodedAddress)) {
+
+                let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
+                this.emitter.emit("transactions/changes/" + BufferExtended.toBase(address), { txId: transaction.txId.toString("hex"), address: addressWIF, transaction: deleted ? undefined : transaction.toJSON()});
+            }
+        });
+
     }
 
 }

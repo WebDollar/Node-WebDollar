@@ -64,7 +64,7 @@ class MiniBlockchain extends  inheritBlockchain{
             //validate transactions & tree
             revert.transactions.start = 0;
 
-            if (!block.data.transactions.validateTransactions(block.height, block.blockValidationType))
+            if (!block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType))
                 throw {message: "Validate Transactions is wrong"};
 
 
