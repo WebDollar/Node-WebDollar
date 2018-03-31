@@ -1,3 +1,5 @@
+const BigNumber = require('bignumber.js');
+
 class InterfaceBlockchainTransactionsWizard{
 
     constructor(transactions, blockchain, wallet, ){

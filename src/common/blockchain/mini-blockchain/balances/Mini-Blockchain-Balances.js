@@ -9,7 +9,7 @@ class MiniBlockchainBalances{
 
     }
 
-    checkBalances(address){
+    listBalances(address){
 
         if (address === '' || address === undefined || address === null)
             return null;
@@ -40,7 +40,7 @@ class MiniBlockchainBalances{
 
         return {
             subscription: subscription,
-            balances: this.checkBalances(addressWIF),
+            balances: this.listBalances(addressWIF),
         }
     }
 

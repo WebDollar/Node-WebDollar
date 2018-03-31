@@ -4,6 +4,7 @@ import InterfaceTransaction from "./transaction/Interface-Blockchain-Transaction
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import InterfaceBlockchainTransactionsWizard from "./Interface-Blockchain-Transactions-Wizard";
+import BufferExtended from 'common/utils/BufferExtended';
 
 class InterfaceBlockchainTransactions {
 
@@ -33,7 +34,7 @@ class InterfaceBlockchainTransactions {
     }
 
 
-    checkTransactions(addressWIF){
+    listTransactions(addressWIF){
 
         if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='')
             return [];
@@ -46,7 +47,7 @@ class InterfaceBlockchainTransactions {
         let indexStart, indexEnd;
         if (this.blockchain.agent.light){
 
-            indexStart = this.blockchain.blocks.length-1  - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS;
+            indexStart = this.blockchain.blocks.length-1  - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS;
             indexEnd = this.blockchain.blocks.length;
 
         } else {
@@ -73,14 +74,14 @@ class InterfaceBlockchainTransactions {
         }
 
 
+        let blockValidation = { blockValidationType: {
+            "take-transactions-list-in-consideration": {
+                validation: true
+            }
+        }};
+
         //adding the valid Pending Transactions
         this.blockchain.transactions.pendingQueue.list.forEach((transaction)=>{
-
-            let blockValidation = { blockValidationType: {
-                "take-transactions-list-in-consideration": {
-                    validation: true
-                }
-            }};
 
             try {
                 if (transaction.validateTransactionEveryTime(undefined, blockValidation)) {
@@ -120,16 +121,21 @@ class InterfaceBlockchainTransactions {
     _searchAddressInTransaction(unencodedAddress, transaction){
 
         for (let i=0; i<transaction.from.addresses.length; i++){
-            if (transaction.from.addresses[i].equals(unencodedAddress))
+            if (transaction.from.addresses[i].unencodedAddress.equals(unencodedAddress))
                 return true;
         }
 
         for (let i=0; i<transaction.to.addresses.length; i++){
-            if (transaction.to.addresses[i].equals(unencodedAddress))
+            if (transaction.to.addresses[i].unencodedAddress.equals(unencodedAddress))
                 return true;
         }
 
         return false;
+    }
+
+    setWallet(newWallet){
+        this.wallet = newWallet;
+        this.wizard.wallet = newWallet;
     }
 
 }
