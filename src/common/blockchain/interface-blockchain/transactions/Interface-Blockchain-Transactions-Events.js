@@ -40,6 +40,7 @@ class InterfaceBlockchainTransactionsEvents{
         for (let i=indexStart; i<indexEnd; i++){
 
             let block = this.blockchain.blocks[i];
+            if (block === undefined) continue;
 
             block.data.transactions.transactions.forEach((transaction)=>{
 
