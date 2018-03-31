@@ -34,7 +34,6 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
 
 
 
-
     setWallet(newWallet){
         this.wallet = newWallet;
         this.wizard.wallet = newWallet;

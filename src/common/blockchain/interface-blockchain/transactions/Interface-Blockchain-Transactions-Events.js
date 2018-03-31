@@ -12,6 +12,27 @@ class InterfaceBlockchainTransactionsEvents{
 
     }
 
+    findTransaction(txId){
+
+        if (typeof txId !== "string")
+            txId = new Buffer(txId, "hex")
+
+        for (let i=this.blockchain.blocks.startingPosition; i<this.blockchain.blocks.endingPosition; i++) {
+
+            let block = this.blockchain.blocks[i];
+            if (block === undefined) continue;
+
+            block.data.transactions.transactions.forEach((transaction)=>{
+
+                if (transaction.txId.equals(txId))
+                    return transaction;
+
+            });
+        }
+
+        return null;
+    }
+
     listTransactions(addressWIF){
 
         if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='')
@@ -22,22 +43,9 @@ class InterfaceBlockchainTransactionsEvents{
 
         let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addressWIF);
 
-        let indexStart, indexEnd;
-        if (this.blockchain.agent.light){
-
-            indexStart = this.blockchain.blocks.length-1  - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS;
-            indexEnd = this.blockchain.blocks.length;
-
-        } else {
-
-            //full node
-            indexStart = 0;
-            indexEnd = this.blockchain.blocks.length;
-        }
-
         let result = {};
 
-        for (let i=indexStart; i<indexEnd; i++){
+        for (let i=this.blockchain.blocks.startingPosition; i<this.blockchain.blocks.endingPosition; i++){
 
             let block = this.blockchain.blocks[i];
             if (block === undefined) continue;
@@ -152,6 +160,11 @@ class InterfaceBlockchainTransactionsEvents{
     }
 
     emitTransactionChangeEvent(transaction, deleted=false){
+
+        if (deleted){
+            if (this.findTransaction(transaction.txId) !== null) //I found a transaction already in Blockchain
+                return false;
+        }
 
         transaction.from.addresses.forEach((address)=>{
             if (this._checkTransactionIsSubscribed(address.unencodedAddress)) {
