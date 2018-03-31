@@ -256,7 +256,7 @@ class InterfaceBlockchainTransaction{
         };
 
         if (!dontIncludeTxId )
-            result.txId = this.txId;
+            result.txId = this.txId.toString("hex");
 
         return result;
     }

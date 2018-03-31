@@ -57,7 +57,8 @@ class InterfaceBlockchainTransactions {
             indexEnd = this.blockchain.blocks.length;
         }
 
-        let result = [];
+        let result = {};
+
         for (let i=indexStart; i<indexEnd; i++){
 
             let block = this.blockchain.blocks[i];
@@ -65,10 +66,11 @@ class InterfaceBlockchainTransactions {
             block.data.transactions.transactions.forEach((transaction)=>{
 
                 if (this._searchAddressInTransaction(unencodedAddress, transaction)){
-                    result.push({
-                        transaction:transaction,
-                        confirmed: true,
-                    });
+
+                    let txId = transaction.txId.toString("hex");
+                    result[txId] = transaction.toJSON();
+                    result[txId].confirmed = true;
+
                 }
             });
         }
@@ -86,11 +88,12 @@ class InterfaceBlockchainTransactions {
             try {
                 if (transaction.validateTransactionEveryTime(undefined, blockValidation)) {
 
-                    if (this._searchAddressInTransaction(unencodedAddress, transaction))
-                        result.push({
-                            confirmed: false,
-                            transaction: transaction,
-                        });
+                    if (this._searchAddressInTransaction(unencodedAddress, transaction)) {
+
+                        let txId = transaction.txId.toString("hex");
+                        result[txId.toString("hex")] = transaction.toJSON();
+                        result[txId.toString("hex")].confirmed = false;
+                    }
 
                 }
             } catch (exception){

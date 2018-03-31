@@ -83,9 +83,20 @@ class InterfaceBlockchainTransactionFrom{
     }
 
     toJSON(){
+        let addresses = [];
+
+        this.addresses.forEach((address)=>{
+            addresses.push({
+                address: BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address.unencodedAddress)),
+                publicKey: address.publicKey.toString("hex"),
+                signature: address.signature.toString("hex"),
+                amount: address.amount.toString(),
+            })
+        });
+
         return {
-            addresses: this.addresses,
-            currencyTokenId: this.currencyTokenId,
+            addresses: addresses,
+            currencyTokenId: this.currencyTokenId.toString("hex"),
         }
     }
 
