@@ -72,14 +72,14 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
             this.blockchain.transactions.pendingQueue.list.forEach((pendingTransaction) => {
 
-                if (pendingTransaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress && pendingTransaction.nonce >= nonce) ) {
+                if (pendingTransaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce >= nonce ) {
                     nonce++;
                 }
 
             });
 
         } catch (exception){
-            console.error("Error processing how many transactions we already have to increment the current nonce");
+            console.error("Error processing how many transactions we already have to increment the current nonce", exception);
         }
 
         return nonce;

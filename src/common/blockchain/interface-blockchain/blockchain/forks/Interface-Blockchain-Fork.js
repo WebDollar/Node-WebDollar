@@ -303,32 +303,7 @@ class InterfaceBlockchainFork {
     postFork(forkedSuccessfully){
 
         //move the transactions to pending
-        if (!forkedSuccessfully)
-            for (let i = this._blocksCopy.length - 1; i >= 0; i--) {
-
-                let block = this._blocksCopy[i];
-
-                // remove transactions
-                block.data.transactions.transactions.forEach((transaction)=>{
-
-                    try {
-
-                        let blockValidation = { blockValidationType: {
-                            "take-transactions-list-in-consideration": {
-                                validation: true
-                            }
-                        }};
-
-                        if ( transaction.validateTransactionEveryTime(block.height, blockValidation ) )
-                            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
-                    }
-                    catch (exception){
-                        console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction);
-                    }
-
-                });
-
-            }
+        this.blockchain.transactions.pendingQueue._removeOldTransactions();
 
     }
 

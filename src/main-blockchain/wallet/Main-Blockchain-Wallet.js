@@ -8,12 +8,12 @@ import BufferExtend from "../../common/utils/BufferExtended";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 import StatusEvents from "common/events/Status-Events"
-
-const md5 = require('md5');
+import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 const EventEmitter = require('events');
 const FileSystem = require('fs');
 
 import AdvancedMessages from "node/menu/Advanced-Messages"
+
 
 class MainBlockchainWallet{
 
@@ -192,7 +192,9 @@ class MainBlockchainWallet{
         if (Buffer.isBuffer(address))
             address = BufferExtended.toBase(address);
 
-        return `https://www.gravatar.com/avatar/${md5(address)}?d=retro&f=y`;
+        address = WebDollarCrypto.SHA256( address );
+
+        return `https://www.gravatar.com/avatar/${address.toString("hex")}?d=retro&f=y`;
     }
     
     /**
