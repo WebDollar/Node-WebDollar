@@ -3,7 +3,7 @@ import InterfaceTransactionsPendingQueue from './pending/Interface-Transactions-
 import InterfaceTransaction from "./transaction/Interface-Blockchain-Transaction"
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-const BigNumber = require('bignumber.js');
+import InterfaceBlockchainTransactionsWizard from "./Interface-Blockchain-Transactions-Wizard";
 
 class InterfaceBlockchainTransactions {
 
@@ -17,136 +17,7 @@ class InterfaceBlockchainTransactions {
         //the Queue is an inverted Queue, because elements are added at the end of the List (queue)
         this.pendingQueue = new InterfaceTransactionsPendingQueue(blockchain, db);
 
-    }
-
-    async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
-
-        if (fee === undefined) fee = this.calculateFeeSimple(toAmount);
-
-        try {
-
-            if (!(toAmount instanceof BigNumber)) toAmount = new BigNumber(toAmount);
-
-        } catch (exception){
-
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
-            return { result:false,  message: "Amount is not a valid number", reason: exception }
-        }
-
-        try {
-            if (!(fee instanceof BigNumber)) fee = new BigNumber(fee);
-        } catch (exception){
-
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
-            return { result:false,  message: "Fee is not a valid number", reason: exception }
-        }
-
-        try {
-
-            address = this.wallet.getAddress(address);
-
-        } catch (exception){
-            console.error("Creating a new transaction raised an exception - Getting Address", exception);
-
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
-            return { result:false,  message: "Get Address failed", reason: exception }
-        }
-
-
-        let transaction = undefined;
-
-        try {
-
-            let from = {
-                addresses: [
-                    {
-                        unencodedAddress: address,
-                        publicKey: undefined,
-                        amount: toAmount.plus(fee)
-                    }
-                ],
-                currencyTokenId: currencyTokenId
-            };
-
-            let to = {
-                addresses: [
-                {
-                    unencodedAddress: toAddress,
-                    amount: toAmount
-                },
-            ]};
-
-            transaction = this._createTransaction(
-
-                //from
-                from,
-
-                //to
-                to,
-                undefined, //nonce
-                timeLock, //timeLock
-                undefined, //version
-                undefined, //txId
-                false, false
-            );
-
-        } catch (exception) {
-            console.error("Creating a new transaction raised an exception - Failed Creating a transaction", exception);
-
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
-            return { result:false,  message: "Failed Creating a transaction", reason: exception }
-        }
-
-
-        let signature;
-        try{
-            signature = await address.signTransaction(transaction, password);
-        } catch (exception){
-            console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception);
-
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
-            return { result:false,  message: "Failed Signing the transaction", reason: exception }
-        }
-
-        try{
-            let blockValidation = { blockValidationType: {
-                "take-transactions-list-in-consideration": {
-                        validation: true
-                    }
-                }
-            };
-            transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidation );
-        } catch (exception){
-            console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception);
-
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
-            return { result:false,  message: "Failed Signing the transaction", reason: exception }
-        }
-
-        try{
-
-            this.pendingQueue.includePendingTransaction(transaction);
-
-        } catch (exception){
-            console.error("Creating a new transaction raised an exception - Including Pending Transaction", exception);
-
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
-            return { result:false,  message: "Including Pending Transaction", reason: exception }
-        }
-
-        return {
-            result: true,
-            message: "Your transaction is pending...",
-            signature: signature
-        }
-    }
-
-    calculateFeeSimple(toAmount){
-
-        if (toAmount < 0)
-            return 0;
-
-        return Math.min( Math.floor (0.1 * toAmount) + 1, 10 );
+        this.wizard = new InterfaceBlockchainTransactionsWizard(this, blockchain, wallet);
 
     }
 
@@ -154,13 +25,112 @@ class InterfaceBlockchainTransactions {
         return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo);
     }
 
-    createTransactionFromBuffer(buffer, offset = 0){
+    _createTransactionFromBuffer(buffer, offset = 0){
 
         let transaction = this._createTransaction ( undefined, undefined, 0, 0xFFFFFFFF, 0x00, new Buffer(32), false, false );
         offset = transaction.deserializeTransaction(buffer, offset);
         return {transaction: transaction, offset: offset};
     }
 
+
+    checkTransactions(addressWIF){
+
+        if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='')
+            return [];
+
+        if (!Buffer.isBuffer(addressWIF))
+            addressWIF = BufferExtended.fromBase(addressWIF);
+
+        let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addressWIF);
+
+        let indexStart, indexEnd;
+        if (this.blockchain.agent.light){
+
+            indexStart = this.blockchain.blocks.length-1  - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS;
+            indexEnd = this.blockchain.blocks.length;
+
+        } else {
+
+            //full node
+            indexStart = 0;
+            indexEnd = this.blockchain.blocks.length;
+        }
+
+        let result = [];
+        for (let i=indexStart; i<indexEnd; i++){
+
+            let block = this.blockchain.blocks[i];
+
+            block.data.transactions.transactions.forEach((transaction)=>{
+
+                if (this._searchAddressInTransaction(unencodedAddress, transaction)){
+                    result.push({
+                        transaction:transaction,
+                        confirmed: true,
+                    });
+                }
+            });
+        }
+
+
+        //adding the valid Pending Transactions
+        this.blockchain.transactions.pendingQueue.list.forEach((transaction)=>{
+
+            let blockValidation = { blockValidationType: {
+                "take-transactions-list-in-consideration": {
+                    validation: true
+                }
+            }};
+
+            try {
+                if (transaction.validateTransactionEveryTime(undefined, blockValidation)) {
+
+                    if (this._searchAddressInTransaction(unencodedAddress, transaction))
+                        result.push({
+                            confirmed: false,
+                            transaction: transaction,
+                        });
+
+                }
+            } catch (exception){
+            }
+
+        });
+
+
+        return result;
+
+    }
+
+    subscribeTransactionsChanges(address){
+
+    }
+
+    unsusbribeTransactionsChanges(subscription){
+
+        if (subscription === undefined || subscription === null) return false;
+
+        if (typeof subscription === 'function')
+            subscription();
+
+        return true;
+    }
+
+
+    _searchAddressInTransaction(unencodedAddress, transaction){
+
+        for (let i=0; i<transaction.from.addresses.length; i++){
+            if (transaction.from.addresses[i].equals(unencodedAddress))
+                return true;
+        }
+
+        for (let i=0; i<transaction.to.addresses.length; i++){
+            if (transaction.to.addresses[i].equals(unencodedAddress))
+                return true;
+        }
+
+        return false;
+    }
 
 }
 

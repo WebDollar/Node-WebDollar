@@ -19,6 +19,9 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
             transactionsList.forEach((transaction)=>{
 
+                if (this.transaction.txId.equals(transaction.txId))
+                    return false; // transaction is not taken in consideration
+
                 transaction.from.addresses.forEach((address)=>{
 
                     let addr = address.unencodedAddress.toString("hex");

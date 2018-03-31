@@ -29,7 +29,7 @@ class MiniBlockchainBalances{
         if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='')
             return null;
 
-        if (!Buffer.isBuffer(addressWIF) && addressWIF !== '' && addressWIF !== undefined)
+        if (!Buffer.isBuffer(addressWIF))
             addressWIF = BufferExtended.fromBase(addressWIF);
 
         let address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addressWIF);
@@ -46,14 +46,12 @@ class MiniBlockchainBalances{
 
     unsusbribeBalancesChanges(subscription){
 
-        if (subscription === undefined || subscription === null)
-            return false;
+        if (subscription === undefined || subscription === null) return false;
 
         if (typeof subscription === 'function')
             subscription();
 
         return true;
-
     }
 
 }
