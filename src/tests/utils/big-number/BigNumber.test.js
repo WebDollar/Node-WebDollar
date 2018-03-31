@@ -1,6 +1,8 @@
 var assert = require('assert')
 var BigNumber = require('bignumber.js');
 
+//big number replaced
+
 import TestsHelper from 'tests/Tests.helper'
 
 describe('BigNumber test', () => {
