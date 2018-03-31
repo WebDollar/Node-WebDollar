@@ -72,6 +72,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 let list = [];
 
+                console.warn("pendingQueue length", Blockchain.blockchain.transactions.pendingQueue.list.length);
                 Blockchain.blockchain.transactions.pendingQueue.list.forEach((pendingTransaction)=>{
 
                     if (response.format === "json")
@@ -92,7 +93,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
         try {
             let answer = await node.sendRequestWaitOnce("transactions/get-all-pending-transactions", {format: "buffer"}, 'answer');
-            if (answer.result && answer.transactions !== null && Array.isArray(answer.transactions)) {
+            if (answer !== null && answer !== undefined && answer.result && answer.transactions !== null && Array.isArray(answer.transactions)) {
                 let transactions = answer.transactions;
 
                 for (let i = 0; i < transactions.length; i++) {

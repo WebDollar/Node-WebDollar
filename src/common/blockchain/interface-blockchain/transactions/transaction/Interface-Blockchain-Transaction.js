@@ -174,7 +174,7 @@ class InterfaceBlockchainTransaction{
 
     isTransactionOK(){
 
-        this.validateTransactionOnce(undefined,  {blockValidationType: {'skip-validation-transactions-from-values': true}} );
+        this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
 
         try {
             let blockValidationType = {
