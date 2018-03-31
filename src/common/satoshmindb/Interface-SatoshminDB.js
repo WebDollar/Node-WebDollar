@@ -245,15 +245,21 @@ class InterfaceSatoshminDB {
         })
     }
 
-    get(key, timeout=5000) {
+    get(key, timeout=6000, throwTimeOutError=false) {
 
         return new Promise((resolve)=>{
 
             //timeout, max 10 seconds to load the database
             let timeoutInterval = setTimeout(()=>{
-                console.error("get failed !!" + key);
+                console.error("SathoshminDB Get failed !!", key);
+
+                if (throwTimeOutError===true )
+                    throw {message: "SatoshminDB Get Failed !!", key};
+
                 resolve(null);
             }, timeout);
+
+
 
             this._getDocument(key).then((answer)=>{
 
@@ -266,7 +272,7 @@ class InterfaceSatoshminDB {
                 console.error("db.get error " + key, exception);
 
                 if (exception.status === 500)
-                    StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: eexception.reason.toString() });
+                    StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
                 resolve(null);
             });

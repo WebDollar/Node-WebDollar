@@ -302,6 +302,14 @@ class InterfaceBlockchainTransaction{
 
     }
 
+    get fee(){
+        //validate amount
+        let inputSum = this.from.calculateInputSum();
+        let outputSum = this.to.calculateOutputSum();
+
+        return outputSum.minus(inputSum);
+    }
+
 }
 
 export default InterfaceBlockchainTransaction

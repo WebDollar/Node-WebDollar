@@ -15,13 +15,13 @@ class InterfaceBlockchainTransactionsProtocol{
 
         let socket = nodesListObject.socket;
 
-        if (Blockchain.synchronized){
+        if (Blockchain.loaded){
             this.initializeTransactionsPropagation(socket);
             return;
         }
 
         //after
-        StatusEvents.on('blockchain/synchronized', ()=>{
+        Blockchain.onLoaded.then((answer)=>{
             // in case the Blockchain was not loaded, I will not be interested in transactions
             this.initializeTransactionsPropagation(socket);
         });

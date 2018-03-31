@@ -1,4 +1,5 @@
 const BigInteger = require('big-integer');
+const BigNumber = require('bignumber.js');
 
 import consts from 'consts/const_global'
 import global from 'consts/global'
@@ -13,8 +14,12 @@ import AdvancedMessages from "node/menu/Advanced-Messages"
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
-    constructor (blockchain, minerAddress){
+    constructor (blockchain, minerAddress, miningFeeThreshold){
         super(blockchain, minerAddress);
+
+        if (miningFeeThreshold === undefined) miningFeeThreshold = consts.MINING_POOL.MINING_FEE_THRESHOLD;
+        this.miningFeeThreshold = new BigNumber(miningFeeThreshold);
+
     }
 
 
@@ -39,15 +44,17 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     }
                 };
 
-                if (transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidationType )) {
+                if (transaction.fee.isGreaterThanOrEqualTo(this.miningFeeThreshold))
+                    if ( transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidationType )) {
 
-                    size -= transaction.serializeTransaction().length;
+                        size -= transaction.serializeTransaction().length;
 
-                    if (size >= 0)
-                        transactions.push(transaction);
+                        if (size >= 0)
+                            transactions.push(transaction);
 
-                } else
-                    bRemoveTransaction = true;
+                    } else
+                        bRemoveTransaction = true;
+
 
 
             } catch (exception){
