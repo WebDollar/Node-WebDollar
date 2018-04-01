@@ -10,9 +10,9 @@ const SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL = 20;
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
 
-    constructor(blockchain, minerAddress){
+    constructor(blockchain, minerAddress, miningFeeThreshold){
 
-        super(blockchain, minerAddress);
+        super(blockchain, minerAddress, miningFeeThreshold);
 
         this._workerFinished = false;
 

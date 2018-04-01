@@ -2,12 +2,6 @@ import InterfaceBlockchainBackboneMining from "common/blockchain/interface-block
 
 class InterfacePoolBackboneMining extends InterfaceBlockchainBackboneMining {
 
-    constructor() {
-
-        super();
-
-    }
-
     mine(difficultyTarget){
 
         this.difficulty = difficultyTarget;

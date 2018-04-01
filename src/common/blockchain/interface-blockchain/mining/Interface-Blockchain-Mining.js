@@ -1,5 +1,6 @@
 const BigInteger = require('big-integer');
 
+
 import consts from 'consts/const_global'
 import global from 'consts/global'
 
@@ -13,8 +14,10 @@ import AdvancedMessages from "node/menu/Advanced-Messages"
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
-    constructor (blockchain, minerAddress){
-        super(blockchain, minerAddress);
+    constructor (blockchain, minerAddress, miningFeeThreshold){
+
+        super(blockchain, minerAddress, miningFeeThreshold);
+
     }
 
 
@@ -32,22 +35,24 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             try {
 
-                let blockValidation = { blockValidationType: {
+                let blockValidationType = {
                     "take-transactions-list-in-consideration": {
                         validation: true,
                         transactions: transactions,
                     }
-                }};
+                };
 
-                if (transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidation )) {
+                if (transaction.fee.isLessThanOrEqualTo(this.miningFeeThreshold))
+                    if ( transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidationType )) {
 
-                    size -= transaction.serializeTransaction().length;
+                        size -= transaction.serializeTransaction().length;
 
-                    if (size >= 0)
-                        transactions.push(transaction);
+                        if (size >= 0)
+                            transactions.push(transaction);
 
-                } else
-                    bRemoveTransaction = true;
+                    } else
+                        bRemoveTransaction = true;
+
 
 
             } catch (exception){
@@ -56,7 +61,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             }
 
             if (bRemoveTransaction)
-                this.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
+                ; //to nothing
 
             i++;
         }
@@ -192,7 +197,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             if (answer.result && this.blockchain.blocks.length === block.height ){
 
                 console.warn( "----------------------------------------------------------------------------");
-                console.warn( "WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress.toString("hex"));
+                console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress.toString("hex"));
                 console.warn( "----------------------------------------------------------------------------");
 
                 try {
@@ -207,6 +212,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                             return this.blockchain.includeBlockchainBlock(block, false, [], true);
                         }) === false) throw {message: "Mining2 returned false"};
+
+                    //confirming transactions
+                    block.data.transactions.transactions.forEach((transaction) => {
+                        transaction.confirmed = true;
+
+                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+                    });
 
                 } catch (exception){
 

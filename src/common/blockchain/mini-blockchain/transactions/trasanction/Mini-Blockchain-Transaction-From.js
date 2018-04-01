@@ -3,14 +3,13 @@ import InterfaceBlockchainTransactionFrom from 'common/blockchain/interface-bloc
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
 
-    validateFromEnoughMoney(blockValidation){
+    validateFromEnoughMoney(blockValidationType){
 
         let amounts = {};
-        if (blockValidation.blockValidationType !== undefined && blockValidation.blockValidationType['take-transactions-list-in-consideration'] !== undefined &&
-            blockValidation.blockValidationType['take-transactions-list-in-consideration'].validation ){
+        if (blockValidationType !== undefined && blockValidationType['take-transactions-list-in-consideration'] !== undefined &&  blockValidationType['take-transactions-list-in-consideration'].validation ){
 
             //fetching the transactions list
-            let transactionsList = blockValidation.blockValidationType['take-transactions-list-in-consideration'].transactions;
+            let transactionsList = blockValidationType['take-transactions-list-in-consideration'].transactions;
 
             if (transactionsList === undefined)
                 transactionsList = this.transaction.blockchain.transactions.pendingQueue.list;
@@ -53,8 +52,7 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
             //simulation the transactions
 
-            if (blockValidation.blockValidationType !== undefined && blockValidation.blockValidationType['take-transactions-list-in-consideration'] !== undefined &&
-                blockValidation.blockValidationType['take-transactions-list-in-consideration'].validation ){
+            if (blockValidationType !== undefined && blockValidationType['take-transactions-list-in-consideration'] !== undefined && blockValidationType['take-transactions-list-in-consideration'].validation ){
 
                 let addr = fromObject.unencodedAddress.toString("hex");
 

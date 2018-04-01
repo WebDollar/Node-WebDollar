@@ -16,7 +16,7 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         let db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.TRANSACTIONS_DATABASE);
 
         //the Queue is an inverted Queue, because elements are added at the end of the List (queue)
-        this.pendingQueue = new InterfaceTransactionsPendingQueue(blockchain, db);
+        this.pendingQueue = new InterfaceTransactionsPendingQueue(this, blockchain, db);
 
         this.wizard = new InterfaceBlockchainTransactionsWizard(this, blockchain, wallet);
     }
@@ -31,7 +31,6 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         offset = transaction.deserializeTransaction(buffer, offset);
         return {transaction: transaction, offset: offset};
     }
-
 
 
 

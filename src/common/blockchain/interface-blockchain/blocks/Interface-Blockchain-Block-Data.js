@@ -50,7 +50,7 @@ class InterfaceBlockchainBlockData {
         if (!hashData.equals(this.hashData))
             throw {message: "block.data hashData is not right"};
 
-        if (!this.transactions.validateTransactions(blockHeight, blockValidation))
+        if (!this.transactions.validateTransactions(blockHeight, blockValidation.blockValidationType ))
             throw {message: "transactions failed to validate"};
 
         return true;

@@ -5,10 +5,11 @@ import consts from 'consts/const_global'
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
+const BigNumber = require('bignumber.js');
 
 class InterfaceBlockchainMiningBasic {
 
-    constructor(blockchain, minerAddress){
+    constructor(blockchain, minerAddress, miningFeeThreshold){
 
         this._minerAddress = undefined;
         this._unencodedMinerAddress = undefined;
@@ -17,6 +18,9 @@ class InterfaceBlockchainMiningBasic {
 
         if (minerAddress !== undefined)
             this.minerAddress = minerAddress;
+
+        if (miningFeeThreshold === undefined) miningFeeThreshold = consts.MINING_POOL.MINING_FEE_THRESHOLD;
+        this.miningFeeThreshold = miningFeeThreshold;
 
         this._nonce = 0;
         this.started = false;
@@ -38,6 +42,13 @@ class InterfaceBlockchainMiningBasic {
         return this._setAddress(newAddress, true)
     }
 
+    set miningFeeThreshold(newFee){
+        this._miningFeeThreshold = new BigNumber(newFee);
+    }
+
+    get miningFeeThreshold(){
+        return this._miningFeeThreshold;
+    }
 
     _setAddress(newAddress, save = true){
 

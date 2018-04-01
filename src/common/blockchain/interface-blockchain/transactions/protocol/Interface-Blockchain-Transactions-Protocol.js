@@ -15,20 +15,20 @@ class InterfaceBlockchainTransactionsProtocol{
 
         let socket = nodesListObject.socket;
 
-        if (Blockchain.synchronized){
+        if (Blockchain.loaded){
             this.initializeTransactionsPropagation(socket);
             return;
         }
 
         //after
-        StatusEvents.on('blockchain/synchronized', ()=>{
+        Blockchain.onLoaded.then((answer)=>{
             // in case the Blockchain was not loaded, I will not be interested in transactions
             this.initializeTransactionsPropagation(socket);
         });
 
     }
 
-    initializeTransactionsPropagation(socket){
+    async initializeTransactionsPropagation(socket){
 
         // in case the Blockchain was not loaded, I will not be interested in transactions
         let node = socket.node;
@@ -72,6 +72,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 let list = [];
 
+                console.warn("pendingQueue length", Blockchain.blockchain.transactions.pendingQueue.list.length);
                 Blockchain.blockchain.transactions.pendingQueue.list.forEach((pendingTransaction)=>{
 
                     if (response.format === "json")
@@ -90,22 +91,26 @@ class InterfaceBlockchainTransactionsProtocol{
         });
 
 
-        let answer = node.sendRequestWaitOnce("propagation/transactions/get-all-pending-transactions", {format: "buffer"},'/answer' );
-        if ( answer.result && answer.transactions !== null && Array.isArray(answer.transactions) ){
-            let transactions = answer.transactions;
+        try {
+            let answer = await node.sendRequestWaitOnce("transactions/get-all-pending-transactions", {format: "buffer"}, 'answer');
+            if (answer !== null && answer !== undefined && answer.result && answer.transactions !== null && Array.isArray(answer.transactions)) {
+                let transactions = answer.transactions;
 
-            for (let i=0; i< transactions.length ;i++){
+                for (let i = 0; i < transactions.length; i++) {
 
-                let transaction = Blockchain.blockchain.transactions._createTransactionFromBuffer(transactions[i]).transaction;
+                    let transaction = Blockchain.blockchain.transactions._createTransactionFromBuffer(transactions[i]).transaction;
 
-                if (!transaction.isTransactionOK()){
-                    continue;
+                    if (!transaction.isTransactionOK()) {
+                        continue;
+                    }
+
+                    if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket))
+                        console.warn("I already have this transaction", transaction.txId)
+
                 }
-
-                if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction))
-                    console.warn ("I already have this transaction", transaction.txId)
-
             }
+        } catch (exception){
+            console.error("Error Getting All Pending Transactions", exception);
         }
 
     }

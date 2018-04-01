@@ -56,6 +56,23 @@ class InterfaceBlockchainBlocks{
 
     }
 
+    get startingPosition(){
+
+        if (this.blockchain.agent.light)
+            return this.blockchain.blocks.length-1  - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS;
+        else
+            //full node
+            return 0;
+    }
+
+    get endingPosition(){
+
+        if (this.blockchain.agent.light)
+            return this.blockchain.blocks.length;
+        else //full node
+            return this.blockchain.blocks.length;
+    }
+
 }
 
 export default InterfaceBlockchainBlocks;

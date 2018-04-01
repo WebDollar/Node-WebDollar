@@ -122,7 +122,7 @@ class MainBlockchainWallet{
 
     async loadAddresses() {
 
-        let buffer = await this.db.get(this.walletFileName);
+        let buffer = await this.db.get( this.walletFileName, 6000, true );
 
         if ( buffer === null || buffer === undefined)
             return false;
@@ -572,11 +572,8 @@ class MainBlockchainWallet{
 
         } catch (exception){
 
-            console.error("exception loading Wallet.Addresses");
-
             StatusEvents.emit('validation/status', {message: "IndexedDB - Wallet couldn't be imported"});
 
-            await this.createNewAddress(); //it will save automatically
         }
     }
 

@@ -64,7 +64,7 @@ class MiniBlockchain extends  inheritBlockchain{
             //validate transactions & tree
             revert.transactions.start = 0;
 
-            if (!block.data.transactions.validateTransactions(block.height, block.blockValidationType))
+            if (!block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType))
                 throw {message: "Validate Transactions is wrong"};
 
 
@@ -99,8 +99,14 @@ class MiniBlockchain extends  inheritBlockchain{
                 block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = undefined;
 
                 //revert reward
-                if (revert.reward)
-                    this.accountantTree.updateAccount( block.data.minerAddress, block.reward.negated(), undefined );
+                if (revert.reward) {
+                    let answer = this.accountantTree.updateAccount(block.data.minerAddress, block.reward.negated(), undefined);
+
+                    //force to delete first time miner
+                    if (answer === null && this.accountantTree.getAccountNonce(block.data.minerAddress) === 0)
+                        this.accountantTree.delete(block.data.minerAddress);
+                }
+
 
                 if (revert.revertNow)
                     return false;

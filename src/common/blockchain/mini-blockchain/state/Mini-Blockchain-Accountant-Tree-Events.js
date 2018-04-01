@@ -59,11 +59,11 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
                 }
 
-                this.propagateBalanceChangeEvent(address, ()=>{return balances} );
+                this.emitBalanceChangeEvent(address, ()=>{return balances} );
             }
     }
 
-    propagateBalanceChangeEvent(address, getBalanceCallback){
+    emitBalanceChangeEvent(address, getBalanceCallback){
 
         if (this._checkBalanceIsSubscribed(address)) {
             let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));

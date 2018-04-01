@@ -182,14 +182,18 @@ class InterfaceBlockchainFork {
             try {
                 this.preForkClone();
             } catch (exception){
-                console.error("preForkBefore raised an error");
+                console.error("-----------------------");
+                console.error("preForkBefore raised an error", exception);
+                console.error("-----------------------");
             }
 
             try {
                 this.preFork();
             } catch (exception){
                 this.revertFork();
-                console.error("preFork raised an error");
+                console.error("-----------------------");
+                console.error("preFork raised an error", exception);
+                console.error("-----------------------");
             }
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight);
@@ -204,7 +208,7 @@ class InterfaceBlockchainFork {
 
                 for (index = 0; index < this.forkBlocks.length; index++) {
 
-                    StatusEvents.emit( "agent/status", {message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
+                    StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
 
@@ -232,8 +236,13 @@ class InterfaceBlockchainFork {
                 try {
 
                     for (let i = 0; i < this._blocksCopy.length; i++)
+
                         if (! (await this.blockchain.includeBlockchainBlock(this._blocksCopy[index], false, "all", false))) {
+
+                            console.error("----------------------------------------------------------");
                             console.error("blockchain couldn't restored after fork included in main Blockchain ", i);
+                            console.error("----------------------------------------------------------");
+
                             break;
                         }
 
@@ -241,8 +250,12 @@ class InterfaceBlockchainFork {
                     console.error("saveFork includeBlockchainBlock2 raised exception", exception);
                 }
 
+            }
+
+            await this.postForkTransactions(forkedSuccessfully);
+
             //successfully, let's delete the backup blocks
-            } else {
+            if (forkedSuccessfully) {
                 for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++)
                     delete this._blocksCopy[i];
 
@@ -300,10 +313,67 @@ class InterfaceBlockchainFork {
 
     }
 
-    postFork(forkedSuccessfully){
+    postForkTransactions(forkedSuccessfully){
 
         //move the transactions to pending
-        this.blockchain.transactions.pendingQueue._removeOldTransactions();
+        if (forkedSuccessfully) {
+
+            // remove transactions and place them in the queue
+            this._blocksCopy.forEach((block) => {
+                block.data.transactions.transactions.forEach((transaction) => {
+
+                    transaction.confirmed = false;
+
+                    try {
+                        this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
+                    }
+                    catch (exception) {
+                        console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction);
+                    }
+
+                });
+            });
+
+            this.forkBlocks.forEach((block)=> {
+                block.data.transactions.transactions.forEach((transaction) => {
+                    transaction.confirmed = true;
+
+                    this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+
+                });
+            });
+
+        } else {
+
+            this._blocksCopy.forEach( (block) => {
+                block.data.transactions.transactions.forEach((transaction) => {
+                    transaction.confirmed = true;
+
+                    this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+
+                });
+            });
+
+            this.forkBlocks.forEach((block)=>{
+                block.data.transactions.transactions.forEach((transaction)=>{
+                    transaction.confirmed = false;
+
+                    try {
+                        this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
+                    }
+                    catch (exception) {
+                        console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction);
+                    }
+
+                });
+            })
+        }
+
+        this.blockchain.transactions.pendingQueue.removeOldTransactions();
+
+    }
+
+    postFork(forkedSuccessfully){
 
     }
 

@@ -4,13 +4,13 @@ import consts from 'consts/const_global'
 
 class InterfaceTransactionsPendingQueue {
 
-    constructor(blockchain, db){
+    constructor(transactions, blockchain, db){
 
+        this.transactions = transactions;
         this.blockchain = blockchain;
         this.list = [];
 
         this.db = db;
-
     }
 
     includePendingTransaction (transaction, exceptSockets){
@@ -18,22 +18,18 @@ class InterfaceTransactionsPendingQueue {
         if (this.findPendingTransaction(transaction) !== -1)
             return false;
 
-        let blockValidation = { blockValidationType: {
+        let blockValidationType = {
             "take-transactions-list-in-consideration": {
                 validation: true
             }
-        }};
+        };
 
-        if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidation ))
+        if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidationType ))
             return false;
 
         this._insertPendingTransaction(transaction);
 
-
         this.propagateTransaction(transaction, exceptSockets);
-
-
-        this._removeOldTransactions();
 
         return true;
 
@@ -71,6 +67,11 @@ class InterfaceTransactionsPendingQueue {
 
         if ( inserted === false)
             this.list.push(transaction);
+
+        transaction.confirmed = false;
+        transaction.pendingDateBlockHeight = this.blockchain.blocks.length-1;
+        
+        this.transactions.emitTransactionChangeEvent( transaction );
     }
 
     findPendingTransaction(transaction){
@@ -83,35 +84,45 @@ class InterfaceTransactionsPendingQueue {
         return -1;
     }
 
-    removePendingTransaction (transaction){
+    _removePendingTransaction (transaction){
 
-        let index = transaction;
+        let index;
 
         if (typeof transaction === "object") index = this.findPendingTransaction(transaction);
+        else if (typeof transaction === "number") {
+            index = transaction;
+            transaction = this.list[index];
+        }
 
         if (index === -1)
             return true;
 
         this.list.splice(index, 1);
+
+        this.transactions.emitTransactionChangeEvent(transaction, true);
     }
 
-    _removeOldTransactions (){
+    removeOldTransactions (){
+
+        let blockValidationType = {
+            "take-transactions-list-in-consideration": {
+                validation: true
+            }
+        };
 
         for (let i=this.list.length-1; i >= 0; i--) {
 
             try{
 
-                let blockValidation = { blockValidationType: {
-                    "take-transactions-list-in-consideration": {
-                        validation: true
-                    }
-                }};
-
-                if (!this.list[i].validateTransactionEveryTime(undefined, blockValidation ))
-                    this.list.splice(i, 1);
+                if ( this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION &&
+                     !this.list[i].validateTransactionEveryTime(undefined, blockValidationType ) &&
+                     ( this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length )
+                ) {
+                    this._removePendingTransaction(i);
+                }
 
             } catch (exception){
-                console.warn("Old Transaction removed because of exception ", exception)
+                console.warn("Old Transaction removed because of exception ", exception);
                 this.list.splice(i, 1);
             }
 

@@ -99,14 +99,13 @@ class InterfaceBlockchainTransactionsWizard{
         }
 
         try{
-            let blockValidation = { blockValidationType: {
+            let blockValidationType = {
                 "take-transactions-list-in-consideration": {
                     validation: true
                 }
-            }
             };
 
-            if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidation ))
+            if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidationType ))
                 throw {message: "Transaction is invalid"};
 
         } catch (exception){

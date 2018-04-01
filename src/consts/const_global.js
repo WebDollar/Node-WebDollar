@@ -26,8 +26,9 @@ consts.BLOCKCHAIN = {
 
     HARD_FORKS : {
 
-
     }
+
+
 };
 
 consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 1 ;
@@ -144,8 +145,12 @@ consts.DATABASE_NAMES = {
 };
 
 consts.MINING_POOL = {
+
     WINDOW_SIZE: 16,
-    BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+    BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+
+    MINING_FEE_THRESHOLD: 0.1
+
 };
 
 
@@ -156,8 +161,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.259",
-        VERSION_COMPATIBILITY: "0.259",
+        VERSION: "0.262",
+        VERSION_COMPATIBILITY: "0.262",
         PROTOCOL: "WebDollar",
 
 

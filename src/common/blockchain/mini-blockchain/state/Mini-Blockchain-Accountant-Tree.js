@@ -53,7 +53,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         }
 
         //optimization, but it doesn't work in browser
-        this.propagateBalanceChangeEvent(address, ()=>{
+        this.emitBalanceChangeEvent(address, ()=>{
             return (resultUpdate !== null ? node.getBalances() : null);
         });
 

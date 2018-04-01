@@ -19,7 +19,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    validateTransactions(blockHeight, blockValidation){
+    validateTransactions(blockHeight, blockValidationType){
 
         let hashTransactions = this.calculateHashTransactions();
         if (!this.hashTransactions.equals(hashTransactions))
@@ -27,15 +27,14 @@ class InterfaceBlockchainBlockDataTransactions {
 
         for (let i=0; i<this.transactions.length; i++) {
 
-            if (blockValidation === undefined ) blockValidation = {};
-            if (blockValidation.blockValidationType === undefined) blockValidation.blockValidationType = {};
+            if (blockValidationType === undefined) blockValidationType = {};
 
-            blockValidation.blockValidationType['take-transactions-list-in-consideration'] = {
+            blockValidationType['take-transactions-list-in-consideration'] = {
                 validation: true,
                 transactions: this.transactions.slice(0, i-1),
             };
 
-            if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidation))
+            if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidationType))
                 throw {message: "validation failed at transaction", transaction: this.transactions[i]};
         }
 
@@ -127,19 +126,20 @@ class InterfaceBlockchainBlockDataTransactions {
         let i;
         for (i=0; i<block.data.transactions.transactions.length; i++)
             if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
-                return i;
+                return i-1;
 
-        return i-1;
+        return block.data.transactions.transactions.length-1;
     }
 
     processBlockDataTransactionsRevert(endPos, startPos, block, multiplicationFactor = -1){
 
         let i;
         for (i = endPos; i >= startPos; i--)
-            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
-                return i;
+            if (i >= 0)
+                if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
+                    return i;
 
-        return i+1;
+        return i;
 
     }
 
