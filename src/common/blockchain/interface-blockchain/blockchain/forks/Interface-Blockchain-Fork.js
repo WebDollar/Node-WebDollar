@@ -173,7 +173,10 @@ class InterfaceBlockchainFork {
         }
         console.log("save Fork after validateFork");
 
-        // to do
+        /**
+            TODO: At the moment the revert function is based on an Accountant Tree clone. This solution will get slower and lower over the time,
+            TODO: Instead, it should unsimulate all the operations like miner reward, transactions
+         **/
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 

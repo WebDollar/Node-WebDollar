@@ -66,9 +66,6 @@ class MiniBlockchainFork extends inheritFork{
             // remove reward
 
             let answer = this.blockchain.accountantTree.updateAccount(block.data.minerAddress, block.reward.negated() );
-            //force to delete first time miner
-            if (answer === null && this.blockchain.accountantTree.getAccountNonce(block.data.minerAddress) === 0)
-                this.blockchain.accountantTree.delete(block.data.minerAddress);
 
             // remove transactions
             for (let j=block.data.transactions.transactions.length-1; j>=0; j--){

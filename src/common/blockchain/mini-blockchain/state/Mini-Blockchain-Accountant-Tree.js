@@ -61,9 +61,18 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         //purging empty addresses
         //TODO Window Transactions for Purging
-        if (this.root.deleteEmptyAddresses && resultUpdate === null) {
-            this.delete(address);
-            return null;
+        if (resultUpdate === null) {
+
+            if (this.root.deleteEmptyAddresses) { //purging automatically
+                this.delete(address);
+                return null;
+            }
+
+            if (node.nonce === 0){ //nonce = 0, let's delete the account because nobody used it.
+                this.delete(address);
+                return null;
+            }
+
         }
 
         node._changedNode();
