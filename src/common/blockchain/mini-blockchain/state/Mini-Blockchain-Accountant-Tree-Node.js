@@ -232,12 +232,11 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 if (webdId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)
                     throw {message: "webd token is incorrect", token: webdId };
 
-                let result = Serialization.deserializeNumber8Bytes(buffer, offset);
-
+                let result = Serialization.deserializeNumber8Bytes(BufferExtended.substr(buffer, offset, 8));
+                offset += 8;
                 //console.log("result.number",result.number);
 
-                this.updateBalanceToken(result.number, webdId);
-                offset = result.newOffset;
+                this.updateBalanceToken(result, webdId);
 
 
                 if (balancesLength > 1) {
@@ -248,11 +247,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                         let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH);
                         offset += consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH;
 
-                        result = Serialization.deserializeNumber8Bytes(buffer, offset);
+                        result = Serialization.deserializeNumber8Bytes(BufferExtended.substr(buffer, offset, 8));
+                        offset+=8;
 
-                        this.updateBalanceToken(result.number, tokenId);
-
-                        offset = result.newOffset;
+                        this.updateBalanceToken(result, tokenId);
                     }
                 }
 

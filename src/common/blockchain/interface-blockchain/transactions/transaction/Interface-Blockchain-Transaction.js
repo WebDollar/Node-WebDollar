@@ -147,7 +147,13 @@ class InterfaceBlockchainTransaction{
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 
-        if (inputSum.isLessThan(outputSum))
+        if (WebDollarCoins.validateCoinsNumber(inputSum))
+            throw {message: "Transaction inputSum is invalid", inputSum: inputSum};
+
+        if (WebDollarCoins.validateCoinsNumber(outputSum))
+            throw {message: "Transaction outputSum is invalid", inputSum: outputSum};
+
+        if (inputSum < outputSum)
             throw {message: "Transaction Validation Input is smaller than Output", input: inputSum, output: outputSum};
 
         if (!this.validateTransactionEveryTime(blockHeight, blockValidationType))

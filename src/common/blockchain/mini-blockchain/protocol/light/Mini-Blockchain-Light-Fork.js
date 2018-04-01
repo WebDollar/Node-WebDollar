@@ -146,7 +146,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             let sum = this.blockchain.accountantTree.calculateNodeCoins();
             console.log("preFork2 accountantTree sum all", sum );
 
-            if (sum.isLessThan(currentSum) || sum.isLessThanOrEqualTo(0)){
+            if (sum < currentSum || sum <= 0){
                 throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: currentSum, blockchainSum: sum};
             }
 

@@ -139,8 +139,8 @@ class InterfaceBlockchainTransactionFrom{
             if (!WebDollarCoins.validateCoinsNumber(fromObject.amount))
                 throw {message: 'From.Object Amount is not specified', amount: fromObject.amount, index:index} ;
 
-            if ( fromObject.amount.isLessThanOrEqualTo(0) )
-                throw {message: "Amount is an invalid number", address: fromObject, index: index };
+            if ( fromObject.amount <= 0 )
+                throw {message: "Amount is an invalid number", amount: fromObject.amount, index: index };
 
 
         });

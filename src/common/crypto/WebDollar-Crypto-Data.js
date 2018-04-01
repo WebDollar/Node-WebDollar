@@ -78,7 +78,7 @@ class WebDollarCryptoData {
 
             if (typeof data === 'number'){
                 this.buffer = Serialization.serializeNumber8Bytes(data);
-                return
+                return;
             }
 
             if (data === null)

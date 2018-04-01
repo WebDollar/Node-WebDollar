@@ -42,7 +42,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     }
                 };
 
-                if (transaction.fee.isLessThanOrEqualTo(this.miningFeeThreshold))
+                if (transaction.fee >= this.miningFeeThreshold)
                     if ( transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidationType )) {
 
                         size -= transaction.serializeTransaction().length;

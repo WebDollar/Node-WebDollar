@@ -81,15 +81,10 @@ class InterfaceBlockchainTransactionTo{
             if ( toObject.amount <= 0 )
                 throw {message: "To.Object Amount is an invalid number", address: toObject, index:index} ;
 
-            let addressFound = false;
             for (let i=0; i<this.transaction.from.addresses.length; i++)
-                if (this.transaction.from.addresses[i].unencodedAddress.equals( toObject.unencodedAddress )){
-                    addressFound = true;
-                    break;
-                }
+                if (this.transaction.from.addresses[i].unencodedAddress.equals( toObject.unencodedAddress ))
+                    throw {message: "To.Object Address is included in the input and it should not be included in output ", address: toObject}
 
-            if (addressFound)
-                throw {message: "To.Object Address is included in the input and it should not be", address: toObject}
 
         });
 
