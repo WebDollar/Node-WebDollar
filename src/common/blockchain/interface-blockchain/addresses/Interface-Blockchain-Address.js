@@ -409,8 +409,10 @@ class InterfaceBlockchainAddress{
 
         if (await this.isPrivateKeyEncrypted()) {
 
-            if (password === undefined) password = InterfaceBlockchainAddressHelper.askForPassword();
-            if (password === null) return null;
+            if (password === undefined)
+                password = await InterfaceBlockchainAddressHelper.askForPassword();
+            if (password === null)
+                return null;
 
         } else password = undefined;
 
