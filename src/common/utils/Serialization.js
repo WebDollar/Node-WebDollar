@@ -64,20 +64,37 @@ class Serialization{
         return  buffer;
     }
 
-    serializeNumber8Bytes(data){
+    serializeNumber8Bytes(long){
+        // we want to represent the input as a 8-bytes array
+        var byteArray = new Buffer(7);
 
-        //converting number value into a buffer
-        let buffer = Buffer(8);
-        buffer[7] = data & 0xff;
-        buffer[6] = data>>8 & 0xff;
-        buffer[5] = data>>16 & 0xff;
-        buffer[4] = data>>24 & 0xff;
-        buffer[3] = data>>32 & 0xff;
-        buffer[2] = data>>40 & 0xff;
-        buffer[1] = data>>48 & 0xff;
-        buffer[0] = data>>56 & 0xff;
+        for ( let index = 0; index < byteArray.length; index ++ ) {
+            let byte = long & 0xff;
+            byteArray [ index ] = byte;
+            long = (long - byte) / 256 ;
+        }
 
-        return  buffer;
+        return byteArray;
+    }
+
+
+    deserializeNumber8Bytes(byteArray){
+        let value = 0;
+
+        for ( let i = byteArray.length - 1; i >= 0; i--)
+            value = (value * 256) + byteArray[i];
+
+        return value;
+    }
+
+    deserializeNumber8BytesBuffer(buffer, offset = 0){
+
+        let value = 0;
+
+        for ( let i = offset + 6 ; i >= offset; i--)
+            value = (value * 256) + buffer[i];
+
+        return value;
     }
 
     deserializeNumber(buffer){
@@ -92,10 +109,6 @@ class Serialization{
 
         if (buffer.length === 6) return buffer[5] | (buffer[4] << 8) | (buffer[3] << 16) | (buffer[2] << 24) | (buffer[1] << 32) | (buffer[0] << 40);
 
-    }
-
-    deserializeNumber8Bytes(buffer){
-        return buffer[7] | (buffer[6] << 8) | (buffer[5] << 16) | (buffer[4] << 24) | (buffer[3] << 32) | (buffer[2] << 40) | (buffer[1] << 48) | (buffer[0] << 56);
     }
 
     /**

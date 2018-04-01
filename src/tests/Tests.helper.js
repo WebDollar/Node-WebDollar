@@ -82,7 +82,7 @@ class TestsHelper {
 
     makeRandomNumber(biggestNumber, negative = false){
 
-        if ( biggestNumber === undefined) biggestNumber = WebDollarCoins.MAX_SAFE_COINS;
+        if ( biggestNumber === undefined) biggestNumber = WebDollarCoins.MAX_SAFE_COINS/10;
 
         let number = Math.floor( Math.random() * biggestNumber);
 

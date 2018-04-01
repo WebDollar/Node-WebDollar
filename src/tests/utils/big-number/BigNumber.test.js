@@ -1,10 +1,9 @@
 var assert = require('assert')
 
-//big number replaced
-
 import TestsHelper from 'tests/Tests.helper'
 
 describe('test', () => {
+
 
     it('creating WebDollarCoins number', ()=>{
 

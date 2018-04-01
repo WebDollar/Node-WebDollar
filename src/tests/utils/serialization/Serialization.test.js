@@ -7,6 +7,24 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 describe('Serialization test', () => {
 
+    it('Serialize WebDollarCoins', ()=>{
+
+        let data = [WebDollarCoins.MAX_SAFE_COINS, 0, 1, 2, 3, 5, WebDollarCoins.MAX_SAFE_COINS-10, WebDollarCoins.MAX_SAFE_COINS-11 ];
+
+        for (let i=0; i<data.length; i++){
+
+            let y = data[i];
+
+            let buffer = Serialization.serializeNumber8Bytes(y);
+            let y2 = Serialization.deserializeNumber8BytesBuffer(buffer);
+
+            assert(y2 === y, "Y and Y2 and not equals after serialization: "+y+"   "+y2);
+            assert(y === y2, "Y and Y2 and not equals after serialization: "+y+"   "+y2);
+        }
+
+    });
+
+
     it('Serialize WebDollarCoins - many random ', ()=>{
 
         let v = TestsHelper.makeRandomNumbersArray(5000, true);
@@ -18,10 +36,9 @@ describe('Serialization test', () => {
             sum1 +=v[i];
 
             let serialization = Serialization.serializeNumber8Bytes(v[i]);
-            let deserialization = Serialization.deserializeNumber8Bytes(serialization);
+            let deserialization = Serialization.deserializeNumber8BytesBuffer(serialization);
 
             assert(deserialization === v[i], "serialization/deserialization of 8 bytes didn't work " + v[i]+" "+deserialization );
-            //console.log(v[i],deserialization.toString());
 
             sum2 += deserialization;
         }
@@ -29,6 +46,7 @@ describe('Serialization test', () => {
         assert(sum1 === sum2, "sum1 is not equal with sum 2");
 
     });
+
 
     it('Serialize WebDollarCoins tests ', ()=>{
 
@@ -40,9 +58,7 @@ describe('Serialization test', () => {
             x.push( v[i] );
 
             let serialization = Serialization.serializeNumber8Bytes(x[i]);
-            let deserialization = Serialization.deserializeNumber8Bytes(serialization);
-
-            //console.log(v[i], serialization.toString("hex"), deserialization);
+            let deserialization = Serialization.deserializeNumber8BytesBuffer(serialization);
 
             assert(deserialization === x[i], "serialization/deserialization of big number didn't work " + v[i]+" "+deserialization);
 

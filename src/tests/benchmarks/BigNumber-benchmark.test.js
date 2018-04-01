@@ -1,4 +1,5 @@
 import Serialization from 'common/utils/Serialization';
+import TestsHelper from 'tests/Tests.helper'
 
 var assert = require('assert')
 
@@ -30,13 +31,14 @@ describe('BigNumber BenchMarks', () => {
         let start = new Date().getTime();
 
         for (let i=0; i<100000; i++){
-            x += i;
-            y = x / 3523;
+
+            x += i * 2;
+            y = x + TestsHelper.makeRandomNumber(undefined, false);
 
             buffer = Serialization.serializeNumber8Bytes(y);
-            let y2 = Serialization.deserializeNumber8Bytes(buffer);
+            let y2 = Serialization.deserializeNumber8BytesBuffer(buffer);
 
-            assert(y2 === y, "Y and Y2 and not equals after serialization")
+            assert(y2 === y, "Y and Y2 and not equals after serialization: "+y+"   "+y2)
 
         }
         let end = new Date().getTime();

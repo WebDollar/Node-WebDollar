@@ -271,8 +271,8 @@ class InterfaceBlockchainTransactionFrom{
             address.signature= BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
             offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
 
-            address.amount = Serialization.deserializeNumber8Bytes(BufferExtended.substr(buffer, offset, 8));
-            offset += 8;
+            address.amount = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
+            offset += 7;
 
             this.addresses.push(address);
         }
