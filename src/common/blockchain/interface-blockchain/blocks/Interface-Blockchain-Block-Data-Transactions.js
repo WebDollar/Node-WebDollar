@@ -16,7 +16,6 @@ class InterfaceBlockchainBlockDataTransactions {
 
         this.hashTransactions = hashTransactions;
 
-
     }
 
     validateTransactions(blockHeight, blockValidationType){
@@ -36,6 +35,41 @@ class InterfaceBlockchainBlockDataTransactions {
 
             if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidationType))
                 throw {message: "validation failed at transaction", transaction: this.transactions[i]};
+        }
+
+        if (!this.validateDuplicateTransactions())
+            return {message: "validateDuplicateTransactions failed"};
+
+        return true;
+    }
+
+    validateDuplicateTransactions(){
+
+        let fromAddresses = {};
+        let toAddresses = {};
+
+        for (let i=0; i<this.transactions.length; i++){
+            let transaction = this.transactions[i];
+
+            transaction.from.addresses.forEach((fromAddress)=>{
+                let address = fromAddress.unencodedAddress.toString("hex");
+                fromAddresses[address]++;
+
+                if ( fromAddresses[address] > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS )
+                    throw {message: "spam guardian detected many identical inputs"};
+
+            });
+
+            transaction.to.addresses.forEach((toAddress)=>{
+
+                let address = toAddresses.unencodedAddress.toString("hex");
+                toAddresses[address]++;
+
+                if ( toAddresses[address] > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS )
+                    throw {message: "spam guardian detected many identical inputs"};
+
+            });
+
         }
 
         return true;

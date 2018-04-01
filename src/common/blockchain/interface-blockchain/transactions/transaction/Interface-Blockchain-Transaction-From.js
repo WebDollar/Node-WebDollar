@@ -113,7 +113,7 @@ class InterfaceBlockchainTransactionFrom{
         if (!Buffer.isBuffer(this.currencyTokenId))
             throw {message: 'To.currencyTokenId is not a buffer', currencyTokenId: this.currencyTokenId};
 
-        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH) )
+        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH) )
             throw { message: "To.currencyTokenId is not valid", currencyTokenId: this.currencyTokenId };
 
         //TODO validate currency

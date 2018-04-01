@@ -138,7 +138,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     _serializeBalance(balance){
 
         return Buffer.concat([
-                Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH),
+                Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH),
                 Serialization.serializeNumber8Bytes(balance.amount)
             ]);
     }
@@ -244,8 +244,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                     //rest of tokens , in case there are
                     for (let i = 1; i < balancesLength; i++) {
 
-                        let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH);
-                        offset += consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH;
+                        let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH);
+                        offset += consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH;
 
                         result = Serialization.deserializeNumber8BytesBuffer(buffer, offset );
                         offset += 7;
@@ -255,6 +255,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 }
 
             }
+
+            this._deleteBalancesEmpty();
 
             return offset;
 
@@ -274,6 +276,39 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         if (this.nonce < 0) throw {message: "nonce is less than 0"};
         if (this.nonce > 0xFFFF) throw {message: "nonce is higher than 0xFFFF"};
+
+        for (let i=0; i<this.balances.length; i++){
+
+            if ( !WebDollarCoins.validateCoinsNumber(this.balances[i].amount) )
+                throw {message: "balance.amount is not a valid Coin Number"};
+
+            if (this.balances[i].amount < 0) throw {message: "balance.amount is invalid number"};
+
+            if (!Buffer.isBuffer(this.balances[i].tokenId)) throw {message: "token is not a buffer"};
+
+            if (this.balances[i].tokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) {
+                if (this.balances[i].tokenId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) throw {message: "WEBD Token is invalid"}
+            } else {
+
+                if (consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED !== -1 && Blockchain.blockchain.blocks.length > consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED) {
+
+                    if (this.balances[i].tokenId.length !== consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH)
+                        throw {message: "Token doesn't have the correct length"}
+                    else {
+
+                        //TODO Token Validation - based on the smart contract
+
+                    }
+
+                } else throw {message: "Other Token is invalid"};
+
+            }
+
+
+        }
+
+        //TODO Window Transactions
+        if (this.balances === [] && this.nonce === 0) throw { message: "Address should not exist" };
 
         if (validateMerkleTree)
             return this._validateHash(this.root);

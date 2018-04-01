@@ -320,6 +320,7 @@ class InterfaceBlockchainTransaction{
         return outputSum.minus(inputSum);
     }
 
+
 }
 
 export default InterfaceBlockchainTransaction

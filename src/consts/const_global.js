@@ -37,12 +37,17 @@ consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LA
 consts.MINI_BLOCKCHAIN = {
 
     TOKENS: {
-        OTHER_TOKEN_LENGTH: 24,
+
+        OTHER_TOKENS:{
+            LENGTH: 24,
+            ACTIVATED: -1, // not activated
+        },
 
         WEBD_TOKEN:{
             LENGTH: 1,
             VALUE: 0x01,
-        },
+        }
+
     }
 };
 
@@ -65,6 +70,15 @@ consts.TRANSACTIONS = {
     SIGNATURE_SCHNORR:{
         LENGTH : 64
     },
+
+};
+
+consts.SPAM_GUARDIAN = {
+
+    TRANSACTIONS:{
+        MAXIMUM_IDENTICAL_INPUTS: 10,
+        MAXIMUM_IDENTICAL_OUTPUTS: 500,
+    }
 
 };
 
