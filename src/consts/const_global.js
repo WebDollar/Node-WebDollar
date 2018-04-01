@@ -133,8 +133,7 @@ consts.HASH_ARGON2_PARAMS = {
 consts.DATABASE_NAMES = {
 
     DEFAULT_DATABASE: "defaultDB",
-    WALLET_DATABASE: "defaultDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
-    //TODO REPLACE with "walletDB"
+    WALLET_DATABASE: "walletDB",
     BLOCKCHAIN_DATABASE: "blockchainDB3",
     BLOCKCHAIN_DATABASE_FILE_NAME : 'blockchain4.bin',
     POOL_DATABASE: "poolDB",
