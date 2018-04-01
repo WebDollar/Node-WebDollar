@@ -1,3 +1,5 @@
+import MiningTransactionsSelector from "./transactions-selector/Mining-Transactions-Selector";
+
 const BigInteger = require('big-integer');
 
 
@@ -11,6 +13,7 @@ import InterfaceBlockchainMiningBasic from "./Interface-Blockchain-Mining-Basic"
 
 import AdvancedMessages from "node/menu/Advanced-Messages"
 
+
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
@@ -18,60 +21,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         super(blockchain, minerAddress, miningFeeThreshold);
 
-    }
+        this.miningTransactionSelector = new MiningTransactionsSelector(blockchain);
 
-
-
-    _selectNextTransactions(){
-
-        let transactions = [], size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
-        let i = 0;
-
-        while (size > 0 && i < this.blockchain.transactions.pendingQueue.list.length ){
-
-            let transaction = this.blockchain.transactions.pendingQueue.list[i];
-
-            let bRemoveTransaction = false;
-
-            try {
-
-                let blockValidationType = {
-                    "take-transactions-list-in-consideration": {
-                        validation: true,
-                        transactions: transactions,
-                    }
-                };
-
-                if (transaction.fee >= this.miningFeeThreshold)
-                    if ( transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidationType )) {
-
-                        size -= transaction.serializeTransaction().length;
-
-                        if (size >= 0)
-                            transactions.push(transaction);
-
-                    } else
-                        bRemoveTransaction = true;
-
-
-
-            } catch (exception){
-                console.warn('Error Including Transaction', exception);
-                bRemoveTransaction = true;
-            }
-
-            if (bRemoveTransaction)
-                ; //to nothing
-
-            i++;
-        }
-
-        console.warn("--------------------------------");
-        console.warn("pendingQueue", this.blockchain.transactions.pendingQueue.list.length);
-        console.warn("Transactions selected for mining: ", transactions.length);
-        console.warn("--------------------------------");
-
-        return transactions;
     }
 
 
@@ -109,7 +60,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             try {
 
 
-                nextTransactions = this._selectNextTransactions();
+                nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeeThreshold);
+
                 nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
                 nextBlock.difficultyTargetPrev = this.blockchain.getDifficultyTarget();

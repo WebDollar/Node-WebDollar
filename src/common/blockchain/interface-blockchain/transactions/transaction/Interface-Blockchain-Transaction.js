@@ -143,6 +143,8 @@ class InterfaceBlockchainTransaction{
         this.from.validateFrom();
         this.to.validateTo();
 
+        if (!this.validateIdenticalAddresses()) return false;
+
         //validate amount
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
@@ -318,6 +320,17 @@ class InterfaceBlockchainTransaction{
         let outputSum = this.to.calculateOutputSum();
 
         return outputSum.minus(inputSum);
+    }
+
+
+    validateIdenticalAddresses(addresses){
+
+        for (let i=0; i<addresses.length; i++)
+            for (let j=i+1; j<addresses.length; j++)
+                if (addresses[i].unencodedAddress.equals(addresses[j].unencodedAddress))
+                    throw {message: "address has identical inputs"};
+
+        return true;
     }
 
 
