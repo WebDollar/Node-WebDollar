@@ -8,7 +8,7 @@ class BlockchainDifficulty{
     static getDifficulty(getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 
         // difficulty algorithm is based on blockNumber
-        if (!( (typeof blockNumber === "number" && blockNumber >= 0) || (blockNumber instanceof BigInteger && blockNumber.isGreaterThanOrEqualTo(0))))
+        if ( typeof blockNumber !== "number" )
             throw {message: "invalid block number"};
 
         return this.getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
