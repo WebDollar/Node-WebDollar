@@ -182,14 +182,18 @@ class InterfaceBlockchainFork {
             try {
                 this.preForkClone();
             } catch (exception){
-                console.error("preForkBefore raised an error");
+                console.error("-----------------------");
+                console.error("preForkBefore raised an error", exception);
+                console.error("-----------------------");
             }
 
             try {
                 this.preFork();
             } catch (exception){
                 this.revertFork();
-                console.error("preFork raised an error");
+                console.error("-----------------------");
+                console.error("preFork raised an error", exception);
+                console.error("-----------------------");
             }
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight);
@@ -204,7 +208,7 @@ class InterfaceBlockchainFork {
 
                 for (index = 0; index < this.forkBlocks.length; index++) {
 
-                    StatusEvents.emit( "agent/status", {message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
+                    StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
 
@@ -232,8 +236,13 @@ class InterfaceBlockchainFork {
                 try {
 
                     for (let i = 0; i < this._blocksCopy.length; i++)
+
                         if (! (await this.blockchain.includeBlockchainBlock(this._blocksCopy[index], false, "all", false))) {
+
+                            console.error("----------------------------------------------------------");
                             console.error("blockchain couldn't restored after fork included in main Blockchain ", i);
+                            console.error("----------------------------------------------------------");
+
                             break;
                         }
 

@@ -126,19 +126,20 @@ class InterfaceBlockchainBlockDataTransactions {
         let i;
         for (i=0; i<block.data.transactions.transactions.length; i++)
             if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
-                return i;
+                return i-1;
 
-        return i-1;
+        return block.data.transactions.transactions.length-1;
     }
 
     processBlockDataTransactionsRevert(endPos, startPos, block, multiplicationFactor = -1){
 
         let i;
         for (i = endPos; i >= startPos; i--)
-            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
-                return i;
+            if (i >= 0)
+                if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
+                    return i;
 
-        return i+1;
+        return i;
 
     }
 

@@ -14,20 +14,19 @@ class InterfaceBlockchainTransactionsEvents{
 
     findTransaction(txId){
 
-        if (typeof txId !== "string")
-            txId = new Buffer(txId, "hex")
+        if (typeof txId === "string")
+            txId = new Buffer(txId, "hex");
 
         for (let i=this.blockchain.blocks.startingPosition; i<this.blockchain.blocks.endingPosition; i++) {
 
             let block = this.blockchain.blocks[i];
             if (block === undefined) continue;
 
-            block.data.transactions.transactions.forEach((transaction)=>{
+            for (let i=0; i<block.data.transactions.transactions.length; i++){
+                if (block.data.transactions.transactions[i].txId.equals(txId))
+                    return block.data.transactions.transactions[i];
+            }
 
-                if (transaction.txId.equals(txId))
-                    return transaction;
-
-            });
         }
 
         return null;

@@ -197,7 +197,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             if (answer.result && this.blockchain.blocks.length === block.height ){
 
                 console.warn( "----------------------------------------------------------------------------");
-                console.warn( "WebDollar Block ", block.height ," mined (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress.toString("hex"));
+                console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress.toString("hex"));
                 console.warn( "----------------------------------------------------------------------------");
 
                 try {
@@ -212,6 +212,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                             return this.blockchain.includeBlockchainBlock(block, false, [], true);
                         }) === false) throw {message: "Mining2 returned false"};
+
+                    //confirming transactions
+                    block.data.transactions.transactions.forEach((transaction) => {
+                        transaction.confirmed = true;
+
+                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+                    });
 
                 } catch (exception){
 
