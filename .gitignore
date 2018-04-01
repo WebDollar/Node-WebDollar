@@ -7,7 +7,11 @@ package-lock.json
 coverage/
 mochawesome-report/
 
+
+
 dist_bundle/bundle_terminal\.js
+
+dist_bundle/terminal-menu-bundle\.js
 
 dist_bundle/Node-WebDollar-bundle\.js
 

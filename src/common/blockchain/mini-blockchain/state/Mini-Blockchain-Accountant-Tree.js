@@ -60,9 +60,9 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         });
 
         //purging empty addresses
-        //TODO Window Transactions for Purging
         if (resultUpdate === null) {
 
+            //TODO Window Transactions for Purging
             if (this.root.deleteEmptyAddresses) { //purging automatically
                 this.delete(address);
                 return null;
