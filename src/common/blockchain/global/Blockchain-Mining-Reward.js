@@ -9,9 +9,9 @@ class BlockchainMiningReward{
 
         if (height >= 0) {
 
-            let cicleNumber = Math.trunc(height / 8409600);
-            let reward = new BigNumber(2500).dividedBy(1 << cicleNumber);
-            let smallestReward = new BigNumber(0.0001);
+            let cicleNumber = Math.trunc(height / 6307200);
+            let reward = new BigNumber(3000).dividedBy(1 << cicleNumber);
+            let smallestReward = new BigNumber(0.00001);
 
             if (reward.isLessThan(smallestReward))
                 reward = smallestReward;
