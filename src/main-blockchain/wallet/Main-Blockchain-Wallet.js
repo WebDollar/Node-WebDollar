@@ -458,7 +458,7 @@ class MainBlockchainWallet{
 
         address = this.getAddress(address);
 
-        if (await this.isAddressEncrypted(address)) {
+        if (await this.isAddressEncrypted(address) && oldPassword === undefined) {
 
             oldPassword = await InterfaceBlockchainAddressHelper.askForPassword();
             if (oldPassword === null)

@@ -182,7 +182,7 @@ describe('test save wallet to local storage', () => {
         }
     });
 
-    it('test create public/private Keys', async () => {
+    it('test create Multi Sig public/private Keys', async () => {
 
         let privateKey1 =  MultiSig.createPrivateKey(['datanastere1','val','pllui']);
         let privateKey2 =  MultiSig.createPrivateKey(['datanastere2','val','pllui']);
@@ -196,7 +196,7 @@ describe('test save wallet to local storage', () => {
         assert(!publicKey1.equals(publicKey2), "Public keys are equal");
     });
 
-    it('test check signature validity', async () => {
+    it('test check Mult Sig signature validity', async () => {
 
         let privateKey =  MultiSig.createPrivateKey(['datanastere1','plm','pllui']);
         let publicKey = MultiSig.getPublicKeyFromPrivate(privateKey);

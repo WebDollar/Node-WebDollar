@@ -16,7 +16,7 @@ class WebDollarCoins{
 
         if (!Number.isInteger(number)) return false;
         if ( number > this.MAX_SAFE_COINS) return false;
-        if ( number < this.MAX_SAFE_COINS) return false;
+        if ( number < this.MIN_SAFE_COINS) return false;
 
         return true;
     }

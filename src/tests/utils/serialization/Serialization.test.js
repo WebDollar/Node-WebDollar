@@ -50,12 +50,12 @@ describe('Serialization test', () => {
 
     it('Serialize WebDollarCoins tests ', ()=>{
 
-        let v = ["321321",7500, "112","5555",32132333, 5551233, -51323, -0, 0, -312321312, -5553434, WebDollarCoins.MAX_SAFE_COINS, WebDollarCoins.MIN_SAFE_COINS];
+        let v = ["321321",7500, "112","5555",32132333, 5551233, 51323, 0, 0, 312321312, 5553434, WebDollarCoins.MAX_SAFE_COINS];
         let x = [];
 
         for (let i=0; i<v.length; i++){
 
-            x.push( v[i] );
+            x.push( parseInt(v[i]) );
 
             let serialization = Serialization.serializeNumber8Bytes(x[i]);
             let deserialization = Serialization.deserializeNumber8BytesBuffer(serialization);

@@ -95,7 +95,7 @@ describe('test pool leader protocol', () => {
         poolLeader.updateRewards(newReward);
 
         //check leader reward
-        let leaderTargetReward = newReward * Math.floor ( poolLeader.getPoolLeaderFee() / 100 );
+        let leaderTargetReward = newReward * poolLeader.getPoolLeaderFee() / 100;
         assert(poolLeader.getPoolLeaderReward() === leaderTargetReward, "Pool leader reward is wrong: " + poolLeader.getPoolLeaderReward().toString() + " !== " + leaderTargetReward.toString());
         
         //check miners reward

@@ -40,6 +40,7 @@ class Argon2Node {
             let encoded = await argon2.hash(data, options)
 
             let hash = encoded.substr(encoded.lastIndexOf("$")+1 )
+            hash = hash.substr(hash).substr(hash.lastIndexOf('/')+1);
             console.log(hash);
 
             return hash;

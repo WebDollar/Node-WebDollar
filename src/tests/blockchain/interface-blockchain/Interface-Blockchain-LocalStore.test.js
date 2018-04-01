@@ -29,8 +29,6 @@ describe('test Interface-Blockchain save/load/remove to/from local storage', () 
             this test will fail because it requires real blocks
          */
 
-        //let response = blockchain.loadBlock();
-
         assert(response === true, 'load: ' + response);
 
         await b0.loadBlock();
@@ -48,7 +46,7 @@ describe('test Interface-Blockchain save/load/remove to/from local storage', () 
 
         assert(blockchain.blocks.length === 4, 'load: blocks.length=' + blockchain.blocks.length);
         
-        response = await blockchain.removeBlockchain();
+        response = await blockchain.removeBlockchain(0);
         assert(response === true, 'remove: ' + response);
     });
 
