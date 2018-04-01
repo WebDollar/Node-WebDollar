@@ -178,7 +178,7 @@ class PoolLeaderProtocol {
      */
     updateRewards(newReward) {
 
-        let newLeaderReward = newReward * this._poolLeaderFee / 100;
+        let newLeaderReward = Math.floor( newReward * this._poolLeaderFee / 100);
         this._poolLeaderReward += newLeaderReward;
 
         let minersReward = newReward - newLeaderReward;

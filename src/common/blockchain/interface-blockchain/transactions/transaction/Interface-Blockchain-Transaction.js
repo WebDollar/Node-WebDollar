@@ -6,6 +6,7 @@ import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
 import Serialization from "common/utils/Serialization"
 import BufferExtended from "common/utils/BufferExtended"
 import consts from "consts/const_global";
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class InterfaceBlockchainTransaction{
 
@@ -281,6 +282,9 @@ class InterfaceBlockchainTransaction{
         let outputSum = this.to.calculateOutputSum();
 
         let diffInFees = inputSum - outputSum;
+
+        if (!WebDollarCoins.validateCoinsNumber(diffInFees))
+            return {message:"Fees are invalid"};
 
         return {fees: diffInFees, currencyTokenId: this.from.currencyTokenId};
     }

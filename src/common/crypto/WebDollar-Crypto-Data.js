@@ -69,18 +69,6 @@ class WebDollarCryptoData {
         else
         if (type === "object" || typeof data === "object"){
 
-            if (typeof data === 'number') { //converting Big Number Format
-
-                data = {s: data.s, e: data.e, c: data.c};
-
-                let newData = [data.s, data.e]
-                for (let i=0; i<data.c.length; i++)
-                    newData.push(data.c[i]);
-
-                data = newData;
-                //console.log("data object", data, typeof data);
-            }
-
             if (data instanceof BigInteger) {
 
                 //converting number value into a buffer

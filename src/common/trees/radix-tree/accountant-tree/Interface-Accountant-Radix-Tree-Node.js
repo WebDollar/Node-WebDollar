@@ -1,5 +1,6 @@
 import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
 import Serialization from 'common/utils/Serialization'
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
@@ -15,32 +16,23 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     setSum(sum){
 
-        if (typeof sum === "object"  && sum !== null && typeof sum === 'number')
-            this.sum =  sum;
-        else {
+        if (sum === undefined || sum === null)
+            sum = 0;
 
-            if (sum === undefined || sum === null)
-                sum = 0;
+        if (typeof sum === "string")
+            sum = parseInt(sum);
 
-            this.sum = sum;
-
-        }
+        this.sum = Integer(sum);
 
     }
 
     isSumValid(){
-
-        if (this.sum === undefined && this.sum=== null)
-            return false;
-        if (typeof this.sum !== "object"  || typeof this.sum !== "number")
-            return false;
-
-        return true;
-
+        return WebDollarCoins.validateCoinsNumber(this.sum);
     }
 
 
     setValue(value){
+
 
         if (typeof value === 'object' && value !== null){
 
@@ -59,15 +51,29 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     }
 
+    // it is not done
+    serializeNode(){
+
+        let array = [ ];
+
+        array.push( Serialization.serializeNumber8Bytes(this.sum) );
+
+        if (this.value !== null )
+            array.push(Serialization.serializeNumber8Bytes(this.value.balances));
+
+        return Buffer.concat(
+
+            array,
+
+        );
+    }
+
     isBalancesValid(){
 
         if (typeof this.value !== 'object' || this.value === null)
             return false;
 
-        if ( this.value.balances === undefined && this.value.balances === null)
-            return false;
-
-        if (typeof this.value.balances !== "object"  || this.value.balances !== "number")
+        if (!WebDollarCoins.validateCoinsNumber(this.value.balances))
             return false;
 
         return true;

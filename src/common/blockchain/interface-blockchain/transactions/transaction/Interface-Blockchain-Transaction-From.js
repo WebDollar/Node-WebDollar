@@ -4,6 +4,7 @@ import consts from "consts/const_global"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
 import ed25519 from "common/crypto/ed25519";
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 //TODO MULTISIG TUTORIAL https://www.youtube.com/watch?v=oTsjMz3DaLs
 
@@ -135,8 +136,8 @@ class InterfaceBlockchainTransactionFrom{
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH)
                 throw { message: "From.address.publicAddress "+index+" is not a buffer", address: fromObject, index: index };
 
-            if (typeof fromObject.amount instanceof !== 'number' )
-                throw { message: "From.address.amount "+index+" is not a number", address: fromObject, index: index };
+            if (!WebDollarCoins.validateCoinsNumber(fromObject.amount))
+                throw {message: 'From.Object Amount is not specified', amount: fromObject.amount, index:index} ;
 
             if ( fromObject.amount.isLessThanOrEqualTo(0) )
                 throw {message: "Amount is an invalid number", address: fromObject, index: index };
@@ -270,9 +271,8 @@ class InterfaceBlockchainTransactionFrom{
             address.signature= BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
             offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
 
-            let result = Serialization.deserializeNumber(buffer, offset);
-            address.amount = result.number;
-            offset = result.newOffset;
+            address.amount = Serialization.deserializeNumber8Bytes(BufferExtended.substr(buffer, offset, 8));
+            offset += 8;
 
             this.addresses.push(address);
         }

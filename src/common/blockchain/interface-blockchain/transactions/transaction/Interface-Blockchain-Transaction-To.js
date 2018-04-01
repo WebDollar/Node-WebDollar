@@ -2,6 +2,7 @@ import BufferExtended from "common/utils/BufferExtended"
 import Serialization from "common/utils/Serialization"
 import consts from "consts/const_global"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class InterfaceBlockchainTransactionTo{
 
@@ -74,7 +75,7 @@ class InterfaceBlockchainTransactionTo{
             if (!toObject.unencodedAddress || toObject.unencodedAddress === null || !Buffer.isBuffer(toObject.unencodedAddress))
                 throw {message: 'To.Object Address is not specified', address: toObject, index:index} ;
 
-            if (!toObject.amount || typeof toObject.amount !== 'number' )
+            if (!WebDollarCoins.validateCoinsNumber(toObject.amount))
                 throw {message: 'To.Object Amount is not specified', address: toObject, index:index} ;
 
             if ( toObject.amount <= 0 )
@@ -137,13 +138,11 @@ class InterfaceBlockchainTransactionTo{
 
             let address = {};
 
-            address.unencodedAddress= BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+            address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
             offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
-            let result = Serialization.deserializeNumber(buffer, offset);
-            address.amount = result.number;
-
-            offset = result.newOffset;
+            address.amount = Serialization.deserializeNumber8Bytes(BufferExtended.substr(buffer, offset, 8));
+            offset += 8;
 
             this.addresses.push(address);
         }

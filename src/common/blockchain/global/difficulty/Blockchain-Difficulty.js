@@ -1,6 +1,7 @@
 var BigInteger = require('big-integer');
-var BigNumber = require('bignumber.js');
 import consts from 'consts/const_global'
+
+var BigNumber = require ('bignumber.js');
 
 class BlockchainDifficulty{
 
@@ -30,16 +31,16 @@ class BlockchainDifficulty{
         let prevBlockDifficulty = getDifficultyCallback(blockNumber);
 
         if (Buffer.isBuffer(prevBlockDifficulty))
-            prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex"));
+            prevBlockDifficulty = new BigInteger(prevBlockDifficulty.toString("hex"), 16);
         else if (typeof prevBlockDifficulty === "string") // it must be hex
-            prevBlockDifficulty = new BigNumber(prevBlockDifficulty);
+            prevBlockDifficulty = new BigInteger(data.toString("hex"), 16);
 
         //let's suppose BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 10
         //              blockNumber === 9
         // it should recalcule using [0...9]
 
         if ( (blockNumber+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS !== 0)
-            return BigInteger( prevBlockDifficulty.toString(16), 16 );
+            return prevBlockDifficulty;
         else {
 
             console.warn("new difficulty mean recalculated", blockNumber);

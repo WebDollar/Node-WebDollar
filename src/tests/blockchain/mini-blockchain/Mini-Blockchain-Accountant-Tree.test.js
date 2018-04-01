@@ -1,6 +1,7 @@
 var assert = require('assert')
 
 import TestsHelper from 'tests/Tests.helper'
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 import Blockchain from 'main-blockchain/Blockchain';
 import MiniBlockchainAccountantTree from 'common/blockchain/mini-blockchain/state/Mini-Blockchain-Accountant-Tree'
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
@@ -39,7 +40,7 @@ describe('MiniBlockchainAccountantTree', () => {
         assert(Tree2.root.hash.sha256.equals(Tree.root.hash.sha256), " root hash is not the same: " +Tree2.root.hash.sha256.toString("hex")+"  "+Tree.root.hash.sha256.toString("hex"));
 
         for (let i=0; i<array.length; i++){
-            assert(Tree2.getBalance(array[i].addr === array[i].val, " value is not equal: " +array[i].val+"  "+Tree2.getBalance(array[i].addr));
+            assert( Tree2.getBalance(array[i].addr) === array[i].val, " value is not equal: " +array[i].val+"  "+Tree2.getBalance(array[i].addr));
         }
 
         assert(Tree2.calculateNodeCoins() === sum, "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sum.toString()+" ")
@@ -63,7 +64,7 @@ describe('MiniBlockchainAccountantTree', () => {
                     break;
                 }
 
-            let value = TestsHelper.makeRandomNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10), false);
+            let value = TestsHelper.makeRandomNumber(undefined, false);
             if (!found && value > 0)
                 list.push ( {address:address.address, value: value } );
         }
@@ -98,7 +99,7 @@ describe('MiniBlockchainAccountantTree', () => {
 
 
         for (let i=0; i<list.length; i++)
-            assert(Tree2.getBalance(list[i].address === list[i].value, " value is not equal: " +list[i].value+"  "+Tree2.getBalance(list[i].address));
+            assert(Tree2.getBalance(list[i].address === list[i].value), " value is not equal: " +list[i].value+"  "+Tree2.getBalance(list[i].address));
 
         assert(Tree2.calculateNodeCoins() === sum, "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sum.toString()+" ")
     });

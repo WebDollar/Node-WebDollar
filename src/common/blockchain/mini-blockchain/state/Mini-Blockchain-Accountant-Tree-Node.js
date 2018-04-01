@@ -3,6 +3,7 @@ import Serialization from "common/utils/Serialization";
 import consts from 'consts/const_global'
 import InterfaceMerkleRadixTreeNode from "common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree-Node"
 import Blockchain from "main-blockchain/Blockchain"
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
@@ -42,6 +43,9 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         if (typeof value === 'string') value = parseInt(value);
 
+        if (!WebDollarCoins.validateCoinsNumber(value))
+            throw {message: "Value is invalid for update"};
+
         let result;
 
         for (let i = 0; i < this.balances.length; i++)
@@ -65,8 +69,11 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         if ( result === undefined)
             throw { message: 'token is empty',  amount: value, tokenId: tokenId };
 
-        if ( result.amount.isLessThan(0) )
+        if ( result.amount < 0 )
             throw { message: 'balances became negative', amount: value, tokenId: tokenId };
+
+        if ( WebDollarCoins.validateCoinsNumber(result.amount))
+            throw {message: "balance is no longer a valid number"};
 
         this._deleteBalancesEmpty();
 
@@ -118,7 +125,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         let result = false;
         for (let i = this.balances.length - 1; i >= 0; i--) {
 
-            if (this.balances[i] === null || this.balances[i] === undefined || this.balances[i].amount == 0) {
+            if (this.balances[i] === null || this.balances[i] === undefined || this.balances[i].amount === 0) {
                 this.balances.splice(i, 1);
                 result = true;
             }
@@ -139,7 +146,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     _serializeBalanceWEBDToken(balance){
         return Buffer.concat([
             Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH),
-            Serialization.serializeToFixedBuffer(balance.amount)
+            Serialization.serializeNumber8Bytes(balance.amount)
         ]);
     }
 
@@ -225,7 +232,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 if (webdId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)
                     throw {message: "webd token is incorrect", token: webdId };
 
-                let result = Serialization.deserializeNumber(buffer, offset);
+                let result = Serialization.deserializeNumber8Bytes(buffer, offset);
 
                 //console.log("result.number",result.number);
 
@@ -241,7 +248,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                         let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH);
                         offset += consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH;
 
-                        result = Serialization.deserializeNumber(buffer, offset);
+                        result = Serialization.deserializeNumber8Bytes(buffer, offset);
 
                         this.updateBalanceToken(result.number, tokenId);
 

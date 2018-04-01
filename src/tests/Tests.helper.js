@@ -1,3 +1,5 @@
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+
 class TestsHelper {
 
     makeId(count, randomLengths, textPossible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
@@ -78,35 +80,26 @@ class TestsHelper {
 
     }
 
-    makeRandomNumber(biggestNumber){
+    makeRandomNumber(biggestNumber, negative = false){
 
-        if ( biggestNumber === undefined) biggestNumber = 100000;
+        if ( biggestNumber === undefined) biggestNumber = WebDollarCoins.MAX_SAFE_COINS;
 
-        return Math.random()*biggestNumber +  300;
+        let number = Math.floor( Math.random() * biggestNumber);
+
+        if (negative)
+            if ( Math.floor(Math.random()) % 2 === 0 )
+                return - number;
+
+        return number;
     }
 
-    makeRandomNumber(noDecimalDigits=10, decimalDigits=10, negative=false){
-
-        let nonDecimalPart = this.makeDigitId(noDecimalDigits, true, negative);
-
-        if(decimalDigits > 0) {
-            let decimalPart = this.makeDigitId(decimalDigits, false);
-            return Number(nonDecimalPart + "." + decimalPart);
-        } else {
-            return Number(noDecimalDigits);
-        }
-    }
-
-    makeRandomNumbersArray(count, isDecimal=false, negative=false){
+    makeRandomNumbersArray(count, negative=false){
 
         if ( count === undefined) count = 10;
 
         let result = [];
         for (let i = 0; i < count; ++i) {
-            if (isDecimal === true)
-                result[i] = this.makeRandomNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10), negative);
-            else
-                result[i] = this.makeRandomNumber(Math.floor(Math.random()*10), 0, negative);
+            result[i] = this.makeRandomNumber(undefined, 0, negative);
         }
 
         return result;

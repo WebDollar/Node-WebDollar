@@ -8,8 +8,8 @@ class BlockchainMiningReward{
         if (height >= 0) {
 
             // ToDO - Budisteanu shift
-            let cicleNumber = Math.trunc(height / 6307200);
-            let reward = 3000/(1 << cicleNumber);
+            let cycleNumber = Math.trunc(height / 6307200);
+            let reward = 3000/(1 << cycleNumber);
             let smallestReward = 0.00001;
 
             if (reward < smallestReward)

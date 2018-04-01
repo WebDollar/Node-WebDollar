@@ -6,9 +6,9 @@ import TestsHelper from 'tests/Tests.helper'
 
 describe('test', () => {
 
-    it('creating big number', ()=>{
+    it('creating WebDollarCoins number', ()=>{
 
-        let v = TestsHelper.makeRandomNumbersArray(5000, true, true);
+        let v = TestsHelper.makeRandomNumbersArray(5000, true);
 
         let sum1 = 0;
         let sum2 = 0;
@@ -21,6 +21,7 @@ describe('test', () => {
             prod1 *= v[i];
             prod2 *= v[i];
         }
+
         let diff1 = sum1-sum2-sum1*2;
         let diff2 = sum1+sum2;
         let diff3 = prod1-prod2;
@@ -32,12 +33,12 @@ describe('test', () => {
 
     it('Big Number 1/3+1/3+1/3 === 1', ()=>{
 
-        let a = 1/3;
-        let b = a+a+ 1/3;
+        let a = 55555;
+        let b = 33333;
 
         //console.log("1/3+1/3+1/3", b);
-        assert(b>0.999999999999, "1/3+1/3+1/3 >= 0.999999999999");
-        assert(b<1.0, "1/3+1/3+1/3 < 1");
+        assert( a + b === 8888, "1/3+1/3+1/3 >= 0.999999999999");
+        assert( b < 1.0, "1/3+1/3+1/3 < 1");
 
     });
 });

@@ -1,4 +1,5 @@
 import InterfaceBlockchainTransactionFrom from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction-From'
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
@@ -80,9 +81,10 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
             for (let i = 0; i < this.addresses.length; i++) {
 
-                if (typeof this.addresses[i].amount !== 'number') throw {message: "amount is not number",  address: this.addresses[i]};
+                if (!WebDollarCoins.validateCoinsNumber(this.addresses[i].amount))
+                    throw {message: "amount is not number",  address: this.addresses[i]};
 
-                let result = this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, this.addresses[i].amount * -multiplicationFactor, this.currencyTokenId);
+                let result = this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, - this.addresses[i].amount * multiplicationFactor, this.currencyTokenId);
 
                 if (result === null) throw {message: "error Updating Account", address: this.addresses[i]};
 
@@ -91,6 +93,7 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
         } catch (exception){
 
             for (let i=lastPosition; i >= 0 ; i--) {
+
                 let result = this.transaction.blockchain.accountantTree.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount * multiplicationFactor, this.currencyTokenId);
 
                 if (result === null) throw {message: "error Updating Account", address: this.addresses[i]};

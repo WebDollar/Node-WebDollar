@@ -19,13 +19,13 @@ describe('test pool leader protocol', () => {
         },
         {
             address: "WEBD$gD$q9AkZPN29xeHnuS$ykXHCqpv1@NT@R5yn4PkY#9bcxztwcDsPw==",
-            reward: 20.1243,
+            reward: 201243,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
         {
             address: "WEBD$gCBzvQdKroa&yU4sp2X3y8*mf#q&r5k3BG3J3mBvogbE3U$SPHsPw==",
-            reward: 30.34556,
+            reward: 3034556,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
@@ -95,8 +95,8 @@ describe('test pool leader protocol', () => {
         poolLeader.updateRewards(newReward);
 
         //check leader reward
-        let leaderTargetReward = newReward * poolLeader.getPoolLeaderFee() / 100;
-        assert(poolLeader.getPoolLeaderReward().eq(leaderTargetReward), "Pool leader reward is wrong: " + poolLeader.getPoolLeaderReward().toString() + " !== " + leaderTargetReward.toString());
+        let leaderTargetReward = newReward * Math.floor ( poolLeader.getPoolLeaderFee() / 100 );
+        assert(poolLeader.getPoolLeaderReward() === leaderTargetReward, "Pool leader reward is wrong: " + poolLeader.getPoolLeaderReward().toString() + " !== " + leaderTargetReward.toString());
         
         //check miners reward
         for (let i = 0; i < minersList.length; ++i){

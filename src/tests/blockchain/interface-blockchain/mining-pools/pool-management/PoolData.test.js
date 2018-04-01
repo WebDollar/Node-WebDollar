@@ -15,13 +15,13 @@ describe('test pool leader DB', () => {
         },
         {
             address: "WEBD$gD$q9AkZPN29xeHnuS$ykXHCqpv1@NT@R5yn4PkY#9bcxztwcDsPw==",
-            reward: 20.1243,
+            reward: 201243,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
         {
             address: "WEBD$gCBzvQdKroa&yU4sp2X3y8*mf#q&r5k3BG3J3mBvogbE3U$SPHsPw==",
-            reward: 30.34556,
+            reward: 3034556,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
@@ -80,12 +80,12 @@ describe('test pool leader DB', () => {
         for (let i = 0; i < minersList.length; ++i){
 
             await pd.setMiner(minersList[i].address, minersList[i].reward);
-            pd.increaseMinerReward(minersList[i].address, 10.133333);
+            pd.increaseMinerReward(minersList[i].address, 10133333);
         }
 
         for (let i = 0; i < minersList.length; ++i){
 
-            let targetReward = minersList[i].reward + 10.133333;
+            let targetReward = minersList[i].reward + 10133333;
             let minerReward = pd.getMinerReward(minersList[i].address);
             assert(minerReward === targetReward, "Miner updateReward is wrong");
         }

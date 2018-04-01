@@ -3,12 +3,13 @@ import Serialization from 'common/utils/Serialization';
 var assert = require('assert')
 
 import TestsHelper from 'tests/Tests.helper'
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 describe('Serialization test', () => {
 
-    it('Serialize Big Number - many random ', ()=>{
+    it('Serialize WebDollarCoins - many random ', ()=>{
 
-        let v = TestsHelper.makeRandomNumbersArray(5000, true, true);
+        let v = TestsHelper.makeRandomNumbersArray(5000, true);
         let sum1 = 0;
         let sum2 = 0;
 
@@ -17,9 +18,9 @@ describe('Serialization test', () => {
             sum1 +=v[i];
 
             let serialization = Serialization.serializeNumber8Bytes(v[i]);
-            let deserialization = Serialization.deserializeNumber(serialization).number;
+            let deserialization = Serialization.deserializeNumber8Bytes(serialization);
 
-            assert(deserialization === v[i], "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
+            assert(deserialization === v[i], "serialization/deserialization of 8 bytes didn't work " + v[i]+" "+deserialization );
             //console.log(v[i],deserialization.toString());
 
             sum2 += deserialization;
@@ -29,9 +30,9 @@ describe('Serialization test', () => {
 
     });
 
-    it('Serialize Big Number tests ', ()=>{
+    it('Serialize WebDollarCoins tests ', ()=>{
 
-        let v = ["0.000661817095001",7500, "0","100000","-10000","-10", "10.00004","10","-10000","-0.1","-0.000000000000000000001","5.5","1","999999999999999999999999998","0.000000000055","555555.555555555555","-.999999999999999", "9999999999999999999999999999999999999.9999999999999999999999"]
+        let v = ["321321",7500, "112","5555",32132333, 5551233, -51323, -0, 0, -312321312, -5553434, WebDollarCoins.MAX_SAFE_COINS, WebDollarCoins.MIN_SAFE_COINS];
         let x = [];
 
         for (let i=0; i<v.length; i++){
@@ -39,11 +40,11 @@ describe('Serialization test', () => {
             x.push( v[i] );
 
             let serialization = Serialization.serializeNumber8Bytes(x[i]);
-            let deserialization = Serialization.deserializeNumber(serialization).number;
+            let deserialization = Serialization.deserializeNumber8Bytes(serialization);
 
             //console.log(v[i], serialization.toString("hex"), deserialization);
 
-            assert(deserialization === x[i], "serialization/deserialization of big number didn't work " + v[i].toString()+" "+deserialization.toString() );
+            assert(deserialization === x[i], "serialization/deserialization of big number didn't work " + v[i]+" "+deserialization);
 
         }
     });

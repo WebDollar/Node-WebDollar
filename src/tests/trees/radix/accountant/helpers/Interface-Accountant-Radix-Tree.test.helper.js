@@ -44,7 +44,7 @@ class InterfaceAccountantRadixTreeTestHelper {
 
         let sum = 0;
         for (let i = 0; i < accountantData.length; i++)
-            sum += accountantData[i].value.toString());
+            sum += accountantData[i].value;
 
         // console.log("Accountant Tree sums");
         // console.log(sum);

@@ -199,10 +199,9 @@ class PoolData {
 
                 let minerAddress = BufferExtended.toBase( BufferExtended.substr(buffer, offset, len) );
                 offset += len;
-                
-                let response = Serialization.deserializeNumber(buffer, offset);
-                let minerReward = response.number;
-                offset = response.newOffset;
+
+                let minerReward = Serialization.deserializeNumber8Bytes(BufferExtended.substr(buffer, offset, 8) );
+                offset += 8;
 
                 this._minersList.push( {address: minerAddress, reward: minerReward} );
             }

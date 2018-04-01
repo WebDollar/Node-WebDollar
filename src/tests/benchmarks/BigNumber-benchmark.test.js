@@ -4,7 +4,7 @@ var assert = require('assert')
 
 describe('BigNumber BenchMarks', () => {
 
-    it('Creating 100K BigNumbers and Multiplication/Division', ()=>{
+    it('Creating 100K and Multiplication/Division', ()=>{
 
         let x = 6, y;
 
@@ -12,7 +12,7 @@ describe('BigNumber BenchMarks', () => {
 
         for (let i=0; i<100000; i++){
             x +=i ;
-            y = x / 3.523;
+            y = x / 3523;
         }
 
         let end = new Date().getTime();
@@ -22,7 +22,7 @@ describe('BigNumber BenchMarks', () => {
 
     });
 
-    it('creating 100K BigNumbers and Serialization/Deserialization', ()=>{
+    it('creating 100K and Serialization/Deserialization', ()=>{
 
         let x = 6;
         let y, buffer;
@@ -31,10 +31,10 @@ describe('BigNumber BenchMarks', () => {
 
         for (let i=0; i<100000; i++){
             x += i;
-            y = x / 3.523;
+            y = x / 3523;
 
             buffer = Serialization.serializeNumber8Bytes(y);
-            let y2 = Serialization.deserializeNumber(buffer).number;
+            let y2 = Serialization.deserializeNumber8Bytes(buffer);
 
             assert(y2 === y, "Y and Y2 and not equals after serialization")
 

@@ -53,7 +53,7 @@ describe('RewardSimulator', () => {
         let BPC = 6307200;
         for (let height = 0; height < BPC; height += 1024) {
             reward = BlockchainMiningReward.getReward(height);
-            assert(reward === 3000), "Wrong reward for bock " + height + ": " + reward.toString() + "!==3000");
+            assert(reward === 3000, "Wrong reward for bock " + height + ": " + reward.toString() + "!==3000");
         }
 
         //TODO Budisteanu Shifts

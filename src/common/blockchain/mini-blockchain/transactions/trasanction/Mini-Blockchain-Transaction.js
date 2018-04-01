@@ -2,6 +2,7 @@ import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockcha
 
 import MiniBlockchainTransactionFrom from './Mini-Blockchain-Transaction-From'
 import MiniBlockchainTransactionTo from './Mini-Blockchain-Transaction-To'
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
@@ -90,7 +91,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
         let diffInFees = inputSum - outputSum;
 
-        if (typeof diffInFees !== 'number')
+        if (! WebDollarCoins.validateCoinsNumber( diffInFees ) )
             throw {message: "diffInFees is not number",  address: minerAddress };
 
         if (diffInFees < 0)

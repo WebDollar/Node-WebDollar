@@ -66,14 +66,16 @@ class Serialization{
 
     serializeNumber8Bytes(data){
 
-        alert("NU E FACUTA");
-
         //converting number value into a buffer
-        let buffer = Buffer(4);
-        buffer[3] = data & 0xff;
-        buffer[2] = data>>8 & 0xff;
-        buffer[1] = data>>16 & 0xff;
-        buffer[0] = data>>24 & 0xff;
+        let buffer = Buffer(8);
+        buffer[7] = data & 0xff;
+        buffer[6] = data>>8 & 0xff;
+        buffer[5] = data>>16 & 0xff;
+        buffer[4] = data>>24 & 0xff;
+        buffer[3] = data>>32 & 0xff;
+        buffer[2] = data>>40 & 0xff;
+        buffer[1] = data>>48 & 0xff;
+        buffer[0] = data>>56 & 0xff;
 
         return  buffer;
     }
@@ -92,18 +94,8 @@ class Serialization{
 
     }
 
-    deserializeNumber8Bytes(data){
-
-        alert("NU E FACUTA");
-
-        //converting number value into a buffer
-        let buffer = Buffer(4);
-        buffer[3] = data & 0xff;
-        buffer[2] = data>>8 & 0xff;
-        buffer[1] = data>>16 & 0xff;
-        buffer[0] = data>>24 & 0xff;
-
-        return  buffer;
+    deserializeNumber8Bytes(buffer){
+        return buffer[7] | (buffer[6] << 8) | (buffer[5] << 16) | (buffer[4] << 24) | (buffer[3] << 32) | (buffer[2] << 40) | (buffer[1] << 48) | (buffer[0] << 56);
     }
 
     /**
