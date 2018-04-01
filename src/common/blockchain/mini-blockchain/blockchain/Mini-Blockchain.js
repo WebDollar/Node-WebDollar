@@ -100,7 +100,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
                 //revert reward
                 if (revert.reward)
-                    let answer = this.accountantTree.updateAccount(block.data.minerAddress, block.reward.negated(), undefined);
+                    this.accountantTree.updateAccount(block.data.minerAddress, block.reward.negated(), undefined);
 
 
                 if (revert.revertNow)
