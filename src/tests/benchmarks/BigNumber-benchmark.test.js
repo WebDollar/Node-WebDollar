@@ -3,7 +3,7 @@ import TestsHelper from 'tests/Tests.helper'
 
 var assert = require('assert')
 
-describe('BigNumber BenchMarks', () => {
+describe('Decimal BenchMarks', () => {
 
     it('Creating 100K and Multiplication/Division', ()=>{
 

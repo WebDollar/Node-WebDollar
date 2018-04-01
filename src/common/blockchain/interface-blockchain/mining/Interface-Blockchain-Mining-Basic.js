@@ -5,7 +5,6 @@ import consts from 'consts/const_global'
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
-const BigNumber = require('bignumber.js');
 
 class InterfaceBlockchainMiningBasic {
 
@@ -43,7 +42,7 @@ class InterfaceBlockchainMiningBasic {
     }
 
     set miningFeeThreshold(newFee){
-        this._miningFeeThreshold = new BigNumber(newFee);
+        this._miningFeeThreshold = newFee;
     }
 
     get miningFeeThreshold(){
