@@ -147,10 +147,15 @@ consts.HASH_ARGON2_PARAMS = {
 consts.DATABASE_NAMES = {
 
     DEFAULT_DATABASE: "defaultDB",
-    WALLET_DATABASE: "defaultDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
+
     //TODO REPLACE with "walletDB"
-    BLOCKCHAIN_DATABASE: "blockchainDB3",
-    BLOCKCHAIN_DATABASE_FILE_NAME : 'blockchain4.bin',
+    WALLET_DATABASE: "defaultDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
+
+    BLOCKCHAIN_DATABASE:{
+        FOLDER:"blockchainDB3",
+        FILE_NAME : 'blockchain4.bin',
+    },
+
     POOL_DATABASE: "poolDB",
     VALIDATE_DATABASE: "validateDB",
     TESTS_DATABASE: "testDB",
@@ -175,8 +180,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.262",
-        VERSION_COMPATIBILITY: "0.262",
+        VERSION: "0.265",
+        VERSION_COMPATIBILITY: "0.265",
         PROTOCOL: "WebDollar",
 
 

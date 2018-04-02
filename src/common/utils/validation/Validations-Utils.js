@@ -9,7 +9,7 @@ let PounchDB;
 if (process.env.BROWSER) PounchDB = require('pouchdb').default;
 else PounchDB = require('pouchdb-node');
 
-const DATABASES = ["validateDB", "defaultDB", consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE];
+const DATABASES = ["validateDB", "defaultDB", consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER];
 const TIME_OUT = 10000;
 const TIME_OUT_DESTROY = 1000;
 

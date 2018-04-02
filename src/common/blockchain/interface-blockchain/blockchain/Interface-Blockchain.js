@@ -40,8 +40,8 @@ class InterfaceBlockchain {
 
         this.mining = undefined;
 
-        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE_FILE_NAME;
-        this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE);
+        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME;
+        this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER);
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
         this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator( this );
@@ -108,7 +108,8 @@ class InterfaceBlockchain {
 
         this.blocks.addBlock(block);
 
-        if (revertActions !== undefined).push({name: "block-added", height: this.blocks.length-1 })
+        if (revertActions !== undefined)
+            revertActions.push({name: "block-added", height: this.blocks.length-1 });
 
         await this._blockIncluded(block);
 

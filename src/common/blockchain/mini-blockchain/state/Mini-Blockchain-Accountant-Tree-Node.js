@@ -72,7 +72,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         if ( result.amount < 0 )
             throw { message: 'balances became negative', amount: value, tokenId: tokenId };
 
-        if ( WebDollarCoins.validateCoinsNumber(result.amount))
+        if (! WebDollarCoins.validateCoinsNumber(result.amount))
             throw {message: "balance is no longer a valid number"};
 
         this._deleteBalancesEmpty();

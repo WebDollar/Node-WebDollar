@@ -109,11 +109,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
-            this._accountantTreeClone = this.blockchain.lightAccountantTreeSerializations[diffIndex];
-
-            if (this._accountantTreeClone === undefined || this._accountantTreeClone === null)
-                this._accountantTreeClone = new Buffer(0);
-
             this._lightAccountantTreeSerializationsHeightClone = new Buffer(this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializations[diffIndex] : 0);
             this._blocksStartingPointClone = this.blockchain.blocks.blocksStartingPoint;
             this._lightPrevDifficultyTargetClone = new Buffer(this.blockchain.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.blockchain.lightPrevDifficultyTargets[diffIndex] : 0);
@@ -145,6 +140,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             let sum = this.blockchain.accountantTree.calculateNodeCoins();
 
+            //ToDo validate the sum
             if (sum < currentSum || sum <= 0){
                 throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: currentSum, blockchainSum: sum};
             }
@@ -166,11 +162,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         //recover to the original Accountant Tree & state
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
-            //recover to the original Accountant Tree
-            //console.log("revertFork1 accountantTree sum all", this.blockchain.accountantTree.calculateNodeCoins() );
-            this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
-            //console.log("revertFork2 accountantTree sum all", this.blockchain.accountantTree.calculateNodeCoins() );
-
             this.blockchain.blocks.blocksStartingPoint = this._blocksStartingPointClone;
 
             let diffIndex = this.forkStartingHeight;
@@ -180,15 +171,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrevs[diffIndex] = this._lightPrevHashPrevClone;
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this._lightAccountantTreeSerializationsHeightClone;
 
-            //if (! (await this.blockchain._recalculateLightPrevs( this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1))) throw {message: "_recalculateLightPrevs failed"};
-        } else
-            return MiniBlockchainFork.prototype.revertFork.call(this);
-    }
+        }
 
-    async postFork(forkedSuccessfully){
-
-        return MiniBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
-
+        return MiniBlockchainFork.prototype.revertFork.call(this);
     }
 
     async saveIncludeBlock(index, revertActions){

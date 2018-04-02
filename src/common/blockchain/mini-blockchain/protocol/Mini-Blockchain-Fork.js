@@ -35,27 +35,13 @@ class MiniBlockchainFork extends inheritFork{
 
     }
 
-    preForkClone(cloneBlocks=true, cloneAccountantTree=true){
+    preForkClone(cloneBlocks=true){
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
-
-        if (!cloneAccountantTree) {
-
-            try {
-                //clone the Accountant Tree
-                this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
-            } catch (exception){
-                console.error("Error cloding Accountant Tree", exception);
-                return false;
-            }
-        }
-
 
     }
 
     preFork(revertActions){
-
-        console.log("preFork positions", this.forkStartingHeight, this.blockchain.blocks.length-1);
 
         //remove transactions and rewards from each blocks
         for (let i = this.blockchain.blocks.length - 1; i >= this.forkStartingHeight; i--) {
@@ -63,7 +49,6 @@ class MiniBlockchainFork extends inheritFork{
             let block = this.blockchain.blocks[i];
 
             // remove reward
-
             this.blockchain.accountantTree.updateAccount(block.data.minerAddress, -block.reward, undefined, revertActions);
 
             // remove transactions
@@ -74,16 +59,6 @@ class MiniBlockchainFork extends inheritFork{
 
     }
 
-    revertFork(){
-
-        //recover to the original Accountant Tree
-        this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
-
-    }
-
-    postFork(forkedSuccessfully){
-        return InterfaceBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
-    }
 
 }
 
