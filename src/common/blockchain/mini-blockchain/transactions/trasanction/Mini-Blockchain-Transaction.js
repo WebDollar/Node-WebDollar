@@ -14,11 +14,13 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return new MiniBlockchainTransactionTo(this, to);
     }
 
-    processTransaction(multiplicationFactor = 1){
+    processTransaction(multiplicationFactor = 1, revertActions){
 
-        this.blockchain.accountantTree.updateAccountNonce( this.from.addresses[0].unencodedAddress, multiplicationFactor );
+        let nonce = this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions);
 
-        return InterfaceBlockchainTransaction.prototype.processTransaction.call(this, multiplicationFactor);
+        if (nonce === undefined || nonce === null) throw { message: "nonce is empty in process transaction" };
+
+        return InterfaceBlockchainTransaction.prototype.processTransaction.call(this, multiplicationFactor, revertActions);
     }
 
     _validateNonce(blockValidationType){

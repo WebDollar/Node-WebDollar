@@ -19,7 +19,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         super(agent);
     }
 
-    async blockIncluded(block){
+    async _blockIncluded(block){
 
         let N = this.blocks.length;
         let prevBlock = (N >= 2) ? this.blocks[N-2] : null;

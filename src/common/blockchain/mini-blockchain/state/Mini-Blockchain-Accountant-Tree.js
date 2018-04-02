@@ -24,7 +24,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
      * @param tokenId
      * @returns {*}
      */
-    updateAccount(address, value, tokenId){
+    updateAccount(address, value, tokenId, revertActions){
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
@@ -38,11 +38,16 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         let node = this.search(address).node;
 
         // in case it doesn't exist, let's create it
-        if ( node === undefined || node === null)
-            node = this.add(address, {balances: [] });
+        if ( node === undefined || node === null) {
 
+            if (revertActions !== undefined) revertActions.push ( { name: "revert-add-accountant-tree", address: address } );
+            node = this.add(address, {balances: []});
+        }
+
+        //it is not a leaf, hardly to believe
         if (!node.isLeaf())
             throw {message: "couldn't updateAccount because node is not leaf", address: address};
+
 
         let resultUpdate = node.updateBalanceToken(value, tokenId);
 
@@ -66,10 +71,12 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         node._changedNode();
 
+        if (revertActions !== undefined) revertActions.push ( { name: "revert-updateAccount", address: address, value:value, tokenId : tokenId } );
+
         return resultUpdate;
     }
 
-    updateAccountNonce(address, nonceChange){
+    updateAccountNonce(address, nonceChange, revertActions){
 
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null)
@@ -85,6 +92,8 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
             throw {message: "couldn't updateAccountNonce because node is not leaf", address: address};
 
         node.nonce += nonceChange;
+
+        if (revertActions !== undefined) revertActions.push ( { name: "revert-updateAccountNonce", address: address, nonceChange: nonceChange } );
 
         if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid"};
 

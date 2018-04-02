@@ -75,7 +75,7 @@ class InterfaceBlockchain {
         return await callback();
     }
 
-    async blockIncluded(block){
+    async _blockIncluded(block){
 
     }
 
@@ -87,7 +87,7 @@ class InterfaceBlockchain {
      * @param socketsAvoidBroadcast
      * @returns {Promise.<boolean>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
 
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
@@ -108,7 +108,9 @@ class InterfaceBlockchain {
 
         this.blocks.addBlock(block);
 
-        await this.blockIncluded(block);
+        if (revertActions !== undefined).push({name: "block-added", height: this.blocks.length-1 })
+
+        await this._blockIncluded(block);
 
         if (saveBlock) {
             await this.saveNewBlock(block);

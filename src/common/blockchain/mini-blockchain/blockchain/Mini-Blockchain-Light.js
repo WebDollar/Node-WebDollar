@@ -49,7 +49,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
 
         if (  !block.blockValidation.blockValidationType['skip-validation'] ) {
 
@@ -61,28 +61,21 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             }) === false) throw {message: "Error Including Blockchain Light Block"};
 
-            console.log("this.blocks.height",block.height);
             //console.log("this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 2", this.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 2);
 
-            if (saveBlock ){
-
-                // propagating a new block in the network
+            if (saveBlock )
                 this.propagateBlocks(block.height, socketsAvoidBroadcast)
-            }
-
 
         } else {
 
             if (! (await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock )))
                 throw {message: "Error Including Blockchain Light Block"};
 
-            //for debugging only
         }
 
         if (! (await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)))
             throw {message: "_recalculateLightPrevs failed"};
 
-        //console.log("BLOCK ", block.serializeBlock().toString("hex"));
         console.log(" hash", block.hash.toString("hex"));
         console.log(" difficulty", block.difficultyTarget.toString("hex"));
         console.log(" prev difficulty ", block.difficultyTargetPrev.toString("hex"));

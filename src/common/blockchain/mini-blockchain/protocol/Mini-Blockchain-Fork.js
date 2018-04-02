@@ -39,7 +39,7 @@ class MiniBlockchainFork extends inheritFork{
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
 
-        if (cloneAccountantTree) {
+        if (!cloneAccountantTree) {
 
             try {
                 //clone the Accountant Tree
@@ -53,9 +53,8 @@ class MiniBlockchainFork extends inheritFork{
 
     }
 
-    preFork(){
+    preFork(revertActions){
 
-        console.log("preFork root before", this.blockchain.accountantTree.calculateNodeCoins());
         console.log("preFork positions", this.forkStartingHeight, this.blockchain.blocks.length-1);
 
         //remove transactions and rewards from each blocks
@@ -65,21 +64,14 @@ class MiniBlockchainFork extends inheritFork{
 
             // remove reward
 
-            let answer = this.blockchain.accountantTree.updateAccount(block.data.minerAddress, block.reward.negated() );
-            //force to delete first time miner
-            if (answer === null && this.blockchain.accountantTree.getAccountNonce(block.data.minerAddress) === 0)
-                this.blockchain.accountantTree.delete(block.data.minerAddress);
+            this.blockchain.accountantTree.updateAccount(block.data.minerAddress, -block.reward, undefined, revertActions);
 
             // remove transactions
-            for (let j=block.data.transactions.transactions.length-1; j>=0; j--){
-                let transaction = block.data.transactions.transactions[j];
-                transaction.processTransaction(-1);
-            }
+            for (let j=block.data.transactions.transactions.length-1; j>=0; j--)
+                block.data.transactions.transactions[j].processTransaction( -1, revertActions );
 
         }
 
-
-        console.log("preFork root after ", this.blockchain.accountantTree.calculateNodeCoins());
     }
 
     revertFork(){

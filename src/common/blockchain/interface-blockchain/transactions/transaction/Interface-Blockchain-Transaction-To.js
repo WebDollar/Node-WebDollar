@@ -145,7 +145,7 @@ class InterfaceBlockchainTransactionTo{
         return offset;
     }
 
-    processTransactionTo(multiplicationFactor=1){
+    processTransactionTo(multiplicationFactor = 1, revertActions){
         // overwritten in Mini Blockchain
     }
 

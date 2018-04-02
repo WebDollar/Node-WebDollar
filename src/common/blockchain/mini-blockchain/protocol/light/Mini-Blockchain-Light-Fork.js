@@ -144,15 +144,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
 
             let sum = this.blockchain.accountantTree.calculateNodeCoins();
-            console.log("preFork2 accountantTree sum all", sum );
 
             if (sum < currentSum || sum <= 0){
                 throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: currentSum, blockchainSum: sum};
             }
-
-            console.log("this.forkPrevDifficultyTarget", this.forkPrevDifficultyTarget.toString("hex") );
-            console.log("this.forkPrevTimeStamp", this.forkPrevTimeStamp );
-            console.log("this.forkPrevHashPrev", this.forkPrevHashPrev.toString("hex") );
 
             this.blockchain.blocks.blocksStartingPoint = this.forkChainStartingPoint;
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;
@@ -196,13 +191,13 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     }
 
-    async saveIncludeBlock(index){
+    async saveIncludeBlock(index, revertActions){
 
-        let answer = await MiniBlockchainFork.prototype.saveIncludeBlock.call(this, index);
+        let answer = await MiniBlockchainFork.prototype.saveIncludeBlock.call(this, index, revertActions);
 
         if (answer){
 
-            if (this.forkChainStartingPoint === this.forkStartingHeight && index === 0 && this.forkBlocks[index].height >= consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3)
+            if (this.forkChainStartingPoint === this.forkStartingHeight && index === 0)
                 this.forkBlocks[index].difficultyTarget = this.forkDifficultyCalculation.difficultyAdditionalBlockFirstDifficulty
         }
 

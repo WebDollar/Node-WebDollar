@@ -134,7 +134,7 @@ class InterfaceBlockchainBlockDataTransactions {
         return offset;
     }
 
-    _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined ){
+    _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined, revertActions = undefined ){
 
         try {
 
@@ -144,9 +144,9 @@ class InterfaceBlockchainBlockDataTransactions {
                     throw {message: "couldn't process the transaction ", transaction: transaction};
             }
 
-            transaction.processTransaction (multiplicationFactor);
+            transaction.processTransaction(multiplicationFactor, revertActions );
 
-            transaction.processTransactionFees(multiplicationFactor, minerAddress);
+            transaction.processTransactionFees( multiplicationFactor, minerAddress, revertActions);
 
             return true;
         } catch (exception){
@@ -155,27 +155,12 @@ class InterfaceBlockchainBlockDataTransactions {
         }
     }
 
-    processBlockDataTransactions(block, multiplicationFactor = 1){
+    processBlockDataTransactions( block, multiplicationFactor = 1){
 
-        let i;
-        for (i=0; i<block.data.transactions.transactions.length; i++)
-            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
-                return i-1;
-
-        return block.data.transactions.transactions.length-1;
+        for (let i=0; i<block.data.transactions.transactions.length; i++)
+            this._processBlockDataTransaction( block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress, revertActions, );
     }
 
-    processBlockDataTransactionsRevert(endPos, startPos, block, multiplicationFactor = -1){
-
-        let i;
-        for (i = endPos; i >= startPos; i--)
-            if (i >= 0)
-                if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
-                    return i;
-
-        return i;
-
-    }
 
 
 }

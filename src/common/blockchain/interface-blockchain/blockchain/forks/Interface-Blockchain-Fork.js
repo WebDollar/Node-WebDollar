@@ -3,6 +3,7 @@ import InterfaceBlockchainBlockValidation from "../../blocks/validation/Interfac
 import global from "consts/global"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import StatusEvents from "common/events/Status-Events";
+import RevertActions from "../../../../utils/Revert-Actions/Revert-Actions";
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -155,45 +156,57 @@ class InterfaceBlockchainFork {
 
     /**
      * Validate the Fork and Use the fork as main blockchain
+     *
+     * overwrite the blockchain blocks with the forkBlocks
+     *
      */
     async saveFork(){
 
         if (global.TERMINATED)
             return false;
 
-        //overwrite the blockchain blocks with the forkBlocks
-
-        // It don't validate the Fork Blocks again
-
-        console.log("save Fork before validateFork");
+        // It don't validate the hashes of the Fork Blocks again
 
         if (! (await this._validateFork(false))) {
             console.error("validateFork was not passed");
             return false
         }
+
         console.log("save Fork after validateFork");
 
-        // to do
+
+
+
+
+        let revertActions = new RevertActions(this.blockchain);
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
             //making a copy of the current blockchain
 
             try {
+
                 this.preForkClone();
+
             } catch (exception){
-                console.error("-----------------------");
                 console.error("preForkBefore raised an error", exception);
-                console.error("-----------------------");
+                return false;
             }
 
             try {
-                this.preFork();
+
+                this.preFork(revertActions);
+
             } catch (exception){
-                this.revertFork();
-                console.error("-----------------------");
+
+                console.error('----------------------------------------');
                 console.error("preFork raised an error", exception);
-                console.error("-----------------------");
+                console.error('----------------------------------------');
+
+                revertActions.revertOperations();
+                this.revertFork();
+
+                return false;
             }
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight);
@@ -202,6 +215,9 @@ class InterfaceBlockchainFork {
 
             console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
             console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+
+
+            //TODO use the revertActions to revert the process
 
             let index;
             try {
@@ -212,25 +228,29 @@ class InterfaceBlockchainFork {
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
 
-                    if (! (await this.saveIncludeBlock(index)) ) {
+                    if (! (await this.saveIncludeBlock(index, revertActions)) ) {
                         console.error("fork couldn't be included in main Blockchain ", index);
                         forkedSuccessfully = false;
                         break;
                     }
+
                 }
 
             } catch (exception){
+                console.error('-----------------------------------------');
                 console.error("saveFork includeBlockchainBlock1 raised exception", exception, "index", index, "forkStartingHeight", this.forkStartingHeight, "fork", this);
+                console.error('-----------------------------------------');
                 forkedSuccessfully = false;
             }
 
-            //reverting back to the clones
-            if (!forkedSuccessfully)
-                await this.revertFork();
 
-            //revert the last K blocks
             if (!forkedSuccessfully) {
 
+                //reverting back to the clones
+                if (!forkedSuccessfully)
+                    await this.revertFork();
+
+                //revert the last K blocks
                 this.blockchain.blocks.spliceBlocks(this.forkStartingHeight);
 
                 try {
@@ -240,7 +260,11 @@ class InterfaceBlockchainFork {
                         if (! (await this.blockchain.includeBlockchainBlock(this._blocksCopy[index], false, "all", false))) {
 
                             console.error("----------------------------------------------------------");
+                            console.error("----------------------------------------------------------");
+                            console.error("----------------------------------------------------------");
                             console.error("blockchain couldn't restored after fork included in main Blockchain ", i);
+                            console.error("----------------------------------------------------------");
+                            console.error("----------------------------------------------------------");
                             console.error("----------------------------------------------------------");
 
                             break;
@@ -256,6 +280,7 @@ class InterfaceBlockchainFork {
 
             //successfully, let's delete the backup blocks
             if (forkedSuccessfully) {
+
                 for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++)
                     delete this._blocksCopy[i];
 
@@ -304,7 +329,7 @@ class InterfaceBlockchainFork {
         return true;
     }
 
-    preFork(){
+    preFork(revertActions){
 
     }
 
@@ -378,9 +403,9 @@ class InterfaceBlockchainFork {
     }
 
 
-    async saveIncludeBlock(index){
+    async saveIncludeBlock(index, revertActions){
 
-        if (! (await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", false))) {
+        if (! (await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", false, revertActions))) {
             console.error("fork couldn't be included in main Blockchain ", index);
             return false;
         }

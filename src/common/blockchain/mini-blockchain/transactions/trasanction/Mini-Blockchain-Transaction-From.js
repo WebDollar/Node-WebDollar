@@ -73,33 +73,21 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
     }
 
 
-    processTransactionFrom(multiplicationFactor=1){
+    processTransactionFrom(multiplicationFactor = 1, revertActions){
 
-        let lastPosition;
+        for (let i = 0; i < this.addresses.length; i++) {
 
-        try {
+            if (!WebDollarCoins.validateCoinsNumber(this.addresses[i].amount))
+                throw {message: "amount is not number",  address: this.addresses[i]};
 
-            for (let i = 0; i < this.addresses.length; i++) {
+            let result = this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, - this.addresses[i].amount * multiplicationFactor, this.currencyTokenId, revertActions);
 
-                if (!WebDollarCoins.validateCoinsNumber(this.addresses[i].amount))
-                    throw {message: "amount is not number",  address: this.addresses[i]};
-
-                let result = this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, - this.addresses[i].amount * multiplicationFactor, this.currencyTokenId);
-
-                if (result === null) throw {message: "error Updating Account", address: this.addresses[i]};
-
-            }
-
-        } catch (exception){
-
-            for (let i=lastPosition; i >= 0 ; i--) {
-
-                let result = this.transaction.blockchain.accountantTree.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount * multiplicationFactor, this.currencyTokenId);
-
-                if (result === null) throw {message: "error Updating Account", address: this.addresses[i]};
-            }
+            if (result === null || result === undefined)
+                throw {message: "error Updating Account", address: this.addresses[i]};
 
         }
+
+        return true;
 
     }
 

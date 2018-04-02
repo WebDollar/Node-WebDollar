@@ -287,7 +287,7 @@ class InterfaceBlockchainTransactionFrom{
 
     }
 
-    processTransactionFrom(multiplicationFactor=1){
+    processTransactionFrom(multiplicationFactor = 1, revertActions ){
         // overwritten in Mini Blockchain
     }
 
