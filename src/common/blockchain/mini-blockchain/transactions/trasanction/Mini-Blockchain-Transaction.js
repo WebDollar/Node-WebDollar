@@ -85,7 +85,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return nonce;
     }
 
-    processTransactionFees(multiplicationFactor=1, minerAddress = undefined){
+    processTransactionFees(multiplicationFactor=1, minerAddress = undefined, revertActions){
 
         //validate amount
         let inputSum = this.from.calculateInputSum();
@@ -101,7 +101,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
         try{
 
-            let result = this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees * multiplicationFactor, this.from.currencyTokenId);
+            let result = this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees * multiplicationFactor, this.from.currencyTokenId, revertActions);
 
             if (result === null) throw {message: "Error Updating Account for Fees"};
 

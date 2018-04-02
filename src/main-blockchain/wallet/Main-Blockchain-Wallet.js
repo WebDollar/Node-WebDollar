@@ -30,6 +30,8 @@ class MainBlockchainWallet{
         this.addresses = [];
 
         this.emitter = new EventEmitter();
+        this.emitter.setMaxListeners(100);
+
     }
 
     async _justCreateNewAddress(salt, emptyAddress){

@@ -22,11 +22,11 @@ class MiningTransactionsSelector{
 
                 //don't upset the SPAM_GUARDIAN
                 for (let j = 0; j < transaction.from.addresses.length; j++)
-                    if (this._countAddresses(transaction.from.addresses[j], true, false) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS)
+                    if (this._countAddresses(transaction.from.addresses[j].unencodedAddress, true, false) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS)
                         throw "too many inputs";
 
                 for (let j = 0; j < transaction.to.addresses.length; j++)
-                    if (this._countAddresses(transaction.to.addresses[j], false, true) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS)
+                    if (this._countAddresses(transaction.to.addresses[j].unencodedAddress, false, true) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS)
                         throw "too many outputs";
 
 

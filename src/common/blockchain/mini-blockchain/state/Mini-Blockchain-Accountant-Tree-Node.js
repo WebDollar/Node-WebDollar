@@ -301,35 +301,36 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             if (this.nonce < 0) throw {message: "nonce is less than 0"};
             if (this.nonce > 0xFFFF) throw {message: "nonce is higher than 0xFFFF"};
 
-            for (let i = 0; i < this.balances.length; i++) {
+            if (this.balances !== undefined)
+                for (let i = 0; i < this.balances.length; i++) {
 
-                if (!WebDollarCoins.validateCoinsNumber(this.balances[i].amount))
-                    throw {message: "balance.amount is not a valid Coin Number"};
+                    if (!WebDollarCoins.validateCoinsNumber(this.balances[i].amount))
+                        throw {message: "balance.amount is not a valid Coin Number"};
 
-                if (this.balances[i].amount < 0) throw {message: "balance.amount is invalid number"};
+                    if (this.balances[i].amount < 0) throw {message: "balance.amount is invalid number"};
 
-                if (!Buffer.isBuffer(this.balances[i].id)) throw {message: "token is not a buffer"};
+                    if (!Buffer.isBuffer(this.balances[i].id)) throw {message: "token is not a buffer"};
 
-                if (this.balances[i].id.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) {
-                    if (this.balances[i].id[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) throw {message: "WEBD Token is invalid"}
-                } else {
+                    if (this.balances[i].id.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) {
+                        if (this.balances[i].id[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) throw {message: "WEBD Token is invalid"}
+                    } else {
 
-                    if (consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED !== -1 && Blockchain.blockchain.blocks.length > consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED) {
+                        if (consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED !== -1 && Blockchain.blockchain.blocks.length > consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED) {
 
-                        if (this.balances[i].id.length !== consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH)
-                            throw {message: "Token doesn't have the correct length"}
-                        else {
+                            if (this.balances[i].id.length !== consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH)
+                                throw {message: "Token doesn't have the correct length"}
+                            else {
 
-                            //TODO Token Validation - based on the smart contract
+                                //TODO Token Validation - based on the smart contract
 
-                        }
+                            }
 
-                    } else throw {message: "Other Token is invalid"};
+                        } else throw {message: "Other Token is invalid"};
+
+                    }
+
 
                 }
-
-
-            }
 
             //TODO Window Transactions
             if (this.isLeaf() && this.balances.length === 0 && this.nonce === 0) throw {message: "Address should not exist"};

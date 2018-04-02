@@ -33,6 +33,16 @@ class RevertActions {
 
             }
             else
+            if (action.name === "revert-updateAccountNonce" && (actionName === '' || actionName === action.name)) {
+
+                let nonce = this.blockchain.accountantTree.updateAccountNonce(action.address, -action.nonceChange, action.tokenId);
+
+                //force to delete first time miner
+                if (nonce === null && this.blockchain.accountantTree.getBalance(action.address) === null)
+                    this.blockchain.accountantTree.delete(action.address);
+
+            }
+            else
             if (action.name === "revert-skip-validation-transactions-from-values"  && (actionName === '' || actionName === action.name)) {
 
                 action.block.blockValidation.blockValidationType["skip-validation-transactions-from-values"] = !action.value;

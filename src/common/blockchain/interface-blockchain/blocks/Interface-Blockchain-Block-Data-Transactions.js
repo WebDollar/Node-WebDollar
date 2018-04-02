@@ -62,7 +62,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
             transaction.to.addresses.forEach((toAddress)=>{
 
-                let address = toAddresses.unencodedAddress.toString("hex");
+                let address = toAddress.unencodedAddress.toString("hex");
                 toAddresses[address]++;
 
                 if ( toAddresses[address] > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS )
@@ -155,7 +155,7 @@ class InterfaceBlockchainBlockDataTransactions {
         }
     }
 
-    processBlockDataTransactions( block, multiplicationFactor = 1){
+    processBlockDataTransactions( block, multiplicationFactor = 1, revertActions){
 
         for (let i=0; i<block.data.transactions.transactions.length; i++)
             this._processBlockDataTransaction( block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress, revertActions, );
