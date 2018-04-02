@@ -22,11 +22,11 @@ class MiningTransactionsSelector{
 
                 //don't upset the SPAM_GUARDIAN
                 for (let j = 0; j < transaction.from.addresses.length; j++)
-                    if (this._countAddresses(transaction.from.addresses[j]) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS)
+                    if (this._countAddresses(transaction.from.addresses[j], true, false) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS)
                         throw "too many inputs";
 
                 for (let j = 0; j < transaction.to.addresses.length; j++)
-                    if (this._countAddresses(transaction.to.addresses[j]) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS)
+                    if (this._countAddresses(transaction.to.addresses[j], false, true) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS)
                         throw "too many outputs";
 
 
@@ -47,7 +47,7 @@ class MiningTransactionsSelector{
                             size -= transaction.serializeTransaction().length;
 
                             if (size >= 0)
-                                transactions.push(transaction);
+                                this._transactions.push(transaction);
 
                         } else
                             bRemoveTransaction = true;
@@ -81,13 +81,25 @@ class MiningTransactionsSelector{
         return this._transactions;
     }
 
-    _countAddresses(unencodedAddress, addresses){
+    _countAddresses( unencodedAddress, from=false, to=false){
 
         let count = 0;
 
-        for (let j=0; j<addresses.length; j++)
-            if (addresses[j].unencodedAddress.equals(unencodedAddress))
-                count ++;
+        this._transactions.forEach((transaction)=>{
+
+            if (from)
+                transaction.from.addresses.forEach((address)=>{
+                    if (address.unencodedAddress.equals(unencodedAddress))
+                        count++;
+                });
+
+            if (to)
+                transaction.to.addresses.forEach((address)=>{
+                    if (address.unencodedAddress.equals(unencodedAddress))
+                        count++;
+                })
+
+        });
 
         return count;
     }

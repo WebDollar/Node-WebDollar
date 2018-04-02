@@ -4,10 +4,10 @@ export default {
   "nodes": [
     {
       "addr": ["webdollar.ddns.net"],
-       "port": 8080,
+       "port": 80,
     },
     {
-        "addr": ["192.168.2.0"],
+        "addr": ["192.168.2.8"],
         "port": 2095,
     },
     {

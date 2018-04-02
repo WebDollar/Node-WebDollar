@@ -143,16 +143,17 @@ class InterfaceBlockchainTransaction{
         this.from.validateFrom();
         this.to.validateTo();
 
-        if (!this.validateIdenticalAddresses()) return false;
+        if (!this.validateIdenticalAddresses(this.from.addresses)) return false;
+        if (!this.validateIdenticalAddresses(this.to.addresses)) return false;
 
         //validate amount
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 
-        if (WebDollarCoins.validateCoinsNumber(inputSum))
+        if (!WebDollarCoins.validateCoinsNumber(inputSum))
             throw {message: "Transaction inputSum is invalid", inputSum: inputSum};
 
-        if (WebDollarCoins.validateCoinsNumber(outputSum))
+        if (!WebDollarCoins.validateCoinsNumber(outputSum))
             throw {message: "Transaction outputSum is invalid", inputSum: outputSum};
 
         if (inputSum < outputSum)
@@ -319,7 +320,7 @@ class InterfaceBlockchainTransaction{
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 
-        return outputSum.minus(inputSum);
+        return inputSum - outputSum;
     }
 
 
