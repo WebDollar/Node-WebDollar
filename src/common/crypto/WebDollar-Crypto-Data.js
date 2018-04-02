@@ -107,9 +107,6 @@ class WebDollarCryptoData {
 
             if (data.hasOwnProperty(property)) {
 
-                //console.log("data[property]", typeof data[property], data[property]);
-                //console.log("WebDollarCryptoData.createWebDollarCryptoData(data[property], false)", WebDollarCryptoData.createWebDollarCryptoData(data[property], false));
-
                 if (i === 0)
                     newValue = WebDollarCryptoData.createWebDollarCryptoData( data[property], true);
                 else {
@@ -132,7 +129,6 @@ class WebDollarCryptoData {
     }
 
     toHex(){
-        
         return this.buffer.toString('hex');
     }
 
