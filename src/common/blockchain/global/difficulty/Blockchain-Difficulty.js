@@ -1,7 +1,7 @@
 var BigInteger = require('big-integer');
-import consts from 'consts/const_global'
-
 var BigNumber = require ('bignumber.js');
+
+import consts from 'consts/const_global'
 
 class BlockchainDifficulty{
 
@@ -31,16 +31,16 @@ class BlockchainDifficulty{
         let prevBlockDifficulty = getDifficultyCallback(blockNumber);
 
         if (Buffer.isBuffer(prevBlockDifficulty))
-            prevBlockDifficulty = new BigInteger(prevBlockDifficulty.toString("hex"), 16);
+            prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex"));
         else if (typeof prevBlockDifficulty === "string") // it must be hex
-            prevBlockDifficulty = new BigInteger(data.toString("hex"), 16);
+            prevBlockDifficulty = new BigNumber(prevBlockDifficulty);
 
         //let's suppose BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 10
         //              blockNumber === 9
         // it should recalcule using [0...9]
 
         if ( (blockNumber+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS !== 0)
-            return prevBlockDifficulty;
+            return  BigInteger( prevBlockDifficulty.toString(16), 16 );
         else {
 
             console.warn("new difficulty mean recalculated", blockNumber);
@@ -62,11 +62,11 @@ class BlockchainDifficulty{
             //adding block 9
             how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
 
-            if ( how_much_it_took_to_mine_X_Blocks <= 0 )
-                throw {message: "how_much_it_took_to_mine_X_Blocks is negative ", how_much_it_took_to_mine_X_Blocks: how_much_it_took_to_mine_X_Blocks};
-
             console.warn("blocktimestamp", blockTimestamp);
             console.warn("how_much_it_took_to_mine_X_Blocks ", how_much_it_took_to_mine_X_Blocks );
+
+            if ( how_much_it_took_to_mine_X_Blocks <= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK )
+                throw {message: "how_much_it_took_to_mine_X_Blocks kess than consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK", how_much_it_took_to_mine_X_Blocks: how_much_it_took_to_mine_X_Blocks};
 
 
             let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks);
@@ -86,7 +86,6 @@ class BlockchainDifficulty{
             console.warn( "newBlockDifficulty2",  newBlockDifficulty.toString(), newBlockDifficulty.toString(16) );
             console.warn( "newBlockDifficulty was calculated", Math.floor( new Date().getTime() / 1000), "    ", new Date() );
             return BigInteger( newBlockDifficulty.toString(16), 16 );
-            //return prevBlockDifficulty.multiply(ratio.toString());
         }
 
     }

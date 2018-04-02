@@ -9,8 +9,8 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
     // value : data
     // edges : [ of Edges]
 
-    constructor(root, parent, edges, value){
-        super(root, parent, edges, value);
+    constructor(root, parent, parentEdge, edges, value){
+        super(root, parent, parentEdge, edges, value);
     }
 
     serializeNode(includeEdges){
@@ -51,8 +51,6 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                 let length = buffer[offset]; //1 byte
                 offset += 1;
 
-                //console.log("length  length  ", length);
-
                 for (let i = 0; i < length; i++) {
 
                     let valueLength = buffer[offset]; //1 byte
@@ -62,10 +60,11 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                     offset += valueLength;
 
                     let targetNode = this.createNewNode();
+                    this.edges.push( this.root.createNewEdge(label, targetNode) );
+
+
                     arguments[1] = offset;
                     offset = targetNode.deserializeNode.apply(targetNode, arguments);
-
-                    this.edges.push( this.root.createNewEdge(label, targetNode) );
 
                 }
 
@@ -84,6 +83,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
     _setNodeValue(value){
         this.value = value;
     }
+
 
     createNewEdge(label, node){
         return new InterfaceRadixTreeEdge(label, node);

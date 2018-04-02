@@ -36,7 +36,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         let result;
 
-        let revertActions = new RevertActions(this.blockchain);
+        let revertActions = new RevertActions(this);
         let revertException = false;
 
         try{

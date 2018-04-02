@@ -1,5 +1,3 @@
-import InterfaceBlockchainBlock from "common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block";
-
 var assert = require('assert')
 
 import PPoWBlockchain from 'common/blockchain/ppow-blockchain/blockchain/PPoW-Blockchain'

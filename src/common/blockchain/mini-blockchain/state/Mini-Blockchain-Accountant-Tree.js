@@ -10,7 +10,7 @@ import MiniBlockchainAccountantTreeEvents from "./Mini-Blockchain-Accountant-Tre
 class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
     createRoot(){
-        this.root = new MiniBlockchainAccountantTreeNode(null, null, [], null);
+        this.root = new MiniBlockchainAccountantTreeNode(null, null, null, [], null);
         this.root.autoMerklify = true;
         this.root.deleteEmptyAddresses = false;
         this.root.root = this.root;
@@ -95,7 +95,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         if (revertActions !== undefined) revertActions.push ( { name: "revert-updateAccountNonce", address: address, nonceChange: nonceChange } );
 
-        if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid"};
+        if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid", nonce: node.nonce};
 
         node.nonce = node.nonce % 0xFFFF;
         if (node.nonce < 0) node.nonce = node.nonce + 0xFFFF;

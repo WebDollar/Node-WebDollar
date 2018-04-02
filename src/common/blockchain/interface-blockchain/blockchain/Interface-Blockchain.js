@@ -400,10 +400,8 @@ class InterfaceBlockchain {
 
                 if (this.blocks[i] === undefined)
                     console.error("PROPAGATE ERROR"+i, this.blocks[i]);
-                else {
-                    console.log("PROPAGATING", this.blocks[i].hash.toString("hex"));
+                else
                     this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
-                }
 
             }
 

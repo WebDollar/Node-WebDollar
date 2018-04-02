@@ -7,23 +7,27 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
-    constructor (root, parent, edges, value){
+    constructor (root, parent, parentEdge, edges, value){
 
-        super(root, parent, edges);
+        super(root, parent, parentEdge, edges);
 
         //console.log("value", value);
         this.hash = { sha256: new Buffer(32) };
         this.total = 0;
 
-        this.nonce = 0;
-
-        if (value !== undefined) {
-            value = value || {};
+        if (value !== undefined && value !== null) {
 
             value.balances = value.balances||[];
 
             this.balances = value.balances;
-            this.value = value;
+            this.nonce = 0;
+
+            this.value = this.balances;
+
+        } else {
+            this.balances = undefined;
+            this.nonce = 0;
+            this.value = undefined;
         }
 
     }
@@ -97,9 +101,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         if (!Buffer.isBuffer(tokenId))
             tokenId = BufferExtended.fromBase(tokenId);
 
-        for (let i = 0; i < this.balances.length; i++)
-            if (this.balances[i].id.equals( tokenId) )
-                return this.balances[i].amount;
+        if (this.balances !== undefined)
+            for (let i = 0; i < this.balances.length; i++)
+                if (this.balances[i].id.equals( tokenId) )
+                    return this.balances[i].amount;
 
         return 0;
 
@@ -123,13 +128,15 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     _deleteBalancesEmpty(){
 
         let result = false;
-        for (let i = this.balances.length - 1; i >= 0; i--) {
 
-            if (this.balances[i] === null || this.balances[i] === undefined || this.balances[i].amount === 0) {
-                this.balances.splice(i, 1);
-                result = true;
+        if (this.balances !== undefined)
+            for (let i = this.balances.length - 1; i >= 0; i--) {
+
+                if (this.balances[i] === null || this.balances[i] === undefined || this.balances[i].amount === 0) {
+                    this.balances.splice(i, 1);
+                    result = true;
+                }
             }
-        }
 
         return true;
 
@@ -160,44 +167,46 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             if (hash === null)
                 hash = new Buffer(0);
 
-            let buffer = Buffer.concat( [hash, Serialization.serializeNumber2Bytes(this.nonce)] );
+            let dataBuffer = new Buffer(0);
 
-            let balancesBuffered = new Buffer(0);
+            if ( this.isLeaf() ) {
 
-            if (this.balances !== undefined && this.balances !== null && this.balances.length > 0) {
+                if (this.balances.length > 0) {
+                    //let serialize WEBD Token
+                    let WEBDTokenIndex = null;
+                    for (let i = 0; i < this.balances.length; i++)
+                        if ((this.balances[i].id.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) && (this.balances[i].id[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)) {
+                            WEBDTokenIndex = i;
+                            break;
+                        }
 
-                //let serialize WEBD Token
-                let WEBDTokenIndex = null;
-                for (let i = 0; i < this.balances.length; i++)
-                    if ((this.balances[i].id.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) && (this.balances[i].id[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)) {
-                        WEBDTokenIndex = i;
-                        break;
+                    // in case it was not serialize d and it is empty
+                    if (WEBDTokenIndex === null) {
+
+                        if (this.balances.length > 0) {
+                            let idWEBD = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+                            idWEBD[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
+
+                            balancesBuffers.push(this._serializeBalanceWEBDToken({id: idWEBD, amount: 0}));
+                        }
+
+                    } else {
+                        balancesBuffers.push(this._serializeBalanceWEBDToken(this.balances[WEBDTokenIndex]));
                     }
 
-                // in case it was not serialize d and it is empty
-                if (WEBDTokenIndex === null) {
+                    //let serialize everything else
+                    for (let i = 0; i < this.balances.length; i++)
+                        if (i !== WEBDTokenIndex)
+                            balancesBuffers.push(this._serializeBalance(this.balances[i]));
 
-                    if (this.balances.length > 0) {
-                        let idWEBD = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
-                        idWEBD[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
-
-                        balancesBuffers.push(this._serializeBalanceWEBDToken({id: idWEBD, amount: 0}));
-                    }
-
-                } else {
-                    balancesBuffers.push(this._serializeBalanceWEBDToken(this.balances[WEBDTokenIndex]));
                 }
+                let balancesBuffered = Buffer.concat(balancesBuffers);
 
-                //let serialize everything else
-                for (let i = 0; i < this.balances.length; i++)
-                    if (i !== WEBDTokenIndex)
-                        balancesBuffers.push(this._serializeBalance(this.balances[i]));
-
-                balancesBuffered = Buffer.concat(balancesBuffers);
+                dataBuffer  = Buffer.concat([Serialization.serializeNumber2Bytes(this.nonce), Serialization.serializeNumber1Byte(balancesBuffers.length), balancesBuffered]);
             }
 
 
-            return Buffer.concat( [ buffer, Serialization.serializeNumber1Byte(balancesBuffers.length), balancesBuffered ] );
+            return Buffer.concat( [ hash, dataBuffer ] );
 
         } catch (exception){
             console.log("Error Serializing MiniAccountantTree NodeData", exception);
@@ -209,54 +218,63 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     deserializeNodeData(buffer, offset, includeEdges, includeHashes){
 
         offset = offset || 0;
-        this.balances = []; // initialization
 
         // deserializing this.value
         offset = InterfaceMerkleRadixTreeNode.prototype.deserializeNodeDataHash.call(this, buffer, offset, includeHashes);
 
-        this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 byte
-        offset += 2;
-
         try {
 
-            let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
-            offset += 1;
+            if (this.isLeafBasedOnParents()){
 
-            if (balancesLength > 0){
+                this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 byte
+                offset += 2;
 
-                // webd balance
-                let webdId =  BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) ;
+                let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
                 offset += 1;
 
-                //webd token
-                if (webdId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)
-                    throw {message: "webd token is incorrect", token: webdId };
+                if (balancesLength > 0){
 
-                let result = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
-                offset += 7;
+                    this.balances = []; // initialization
+
+                    // webd balance
+                    let webdId =  BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) ;
+                    offset += consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH;
+
+                    //webd token
+                    if (webdId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)
+                        throw {message: "webd token is incorrect", token: webdId };
+
+                    let result = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
+                    offset += 7;
 
 
-                this.updateBalanceToken(result, webdId);
+                    this.updateBalanceToken(result, webdId);
 
 
-                if (balancesLength > 1) {
+                    if (balancesLength > 1) {
 
-                    //rest of tokens , in case there are
-                    for (let i = 1; i < balancesLength; i++) {
+                        //rest of tokens , in case there are
+                        for (let i = 1; i < balancesLength; i++) {
 
-                        let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH);
-                        offset += consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH;
+                            let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH);
+                            offset += consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH;
 
-                        result = Serialization.deserializeNumber8BytesBuffer(buffer, offset );
-                        offset += 7;
+                            result = Serialization.deserializeNumber8BytesBuffer(buffer, offset );
+                            offset += 7;
 
-                        this.updateBalanceToken(result, tokenId);
+                            this.updateBalanceToken(result, tokenId);
+                        }
                     }
+
                 }
 
+                this._deleteBalancesEmpty();
+
+            } else {
+                this.balances = undefined;
+                this.nonce = undefined;
             }
 
-            this._deleteBalancesEmpty();
 
             return offset;
 
@@ -272,43 +290,50 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         if (!InterfaceMerkleRadixTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
 
-        if (!Number.isInteger(this.nonce)) throw {message: "nonce is invalid"};
+        if (!this.isLeafBasedOnParents()) {
 
-        if (this.nonce < 0) throw {message: "nonce is less than 0"};
-        if (this.nonce > 0xFFFF) throw {message: "nonce is higher than 0xFFFF"};
+            if (this.balances !== undefined) throw {message: "balance is not undefined"};
+            if (this.nonce !== undefined) throw {message: "nonce is not undefined"};
 
-        for (let i=0; i<this.balances.length; i++){
+        } else {
+            if (!Number.isInteger(this.nonce)) throw {message: "nonce is invalid"};
 
-            if ( !WebDollarCoins.validateCoinsNumber(this.balances[i].amount) )
-                throw {message: "balance.amount is not a valid Coin Number"};
+            if (this.nonce < 0) throw {message: "nonce is less than 0"};
+            if (this.nonce > 0xFFFF) throw {message: "nonce is higher than 0xFFFF"};
 
-            if (this.balances[i].amount < 0) throw {message: "balance.amount is invalid number"};
+            for (let i = 0; i < this.balances.length; i++) {
 
-            if (!Buffer.isBuffer(this.balances[i].tokenId)) throw {message: "token is not a buffer"};
+                if (!WebDollarCoins.validateCoinsNumber(this.balances[i].amount))
+                    throw {message: "balance.amount is not a valid Coin Number"};
 
-            if (this.balances[i].tokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) {
-                if (this.balances[i].tokenId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) throw {message: "WEBD Token is invalid"}
-            } else {
+                if (this.balances[i].amount < 0) throw {message: "balance.amount is invalid number"};
 
-                if (consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED !== -1 && Blockchain.blockchain.blocks.length > consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED) {
+                if (!Buffer.isBuffer(this.balances[i].id)) throw {message: "token is not a buffer"};
 
-                    if (this.balances[i].tokenId.length !== consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH)
-                        throw {message: "Token doesn't have the correct length"}
-                    else {
+                if (this.balances[i].id.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) {
+                    if (this.balances[i].id[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) throw {message: "WEBD Token is invalid"}
+                } else {
 
-                        //TODO Token Validation - based on the smart contract
+                    if (consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED !== -1 && Blockchain.blockchain.blocks.length > consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.ACTIVATED) {
 
-                    }
+                        if (this.balances[i].id.length !== consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH)
+                            throw {message: "Token doesn't have the correct length"}
+                        else {
 
-                } else throw {message: "Other Token is invalid"};
+                            //TODO Token Validation - based on the smart contract
+
+                        }
+
+                    } else throw {message: "Other Token is invalid"};
+
+                }
+
 
             }
 
-
+            //TODO Window Transactions
+            if (this.isLeaf() && this.balances.length === 0 && this.nonce === 0) throw {message: "Address should not exist"};
         }
-
-        //TODO Window Transactions
-        if (this.balances === [] && this.nonce === 0) throw { message: "Address should not exist" };
 
         if (validateMerkleTree)
             return this._validateHash(this.root);
@@ -317,6 +342,30 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     }
 
+    isLeaf(){
+        return this.balances !== undefined
+    }
+
+    isLeafBasedOnParents(){
+
+        let edge = this.parentEdge;
+        let node = this;
+
+        let count = 0;
+
+        while (node !== null && edge !== null){
+
+            count += edge.label.length;
+            node = node.parent;
+            edge = node.parentEdge;
+        }
+
+        if (count === consts.ADDRESSES.ADDRESS.LENGTH)
+            return true;
+        else
+            return false;
+
+    }
 
 }
 

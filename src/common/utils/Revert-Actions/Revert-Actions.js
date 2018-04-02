@@ -18,22 +18,31 @@ class RevertActions {
             let action = this._actions [i];
 
 
-            if (action.name === "revert-add-accountant-tree" && (actionName === '' || actionName === action.name))
-                this.blockchain.accountantTree.delete( action.data.address );
-            else
-            if (action.name === "revert-updateAccount" && (actionName === '' || actionName === action.name)) {
-                let answer = this.blockchain.accountantTree.updateAccount(action.data.address, -action.value, action.tokenId);
+            if (action.name === "revert-add-accountant-tree" && (actionName === '' || actionName === action.name)) {
 
-                //force to delete first time miner
-                if (answer === null && this.blockchain.accountantTree.getAccountNonce(action.data.address) === 0)
-                    this.blockchain.accountantTree.delete(action.data.address);
+                this.blockchain.accountantTree.delete(action.address);
             }
             else
-            if (action.name === "revert-skip-validation-transactions-from-values"  && (actionName === '' || actionName === action.name))
-                action.data.block.blockValidation.blockValidationType["skip-validation-transactions-from-values"] = !action.data.value;
+            if (action.name === "revert-updateAccount" && (actionName === '' || actionName === action.name)) {
+
+                let answer = this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
+
+                //force to delete first time miner
+                if (answer === null && this.blockchain.accountantTree.getAccountNonce(action.address) === 0)
+                    this.blockchain.accountantTree.delete(action.address);
+
+            }
             else
-            if (action.name === "block-added"  && (actionName === '' || actionName === action.name))
-                this.blockchain.blocks.spliceBlocks(action.data.height);
+            if (action.name === "revert-skip-validation-transactions-from-values"  && (actionName === '' || actionName === action.name)) {
+
+                action.block.blockValidation.blockValidationType["skip-validation-transactions-from-values"] = !action.value;
+            }
+            else
+            if (action.name === "block-added"  && (actionName === '' || actionName === action.name)) {
+
+                this.blockchain.blocks.spliceBlocks(action.height);
+
+            }
 
         }
 
