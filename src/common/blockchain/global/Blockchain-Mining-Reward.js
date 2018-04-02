@@ -20,6 +20,17 @@ class BlockchainMiningReward{
         }
 
     }
+    
+    _getContinuousReward(height) {
+        
+        if (typeof height !== "number")
+            throw ('height is not defined');
+
+        if (height >= 0) {
+            //TODO: implement continuous reward function
+        }
+        
+    }
 
 }
 
