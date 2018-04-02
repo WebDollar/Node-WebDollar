@@ -289,7 +289,7 @@ class CLI{
             return false;
         }
 
-        //await Blockchain.blockchain.mining.minerAddress = Blockchain.Wallet.addresses[addressId].address;
+        Blockchain.blockchain.mining.minerAddress = Blockchain.Wallet.addresses[addressId].address;
 
         return true;
     }
