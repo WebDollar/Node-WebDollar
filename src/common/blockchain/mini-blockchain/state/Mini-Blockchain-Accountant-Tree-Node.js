@@ -125,6 +125,19 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         return list;
     }
 
+    hasBalances(){
+
+        let balances = this.getBalances();
+
+        if (balances === null) return false;
+
+        if (Object.keys(balances).length === 0 && balances.constructor === Object)
+            return false;
+
+        return true;
+
+    }
+
     _deleteBalancesEmpty(){
 
         let result = false;
@@ -160,7 +173,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     serializeNodeData( includeEdges, includeHashes ){
 
         try {
-            let hash, balancesBuffers = [];
+            let hash;
 
             hash = InterfaceMerkleRadixTreeNode.prototype.serializeNodeDataHash.call(this, includeHashes);
 
@@ -169,9 +182,11 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             let dataBuffer = new Buffer(0);
 
-            if ( this.isLeaf() ) {
+            if ( this.isLeafBasedOnParents() ) {
 
+                let balancesBuffers = [];
                 if (this.balances.length > 0) {
+
                     //let serialize WEBD Token
                     let WEBDTokenIndex = null;
                     for (let i = 0; i < this.balances.length; i++)
@@ -232,9 +247,8 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
                 offset += 1;
 
+                this.balances = []; // initialization
                 if (balancesLength > 0){
-
-                    this.balances = []; // initialization
 
                     // webd balance
                     let webdId =  BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH) ;

@@ -64,7 +64,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         });
 
         //purging empty addresses
-        if ( resultUpdate === null) {
+        if ( !node.hasBalances() ) {
 
             if (this.root.deleteEmptyAddresses ||   //TODO Window Transactions for Purging
                 this.getAccountNonce(address) === 0 ) {
@@ -73,7 +73,6 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
                 return null;
 
             }
-
         }
 
         node._changedNode();
@@ -106,7 +105,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         if (node.nonce < 0) node.nonce = node.nonce + 0xFFFF;
 
         //force to delete first time miner
-        if (node.nonce === 0 && this.getBalance(address) === null) { //TODO Window Transactions for Purging
+        if (node.nonce === 0 && !node.hasBalances(address) ) { //TODO Window Transactions for Purging
             this.delete(address);
             return null;
         }
@@ -166,7 +165,9 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         if (address === null) throw {message: "getAccountNonce - Your address is invalid", address: address };
 
         let node = this.search(address).node;
-        if (node === undefined || node === null) throw {message: "getAccountNonce - address not found", address: address };
+
+        if (node === undefined || node === null)
+            return null; //throw {message: "getAccounantNonce address not found", address: address, tokenId: tokenId };
 
         return node.nonce;
     }

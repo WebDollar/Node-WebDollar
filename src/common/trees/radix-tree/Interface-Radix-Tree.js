@@ -272,6 +272,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                     grandParent.edges[i].targetNode = node;
 
                                     node.parent = grandParent;
+                                    node.parentEdge = grandParent.edges[i];
 
                                     // it is not necessary its parent
                                     //console.log("this._changedNode 1_2");
@@ -328,6 +329,14 @@ class InterfaceRadixTree extends InterfaceTree{
         //this.printLevelSearch();
 
         node._changedNode(  );
+
+        try {
+            let serialization = this._serializeTree(false);
+            this._deserializeTree(serialization, 0);
+        } catch (exception){
+            console.error("ERRROR DELETING!!!!!!!!!!!!!!!! ", input );
+            throw exception;
+        }
 
         return true;
     }
