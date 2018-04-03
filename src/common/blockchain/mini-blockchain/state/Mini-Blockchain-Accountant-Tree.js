@@ -40,19 +40,20 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         // in case it doesn't exist, let's create it
         if ( node === undefined || node === null) {
 
-            if (revertActions !== undefined) revertActions.push ( { name: "revert-add-accountant-tree", address: address } );
             node = this.add(address, {balances: []});
+            if (revertActions !== undefined) revertActions.push ( { name: "revert-add-accountant-tree", address: address } );
         }
 
         //it is not a leaf, hardly to believe
         if (!node.isLeaf())
             throw {message: "couldn't updateAccount because node is not leaf", address: address};
 
-
         let resultUpdate = node.updateBalanceToken(value, tokenId);
 
+        if (revertActions !== undefined) revertActions.push ( { name: "revert-updateAccount", address: address, value:value, tokenId : tokenId } );
+
         //WEBD
-        if (tokenId.length === 1 && tokenId[0] === 1){
+        if (tokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH && tokenId[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE ){
             this.root.total += value;
             this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
         }
@@ -63,15 +64,19 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         });
 
         //purging empty addresses
-        //TODO Window Transactions for Purging
-        if (this.root.deleteEmptyAddresses && resultUpdate === null) {
-            this.delete(address);
-            return null;
+        if ( resultUpdate === null) {
+
+            if (this.root.deleteEmptyAddresses ||   //TODO Window Transactions for Purging
+                this.blockchain.accountantTree.getAccountNonce(address) === 0 ) {
+
+                this.delete(address);
+                return null;
+
+            }
+
         }
 
         node._changedNode();
-
-        if (revertActions !== undefined) revertActions.push ( { name: "revert-updateAccount", address: address, value:value, tokenId : tokenId } );
 
         return resultUpdate;
     }
@@ -99,6 +104,14 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         node.nonce = node.nonce % 0xFFFF;
         if (node.nonce < 0) node.nonce = node.nonce + 0xFFFF;
+
+        //force to delete first time miner
+        if (node.nonce === 0 && this.getBalance(address) === null) { //TODO Window Transactions for Purging
+            this.delete(address);
+            return null;
+        }
+
+        node._changedNode();
 
         return node.nonce;
     }

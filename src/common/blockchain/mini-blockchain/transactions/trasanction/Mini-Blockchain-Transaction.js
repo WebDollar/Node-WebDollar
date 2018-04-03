@@ -99,15 +99,10 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         if (diffInFees < 0)
             throw {message: "Accountant Tree is negative" };
 
-        try{
 
-            let result = this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees * multiplicationFactor, this.from.currencyTokenId, revertActions);
+        let result = this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees * multiplicationFactor, this.from.currencyTokenId, revertActions);
 
-            if (result === null) throw {message: "Error Updating Account for Fees"};
-
-        } catch (exception){
-            console.error("processTransactionFees error ", exception)
-        }
+        if (result === null) throw {message: "processTransactionTo - Error Updating Account for Fees"};
 
         return {fees: diffInFees, currencyTokenId: this.currencyTokenId};
 

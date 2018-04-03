@@ -80,10 +80,7 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
             if (!WebDollarCoins.validateCoinsNumber(this.addresses[i].amount))
                 throw {message: "amount is not number",  address: this.addresses[i]};
 
-            let result = this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, - this.addresses[i].amount * multiplicationFactor, this.currencyTokenId, revertActions);
-
-            if (result === null || result === undefined)
-                throw {message: "error Updating Account", address: this.addresses[i]};
+            this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, - this.addresses[i].amount * multiplicationFactor, this.currencyTokenId, revertActions);
 
         }
 

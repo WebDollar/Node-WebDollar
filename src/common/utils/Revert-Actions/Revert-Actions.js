@@ -25,21 +25,13 @@ class RevertActions {
             else
             if (action.name === "revert-updateAccount" && (actionName === '' || actionName === action.name)) {
 
-                let answer = this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
-
-                //force to delete first time miner
-                if (answer === null && this.blockchain.accountantTree.getAccountNonce(action.address) === 0)
-                    this.blockchain.accountantTree.delete(action.address);
+                this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
 
             }
             else
             if (action.name === "revert-updateAccountNonce" && (actionName === '' || actionName === action.name)) {
 
                 let nonce = this.blockchain.accountantTree.updateAccountNonce(action.address, -action.nonceChange, action.tokenId);
-
-                //force to delete first time miner
-                if (nonce === null && this.blockchain.accountantTree.getBalance(action.address) === null)
-                    this.blockchain.accountantTree.delete(action.address);
 
             }
             else
