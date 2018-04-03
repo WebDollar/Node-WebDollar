@@ -55,20 +55,22 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
             console.log("block.height > ", block.height);
 
-            if ( await this.simulateNewBlock(block, false, async () => {
+            if ( await this.simulateNewBlock(block, false, revertActions,
 
-                return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock );
+                    async () => {
 
-            }) === false) throw {message: "Error Including Blockchain Light Block"};
+                        return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions);
 
-            //console.log("this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 2", this.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 2);
+                    }) === false
+
+            ) throw {message: "Error Including Blockchain Light Block"};
 
             if (saveBlock )
                 this.propagateBlocks(block.height, socketsAvoidBroadcast)
 
         } else {
 
-            if (! (await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock )))
+            if (! (await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock, revertActions )))
                 throw {message: "Error Including Blockchain Light Block"};
 
         }

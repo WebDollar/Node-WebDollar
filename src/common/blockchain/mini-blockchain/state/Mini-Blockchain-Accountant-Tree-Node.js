@@ -48,7 +48,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         if (typeof value === 'string') value = parseInt(value);
 
         if (!WebDollarCoins.validateCoinsNumber(value))
-            throw {message: "Value is invalid for update"};
+            throw {message: "Value is invalid for update", value: value};
 
         let result;
 

@@ -18,11 +18,8 @@ class RevertActions {
             let action = this._actions [i];
 
 
-            if (action.name === "revert-add-accountant-tree" && (actionName === '' || actionName === action.name)) {
+            let done = true;
 
-                this.blockchain.accountantTree.delete(action.address);
-            }
-            else
             if (action.name === "revert-updateAccount" && (actionName === '' || actionName === action.name)) {
 
                 this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
@@ -44,6 +41,17 @@ class RevertActions {
 
                 this.blockchain.blocks.spliceBlocks(action.height);
 
+            } else
+            if (action.name === "breakpoint"  && (actionName === '' || actionName === action.name)) {
+
+                break;
+
+            }
+            else done = false;
+
+            if (done === true){
+                action.name = '';
+                this._actions.splice(i,1);
             }
 
         }

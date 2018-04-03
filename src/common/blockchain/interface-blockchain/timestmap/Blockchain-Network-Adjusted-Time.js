@@ -31,6 +31,8 @@ class BlockchainNetworkAdjustedTime {
 
         try {
 
+
+            this.blockchainTimestamp._sendUTC(socket);
             let answer = await socket.node.sendRequestWaitOnce( "timestamp/request-timeUTC", {}, 'answer' );
 
             if (answer === null || answer === undefined) throw {message: "The node answer for timestamp returned null or empty"};

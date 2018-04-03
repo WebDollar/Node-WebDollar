@@ -133,16 +133,16 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
-            let currentSum = this.blockchain.accountantTree.calculateNodeCoins();
+            //blockchain sum
+            let blockchaimSum = this.blockchain.accountantTree.calculateNodeCoins();
 
-            //validate sum
+            //fork sum
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
-
-            let sum = this.blockchain.accountantTree.calculateNodeCoins();
+            let forkSum = this.blockchain.accountantTree.calculateNodeCoins();
 
             //ToDo validate the sum
-            if (sum < currentSum || sum <= 0){
-                throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: currentSum, blockchainSum: sum};
+            if ( forkSum  < blockchaimSum || forkSum <= 0){
+                throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: forkSum, blockchainSum: blockchaimSum};
             }
 
             this.blockchain.blocks.blocksStartingPoint = this.forkChainStartingPoint;

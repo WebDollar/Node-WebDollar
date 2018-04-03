@@ -38,15 +38,14 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         let node = this.search(address).node;
 
         // in case it doesn't exist, let's create it
-        if ( node === undefined || node === null) {
-
+        if ( node === undefined || node === null)
             node = this.add(address, {balances: []});
-            if (revertActions !== undefined) revertActions.push ( { name: "revert-add-accountant-tree", address: address } );
-        }
 
         //it is not a leaf, hardly to believe
-        if (!node.isLeaf())
+        if (!node.isLeaf()) {
+            this.delete(address);
             throw {message: "couldn't updateAccount because node is not leaf", address: address};
+        }
 
         let resultUpdate = node.updateBalanceToken(value, tokenId);
 

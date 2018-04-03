@@ -330,13 +330,6 @@ class InterfaceRadixTree extends InterfaceTree{
 
         node._changedNode(  );
 
-        try {
-            let serialization = this._serializeTree(false);
-            this._deserializeTree(serialization, 0);
-        } catch (exception){
-            console.error("ERRROR DELETING!!!!!!!!!!!!!!!! ", input );
-            throw exception;
-        }
 
         return true;
     }

@@ -32,17 +32,24 @@ class MiniBlockchain extends  inheritBlockchain{
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
     }
 
-    async simulateNewBlock(block, revertAutomatically, callback){
+    async simulateNewBlock(block, revertAutomatically, revertActions, callback){
 
-        let result;
+        if (revertActions === undefined)
+            revertActions = new RevertActions(this);
 
-        let revertActions = new RevertActions(this);
+        revertActions.push( { name: "breakpoint" } );
+
         let revertException = false;
+
+        let hashAccountantTree = [];
 
         try{
 
+
+            hashAccountantTree[0] = this.accountantTree.serializeMiniAccountant();
+
             //updating reward
-            result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions )
+            let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions )
 
             //reward
             if (result === null || result === undefined)
@@ -60,9 +67,9 @@ class MiniBlockchain extends  inheritBlockchain{
 
             block.data.transactions.processBlockDataTransactions( block, 1, revertActions);
 
-            result = await callback();
+            let callbackDone = await callback();
 
-            if (result === false)
+            if (callbackDone === false)
                 throw {message: "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock"};
 
         } catch (ex){
@@ -76,6 +83,21 @@ class MiniBlockchain extends  inheritBlockchain{
             if (revertException || revertAutomatically){
 
                 revertActions.revertOperations();
+
+                hashAccountantTree[1] = this.accountantTree.serializeMiniAccountant();
+
+                console.log("mini blockchain-fork");
+                for (let i=0; i<hashAccountantTree.length; i++) {
+                    console.warn("accountantTree", i,"   ", hashAccountantTree[i].toString("hex"), revertException);
+
+
+                    if( revertException )
+                        if (!this.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])){
+                            console.error("************************************************");
+                            console.error("accountantTree", i, "    ", this.accountantTree.serializeMiniAccountant());
+                            console.error("************************************************");
+                        }
+                }
 
                 if (revertException)
                     return false;
@@ -103,9 +125,13 @@ class MiniBlockchain extends  inheritBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
 
-        if (await this.simulateNewBlock(block, false, async ()=>{
-            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock );
-        })===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
+        if (await this.simulateNewBlock(block, false, revertActions,
+
+                async ()=>{
+                    return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
+                }
+
+            )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
 
         if (saveBlock)
             if (! (await this.accountantTree.saveMiniAccountant(true)))

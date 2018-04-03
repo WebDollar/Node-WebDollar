@@ -184,6 +184,9 @@ class InterfaceBlockchainFork {
 
             //making a copy of the current blockchain
 
+            let hashAccountantTree = [];
+            hashAccountantTree[0] = this.blockchain.accountantTree.serializeMiniAccountant();
+
             try {
 
                 this.preForkClone();
@@ -192,6 +195,8 @@ class InterfaceBlockchainFork {
                 console.error("preForkBefore raised an error", exception);
                 return false;
             }
+
+            hashAccountantTree[1] = this.blockchain.accountantTree.serializeMiniAccountant();
 
             try {
 
@@ -206,6 +211,8 @@ class InterfaceBlockchainFork {
                 revertActions.revertOperations();
                 await this.revertFork();
 
+                hashAccountantTree[2] = this.blockchain.accountantTree.serializeMiniAccountant();
+
                 return false;
             }
 
@@ -215,7 +222,6 @@ class InterfaceBlockchainFork {
 
             console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
             console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-
 
             //TODO use the revertActions to revert the process
 
@@ -233,7 +239,9 @@ class InterfaceBlockchainFork {
 
                 }
 
+
             } catch (exception){
+
                 console.error('-----------------------------------------');
                 console.error("saveFork includeBlockchainBlock1 raised exception", exception);
                 console.error("index", index, "forkStartingHeight", this.forkStartingHeight, "fork", this);
@@ -248,20 +256,34 @@ class InterfaceBlockchainFork {
                 //reverting back to the clones, especially light settings
                 await this.revertFork();
 
+                hashAccountantTree[3] = this.blockchain.accountantTree.serializeMiniAccountant();
             }
 
 
             await this.postForkTransactions(forkedSuccessfully);
 
-            //successfully, let's delete the backup blocks
-            if (forkedSuccessfully)
-                this._deleteBackupBlocks();
-
             //propagating valid blocks
             if (forkedSuccessfully) {
+
+                //successfully, let's delete the backup blocks
+                this._deleteBackupBlocks();
+
                 await this.blockchain.saveBlockchain();
                 this.blockchain.mining.resetMining();
             }
+
+            console.log("interface-blockchain-fork");
+            for (let i=0; i<hashAccountantTree.length; i++)
+                if (hashAccountantTree [i] !== undefined) {
+                    console.warn("accountantTree", i,"   ", hashAccountantTree[i].toString("hex"));
+
+                    if(!forkedSuccessfully)
+                        if (!this.blockchain.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])){
+                            console.error("************************************************");
+                            console.error("accountantTree", i, "    ", this.blockchain.accountantTree.serializeMiniAccountant().toString("hex"));
+                            console.error("************************************************");
+                        }
+                }
 
             return forkedSuccessfully;
         });

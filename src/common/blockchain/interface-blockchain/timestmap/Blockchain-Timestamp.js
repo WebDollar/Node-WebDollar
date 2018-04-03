@@ -64,7 +64,7 @@ class BlockchainTimestamp{
             });
 
         } catch (exception){
-
+            console.error("error sending the UTC time", exception);
         }
 
     }

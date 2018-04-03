@@ -76,10 +76,16 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(  ()=>{
-                        return  this.blockchain.simulateNewBlock(nextBlock, true, ()=>{
-                            return this._simulatedNextBlockMining(nextBlock);
-                        });
+                let revertActions = undefined;
+                if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
+
+                    ()=>{
+
+                        return  this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
+                            ()=>{
+                                return this._simulatedNextBlockMining(nextBlock);
+                            });
+
                     }) === false) throw {message: "Mining1 returned False"};
 
 

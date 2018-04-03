@@ -71,7 +71,7 @@ class InterfaceBlockchain {
         return true;
     }
 
-    async simulateNewBlock(block, revertAutomatically, callback){
+    async simulateNewBlock(block, revertAutomatically, revertActions, callback){
         return await callback();
     }
 
