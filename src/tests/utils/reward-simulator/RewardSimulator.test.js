@@ -76,5 +76,34 @@ describe('RewardSimulator', () => {
         }
 
     });
+    
+    it('reward simulator test - weekly reward reduction', ()=>{
+
+        let TOTAL_SUPPLY = 42000000000;
+        
+        let GENESIS_PERCENT = 9.99 / 100; //9.99%
+        let GENESIS_SUPPLY = TOTAL_SUPPLY * GENESIS_PERCENT;    
+        
+        let MINING_REWARD = TOTAL_SUPPLY - GENESIS_SUPPLY;
+        let INITIAL_REWARD_PER_BLOCK = 3000;
+        
+        console.log("GENESIS_SUPPLY=", GENESIS_SUPPLY);
+        console.log("MINING_REWARD=", MINING_REWARD);
+        
+        //BEGIN SIMUALTION
+        let weeksPerYear = 52;
+        let numWeeks = (365 * 100 + 25) / 7; //~ 52 * 100; 25 is from 366-day years
+        let minedWebd = 0;
+        let actualReward = INITIAL_REWARD_PER_BLOCK;
+        let reducingFactor = 0.24 / 100; //every week we reduce the reward by 1%
+        
+        for (let i = 0; i < numWeeks; ++i) {
+            minedWebd += actualReward * 3 * 60 * 24 * 7; //sum the current week's reward
+            actualReward -= actualReward * reducingFactor; //reduce the reward per block with reducingFactor %
+        }
+        
+        console.log("WEBD mined after 100 years=", minedWebd);
+        
+    });
 
 });
