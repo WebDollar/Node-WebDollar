@@ -67,7 +67,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         if ( resultUpdate === null) {
 
             if (this.root.deleteEmptyAddresses ||   //TODO Window Transactions for Purging
-                this.blockchain.accountantTree.getAccountNonce(address) === 0 ) {
+                this.getAccountNonce(address) === 0 ) {
 
                 this.delete(address);
                 return null;

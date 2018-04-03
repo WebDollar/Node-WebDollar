@@ -1,4 +1,5 @@
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 
 class TestsHelper {
 
@@ -172,6 +173,27 @@ class TestsHelper {
         let product = [];
         this.backCartesianProduct(0, maxLength, product, radixTestingArray, result);
         return result;
+    }
+
+    generateAddresses(count){
+
+        let list = [];
+
+        while (list.length < count){
+            let address = InterfaceBlockchainAddressHelper.generateAddress();
+
+            let found = false;
+            for (let j = 0; j < list.length; j++)
+                if (list[j].address === address.address) {
+                    found = true;
+                    break;
+                }
+
+            if (!found)
+                list.push(address.address);
+        }
+
+        return list;
     }
 
 }
