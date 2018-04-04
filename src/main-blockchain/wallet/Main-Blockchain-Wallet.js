@@ -3,8 +3,8 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
-import consts from "../../consts/const_global";
-import BufferExtend from "../../common/utils/BufferExtended";
+import consts from 'consts/const_global'
+import BufferExtend from "common/utils/BufferExtended";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 import StatusEvents from "common/events/Status-Events"

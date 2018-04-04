@@ -7,7 +7,7 @@ class WebDollarCoins{
 
 
         //max safe int:     90071992547 40992
-        //rewards           41000000000.00000
+        //rewards           42000000000.00000
 
         this.WEBD = 10000;
         this.UNIT = 1;
