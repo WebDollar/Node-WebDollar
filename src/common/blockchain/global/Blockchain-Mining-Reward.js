@@ -1,4 +1,4 @@
-const BigNumber = require('bignumber.js');
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class BlockchainMiningReward{
 

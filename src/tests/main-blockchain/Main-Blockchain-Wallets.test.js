@@ -112,7 +112,7 @@ describe('test save wallet to local storage', () => {
 
     it('test export/import wallet privateKeys', async () => {
 
-        for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
+        for (let i = 0; i < Blockchain.Wallet.addresses.length; i++) {
             let privateKey = await Blockchain.Wallet.addresses[i].getPrivateKey();
             let totalMultiSig = 3;
             let requiredMultiSig = 2;
