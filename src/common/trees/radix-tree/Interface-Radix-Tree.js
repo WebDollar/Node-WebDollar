@@ -328,6 +328,13 @@ class InterfaceRadixTree extends InterfaceTree{
         //console.log("this.printLevelSearch() node", node);
         //this.printLevelSearch();
 
+        // try {
+        //     let serialization = this._serializeTree();
+        //     this._deserializeTree(serialization);
+        // } catch (exception){
+        //     console.error("ERRROR!!!");
+        // }
+
         node._changedNode(  );
 
 

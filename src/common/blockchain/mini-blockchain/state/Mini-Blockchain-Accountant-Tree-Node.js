@@ -375,8 +375,13 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             edge = node.parentEdge;
         }
 
+
+
         if (count === consts.ADDRESSES.ADDRESS.LENGTH)
             return true;
+        else
+        if (count > consts.ADDRESSES.ADDRESS.LENGTH)
+            throw {message: "Label is longer than any address"}
         else
             return false;
 

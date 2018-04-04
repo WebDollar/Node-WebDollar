@@ -13,7 +13,7 @@ class BlockchainGenesis{
         //this.difficultyTarget = new Buffer ( "00278112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ); //hard difficulty
         this.difficultyTarget = new Buffer ( "08898112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ); //hard difficulty
 
-        this.address = BufferExtended.fromBase("WEBD$gA$G*y&p*jb8Vg27Dub46mJY6mtahfs#94Tj$VNgPwkPhh7HgDsPw=="); // genesis address
+        this.address = BufferExtended.fromBase("WEBD$gBzsiV+$FARK8qSGqs09V6AEDBi#@fP6n7$"); // genesis address
     }
 
     validateGenesis(block){

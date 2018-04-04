@@ -84,8 +84,6 @@ consts.SPAM_GUARDIAN = {
 
 consts.ADDRESSES = {
 
-    USE_BASE64 : true,
-
     PRIVATE_KEY:{
         WIF:{
             VERSION_PREFIX : "80", //it is in HEX
@@ -99,11 +97,14 @@ consts.ADDRESSES = {
 
     ADDRESS:{
 
-        LENGTH : 32,
+        USE_BASE64 : true,
+
+        LENGTH : 20,
 
         WIF:{
+            LENGTH: 0,
+
             VERSION_PREFIX : "00", //ending BASE64 HEX
-            LENGTH : 32,
             CHECK_SUM_LENGTH : 4, //in bytes   //ending BASE64 HEX
 
 
@@ -111,7 +112,7 @@ consts.ADDRESSES = {
             //WEBD  584043
             //WEBD$ 584043FF
 
-            SUFFIX_BASE64 : "EC3F", //ending BASE64 HEX
+            SUFFIX_BASE64 : "FF", //ending BASE64 HEX
             //#w$ EC3F
             //%#$ 8FBF
 
@@ -121,8 +122,11 @@ consts.ADDRESSES = {
 
     },
 
-
 };
+
+let prefix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
+let suffix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
+consts.ADDRESSES.ADDRESS.WIF.LENGTH = consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2;
 
 
 consts.HASH_ARGON2_PARAMS = {
@@ -148,8 +152,8 @@ consts.DATABASE_NAMES = {
 
     DEFAULT_DATABASE: "defaultDB",
 
-    //TODO REPLACE with "walletDB"
-    WALLET_DATABASE: "defaultDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
+    //WALLET_DATABASE: "walletDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
+    WALLET_DATABASE: "defaultDB2", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
 
     BLOCKCHAIN_DATABASE:{
         FOLDER:"blockchainDB3",

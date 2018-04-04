@@ -19,11 +19,8 @@ class WebDollarCrypto {
         let newStr = '';
         for (let i = 0; i < result.length; i++) {
 
-            if (result[i] === 'O') newStr +=  '&'; else
-            if (result[i] === '0') newStr +=  '*'; else
-            if (result[i] === 'I') newStr +=  '%'; else
+            if (result[i] === 'O') newStr +=  '#'; else
             if (result[i] === 'l') newStr +=  '@'; else
-            if (result[i] === '+') newStr +=  '#'; else
             if (result[i] === '/') newStr +=  '$';
             else newStr += result[i];
 
@@ -44,11 +41,8 @@ class WebDollarCrypto {
         let newStr = '';
         for (let i = 0; i < str.length; i++) {
 
-            if (str[i] === '&') newStr +=  'O'; else
-            if (str[i] === '*') newStr +=  '0'; else
-            if (str[i] === '%') newStr +=  'I'; else
+            if (str[i] === '#') newStr +=  'O'; else
             if (str[i] === '@') newStr +=  'l'; else
-            if (str[i] === '#') newStr +=  '+'; else
             if (str[i] === '$') newStr +=  '/';
             else newStr += str[i];
         }

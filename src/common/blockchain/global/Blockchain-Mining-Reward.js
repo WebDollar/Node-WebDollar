@@ -1,3 +1,5 @@
+import WebDolalrCoins from "common/utils/coins/WebDollar-Coins"
+
 class BlockchainMiningReward{
 
     getReward(height){
@@ -8,8 +10,8 @@ class BlockchainMiningReward{
         if (height >= 0) {
 
             // ToDO - Budisteanu shift
-            let cycleNumber = Math.trunc(height / 6307200);
-            let reward = 3000/(1 << cycleNumber);
+            let cycleNumber = Math.trunc( height / 6307200 );
+            let reward = WebDolalrCoins.WEBD * 3000/(1 << cycleNumber);
             let smallestReward = 0.00001;
 
             if (reward < smallestReward)

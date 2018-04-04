@@ -1,3 +1,5 @@
+import BufferExtended from "../../../common/utils/BufferExtended";
+
 var assert = require('assert')
 
 import TestsHelper from 'tests/Tests.helper'
@@ -5,16 +7,17 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 import Blockchain from 'main-blockchain/Blockchain';
 import MiniBlockchainAccountantTree from 'common/blockchain/mini-blockchain/state/Mini-Blockchain-Accountant-Tree'
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
+import consts from 'consts/const_global'
 
 describe('MiniBlockchainAccountantTree', () => {
 
     it('save MiniBlockchainAccountantTree Tree', async () => {
 
         let array = [
-                     {addr:"WEBD$gAWbRegeuENxh8SXRJgns6pWZ#&rZHqG#bCPUh35Zkxpbo1s%HsPw==", val: "000661817095001" },
-                     {addr:"WEBD$gAvuc$kGH1LQSYo62mPT#YpaVu*pH54rGxWmXfD5NaXi#Nu8svsPw==", val:124213},
-                     {addr:"WEBD$gB3TtEpjSy6ts1zToLMm9YUa5NJgh6i2pLhzA$5FXQCe6R%i17sPw==", val: 123233 },
-                     {addr:"WEBD$gB34HQUEPTP4GgLJ9M4muGQfS5Q4EC1E1z$f&eASjs6eH1mbezsPw==", val:15323313}
+                     {addr:"WEBD$gCnD#W5qC6g#u0XD$8orGEhTYoCx+VDEH$$", val: "000661817095001" },
+                     {addr:"WEBD$gAePSrtnvtesE6#xeKsvV4dkFbjGI6Q9kD$", val:124213},
+                     {addr:"WEBD$gDojfYVXudrLz$XHyJQtFIYxBeS+fNQaoL$", val: 123233 },
+                     {addr:"WEBD$gBzsiV+$FARK8qSGqs09V6AEDBi#@fP6n7$", val:15323313}
                     ];
 
         let Tree = new MiniBlockchainAccountantTree(Blockchain.blockchain.db);
@@ -121,6 +124,7 @@ describe('MiniBlockchainAccountantTree', () => {
             list[i] = {
                 address: addresses[i],
                 value1: value,
+                value2: 0,
             };
 
             switch (Math.floor(Math.random() * 3 )){
@@ -183,12 +187,23 @@ describe('MiniBlockchainAccountantTree', () => {
 
         for (let i=0; i<list.length; i++) {
 
-            assert(Tree2.getBalance(list[i].address) === Tree.getBalance(list[i].address), "final balance is not right after deserialization "+Tree2.getBalance(list[i].address)+" "+Tree.getBalance(list[i].address)+" "+JSON.stringify(list[i]) );
-            assert(Tree2.getAccountNonce(list[i].address) === Tree.getAccountNonce(list[i].address), "final nonce is not right after deserialization "+Tree2.getAccountNonce(list[i].address+" "+Tree.getAccountNonce(list[i].address))+" "+JSON.stringify(list[i]));
+            let address = BufferExtended.fromBase(list[i].address);
+            assert (address.length === consts.ADDRESSES.ADDRESS.WIF.LENGTH, "Address is invalid!!!" + list[i].address + " " + consts.ADDRESSES.ADDRESS.WIF.LENGTH);
 
-            let sum = (list[i].value1 + list[i].value2);
-            if (sum === 0) sum = null;
-            assert(Tree2.getBalance(list[i].address) === sum, " value is not equal: " + (list[i].value1 + list[i].value2) + "  " + Tree2.getBalance(list[i].address));
+            try{
+                if (!Tree2.getBalance(list[i].address) === Tree.getBalance(list[i].address) ) throw {message: "didn't match 1", balance2: Tree2.getBalance(list[i].address), balance1: Tree.getBalance(list[i].address)}
+                if (!Tree2.getAccountNonce(list[i].address) === Tree.getAccountNonce(list[i].address)) throw {message: "didn't match 2", balance2: Tree2.getAccountNonce(list[i].address), balance1: Tree.getAccountNonce(list[i].address)};
+
+                let sum = (list[i].value1 + list[i].value2);
+                if (sum === 0) sum = null;
+
+                if (!Tree2.getBalance(list[i].address) === sum) throw {message: " value is not equal: " + (list[i].value1 + list[i].value2)}
+
+            } catch (exception){
+                console.error(exception, list[i].address);
+            }
+
+
         }
 
         assert(Tree2.calculateNodeCoins() === sum, "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sum.toString()+" ")
@@ -374,9 +389,16 @@ describe('MiniBlockchainAccountantTree', () => {
 
         for (let i=0; i<list.length; i++) {
 
-            assert(Tree2.getBalance(list[i].address) === Tree.getBalance(list[i].address), "final balance is not right after deserialization "+Tree2.getBalance(list[i].address)+" "+Tree.getBalance(list[i].address)+" "+JSON.stringify(list[i]) );
-            assert(Tree2.getAccountNonce(list[i].address) === Tree.getAccountNonce(list[i].address), "final nonce is not right after deserialization "+Tree2.getAccountNonce(list[i].address+" "+Tree.getAccountNonce(list[i].address))+" "+JSON.stringify(list[i]));
+            let address = BufferExtended.fromBase(list[i].address);
+            assert (address.length === consts.ADDRESSES.ADDRESS.WIF.LENGTH, "Address is invalid!!!" + list[i].address + " " + consts.ADDRESSES.ADDRESS.WIF.LENGTH);
 
+            try{
+                if (!Tree2.getBalance(list[i].address) === Tree.getBalance(list[i].address) ) throw {message: "didn't match 1", balance2: Tree2.getBalance(list[i].address), balance1: Tree.getBalance(list[i].address)}
+                if (!Tree2.getAccountNonce(list[i].address) === Tree.getAccountNonce(list[i].address)) throw {message: "didn't match 2", balance2: Tree2.getAccountNonce(list[i].address), balance1: Tree.getAccountNonce(list[i].address)};
+
+            } catch (exception){
+                console.error(exception, list[i].address);
+            }
         }
 
         assert(Tree2.calculateNodeCoins() === sum, "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sum.toString()+" ")
@@ -542,13 +564,19 @@ describe('MiniBlockchainAccountantTree', () => {
 
         for (let i=0; i<list.length; i++) {
 
-            assert(Tree2.getBalance(list[i].address) === Tree.getBalance(list[i].address), "final balance is not right after deserialization "+Tree2.getBalance(list[i].address)+" "+Tree.getBalance(list[i].address)+" "+JSON.stringify(list[i]) );
-            assert(Tree2.getAccountNonce(list[i].address) === Tree.getAccountNonce(list[i].address), "final nonce is not right after deserialization "+Tree2.getAccountNonce(list[i].address+" "+Tree.getAccountNonce(list[i].address))+" "+JSON.stringify(list[i]));
+            let address = BufferExtended.fromBase(list[i].address);
+            assert (address.length === consts.ADDRESSES.ADDRESS.WIF.LENGTH, "Address is invalid!!!" + list[i].address + " " + consts.ADDRESSES.ADDRESS.WIF.LENGTH);
 
+            try{
+                if (!Tree2.getBalance(list[i].address) === Tree.getBalance(list[i].address) ) throw {message: "didn't match 1", balance2: Tree2.getBalance(list[i].address), balance1: Tree.getBalance(list[i].address)}
+                if (!Tree2.getAccountNonce(list[i].address) === Tree.getAccountNonce(list[i].address)) throw {message: "didn't match 2", balance2: Tree2.getAccountNonce(list[i].address), balance1: Tree.getAccountNonce(list[i].address)};
+
+            } catch (exception){
+                console.error(exception, list[i].address);
+            }
         }
 
         assert(Tree2.calculateNodeCoins() === sumTotal, "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sumTotal.toString()+" ")
     });
-
 
 });
