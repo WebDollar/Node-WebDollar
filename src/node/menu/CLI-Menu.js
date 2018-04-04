@@ -229,6 +229,8 @@ class CLI{
             let addressPath = await this.question('Enter path for saving address: ');
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
+            let fileName = "WEBD$" + Blockchain.Wallet.addresses[addressId].unencodedAddress.toString("hex") + ".webd";
+            
             let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
 
             if (answer.result === false) {
@@ -239,7 +241,7 @@ class CLI{
 
             let jsonAddress = JSON.stringify(answer.data);
 
-            FileSystem.writeFile(addressPath+addressString+".webd", jsonAddress, 'utf8', (err) => {
+            FileSystem.writeFile(addressPath+fileName, jsonAddress, 'utf8', (err) => {
 
                 if (err) {
                     console.error(err);
@@ -292,7 +294,7 @@ class CLI{
             return false;
         }
 
-        //await Blockchain.blockchain.mining.minerAddress = Blockchain.Wallet.addresses[addressId].address;
+        Blockchain.blockchain.mining.minerAddress = Blockchain.Wallet.addresses[addressId].address;
 
         return true;
     }

@@ -78,6 +78,13 @@ class MainBlockchainWallet{
         return true;
     }
 
+    getUnencodedAddress(address) {
+        if (Buffer.isBuffer(address))
+            address = BufferExtended.toBase(address);
+
+        return this.getAddress(address).unencodedAddress;
+    }
+
     async serialize(serializePrivateKey = false) {
 
         let list = [Serialization.serializeNumber4Bytes(this.addresses.length)];
