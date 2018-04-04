@@ -90,7 +90,6 @@ class MiniBlockchain extends  inheritBlockchain{
                 for (let i=0; i<hashAccountantTree.length; i++) {
                     console.warn("accountantTree", i,"   ", hashAccountantTree[i].toString("hex"), revertException);
 
-
                     if( revertException )
                         if (!this.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])){
                             console.error("************************************************");

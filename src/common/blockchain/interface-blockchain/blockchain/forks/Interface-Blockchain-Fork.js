@@ -196,8 +196,6 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            hashAccountantTree[1] = this.blockchain.accountantTree.serializeMiniAccountant();
-
             try {
 
                 this.preFork(revertActions);
@@ -210,8 +208,6 @@ class InterfaceBlockchainFork {
 
                 revertActions.revertOperations();
                 await this.revertFork();
-
-                hashAccountantTree[2] = this.blockchain.accountantTree.serializeMiniAccountant();
 
                 return false;
             }

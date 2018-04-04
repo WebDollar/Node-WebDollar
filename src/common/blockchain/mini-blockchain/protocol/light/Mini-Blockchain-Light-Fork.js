@@ -1,6 +1,7 @@
 import consts from 'consts/const_global'
 import MiniBlockchainFork from "./../Mini-Blockchain-Fork"
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 
 class MiniBlockchainLightFork extends MiniBlockchainFork {
 
@@ -134,15 +135,14 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
             //blockchain sum
-            let blockchaimSum = this.blockchain.accountantTree.calculateNodeCoins();
+            this.blockchain.accountantTree.calculateNodeCoins();
 
             //fork sum
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
             let forkSum = this.blockchain.accountantTree.calculateNodeCoins();
 
-            //ToDo validate the sum
-            if ( forkSum  < blockchaimSum || forkSum <= 0){
-                throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: forkSum, blockchainSum: blockchaimSum};
+            if ( forkSum !== BlockchainMiningReward.getSumReward(diffIndex) || forkSum <= 0 ){
+                throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: forkSum, rewardShould: BlockchainMiningReward.getSumReward(diffIndex)};
             }
 
             this.blockchain.blocks.blocksStartingPoint = this.forkChainStartingPoint;
