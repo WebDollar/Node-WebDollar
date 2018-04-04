@@ -2,6 +2,7 @@ import {Node, Blockchain} from '../../index.js';
 const FileSystem = require('fs');
 const readline = require('readline');
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 
 class CLI{
 
@@ -123,8 +124,10 @@ class CLI{
             let address = Blockchain.Wallet.addresses[i].address;
 
             let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
-            if (balance === null) balance = 0;
-
+            if (balance === null)
+                balance = 0;
+            balance /= WebDollarCoins.WEBD;
+            
             if (address === miningAddress) {
                 console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
             } else {
@@ -135,7 +138,9 @@ class CLI{
         let balance = 0;
         if (miningAddress !== 'not specified') {
             balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
-            if (balance === null) balance = 0;
+            if (balance === null)
+                balance = 0;
+            balance /= WebDollarCoins.WEBD;
         }
         console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
 
