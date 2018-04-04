@@ -4,9 +4,46 @@ var assert = require('assert')
 
 import InterfaceBlockchainAddress from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address'
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
+import consts from 'consts/const_global'
 
 
 describe('testAddressGenerator', () => {
+
+    it('generate public addresses', ()=>{
+
+        for (let i=0; i<3; i++) {
+
+
+            let address = InterfaceBlockchainAddressHelper.generateAddress();
+
+            console.log("address", address.address);
+            console.log("unencodedAddress",address.unencodedAddress.toString("hex"));
+            console.log("publicKey", address.publicKey.toString("hex"));
+            console.log("privateKey", address.privateKey.privateKeyWIF.toString("hex"));
+            console.log("    ");
+            console.log("    ");
+
+        }
+
+        consts.ADDRESSES.ADDRESS.USE_BASE64 = !consts.ADDRESSES.ADDRESS.USE_BASE64;
+
+        for (let i=0; i<2; i++) {
+
+
+            let address = InterfaceBlockchainAddressHelper.generateAddress();
+
+            console.log("address", address.address);
+            console.log("unencodedAddress",address.unencodedAddress.toString("hex"));
+            console.log("publicKey", address.publicKey.toString("hex"));
+            console.log("privateKey", address.privateKey.privateKeyWIF.toString("hex"));
+            console.log("    ");
+            console.log("    ");
+
+        }
+
+        consts.ADDRESSES.ADDRESS.USE_BASE64 = !consts.ADDRESSES.ADDRESS.USE_BASE64;
+
+    });
 
     let privateKey  = null;
     it('should return privateKey', ()=>{

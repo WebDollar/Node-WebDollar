@@ -6,6 +6,7 @@ class StatusEvents{
     constructor(){
 
         this.emitter = new EventEmitter();
+        this.emitter.setMaxListeners(100);
 
     }
 

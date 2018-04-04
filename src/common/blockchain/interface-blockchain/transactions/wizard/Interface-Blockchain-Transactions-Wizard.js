@@ -1,4 +1,4 @@
-const BigNumber = require('bignumber.js');
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class InterfaceBlockchainTransactionsWizard{
 
@@ -16,7 +16,8 @@ class InterfaceBlockchainTransactionsWizard{
 
         try {
 
-            if (!(toAmount instanceof BigNumber)) toAmount = new BigNumber(toAmount);
+            if (typeof toAmount === 'string')
+                toAmount = parseInt(toAmount);
 
         } catch (exception){
 
@@ -25,7 +26,7 @@ class InterfaceBlockchainTransactionsWizard{
         }
 
         try {
-            if (!(fee instanceof BigNumber)) fee = new BigNumber(fee);
+            if (typeof fee ==='string') fee = parseInt(fee);
         } catch (exception){
 
             if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
@@ -53,7 +54,7 @@ class InterfaceBlockchainTransactionsWizard{
                     {
                         unencodedAddress: address,
                         publicKey: undefined,
-                        amount: toAmount.plus(fee)
+                        amount: toAmount +fee
                     }
                 ],
                 currencyTokenId: currencyTokenId
@@ -139,7 +140,11 @@ class InterfaceBlockchainTransactionsWizard{
         if (toAmount < 0)
             return 0;
 
-        return Math.min( Math.floor (0.1 * toAmount) + 1, 10 );
+        return  Math.max(
+                            Math.min(
+                                    Math.floor (0.1 * toAmount) + WebDollarCoins.WEBD,
+                                    10*WebDollarCoins.WEBD ),
+                            1*WebDollarCoins.WEBD );
 
     }
 

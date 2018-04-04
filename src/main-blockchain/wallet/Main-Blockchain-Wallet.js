@@ -3,8 +3,8 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
-import consts from "../../consts/const_global";
-import BufferExtend from "../../common/utils/BufferExtended";
+import consts from 'consts/const_global'
+import BufferExtend from "common/utils/BufferExtended";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 import StatusEvents from "common/events/Status-Events"
@@ -30,6 +30,8 @@ class MainBlockchainWallet{
         this.addresses = [];
 
         this.emitter = new EventEmitter();
+        this.emitter.setMaxListeners(100);
+
     }
 
     async _justCreateNewAddress(salt, emptyAddress){
@@ -79,10 +81,10 @@ class MainBlockchainWallet{
     getUnencodedAddress(address) {
         if (Buffer.isBuffer(address))
             address = BufferExtended.toBase(address);
-        
+
         return this.getAddress(address).unencodedAddress;
     }
-    
+
     async serialize(serializePrivateKey = false) {
 
         let list = [Serialization.serializeNumber4Bytes(this.addresses.length)];
@@ -465,7 +467,7 @@ class MainBlockchainWallet{
 
         address = this.getAddress(address);
 
-        if (await this.isAddressEncrypted(address)) {
+        if (await this.isAddressEncrypted(address) && oldPassword === undefined) {
 
             oldPassword = await InterfaceBlockchainAddressHelper.askForPassword();
             if (oldPassword === null)

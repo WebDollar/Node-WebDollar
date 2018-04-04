@@ -255,7 +255,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
             console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
-            //in case I didn't check this socket for the same block
             while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength && !global.TERMINATED ) {
 
 

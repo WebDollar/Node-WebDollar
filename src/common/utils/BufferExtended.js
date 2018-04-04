@@ -46,16 +46,19 @@ class BufferExtended {
     }
 
     toBase(buffer){
-        if (consts.ADDRESSES.USE_BASE64)  {
+
+        if (consts.ADDRESSES.ADDRESS.USE_BASE64)  {
             return WebDollarCrypto.encodeBase64(buffer);
         }
         else {
             return bs58.encode(buffer);
         }
+
     }
 
     fromBase(string){
-        if (consts.ADDRESSES.USE_BASE64)  {
+
+        if (consts.ADDRESSES.ADDRESS.USE_BASE64)  {
             return WebDollarCrypto.decodeBase64(string); //if it is string, it must be a Base string
         }
         else {

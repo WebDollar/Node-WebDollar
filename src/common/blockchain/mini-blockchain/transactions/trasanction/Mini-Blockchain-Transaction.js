@@ -2,8 +2,7 @@ import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockcha
 
 import MiniBlockchainTransactionFrom from './Mini-Blockchain-Transaction-From'
 import MiniBlockchainTransactionTo from './Mini-Blockchain-Transaction-To'
-
-const BigNumber = require('bignumber.js');
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
@@ -15,11 +14,13 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return new MiniBlockchainTransactionTo(this, to);
     }
 
-    processTransaction(multiplicationFactor = 1){
+    processTransaction(multiplicationFactor = 1, revertActions){
 
-        this.blockchain.accountantTree.updateAccountNonce( this.from.addresses[0].unencodedAddress, multiplicationFactor );
+        let nonce = this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions);
 
-        return InterfaceBlockchainTransaction.prototype.processTransaction.call(this, multiplicationFactor);
+        if (nonce === undefined || nonce === null) throw { message: "nonce is empty in process transaction" };
+
+        return InterfaceBlockchainTransaction.prototype.processTransaction.call(this, multiplicationFactor, revertActions);
     }
 
     _validateNonce(blockValidationType){
@@ -84,29 +85,24 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return nonce;
     }
 
-    processTransactionFees(multiplicationFactor=1, minerAddress = undefined){
+    processTransactionFees(multiplicationFactor=1, minerAddress = undefined, revertActions){
 
         //validate amount
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 
-        let diffInFees = inputSum.minus(outputSum);
+        let diffInFees = inputSum - outputSum;
 
-        if (diffInFees instanceof BigNumber === false)
-            throw {message: "diffInFees is not BigNumber",  address: minerAddress };
+        if (! WebDollarCoins.validateCoinsNumber( diffInFees ) )
+            throw {message: "diffInFees is not number",  address: minerAddress };
 
-        if (diffInFees.isLessThan(0))
+        if (diffInFees < 0)
             throw {message: "Accountant Tree is negative" };
 
-        try{
 
-            let result = this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees.multipliedBy(multiplicationFactor), this.from.currencyTokenId);
+        let result = this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees * multiplicationFactor, this.from.currencyTokenId, revertActions);
 
-            if (result === null) throw {message: "Error Updating Account for Fees"};
-
-        } catch (exception){
-            console.error("processTransactionFees error ", exception)
-        }
+        if (result === null) throw {message: "processTransactionTo - Error Updating Account for Fees"};
 
         return {fees: diffInFees, currencyTokenId: this.currencyTokenId};
 

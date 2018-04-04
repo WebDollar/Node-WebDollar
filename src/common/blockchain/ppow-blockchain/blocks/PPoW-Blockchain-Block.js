@@ -187,6 +187,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
             offset = this._deserializeInterlink(buffer, offset);
 
+            this.difficultyTarget = difficultyTarget;
+
             this.level = this.getLevel();
 
         } catch (exception){

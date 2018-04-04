@@ -49,40 +49,35 @@ class MiniBlockchainLight extends  MiniBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
 
         if (  !block.blockValidation.blockValidationType['skip-validation'] ) {
 
             console.log("block.height > ", block.height);
 
-            if ( await this.simulateNewBlock(block, false, async () => {
+            if ( await this.simulateNewBlock(block, false, revertActions,
 
-                return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock );
+                    async () => {
 
-            }) === false) throw {message: "Error Including Blockchain Light Block"};
+                        return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions);
 
-            console.log("this.blocks.height",block.height);
-            //console.log("this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS - 2", this.blocks.length - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 2);
+                    }) === false
 
-            if (saveBlock ){
+            ) throw {message: "Error Including Blockchain Light Block"};
 
-                // propagating a new block in the network
+            if (saveBlock )
                 this.propagateBlocks(block.height, socketsAvoidBroadcast)
-            }
-
 
         } else {
 
-            if (! (await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock )))
+            if (! (await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock, revertActions )))
                 throw {message: "Error Including Blockchain Light Block"};
 
-            //for debugging only
         }
 
         if (! (await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)))
             throw {message: "_recalculateLightPrevs failed"};
 
-        //console.log("BLOCK ", block.serializeBlock().toString("hex"));
         console.log(" hash", block.hash.toString("hex"));
         console.log(" difficulty", block.difficultyTarget.toString("hex"));
         console.log(" prev difficulty ", block.difficultyTargetPrev.toString("hex"));

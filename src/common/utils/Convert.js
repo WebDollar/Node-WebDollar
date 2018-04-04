@@ -1,6 +1,5 @@
 import BufferExtended from "./BufferExtended";
 
-const BigNumber = require('bignumber.js');
 const BigInteger = require('big-integer');
 
 class Convert{
@@ -27,21 +26,6 @@ class Convert{
         }
 
         return Buffer.from(str, "hex");
-    }
-    
-    bigIntegerToBigNumberHex(data){
-        
-        return new BigNumber(data.toString(16), 16);
-    }
-    
-    bigNumberToBigIntegerHex(data){
-        
-        return new BigInteger(data.toString(16), 16);
-    }
-    
-    bufferToBigNumberHex(data){
-    
-        return new BigNumber(data.toString("hex"), 16);
     }
     
     bufferToBigIntegerHex(data){

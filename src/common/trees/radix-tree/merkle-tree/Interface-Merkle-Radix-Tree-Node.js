@@ -10,9 +10,9 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
     // edges : [ of Edges]
     // hash
 
-    constructor(root, parent, edges, value, hash){
+    constructor(root, parent, parentEdge, edges, value, hash){
 
-        super(root, parent, edges, value);
+        super(root, parent, parentEdge, edges, value);
 
         this.hash = hash;
 

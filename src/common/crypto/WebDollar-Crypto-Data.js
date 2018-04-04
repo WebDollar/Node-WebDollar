@@ -1,5 +1,4 @@
 const BigInteger = require('big-integer');
-const BigNumber = require('bignumber.js');
 
 import BufferExtended from "../utils/BufferExtended";
 import WebDollarCrypto from './WebDollar-Crypto';
@@ -70,18 +69,6 @@ class WebDollarCryptoData {
         else
         if (type === "object" || typeof data === "object"){
 
-            if (data instanceof BigNumber) { //converting Big Number Format
-
-                data = {s: data.s, e: data.e, c: data.c};
-
-                let newData = [data.s, data.e]
-                for (let i=0; i<data.c.length; i++)
-                    newData.push(data.c[i]);
-
-                data = newData;
-                //console.log("data object", data, typeof data);
-            }
-
             if (data instanceof BigInteger) {
 
                 //converting number value into a buffer
@@ -89,9 +76,9 @@ class WebDollarCryptoData {
                 return;
             }
 
-            if (data instanceof BigNumber){
-                this.buffer = Serialization.serializeBigNumber(data);
-                return
+            if (typeof data === 'number'){
+                this.buffer = Serialization.serializeNumber8Bytes(data);
+                return;
             }
 
             if (data === null)
@@ -120,9 +107,6 @@ class WebDollarCryptoData {
 
             if (data.hasOwnProperty(property)) {
 
-                //console.log("data[property]", typeof data[property], data[property]);
-                //console.log("WebDollarCryptoData.createWebDollarCryptoData(data[property], false)", WebDollarCryptoData.createWebDollarCryptoData(data[property], false));
-
                 if (i === 0)
                     newValue = WebDollarCryptoData.createWebDollarCryptoData( data[property], true);
                 else {
@@ -145,7 +129,6 @@ class WebDollarCryptoData {
     }
 
     toHex(){
-        
         return this.buffer.toString('hex');
     }
 

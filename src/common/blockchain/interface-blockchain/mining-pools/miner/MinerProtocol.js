@@ -1,4 +1,5 @@
 import NodesList from 'node/lists/nodes-list';
+import Serialization from "common/utils/Serialization";
 
 class MinerProtocol {
 
@@ -73,7 +74,7 @@ class MinerProtocol {
             list.push( Serialization.serializeNumber1Byte(BufferExtended.fromBase(hashList[i].address).length) );
             list.push( BufferExtended.fromBase(hashList[i].address) );
 
-            list.push ( Serialization.serializeBigNumber(hashList[i].reward) );
+            list.push ( Serialization.serializeNumber8Bytes(hashList[i].reward) );
         }
 
         return Buffer.concat(list);

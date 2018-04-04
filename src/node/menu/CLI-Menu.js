@@ -1,6 +1,7 @@
 import {Node, Blockchain} from '../../index.js';
 const FileSystem = require('fs');
 const readline = require('readline');
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 class CLI{
 
@@ -271,12 +272,14 @@ class CLI{
             return false;
         }
 
-        return true;
-
         let addressString = Blockchain.Wallet.addresses[addressId].address;
-        let response = await Blockchain.Wallet.encryptAddress(addressString, newPassword, oldPassword)
+        let newPassword = await InterfaceBlockchainAddressHelper.askForPassword("Please enter a password(12 words separated by space):");
+        let response = await Blockchain.Wallet.encryptAddress(addressString, newPassword);
 
-        console.info(response.message);
+        if (response === true)
+            console.info("Address was encrypted:", addressString);
+        else
+            console.error("Address couldn't be encrypted:", addressString);
 
         return response.result;
     }

@@ -1,4 +1,5 @@
-var BigNumber = require('bignumber.js');
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 
 class TestsHelper {
 
@@ -80,35 +81,26 @@ class TestsHelper {
 
     }
 
-    makeRandomNumber(biggestNumber){
+    makeRandomNumber(biggestNumber, negative = false){
 
-        if ( biggestNumber === undefined) biggestNumber = 100000;
+        if ( biggestNumber === undefined) biggestNumber = WebDollarCoins.MAX_SAFE_COINS/10;
 
-        return Math.random()*biggestNumber +  300;
+        let number = Math.floor( Math.random() * biggestNumber);
+
+        if (negative)
+            if ( Math.floor(Math.random()) % 2 === 0 )
+                return - number;
+
+        return number;
     }
 
-    makeRandomBigNumber(noDecimalDigits=10, decimalDigits=10, negative=false){
-
-        let nonDecimalPart = this.makeDigitId(noDecimalDigits, true, negative);
-
-        if(decimalDigits > 0) {
-            let decimalPart = this.makeDigitId(decimalDigits, false);
-            return new BigNumber(nonDecimalPart + "." + decimalPart);
-        } else {
-            return new BigNumber(noDecimalDigits);
-        }
-    }
-
-    makeRandomBigNumbersArray(count, isDecimal=false, negative=false){
+    makeRandomNumbersArray(count, negative=false){
 
         if ( count === undefined) count = 10;
 
         let result = [];
         for (let i = 0; i < count; ++i) {
-            if (isDecimal === true)
-                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), Math.floor(Math.random()*10), negative);
-            else
-                result[i] = this.makeRandomBigNumber(Math.floor(Math.random()*10), 0, negative);
+            result[i] = this.makeRandomNumber(undefined, 0, negative);
         }
 
         return result;
@@ -181,6 +173,27 @@ class TestsHelper {
         let product = [];
         this.backCartesianProduct(0, maxLength, product, radixTestingArray, result);
         return result;
+    }
+
+    generateAddresses(count){
+
+        let list = [];
+
+        while (list.length < count){
+            let address = InterfaceBlockchainAddressHelper.generateAddress();
+
+            let found = false;
+            for (let j = 0; j < list.length; j++)
+                if (list[j].address === address.address) {
+                    found = true;
+                    break;
+                }
+
+            if (!found)
+                list.push(address.address);
+        }
+
+        return list;
     }
 
 }

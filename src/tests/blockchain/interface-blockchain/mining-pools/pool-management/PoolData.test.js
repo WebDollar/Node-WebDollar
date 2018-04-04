@@ -1,5 +1,4 @@
 const assert = require('assert');
-const BigNumber = require('bignumber.js');
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
@@ -10,19 +9,19 @@ describe('test pool leader DB', () => {
     let minersList = [
         {
             address: "WEBD$gDDEDYafT8ur7EkSQzkVAZU4egSgEkH25#9TM3zKKN#Yj#eH@HsPw==",
-            reward: new BigNumber(100),
+            reward: 100,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
         {
             address: "WEBD$gD$q9AkZPN29xeHnuS$ykXHCqpv1@NT@R5yn4PkY#9bcxztwcDsPw==",
-            reward: new BigNumber(20.1243),
+            reward: 201243,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
         {
             address: "WEBD$gCBzvQdKroa&yU4sp2X3y8*mf#q&r5k3BG3J3mBvogbE3U$SPHsPw==",
-            reward: new BigNumber(30.34556),
+            reward: 3034556,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
@@ -81,14 +80,14 @@ describe('test pool leader DB', () => {
         for (let i = 0; i < minersList.length; ++i){
 
             await pd.setMiner(minersList[i].address, minersList[i].reward);
-            pd.increaseMinerReward(minersList[i].address, new BigNumber(10.133333));
+            pd.increaseMinerReward(minersList[i].address, 10133333);
         }
 
         for (let i = 0; i < minersList.length; ++i){
 
-            let targetReward = minersList[i].reward.plus(new BigNumber(10.133333));
+            let targetReward = minersList[i].reward + 10133333;
             let minerReward = pd.getMinerReward(minersList[i].address);
-            assert(minerReward.isEqualTo(targetReward), "Miner updateReward is wrong");
+            assert(minerReward === targetReward, "Miner updateReward is wrong");
         }
         
         

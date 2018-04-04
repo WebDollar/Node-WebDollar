@@ -1,4 +1,3 @@
-const BigNumber = require('bignumber.js');
 const BigInteger = require('big-integer');
 
 import consts from 'consts/const_global';
@@ -35,7 +34,7 @@ class PoolLeaderProtocol {
         this._poolLeaderFee = poolLeaderFee;
 
         //TODO: Check is needed to store/load from database
-        this._poolLeaderReward = new BigNumber(0);
+        this._poolLeaderReward = 0;
 
         //TODO: Check is needed to store/load from database, Update hardcoded value
         this._bestHash = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex");
@@ -179,19 +178,19 @@ class PoolLeaderProtocol {
      */
     updateRewards(newReward) {
 
-        let newLeaderReward = newReward.multipliedBy(this._poolLeaderFee).dividedBy(100);
-        this._poolLeaderReward = this._poolLeaderReward.plus(newLeaderReward);
+        let newLeaderReward = Math.floor( newReward * this._poolLeaderFee / 100);
+        this._poolLeaderReward += newLeaderReward;
 
-        let minersReward = newReward.minus(newLeaderReward);
+        let minersReward = newReward - newLeaderReward;
 
         let response = this.computeHashDifficulties();
         let difficultyList = response.difficultyList;
         let difficultySum = response.sum;
-        let rewardPerDifficultyLevel = new BigNumber( minersReward.dividedBy(difficultySum) );
+        let rewardPerDifficultyLevel =  minersReward / difficultySum;
 
         //update rewards for each miner
         for (let i = 0; i < difficultyList.length; ++i) {
-            let incReward = new BigNumber( rewardPerDifficultyLevel.multipliedBy(difficultyList[i]) );
+            let incReward = rewardPerDifficultyLevel * difficultyList[i];
             this._poolData.increaseMinerRewardById(i, incReward);
         }
 
@@ -285,7 +284,7 @@ class PoolLeaderProtocol {
      */
     async resetRewards() {
         
-        this._poolLeaderReward = new BigNumber(0);
+        this._poolLeaderReward = 0;
         await this._poolData.resetRewards();
     }
 

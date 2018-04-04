@@ -132,18 +132,47 @@ class InterfaceBlockchainAddressHelper{
         //bitcoin original
         //let hash160 = CryptoJS.RIPEMD160(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
 
-        let hash160 =  WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(publicKey));
+        let hash160 =  WebDollarCrypto.RIPEMD160(WebDollarCrypto.SHA256(publicKey));
 
         if (showDebug)
             console.log("hash160 hex", hash160.toString('hex') ); //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
 
-        let unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
+        let unencodedAddress;
+       /* if (consts.ADDRESSES.ADDRESS.USE_BASE64 === false){
+            for (let i=220; i>0; i--) {
+                for (let j = 255; j > 0; j--) {
+                    for (let q = 255; q > 0; q--){
+                        /!*for (let w = 255; w > 0; w--) *!/{
+
+                            consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58 = i.toString(16) + j.toString(16) + q.toString(16) /!*+ w.toString(16)*!/;
+                            unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
+
+                            if (BufferExtended.toBase(unencodedAddress).indexOf("WEBD") === 0)
+                                console.log(i, j, q, /!*w,*!/ BufferExtended.toBase(unencodedAddress));
+
+
+                            if (BufferExtended.toBase(unencodedAddress).indexOf("WEB") === 0)
+                                console.log(i, j, q, BufferExtended.toBase(unencodedAddress));
+
+                            if (BufferExtended.toBase(unencodedAddress).indexOf("WBD") === 0)
+                                console.log(i, j, q, BufferExtended.toBase(unencodedAddress));
+
+                        }
+                    }
+
+                }
+                console.log(i, BufferExtended.toBase(unencodedAddress));
+
+            }
+        }
+*/
+         unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
 
         if (showDebug)
             console.log("unencodedAddress", unencodedAddress.toString("hex")); //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
 
-        if (showDebug)
-            console.log("address",BufferExtended.toBase(unencodedAddress)); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
+        //if (showDebug)
+            //console.log("address",BufferExtended.toBase(unencodedAddress).length); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
 
         return  {
             unencodedAddress: unencodedAddress,
@@ -156,8 +185,8 @@ class InterfaceBlockchainAddressHelper{
         if (!Buffer.isBuffer(address))
             address = BufferExtended.fromBase(address);
 
-        let prefix = ( consts.ADDRESSES.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
-        let suffix = ( consts.ADDRESSES.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
+        let prefix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
+        let suffix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
 
         //maybe address is already a
         if (address.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2)
@@ -179,9 +208,25 @@ class InterfaceBlockchainAddressHelper{
 
     static generateAddress(salt, privateKeyWIF){
 
-        let privateKey = InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, false, privateKeyWIF);
-        let publicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey.privateKeyWIF, false);
-        let address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, false);
+        let privateKey, publicKey, address;
+
+        let invalidAddress = true;
+
+        while (invalidAddress) {
+
+            privateKey = InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, false, privateKeyWIF);
+            publicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey.privateKeyWIF, false);
+            address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, false);
+
+            try {
+                if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address.address) !== null)
+                    invalidAddress = false;
+            } catch (exception){
+                console.error("Address is invalid", address.address, address.address.length);
+                InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address.address);
+            }
+
+        }
 
         return {
             address: address.address,
@@ -315,8 +360,8 @@ class InterfaceBlockchainAddressHelper{
         let suffixDetected = false;
         let versionDetectedBuffer = '';
 
-        let prefix = ( consts.ADDRESSES.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
-        let suffix = ( consts.ADDRESSES.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
+        let prefix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
+        let suffix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
 
         //prefix
         if ( addressWIF.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2 ){
@@ -330,7 +375,7 @@ class InterfaceBlockchainAddressHelper{
 
         if ( addressWIF.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + suffix.length/2 ) {
 
-            if ( addressWIF.indexOf( Buffer.from(suffix, "hex") ) === addressWIF.length - suffix.length/2 ) {
+            if ( addressWIF.lastIndexOf( Buffer.from(suffix, "hex") ) === addressWIF.length - suffix.length/2 ) {
                 suffixDetected = true;
                 addressWIF = BufferExtended.substr(addressWIF, 0, addressWIF.length - suffix.length/2 );
             }
@@ -371,16 +416,16 @@ class InterfaceBlockchainAddressHelper{
         if (addressWIF.length !== consts.ADDRESSES.ADDRESS.LENGTH){
 
             if (!prefixDetected) 
-                throw {message: "ADDRESS KEY  PREFIX  is not right"};
+                throw {message: "ADDRESS KEY  PREFIX  is not right", addressWIF: addressWIF};
 
             if (!suffixDetected)
-                throw {message: "ADDRESS KEY  SUFFIX is not right"};
+                throw {message: "ADDRESS KEY  SUFFIX is not right", addressWIF: addressWIF};
 
             if (!checkSumDetected)
-                throw {message: "ADDRESS KEY  CHECK SUM is not right"};
+                throw {message: "ADDRESS KEY  CHECK SUM is not right", addressWIF: addressWIF};
 
             if (!versionDetected)
-                throw {message: "ADDRESS KEY  VERSION PREFIX is not recognized"};
+                throw {message: "ADDRESS KEY  VERSION PREFIX is not recognized", addressWIF: addressWIF};
         }
 
         return {result: true, unencodedAddress: addressWIF};

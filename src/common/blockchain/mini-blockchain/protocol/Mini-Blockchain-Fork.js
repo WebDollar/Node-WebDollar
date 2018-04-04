@@ -35,28 +35,13 @@ class MiniBlockchainFork extends inheritFork{
 
     }
 
-    preForkClone(cloneBlocks=true, cloneAccountantTree=true){
+    preForkClone(cloneBlocks=true){
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
 
-        if (cloneAccountantTree) {
-
-            try {
-                //clone the Accountant Tree
-                this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
-            } catch (exception){
-                console.error("Error cloding Accountant Tree", exception);
-                return false;
-            }
-        }
-
-
     }
 
-    preFork(){
-
-        console.log("preFork root before", this.blockchain.accountantTree.calculateNodeCoins());
-        console.log("preFork positions", this.forkStartingHeight, this.blockchain.blocks.length-1);
+    preFork(revertActions){
 
         //remove transactions and rewards from each blocks
         for (let i = this.blockchain.blocks.length - 1; i >= this.forkStartingHeight; i--) {
@@ -64,31 +49,16 @@ class MiniBlockchainFork extends inheritFork{
             let block = this.blockchain.blocks[i];
 
             // remove reward
-
-            let answer = this.blockchain.accountantTree.updateAccount(block.data.minerAddress, block.reward.negated() );
+            this.blockchain.accountantTree.updateAccount(block.data.minerAddress, -block.reward, undefined, revertActions);
 
             // remove transactions
-            for (let j=block.data.transactions.transactions.length-1; j>=0; j--){
-                let transaction = block.data.transactions.transactions[j];
-                transaction.processTransaction(-1);
-            }
+            for (let j=block.data.transactions.transactions.length-1; j>=0; j--)
+                block.data.transactions.transactions[j].processTransaction( -1, revertActions );
 
         }
 
-
-        console.log("preFork root after ", this.blockchain.accountantTree.calculateNodeCoins());
     }
 
-    revertFork(){
-
-        //recover to the original Accountant Tree
-        this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
-
-    }
-
-    postFork(forkedSuccessfully){
-        return InterfaceBlockchainFork.prototype.postFork.call(this, forkedSuccessfully);
-    }
 
 }
 

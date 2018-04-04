@@ -23,7 +23,7 @@ class InterfaceBlockchainBlocks{
         StatusEvents.emit("blockchain/block-inserted", block);
 
         //delete old blocks when I am in light node
-        if (this.blockchain.agent.light){
+        if (this.blockchain.agent !== undefined && this.blockchain.agent.light){
 
             let index = this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
             while (this[index] !== undefined){

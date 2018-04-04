@@ -6,7 +6,7 @@ consts.BLOCKCHAIN = {
 
     DIFFICULTY:{
         NO_BLOCKS : 10,
-        TIME_PER_BLOCK : 20, //in s, timestamp in UNIX format
+        TIME_PER_BLOCK : 5, //in s, timestamp in UNIX format
     },
 
     TIMESTAMP:{
@@ -37,12 +37,17 @@ consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LA
 consts.MINI_BLOCKCHAIN = {
 
     TOKENS: {
-        OTHER_TOKEN_LENGTH: 24,
+
+        OTHER_TOKENS:{
+            LENGTH: 24,
+            ACTIVATED: -1, // not activated
+        },
 
         WEBD_TOKEN:{
             LENGTH: 1,
             VALUE: 0x01,
-        },
+        }
+
     }
 };
 
@@ -68,9 +73,16 @@ consts.TRANSACTIONS = {
 
 };
 
-consts.ADDRESSES = {
+consts.SPAM_GUARDIAN = {
 
-    USE_BASE64 : true,
+    TRANSACTIONS:{
+        MAXIMUM_IDENTICAL_INPUTS: 10,
+        MAXIMUM_IDENTICAL_OUTPUTS: 500,
+    }
+
+};
+
+consts.ADDRESSES = {
 
     PRIVATE_KEY:{
         WIF:{
@@ -85,11 +97,14 @@ consts.ADDRESSES = {
 
     ADDRESS:{
 
-        LENGTH : 32,
+        USE_BASE64 : true,
+
+        LENGTH : 20,
 
         WIF:{
+            LENGTH: 0,
+
             VERSION_PREFIX : "00", //ending BASE64 HEX
-            LENGTH : 32,
             CHECK_SUM_LENGTH : 4, //in bytes   //ending BASE64 HEX
 
 
@@ -97,7 +112,7 @@ consts.ADDRESSES = {
             //WEBD  584043
             //WEBD$ 584043FF
 
-            SUFFIX_BASE64 : "EC3F", //ending BASE64 HEX
+            SUFFIX_BASE64 : "FF", //ending BASE64 HEX
             //#w$ EC3F
             //%#$ 8FBF
 
@@ -107,8 +122,11 @@ consts.ADDRESSES = {
 
     },
 
-
 };
+
+let prefix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
+let suffix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
+consts.ADDRESSES.ADDRESS.WIF.LENGTH = consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2;
 
 
 consts.HASH_ARGON2_PARAMS = {
@@ -133,9 +151,15 @@ consts.HASH_ARGON2_PARAMS = {
 consts.DATABASE_NAMES = {
 
     DEFAULT_DATABASE: "defaultDB",
-    WALLET_DATABASE: "walletDB",
-    BLOCKCHAIN_DATABASE: "blockchainDB3",
-    BLOCKCHAIN_DATABASE_FILE_NAME : 'blockchain4.bin',
+
+    //WALLET_DATABASE: "walletDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
+    WALLET_DATABASE: "defaultDB2", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
+
+    BLOCKCHAIN_DATABASE:{
+        FOLDER:"blockchainDB3",
+        FILE_NAME : 'blockchain4.bin',
+    },
+
     POOL_DATABASE: "poolDB",
     VALIDATE_DATABASE: "validateDB",
     TESTS_DATABASE: "testDB",
@@ -148,7 +172,7 @@ consts.MINING_POOL = {
     WINDOW_SIZE: 16,
     BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
 
-    MINING_FEE_THRESHOLD: 0.1
+    MINING_FEE_THRESHOLD: 100,
 
 };
 
@@ -160,8 +184,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.264",
-        VERSION_COMPATIBILITY: "0.264",
+        VERSION: "0.270",
+        VERSION_COMPATIBILITY: "0.270",
         PROTOCOL: "WebDollar",
 
 

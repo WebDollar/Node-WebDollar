@@ -40,8 +40,8 @@ class InterfaceBlockchain {
 
         this.mining = undefined;
 
-        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE_FILE_NAME;
-        this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE);
+        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME;
+        this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER);
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
         this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator( this );
@@ -71,11 +71,11 @@ class InterfaceBlockchain {
         return true;
     }
 
-    async simulateNewBlock(block, revertAutomatically, callback){
+    async simulateNewBlock(block, revertAutomatically, revertActions, callback){
         return await callback();
     }
 
-    async blockIncluded(block){
+    async _blockIncluded(block){
 
     }
 
@@ -87,7 +87,7 @@ class InterfaceBlockchain {
      * @param socketsAvoidBroadcast
      * @returns {Promise.<boolean>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
 
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
@@ -108,7 +108,10 @@ class InterfaceBlockchain {
 
         this.blocks.addBlock(block);
 
-        await this.blockIncluded(block);
+        if (revertActions !== undefined)
+            revertActions.push({name: "block-added", height: this.blocks.length-1 });
+
+        await this._blockIncluded(block);
 
         if (saveBlock) {
             await this.saveNewBlock(block);
@@ -397,10 +400,8 @@ class InterfaceBlockchain {
 
                 if (this.blocks[i] === undefined)
                     console.error("PROPAGATE ERROR"+i, this.blocks[i]);
-                else {
-                    console.log("PROPAGATING", this.blocks[i].hash.toString("hex"));
+                else
                     this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
-                }
 
             }
 

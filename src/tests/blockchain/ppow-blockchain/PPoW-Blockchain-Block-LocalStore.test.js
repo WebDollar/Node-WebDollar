@@ -45,11 +45,15 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
         assert(block.nonce === nonce,'ppow-block nonce differ after load: ' + block.nonce + '!==' + nonce);
         assert(block.data.minerAddress.toString() === data.minerAddress.toString(),'ppow-block data.minerAddress differ after load: ' + block.data.minerAddress + '!==' + data.minerAddress);
         assert(block.height === height,'ppow-block height differ after load: ' + block.height + '!==' + height);
-        
-        for (let link in block.interlink){
+
+        let i =0;
+
+        block.interlink.forEach((link)=>{
             assert(link.height === interlink[i].height, 'PPoW Block height differ ' + link.height + '!==' + interlink[i].height);
             assert(link.blockId.equals(interlink[i].blockId), 'PPoW Block blockId  differ ' + link.blockId + '!==' + interlink[i].blockId);
-        }
+
+            i++;
+        })
 
         response = await block.removeBlock();
         assert(response === true, 'remove: ' + response);

@@ -1,5 +1,3 @@
-const BigNumber = require('bignumber.js');
-
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
 
@@ -12,7 +10,7 @@ import MiniBlockchainAccountantTreeEvents from "./Mini-Blockchain-Accountant-Tre
 class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
     createRoot(){
-        this.root = new MiniBlockchainAccountantTreeNode(null, null, [], null);
+        this.root = new MiniBlockchainAccountantTreeNode(null, null, null, [], null);
         this.root.autoMerklify = true;
         this.root.deleteEmptyAddresses = false;
         this.root.root = this.root;
@@ -26,7 +24,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
      * @param tokenId
      * @returns {*}
      */
-    updateAccount(address, value, tokenId){
+    updateAccount(address, value, tokenId, revertActions){
 
         if (tokenId === undefined  || tokenId === '' || tokenId === null) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
@@ -41,16 +39,21 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         // in case it doesn't exist, let's create it
         if ( node === undefined || node === null)
-            node = this.add(address, {balances: [] });
+            node = this.add(address, {balances: []});
 
-        if (!node.isLeaf())
+        //it is not a leaf, hardly to believe
+        if (!node.isLeaf()) {
+            this.delete(address);
             throw {message: "couldn't updateAccount because node is not leaf", address: address};
+        }
 
         let resultUpdate = node.updateBalanceToken(value, tokenId);
 
+        if (revertActions !== undefined) revertActions.push ( { name: "revert-updateAccount", address: address, value:value, tokenId : tokenId } );
+
         //WEBD
-        if (tokenId.length === 1 && tokenId[0] === 1){
-            this.root.total = this.root.total.plus( value );
+        if (tokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH && tokenId[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE ){
+            this.root.total += value;
             this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
         }
 
@@ -60,19 +63,15 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         });
 
         //purging empty addresses
-        if (resultUpdate === null) {
+        if ( !node.hasBalances() ) {
 
-            //TODO Window Transactions for Purging
-            if (this.root.deleteEmptyAddresses) { //purging automatically
+            if (this.root.deleteEmptyAddresses ||   //TODO Window Transactions for Purging
+                this.getAccountNonce(address) === 0 ) {
+
                 this.delete(address);
                 return null;
-            }
 
-            if (node.nonce === 0){ //nonce = 0, let's delete the account because nobody used it.
-                this.delete(address);
-                return null;
             }
-
         }
 
         node._changedNode();
@@ -80,7 +79,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         return resultUpdate;
     }
 
-    updateAccountNonce(address, nonceChange){
+    updateAccountNonce(address, nonceChange, revertActions){
 
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null)
@@ -97,10 +96,20 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         node.nonce += nonceChange;
 
-        if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid"};
+        if (revertActions !== undefined) revertActions.push ( { name: "revert-updateAccountNonce", address: address, nonceChange: nonceChange } );
+
+        if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid", nonce: node.nonce};
 
         node.nonce = node.nonce % 0xFFFF;
         if (node.nonce < 0) node.nonce = node.nonce + 0xFFFF;
+
+        //force to delete first time miner
+        if (node.nonce === 0 && !node.hasBalances(address) ) { //TODO Window Transactions for Purging
+            this.delete(address);
+            return null;
+        }
+
+        node._changedNode();
 
         return node.nonce;
     }
@@ -155,7 +164,9 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         if (address === null) throw {message: "getAccountNonce - Your address is invalid", address: address };
 
         let node = this.search(address).node;
-        if (node === undefined || node === null) throw {message: "getAccountNonce - address not found", address: address };
+
+        if (node === undefined || node === null)
+            return null; //throw {message: "getAccounantNonce address not found", address: address, tokenId: tokenId };
 
         return node.nonce;
     }
@@ -212,11 +223,11 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         if (node === undefined) node = this.root;
 
-        let sum = new BigNumber(0).plus( node.getBalance(tokenId)  );
+        let sum = node.getBalance(tokenId);
 
         for (let i = 0; i < node.edges.length; i++)
             if (node.edges[i].targetNode !== undefined && node.edges[i].targetNode !== null)
-                sum = sum.plus( this.calculateNodeCoins( tokenId, node.edges[i].targetNode ) );
+                sum += this.calculateNodeCoins( tokenId, node.edges[i].targetNode );
 
         return sum;
 

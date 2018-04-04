@@ -20,7 +20,11 @@ describe('test Interface-Blockchain save/load/remove to/from local storage', () 
         let b1 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 1, blockchain.db );
         let b2 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 2, blockchain.db );
         let b3 = new InterfaceBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 3, blockchain.db );
-        blockchain.blocks = [b0, b1, b2, b3];
+
+        blockchain.blocks.addBlock(b0);
+        blockchain.blocks.addBlock(b1);
+        blockchain.blocks.addBlock(b2);
+        blockchain.blocks.addBlock(b3);
 
         response = await blockchain.saveBlockchain();
         assert(response === true, 'save: ' + response);
@@ -28,8 +32,6 @@ describe('test Interface-Blockchain save/load/remove to/from local storage', () 
         /*
             this test will fail because it requires real blocks
          */
-
-        //let response = blockchain.loadBlock();
 
         assert(response === true, 'load: ' + response);
 
@@ -48,7 +50,7 @@ describe('test Interface-Blockchain save/load/remove to/from local storage', () 
 
         assert(blockchain.blocks.length === 4, 'load: blocks.length=' + blockchain.blocks.length);
         
-        response = await blockchain.removeBlockchain();
+        response = await blockchain.removeBlockchain(0);
         assert(response === true, 'remove: ' + response);
     });
 

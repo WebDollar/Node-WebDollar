@@ -6,6 +6,7 @@ import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
 import Serialization from "common/utils/Serialization"
 import BufferExtended from "common/utils/BufferExtended"
 import consts from "consts/const_global";
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class InterfaceBlockchainTransaction{
 
@@ -142,11 +143,20 @@ class InterfaceBlockchainTransaction{
         this.from.validateFrom();
         this.to.validateTo();
 
+        if (!this.validateIdenticalAddresses(this.from.addresses)) return false;
+        if (!this.validateIdenticalAddresses(this.to.addresses)) return false;
+
         //validate amount
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 
-        if (inputSum.isLessThan(outputSum))
+        if (!WebDollarCoins.validateCoinsNumber(inputSum))
+            throw {message: "Transaction inputSum is invalid", inputSum: inputSum};
+
+        if (!WebDollarCoins.validateCoinsNumber(outputSum))
+            throw {message: "Transaction outputSum is invalid", inputSum: outputSum};
+
+        if (inputSum < outputSum)
             throw {message: "Transaction Validation Input is smaller than Output", input: inputSum, output: outputSum};
 
         if (!this.validateTransactionEveryTime(blockHeight, blockValidationType))
@@ -268,10 +278,10 @@ class InterfaceBlockchainTransaction{
      * It will update the Accountant Tree
      */
 
-    processTransaction(multiplicationFactor=1){
+    processTransaction(multiplicationFactor = 1 , revertActions){
 
-        this.from.processTransactionFrom(multiplicationFactor);
-        this.to.processTransactionTo(multiplicationFactor);
+        this.from.processTransactionFrom(multiplicationFactor, revertActions);
+        this.to.processTransactionTo(multiplicationFactor, revertActions);
 
         return true;
     }
@@ -280,7 +290,10 @@ class InterfaceBlockchainTransaction{
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 
-        let diffInFees = inputSum.minus(outputSum);
+        let diffInFees = inputSum - outputSum;
+
+        if (!WebDollarCoins.validateCoinsNumber(diffInFees))
+            return {message:"Fees are invalid"};
 
         return {fees: diffInFees, currencyTokenId: this.from.currencyTokenId};
     }
@@ -307,8 +320,20 @@ class InterfaceBlockchainTransaction{
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 
-        return outputSum.minus(inputSum);
+        return inputSum - outputSum;
     }
+
+
+    validateIdenticalAddresses(addresses){
+
+        for (let i=0; i<addresses.length; i++)
+            for (let j=i+1; j<addresses.length; j++)
+                if (addresses[i].unencodedAddress.equals(addresses[j].unencodedAddress))
+                    throw {message: "address has identical inputs"};
+
+        return true;
+    }
+
 
 }
 

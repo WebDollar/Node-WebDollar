@@ -8,6 +8,7 @@ if ( typeof describe !== 'undefined') {
     require('tests/blockchain/mini-blockchain/Mini-Blockchain-Accountant-Tree.test');
 
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test');
+
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Difficulty.test');
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Block-LocalStore.test');
     require ('tests/blockchain/interface-blockchain/Interface-Blockchain-LocalStore.test');

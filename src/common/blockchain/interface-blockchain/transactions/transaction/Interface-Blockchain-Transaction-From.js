@@ -4,8 +4,7 @@ import consts from "consts/const_global"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
 import ed25519 from "common/crypto/ed25519";
-
-const BigNumber = require('bignumber.js');
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 //TODO MULTISIG TUTORIAL https://www.youtube.com/watch?v=oTsjMz3DaLs
 
@@ -68,8 +67,8 @@ class InterfaceBlockchainTransactionFrom{
             if (typeof fromObject.signature === "string")
                 fromObject.signature = new Buffer (fromObject.signature, "hex");
 
-            if (fromObject.amount  instanceof BigNumber === false)
-                fromObject.amount = new BigNumber(fromObject.amount);
+            if (typeof fromObject.amount === "string")
+                fromObject.amount = parseInt(fromObject.amount);
 
         });
 
@@ -114,7 +113,7 @@ class InterfaceBlockchainTransactionFrom{
         if (!Buffer.isBuffer(this.currencyTokenId))
             throw {message: 'To.currencyTokenId is not a buffer', currencyTokenId: this.currencyTokenId};
 
-        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKEN_LENGTH) )
+        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH) )
             throw { message: "To.currencyTokenId is not valid", currencyTokenId: this.currencyTokenId };
 
         //TODO validate currency
@@ -137,11 +136,11 @@ class InterfaceBlockchainTransactionFrom{
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH)
                 throw { message: "From.address.publicAddress "+index+" is not a buffer", address: fromObject, index: index };
 
-            if (fromObject.amount instanceof BigNumber === false )
-                throw { message: "From.address.amount "+index+" is not a number", address: fromObject, index: index };
+            if (!WebDollarCoins.validateCoinsNumber(fromObject.amount))
+                throw {message: 'From.Object Amount is not specified', amount: fromObject.amount, index:index} ;
 
-            if ( fromObject.amount.isLessThanOrEqualTo(0) )
-                throw {message: "Amount is an invalid number", address: fromObject, index: index };
+            if ( fromObject.amount <= 0 )
+                throw {message: "Amount is an invalid number", amount: fromObject.amount, index: index };
 
 
         });
@@ -159,11 +158,11 @@ class InterfaceBlockchainTransactionFrom{
     calculateInputSum(){
 
         //validate amount
-        let inputValues = [], inputSum = BigNumber(0);
+        let inputValues = [], inputSum = 0;
 
         for (let i=0; i<this.addresses.length; i++ ){
             inputValues.push( this.addresses[i].amount );
-            inputSum = inputSum.plus( this.addresses[i].amount );
+            inputSum += this.addresses[i].amount;
         }
 
         return inputSum;
@@ -242,7 +241,7 @@ class InterfaceBlockchainTransactionFrom{
             array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
             array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[i].publicKey ));
             array.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH, this.addresses[i].signature ));
-            array.push( Serialization.serializeBigNumber( this.addresses[i].amount ));
+            array.push( Serialization.serializeNumber8Bytes( this.addresses[i].amount ));
         }
 
         array.push(Serialization.serializeNumber1Byte( this.currencyTokenId.length ));
@@ -272,9 +271,8 @@ class InterfaceBlockchainTransactionFrom{
             address.signature= BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
             offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
 
-            let result = Serialization.deserializeBigNumber(buffer, offset);
-            address.amount = result.number;
-            offset = result.newOffset;
+            address.amount = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
+            offset += 7;
 
             this.addresses.push(address);
         }
@@ -289,7 +287,7 @@ class InterfaceBlockchainTransactionFrom{
 
     }
 
-    processTransactionFrom(multiplicationFactor=1){
+    processTransactionFrom(multiplicationFactor = 1, revertActions ){
         // overwritten in Mini Blockchain
     }
 

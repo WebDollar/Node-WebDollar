@@ -1,6 +1,6 @@
 import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
 import Serialization from 'common/utils/Serialization'
-var BigNumber = require('bignumber.js');
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
@@ -16,42 +16,33 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     setSum(sum){
 
-        if (typeof sum === "object"  && sum !== null && sum.constructor.name === "BigNumber")
-            this.sum =  sum;
-        else {
+        if (sum === undefined || sum === null)
+            sum = 0;
 
-            if (sum === undefined || sum === null)
-                sum = 0;
+        if (typeof sum === "string")
+            sum = parseInt(sum);
 
-            this.sum = new BigNumber(sum);
-        }
+        this.sum = Integer(sum);
 
     }
 
     isSumValid(){
-
-        if (this.sum === undefined && this.sum=== null)
-            return false;
-        if (typeof this.sum !== "object"  || this.sum.constructor.name !== "BigNumber")
-            return false;
-
-        return true;
-
+        return WebDollarCoins.validateCoinsNumber(this.sum);
     }
 
 
     setValue(value){
 
+
         if (typeof value === 'object' && value !== null){
 
-            if (typeof value.balances === "object"  && value.balances !== null && value.balance.constructor.name === "BigNumber") { 
+            if (typeof value.balances === "object"  && value.balances !== null && typeof value.balance === "number") {
             }
             else {
 
                 if ( value.balances === undefined || value.balances === null)
                     value.balances = 0;
 
-                value.balances = new BigNumber(value.balances);
             }
 
         }
@@ -60,15 +51,29 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
     }
 
+    // it is not done
+    serializeNode(){
+
+        let array = [ ];
+
+        array.push( Serialization.serializeNumber8Bytes(this.sum) );
+
+        if (this.value !== null )
+            array.push(Serialization.serializeNumber8Bytes(this.value.balances));
+
+        return Buffer.concat(
+
+            array,
+
+        );
+    }
+
     isBalancesValid(){
 
         if (typeof this.value !== 'object' || this.value === null)
             return false;
 
-        if ( this.value.balances === undefined && this.value.balances === null)
-            return false;
-
-        if (typeof this.value.balances !== "object"  || this.value.balances.constructor.name !== "BigNumber")
+        if (!WebDollarCoins.validateCoinsNumber(this.value.balances))
             return false;
 
         return true;
@@ -80,10 +85,10 @@ class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
 
         let array = [ ];
 
-        array.push( Serialization.serializeBigNumber(this.sum) );
+        array.push( Serialization.serializeNumber8Bytes(this.sum) );
 
         if (this.value !== null )
-            array.push(Serialization.serializeBigNumber(this.value.balances));
+            array.push(Serialization.serializeNumber8Bytes(this.value.balances));
 
         return Buffer.concat(
 

@@ -6,6 +6,7 @@ import MiniBlockchainBlock from '../blocks/Mini-Blockchain-Block'
 import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import MiniBlockchainTransactions from "../transactions/Mini-Blockchain-Transactions"
+import RevertActions from "common/utils/Revert-Actions/Revert-Actions"
 
 let inheritBlockchain;
 
@@ -31,86 +32,80 @@ class MiniBlockchain extends  inheritBlockchain{
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
     }
 
-    async simulateNewBlock(block, revertAutomatically, callback){
+    async simulateNewBlock(block, revertAutomatically, revertActions, callback){
 
-        let revert = {
-            revertNow: false,
-            reward: false,
-            transactions:{
-                start: 0,
-                end: -1,
-            }
-        };
+        if (revertActions === undefined)
+            revertActions = new RevertActions(this);
 
-        let exception = null;
+        revertActions.push( { name: "breakpoint" } );
 
-        let result;
+        let revertException = false;
+
+        let hashAccountantTree = [];
 
         try{
 
+
+            hashAccountantTree[0] = this.accountantTree.serializeMiniAccountant();
+
             //updating reward
-
-            result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined )
-
-            // let balances = this.accountantTree.listBalances( block.data.minerAddress );
-            // console.log("balances", balances );
+            let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions )
 
             //reward
             if (result === null || result === undefined)
                 throw {message: "reward couldn't be set to the minerAddress"};
 
-
-            revert.reward = true;
-            //validate transactions & tree
-            revert.transactions.start = 0;
-
             if (!block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType))
                 throw {message: "Validate Transactions is wrong"};
 
 
-            block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = true;
-            revert.transactions.end = block.data.transactions.processBlockDataTransactions(block, 1);
+            if (block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] !== true) {
 
-            //inheriting blockchain includeBlockchainBlock
-            result = await callback();
+                block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = true;
+                revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
+            }
 
-            if (result === false)
+            block.data.transactions.processBlockDataTransactions( block, 1, revertActions);
+
+            let callbackDone = await callback();
+
+            if (callbackDone === false)
                 throw {message: "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock"};
 
-
         } catch (ex){
-
-            exception = ex;
-            revert.revertNow = true;
-
+            revertException = true;
             console.error("MiniBlockchain simulateNewBlock 1 raised an exception", ex);
-
         }
 
         try{
 
             //revert back the database
-            console.log("reverting", revert.revertNow, revertAutomatically)
+            if (revertException || revertAutomatically){
 
-            if (revert.revertNow || revertAutomatically){
+                revertActions.revertOperations();
 
-                //revert transactions
-                block.data.transactions.processBlockDataTransactionsRevert(revert.transactions.end, revert.transactions.start, block, - 1);
-                block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = undefined;
+                hashAccountantTree[1] = this.accountantTree.serializeMiniAccountant();
 
-                //revert reward
-                if (revert.reward)
-                    this.accountantTree.updateAccount(block.data.minerAddress, block.reward.negated(), undefined);
+                console.log("mini blockchain-fork");
+                for (let i=0; i<hashAccountantTree.length; i++) {
+                    console.warn("accountantTree", i,"   ", hashAccountantTree[i].toString("hex"), revertException);
 
+                    if( revertException )
+                        if (!this.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])){
+                            console.error("************************************************");
+                            console.error("accountantTree", i, "    ", this.accountantTree.serializeMiniAccountant());
+                            console.error("************************************************");
+                        }
+                }
 
-                if (revert.revertNow)
+                if (revertException)
                     return false;
             }
 
 
         } catch (exception){
 
-            console.log("MiniBlockchain simulateNewBlock 2 raised an exception", exception);
+            console.log("MiniBlockchain Reverting Error raised an exception", exception);
             return false;
 
         }
@@ -127,14 +122,19 @@ class MiniBlockchain extends  inheritBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
 
-        if (await this.simulateNewBlock(block, false, async ()=>{
-            return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock );
-        })===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
+        if (await this.simulateNewBlock(block, false, revertActions,
 
-        if (! (await this.accountantTree.saveMiniAccountant(true)))
-            console.error("Error Saving Mini Accountant Tree");
+                async ()=>{
+                    return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
+                }
+
+            )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
+
+        if (saveBlock)
+            if (! (await this.accountantTree.saveMiniAccountant(true)))
+                console.error("Error Saving Mini Accountant Tree");
 
         return true;
     }

@@ -1,6 +1,5 @@
 const assert = require('assert');
 const BigInteger = require('big-integer');
-const BigNumber = require('bignumber.js');
 
 import consts from 'consts/const_global';
 import TestsHelper from 'tests/Tests.helper';
@@ -14,19 +13,19 @@ describe('test pool leader protocol', () => {
     let testMinersList = [
         {
             address: "WEBD$gDDEDYafT8ur7EkSQzkVAZU4egSgEkH25#9TM3zKKN#Yj#eH@HsPw==",
-            reward: new BigNumber(100),
+            reward: 100,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
         {
             address: "WEBD$gD$q9AkZPN29xeHnuS$ykXHCqpv1@NT@R5yn4PkY#9bcxztwcDsPw==",
-            reward: new BigNumber(20.1243),
+            reward: 201243,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
         {
             address: "WEBD$gCBzvQdKroa&yU4sp2X3y8*mf#q&r5k3BG3J3mBvogbE3U$SPHsPw==",
-            reward: new BigNumber(30.34556),
+            reward: 3034556,
             bestHash: TestsHelper.makeIdHex(32),
             difficulty: 0
         },
@@ -92,12 +91,12 @@ describe('test pool leader protocol', () => {
         //reset miners reward
         await poolLeader.resetRewards();
         
-        let newReward = new BigNumber(15000);
+        let newReward = 15000;
         poolLeader.updateRewards(newReward);
 
         //check leader reward
-        let leaderTargetReward = newReward.multipliedBy(poolLeader.getPoolLeaderFee()).dividedBy(100);
-        assert(poolLeader.getPoolLeaderReward().eq(leaderTargetReward), "Pool leader reward is wrong: " + poolLeader.getPoolLeaderReward().toString() + " !== " + leaderTargetReward.toString());
+        let leaderTargetReward = newReward * poolLeader.getPoolLeaderFee() / 100;
+        assert(poolLeader.getPoolLeaderReward() === leaderTargetReward, "Pool leader reward is wrong: " + poolLeader.getPoolLeaderReward().toString() + " !== " + leaderTargetReward.toString());
         
         //check miners reward
         for (let i = 0; i < minersList.length; ++i){

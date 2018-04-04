@@ -14,7 +14,7 @@ class InterfaceRadixMerkleTree extends InterfaceRadixTree {
     }
 
     createRoot(){
-        this.root = new InterfaceMerkleRadixTreeNode(null, null, [], null);
+        this.root = new InterfaceMerkleRadixTreeNode(null, null,null, [], null);
         this.root.autoMerklify = true;
         this.root.root = this.root;
     }

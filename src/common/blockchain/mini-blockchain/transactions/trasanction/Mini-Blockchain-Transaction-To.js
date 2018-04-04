@@ -1,35 +1,19 @@
 import InterfaceBlockchainTransactionTo from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction-To'
-
-const BigNumber = require('bignumber.js');
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class MiniBlockchainTransactionTo extends InterfaceBlockchainTransactionTo {
 
-    processTransactionTo(multiplicationFactor=1){
+    processTransactionTo(multiplicationFactor = 1, revertActions){
 
-        let lastPosition;
+        for (let i = 0; i < this.addresses.length; i++) {
 
-        try {
+            if (!WebDollarCoins.validateCoinsNumber(this.addresses[i].amount))
+                throw {message: "Amount is not a number", address: this.addresses[i]};
 
-            for (let i = 0; i < this.addresses.length; i++) {
-
-                if (this.addresses[i].amount instanceof BigNumber === false) throw {message: "amount is not BigNumber", address: this.addresses[i]};
-
-                let result = this.transaction.blockchain.accountantTree.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor), this.transaction.from.currencyTokenId);
-
-                if (result === null) throw {message: "error Updating Account", address: this.addresses[i]}
-
-                lastPosition = i;
-            }
-
-        } catch (exception){
-
-            for (let i=lastPosition; i >= 0 ; i--) {
-                let result = this.transaction.blockchain.accountantTree.updateAccount(this.addresses[i].unencodedAddress, this.addresses[i].amount.multipliedBy(multiplicationFactor).negated(), this.transaction.from.currencyTokenId);
-
-                if (result === null) throw {message: "error Updating Account", address: this.addresses[i]};
-            }
+            this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, this.addresses[i].amount * multiplicationFactor, this.transaction.from.currencyTokenId, revertActions);
 
         }
+
 
     }
 

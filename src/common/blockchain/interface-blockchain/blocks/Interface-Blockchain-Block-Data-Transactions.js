@@ -16,7 +16,6 @@ class InterfaceBlockchainBlockDataTransactions {
 
         this.hashTransactions = hashTransactions;
 
-
     }
 
     validateTransactions(blockHeight, blockValidationType){
@@ -36,6 +35,41 @@ class InterfaceBlockchainBlockDataTransactions {
 
             if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidationType))
                 throw {message: "validation failed at transaction", transaction: this.transactions[i]};
+        }
+
+        if (!this.validateDuplicateTransactions())
+            return {message: "validateDuplicateTransactions failed"};
+
+        return true;
+    }
+
+    validateDuplicateTransactions(){
+
+        let fromAddresses = {};
+        let toAddresses = {};
+
+        for (let i=0; i<this.transactions.length; i++){
+            let transaction = this.transactions[i];
+
+            transaction.from.addresses.forEach((fromAddress)=>{
+                let address = fromAddress.unencodedAddress.toString("hex");
+                fromAddresses[address]++;
+
+                if ( fromAddresses[address] > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS )
+                    throw {message: "spam guardian detected many identical inputs"};
+
+            });
+
+            transaction.to.addresses.forEach((toAddress)=>{
+
+                let address = toAddress.unencodedAddress.toString("hex");
+                toAddresses[address]++;
+
+                if ( toAddresses[address] > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS )
+                    throw {message: "spam guardian detected many identical inputs"};
+
+            });
+
         }
 
         return true;
@@ -100,7 +134,7 @@ class InterfaceBlockchainBlockDataTransactions {
         return offset;
     }
 
-    _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined ){
+    _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined, revertActions = undefined ){
 
         try {
 
@@ -110,9 +144,9 @@ class InterfaceBlockchainBlockDataTransactions {
                     throw {message: "couldn't process the transaction ", transaction: transaction};
             }
 
-            transaction.processTransaction (multiplicationFactor);
+            transaction.processTransaction(multiplicationFactor, revertActions );
 
-            transaction.processTransactionFees(multiplicationFactor, minerAddress);
+            transaction.processTransactionFees( multiplicationFactor, minerAddress, revertActions);
 
             return true;
         } catch (exception){
@@ -121,27 +155,12 @@ class InterfaceBlockchainBlockDataTransactions {
         }
     }
 
-    processBlockDataTransactions(block, multiplicationFactor = 1){
+    processBlockDataTransactions( block, multiplicationFactor = 1, revertActions){
 
-        let i;
-        for (i=0; i<block.data.transactions.transactions.length; i++)
-            if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
-                return i-1;
-
-        return block.data.transactions.transactions.length-1;
+        for (let i=0; i<block.data.transactions.transactions.length; i++)
+            this._processBlockDataTransaction( block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress, revertActions, );
     }
 
-    processBlockDataTransactionsRevert(endPos, startPos, block, multiplicationFactor = -1){
-
-        let i;
-        for (i = endPos; i >= startPos; i--)
-            if (i >= 0)
-                if ( ! this._processBlockDataTransaction(block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress))
-                    return i;
-
-        return i;
-
-    }
 
 
 }

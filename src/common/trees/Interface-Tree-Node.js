@@ -11,10 +11,11 @@ class InterfaceTreeNode {
     // value : data
     // edges : [ of Edges]
 
-    constructor(root, parent, edges, value){
+    constructor(root, parent, parentEdge, edges, value){
 
         if (edges === undefined)
             edges = [];
+
         if (value === undefined)
             value = null;
 
@@ -23,14 +24,14 @@ class InterfaceTreeNode {
         this.root = root;
 
         this.parent = parent;
+        this.parentEdge = parentEdge;
+
         this.edges = edges;
 
         this.value = value;
-
     }
 
     isLeaf(){
-
         return this.value !== null
     }
 
@@ -120,10 +121,10 @@ class InterfaceTreeNode {
         return new InterfaceTreeEdge(node);
     }
 
-    createNewNode(parent, edges=[], value=null, hash = null){
+    createNewNode(parent, parentEdge, edges=[], value=null, hash = null){
 
         if (parent === undefined ) parent = this;
-        return new this.constructor (this.root, parent, edges, value, hash);
+        return new this.constructor (this.root, parent,parentEdge, edges, value, hash);
     }
 
     validateTreeNode(){

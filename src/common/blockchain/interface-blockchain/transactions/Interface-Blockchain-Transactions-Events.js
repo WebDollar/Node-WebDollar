@@ -9,7 +9,8 @@ class InterfaceBlockchainTransactionsEvents{
 
         this.blockchain = blockchain;
         this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(200);
+        this.emitter.setMaxListeners(100);
+
     }
 
     findTransaction(txId){
