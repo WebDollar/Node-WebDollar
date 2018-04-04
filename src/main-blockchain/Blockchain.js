@@ -172,7 +172,8 @@ class Blockchain{
         this.synchronized = true;
         this.startMining();
 
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"} );
+        console.warn( "Blockchain Ready to Mine" );
+        StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine" } );
     }
 
     get loaded(){
