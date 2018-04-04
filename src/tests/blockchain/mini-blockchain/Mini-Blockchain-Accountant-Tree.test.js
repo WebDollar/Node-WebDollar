@@ -15,7 +15,7 @@ describe('MiniBlockchainAccountantTree', () => {
                      {addr:"WEBD$gAvuc$kGH1LQSYo62mPT#YpaVu*pH54rGxWmXfD5NaXi#Nu8svsPw==", val:124213},
                      {addr:"WEBD$gB3TtEpjSy6ts1zToLMm9YUa5NJgh6i2pLhzA$5FXQCe6R%i17sPw==", val: 123233 },
                      {addr:"WEBD$gB34HQUEPTP4GgLJ9M4muGQfS5Q4EC1E1z$f&eASjs6eH1mbezsPw==", val:15323313}
-                    ]
+                    ];
 
         let Tree = new MiniBlockchainAccountantTree(Blockchain.blockchain.db);
         let sum = 0;
@@ -377,22 +377,177 @@ describe('MiniBlockchainAccountantTree', () => {
             assert(Tree2.getBalance(list[i].address) === Tree.getBalance(list[i].address), "final balance is not right after deserialization "+Tree2.getBalance(list[i].address)+" "+Tree.getBalance(list[i].address)+" "+JSON.stringify(list[i]) );
             assert(Tree2.getAccountNonce(list[i].address) === Tree.getAccountNonce(list[i].address), "final nonce is not right after deserialization "+Tree2.getAccountNonce(list[i].address+" "+Tree.getAccountNonce(list[i].address))+" "+JSON.stringify(list[i]));
 
-            let sum = (list[i].value1 + list[i].value2);
-
-            //TODO WINDOW Transactions
-            if (sum === 0)
-                if ( (list[i].nonce1 + list[i].nonce2 + list[i].nonce3) !== 0)
-                    console.log("Address still has nonce", Tree2.getBalance(list[i].address))
-                else
-                    sum = null;
-
-            if (Tree2.getBalance(list[i].address) !== sum)
-                console.error("ERROR! BALANCE IS NOT RIGHT");
-
-            assert(Tree2.getBalance(list[i].address) === sum, " final balance value is not equal: " + (sum) + "  " + Tree2.getBalance(list[i].address));
         }
 
         assert(Tree2.calculateNodeCoins() === sum, "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sum.toString()+" ")
+    });
+
+
+    it('save MiniBlockchainAccountantTree Tree multiple tests with + - NONCES', async () => {
+
+        let Tree = new MiniBlockchainAccountantTree(Blockchain.blockchain.db);
+        const NUMBER_ADDRESSES = 100;
+        const NUMBER_TESTS = 1000;
+
+        let sumTotal = 0;
+        let addresses = TestsHelper.generateAddresses(NUMBER_ADDRESSES);
+
+        let list = [];
+
+        addresses.forEach((address)=>{
+
+            list.push({
+                address: address,
+                sumValue: 0,
+                sumNonce: 0,
+            })
+
+        });
+
+        for (let i=0; i<NUMBER_TESTS; i++){
+
+            let index = Math.floor ( Math.random() * NUMBER_ADDRESSES );
+
+            let address = list[index].address;
+            let tests = Math.floor( Math.random() * 100);
+
+            for (let i=0; i<tests; i++){
+
+                let test = Math.floor( Math.random()*6 );
+
+                let nonce = 0;
+                let value = 0;
+
+                switch (test){
+
+                    case 0:
+                        value = Math.floor( Math.random() * WebDollarCoins.MAX_SAFE_COINS/100 );
+                        break;
+
+                    case 1:
+                        nonce += Math.floor( Math.random() * WebDollarCoins.MAX_SAFE_COINS/100 );
+                        break;
+
+                    case 2:
+                        value = -Math.floor ( Math.random() *  list[index].sumValue);
+                        break;
+
+                    case 3:
+                        nonce = - Math.floor ( Math.random() * list[index].sumNonce );
+                        break;
+
+                    case 4:
+                        value = - list[index].sumValue ;
+                        break;
+
+                    case 5:
+                        nonce = - list[index].sumNonce;
+                        break;
+
+                }
+
+                if (value !== 0 ){
+
+                    try{
+
+                        Tree.updateAccount(address, value);
+
+                        if (value <= 0 && list[index].sumValue === 0) throw "Impossible value";
+
+                        list[index].sumValue += value;
+
+                        sumTotal += value;
+                    }catch (exception){
+
+                        if ( list[index].sumValue + value > 0) throw "It should return an error";
+
+                    }
+
+
+                } else
+                if (nonce !== 0){
+
+                    try{
+
+                        Tree.updateAccountNonce(address, value);
+
+                        if ( nonce <=0 && list[index].nonce === 0) throw "Impossible nonce";
+
+                        list[index].sumNonce += value;
+
+                    } catch (exception){
+
+                        if ( list[index].sumValue  > 0) throw "It should return an error";
+                        if ( list[index].sumNonce  > 0) throw "It should return an error";
+
+                    }
+
+
+                }
+
+            }
+
+
+        }
+
+        for (let i=0; i<list.length; i++) {
+
+            let sum = list[i].sumValue;
+
+            //TODO WINDOW Transactions
+            if ( sum === 0)
+                if ( list[i].sumNonce !== 0)
+                    console.log("Address still has nonce", Tree.getBalance(list[i].address));
+                else
+                    sum = null;
+
+            if (Tree.getBalance(list[i].address) !== sum)
+                console.error("ERROR! BALANCE IS NOT RIGHT");
+
+            assert(Tree.getBalance(list[i].address) === sum, " balance value is not equal: " + sum + "  " + Tree.getBalance(list[i].address));
+        }
+
+        for (let i=0; i<list.length; i++) {
+
+            let sum = list[i].sumNonce;
+
+            if ( sum === 0)
+                if (list[i].sumValue === 0){
+
+                    //TODO WINDOW Transactions
+                    Tree.getAccountNonce(list[i].address);
+
+                    assert(Tree.getAccountNonce(list[i].address) === null, " nonce 2 is not equal: " + 'null' + "  " + Tree.getAccountNonce(list[i].address));
+
+                    continue;
+                }
+
+
+            assert(Tree.getAccountNonce(list[i].address) === sum, " nonce 2 is not equal: " + sum + "  " + Tree.getBalance(list[i].address));
+        }
+
+        assert(!Tree.root.hash.sha256.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.sha256.toString("hex"));
+
+        let response = await Tree.saveMiniAccountant(true, "MiniBlockchainAccountantTree.test");
+
+        assert(response === true, 'save miniblockchain accountant tree : ' + response);
+
+        let Tree2 = new MiniBlockchainAccountantTree(Blockchain.blockchain.db);
+
+        response = await Tree2.loadMiniAccountant(undefined,undefined,true, "MiniBlockchainAccountantTree.test");
+        assert(response === true, 'load miniblockchain accountant tree: ' + response);
+
+        assert(Tree2.root.hash.sha256.equals(Tree.root.hash.sha256), " root hash is not the same: " +Tree2.root.hash.sha256.toString("hex")+"  "+Tree.root.hash.sha256.toString("hex"));
+
+
+        for (let i=0; i<list.length; i++) {
+
+            assert(Tree2.getBalance(list[i].address) === Tree.getBalance(list[i].address), "final balance is not right after deserialization "+Tree2.getBalance(list[i].address)+" "+Tree.getBalance(list[i].address)+" "+JSON.stringify(list[i]) );
+            assert(Tree2.getAccountNonce(list[i].address) === Tree.getAccountNonce(list[i].address), "final nonce is not right after deserialization "+Tree2.getAccountNonce(list[i].address+" "+Tree.getAccountNonce(list[i].address))+" "+JSON.stringify(list[i]));
+
+        }
+
+        assert(Tree2.calculateNodeCoins() === sumTotal, "Sums are not Equals "+" "+ Tree2.calculateNodeCoins().toString() +" "+sumTotal.toString()+" ")
     });
 
 
