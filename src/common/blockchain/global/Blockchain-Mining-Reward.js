@@ -1,4 +1,4 @@
-import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+const BigNumber = require('bignumber.js');
 
 class BlockchainMiningReward{
 
@@ -39,16 +39,16 @@ class BlockchainMiningReward{
         }
 
     }
-    
+
     _getContinuousReward(height) {
-        
+
         if (typeof height !== "number")
             throw ('height is not defined');
 
         if (height >= 0) {
             //TODO: implement continuous reward function
         }
-        
+
     }
 
 }

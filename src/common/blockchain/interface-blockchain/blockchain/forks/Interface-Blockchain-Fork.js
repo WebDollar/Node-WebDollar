@@ -3,7 +3,7 @@ import InterfaceBlockchainBlockValidation from "../../blocks/validation/Interfac
 import global from "consts/global"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import StatusEvents from "common/events/Status-Events";
-import RevertActions from "../../../../utils/Revert-Actions/Revert-Actions";
+import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
