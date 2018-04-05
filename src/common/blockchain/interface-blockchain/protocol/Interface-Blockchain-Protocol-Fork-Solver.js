@@ -149,7 +149,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 }
 
-                console.warn("discoverFork 6666" + newChainStartingPoint)
+                console.warn("discoverFork 6666" + newChainStartingPoint);
 
                 binarySearchResult = await this._calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength );
 

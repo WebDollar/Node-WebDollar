@@ -185,7 +185,7 @@ class InterfaceBlockchainFork {
             //making a copy of the current blockchain
 
             let hashAccountantTree = [];
-            hashAccountantTree[0] = this.blockchain.accountantTree.serializeMiniAccountant();
+            // hashAccountantTree[0] = this.blockchain.accountantTree.serializeMiniAccountant();
 
             try {
 
@@ -252,7 +252,7 @@ class InterfaceBlockchainFork {
                 //reverting back to the clones, especially light settings
                 await this.revertFork();
 
-                hashAccountantTree[3] = this.blockchain.accountantTree.serializeMiniAccountant();
+                // hashAccountantTree[3] = this.blockchain.accountantTree.serializeMiniAccountant();
             }
 
 
@@ -268,20 +268,20 @@ class InterfaceBlockchainFork {
                 this.blockchain.mining.resetMining();
             }
 
-            if (!forkedSuccessfully) {
-                console.log("interface-blockchain-fork");
-                for (let i = 0; i < hashAccountantTree.length; i++)
-                    if (hashAccountantTree [i] !== undefined) {
-                        console.warn("accountantTree", i, "   ", hashAccountantTree[i].toString("hex"));
-
-                        if (!forkedSuccessfully)
-                            if (!this.blockchain.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])) {
-                                console.error("************************************************");
-                                console.error("accountantTree", i, "    ", this.blockchain.accountantTree.serializeMiniAccountant().toString("hex"));
-                                console.error("************************************************");
-                            }
-                    }
-            }
+            // if (!forkedSuccessfully) {
+            //     console.log("interface-blockchain-fork");
+            //     for (let i = 0; i < hashAccountantTree.length; i++)
+            //         if (hashAccountantTree [i] !== undefined) {
+            //             console.warn("accountantTree", i, "   ", hashAccountantTree[i].toString("hex"));
+            //
+            //             if (!forkedSuccessfully)
+            //                 if (!this.blockchain.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])) {
+            //                     console.error("************************************************");
+            //                     console.error("accountantTree", i, "    ", this.blockchain.accountantTree.serializeMiniAccountant().toString("hex"));
+            //                     console.error("************************************************");
+            //                 }
+            //         }
+            // }
 
             return forkedSuccessfully;
         });

@@ -17,7 +17,7 @@ class NodeSignalingClientProtocol {
      */
 
     //initiator
-    initializeSignalingClientService1(socket, params){
+    _initializeSignalingClientService1(socket){
 
         //TODO protocol to request to connect me with somebody
 
@@ -173,7 +173,7 @@ class NodeSignalingClientProtocol {
     }
 
     //answer
-    initializeSignalingClientService2(socket, params){
+    _initializeSignalingClientService2(socket){
 
         socket.node.on("signals/client/answer/receive-initiator-signal", async (data) => {
 
@@ -285,8 +285,8 @@ class NodeSignalingClientProtocol {
 
     initializeSignalingClientService(socket, params) {
 
-        this.initializeSignalingClientService1(socket, params);
-        this.initializeSignalingClientService2(socket, params);
+        this._initializeSignalingClientService1(socket, params);
+        this._initializeSignalingClientService2(socket, params);
 
         this.subscribeClientToSignalingServer(socket, params);
     }

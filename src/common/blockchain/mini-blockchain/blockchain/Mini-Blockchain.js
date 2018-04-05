@@ -46,7 +46,7 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
 
-            hashAccountantTree[0] = this.accountantTree.serializeMiniAccountant();
+            // hashAccountantTree[0] = this.accountantTree.serializeMiniAccountant();
 
             //updating reward
             let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions )
@@ -85,21 +85,21 @@ class MiniBlockchain extends  inheritBlockchain{
 
                 revertActions.revertOperations();
 
-                hashAccountantTree[1] = this.accountantTree.serializeMiniAccountant();
-
-                if (revertActions) {
-                    console.log("mini blockchain-fork");
-                    for (let i = 0; i < hashAccountantTree.length; i++) {
-                        console.warn("accountantTree", i, "   ", hashAccountantTree[i].toString("hex"), revertException);
-
-                        if (revertException)
-                            if (!this.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])) {
-                                console.error("************************************************");
-                                console.error("accountantTree", i, "    ", this.accountantTree.serializeMiniAccountant());
-                                console.error("************************************************");
-                            }
-                    }
-                }
+                // hashAccountantTree[1] = this.accountantTree.serializeMiniAccountant();
+                //
+                // if (revertActions) {
+                //     console.log("mini blockchain-fork");
+                //     for (let i = 0; i < hashAccountantTree.length; i++) {
+                //         console.warn("accountantTree", i, "   ", hashAccountantTree[i].toString("hex"), revertException);
+                //
+                //         if (revertException)
+                //             if (!this.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])) {
+                //                 console.error("************************************************");
+                //                 console.error("accountantTree", i, "    ", this.accountantTree.serializeMiniAccountant());
+                //                 console.error("************************************************");
+                //             }
+                //     }
+                // }
 
                 if (revertException)
                     return false;

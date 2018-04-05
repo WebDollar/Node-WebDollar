@@ -6,7 +6,7 @@ let inheritedBlockchain;
 if (process.env.BROWSER) inheritedBlockchain = MiniBlockchainLight
 else inheritedBlockchain = MiniBlockchain;
 
-inheritedBlockchain = MiniBlockchainLight;
+//inheritedBlockchain = MiniBlockchainLight;
 
 class MainBlockchain extends  inheritedBlockchain{
 

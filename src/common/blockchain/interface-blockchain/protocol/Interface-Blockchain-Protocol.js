@@ -71,10 +71,13 @@ class InterfaceBlockchainProtocol {
 
     _validateBlockchainHeader(data){
 
+        if ( data=== undefined || data === null) throw {message: "data is not defined"};
+
         // validating data
         if (typeof data.chainLength !== 'number') throw {message: 'chainLength is not specified'};
         if (typeof data.height !== 'number') throw {message: 'height is not specified'};
         if (typeof data.header !== 'object') throw {message: 'header is not specified'};
+        if (data.header === undefined ) throw {message:'header.header is not specified'};
         if (data.header.hashPrev === undefined ) throw {message:'header.hashPrev is not specified'};
         if (data.header.hash === undefined) throw {message: 'header.hash is not specified'};
 
@@ -153,6 +156,9 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
+                    if (data === null || data.result !== true)
+                        throw {message: "last block is not valid"};
+
                     console.log("blockchain/header/new-block received", data.chainLength||0);
 
                     this._validateBlockchainHeader(data);
@@ -191,7 +197,7 @@ class InterfaceBlockchainProtocol {
                 } catch (exception) {
 
                     try {
-                        console.error("Socket Error - blockchain/new-block-header", exception, data.header.hash.toString("hex"));
+                        console.error("Socket Error - blockchain/new-block-header", exception, data);
                     } catch (exception) {}
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
@@ -353,7 +359,7 @@ class InterfaceBlockchainProtocol {
 
         } catch (exception) {
 
-            console.error("Socket Error - get/blockchain/header/last-block", exception);
+            console.error("Socket Error - get/blockchain/header/last-block", exception, data);
             return false;
         }
 
