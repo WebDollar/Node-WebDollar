@@ -2,6 +2,7 @@ const bs58 = require('bs58');
 
 import consts from "consts/const_global";
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+const safeCompare = require('safe-compare');
 
 class BufferExtended {
 
@@ -43,6 +44,11 @@ class BufferExtended {
 
         return  null;
 
+    }
+    
+    safeCompare(buffer1, buffer2){
+
+        return safeCompare(buffer1, buffer2);
     }
 
     toBase(buffer){

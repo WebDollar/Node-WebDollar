@@ -1,6 +1,7 @@
 let assert = require('assert');
 
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 
 describe('RewardSimulator', () => {
 
@@ -52,21 +53,21 @@ describe('RewardSimulator', () => {
         let smallestReward = 0.0001;
         let BPC = 6307200;
         for (let height = 0; height < BPC; height += 1024) {
-            reward = BlockchainMiningReward.getReward(height);
+            reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
             assert(reward === 3000, "Wrong reward for bock " + height + ": " + reward.toString() + "!==3000");
         }
 
         //TODO Budisteanu Shifts
         for (let cycle = 1; cycle <= 25; ++cycle) {
             let height = cycle * (BPC) - 1;
-            reward = BlockchainMiningReward.getReward(height);
+            reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
             let targetReward = 3000 / (1 << (cycle-1));
 
             if (targetReward < smallestReward) targetReward = smallestReward;
             assert(reward === targetReward, "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
 
             height = cycle * (BPC);
-            reward = BlockchainMiningReward.getReward(height);
+            reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
             targetReward = 3000 / (1 << cycle);
 
             if (targetReward < smallestReward) targetReward = smallestReward;

@@ -1,3 +1,5 @@
+import BufferExtended from 'common/utils/BufferExtended';
+
 let Argon2 = null;
 
 if (process.env.BROWSER) {
@@ -26,11 +28,7 @@ Argon2.verify = async (initialHash, data) => {
 
         //console.log("verify", myHash, initialHash)
 
-        if (myHash.length !== initialHash.length)
-            return false;
-
-        return initialHash.equals(myHash);
-
+        return BufferExtended.safeCompare(initialHash, myHash);
     }
     else
     if (typeof initialHash === 'string') {
