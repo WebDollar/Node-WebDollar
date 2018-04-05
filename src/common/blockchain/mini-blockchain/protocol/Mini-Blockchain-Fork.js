@@ -44,12 +44,12 @@ class MiniBlockchainFork extends inheritFork{
 
             let block = this.blockchain.blocks[i];
 
-            // remove reward
-            this.blockchain.accountantTree.updateAccount(block.data.minerAddress, -block.reward, undefined, revertActions);
-
             // remove transactions
             for (let j=block.data.transactions.transactions.length-1; j>=0; j--)
                 block.data.transactions.transactions[j].processTransaction( -1, revertActions );
+
+            // remove reward
+            this.blockchain.accountantTree.updateAccount( block.data.minerAddress, - block.reward, undefined, revertActions);
 
         }
 
