@@ -132,21 +132,17 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if ( binarySearchResult.position === -1 ) {
 
-                if (this.blockchain.agent.light) {
+                let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
 
-                    let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
+                if (answer === null) throw {message: "connection dropped info"};
+                if (answer === undefined || typeof answer.chainStartingPoint !== "number" )
+                    throw {message: "request-blockchain-info couldn't return real values"};
 
-                    if (answer === null) throw {message: "connection dropped info"};
-                    if (answer === undefined || typeof answer.chainStartingPoint !== "number" )
-                        throw {message: "request-blockchain-info couldn't return real values"};
+                newChainStartingPoint = answer.chainStartingPoint;
 
-                    newChainStartingPoint = answer.chainStartingPoint;
-
-                    if (newChainLength - newChainStartingPoint > consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS) {
-                        console.warn("LIGHT CHANGES from ", newChainStartingPoint, " to ", newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1);
-                        newChainStartingPoint = newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1;
-                    }
-
+                if (newChainLength - newChainStartingPoint > consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS) {
+                    console.warn("LIGHT CHANGES from ", newChainStartingPoint, " to ", newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1);
+                    newChainStartingPoint = newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1;
                 }
 
                 console.warn("discoverFork 6666" + newChainStartingPoint);
