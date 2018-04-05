@@ -57,6 +57,8 @@ class NodeSignalingServerProtocol {
 
     connectWebPeersInterval(){
 
+        //TODO instead of using Interval, to use an event based Protocol
+
         let listAcceptingWebPeerConnections = [] ;
 
         for (let i = 0; i < NodesList.nodes.length; i++)
@@ -92,8 +94,7 @@ class NodeSignalingServerProtocol {
                         console.log("Step 0 ", typeof client1, typeof client2, typeof previousEstablishedConnection, (previousEstablishedConnection ? previousEstablishedConnection.id : 'no-id'), (previousEstablishedConnection ? previousEstablishedConnection.status : 'no status') );
 
                     if (previousEstablishedConnection === null
-                        || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished )
-                        || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status === SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected )){
+                        || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status in [ SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected] )){
 
                         let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
@@ -102,20 +103,25 @@ class NodeSignalingServerProtocol {
 
                         // Step1, send the request to generate the INITIATOR SIGNAL
                         client1.node.sendRequestWaitOnce("signals/client/initiator/generate-initiator-signal", {
+
                             id: connection.id,
 
                             remoteAddress: client2.node.sckAddress.getAddress(false),
                             remoteUUID: client2.node.sckAddress.uuid,
+
                         }, connection.id ).then ( (initiatorAnswer) =>{
 
                             if ( initiatorAnswer === null || initiatorAnswer.initiatorSignal === undefined )
                                 SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
                             else
-                            if ( ((initiatorAnswer.accepted||false) === false) && ((initiatorAnswer.message || '') === "Already connected"))
+                            if ( initiatorAnswer.accepted === false && initiatorAnswer.message  === "Already connected")
                                 SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
                             else
+                            if ( initiatorAnswer.accepted === false && initiatorAnswer.message === "Full Room")
+                                SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionFullRoom);
+                            else
 
-                            if ( (initiatorAnswer.accepted||false) === true) {
+                            if ( initiatorAnswer.accepted === true) {
 
                                 SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating );
 
@@ -132,10 +138,13 @@ class NodeSignalingServerProtocol {
                                     if ( answer === null || answer === undefined || answer.answerSignal === undefined )
                                         SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
                                     else
-                                    if ( ((answer.accepted||false) === false) && (answer.message === "Already connected"))
+                                    if ( answer.accepted === false && answer.message === "Already connected")
                                         SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
                                     else
-                                    if ( (answer.accepted||false) === true) {
+                                    if ( answer.accepted === false && answer.message === "Full Room")
+                                        SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionFullRoom);
+                                    else
+                                    if ( answer.accepted === true) {
 
                                         if (process.env.DEBUG_SIGNALING_SERVER === 'true')  console.log("Step 2_0 - Answer Signal received  ", connection.id, answer );
 
@@ -159,11 +168,11 @@ class NodeSignalingServerProtocol {
                                              if ( result === null || result === undefined )
                                                 SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError);
                                              else
-                                             if ( ((answer.established||false) === false) && ((answer.message || '') === "Already connected"))
+                                             if ( answer.established === false && answer.message === "Already connected")
                                                 SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected);
                                              else {
 
-                                                if ((result.established || false) === true) {
+                                                if (result.established  === true) {
 
                                                     //connected
                                                     connection.refreshLastTimeConnected();

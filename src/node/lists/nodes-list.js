@@ -132,6 +132,24 @@ class NodesList {
         return list;
     }
 
+    countNodes(type){
+        if ( type === undefined) type = 'all';
+
+        let count = 0;
+
+        for (let i=0; i<this.nodes.length; i++)
+
+            if (typeof type === 'string') { // in case type is just a simple string
+                if (type === this.nodes[i].type || type === "all")
+                    count++;
+            }
+            else if (Array.isArray(type)) //in case type is an Array
+                if (this.nodes[i].type in type)
+                    count++;
+
+        return count;
+    }
+
 
     removeDisconnectedSockets(){
 

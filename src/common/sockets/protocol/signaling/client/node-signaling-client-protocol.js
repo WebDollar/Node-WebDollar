@@ -6,6 +6,9 @@ import NodesList from 'node/lists/nodes-list'
 class NodeSignalingClientProtocol {
 
     constructor(){
+
+        this.LIMIT_CONNECTIONS = consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS;
+
         console.log("NodeSignalingClientProtocol constructor");
     }
 
@@ -15,6 +18,8 @@ class NodeSignalingClientProtocol {
 
     //initiator
     initializeSignalingClientService1(socket, params){
+
+        //TODO protocol to request to connect me with somebody
 
         socket.node.on("signals/client/initiator/generate-initiator-signal", async (data) => {
 
@@ -28,12 +33,14 @@ class NodeSignalingClientProtocol {
                 if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null) //already connected in the past
                     return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
 
-                if (SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) !== null){
-                    //console.error("data.remoteUUID 1 already connected", data.remoteUUID);
+                if (SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) !== null)
                     return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
-                }
 
                 console.log("data.remoteUUID 1", data.remoteUUID, SignalingClientList);
+
+                if (NodesList.countNodes("webpeer") > this.LIMIT_CONNECTIONS )
+                    return socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, initiatorSignal: undefined, message: "Full Room" });
+
 
                 let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, undefined, data.remoteUUID);
                 let webPeer = webPeerSignalingClientListObject.webPeer;
@@ -78,6 +85,9 @@ class NodeSignalingClientProtocol {
             //search if the new protocol was already connected in the past
             if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null) //already connected in the past
                 return socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established:false, message: "Already connected"});
+
+            if ( NodesList.countNodes("webpeer") > this.LIMIT_CONNECTIONS )
+                return socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, { established:false, message: "Full Room" } );
 
             console.log("data.remoteUUID 5", data.remoteUUID);
 
@@ -129,6 +139,9 @@ class NodeSignalingClientProtocol {
             //search if the new protocol was already connected in the past
             if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null) //already connected in the past
                 return socket.node.sendRequest("signals/client/initiator/receive-ice-candidate/" + data.id, {established:false, message: "Already connected"});
+
+            if (NodesList.countNodes("webpeer") > this.LIMIT_CONNECTIONS )
+                return socket.node.sendRequest("signals/client/initiator/receive-ice-candidate/" + data.id, {established:false,  message: "Full Room" });
 
             console.log("data.remoteUUID 4", data.remoteUUID);
 
@@ -182,6 +195,9 @@ class NodeSignalingClientProtocol {
                     return socket.node.sendRequest("signals/client/answer/receive-initiator-signal/" + data.id, {accepted:false, message: "Already connected"});
                 }
 
+                if (NodesList.countNodes("webpeer") > this.LIMIT_CONNECTIONS )
+                    return socket.node.sendRequest("signals/client/answer/receive-initiator-signal/" + data.id, {established:false,  message: "Full Room" });
+
                 console.log("data.remoteUUID 2", data.remoteUUID);
 
                 let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal( data.initiatorSignal, undefined , data.remoteUUID );
@@ -227,6 +243,9 @@ class NodeSignalingClientProtocol {
                 //search if the new protocol was already connected in the past
                 if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null) //already connected in the past
                     return socket.node.sendRequest("signals/client/answer/receive-ice-candidate/" + data.id, {established:false, message: "Already connected"});
+
+                if ( NodesList.countNodes("webpeer") > this.LIMIT_CONNECTIONS  )
+                    return socket.node.sendRequest("signals/client/answer/receive-ice-candidate/" + data.id, {established:false,  message: "Full Room" });
 
                 console.log("data.remoteUUID 3", data.remoteUUID);
 

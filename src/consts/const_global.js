@@ -181,6 +181,7 @@ consts.MINING_POOL = {
 
 
 consts.SETTINGS = {
+
     UUID: uuid.v4(),
 
     NODE: {
@@ -213,6 +214,19 @@ consts.SETTINGS = {
         WALLET:{
             VERSION: "0.1"
         },
+
+        CONNECTIONS:{
+
+            NODES: {
+                MAXIMUM_CONNECTIONS: 100,
+            },
+
+            WEBRTC: {
+                MAXIMUM_CONNECTIONS: 6,
+            }
+
+        },
+
     },
 
     MEM_POOL : {

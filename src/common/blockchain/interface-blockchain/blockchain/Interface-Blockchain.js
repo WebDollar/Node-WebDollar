@@ -168,7 +168,6 @@ class InterfaceBlockchain {
 
             block.difficultyTarget = Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(block.difficultyTarget) );
 
-            console.warn(" computed ", block.difficultyTarget.toString("hex"), " from ", block.difficultyTargetPrev.toString("hex") )
         }
 
         return true;
