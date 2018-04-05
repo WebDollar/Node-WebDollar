@@ -21,7 +21,7 @@ consts.BLOCKCHAIN = {
     LIGHT:{
         VALIDATE_LAST_BLOCKS: 10 , //overwrite below
         SAFETY_LAST_BLOCKS: 40, //overwrite below
-        SAFETY_LAST_BLOCKS_DELETE: 60, //overwrite below
+        SAFETY_LAST_BLOCKS_DELETE: 400, //overwrite below
     },
 
     HARD_FORKS : {
