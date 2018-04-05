@@ -327,8 +327,6 @@ class InterfaceBlockchain {
 
                 await this._loadBlock(indexStart, i, blockValidation);
 
-                console.log("serializeMiniAccountantTree", this.accountantTree.serializeMiniAccountant().toString("hex"));
-
             }
 
         } catch (exception){

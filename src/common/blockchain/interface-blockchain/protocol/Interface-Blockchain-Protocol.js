@@ -180,7 +180,7 @@ class InterfaceBlockchainProtocol {
                             //you are ok
                         } else
                         if (this.blockchain.blocks[data.height].hash.equals(data.header.hash) === true)
-                            throw {message: "your block is not new, because I have the same block at same height "};
+                            throw {message: "your block is not new, because I have the same block at same height"};
 
                     }
 
@@ -196,9 +196,8 @@ class InterfaceBlockchainProtocol {
 
                 } catch (exception) {
 
-                    try {
+                    if (! (typeof exception === "object" && exception.message === "your block is not new, because I have the same block at same height"))
                         console.error("Socket Error - blockchain/new-block-header", exception, data);
-                    } catch (exception) {}
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: false,
@@ -344,7 +343,7 @@ class InterfaceBlockchainProtocol {
                 //in case the hashes are exactly the same, there is no reason why we should download it
                 let myHash = this.blockchain.getHashPrev(data.height+1);
                 if ( myHash !== undefined && myHash !== null && myHash.equals(data.header.hash) === true )
-                    throw {message: "your block is not new, because I have the same block at same height "};
+                    throw {message: "your block is not new, because I have the same block at same height"};
 
             }
 
@@ -359,7 +358,9 @@ class InterfaceBlockchainProtocol {
 
         } catch (exception) {
 
-            console.error("Socket Error - get/blockchain/header/last-block", exception, data);
+            if (! (typeof exception === "object" && exception.message === "your block is not new, because I have the same block at same height"))
+                console.error("Socket Error - get/blockchain/header/last-block", exception, data);
+
             return false;
         }
 

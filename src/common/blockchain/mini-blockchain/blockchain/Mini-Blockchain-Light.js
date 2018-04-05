@@ -99,9 +99,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         this.lightPrevTimeStamps[height+1] =  block.timeStamp;
         this.lightPrevHashPrevs[height+1] =  block.hash;
 
-        if (this.agent.light === true)
-            this.blocks.blocksStartingPoint = height - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS ;
-
         if (serialization === undefined){
             serialization = this.accountantTree.serializeMiniAccountant();
             //console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
@@ -363,6 +360,10 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             delete this.lightPrevDifficultyTargets[index];
             delete this.lightPrevHashPrevs[index];
             delete this.lightPrevTimeStamps[index];
+
+            if ( this.blockchain.blocksStartingPoint === index )
+                this.blockchain.blocksStartingPoint++;
+
             index--;
         }
 
