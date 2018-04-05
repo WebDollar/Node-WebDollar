@@ -368,23 +368,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     }
 
-    getSerializedAccountantTree(height){
 
-        if (height < 0)
-            height = -1;
-
-        if (height === -1){
-            let emptyAccountantTree = new MiniBlockchainAccountantTree(this.db);
-            return emptyAccountantTree.serializeMiniAccountant();
-        }
-
-        if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) )
-            return this.lightAccountantTreeSerializations[height];
-
-        // else I need to compute it, by removing n-1..n
-        throw {message: "not computed ", height:height};
-
-    }
 
     getDifficultyTarget(height){
 
