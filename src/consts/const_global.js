@@ -222,7 +222,7 @@ consts.SETTINGS = {
             },
 
             WEBRTC: {
-                MAXIMUM_CONNECTIONS: 6,
+                MAXIMUM_CONNECTIONS: 5,
             }
 
         },
