@@ -11,8 +11,11 @@ let inheritProtocol;
 if (consts.POPOW_PARAMS.ACTIVATED) inheritProtocol = PPoWBlockchainProtocol;
 else inheritProtocol = InterfaceBlockchainProtocol;
 
-class MiniBlockchainProtocol extends inheritProtocol{
+/**
+ *  FULL MINI BLOCKCHAIN PROTOCOL
+ */
 
+class MiniBlockchainProtocol extends inheritProtocol{
 
     _validateBlockchainHeader(data){
 
@@ -31,7 +34,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
         inheritProtocol.prototype._initializeNewSocket.call(this, nodesListObject);
 
         /**
-         * Get difficulty
+         * Get difficulty, accountant Tree for Light Nodes
          */
         socket.node.on("get/blockchain/light/get-light-settings", async (data)=>{
 
@@ -39,8 +42,6 @@ class MiniBlockchainProtocol extends inheritProtocol{
 
                 if (data.height === undefined)
                     data.height = -1;
-
-                console.log("get-light-settings111")
 
                 if (typeof data.height !== "number" ) throw {message: "data.height is not a number"};
                 if (data.height < 0) throw {message: "height is not valid"};

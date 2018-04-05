@@ -22,8 +22,6 @@ class NodesList {
         this.nodes = [];
         this.nodesTotal = 0;
 
-        this.events = [];
-
         this.removeDisconnectedSockets();
     }
 

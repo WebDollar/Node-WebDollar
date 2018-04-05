@@ -316,7 +316,7 @@ class CLI{
         };
 
         if (!Blockchain._blockchainInitiated) {
-            Blockchain.createBlockchain("light-node", () => {
+            Blockchain.createBlockchain("full-node", () => {
                 Node.NodeServer.startServer();
                 Node.NodeClientsService.startService();
 

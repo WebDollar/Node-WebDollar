@@ -31,10 +31,6 @@ class MiniBlockchainFork extends inheritFork{
         return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
-    _preForkCloneAccounantTree(){
-
-    }
-
     preForkClone(cloneBlocks=true){
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);

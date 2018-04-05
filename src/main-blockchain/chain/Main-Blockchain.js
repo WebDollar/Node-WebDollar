@@ -1,8 +1,12 @@
 import MiniBlockchain from 'common/blockchain/mini-blockchain/blockchain/Mini-Blockchain'
 import MiniBlockchainLight from 'common/blockchain/mini-blockchain/blockchain/Mini-Blockchain-Light'
 
-class MainBlockchain extends  MiniBlockchainLight{
-//class MainBlockchain extends  MiniBlockchain{
+let inheritedBlockchain;
+
+if (process.env.BROWSER) inheritedBlockchain = MiniBlockchainLight
+else inheritedBlockchain = MiniBlockchain;
+
+class MainBlockchain extends  MiniBlockchain{
 
 
 }

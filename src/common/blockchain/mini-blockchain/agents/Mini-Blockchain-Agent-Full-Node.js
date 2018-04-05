@@ -9,7 +9,6 @@ let inheritAgentClass;
 if (consts.POPOW_PARAMS.ACTIVATED) inheritAgentClass = PPoWBlockchainAgentFullNode;
 else  inheritAgentClass = InterfaceBlockchainAgentFullNode;
 
-
 class MiniBlockchainAgentFullNode extends inheritAgentClass{
 
     newFork(){
