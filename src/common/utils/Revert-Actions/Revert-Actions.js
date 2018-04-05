@@ -44,6 +44,7 @@ class RevertActions {
             } else
             if (action.name === "breakpoint"  && (actionName === '' || actionName === action.name)) {
 
+                this._actions.splice(i,1);
                 break;
 
             }

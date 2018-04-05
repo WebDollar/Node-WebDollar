@@ -51,6 +51,7 @@ class MiniBlockchainFork extends inheritFork{
             // remove reward
             this.blockchain.accountantTree.updateAccount( block.data.minerAddress, - block.reward, undefined, revertActions);
 
+
         }
 
     }
