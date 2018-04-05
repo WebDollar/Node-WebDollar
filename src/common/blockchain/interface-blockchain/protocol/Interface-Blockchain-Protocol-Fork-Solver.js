@@ -300,7 +300,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 try {
 
-                   
+
                     result = await fork.includeForkBlock(block);
 
                 } catch (Exception) {

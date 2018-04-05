@@ -50,14 +50,14 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
                 for (let i=nonce; i<this.nonce; i++)
                     if (!foundNonce[i])
-                        return false;
+                        throw {message: "Nonce is not right 2", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
 
                 return true;
 
             }
 
         if (nonce !== this.nonce)
-            throw {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce };
+            throw {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
 
         return true;
 

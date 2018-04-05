@@ -30,7 +30,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
             blockValidationType['take-transactions-list-in-consideration'] = {
                 validation: true,
-                transactions: this.transactions.slice(0, i-1),
+                transactions: this.transactions.slice(0, i),
             };
 
             if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidationType))

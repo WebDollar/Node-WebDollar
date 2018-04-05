@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
 import global from "consts/global"
 import Serialization from "common/utils/Serialization";
-import MiniBlockchainAdvanced from "./Mini-Blockchain"
+import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 

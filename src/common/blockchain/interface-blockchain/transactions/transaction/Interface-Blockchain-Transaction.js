@@ -173,7 +173,7 @@ class InterfaceBlockchainTransaction{
 
         if (blockValidationType === undefined || !blockValidationType['skip-validation-transactions-from-values']){
 
-            this._validateNonce(blockValidationType);
+            if (! this._validateNonce(blockValidationType) ) throw {message: "Nonce is invalid" }
 
             return this.from.validateFromEnoughMoney(blockValidationType);
         }

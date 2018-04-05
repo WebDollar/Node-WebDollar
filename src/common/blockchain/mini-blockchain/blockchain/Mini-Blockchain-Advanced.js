@@ -22,11 +22,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
 
-        if (block.height === 541){
-            console.log("psss");
-        }
-
-        let answer = await MiniBlockchain.prototype.includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions);
+        let answer = await MiniBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions);
 
         let serialization = this.accountantTree.serializeMiniAccountant();
         this.lightAccountantTreeSerializations[block.height+1] = serialization;
@@ -56,4 +52,5 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
 }
 
-export default MiniBlockchain
+
+export default MiniBlockchainAdvanced
