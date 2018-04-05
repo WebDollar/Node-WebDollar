@@ -23,7 +23,10 @@ class MiniBlockchainFork extends inheritFork{
      */
     _createBlockValidation_ForkValidation(height, forkHeight){
 
-        let validationType = {"skip-accountant-tree-validation": true};
+        let validationType = {
+            "skip-accountant-tree-validation": true,
+            "skip-validation-transactions-from-values": true //can not validate the transactions
+        };
 
         if (height === this.forkChainLength-1)
             validationType["validation-timestamp-adjusted-time"] = true;

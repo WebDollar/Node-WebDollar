@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
 import global from "consts/global"
 import Serialization from "common/utils/Serialization";
-import MiniBlockchain from "./Mini-Blockchain"
+import MiniBlockchainAdvanced from "./Mini-Blockchain"
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
@@ -9,7 +9,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
  */
-class MiniBlockchainLight extends  MiniBlockchain{
+class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
     constructor (agent) {
 
@@ -337,7 +337,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
 
     async _loadBlock(indexStart, i, blockValidation){
 
-        let block = await MiniBlockchain.prototype._loadBlock.call(this, indexStart, i, blockValidation);
+        let block = await MiniBlockchainAdvanced.prototype._loadBlock.call(this, indexStart, i, blockValidation);
 
         if ( (i + 1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS  === 0 && i === indexStart){
 
@@ -383,7 +383,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 return this.lightPrevDifficultyTargets[height];
         }
 
-        return MiniBlockchain.prototype.getDifficultyTarget.call(this, height);
+        return MiniBlockchainAdvanced.prototype.getDifficultyTarget.call(this, height);
     }
 
     getTimeStamp(height){
@@ -396,7 +396,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
                 return this.lightPrevTimeStamps[height];
         }
 
-        return MiniBlockchain.prototype.getTimeStamp.call(this, height);
+        return MiniBlockchainAdvanced.prototype.getTimeStamp.call(this, height);
     }
 
     getHashPrev(height){
@@ -409,7 +409,7 @@ class MiniBlockchainLight extends  MiniBlockchain{
             if ( this.lightPrevHashPrevs[height] !== undefined )
                 return this.lightPrevHashPrevs[height];
 
-        return MiniBlockchain.prototype.getHashPrev.call(this, height);
+        return MiniBlockchainAdvanced.prototype.getHashPrev.call(this, height);
     }
 
 

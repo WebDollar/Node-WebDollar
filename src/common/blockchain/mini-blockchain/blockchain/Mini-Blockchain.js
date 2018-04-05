@@ -23,7 +23,6 @@ class MiniBlockchain extends  inheritBlockchain{
         super(agent);
 
         this.accountantTree = new MiniBlockchainAccountantTree(this.db);
-        this.lightAccountantTreeSerializations = {};
 
         this.inheritBlockchain = inheritBlockchain;
     }
@@ -140,9 +139,6 @@ class MiniBlockchain extends  inheritBlockchain{
             if (! (await this.accountantTree.saveMiniAccountant(true)))
                 console.error("Error Saving Mini Accountant Tree");
 
-        let serialization = this.accountantTree.serializeMiniAccountant();
-        this.lightAccountantTreeSerializations[block.height+1] = serialization;
-
 
 
         return true;
@@ -216,23 +212,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
     }
 
-    getSerializedAccountantTree(height){
 
-        if (height < 0)
-            height = -1;
-
-        if (height === -1){
-            let emptyAccountantTree = new MiniBlockchainAccountantTree(this.db);
-            return emptyAccountantTree.serializeMiniAccountant();
-        }
-
-        if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) )
-            return this.lightAccountantTreeSerializations[height];
-
-        // else I need to compute it, by removing n-1..n
-        throw {message: "not computed ", height:height};
-
-    }
 
 
 }
