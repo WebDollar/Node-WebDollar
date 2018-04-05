@@ -136,6 +136,33 @@ class InterfaceBlockchainBlockDataTransactions {
 
     _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined, revertActions = undefined ){
 
+        try {
+
+            //skipping checking the Transaction in case it requires reverting
+            if (multiplicationFactor === 1) {
+                if (!transaction.validateTransactionOnce(blockHeight))
+                    throw {message: "couldn't process the transaction ", transaction: transaction};
+            }
+
+            transaction.processTransaction(multiplicationFactor, revertActions );
+
+            transaction.processTransactionFees( multiplicationFactor, minerAddress, revertActions);
+
+            return true;
+        } catch (exception){
+            console.error("couldn't process the transaction ", transaction, exception);
+            return false;
+        }
+    }
+
+    processBlockDataTransactions( block, multiplicationFactor = 1, revertActions){
+
+        for (let i=0; i<block.data.transactions.transactions.length; i++)
+            this._processBlockDataTransaction( block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress, revertActions, );
+    }
+
+    /*_processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined, revertActions = undefined ){
+
         //skipping checking the Transaction in case it requires reverting
         if (multiplicationFactor === 1) {
             if (!transaction.validateTransactionOnce(blockHeight))
@@ -157,7 +184,7 @@ class InterfaceBlockchainBlockDataTransactions {
                 return false;
 
         return true;
-    }
+    }*/
 
 
 
