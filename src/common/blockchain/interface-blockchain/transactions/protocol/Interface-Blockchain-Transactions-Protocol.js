@@ -59,6 +59,10 @@ class InterfaceBlockchainTransactionsProtocol{
                     throw {message: "I already have this transaction"};
 
             } catch (exception){
+
+                if (typeof exception === "object" && exception.message === "I already have this transaction" )
+                    return false;
+
                 console.error("Transaction is wrong. It should ban the user", exception);
             }
 

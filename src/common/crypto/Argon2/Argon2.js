@@ -29,11 +29,7 @@ Argon2.verify = async (initialHash, data) => {
         if (myHash.length !== initialHash.length)
             return false;
 
-        for (let i=0; i<initialHash.length; i++)
-            if (initialHash[i] !== myHash[i])
-                return false;
-
-        return true;
+        return initialHash.equals(myHash);
 
     }
     else

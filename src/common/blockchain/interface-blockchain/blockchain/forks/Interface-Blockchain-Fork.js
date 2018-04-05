@@ -268,18 +268,20 @@ class InterfaceBlockchainFork {
                 this.blockchain.mining.resetMining();
             }
 
-            console.log("interface-blockchain-fork");
-            for (let i=0; i<hashAccountantTree.length; i++)
-                if (hashAccountantTree [i] !== undefined) {
-                    console.warn("accountantTree", i,"   ", hashAccountantTree[i].toString("hex"));
+            if (!forkedSuccessfully) {
+                console.log("interface-blockchain-fork");
+                for (let i = 0; i < hashAccountantTree.length; i++)
+                    if (hashAccountantTree [i] !== undefined) {
+                        console.warn("accountantTree", i, "   ", hashAccountantTree[i].toString("hex"));
 
-                    if(!forkedSuccessfully)
-                        if (!this.blockchain.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])){
-                            console.error("************************************************");
-                            console.error("accountantTree", i, "    ", this.blockchain.accountantTree.serializeMiniAccountant().toString("hex"));
-                            console.error("************************************************");
-                        }
-                }
+                        if (!forkedSuccessfully)
+                            if (!this.blockchain.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])) {
+                                console.error("************************************************");
+                                console.error("accountantTree", i, "    ", this.blockchain.accountantTree.serializeMiniAccountant().toString("hex"));
+                                console.error("************************************************");
+                            }
+                    }
+            }
 
             return forkedSuccessfully;
         });
