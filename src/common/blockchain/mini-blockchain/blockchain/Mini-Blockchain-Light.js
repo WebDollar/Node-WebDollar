@@ -23,8 +23,6 @@ class MiniBlockchainLight extends  MiniBlockchain{
         this.blocks.clear();
         this.blocks.blocksStartingPoint = 0;
 
-        this.lightAccountantTreeSerializations = {};
-
         this.lightPrevDifficultyTargets = {};
         this.lightPrevTimeStamps = {};
         this.lightPrevHashPrevs = {};

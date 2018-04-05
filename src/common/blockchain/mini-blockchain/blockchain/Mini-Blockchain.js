@@ -23,6 +23,7 @@ class MiniBlockchain extends  inheritBlockchain{
         super(agent);
 
         this.accountantTree = new MiniBlockchainAccountantTree(this.db);
+        this.lightAccountantTreeSerializations = {};
 
         this.inheritBlockchain = inheritBlockchain;
     }
@@ -138,6 +139,11 @@ class MiniBlockchain extends  inheritBlockchain{
         if (saveBlock)
             if (! (await this.accountantTree.saveMiniAccountant(true)))
                 console.error("Error Saving Mini Accountant Tree");
+
+        let serialization = this.accountantTree.serializeMiniAccountant();
+        this.lightAccountantTreeSerializations[block.height+1] = serialization;
+
+
 
         return true;
     }
