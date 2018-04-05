@@ -65,7 +65,8 @@ class MiniBlockchain extends  inheritBlockchain{
                 revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
             }
 
-            block.data.transactions.processBlockDataTransactions( block, 1, revertActions);
+            if (!block.data.transactions.processBlockDataTransactions( block, 1, revertActions))
+                throw {message: "Process Block Data Transactions failed"};
 
             let callbackDone = await callback();
 
@@ -86,16 +87,18 @@ class MiniBlockchain extends  inheritBlockchain{
 
                 hashAccountantTree[1] = this.accountantTree.serializeMiniAccountant();
 
-                console.log("mini blockchain-fork");
-                for (let i=0; i<hashAccountantTree.length; i++) {
-                    console.warn("accountantTree", i,"   ", hashAccountantTree[i].toString("hex"), revertException);
+                if (revertActions) {
+                    console.log("mini blockchain-fork");
+                    for (let i = 0; i < hashAccountantTree.length; i++) {
+                        console.warn("accountantTree", i, "   ", hashAccountantTree[i].toString("hex"), revertException);
 
-                    if( revertException )
-                        if (!this.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])){
-                            console.error("************************************************");
-                            console.error("accountantTree", i, "    ", this.accountantTree.serializeMiniAccountant());
-                            console.error("************************************************");
-                        }
+                        if (revertException)
+                            if (!this.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])) {
+                                console.error("************************************************");
+                                console.error("accountantTree", i, "    ", this.accountantTree.serializeMiniAccountant());
+                                console.error("************************************************");
+                            }
+                    }
                 }
 
                 if (revertException)

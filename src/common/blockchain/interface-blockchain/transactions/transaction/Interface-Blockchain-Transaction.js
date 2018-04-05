@@ -280,8 +280,8 @@ class InterfaceBlockchainTransaction{
 
     processTransaction(multiplicationFactor = 1 , revertActions){
 
-        this.from.processTransactionFrom(multiplicationFactor, revertActions);
-        this.to.processTransactionTo(multiplicationFactor, revertActions);
+        if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false
+        if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
 
         return true;
     }

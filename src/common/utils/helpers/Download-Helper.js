@@ -26,7 +26,7 @@ class DownloadHelper{
             return null;
         }
         catch(exception){
-            console.error("ERROR downloading list: ", address, exception);
+            console.error("ERROR downloading list: ", address );
             return null;
         }
     }

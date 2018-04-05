@@ -47,7 +47,7 @@ class SocketExtend{
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port, uuid);
 
         socket.node.sendRequest = (request, requestData) => { return this.sendRequest(socket, request, requestData) };
-        socket.node.sendRequestWaitOnce = (request, requestData, answerSuffix) => {return this.sendRequestWaitOnce(socket, request, requestData, answerSuffix) };
+        socket.node.sendRequestWaitOnce = (request, requestData, answerSuffix, timeOutInterval) => {return this.sendRequestWaitOnce(socket, request, requestData, answerSuffix, timeOutInterval) };
         socket.node.broadcastRequest = (request, data, type, exceptSockets) => {
 
             if (exceptSockets !== undefined && exceptSockets !== null && !Array.isArray(exceptSockets))
@@ -105,7 +105,7 @@ class SocketExtend{
         Sending the Request and return the Promise to Wait Async
     */
 
-    sendRequestWaitOnce (socket, request, requestData, answerSuffix, timeOutInterval=3000) {
+    sendRequestWaitOnce (socket, request, requestData, answerSuffix, timeOutInterval=5000) {
 
         if ( answerSuffix !== undefined) answerSuffix = String(answerSuffix); //in case it is a number
 
