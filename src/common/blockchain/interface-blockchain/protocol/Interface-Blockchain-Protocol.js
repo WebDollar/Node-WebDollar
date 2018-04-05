@@ -156,7 +156,7 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
-                    if (data === null || data.result !== true)
+                    if (data === null )
                         throw {message: "last block is not valid"};
 
                     console.log("blockchain/header/new-block received", data.chainLength||0);
