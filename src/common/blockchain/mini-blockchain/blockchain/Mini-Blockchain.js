@@ -202,7 +202,6 @@ class MiniBlockchain extends  inheritBlockchain{
         } catch (exception){
 
             console.error("Couldn't load  MiniBlockchain", exception);
-            this.accountantTree = new MiniBlockchainAccountantTree(this.db);
             return false;
         }
 

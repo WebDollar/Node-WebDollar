@@ -22,6 +22,7 @@ import SemaphoreProcessing from "common/utils/Semaphore-Processing"
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 
 import BlockchainTimestamp from "common/blockchain/interface-blockchain/timestmap/Blockchain-Timestamp"
+import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 
 
 const SEMAPHORE_PROCESSING_INTERVAL = 10;
@@ -111,7 +112,7 @@ class InterfaceBlockchain {
         if (revertActions !== undefined)
             revertActions.push({name: "block-added", height: this.blocks.length-1 });
 
-        await this._blockIncluded(block);
+        await this._blockIncluded( block);
 
         if (saveBlock) {
             await this.saveNewBlock(block);
@@ -327,9 +328,13 @@ class InterfaceBlockchain {
 
                 await this._loadBlock(indexStart, i, blockValidation);
 
+                console.log("serializeMiniAccountantTree", this.accountantTree.serializeMiniAccountant().toString("hex"));
+
             }
 
         } catch (exception){
+            console.log("serializeMiniAccountantTreeERRROR", this.accountantTree.serializeMiniAccountant().toString("hex"));
+            console.log("serializeMiniAccountantTreeERRROR", this.blocks.length-1);
             console.error("blockchain.load raised an exception", exception);
             return false;
         }
@@ -338,7 +343,12 @@ class InterfaceBlockchain {
     }
 
 
-    async _loadBlock(indexStart, i, blockValidation){
+    async _loadBlock(indexStart, i, blockValidation, revertActions){
+
+        if (revertActions === undefined)
+            revertActions = new RevertActions(this);
+
+        revertActions.push( { name: "breakpoint" } );
 
         let block = this.blockCreator.createEmptyBlock(i, blockValidation);
         block.height = i;
@@ -350,7 +360,7 @@ class InterfaceBlockchain {
 
             //it will include the block, but it will not ask to save, because it was already saved before
 
-            if (await this.includeBlockchainBlock(block, undefined, "all", false) )
+            if (await this.includeBlockchainBlock( block, undefined, "all", false, revertActions) )
                 console.warn("blockchain loaded successfully index ", i);
             else {
                 console.error("blockchain is invalid at index " + i);
@@ -360,6 +370,7 @@ class InterfaceBlockchain {
 
         } catch (exception){
             console.error("blockchain LOADING stopped at " + i, exception);
+            revertActions.revertOperations();
             throw exception;
         }
 
