@@ -259,19 +259,26 @@ class InterfaceBlockchainFork {
 
             await this.postForkTransactions(forkedSuccessfully);
 
+            console.log("FORK STATUS SUCCESS2: ", forkedSuccessfully);
+
             this.postFork(forkedSuccessfully);
+
+            console.log("FORK STATUS SUCCESS3: ", forkedSuccessfully);
 
             //propagating valid blocks
             if (forkedSuccessfully) {
 
                 //successfully, let's delete the backup blocks
                 this._deleteBackupBlocks();
+                console.log("FORK STATUS SUCCESS4: ", forkedSuccessfully);
 
                 await this.blockchain.saveBlockchain();
+                console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
                 this.blockchain.mining.resetMining();
+                console.log("FORK STATUS SUCCESS6: ", forkedSuccessfully);
             }
 
-            console.log("FORK STATUS SUCCESS2: ", forkedSuccessfully);
+            console.log("FORK STATUS SUCCESS7: ", forkedSuccessfully);
 
             return forkedSuccessfully;
         });
