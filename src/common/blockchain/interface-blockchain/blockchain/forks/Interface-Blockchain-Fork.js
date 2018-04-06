@@ -237,7 +237,7 @@ class InterfaceBlockchainFork {
 
                 console.error('-----------------------------------------');
                 console.error("saveFork includeBlockchainBlock1 raised exception");
-                //console.error( exception );
+                console.error( exception.message );
                 console.error("index", index, "forkStartingHeight", this.forkStartingHeight, "fork", this);
                 console.error('-----------------------------------------');
                 forkedSuccessfully = false;
