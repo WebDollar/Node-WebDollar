@@ -104,12 +104,14 @@ class InterfaceBlockchainTransactionsProtocol{
 
                     let transaction = Blockchain.blockchain.transactions._createTransactionFromBuffer(transactions[i]).transaction;
 
-                    if (!transaction.isTransactionOK()) {
-                        continue;
-                    }
+                    try {
+                        if (!transaction.isTransactionOK())
+                            continue;
 
-                    if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket)) {
-                        //console.warn("I already have this transaction", transaction.txId.toString("hex"))
+                        if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket))
+                            //console.warn("I already have this transaction", transaction.txId.toString("hex"))
+                    } catch (exception){
+
                     }
 
                 }

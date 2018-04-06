@@ -112,7 +112,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-1 }, currentBlockchainLength-1 );
 
                 if (answer === null || answer === undefined)
-                    throw {message: "connection dropped headers-info"};
+                    throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };
+
                 if (answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) )
                     throw {message: "connection headers-info malformed"};
 
