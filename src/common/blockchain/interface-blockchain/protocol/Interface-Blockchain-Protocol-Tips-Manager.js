@@ -73,7 +73,11 @@ class InterfaceBlockchainProtocolTipsManager {
     async discoverNewForkTip(socket, newChainLength, forkLastBlockHeader){
 
         if (typeof newChainLength !== "number") throw {message: "newChainLength is not a number"};
-        if (newChainLength < this.blockchain.blocks.length) throw {message: "Your blockchain is smaller than mine"};
+        if (newChainLength < this.blockchain.blocks.length){
+
+            socket.node.sendRequest("blockchain/header/new-block", this.blockchain.blocks.last.getBlockHeader());
+            throw {message: "Your blockchain is smaller than mine"};
+        }
 
         let tip = this.blockchain.tipsAdministrator.getTip(socket);
 

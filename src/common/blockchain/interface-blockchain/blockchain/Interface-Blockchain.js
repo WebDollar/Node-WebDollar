@@ -391,16 +391,6 @@ class InterfaceBlockchain {
     }
 
 
-    // aka head
-    get last() {
-        return this.blocks[this.blocks.length - 1];
-    }
-
-    // aka tail
-    get first() {
-        return this.blocks[0];
-    }
-
     propagateBlocks(height, socketsAvoidBroadcast){
 
         if (this.agent !== undefined) {
@@ -409,7 +399,7 @@ class InterfaceBlockchain {
                 if (this.blocks[i] === undefined)
                     console.error("PROPAGATE ERROR"+i, this.blocks[i]);
                 else
-                    this.agent.protocol.propagateHeader(this.blocks[i], this.blocks.length, socketsAvoidBroadcast);
+                    this.agent.protocol.propagateHeader(this.blocks[i],  socketsAvoidBroadcast);
 
             }
 

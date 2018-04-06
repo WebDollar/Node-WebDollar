@@ -62,7 +62,7 @@ class InterfaceBlockchainProtocol {
         this.tipsManager = new InterfaceBlockchainProtocolTipsManager(this.blockchain, this);
     }
 
-    propagateHeader(block, chainLength, socketsAvoidBroadcast){
+    propagateHeader(block,  socketsAvoidBroadcast){
 
         // broadcasting the new block, to everybody else
         NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeader(), "all", socketsAvoidBroadcast);
@@ -117,12 +117,12 @@ class InterfaceBlockchainProtocol {
                     let answer = {};
 
                     console.log("get/blockchain/header/last-block length", this.blockchain.blocks.length);
-                    console.log("get/blockchain/header/last-block last", this.blockchain.last === undefined);
+                    console.log("get/blockchain/header/last-block last", this.blockchain.blocks.last === undefined);
 
-                    if (this.blockchain.blocks.length > 0 && this.blockchain.last !== undefined)
+                    if (this.blockchain.blocks.length > 0 && this.blockchain.blocks.last !== undefined)
                         answer = {
                             result: true,
-                            data: this.blockchain.last.getBlockHeader()
+                            data: this.blockchain.blocks.last.getBlockHeader()
                         };
                     else
                         answer = { result: false,  message: "no blocks"};

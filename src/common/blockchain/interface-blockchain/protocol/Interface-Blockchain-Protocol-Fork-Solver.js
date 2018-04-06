@@ -117,7 +117,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) )
                     throw {message: "connection headers-info malformed"};
 
-                if (answer.header.hash.equals( this.blockchain.last.hash ))
+                if (answer.header.hash.equals( this.blockchain.blocks.last.hash ))
 
                     binarySearchResult = {
                         position : currentBlockchainLength,

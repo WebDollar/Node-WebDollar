@@ -244,7 +244,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
             // TODO !!!!!! maybe it will require an min
 
-            const underlyingLength = superchain.last.height - superchain.blocks[superchain.length - m].height + 1; // I think it is without +1
+            const underlyingLength = superchain.blocks.last.height - superchain.blocks[superchain.length - m].height + 1; // I think it is without +1
 
             // C'length = m
             // C.length = underlingLength

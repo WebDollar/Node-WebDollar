@@ -73,6 +73,17 @@ class InterfaceBlockchainBlocks{
             return this.blockchain.blocks.length;
     }
 
+    // aka head
+    get last() {
+        return this[this.length - 1];
+    }
+
+    // aka tail
+    get first() {
+        return this[ this.blocksStartingPoint ];
+    }
+
+
 }
 
 export default InterfaceBlockchainBlocks;

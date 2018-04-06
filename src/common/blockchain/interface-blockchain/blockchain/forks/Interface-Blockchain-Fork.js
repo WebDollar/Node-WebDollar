@@ -224,6 +224,7 @@ class InterfaceBlockchainFork {
                 for (index = 0; index < this.forkBlocks.length; index++) {
 
                     StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
+                    console.log("Forking ", index);
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
 
@@ -251,6 +252,8 @@ class InterfaceBlockchainFork {
                 await this.revertFork();
 
             }
+
+            console.log("FORK STATUS", index);
 
 
             await this.postForkTransactions(forkedSuccessfully);
