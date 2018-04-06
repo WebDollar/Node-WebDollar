@@ -109,7 +109,8 @@ class InterfaceBlockchainTransactionsProtocol{
                             continue;
 
                         if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket))
-                            //console.warn("I already have this transaction", transaction.txId.toString("hex"))
+                            ; //console.warn("I already have this transaction", transaction.txId.toString("hex"))
+
                     } catch (exception){
 
                     }
