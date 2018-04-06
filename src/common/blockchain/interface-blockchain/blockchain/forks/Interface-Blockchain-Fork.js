@@ -223,7 +223,6 @@ class InterfaceBlockchainFork {
                 for (index = 0; index < this.forkBlocks.length; index++) {
 
                     StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
-                    console.log("Forking ", index);
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
 
@@ -258,27 +257,22 @@ class InterfaceBlockchainFork {
 
             await this.postForkTransactions(forkedSuccessfully);
 
-            console.log("FORK STATUS SUCCESS2: ", forkedSuccessfully);
-
             this.postFork(forkedSuccessfully);
-
-            console.log("FORK STATUS SUCCESS3: ", forkedSuccessfully);
 
             //propagating valid blocks
             if (forkedSuccessfully) {
 
-                //successfully, let's delete the backup blocks
-                this._deleteBackupBlocks();
-                console.log("FORK STATUS SUCCESS4: ", forkedSuccessfully);
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
 
+
+                //successfully, let's delete the backup blocks
+                this._deleteBackupBlocks();
+
                 this.blockchain.mining.resetMining();
-                console.log("FORK STATUS SUCCESS6: ", forkedSuccessfully);
             }
 
-            console.log("FORK STATUS SUCCESS7: ", forkedSuccessfully);
 
             return forkedSuccessfully;
         });

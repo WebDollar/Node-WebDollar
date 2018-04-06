@@ -226,7 +226,7 @@ consts.SETTINGS = {
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 50,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 40,
             }
 
         },
