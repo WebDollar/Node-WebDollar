@@ -75,7 +75,7 @@ class InterfaceBlockchainProtocolTipsManager {
         if (typeof newChainLength !== "number") throw {message: "newChainLength is not a number"};
         if (newChainLength < this.blockchain.blocks.length){
 
-            socket.node.sendRequest("blockchain/header/new-block", this.blockchain.blocks.last.getBlockHeader());
+            socket.node.sendRequest( "blockchain/header/new-block", this.blockchain.blocks.last.getBlockHeader() );
             throw {message: "Your blockchain is smaller than mine"};
         }
 

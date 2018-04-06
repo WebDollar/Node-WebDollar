@@ -254,6 +254,7 @@ class InterfaceBlockchainFork {
             }
 
             console.log("FORK STATUS", index);
+            console.log("FORK STATUS SUCCESS1: ", forkedSuccessfully);
 
 
             await this.postForkTransactions(forkedSuccessfully);
@@ -270,6 +271,7 @@ class InterfaceBlockchainFork {
                 this.blockchain.mining.resetMining();
             }
 
+            console.log("FORK STATUS SUCCESS2: ", forkedSuccessfully);
 
             return forkedSuccessfully;
         });
