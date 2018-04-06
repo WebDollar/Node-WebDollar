@@ -1,4 +1,4 @@
-const TIP_BAN_TIME = 5000;
+const TIP_BAN_TIME = 20000;
 
 class InterfaceBlockchainTipBan{
 

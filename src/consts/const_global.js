@@ -185,8 +185,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.275",
-        VERSION_COMPATIBILITY: "0.275",
+        VERSION: "0.276",
+        VERSION_COMPATIBILITY: "0.276",
         PROTOCOL: "WebDollar",
 
 
