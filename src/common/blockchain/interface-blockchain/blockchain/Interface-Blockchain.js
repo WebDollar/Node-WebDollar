@@ -125,7 +125,13 @@ class InterfaceBlockchain {
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
             this.mining.resetMining();
 
+        this._onBlockCreated(block,  saveBlock);
+
         return true;
+    }
+
+    _onBlockCreated(block, saveBlock){
+
     }
 
     /**

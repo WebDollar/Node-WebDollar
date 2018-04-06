@@ -271,7 +271,7 @@ class InterfaceBlockchainFork {
                 this._deleteBackupBlocks();
                 console.log("FORK STATUS SUCCESS4: ", forkedSuccessfully);
 
-                await this.blockchain.saveBlockchain(this.forkStartingHeight);
+                await this.blockchain.saveBlockchain( this.forkStartingHeight );
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
 
                 this.blockchain.mining.resetMining();

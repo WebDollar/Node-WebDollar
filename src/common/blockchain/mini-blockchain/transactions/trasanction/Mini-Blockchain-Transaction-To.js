@@ -14,6 +14,7 @@ class MiniBlockchainTransactionTo extends InterfaceBlockchainTransactionTo {
 
         }
 
+        return true;
 
     }
 

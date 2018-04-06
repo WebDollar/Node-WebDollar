@@ -71,14 +71,21 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             if (! (await this.inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, "all", saveBlock, revertActions )))
                 throw {message: "Error Including Blockchain Light Block"};
 
+
+
         }
 
-        let serialization = this.accountantTree.serializeMiniAccountant();
-        this.lightAccountantTreeSerializations[block.height+1] = serialization;
 
+        return true;
+
+    }
+
+    async _onBlockCreated(block, saveBlock){
+
+        MiniBlockchainAdvanced.prototype._onBlockCreated.call(this, block, saveBlock);
 
         if (! (await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)))
-            throw {message: "_recalculateLightPrevs failed"};
+        throw {message: "_recalculateLightPrevs failed"};
 
         /*console.log(" hash", block.hash.toString("hex"));
         console.log(" difficulty", block.difficultyTarget.toString("hex"));
@@ -86,9 +93,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         console.log(" prev hash ", block.hashPrev.toString("hex"));
 
         console.log("blockchain balances ",  this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex") );*/
-
-        return true;
-
     }
 
     /**

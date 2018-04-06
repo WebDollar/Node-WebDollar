@@ -135,13 +135,19 @@ class MiniBlockchain extends  inheritBlockchain{
 
             )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
 
-        if (saveBlock)
-            if (! (await this.accountantTree.saveMiniAccountant(true)))
-                console.error("Error Saving Mini Accountant Tree");
-
 
 
         return true;
+    }
+
+
+    async _onBlockCreated(block, saveBlock){
+
+        await inheritBlockchain.prototype._onBlockCreated.call(this, block, saveBlock);
+
+        if (saveBlock)
+            if ( ! (await this.accountantTree.saveMiniAccountant(true)))
+                console.error("Error Saving Mini Accountant Tree");
     }
 
     getBalances(address){
