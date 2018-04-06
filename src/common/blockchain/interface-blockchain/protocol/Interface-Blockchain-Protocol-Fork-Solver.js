@@ -133,6 +133,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if ( binarySearchResult.position === -1 ) {
 
+                console.warn("blockchain/info/request-blockchain-info");
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/info/request-blockchain-info", { } );
 
                 if (answer === null) throw {message: "connection dropped info"};
