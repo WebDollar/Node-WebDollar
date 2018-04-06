@@ -99,7 +99,7 @@ class InterfaceBlockchainAddress{
         try {
             if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
                 let generatedPublicKey = InterfaceBlockchainAddressHelper._generatePublicKey(privateKey);
-                return !generatedPublicKey.equals(this.publicKey);
+                return ! BufferExtended.safeCompare(generatedPublicKey, this.publicKey);
             }
         } catch (exception) {
 

@@ -47,7 +47,7 @@ class InterfaceBlockchainBlockData {
         //validate hash
         let hashData = this.calculateHashBlockData();
 
-        if (!hashData.equals(this.hashData))
+        if (! BufferExtended.safeCompare(hashData, this.hashData))
             throw {message: "block.data hashData is not right"};
 
         if (!this.transactions.validateTransactions(blockHeight, blockValidation.blockValidationType ))
@@ -120,7 +120,7 @@ class InterfaceBlockchainBlockData {
     }
 
     equals(data) {
-        return this.hashData.equals(data.hashData);
+        return BufferExtended.safeCompare(this.hashData, data.hashData);
     }
 
     get minerAddress(){

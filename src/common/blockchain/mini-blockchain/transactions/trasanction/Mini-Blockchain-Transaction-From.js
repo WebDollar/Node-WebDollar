@@ -1,5 +1,6 @@
 import InterfaceBlockchainTransactionFrom from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction-From'
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import BufferExtended from "../../../../utils/BufferExtended";
 
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
@@ -17,7 +18,7 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
             transactionsList.forEach((transaction)=>{
 
-                if (this.transaction.txId.equals(transaction.txId))
+                if (BufferExtended.safeCompare(this.transaction.txId, transaction.txId))
                     return false; // transaction is not taken in consideration
 
                 transaction.from.addresses.forEach((address)=>{

@@ -1,4 +1,5 @@
 import consts from 'consts/const_global'
+import BufferExtended from "../../../../utils/BufferExtended";
 
 class MiningTransactionsSelector{
 
@@ -94,13 +95,13 @@ class MiningTransactionsSelector{
 
             if (from)
                 transaction.from.addresses.forEach((address)=>{
-                    if (address.unencodedAddress.equals(unencodedAddress))
+                    if (BufferExtended.safeCompare(address.unencodedAddress, unencodedAddress))
                         count++;
                 });
 
             if (to)
                 transaction.to.addresses.forEach((address)=>{
-                    if (address.unencodedAddress.equals(unencodedAddress))
+                    if ( BufferExtended.safeCompare(address.unencodedAddress, unencodedAddress))
                         count++;
                 })
 

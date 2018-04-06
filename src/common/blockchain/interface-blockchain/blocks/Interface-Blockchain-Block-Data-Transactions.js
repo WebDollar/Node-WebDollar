@@ -21,7 +21,8 @@ class InterfaceBlockchainBlockDataTransactions {
     validateTransactions(blockHeight, blockValidationType){
 
         let hashTransactions = this.calculateHashTransactions();
-        if (!this.hashTransactions.equals(hashTransactions))
+
+        if (! BufferExtended.safeCompare(this.hashTransactions, hashTransactions))
             throw {message: "hash transaction is invalid at", hashTransactionsOriginal: this.hashTransactions, hashTransactions: hashTransactions, };
 
         for (let i=0; i<this.transactions.length; i++) {

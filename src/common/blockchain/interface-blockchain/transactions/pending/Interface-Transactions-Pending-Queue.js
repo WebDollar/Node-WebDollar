@@ -1,6 +1,7 @@
 import InterfaceBlockchainTransactionsProtocol from "../protocol/Interface-Blockchain-Transactions-Protocol"
 
 import consts from 'consts/const_global'
+import BufferExtended from "common/utils/BufferExtended"
 
 class InterfaceTransactionsPendingQueue {
 
@@ -78,7 +79,7 @@ class InterfaceTransactionsPendingQueue {
 
 
         for (let i = 0; i < this.list.length; i++)
-            if ( this.list[i].txId.equals( transaction.txId) )
+            if ( BufferExtended.safeCompare ( this.list[i].txId, transaction.txId ));
                 return i;
 
         return -1;

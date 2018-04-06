@@ -4,7 +4,7 @@ import InterfaceBlockchainProtocolTipsManager from "./Interface-Blockchain-Proto
 
 import Serialization from 'common/utils/Serialization';
 import NodeProtocol from 'common/sockets/protocol/node-protocol'
-
+import BufferExtended from "common/utils/BufferExtended"
 
 /**
  * Blockchain Protocol
@@ -179,7 +179,7 @@ class InterfaceBlockchainProtocol {
                         if (this.blockchain.agent.light && this.blockchain.blocks.blocksStartingPoint > data.height ){
                             //you are ok
                         } else
-                        if (this.blockchain.blocks[data.height].hash.equals(data.header.hash) === true)
+                        if ( BufferExtended.safeCompare(this.blockchain.blocks[data.height].hash, data.header.hash) === true)
                             throw {message: "your block is not new, because I have the same block at same height"};
 
                     }
@@ -342,7 +342,7 @@ class InterfaceBlockchainProtocol {
 
                 //in case the hashes are exactly the same, there is no reason why we should download it
                 let myHash = this.blockchain.getHashPrev(data.height+1);
-                if ( myHash !== undefined && myHash !== null && myHash.equals(data.header.hash) === true )
+                if ( myHash !== undefined && myHash !== null && BufferExtended.safeCompare(myHash, data.header.hash) === true )
                     throw {message: "your block is not new, because I have the same block at same height"};
 
             }

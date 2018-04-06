@@ -24,7 +24,7 @@ class InterfaceBlockchainTransactionsEvents{
             if (block === undefined) continue;
 
             for (let i=0; i<block.data.transactions.transactions.length; i++){
-                if (block.data.transactions.transactions[i].txId.equals(txId))
+                if (BufferExtended.safeCompare(block.data.transactions.transactions[i].txId, txId))
                     return block.data.transactions.transactions[i];
             }
 
@@ -128,11 +128,11 @@ class InterfaceBlockchainTransactionsEvents{
     _searchAddressInTransaction(unencodedAddress, transaction){
 
         for (let i=0; i<transaction.from.addresses.length; i++)
-            if (transaction.from.addresses[i].unencodedAddress.equals(unencodedAddress))
+            if (BufferExtended.safeCompare(transaction.from.addresses[i].unencodedAddress, unencodedAddress))
                 return true;
 
         for (let i=0; i<transaction.to.addresses.length; i++)
-            if (transaction.to.addresses[i].unencodedAddress.equals(unencodedAddress))
+            if (BufferExtended.safeCompare(transaction.to.addresses[i].unencodedAddress, unencodedAddress))
                 return true;
 
         return false;

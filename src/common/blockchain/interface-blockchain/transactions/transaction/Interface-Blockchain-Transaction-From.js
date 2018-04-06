@@ -173,8 +173,10 @@ class InterfaceBlockchainTransactionFrom{
         //in case it is a WIF address
         unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(unencodedAddress);
 
+        BufferExtended.safeCompare(this.root.hash.sha256, tree.root.hash.sha256);
+
         for (let i = 0; i<this.addresses.length; i++)
-            if (this.addresses[i].unencodedAddress.equals( unencodedAddress ) )
+            if ( BufferExtended.safeCompare(this.addresses[i].unencodedAddress, unencodedAddress ) )
                 return i;
 
         return -1;

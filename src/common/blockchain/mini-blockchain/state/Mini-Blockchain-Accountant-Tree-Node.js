@@ -53,7 +53,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         let result;
 
         for (let i = 0; i < this.balances.length; i++)
-            if (this.balances[i].id.equals( tokenId )) {
+            if (BufferExtended.safeCompare(this.balances[i].id, tokenId )) {
                 this.balances[i].amount += value;
                 result = this.balances[i];
                 break;
@@ -103,7 +103,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         if (this.balances !== undefined)
             for (let i = 0; i < this.balances.length; i++)
-                if (this.balances[i].id.equals( tokenId) )
+                if ( BufferExtended.safeCompare(this.balances[i].id, tokenId) )
                     return this.balances[i].amount;
 
         return 0;

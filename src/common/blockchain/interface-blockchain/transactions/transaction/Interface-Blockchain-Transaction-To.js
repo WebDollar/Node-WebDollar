@@ -82,7 +82,7 @@ class InterfaceBlockchainTransactionTo{
                 throw {message: "To.Object Amount is an invalid number", address: toObject, index:index} ;
 
             for (let i=0; i<this.transaction.from.addresses.length; i++)
-                if (this.transaction.from.addresses[i].unencodedAddress.equals( toObject.unencodedAddress ))
+                if ( BufferExtended.safeCompare(this.transaction.from.addresses[i].unencodedAddress, toObject.unencodedAddress ))
                     throw {message: "To.Object Address is included in the input and it should not be included in output ", address: toObject}
 
 

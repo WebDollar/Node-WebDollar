@@ -1,4 +1,5 @@
 import InterfaceBlockchainFork from './Interface-Blockchain-Fork'
+import BufferExtended from "common/utils/BufferExtended"
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -75,7 +76,8 @@ class InterfaceBlockchainForksAdministrator {
             return null;
 
         for (let i = 0; i < this.forks.length; i++)
-            if ( this.forks[i].forkHeader !== null && this.forks[i].forkHeader.hash !== undefined && this.forks[i].forkHeader.hash !== null && (this.forks[i].forkHeader === header || this.forks[i].forkHeader.hash.equals( header.hash )) )
+            if ( this.forks[i].forkHeader !== null && this.forks[i].forkHeader.hash !== undefined && this.forks[i].forkHeader.hash !== null &&
+                (this.forks[i].forkHeader === header || BufferExtended.safeCompare(this.forks[i].forkHeader.hash, header.hash )) )
                 return this.forks[i];
 
         return null;

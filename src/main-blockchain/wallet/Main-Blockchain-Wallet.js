@@ -538,7 +538,7 @@ class MainBlockchainWallet{
             AdvancedMessages.log("Address deleted " + addressToDelete, "Address deleted " + addressToDelete.toString());
 
             //setting the next minerAddress
-            if (this.blockchain.mining.minerAddress === undefined || this.blockchain.mining.unencodedMinerAddress.equals(addressToDelete.unencodedAddress) ) {
+            if (this.blockchain.mining.minerAddress === undefined || BufferExtended.safeCompare(this.blockchain.mining.unencodedMinerAddress, addressToDelete.unencodedAddress) ) {
                 this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
                 this.blockchain.mining.resetMining();
             }

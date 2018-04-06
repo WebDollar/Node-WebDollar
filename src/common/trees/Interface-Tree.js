@@ -1,6 +1,7 @@
 import InterfaceTreeEdge from './Interface-Tree-Edge';
 import InterfaceTreeNode from './Interface-Tree-Node';
 import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
+import BufferExtended from "../utils/BufferExtended";
 
 class InterfaceTree{
 
@@ -113,9 +114,9 @@ class InterfaceTree{
             node = this.root;
 
         if (!Buffer.isBuffer(value))
-            value = WebDollarCryptoData.createWebDollarCryptoData(value).buffer
+            value = WebDollarCryptoData.createWebDollarCryptoData(value).buffer;
 
-        if ( node.value !== undefined && node.value !== null && node.value.equals (value) ) {
+        if ( node.value !== undefined && node.value !== null && BufferExtended.safeCompare(node.value, value) ) {
             return { result: true, node: node, value: node.value }
         }
 

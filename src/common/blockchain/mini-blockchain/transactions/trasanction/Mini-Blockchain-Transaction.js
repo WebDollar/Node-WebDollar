@@ -3,6 +3,7 @@ import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockcha
 import MiniBlockchainTransactionFrom from './Mini-Blockchain-Transaction-From'
 import MiniBlockchainTransactionTo from './Mini-Blockchain-Transaction-To'
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import BufferExtended from "../../../../utils/BufferExtended";
 
 class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
@@ -43,7 +44,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
                 transactionsList.forEach((transaction)=>{
 
-                    if (transaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress))
+                    if ( BufferExtended.safeCompare(transaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress))
                         foundNonce[ transaction.nonce ] = true;
 
                 });
@@ -72,7 +73,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
             this.blockchain.transactions.pendingQueue.list.forEach((pendingTransaction) => {
 
-                if (pendingTransaction.from.addresses[0].unencodedAddress.equals(this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce >= nonce ) {
+                if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce >= nonce ) {
                     nonce++;
                 }
 

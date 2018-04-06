@@ -132,7 +132,7 @@ class InterfaceBlockchainTransaction{
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock};
 
         let txId = this._computeTxId();
-        if (!txId.equals( this.txId ) ) throw {message: "txid don't match"};
+        if (! BufferExtended.safeCompare(txId, this.txId ) ) throw {message: "txid don't match"};
 
         if (!this.from)
             throw { message: 'Transaction Validation Invalid: From was not specified', from: this.from };
@@ -328,7 +328,7 @@ class InterfaceBlockchainTransaction{
 
         for (let i=0; i<addresses.length; i++)
             for (let j=i+1; j<addresses.length; j++)
-                if (addresses[i].unencodedAddress.equals(addresses[j].unencodedAddress))
+                if (BufferExtended.safeCompare ( addresses[i].unencodedAddress, addresses[j].unencodedAddress))
                     throw {message: "address has identical inputs"};
 
         return true;

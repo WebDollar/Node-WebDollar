@@ -109,7 +109,7 @@ class InterfaceBlockchainBlock {
             if ( previousHash === null || !Buffer.isBuffer(previousHash))
                 throw {message: 'previous hash is not given'};
 
-            if (! previousHash.equals(this.hashPrev))
+            if (! BufferExtended.safeCompare(previousHash, this.hashPrev))
                 throw {message: "block prevHash doesn't match ", prevHash: previousHash.toString("hex"), hashPrev: this.hashPrev.toString("hex")};
         }
 
@@ -121,7 +121,7 @@ class InterfaceBlockchainBlock {
 
             let hash = await this.computeHash();
 
-            if (!hash.equals(this.hash))
+            if (! BufferExtended.safeCompare(hash, this.hash))
                 throw {message: "block hash is not right", nonce: this.nonce, height: this.height, myHash:this.hash.toString("hex"), hash:hash.toString("hex"),
                        difficultyTargetPrev: this.difficultyTargetPrev.toString("hex"), serialization: Buffer.concat( [this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)] ).toString("hex")};
 
@@ -353,8 +353,7 @@ class InterfaceBlockchainBlock {
     
     equals(targetBlock){
 
-        return this.hash.equals(targetBlock.hash) &&
-            this.hashPrev.equals(targetBlock.hashPrev) &&
+        return BufferExtended.safeCompare(this.hash, targetBlock.hash) &&
             this.height === targetBlock.height &&
             this.nonce === targetBlock.nonce &&
             this.version === targetBlock.version;

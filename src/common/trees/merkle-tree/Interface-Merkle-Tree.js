@@ -1,5 +1,4 @@
-import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
+import BufferExtended from "common/utils/BufferExtended"
 
 import InterfaceTree from 'common/trees/Interface-Tree'
 import InterfaceMerkleTreeNode from './Interface-Merkle-Tree-Node'
@@ -43,7 +42,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         let result = this.validateRoot();
         result = result && tree.validateRoot();
 
-        result = result && this.root.hash.sha256.equals(tree.root.hash.sha256);
+        result = result && BufferExtended.safeCompare(this.root.hash.sha256, tree.root.hash.sha256);
 
         return result;
     }

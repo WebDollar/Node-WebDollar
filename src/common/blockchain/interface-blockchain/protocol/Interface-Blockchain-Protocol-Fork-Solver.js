@@ -3,6 +3,7 @@ import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-R
 import global from "consts/global"
 import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
+import BufferExtended from "../../../utils/BufferExtended";
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
@@ -117,7 +118,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) )
                     throw {message: "connection headers-info malformed"};
 
-                if (answer.header.hash.equals( this.blockchain.blocks.last.hash ))
+                if (  BufferExtended.safeCompare(answer.header.hash, this.blockchain.blocks.last.hash ) )
 
                     binarySearchResult = {
                         position : currentBlockchainLength,

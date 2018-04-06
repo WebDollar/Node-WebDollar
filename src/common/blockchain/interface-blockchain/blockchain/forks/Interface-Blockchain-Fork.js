@@ -238,8 +238,8 @@ class InterfaceBlockchainFork {
 
                 console.error('-----------------------------------------');
                 console.error("saveFork includeBlockchainBlock1 raised exception");
-                console.error( exception.message );
-                console.error("index", index, "forkStartingHeight", this.forkStartingHeight, "fork", this);
+                this.printException( exception );
+                console.error("index", index, "forkStartingHeight", this.forkStartingHeight, "fork");
                 console.error('-----------------------------------------');
                 forkedSuccessfully = false;
 
@@ -272,8 +272,9 @@ class InterfaceBlockchainFork {
                 this._deleteBackupBlocks();
                 console.log("FORK STATUS SUCCESS4: ", forkedSuccessfully);
 
-                await this.blockchain.saveBlockchain();
+                await this.blockchain.saveBlockchain(this.forkStartingHeight);
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
+
                 this.blockchain.mining.resetMining();
                 console.log("FORK STATUS SUCCESS6: ", forkedSuccessfully);
             }
@@ -424,6 +425,36 @@ class InterfaceBlockchainFork {
 
     }
 
+    printException(exception){
+
+        exception = JSON.stringify(exception);
+
+        let isIterable = (obj) => {
+            // checks for null and undefined
+            if (obj === null)
+                return false;
+            return typeof obj[Symbol.iterator] === 'function';
+        };
+
+        let removeBlocks = (obj, depth=1000)=>{
+
+            if (depth <= 0) return;
+
+            if (isIterable(obj) || Array.isArray(obj) )
+            for (let key in obj)
+                if (obj.hasOwnProperty(key)){
+                    if (key === "blocks")
+                        obj[key] = '';
+
+                    removeBlocks(obj[key], depth-1);
+                }
+
+        };
+
+        removeBlocks(exception);
+        console.error(exception);
+
+    }
 
 }
 

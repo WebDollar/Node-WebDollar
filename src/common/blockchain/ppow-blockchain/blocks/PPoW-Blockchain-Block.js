@@ -77,7 +77,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     
     _validateInterlink() {
 
-        if (this.interlink[0].height !== -1 || !this.interlink[0].blockId.equals(BlockchainGenesis.hashPrev)){
+        if (this.interlink[0].height !== -1 || ! BufferExtended.safeCompare(this.interlink[0].blockId, BlockchainGenesis.hashPrev)){
             console.error("Interlink to Genesis is wrong! ");
             return false;
         }
@@ -85,7 +85,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         for (let i = 1; i < this.interlink.length; ++i){
             let link = this.interlink[i];
             let linkedBlock = this.blockchain.blocks[link.height];
-            if (!linkedBlock.hash.equals(link.blockId)){
+
+            if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId)){
                 console.error("Interlink to Genesis is wrong! ");
                 return false;
             }

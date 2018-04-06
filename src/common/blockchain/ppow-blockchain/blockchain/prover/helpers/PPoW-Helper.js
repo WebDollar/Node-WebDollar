@@ -1,4 +1,5 @@
 import consts from 'consts/const_global'
+import BufferExtended from "../../../../../utils/BufferExtended";
 
 class PPoWHelper{
 
@@ -21,13 +22,12 @@ class PPoWHelper{
             const block1 = proofs1.blocks[i1];
             const block2 = proofs2.blocks[i2];
 
-            if (block1.equals(block2)) {
+            if (BufferExtended.safeCompare(block1, block2))
                 return block1;
-            } else if (block1.height > block2.height) {
+            else if (block1.height > block2.height)
                 i1--;
-            } else {
+            else
                 i2--;
-            }
         }
 
         return null;
