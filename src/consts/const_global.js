@@ -223,6 +223,10 @@ consts.SETTINGS = {
 
             WEBRTC: {
                 MAXIMUM_CONNECTIONS: 5,
+            },
+
+            FORKS:{
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 50,
             }
 
         },

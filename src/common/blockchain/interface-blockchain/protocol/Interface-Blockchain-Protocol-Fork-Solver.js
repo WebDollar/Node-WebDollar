@@ -181,6 +181,13 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 }
 
+            //maximum blocks to download
+            if (!this.blockchain.agent.light){
+                    if (newChainLength > this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD){
+                        newChainLength = this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD;
+                    }
+            }
+
             //its a fork... starting from position
             console.log("fork position", binarySearchResult.position, "newChainStartingPoint", newChainStartingPoint, "newChainLength", newChainLength);
 
