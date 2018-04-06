@@ -115,32 +115,27 @@ class CLI{
         let miningAddress = Blockchain.blockchain.mining.minerAddress;
         if (miningAddress === undefined)
             miningAddress = 'not specified';
-
-        console.log("miningAddress=", miningAddress);
-
+        
         console.log(addressHeader);
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
 
             let address = Blockchain.Wallet.addresses[i].address;
 
             let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
-            if (balance === null)
-                balance = 0;
-            balance /= WebDollarCoins.WEBD;
             
+            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+
             if (address === miningAddress) {
                 console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
             } else {
                 console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
             }
         }
-
+        
         let balance = 0;
         if (miningAddress !== 'not specified') {
             balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
-            if (balance === null)
-                balance = 0;
-            balance /= WebDollarCoins.WEBD;
+            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
         }
         console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
 
@@ -153,11 +148,12 @@ class CLI{
         try {
             let address = await Blockchain.Wallet.createNewAddress();
             console.info("Address was created: " + address.address);
+            return true;
         } catch(err) {
             console.err(err);
+            return false;
         }
 
-        return true;
     }
 
     async deleteAddress() {
@@ -268,6 +264,7 @@ class CLI{
     }
 
     async encryptAddress() {
+
         console.info('Encrypt address.');
 
         let addressId = await this._chooseAddress();
@@ -290,6 +287,7 @@ class CLI{
     }
 
     async setMiningAddress() {
+
         console.info('Set mining address.');
 
         let addressId = await this._chooseAddress();
