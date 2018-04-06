@@ -149,7 +149,7 @@ class MiniBlockchain extends  inheritBlockchain{
     }
 
 
-    async saveBlockchain(){
+    async saveBlockchain( startingHeight, endingHeight ){
 
         if (process.env.BROWSER)
             return true;
@@ -160,10 +160,10 @@ class MiniBlockchain extends  inheritBlockchain{
                 return false;
 
             if (! (await this.accountantTree.saveMiniAccountant( true )))
-                throw {message: "Couldn't save the Account Tree"}
+                throw {message: "Couldn't save the Account Tree"};
 
-            if (! (await inheritBlockchain.prototype.saveBlockchain.call(this)))
-                throw {message: "couldn't sae the blockchain"}
+            if (! (await inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
+                throw {message: "couldn't sae the blockchain"};
 
             return true;
 

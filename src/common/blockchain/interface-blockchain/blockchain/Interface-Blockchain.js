@@ -251,7 +251,7 @@ class InterfaceBlockchain {
         return true;
     }
 
-    async saveBlockchain(onlyLastBlocks){
+    async saveBlockchain(startingHeight, endingHeight){
 
         if (process.env.BROWSER)
             return true;
@@ -263,19 +263,15 @@ class InterfaceBlockchain {
             console.error("Error saving the blocks.length");
         else {
 
-            let indexStart = 0;
+            if (startingHeight === undefined) startingHeight = this.blocks.blocksStartingPoint;
+            if (endingHeight === undefined) endingHeight = this.blocks.length-1;
 
-            if (onlyLastBlocks !== undefined)
-                indexStart = this.blocks.length - onlyLastBlocks;
-
-            for (let i = indexStart; i < this.blocks.length; ++i)
+            for (let i = startingHeight; i < endingHeight; i++ )
 
                 if (this.blocks[i] !== undefined && this.blocks[i] !== null) {
 
-                    let response = await this.blocks[i].saveBlock();
-
-                    if (response !== true)
-                        break;
+                    if (! ( await this.blocks[i].saveBlock()) )
+                        break
                 }
         }
 
@@ -320,8 +316,6 @@ class InterfaceBlockchain {
             for (let i = indexStart; i < numBlocks; ++i) {
 
                 let validationType = this._getLoadBlockchainValidationType(indexStart, i, numBlocks, onlyLastBlocks);
-
-                console.log("validationType", validationType);
 
                 let blockValidation = new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
 
