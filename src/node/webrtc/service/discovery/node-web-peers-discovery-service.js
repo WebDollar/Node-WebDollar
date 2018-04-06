@@ -22,12 +22,8 @@ class NodeWebPeersDiscoveryService {
         if (nodesListObject.type === "webpeer" ||   // signaling service on webpeer
             nodesListObject.type === "client") {
 
-            let params = {
-                connections: consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS - NodesList.countNodes("webpeer"),
-            }
-
             //client Signaling for WebRTC
-            //nodesListObject.socket.node.protocol.signaling.client.initializeSignalingClientService(params);
+            nodesListObject.socket.node.protocol.signaling.client.initializeSignalingClientService(params);
 
         }
 

@@ -13,7 +13,6 @@ class NodeSignalingServerProtocol {
 
         this.started = false;
 
-
         console.log("NodeSignalingServerProtocol constructor");
     }
 
@@ -33,7 +32,11 @@ class NodeSignalingServerProtocol {
 
                 let room = SignalingServerRoom2.addSocketToRoom(socket || 0, data.connections);
 
-                this.connect(room);
+                let answer = this.connect(room);
+
+                socket.node.sendRequest("signals/server/register/accept-web-peer-connections"+"/answer", {
+                    result: false,
+                });
 
             } catch (exception){
 

@@ -1,6 +1,7 @@
 import consts from 'consts/const_global'
 
 import SignalingClientList from './signaling-client-list/signaling-client-list'
+import SignalingClientListService from "./signaling-clients-list-service/Signaling-Client-List-Service"
 import NodesList from 'node/lists/nodes-list'
 
 class NodeSignalingClientProtocol {
@@ -10,6 +11,7 @@ class NodeSignalingClientProtocol {
         this.LIMIT_CONNECTIONS = consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS;
 
         console.log("NodeSignalingClientProtocol constructor");
+
     }
 
     /*
@@ -45,7 +47,7 @@ class NodeSignalingClientProtocol {
                 let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, undefined, data.remoteUUID);
                 let webPeer = webPeerSignalingClientListObject.webPeer;
 
-                webPeer.createPeer(true, socket, data.id, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress, data.remoteUUID, socket.level+1);
+                webPeer.createPeer(true, socket, data.id, (iceCandidate) => {this._sendInitiatorIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress, data.remoteUUID, socket.level+1);
 
                 let answer;
 
@@ -150,7 +152,7 @@ class NodeSignalingClientProtocol {
 
             //arrived earlier than  /receive-initiator-signal
             if (webPeer.peer === null){
-                webPeer.createPeer(false, socket, data.id, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress, data.remoteUUID, socket.level+1 );
+                webPeer.createPeer(false, socket, data.id, (iceCandidate) => {this._sendInitiatorIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress, data.remoteUUID, socket.level+1 );
                 webPeer.peer.signalInitiatorData = data.initiatorSignal;
             }
 
@@ -204,7 +206,7 @@ class NodeSignalingClientProtocol {
                 let webPeer = webPeerSignalingClientListObject.webPeer;
 
                 if (webPeer.peer === null) { //arrived earlier than  /receive-initiator-signal
-                    webPeer.createPeer(false, socket, data.id, (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate)}, data.remoteAddress, data.remoteUUID, socket.level + 1);
+                    webPeer.createPeer(false, socket, data.id, (iceCandidate) => {this._sendAnswerIceCandidate(socket, data.id, iceCandidate)}, data.remoteAddress, data.remoteUUID, socket.level + 1);
                     webPeer.peer.signalInitiatorData = data.initiatorSignal;
                 }
 
@@ -253,7 +255,7 @@ class NodeSignalingClientProtocol {
                 let webPeer = webPeerSignalingClientListObject.webPeer;
 
                 if (webPeer.peer === null) { //arrived earlier than  /receive-initiator-signal
-                    webPeer.createPeer(false, socket, data.id, (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress, data.remoteUUID, socket.level+1);
+                    webPeer.createPeer(false, socket, data.id, (iceCandidate) => {this._sendAnswerIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress, data.remoteUUID, socket.level+1);
                     webPeer.peer.signalInitiatorData = data.initiatorSignal;
                 }
 
@@ -283,31 +285,30 @@ class NodeSignalingClientProtocol {
 
     }
 
-    initializeSignalingClientService(socket, params) {
+    initializeSignalingClientService(socket) {
 
-        this._initializeSignalingClientService1(socket, params);
-        this._initializeSignalingClientService2(socket, params);
+        this._initializeSignalingClientService1(socket);
+        this._initializeSignalingClientService2(socket);
 
-        this.subscribeClientToSignalingServer(socket, params);
-    }
-
-    subscribeClientToSignalingServer(socket, params){
-
-        if (socket.node.type === "client" || socket.node.type === "webpeer")
-            socket.node.sendRequest("signals/server/register/accept-web-peer-connections", {params: params} );
-
+        SignalingClientListService.subscribeClientToSignalingServer( socket );
     }
 
 
-    sendInitiatorIceCandidate(socket, connectionId, iceCandidate){
-        //console.log("sendInitiatorIceCandidate", connectionId, iceCandidate);
+
+
+    _sendInitiatorIceCandidate(socket, connectionId, iceCandidate){
+        //console.log("_sendInitiatorIceCandidate", connectionId, iceCandidate);
         socket.node.sendRequest("signals/server/new-initiator-ice-candidate/" + connectionId, {candidate: iceCandidate} )
     }
 
-    sendAnswerIceCandidate(socket, connectionId, iceCandidate){
-        //console.log("sendAnswerIceCandidate", connectionId, iceCandidate);
+    _sendAnswerIceCandidate(socket, connectionId, iceCandidate){
+        //console.log("_sendAnswerIceCandidate", connectionId, iceCandidate);
         socket.node.sendRequest("signals/server/new-answer-ice-candidate/" + connectionId, {candidate: iceCandidate} )
     }
+
+
+
+
 
 }
 

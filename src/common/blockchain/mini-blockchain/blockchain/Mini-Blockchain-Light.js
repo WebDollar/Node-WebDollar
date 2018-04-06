@@ -73,6 +73,10 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         }
 
+        let serialization = this.accountantTree.serializeMiniAccountant();
+        this.lightAccountantTreeSerializations[block.height+1] = serialization;
+
+
         if (! (await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)))
             throw {message: "_recalculateLightPrevs failed"};
 
