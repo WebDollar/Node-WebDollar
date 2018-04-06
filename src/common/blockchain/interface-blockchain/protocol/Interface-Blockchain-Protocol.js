@@ -212,7 +212,7 @@ class InterfaceBlockchainProtocol {
 
             try{
 
-                socket.node.sendRequest("blockchain/info/request-blockchain-info", {
+                socket.node.sendRequest("blockchain/info/request-blockchain-info"+"/answer", {
                     result: true,
                     chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),
                     chainLength: this.blockchain.blocks.length
@@ -222,7 +222,7 @@ class InterfaceBlockchainProtocol {
 
                 console.error("Socket Error - blockchain/info/request-blockchain-info", exception);
 
-                socket.node.sendRequest("blockchain/info/request-blockchain-info", {
+                socket.node.sendRequest("blockchain/info/request-blockchain-info"+"/answer", {
                     result: false,
                     message: exception,
                 });
