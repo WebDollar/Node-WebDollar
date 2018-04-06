@@ -1,7 +1,7 @@
 import InterfaceTreeEdge from './Interface-Tree-Edge';
 import InterfaceTreeNode from './Interface-Tree-Node';
 import WebDollarCryptoData from "common/crypto/WebDollar-Crypto-Data";
-import BufferExtended from "../utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 class InterfaceTree{
 

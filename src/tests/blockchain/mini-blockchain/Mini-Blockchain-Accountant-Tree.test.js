@@ -1,4 +1,4 @@
-import BufferExtended from "../../../common/utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 var assert = require('assert')
 

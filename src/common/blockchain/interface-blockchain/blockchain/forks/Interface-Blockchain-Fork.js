@@ -177,7 +177,6 @@ class InterfaceBlockchainFork {
 
 
 
-
         let revertActions = new RevertActions(this.blockchain);
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {

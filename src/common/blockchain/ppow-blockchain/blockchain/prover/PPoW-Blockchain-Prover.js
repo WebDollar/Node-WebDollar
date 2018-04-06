@@ -2,7 +2,7 @@ import consts from 'consts/const_global'
 import PPoWHelper from './helpers/PPoW-Helper'
 import PPowBlockchainProofs from './PPoW-Blockchain-Proofs'
 import PPowBlockchainLastBlocks from './PPoW-Blockchain-LastBlocks'
-import BufferExtended from "../../../../utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 class PPoWBlockchainProver{
 

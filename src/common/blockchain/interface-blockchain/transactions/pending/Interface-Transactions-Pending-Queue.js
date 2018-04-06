@@ -79,7 +79,7 @@ class InterfaceTransactionsPendingQueue {
 
 
         for (let i = 0; i < this.list.length; i++)
-            if ( BufferExtended.safeCompare ( this.list[i].txId, transaction.txId ));
+            if ( BufferExtended.safeCompare ( this.list[i].txId, transaction.txId ))
                 return i;
 
         return -1;

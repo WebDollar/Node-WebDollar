@@ -170,9 +170,7 @@ class InterfaceBlockchainBlockDataTransactions {
                 throw {message: "couldn't process the transaction ", transaction: transaction.txId };
         }
 
-        transaction.processTransaction(multiplicationFactor, revertActions );
-
-        transaction.processTransactionFees( multiplicationFactor, minerAddress, revertActions);
+        transaction.processTransaction(multiplicationFactor, minerAddress, revertActions );
 
         return true;
 

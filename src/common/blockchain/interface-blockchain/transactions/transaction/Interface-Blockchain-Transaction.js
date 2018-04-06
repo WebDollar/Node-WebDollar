@@ -278,15 +278,17 @@ class InterfaceBlockchainTransaction{
      * It will update the Accountant Tree
      */
 
-    processTransaction(multiplicationFactor = 1 , revertActions){
+    processTransaction(multiplicationFactor = 1 , minerAddress, revertActions){
 
-        if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false
+        if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false;
         if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
+
+        this._processTransactionFees( multiplicationFactor, minerAddress, revertActions);
 
         return true;
     }
 
-    processTransactionFees(){
+    _processTransactionFees(){
         let inputSum = this.from.calculateInputSum();
         let outputSum = this.to.calculateOutputSum();
 

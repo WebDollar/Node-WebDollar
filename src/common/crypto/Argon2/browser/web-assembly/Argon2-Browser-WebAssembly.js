@@ -4,7 +4,7 @@ import Argon2WebAssemblyCalcClass from './antelle/calc.js'
 let Argon2WebAssemblyCalc = new Argon2WebAssemblyCalcClass();
 
 import Argon2WebAssemblyMain from './antelle/main.js'
-import BufferExtended from "../../../../utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 //require('antelle/worker.js')
 
 /*

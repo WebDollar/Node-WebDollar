@@ -1,5 +1,5 @@
 import consts from 'consts/const_global'
-import BufferExtended from "../../../../utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 class MiningTransactionsSelector{
 

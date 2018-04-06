@@ -1,6 +1,6 @@
 import InterfaceBlockchainTransactionFrom from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction-From'
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
-import BufferExtended from "../../../../utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 

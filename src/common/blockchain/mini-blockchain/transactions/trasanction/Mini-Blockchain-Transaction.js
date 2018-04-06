@@ -3,7 +3,7 @@ import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockcha
 import MiniBlockchainTransactionFrom from './Mini-Blockchain-Transaction-From'
 import MiniBlockchainTransactionTo from './Mini-Blockchain-Transaction-To'
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
-import BufferExtended from "../../../../utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
@@ -15,13 +15,13 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return new MiniBlockchainTransactionTo(this, to);
     }
 
-    processTransaction(multiplicationFactor = 1, revertActions){
+    processTransaction(multiplicationFactor = 1, minerAddress, revertActions){
 
         let nonce = this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions);
 
         if (nonce === undefined || nonce === null) throw { message: "nonce is empty in process transaction" };
 
-        return InterfaceBlockchainTransaction.prototype.processTransaction.call(this, multiplicationFactor, revertActions);
+        return InterfaceBlockchainTransaction.prototype.processTransaction.call(this, multiplicationFactor, minerAddress, revertActions);
     }
 
     _validateNonce(blockValidationType){
@@ -86,7 +86,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return nonce;
     }
 
-    processTransactionFees(multiplicationFactor=1, minerAddress = undefined, revertActions){
+    _processTransactionFees(multiplicationFactor=1, minerAddress = undefined, revertActions){
 
         //validate amount
         let inputSum = this.from.calculateInputSum();

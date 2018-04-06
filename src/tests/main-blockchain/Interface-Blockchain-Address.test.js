@@ -4,7 +4,7 @@ let assert = require('assert');
 
 import MultiSig from 'common/blockchain/interface-blockchain/addresses/MultiSig';
 import Blockchain from 'main-blockchain/Blockchain';
-import BufferExtended from "../../common/utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 describe('test save addresses to local storage', () => {
 

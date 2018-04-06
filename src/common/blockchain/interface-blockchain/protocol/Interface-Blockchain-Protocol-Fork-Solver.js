@@ -3,7 +3,7 @@ import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-R
 import global from "consts/global"
 import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
-import BufferExtended from "../../../utils/BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
