@@ -89,7 +89,7 @@ Install No-IP app (5 mb) via https://www.noip.com/download
 Follow the Setup using your account and set it up to automatically update your ip
 
 ### Windows, Unix, Mac
-1. `run start`
+1. `npm run start`
 2. open http://127.0.0.1
 2. open http://yourdomain.ddns.net or whatever no-ip domain you have and should receive the same message. In case it will fail to return, it means that your no-ip domain is not configured properly. Are you sure you installed the no-ip software and configured with your account?
 
