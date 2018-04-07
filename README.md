@@ -73,7 +73,7 @@ WebDollar uses SSL (Secured Socket Layer) and in order to generate your SSL Cert
 
 ### 4.1 No-IP solution for Free Domain
 
-Create a fre account to https://www.noip.com
+Create a free account to https://www.noip.com
 
 #### Unix
 
@@ -89,7 +89,7 @@ Install No-IP app (5 mb) via https://www.noip.com/download
 Follow the Setup using your account and set it up to automatically update your ip
 
 ### Windows, Unix, Mac
-1. `run start`
+1. `npm run start`
 2. open http://127.0.0.1
 2. open http://yourdomain.ddns.net or whatever no-ip domain you have and should receive the same message. In case it will fail to return, it means that your no-ip domain is not configured properly. Are you sure you installed the no-ip software and configured with your account?
 
@@ -118,48 +118,44 @@ Unix
 If you are under a **router/firewall**, you need to port forward the port used by the Nodes **80** or whatever port they use
 
 
-## 3. **Console commands**
+## 5. **Console commands**
 
-### Run terminal interactive menu
+#### 5.1 Run terminal interactive menu
 ```
 npm run commands
 ```
 
-Run Mocha Tests
+#### 5.2 Run Mocha Tests
 ```
-npm test                                                       
+npm run test                                                       
 ```
 
-
-#### Missing Packages or Errors
+#### 5.3 Missing Packages or Errors
 Obs. In case there you get an error message about some missing packages like the following one:
 
 ``` Error: Cannot find module 'name_missing_package' ```
 
 just, run ```npm install name_missing_package```
 
-## Building Dist
 
-### Building Dist for Browser (webpack)
+#### 5.4 Building Dist for Browser (webpack)
 ```
 npm run build_browser
 ```
 
-#### Building Dist for Browser TEST (dist_bundle/browser/browser.html)
+#### 5.5 Building Dist for Browser TEST (dist_bundle/browser/browser.html)
 ```
 npm run test_browser
 ```
 
-### Building Dist for User-Interface
+#### 5.6 Building Dist for User-Interface
 ```
 npm run build_browser_user_interface
 ```
 
-
-
 open web page `dist_bundle/browser/browser.html`
 
-### Running Server in Node.js
+#### 5.7 Running Server in Node.js
 
 ```
 npm run start_double_connections
@@ -179,8 +175,7 @@ npm install bufferutil utf-8-validate
 # To do:
 
 1. Pool Mining
-2. Exchange
-3. Multi-sig with Schnorr Signatures
+2. Multi-sig with Schnorr Signatures
 
 
 # Materials to learn
