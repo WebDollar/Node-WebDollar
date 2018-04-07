@@ -2,6 +2,8 @@ const uuid = require('uuid');
 
 let consts = {
 
+    DEBUG: false,
+
 };
 
 consts.BLOCKCHAIN = {
@@ -253,7 +255,11 @@ consts.SETTINGS = {
 
 
 
-
+if ( consts.DEBUG === true ){
+    consts.SETTINGS.NODE.VERSION += "1";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "1";
+    consts.SETTINGS.NODE.SSL = false;
+}
 
 
 export default consts
