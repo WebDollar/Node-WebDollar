@@ -81,10 +81,7 @@ class Blockchain{
         StatusEvents.emit('blockchain/status', {message: "Single Window"});
 
 
-        await this.initializeBlockchain();
-
-        if (typeof initializationCallback === "function")
-            initializationCallback();
+        await this.initializeBlockchain( initializationCallback );
 
     }
 
@@ -100,12 +97,15 @@ class Blockchain{
         }
     }
 
-    async initializeBlockchain(){
+    async initializeBlockchain(initializationCallback){
 
         await this.loadWallet();
 
         //loading the blockchain
         let blockchainLoaded = await this.loadBlockchain();
+
+        if (typeof initializationCallback === "function")
+            initializationCallback();
 
         await this.Agent.initializeStartAgent();
 
