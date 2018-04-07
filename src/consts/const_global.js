@@ -208,7 +208,9 @@ consts.SETTINGS = {
 
         MAX_SIZE: {
             BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,       // in bytes
-            SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50    // in bytes
+            SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50,    // in bytes
+
+            SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 100 * 1024,
         },
 
         WALLET:{
