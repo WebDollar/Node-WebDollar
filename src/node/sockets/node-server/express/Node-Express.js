@@ -2,6 +2,10 @@ const https = require('https');
 const express = require('express')
 const cors = require('cors');
 const fs = require('fs')
+const resolve = file => path.resolve(__dirname, file)
+const serve = (path, cache) => express.static(resolve(path), {
+    maxAge: cache && isProd ? 1000 * 60 * 60 * 24 * 30 : 0
+});
 
 import consts from 'consts/const_global'
 
@@ -21,34 +25,50 @@ class NodeExpress{
 
             this.app = express();
             this.app.use(cors({ credentials: true }));
+            this.app.use('/.well-known/acme-challenge', serve('./certificates/well-known/acme-challenge', true) );
 
-            var options = {
-                key: fs.readFileSync('./certificates/private.key', 'utf8'),
-                cert: fs.readFileSync('./certificates/certificate.crt', 'utf8'),
-                ca: fs.readFileSync('./certificates/ca_bundle.crt', 'utf8')
-            };
+            var options = {};
 
             let port = process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
 
-            this.https = https.createServer(options, this.app).listen(port, ()=>{
+            try {
 
-                this._initializeRouter();
+                options.key = fs.readFileSync('./certificates/private.key', 'utf8');
+                options.cert = fs.readFileSync('./certificates/certificate.crt', 'utf8');
+                options.ca = fs.readFileSync('./certificates/ca_bundle.crt', 'utf8');
 
-                console.log("HTTPS Express was opened on port "+port)
-                resolve(true);
+                this.https = https.createServer(options, this.app).listen(port, ()=>{
 
-            });
+                    this._initializeRouter();
+
+                    console.log("HTTPS Express was opened on port "+port);
+                    resolve(true);
+
+                });
+
+            } catch (exception){
+
+                //cloudflare generates its own SSL certificate
+                this.app.listen(port, () => {
+                    console.log(`server started at localhost:${port}`)
+                    this._initializeRouter();
+                });
+
+
+            }
 
         })
     }
 
     _initializeRouter(){
 
+
+
         // respond with "hello world" when a GET request is made to the homepage
         this.app.get('/', (req, res) => {
 
             res.json({
-                name: 'WebDollar',
+                protocol: 'WebDollar',
                 version: consts.SETTINGS.NODE.VERSION
             });
 
@@ -64,14 +84,6 @@ class NodeExpress{
             res.json( { ping: "pong" });
         });
 
-        /**
-         *      Used for https://www.sslforfree.com to generate SSL certificates
-         *
-         */
-
-        this.app.get('sslforce-key', (req, res) => {
-            res.send( 'sslforce-answer' );
-        })
 
     }
 

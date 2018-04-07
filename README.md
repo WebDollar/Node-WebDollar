@@ -67,18 +67,63 @@ env CXX=g++-5 npm install argon2
 
 Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 
-##### Argon2 node.js <=0.16.0   
-Installing Argon2 node.js for 0.16.0		
+## 4 SSL (Secured Socket Layer) Certificate
 
-you need to make a small change at the `node_modules/argon2/index.js` after line 45 `crypto.randomBytes`		
-		
-```		
-// Added by Alexandru Ionut Budisteanu		
-if ( options.salt !== undefined)		
-salt = options.salt;		
-```
+WebDollar uses SSL (Secured Socket Layer) and in order to generate your SSL Certificate you need a Domain or to generate your own SSL Certificate for your IP
+
+### 4.1 No-IP solution for Free Domain
+
+Create a fre account to https://www.noip.com
+
+#### Unix
+
+http://www.noip.com/support/knowledgebase/installing-the-linux-dynamic-update-client-on-ubuntu/
+
+Tutorial how to make NO-IP as start-up service in Linux
+https://askubuntu.com/questions/903411/how-do-i-set-up-no-ip-as-a-proper-service
+
+#### Windows
+
+Install No-IP app (5 mb) via https://www.noip.com/download
+
+Follow the Setup using your account and set it up to automatically update your ip
+
+### Windows, Unix, Mac
+1. `run start`
+2. open http://yourdomain.ddns.net or whatever no-ip domain you have
+
+You should get **a response** {protocol: WebDollar, version: x.x}. 
+
+### 4.2 Generate your SSL certificate
+
+
+1. Open https://www.sslforfree.com/
+2. Include your new no-ip domain
+3. Click the **Manual Verification**
+4. Click **Manual Verify Domain**
+5. **Download Files**
+6. Copy the downloaded files to the folder /certificates/well-known/acme-challenge
+7. Click on the website "Retry Manual Verification"
+8. Download the Certificates and copy the certificates into the /certificates directory
+9. Restart the terminal and run again `run start`
+10. Delete the .well-know/acme-challenge files (optionally)
+
+
+#### Firewall acceptable
+
+Unix
+`sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT`
+
+If you are under a **router/firewall**, you need to port forward the port used by the Nodes **80** or whatever port they use
+
 
 ## 3. **Console commands**
+
+### Run terminal interactive menu
+```
+npm run commands
+```
+
 Run Mocha Tests
 ```
 npm test                                                       
@@ -109,15 +154,7 @@ npm run test_browser
 npm run build_browser_user_interface
 ```
 
-### Run terminal mining
-```
-npm run start_mining
-```
 
-### Run terminal interactive menu
-```
-npm run commands
-```
 
 open web page `dist_bundle/browser/browser.html`
 
@@ -136,25 +173,13 @@ webpack dist/index.js > dist_bundle/bundle.js
 npm install bufferutil utf-8-validate
 ``` 
 
-### No-IP solution for FallBack server
-http://www.noip.com/support/knowledgebase/installing-the-linux-dynamic-update-client-on-ubuntu/
-
-Tutorial how to make NO-IP as start-up service in Linux
-https://askubuntu.com/questions/903411/how-do-i-set-up-no-ip-as-a-proper-service
-
-#### Firewall acceptable
-
-Unix
-`sudo iptables -A INPUT -p tcp --dport 12320 -j ACCEPT`
-
-If you are under a **router/firewall**, you need to port forward the port used by the Nodes **12320**
 
 
 # To do:
 
 1. Pool Mining
 2. Exchange
-3. Multisig
+3. Multi-sig with Schnorr Signatures
 
 
 # Materials to learn
