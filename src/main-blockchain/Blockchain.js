@@ -85,7 +85,7 @@ class Blockchain{
 
         if (typeof initializationCallback === "function")
             initializationCallback();
-        
+
     }
 
     async loadWallet(){
