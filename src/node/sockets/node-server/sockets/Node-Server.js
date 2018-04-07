@@ -29,6 +29,7 @@ class NodeServer {
         {
             let server = null;
             try {
+
                 server = io({
                     maxHttpBufferSize:consts.SOCKET_MAX_SIZE_BYRES,
                 });
@@ -61,7 +62,7 @@ class NodeServer {
                 let port = process.env.SERVER_PORT||consts.SETTINGS.NODE.PORT;
 
                 try{
-                    server.listen (NodeExpress.https);
+                    server.listen (NodeExpress.server);
                 } catch (Exception) {
                     console.error( "Couldn't open server on port ", port, " try next port") ;
                 }

@@ -40,7 +40,8 @@ class NodeClient {
 
                 // in case the port is not included
                 if (address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
-                if (address.indexOf("https://") === -1 )  address = "https://"+address;
+
+                if (address.indexOf("http" + (consts.SETTINGS.NODE.SSL ? 's' : '') +"://") === -1 )  address = "http"+ (consts.SETTINGS.NODE.SSL ? 's' : '') +"://"+address;
 
                 console.log("connecting... to:                ", address);
 
@@ -49,10 +50,12 @@ class NodeClient {
 
                     // params described in the documentation https://socket.io/docs/client-api#manager
                     socket = io(address, {
+
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
                         timeout: 5000, //10 sec, default 20 sec
-                        secure: true, //https
+
+                        secure: consts.SETTINGS.NODE.SSL, //https
                     });
 
                 }  catch (Exception){

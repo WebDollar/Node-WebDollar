@@ -16,12 +16,11 @@ class BufferExtended {
         if (length-index <= 0)
             throw {message: "length-index <= 0...", buffer: buffer.toString("hex"), index:index, length:length, count: count};
 
-        let array = new Buffer(length - index);
+        let buf = new Buffer(length-index);
+        buffer.copy(buf, 0, index, length);
+        
+        return buf;
 
-        for (let i = index; i < length; i++)
-            array[i-index] = buffer[i];
-
-        return array;
     }
 
     longestMatch(buffer, buffer2, startIndex){

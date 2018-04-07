@@ -1,4 +1,6 @@
 import MiniBlockchainProtocol from "./Mini-Blockchain-Protocol"
+import BufferExtended from "../../../utils/BufferExtended";
+import consts from "consts/const_global"
 
 class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
@@ -29,13 +31,39 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                     throw {message: "height is not valid"};
 
                 let serialization = this.blockchain.getSerializedAccountantTree(data.height);
+                let moreChunks = false;
 
-                //console.log("get/blockchain/accountant-tree/get-accountant-tree", serialization.toString("hex"))
+                if (typeof data.substr === "object" && data.substr !== null) {
 
-                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
-                    result: true,
-                    accountantTree: serialization,
-                });
+                    if (typeof data.substr.startIndex === "number" && typeof data.substr.count === "number") {
+
+                        if (data.substr.count < consts.SETTINGS.PARAMS.MAX_SIZE.MINIMUM_SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES) throw {message:"way to few messages"};
+
+
+                        if ((serialization.length - data.substr.startIndex) > data.substr.count)
+                            moreChunks = true
+                        else
+                            moreChunks = false;
+
+                        if (serialization.length - 1 - data.substr.startIndex > 0)
+                            serialization = BufferExtended.substr(serialization, data.substr.startIndex, Math.min(data.substr.count, serialization.length - 1 - data.substr.startIndex));
+                        else
+                            serialization = new Buffer(0);
+
+                        return socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
+                            result: true,
+                            accountantTree: serialization,
+                            moreChunks: moreChunks,
+                        });
+                        
+                    }
+
+                } else {
+                    return socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
+                        result: true,
+                        accountantTree:serialization,
+                    }); 
+                }
 
 
             } catch (exception){
@@ -95,6 +123,59 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
     }
 
+    async getAccountantTree( socket, height, timeoutCount = 1000 ){
+
+        let downloading = true;
+        let pos = 0;
+        let buffers = [];
+
+        //can not be more than 1000
+        while (downloading && pos < timeoutCount) {
+
+            let answer = await socket.node.sendRequestWaitOnce("get/blockchain/accountant-tree/get-accountant-tree", {
+                    height: height,
+
+                    substr: {
+                        startIndex: pos * consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES,
+                        count: consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES,
+                    }
+
+                },
+
+                height, 10000);
+
+            if (answer === null) throw {message: "get-accountant-tree never received ", forkStartingHeight: height};
+            if (!answer.result) throw {message: "get-accountant-tree return false ", answer: answer.message };
+
+            if ( !Buffer.isBuffer(answer.accountantTree) )
+                throw {message: "accountantTree data is not a buffer"};
+
+            if (answer.accountantTree.length === consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES ||
+                (answer.accountantTree.length <= consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES && !answer.moreChunks))
+            {
+
+                buffers.push(answer.accountantTree);
+
+                if (!answer.moreChunks)
+                    downloading = false;
+
+            }
+
+            pos++;
+
+        }
+
+        if (pos === timeoutCount)
+            throw {message: "accountantTree too many trials"};
+
+        if (buffers.length === 0)
+            throw {message: "accountantTree is empty"};
+
+        let buffer = Buffer.concat(buffers);
+
+        return buffer;
+
+    }
 
 }
 

@@ -1,4 +1,5 @@
 const https = require('https');
+const http = require('http');
 const path = require('path')
 const express = require('express')
 const cors = require('cors');
@@ -34,11 +35,13 @@ class NodeExpress{
 
             try {
 
+                if (!consts.SETTINGS.NODE.SSL) throw {message: "no ssl"};
+
                 options.key = fs.readFileSync('./certificates/private.key', 'utf8');
                 options.cert = fs.readFileSync('./certificates/certificate.crt', 'utf8');
                 options.ca = fs.readFileSync('./certificates/ca_bundle.crt', 'utf8');
 
-                this.https = https.createServer(options, this.app).listen(port, ()=>{
+                this.server = https.createServer(options, this.app).listen(port, ()=>{
 
                     this._initializeRouter();
 
@@ -50,10 +53,12 @@ class NodeExpress{
             } catch (exception){
 
                 //cloudflare generates its own SSL certificate
-                this.app.listen(port, () => {
+                this.server = http.createServer(this.app).listen(port, ()=>{
                     console.log(`server started at localhost:${port}`)
                     this._initializeRouter();
-                });
+
+                    resolve(true);
+                })
 
 
             }

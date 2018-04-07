@@ -1,6 +1,8 @@
 const uuid = require('uuid');
 
-let consts = {};
+let consts = {
+
+};
 
 consts.BLOCKCHAIN = {
 
@@ -188,6 +190,7 @@ consts.SETTINGS = {
         VERSION: "0.277",
         VERSION_COMPATIBILITY: "0.277",
         PROTOCOL: "WebDollar",
+        SSL: true,
 
 
         PORT: 80, //port
@@ -210,7 +213,8 @@ consts.SETTINGS = {
             BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,       // in bytes
             SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50,    // in bytes
 
-            SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 100 * 1024,
+            SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 32 * 1024, //32 kb
+            MINIMUM_SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 32 *1024, //32 kb
         },
 
         WALLET:{
