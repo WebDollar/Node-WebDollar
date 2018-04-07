@@ -12,7 +12,7 @@ export default {
     },
     {
       "addr": ["webdollar.io", "149.56.14.37"],
-      "port": 2095
+      "port": 443
     },
 
     {
