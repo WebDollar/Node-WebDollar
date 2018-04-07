@@ -8,10 +8,6 @@ class BlockchainTimestamp{
 
         this._networkAdjustedTime = new BlockchainnetworkTime(this);
 
-        NodesList.emitter.on("nodes-list/connected", (result) => {
-            this._initializeNewSocket(result)
-        });
-
     }
 
 
@@ -46,8 +42,6 @@ class BlockchainTimestamp{
     _initializeNewSocket(nodesListObject){
 
         let socket = nodesListObject.socket;
-
-        this._sendUTC(socket);
 
         socket.node.on("timestamp/request-timeUTC", (data) => {
             this._sendUTC(socket);

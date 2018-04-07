@@ -270,12 +270,14 @@ class InterfaceBlockchain {
         else {
 
             if (startingHeight === undefined) startingHeight = this.blocks.blocksStartingPoint;
-            if (endingHeight === undefined) endingHeight = this.blocks.length-1;
+            if (endingHeight === undefined) endingHeight = this.blocks.length;
 
+            console.warn("Saving Blockchain. Starting from ", startingHeight, endingHeight);
             for (let i = startingHeight; i < endingHeight; i++ )
 
                 if (this.blocks[i] !== undefined && this.blocks[i] !== null) {
 
+                    console.warn("Saving Block ",i)
                     if (! ( await this.blocks[i].saveBlock()) )
                         break
                 }

@@ -129,7 +129,7 @@ class InterfaceBlockchainTransaction{
         if (this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
 
-        if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock};
+        if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock, blockHeight: blockHeight };
 
         let txId = this._computeTxId();
         if (! BufferExtended.safeCompare(txId, this.txId ) ) throw {message: "txid don't match"};

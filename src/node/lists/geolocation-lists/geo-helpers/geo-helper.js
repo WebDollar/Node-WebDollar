@@ -29,7 +29,7 @@ class GeoHelper {
                 localIP = true;
             }
 
-            let data = await DownloadHelper.downloadMultipleFiles(["http://ip-api.com/json/"+address, "http://freegeoip.net/json/"+address ], 30000);
+            let data = await DownloadHelper.downloadMultipleFiles(["https://ip-api.com/json/"+address, "https://freegeoip.net/json/"+address ], 30000);
 
             if (data !== null && data !== undefined){
 

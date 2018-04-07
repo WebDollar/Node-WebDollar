@@ -3,17 +3,7 @@ let io = require('socket.io');
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
-import NodeProtocol from 'common/sockets/protocol/node-protocol'
-
-import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
-
-/*
-    TUTORIAL
-
-    socket.emit('request', {); // emit an event to the socket
-    io.emit('broadcast', {); // emit an event to all connected socket
-    socket.on('reply', function(){  }); // listen to the event
- */
+import NodeExpress from "./../express/Node-Express";
 
 class NodeServer {
 
@@ -28,9 +18,12 @@ class NodeServer {
 
     }
 
-    startServer(){
+    async startServer(){
 
         this.nodeServer = null;
+
+        if (!NodeExpress.loaded)
+            await NodeExpress.startExpress();
 
         try
         {
@@ -63,16 +56,14 @@ class NodeServer {
             });
 
             try {
-                console.log("SERVER typeof", typeof server);
-
                 //multiple ports, but doesn't work
 
                 let port = process.env.SERVER_PORT||consts.SETTINGS.NODE.PORT;
+
                 try{
-                    server.listen (port);
+                    server.listen (NodeExpress.https);
                 } catch (Exception) {
                     console.error( "Couldn't open server on port ", port, " try next port") ;
-                    server.listen (port+1);
                 }
             } catch(Exception){
                 console.error("Error Calling node_server.listen", Exception);

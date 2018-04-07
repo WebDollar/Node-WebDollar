@@ -51,6 +51,7 @@ class InterfaceBlockchainProtocolTipsManager {
                 if (bestTip.forkResolve !== undefined)
                     bestTip.forkResolve(true);
             } else {
+
                 this.blockchain.tipsAdministrator.deleteBan(bestTip.socket.node.sckAddress);
 
                 if (bestTip.forkResolve !== undefined)

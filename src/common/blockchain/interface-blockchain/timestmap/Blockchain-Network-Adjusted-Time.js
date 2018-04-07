@@ -2,6 +2,7 @@ import NodesList from 'node/lists/nodes-list'
 import consts from 'consts/const_global'
 import NetworkAdjustedTimeClusters from "./clusters/Network-Adjusted-Time-Clusters";
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import BlockchainTimestamp from "./Blockchain-Timestamp";
 
 class BlockchainNetworkAdjustedTime {
 
@@ -10,9 +11,13 @@ class BlockchainNetworkAdjustedTime {
         this.blockchainTimestamp = blockchainTimestamp;
         this.networkAdjustedTimeClusters = new NetworkAdjustedTimeClusters();
 
-        NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => { await this._initializingNewNode(nodesListObject); } );
+        NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
+            await this._initializingNewNode(nodesListObject);
+        } );
 
-        NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => { await this._desinitializeNode(nodesListObject); });
+        NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
+            await this._desinitializeNode(nodesListObject);
+        });
     }
 
     get networkAdjustedTime(){
@@ -27,13 +32,18 @@ class BlockchainNetworkAdjustedTime {
 
     async _initializingNewNode(nodesListObject){
 
+        this.blockchainTimestamp._initializeNewSocket(nodesListObject)
+
         let socket = nodesListObject.socket;
 
         try {
 
 
             this.blockchainTimestamp._sendUTC(socket);
-            let answer = await socket.node.sendRequestWaitOnce( "timestamp/request-timeUTC", {}, 'answer' );
+            let answer = socket.node.sendRequestWaitOnce( "timestamp/request-timeUTC", {}, 'answer' );
+            this.blockchainTimestamp._sendUTC(socket);
+
+            answer = await answer;
 
             if (answer === null || answer === undefined) throw {message: "The node answer for timestamp returned null or empty"};
 

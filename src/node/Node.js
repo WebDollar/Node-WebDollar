@@ -1,7 +1,9 @@
-var NodeServer;
+var NodeServer, NodeExpress;
 
-if (!process.env.BROWSER)
-    NodeServer = require('node/sockets/node-server/sockets/node-server').default;
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+}
 
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodeClientsService from 'node/sockets/node-clients/service/node-clients-service'
@@ -14,7 +16,9 @@ class Node{
 
 
     constructor() {
+        this.NodeExpress = NodeExpress;
         this.NodeServer = NodeServer;
+
         this.NodeClientsService = NodeClientsService;
         this.NodeWebPeersService = NodeWebPeersService;
         this.NodesStats = NodesStats;

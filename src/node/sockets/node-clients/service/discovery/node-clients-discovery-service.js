@@ -16,20 +16,20 @@ class NodeDiscoveryService {
         //in common
         this.fallbackLists = [
 
-            //not working
-            "https://www.jasonbase.com/things/RPY5",
+            //working in both
+        //    "https://www.jasonbase.com/things/RPY5",
 
         ];
 
-        //CORS problem
-        if (!process.env.BROWSER){ // in the browser
-
-            this.fallbackLists.push("https://api.myjson.com/bins/xi1hr");
-            this.fallbackLists.push("http://skyhub.me/public/webdollars.json");
-            this.fallbackLists.push("http://visionbot.net/webdollars.json");
-            this.fallbackLists.push("http://budisteanu.net/webdollars.json");
-
-        }
+        // //CORS problem
+        // if (!process.env.BROWSER){ // in the browser
+        //
+        //     this.fallbackLists.push("https://api.myjson.com/bins/xi1hr");
+        //     this.fallbackLists.push("https://skyhub.me/public/webdollars.json");
+        //     this.fallbackLists.push("https://visionbot.net/webdollars.json");
+        //     this.fallbackLists.push("https://budisteanu.net/webdollars.json");
+        //
+        // }
 
         for (let i=0; i<this.fallbackLists.length; i++)
             this.fallbackLists[i] = new FallBackObject(this.fallbackLists[i]);
@@ -113,10 +113,6 @@ class NodeDiscoveryService {
 
                 let nodes = [];
                 let name = '';
-
-                //console.log(data);
-                //console.log((data.hasOwnProperty('protocol')));
-                //console.log(((data['protocol'] === nodeProtocol)));
 
                 if ((data.hasOwnProperty('protocol')) && (data['protocol'] === consts.SETTINGS.NODE.PROTOCOL)) {
                     name = data.name || '';

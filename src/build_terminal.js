@@ -4,8 +4,9 @@ import CLI from "node/menu/CLI-Menu";
 
 console.log("TESTING MODE");
 
+//                            light-node
+
 Blockchain.createBlockchain("full-node", ()=>{
-//Blockchain.createBlockchain("light-node", ()=>{
     Node.NodeServer.startServer();
     Node.NodeClientsService.startService();
 });

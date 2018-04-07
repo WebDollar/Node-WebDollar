@@ -11,9 +11,8 @@ class NodeClient {
 
     constructor(){
 
-        //console.log("NodeClient constructor");
-
         this.socket = null;
+
     }
 
     connectTo(address, port, level){
@@ -41,7 +40,7 @@ class NodeClient {
 
                 // in case the port is not included
                 if (address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
-                if (address.indexOf("http://") === -1 )  address = "http://"+address;
+                if (address.indexOf("https://") === -1 )  address = "https://"+address;
 
                 console.log("connecting... to:                ", address);
 
@@ -53,6 +52,7 @@ class NodeClient {
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
                         timeout: 5000, //10 sec, default 20 sec
+                        secure: true, //https
                     });
 
                 }  catch (Exception){
