@@ -80,10 +80,12 @@ class Blockchain{
         });
         StatusEvents.emit('blockchain/status', {message: "Single Window"});
 
-        if (typeof initializationCallback === "function")
-            initializationCallback();
 
         await this.initializeBlockchain();
+
+        if (typeof initializationCallback === "function")
+            initializationCallback();
+        
     }
 
     async loadWallet(){

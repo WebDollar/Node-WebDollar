@@ -28,17 +28,16 @@ class NodeExpress{
                 ca: fs.readFileSync('./certificates/ca_bundle.crt', 'utf8')
             };
 
+            let port = process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
+
             this.https = https.createServer(options, this.app).listen(port, ()=>{
 
-                this._initializeRouter()
+                this._initializeRouter();
 
                 console.log("HTTPS Express was opened on port "+port)
                 resolve(true);
 
             });
-
-
-
 
         })
     }
