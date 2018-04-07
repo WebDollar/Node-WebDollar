@@ -73,7 +73,7 @@ WebDollar uses SSL (Secured Socket Layer) and in order to generate your SSL Cert
 
 ### 4.1 No-IP solution for Free Domain
 
-Create a fre account to https://www.noip.com
+Create a free account to https://www.noip.com
 
 #### Unix
 
@@ -118,7 +118,7 @@ Unix
 If you are under a **router/firewall**, you need to port forward the port used by the Nodes **80** or whatever port they use
 
 
-## 3. **Console commands**
+## 5. **Console commands**
 
 ### Run terminal interactive menu
 ```
@@ -179,8 +179,7 @@ npm install bufferutil utf-8-validate
 # To do:
 
 1. Pool Mining
-2. Exchange
-3. Multi-sig with Schnorr Signatures
+2. Multi-sig with Schnorr Signatures
 
 
 # Materials to learn
