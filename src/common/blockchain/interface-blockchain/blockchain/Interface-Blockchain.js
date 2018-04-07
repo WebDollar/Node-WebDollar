@@ -277,10 +277,10 @@ class InterfaceBlockchain {
 
                 if (this.blocks[i] !== undefined && this.blocks[i] !== null) {
 
-                    console.warn("Saving Block ",i)
                     if (! ( await this.blocks[i].saveBlock()) )
                         break
                 }
+            console.warn("Successfully saving blocks ", startingHeight, endingHeight);
         }
 
         return result;

@@ -5,7 +5,7 @@ const cors = require('cors');
 const fs = require('fs')
 const resolve = file => path.resolve(__dirname, file)
 const serve = (path, cache) => express.static(resolve(path), {
-    maxAge: cache && isProd ? 1000 * 60 * 60 * 24 * 30 : 0
+    maxAge: cache ? 1000 * 60 * 60 * 24 * 30 : 0
 });
 
 import consts from 'consts/const_global'
@@ -28,7 +28,7 @@ class NodeExpress{
             this.app.use(cors({ credentials: true }));
             this.app.use('/.well-known/acme-challenge', serve('./certificates/well-known/acme-challenge', true) );
 
-            var options = {};
+            let options = {};
 
             let port = process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
 
