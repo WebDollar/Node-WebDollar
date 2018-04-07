@@ -105,7 +105,7 @@ class SocketExtend{
         Sending the Request and return the Promise to Wait Async
     */
 
-    sendRequestWaitOnce (socket, request, requestData, answerSuffix, timeOutInterval=3000) {
+    sendRequestWaitOnce (socket, request, requestData, answerSuffix, timeOutInterval=4000) {
 
         if ( answerSuffix !== undefined) answerSuffix = String(answerSuffix); //in case it is a number
 
