@@ -7,7 +7,7 @@ export default {
        "port": 80,
     },
     {
-        "addr": ["192.168.2.55"],
+        "addr": ["192.168.2.8"],
         "port": 2095,
     },
     {
@@ -16,7 +16,9 @@ export default {
     },
 
     {
-      "addr": ["skyhub.me", "92.222.85.90"]
+      "addr": ["skyhub.me", "92.222.85.90"],
+       "port": 443,
     }
+
   ]
 }
