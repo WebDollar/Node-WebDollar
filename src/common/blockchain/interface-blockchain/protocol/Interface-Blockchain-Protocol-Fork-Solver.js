@@ -237,16 +237,16 @@ class InterfaceBlockchainProtocolForkSolver{
                 //it is a totally new blockchain (maybe genesis was mined)
                 console.log("fork is something new");
 
-        } catch (Exception){
+        } catch ( exception ){
 
-            console.error("discoverAndProcessFork raised an exception", Exception );
-            result = false;
+            console.error("discoverAndProcessFork raised an exception", exception );
+            return {result:false, error: exception };
 
         }
 
         this.blockchain.forksAdministrator.deleteFork(fork);
 
-        return result;
+        return { result: true };
     }
 
 

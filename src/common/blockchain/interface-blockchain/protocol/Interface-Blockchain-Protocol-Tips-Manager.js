@@ -12,7 +12,6 @@ class InterfaceBlockchainProtocolTipsManager {
     }
 
 
-
     async processTips(){
 
         if (this.blockchain === undefined) {
@@ -44,7 +43,8 @@ class InterfaceBlockchainProtocolTipsManager {
             console.log("AFTER");
             bestTip.toString();
 
-            if (!forkAnswer) {
+            if (!forkAnswer.result) {
+
                 console.log("BANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
                 this.blockchain.tipsAdministrator.addBan(bestTip.socket.node.sckAddress);
 

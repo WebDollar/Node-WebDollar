@@ -161,7 +161,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 //check if I mined all the last K blocks
                 let i = this.blockchain.blocks.length-1;
                 let count = 0;
-                while (i >= 0 && this.blockchain.blocks[i].minerAddress.equals(this.minerAddress)){
+
+                while ( i >= 0 && this.blockchain.blocks[i].minerAddress.equals( this.unencodedMinerAddress ) ){
 
                     count ++;
                     i--;
