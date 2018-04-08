@@ -179,9 +179,6 @@ class InterfaceBlockchain {
         return true;
     }
 
-    getBlockchainStartingPoint(){
-        return this.blocks.blocksStartingPoint;
-    }
 
 
     getDifficultyTarget(height){

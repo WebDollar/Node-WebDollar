@@ -1,18 +1,20 @@
 class InterfaceBlockchainTip{
 
-    constructor(blockchain, socket, forkChainLength, forkLastBlockHeader){
+    constructor(blockchain, socket, forkChainLength,forkChainStartingPoint, forkLastBlockHeader){
 
         this.blockchain = blockchain;
 
         this.socket = socket;
         this.forkChainLength = forkChainLength;
+        this.forkChainStartingPoint = forkChainStartingPoint;
         this.forkLastBlockHeader = forkLastBlockHeader;
 
         this.forkPromise = new Promise((resolve)=>{
             this.forkResolve = resolve;
-        })
+        });
 
         this.forkToDoChainLength = -1;
+        this.forkToDoChainStartingPoint = -1;
         this.forkToDoLastBlockHeader = undefined;
         this.forkToDoPromise = undefined;
         this.forkToDoResolve = undefined;
@@ -26,12 +28,14 @@ class InterfaceBlockchainTip{
                 this.forkResolve(false);
 
             this.forkChainLength = this.forkToDoChainLength;
+            this.forkChainStartingPoint = this.forkToDoChainStartingPoint;
             this.forkLastBlockHeader = this.forkToDoLastBlockHeader;
             this.forkPromise = this.forkToDoPromise;
             this.forkResolve = this.forkToDoResolve;
 
 
             this.forkToDoChainLength = -1;
+            this.forkToDoChainStartingPoint = -1;
             this.forkToDoLastBlockHeader = undefined;
             this.forkToDoPromise = undefined;
             this.forkToDoResolve = undefined;

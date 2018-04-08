@@ -24,13 +24,6 @@ class NodeExpress{
             this.app.use(cors({ credentials: true }));
 
 
-            console.log("__dirname__dirname__dirname__dirname",__dirname)
-            console.log("__dirname__dirname__dirname__dirname",__dirname)
-            console.log("__dirname__dirname__dirname__dirname",__dirname)
-            console.log("__dirname__dirname__dirname__dirname",__dirname)
-            console.log("__dirname__dirname__dirname__dirname",__dirname)
-            console.log("__dirname__dirname__dirname__dirname",__dirname)
-
             this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
 
             let options = {};

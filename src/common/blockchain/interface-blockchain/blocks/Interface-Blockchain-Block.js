@@ -363,6 +363,7 @@ class InterfaceBlockchainBlock {
         return {
             height: this.height,
             chainLength: this.blockchain.blocks.length,
+            chainStartingPoint: this.blockchain.blocks.blocksStartingPoint,
             header: {
                 hash: this.hash,
                 hashPrev: this.hashPrev,

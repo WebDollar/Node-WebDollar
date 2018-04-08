@@ -75,6 +75,8 @@ class InterfaceBlockchainProtocol {
 
         // validating data
         if (typeof data.chainLength !== 'number') throw {message: 'chainLength is not specified'};
+        if (typeof data.chainStartingPoint !== 'number') throw {message: 'chainStartingPoint is not specified'};
+
         if (typeof data.height !== 'number') throw {message: 'height is not specified'};
         if (typeof data.header !== 'object') throw {message: 'header is not specified'};
         if (data.header === undefined ) throw {message:'header.header is not specified'};
@@ -100,7 +102,10 @@ class InterfaceBlockchainProtocol {
             data.header.data.hashData = new Buffer(data.header.data.hashData);
 
         if (data.header.chainLength < data.header.height)
-            throw {message: 'chainLength is smaller than block height ?? ', dataHeaderChainLength: data.header.chainLength, dataHeaderHeight: data.header.height};
+            throw {message: 'chainLength is smaller than block height ?? ', dataChainLength: data.header.chainLength, dataHeaderHeight: data.header.height};
+
+        if (data.header.chainStartingPoint > data.header.height )
+            throw {message: 'chainLength is smaller than block height ?? ', dataChainStartingPoint: data.header.chainStartingPoint, dataHeaderHeight: data.header.height};
 
     }
 
@@ -186,7 +191,7 @@ class InterfaceBlockchainProtocol {
 
                     console.log("blockchain/header/new-block discoverNewForkTip");
 
-                    let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.header);
+                    let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: true,
@@ -207,28 +212,6 @@ class InterfaceBlockchainProtocol {
 
 
             });
-
-        socket.node.on("blockchain/info/request-blockchain-info", (data)=>{
-
-            try{
-
-                socket.node.sendRequest("blockchain/info/request-blockchain-info"+"/answer", {
-                    result: true,
-                    chainStartingPoint: this.blockchain.getBlockchainStartingPoint(),
-                    chainLength: this.blockchain.blocks.length
-                });
-
-            } catch (exception) {
-
-                console.error("Socket Error - blockchain/info/request-blockchain-info", exception);
-
-                socket.node.sendRequest("blockchain/info/request-blockchain-info"+"/answer", {
-                    result: false,
-                    message: exception,
-                });
-            }
-
-        });
 
         if (this.acceptBlockHeaders)
             socket.node.on("blockchain/headers-info/request-header-info-by-height", (data) => {
@@ -347,7 +330,7 @@ class InterfaceBlockchainProtocol {
 
             }
 
-            let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.header);
+            let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
 
             socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                 result: true,
