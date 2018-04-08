@@ -134,9 +134,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
-            //blockchain sum
-            this.blockchain.accountantTree.calculateNodeCoins();
-
             //fork sum
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
             let forkSum = this.blockchain.accountantTree.calculateNodeCoins();

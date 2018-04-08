@@ -280,10 +280,22 @@ class InterfaceBlockchainTransaction{
 
     processTransaction(multiplicationFactor = 1 , minerAddress, revertActions){
 
-        if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false;
-        if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
+        if ( multiplicationFactor === 1 ) {
 
-        this._processTransactionFees( multiplicationFactor, minerAddress, revertActions);
+            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false;
+            if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
+
+            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions) === null);
+
+        } else if (multiplicationFactor === -1) {
+
+            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions) === null) return false;
+            if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
+            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false;
+
+
+        }else
+            throw {message: "multiplicationFactor is illegal"};
 
         return true;
     }
@@ -295,7 +307,7 @@ class InterfaceBlockchainTransaction{
         let diffInFees = inputSum - outputSum;
 
         if (!WebDollarCoins.validateCoinsNumber(diffInFees))
-            return {message:"Fees are invalid"};
+            throw {message:"Fees are invalid"};
 
         return {fees: diffInFees, currencyTokenId: this.from.currencyTokenId};
     }

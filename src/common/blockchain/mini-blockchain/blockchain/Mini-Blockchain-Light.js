@@ -85,7 +85,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         MiniBlockchainAdvanced.prototype._onBlockCreated.call(this, block, saveBlock);
 
         if (! (await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)))
-        throw {message: "_recalculateLightPrevs failed"};
+            throw {message: "_recalculateLightPrevs failed"};
 
         /*console.log(" hash", block.hash.toString("hex"));
         console.log(" difficulty", block.difficultyTarget.toString("hex"));
@@ -369,8 +369,8 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             delete this.lightPrevHashPrevs[index];
             delete this.lightPrevTimeStamps[index];
 
-            if ( this.blockchain.blocksStartingPoint === index )
-                this.blockchain.blocksStartingPoint++;
+            if ( this.blocksStartingPoint === index )
+                this.blocksStartingPoint++;
 
             index--;
         }

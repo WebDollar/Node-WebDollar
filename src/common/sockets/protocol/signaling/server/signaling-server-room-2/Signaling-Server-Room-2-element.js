@@ -4,13 +4,17 @@ class SignalingServerRoomConnectionObject {
         webPeer1 - initiator
         webPeer2 -
      */
-    constructor( socket, connectionsLeft, ){
+    constructor( socket, timeLeft, connectionUUID ){
 
         this.socket = socket;
-        this.connectionsLeft = connectionsLeft;
 
         this.listConnected = [];
         this.listErrors = [];
+
+        this.listPending = [ {
+            timeLeft: timeLeft,
+            connectionUUID: connectionUUID,
+        } ];
     }
 
     containsConnectedSocket(socket){

@@ -10,9 +10,13 @@ class SignalingServerRoom2{
 
     }
 
-    addSocketToRoom(socket, connections ){
+    addSocketToRoom(socket, timeLeft, uuid ){
 
-        let roomElement = new SignalingServerRoom2Element(socket, connections);
+        let roomElement = this.searchSocketRoom(socket);
+
+        if (roomElement === null){
+            new SignalingServerRoom2Element(socket,  timeLeft, uuid);
+        }
 
         this.room.push( roomElement );
 

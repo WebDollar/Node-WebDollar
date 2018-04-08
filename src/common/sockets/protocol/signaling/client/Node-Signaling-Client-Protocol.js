@@ -14,6 +14,7 @@ class NodeSignalingClientProtocol {
 
     }
 
+
     /*
         Signaling Server Service
      */
@@ -290,7 +291,7 @@ class NodeSignalingClientProtocol {
         this._initializeSignalingClientService1(socket);
         this._initializeSignalingClientService2(socket);
 
-        SignalingClientListService.subscribeClientToSignalingServer( socket );
+        SignalingClientListService.subscribeSignalingServer( socket );
     }
 
 

@@ -30,12 +30,12 @@ class NodeSignalingServerProtocol {
                 if (typeof connections  !== "number") throw {message: "connections is not a number"};
                 if (connections  <= 0) throw {message: "connections is less than 0"};
 
-                let room = SignalingServerRoom2.addSocketToRoom(socket || 0, data.connections);
+                let room = SignalingServerRoom2.addSocketToRoom(socket, data.connectionUUID, data.timeLeft||0 );
 
                 let answer = this.connect(room);
 
                 socket.node.sendRequest("signals/server/register/accept-web-peer-connections"+"/answer", {
-                    result: false,
+                    result: true,
                 });
 
             } catch (exception){

@@ -69,7 +69,6 @@ class NodeExpress{
     _initializeRouter(){
 
 
-
         // respond with "hello world" when a GET request is made to the homepage
         this.app.get('/', (req, res) => {
 
