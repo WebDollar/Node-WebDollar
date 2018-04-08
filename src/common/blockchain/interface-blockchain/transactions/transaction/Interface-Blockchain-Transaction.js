@@ -290,6 +290,7 @@ class InterfaceBlockchainTransaction{
         } else if (multiplicationFactor === -1) {
 
             if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions) === null) return false;
+
             if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
             if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false;
 

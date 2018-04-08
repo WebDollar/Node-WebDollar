@@ -73,41 +73,13 @@ WebDollar uses SSL (Secured Socket Layer) and in order to generate your SSL Cert
 
 ### 4.1 No-IP solution for Free Domain
 
-Create a free account to https://www.noip.com
+Follow the Tutorial [Install No-Ip using ddns.net ](/docs/Install-No-Ip.md) 
 
-#### Unix
-
-http://www.noip.com/support/knowledgebase/installing-the-linux-dynamic-update-client-on-ubuntu/
-
-Tutorial how to make NO-IP as start-up service in Linux
-https://askubuntu.com/questions/903411/how-do-i-set-up-no-ip-as-a-proper-service
-
-#### Windows
-
-Install No-IP app (5 mb) via https://www.noip.com/download
-
-Follow the Setup using your account and set it up to automatically update your ip
-
-### Windows, Unix, Mac
-1. `npm run start`
-2. open http://127.0.0.1
-2. open http://yourdomain.ddns.net or whatever no-ip domain you have and should receive the same message. In case it will fail to return, it means that your no-ip domain is not configured properly. Are you sure you installed the no-ip software and configured with your account?
-
-You should get **a response** {protocol: WebDollar, version: x.x}. 
 
 ### 4.2 Generate your SSL certificate
 
 
-1. Open https://www.sslforfree.com/
-2. Include your new no-ip domain
-3. Click the **Manual Verification**
-4. Click **Manual Verify Domain**
-5. **Download Files**
-6. Copy the downloaded files to the folder /certificates/well-known/acme-challenge
-7. Click on the website "Retry Manual Verification"
-8. Download the Certificates and copy the certificates into the /certificates directory
-9. Restart the terminal and run again `run start`
-10. Delete the .well-know/acme-challenge files (optionally)
+Follow the Tutorial [Get SSL Certificates ](/docs/Get-SSL-Certificates.md) 
 
 
 #### Firewall acceptable
@@ -162,15 +134,9 @@ npm run start_double_connections
 npm run start
 ```
 
-We use WebPack
+#### 5.8 PM2 to run the Node run indefinitely 
 
-```
-npm install -g webpack
-webpack dist/index.js > dist_bundle/bundle.js
-npm install bufferutil utf-8-validate
-``` 
-
-
+Follow the Tutorial [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md) 
 
 # To do:
 

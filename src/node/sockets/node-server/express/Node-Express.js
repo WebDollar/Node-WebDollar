@@ -4,11 +4,6 @@ const path = require('path')
 const express = require('express')
 const cors = require('cors');
 const fs = require('fs')
-const resolve = file => path.resolve(__dirname, file)
-const serve = (path, cache) => express.static(resolve(path), {
-    maxAge: cache ? 1000 * 60 * 60 * 24 * 30 : 0
-});
-
 import consts from 'consts/const_global'
 
 class NodeExpress{
@@ -27,7 +22,16 @@ class NodeExpress{
 
             this.app = express();
             this.app.use(cors({ credentials: true }));
-            this.app.use('/.well-known/acme-challenge', serve('./certificates/well-known/acme-challenge', true) );
+
+
+            console.log("__dirname__dirname__dirname__dirname",__dirname)
+            console.log("__dirname__dirname__dirname__dirname",__dirname)
+            console.log("__dirname__dirname__dirname__dirname",__dirname)
+            console.log("__dirname__dirname__dirname__dirname",__dirname)
+            console.log("__dirname__dirname__dirname__dirname",__dirname)
+            console.log("__dirname__dirname__dirname__dirname",__dirname)
+
+            this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
 
             let options = {};
 

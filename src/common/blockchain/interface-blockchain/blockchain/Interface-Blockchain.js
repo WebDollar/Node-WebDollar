@@ -359,8 +359,12 @@ class InterfaceBlockchain {
 
             //it will include the block, but it will not ask to save, because it was already saved before
 
-            if (await this.includeBlockchainBlock( block, undefined, "all", false, revertActions) )
-                console.warn("blockchain loaded successfully index ", i);
+            if (await this.includeBlockchainBlock( block, undefined, "all", false, revertActions) ) {
+
+                if (i % 100 === 0)
+                    console.warn("blockchain loaded successfully index ", i);
+
+            }
             else {
                 console.error("blockchain is invalid at index " + i);
                 throw {message: "blockchain is invalid at index ", height: i};

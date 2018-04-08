@@ -6,7 +6,7 @@ source: https://www.digitalocean.com/community/tutorials/how-to-install-node-js-
 
 ```
 sudo apt-get update
-sudo apt-get install build-essential libssl-dev
+sudo apt-get install build-essential libssl-devstart
 
 mkdir nvm
 curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh -o install_nvm.sh
@@ -18,8 +18,8 @@ bash install_nvm.sh
 source ~/.profile
 
 nvm ls-remote
-nvm install 8.1.4
-nvm use 8.1.4
+nvm install 8.2.1
+nvm use 8.2.1
 node -v                  show show the 8.x version
 
 nvm ls

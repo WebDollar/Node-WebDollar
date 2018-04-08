@@ -2,7 +2,7 @@ const uuid = require('uuid');
 
 let consts = {
 
-    DEBUG: false,
+    DEBUG: true,
 
 };
 

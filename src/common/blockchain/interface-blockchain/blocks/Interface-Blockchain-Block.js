@@ -318,7 +318,6 @@ class InterfaceBlockchainBlock {
     async loadBlock(){
 
         let key = "block" + this.height;
-        console.log("block load", key);
 
         try{
 

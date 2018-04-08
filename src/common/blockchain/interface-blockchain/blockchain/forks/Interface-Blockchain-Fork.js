@@ -243,7 +243,7 @@ class InterfaceBlockchainFork {
 
 
                 //revert the accountant tree
-                //revert the last K blocks
+                //revert the last K block
                 revertActions.revertOperations();
 
                 //reverting back to the clones, especially light settings
