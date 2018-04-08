@@ -12,7 +12,7 @@ import Serialization from 'common/utils/Serialization'
 import InterfaceBlockchainMiningBasic from "./Interface-Blockchain-Mining-Basic";
 
 import AdvancedMessages from "node/menu/Advanced-Messages"
-
+import StatusEvents from "common/events/Status-Events"
 
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
@@ -157,6 +157,22 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 console.warn( "----------------------------------------------------------------------------");
                 console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress.toString("hex"));
                 console.warn( "----------------------------------------------------------------------------");
+
+                //check if I mined all the last K blocks
+                let i = this.blockchain.blocks.length-1;
+                let count = 0;
+                while (i >= 0 && this.blockchain.blocks[i].minerAddress.equals(this.minerAddress)){
+
+                    count ++;
+                    i--;
+
+                    if (count >= consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR){
+
+                        StatusEvents.emit("blockchain/logs", {message: "You mined way too many blocks"});
+                        break;
+                    }
+
+                }
 
                 try {
 

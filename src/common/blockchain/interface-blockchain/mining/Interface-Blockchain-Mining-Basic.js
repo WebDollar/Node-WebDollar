@@ -18,7 +18,7 @@ class InterfaceBlockchainMiningBasic {
         if (minerAddress !== undefined)
             this.minerAddress = minerAddress;
 
-        if (miningFeeThreshold === undefined) miningFeeThreshold = consts.MINING_POOL.MINING_FEE_THRESHOLD;
+        if (miningFeeThreshold === undefined) miningFeeThreshold = consts.MINING_POOL.MINING.FEE_THRESHOLD;
         this.miningFeeThreshold = miningFeeThreshold;
 
         this._nonce = 0;

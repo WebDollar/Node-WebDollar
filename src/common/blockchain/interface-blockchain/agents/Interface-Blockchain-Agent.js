@@ -2,6 +2,7 @@ import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
 import MiniBlockchainProtocol from "common/blockchain/mini-blockchain/protocol/Mini-Blockchain-Protocol"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
+import VersionChecker from "common/utils/helpers/Version-Checker"
 
 const EventEmitter = require('events');
 
@@ -22,7 +23,11 @@ class InterfaceBlockchainAgent{
         this.agentQueueProcessing = [];
         this.agentQueueCount = 0;
 
-        this.AGENT_TIME_OUT = 40000;
+        if (VersionChecker.detectMobileAndTablet())
+            this.AGENT_TIME_OUT = 60000;
+        else
+            this.AGENT_TIME_OUT = 40000;
+
         this.AGENT_TIME_OUT_NEW_CONNECTIONS = 10000;
 
         this.AGENT_QUEUE_COUNT_MIN = 1;
