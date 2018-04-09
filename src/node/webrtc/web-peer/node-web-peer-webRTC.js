@@ -5,9 +5,10 @@
 
 // TUTORIAL BASED ON https://www.scaledrone.com/blog/posts/webrtc-chat-tutorial
 
-
+const EventEmitter = require('events');
 import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
+import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 
 const config = {
 
@@ -46,6 +47,9 @@ class NodeWebPeerRTC {
         console.log("Peer WebRTC Client constructor");
 
         this.peer = null;
+
+        this.emitter = new EventEmitter();
+        this.emitter.setMaxListeners(20);
 
     }
 
@@ -88,21 +92,6 @@ class NodeWebPeerRTC {
         this.peer.signalData = null;
         this.peer.signalInitiatorData = null;
 
-        if (initiator) {
-
-            this.peer.dataChannel = this.peer.createDataChannel('chat');
-            this.setupDataChannel();
-
-            console.log("offer set");
-        } else {
-
-            // If user is not the offerer let wait for a data channel
-            this.peer.ondatachannel = event => {
-                this.peer.dataChannel = event.channel;
-                this.setupDataChannel();
-            }
-        }
-
 
         this.peer.on('error', err => { console.log('error', err) } );
 
@@ -135,6 +124,23 @@ class NodeWebPeerRTC {
         this.peer.on('data', (data) => {
             console.log('data: ' , data)
         });
+
+
+
+        if (initiator) {
+
+            this.peer.dataChannel = this.peer.createDataChannel('chat');
+            this.setupDataChannel();
+
+            console.log("offer set");
+        } else {
+
+            // If user is not the offerer let wait for a data channel
+            this.peer.ondatachannel = event => {
+                this.peer.dataChannel = event.channel;
+                this.setupDataChannel();
+            }
+        }
 
 
     }
@@ -193,6 +199,8 @@ class NodeWebPeerRTC {
                     inputSignal = JSON.parse(inputSignal);
                 } catch (exception){
                     console.error("Error processing JSON createSignal", inputSignal, exception)
+                    resolve({result:false, message: "Invalid input signal"});
+                    return;
                 }
             }
 
@@ -276,7 +284,8 @@ class NodeWebPeerRTC {
                 console.log('iceConnection Disconnected');
                 if (this.peer.connected === true) {
                     this.peer.connected = false;
-                    this.callEvents("disconnect", {});
+
+                    this.emitter.emit("disconnect", {})
                 }
             }
         };
@@ -288,8 +297,9 @@ class NodeWebPeerRTC {
 
                 let name = data.name;
                 let value = data.value;
+
                 if (name !== '')
-                    this.callEvents(name, value);
+                    this.emitter.emit(name, value);
 
             } catch (exception){
                 console.error("Error onMessage", event.data, exception);
@@ -307,14 +317,14 @@ class NodeWebPeerRTC {
         if (this.peer.dataChannel.readyState === 'open') {
             if (!this.peer.connected ) {
                 this.peer.connected = true;
-                this.callEvents("connect", {});
+                this.emitter.emit("connect", {});
             }
         }
 
         if (this.peer.dataChannel.readyState === 'close') {
             if (this.peer.connected){
                 this.peer.connected = false;
-                this.callEvents("disconnect", {});
+                this.emitter.emit("disconnect", {});
             }
         }
     }
@@ -335,6 +345,8 @@ class NodeWebPeerRTC {
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
             NodesList.disconnectSocket( this.peer );
 
+            NodeSignalingClientProtocol.webPeerDisconnected(this.peer);
+
         });
 
     }
@@ -352,16 +364,12 @@ class NodeWebPeerRTC {
         this.peer.eventSubscribers = []; //to simulate .on and .once
         this.peer.eventSubscribersIndex = 0;
 
-        this.peer.on = (eventName, callback) =>{
-            return this.subscribeEvent(eventName, callback, "on");
-        };
+        this.peer.on = (name, callback)=>{ this.emitter.on(name, callback) };
 
-        this.peer.once = (eventName, callback) =>{
-            return this.subscribeEvent(eventName, callback, "once");
-        };
-        this.peer.off = (index) =>{
-            return this.unscribeEvent(index);
-        };
+        this.peer.once = (name, callback)=>{ this.emitter.once(name, callback) };
+
+        this.peer.off = (id)=>{ this.emitter.off(id) };
+
         this.peer.send = (name, value) =>{
 
             let data = {name: name, value: value};
@@ -375,40 +383,6 @@ class NodeWebPeerRTC {
         };
     }
 
-    subscribeEvent(eventName, callback, type){
-        if (!this.peer ) return  null;
-
-        this.peer.eventSubscribers.push({eventName: eventName, callback: callback, type: type, index: this.peer.eventSubscribersIndex++}) ;
-
-        return this.peer.eventSubscribersIndex;
-    }
-
-    unscribeEvent(index){
-        if (!this.peer ) return  null;
-
-        for (let i=0; i< this.peer.eventSubscribers.length; i++)
-            if (this.peer.eventSubscribers[i].index === index){
-                this.peer.eventSubscribers.splice(i, 1);
-                return true;
-            }
-
-        return false;
-    }
-
-    callEvents(eventName, data){
-        if (!this.peer ) return  null;
-
-        for (let i=0; i<this.peer.eventSubscribers.length; i++)
-            if (this.peer.eventSubscribers[i].eventName === eventName){
-                this.peer.eventSubscribers[i].callback(data);
-            }
-
-        //deleting once events...
-        for (let i=this.peer.eventSubscribers.length-1; i>=0; i--)
-            if ((this.peer.eventSubscribers[i].eventName === eventName) && (this.peer.eventSubscribers[i].type === "once"))
-                this.peer.eventSubscribers.splice(i,1);
-
-    }
 
 
     /*

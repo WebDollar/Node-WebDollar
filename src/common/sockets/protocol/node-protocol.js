@@ -8,13 +8,14 @@ class NodeProtocol {
      */
     async sendHello (node, validationDoubleConnectionsTypes) {
 
-        //console.log(node);
 
         // Waiting for Protocol Confirmation
-        let response = await node.sendRequestWaitOnce("HelloNode", {
+        let response = node.sendRequestWaitOnce("HelloNode", {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
         });
+
+        response = await response;
 
         if (typeof response !== "object")
             return false;

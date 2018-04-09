@@ -166,6 +166,9 @@ class NodeSignalingServerProtocol {
                             });
 
 
+                            if ( answer === null || answer === undefined )
+                                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                            else
                             if ( answer.established === false && initiatorAnswer.message === "I can't accept WebPeers anymore") {
                                 this.clientIsNotAcceptingAnymoreWebPeers(client1, connection);
                                 return false;
@@ -177,10 +180,10 @@ class NodeSignalingServerProtocol {
 
                     });
 
-                    client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, (iceCandidate) => {
+                    client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, async (iceCandidate) => {
 
 
-                        client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{
+                        let answer = await client2.node.sendRequestWaitOnce("signals/client/answer/receive-ice-candidate",{
                             id: connection.id,
 
                             initiatorSignal: initiatorAnswer.initiatorSignal,
@@ -189,6 +192,14 @@ class NodeSignalingServerProtocol {
                             remoteAddress: client1.node.sckAddress.getAddress(false),
                             remoteUUID: client1.node.sckAddress.uuid,
                         });
+
+                        if ( answer === null || answer === undefined )
+                            connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                        else
+                        if ( answer.established === false && initiatorAnswer.message === "I can't accept WebPeers anymore") {
+                            this.clientIsNotAcceptingAnymoreWebPeers(client1, connection);
+                            return false;
+                        }
 
                     });
 

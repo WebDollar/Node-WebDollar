@@ -1,3 +1,4 @@
+import consts from 'consts/const_global'
 import SignalingClientPeerObject from './signaling-client-peer-object';
 import NodeWebPeerRTC from "node/webrtc/web-peer/node-web-peer-webRTC";
 import NodesList from 'node/lists/nodes-list'
@@ -23,7 +24,7 @@ class SignalingClientList {
         let pos = this.findWebPeerSignalingClientList(undefined, undefined, webpeer.node.sckAddress.uuid);
 
         if (pos !== -1) {
-            this.connected.splice(i, 1);
+            this.connected.splice(pos, 1);
 
             NodeSignalingClientService.askRandomSignalingServerToConnect();
         }
@@ -85,6 +86,10 @@ class SignalingClientList {
             }
 
         return false;
+    }
+
+    computeMaxWebPeersConnected( uuid ){
+        return consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS + (this.findWebPeerSignalingClientList( uuid ) === -1 ? -1 : 0 )
     }
 
 }

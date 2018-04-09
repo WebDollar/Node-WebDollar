@@ -17,7 +17,7 @@ class NodeSignalingClientProtocol {
 
             socket.node.sendRequest("signals/client/do-you-have-free-room"+"/answer", {
                 result: true,
-                acceptWebPeers: SignalingClientList.connected.length < this.LIMIT_CONNECTIONS,
+                acceptWebPeers: SignalingClientList.connected.length < consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS,
             })
 
         })
@@ -46,7 +46,7 @@ class NodeSignalingClientProtocol {
                 if (SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) !== null)
                     throw {message: "Already connected"};
 
-                if (SignalingClientList.connected.length > consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS)
+                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
                     throw {message: "I can not accept connections anymore" };
 
 
@@ -58,14 +58,7 @@ class NodeSignalingClientProtocol {
 
                 let answer;
 
-                for (let trials=0; trials<2; trials++) {
-                    answer = await webPeer.createSignalInitiator();
-
-                    if (answer.signal === undefined)
-                        console.log("WEBRTC 1 is not supported !!!! being the initiator");
-                    else
-                        break;
-                }
+                answer = await webPeer.createSignalInitiator();
 
                 if (!answer.result )
                     throw {message: "Failed to Get a initiatorSignal: " +answer.message};
@@ -89,7 +82,7 @@ class NodeSignalingClientProtocol {
                 if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"]) !== null) //already connected in the past
                     throw {message: "Already Connected"};
 
-                if (SignalingClientList.connected.length > this.LIMIT_CONNECTIONS)
+                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
                     throw {message: "I can't accept WebPeers anymore"};
 
 
@@ -141,7 +134,7 @@ class NodeSignalingClientProtocol {
                 if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"]) !== null) //already connected in the past
                     throw {message: "Already connected"};
 
-                if (SignalingClientList.connected.length > this.LIMIT_CONNECTIONS)
+                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
                     throw {message: "I can't accept WebPeers anymore"};
 
 
@@ -189,7 +182,7 @@ class NodeSignalingClientProtocol {
                 if (SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID) !== null)
                     throw {message: "Already connected"};
 
-                if (SignalingClientList.connected.length > consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS)
+                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
                     throw {message: "I can't accept WebPeers anymore" };
 
 
@@ -202,15 +195,12 @@ class NodeSignalingClientProtocol {
                     webPeer.createPeer(false, socket, data.id, (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate)}, data.remoteAddress, data.remoteUUID, socket.level + 1);
                     webPeer.peer.signalInitiatorData = data.initiatorSignal;
 
-                    webPeer.peer.on("disconnect", ()=>{
-                        this.webPeerDisconencted(webPeer);
-                    });
                 }
 
                 let answer = await webPeer.createSignal(data.initiatorSignal);
 
                 if (answer.signal === undefined)
-                    console.log("WEBRTC 2 is not supported !!!!", data.initiatorSignal);
+                    console.log("WEBRTC 2 is not supported !!!!", answer);
 
                 if (!answer.result )
                     throw {message: answer.message };
@@ -235,7 +225,7 @@ class NodeSignalingClientProtocol {
                 if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null) //already connected in the past
                     throw {message: "Already connected" };
 
-                if ( SignalingClientList.connected.length > consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS )
+                if ( SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ) )
                     throw {message: "I can't accept WebPeers anymore" }
 
 
@@ -246,18 +236,10 @@ class NodeSignalingClientProtocol {
                 if (webPeer.peer === null) { //arrived earlier than  /receive-initiator-signal
                     webPeer.createPeer(false, socket, data.id, (iceCandidate) => {this.sendAnswerIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress, data.remoteUUID, socket.level+1);
                     webPeer.peer.signalInitiatorData = data.initiatorSignal;
-
-                    webPeer.peer.on("disconnect", ()=>{
-                        this.webPeerDisconencted(webPeer);
-                    });
-
                 }
 
 
                 let answer = await webPeer.createSignal(data.iceCandidate);
-
-                if (answer.signal === undefined)
-                    console.warn("WEBRTC 3 is not supported !!!!", data.iceCandidate);
 
                 if (!answer.result )
                     throw {message: answer.message};
@@ -295,7 +277,7 @@ class NodeSignalingClientProtocol {
         socket.node.sendRequest("signals/server/new-answer-ice-candidate/" + connectionId, {candidate: iceCandidate} )
     }
 
-    webPeerDisconencted(webPeer){
+    webPeerDisconnected(webPeer){
 
         webPeer.signaling.socketSignaling.node.sendRequest("signals/server/connections/established-connection-was-dropped", {address: webPeer.remoteAddress, connectionId: webPeer.signaling.connectionId} );
         SignalingClientList.desinitializeWebPeerConnection(webPeer);

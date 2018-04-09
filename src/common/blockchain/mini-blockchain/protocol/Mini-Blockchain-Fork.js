@@ -34,9 +34,20 @@ class MiniBlockchainFork extends inheritFork{
         return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
-    preForkClone(cloneBlocks=true){
+    preForkClone(cloneBlocks=true, cloneAccountantTree=true){
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
+
+        if (!cloneAccountantTree) {
+
+            try {
+                //clone the Accountant Tree
+                this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
+            } catch (exception){
+                console.error("Error cloding Accountant Tree", exception);
+                return false;
+            }
+        }
 
     }
 
@@ -56,6 +67,15 @@ class MiniBlockchainFork extends inheritFork{
 
 
         }
+
+    }
+
+    revertFork(){
+
+        //recover to the original Accountant Tree
+        this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
+
+        inheritFork.prototype.revertFork.call(this);
 
     }
 
