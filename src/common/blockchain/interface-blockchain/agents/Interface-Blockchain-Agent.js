@@ -40,7 +40,6 @@ class InterfaceBlockchainAgent{
 
         this.synchronized = false;
 
-        this.newFork();
         this.newProtocol();
     }
 

@@ -192,8 +192,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.278",
-        VERSION_COMPATIBILITY: "0.278",
+        VERSION: "0.279",
+        VERSION_COMPATIBILITY: "0.279",
         PROTOCOL: "WebDollar",
         SSL: true,
 
@@ -262,6 +262,7 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.VERSION += "1";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "1";
     consts.SETTINGS.NODE.SSL = false;
+    consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 }
 
 

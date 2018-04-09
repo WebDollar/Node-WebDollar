@@ -177,7 +177,7 @@ class InterfaceBlockchainProtocolForkSolver{
             }
 
             //its a fork... starting from position
-            console.log("fork position", binarySearchResult.position, "tip.forkChainStartingPoint", tip.forkChainStartingPoint, "newChainLength", tip.forkChainLength);
+            console.log("fork position", binarySearchResult.position, "tip.forkChainStartingPoint", tip.forkChainStartingPoint, "forkChainLength", tip.forkChainLength);
 
             if (binarySearchResult.position === -1 || (binarySearchResult.position > 0 && binarySearchResult.header !== undefined && binarySearchResult.header !== null) ){
 
@@ -290,7 +290,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     throw {message: "block never received "+ nextBlockHeight};
 
                 if ( !answer.result || answer.block === undefined  || !Buffer.isBuffer(answer.block) ) {
-                    console.log("Fork Answer received ", answer);
+                    console.error("Fork Answer received ", answer);
                     throw {message: "Fork Answer is not Buffer"};
                 }
 
@@ -332,14 +332,14 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (await fork.saveFork())
                     return true;
                 else
-                    return false;
+                    throw {message: "Save Fork couldn't be saved"};
 
             }
 
 
         } catch (exception){
 
-            console.log("solveFork raised an exception", exception);
+            console.error("solveFork raised an exception", exception);
             return false;
 
 
