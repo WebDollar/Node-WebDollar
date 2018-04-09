@@ -88,7 +88,7 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async discoverAndProcessFork(tip){
 
-        let fork, result = null;
+        let fork;
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.blocks.length;
 
@@ -219,9 +219,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 }
 
 
-                if (fork === null) {
+                if (fork === null)
                     console.log("fork is null");
-                }
 
 
             } else
@@ -231,12 +230,15 @@ class InterfaceBlockchainProtocolForkSolver{
         } catch ( exception ){
 
             console.error("discoverAndProcessFork raised an exception", exception );
+
+            if (fork !== undefined && fork !== null)
+                this.blockchain.forksAdministrator.deleteFork(fork);
+
             return {result:false, error: exception };
 
         }
 
         this.blockchain.forksAdministrator.deleteFork(fork);
-
         return { result: true };
     }
 
