@@ -205,7 +205,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     if (fork !== null) {
                         console.log("solveFork1");
-                        result = await this.solveFork(fork);
+
+                        if (! (await this.solveFork(fork) ))
+                            throw "Fork Solved was failed"
+
                     }
 
 

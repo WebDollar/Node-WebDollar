@@ -18,7 +18,7 @@ class InterfaceBlockchainTransactionsEvents{
         if (typeof txId === "string")
             txId = new Buffer(txId, "hex");
 
-        for (let i=this.blockchain.blocks.startingPosition; i<this.blockchain.blocks.endingPosition; i++) {
+        for (let i=this.blockchain.blocks.blocksStartingPoint; i<this.blockchain.blocks.endingPosition; i++) {
 
             let block = this.blockchain.blocks[i];
             if (block === undefined) continue;
@@ -45,7 +45,7 @@ class InterfaceBlockchainTransactionsEvents{
 
         let result = {};
 
-        for (let i=this.blockchain.blocks.startingPosition; i<this.blockchain.blocks.endingPosition; i++){
+        for (let i=this.blockchain.blocks.blocksStartingPoint; i<this.blockchain.blocks.endingPosition; i++){
 
             let block = this.blockchain.blocks[i];
             if (block === undefined) continue;

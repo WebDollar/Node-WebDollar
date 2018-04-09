@@ -240,7 +240,8 @@ class InterfaceBlockchainProtocol {
                             height: block.height,
                             prevHash: block.hashPrev,
                             hash: block.hash,
-                            chainLength: this.blockchain.blocks.length
+                            chainLength: this.blockchain.blocks.length,
+                            chainStartingPoint: this.blockchain.blocks.blocksStartingPoint
                         }
                     });
 
