@@ -23,7 +23,8 @@ class NodeWebPeersDiscoveryService {
             nodesListObject.type === "client") {
 
             //client Signaling for WebRTC
-            nodesListObject.socket.node.protocol.signaling.client.initializeSignalingClientService(params);
+
+            nodesListObject.socket.node.protocol.signaling.client.initializeSignalingClientService();
 
         }
 

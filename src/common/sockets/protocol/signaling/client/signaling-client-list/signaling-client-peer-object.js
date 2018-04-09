@@ -3,7 +3,6 @@ class SignalingClientPeerObject {
     /*
         webPeer
         uuid
-
      */
 
     constructor(webPeer, uuid){

@@ -63,7 +63,7 @@ class SocketAddress {
         this.addressString = address.toString();
         this.address = address;
         this.port = port;
-        this.geoLocation = null;
+        this._geoLocation = null;
 
         this.uuid = uuid;
     }
@@ -150,11 +150,24 @@ class SocketAddress {
         }
     }
 
-    getGeoLocation(){
-        if (this.geoLocation !== null) //already computed
-            return (this.geoLocation);
+    get geoLocation(){
 
-        return GeoHelper.getLocationFromAddress(this);
+        if (this._geoLocation !== null) //already computed
+            return this._geoLocation;
+
+        this._geoLocation = new Promise( async (resolve)=>{
+
+            let answer = await GeoHelper.getLocationFromAddress(this);
+
+            if (answer === null) resolve(null);
+            else {
+                this._geoLocation = answer;
+                resolve(answer);
+            }
+
+        });
+
+        return this._geoLocation;
 
     }
 

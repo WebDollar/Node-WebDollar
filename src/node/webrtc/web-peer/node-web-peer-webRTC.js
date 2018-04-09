@@ -123,7 +123,7 @@ class NodeWebPeerRTC {
             this.peer.remoteUUID = remoteUUID||remoteData.uuid;
             this.peer.remotePort = remotePort||remoteData.port;
 
-            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, level+1 );
+            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, socketSignaling.node.level + 1 );
 
             this.peer.node.protocol.sendHello(["uuid"]).then( (answer)=>{
                 this.initializePeer(["uuid"]);
@@ -246,6 +246,7 @@ class NodeWebPeerRTC {
 
                     this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
                     resolve({result: true, message:"iceCandidate successfully introduced"});
+
                 } catch (Exception){
                     resolve({result:false, message: "iceCandidate error ", exception: Exception });
                     console.error("iceCandidate error", inputSignal.candidate);
@@ -330,11 +331,9 @@ class NodeWebPeerRTC {
         this.peer.node.protocol.signaling.server.initializeSignalingServerService();
 
         this.peer.on("disconnect", ()=>{
+
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
-
-            this.peer.signaling.socketSignaling.node.sendRequest("signals/server/connections/established-connection-was-dropped", {address: this.peer.remoteAddress, connectionId: this.peer.signaling.connectionId} );
-
-            NodesList.disconnectSocket(this.peer);
+            NodesList.disconnectSocket( this.peer );
 
         });
 
