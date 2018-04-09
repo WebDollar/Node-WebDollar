@@ -47,7 +47,8 @@ class MiniBlockchainFork extends inheritFork{
                 console.error("Error cloding Accountant Tree", exception);
                 return false;
             }
-        }
+        } else
+            this._accountantTreeClone = null;
 
     }
 
@@ -73,7 +74,8 @@ class MiniBlockchainFork extends inheritFork{
     revertFork(){
 
         //recover to the original Accountant Tree
-        this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
+        if (this._accountantTreeClone !== null)
+            this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
 
         inheritFork.prototype.revertFork.call(this);
 
