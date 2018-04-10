@@ -38,6 +38,8 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/initiator/generate-initiator-signal", async (data) => {
 
             try{
+                console.warn("WEBRTC# 1 Generate Initiator Signal");
+
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "remoteUUID was not specified"};
 
@@ -52,19 +54,26 @@ class NodeSignalingClientProtocol {
                     throw {message: "I can not accept connections anymore" };
 
 
-
                 let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, undefined, data.remoteUUID);
                 let webPeer = webPeerSignalingClientListObject.webPeer;
 
-                if (webPeer.peer === null){
+                if (webPeer.peer === null)
                     webPeer.createPeer(true, socket, data.id, (iceCandidate) => {this.sendInitiatorIceCandidate(socket, data.id, iceCandidate) }, data.remoteAddress, data.remoteUUID, socket.level+1);
-                    webPeer.peer.signalInitiatorData = data.initiatorSignal;
-                }
 
                 let answer;
 
-                answer = await webPeer.createSignalInitiator();
+                for (let trials=0; trials<3; trials++) {
 
+                    answer = await webPeer.createSignalInitiator();
+
+                    console.log("###################### signals/client/initiator/generate-initiator-signal/" + data.id, answer, webPeer.peer, typeof answer);
+
+                    if (answer.signal === undefined)
+                        console.log("WEBRTC 1 is not supported !!!! being the initiator");
+                    else
+                        break;
+
+                }
                 if (!answer.result )
                     throw {message: "Failed to Get a initiatorSignal: " +answer.message};
 
@@ -80,24 +89,24 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/initiator/join-answer-signal", async (data) => {
 
             try {
+                console.warn("WEBRTC# 1_2");
+
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
-                    throw {message: "remoteUUID was not specified"};
-
-                //search if the new protocol was already connected in the past
-                if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"]) !== null) //already connected in the past
-                    throw {message: "Already Connected"};
-
-                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
-                    throw {message: "I can't accept WebPeers anymore"};
-
-
+                    throw { message: "remoteUUID was not specified" };
 
                 let webPeerSignalingClientListObject = SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID);
+
+                if (webPeerSignalingClientListObject === null)
+                    throw { message: "WebRTC Client was not found"};
+
                 let webPeer = webPeerSignalingClientListObject.webPeer;
 
                 let answer = await webPeer.joinAnswer(data.answerSignal);
 
-                socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: false, answer: answer });
+                if (!answer.result)
+                    throw {message: answer.message};
+
+                socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: true });
 
             } catch (exception){
 
@@ -111,22 +120,19 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/initiator/receive-ice-candidate", async (data) => {
 
             try {
+                console.warn("WEBRTC# 1_3");
+
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "data.remoteUUID 4 was not specified"};
 
                 if (data.iceCandidate === undefined)
                     throw {message: "data.iceCandidate 4 was not specified"};
 
-                //search if the new protocol was already connected in the past
-                if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"]) !== null) //already connected in the past
-                    throw {message: "Already connected"};
-
-                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
-                    throw {message: "I can't accept WebPeers anymore"};
-
-
-
                 let webPeerSignalingClientListObject = SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID);
+
+                if ( webPeerSignalingClientListObject === null )
+                    throw { message: "WebRTC Client was not found"};
+
                 let webPeer = webPeerSignalingClientListObject.webPeer;
 
                 //arrived earlier than  /receive-initiator-signal
@@ -157,6 +163,8 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/answer/receive-initiator-signal", async (data) => {
 
             try {
+                console.warn("WEBRTC# 2");
+
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "data.remoteUUID 2 was not specified"}
 
@@ -169,8 +177,6 @@ class NodeSignalingClientProtocol {
 
                 if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
                     throw {message: "I can't accept WebPeers anymore" };
-
-
 
                 let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal( data.initiatorSignal, undefined , data.remoteUUID );
                 let webPeer = webPeerSignalingClientListObject.webPeer;
@@ -200,20 +206,16 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/answer/receive-ice-candidate", async (data) => {
 
             try{
+                console.warn("WEBRTC# 2_2");
 
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "data.remoteUUID 3 is empty"};
 
-                //search if the new protocol was already connected in the past
-                if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null) //already connected in the past
-                    throw {message: "Already connected" };
+                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
+                    throw {message: "I can't accept WebPeers anymore" };
 
-                if ( SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ) )
-                    throw {message: "I can't accept WebPeers anymore" }
+                let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal( data.initiatorSignal, undefined , data.remoteUUID );
 
-
-
-                let webPeerSignalingClientListObject = SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID);
                 let webPeer = webPeerSignalingClientListObject.webPeer;
 
                 if (webPeer.peer === null) { //arrived earlier than  /receive-initiator-signal

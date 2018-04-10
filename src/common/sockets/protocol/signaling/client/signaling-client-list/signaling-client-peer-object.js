@@ -22,7 +22,7 @@ class SignalingClientPeerObject {
 
             NodeSignalingClientProtocol.sendErrorConnection(webPeer);
 
-        }, 10000);
+        }, 30000);
 
         webPeer.emitter.on("connect",()=>{
 
