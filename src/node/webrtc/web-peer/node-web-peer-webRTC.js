@@ -89,7 +89,7 @@ class NodeWebPeerRTC {
         this.peer.signaling.socketSignaling = socketSignaling;
         this.peer.signaling.connectionId =  signalingServerConnectionId;
 
-        console.log('Created webRTC peer');
+        console.log('Created webRTC peer', "initiator", initiator, "signalingServerConnectionId", signalingServerConnectionId, "remoteAddress", remoteAddress, "remoteUUID", remoteUUID, "remotePort", remotePort);
 
         this.peer.disconnect = () => {  }
 

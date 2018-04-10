@@ -117,11 +117,11 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this._lightPrevHashPrevClone = new Buffer(this.blockchain.lightPrevHashPrevs[diffIndex] !== undefined ? this.blockchain.lightPrevHashPrevs[diffIndex] : 0);
 
             //it is just a simple fork
-            return MiniBlockchainFork.prototype.preForkClone.call(this, true, false);
+            return MiniBlockchainFork.prototype.preForkClone.call(this, true, true );
 
         } else
         //it is just a simple fork
-            return MiniBlockchainFork.prototype.preForkClone.call(this, true, true);
+            return MiniBlockchainFork.prototype.preForkClone.call(this, true, false );
 
     }
 

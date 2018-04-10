@@ -38,7 +38,7 @@ class MiniBlockchainFork extends inheritFork{
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
 
-        if (!cloneAccountantTree) {
+        if (cloneAccountantTree) {
 
             try {
                 //clone the Accountant Tree
