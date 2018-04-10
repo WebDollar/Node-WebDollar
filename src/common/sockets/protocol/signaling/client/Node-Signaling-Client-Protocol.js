@@ -80,7 +80,10 @@ class NodeSignalingClientProtocol {
                 socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted: true, initiatorSignal: answer.signal});
 
             } catch (exception){
-                console.error("signals/client/initiator/generate-initiator-signal", exception);
+
+                if (exception.message !== "I can not accept connections anymore")
+                    console.error("signals/client/initiator/generate-initiator-signal", exception);
+
                 socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, initiatorSignal: undefined, message: exception.message });
             }
 

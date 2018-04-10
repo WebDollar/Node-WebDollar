@@ -37,6 +37,7 @@ class InterfaceBlockchainAgent{
         this._synchronizeComplete = false;
 
         this._eventEmitter = new EventEmitter();
+        this._eventEmitter.setMaxListeners(100);
 
         this.synchronized = false;
 
