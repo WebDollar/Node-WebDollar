@@ -4,6 +4,7 @@ import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
 import SocketAddress from 'common/sockets/socket-address'
 import NodesList from 'node/lists/nodes-list'
+import ConnectionsType from "node/lists/types/Connections-Type"
 
 class NodeClient {
 
@@ -127,7 +128,7 @@ class NodeClient {
 
         //it is not unique... then I have to disconnect
 
-        if (NodesList.registerUniqueSocket(this.socket, "client", validationDoubleConnectionsTypes) === false){
+        if (NodesList.registerUniqueSocket(this.socket, ConnectionsType.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 

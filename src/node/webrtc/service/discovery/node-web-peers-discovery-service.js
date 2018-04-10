@@ -1,5 +1,6 @@
 import NodesList from 'node/lists/nodes-list'
 import consts from "consts/const_global";
+import ConnectionsType from "node/lists/types/Connections-Type"
 
 class NodeWebPeersDiscoveryService {
 
@@ -19,8 +20,8 @@ class NodeWebPeersDiscoveryService {
     _newSocketRegisterAcceptWebPeers(nodesListObject){
         //{type: ["webpeer", "client"]}
 
-        if (nodesListObject.type === "webpeer" ||   // signaling service on webpeer
-            nodesListObject.type === "client") {
+
+        if ([ ConnectionsType.CONNECTION_CLIENT_SOCKET, ConnectionsType.CONNECTION_WEBRTC].indexOf(nodesListObject.connectionType) >= 0) {
 
             //client Signaling for WebRTC
 

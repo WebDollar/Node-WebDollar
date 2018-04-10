@@ -4,6 +4,7 @@ import NodesWaitlistObject  from 'node/lists/waitlist/nodes-waitlist-object';
 import NodesList from 'node/lists/nodes-list'
 import FallBackObject from './fallbacks/fallback-object';
 import FallBackNodesList from './fallbacks/fallback_nodes_list';
+import NodesType from "node/lists/types/Nodes-Type"
 
 const axios = require('axios');
 
@@ -127,7 +128,7 @@ class NodeDiscoveryService {
                         for (let i = 0; i < nodes.length; i++) {
 
                             let nodeAddress = '', nodePort = undefined,
-                                nodeType = NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER;
+                                nodeType = NodesType.NODE_TERMINAL;
 
                             if (typeof nodes[i] === "object") {
                                 nodeAddress = nodes[i].addr || '';

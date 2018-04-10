@@ -6,9 +6,10 @@ const ipaddr = require('ipaddr.js');
 
 class NodesListObject {
 
-    constructor(socket, type){
+    constructor(socket, connectionType, type){
 
         this.socket = socket;
+        this.connectionType = connectionType;
         this.type = type;
     }
 

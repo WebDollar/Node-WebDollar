@@ -3,6 +3,8 @@ import NodesList from 'node/lists/nodes-list'
 import NodesWaitlistObject from './nodes-waitlist-object';
 import SocketAddress from 'common/sockets/socket-address'
 import consts from 'consts/const_global'
+import NodesType from "node/lists/types/Nodes-Type"
+
 const EventEmitter = require('events');
 
 class NodesWaitlist {
@@ -16,7 +18,6 @@ class NodesWaitlist {
     constructor(){
         console.log("NodesWaitlist constructor");
 
-        this.NODES_WAITLIST_OBJECT_TYPE = NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE;
         this.NodesWaitlistObject = NodesWaitlistObject;
 
         this.emitter = new EventEmitter();
@@ -119,7 +120,7 @@ class NodesWaitlist {
     _tryToConnectNextNode(nextWaitListObject){
 
         //connect only to TERMINAL NODES
-        if (nextWaitListObject.type === NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER) {
+        if (nextWaitListObject.type === NodesType.NODE_TERMINAL) {
 
             if (nextWaitListObject.checkLastTimeChecked(consts.SETTINGS.PARAMS.WAITLIST.TRY_RECONNECT_AGAIN) && nextWaitListObject.blocked === false &&
                 nextWaitListObject.connecting === false && nextWaitListObject.checkIsConnected() === null) {
@@ -174,7 +175,7 @@ class NodesWaitlist {
     }
 
     /**
-     * It will delete useless waitlist WEB_RTC_PEERs
+     * It will delete useless waitlist WEB_PEER
      * It will delete addresses that tried way too much
      * @returns {boolean}
      */
@@ -186,7 +187,7 @@ class NodesWaitlist {
         for (let i=this.waitlist.length-1; i>=0; i--) {
 
             if (this.waitlist[i].errorTrial > this.MAX_ERROR_TRIALS ||
-                this.waitlist[i].type === NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE.WEB_RTC_PEER) {
+                this.waitlist[i].type === NodesType.NODE_WEB_PEER) {
 
                 this.emitter.emit("waitlist/delete-node", this.waitlist[i]);
                 this.waitlist.splice(i, 1);

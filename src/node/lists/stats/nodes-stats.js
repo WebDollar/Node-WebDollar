@@ -2,6 +2,7 @@ import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
+import ConnectionsType from "node/lists/types/Connections-Type"
 
 class NodesStats {
 
@@ -28,12 +29,12 @@ class NodesStats {
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Waitlist:",this.statsWaitlist,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
 
         let string1 = "";
-        let clients = NodesList.getNodes("client");
+        let clients = NodesList.getNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
         for (let i=0; i<clients.length; i++)
             string1 += '('+clients[i].socket.node.sckAddress.address+' , '+clients[i].socket.node.sckAddress.uuid+')   ';
 
         let string2 = "";
-        let server = NodesList.getNodes("server");
+        let server = NodesList.getNodes( ConnectionsType.CONNECTION_SERVER_SOCKET );
         for (let i=0; i<server.length; i++)
             string2 += '(' + server[i].socket.node.sckAddress.address + ' , ' + server[i].socket.node.sckAddress.uuid + ')   ';
 
@@ -44,9 +45,9 @@ class NodesStats {
 
     _recalculateStats(nodesListObject){
 
-        this.statsClients = NodesList.getNodes("client").length;
-        this.statsServer = NodesList.getNodes("server").length;
-        this.statsWebPeers = NodesList.getNodes("webpeer").length;
+        this.statsClients = NodesList.getNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET).length;
+        this.statsServer = NodesList.getNodes(ConnectionsType.CONNECTION_SERVER_SOCKET).length;
+        this.statsWebPeers = NodesList.getNodes(ConnectionsType.CONNECTION_WEBRTC).length;
         this.statsWaitlist = NodesWaitlist.waitlist.length;
 
         this._printStats();

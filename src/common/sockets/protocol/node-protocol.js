@@ -1,5 +1,6 @@
 import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
+import NodesType from "node/lists/types/Nodes-Type"
 
 class NodeProtocol {
 
@@ -13,6 +14,7 @@ class NodeProtocol {
         let response = node.sendRequestWaitOnce("HelloNode", {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
+            nodeType: process.env.BROWSER ? NodesType.NODE_WEB_PEER : NodesType.NODE_TERMINAL
         });
 
         response = await response;
@@ -20,7 +22,7 @@ class NodeProtocol {
         if (typeof response !== "object")
             return false;
 
-        if (response === null || !response.hasOwnProperty("uuid")){
+        if (response === null || !response.hasOwnProperty("uuid") ){
             console.error("hello received, but there is not uuid", response);
             return false;
         }
@@ -28,20 +30,20 @@ class NodeProtocol {
         if (response.hasOwnProperty("version")){
 
             if (response.version < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
-
                 console.log("hello received, VERSION is not right", response.version, consts.SETTINGS.NODE.VERSION_COMPATIBILITY);
                 return false;
+            }
 
+            if ( [NodesType.NODE_TERMINAL, NodesType.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
+                console.error("invalid node type", response.nodeType);
+                return false;
             }
 
             node.sckAddress.uuid = response.uuid;
+            node.protocol.nodeType = response.nodeType;
 
             //check if it is a unique connection, add it to the list
             let previousConnection = NodesList.searchNodeSocketByAddress(node.sckAddress, "all", validationDoubleConnectionsTypes);
-
-            // console.log("sendHello clientSockets", NodesList.clientSockets);
-            // console.log("sendHello serverSockets", NodesList.serverSockets);
-            // console.log("sendHello", result);
 
             if ( previousConnection === null ){
                 console.log("RECEIVED HELLO NODE BACK", response.version, response.uuid);
