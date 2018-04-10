@@ -15,6 +15,8 @@ class NodeSignalingClientProtocol {
 
         socket.node.on("signals/client/do-you-have-free-room", (data)=>{
 
+            console.warn("free room: I have ", SignalingClientList.connected.length, "max", consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS);
+
             socket.node.sendRequest("signals/client/do-you-have-free-room"+"/answer", {
                 result: true,
                 acceptWebPeers: SignalingClientList.connected.length < consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS,

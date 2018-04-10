@@ -320,7 +320,7 @@ class NodeWebPeerRTC {
             }
         }
 
-        if (this.peer.dataChannel.readyState === 'close') {
+        if (this.peer.dataChannel.readyState === 'closed') {
             if (this.peer.connected){
                 this.peer.connected = false;
                 this.emitter.emit("disconnect", {});
