@@ -175,8 +175,6 @@ class InterfaceBlockchainFork {
         console.log("save Fork after validateFork");
 
 
-
-
         let revertActions = new RevertActions(this.blockchain);
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
@@ -202,7 +200,8 @@ class InterfaceBlockchainFork {
                 console.error("preFork raised an error", exception);
                 console.error('----------------------------------------');
 
-                revertActions.revertOperations();
+                revertActions.revertOperations('', "all");
+                this._blocksCopy = []; //We didn't use them so far
                 await this.revertFork();
 
                 return false;
@@ -244,7 +243,7 @@ class InterfaceBlockchainFork {
 
                 //revert the accountant tree
                 //revert the last K block
-                revertActions.revertOperations();
+                revertActions.revertOperations('', "all");
 
                 //reverting back to the clones, especially light settings
                 await this.revertFork();

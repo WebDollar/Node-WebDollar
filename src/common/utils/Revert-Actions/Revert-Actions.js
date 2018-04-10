@@ -11,7 +11,7 @@ class RevertActions {
         this._actions .push(data);
     }
 
-    revertOperations(actionName=''){
+    revertOperations(actionName='', all=''){
 
         for (let i=this._actions .length-1; i>=0; i--) {
 
@@ -22,7 +22,7 @@ class RevertActions {
 
             if (action.name === "revert-updateAccount" && (actionName === '' || actionName === action.name)) {
 
-                this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
+                let balance = this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
 
             }
             else
@@ -45,7 +45,9 @@ class RevertActions {
             if (action.name === "breakpoint"  && (actionName === '' || actionName === action.name)) {
 
                 this._actions.splice(i,1);
-                break;
+
+                if (all !== 'all')
+                    break;
 
             }
             else done = false;
