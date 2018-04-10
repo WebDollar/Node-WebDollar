@@ -45,6 +45,34 @@ class NodeSignalingServerProtocol {
 
         });
 
+
+        socket.node.on("signals/server/connections/was-established-successfully", (data)=>{
+
+            if (!data.connectionId){
+
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+
+                if (connection  !== null)
+                    SignalingServerRoomList.setSignalingServerRoomConnectionStatus(connection.client1, connection.client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished)
+
+            }
+
+        });
+
+        socket.node.on("signals/server/connections/error-establishing-connection", (data)=>{
+
+            if (!data.connectionId){
+
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+
+                if (connection  !== null)
+                    SignalingServerRoomList.setSignalingServerRoomConnectionStatus(connection.client1, connection.client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError)
+
+            }
+
+        });
+
+
     }
 
 
@@ -137,18 +165,6 @@ class NodeSignalingServerProtocol {
                                     this.clientIsNotAcceptingAnymoreWebPeers(client1, connection);
                                     return false;
                                 }
-                                else {
-
-                                    if (result.established  === true) {
-
-                                        //connected
-                                        connection.refreshLastTimeConnected();
-
-                                    } else {
-                                        //not connected
-                                        connection.refreshLastTimeErrorChecked();
-                                    }
-                                }
 
                             });
                         }
@@ -175,7 +191,6 @@ class NodeSignalingServerProtocol {
                             }
 
                         });
-
 
 
                     });
@@ -218,6 +233,8 @@ class NodeSignalingServerProtocol {
         client.acceptWebPeers = false;
 
     }
+
+
 
 }
 

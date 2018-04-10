@@ -21,7 +21,7 @@ class SignalingClientList {
 
     desinitializeWebPeerConnection(webpeer){
 
-        let pos = this.findWebPeerSignalingClientList(undefined, undefined, webpeer.node.sckAddress.uuid);
+        let pos = this.findWebPeerSignalingClientList(undefined, undefined, webpeer.peer.node.sckAddress.uuid);
 
         if (pos !== -1) {
             this.connected.splice(pos, 1);

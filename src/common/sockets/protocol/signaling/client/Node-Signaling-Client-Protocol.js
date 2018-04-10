@@ -90,27 +90,9 @@ class NodeSignalingClientProtocol {
                 let webPeerSignalingClientListObject = SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID);
                 let webPeer = webPeerSignalingClientListObject.webPeer;
 
-                let timeoutId = setTimeout(() => {
-                    console.log("%%%%%%%%%%%% WEBRTC TIMEOUT !!!!");
-                    socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, { established: false });
-                }, 30000);
-
-                let connectId = webPeer.peer.once("connect", () => {
-
-                    clearTimeout(timeoutId);
-
-                    socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: true,});
-                });
-
-                let disconnectId = webPeer.peer.once("error", () => {
-
-                    console.log("%%%%%%% WEBRTC connection NOT established");
-                    clearTimeout(timeoutId);
-
-                    socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: false,});
-                });
-
                 let answer = await webPeer.joinAnswer(data.answerSignal);
+
+                socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: false, answer: answer });
 
             } catch (exception){
 
@@ -279,9 +261,17 @@ class NodeSignalingClientProtocol {
 
     webPeerDisconnected(webPeer){
 
-        webPeer.signaling.socketSignaling.node.sendRequest("signals/server/connections/established-connection-was-dropped", {address: webPeer.remoteAddress, connectionId: webPeer.signaling.connectionId} );
+        webPeer.peer.signaling.socketSignaling.node.sendRequest("signals/server/connections/established-connection-was-dropped", {address: webPeer.remoteAddress, connectionId: webPeer.peer.signaling.connectionId} );
         SignalingClientList.desinitializeWebPeerConnection(webPeer);
 
+    }
+
+    sendSuccessConnection(webPeer){
+        webPeer.peer.signaling.socketSignaling.node.sendRequest("signals/server/connections/was-established-successfully", {connectionId: webPeer.peer.signaling.connectionId})
+    }
+
+    sendErrorConnection(webPeer){
+        webPeer.peer.signaling.socketSignaling.node.sendRequest("signals/server/connections/error-establishing-connection", {connectionId: webPeer.peer.signaling.connectionId})
     }
 
 }

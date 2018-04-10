@@ -82,7 +82,12 @@ class NodeWebPeerRTC {
             }
         };
 
-
+        /*
+            keeping information about new connection
+         */
+        this.peer.signaling = {};
+        this.peer.signaling.socketSignaling = socketSignaling;
+        this.peer.signaling.connectionId =  signalingServerConnectionId;
 
         console.log('Created webRTC peer');
 
@@ -101,12 +106,6 @@ class NodeWebPeerRTC {
 
             let remoteData = this.processDescription(this.peer.remoteDescription);
 
-            /*
-                keeping information about new connection
-             */
-            this.peer.signaling = {};
-            this.peer.signaling.socketSignaling = socketSignaling;
-            this.peer.signaling.connectionId =  signalingServerConnectionId;
 
             this.peer.remoteAddress = remoteAddress||remoteData.address;
             this.peer.remoteUUID = remoteUUID||remoteData.uuid;
@@ -345,7 +344,7 @@ class NodeWebPeerRTC {
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
             NodesList.disconnectSocket( this.peer );
 
-            NodeSignalingClientProtocol.webPeerDisconnected(this.peer);
+            NodeSignalingClientProtocol.webPeerDisconnected(this);
 
         });
 

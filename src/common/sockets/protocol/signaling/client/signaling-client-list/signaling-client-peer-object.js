@@ -1,3 +1,6 @@
+import SignalingClientList from "./signaling-client-list"
+import NodeSignalingClientProtocol from "./../Node-Signaling-Client-Protocol"
+
 class SignalingClientPeerObject {
 
     /*
@@ -11,6 +14,23 @@ class SignalingClientPeerObject {
         this.uuid = uuid;
 
         this.lastTimeChecked = 0;
+
+        let timeout = setTimeout(()=>{
+
+            console.error("Signaling Client Peer Object Timeout");
+            SignalingClientList.deleteWebPeerSignalingClientList(uuid);
+
+            NodeSignalingClientProtocol.sendErrorConnection(webPeer);
+
+        }, 30000);
+
+        webPeer.emitter.on("connect",()=>{
+
+            clearTimeout(timeout);
+            NodeSignalingClientProtocol.sendSuccessConnection(webPeer);
+
+        });
+
     }
 
     refreshLastTimeChecked(){
