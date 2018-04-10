@@ -165,8 +165,6 @@ class InterfaceBlockchainFork {
         if (global.TERMINATED)
             return false;
 
-        // It don't validate the hashes of the Fork Blocks again
-
         if (! (await this._validateFork(false))) {
             console.error("validateFork was not passed");
             return false
@@ -224,6 +222,7 @@ class InterfaceBlockchainFork {
                     StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
+                    this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
 
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});

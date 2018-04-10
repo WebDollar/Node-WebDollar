@@ -79,7 +79,7 @@ class SignalingClientList {
 
     deleteWebPeerSignalingClientList(uuid){
 
-        for (let i=0; i<this.connected; i++)
+        for (let i=0; i<this.connected.length; i++)
             if (this.connected[i].uuid === uuid ){
                 this.connected.splice(i,1);
                 return true;
