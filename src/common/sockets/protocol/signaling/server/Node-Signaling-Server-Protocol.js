@@ -86,7 +86,8 @@ class NodeSignalingServerProtocol {
         let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
         if (previousEstablishedConnection === null
-            || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status in [ SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected] )){
+            || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status in [ SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished] )
+            || (previousEstablishedConnection.checkLastTimeChecked(60*1000) && previousEstablishedConnection.status in [ SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError] )){
 
             let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 

@@ -233,7 +233,7 @@ consts.SETTINGS = {
             },
 
             WEBRTC: {
-                MAXIMUM_CONNECTIONS: 5,
+                MAXIMUM_CONNECTIONS: 7,
             },
 
             FORKS:{
