@@ -187,8 +187,10 @@ class NodesWaitlist {
 
             if (this.waitlist[i].errorTrial > this.MAX_ERROR_TRIALS ||
                 this.waitlist[i].type === NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE.WEB_RTC_PEER) {
+
                 this.emitter.emit("waitlist/delete-node", this.waitlist[i]);
                 this.waitlist.splice(i, 1);
+
             }
 
         }
@@ -200,8 +202,16 @@ class NodesWaitlist {
         let index = this._findNodesWaitlist(address, port);
 
         if (index !== -1) {
-            this.emitter.emit("waitlist/delete-node", this.waitlist[index]);
-            this.waitlist.splice(index, 1);
+
+            this.waitlist[index].removeBackedBy(backedBy);
+
+            if ( this.waitlist[index].length === 0) {
+
+                this.emitter.emit("waitlist/delete-node", this.waitlist[index]);
+                this.waitlist.splice(index, 1);
+
+            }
+
             return true;
         }
 

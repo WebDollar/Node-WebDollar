@@ -15,11 +15,11 @@ class NodePropagationProtocol {
 
         socket.node.sendRequestWaitOnce("propagation/request-all-wait-list-nodes");
 
-        NodesList.emitter.on("nodes-list/connected", nodeListObject => { this._newNodeConnected(nodeListObject) } );
-        NodesList.emitter.on("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected(nodeListObject) });
+        NodesList.emitter.on("nodes-list/connected", nodeListObject => { this._newNodeConnected(socket, nodeListObject) } );
+        NodesList.emitter.on("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected(socket, nodeListObject) });
 
-        NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected(nodeWaitListObject) } );
-        NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected(nodeWaitListObject) });
+        NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected(socket, nodeWaitListObject) } );
+        NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected(socket, nodeWaitListObject) });
 
     }
 
@@ -49,6 +49,7 @@ class NodePropagationProtocol {
 
             try {
                 console.log("NodePropagation", socket.node.sckAddress.getAddress());
+                console.log("NodePropagation", response);
 
                 let addresses = response.addresses || [];
                 if (typeof addresses === "string") addresses = [addresses];
@@ -85,12 +86,12 @@ class NodePropagationProtocol {
         });
     }
 
-    _newNodeConnected(address){
-        NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-nodes", addresses: [address.toJSON() ]},)
+    _newNodeConnected(socket, address){
+        socket.node.sendRequest("propagation/nodes", {op: "new-nodes", addresses: [address.toJSON() ]},)
     }
 
-    _nodeDisconnected(address){
-        NodeProtocol.broadcastRequest("propagation/nodes", {op: "deleted-nodes", addresses: [address.toJSON() ]},)
+    _nodeDisconnected(socket, address){
+        socket.node.sendRequest("propagation/nodes", {op: "deleted-nodes", addresses: [address.toJSON() ]},)
     }
 
 }
