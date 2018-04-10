@@ -1,9 +1,6 @@
-import consts from 'consts/const_global'
-
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodeProtocol from 'common/sockets/protocol/node-protocol';
-
-import Blockchain from "main-blockchain/Blockchain"
+import NodesList from 'node/lists/nodes-list'
 
 class NodePropagationProtocol {
 
@@ -12,37 +9,72 @@ class NodePropagationProtocol {
     }
 
 
-    initializeSocketForPropagation(node){
+    initializeSocketForPropagation(socket){
 
-        this.initializeNodesPropagation(node);
+        this.initializeNodesPropagation(socket);
+
+        socket.node.sendRequestWaitOnce("propagation/request-all-wait-list-nodes");
+
+        NodesList.emitter.on("nodes-list/connected", nodeListObject => { this._newNodeConnected(nodeListObject) } );
+        NodesList.emitter.on("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected(nodeListObject) });
+
+        NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected(nodeWaitListObject) } );
+        NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected(nodeWaitListObject) });
 
     }
 
-    initializeNodesPropagation(node){
+    initializeNodesPropagation(socket){
 
-        node.on("propagation/nodes", response => {
+        socket.node.on("propagation/request-all-wait-list-nodes", response =>{
+
+            try{
+
+                let list = [];
+
+                for (let i=0; i<NodesList.nodes.length; i++)
+                    list.push(NodesList.nodes[i].toJSON());
+
+                for (let i=0; i<NodesWaitlist.waitlist.length; i++)
+                    list.push(NodesWaitlist.waitlist[i].toJSON());
+
+                socket.node.sendRequest("propagation/nodes", {"op": "new-nodes", addresses: list });
+
+            } catch(exception){
+
+            }
+
+        });
+
+        socket.node.on("propagation/nodes", response => {
 
             try {
-                console.log("NodePropagation", node.sckAddress.getAddress());
+                console.log("NodePropagation", socket.node.sckAddress.getAddress());
 
-                let instruction = response.instruction || '';
-                switch (instruction) {
+                let addresses = response.addresses || [];
+                if (typeof addresses === "string") addresses = [addresses];
+
+                if (!Array.isArray(addresses)) throw {message: "addresses is not an array"};
+
+                let op = response.op || '';
+                switch (op) {
+
                     case "new-nodes":
 
-                        let addresses = response.addresses || [];
-                        if (Array.isArray(addresses)) {
-
-                            for (let i = 0; i < addresses.length; i++) {
-
-                                let address = addresses[i].addr;
-                                let port = addresses[i].port;
-                                let type = addresses[i].type;
-
-                                NodesWaitlist.addNewNodeToWaitlist(address, port, type, node.level + 1);
-                            }
-                        }
+                        for (let i = 0; i < addresses.length; i++)
+                            NodesWaitlist.addNewNodeToWaitlist(addresses[i].addr, addresses[i].port, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket );
 
                         break;
+
+                    case "deleted-nodes":
+
+                        for (let i = 0; i < addresses.length; i++)
+                            NodesWaitlist.removedWaitListElement( addresses[i].addr, addresses[i].port, socket );
+
+                        break;
+
+                    default:
+                        throw {message: "Op is invalid"};
+
                 }
 
             }
@@ -53,16 +85,13 @@ class NodePropagationProtocol {
         });
     }
 
-
-
-    propagateNewNodes(nodes, exceptSockets){
-
-        if (typeof nodes === 'string') nodes = [nodes];
-
-        NodeProtocol.broadcastRequest("propagation/nodes", {instruction: "new-nodes", nodes: nodes }, undefined, exceptSockets);
-
+    _newNodeConnected(address){
+        NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-nodes", addresses: [address.toJSON() ]},)
     }
 
+    _nodeDisconnected(address){
+        NodeProtocol.broadcastRequest("propagation/nodes", {op: "deleted-nodes", addresses: [address.toJSON() ]},)
+    }
 
 }
 

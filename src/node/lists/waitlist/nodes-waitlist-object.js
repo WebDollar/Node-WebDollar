@@ -7,13 +7,18 @@ const NODES_WAITLIST_OBJECT_TYPE = {
 
 class NodesWaitlistObject {
 
-    constructor(sckAddresses, type, level){
+    constructor(sckAddresses, type, nodeConnected, level, backedBy){
 
         this.sckAddresses = sckAddresses;
         this.socket = null;
 
+        this.nodeConnected = nodeConnected||false;
         this.blocked = false;
         this.checked = false;
+
+        if (backedBy === undefined) backedBy = [];
+        if ( !Array.isArray(backedBy) ) backedBy = [backedBy];
+        this.backedBy = backedBy;
 
         this.connecting = false;
 
@@ -51,6 +56,7 @@ class NodesWaitlistObject {
     }
 
     checkIsConnected() {
+
         //checking if I had been connected in the past
 
         for (let i = 0; i < this.sckAddresses.length; i++) {
@@ -78,6 +84,36 @@ class NodesWaitlistObject {
         this.lastTimeChecked = 0;
         this.errorTrial = 0;
 
+    }
+
+
+    toJSON(){
+
+        return {
+
+            type: this.type,
+            addr: this.sckAddresses[0].addressString,
+            port: this.sckAddresses[0].port,
+
+        }
+
+    }
+
+    pushBackedBy(socket){
+
+        for (let i=0; i< this.backedBy.length; i++)
+            if (this.backedBy[i] === socket)
+                return false;
+
+        this.backedBy.push(socket);
+    }
+
+    removeBackedBy(socket){
+        for (let i=0; i< this.backedBy.length; i++)
+            if (this.backedBy[i] === socket) {
+                this.backedBy.splice(i, 1);
+                return;
+            }
     }
 
 }

@@ -12,6 +12,18 @@ class NodesListObject {
         this.type = type;
     }
 
+
+    toJSON(){
+
+        return {
+            type: this.type,
+            addr: this.socket.node.sckAddress.addressString,
+            port: this.socket.node.sckAddress.port,
+            connected: true,
+        }
+
+    }
+
 }
 
 

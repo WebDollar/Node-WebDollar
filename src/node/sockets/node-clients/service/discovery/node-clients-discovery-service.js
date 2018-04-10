@@ -136,7 +136,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[i]; //a simple string Address
                             }
 
-                            NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort, nodeType, 1);
+                            NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType, false, 1, "fallback" );
                         }
 
                     }

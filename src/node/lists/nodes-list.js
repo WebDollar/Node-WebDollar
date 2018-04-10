@@ -18,6 +18,7 @@ class NodesList {
         console.log("NodesList constructor");
 
         this.emitter = new EventEmitter();
+        this.emitter.setMaxListeners(100);
 
         this.nodes = [];
         this.nodesTotal = 0;

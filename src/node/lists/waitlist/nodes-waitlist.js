@@ -20,6 +20,7 @@ class NodesWaitlist {
         this.NodesWaitlistObject = NodesWaitlistObject;
 
         this.emitter = new EventEmitter();
+        this.emitter.setMaxListeners(100);
 
         this.waitlist = [];
         this.events = [];
@@ -39,7 +40,7 @@ class NodesWaitlist {
 
     }
 
-    addNewNodeToWaitlist(addresses, port, type, level){
+    addNewNodeToWaitlist(addresses, port, type, nodeConnected, level, backedBy){
 
         // addresses = "127.0.0.1";
 
@@ -52,17 +53,16 @@ class NodesWaitlist {
 
             let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
-            //console.log("addNewNodeToWaitlist2", addresses[i], this._searchNodesWaitlist(sckAddress));
+            let foundWaitList = this._searchNodesWaitlist(sckAddress);
 
-            if ( this._searchNodesWaitlist(sckAddress) === null){
-                sckAddresses.push(sckAddress);
-            }
+            if ( foundWaitList !== null)  foundWaitList.pushBackedBy(backedBy);
+            else  sckAddresses.push(sckAddress);
 
         }
 
         if (sckAddresses.length > 0){
 
-            let waitListObject = new NodesWaitlistObject(sckAddresses, type, level);
+            let waitListObject = new NodesWaitlistObject(sckAddresses, type, nodeConnected, level, backedBy);
             this.waitlist.push(waitListObject);
 
             this._tryToConnectNextNode(waitListObject);
@@ -74,26 +74,32 @@ class NodesWaitlist {
         return null;
     }
 
-    _searchNodesWaitlist(address, port){
+    _findNodesWaitlist(address, port){
 
         let sckAddress = SocketAddress.createSocketAddress( address, port );
 
         for (let i=0; i<this.waitlist.length; i++)
             for (let j=0; j<this.waitlist[i].sckAddresses.length; j++)
                 if (this.waitlist[i].sckAddresses[j].matchAddress(sckAddress) )
-                    return this.waitlist[i];
+                    return i
 
-        return null;
+        return -1;
+    }
+
+    _searchNodesWaitlist(address, port){
+
+        let index = this._findNodesWaitlist(address, port);
+
+        if (index === -1) return null;
+
+        return this.waitlist[index];
+
     }
 
     /*
         Connect to all nodes
     */
     _connectNewNodesWaitlist(setTimeOut){
-
-        // console.log("Waitlist length", this.waitlist.length);
-        // for (let i=0; i<this.waitlist.length; i++)
-        //     console.log(this.waitlist[i].toString())
 
         this._deleteUselessWaitlist();
 
@@ -189,6 +195,18 @@ class NodesWaitlist {
 
     }
 
+    removedWaitListElement(address, port, backedBy){
+
+        let index = this._findNodesWaitlist(address, port);
+
+        if (index !== -1) {
+            this.emitter.emit("waitlist/delete-node", this.waitlist[index]);
+            this.waitlist.splice(index, 1);
+            return true;
+        }
+
+        return false;
+    }
 
     resetWaitlist(){
 
