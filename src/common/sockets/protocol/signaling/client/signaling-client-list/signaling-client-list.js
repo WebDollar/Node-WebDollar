@@ -89,7 +89,7 @@ class SignalingClientList {
     }
 
     computeMaxWebPeersConnected( uuid ){
-        return consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS + (this.findWebPeerSignalingClientList( uuid ) === -1 ? -1 : 0 )
+        return consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS + (this.findWebPeerSignalingClientList( uuid ) !== -1 ? -1 : 0 )
     }
 
 }
