@@ -102,7 +102,6 @@ describe('RewardSimulator', () => {
         }
         
         console.log("WEBD mined after 100 years=", minedWebd);
-        
     });
 
 });
