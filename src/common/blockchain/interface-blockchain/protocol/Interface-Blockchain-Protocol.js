@@ -65,7 +65,7 @@ class InterfaceBlockchainProtocol {
     propagateHeader(block,  socketsAvoidBroadcast){
 
         // broadcasting the new block, to everybody else
-        NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeader(), "all", socketsAvoidBroadcast);
+        NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeaderWithInformation(), "all", socketsAvoidBroadcast);
 
     }
 
@@ -127,7 +127,7 @@ class InterfaceBlockchainProtocol {
                     if (this.blockchain.blocks.length > 0 && this.blockchain.blocks.last !== undefined)
                         answer = {
                             result: true,
-                            data: this.blockchain.blocks.last.getBlockHeader()
+                            data: this.blockchain.blocks.last.getBlockHeaderWithInformation()
                         };
                     else
                         answer = { result: false,  message: "no blocks"};
@@ -167,8 +167,6 @@ class InterfaceBlockchainProtocol {
                     console.log("blockchain/header/new-block received", data.chainLength||0);
 
                     this._validateBlockchainHeader(data);
-
-                    console.log("blockchain/header/new-block validated");
 
                     //validate header
                     //TODO !!!

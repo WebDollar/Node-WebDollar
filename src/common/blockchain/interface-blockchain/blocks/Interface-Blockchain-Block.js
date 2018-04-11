@@ -356,24 +356,33 @@ class InterfaceBlockchainBlock {
             this.version === targetBlock.version;
     }
 
-    getBlockHeader(){
+    getBlockHeaderWithInformation(){
 
         return {
+
             height: this.height,
             chainLength: this.blockchain.blocks.length,
             chainStartingPoint: this.blockchain.blocks.blocksStartingPoint,
-            header: {
-                hash: this.hash,
-                hashPrev: this.hashPrev,
-                data: {
-                    hashData: this.data.hashData,
-                    hashTransactions: this.data.hashTransactions,
-                },
 
-                nonce: this.nonce,
-            }
-
+            header: this.getBlockHeader(),
         }
+
+    }
+
+    getBlockHeader(){
+
+        return {
+
+            hash: this.hash,
+            hashPrev: this.hashPrev,
+            data: {
+                hashData: this.data.hashData,
+                hashTransactions: this.data.hashTransactions,
+            },
+
+            nonce: this.nonce,
+        }
+
     }
 
 }

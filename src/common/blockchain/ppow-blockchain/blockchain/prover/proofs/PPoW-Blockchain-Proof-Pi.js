@@ -2,7 +2,7 @@
  * Known as π
  */
 
-class PPowBlockchainProofs{
+class PPowBlockchainProofPi{
 
     constructor(blocks){
 
@@ -38,6 +38,15 @@ class PPowBlockchainProofs{
         return list;
     }
 
+    getProofHeaders(){
+
+        let list = [];
+        for (let i=0; i<this.blocks.length; i++)
+            list.push( this.blocks[i].getBlockHeader() )
+
+        return list;
+    }
+
 }
 
-export default PPowBlockchainProofs;
+export default PPowBlockchainProofPi;

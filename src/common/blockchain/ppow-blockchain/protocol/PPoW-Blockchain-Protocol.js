@@ -1,4 +1,5 @@
 import InterfaceBlockchainProtocol from "common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol"
+import PPoWBlockchainProofPi from "./../blockchain/prover/PPoW-Blockchain-Prover"
 
 class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
@@ -8,19 +9,25 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
         let socket = nodesListObject.socket;
 
+        this._initializeNodeNiPoPoW(socket);
+
     }
 
-    _initializeFullNodeNiPoPoW(socket){
+    _initializeNodeNiPoPoW(socket){
 
-        socket.node.on("get/nipopow-blockchain/get-proof", async (data)=>{
+        socket.node.on("get/nipopow-blockchain/get-proofs/pi/headers", async ()=>{
 
-            let proof = this.blockchain.createProve( this.blockchain );
+            socket.node.sendRequest("get/nipopow-blockchain/get-proofs/pi/headers", this.blockchain.prover.proofPi.getProofHeaders() );
+
+        });
+
+        socket.node.on("get/nipopow-blockchain/get-proofs/xi/headers", async ()=>{
+
+            socket.node.sendRequest("get/nipopow-blockchain/get-proofs/pi/headers", this.blockchain.prover.proofXi.getProofHeaders() );
 
         });
 
     }
-
-
 
 }
 
