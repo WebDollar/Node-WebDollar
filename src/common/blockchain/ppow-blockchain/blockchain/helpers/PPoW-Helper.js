@@ -67,23 +67,40 @@ class PPoWHelper{
         if (m < 1)
             throw ('superchainQuality is not good');
 
-        if (superchain.length < m)
+        if (superchain.blocks.length < m)
             return false;
 
         //m ∈ N states that for all m' ≥ m
 
         // local-good δ (C↑ µ [−m' :], C↑µ [−m' :]↓ , µ).
 
-        while ( m < superchain.length ){
+        let mP = m;
+        while ( mP >= m  && mP <superchain.blocks.length){
 
-            // TODO !!!!!! maybe it will require an min
+            // C↑ µ
+            let upperChain = superchain.blocksGreaterLevel(miu);
 
-            const underlyingLength = superchain.blocks.last.height - superchain.blocks[superchain.length - m].height + 1; // I think it is without +1
+            // downchain C'↓ C is defined as C[ C'[0] : C'[−1] ].          simply write C'↓
 
-            // C'length = m
-            // C.length = underlingLength
+            //finding C[ C'[0] :
+            let first = -1;
+            let last = -1;
+            for (let i=0; i<superchain.blocks.length; i++)
+                if (superchain.blocks[i] === upperChain[0]) {
+                    first = i;
+                    break;
+                }
 
-            if (this._localGood( Math.min( m, superchain.length ), underlyingLength , miu) === false)
+            //finding C'[ : C'[-1] ]
+            for (let i=0; i<superchain.blocks.length; i++)
+                if (superchain.blocks[i] === upperChain[upperChain.length-1]) {
+                    last = i;
+                    break;
+                }
+
+            let underlyingLength = last - first;
+
+            if (this._localGood( m, underlyingLength , miu) === false)
                 return false;
 
             m++;
@@ -101,7 +118,36 @@ class PPoWHelper{
      */
     _multilevelQuality(superchain, miu){
 
+
         //C ∗ = C [−m : ]
+        for (let i = 0; i<superchain.blocks.length - consts.POPOW_PARAMS.k1; i++){
+
+            //C∗ ⊆ C, if |C∗↑µ| ≥ k1
+
+            let first = i;
+            let last = superchain.blocks.length;
+
+            let CStar = [];
+            for (let j=first; j <=last; j++)
+                CStar.push(superchain[j]);
+
+            //any µ' < µ
+            for (let miuP=miu; miuP >= 1; miuP--) {
+
+                //should be optimized
+                let upperChain = CStar.blocksGreaterLevel(miuP);
+
+                //| C∗↑µ' | ≥ k1
+                if (upperChain.length >= consts.POPOW_PARAMS.k1){
+
+                    if ((CStar.blocksGreaterLevel(miu) >= (1 - consts.POPOW_PARAMS.d ) * new BigInteger(2).pow(miu - miuP) * upperChain ) === false)
+                        return false;
+
+                }
+
+            }
+
+        }
 
         return true;
         // TBD

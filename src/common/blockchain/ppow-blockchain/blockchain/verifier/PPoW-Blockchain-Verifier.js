@@ -186,13 +186,11 @@ class PPoWBlockchainVerifier{
                 //if |C1| = m then
                 if (C1.length === consts.POPOW_PARAMS.m){
 
-                    // C∗ ← C↓↑µ−1
-                    // TODO DEFINE Cstar
-
-                    let Cstar = [];
+                    // C∗ ← C↑µ−1    //not C↓↑
+                    let Cstar = proofs.blocksGreaterLevel(miu-1);
 
                     if ( new BigInteger( 2 * C1.length ).lesser( new BigInteger(1-consts.POPOW_PARAMS.d).pow(p) * Cstar.length  ) )
-                        return Cstar; //Chain is bad
+                        throw {message: "badness failed because of Cstar badness ", Cstar: Cstar}
 
 
                 }

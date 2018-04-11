@@ -1,5 +1,5 @@
 import consts from 'consts/const_global'
-import PPoWHelper from '../verifier/helpers/PPoW-Helper'
+import PPoWHelper from '../helpers/PPoW-Helper'
 import PPowBlockchainProofPi from './proofs/PPoW-Blockchain-Proof-Pi'
 import PPowBlockchainProofXi from './proofs/PPoW-Blockchain-Proof-Xi'
 
@@ -47,7 +47,7 @@ class PPoWBlockchainProver{
                     proofPi.blocks.push(alpha[i]);
 
                 //if goodδ,m(C, α, µ)
-                if (this.blockchain.good(alpha, miu)) {
+                if (PPoWHelper.good(alpha, miu)) {
                     B = alpha[alpha.length - consts.POPOW_PARAMS.m];
                 }
 
