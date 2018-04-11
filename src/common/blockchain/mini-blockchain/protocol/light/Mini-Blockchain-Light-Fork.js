@@ -110,8 +110,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
-            this._lightAccountantTreeSerializationsHeightClone = new Buffer(this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializations[diffIndex] : 0);
             this._blocksStartingPointClone = this.blockchain.blocks.blocksStartingPoint;
+            this._lightAccountantTreeSerializationsHeightClone = new Buffer(this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializations[diffIndex] : 0);
             this._lightPrevDifficultyTargetClone = new Buffer(this.blockchain.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.blockchain.lightPrevDifficultyTargets[diffIndex] : 0);
             this._lightPrevTimeStampClone = this.blockchain.lightPrevTimeStamps[diffIndex];
             this._lightPrevHashPrevClone = new Buffer(this.blockchain.lightPrevHashPrevs[diffIndex] !== undefined ? this.blockchain.lightPrevHashPrevs[diffIndex] : 0);
@@ -138,9 +138,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
             let forkSum = this.blockchain.accountantTree.calculateNodeCoins();
 
-            if ( forkSum !== BlockchainMiningReward.getSumReward(diffIndex) || forkSum <= 0 ){
+            if ( forkSum !== BlockchainMiningReward.getSumReward(diffIndex) || forkSum <= 0 )
                 throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: forkSum, rewardShould: BlockchainMiningReward.getSumReward(diffIndex)};
-            }
 
             this.blockchain.blocks.blocksStartingPoint = diffIndex;
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;
@@ -161,7 +160,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             this.blockchain.blocks.blocksStartingPoint = this._blocksStartingPointClone;
 
-            let diffIndex = this.forkStartingHeight;
+            let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this._lightPrevDifficultyTargetClone;
             this.blockchain.lightPrevTimeStamps[diffIndex] = this._lightPrevTimeStampClone;

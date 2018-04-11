@@ -64,11 +64,17 @@ class PPoWBlockchainProver{
     }
 
 
-    /**
+
+
+
+
+    /*
+
+    /!**
      *
      * @param superblock - hi
      * @param regularblock lo
-     */
+     *!/
     followDown(superblock, regularblock, blockById ){
 
         let B = superblock;
@@ -94,11 +100,11 @@ class PPoWBlockchainProver{
 
     }
 
-    /**
+    /!**
      *
      * @param C
      * @param C1
-     */
+     *!/
     proveInfix(C, C1){
 
         let prove = this.createProve(C);
@@ -134,7 +140,7 @@ class PPoWBlockchainProver{
     }
 
 
-
+*/
 
 
 

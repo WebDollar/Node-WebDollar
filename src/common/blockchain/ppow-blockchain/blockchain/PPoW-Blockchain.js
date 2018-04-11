@@ -75,10 +75,10 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     }
 
-    /**
+/*    /!**
      * Algorithm 8 The verify algorithm for the NIPoPoW infix protocol
      * @param provers
-     */
+     *!/
 
     verifyInfix(provers){
 
@@ -104,24 +104,37 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     }
 
+    */
+
+
+    /**
+     * predicateQ validates the last blocks L
+     * @param C - Chain
+     * @returns Boolean
+     */
     predicateQ(C){
 
         // undefined, if |C[: −k]| < l, otherwise:
-        if (C.length - consts.POPOW_PARAMS.k < consts.POPOW_PARAMS.l )
-            return undefined;
-
-        let CTest = C.splice(C.length - consts.POPOW_PARAMS.k);
-
-        // TODO
+        if (C.lastBlocks.length < consts.POPOW_PARAMS.l )
+            throw {message: "Error, the Chain C doesn't have at least l security param blocks", l: consts.POPOW_PARAMS.l}
 
         // true, if ∃C1 ⊆ C[: −k] : |C1 | ≤ d ∧ D(C1)
+        if (this.predicateD(C.accountantTree, C.lastBlocks))
+            return true;
 
-        return false;
+        throw {message: "predicateQ is invalid"};
 
     }
 
-    D(){
+    /**
+     * validate the accountantTree and the lastBlocks
+     * @param accountantTree
+     * @param lastBlocks
+     */
 
+    predicateD(accountantTree, lastBlocks){
+
+        throw {message: "predicateD is invalid"}
     }
 
     /**

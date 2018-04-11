@@ -252,7 +252,6 @@ class InterfaceBlockchainFork {
             console.log( "FORK STATUS", index );
             console.log( "FORK STATUS SUCCESS1: ", forkedSuccessfully );
 
-
             await this.postForkTransactions(forkedSuccessfully);
 
             this.postFork(forkedSuccessfully);
