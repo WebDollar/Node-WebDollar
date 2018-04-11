@@ -121,14 +121,14 @@ class NodesList {
 
         for (let i=0; i<this.nodes.length; i++)
 
-            if (typeof connectionType === 'string') { // in case type is just a simple string
-                if (connectionType === this.nodes[i].connectionType || connectionType === "all")
-                    list.push(this.nodes[i]);
-            }
-            else if (Array.isArray(connectionType)) //in case type is an Array
+            if (Array.isArray(connectionType)) { //in case type is an Array
                 if (this.nodes[i].connectionType in connectionType)
                     list.push(this.nodes[i]);
-
+            } else
+            // in case type is just a simple string
+            if (connectionType === this.nodes[i].connectionType || connectionType === "all")
+                list.push(this.nodes[i]);
+    
         return list;
     }
 
@@ -139,14 +139,13 @@ class NodesList {
         let count = 0;
 
         for (let i=0; i<this.nodes.length; i++)
-
-            if (typeof type === 'string') { // in case type is just a simple string
-                if (type === this.nodes[i].connectionType || connectionType === "all")
-                    count++;
-            }
-            else if (Array.isArray(type)) //in case type is an Array
+            if (Array.isArray(type)) { //in case type is an Array
                 if (this.nodes[i].connectionType in connectionType)
                     count++;
+            }
+            else
+            if (type === this.nodes[i].connectionType || connectionType === "all")
+                count++;
 
         return count;
     }
