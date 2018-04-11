@@ -172,7 +172,7 @@ class NodeSignalingServerProtocol {
 
                         client2.node.on("signals/server/new-answer-ice-candidate/" + connection.id, async (iceCandidate) => {
 
-                            let answer = await client1.node.sendRequestWaitOnce("signals/client/initiator/receive-ice-candidate",{
+                            await client1.node.sendRequest("signals/client/initiator/receive-ice-candidate",{  //sendRequestWaitOnce returns errors
                                 id: connection.id,
 
                                 initiatorSignal: initiatorAnswer.initiatorSignal,
@@ -183,13 +183,13 @@ class NodeSignalingServerProtocol {
                             }, "connection.id");
 
 
-                            if ( answer === null || answer === undefined )
-                                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-                            else
-                            if ( answer.established === false && initiatorAnswer.message === "I can't accept WebPeers anymore") {
-                                this.clientIsNotAcceptingAnymoreWebPeers(client2, connection);
-                                return false;
-                            }
+                            // if ( answer === null || answer === undefined )
+                            //     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                            // else
+                            // if ( answer.established === false && initiatorAnswer.message === "I can't accept WebPeers anymore") {
+                            //     this.clientIsNotAcceptingAnymoreWebPeers(client2, connection);
+                            //     return false;
+                            // }
 
                         });
 
@@ -199,7 +199,7 @@ class NodeSignalingServerProtocol {
                     client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, async (iceCandidate) => {
 
 
-                        let answer = await client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
+                        await client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
                             id: connection.id,
 
                             initiatorSignal: initiatorAnswer.initiatorSignal,

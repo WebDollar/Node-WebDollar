@@ -17,8 +17,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
     _preProcessTransaction(multiplicationFactor = 1 , minerAddress, revertActions){
 
-        let nonce = this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions);
-        if (nonce === undefined || nonce === null) throw { message: "nonce is empty in process transaction" };
+        this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions);
 
         return true;
     }
@@ -100,9 +99,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
             throw {message: "Accountant Tree is negative" };
 
 
-        let result = this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees * multiplicationFactor, this.from.currencyTokenId, revertActions);
-
-        if (result === null) throw {message: "processTransactionTo - Error Updating Account for Fees"};
+        this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees * multiplicationFactor, this.from.currencyTokenId, revertActions);
 
         return {fees: diffInFees, currencyTokenId: this.currencyTokenId};
 

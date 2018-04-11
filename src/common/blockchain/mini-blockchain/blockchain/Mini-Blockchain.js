@@ -60,7 +60,7 @@ class MiniBlockchain extends  inheritBlockchain{
                 revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
             }
 
-            if (!block.data.transactions.processBlockDataTransactions( block, 1, revertActions))
+            if (!block.data.transactions.processBlockDataTransactions( block, +1, revertActions))
                 throw {message: "Process Block Data Transactions failed"};
 
             let callbackDone = await callback();
@@ -104,12 +104,12 @@ class MiniBlockchain extends  inheritBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
+    async includeBlockchainBlock( block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions ){
 
         if (await this.simulateNewBlock(block, false, revertActions,
 
                 async ()=>{
-                    return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
+                    return await inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
                 }
 
             )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};

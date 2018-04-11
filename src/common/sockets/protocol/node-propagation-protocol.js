@@ -48,8 +48,6 @@ class NodePropagationProtocol {
         socket.node.on("propagation/nodes", response => {
 
             try {
-                console.log("NodePropagation", socket.node.sckAddress.getAddress());
-                console.log("NodePropagation", response);
 
                 let addresses = response.addresses || [];
                 if (typeof addresses === "string") addresses = [addresses];

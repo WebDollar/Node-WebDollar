@@ -22,13 +22,13 @@ class RevertActions {
 
             if (action.name === "revert-updateAccount" && (actionName === '' || actionName === action.name)) {
 
-                let balance = this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
+                this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
 
             }
             else
             if (action.name === "revert-updateAccountNonce" && (actionName === '' || actionName === action.name)) {
 
-                let nonce = this.blockchain.accountantTree.updateAccountNonce(action.address, -action.nonceChange, action.tokenId);
+                this.blockchain.accountantTree.updateAccountNonce(action.address, -action.nonceChange, action.tokenId);
 
             }
             else

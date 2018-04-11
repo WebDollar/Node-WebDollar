@@ -109,7 +109,7 @@ class InterfaceBlockchain {
 
         this.blocks.addBlock(block);
 
-        if (revertActions !== undefined)
+        if ( revertActions !== undefined )
             revertActions.push({name: "block-added", height: this.blocks.length-1 });
 
         await this._blockIncluded( block);
