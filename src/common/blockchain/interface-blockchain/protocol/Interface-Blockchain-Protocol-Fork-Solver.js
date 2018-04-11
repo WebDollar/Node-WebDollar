@@ -170,12 +170,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 }
 
-            //maximum blocks to download
-            if (!this.blockchain.agent.light){
-                if (tip.forkChainLength > this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD)
-                    tip.forkChainLength = this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD;
-            }
-
             //its a fork... starting from position
             console.log("fork position", binarySearchResult.position, "tip.forkChainStartingPoint", tip.forkChainStartingPoint, "forkChainLength", tip.forkChainLength);
 
@@ -191,7 +185,12 @@ class InterfaceBlockchainProtocolForkSolver{
                     if ( forkFound !== null )
                         return forkFound;
 
-                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, tip.forkChainStartingPoint, tip.forkChainLength, binarySearchResult.header);
+                    //maximum blocks to download
+                    let forkChainLength = tip.forkChainLength;
+                    if (!this.blockchain.agent.light)
+                        forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
+
+                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, tip.forkChainStartingPoint, forkChainLength, binarySearchResult.header);
 
 
                 } catch (Exception){
