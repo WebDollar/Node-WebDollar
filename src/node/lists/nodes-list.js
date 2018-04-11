@@ -144,7 +144,7 @@ class NodesList {
                     count++;
             }
             else
-            if (type === this.nodes[i].connectionType || connectionType === "all")
+            if (connectionType === this.nodes[i].connectionType || connectionType === "all")
                 count++;
 
         return count;
