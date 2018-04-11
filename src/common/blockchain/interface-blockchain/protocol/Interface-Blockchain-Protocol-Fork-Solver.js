@@ -295,7 +295,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
 
                 let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
-                let block = this._deserializeForkBlock(answer.block, nextBlockHeight, blockValidation );
+                let block = this._deserializeForkBlock(fork, answer.block, nextBlockHeight, blockValidation );
 
                 let result;
 
@@ -303,6 +303,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
 
                     result = await fork.includeForkBlock(block);
+
+                    console.log("block.interlink", block.interlink.length);
 
                 } catch (Exception) {
 
@@ -346,7 +348,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    _deserializeForkBlock( blockData, blockHeight, validationBlock){
+    _deserializeForkBlock( fork, blockData, blockHeight, validationBlock){
 
         let block = undefined;
 
@@ -357,7 +359,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
                 block.data._onlyHeader = true; //avoiding to store the transactions
 
-            block.deserializeBlock( blockData, blockHeight, BlockchainMiningReward.getReward(block.height), new Buffer(32) );
+            block.deserializeBlock( blockData, blockHeight, BlockchainMiningReward.getReward(block.height), fork.getForkDifficultyTarget(block.height)  );
 
         } catch (Exception) {
             console.error("Error deserializing blocks ", Exception, blockData);

@@ -25,6 +25,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             return this.level;
 
         let T = this.difficultyTarget;
+
         if (Buffer.isBuffer(T))
             T = Convert.bufferToBigIntegerHex(this.difficultyTarget);
 
@@ -43,8 +44,6 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         console.log('L=', u);
         console.log('P=', id.multiply(1 << u).toString());
 
-        this.level = u;
-
         return u;
     }
 
@@ -60,6 +59,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 this.interlink[i] = prevBlock.interlink[i];
             blockLevel = prevBlock.getLevel();
         }
+        this.level = blockLevel
 
         //add new interlinks for current block
         //Every block of level u needs a pointer to the previous block with level <= u.
@@ -77,33 +77,37 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     
     _validateInterlink() {
 
-        if (this.interlink[0].height !== -1 || ! BufferExtended.safeCompare(this.interlink[0].blockId, BlockchainGenesis.hashPrev)){
-            console.error("Interlink to Genesis is wrong! ");
-            return false;
-        }
 
-        for (let i = 1; i < this.interlink.length; ++i){
-            let link = this.interlink[i];
+
+        //validate interlinks array
+        let level = this.interlink.length-1;
+        while (level >= 0){
+
+            let link = this.interlink[level];
             let linkedBlock = this.blockchain.blocks[link.height];
 
-            if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId)){
-                console.error("Interlink to Genesis is wrong! ");
-                return false;
+            if (level !== 0) {
+                if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId))
+                    throw {message: "Interlink to Genesis is wrong! "};
+
+                let linkedBlockLevel = linkedBlock.getLevel();
+
+                if (linkedBlockLevel !== level )
+                    throw {message: "Interlink level error", level: level}
+
+                //TODO verify that the interlinks are actually the last on the same level
+
+            } else {
+
+                if (linkedBlock !== undefined || this.interlink[0].height !== -1 || ! BufferExtended.safeCompare(this.interlink[0].blockId, BlockchainGenesis.hashPrev))
+                    throw {message: "Interlink to Genesis is wrong! "}
+
             }
+
+            level--;
+
+
         }
-
-        //TODO: verify if interlinks points to blocks with highest difficulty
-/*        let crtLevel = this.getLevel();
-        let lastLink = this.interlink[this.interlink.length-1];
-        let linkLevel = this.blockchain[lastLink.height].getLevel();
-
-        if (linkLevel + 1 < crtLevel) {
-            console.error('Interlink level errors');
-            return false;
-        }*/
-
-        //TODO: Verify proof of proofs
-
 
         return true;
     }
@@ -131,13 +135,13 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         let list = [Serialization.serializeNumber1Byte(this.interlink.length)];
 
-        for (let i = 0; i < this.interlink.length; ++i) {
+        for (let i = 0; i < this.interlink.length; i++) {
 
             //optimize storage
             if (i > 0 && this.interlink[i-1].height === this.interlink[i].height){
                 list.push(Serialization.serializeNumber4Bytes(consts.SETTINGS.MAX_UINT32));
             } else {
-                let heightBuffer = Serialization.serializeNumber4Bytes(this.interlink[i].height + 1);
+                let heightBuffer = Serialization.serializeNumber4Bytes(this.interlink[i].height + 1 );
                 let blockIdBuffer = this.interlink[i].blockId;
                 list.push(heightBuffer);
                 list.push(blockIdBuffer);
@@ -182,7 +186,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     deserializeBlock(buffer, height, reward, difficultyTarget, offset){
 
 
-        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, undefined, undefined, undefined, offset);
+        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTarget, offset);
 
         try {
 

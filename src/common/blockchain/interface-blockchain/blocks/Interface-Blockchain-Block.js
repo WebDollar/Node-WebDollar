@@ -326,7 +326,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockchain.getDifficultyTarget() );
+            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height) );
 
             return true;
         }
