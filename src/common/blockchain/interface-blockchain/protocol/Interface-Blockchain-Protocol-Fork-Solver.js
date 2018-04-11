@@ -129,7 +129,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             // in case it was you solved previously && there is something in the blockchain
 
-            console.warn("discoverFork 555" , binarySearchResult);
+            //console.warn("discoverFork 555" , binarySearchResult);
 
             if ( binarySearchResult.position === -1 ) {
 
@@ -231,8 +231,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             console.error("discoverAndProcessFork raised an exception", exception );
 
-            if (fork !== undefined && fork !== null)
-                this.blockchain.forksAdministrator.deleteFork(fork);
+            this.blockchain.forksAdministrator.deleteFork(fork);
 
             return {result:false, error: exception };
 

@@ -142,7 +142,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
                 throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: forkSum, rewardShould: BlockchainMiningReward.getSumReward(diffIndex)};
             }
 
-            this.blockchain.blocks.blocksStartingPoint = this.forkChainStartingPoint;
+            this.blockchain.blocks.blocksStartingPoint = diffIndex;
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;
             this.blockchain.lightPrevTimeStamps[diffIndex] = this.forkPrevTimeStamp;
             this.blockchain.lightPrevHashPrevs[diffIndex] = this.forkPrevHashPrev;
@@ -174,10 +174,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
     }
 
     postFork(forkedSuccessfully){
-
-        //setting the blocksStartingPoint
-        if (forkedSuccessfully)
-            this.blockchain.blocks.blocksStartingPoint = this.forkBlocks[0].height;
 
     }
 

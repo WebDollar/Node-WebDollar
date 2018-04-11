@@ -81,7 +81,7 @@ class NodeSignalingClientProtocol {
 
             } catch (exception){
 
-                if (exception.message !== "I can not accept connections anymore")
+                if (exception.message !== "Already connected" && exception.message !== "I can't accept WebPeers anymore")
                     console.error("signals/client/initiator/generate-initiator-signal", exception);
 
                 socket.node.sendRequest("signals/client/initiator/generate-initiator-signal/" + data.id, {accepted:false, initiatorSignal: undefined, message: exception.message });
@@ -113,7 +113,9 @@ class NodeSignalingClientProtocol {
 
             } catch (exception){
 
-                console.error("signals/client/initiator/join-answer-signal/" + data.id, exception);
+                if (exception.message !== "Already connected" && exception.message !== "I can't accept WebPeers anymore")
+                    console.error("signals/client/initiator/join-answer-signal/" + data.id, exception);
+
                 socket.node.sendRequest("signals/client/initiator/join-answer-signal/" + data.id, {established: false, message: exception.message });
 
             }
@@ -152,7 +154,10 @@ class NodeSignalingClientProtocol {
                 socket.node.sendRequest("signals/client/initiator/receive-ice-candidate/" + data.id, {accepted: true, answerSignal: answer.signal} );
 
             } catch (exception){
-                console.error("signals/client/initiator/receive-ice-candidate/" + data.id, exception);
+
+                if (exception.message !== "Already connected" && exception.message !== "I can't accept WebPeers anymore")
+                    console.error("signals/client/initiator/receive-ice-candidate/" + data.id, exception);
+
                 socket.node.sendRequest("signals/client/initiator/receive-ice-candidate/" + data.id, { accepted: false,  message: exception.message });
             }
 
@@ -200,7 +205,10 @@ class NodeSignalingClientProtocol {
                 socket.node.sendRequest("signals/client/answer/receive-initiator-signal/" + data.id, {accepted: true, answerSignal: answer.signal} );
 
             } catch (exception){
-                console.error("signals/client/answer/receive-initiator-signal", exception);
+
+                if (exception.message !== "Already connected" && exception.message !== "I can't accept WebPeers anymore")
+                    console.error("signals/client/answer/receive-initiator-signal", exception);
+
                 socket.node.sendRequest("signals/client/answer/receive-initiator-signal/" + data.id, {accepted:false, answerSignal: undefined });
             }
 
@@ -235,7 +243,10 @@ class NodeSignalingClientProtocol {
                 socket.node.sendRequest("signals/client/answer/receive-ice-candidate/" + data.id, { accepted: true, answerSignal: answer.signal} );
 
             } catch (exception){
-                console.error("signals/client/answer/receive-ice-candidate/"+ data.id, exception);
+
+                if (exception.message !== "Already connected" && exception.message !== "I can't accept WebPeers anymore")
+                    console.error("signals/client/answer/receive-ice-candidate/"+ data.id, exception);
+
                 socket.node.sendRequest("signals/client/answer/receive-ice-candidate/" + data.id, {accepted:false, answerSignal: undefined, message: exception.message });
             }
 

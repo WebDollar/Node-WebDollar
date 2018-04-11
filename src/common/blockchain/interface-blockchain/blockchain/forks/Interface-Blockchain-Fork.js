@@ -260,7 +260,6 @@ class InterfaceBlockchainFork {
             //propagating valid blocks
             if (forkedSuccessfully) {
 
-
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
 

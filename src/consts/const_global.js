@@ -1,9 +1,7 @@
 const uuid = require('uuid');
 
 let consts = {
-
     DEBUG: false,
-
 };
 
 consts.BLOCKCHAIN = {
@@ -192,8 +190,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.282",
-        VERSION_COMPATIBILITY: "0.282",
+        VERSION: "0.284",
+        VERSION_COMPATIBILITY: "0.284",
         PROTOCOL: "WebDollar",
         SSL: true,
 
