@@ -156,10 +156,14 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             if (! (await this.accountantTree.saveMiniAccountant(true, undefined, treeSerialization)))
                 throw {message: "saveMiniAccountant", diffIndex};
 
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex]))) throw {message: "Couldn't be saved _LightSettings_prevDifficultyTarget", diffIndex: diffIndex};
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart", this.lightPrevDifficultyTargets[diffIndex+1]))) throw {message: "Couldn't be saved _LightSettings_prevDifficultyTargetStart", diffIndex: diffIndex};
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex]))) throw {message: "Couldn't be saved _LightSettings_prevTimestamp ", diffIndex: diffIndex};
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex]))) throw {message: "Couldn't be saved _LightSettings_prevHashPrev ", diffIndex:diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex])))
+                throw {message: "Couldn't be saved _LightSettings_prevDifficultyTarget", diffIndex: diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart", this.lightPrevDifficultyTargets[diffIndex+1])))
+                throw {message: "Couldn't be saved _LightSettings_prevDifficultyTargetStart", diffIndex: diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex])))
+                throw {message: "Couldn't be saved _LightSettings_prevTimestamp ", diffIndex: diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex])))
+                throw {message: "Couldn't be saved _LightSettings_prevHashPrev ", diffIndex:diffIndex};
 
         } catch (exception){
             console.error("Error saving LIGHT SETTINGS", exception);
