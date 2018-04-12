@@ -106,40 +106,25 @@ class PPoWHelper{
      */
     _multilevelQuality(underlyingChain, superChain, miu){
 
+        //from badness, we have this
+        //C∗ ← C'↓↑µ'−1 - asta
+        for (let miu1 = miu; miu1 >= 1; miu1 --){
 
-        //C ∗ = C [−m : ]
-        for (let i = 0; i<underlyingChain.blocks.length - consts.POPOW_PARAMS.k1; i++){
+            let CStar = superChain.downSuperChainGetUnderlyingChain(underlyingChain);
+            CStar = CStar.blocksGreaterLevel(miu1 - 1);
 
-            // C∗ ⊆ C,
-            // C ∗ = C [−k1 : ]
-            let first = i;
-            let last = i + consts.POPOW_PARAMS.k1;
+            //|C∗↑µ'|
+            let upperChain = CStar.blocksGreaterLevel(miu1);
 
-            let CStar = new PPowBlockchainProofPi([]);
-            for (let j=first; j <last; j++)
-                CStar.blocks.push(underlyingChain.blocks[j]);
+            //| C∗↑µ' | ≥ k1
+            if (upperChain.blocks.length >= consts.POPOW_PARAMS.k1){
 
-            //any µ' < µ
-            for (let miuP=miu; miuP >= 1; miuP--) {
-
-                // if |C∗↑µ| ≥ k1
-
-                //should be optimized
-                let upperChain = CStar.blocksGreaterLevel(miuP);
-
-                //| C∗↑µ' | ≥ k1
-                if (upperChain.blocks.length >= consts.POPOW_PARAMS.k1){
-
-                    if ( ! (CStar.blocksGreaterLevel(miu).blocks.length >= (1 - consts.POPOW_PARAMS.d ) * new BigInteger(2).pow(miu - miuP) * upperChain.blocks.length ) )
-                        return false;
-
-                }
+                if ( ! (CStar.blocksGreaterLevel(miu).blocks.length >= (1 - consts.POPOW_PARAMS.d ) * new BigInteger(2).pow(miu - miu1) * upperChain.blocks.length ) )
+                    return false;
 
             }
 
         }
-
-
 
         return true;
     }

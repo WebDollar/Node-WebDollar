@@ -219,7 +219,6 @@ class PPoWBlockchainVerifier{
 
                     // C∗ ← C'↓ ↑µ−1    //not C↓↑
 
-                    //TODO CORRECT IT
                     let CStar = proofs.downSuperChainGetUnderlyingChain(C1);
                     Cstar = Cstar.blocksGreaterLevel(miu-1);
 
