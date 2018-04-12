@@ -12,8 +12,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
         super(agent);
 
-        this.prover = new PPoWBlockchainProver(this);
-        this.verifier = new PPowBlockchainVerifier(this);
+        this.prover = new PPoWBlockchainProver(this, );
+        this.verifier = new PPowBlockchainVerifier(this, );
 
     }
 

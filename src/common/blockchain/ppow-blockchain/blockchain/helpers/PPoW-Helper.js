@@ -17,11 +17,12 @@ class PPoWHelper{
 
         //LCA(C1, C2) = (C1 ∩ C2)[−1] π
 
-        let i1 = proofs1.length - 1;
-        let i2 = proofs2.length - 1;
+        let i1 = proofs1.blocks.length - 1;
+        let i2 = proofs2.blocks.length - 1;
 
         //Find LCA on path to Genesis
         while (i1 >= 0 && i2 >= 0) {
+
             const block1 = proofs1.blocks[i1];
             const block2 = proofs2.blocks[i2];
 
@@ -155,8 +156,8 @@ class PPoWHelper{
             return false;
 
 
-        if (this._multilevelQuality(underlyingChain, superChain, miu) === false)
-            return false;
+        // if (this._multilevelQuality(underlyingChain, superChain, miu) === false)
+        //     return false;
 
         return true;
     }

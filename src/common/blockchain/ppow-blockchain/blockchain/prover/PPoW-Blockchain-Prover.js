@@ -50,8 +50,19 @@ class PPoWBlockchainProver{
                         }
 
                     // π ← π ∪ α
-                    for (let i = 0; i < superChain.blocks.length; ++i)
-                        underlyingChain.blocks.push(superChain.blocks[i]);
+                    for (let i = 0; i < superChain.blocks.length; ++i) {
+
+                        //avoiding to be included multiple times
+                        let found = false;
+                        for (let j=0; j<underlyingChain.blocks.length; j++)
+                            if (underlyingChain.blocks[j].height === superChain.blocks[i].height ){
+                                found = true;
+                                break;
+                            }
+
+                        if (!found)
+                            underlyingChain.blocks.push(superChain.blocks[i]);
+                    }
 
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) ) {

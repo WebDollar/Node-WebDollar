@@ -92,7 +92,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
                 let linkedBlockLevel = linkedBlock.getLevel();
 
-                if (linkedBlockLevel !== level )
+                if (linkedBlockLevel < level )
                     throw {message: "Interlink level error", level: level}
 
                 //TODO verify that the interlinks are actually the last on the same level

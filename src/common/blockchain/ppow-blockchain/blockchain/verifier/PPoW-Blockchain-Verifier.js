@@ -5,8 +5,9 @@ const BigInteger = require('big-integer');
 
 class PPoWBlockchainVerifier{
 
-    constructor(){
+    constructor(blockchain){
 
+        this.blockchain = blockchain;
         this.prevProofs = [];
     }
 
@@ -18,20 +19,34 @@ class PPoWBlockchainVerifier{
 
       //  if (!proofXi.validateProof()) throw {message: "proofXi failed"};
 
-        this.prevProofs.push( proofPi );
+        if (proofPi.blocks.length > 0)
+            this.prevProofs.push( proofPi );
 
-        for (let i=0; i<this.prevProofs.length; i++)
-            for (let j=i+1; j<this.prevProofs.length; j++){
+        for (let i=this.prevProofs.length-1; i>=0; i--)
+            for (let j=this.prevProofs.length-1; j >= 0; j--){
 
                 let answer = this.compareProofs(this.prevProofs[i], this.prevProofs[j]);
                 console.info("comparison", i ,j, answer);
 
             }
 
+        // for (let i=0; i<this.prevProofs.length; i++) {
+        //
+        //     let pos1 = Math.floor( Math.random() * this.prevProofs.length  );
+        //
+        //     for (let j = 0; j < this.prevProofs.length; j++) {
+        //
+        //         let pos2 = j; // Math.floor (Math.random() * this.prevProofs.length );
+        //
+        //         let answer = this.compareProofs(this.prevProofs[pos1], this.prevProofs[pos2]);
+        //         if (pos1 > pos2) console.info("comparison", pos1, pos2, answer, true);
+        //         else console.info("comparison", pos1, pos2, answer, false);
+        //
+        //     }
+        // }
+
         return true;
     }
-
-
 
 
 
@@ -115,7 +130,9 @@ class PPoWBlockchainVerifier{
 
         // Obs M is a counter of how many blocks have the level[i]
         // M[id] === undefined if there is no block of level id
-        let M = [0];
+        let M = {
+            0: [],
+        };
 
         // optimization
         // { b : }
