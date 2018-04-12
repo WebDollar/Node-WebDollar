@@ -1,7 +1,7 @@
 const uuid = require('uuid');
 
 let consts = {
-    DEBUG: true,
+    DEBUG: false,
 };
 
 consts.BLOCKCHAIN = {
@@ -60,7 +60,7 @@ consts.POPOW_PARAMS={
     k1: 6,
     d: 0.5,
     BLOCKS_LEVEL_INFINITE: 1 << 30,
-    ACTIVATED : true,
+    ACTIVATED : false,
 };
 
 
