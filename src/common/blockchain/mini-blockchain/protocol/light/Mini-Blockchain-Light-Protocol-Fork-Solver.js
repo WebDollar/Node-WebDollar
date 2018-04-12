@@ -160,14 +160,18 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkStartingHeight = fork.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
             fork.forkChainStartingPoint = fork.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
+            //Downloading Proof Pi
+            let answer;
+            // let answer = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi", {}, "answer");
+            // if (answer.length === 0)
+
             //downloading the accountant tree
             StatusEvents.emit( "agent/status", {message: "Downloading Accountant Tree", blockHeight: fork.forkStartingHeight } );
-
-            let answer = await this.protocol.getAccountantTree(socket, fork.forkStartingHeight);
+            answer = await this.protocol.getAccountantTree(socket, fork.forkStartingHeight);
 
             fork.forkPrevAccountantTree = answer;
 
-            //downloading the light settings
+            //Downloading Proof Xi and light settings
             answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkStartingHeight  }, fork.forkStartingHeight );
 
             if (answer === null) throw {message: "get-light-settings never received ", forkChainStartingPoint: fork.forkChainStartingPoint};

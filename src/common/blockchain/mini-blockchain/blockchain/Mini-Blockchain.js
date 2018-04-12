@@ -60,7 +60,7 @@ class MiniBlockchain extends  inheritBlockchain{
                 revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
             }
 
-            if (!block.data.transactions.processBlockDataTransactions( block, +1, revertActions))
+            if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions ))
                 throw {message: "Process Block Data Transactions failed"};
 
             let callbackDone = await callback();

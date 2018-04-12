@@ -177,6 +177,9 @@ class InterfaceBlockchainFork {
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
+            //make a copy of the current accountant tree
+            let accountantTreeCopy = this.blockchain.accountantTree.serializeMiniAccountant(false);
+
             //making a copy of the current blockchain
 
             try {
@@ -185,6 +188,7 @@ class InterfaceBlockchainFork {
 
             } catch (exception){
                 console.error("preForkBefore raised an error", exception);
+                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeCopy, undefined, false);
                 return false;
             }
 
@@ -201,6 +205,7 @@ class InterfaceBlockchainFork {
                 revertActions.revertOperations('', "all");
                 this._blocksCopy = []; //We didn't use them so far
                 await this.revertFork();
+                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeCopy, undefined, false);
 
                 return false;
             }
@@ -229,6 +234,14 @@ class InterfaceBlockchainFork {
 
                 }
 
+                await this.blockchain.saveBlockchain( this.forkStartingHeight );
+                console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
+
+
+                //successfully, let's delete the backup blocks
+                this._deleteBackupBlocks();
+
+                this.blockchain.mining.resetMining();
 
             } catch (exception){
 
@@ -247,28 +260,10 @@ class InterfaceBlockchainFork {
                 //reverting back to the clones, especially light settings
                 await this.revertFork();
 
+                this.blockchain.accountantTree.deserializeMiniAccountant( accountantTreeCopy, undefined, false);
             }
-
-            console.log( "FORK STATUS", index );
-            console.log( "FORK STATUS SUCCESS1: ", forkedSuccessfully );
 
             await this.postForkTransactions(forkedSuccessfully);
-
-            this.postFork(forkedSuccessfully);
-
-            //propagating valid blocks
-            if (forkedSuccessfully) {
-
-                await this.blockchain.saveBlockchain( this.forkStartingHeight );
-                console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
-
-
-                //successfully, let's delete the backup blocks
-                this._deleteBackupBlocks();
-
-                this.blockchain.mining.resetMining();
-            }
-
 
             return forkedSuccessfully;
         });
@@ -390,9 +385,6 @@ class InterfaceBlockchainFork {
 
     }
 
-    postFork(){
-
-    }
 
     async saveIncludeBlock(index, revertActions){
 
