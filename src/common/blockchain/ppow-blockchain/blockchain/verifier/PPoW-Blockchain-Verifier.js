@@ -101,10 +101,10 @@ class PPoWBlockchainVerifier{
             let max = 0;
             for (let i = 0; i < M.length; ++i)
                 //if there are blocks of level i
-                if (M[i].length > 0){
+                if (M[i] > 0){
                     let miu = i;
 
-                    let formula = new BigInteger(2).pow(miu).multiply(M[miu].length);
+                    let formula = new BigInteger(2).pow(miu).multiply(M[miu]);
                     if ( max < formula )
                         max = formula;
                 }
@@ -130,9 +130,7 @@ class PPoWBlockchainVerifier{
 
         // Obs M is a counter of how many blocks have the level[i]
         // M[id] === undefined if there is no block of level id
-        let M = {
-            0: [],
-        };
+        let M = [0]
 
         // optimization
         // { b : }
@@ -147,6 +145,7 @@ class PPoWBlockchainVerifier{
         } else index = 0;
 
 
+        let levels = [];
         while (index < proofPi.blocks.length - 1){
 
             index++;
@@ -154,14 +153,20 @@ class PPoWBlockchainVerifier{
             // {µ : |π ↑µ {b :}| ≥ m}
             let miu = proofPi.blocks[index].level;
 
-            if (miu > consts.POPOW_PARAMS.m) {
+            //mark that I have a block with all the levels from [0... miu]
+            for (let level=0; level<miu; level++) {
 
-                if (M[miu] === undefined)  M[miu] = [];
+                if (levels[level] === undefined) levels[level] = 0;
+                levels[level]++;
 
-                M[miu].push(index);
             }
 
         }
+
+        for (let miu=0; miu<levels.length; miu++)
+            if (levels[miu] >= consts.POPOW_PARAMS.m){
+                    M[miu] = levels[miu] ;
+                }
 
         return M;
 
@@ -189,6 +194,7 @@ class PPoWBlockchainVerifier{
         let p = 1 / max;
 
         for (let miu = 0; miu < M.length; miu++){
+
             if (M[miu] === undefined)
                 continue;
 
