@@ -22,28 +22,29 @@ class PPoWBlockchainVerifier{
         if (proofPi.blocks.length > 0)
             this.prevProofs.push( proofPi );
 
-        // for (let i=this.prevProofs.length-1; i>=0; i--)
-        //     for (let j=this.prevProofs.length-1; j >= 0; j--){
-        //
-        //         let answer = this.compareProofs(this.prevProofs[i], this.prevProofs[j]);
-        //         console.info(answer, "comparison", i ,j, this.prevProofs[j].blocks.length);
-        //
-        //     }
+        for (let i=this.prevProofs.length-1; i>=0; i--)
+            for (let j=this.prevProofs.length-1; j >= 0; j--){
 
-        for (let i=0; i<this.prevProofs.length; i++) {
-
-            let pos1 = Math.floor( Math.random() * this.prevProofs.length  );
-
-            for (let j = 0; j < this.prevProofs.length; j++) {
-
-                let pos2 = Math.floor (Math.random() * this.prevProofs.length );
-
-                let answer = this.compareProofs(this.prevProofs[pos1], this.prevProofs[pos2]);
-                if (pos1 > pos2) console.info("comparison", pos1, pos2, answer, true);
-                else console.info("comparison", pos1, pos2, answer, false);
+                let answer = this.compareProofs(this.prevProofs[i], this.prevProofs[j]);
+                console.info(answer, "comparison", i ,j, this.prevProofs[j].blocks.length);
 
             }
-        }
+
+        // for (let i=0; i<this.prevProofs.length; i++) {
+        //
+        //     let pos1 = Math.floor( Math.random() * this.prevProofs.length  );
+        //
+        //     for (let j = 0; j < this.prevProofs.length; j++) {
+        //
+        //         let pos2 = Math.floor (Math.random() * this.prevProofs.length );
+        //
+        //         let answer = this.compareProofs(this.prevProofs[pos1], this.prevProofs[pos2]);
+        //
+        //         if (pos1 > pos2) console.info("comparison", pos1, pos2, answer, true);
+        //         else console.info("comparison", pos1, pos2, answer, false);
+        //
+        //     }
+        // }
 
         return true;
     }
@@ -98,13 +99,13 @@ class PPoWBlockchainVerifier{
 
 
             //return max µ ∈ M {2^µ · | π↑µ {b : }| }
-            let max = 0;
+            let max = BigInteger(0);
             for (let i = 0; i < M.length; ++i)
                 //if there are blocks of level i
                 if (M[i] > 0){
                     let miu = i;
 
-                    let formula = new BigInteger(2).pow(miu).multiply(M[miu]);
+                    let formula = new BigInteger(2).pow(miu).multiply( M [miu] );
                     if ( max < formula )
                         max = formula;
                 }
@@ -116,7 +117,11 @@ class PPoWBlockchainVerifier{
         let b = PPoWHelper.LCA(proofPi1, proofPi2);
 
         //best-argm(πA, b) ≥ best-argm(πB, b)
-        return bestArg(proofPi1, b) >= bestArg(proofPi2, b);
+        let val1 = bestArg(proofPi1, b);
+        let val2 = bestArg(proofPi2, b);
+
+        //console.log(val1.toString(), " ", val2.toString() )
+        return val1.compare( val2 );
 
     }
 
