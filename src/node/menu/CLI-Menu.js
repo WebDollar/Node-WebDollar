@@ -111,16 +111,18 @@ class CLI{
 
         /*let callback = () => {
 
-                Blockchain.startMiningNextTimeSynchronized = true;
+            Blockchain.startMiningNextTimeSynchronized = true;
         };
 
         if (!Blockchain._blockchainInitiated) {
             Blockchain.createBlockchain("full-node", () => {
+                Node.NodeServer.startServer();
                 Node.NodeClientsService.startService();
-
+                Blockchain.Mining.stopMining();
                 callback();
             });
         } else {
+            Blockchain.Mining.stopMining();
             callback();
         }*/
     }
@@ -129,7 +131,7 @@ class CLI{
 
         console.info('\nWallet addresses:');
 
-        this._sync();
+        this._sync(true);
 
         let miningAddress = Blockchain.blockchain.mining.minerAddress;
         if (miningAddress === undefined)
