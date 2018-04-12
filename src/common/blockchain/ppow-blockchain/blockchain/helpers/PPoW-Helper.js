@@ -110,17 +110,19 @@ class PPoWHelper{
         //C ∗ = C [−m : ]
         for (let i = 0; i<underlyingChain.blocks.length - consts.POPOW_PARAMS.k1; i++){
 
-            //C∗ ⊆ C, if |C∗↑µ| ≥ k1
-
+            // C∗ ⊆ C,
+            // C ∗ = C [−k1 : ]
             let first = i;
             let last = i + consts.POPOW_PARAMS.k1;
 
             let CStar = new PPowBlockchainProofPi([]);
-            for (let j=first; j <=last; j++)
+            for (let j=first; j <last; j++)
                 CStar.blocks.push(underlyingChain.blocks[j]);
 
             //any µ' < µ
             for (let miuP=miu; miuP >= 1; miuP--) {
+
+                // if |C∗↑µ| ≥ k1
 
                 //should be optimized
                 let upperChain = CStar.blocksGreaterLevel(miuP);
@@ -156,8 +158,8 @@ class PPoWHelper{
             return false;
 
 
-        // if (this._multilevelQuality(underlyingChain, superChain, miu) === false)
-        //     return false;
+        if (this._multilevelQuality(underlyingChain, superChain, miu) === false)
+            return false;
 
         return true;
     }
