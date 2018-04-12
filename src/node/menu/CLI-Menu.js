@@ -8,7 +8,7 @@ class CLI{
 
     constructor(){
 
-        if ( process.env.BROWSER)
+        if (process.env.BROWSER)
             return;
 
         this.WEBD_CLI = readline.createInterface({
@@ -30,7 +30,7 @@ class CLI{
             return;
         }
 
-        let answer = '9'; //await this.question('Command: ');
+        let answer = await this.question('Command: ');
 
         switch(answer.trim()) {
             case '1':
@@ -68,7 +68,7 @@ class CLI{
                 break;
         }
 
-        // await this._runMenu();
+        await this._runMenu();
     };
 
     async _start() {
