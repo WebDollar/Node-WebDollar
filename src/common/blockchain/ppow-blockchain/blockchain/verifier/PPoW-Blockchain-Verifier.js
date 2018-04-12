@@ -7,23 +7,26 @@ class PPoWBlockchainVerifier{
 
     constructor(){
 
+        this.prevProofs = [];
     }
 
 
-    validateChain(proofs, lastBlocks){
+    validateChain(proofPi, proofXi){
 
         //TODO: Check if another validation is required
+        if (!proofPi.validateProof()) throw {message: "proofPi failed"};
 
-        if (!Array.isArray(proofs) || !Array.isArray(lastBlocks))
-            return false;
+      //  if (!proofXi.validateProof()) throw {message: "proofXi failed"};
 
-        for (let i = 0; i < proofs.length; ++i)
-            if (!proofs.blocks[i]._validateInterlink())
-                return false;
+        this.prevProofs.push( proofPi );
 
-        for (let i = 0; i < lastBlocks.length; ++i)
-            if (!lastBlocks.blocks[i]._validateInterlink())
-                return false;
+        for (let i=0; i<this.prevProofs.length; i++)
+            for (let j=i+1; j<this.prevProofs.length; j++){
+
+                let answer = this.compareProofs(this.prevProofs[i], this.prevProofs[j]);
+                console.info("comparison", i ,j, answer);
+
+            }
 
         return true;
     }
@@ -62,43 +65,6 @@ class PPoWBlockchainVerifier{
         throw {message: "predicateD is invalid"}
     }
 
-    /**
-     * returns a list of Levels u which have at least m blocks with that level
-     */
-    calculateM(proofs, blockStop){
-
-        let index;
-
-        // Obs M is a counter of how many blocks have the level[i]
-        // M[id] === undefined if there is no block of level id
-        let M = [0];
-
-        // { b : }
-        if (blockStop !== undefined) {
-            index = proofs.length - 1;
-            while (index >= 0) {
-                // { b : }
-                if (proofs[index] === blockStop)
-                    break;
-                index--;
-            }
-        } else index = 0;
-
-
-        while (index < proofs.length - 1){
-
-            index++;
-
-            // {µ : |π ↑µ {b :}| ≥ m}
-            let miu = proofs[index].level;
-            if (miu > consts.POPOW_PARAMS.m) {
-                if (M[miu] === undefined)  M[miu] = [];
-                M[miu].push(index);
-            }
-
-        }
-
-    }
 
     /**
      * Algorithm 4. Compare 2 proofs. aka bestArg
@@ -106,14 +72,14 @@ class PPoWBlockchainVerifier{
      * @param proofs2
      * @returns {boolean}
      */
-    compareProofs(proofs1, proofs2){
+    compareProofs(proofPi1, proofPi2){
 
-        let bestArg = (proofs, b) => {
+        let bestArg = (proofPi, b) => {
 
             //M ← {µ : |π↑µ {b :}| ≥ m } ∪ {0}
 
             // Obs M is a counter of how many blocks have the level[i]
-            let M = this.calculateM(proofs, b);
+            let M = this.calculateM(proofPi, b);
 
 
             //return max µ ∈ M {2^µ · | π↑µ {b : }| }
@@ -123,7 +89,7 @@ class PPoWBlockchainVerifier{
                 if (M[i].length > 0){
                     let miu = i;
 
-                    let formula = new BigInteger(2).pow(miu).mul(M[miu].length);
+                    let formula = new BigInteger(2).pow(miu).multiply(M[miu].length);
                     if ( max < formula )
                         max = formula;
                 }
@@ -132,15 +98,57 @@ class PPoWBlockchainVerifier{
         };
 
         //calculating the interesection
-        let b = PPoWHelper.LCA(proofs1, proofs2);
+        let b = PPoWHelper.LCA(proofPi1, proofPi2);
 
         //best-argm(πA, b) ≥ best-argm(πB, b)
-        return bestArg(proofs1, b) >= bestArg(proofs2, b);
+        return bestArg(proofPi1, b) >= bestArg(proofPi2, b);
 
     }
 
 
+    /**
+     * returns a list of Levels u which have at least m blocks with that level
+     */
+    calculateM(proofPi, blockStart){
 
+        let index;
+
+        // Obs M is a counter of how many blocks have the level[i]
+        // M[id] === undefined if there is no block of level id
+        let M = [0];
+
+        // optimization
+        // { b : }
+        if (blockStart !== undefined) {
+            index = proofPi.blocks.length - 1;
+            while (index >= 0) {
+                // { b : }
+                if (proofPi.blocks[index] === blockStart)
+                    break;
+                index--;
+            }
+        } else index = 0;
+
+
+        while (index < proofPi.blocks.length - 1){
+
+            index++;
+
+            // {µ : |π ↑µ {b :}| ≥ m}
+            let miu = proofPi.blocks[index].level;
+
+            if (miu > consts.POPOW_PARAMS.m) {
+
+                if (M[miu] === undefined)  M[miu] = [];
+
+                M[miu].push(index);
+            }
+
+        }
+
+        return M;
+
+    }
 
     /**
      * Algorithm 5 The badness prover which generates a succinct certificate of badness
@@ -186,10 +194,11 @@ class PPoWBlockchainVerifier{
                 //if |C1| = m then
                 if (C1.length === consts.POPOW_PARAMS.m){
 
-                    // C∗ ← C' ↓↑µ−1    //not C↓↑
+                    // C∗ ← C'↓ ↑µ−1    //not C↓↑
 
                     //TODO CORRECT IT
-                    let Cstar = proofs.blocksGreaterLevel(miu-1);
+                    let CStar = proofs.downSuperChainGetUnderlyingChain(C1);
+                    Cstar = Cstar.blocksGreaterLevel(miu-1);
 
                     if ( new BigInteger( 2 * C1.length ).lesser( new BigInteger(1-consts.POPOW_PARAMS.d).pow(p) * Cstar.length  ) )
                         throw {message: "badness failed because of Cstar badness ", Cstar: Cstar}

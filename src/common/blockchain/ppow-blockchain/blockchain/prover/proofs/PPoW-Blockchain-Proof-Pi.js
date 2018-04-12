@@ -2,13 +2,10 @@
  * Known as π
  */
 
-class PPowBlockchainProofPi{
+import PPoWBlockchainProofBasic from "./PPoW-Blockchain-Proof-Basic"
 
-    constructor(blocks){
+class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
 
-        this.blocks = blocks;
-
-    }
 
     /**
      * Returns ths upchain of current chain(C ↑ µ).
@@ -73,31 +70,6 @@ class PPowBlockchainProofPi{
             return newUnderlyingChain;
         }
     }
-
-    getProofHeaders(){
-
-        let list = [];
-        for (let i=0; i<this.blocks.length; i++)
-            list.push( this.blocks[i].getBlockHeader() )
-
-        return list;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

@@ -1,5 +1,6 @@
 import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockchain/Interface-Blockchain'
 import PPoWBlockchainProver from './prover/PPoW-Blockchain-Prover'
+import PPowBlockchainVerifier from './verifier/PPoW-Blockchain-Verifier'
 
 /**
  * NiPoPoW Blockchain contains a chain of blocks based on Proof of Proofs of Work
@@ -12,6 +13,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         super(agent);
 
         this.prover = new PPoWBlockchainProver(this);
+        this.verifier = new PPowBlockchainVerifier(this);
 
     }
 
