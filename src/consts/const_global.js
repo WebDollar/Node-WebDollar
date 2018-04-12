@@ -55,7 +55,7 @@ consts.MINI_BLOCKCHAIN = {
 
 
 consts.POPOW_PARAMS={
-    m: 6,
+    m: 3,
     k: 6,
     k1: 6,
     d: 0.5,
@@ -109,7 +109,6 @@ consts.ADDRESSES = {
 
             VERSION_PREFIX : "00", //ending BASE64 HEX
             CHECK_SUM_LENGTH : 4, //in bytes   //ending BASE64 HEX
-
 
             PREFIX_BASE64 : "584043fe", //BASE64 HEX  WEBD$
             //WEBD  584043
@@ -191,8 +190,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.287",
-        VERSION_COMPATIBILITY: "0.287",
+        VERSION: "0.288",
+        VERSION_COMPATIBILITY: "0.288",
         PROTOCOL: "WebDollar",
         SSL: true,
 
