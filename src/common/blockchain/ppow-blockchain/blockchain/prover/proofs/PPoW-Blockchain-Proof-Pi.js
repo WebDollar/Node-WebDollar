@@ -21,7 +21,7 @@ class PPowBlockchainProofPi{
             if (miu <= this.blocks[i].level)
                 list.push(this.blocks[i]);
 
-        return list;
+        return new PPowBlockchainProofPi(list);
     }
 
     /**
@@ -35,7 +35,7 @@ class PPowBlockchainProofPi{
             if (this.blocks[i].level <= miu)
                 list.push(this.blocks[i]);
 
-        return list;
+        return new PPowBlockchainProofPi(list);
     }
 
     /**
@@ -43,20 +43,20 @@ class PPowBlockchainProofPi{
      * @param underlyingChain C
      * @param superChain C'
      */
-    downSuperChainGetUnderlyingChain(superChain, underlyingChain ){
+    downSuperChainGetUnderlyingChain(underlyingChain ){
 
         //finding C[ C'[0] :
         let first = -1, last = -1;
 
-        for (let i=0; i<superChain.blocks.length; i++)
-            if (underlyingChain.blocks[i] === superChain.blocks[0]) {
+        for (let i=0; i<this.blocks.length; i++)
+            if (underlyingChain.blocks[i] === this.blocks[0]) {
                 first = i;
                 break;
             }
 
         //finding C[ : C'[-1] ]
         for (let i=0; i<underlyingChain.blocks.length; i++)
-            if (underlyingChain.blocks[i] === superChain.blocks[superChain.blocks.length-1]) {
+            if (underlyingChain.blocks[i] === this.blocks[this.blocks.length-1]) {
                 last = i;
                 break;
             }

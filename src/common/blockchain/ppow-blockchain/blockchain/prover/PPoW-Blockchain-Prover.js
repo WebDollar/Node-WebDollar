@@ -66,6 +66,10 @@ class PPoWBlockchainProver{
 
         }
 
+        console.warn("########################### underlyingChain", underlyingChain);
+
+
+
         return underlyingChain;
 
     }
@@ -73,7 +77,7 @@ class PPoWBlockchainProver{
     _createProofXi(chain){
 
         // χ ← C[−k : ]
-        let proofXi = new PPowBlockchainProofXi( chain.blocks.slice( - consts.POPOW_PARAMS.k) );
+        //let proofXi = new PPowBlockchainProofXi( chain.blocks.slice( - consts.POPOW_PARAMS.k) );
 
         return proofXi;
     }

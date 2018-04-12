@@ -81,10 +81,10 @@ class PPoWHelper{
         while ( mP >= consts.POPOW_PARAMS.m  && mP <underlyingChain.blocks.length){
 
             // C↑µ [−m':]
-            let upperChain = new PPowBlockchainProofPi(underlyingChain.blocksGreaterLevel(miu));
+            let upperChain = underlyingChain.blocksGreaterLevel(miu);
 
             // downChain C'↓ C is defined as C[ C'[0] : C'[−1] ].          simply write C'↓
-            let downChain = upperChain.downSuperChainGetUnderlyingChain(upperChain, underlyingChain, );
+            let downChain = upperChain.downSuperChainGetUnderlyingChain(underlyingChain, );
 
             if (! this._localGood( Math.min( upperChain.blocks.length, mP ), Math.min( downChain.blocks.length, mP ) , miu) )
                 return false;
@@ -112,11 +112,11 @@ class PPoWHelper{
             //C∗ ⊆ C, if |C∗↑µ| ≥ k1
 
             let first = i;
-            let last = underlyingChain-consts.POPOW_PARAMS.k1;
+            let last = i + consts.POPOW_PARAMS.k1;
 
             let CStar = new PPowBlockchainProofPi([]);
             for (let j=first; j <=last; j++)
-                CStar.blocks.push(underlyingChain[j]);
+                CStar.blocks.push(underlyingChain.blocks[j]);
 
             //any µ' < µ
             for (let miuP=miu; miuP >= 1; miuP--) {
@@ -125,9 +125,9 @@ class PPoWHelper{
                 let upperChain = CStar.blocksGreaterLevel(miuP);
 
                 //| C∗↑µ' | ≥ k1
-                if (upperChain.length >= consts.POPOW_PARAMS.k1){
+                if (upperChain.blocks.length >= consts.POPOW_PARAMS.k1){
 
-                    if ((CStar.blocksGreaterLevel(miu) >= (1 - consts.POPOW_PARAMS.d ) * new BigInteger(2).pow(miu - miuP) * upperChain ) === false)
+                    if ( ! (CStar.blocksGreaterLevel(miu).blocks.length >= (1 - consts.POPOW_PARAMS.d ) * new BigInteger(2).pow(miu - miuP) * upperChain.blocks.length ) )
                         return false;
 
                 }
@@ -135,6 +135,8 @@ class PPoWHelper{
             }
 
         }
+
+
 
         return true;
     }
@@ -158,6 +160,11 @@ class PPoWHelper{
 
         return true;
     }
+
+
+
+
+
 
 }
 
