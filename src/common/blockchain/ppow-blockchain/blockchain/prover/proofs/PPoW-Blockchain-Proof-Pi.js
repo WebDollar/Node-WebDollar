@@ -64,6 +64,12 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
 
             let newUnderlyingChain = new PPowBlockchainProofPi([]);
 
+            if (last < first){
+                let aux = last;
+                last = first;
+                first = aux;
+            }
+
             for (let i=first; i<=last; i++)
                 newUnderlyingChain.blocks.push(underlyingChain.blocks[i]);
 

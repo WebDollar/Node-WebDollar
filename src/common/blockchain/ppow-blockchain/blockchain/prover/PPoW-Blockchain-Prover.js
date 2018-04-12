@@ -92,7 +92,8 @@ class PPoWBlockchainProver{
         // χ ← C[−k : ]
         let blocks = [];
         for (let i=chain.blocks.length - consts.POPOW_PARAMS.k; i<chain.blocks.length; i++)
-            blocks.push(chain.blocks[i]);
+            if (i >= 0)
+                blocks.push(chain.blocks[i]);
 
         let proofXi = new PPowBlockchainProofXi( blocks );
 
