@@ -93,7 +93,6 @@ class CLI{
             addressId = -1;
 
         return addressId;
-
     }
 
     _showCommands() {
@@ -108,9 +107,29 @@ class CLI{
         return true;
     }
 
+    _sync(sync = true) {
+
+        /*let callback = () => {
+
+                Blockchain.startMiningNextTimeSynchronized = true;
+        };
+
+        if (!Blockchain._blockchainInitiated) {
+            Blockchain.createBlockchain("full-node", () => {
+                Node.NodeClientsService.startService();
+
+                callback();
+            });
+        } else {
+            callback();
+        }*/
+    }
+
     async listAddresses() {
 
         console.info('\nWallet addresses:');
+
+        this._sync();
 
         let miningAddress = Blockchain.blockchain.mining.minerAddress;
         if (miningAddress === undefined)
@@ -138,6 +157,8 @@ class CLI{
             balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
         }
         console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
+
+        this._sync(false);
 
         return true;
     }
@@ -320,8 +341,7 @@ class CLI{
 
                 callback();
             });
-        }
-        else {
+        } else {
             callback();
         }
 
