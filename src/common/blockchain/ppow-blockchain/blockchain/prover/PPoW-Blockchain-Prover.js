@@ -25,7 +25,10 @@ class PPoWBlockchainProver{
         let B = chain.blocks[0];
 
         // π
-        let proofPi = new PPowBlockchainProofPi([]);
+        // π is underlyingChain
+
+
+        let underlyingChain = new PPowBlockchainProofPi([]);
 
         let chainLength =  chain.blocks.length;
 
@@ -34,22 +37,26 @@ class PPoWBlockchainProver{
             for (let miu = chain.blocks[chainLength - consts.POPOW_PARAMS.k].interlink.length - 1; miu >= 0; --miu) {
 
                 //  α ← C[: −k]{B :}↑µ
-                let alpha = [];
+                //  α is superChain
+                let superChain = new PPowBlockchainProofPi([]);
+
                 for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
                     if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
                         chain.blocks[i].getLevel() >= miu) {
 
-                        alpha.push(chain.blocks[i]);
+                        superChain.blocks.push(chain.blocks[i]);
                     }
 
                 // π ← π ∪ α
-                for (let i = 0; i < alpha.length; ++i)
-                    proofPi.blocks.push(alpha[i]);
+                for (let i = 0; i < superChain.blocks.length; ++i)
+                    underlyingChain.blocks.push(superChain.blocks[i]);
 
                 //if goodδ,m(C, α, µ)
-                if (PPoWHelper.good(alpha, miu)) {
-                    B = alpha[alpha.length - consts.POPOW_PARAMS.m];
+                if (PPoWHelper.good(underlyingChain, superChain, miu) ) {
+                    console.log(PPoWHelper.good(underlyingChain, superChain, miu));
+                    B = superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m];
                 }
+
 
             }
 
@@ -59,7 +66,7 @@ class PPoWBlockchainProver{
 
         }
 
-        return proofPi;
+        return underlyingChain;
 
     }
 
