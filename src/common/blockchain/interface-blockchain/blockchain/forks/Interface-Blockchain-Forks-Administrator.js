@@ -23,16 +23,15 @@ class InterfaceBlockchainForksAdministrator {
 
         if (!Array.isArray(sockets)) sockets = [sockets];
 
-        if (this.findForkBySockets(sockets) !== null)
-            return null;
+        let fork = this.findForkBySockets(sockets);
+        if ( fork !== null ) return fork;
 
-        if (this.findForkByHeader(header) !== null)
-            return null;
+        fork = this.findForkByHeader(header);
+        if ( fork !== null) return fork;
 
-        let fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header );
+        fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header );
 
         this.forks.push(fork);
-
         return fork;
     }
 
@@ -72,6 +71,7 @@ class InterfaceBlockchainForksAdministrator {
 
         if (header === null || header === undefined)
             return null;
+
         if (header.hash === null || header.hash === undefined)
             return null;
 

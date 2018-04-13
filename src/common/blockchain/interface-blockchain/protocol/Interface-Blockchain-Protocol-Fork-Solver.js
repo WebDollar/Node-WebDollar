@@ -83,20 +83,21 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
+
     /*
         may the fork be with you Otto
      */
-    async discoverAndProcessFork(tip){
+
+    //TODO it will not update positions
+    async discoverFork(socket, forkChainLength, forkChainStartingPoint){
 
         let fork;
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.blocks.length;
 
-        let socket = tip.socket;
-
         try{
 
-            if (currentBlockchainLength > tip.forkChainLength)
+            if (currentBlockchainLength > forkChainLength)
                 throw {message: "discoverAndProcessFork a smaller fork than I have"};
 
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
@@ -106,8 +107,9 @@ class InterfaceBlockchainProtocolForkSolver{
                 return forkFound;
             }
 
+            //optimization
             //check if n-2 was ok, but I need at least 1 block
-            if (currentBlockchainLength === tip.forkChainLength-1 && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
+            if (currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
 
                 let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-1 }, currentBlockchainLength-1 );
 
@@ -124,54 +126,37 @@ class InterfaceBlockchainProtocolForkSolver{
                         header: answer.header,
                     };
 
-
             }
 
             // in case it was you solved previously && there is something in the blockchain
 
             //console.warn("discoverFork 555" , binarySearchResult);
-
+            //Binary Search to detect the Fork Position
             if ( binarySearchResult.position === -1 ) {
 
                 if (this.blockchain.agent.light) {
-                    if (tip.forkChainLength - tip.forkChainStartingPoint > consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS) {
-                        console.warn("LIGHT CHANGES from ", tip.forkChainStartingPoint, " to ", tip.forkChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1);
-                        tip.forkChainStartingPoint = tip.forkChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1;
+                    if (forkChainLength - forkChainStartingPoint > consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS) {
+                        console.warn("LIGHT CHANGES from ", forkChainStartingPoint, " to ", forkChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1);
+                        forkChainStartingPoint = forkChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS - 1;
                     }
                 }
 
-                console.warn("discoverFork 6666" + tip.forkChainStartingPoint);
+                console.warn("discoverFork 6666" + forkChainStartingPoint);
 
-                binarySearchResult = await this._calculateForkBinarySearch(socket, tip.forkChainStartingPoint, tip.forkChainLength, currentBlockchainLength );
+                binarySearchResult = await this._calculateForkBinarySearch(socket, forkChainStartingPoint, forkChainLength, currentBlockchainLength );
 
                 if (binarySearchResult.position === null)
                     throw {message: "connection dropped discoverForkBinarySearch"}
 
-                // console.log("binary search ", binarySearchResult)
             }
 
             console.warn("discoverFork 7777" , binarySearchResult);
 
-            // it has a ground-new blockchain
-            // very skeptical when the blockchain becomes bigger
-
-            // probably for mini-blockchain light
-            if (this.blockchain.agent.light)
-                if (binarySearchResult.position === -1 && currentBlockchainLength < tip.forkChainLength){
-
-                    let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: tip.forkChainStartingPoint }, tip.forkChainStartingPoint );
-
-                    if (answer === null || answer === undefined )
-                        throw {message: "connection dropped headers-info tip.forkChainStartingPoint"};
-                    if (answer.result !== true || answer.header === undefined)
-                        throw {message: "headers-info 0 malformed"}
-
-                    binarySearchResult = {position: tip.forkChainStartingPoint, header: answer.header};
-
-                }
+            //process light and NiPoPow
+            await this.optionalProcess(socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint);
 
             //its a fork... starting from position
-            console.log("fork position", binarySearchResult.position, "tip.forkChainStartingPoint", tip.forkChainStartingPoint, "forkChainLength", tip.forkChainLength);
+            console.log("fork position", binarySearchResult.position, "forkChainStartingPoint", forkChainStartingPoint, "forkChainLength", forkChainLength);
 
             if (binarySearchResult.position === -1 || (binarySearchResult.position > 0 && binarySearchResult.header !== undefined && binarySearchResult.header !== null) ){
 
@@ -186,41 +171,19 @@ class InterfaceBlockchainProtocolForkSolver{
                         return forkFound;
 
                     //maximum blocks to download
-                    let forkChainLength = tip.forkChainLength;
+                    let forkChainLength = forkChainLength;
                     if (!this.blockchain.agent.light)
                         forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
 
-                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, tip.forkChainStartingPoint, forkChainLength, binarySearchResult.header);
-
-
-                } catch (Exception){
-
-                    console.error("discoverAndProcessFork - creating a fork raised an exception" , Exception, "binarySearchResult", binarySearchResult )
-                    throw Exception;
-                }
-
-                try{
-
-
-                    if (fork !== null) {
-                        console.log("solveFork1");
-
-                        if (! (await this.solveFork(fork) ))
-                            throw "Fork Solved was failed"
-
-                    }
-
+                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, forkChainStartingPoint, forkChainLength, binarySearchResult.header);
 
                 } catch (Exception){
 
-                    console.error("solving a fork raised an exception" , Exception, "binarySearchResult", binarySearchResult );
+                    this.blockchain.forksAdministrator.deleteFork(fork);
+
+                    console.error( "discoverAndProcessFork - creating a fork raised an exception" , Exception, "binarySearchResult", binarySearchResult )
                     throw Exception;
                 }
-
-
-                if (fork === null)
-                    console.log("fork is null");
-
 
             } else
                 //it is a totally new blockchain (maybe genesis was mined)
@@ -230,23 +193,42 @@ class InterfaceBlockchainProtocolForkSolver{
 
             console.error("discoverAndProcessFork raised an exception", exception );
 
-            this.blockchain.forksAdministrator.deleteFork(fork);
-
-            return {result:false, error: exception };
+            return { result:false, error: exception };
 
         }
 
-        this.blockchain.forksAdministrator.deleteFork(fork);
-        return { result: true };
+        return {result: true };
+
     }
 
+    async optionalProcess(socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint){
+
+    }
+
+    async processFork(fork){
+
+        if (fork === null)
+            throw {message: "fork doesn't exist"};
+
+        try{
+
+            if (! (await this._solveFork(fork) ))
+                throw "Fork Solved was failed"
+
+        } catch (exception){
+
+            console.error("solving a fork raised an exception" , exception );
+            throw exception;
+        }
+
+    }
 
     /**
      * Solve Fork by Downloading  the blocks required in the fork
      * @param fork
      * @returns {Promise.<boolean>}
      */
-    async solveFork(fork) {
+    async _solveFork(fork) {
 
         if (fork === null || fork === undefined || typeof fork !== "object" )
             throw ('fork is null');

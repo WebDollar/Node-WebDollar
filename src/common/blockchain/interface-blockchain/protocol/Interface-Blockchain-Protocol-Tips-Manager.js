@@ -24,12 +24,6 @@ class InterfaceBlockchainProtocolTipsManager {
         let bestTip = this.blockchain.tipsAdministrator.getBestTip();
         let result = false;
 
-        // for (let i=0; i<this.blockchain.tipsAdministrator.tips.length; i++)
-        //     console.log("tip: ",this.blockchain.tipsAdministrator.tips[i].toString());
-        //
-        // console.log("bestTip", bestTip !== null ? bestTip.toString() : "null");
-
-
         if (bestTip !== null) {
 
             console.log("BEEEEEST TIIIP BEFORE");
@@ -38,7 +32,7 @@ class InterfaceBlockchainProtocolTipsManager {
             console.log("bans bans bans bans bans bans bans bans");
             console.log(this.blockchain.tipsAdministrator.bans);
 
-            let forkAnswer = await this.protocol.forkSolver.discoverAndProcessFork(bestTip);
+            let forkAnswer = await this.protocol.forkSolver.discoverFork(bestTip);
 
             console.log("AFTER");
             bestTip.toString();

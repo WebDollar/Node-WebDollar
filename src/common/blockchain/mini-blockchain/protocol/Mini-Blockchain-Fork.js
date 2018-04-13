@@ -1,4 +1,4 @@
-import PPoWBlockchainFork from "common/blockchain/ppow-blockchain/protocol/PPoW-Blockchain-Fork"
+import PPoWBlockchainFork from "common/blockchain/ppow-blockchain/blockchain/forks/PPoW-Blockchain-Fork"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
 import consts from "consts/const_global";
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"

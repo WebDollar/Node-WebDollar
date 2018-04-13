@@ -20,6 +20,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
     _initializeMiniBlockchainLight(){
 
+        this.proofPi = null;
         this.blocks.clear();
         this.blocks.blocksStartingPoint = 0;
 
@@ -381,14 +382,28 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
     }
 
+    getBlock(height){
 
+        if (height === undefined )
+            height = this.blocks.length;
+
+        if (this.agent !== undefined && this.agent.light === true && height !== 0) {
+
+            if (this.blocks[height] !== undefined)
+                return this.blocks[height];
+            else if (this.proofPi.blocks[height])
+
+            if (this.proofPi.blocks[height] !== undefined )
+                return this.lightPrevDifficultyTargets[height];
+        }
+
+        return MiniBlockchainAdvanced.prototype.getDifficultyTarget.call(this, height);
+    }
 
     getDifficultyTarget(height){
 
         if (height === undefined )
             height = this.blocks.length;
-
-        //console.warn("difficultyTarget", height, this.blocks.blocksStartingPoint , this.blocks.length, this.lightPrevDifficultyTargets[height] !== undefined ? this.lightPrevDifficultyTargets[height].toString("hex") : '');
 
         if (this.agent !== undefined && this.agent.light === true && height !== 0) {
 
@@ -402,8 +417,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
     getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
-        //console.warn("getTimeStamp", height, this.blocks.blocksStartingPoint, this.lightPrevTimeStamps[height])
-
         if (this.agent.light === true && height !== 0) {
             if ( this.lightPrevTimeStamps[height] !== undefined )
                 return this.lightPrevTimeStamps[height];
@@ -415,8 +428,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
     getHashPrev(height){
 
         if (height === undefined) height = this.blocks.length;
-
-        //console.warn("getHashPrev", height, this.blocks.blocksStartingPoint, this.lightPrevHashPrevs[height] !== undefined ? this.lightPrevHashPrevs[height].toString("hex") : '')
 
         if (this.agent.light === true && height !== 0)
             if ( this.lightPrevHashPrevs[height] !== undefined )

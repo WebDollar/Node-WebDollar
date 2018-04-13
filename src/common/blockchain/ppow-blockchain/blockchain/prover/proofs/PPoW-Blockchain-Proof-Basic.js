@@ -27,6 +27,17 @@ class PPoWBlockchainProofBasic{
         return true;
     }
 
+    //TODO should be optimized using Object {}
+    hasBlock(height){
+
+        for (let i=0; i<this.blocks.length; i++)
+            if (this.blocks[i].height === height)
+                return this.blocks[i];
+
+        return null;
+
+    }
+
 }
 
 export default PPoWBlockchainProofBasic

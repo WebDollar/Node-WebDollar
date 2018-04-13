@@ -179,7 +179,20 @@ class InterfaceBlockchain {
         return true;
     }
 
+    getBlock(height){
+        if (height === undefined)
+            height = this.blocks.length;
 
+        if (height <= 0)
+            return BlockchainGenesis;
+        else{
+            if (height > this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length}; else
+            if (this.blocks[height-1] === undefined) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
+
+            return this.blocks[height-1];
+        }
+
+    }
 
     getDifficultyTarget(height){
 
@@ -189,10 +202,8 @@ class InterfaceBlockchain {
         if (height <= 0)
             return BlockchainGenesis.difficultyTarget;
         else{
-            if (height > this.blocks.length )
-                throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
-            if (this.blocks[height-1] === undefined)
-                throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
+            if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
+            if (this.blocks[height-1] === undefined) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
 
             return this.blocks[height-1].difficultyTarget;
         }
@@ -205,11 +216,8 @@ class InterfaceBlockchain {
         if (height <= 0)
             return BlockchainGenesis.timeStamp;
         else{
-            if (height > this.blocks.length )
-                throw {message: "getTimeStamp invalid height ", height: height};
-            else
-            if (this.blocks[height-1] === undefined)
-                throw {message: "getTimeStamp invalid height ", height: height};
+            if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height}; else
+            if (this.blocks[height-1] === undefined) throw {message: "getTimeStamp invalid height ", height: height};
 
             return this.blocks[height-1].timeStamp;
         }
@@ -223,11 +231,9 @@ class InterfaceBlockchain {
         if (height <= 0)
             return BlockchainGenesis.hashPrev;
         else {
-            if (height > this.blocks.length )
-                throw {message: "getHashPrev invalid height", height: height};
-            else
-            if (this.blocks[height-1] === undefined)
-                throw {message: "getHashPrev invalid height", height: height};
+
+            if (height > this.blocks.length ) throw {message: "getHashPrev invalid height", height: height}; else
+            if (this.blocks[height-1] === undefined) throw {message: "getHashPrev invalid height", height: height};
 
             return this.blocks[height-1].hash;
         }

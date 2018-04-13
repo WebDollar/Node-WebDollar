@@ -90,6 +90,20 @@ class InterfaceBlockchainFork {
         return result;
     }
 
+    getForkBlock(height){
+
+        let forkHeight = height - this.forkStartingHeight;
+
+        if (height === 0)
+            return BlockchainGenesis; // based on genesis block
+        else if ( forkHeight === 0)
+            return this.blockchain.getBlock(height);
+        else if ( forkHeight > 0)
+            return this.forkBlocks[forkHeight - 1]; // just the fork
+        else
+            return this.blockchain.getBlock(height) // the blockchain
+    }
+
     // return the difficultly target for ForkBlock
     getForkDifficultyTarget(height){
 

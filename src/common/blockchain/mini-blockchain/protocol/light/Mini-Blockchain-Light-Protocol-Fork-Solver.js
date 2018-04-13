@@ -145,7 +145,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
     }
 
-    async solveFork(fork) {
+    async _solveFork(fork) {
 
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
@@ -160,14 +160,9 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkStartingHeight = fork.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
             fork.forkChainStartingPoint = fork.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
-            //Downloading Proof Pi
-            let answer;
-            // let answer = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi", {}, "answer");
-            // if (answer.length === 0)
-
             //downloading the accountant tree
             StatusEvents.emit( "agent/status", {message: "Downloading Accountant Tree", blockHeight: fork.forkStartingHeight } );
-            answer = await this.protocol.getAccountantTree(socket, fork.forkStartingHeight);
+            let answer = await this.protocol.getAccountantTree(socket, fork.forkStartingHeight);
 
             fork.forkPrevAccountantTree = answer;
 
@@ -234,8 +229,30 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevHashPrev = null;
         }
 
-        return await inheritForkSolver.prototype.solveFork.call(this, fork);
+        return await inheritForkSolver.prototype._solveFork.call(this, fork);
     }
+
+
+    async optionalProcess ( socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint ){
+
+        if (binarySearchResult.position === -1 && currentBlockchainLength < forkChainLength){
+
+            let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: forkChainStartingPoint }, forkChainStartingPoint );
+
+            if (answer === null || answer === undefined )
+                throw {message: "connection dropped headers-info forkChainStartingPoint"};
+
+            if (answer.result !== true || answer.header === undefined)
+                throw {message: "headers-info 0 malformed"};
+
+            binarySearchResult.position = {position: forkChainStartingPoint, header: answer.header};
+
+        }
+
+        await inheritForkSolver.prototype.optionalProcess.call(this, socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint )
+
+    }
+
 
 }
 
