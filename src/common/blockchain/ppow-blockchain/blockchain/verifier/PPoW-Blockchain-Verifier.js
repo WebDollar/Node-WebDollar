@@ -22,21 +22,21 @@ class PPoWBlockchainVerifier{
         if (proofPi.blocks.length > 0)
             this.prevProofs.push( proofPi );
 
-        for (let i=this.prevProofs.length-1; i>=0; i--) {
-
-            let prevAnswer = -2;
-            for (let j = this.prevProofs.length - 1; j >= 0; j--) {
-
-                let answer = this.compareProofs(this.prevProofs[i], this.prevProofs[j]);
-
-                if (answer !== prevAnswer) {
-                    prevAnswer = answer;
-                    console.info(answer, "comparison", i, j, this.prevProofs[j].blocks.length);
-                }
-
-            }
-
-        }
+        // for (let i=this.prevProofs.length-1; i>=0; i--) {
+        //
+        //     let prevAnswer = -2;
+        //     for (let j = this.prevProofs.length - 1; j >= 0; j--) {
+        //
+        //         let answer = this.compareProofs(this.prevProofs[i], this.prevProofs[j]);
+        //
+        //         if (answer !== prevAnswer) {
+        //             prevAnswer = answer;
+        //             console.info(answer, "comparison", i, j, this.prevProofs[j].blocks.length);
+        //         }
+        //
+        //     }
+        //
+        // }
 
         // for (let i=0; i<this.prevProofs.length; i++) {
         //

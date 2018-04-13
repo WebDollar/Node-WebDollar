@@ -7,7 +7,11 @@ class PPoWBlockchainProver{
 
     constructor(blockchain){
 
+        this.proofActivated = true;
+
         this.blockchain = blockchain;
+        this.proofPi = null;
+        this.proofXi = null;
 
     }
 
@@ -32,6 +36,7 @@ class PPoWBlockchainProver{
         let chainLength =  chain.blocks.length;
 
         try {
+
             //for µ = |C[−k].interlink| down to 0 do
 
             if (chainLength - consts.POPOW_PARAMS.k >= 0)
@@ -64,10 +69,9 @@ class PPoWBlockchainProver{
                     }
 
                     //if goodδ,m(C, α, µ)
-                    if (PPoWHelper.good(underlyingChain, superChain, miu) ) {
-                        console.log(PPoWHelper.good(underlyingChain, superChain, miu));
+                    if (PPoWHelper.good(underlyingChain, superChain, miu) )
                         B = superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m];
-                    }
+
 
 
                 }
@@ -75,12 +79,9 @@ class PPoWBlockchainProver{
         } catch (exception){
 
             console.error( "_createProofPi" , exception);
+            underlyingChain = null;
 
         }
-
-        console.warn("########################### underlyingChain", underlyingChain.length );
-
-
 
         return underlyingChain;
 
@@ -99,12 +100,17 @@ class PPoWBlockchainProver{
         return proofXi;
     }
 
-    createProofs(){
+    createProofs() {
+
+        if ( !this.proofActivated )
+            return false;
 
         this.proofPi = this._createProofPi(this.blockchain);
         this.proofXi = this._createProofXi(this.blockchain);
 
-        this.blockchain.verifier.validateChain(this.proofPi, this.proofXi);
+        // if (consts.DEBUG)
+        //     if (this.proofPi !== null && this.proofXi !== null)
+        //         this.blockchain.verifier.validateChain(this.proofPi, this.proofXi);
 
     }
 

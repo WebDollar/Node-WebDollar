@@ -68,7 +68,7 @@ class NodeSignalingServerService{
         for (let i=0; i<this.waitlist.length; i++)
             await this.waitlist[i].checkAvailability();
 
-        setTimeout( this._determineWebPeersAvailability.bind(this), 3000 );
+        setTimeout( this._determineWebPeersAvailability.bind(this), 5000 );
     }
 
     _connectWebPeers(){

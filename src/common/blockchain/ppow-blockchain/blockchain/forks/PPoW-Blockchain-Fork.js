@@ -9,24 +9,23 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         InterfaceBlockchainFork.prototype.initializeConstructor.call(this, blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header);
 
-        this.proofPi = null;
-        if (this.blockchain.agent.light) {
+        this.forkProofPi = null;
+        this._forkProofPiClone = null;
+
+        if (this.blockchain.agent.light && (forkChainStartingPoint === forkStartingHeight)) {
 
             //Downloading Proof Pi
-            let socket = sockets;
-            if (Array.isArray(sockets))
-                socket = sockets[0];
 
-            let answer = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi", {}, "answer");
+            let answer = await this.getSocket().node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi", {}, "answer");
             if (answer === null || answer === undefined) throw {message: "Proof is invalid"};
 
             //importing Proof
-            this.proofPi = new PPoWBlockchainProofPi(this.blockchain, []);
+            this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
 
             await this.importForkProofHeaders( answer );
 
-            //this.proofPi.validateProof();
-            this.proofPi.validateProofLastElements(consts.POPOW_PARAMS.m);
+            //this.forkProofPi.validateProof();
+            this.forkProofPi.validateProofLastElements(consts.POPOW_PARAMS.m);
 
         }
 
@@ -41,7 +40,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             await block.importBlockFromHeader( blocksHeader[i] );
 
-            this.proofPi.blocks.push(block);
+            this.forkProofPi.blocks.push(block);
 
         }
 
@@ -49,13 +48,39 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
 
     getForkProofsPiBlock(height){
-
-        let forkHeight = height - this.forkStartingHeight;
-
         if (height <= 0)  return BlockchainGenesis; // based on genesis block
-        else return this.proofPi.hasBlock(height - 1);
+        else return this.forkProofPi.hasBlock(height - 1);
     }
 
+
+    preForkClone(cloneBlocks=true){
+
+        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+            this._forkProofPiClone = this.blockchain.proofPi;
+        }
+
+        InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
+
+    }
+
+    preFork(revertActions){
+
+        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+            this.blockchain.proofPi = this.forkProofPi;
+        }
+
+        InterfaceBlockchainFork.prototype.preFork.call(this, revertActions);
+    }
+
+    revertFork(){
+
+        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+            this.blockchain.proofPi = this._forkProofPiClone;
+        }
+
+        InterfaceBlockchainFork.prototype.revertFork.call(this);
+
+    }
 
 }
 

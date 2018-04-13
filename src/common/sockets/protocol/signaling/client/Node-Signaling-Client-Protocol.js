@@ -15,7 +15,7 @@ class NodeSignalingClientProtocol {
 
         socket.node.on("signals/client/do-you-have-free-room", (data)=>{
 
-            console.warn("free room: I have ", SignalingClientList.connected.length, "max", consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS);
+            //console.warn("free room: I have ", SignalingClientList.connected.length, "max", consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS);
 
             socket.node.sendRequest("signals/client/do-you-have-free-room"+"/answer", {
                 result: true,
@@ -38,7 +38,9 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/initiator/generate-initiator-signal", async (data) => {
 
             try{
-                console.warn("WEBRTC# 1 Generate Initiator Signal");
+
+                if (consts.DEBUG)
+                    console.warn("WEBRTC# 1 Generate Initiator Signal");
 
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "remoteUUID was not specified"};
@@ -92,7 +94,9 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/initiator/join-answer-signal", async (data) => {
 
             try {
-                console.warn("WEBRTC# 1_2");
+
+                if (consts.DEBUG)
+                    console.warn("WEBRTC# 1_2");
 
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw { message: "remoteUUID was not specified" };
@@ -125,7 +129,9 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/initiator/receive-ice-candidate", async (data) => {
 
             try {
-                console.warn("WEBRTC# 1_3");
+
+                if (consts.DEBUG)
+                    console.warn("WEBRTC# 1_3");
 
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "data.remoteUUID 4 was not specified"};
@@ -171,7 +177,9 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/answer/receive-initiator-signal", async (data) => {
 
             try {
-                console.warn("WEBRTC# 2");
+
+                if (consts.DEBUG)
+                    console.warn("WEBRTC# 2");
 
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "data.remoteUUID 2 was not specified"}
@@ -217,7 +225,9 @@ class NodeSignalingClientProtocol {
         socket.node.on("signals/client/answer/receive-ice-candidate", async (data) => {
 
             try{
-                console.warn("WEBRTC# 2_2");
+
+                if (consts.DEBUG)
+                    console.warn("WEBRTC# 2_2");
 
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "data.remoteUUID 3 is empty"};

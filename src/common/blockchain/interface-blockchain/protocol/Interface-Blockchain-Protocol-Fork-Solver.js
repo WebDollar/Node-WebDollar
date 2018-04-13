@@ -4,7 +4,7 @@ import global from "consts/global"
 import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
 import BufferExtended from "common/utils/BufferExtended";
-
+import BansList from "common/utils/bans/BansList"
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
  */
@@ -192,6 +192,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             console.error("discoverAndProcessFork raised an exception", exception );
 
+            BansList.addBan(socket, 2000, exception.message);
+
             return { result:false, error: exception };
 
         }
@@ -212,13 +214,17 @@ class InterfaceBlockchainProtocolForkSolver{
         try{
 
             if (! (await this._solveFork(fork) ))
-                throw "Fork Solved was failed"
+                throw "Fork Solved was failed";
 
             return true;
 
         } catch (exception){
 
             console.error("solving a fork raised an exception" , exception );
+
+            //let's ban the guy
+            BansList.addBan(fork.getSocket(), 10000, exception.message);
+
             throw exception;
         }
 

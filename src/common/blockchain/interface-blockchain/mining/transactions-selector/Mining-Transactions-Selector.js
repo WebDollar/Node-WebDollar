@@ -22,9 +22,6 @@ class MiningTransactionsSelector{
             try {
                 
                 console.log(transaction.txId.toString("hex"));
-                if (transaction.txId.toString("hex") === "abb") {
-                    console.log("blabla");
-                }
 
                 //don't upset the SPAM_GUARDIAN
                 for (let j = 0; j < transaction.from.addresses.length; j++)

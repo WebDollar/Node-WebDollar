@@ -21,13 +21,18 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
         socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi", async ()=>{
 
-            socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi"+"/answer", this.blockchain.prover.proofPi.getProofHeaders() );
+            if (this.blockchain.agent.light) //light
+                return null;
+                //TODO generate proofs
+                //socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi"+"/answer", this.blockchain.proofPi.getProofHeaders() );
+            else  // full node
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi"+"/answer", this.blockchain.prover.proofPi.getProofHeaders() );
 
         });
 
         socket.node.on("get/nipopow-blockchain/headers/get-proofs/xi", async ()=>{
 
-            socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/xi"+"/answer", this.blockchain.prover.proofXi.getProofHeaders() );
+            //socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/xi"+"/answer", this.blockchain.prover.proofXi.getProofHeaders() );
 
         });
 

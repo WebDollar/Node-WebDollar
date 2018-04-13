@@ -7,7 +7,6 @@ import PPowBlockchainVerifier from './verifier/PPoW-Blockchain-Verifier'
  */
 class PPoWBlockchain extends InterfaceBlockchain {
 
-
     constructor (agent){
 
         super(agent);
@@ -25,7 +24,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
         block.updateInterlink(prevBlock);
         block.level = block.getLevel(); //computing the level
 
-        //TODO even light agents should be able to generate proofs
+
+        //TODO generate proofs as a LightNode
         if (!this.agent.light)
             this.prover.createProofs();
 

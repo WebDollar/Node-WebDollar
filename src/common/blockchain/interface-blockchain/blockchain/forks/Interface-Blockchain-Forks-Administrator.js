@@ -83,6 +83,23 @@ class InterfaceBlockchainForksAdministrator {
         return null;
     }
 
+    findForkByProofs(proof){
+
+        if (proof === null || proof === undefined) return false;
+
+        try{
+
+            for (let i=0; i<this.forks.length; i++)
+                if (this.forks[i].forkProofPi.equalsProofs(proof))
+                    return this.forks[i];
+
+        } catch (exception) {
+
+        }
+
+        return null;
+    }
+
     deleteFork(fork){
 
         if (fork === undefined)

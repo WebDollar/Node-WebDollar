@@ -1,3 +1,5 @@
+import BufferExtended from "common/utils/BufferExtended"
+
 class PPoWBlockchainProofBasic{
 
 
@@ -50,6 +52,24 @@ class PPoWBlockchainProofBasic{
                 return this.blocks[i];
 
         return null;
+
+    }
+
+    equalsProofs(proof2){
+
+        if (this.blocks.length !== proof2.blocks.length)
+            return false;
+
+        for (let i=0; i<this.blocks.length; i++){
+
+            if (this.blocks[i].height !== proof2.blocks[i].height) return false;
+            if (! BufferExtended.safeCompare(this.blocks[i].hash, proof2[i].blocks[i].blockId)) return false;
+            if (! BufferExtended.safeCompare(this.blocks[i].difficultyTarget, proof2[i].blocks[i].difficultyTarget)) return false;
+            if (! BufferExtended.safeCompare(this.blocks[i].data.hashData, proof2[i].blocks[i].data.hashData)) return false;
+
+        }
+
+        return true;
 
     }
 

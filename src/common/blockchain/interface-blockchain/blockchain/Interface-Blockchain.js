@@ -7,7 +7,6 @@ import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockch
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 
 import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
-import InterfaceBlockchainTipsAdministrator from './tips/Interface-Blockchain-Tips-Administrator'
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 

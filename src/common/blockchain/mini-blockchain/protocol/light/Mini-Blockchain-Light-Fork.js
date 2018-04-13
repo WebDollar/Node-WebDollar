@@ -125,7 +125,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     }
 
-    preFork() {
+    preFork(revertActions) {
 
         // I have a new accountant Tree, so it is a new [:-m] light proof
 
@@ -150,7 +150,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         } else
             //it is just a simple fork
-            return MiniBlockchainFork.prototype.preFork.call(this);
+            return MiniBlockchainFork.prototype.preFork.call(this, revertActions);
     }
 
     revertFork(){

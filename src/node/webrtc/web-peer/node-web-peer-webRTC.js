@@ -361,8 +361,7 @@ class NodeWebPeerRTC {
 
     enableEventsHandling(){
 
-        this.peer.eventSubscribers = []; //to simulate .on and .once
-        this.peer.eventSubscribersIndex = 0;
+        this.peer.errorTrials = 0;
 
         this.peer.on = (name, callback)=>{ this.emitter.on(name, callback) };
 
@@ -375,7 +374,15 @@ class NodeWebPeerRTC {
             let data = {name: name, value: value};
 
             if (this.peer.dataChannel.readyState !== "open") {
+
                 console.error("Error sending data to webRTC because it is not open", data);
+                this.peer.errorTrials++;
+
+                if (this.peer.errorTrials > 5) {
+                    NodesList.disconnectSocket(this);
+                    console.warn("I deleted socket", this.peer.errorTrials);
+                }
+
                 return null;
             }
 

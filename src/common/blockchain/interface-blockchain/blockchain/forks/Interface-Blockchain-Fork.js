@@ -35,6 +35,7 @@ class InterfaceBlockchainFork {
         this.forkChainLength = newChainLength||0;
         this.forkBlocks = [];
         this.forkHeader = header;
+
         this.forkPromise = new Promise ((resolve)=>{
             this._forkPromiseResolver = resolve;
         });
@@ -455,6 +456,14 @@ class InterfaceBlockchainFork {
         removeBlocks(exception);
         console.error(exception);
 
+    }
+
+    getSocket(){
+        let socket = this.sockets;
+        if (Array.isArray(socket))
+            socket = socket[0];
+
+        return socket;
     }
 
 }

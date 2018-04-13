@@ -1,4 +1,6 @@
-class InterfaceBlockchainProtocolForksManager{
+import BansList from "common/utils/bans/BansList"
+
+class InterfaceBlockchainProtocolForksManager {
 
     constructor(blockchain, protocol){
 
@@ -20,6 +22,10 @@ class InterfaceBlockchainProtocolForksManager{
 
             socket.node.sendRequest( "blockchain/header/new-block", this.blockchain.blocks.last.getBlockHeaderWithInformation() );
 
+
+            if (newChainLength < this.blockchain.blocks.length - 50)
+                BansList.addBan( socket, 500, "Your blockchain is smaller than mine" );
+
             throw {message: "Your blockchain is smaller than mine"};
 
         }
@@ -30,6 +36,7 @@ class InterfaceBlockchainProtocolForksManager{
 
 
         let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+
         if (answer.result)
             return answer.fork.forkPromise;
         else
@@ -39,24 +46,36 @@ class InterfaceBlockchainProtocolForksManager{
 
     async processForksQueue(){
 
-        let bestFork = await this._getBestFork();
+        let bestFork;
+
+        try {
+
+            bestFork = await this._getBestFork();
+
+        } catch (exception){
+            console.error("processForksQueue error getting bestFork", exception  );
+            bestFork = null;
+        }
 
         if (bestFork !== null) {
 
-            let answer = {};
+            let answer= false;
+
             try {
 
-                answer = await this.protocol.forkSolver.processFork(bestFork);
+                answer = await this.protocol.forkSolver.processFork( bestFork );
 
-                if (answer)
-                    this.blockchain.forksAdministrator.deleteFork(bestFork);
+                if (!answer)
+                    throw { message: "Invalid Fork" }
 
             } catch (exception) {
 
                 console.error("processForksQueue returned an error", exception);
-                console.warn("BANNNNNNNNNNNNNNNNN", answer.message);
+                console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.addressString, exception.message);
 
             }
+
+            this.blockchain.forksAdministrator.deleteFork(bestFork);
 
         }
 

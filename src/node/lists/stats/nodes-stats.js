@@ -15,10 +15,11 @@ class NodesStats {
         this.statsWebPeers = 0;
         this.statsWaitlist = 0;
 
-        NodesList.emitter.on("nodes-list/connected", (result) => { this._recalculateStats(result) } );
-        NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._recalculateStats(result ) });
+        NodesList.emitter.on("nodes-list/connected", (nodesListObject) => { this._recalculateStats(nodesListObject) } );
+        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject ) => { this._recalculateStats(nodesListObject ) });
 
-        NodesWaitlist.emitter.on("waitlist/new-node", (result ) => { this._recalculateStats(result ) });
+        NodesWaitlist.emitter.on("waitlist/new-node", (nodesListObject ) => { this._recalculateStats(nodesListObject, false ) });
+        NodesWaitlist.emitter.on("waitlist/delete-node", (nodesListObject ) => { this._recalculateStats(nodesListObject, false ) });
 
         setInterval( () => { return this._printStats() }, consts.SETTINGS.PARAMS.STATUS_INTERVAL)
     }
@@ -43,14 +44,15 @@ class NodesStats {
 
     }
 
-    _recalculateStats(nodesListObject){
+    _recalculateStats(nodesListObject, printStats = true){
 
         this.statsClients = NodesList.countNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
         this.statsServer = NodesList.countNodes(ConnectionsType.CONNECTION_SERVER_SOCKET);
         this.statsWebPeers = NodesList.countNodes(ConnectionsType.CONNECTION_WEBRTC);
         this.statsWaitlist = NodesWaitlist.waitlist.length;
 
-        this._printStats();
+        if (printStats)
+            this._printStats();
 
     }
 }
