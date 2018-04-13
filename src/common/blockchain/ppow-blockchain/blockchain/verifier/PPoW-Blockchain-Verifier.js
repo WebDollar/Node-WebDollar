@@ -30,7 +30,7 @@ class PPoWBlockchainVerifier{
                 let answer = this.compareProofs(this.prevProofs[i], this.prevProofs[j]);
 
                 if (answer !== prevAnswer) {
-                    answer = prevAnswer;
+                    prevAnswer = answer;
                     console.info(answer, "comparison", i, j, this.prevProofs[j].blocks.length);
                 }
 

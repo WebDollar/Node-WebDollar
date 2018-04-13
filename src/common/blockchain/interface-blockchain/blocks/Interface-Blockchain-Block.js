@@ -386,6 +386,7 @@ class InterfaceBlockchainBlock {
             },
             nonce: this.nonce,
             timeStamp: this.timeStamp,
+            difficultyTarget: this.difficultyTarget,
             difficultyTargetPrev: this.difficultyTargetPrev,
         }
 
@@ -400,6 +401,7 @@ class InterfaceBlockchainBlock {
         this.data.hashData = json.data.hashData;
         this.nonce = json.nonce;
         this.timeStamp = json.timeStamp;
+        this.difficultyTarget = json.difficultyTarget;
         this.difficultyTargetPrev = json.difficultyTargetPrev;
 
         //calculate Hash
