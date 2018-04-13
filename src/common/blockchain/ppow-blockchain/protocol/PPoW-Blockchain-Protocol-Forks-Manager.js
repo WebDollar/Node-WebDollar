@@ -9,30 +9,42 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
             return InterfaceBlockchainProtocolForksManager.prototype._getBestFork.call(this);
 
         let bestFork = null;
+        let fork = null;
 
-        for (let i=0; i<this.blockchain.forksAdministrator.forks.length; i++){
-            let fork = this.blockchain.forksAdministrator.forks[i];
+        try {
 
-            if ( bestFork === null
-                || (fork.forkChainStartingPoint < fork.forkStartingHeight && bestFork.forkChainLength < fork.forkChainLength )) //it is a small fork that I already have the first forks, but I will download the remaning blocks
-            {
+            for (let i = 0; i < this.blockchain.forksAdministrator.forks.length; i++) {
 
-                bestFork = fork;
+                fork = this.blockchain.forksAdministrator.forks[i];
 
-            } else
-            if (bestFork.proofPi !== null && fork.proofPi !== null){
-
-                let compare = await this.blockchain.verifier.compareProofs(bestFork.proofPi, bestFork.proofPi);
-
-                if (compare < 0 //better proof
-                    || (compare === 0 && bestFork.forkChainLength < fork.forkChainLength) ){
+                if (bestFork === null
+                    || (fork.forkChainStartingPoint < fork.forkStartingHeight && bestFork.forkChainLength < fork.forkChainLength )) //it is a small fork that I already have the first forks, but I will download the remaning blocks
+                {
 
                     bestFork = fork;
+
+                } else if ( bestFork.forkProofPi !== null && fork.forkProofPi !== null ) {
+
+                    let compare = await this.blockchain.verifier.compareProofs(bestFork.forkProofPi, fork.forkProofPi);
+
+                    if (compare < 0 //better proof
+                        || (compare === 0 && bestFork.forkChainLength < fork.forkChainLength)) {
+
+                        bestFork = fork;
+
+                    }
+
+                } else if (bestFork.forkProofPi === null && fork.forkProofPi !== null){
+
+                    bestFork = fork.forkProofPi;
 
                 }
 
             }
 
+        } catch (exception){
+            console.error("_getBestFork returned an exception", exception );
+            throw {message: exception, fork: fork}
         }
 
         return bestFork;

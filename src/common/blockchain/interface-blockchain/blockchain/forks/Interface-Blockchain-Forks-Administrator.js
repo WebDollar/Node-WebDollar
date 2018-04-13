@@ -102,7 +102,7 @@ class InterfaceBlockchainForksAdministrator {
 
     deleteFork(fork){
 
-        if (fork === undefined)
+        if (fork === undefined || fork === null)
             return false;
 
         for (let i=0; i<this.forks.length; i++)

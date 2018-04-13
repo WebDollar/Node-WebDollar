@@ -53,7 +53,12 @@ class InterfaceBlockchainProtocolForksManager {
             bestFork = await this._getBestFork();
 
         } catch (exception){
+
             console.error("processForksQueue error getting bestFork", exception  );
+            let forkError = exception.fork;
+
+            this.blockchain.forksAdministrator.deleteFork(forkError);
+
             bestFork = null;
         }
 
@@ -88,14 +93,22 @@ class InterfaceBlockchainProtocolForksManager {
     _getBestFork(){
 
         let bestFork = null;
+        let fork = null;
 
-        this.blockchain.forksAdministrator.forks.forEach((fork)=>{
+        try {
+            for (let i = 0; i < this.blockchain.forksAdministrator.forks.length; i++) {
 
-            if ( bestFork === null || bestFork.forkChainLength < fork.forkChainLength )
-                bestFork = fork;
+                fork = this.blockchain.forksAdministrator.forks[i];
 
-        });
+                if (bestFork === null || bestFork.forkChainLength < fork.forkChainLength)
+                    bestFork = fork;
 
+            }
+        } catch (exception){
+
+            console.error("_getBestFork returned an exception", exception );
+            throw {message: exception, fork: fork}
+        }
 
         return bestFork;
     }

@@ -17,10 +17,6 @@ class MiniBlockchainLightProtocol extends MiniBlockchainAdvancedProtocol{
 
     }
 
-    _getBestFork(){
-
-    }
-
 }
 
 export default MiniBlockchainLightProtocol
