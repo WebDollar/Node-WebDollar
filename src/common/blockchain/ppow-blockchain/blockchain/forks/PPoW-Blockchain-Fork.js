@@ -19,7 +19,10 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             let answer = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi", {}, "answer");
             if (answer === null || answer === undefined) throw {message: "Proof is invalid"};
 
-            this.proofPi = new PPoWBlockchainProofPi(answer);
+            //importing Proof
+            this.proofPi = new PPoWBlockchainProofPi([]);
+            this.proofPi.importProofHeaders(answer);
+
             this.proofPi.validateProof();
 
         }

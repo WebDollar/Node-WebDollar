@@ -374,6 +374,7 @@ class InterfaceBlockchainBlock {
         return {
 
             version: this.version,
+            height: this.height,
             hash: this.hash,
             hashPrev: this.hashPrev,
             data: {
@@ -385,6 +386,23 @@ class InterfaceBlockchainBlock {
         }
 
     }
+
+    async importBlockFromHeader(json) {
+
+        this.version = json.version;
+        this.height = json.height;
+        this.hash = json.hash;
+        this.hashPrev = json.hashPrev;
+        this.data.hashData = json.data.hashPrev;
+        this.data.hashTransactions = json.data.hashTransactions;
+        this.nonce = json.nonce;
+        this.timeStamp = json.timeStamp;
+
+        //calculate Hash
+        this._computeBlockHeaderPrefix(true, true);
+        await this.computeHash();
+    }
+
 
 }
 

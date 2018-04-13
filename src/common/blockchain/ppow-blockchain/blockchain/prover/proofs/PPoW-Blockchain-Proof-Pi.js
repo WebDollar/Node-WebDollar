@@ -6,7 +6,6 @@ import PPoWBlockchainProofBasic from "./PPoW-Blockchain-Proof-Basic"
 
 class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
 
-
     /**
      * Returns ths upchain of current chain(C ↑ µ).
      */
@@ -77,6 +76,17 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
         }
     }
 
+
+    importProofHeaders(blocksHeaders){
+
+        blocksHeaders.forEach((blockHeader)=>{
+
+            let block = this.blockchain.blockCreator.createEmptyBlock(blockHeader.height);
+            block.import
+
+        });
+
+    }
 
 }
 

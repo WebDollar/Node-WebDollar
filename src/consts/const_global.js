@@ -185,14 +185,13 @@ consts.MINING_POOL = {
 
 
 
-
 consts.SETTINGS = {
 
     UUID: uuid.v4(),
 
     NODE: {
         VERSION: "0.288",
-        VERSION_COMPATIBILITY: "0.288",
+        VERSION_COMPATIBILITY: "0.28",
         PROTOCOL: "WebDollar",
         SSL: true,
 

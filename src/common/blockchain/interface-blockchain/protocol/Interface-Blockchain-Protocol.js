@@ -200,7 +200,7 @@ class InterfaceBlockchainProtocol {
                 } catch (exception) {
 
                     if (! (typeof exception === "object" && exception.message === "your block is not new, because I have the same block at same height"))
-                        console.error("Socket Error - blockchain/new-block-header", exception, data);
+                        console.error("Socket Error - blockchain/new-block-header", socket.node.sckAddress.addressString, exception, data);
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: false,
