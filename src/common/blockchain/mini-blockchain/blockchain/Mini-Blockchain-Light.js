@@ -389,15 +389,15 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         if (this.agent !== undefined && this.agent.light === true && height !== 0) {
 
-            if (this.blocks[height] !== undefined)
-                return this.blocks[height];
-            else if (this.proofPi.blocks[height])
+            if (this.proofPi !== null) {
+                let proofPiBlock = this.proofPi.hasBlock(height-1);
+                if (proofPiBlock !== null)
+                    return proofPiBlock;
+            }
 
-            if (this.proofPi.blocks[height] !== undefined )
-                return this.lightPrevDifficultyTargets[height];
         }
 
-        return MiniBlockchainAdvanced.prototype.getDifficultyTarget.call(this, height);
+        return MiniBlockchainAdvanced.prototype.getBlock.call(this, height);
     }
 
     getDifficultyTarget(height){

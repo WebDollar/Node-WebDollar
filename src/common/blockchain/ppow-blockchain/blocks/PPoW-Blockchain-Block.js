@@ -75,16 +75,17 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
     }
     
-    _validateInterlink() {
+    _validateInterlink(getBlockCallback) {
 
-
+        if (getBlockCallback === undefined)
+            getBlockCallback = this.blockchain.getBlock;
 
         //validate interlinks array
         let level = this.interlink.length-1;
         while (level >= 0){
 
             let link = this.interlink[level];
-            let linkedBlock = this.blockchain.blocks[link.height];
+            let linkedBlock = getBlockCallback(link.height+1);
 
             if (level !== 0) {
                 if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId))
@@ -206,7 +207,32 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
 
+    toJSON(){
+        let answer = InterfaceBlockchainBlock.prototype.toJSON.call(this);
+        answer.interlinks = [];
 
+        for (let i=0; i<this.interlink.length; i++)
+            answer.interlink.push({
+                height: this.interlink[i].height,
+                blockId: this.interlink[i].blockId,
+            })
+
+        return answer;
+    }
+
+    getBlockHeader(){
+
+        let answer = InterfaceBlockchainBlock.prototype.getBlockHeader.call(this);
+        answer.interlinks = [];
+
+        for (let i=0; i<this.interlink.length; i++)
+            answer.interlink.push({
+                height: this.interlink[i].height,
+                blockId: this.interlink[i].blockId,
+            })
+
+        return answer;
+    }
 
 }
 

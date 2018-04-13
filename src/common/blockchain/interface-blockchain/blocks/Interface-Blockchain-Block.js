@@ -373,14 +373,15 @@ class InterfaceBlockchainBlock {
 
         return {
 
+            version: this.version,
             hash: this.hash,
             hashPrev: this.hashPrev,
             data: {
                 hashData: this.data.hashData,
                 hashTransactions: this.data.hashTransactions,
             },
-
             nonce: this.nonce,
+            timeStamp: this.timeStamp,
         }
 
     }

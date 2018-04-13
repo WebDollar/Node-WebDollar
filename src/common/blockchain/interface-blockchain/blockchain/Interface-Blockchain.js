@@ -328,7 +328,7 @@ class InterfaceBlockchain {
 
                 let validationType = this._getLoadBlockchainValidationType(indexStart, i, numBlocks, onlyLastBlocks);
 
-                let blockValidation = new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
+                let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
 
                 await this._loadBlock(indexStart, i, blockValidation);
 
@@ -416,7 +416,7 @@ class InterfaceBlockchain {
     }
 
     createBlockValidation(){
-        return new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
+        return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
     }
 
 
