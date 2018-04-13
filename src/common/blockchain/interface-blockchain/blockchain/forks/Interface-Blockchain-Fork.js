@@ -35,6 +35,9 @@ class InterfaceBlockchainFork {
         this.forkChainLength = newChainLength||0;
         this.forkBlocks = [];
         this.forkHeader = header;
+        this.forkPromise = new Promise ((resolve)=>{
+            this._forkPromiseResolver = resolve;
+        });
 
         this._blocksCopy = [];
     }

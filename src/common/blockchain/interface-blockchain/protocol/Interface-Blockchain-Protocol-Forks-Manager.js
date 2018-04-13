@@ -27,6 +27,13 @@ class InterfaceBlockchainProtocolForksManager{
         if (newChainStartingPoint < 0 ) throw {message: "Incorrect2 newChainStartingPoint"};
         if (newChainStartingPoint > forkLastBlockHeader.height ) throw {message: "Incorrect3 newChainStartingPoint"};
 
+
+        let fork = this.blockchain.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+        if (fork.result)
+            return fork.forkPromise;
+        else
+            return false;
+
     }
 
     processForksQueue(){

@@ -197,7 +197,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         }
 
-        return {result: true };
+        return {result: true, fork:fork };
 
     }
 

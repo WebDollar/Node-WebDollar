@@ -1,6 +1,5 @@
 import MiniBlockchainAdvancedProtocol from "../Mini-Blockchain-Advanced-Protocol";
 import MiniBlockchainLightProtocolForkSolver from "./Mini-Blockchain-Light-Protocol-Fork-Solver"
-import consts from 'consts/const_global'
 
 class MiniBlockchainLightProtocol extends MiniBlockchainAdvancedProtocol{
 
@@ -15,6 +14,10 @@ class MiniBlockchainLightProtocol extends MiniBlockchainAdvancedProtocol{
 
         MiniBlockchainAdvancedProtocol.prototype._initializeNewSocket.call(this, nodesListObject);
 
+
+    }
+
+    _getBestFork(){
 
     }
 

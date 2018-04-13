@@ -7,7 +7,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         InterfaceBlockchainFork.prototype.initializeConstructor.call(this, blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header);
 
-        if (this.blockchain.light) {
+        if (this.blockchain.agent.light) {
 
             this.proofPi = null;
 

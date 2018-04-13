@@ -5,6 +5,9 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
     //will select the best
     _getBestFork(){
 
+        if (!this.blockchain.agent.light)
+            return InterfaceBlockchainProtocolForksManager.prototype._getBestFork.call(this);
+
         let bestFork = null;
 
         this.blockchain.forksAdministrator.forks.forEach((fork)=>{
@@ -14,7 +17,9 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
             if ( bestFork === null
                 || (fork.forkChainStartingPoint < fork.forkStartingHeight && bestFork.forkChainLength < fork.forkChainLength )) //it is a small fork that I already have the first forks, but I will download the remaning blocks
             {
+
                 bestFork = fork;
+
             } else
             if (bestFork.proofPi !== null && fork.proofPi !== null){
 

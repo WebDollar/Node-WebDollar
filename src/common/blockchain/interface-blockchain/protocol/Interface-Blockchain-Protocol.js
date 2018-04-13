@@ -1,6 +1,6 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
-import InterfaceBlockchainProtocolTipsManager from "./Interface-Blockchain-Protocol-Tips-Manager"
+import InterfaceBlockchainProtocolForksManager from "./Interface-Blockchain-Protocol-Forks-Manager"
 
 import Serialization from 'common/utils/Serialization';
 import NodeProtocol from 'common/sockets/protocol/node-protocol'
@@ -51,15 +51,15 @@ class InterfaceBlockchainProtocol {
             this._initializeNewSocket(NodesList.nodes[i]);
 
         this.createForkSolver();
-        this.createTipsManager();
+        this.createForksManager();
     }
 
     createForkSolver(){
         this.forkSolver = new InterfaceBlockchainProtocolForkSolver(this.blockchain, this);
     }
 
-    createTipsManager(){
-        this.tipsManager = new InterfaceBlockchainProtocolTipsManager(this.blockchain, this);
+    createForksManager(){
+        this.forksManager = new InterfaceBlockchainProtocolForksManager(this.blockchain, this);
     }
 
     propagateHeader(block,  socketsAvoidBroadcast){
@@ -187,9 +187,9 @@ class InterfaceBlockchainProtocol {
 
                     }
 
-                    console.log("blockchain/header/new-block discoverNewForkTip");
+                    console.log("blockchain/header/new-block newForkTip");
 
-                    let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
+                    let result = await this.forksManager.newForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
 
                     socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                         result: true,
@@ -329,7 +329,7 @@ class InterfaceBlockchainProtocol {
 
             }
 
-            let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
+            let result = await this.tipsManager.newForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
 
             socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                 result: true,

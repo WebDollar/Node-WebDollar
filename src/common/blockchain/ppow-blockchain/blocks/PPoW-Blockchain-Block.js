@@ -140,9 +140,9 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
             //optimize storage
             if (i > 0 && this.interlink[i-1].height === this.interlink[i].height){
-                list.push(Serialization.serializeNumber4Bytes(consts.SETTINGS.MAX_UINT32));
+                list.push(Serialization.serializeNumber3Bytes(0));
             } else {
-                let heightBuffer = Serialization.serializeNumber4Bytes(this.interlink[i].height + 1 );
+                let heightBuffer = Serialization.serializeNumber3Bytes(this.interlink[i].height + 2 );
                 let blockIdBuffer = this.interlink[i].blockId;
                 list.push(heightBuffer);
                 list.push(blockIdBuffer);
@@ -163,16 +163,16 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             this.interlink = [];
             for (let i = 0; i < numInterlink; ++i) {
 
-                let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
-                offset += 4;
+                let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 3 ) );
+                offset += 3;
 
-                if (height === consts.SETTINGS.MAX_UINT32) {
+                if (height === 0) {
                     this.interlink.push(this.interlink[i-1]);
                 } else {
                     let blockId = BufferExtended.substr(buffer, offset, 32);
                     offset += 32;
 
-                    this.interlink.push( {height: height - 1, blockId: blockId} );
+                    this.interlink.push( {height: height - 2, blockId: blockId} );
                 }
             }
 
@@ -193,13 +193,11 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
             offset = this._deserializeInterlink(buffer, offset);
 
-            this.difficultyTarget = difficultyTarget;
-
             this.level = this.getLevel();
 
         } catch (exception){
 
-            console.error("error deserialize a block  ", exception, buffer);
+            console.error("error deserialize a NiPoPoW block  ", exception, buffer);
             throw exception;
 
         }
