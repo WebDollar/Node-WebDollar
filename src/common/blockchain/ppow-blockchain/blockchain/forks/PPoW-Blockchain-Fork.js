@@ -21,7 +21,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             //importing Proof
             this.proofPi = new PPoWBlockchainProofPi([]);
-            this.proofPi.importProofHeaders(answer);
+            this.proofPi.importProofHeaders( answer );
 
             this.proofPi.validateProof();
 

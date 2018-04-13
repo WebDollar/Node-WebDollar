@@ -3,16 +3,15 @@ import InterfaceBlockchainProtocolForksManager from "common/blockchain/interface
 class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolForksManager {
 
     //will select the best
-    _getBestFork(){
+    async _getBestFork(){
 
         if (!this.blockchain.agent.light)
             return InterfaceBlockchainProtocolForksManager.prototype._getBestFork.call(this);
 
         let bestFork = null;
 
-        this.blockchain.forksAdministrator.forks.forEach((fork)=>{
-
-
+        for (let i=0; i<this.blockchain.forksAdministrator.forks.length; i++){
+            let fork = this.blockchain.forksAdministrator.forks[i];
 
             if ( bestFork === null
                 || (fork.forkChainStartingPoint < fork.forkStartingHeight && bestFork.forkChainLength < fork.forkChainLength )) //it is a small fork that I already have the first forks, but I will download the remaning blocks
@@ -23,7 +22,7 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
             } else
             if (bestFork.proofPi !== null && fork.proofPi !== null){
 
-                let compare = this.blockchain.verifier.compareProofs(bestFork.proofPi, bestFork.proofPi);
+                let compare = await this.blockchain.verifier.compareProofs(bestFork.proofPi, bestFork.proofPi);
 
                 if (compare < 0 //better proof
                     || (compare === 0 && bestFork.forkChainLength < fork.forkChainLength) ){
@@ -34,12 +33,11 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
 
             }
 
-        });
-
+        }
 
         return bestFork;
     }
 
 }
 
-export default PPoWBlockchainProtocolForksManager();
+export default PPoWBlockchainProtocolForksManager;

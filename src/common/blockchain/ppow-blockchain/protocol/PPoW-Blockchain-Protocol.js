@@ -1,7 +1,12 @@
 import InterfaceBlockchainProtocol from "common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol"
 import PPoWBlockchainProofPi from "./../blockchain/prover/PPoW-Blockchain-Prover"
+import PPoWBlockchainProtocolForksManager from "./PPoW-Blockchain-Protocol-Forks-Manager"
 
 class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
+
+    createForksManager(){
+        this.forksManager = new PPoWBlockchainProtocolForksManager( this.blockchain, this );
+    }
 
     _initializeNewSocket(nodesListObject) {
 

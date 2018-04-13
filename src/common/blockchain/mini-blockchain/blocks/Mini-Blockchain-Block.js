@@ -13,11 +13,18 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     getBlockHeader(){
 
-        let result = inheritBlockchainBlock.prototype.getBlockHeader.call(this);
+        let json = inheritBlockchainBlock.prototype.getBlockHeader.call(this);
 
-        result.data.hashAccountantTree = this.data.hashAccountantTree;
+        json.data.hashAccountantTree = this.data.hashAccountantTree;
 
-        return result;
+        return json;
+    }
+
+    importBlockFromHeader(json){
+
+        this.data.hashAccountantTree = json.data.hashAccountantTree;
+
+        inheritBlockchainBlock.prototype.importBlockFromHeader.call(json);
     }
 
 }

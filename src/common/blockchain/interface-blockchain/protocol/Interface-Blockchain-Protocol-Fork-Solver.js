@@ -171,7 +171,6 @@ class InterfaceBlockchainProtocolForkSolver{
                         return forkFound;
 
                     //maximum blocks to download
-                    let forkChainLength = forkChainLength;
                     if (!this.blockchain.agent.light)
                         forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
 

@@ -1,8 +1,9 @@
 class InterfaceBlockchainProtocolForksManager{
 
-    constructor(blockchain){
+    constructor(blockchain, protocol){
 
         this.blockchain = blockchain;
+        this.protocol = protocol;
 
         this.processForksQueue();
     }
@@ -10,7 +11,7 @@ class InterfaceBlockchainProtocolForksManager{
     /*
         may the fork2 be with you Otto
     */
-    newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader){
+    async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader){
 
         if (typeof newChainLength !== "number") throw {message: "newChainLength is not a number"};
         if (typeof newChainStartingPoint !== "number") throw {message: "newChainStartingPoint is not a number"};
@@ -28,7 +29,7 @@ class InterfaceBlockchainProtocolForksManager{
         if (newChainStartingPoint > forkLastBlockHeader.height ) throw {message: "Incorrect3 newChainStartingPoint"};
 
 
-        let fork = this.blockchain.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+        let fork = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
         if (fork.result)
             return fork.forkPromise;
         else
@@ -36,13 +37,31 @@ class InterfaceBlockchainProtocolForksManager{
 
     }
 
-    processForksQueue(){
+    async processForksQueue(){
 
-        let bestFork = this._getBestFork();
+        let bestFork = await this._getBestFork();
 
-        this.blockchain.
+        if (bestFork !== null) {
 
-        setTimeout( this.processTipsQueue.bind(this), 200 );
+            let answer = {};
+            try {
+
+                answer = await this.protocol.forkSolver.processFork(bestFork);
+
+            } catch (exception) {
+
+                console.error("processForksQueue returned an error", exception);
+                answer = {result: false};
+
+            }
+
+
+            if (answer.result === false){
+                console.warn("BANNNNNNNNNNNNNNNNN", answer.message);
+            }
+        }
+
+        setTimeout( this.processForksQueue.bind(this), 200 );
     }
 
 

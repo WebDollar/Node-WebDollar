@@ -329,7 +329,7 @@ class InterfaceBlockchainProtocol {
 
             }
 
-            let result = await this.tipsManager.newForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
+            let result = await this.forksManager.newForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
 
             socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
                 result: true,

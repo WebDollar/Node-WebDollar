@@ -58,7 +58,7 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
             }
 
         if (first === -1 || last === -1)
-            return null;
+            return new PPowBlockchainProofPi([]);
         else {
 
             let newUnderlyingChain = new PPowBlockchainProofPi([]);
@@ -77,14 +77,14 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
     }
 
 
-    importProofHeaders(blocksHeaders){
+    async importProofHeaders(blocksHeader){
 
-        blocksHeaders.forEach((blockHeader)=>{
+        for (let i=0; i<blocksHeader.length; i++){
 
-            let block = this.blockchain.blockCreator.createEmptyBlock(blockHeader.height);
-            block.import
+            let block = this.blockchain.blockCreator.createEmptyBlock( blocksHeader[i].height );
+            await block.importBlockFromHeader( blocksHeader[i] );
 
-        });
+        }
 
     }
 

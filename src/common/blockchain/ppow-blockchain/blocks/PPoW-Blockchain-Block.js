@@ -40,7 +40,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             ++u;
             pow = pow.multiply(2);
         }
-        --u;
+        --u
         console.log('L=', u);
         console.log('P=', id.multiply(1 << u).toString());
 
@@ -75,17 +75,14 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
     }
     
-    _validateInterlink(getBlockCallback) {
-
-        if (getBlockCallback === undefined)
-            getBlockCallback = this.blockchain.getBlock;
+    _validateInterlink() {
 
         //validate interlinks array
         let level = this.interlink.length-1;
         while (level >= 0){
 
             let link = this.interlink[level];
-            let linkedBlock = getBlockCallback(link.height+1);
+            let linkedBlock = this.blockValidation.getBlockCallBack(link.height+1);
 
             if (level !== 0) {
                 if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId))
@@ -100,7 +97,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
             } else {
 
-                if (linkedBlock !== undefined || this.interlink[0].height !== -1 || ! BufferExtended.safeCompare(this.interlink[0].blockId, BlockchainGenesis.hashPrev))
+                if (linkedBlock !== BlockchainGenesis || this.interlink[0].height !== -1 || ! BufferExtended.safeCompare(this.interlink[0].blockId, BlockchainGenesis.hashPrev))
                     throw {message: "Interlink to Genesis is wrong! "}
 
             }
