@@ -48,17 +48,16 @@ class InterfaceBlockchainProtocolForksManager{
 
                 answer = await this.protocol.forkSolver.processFork(bestFork);
 
+                if (answer)
+                    this.blockchain.forksAdministrator.deleteFork(bestFork);
+
             } catch (exception) {
 
                 console.error("processForksQueue returned an error", exception);
-                answer = {result: false};
-
-            }
-
-
-            if (answer.result === false){
                 console.warn("BANNNNNNNNNNNNNNNNN", answer.message);
+
             }
+
         }
 
         setTimeout( this.processForksQueue.bind(this), 200 );

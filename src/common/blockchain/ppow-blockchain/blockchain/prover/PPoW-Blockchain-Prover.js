@@ -2,7 +2,6 @@ import consts from 'consts/const_global'
 import PPoWHelper from '../helpers/PPoW-Helper'
 import PPowBlockchainProofPi from './proofs/PPoW-Blockchain-Proof-Pi'
 import PPowBlockchainProofXi from './proofs/PPoW-Blockchain-Proof-Xi'
-import PPoWBlockchainVerifier from "./../verifier/PPoW-Blockchain-Verifier"
 
 class PPoWBlockchainProver{
 
@@ -28,7 +27,7 @@ class PPoWBlockchainProver{
         // π is underlyingChain
 
 
-        let underlyingChain = new PPowBlockchainProofPi([]);
+        let underlyingChain = new PPowBlockchainProofPi(this.blockchain, []);
 
         let chainLength =  chain.blocks.length;
 
@@ -40,7 +39,7 @@ class PPoWBlockchainProver{
 
                     //  α ← C[: −k]{B :}↑µ
                     //  α is superChain
-                    let superChain = new PPowBlockchainProofPi([]);
+                    let superChain = new PPowBlockchainProofPi(this.blockchain, []);
 
                     for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
                         if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
@@ -95,7 +94,7 @@ class PPoWBlockchainProver{
             if (i >= 0)
                 blocks.push(chain.blocks[i]);
 
-        let proofXi = new PPowBlockchainProofXi( blocks );
+        let proofXi = new PPowBlockchainProofXi( this.blockchain, blocks );
 
         return proofXi;
     }

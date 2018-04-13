@@ -150,7 +150,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            console.warn("discoverFork 7777" , binarySearchResult);
+            //console.warn("discoverFork 7777" , binarySearchResult);
 
             //process light and NiPoPow
             await this.optionalProcess(socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint);
@@ -213,6 +213,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if (! (await this._solveFork(fork) ))
                 throw "Fork Solved was failed"
+
+            return true;
 
         } catch (exception){
 
@@ -324,7 +326,6 @@ class InterfaceBlockchainProtocolForkSolver{
             console.error("solveFork raised an exception", exception);
             return false;
 
-
         }
 
     }
@@ -340,7 +341,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
                 block.data._onlyHeader = true; //avoiding to store the transactions
 
-            block.deserializeBlock( blockData, blockHeight, BlockchainMiningReward.getReward(block.height), fork.getForkDifficultyTarget(block.height)  );
+            block.deserializeBlock( blockData, blockHeight, BlockchainMiningReward.getReward(block.height), fork.getForkDifficultyTarget(block.height), fork.getForkDifficultyTarget(block.height-1)  );
 
         } catch (Exception) {
             console.error("Error deserializing blocks ", Exception, blockData);

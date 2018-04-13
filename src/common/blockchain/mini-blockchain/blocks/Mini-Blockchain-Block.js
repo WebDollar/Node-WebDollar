@@ -24,7 +24,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
         this.data.hashAccountantTree = json.data.hashAccountantTree;
 
-        inheritBlockchainBlock.prototype.importBlockFromHeader.call(json);
+        return inheritBlockchainBlock.prototype.importBlockFromHeader.call(this, json);
     }
 
 }

@@ -17,7 +17,7 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
             if (miu <= this.blocks[i].level)
                 list.push(this.blocks[i]);
 
-        return new PPowBlockchainProofPi(list);
+        return new PPowBlockchainProofPi(this.blockchain, list);
     }
 
     /**
@@ -31,7 +31,7 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
             if (this.blocks[i].level <= miu)
                 list.push(this.blocks[i]);
 
-        return new PPowBlockchainProofPi(list);
+        return new PPowBlockchainProofPi(this.blockchain, list);
     }
 
     /**
@@ -58,10 +58,10 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
             }
 
         if (first === -1 || last === -1)
-            return new PPowBlockchainProofPi([]);
+            return new PPowBlockchainProofPi(this.blockchain, []);
         else {
 
-            let newUnderlyingChain = new PPowBlockchainProofPi([]);
+            let newUnderlyingChain = new PPowBlockchainProofPi(this.blockchain, []);
 
             if (last < first){
                 let aux = last;
@@ -74,18 +74,6 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
 
             return newUnderlyingChain;
         }
-    }
-
-
-    async importProofHeaders(blocksHeader){
-
-        for (let i=0; i<blocksHeader.length; i++){
-
-            let block = this.blockchain.blockCreator.createEmptyBlock( blocksHeader[i].height );
-            await block.importBlockFromHeader( blocksHeader[i] );
-
-        }
-
     }
 
 }

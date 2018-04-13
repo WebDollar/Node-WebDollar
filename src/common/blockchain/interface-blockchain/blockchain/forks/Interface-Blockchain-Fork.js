@@ -97,7 +97,7 @@ class InterfaceBlockchainFork {
 
         let forkHeight = height - this.forkStartingHeight;
 
-        if (height === 0)
+        if (height <= 0)
             return BlockchainGenesis; // based on genesis block
         else if ( forkHeight === 0)
             return this.blockchain.getBlock(height);

@@ -24,10 +24,13 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         if (!computeLevel && this.level !== undefined)
             return this.level;
 
-        let T = this.difficultyTarget;
+        //we use difficultyTargetPrev instead of current difficultyTarget
+        let T = this.difficultyTargetPrev;
+        if (this.height === 0)
+            T = BlockchainGenesis.difficultyTarget;
 
         if (Buffer.isBuffer(T))
-            T = Convert.bufferToBigIntegerHex(this.difficultyTarget);
+            T = Convert.bufferToBigIntegerHex(T);
 
         let id = Convert.bufferToBigIntegerHex(this.hash);
         
@@ -40,9 +43,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             ++u;
             pow = pow.multiply(2);
         }
-        --u
-        console.log('L=', u);
-        console.log('P=', id.multiply(1 << u).toString());
+        --u;
+        
+        //console.log('L=', u);
+        //console.log('P=', id.multiply(1 << u).toString());
 
         return u;
     }
@@ -115,13 +119,13 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return this._validateInterlink();
     }
 
-    _computeBlockHeaderPrefix(skipPrefix){
+    _computeBlockHeaderPrefix(skipPrefix, requestHeader){
 
         if (skipPrefix === true && Buffer.isBuffer(this.computedBlockPrefix) )
             return this.computedBlockPrefix;
 
         this.computedBlockPrefix = Buffer.concat ( [
-            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, false),
+            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, false, requestHeader),
             this._serializeInterlink(),
         ]);
 
@@ -181,10 +185,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
     
-    deserializeBlock(buffer, height, reward, difficultyTarget, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, difficultyTargetPrev, offset){
 
 
-        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTarget, offset);
+        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTarget, difficultyTarget, offset);
 
         try {
 
@@ -231,11 +235,11 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return answer;
     }
 
-    async importBlockFromHeader(json){
+    importBlockFromHeader(json){
 
         this.interlink = this._interlinksToJSON(json.interlinks);
 
-        await InterfaceBlockchainBlock.prototype.importBlockFromHeader.call(this, json);
+        return InterfaceBlockchainBlock.prototype.importBlockFromHeader.call(this, json);
 
     }
 

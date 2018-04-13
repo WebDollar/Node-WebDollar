@@ -49,6 +49,9 @@ class InterfaceBlockchainBlock {
 
         this.reward = undefined;
 
+        if (blockValidation === undefined)
+            blockValidation = this.blockchain.createBlockValidation();
+
         this.blockValidation = blockValidation;
 
         this.db = db;
@@ -247,7 +250,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, difficultyTargetPrev, offset){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -256,6 +259,7 @@ class InterfaceBlockchainBlock {
         if (height !== undefined)  this.height = height;
         if (reward !== undefined) this.reward = reward;
         if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
+        if (difficultyTargetPrev !== undefined) this.difficultyTargetPrev = difficultyTargetPrev;
         if (offset === undefined) offset = 0;
 
         if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
@@ -326,7 +330,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height) );
+            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height), this.blockValidation.getDifficultyCallback(this.height-1) );
 
             return true;
         }
@@ -379,10 +383,10 @@ class InterfaceBlockchainBlock {
             hashPrev: this.hashPrev,
             data: {
                 hashData: this.data.hashData,
-                hashTransactions: this.data.hashTransactions,
             },
             nonce: this.nonce,
             timeStamp: this.timeStamp,
+            difficultyTargetPrev: this.difficultyTargetPrev,
         }
 
     }
@@ -393,10 +397,10 @@ class InterfaceBlockchainBlock {
         this.height = json.height;
         this.hash = json.hash;
         this.hashPrev = json.hashPrev;
-        this.data.hashData = json.data.hashPrev;
-        this.data.hashTransactions = json.data.hashTransactions;
+        this.data.hashData = json.data.hashData;
         this.nonce = json.nonce;
         this.timeStamp = json.timeStamp;
+        this.difficultyTargetPrev = json.difficultyTargetPrev;
 
         //calculate Hash
         this._computeBlockHeaderPrefix(true, true);
