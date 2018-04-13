@@ -250,7 +250,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, difficultyTargetPrev, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, offset){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -259,7 +259,6 @@ class InterfaceBlockchainBlock {
         if (height !== undefined)  this.height = height;
         if (reward !== undefined) this.reward = reward;
         if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
-        if (difficultyTargetPrev !== undefined) this.difficultyTargetPrev = difficultyTargetPrev;
         if (offset === undefined) offset = 0;
 
         if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
@@ -330,7 +329,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height), this.blockValidation.getDifficultyCallback(this.height-1) );
+            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height) );
 
             return true;
         }

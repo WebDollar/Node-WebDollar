@@ -29,9 +29,9 @@ class InterfaceBlockchainProtocolForksManager{
         if (newChainStartingPoint > forkLastBlockHeader.height ) throw {message: "Incorrect3 newChainStartingPoint"};
 
 
-        let fork = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
-        if (fork.result)
-            return fork.forkPromise;
+        let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+        if (answer.result)
+            return answer.fork.forkPromise;
         else
             return false;
 

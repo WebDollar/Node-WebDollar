@@ -25,7 +25,9 @@ class PPoWBlockchain extends InterfaceBlockchain {
         block.updateInterlink(prevBlock);
         block.level = block.getLevel(); //computing the level
 
-        this.prover.createProofs();
+        //TODO even light agents should be able to generate proofs
+        if (!this.agent.light)
+            this.prover.createProofs();
 
     }
 

@@ -25,7 +25,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             return this.level;
 
         //we use difficultyTargetPrev instead of current difficultyTarget
-        let T = this.difficultyTargetPrev;
+        let T = this.difficultyTarget;
+
         if (this.height === 0)
             T = BlockchainGenesis.difficultyTarget;
 
@@ -185,10 +186,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
     
-    deserializeBlock(buffer, height, reward, difficultyTarget, difficultyTargetPrev, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, offset){
 
 
-        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTarget, difficultyTarget, offset);
+        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTarget, offset);
 
         try {
 

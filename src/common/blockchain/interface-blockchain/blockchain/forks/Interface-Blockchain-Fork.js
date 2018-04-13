@@ -282,6 +282,9 @@ class InterfaceBlockchainFork {
 
             await this.postForkTransactions(forkedSuccessfully);
 
+            if (forkedSuccessfully)
+                this._forkPromiseResolver(true);
+
             return forkedSuccessfully;
         });
 
