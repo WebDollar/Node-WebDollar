@@ -49,24 +49,29 @@ class BlockchainMiningReward{
 
         let blocksPerCycle = 6307200;
 
-        if (height > 0){
 
-            if (height <= 40) {
-                return WebDollarCoins.WEBD * Math.trunc( 1949770302 / Math.pow(1.01645589, 41.5 * height - height * height / 2 - 41) );
-            }
-            else {
+        if (height <= 40) {
 
-                let cycleNumber = Math.trunc( height / blocksPerCycle );
-                let reward = WebDollarCoins.WEBD * 3000 / (1 << cycleNumber);
-                let smallestReward = 1;
+            //return WebDollarCoins.WEBD * Math.trunc( 1949770302 / Math.pow(1.01645589, 41.5 * height - height * height / 2 - 41) );
 
-                if (reward < smallestReward)
-                    reward = smallestReward;
+            let v = [1, 1949770302, 1014943763, 537018249, 288818259, 157887877, 87732693, 49552169, 28448044,
+                16600864, 9846854, 5936806, 3638285, 2266361, 1434994, 923548, 604168, 401739, 271531, 186544,
+                130267, 92464, 66712, 48924, 36469, 27632, 21281, 16660, 13256, 10722, 8815, 7366, 6257, 5402,
+                4740, 4229, 3834, 3534, 3310, 3152, 3051];
 
-                return reward;
-            }
+            return v[height] * WebDollarCoins.WEBD;
+        }
+        else {
 
-        } else return  WebDollarCoins.WEBD * 1;
+            let cycleNumber = Math.trunc( height / blocksPerCycle );
+            let reward = WebDollarCoins.WEBD * 3000 / (1 << cycleNumber);
+            let smallestReward = 1;
+
+            if (reward < smallestReward)
+                reward = smallestReward;
+
+            return reward;
+        }
 
     }
     
