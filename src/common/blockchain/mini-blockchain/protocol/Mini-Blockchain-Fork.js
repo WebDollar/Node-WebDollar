@@ -68,6 +68,8 @@ class MiniBlockchainFork extends inheritFork{
 
         }
 
+        return inheritFork.prototype.preFork.call(this, revertActions);
+
     }
 
     revertFork(){
@@ -76,7 +78,7 @@ class MiniBlockchainFork extends inheritFork{
         if (this._accountantTreeClone !== null)
             this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
 
-        inheritFork.prototype.revertFork.call(this);
+        return inheritFork.prototype.revertFork.call(this);
 
     }
 

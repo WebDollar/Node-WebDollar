@@ -63,7 +63,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
     }
 
     async _validateFork(validateHashesAgain){
-        
+
         await this._validateProofXi();
 
         return await InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
@@ -99,7 +99,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             this._forkProofPiClone = this.blockchain.proofPi;
         }
 
-        InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
+        return InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
 
     }
 
@@ -109,7 +109,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             this.blockchain.proofPi = this.forkProofPi;
         }
 
-        InterfaceBlockchainFork.prototype.preFork.call(this, revertActions);
+        return InterfaceBlockchainFork.prototype.preFork.call(this, revertActions);
     }
 
     revertFork(){
@@ -118,7 +118,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             this.blockchain.proofPi = this._forkProofPiClone;
         }
 
-        InterfaceBlockchainFork.prototype.revertFork.call(this);
+        return InterfaceBlockchainFork.prototype.revertFork.call(this);
 
     }
 
