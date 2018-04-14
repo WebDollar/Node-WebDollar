@@ -143,8 +143,8 @@ class PPoWHelper{
             return false;
 
 
-        if (this._multilevelQuality(underlyingChain, superChain, miu) === false)
-            return false;
+        // if (this._multilevelQuality(underlyingChain, superChain, miu) === false)
+        //     return false;
 
         return true;
     }
