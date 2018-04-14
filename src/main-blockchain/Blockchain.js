@@ -8,6 +8,7 @@ import ValidationsUtils from "common/utils/validation/Validations-Utils";
 import NodesList from 'node/lists/nodes-list';
 import StatusEvents from "common/events/Status-Events";
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist';
+import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 
 class Blockchain{
 
@@ -100,6 +101,14 @@ class Blockchain{
     async initializeBlockchain(initializationCallback){
 
         await this.loadWallet();
+
+        if (process.env.BROWSER) { //let's make a hash first
+
+            StatusEvents.emit('blockchain/status', {message: "Loading Hashing Function"});
+            await WebDollarCrypto.hashPOW(Buffer(32));
+            StatusEvents.emit('blockchain/status', {message: "Successfully Hash Function Loaded"});
+
+        }
 
         //loading the blockchain
         let blockchainLoaded = await this.loadBlockchain();

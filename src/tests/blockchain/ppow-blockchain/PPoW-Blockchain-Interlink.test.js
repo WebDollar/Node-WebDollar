@@ -7,7 +7,7 @@ import MiniBlockcain from 'common/blockchain/mini-blockchain/blockchain/Mini-Blo
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import consts from 'consts/const_global'
-import WebDollarCrypto from "../../../common/crypto/WebDollar-Crypto";
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 
 describe('test PPoW-Blockchain interlink data structure', () => {
 

@@ -1,4 +1,5 @@
 import BansList from "common/utils/bans/BansList"
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 
 class InterfaceBlockchainProtocolForksManager {
 
@@ -6,6 +7,7 @@ class InterfaceBlockchainProtocolForksManager {
 
         this.blockchain = blockchain;
         this.protocol = protocol;
+
 
         this.processForksQueue();
     }

@@ -58,10 +58,10 @@ consts.MINI_BLOCKCHAIN = {
 consts.POPOW_PARAMS={
     m: 40, //length proof Pi for validating the Genesis
 
-    k: 40, //length proof Xi for Accountant Tree
-    k1: 40, //length
+    k: 6, //length proof Xi for Accountant Tree
+    k1: 6, //length
 
-    d: 0.1,
+    d: 0.5,
 
     ACTIVATED : true,
 };
@@ -230,7 +230,7 @@ consts.SETTINGS = {
         CONNECTIONS:{
 
             SOCKETS: {
-                MAXIMUM_CONNECTIONS_IN_BROWSER: 2,
+                MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
                 MAXIMUM_CONNECTIONS_IN_TERMINAL: 3,
             },
 
