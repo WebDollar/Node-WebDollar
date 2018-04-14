@@ -88,14 +88,15 @@ class InterfaceBlockchainForksAdministrator {
 
     _findForkyByHeader(header){
 
-        if (header.hash === null || header.hash === undefined)
+        if (header === null || header === undefined || header.hash === null || header.hash === undefined)
             return null;
 
         for (let i = 0; i < this.forks.length; i++)
+            if (this.forks[i] !== null)
             for (let j=0; j<this.forks[i].forkHeaders.length; j++) {
 
                 if (this.forks[i].forkHeaders[j] !== null && this.forks[i].forkHeaders[j].hash !== undefined && this.forks[i].forkHeaders[j].hash !== null &&
-                    (this.forks[i].forkHeaders[j] === header || BufferExtended.safeCompare(this.forks[i].forkHeaders[j].hash, header.hash)))
+                    BufferExtended.safeCompare(this.forks[i].forkHeaders[j].hash, header.hash))
                     return this.forks[i];
             }
 
