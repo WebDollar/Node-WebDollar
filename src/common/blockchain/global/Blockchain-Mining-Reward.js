@@ -10,7 +10,7 @@ class BlockchainMiningReward{
         if (typeof height !== "number")
             throw ('height is not defined');
         
-        let entireGenesis = 4156801540; //4156801128;
+        let entireGenesis = 4156801127;
         let minedDistributionAfterCycle = [0, 
             18921600000, 28382400000, 33112800000, 35478000000, 36660600000, 37251900000,
             37547550000, 37695375000, 37769287500, 37806243750, 37824721875, 37833960938,
