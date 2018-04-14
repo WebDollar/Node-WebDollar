@@ -1,7 +1,7 @@
 const uuid = require('uuid');
 
 let consts = {
-    DEBUG: true,
+    DEBUG: false,
 };
 
 consts.BLOCKCHAIN = {
