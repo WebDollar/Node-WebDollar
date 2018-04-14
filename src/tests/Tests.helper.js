@@ -198,7 +198,7 @@ class TestsHelper {
         return result;
     }
 
-    generateAddresses(count){
+    generateAddresses(count, onlyAddress = true){
 
         let list = [];
 
@@ -212,8 +212,13 @@ class TestsHelper {
                     break;
                 }
 
-            if (!found)
-                list.push(address.address);
+            if (!found){
+                if (onlyAddress)
+                    list.push(address.address);
+                else
+                    list.push(address);
+                
+            }
         }
 
         return list;

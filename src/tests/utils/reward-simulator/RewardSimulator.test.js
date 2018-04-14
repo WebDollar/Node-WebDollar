@@ -52,7 +52,7 @@ describe('RewardSimulator', () => {
         let reward = 0;
         let smallestReward = 0.0001;
         let BPC = 6307200;
-        for (let height = 0; height < BPC; height += 1024) {
+        for (let height = 41; height < BPC; height += 1024) {
             reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
             assert(reward === 3000, "Wrong reward for bock " + height + ": " + reward.toString() + "!==3000");
         }
