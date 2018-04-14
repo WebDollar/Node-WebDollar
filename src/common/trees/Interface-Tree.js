@@ -13,7 +13,7 @@ class InterfaceTree{
     }
 
     createRoot(){
-        this.root = new InterfaceTreeNode(null, null, null, [], null);
+        this.root = new InterfaceTreeNode(null, null,  [], null);
         this.root.root = this.root;
     }
 

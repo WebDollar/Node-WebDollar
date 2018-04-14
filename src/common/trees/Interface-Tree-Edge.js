@@ -13,7 +13,6 @@ class InterfaceTreeEdge {
             throw {message: "Target Node is not a Node"};
 
         this.targetNode = targetNode;
-        this.targetNode.parentEdge = this;
 
     }
 

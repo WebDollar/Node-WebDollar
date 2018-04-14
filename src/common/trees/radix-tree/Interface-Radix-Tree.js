@@ -21,7 +21,7 @@ import BufferExtended from "common/utils/BufferExtended"
 class InterfaceRadixTree extends InterfaceTree{
 
     createRoot(){
-        this.root = new InterfaceRadixTreeNode(null, null,null, [], null);
+        this.root = new InterfaceRadixTreeNode(null, null, [], null);
         this.root.root = this.root;
     }
 
@@ -272,7 +272,6 @@ class InterfaceRadixTree extends InterfaceTree{
                                     grandParent.edges[i].targetNode = node;
 
                                     node.parent = grandParent;
-                                    node.parentEdge = grandParent.edges[i];
 
                                     // it is not necessary its parent
                                     //console.log("this._changedNode 1_2");
