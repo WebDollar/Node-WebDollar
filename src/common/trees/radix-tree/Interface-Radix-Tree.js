@@ -80,7 +80,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = nodeCurrent.createNewNode( nodeCurrent, undefined, [], value);
+                                nodeMatch = nodeCurrent.createNewNode( nodeCurrent, [], value);
                                 nodeCurrent.edges.push( this.root.createNewEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
@@ -94,7 +94,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = nodeCurrent.createNewNode( nodeCurrent, undefined, [], null);
+                                nodeMatch = nodeCurrent.createNewNode( nodeCurrent,  [], null);
                                 nodeCurrent.edges.push( this.root.createNewEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
@@ -102,7 +102,7 @@ class InterfaceRadixTree extends InterfaceTree{
                                 edge.targetNode.parent = nodeMatch;
 
                                 // Adding thew new nodeChild with current Value
-                                let nodeChild = nodeMatch.createNewNode( nodeMatch, undefined, [], value);
+                                let nodeChild = nodeMatch.createNewNode( nodeMatch, [], value);
                                 nodeMatch.edges.push( this.root.createNewEdge(BufferExtended.substr(input, i+match.length), nodeChild));
 
                                 nodeCurrent = nodeChild;
@@ -152,7 +152,7 @@ class InterfaceRadixTree extends InterfaceTree{
 
                 // no more Children...
 
-                let nodeChild = nodeCurrent.createNewNode(nodeCurrent, undefined, [], value);
+                let nodeChild = nodeCurrent.createNewNode(nodeCurrent,  [], value);
                 nodeCurrent.edges.push( this.root.createNewEdge( BufferExtended.substr(input, i), nodeChild ));
 
                 //console.log("nodeChild2", nodeChild)

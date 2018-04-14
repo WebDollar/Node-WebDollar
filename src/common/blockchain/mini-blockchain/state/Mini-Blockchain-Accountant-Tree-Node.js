@@ -359,6 +359,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     isLeaf(){
         return this.balances !== undefined
+        //return this.isLeafBasedOnParents();
     }
 
     isLeafBasedOnParents(){
@@ -373,6 +374,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                         count += node.parent.edges[i].label.length;
                         break;
                     }
+
 
             node = node.parent;
         }
