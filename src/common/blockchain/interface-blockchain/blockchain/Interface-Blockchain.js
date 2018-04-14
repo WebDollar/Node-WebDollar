@@ -119,11 +119,10 @@ class InterfaceBlockchain {
             this.propagateBlocks(block.height, socketsAvoidBroadcast)
         }
 
+        this._onBlockCreated(block,  saveBlock);
 
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
             this.mining.resetMining();
-
-        this._onBlockCreated(block,  saveBlock);
 
         return true;
     }

@@ -40,7 +40,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
     }
 
     //light validation Proof Xi
-    async _validateProofXi(){
+    _validateProofXi(){
         
         if (!this.blockchain.agent.light) return true;
         if (this.forkChainStartingPoint !== this.forkStartingHeight || this.forkProofPi === null) return true;
@@ -62,11 +62,11 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     }
 
-    async _validateFork(validateHashesAgain){
+    _validateFork(validateHashesAgain){
 
-        await this._validateProofXi();
+        this._validateProofXi();
 
-        return await InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
+        return InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
 
     }
 

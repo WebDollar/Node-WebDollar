@@ -259,8 +259,6 @@ class InterfaceBlockchainFork {
                 //successfully, let's delete the backup blocks
                 this._deleteBackupBlocks();
 
-                this.blockchain.mining.resetMining();
-
             } catch (exception){
 
                 console.error('-----------------------------------------');
@@ -283,8 +281,10 @@ class InterfaceBlockchainFork {
 
             await this.postForkTransactions(forkedSuccessfully);
 
-            if (forkedSuccessfully)
-                this._forkPromiseResolver(true);
+            if (forkedSuccessfully) {
+                this.blockchain.mining.resetMining();
+                setTimeout( ()=>{ this._forkPromiseResolver(true) } , 10 ); //making it async
+            }
 
             return forkedSuccessfully;
         });
@@ -328,7 +328,7 @@ class InterfaceBlockchainFork {
     async revertFork(){
         try {
 
-            for (let i=0; i<this._blocksCopy; i++)
+            for (let i=0; i<this._blocksCopy.length; i++)
                 if (! (await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], false, "all", false))) {
 
                     console.error("----------------------------------------------------------");

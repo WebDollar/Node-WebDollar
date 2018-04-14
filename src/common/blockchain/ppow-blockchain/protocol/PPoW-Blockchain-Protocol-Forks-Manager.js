@@ -17,8 +17,7 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
 
                 fork = this.blockchain.forksAdministrator.forks[i];
 
-                if (bestFork === null
-                    || (fork.forkChainStartingPoint < fork.forkStartingHeight && bestFork.forkChainLength < fork.forkChainLength )) //it is a small fork that I already have the first forks, but I will download the remaning blocks
+                if (fork.forkChainStartingPoint < fork.forkStartingHeight && (bestFork === null || bestFork.forkChainLength < fork.forkChainLength) ) //it is a small fork that I already have the first forks, but I will download the remaning blocks
                 {
 
                     bestFork = fork;

@@ -16,7 +16,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         //first pointer is to Genesis
         this.interlink = [{height: -1, blockId: BlockchainGenesis.hashPrev}];
-        this.level = 0;
+        this.level = undefined;
     }
 
     getLevel(computeLevel = true){
@@ -64,7 +64,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 this.interlink[i] = prevBlock.interlink[i];
             blockLevel = prevBlock.getLevel(false);
         }
-        this.level = blockLevel
+        this.level = blockLevel;
 
         //add new interlinks for current block
         //Every block of level u needs a pointer to the previous block with level <= u.
@@ -115,7 +115,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return true;
     }
     
-    async _supplementaryValidation() {
+    _supplementaryValidation() {
         
         return this._validateInterlink();
     }
