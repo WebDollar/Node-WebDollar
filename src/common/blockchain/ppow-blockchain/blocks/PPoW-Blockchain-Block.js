@@ -62,7 +62,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         if (prevBlock) {
             for (let i = 0; i < prevBlock.interlink.length; ++i)
                 this.interlink[i] = prevBlock.interlink[i];
-            blockLevel = prevBlock.getLevel();
+            blockLevel = prevBlock.getLevel(false);
         }
         this.level = blockLevel
 
@@ -93,7 +93,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId))
                     throw {message: "Interlink to Genesis is wrong! "};
 
-                let linkedBlockLevel = linkedBlock.getLevel();
+                let linkedBlockLevel = linkedBlock.getLevel(false);
 
                 if (linkedBlockLevel < level )
                     throw {message: "Interlink level error", level: level}

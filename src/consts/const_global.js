@@ -21,8 +21,9 @@ consts.BLOCKCHAIN = {
     BLOCKS_NONCE : 4,
 
     LIGHT:{
-        VALIDATE_LAST_BLOCKS: 10 , //overwrite below
-        SAFETY_LAST_BLOCKS: 40, //overwrite below
+        VALIDATE_LAST_BLOCKS: undefined , //overwrite below
+        SAFETY_LAST_BLOCKS: undefined, //overwrite below
+
         SAFETY_LAST_BLOCKS_DELETE: 400, //overwrite below
     },
 
@@ -33,7 +34,7 @@ consts.BLOCKCHAIN = {
 
 };
 
-consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 1 ;
+consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 2 ;
 consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS + 2* consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ;
 
 consts.MINI_BLOCKCHAIN = {
@@ -55,11 +56,13 @@ consts.MINI_BLOCKCHAIN = {
 
 
 consts.POPOW_PARAMS={
-    m: 3,
-    k: 6,
-    k1: 6,
-    d: 0.5,
-    BLOCKS_LEVEL_INFINITE: 1 << 30,
+    m: 40, //length proof Pi for validating the Genesis
+
+    k: 40, //length proof Xi for Accountant Tree
+    k1: 40, //length
+
+    d: 0.1,
+
     ACTIVATED : true,
 };
 
@@ -190,8 +193,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.291",
-        VERSION_COMPATIBILITY: "0.291",
+        VERSION: "0.3",
+        VERSION_COMPATIBILITY: "0.3",
         PROTOCOL: "WebDollar",
         SSL: true,
 

@@ -239,6 +239,8 @@ class InterfaceBlockchainProtocolForkSolver{
      */
     async _solveFork(fork) {
 
+        StatusEvents.emit( "agent/status", {message: "Collecting Blockchain", blockHeight: fork.forkStartingHeightDownloading } );
+
         if (fork === null || fork === undefined || typeof fork !== "object" )
             throw {message: 'fork is null'};
 
@@ -260,8 +262,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 console.log("nextBlockHeight", nextBlockHeight);
 
-                if (nextBlockHeight % 2 === 0)
-                    StatusEvents.emit( "agent/status", {message: "Synchronizing - Downloading Block", blockHeight: nextBlockHeight, blockHeightMax: fork.forkChainLength } );
+                StatusEvents.emit( "agent/status", {message: "Synchronizing - Downloading Block", blockHeight: nextBlockHeight, blockHeightMax: fork.forkChainLength } );
 
                 //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
@@ -290,7 +291,6 @@ class InterfaceBlockchainProtocolForkSolver{
                 let result;
 
                 try {
-
 
                     result = await fork.includeForkBlock(block);
 

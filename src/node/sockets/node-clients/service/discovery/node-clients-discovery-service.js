@@ -129,11 +129,15 @@ class NodeDiscoveryService {
 
                         for (let i = 0; i < nodes.length; i++) {
 
+
+
                             let pos = Math.floor( Math.random(  ) * nodes.length );
 
                             while (marked[pos] !== undefined){
                                 pos = Math.floor( Math.random(  ) * nodes.length );
                             }
+
+                            marked[pos] = true;
 
                             let nodeAddress = '', nodePort = undefined,
                                 nodeType = NodesType.NODE_TERMINAL;

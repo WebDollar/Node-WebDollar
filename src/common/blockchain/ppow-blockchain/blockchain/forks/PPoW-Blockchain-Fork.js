@@ -2,6 +2,8 @@ import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/bloc
 import PPoWBlockchainProofPi from './../prover/proofs/PPoW-Blockchain-Proof-Pi'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import consts from 'consts/const_global'
+import BufferExtended from "common/utils/BufferExtended"
+import StatusEvents from "common/events/Status-Events";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -16,18 +18,55 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             //Downloading Proof Pi
 
+            StatusEvents.emit( "agent/status", {message: "Downloading Proofs", blockHeight: this.forkStartingHeight } );
+
             let answer = await this.getSocket().node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi", {}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
             if (answer === null || answer === undefined) throw {message: "Proof is invalid"};
 
             //importing Proof
             this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
 
+            StatusEvents.emit( "agent/status", {message: "Preparing Proof", blockHeight: this.forkStartingHeight } );
+
             await this.importForkProofHeaders( answer );
 
             //this.forkProofPi.validateProof();
             this.forkProofPi.validateProofLastElements(consts.POPOW_PARAMS.m);
 
+            StatusEvents.emit( "agent/status", {message: "Proofs Validated", blockHeight: this.forkStartingHeight } );
+
         }
+
+    }
+
+    //light validation Proof Xi
+    async _validateProofXi(){
+        
+        if (!this.blockchain.agent.light) return true;
+        if (this.forkChainStartingPoint !== this.forkStartingHeight || this.forkProofPi === null) return true;
+
+        //for (let i=this.forkBlocks.length-consts.POPOW_PARAMS.k; i<this.forkBlocks.length; i++) {
+        for (let i=0; i<this.forkBlocks.length; i++) {
+
+            this.forkBlocks[i].blockValidation.getBlockCallBack = this.getForkProofsPiBlock.bind(this);
+
+            if (!this.forkBlocks[i]._validateInterlink()) {
+                throw {message: "validate Interlink Failed"};
+            }
+
+            this.forkProofPi.blocks.push( this.forkBlocks[i] );
+
+        }
+
+        return true;
+
+    }
+
+    async _validateFork(validateHashesAgain){
+        
+        await this._validateProofXi();
+
+        return await InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
 
     }
 
@@ -42,6 +81,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             this.forkProofPi.blocks.push(block);
 
+            StatusEvents.emit( "agent/status", {message: "Validating Proof ", blockHeight: i } );
         }
 
     }

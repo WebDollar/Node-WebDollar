@@ -121,7 +121,6 @@ class Argon2BrowserWebAssemblyCalc{
             }
 
             this._librayLoaded = false;
-            this._libraryLoadPromise = promise;
 
             const KB = 1024 * 1024;
             const MB = 1024 * KB;

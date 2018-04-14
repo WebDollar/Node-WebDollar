@@ -114,6 +114,15 @@ class NodesWaitlistObject {
             }
     }
 
+    findBackedBy(socket){
+
+        for (let i=0; i<this.backedBy.length; i++)
+            if (this.backedBy[i] === socket)
+                return true;
+
+        return null;
+    }
+
 }
 
 export default NodesWaitlistObject;

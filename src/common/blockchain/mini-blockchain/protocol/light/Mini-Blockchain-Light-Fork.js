@@ -138,8 +138,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
             let forkSum = this.blockchain.accountantTree.calculateNodeCoins();
 
-            if ( forkSum !== BlockchainMiningReward.getSumReward(diffIndex) || forkSum <= 0 )
-                throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: forkSum, rewardShould: BlockchainMiningReward.getSumReward(diffIndex)};
+            if ( forkSum !== BlockchainMiningReward.getSumReward(diffIndex-1) || forkSum <= 0 )
+                throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: forkSum, rewardShould: BlockchainMiningReward.getSumReward(diffIndex-1)};
 
             this.blockchain.blocks.blocksStartingPoint = diffIndex;
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;

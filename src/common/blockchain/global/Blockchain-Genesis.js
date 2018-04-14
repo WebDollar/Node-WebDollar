@@ -30,7 +30,7 @@ class BlockchainGenesis{
 
     getLevel(){
 
-        return consts.POPOW_PARAMS.BLOCKS_LEVEL_INFINITE;
+        return 0;
     }
 
 }

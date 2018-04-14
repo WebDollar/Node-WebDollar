@@ -10,7 +10,7 @@ class BlockchainMiningReward{
         if (typeof height !== "number")
             throw {message: 'height is not defined'};
         
-        let entireGenesis = 4156801540; //4156801128;
+        let marketSupply = 4156801128; //4156801128;
         let minedDistributionAfterCycle = [0, 
             18921600000, 28382400000, 33112800000, 35478000000, 36660600000, 37251900000,
             37547550000, 37695375000, 37769287500, 37806243750, 37824721875, 37833960938,
@@ -21,9 +21,20 @@ class BlockchainMiningReward{
         
         let blocksPerCycle = 6307200;
         let cycle = Math.trunc( height / blocksPerCycle );
-        
-        let sum = WebDollarCoins.WEBD * (entireGenesis + minedDistributionAfterCycle[cycle]) + 
+
+        let sum = 0;
+
+
+        if (height <= 40)
+            for (let i = 0; i <= height; i++)
+                sum += this.getReward(i);
+        else {
+            sum = WebDollarCoins.WEBD * (marketSupply + minedDistributionAfterCycle[cycle]) +
                 ( this.getReward(height) * (height % blocksPerCycle) );
+
+            if (height <= blocksPerCycle)
+                sum -= 40 * this.getReward(height);
+        }
 
         return sum;
     }
@@ -38,7 +49,7 @@ class BlockchainMiningReward{
 
         let blocksPerCycle = 6307200;
 
-        if (height >= 0){
+        if (height > 0){
 
             if (height <= 40) {
                 return WebDollarCoins.WEBD * Math.trunc( 1949770302 / Math.pow(1.01645589, 41.5 * height - height * height / 2 - 41) );
@@ -54,7 +65,8 @@ class BlockchainMiningReward{
 
                 return reward;
             }
-        }
+
+        } else return  WebDollarCoins.WEBD * 1;
 
     }
     

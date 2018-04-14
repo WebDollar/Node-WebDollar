@@ -294,6 +294,8 @@ class InterfaceBlockchainProtocol {
 
             });
 
+        this.askBlockchain(socket);
+
     }
 
     _uninitializeSocket(nodesListObject) {

@@ -4,6 +4,7 @@ import NodesWaitlistObject from './nodes-waitlist-object';
 import SocketAddress from 'common/sockets/socket-address'
 import consts from 'consts/const_global'
 import NodesType from "node/lists/types/Nodes-Type"
+import CONNECTION_TYPE from "../types/Connections-Type";
 
 const EventEmitter = require('events');
 
@@ -67,8 +68,6 @@ class NodesWaitlist {
             let waitListObject = new NodesWaitlistObject( sckAddresses, type, nodeConnected, level, backedBy );
             this.waitlist.push(waitListObject);
 
-            this._tryToConnectNextNode(waitListObject);
-
             this.emitter.emit("waitlist/new-node", waitListObject);
             return waitListObject;
         }
@@ -83,7 +82,7 @@ class NodesWaitlist {
         for (let i=0; i<this.waitlist.length; i++)
             for (let j=0; j<this.waitlist[i].sckAddresses.length; j++)
                 if (this.waitlist[i].sckAddresses[j].matchAddress(sckAddress) )
-                    return i
+                    return i;
 
         return -1;
     }
@@ -106,9 +105,20 @@ class NodesWaitlist {
         this._deleteUselessWaitlist();
 
         //TODO shuffle them
-        for (let i=0; i < this.waitlist.length; i++)
-            if ( this.waitlist[i].type === NodesType.NODE_TERMINAL )
-                this._tryToConnectNextNode(this.waitlist[i]);
+
+        if (NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) === 0){
+
+            for (let i=0; i < this.waitlist.length; i++)
+                if ( this.waitlist[i].type === NodesType.NODE_TERMINAL && this.waitlist[i].findBackedBy("fallback") !== null)
+                    this._tryToConnectNextNode(this.waitlist[i]);
+
+        } else {
+
+            for (let i=0; i < this.waitlist.length; i++)
+                if ( this.waitlist[i].type === NodesType.NODE_TERMINAL )
+                    this._tryToConnectNextNode(this.waitlist[i]);
+
+        }
 
     }
 
