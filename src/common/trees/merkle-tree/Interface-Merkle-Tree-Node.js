@@ -139,9 +139,9 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
         if (this.edges.length === 0){ //Leaf Node (terminal node)
 
             if ( this.value === null)
-                throw ("Leaf nodes has not value");
+                throw {message: "Leaf nodes has not value"};
             if ( this.isLeaf() === false)
-                throw ("Node is not leaf");
+                throw {message: "Node is not leaf"};
 
             // Let's hash
 
@@ -166,7 +166,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
             }
 
             if (hashConcat === [])
-                throw ("Empty node with invalid sha256");
+                throw {message: "Empty node with invalid sha256"};
 
             hashConcat = Buffer.concat(hashConcat);
 

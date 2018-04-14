@@ -8,7 +8,7 @@ class BlockchainMiningReward{
     getSumReward(height){
 
         if (typeof height !== "number")
-            throw ('height is not defined');
+            throw {message: 'height is not defined'};
         
         let entireGenesis = 0;
         let minedDistributionAfterCycle = [0, 
@@ -34,7 +34,7 @@ class BlockchainMiningReward{
     getReward(height){
 
         if (typeof height !== "number")
-            throw ('height is not defined');
+            throw {message: 'height is not defined'};
 
         let blocksPerCycle = 6307200;
 
@@ -55,7 +55,7 @@ class BlockchainMiningReward{
     _getContinuousReward(height) {
         
         if (typeof height !== "number")
-            throw ('height is not defined');
+            throw {message: 'height is not defined'};
 
         if (height >= 0) {
             //TODO: implement continuous reward function

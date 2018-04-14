@@ -43,7 +43,7 @@ class NodesList {
 
     registerUniqueSocket(socket, connectionType, type, validationDoubleConnectionsTypes){
 
-        if (type === undefined) throw ("type is necessary");
+        if (type === undefined) throw {message: "type is necessary"};
 
         if (!socket.node || !socket.node.protocol || !socket.node.protocol.helloValidated ) {
             socket.disconnect(true);

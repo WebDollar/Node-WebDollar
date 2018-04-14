@@ -70,7 +70,7 @@ class PPoWHelper{
     _superchainQuality( underlyingChain, superChain, miu){
 
         if (consts.POPOW_PARAMS.m < 1)
-            throw ('superchainQuality is not good');
+            throw {message: 'superchainQuality is not good'};
 
         if (superChain.blocks.length <= consts.POPOW_PARAMS.m)
             return false;

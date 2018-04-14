@@ -283,7 +283,7 @@ class InterfaceBlockchainAddressHelper{
     static validatePrivateKeyWIF(privateKeyWIF){
 
         if (privateKeyWIF === null || !Buffer.isBuffer(privateKeyWIF) ){
-            throw ('privateKeyWIF must be a Buffer');
+            throw {message: 'privateKeyWIF must be a Buffer'};
         }
 
         //contains VERSION prefix

@@ -144,7 +144,7 @@ class InterfaceBlockchain {
     async validateBlockchainBlock( block ){
 
         if ( block instanceof InterfaceBlockchainBlock === false )
-            throw ('block '+block.height+' is not an instance of InterfaceBlockchainBlock ');
+            throw {message: 'block is not an instance of InterfaceBlockchainBlock ', height:block.height};
 
         // in case it is not a fork controlled blockchain
 
@@ -161,7 +161,7 @@ class InterfaceBlockchain {
 
         //validate difficulty & hash
         if (! (await block.validateBlock(block.height)))
-            throw ('block validation failed');
+            throw {message: 'block validation failed'};
 
         //recalculate next target difficulty
         if ( !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] ){
@@ -333,9 +333,13 @@ class InterfaceBlockchain {
             }
 
         } catch (exception){
-            console.log("serializeMiniAccountantTreeERRROR", this.accountantTree.serializeMiniAccountant().toString("hex"));
+
+            if (this.accountantTree !== undefined)
+                console.log("serializeMiniAccountantTreeERRROR", this.accountantTree.serializeMiniAccountant().toString("hex"));
+
             console.log("serializeMiniAccountantTreeERRROR", this.blocks.length-1);
             console.error("blockchain.load raised an exception", exception);
+
             return false;
         }
 

@@ -11,7 +11,6 @@ class NodesWaitlist {
 
     /*
         waitlist = []     //Addresses where it should connect too
-        events = []
         stated = false;
     */
 
@@ -24,20 +23,22 @@ class NodesWaitlist {
         this.emitter.setMaxListeners(100);
 
         this.waitlist = [];
-        this.events = [];
         this.started = false;
 
-        this.MAX_CONNECTIONS = 5000;
+        this._connectedQueue = []
+
+        this.MAX_WAITLIST_CONNECTIONS = 500;
         this.MAX_ERROR_TRIALS = 100;
+
     }
 
 
     startConnecting(){
 
-        if (this.started === false) {
-            this.started = true;
-            this._connectNewNodesWaitlist(true);
-        }
+        if (this.started)  return;
+
+        this.started = true;
+        this._connectNewNodesWaitlistInterval();
 
     }
 
@@ -63,7 +64,7 @@ class NodesWaitlist {
 
         if (sckAddresses.length > 0){
 
-            let waitListObject = new NodesWaitlistObject(sckAddresses, type, nodeConnected, level, backedBy);
+            let waitListObject = new NodesWaitlistObject( sckAddresses, type, nodeConnected, level, backedBy );
             this.waitlist.push(waitListObject);
 
             this._tryToConnectNextNode(waitListObject);
@@ -100,36 +101,47 @@ class NodesWaitlist {
     /*
         Connect to all nodes
     */
-    _connectNewNodesWaitlist(setTimeOut){
+    _connectNewNodesWaitlist(){
 
         this._deleteUselessWaitlist();
 
-        for (let i=0; i < this.waitlist.length; i++){
+        //TODO shuffle them
+        for (let i=0; i < this.waitlist.length; i++)
+            if ( this.waitlist[i].type === NodesType.NODE_TERMINAL )
+                this._tryToConnectNextNode(this.waitlist[i]);
 
-            let nextNode = this.waitlist[i];
+    }
 
-            this._tryToConnectNextNode(nextNode);
+    _connectNewNodesWaitlistInterval(){
 
-        }
+        this._connectNewNodesWaitlist();
 
-
-        if (setTimeOut === true)
-            setTimeout(()=>{ return this._connectNewNodesWaitlist( true ) }, consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
+        setTimeout( this._connectNewNodesWaitlistInterval.bind(this), consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
     }
 
     _tryToConnectNextNode(nextWaitListObject){
 
+        if ( process.env.BROWSER && this._connectedQueue.length > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_BROWSER ) return; else
+        if ( !process.env.BROWSER && this._connectedQueue.length > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_TERMINAL ) return;
+
         //connect only to TERMINAL NODES
-        if (nextWaitListObject.type === NodesType.NODE_TERMINAL) {
+        if ( nextWaitListObject.type === NodesType.NODE_TERMINAL) {
 
             if (nextWaitListObject.checkLastTimeChecked(consts.SETTINGS.PARAMS.WAITLIST.TRY_RECONNECT_AGAIN) && nextWaitListObject.blocked === false &&
                 nextWaitListObject.connecting === false && nextWaitListObject.checkIsConnected() === null) {
 
                 nextWaitListObject.blocked = true;
+                this._connectedQueue.push(nextWaitListObject);
 
                 //console.log("connectNewNodesWaitlist ", nextNode.sckAddresses.toString() );
 
                 this._connectNowToNewNode(nextWaitListObject).then((connected) => {
+
+                    for (let i=0; i<this._connectedQueue.length; i++)
+                        if (this._connectedQueue[i] === nextWaitListObject){
+                            this._connectedQueue.splice(i,1);
+                        }
+
                     nextWaitListObject.checked = true;
                     nextWaitListObject.blocked = false;
                     nextWaitListObject.connected = connected;
@@ -137,14 +149,13 @@ class NodesWaitlist {
                 });
 
             }
+
         }
     }
 
     async _connectNowToNewNode(nextWaitListObject){
 
         nextWaitListObject.connecting = true;
-
-        //console.log("nextNode.sckAddresses", nextNode.sckAddresses);
 
         //trying to connect to each sckAddresses
         for (let i=0; i<nextWaitListObject.sckAddresses.length; i++) {
@@ -181,7 +192,7 @@ class NodesWaitlist {
      */
     _deleteUselessWaitlist(){
 
-        if (this.waitlist.length < this.MAX_CONNECTIONS)
+        if (this.waitlist.length < this.MAX_WAITLIST_CONNECTIONS)
             return false;
 
         for (let i=this.waitlist.length-1; i>=0; i--) {

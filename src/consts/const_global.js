@@ -204,8 +204,8 @@ consts.SETTINGS = {
         STATUS_INTERVAL: 60 * 1000,                      //miliseconds
 
         WAITLIST: {
-            TRY_RECONNECT_AGAIN: 60 * 1000,             //miliseconds
-            INTERVAL: 5 * 1000,                         //miliseconds
+            TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
+            INTERVAL: 2 * 1000,                         //miliseconds
         },
 
         SIGNALING: {
@@ -226,8 +226,9 @@ consts.SETTINGS = {
 
         CONNECTIONS:{
 
-            NODES: {
-                MAXIMUM_CONNECTIONS: 100,
+            SOCKETS: {
+                MAXIMUM_CONNECTIONS_IN_BROWSER: 2,
+                MAXIMUM_CONNECTIONS_IN_TERMINAL: 3,
             },
 
             WEBRTC: {
@@ -236,6 +237,10 @@ consts.SETTINGS = {
 
             FORKS:{
                 MAXIMUM_BLOCKS_TO_DOWNLOAD: 40,
+            },
+
+            TIMEOUT: {
+                WAIT_ASYNC_DISCOVERY_TIMEOUT: 8000,
             }
 
         },

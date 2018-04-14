@@ -24,9 +24,9 @@ class InterfaceBlockchainAgent{
         this.agentQueueCount = 0;
 
         if (VersionChecker.detectMobileAndTablet())
-            this.AGENT_TIME_OUT = 60000;
+            this.AGENT_TIME_OUT = 80000;
         else
-            this.AGENT_TIME_OUT = 40000;
+            this.AGENT_TIME_OUT = 60000;
 
         this.AGENT_TIME_OUT_NEW_CONNECTIONS = 10000;
 
@@ -109,7 +109,6 @@ class InterfaceBlockchainAgent{
 
         //check if start Agent is finished
 
-        console.log("this.startAgentResolver",this._startAgentResolver !== undefined);
         console.log("this.agentQueueProcessing", this.agentQueueProcessing.length);
         console.log("this.blockchain.blocks.length", this.blockchain.blocks.length);
 
@@ -117,13 +116,16 @@ class InterfaceBlockchainAgent{
 
             let done = true;
 
-            if (this._synchronizeComplete)
-                for (let i = 0; i < NodesList.nodes.length; i++)
-                    if (NodesList.nodes[i].socket.level <= 2 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
+            //THIS THING DOESN'T WORK
+            //TODO I need to work to improve it
 
-                        done = false;
-                        break;
-                    }
+            // if (this._synchronizeComplete)
+                // for (let i = 0; i < NodesList.nodes.length; i++)
+                //     if (NodesList.nodes[i].socket.level <= 2 && NodesList.nodes[i].socket.node.protocol.agent.startedAgentDone === false) {
+                //
+                //         done = false;
+                //         break;
+                //     }
 
             console.log("done param", done);
 
@@ -202,7 +204,7 @@ class InterfaceBlockchainAgent{
             this._startAgentTimeOut = undefined;
             this.synchronized = false;
 
-        }, this.AGENT_TIME_OUT*factor);
+        }, this.AGENT_TIME_OUT);
     }
 
     set synchronized(newValue){

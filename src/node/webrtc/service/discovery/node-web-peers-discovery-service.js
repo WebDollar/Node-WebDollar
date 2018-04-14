@@ -15,6 +15,9 @@ class NodeWebPeersDiscoveryService {
         //if a new client || or || web peer is established then, I should register for accepting WebPeer connections
         NodesList.emitter.on("nodes-list/connected", (result) => { this._newSocketRegisterAcceptWebPeers(result) } );
 
+        for (let i=0; i<NodesList.nodes.length; i++)
+            this._newSocketRegisterAcceptWebPeers(NodesList.nodes[i]);
+
     }
 
     _newSocketRegisterAcceptWebPeers(nodesListObject){

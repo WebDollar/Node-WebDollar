@@ -23,7 +23,13 @@ class InterfaceBlockchainTransactionsProtocol{
         //after
         Blockchain.onLoaded.then((answer)=>{
             // in case the Blockchain was not loaded, I will not be interested in transactions
-            this.initializeTransactionsPropagation(socket);
+
+            setTimeout(()=>{
+
+                this.initializeTransactionsPropagation(socket);
+
+            }, 8000)
+
         });
 
     }

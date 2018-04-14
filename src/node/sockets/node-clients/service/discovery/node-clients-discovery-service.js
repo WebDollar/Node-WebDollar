@@ -120,21 +120,29 @@ class NodeDiscoveryService {
                     nodes = data.nodes || [];
 
                     //console.log("FallBack Nodes ",nodes);
-
                     if (Array.isArray(nodes)) {
 
+                        //let's shuffle
                         console.warn("NEW NODES", nodes);
 
+                        let marked = [];
+
                         for (let i = 0; i < nodes.length; i++) {
+
+                            let pos = Math.floor( Math.random(  ) * nodes.length );
+
+                            while (marked[pos] !== undefined){
+                                pos = Math.floor( Math.random(  ) * nodes.length );
+                            }
 
                             let nodeAddress = '', nodePort = undefined,
                                 nodeType = NodesType.NODE_TERMINAL;
 
-                            if (typeof nodes[i] === "object") {
-                                nodeAddress = nodes[i].addr || '';
-                                nodePort = nodes[i].port;
+                            if (typeof nodes[pos] === "object") {
+                                nodeAddress = nodes[pos].addr || '';
+                                nodePort = nodes[pos].port;
                             } else {
-                                nodeAddress = nodes[i]; //a simple string Address
+                                nodeAddress = nodes[pos]; //a simple string Address
                             }
 
                             NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType, false, 1, "fallback" );

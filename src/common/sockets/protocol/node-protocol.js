@@ -11,11 +11,19 @@ class NodeProtocol {
 
 
         // Waiting for Protocol Confirmation
+
         let response = node.sendRequestWaitOnce("HelloNode", {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NodesType.NODE_WEB_PEER : NodesType.NODE_TERMINAL
         });
+
+        for (let i=0; i<100; i++)
+            node.sendRequest( "HelloNode", {
+                version: consts.SETTINGS.NODE.VERSION,
+                uuid: consts.SETTINGS.UUID,
+                nodeType: process.env.BROWSER ? NodesType.NODE_WEB_PEER : NodesType.NODE_TERMINAL
+            });
 
         response = await response;
 

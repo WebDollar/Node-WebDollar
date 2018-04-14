@@ -70,7 +70,7 @@ class BansList{
     _removeEmptyBans(){
 
         for (let i=this.bans.length-1; i>=0; i--)
-            if (!this.bans[i].isBanned)
+            if (!this.bans[i].isBanned() )
                 this.bans.splice(i,1)
 
     }

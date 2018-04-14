@@ -126,7 +126,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             if (i === input.length){ //the prefix became a solution
 
                                 if (nodeCurrent.value !== null)
-                                    throw ('the node already includes a value....');
+                                    throw {message: 'the node already includes a value....'};
                                 else
                                     nodeCurrent._setNodeValue(value);
 
@@ -199,7 +199,7 @@ class InterfaceRadixTree extends InterfaceTree{
         let finished = false;
 
         if (!searchResult.node.isLeaf())
-            throw ("couldn't delete because input is not a leaf node");
+            throw {message: "couldn't delete because input is not a leaf node"};
 
         let node = searchResult.node;
 
@@ -412,7 +412,7 @@ class InterfaceRadixTree extends InterfaceTree{
             return false;
 
         if (!searchResult.node.isLeaf())
-            throw ("couldn't delete because input is not a leaf node");
+            throw {message: "couldn't delete because input is not a leaf node"};
 
         let node = searchResult.node;
 

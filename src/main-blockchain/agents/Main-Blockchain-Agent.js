@@ -19,7 +19,7 @@ class MainBlockchainAgent{
         if (agentName === "light-node")
             return new MiniBlockchainAgentLightNode(blockchain);
 
-        throw ("Couldn't create an agent")
+        throw {message: "Couldn't create an agent"}
     }
 
 

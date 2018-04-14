@@ -24,6 +24,7 @@ class BanObject{
     }
 
     increaseBanTrials(banTime, banReason){
+
         let timestamp = new Date().getTime();
 
         if ( (timestamp - this.banTimestamp) >= ( 1.5*this.banTime )){ // no blocks for long time

@@ -130,7 +130,7 @@ class InterfaceTreeNode {
     validateTreeNode(){
 
         if ( this === undefined || this === null)
-            throw ('Tree Validation Errror. Node is null');
+            throw {message: 'Tree Validation Errror. Node is null'};
 
         for (let i = 0; i < this.edges.length; i++) {
 

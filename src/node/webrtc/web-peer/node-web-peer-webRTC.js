@@ -379,8 +379,10 @@ class NodeWebPeerRTC {
                 this.peer.errorTrials++;
 
                 if (this.peer.errorTrials > 5) {
-                    NodesList.disconnectSocket(this);
+
+                    NodesList.disconnectSocket( this.peer );
                     console.warn("I deleted socket", this.peer.errorTrials);
+
                 }
 
                 return null;
