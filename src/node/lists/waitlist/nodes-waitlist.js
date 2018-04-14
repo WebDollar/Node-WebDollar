@@ -131,8 +131,8 @@ class NodesWaitlist {
 
     _tryToConnectNextNode(nextWaitListObject){
 
-        if ( process.env.BROWSER && this._connectedQueue.length > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_BROWSER ) return; else
-        if ( !process.env.BROWSER && this._connectedQueue.length > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_TERMINAL ) return;
+        if ( process.env.BROWSER && (this._connectedQueue.length + NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_BROWSER ) return;
+        if ( !process.env.BROWSER && (this._connectedQueue.length + NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_TERMINAL ) return;
 
         //connect only to TERMINAL NODES
         if ( nextWaitListObject.type === NodesType.NODE_TERMINAL) {

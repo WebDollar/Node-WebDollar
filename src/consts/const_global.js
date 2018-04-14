@@ -58,8 +58,8 @@ consts.MINI_BLOCKCHAIN = {
 consts.POPOW_PARAMS={
     m: 30, //length proof Pi for validating the Genesis
 
-    k: 6, //length proof Xi for Accountant Tree
-    k1: 6, //length
+    k: 5, //length proof Xi for Accountant Tree
+    k1: 5, //length
 
     d: 0.5,
 
@@ -193,8 +193,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.40",
-        VERSION_COMPATIBILITY: "0.40",
+        VERSION: "0.49",
+        VERSION_COMPATIBILITY: "0.49",
         PROTOCOL: "WebDollar",
         SSL: true,
 
@@ -231,7 +231,7 @@ consts.SETTINGS = {
 
             SOCKETS: {
                 MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
-                MAXIMUM_CONNECTIONS_IN_TERMINAL: 3,
+                MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
             },
 
             WEBRTC: {
