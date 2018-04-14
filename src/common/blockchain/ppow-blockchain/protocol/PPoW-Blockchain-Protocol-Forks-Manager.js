@@ -22,7 +22,7 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
 
                     bestFork = fork;
 
-                } else if ( bestFork !== null && bestFork.forkProofPi !== null && fork.forkProofPi !== null ) {
+                } else if ( bestFork !==  null && bestFork.forkProofPi !== null && fork.forkProofPi !== null ) {
 
                     let compare = await this.blockchain.verifier.compareProofs(bestFork.forkProofPi, fork.forkProofPi);
 
@@ -33,9 +33,9 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
 
                     }
 
-                } else if (bestFork === null && bestFork.forkProofPi === null && fork.forkProofPi !== null){
+                } else if ( (bestFork ===  null || bestFork.forkProofPi === null) && fork.forkProofPi !== null){
 
-                    bestFork = fork.forkProofPi;
+                    bestFork = fork;
 
                 }
 

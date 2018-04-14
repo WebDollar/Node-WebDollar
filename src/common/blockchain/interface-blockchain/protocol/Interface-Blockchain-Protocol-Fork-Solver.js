@@ -91,7 +91,7 @@ class InterfaceBlockchainProtocolForkSolver{
      */
 
     //TODO it will not update positions
-    async discoverFork(socket, forkChainLength, forkChainStartingPoint){
+    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHeader ){
 
         let fork;
         let binarySearchResult = {position: -1, header: null };
@@ -105,7 +105,14 @@ class InterfaceBlockchainProtocolForkSolver{
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
 
             if ( forkFound !== null ) {
-                console.error("discoverAndProcessFork - fork already found");
+                console.error("discoverAndProcessFork - fork already found by socket");
+                return {result: true, fork: forkFound};
+            }
+
+            let forkLastBlockHeader = this.blockchain.forksAdministrator.findForkByHeader(forkLastBlockHeader);
+
+            if ( forkFound !== null ) {
+                console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
                 return {result: true, fork: forkFound};
             }
 
@@ -176,7 +183,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (!this.blockchain.agent.light)
                         forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
 
-                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, forkChainStartingPoint, forkChainLength, binarySearchResult.header);
+                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, forkChainStartingPoint, forkChainLength, binarySearchResult.header, forkLastBlockHeader);
 
                 } catch (exception){
 
