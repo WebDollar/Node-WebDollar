@@ -135,8 +135,8 @@ consts.ADDRESSES.ADDRESS.WIF.LENGTH = consts.ADDRESSES.ADDRESS.LENGTH + consts.A
 
 
 consts.HASH_ARGON2_PARAMS = {
-    salt: 'WebDollar_make_$',
-    saltBuffer: Buffer.from("WebDollar_make_$"),
+    salt: 'Satoshi_is_Finney',
+    saltBuffer: Buffer.from("Satoshi_is_Finney"),
     time: 2,
     memPower:10,
     memBytes: 1024,
@@ -157,8 +157,7 @@ consts.DATABASE_NAMES = {
 
     DEFAULT_DATABASE: "defaultDB",
 
-    //WALLET_DATABASE: "walletDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
-    WALLET_DATABASE: "defaultDB2", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
+    WALLET_DATABASE: "walletDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
 
     BLOCKCHAIN_DATABASE:{
         FOLDER:"blockchainDB3",
