@@ -18,7 +18,7 @@ class InterfaceBlockchainFork {
      * initializeConstructor is used to initialize the constructor dynamically using .apply method externally passing the arguments
      */
 
-    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header){
+    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers){
 
         this.blockchain = blockchain;
 
@@ -34,7 +34,9 @@ class InterfaceBlockchainFork {
         this.forkChainStartingPoint = forkChainStartingPoint;
         this.forkChainLength = newChainLength||0;
         this.forkBlocks = [];
-        this.forkHeader = header;
+
+        if (!Array.isArray(headers)) headers = [headers];
+        this.forkHeaders = headers;
 
         this.forkPromise = new Promise ((resolve)=>{
             this._forkPromiseResolver = resolve;

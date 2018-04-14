@@ -109,7 +109,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 return {result: true, fork: forkFound};
             }
 
-            let forkLastBlockHeader = this.blockchain.forksAdministrator.findForkByHeader(forkLastBlockHeader);
+            forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHeader);
 
             if ( forkFound !== null ) {
                 console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
@@ -183,7 +183,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (!this.blockchain.agent.light)
                         forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
 
-                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, forkChainStartingPoint, forkChainLength, binarySearchResult.header, forkLastBlockHeader);
+                    fork = await this.blockchain.forksAdministrator.createNewFork(socket, binarySearchResult.position, forkChainStartingPoint, forkChainLength, [ binarySearchResult.header, forkLastBlockHeader] );
 
                 } catch (exception){
 
