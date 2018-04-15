@@ -97,7 +97,7 @@ class InterfaceBlockchainTransactionsWizard{
             console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception);
 
             if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
-            return { result:false,  message: "Failed Signing the transaction", reason: exception }
+            return { result:false,  message: "Wrong password", reason: exception }
         }
 
         try{
