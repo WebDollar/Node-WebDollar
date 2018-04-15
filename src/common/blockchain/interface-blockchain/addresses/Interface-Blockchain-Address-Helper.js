@@ -10,6 +10,7 @@ import BufferExtended from 'common/utils/BufferExtended';
 
 import CLI from 'node/menu/CLI-Menu';
 import consts from 'consts/const_global';
+import AdvancedMessages from "node/menu/Advanced-Messages"
 
 class InterfaceBlockchainAddressHelper{
 
