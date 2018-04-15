@@ -174,6 +174,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === -1)
                     binarySearchResult.position = 0;
 
+                console.log("fork position2", binarySearchResult.position, forkChainStartingPoint, forkChainLength, binarySearchResult.header);
+
                 try {
 
                     //maximum blocks to download
@@ -186,6 +188,8 @@ class InterfaceBlockchainProtocolForkSolver{
                     fork.forkChainLength = forkChainLength;
                     fork.forkHeaders.push(binarySearchResult.header);
                     fork.ready = true;
+
+                    console.log("fork position3",  fork.forkStartingHeight, fork.forkStartingHeightDownloading, fork.forkChainStartingPoint );
 
                 } catch (exception){
 
