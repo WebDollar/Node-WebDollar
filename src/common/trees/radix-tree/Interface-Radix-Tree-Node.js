@@ -9,8 +9,8 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
     // value : data
     // edges : [ of Edges]
 
-    constructor(root, parent, parentEdge, edges, value){
-        super(root, parent, parentEdge, edges, value);
+    constructor(root, parent,  edges, value){
+        super(root, parent,  edges, value);
     }
 
     serializeNode(includeEdges){
@@ -60,7 +60,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                     offset += valueLength;
 
                     let targetNode = this.createNewNode();
-                    this.edges.push( this.root.createNewEdge(label, targetNode) );
+                    this.edgesPush( this.root.createNewEdge(label, targetNode) );
 
 
                     arguments[1] = offset;

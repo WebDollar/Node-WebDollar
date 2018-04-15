@@ -11,7 +11,7 @@ class InterfaceTreeNode {
     // value : data
     // edges : [ of Edges]
 
-    constructor(root, parent, parentEdge, edges, value){
+    constructor(root, parent, edges, value){
 
         if (edges === undefined)
             edges = [];
@@ -24,7 +24,6 @@ class InterfaceTreeNode {
         this.root = root;
 
         this.parent = parent;
-        this.parentEdge = parentEdge;
 
         this.edges = edges;
 
@@ -104,7 +103,7 @@ class InterfaceTreeNode {
 
                     let edge = new this.root.createNewEdge(null);
                     edge.deserializeEdge(buffer, offset, this.createNewNode);
-                    this.edges.push(edge);
+                    this.edgesPush(edge);
                 }
 
             }
@@ -121,16 +120,16 @@ class InterfaceTreeNode {
         return new InterfaceTreeEdge(node);
     }
 
-    createNewNode(parent, parentEdge, edges=[], value=null, hash = null){
+    createNewNode(parent,  edges=[], value=null, hash = null){
 
         if (parent === undefined ) parent = this;
-        return new this.constructor (this.root, parent,parentEdge, edges, value, hash);
+        return new this.constructor (this.root, parent, edges, value, hash);
     }
 
     validateTreeNode(){
 
         if ( this === undefined || this === null)
-            throw ('Tree Validation Errror. Node is null');
+            throw {message: 'Tree Validation Errror. Node is null'};
 
         for (let i = 0; i < this.edges.length; i++) {
 
@@ -162,6 +161,38 @@ class InterfaceTreeNode {
 
     _changedNode(node){
         //no changes in a simple tree
+    }
+
+    //lexicographic order
+    edgesPush(edge){
+
+        let position = 0;
+
+        if (typeof edge.label === "string" ) {
+            for (let i = 0; i < this.edges.length; i++) {
+                position = 0;
+                while (position >= 0 && position < this.edges.length) {
+
+                    if (edge.label > this.edges[position].label)
+                        position++;
+                    else
+                        break
+                }
+            }
+        } else if (Buffer.isBuffer(edge.label)){
+
+            position = 0;
+            while (position >= 0 && position < this.edges.length) {
+
+                if (Buffer.compare(edge.label, this.edges[position].label) > 0)
+                    position++;
+                else
+                    break
+            }
+        }
+
+        this.edges.splice(position, 0, edge);
+
     }
 
 

@@ -14,6 +14,13 @@ var root = "https://antelle.net/argon2-browser/";
 
 class Argon2BrowserWebAssemblyCalc{
 
+    constructor(){
+
+        this._libraryLoadPromise = null;
+        this._librayLoaded = false;
+
+    }
+
     calc(fn, arg) {
         try {
             return fn.call(this, arg);
@@ -25,18 +32,23 @@ class Argon2BrowserWebAssemblyCalc{
     }
 
     calcAsmJs(arg) {
+
         //this.clearLog();
 
-        return new Promise( (resolve) => {
+        let promise = new Promise( async (resolve) => {
 
            // this.log('Testing Argon2 using asm.js...');
 
             if (global.Module && !global.Module.wasmJSMethod) {
-                //this.log('Calculating hash....');
-                resolve ( this.calcHash(arg) )
+
+                if (!this._librayLoaded) await this._libraryLoadPromise;
+
+                resolve ( this.calcHash(arg) );
                 return;
+
             }
 
+            this._librayLoaded = false;
             global.Module = {
                 print: this.log,
                 printErr: this.log,
@@ -50,15 +62,23 @@ class Argon2BrowserWebAssemblyCalc{
                 //this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                 //this.log('Calculating hash....');
 
+                this._librayLoaded = true;
                 resolve(this.calcHash(arg))
 
             }, () => {
+
+                this._librayLoaded = true;
                 this.log('Error loading script');
             });
 
             // this.calcBinaryen(arg, 'asmjs');
 
         });
+
+        if (!this._librayLoaded)
+            this._libraryLoadPromise = promise;
+
+        return promise;
     }
 
     calcWasm(arg) {
@@ -77,13 +97,14 @@ class Argon2BrowserWebAssemblyCalc{
 
         this.clearLog();
 
-        return new Promise ((resolve)=>{
+        let promise =  new Promise (async (resolve)=>{
 
             if (!global.WebAssembly) {
 
                 this.log('Your browser doesn\'t support WebAssembly, please try it in Chrome Canary or Firefox Nightly with WASM flag enabled');
 
                 resolve(null); // return
+
                 return;
             }
 
@@ -92,9 +113,14 @@ class Argon2BrowserWebAssemblyCalc{
             //this.log('Testing Argon2 using Binaryen ' + method);
             if (global.Module && global.Module.wasmJSMethod === method && global.Module._argon2_hash) {
                 //this.log('Calculating hash.... WASM optimized');
-                resolve (this.calcHash(arg))
+
+                if (!this._librayLoaded) await this._libraryLoadPromise;
+
+                resolve (this.calcHash(arg));
                 return;
             }
+
+            this._librayLoaded = false;
 
             const KB = 1024 * 1024;
             const MB = 1024 * KB;
@@ -137,8 +163,13 @@ class Argon2BrowserWebAssemblyCalc{
                     this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                     this.log('Calculating hash....');
 
+                    this._librayLoaded = true;
+
                 }, () => {
+
+                    this._librayLoaded = true;
                     this.log('Error loading script');
+
                 });
             };
             xhr.onerror = () => {
@@ -146,7 +177,12 @@ class Argon2BrowserWebAssemblyCalc{
             };
             xhr.send(null);
 
-        })
+        });
+
+        if (!this._librayLoaded)
+            this._libraryLoadPromise = promise;
+
+        return promise;
 
     }
 

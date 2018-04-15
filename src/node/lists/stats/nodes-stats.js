@@ -2,6 +2,7 @@ import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
+import ConnectionsType from "node/lists/types/Connections-Type"
 
 class NodesStats {
 
@@ -14,10 +15,11 @@ class NodesStats {
         this.statsWebPeers = 0;
         this.statsWaitlist = 0;
 
-        NodesList.emitter.on("nodes-list/connected", (result) => { this._recalculateStats(result) } );
-        NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._recalculateStats(result ) });
+        NodesList.emitter.on("nodes-list/connected", (nodesListObject) => { this._recalculateStats(nodesListObject) } );
+        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject ) => { this._recalculateStats(nodesListObject ) });
 
-        NodesWaitlist.emitter.on("waitlist/new-node", (result ) => { this._recalculateStats(result ) });
+        NodesWaitlist.emitter.on("waitlist/new-node", (nodesListObject ) => { this._recalculateStats(nodesListObject, false ) });
+        NodesWaitlist.emitter.on("waitlist/delete-node", (nodesListObject ) => { this._recalculateStats(nodesListObject, false ) });
 
         setInterval( () => { return this._printStats() }, consts.SETTINGS.PARAMS.STATUS_INTERVAL)
     }
@@ -28,12 +30,12 @@ class NodesStats {
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Waitlist:",this.statsWaitlist,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
 
         let string1 = "";
-        let clients = NodesList.getNodes("client");
+        let clients = NodesList.getNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
         for (let i=0; i<clients.length; i++)
             string1 += '('+clients[i].socket.node.sckAddress.address+' , '+clients[i].socket.node.sckAddress.uuid+')   ';
 
         let string2 = "";
-        let server = NodesList.getNodes("server");
+        let server = NodesList.getNodes( ConnectionsType.CONNECTION_SERVER_SOCKET );
         for (let i=0; i<server.length; i++)
             string2 += '(' + server[i].socket.node.sckAddress.address + ' , ' + server[i].socket.node.sckAddress.uuid + ')   ';
 
@@ -42,14 +44,15 @@ class NodesStats {
 
     }
 
-    _recalculateStats(nodesListObject){
+    _recalculateStats(nodesListObject, printStats = true){
 
-        this.statsClients = NodesList.getNodes("client").length;
-        this.statsServer = NodesList.getNodes("server").length;
-        this.statsWebPeers = NodesList.getNodes("webpeer").length;
+        this.statsClients = NodesList.countNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
+        this.statsServer = NodesList.countNodes(ConnectionsType.CONNECTION_SERVER_SOCKET);
+        this.statsWebPeers = NodesList.countNodes(ConnectionsType.CONNECTION_WEBRTC);
         this.statsWaitlist = NodesWaitlist.waitlist.length;
 
-        this._printStats();
+        if (printStats)
+            this._printStats();
 
     }
 }

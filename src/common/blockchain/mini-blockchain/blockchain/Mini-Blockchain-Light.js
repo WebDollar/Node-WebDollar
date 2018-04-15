@@ -20,6 +20,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
     _initializeMiniBlockchainLight(){
 
+        this.proofPi = null;
         this.blocks.clear();
         this.blocks.blocksStartingPoint = 0;
 
@@ -156,10 +157,14 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             if (! (await this.accountantTree.saveMiniAccountant(true, undefined, treeSerialization)))
                 throw {message: "saveMiniAccountant", diffIndex};
 
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex]))) throw {message: "Couldn't be saved _LightSettings_prevDifficultyTarget", diffIndex: diffIndex};
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart", this.lightPrevDifficultyTargets[diffIndex+1]))) throw {message: "Couldn't be saved _LightSettings_prevDifficultyTargetStart", diffIndex: diffIndex};
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex]))) throw {message: "Couldn't be saved _LightSettings_prevTimestamp ", diffIndex: diffIndex};
-            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex]))) throw {message: "Couldn't be saved _LightSettings_prevHashPrev ", diffIndex:diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex])))
+                throw {message: "Couldn't be saved _LightSettings_prevDifficultyTarget", diffIndex: diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart", this.lightPrevDifficultyTargets[diffIndex+1])))
+                throw {message: "Couldn't be saved _LightSettings_prevDifficultyTargetStart", diffIndex: diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex])))
+                throw {message: "Couldn't be saved _LightSettings_prevTimestamp ", diffIndex: diffIndex};
+            if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex])))
+                throw {message: "Couldn't be saved _LightSettings_prevHashPrev ", diffIndex:diffIndex};
 
         } catch (exception){
             console.error("Error saving LIGHT SETTINGS", exception);
@@ -377,14 +382,28 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
     }
 
+    getBlock(height){
 
+        if (height === undefined )
+            height = this.blocks.length;
+
+        if (this.agent !== undefined && this.agent.light === true && height !== 0) {
+
+            if (this.proofPi !== null) {
+                let proofPiBlock = this.proofPi.hasBlock(height-1);
+                if (proofPiBlock !== null)
+                    return proofPiBlock;
+            }
+
+        }
+
+        return MiniBlockchainAdvanced.prototype.getBlock.call(this, height);
+    }
 
     getDifficultyTarget(height){
 
         if (height === undefined )
             height = this.blocks.length;
-
-        //console.warn("difficultyTarget", height, this.blocks.blocksStartingPoint , this.blocks.length, this.lightPrevDifficultyTargets[height] !== undefined ? this.lightPrevDifficultyTargets[height].toString("hex") : '');
 
         if (this.agent !== undefined && this.agent.light === true && height !== 0) {
 
@@ -398,8 +417,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
     getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
-        //console.warn("getTimeStamp", height, this.blocks.blocksStartingPoint, this.lightPrevTimeStamps[height])
-
         if (this.agent.light === true && height !== 0) {
             if ( this.lightPrevTimeStamps[height] !== undefined )
                 return this.lightPrevTimeStamps[height];
@@ -411,8 +428,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
     getHashPrev(height){
 
         if (height === undefined) height = this.blocks.length;
-
-        //console.warn("getHashPrev", height, this.blocks.blocksStartingPoint, this.lightPrevHashPrevs[height] !== undefined ? this.lightPrevHashPrevs[height].toString("hex") : '')
 
         if (this.agent.light === true && height !== 0)
             if ( this.lightPrevHashPrevs[height] !== undefined )

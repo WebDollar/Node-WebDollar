@@ -1,8 +1,8 @@
+import consts from 'consts/const_global'
 import SignalingClientPeerObject from './signaling-client-peer-object';
-
-//import NodeWebPeer from "node/webrtc/web-peer/node-web-peer";
 import NodeWebPeerRTC from "node/webrtc/web-peer/node-web-peer-webRTC";
-
+import NodesList from 'node/lists/nodes-list'
+import NodeSignalingClientService from "../signaling-client-service/Node-Signaling-Client-Service"
 /*
     The List is populated with Node Sockets who are available for WebRTC
  */
@@ -15,8 +15,20 @@ class SignalingClientList {
 
         console.log("SignalingRoomList constructor");
 
-        this.list = [];
-        this.events = [];
+        this.connected = [];
+
+    }
+
+    desinitializeWebPeerConnection(webpeer){
+
+        let pos = this.findWebPeerSignalingClientList(undefined, undefined, webpeer.peer.node.sckAddress.uuid);
+
+        if (pos !== -1) {
+            this.connected.splice(pos, 1);
+
+            NodeSignalingClientService.askRandomSignalingServerToConnect();
+        }
+
     }
 
     registerWebPeerSignalingClientListBySignal(signalInitiator, signalAnswer, uuid) {
@@ -28,36 +40,57 @@ class SignalingClientList {
             let webPeer = new NodeWebPeerRTC();
             signalingClientPeerObject = new SignalingClientPeerObject(webPeer, uuid);
 
-            this.list.push(signalingClientPeerObject);
+            this.connected.push(signalingClientPeerObject);
 
         }
 
         return signalingClientPeerObject;
     }
 
-    searchWebPeerSignalingClientList(signalInitiator, signalAnswer, uuid){
+    findWebPeerSignalingClientList(signalInitiator, signalAnswer, uuid){
 
         //previous established connection
-        for (let i = 0; i < this.list.length; i++)
-            if (this.list[i].webPeer.peer !== null && this.list[i].webPeer.peer !== undefined ) {
+        for (let i = 0; i < this.connected.length; i++)
+            if (this.connected[i].webPeer.peer !== null && this.connected[i].webPeer.peer !== undefined ) {
 
-            //console.log("searchWebPeerSignalingClientList", this.list[i].webPeer.peer.signalData, data, JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(data));
+                if ( signalInitiator !== undefined && JSON.stringify(this.connected[i].webPeer.peer.signalInitiatorData) === JSON.stringify(signalInitiator))
+                    return i;
 
-            if ( signalInitiator !== undefined && JSON.stringify(this.list[i].webPeer.peer.signalInitiatorData) === JSON.stringify(signalInitiator))
-                return this.list[i];
+                if ( signalAnswer !== undefined && JSON.stringify(this.connected[i].webPeer.peer.signalData) === JSON.stringify(signalAnswer))
+                    return i;
 
-            if ( signalAnswer !== undefined && JSON.stringify(this.list[i].webPeer.peer.signalData) === JSON.stringify(signalAnswer))
-                return this.list[i];
+                if ( uuid !== undefined && this.connected[i].uuid === uuid)
+                    return i;
 
-            if ( uuid !== undefined && this.list[i].uuid === uuid)
-                return this.list[i];
-
-        }
+            }
 
 
-        return null;
+        return -1;
     }
 
+    searchWebPeerSignalingClientList(signalInitiator, signalAnswer, uuid){
+
+        let pos = this.findWebPeerSignalingClientList(signalInitiator, signalAnswer, uuid);
+
+        if (pos === -1) return null;
+
+        return this.connected[pos];
+    }
+
+    deleteWebPeerSignalingClientList(uuid){
+
+        for (let i=0; i<this.connected.length; i++)
+            if (this.connected[i].uuid === uuid ){
+                this.connected.splice(i,1);
+                return true;
+            }
+
+        return false;
+    }
+
+    computeMaxWebPeersConnected( uuid ){
+        return consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS + (this.findWebPeerSignalingClientList( uuid ) !== -1 ? -1 : 0 )
+    }
 
 }
 

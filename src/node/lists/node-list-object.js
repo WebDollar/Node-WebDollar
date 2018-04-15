@@ -6,10 +6,23 @@ const ipaddr = require('ipaddr.js');
 
 class NodesListObject {
 
-    constructor(socket, type){
+    constructor(socket, connectionType, type){
 
         this.socket = socket;
+        this.connectionType = connectionType;
         this.type = type;
+    }
+
+
+    toJSON(){
+
+        return {
+            type: this.type,
+            addr: this.socket.node.sckAddress.addressString,
+            port: this.socket.node.sckAddress.port,
+            connected: true,
+        }
+
     }
 
 }

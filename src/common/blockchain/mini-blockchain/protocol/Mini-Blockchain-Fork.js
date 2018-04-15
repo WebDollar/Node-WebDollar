@@ -1,4 +1,4 @@
-import PPoWBlockchainFork from "common/blockchain/ppow-blockchain/protocol/PPoW-Blockchain-Fork"
+import PPoWBlockchainFork from "common/blockchain/ppow-blockchain/blockchain/forks/PPoW-Blockchain-Fork"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
 import consts from "consts/const_global";
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
@@ -31,12 +31,24 @@ class MiniBlockchainFork extends inheritFork{
         if (height === this.forkChainLength-1)
             validationType["validation-timestamp-adjusted-time"] = true;
 
-        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
-    preForkClone(cloneBlocks=true){
+    preForkClone(cloneBlocks=true, cloneAccountantTree=true){
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
+
+        if (cloneAccountantTree) {
+
+            try {
+                //clone the Accountant Tree
+                this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
+            } catch (exception){
+                console.error("Error cloding Accountant Tree", exception);
+                return false;
+            }
+        } else
+            this._accountantTreeClone = null;
 
     }
 
@@ -54,8 +66,19 @@ class MiniBlockchainFork extends inheritFork{
             // remove reward
             this.blockchain.accountantTree.updateAccount( block.data.minerAddress, - block.reward, undefined, revertActions);
 
-
         }
+
+        return inheritFork.prototype.preFork.call(this, revertActions);
+
+    }
+
+    revertFork(){
+
+        //recover to the original Accountant Tree
+        if (this._accountantTreeClone !== null)
+            this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
+
+        return inheritFork.prototype.revertFork.call(this);
 
     }
 

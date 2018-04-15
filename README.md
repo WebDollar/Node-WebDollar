@@ -144,7 +144,7 @@ Follow the Tutorial [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
 2. Multi-sig with Schnorr Signatures
 
 
-# Materials to learn
+# Resources to learn
 7
 Ethereum https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369
 

@@ -49,6 +49,9 @@ class InterfaceBlockchainBlock {
 
         this.reward = undefined;
 
+        if (blockValidation === undefined)
+            blockValidation = this.blockchain.createBlockValidation();
+
         this.blockValidation = blockValidation;
 
         this.db = db;
@@ -59,7 +62,7 @@ class InterfaceBlockchainBlock {
         return true;
     }
 
-    async validateBlock(height){
+    async validateBlock( height ){
 
         if (typeof this.version !== 'number') throw {message: 'version is empty'};
         if (typeof this.nonce !== 'number') throw {message: 'nonce is empty'};
@@ -115,9 +118,7 @@ class InterfaceBlockchainBlock {
 
         //validate hash
         //skip the validation, if the blockValidationType is provided
-        if ( !this.blockValidation.blockValidationType['skip-validation']) {
-
-            console.log("_validateBlockHash");
+        if (!this.blockValidation.blockValidationType['skip-validation-PoW-hash']) {
 
             let hash = await this.computeHash();
 
@@ -249,7 +250,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, prevBlock, offset){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -328,7 +329,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockchain.getDifficultyTarget() );
+            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height) );
 
             return true;
         }
@@ -358,25 +359,55 @@ class InterfaceBlockchainBlock {
             this.version === targetBlock.version;
     }
 
-    getBlockHeader(){
+    getBlockHeaderWithInformation(){
 
         return {
+
             height: this.height,
             chainLength: this.blockchain.blocks.length,
             chainStartingPoint: this.blockchain.blocks.blocksStartingPoint,
-            header: {
-                hash: this.hash,
-                hashPrev: this.hashPrev,
-                data: {
-                    hashData: this.data.hashData,
-                    hashTransactions: this.data.hashTransactions,
-                },
 
-                nonce: this.nonce,
-            }
-
+            header: this.getBlockHeader(),
         }
+
     }
+
+    getBlockHeader(){
+
+        return {
+
+            version: this.version,
+            height: this.height,
+            hash: this.hash,
+            hashPrev: this.hashPrev,
+            data: {
+                hashData: this.data.hashData,
+            },
+            nonce: this.nonce,
+            timeStamp: this.timeStamp,
+            difficultyTarget: this.difficultyTarget,
+            difficultyTargetPrev: this.difficultyTargetPrev,
+        }
+
+    }
+
+    async importBlockFromHeader(json) {
+
+        this.version = json.version;
+        this.height = json.height;
+        this.hash = json.hash;
+        this.hashPrev = json.hashPrev;
+        this.data.hashData = json.data.hashData;
+        this.nonce = json.nonce;
+        this.timeStamp = json.timeStamp;
+        this.difficultyTarget = json.difficultyTarget;
+        this.difficultyTargetPrev = json.difficultyTargetPrev;
+
+        //calculate Hash
+        this._computeBlockHeaderPrefix(true, true);
+        await this.computeHash();
+    }
+
 
 }
 

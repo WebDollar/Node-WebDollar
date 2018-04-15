@@ -5,9 +5,11 @@
 
 // TUTORIAL BASED ON https://www.scaledrone.com/blog/posts/webrtc-chat-tutorial
 
-
+const EventEmitter = require('events');
 import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
+import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
+import ConnectionsType from "node/lists/types/Connections-Type"
 
 const config = {
 
@@ -47,6 +49,9 @@ class NodeWebPeerRTC {
 
         this.peer = null;
 
+        this.emitter = new EventEmitter();
+        this.emitter.setMaxListeners(20);
+
     }
 
     createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
@@ -78,15 +83,49 @@ class NodeWebPeerRTC {
             }
         };
 
+        /*
+            keeping information about new connection
+         */
+        this.peer.signaling = {};
+        this.peer.signaling.socketSignaling = socketSignaling;
+        this.peer.signaling.connectionId =  signalingServerConnectionId;
 
-
-        console.log('Created webRTC peer');
+        console.log('Created webRTC peer', "initiator", initiator, "signalingServerConnectionId", signalingServerConnectionId, "remoteAddress", remoteAddress, "remoteUUID", remoteUUID, "remotePort", remotePort);
 
         this.peer.disconnect = () => {  }
 
         this.socket =  this.peer;
         this.peer.signalData = null;
         this.peer.signalInitiatorData = null;
+
+
+        this.peer.on('error', err => { console.log('error', err) } );
+
+        this.peer.on('connect',async () => {
+
+            console.log('WEBRTC PEER CONNECTED', this.peer);
+
+            let remoteData = this.processDescription(this.peer.remoteDescription);
+
+
+            this.peer.remoteAddress = remoteAddress||remoteData.address;
+            this.peer.remoteUUID = remoteUUID||remoteData.uuid;
+            this.peer.remotePort = remotePort||remoteData.port;
+
+            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, socketSignaling.node.level + 1 );
+
+            this.peer.node.protocol.sendHello(["uuid"]).then( (answer)=>{
+                this.initializePeer(["uuid"]);
+            });
+
+        });
+
+
+        this.peer.on('data', (data) => {
+            console.log('data: ' , data)
+        });
+
+
 
         if (initiator) {
 
@@ -102,39 +141,6 @@ class NodeWebPeerRTC {
                 this.setupDataChannel();
             }
         }
-
-
-        this.peer.on('error', err => { console.log('error', err) } );
-
-        this.peer.on('connect',async () => {
-
-            console.log('WEBRTC PEER CONNECTED', this.peer);
-
-            let remoteData = this.processDescription(this.peer.remoteDescription);
-
-            /*
-                keeping information about new connection
-             */
-            this.peer.signaling = {};
-            this.peer.signaling.socketSignaling = socketSignaling;
-            this.peer.signaling.connectionId =  signalingServerConnectionId;
-
-            this.peer.remoteAddress = remoteAddress||remoteData.address;
-            this.peer.remoteUUID = remoteUUID||remoteData.uuid;
-            this.peer.remotePort = remotePort||remoteData.port;
-
-            SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, level+1 );
-
-            this.peer.node.protocol.sendHello(["uuid"]).then( (answer)=>{
-                this.initializePeer(["uuid"]);
-            });
-
-        });
-
-
-        this.peer.on('data', (data) => {
-            console.log('data: ' , data)
-        });
 
 
     }
@@ -193,6 +199,8 @@ class NodeWebPeerRTC {
                     inputSignal = JSON.parse(inputSignal);
                 } catch (exception){
                     console.error("Error processing JSON createSignal", inputSignal, exception)
+                    resolve({result:false, message: "Invalid input signal"});
+                    return;
                 }
             }
 
@@ -246,6 +254,7 @@ class NodeWebPeerRTC {
 
                     this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
                     resolve({result: true, message:"iceCandidate successfully introduced"});
+
                 } catch (Exception){
                     resolve({result:false, message: "iceCandidate error ", exception: Exception });
                     console.error("iceCandidate error", inputSignal.candidate);
@@ -275,7 +284,8 @@ class NodeWebPeerRTC {
                 console.log('iceConnection Disconnected');
                 if (this.peer.connected === true) {
                     this.peer.connected = false;
-                    this.callEvents("disconnect", {});
+
+                    this.emitter.emit("disconnect", {})
                 }
             }
         };
@@ -287,8 +297,9 @@ class NodeWebPeerRTC {
 
                 let name = data.name;
                 let value = data.value;
+
                 if (name !== '')
-                    this.callEvents(name, value);
+                    this.emitter.emit(name, value);
 
             } catch (exception){
                 console.error("Error onMessage", event.data, exception);
@@ -306,14 +317,14 @@ class NodeWebPeerRTC {
         if (this.peer.dataChannel.readyState === 'open') {
             if (!this.peer.connected ) {
                 this.peer.connected = true;
-                this.callEvents("connect", {});
+                this.emitter.emit("connect", {});
             }
         }
 
-        if (this.peer.dataChannel.readyState === 'close') {
+        if (this.peer.dataChannel.readyState === 'closed') {
             if (this.peer.connected){
                 this.peer.connected = false;
-                this.callEvents("disconnect", {});
+                this.emitter.emit("disconnect", {});
             }
         }
     }
@@ -322,7 +333,7 @@ class NodeWebPeerRTC {
     initializePeer(validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(this.peer, "webpeer", validationDoubleConnectionsTypes) === false){
+        if (NodesList.registerUniqueSocket(this.peer, ConnectionsType.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 
@@ -330,11 +341,11 @@ class NodeWebPeerRTC {
         this.peer.node.protocol.signaling.server.initializeSignalingServerService();
 
         this.peer.on("disconnect", ()=>{
+
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
+            NodesList.disconnectSocket( this.peer );
 
-            this.peer.signaling.socketSignaling.node.sendRequest("signals/server/connections/established-connection-was-dropped", {address: this.peer.remoteAddress, connectionId: this.peer.signaling.connectionId} );
-
-            NodesList.disconnectSocket(this.peer);
+            NodeSignalingClientProtocol.webPeerDisconnected(this);
 
         });
 
@@ -350,25 +361,30 @@ class NodeWebPeerRTC {
 
     enableEventsHandling(){
 
-        this.peer.eventSubscribers = []; //to simulate .on and .once
-        this.peer.eventSubscribersIndex = 0;
+        this.peer.errorTrials = 0;
 
-        this.peer.on = (eventName, callback) =>{
-            return this.subscribeEvent(eventName, callback, "on");
-        };
+        this.peer.on = (name, callback)=>{ this.emitter.on(name, callback) };
 
-        this.peer.once = (eventName, callback) =>{
-            return this.subscribeEvent(eventName, callback, "once");
-        };
-        this.peer.off = (index) =>{
-            return this.unscribeEvent(index);
-        };
+        this.peer.once = (name, callback)=>{ this.emitter.once(name, callback) };
+
+        this.peer.off = (id)=>{ this.emitter.off(id) };
+
         this.peer.send = (name, value) =>{
 
             let data = {name: name, value: value};
 
             if (this.peer.dataChannel.readyState !== "open") {
+
                 console.error("Error sending data to webRTC because it is not open", data);
+                this.peer.errorTrials++;
+
+                if (this.peer.errorTrials > 5) {
+
+                    NodesList.disconnectSocket( this.peer );
+                    console.warn("I deleted socket", this.peer.errorTrials);
+
+                }
+
                 return null;
             }
 
@@ -376,40 +392,6 @@ class NodeWebPeerRTC {
         };
     }
 
-    subscribeEvent(eventName, callback, type){
-        if (!this.peer ) return  null;
-
-        this.peer.eventSubscribers.push({eventName: eventName, callback: callback, type: type, index: this.peer.eventSubscribersIndex++}) ;
-
-        return this.peer.eventSubscribersIndex;
-    }
-
-    unscribeEvent(index){
-        if (!this.peer ) return  null;
-
-        for (let i=0; i< this.peer.eventSubscribers.length; i++)
-            if (this.peer.eventSubscribers[i].index === index){
-                this.peer.eventSubscribers.splice(i, 1);
-                return true;
-            }
-
-        return false;
-    }
-
-    callEvents(eventName, data){
-        if (!this.peer ) return  null;
-
-        for (let i=0; i<this.peer.eventSubscribers.length; i++)
-            if (this.peer.eventSubscribers[i].eventName === eventName){
-                this.peer.eventSubscribers[i].callback(data);
-            }
-
-        //deleting once events...
-        for (let i=this.peer.eventSubscribers.length-1; i>=0; i--)
-            if ((this.peer.eventSubscribers[i].eventName === eventName) && (this.peer.eventSubscribers[i].type === "once"))
-                this.peer.eventSubscribers.splice(i,1);
-
-    }
 
 
     /*

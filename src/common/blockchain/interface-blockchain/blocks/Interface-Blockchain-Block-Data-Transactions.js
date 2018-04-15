@@ -152,7 +152,7 @@ class InterfaceBlockchainBlockDataTransactions {
     processBlockDataTransactions( block, multiplicationFactor = 1, revertActions){
 
         for (let i=0; i<block.data.transactions.transactions.length; i++)
-            if (!this._processBlockDataTransaction( block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress, revertActions, ))
+            if (! this._processBlockDataTransaction( block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress, revertActions ) )
                 return false;
 
         return true;

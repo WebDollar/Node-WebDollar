@@ -15,21 +15,30 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         super(blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db);
 
         //first pointer is to Genesis
-        this.interlink = [{height: -1, blockId: BlockchainGenesis.hashPrev}];
-        this.level = 0;
+        this._level = undefined;
+        this.interlink = undefined;
     }
 
-    getLevel(computeLevel = true){
+    updateInterlink(){
+        this.interlink = this.calculateInterlink();
+    }
 
-        if (!computeLevel && this.level !== undefined)
-            return this.level;
+    getLevel(){
 
-        let T = this.difficultyTarget;
+        //TODO optimization
+        //if (this._level !== undefined) return this._level;
+
+        //we use difficultyTargetPrev instead of current difficultyTarget
+        let T = this.difficultyTargetPrev;
+
+        if (this.height === 0)
+            T = BlockchainGenesis.difficultyTarget;
+
         if (Buffer.isBuffer(T))
-            T = Convert.bufferToBigIntegerHex(this.difficultyTarget);
+            T = Convert.bufferToBigIntegerHex(T);
 
         let id = Convert.bufferToBigIntegerHex(this.hash);
-        
+
         //If id <= T/2^u the block is of level u => block level is max(u) for 2^u * id <= T
         // T -> inf => u -> 255
         let u = 0;
@@ -40,10 +49,11 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             pow = pow.multiply(2);
         }
         --u;
-        console.log('L=', u);
-        console.log('P=', id.multiply(1 << u).toString());
 
-        this.level = u;
+        //console.log('L=', u);
+        //console.log('P=', id.multiply(1 << u).toString());
+
+        this._level = u;
 
         return u;
     }
@@ -51,13 +61,20 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     /**
      * Algorithm 1
      */
-    updateInterlink(prevBlock){
+    calculateInterlink(){
+
+        let interlink = [{height: -1, blockId: BlockchainGenesis.hashPrev}];
+        if (this.height === 0) return interlink;
 
         let blockLevel = 0;
         // interlink = interlink'
-        if (prevBlock) {
+        let prevBlock = this.blockValidation.getBlockCallBack( this.height );
+
+        if (prevBlock === BlockchainGenesis) blockLevel = 0;
+        else
+        if ( prevBlock ) {
             for (let i = 0; i < prevBlock.interlink.length; ++i)
-                this.interlink[i] = prevBlock.interlink[i];
+                interlink[i] = prevBlock.interlink[i];
             blockLevel = prevBlock.getLevel();
         }
 
@@ -66,78 +83,81 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         for (let i = 1; i <= blockLevel; ++i){
 
-            if (i > this.interlink.length)
-                this.interlink.push({});
+            if (i > interlink.length)
+                interlink.push({});
 
-            this.interlink[i] = {height: prevBlock.height, blockId: prevBlock.hash }; //getId = Hash
+            interlink[i] = {height: prevBlock.height, blockId: prevBlock.hash }; //getId = Hash
 
         }
+
+        return interlink;
 
     }
-    
+
     _validateInterlink() {
 
-        if (this.interlink[0].height !== -1 || ! BufferExtended.safeCompare(this.interlink[0].blockId, BlockchainGenesis.hashPrev)){
-            console.error("Interlink to Genesis is wrong! ");
-            return false;
-        }
+        //validate interlinks array
+        let level = this.interlink.length-1;
+        while (level >= 0){
 
-        for (let i = 1; i < this.interlink.length; ++i){
-            let link = this.interlink[i];
-            let linkedBlock = this.blockchain.blocks[link.height];
+            let link = this.interlink[level];
+            let linkedBlock = this.blockValidation.getBlockCallBack(link.height+1);
 
-            if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId)){
-                console.error("Interlink to Genesis is wrong! ");
-                return false;
+            if (level !== 0) {
+                if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId))
+                    throw {message: "Interlink to Genesis is wrong! "};
+
+                let linkedBlockLevel = linkedBlock.getLevel();
+
+                if (linkedBlockLevel < level )
+                    throw {message: "Interlink level error", level: level}
+
+                //TODO verify that the interlinks are actually the last on the same level
+
+            } else {
+
+                if (linkedBlock !== BlockchainGenesis || this.interlink[0].height !== -1 || ! BufferExtended.safeCompare(this.interlink[0].blockId, BlockchainGenesis.hashPrev))
+                    throw {message: "Interlink to Genesis is wrong! "}
+
             }
+
+            level--;
+
+
         }
-
-        //TODO: verify if interlinks points to blocks with highest difficulty
-/*        let crtLevel = this.getLevel();
-        let lastLink = this.interlink[this.interlink.length-1];
-        let linkLevel = this.blockchain[lastLink.height].getLevel();
-
-        if (linkLevel + 1 < crtLevel) {
-            console.error('Interlink level errors');
-            return false;
-        }*/
-
-        //TODO: Verify proof of proofs
-
 
         return true;
     }
-    
-    async _supplementaryValidation() {
-        
-        return this._validateInterlink();
+
+    _supplementaryValidation() {
+        return this.validateBlockInterlinks();
     }
 
-    _computeBlockHeaderPrefix(skipPrefix){
+    _computeBlockHeaderPrefix(skipPrefix, requestHeader){
 
         if (skipPrefix === true && Buffer.isBuffer(this.computedBlockPrefix) )
             return this.computedBlockPrefix;
 
         this.computedBlockPrefix = Buffer.concat ( [
-            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, false),
+            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, false, requestHeader),
             this._serializeInterlink(),
         ]);
 
         return this.computedBlockPrefix;
 
     }
-    
+
     _serializeInterlink(){
 
         let list = [Serialization.serializeNumber1Byte(this.interlink.length)];
 
-        for (let i = 0; i < this.interlink.length; ++i) {
+        for (let i = 0; i < this.interlink.length; i++) {
 
             //optimize storage
             if (i > 0 && this.interlink[i-1].height === this.interlink[i].height){
-                list.push(Serialization.serializeNumber4Bytes(consts.SETTINGS.MAX_UINT32));
+                list.push(Serialization.serializeNumber3Bytes(0));
             } else {
-                let heightBuffer = Serialization.serializeNumber4Bytes(this.interlink[i].height + 1);
+                let heightBuffer = Serialization.serializeNumber3Bytes(this.interlink[i].height + 2 );
                 let blockIdBuffer = this.interlink[i].blockId;
                 list.push(heightBuffer);
                 list.push(blockIdBuffer);
@@ -147,7 +167,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         return Buffer.concat (list);
     }
-    
+
     _deserializeInterlink(buffer, offset){
 
         try {
@@ -158,16 +178,16 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             this.interlink = [];
             for (let i = 0; i < numInterlink; ++i) {
 
-                let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
-                offset += 4;
+                let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 3 ) );
+                offset += 3;
 
-                if (height === consts.SETTINGS.MAX_UINT32) {
+                if (height === 0) {
                     this.interlink.push(this.interlink[i-1]);
                 } else {
                     let blockId = BufferExtended.substr(buffer, offset, 32);
                     offset += 32;
 
-                    this.interlink.push( {height: height - 1, blockId: blockId} );
+                    this.interlink.push( {height: height - 2, blockId: blockId} );
                 }
             }
 
@@ -175,26 +195,22 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             console.log("Error deserialize interlink. ", exception);
             throw exception;
         }
-        
+
         return offset;
     }
-    
+
     deserializeBlock(buffer, height, reward, difficultyTarget, offset){
 
 
-        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, undefined, undefined, undefined, offset);
+        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTarget, offset);
 
         try {
 
             offset = this._deserializeInterlink(buffer, offset);
 
-            this.difficultyTarget = difficultyTarget;
-
-            this.level = this.getLevel();
-
         } catch (exception){
 
-            console.error("error deserialize a block  ", exception, buffer);
+            console.error("error deserialize a NiPoPoW block  ", exception, buffer);
             throw exception;
 
         }
@@ -202,7 +218,75 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
 
+    _interlinksToJSON(interlinks){
 
+        let data = [];
+        for (let i=0; i<interlinks.length; i++)
+            data.push({
+                height: interlinks[i].height,
+                blockId: interlinks[i].blockId,
+            })
+
+        return data;
+    }
+
+    toJSON(){
+        let answer = InterfaceBlockchainBlock.prototype.toJSON.call(this);
+
+        answer.interlinks = this._interlinksToJSON(this.interlink);
+
+        return answer;
+    }
+
+    getBlockHeader(){
+
+        let answer = InterfaceBlockchainBlock.prototype.getBlockHeader.call(this);
+
+        answer.interlinks = this._interlinksToJSON(this.interlink);
+
+        return answer;
+    }
+
+    importBlockFromHeader(json){
+
+        this.interlink = this._interlinksToJSON(json.interlinks);
+
+        return InterfaceBlockchainBlock.prototype.importBlockFromHeader.call(this, json);
+
+    }
+
+
+    validateBlockInterlinks(){
+
+        if (!this.blockValidation.blockValidationType["skip-validation-interlinks"]) {
+
+            let interlink = this.calculateInterlink();
+
+            if (interlink.length !== this.interlink.length) throw {message: "interlink has different sizes"};
+
+            for (let i = 0; i < interlink.length; i++) {
+                if (interlink[i].height !== this.interlink[i].height) throw {message: "interlink height is different"};
+                if (!BufferExtended.safeCompare(interlink[i].blockId, this.interlink[i].blockId)) throw {message: "interlink prevBlock height is different"};
+            }
+
+        }
+
+
+        return true;
+
+    }
+
+    async validateBlock(height){
+
+        let answer = await InterfaceBlockchainBlock.prototype.validateBlock.call(this, height);
+
+        if (!answer) return answer;
+
+        this.validateBlockInterlinks();
+
+        return true;
+
+    }
 
 }
 

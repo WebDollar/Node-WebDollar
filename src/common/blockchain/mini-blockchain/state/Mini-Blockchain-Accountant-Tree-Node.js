@@ -7,9 +7,9 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
-    constructor (root, parent, parentEdge, edges, value){
+    constructor (root, parent, edges, value){
 
-        super(root, parent, parentEdge, edges);
+        super(root, parent, edges);
 
         //console.log("value", value);
         this.hash = { sha256: new Buffer(32) };
@@ -359,23 +359,25 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     isLeaf(){
         return this.balances !== undefined
+        //return this.isLeafBasedOnParents();
     }
 
     isLeafBasedOnParents(){
 
-        let edge = this.parentEdge;
         let node = this;
-
         let count = 0;
+        while (node !== null){
 
-        while (node !== null && edge !== null){
+            if (node.parent !== null)
+                for (let i=0; i<node.parent.edges.length; i++)
+                    if (node.parent.edges[i].targetNode === node){
+                        count += node.parent.edges[i].label.length;
+                        break;
+                    }
 
-            count += edge.label.length;
+
             node = node.parent;
-            edge = node.parentEdge;
         }
-
-
 
         if (count === consts.ADDRESSES.ADDRESS.LENGTH)
             return true;

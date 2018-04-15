@@ -23,7 +23,7 @@ Argon2WebAssemblyCalc.loadScript = loadScriptWorker;
 let jobTerminated = false; //is not working and jobTermianted is not reliable in the Worker....
 let method = undefined;
 let block = undefined;
-let ARGON2_PARAM = { salt: 'WebDollar_make_$', time: 2, mem: 1024, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://antelle.github.io/argon2-browser/dist'}
+let ARGON2_PARAM = { salt: 'Satoshi_is_Finney', time: 2, mem: 512, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://antelle.github.io/argon2-browser/dist'}
 
 let algorithm = undefined;
 

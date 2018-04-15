@@ -1,6 +1,6 @@
 import NodeProtocol from 'common/sockets/protocol/node-protocol';
 import NodePropagationProtocol from 'common/sockets/protocol/node-propagation-protocol'
-import NodeSignalingServerProtocol from 'common/sockets/protocol/signaling/server/node-signaling-server-protocol';
+import NodeSignalingServerProtocol from 'common/sockets/protocol/signaling/server/Node-Signaling-Server-Protocol';
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import SocketAddress from 'common/sockets/socket-address'
 import isArrayBuffer from 'is-array-buffer';
@@ -61,14 +61,14 @@ class SocketExtend{
         socket.node.protocol.sendHello = (validationDoubleConnectionsTypes) => { return NodeProtocol.sendHello(socket.node, validationDoubleConnectionsTypes)  };
 
         socket.node.protocol.propagation = {};
-        socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket.node) };
+        socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket) };
 
         socket.node.protocol.signaling = {};
         socket.node.protocol.signaling.server = {};
         socket.node.protocol.signaling.server.initializeSignalingServerService = () => { return NodeSignalingServerProtocol.initializeSignalingServerService(socket) };
 
         socket.node.protocol.signaling.client = {};
-        socket.node.protocol.signaling.client.initializeSignalingClientService = (params) => { return NodeSignalingClientProtocol.initializeSignalingClientService(socket, params) };
+        socket.node.protocol.signaling.client.initializeSignalingClientService = () => { return NodeSignalingClientProtocol.initializeSignalingClientService(socket, ) };
 
         socket.node.protocol.agent = {};
         socket.node.protocol.agent.startedAgentDone = false;
@@ -105,7 +105,7 @@ class SocketExtend{
         Sending the Request and return the Promise to Wait Async
     */
 
-    sendRequestWaitOnce (socket, request, requestData, answerSuffix, timeOutInterval=4000) {
+    sendRequestWaitOnce (socket, request, requestData, answerSuffix, timeOutInterval=3000) {
 
         if ( answerSuffix !== undefined) answerSuffix = String(answerSuffix); //in case it is a number
 

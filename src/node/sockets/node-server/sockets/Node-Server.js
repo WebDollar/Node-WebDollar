@@ -4,6 +4,7 @@ import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
 import NodeExpress from "./../express/Node-Express";
+import ConnectionsType from "node/lists/types/Connections-Type";
 
 class NodeServer {
 
@@ -85,7 +86,7 @@ class NodeServer {
     initializeSocket(socket, validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(socket, "server", validationDoubleConnectionsTypes) === false){
+        if (NodesList.registerUniqueSocket(socket, ConnectionsType.CONNECTION_SERVER_SOCKET, socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 

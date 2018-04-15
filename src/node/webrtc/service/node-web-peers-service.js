@@ -1,5 +1,5 @@
 import NodeWebPeersDiscoveryService from 'node/webrtc/service/discovery/node-web-peers-discovery-service'
-
+import Blockchain from "main-blockchain/Blockchain"
 
 
 class NodeWebPeersService {
@@ -10,7 +10,19 @@ class NodeWebPeersService {
 
 
     startService(){
-        NodeWebPeersDiscoveryService.startDiscovery();
+
+        //after
+        Blockchain.onLoaded.then((answer)=>{
+            // in case the Blockchain was not loaded, I will not be interested in transactions
+
+            setTimeout(()=>{
+
+                NodeWebPeersDiscoveryService.startDiscovery();
+
+            }, 3000)
+
+        });
+
     }
 
 

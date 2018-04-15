@@ -19,20 +19,19 @@ class InterfaceBlockchainForksAdministrator {
         this.socketsProcessing = [];
     }
 
-    createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header){
+    createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, headers, ready){
 
         if (!Array.isArray(sockets)) sockets = [sockets];
 
-        if (this.findForkBySockets(sockets) !== null)
-            return null;
+        let fork = this.findForkBySockets(sockets);
+        if ( fork !== null ) return fork;
 
-        if (this.findForkByHeader(header) !== null)
-            return null;
+        fork = this.findForkByHeaders(headers);
+        if ( fork !== null) return fork;
 
-        let fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header );
+        fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, headers, ready );
 
         this.forks.push(fork);
-
         return fork;
     }
 
@@ -68,24 +67,63 @@ class InterfaceBlockchainForksAdministrator {
      * @param header
      * @returns {*}
      */
-    findForkByHeader(header){
+    findForkByHeaders(headers){
 
-        if (header === null || header === undefined)
+        if (headers === null || headers === undefined)
             return null;
-        if (header.hash === null || header.hash === undefined)
+
+        if (Array.isArray(headers))
+            for (let i=0; i<headers.length; i++) {
+
+                let fork = this._findForkyByHeader(headers[i]);
+                if (fork !== null)
+                    return fork;
+            }
+        else
+            return this._findForkyByHeader(headers);
+
+        return null;
+
+    }
+
+    _findForkyByHeader(header){
+
+        if (header === null || header === undefined || header.hash === null || header.hash === undefined)
             return null;
 
         for (let i = 0; i < this.forks.length; i++)
-            if ( this.forks[i].forkHeader !== null && this.forks[i].forkHeader.hash !== undefined && this.forks[i].forkHeader.hash !== null &&
-                (this.forks[i].forkHeader === header || BufferExtended.safeCompare(this.forks[i].forkHeader.hash, header.hash )) )
-                return this.forks[i];
+            if (this.forks[i] !== null)
+            for (let j=0; j<this.forks[i].forkHeaders.length; j++) {
+
+                if (this.forks[i].forkHeaders[j] !== null && this.forks[i].forkHeaders[j].hash !== undefined && this.forks[i].forkHeaders[j].hash !== null &&
+                    BufferExtended.safeCompare(this.forks[i].forkHeaders[j].hash, header.hash))
+                    return this.forks[i];
+            }
+
+        return null;
+
+    }
+
+    findForkByProofs(proof){
+
+        if (proof === null || proof === undefined) return false;
+
+        try{
+
+            for (let i=0; i<this.forks.length; i++)
+                if (this.forks[i].forkProofPi.equalsProofs(proof))
+                    return this.forks[i];
+
+        } catch (exception) {
+
+        }
 
         return null;
     }
 
     deleteFork(fork){
 
-        if (fork === undefined)
+        if (fork === undefined || fork === null)
             return false;
 
         for (let i=0; i<this.forks.length; i++)

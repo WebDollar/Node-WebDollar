@@ -1,7 +1,8 @@
 import SocketAddress from 'common/sockets/socket-address'
 import SignalingServerRoomConnectionObject from './signaling-server-room-connection-object';
 import NodesList from 'node/lists/nodes-list'
-
+import ConnectionsType from "node/lists/types/Connections-Type"
+import NodesType from "node/lists/types/Nodes-Type"
 /*
     The List is populated with Node Sockets who are available for WebRTC
  */
@@ -18,10 +19,9 @@ class SignalingServerRoomList {
         this.lastConnectionsId = 0;
 
         this.list = [];
-        this.events = [];
 
         //{type: ["webpeer", "client"]}
-        NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._removeDisconnectedSignalingServerRoomConnections( result ) });
+        NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._disconnectedNode( result ) });
     }
 
     registerSignalingServerRoomConnection(client1, client2, status) {
@@ -69,7 +69,7 @@ class SignalingServerRoomList {
     }
 
     searchSignalingServerRoomConnectionById(id){
-        
+
         for (let i = 0; i < this.list.length; i++)
             if (this.list[i].id === id)
                 return this.list[i];
@@ -77,19 +77,25 @@ class SignalingServerRoomList {
         return null;
     }
 
-    _removeDisconnectedSignalingServerRoomConnections(nodesListObject) {
+    _disconnectedNode(nodesListObject){
 
-        //{type: ["webpeer", "client"]}
-
-        if (nodesListObject.type === "webpeer" ||   // signaling service on webpeer
-            nodesListObject.type === "client") {
+        if ( [ ConnectionsType.CONNECTION_CLIENT_SOCKET, ConnectionsType.CONNECTION_WEBRTC].indexOf(nodesListObject.connectionType) )    // signaling service on webpeer
 
             for (let i = this.list.length-1; i >= 0 ; i--)
                 if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){
                     this.list.splice(i, 1);
                 }
 
-        }
+    }
+
+    removeServerRoomConnection( connection ) {
+
+        for (let i=0; this.list.length; i++)
+            if (this.list[i].id === connection.id){
+                this.list.splice(i,1);
+                return;
+            }
+
     }
 
 

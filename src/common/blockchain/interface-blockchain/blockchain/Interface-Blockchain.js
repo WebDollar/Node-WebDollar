@@ -7,7 +7,6 @@ import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockch
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 
 import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
-import InterfaceBlockchainTipsAdministrator from './tips/Interface-Blockchain-Tips-Administrator'
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 
@@ -45,7 +44,6 @@ class InterfaceBlockchain {
         this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER);
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
-        this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator( this );
 
         this._createBlockchainElements();
 
@@ -109,7 +107,7 @@ class InterfaceBlockchain {
 
         this.blocks.addBlock(block);
 
-        if (revertActions !== undefined)
+        if ( revertActions !== undefined )
             revertActions.push({name: "block-added", height: this.blocks.length-1 });
 
         await this._blockIncluded( block);
@@ -121,11 +119,10 @@ class InterfaceBlockchain {
             this.propagateBlocks(block.height, socketsAvoidBroadcast)
         }
 
+        this._onBlockCreated(block,  saveBlock);
 
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
             this.mining.resetMining();
-
-        this._onBlockCreated(block,  saveBlock);
 
         return true;
     }
@@ -146,7 +143,7 @@ class InterfaceBlockchain {
     async validateBlockchainBlock( block ){
 
         if ( block instanceof InterfaceBlockchainBlock === false )
-            throw ('block '+block.height+' is not an instance of InterfaceBlockchainBlock ');
+            throw {message: 'block is not an instance of InterfaceBlockchainBlock ', height:block.height};
 
         // in case it is not a fork controlled blockchain
 
@@ -162,8 +159,8 @@ class InterfaceBlockchain {
 
 
         //validate difficulty & hash
-        if (! (await block.validateBlock(block.height)))
-            throw ('block validation failed');
+        if (! (await block.validateBlock( block.height )))
+            throw {message: 'block validation failed'};
 
         //recalculate next target difficulty
         if ( !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] ){
@@ -179,7 +176,20 @@ class InterfaceBlockchain {
         return true;
     }
 
+    getBlock(height){
+        if (height === undefined)
+            height = this.blocks.length;
 
+        if (height <= 0)
+            return BlockchainGenesis;
+        else{
+            if (height > this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length}; else
+            if (this.blocks[height-1] === undefined) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
+
+            return this.blocks[height-1];
+        }
+
+    }
 
     getDifficultyTarget(height){
 
@@ -189,10 +199,8 @@ class InterfaceBlockchain {
         if (height <= 0)
             return BlockchainGenesis.difficultyTarget;
         else{
-            if (height > this.blocks.length )
-                throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
-            if (this.blocks[height-1] === undefined)
-                throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
+            if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
+            if (this.blocks[height-1] === undefined) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
 
             return this.blocks[height-1].difficultyTarget;
         }
@@ -205,11 +213,8 @@ class InterfaceBlockchain {
         if (height <= 0)
             return BlockchainGenesis.timeStamp;
         else{
-            if (height > this.blocks.length )
-                throw {message: "getTimeStamp invalid height ", height: height};
-            else
-            if (this.blocks[height-1] === undefined)
-                throw {message: "getTimeStamp invalid height ", height: height};
+            if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height}; else
+            if (this.blocks[height-1] === undefined) throw {message: "getTimeStamp invalid height ", height: height};
 
             return this.blocks[height-1].timeStamp;
         }
@@ -223,11 +228,9 @@ class InterfaceBlockchain {
         if (height <= 0)
             return BlockchainGenesis.hashPrev;
         else {
-            if (height > this.blocks.length )
-                throw {message: "getHashPrev invalid height", height: height};
-            else
-            if (this.blocks[height-1] === undefined)
-                throw {message: "getHashPrev invalid height", height: height};
+
+            if (height > this.blocks.length ) throw {message: "getHashPrev invalid height", height: height}; else
+            if (this.blocks[height-1] === undefined) throw {message: "getHashPrev invalid height", height: height};
 
             return this.blocks[height-1].hash;
         }
@@ -322,16 +325,20 @@ class InterfaceBlockchain {
 
                 let validationType = this._getLoadBlockchainValidationType(indexStart, i, numBlocks, onlyLastBlocks);
 
-                let blockValidation = new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
+                let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
 
                 await this._loadBlock(indexStart, i, blockValidation);
 
             }
 
         } catch (exception){
-            console.log("serializeMiniAccountantTreeERRROR", this.accountantTree.serializeMiniAccountant().toString("hex"));
+
+            if (this.accountantTree !== undefined)
+                console.log("serializeMiniAccountantTreeERRROR", this.accountantTree.serializeMiniAccountant().toString("hex"));
+
             console.log("serializeMiniAccountantTreeERRROR", this.blocks.length-1);
             console.error("blockchain.load raised an exception", exception);
+
             return false;
         }
 
@@ -410,7 +417,7 @@ class InterfaceBlockchain {
     }
 
     createBlockValidation(){
-        return new InterfaceBlockchainBlockValidation( this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
+        return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
     }
 
 

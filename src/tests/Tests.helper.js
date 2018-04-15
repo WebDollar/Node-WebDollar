@@ -5,12 +5,14 @@ class TestsHelper {
 
     makeId(count, randomLengths, textPossible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
 
-        if ( count === undefined) count = Math.floor(Math.random()*100 + 30 );
+        if (count === undefined)
+            count = Math.floor(Math.random() * 100 + 30 );
 
-        if (randomLengths === true) randomLengths = Math.floor( Math.random() * count );
+        if (randomLengths === true)
+            randomLengths = Math.floor(Math.random() * count );
 
         if (randomLengths)
-            count = randomLengths + Math.floor( Math.random() * ( count + randomLengths) );
+            count = randomLengths + Math.floor(Math.random() * ( count + randomLengths) );
 
         let text = "";
         let possible = textPossible;
@@ -27,7 +29,8 @@ class TestsHelper {
 
     makeDigitId(count, isNonDecimal, negative=false) {
 
-        if ( count === undefined) count = Math.floor(Math.random()*100 + 30 );
+        if (count === undefined)
+            count = Math.floor(Math.random() * 100 + 30 );
 
         let text = "";
         let digits = "0123456789";
@@ -53,11 +56,13 @@ class TestsHelper {
 
     makeIds(count, wordCount, randomLengths){
 
-        if ( count === undefined) count = Math.floor(Math.random()*100 + 30)
-        if ( randomLengths === undefined) randomLengths = false;
+        if (count === undefined)
+            count = Math.floor(Math.random() * 100 + 30)
+        if (randomLengths === undefined)
+            randomLengths = false;
 
         let result = [];
-        for (let i=0; i<count; i++) {
+        for (let i = 0; i < count; i++) {
 
             let word = this.makeId( wordCount, randomLengths);
             let found = true;
@@ -66,10 +71,10 @@ class TestsHelper {
             while (found){
 
                 found = false;
-                for (let j=0; j<result.length; j++)
+                for (let j = 0; j < result.length; j++)
                     if (result[j] === word) {
                         found = true;
-                        word = this.makeId( wordCount, randomLengths);
+                        word = this.makeId(wordCount, randomLengths);
                         break;
                     }
 
@@ -83,9 +88,10 @@ class TestsHelper {
 
     makeRandomNumber(biggestNumber, negative = false){
 
-        if ( biggestNumber === undefined) biggestNumber = WebDollarCoins.MAX_SAFE_COINS/10;
+        if (biggestNumber === undefined)
+            biggestNumber = WebDollarCoins.MAX_SAFE_COINS / 10;
 
-        let number = Math.floor( Math.random() * biggestNumber);
+        let number = Math.floor(Math.random() * biggestNumber);
 
         if (negative)
             if ( Math.floor(Math.random()) % 2 === 0 )
@@ -94,9 +100,10 @@ class TestsHelper {
         return number;
     }
 
-    makeRandomNumbersArray(count, negative=false){
+    makeRandomNumbersArray(count, negative = false){
 
-        if ( count === undefined) count = 10;
+        if (count === undefined)
+            count = 10;
 
         let result = [];
         for (let i = 0; i < count; ++i) {
@@ -110,10 +117,11 @@ class TestsHelper {
 
         let list = this.makeIds(count, wordCount, randomLengths);
 
-        for (let i=0; i<list.length; i++) {
+        for (let i = 0; i < list.length; i++) {
             let number = this.makeRandomNumber(biggestNumber);
 
-            if (floor) number = Math.floor(number);
+            if (floor)
+                number = Math.floor(number);
 
             list[i] = {text: list[i], value: number }
         }
@@ -126,6 +134,7 @@ class TestsHelper {
     }
 	
 	backPermutations(k, n, radixTestingArray, used, ind, result) {
+        
 		if(k === n) {
 			let tmp = new Array(n);
 			for(let i = 0; i < n; ++i) {
@@ -134,6 +143,7 @@ class TestsHelper {
 			result.push(tmp);
 			return;
 		}
+        
 		for(let i = 0; i < n; ++i) {
 			if(used[i] === 0) {
 				used[i] = 1;
@@ -145,23 +155,33 @@ class TestsHelper {
 	}
 	
 	makePermutations(radixTestingArray) {
+        
 		let used = new Array(radixTestingArray.length);
+        
 		for(let i = 0; i < used.length; ++i)
 			used[i] = 0;
+        
 		let result = [];
+        
 		this.backPermutations(0, used.length, radixTestingArray, used, new Array(used.length), result);
+        
 		return result;
 	}
     
     backCartesianProduct(k, maxLength, product, radixTestingArray, result) {
+        
         let tmp = "";
+        
         for(let i = 0; i < k; ++i) {
             tmp += product[i];
         }
+        
         if(tmp !== "")
             result.push(tmp);
+        
         if(k === maxLength)
             return;
+        
         for(let i = 0; i < maxLength; ++i) {
             product[k] = radixTestingArray[i];
             this.backCartesianProduct(k + 1, maxLength, product, radixTestingArray, result);
@@ -169,13 +189,16 @@ class TestsHelper {
     }
 
     makeCartesianProduct(radixTestingArray, maxLength) {
+        
         let result = [];
         let product = [];
+        
         this.backCartesianProduct(0, maxLength, product, radixTestingArray, result);
+        
         return result;
     }
 
-    generateAddresses(count){
+    generateAddresses(count, onlyAddress = true){
 
         let list = [];
 
@@ -189,8 +212,13 @@ class TestsHelper {
                     break;
                 }
 
-            if (!found)
-                list.push(address.address);
+            if (!found){
+                if (onlyAddress)
+                    list.push(address.address);
+                else
+                    list.push(address);
+                
+            }
         }
 
         return list;

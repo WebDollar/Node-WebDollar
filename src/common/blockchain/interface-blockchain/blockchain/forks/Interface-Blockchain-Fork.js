@@ -12,13 +12,14 @@ class InterfaceBlockchainFork {
 
 
     constructor (){
+
     }
 
     /**
      * initializeConstructor is used to initialize the constructor dynamically using .apply method externally passing the arguments
      */
 
-    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header){
+    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, ready=false){
 
         this.blockchain = blockchain;
 
@@ -34,24 +35,35 @@ class InterfaceBlockchainFork {
         this.forkChainStartingPoint = forkChainStartingPoint;
         this.forkChainLength = newChainLength||0;
         this.forkBlocks = [];
-        this.forkHeader = header;
+
+        if (!Array.isArray(headers)) headers = [headers];
+        this.forkHeaders = headers;
+
+        this.forkPromise = new Promise ((resolve)=>{
+            this._forkPromiseResolver = resolve;
+        });
 
         this._blocksCopy = [];
+
+        this._ready = ready;
+    }
+
+    set ready(newValue){
+        this._ready = newValue;
+    }
+
+    get ready(){
+        return this._ready;
     }
 
     async _validateFork(validateHashesAgain){
 
-        let useFork = false;
-
-        if (this.blockchain.blocks.length < this.forkStartingHeight + this.forkBlocks.length)
-            useFork = true;
+        if (this.blockchain.blocks.length > this.forkStartingHeight + this.forkBlocks.length + 1)
+            throw {message: "my blockchain is larger than yours", position: this.forkStartingHeight + this.forkBlocks.length};
         else
         if (this.blockchain.blocks.length === this.forkStartingHeight + this.forkBlocks.length) //I need to check
-            if (this.forkBlocks[this.forkBlocks.length-1].hash.compare( this.blockchain.getHashPrev(this.blockchain.blocks.length) ) < 0)
-                useFork = true;
-
-        if (!useFork)
-            return false;
+            if (this.forkBlocks[this.forkBlocks.length-1].hash.compare( this.blockchain.getHashPrev(this.blockchain.blocks.length) ) >= 0)
+                throw {message: "blockchain has same length, but your block is not better than mine"}
 
         if (validateHashesAgain)
             for (let i = 0; i < this.forkBlocks.length; i++){
@@ -82,12 +94,26 @@ class InterfaceBlockchainFork {
         //calculate the forkHeight
         let forkHeight = block.height - this.forkStartingHeight;
 
-        if (block.height < this.forkStartingHeight) throw {message: 'block height is smaller than the fork itself', blockHeight: block.height, height:height};
+        if (block.height < this.forkStartingHeight) throw {message: 'block height is smaller than the fork itself', blockHeight: block.height, forkStartingHeight:this.forkStartingHeight };
         if (block.height !== height) throw {message:"block height is different than block's height", blockHeight: block.height, height:height};
 
         let result = await this.blockchain.validateBlockchainBlock( block );
 
         return result;
+    }
+
+    getForkBlock(height){
+
+        let forkHeight = height - this.forkStartingHeight;
+
+        if (height <= 0)
+            return BlockchainGenesis; // based on genesis block
+        else if ( forkHeight === 0)
+            return this.blockchain.getBlock(height);
+        else if ( forkHeight > 0)
+            return this.forkBlocks[forkHeight - 1]; // just the fork
+        else
+            return this.blockchain.getBlock(height) // the blockchain
     }
 
     // return the difficultly target for ForkBlock
@@ -140,7 +166,7 @@ class InterfaceBlockchainFork {
         if (height === this.forkChainLength-1)
             validationType["validation-timestamp-adjusted-time"] = true;
 
-        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
     _createBlockValidation_BlockchainValidation(height, forkHeight){
@@ -150,7 +176,7 @@ class InterfaceBlockchainFork {
         if (height === this.forkChainLength-1)
             validationType["validation-timestamp-adjusted-time"] = true;
 
-        return new InterfaceBlockchainBlockValidation(this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
 
@@ -165,8 +191,6 @@ class InterfaceBlockchainFork {
         if (global.TERMINATED)
             return false;
 
-        // It don't validate the hashes of the Fork Blocks again
-
         if (! (await this._validateFork(false))) {
             console.error("validateFork was not passed");
             return false
@@ -175,11 +199,12 @@ class InterfaceBlockchainFork {
         console.log("save Fork after validateFork");
 
 
-
-
         let revertActions = new RevertActions(this.blockchain);
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+
+            //make a copy of the current accountant tree
+            let accountantTreeCopy = this.blockchain.accountantTree.serializeMiniAccountant(false);
 
             //making a copy of the current blockchain
 
@@ -189,6 +214,7 @@ class InterfaceBlockchainFork {
 
             } catch (exception){
                 console.error("preForkBefore raised an error", exception);
+                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeCopy, undefined, false);
                 return false;
             }
 
@@ -202,8 +228,10 @@ class InterfaceBlockchainFork {
                 console.error("preFork raised an error", exception);
                 console.error('----------------------------------------');
 
-                revertActions.revertOperations();
+                revertActions.revertOperations('', "all");
+                this._blocksCopy = []; //We didn't use them so far
                 await this.revertFork();
+                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeCopy, undefined, false);
 
                 return false;
             }
@@ -225,12 +253,19 @@ class InterfaceBlockchainFork {
                     StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
+                    this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
 
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});
 
                 }
 
+                await this.blockchain.saveBlockchain( this.forkStartingHeight );
+                console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
+
+
+                //successfully, let's delete the backup blocks
+                this._deleteBackupBlocks();
 
             } catch (exception){
 
@@ -244,35 +279,22 @@ class InterfaceBlockchainFork {
 
                 //revert the accountant tree
                 //revert the last K block
-                revertActions.revertOperations();
+                revertActions.revertOperations('', "all");
 
                 //reverting back to the clones, especially light settings
                 await this.revertFork();
 
+                this.blockchain.accountantTree.deserializeMiniAccountant( accountantTreeCopy, undefined, false);
             }
-
-            console.log( "FORK STATUS", index );
-            console.log( "FORK STATUS SUCCESS1: ", forkedSuccessfully );
-
 
             await this.postForkTransactions(forkedSuccessfully);
 
             this.postFork(forkedSuccessfully);
 
-            //propagating valid blocks
             if (forkedSuccessfully) {
-
-
-                await this.blockchain.saveBlockchain( this.forkStartingHeight );
-                console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
-
-
-                //successfully, let's delete the backup blocks
-                this._deleteBackupBlocks();
-
                 this.blockchain.mining.resetMining();
+                setTimeout( ()=>{ this._forkPromiseResolver(true) } , 10 ); //making it async
             }
-
 
             return forkedSuccessfully;
         });
@@ -283,6 +305,9 @@ class InterfaceBlockchainFork {
         if (success){
             //propagate last block
             this.blockchain.propagateBlocks( this.blockchain.blocks.length-1, this.sockets );
+
+            this.blockchain.agent.protocol.askBlockchain(this.getSocket());
+
         }
 
         return success;
@@ -316,7 +341,7 @@ class InterfaceBlockchainFork {
     async revertFork(){
         try {
 
-            for (let i=0; i<this._blocksCopy; i++)
+            for (let i=0; i<this._blocksCopy.length; i++)
                 if (! (await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], false, "all", false))) {
 
                     console.error("----------------------------------------------------------");
@@ -394,7 +419,7 @@ class InterfaceBlockchainFork {
 
     }
 
-    postFork(){
+    postFork(forkedSuccessfully){
 
     }
 
@@ -447,6 +472,14 @@ class InterfaceBlockchainFork {
         removeBlocks(exception);
         console.error(exception);
 
+    }
+
+    getSocket(){
+        let socket = this.sockets;
+        if (Array.isArray(socket))
+            socket = socket[0];
+
+        return socket;
     }
 
 }

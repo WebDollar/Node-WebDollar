@@ -21,7 +21,7 @@ import BufferExtended from "common/utils/BufferExtended"
 class InterfaceRadixTree extends InterfaceTree{
 
     createRoot(){
-        this.root = new InterfaceRadixTreeNode(null, null,null, [], null);
+        this.root = new InterfaceRadixTreeNode(null, null, [], null);
         this.root.root = this.root;
     }
 
@@ -80,11 +80,11 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = nodeCurrent.createNewNode( nodeCurrent, undefined, [], value);
-                                nodeCurrent.edges.push( this.root.createNewEdge( match, nodeMatch ));
+                                nodeMatch = nodeCurrent.createNewNode( nodeCurrent, [], value);
+                                nodeCurrent.edgesPush( this.root.createNewEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this.root.createNewEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
+                                nodeMatch.edgesPush( this.root.createNewEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
                                 edge.targetNode.parent = nodeMatch;
 
                                 nodeCurrent = edge.targetNode;
@@ -94,16 +94,16 @@ class InterfaceRadixTree extends InterfaceTree{
 
                                 // Adding the new nodeMatch by edge Match
 
-                                nodeMatch = nodeCurrent.createNewNode( nodeCurrent, undefined, [], null);
-                                nodeCurrent.edges.push( this.root.createNewEdge( match, nodeMatch ));
+                                nodeMatch = nodeCurrent.createNewNode( nodeCurrent,  [], null);
+                                nodeCurrent.edgesPush( this.root.createNewEdge( match, nodeMatch ));
 
                                 // Adding the new nodeEdge to the nodeMatch
-                                nodeMatch.edges.push( this.root.createNewEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
+                                nodeMatch.edgesPush( this.root.createNewEdge( BufferExtended.substr(edge.label, match.length), edge.targetNode), );
                                 edge.targetNode.parent = nodeMatch;
 
                                 // Adding thew new nodeChild with current Value
-                                let nodeChild = nodeMatch.createNewNode( nodeMatch, undefined, [], value);
-                                nodeMatch.edges.push( this.root.createNewEdge(BufferExtended.substr(input, i+match.length), nodeChild));
+                                let nodeChild = nodeMatch.createNewNode( nodeMatch, [], value);
+                                nodeMatch.edgesPush( this.root.createNewEdge(BufferExtended.substr(input, i+match.length), nodeChild));
 
                                 nodeCurrent = nodeChild;
 
@@ -126,7 +126,7 @@ class InterfaceRadixTree extends InterfaceTree{
                             if (i === input.length){ //the prefix became a solution
 
                                 if (nodeCurrent.value !== null)
-                                    throw ('the node already includes a value....');
+                                    throw {message: 'the node already includes a value....'};
                                 else
                                     nodeCurrent._setNodeValue(value);
 
@@ -152,8 +152,8 @@ class InterfaceRadixTree extends InterfaceTree{
 
                 // no more Children...
 
-                let nodeChild = nodeCurrent.createNewNode(nodeCurrent, undefined, [], value);
-                nodeCurrent.edges.push( this.root.createNewEdge( BufferExtended.substr(input, i), nodeChild ));
+                let nodeChild = nodeCurrent.createNewNode(nodeCurrent,  [], value);
+                nodeCurrent.edgesPush( this.root.createNewEdge( BufferExtended.substr(input, i), nodeChild ));
 
                 //console.log("nodeChild2", nodeChild)
                 nodeChild._changedNode();
@@ -199,7 +199,7 @@ class InterfaceRadixTree extends InterfaceTree{
         let finished = false;
 
         if (!searchResult.node.isLeaf())
-            throw ("couldn't delete because input is not a leaf node");
+            throw {message: "couldn't delete because input is not a leaf node"};
 
         let node = searchResult.node;
 
@@ -236,7 +236,7 @@ class InterfaceRadixTree extends InterfaceTree{
                     // prefix slow => slowly
                     if ( node._previousEdges.length === 1 ){
 
-                        nodeParent.edges.push(  this.root.createNewEdge( Buffer.concat( [ deletedParentEdge.label,  node._previousEdges[0].label  ] ), node._previousEdges[0].targetNode) );
+                        nodeParent.edgesPush(  this.root.createNewEdge( Buffer.concat( [ deletedParentEdge.label,  node._previousEdges[0].label  ] ), node._previousEdges[0].targetNode) );
 
                         node = node._previousEdges[0].targetNode;
                         node.parent = nodeParent;
@@ -249,7 +249,7 @@ class InterfaceRadixTree extends InterfaceTree{
                     if ( node._previousEdges.length > 1 ){
 
                         node.edges = node._previousEdges;
-                        nodeParent.edges.push( deletedParentEdge ) ;
+                        nodeParent.edgesPush( deletedParentEdge ) ;
 
                         //console.log("this._changedNode 1_1");
 
@@ -266,13 +266,14 @@ class InterfaceRadixTree extends InterfaceTree{
 
                             //replace grand parent edge child
                             for (let i = 0; i < grandParent.edges.length; i++)
-                                if (grandParent.edges[i].targetNode === nodeParent){
+                                if (grandParent.edges[i].targetNode === nodeParent) {
 
-                                    grandParent.edges[i].label =  Buffer.concat( [ grandParent.edges[i].label, edge.label  ] );
-                                    grandParent.edges[i].targetNode = node;
+
+                                    let label =  Buffer.concat( [ grandParent.edges[i].label, edge.label  ]);
+                                    grandParent.edges.splice(i,1);
+                                    grandParent.edgesPush( this.root.createNewEdge( label, node )) ;
 
                                     node.parent = grandParent;
-                                    node.parentEdge = grandParent.edges[i];
 
                                     // it is not necessary its parent
                                     //console.log("this._changedNode 1_2");
@@ -412,7 +413,7 @@ class InterfaceRadixTree extends InterfaceTree{
             return false;
 
         if (!searchResult.node.isLeaf())
-            throw ("couldn't delete because input is not a leaf node");
+            throw {message: "couldn't delete because input is not a leaf node"};
 
         let node = searchResult.node;
 

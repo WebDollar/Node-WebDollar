@@ -4,6 +4,7 @@ import NodesWaitlistObject  from 'node/lists/waitlist/nodes-waitlist-object';
 import NodesList from 'node/lists/nodes-list'
 import FallBackObject from './fallbacks/fallback-object';
 import FallBackNodesList from './fallbacks/fallback_nodes_list';
+import NodesType from "node/lists/types/Nodes-Type"
 
 const axios = require('axios');
 
@@ -119,24 +120,36 @@ class NodeDiscoveryService {
                     nodes = data.nodes || [];
 
                     //console.log("FallBack Nodes ",nodes);
-
                     if (Array.isArray(nodes)) {
 
+                        //let's shuffle
                         console.warn("NEW NODES", nodes);
+
+                        let marked = [];
 
                         for (let i = 0; i < nodes.length; i++) {
 
-                            let nodeAddress = '', nodePort = undefined,
-                                nodeType = NodesWaitlistObject.NODES_WAITLIST_OBJECT_TYPE.NODE_PEER_TERMINAL_SERVER;
 
-                            if (typeof nodes[i] === "object") {
-                                nodeAddress = nodes[i].addr || '';
-                                nodePort = nodes[i].port;
-                            } else {
-                                nodeAddress = nodes[i]; //a simple string Address
+
+                            let pos = Math.floor( Math.random(  ) * nodes.length );
+
+                            while (marked[pos] !== undefined){
+                                pos = Math.floor( Math.random(  ) * nodes.length );
                             }
 
-                            NodesWaitlist.addNewNodeToWaitlist(nodeAddress, nodePort, nodeType, 1);
+                            marked[pos] = true;
+
+                            let nodeAddress = '', nodePort = undefined,
+                                nodeType = NodesType.NODE_TERMINAL;
+
+                            if (typeof nodes[pos] === "object") {
+                                nodeAddress = nodes[pos].addr || '';
+                                nodePort = nodes[pos].port;
+                            } else {
+                                nodeAddress = nodes[pos]; //a simple string Address
+                            }
+
+                            NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType, false, 1, "fallback" );
                         }
 
                     }

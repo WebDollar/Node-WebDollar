@@ -1,6 +1,6 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
-import InterfaceBlockchainProtocolTipsManager from "./Interface-Blockchain-Protocol-Tips-Manager"
+import InterfaceBlockchainProtocolForksManager from "./Interface-Blockchain-Protocol-Forks-Manager"
 
 import Serialization from 'common/utils/Serialization';
 import NodeProtocol from 'common/sockets/protocol/node-protocol'
@@ -51,21 +51,21 @@ class InterfaceBlockchainProtocol {
             this._initializeNewSocket(NodesList.nodes[i]);
 
         this.createForkSolver();
-        this.createTipsManager();
+        this.createForksManager();
     }
 
     createForkSolver(){
         this.forkSolver = new InterfaceBlockchainProtocolForkSolver(this.blockchain, this);
     }
 
-    createTipsManager(){
-        this.tipsManager = new InterfaceBlockchainProtocolTipsManager(this.blockchain, this);
+    createForksManager(){
+        this.forksManager = new InterfaceBlockchainProtocolForksManager(this.blockchain, this);
     }
 
     propagateHeader(block,  socketsAvoidBroadcast){
 
         // broadcasting the new block, to everybody else
-        NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeader(), "all", socketsAvoidBroadcast);
+        NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeaderWithInformation(), "all", socketsAvoidBroadcast);
 
     }
 
@@ -85,21 +85,15 @@ class InterfaceBlockchainProtocol {
 
         if (typeof data.header.hashPrev === 'string')
             data.header.hashPrev = Serialization.fromBase(data.header.hashPrev);
-        else
-            data.header.hashPrev = new Buffer(data.header.hashPrev);
 
         if (typeof data.header.hash === 'string')
             data.header.hash = Serialization.fromBase(data.header.hash);
-        else
-            data.header.hash = new Buffer(data.header.hash);
 
         if ((typeof data.header.nonce === 'number' || Buffer.isBuffer(data.header.nonce)) === false)
             throw {message: 'nonce is not specified'};
 
         if (typeof data.header.data.hashData === 'string')
             data.header.data.hashData = Serialization.fromBase(data.header.data.hashData);
-        else
-            data.header.data.hashData = new Buffer(data.header.data.hashData);
 
         if (data.header.chainLength < data.header.height)
             throw {message: 'chainLength is smaller than block height ?? ', dataChainLength: data.header.chainLength, dataHeaderHeight: data.header.height};
@@ -127,7 +121,7 @@ class InterfaceBlockchainProtocol {
                     if (this.blockchain.blocks.length > 0 && this.blockchain.blocks.last !== undefined)
                         answer = {
                             result: true,
-                            data: this.blockchain.blocks.last.getBlockHeader()
+                            data: this.blockchain.blocks.last.getBlockHeaderWithInformation()
                         };
                     else
                         answer = { result: false,  message: "no blocks"};
@@ -168,11 +162,6 @@ class InterfaceBlockchainProtocol {
 
                     this._validateBlockchainHeader(data);
 
-                    console.log("blockchain/header/new-block validated");
-
-                    //validate header
-                    //TODO !!!
-
                     if (data.height < 0)
                         throw {message: "your block is invalid"};
 
@@ -189,25 +178,15 @@ class InterfaceBlockchainProtocol {
 
                     }
 
-                    console.log("blockchain/header/new-block discoverNewForkTip");
+                    console.log("blockchain/header/new-block newForkTip");
 
-                    let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
-
-                    socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
-                        result: true,
-                        forkAnswer: (result !== null)
-                    });
-
+                    await this.forksManager.newForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
 
                 } catch (exception) {
 
                     if (! (typeof exception === "object" && exception.message === "your block is not new, because I have the same block at same height"))
-                        console.error("Socket Error - blockchain/new-block-header", exception, data);
+                        console.error("Socket Error - blockchain/new-block-header", socket.node.sckAddress.addressString, exception, data);
 
-                    socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
-                        result: false,
-                        message: exception,
-                    });
                 }
 
 
@@ -296,6 +275,8 @@ class InterfaceBlockchainProtocol {
 
             });
 
+        this.askBlockchain(socket);
+
     }
 
     _uninitializeSocket(nodesListObject) {
@@ -308,7 +289,7 @@ class InterfaceBlockchainProtocol {
 
         let data = await socket.node.sendRequestWaitOnce("get/blockchain/header/last-block", undefined, "answer");
 
-        console.log("get/blockchain/header/last-block2", data);
+        //console.log("get/blockchain/header/last-block2", data);
 
         try {
 
@@ -331,12 +312,8 @@ class InterfaceBlockchainProtocol {
 
             }
 
-            let result = await this.tipsManager.discoverNewForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
+            let result = await this.forksManager.newForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
 
-            socket.node.sendRequest("blockchain/header/new-block/answer/" + data.height || 0, {
-                result: true,
-                forkAnswer: (result !== null)
-            });
 
             return result;
 

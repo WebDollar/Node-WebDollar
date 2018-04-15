@@ -41,15 +41,10 @@ class MiniBlockchain extends  inheritBlockchain{
 
         let revertException = false;
 
-        let hashAccountantTree = [];
-
         try{
 
-
-            // hashAccountantTree[0] = this.accountantTree.serializeMiniAccountant();
-
             //updating reward
-            let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions )
+            let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions );
 
             //reward
             if (result === null || result === undefined)
@@ -65,7 +60,7 @@ class MiniBlockchain extends  inheritBlockchain{
                 revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
             }
 
-            if (!block.data.transactions.processBlockDataTransactions( block, 1, revertActions))
+            if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions ))
                 throw {message: "Process Block Data Transactions failed"};
 
             let callbackDone = await callback();
@@ -84,22 +79,6 @@ class MiniBlockchain extends  inheritBlockchain{
             if (revertException || revertAutomatically){
 
                 revertActions.revertOperations();
-
-                // hashAccountantTree[1] = this.accountantTree.serializeMiniAccountant();
-                //
-                // if (revertActions) {
-                //     console.log("mini blockchain-fork");
-                //     for (let i = 0; i < hashAccountantTree.length; i++) {
-                //         console.warn("accountantTree", i, "   ", hashAccountantTree[i].toString("hex"), revertException);
-                //
-                //         if (revertException)
-                //             if (!this.accountantTree.serializeMiniAccountant().equals(hashAccountantTree[i])) {
-                //                 console.error("************************************************");
-                //                 console.error("accountantTree", i, "    ", this.accountantTree.serializeMiniAccountant());
-                //                 console.error("************************************************");
-                //             }
-                //     }
-                // }
 
                 if (revertException)
                     return false;
@@ -125,17 +104,15 @@ class MiniBlockchain extends  inheritBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
+    async includeBlockchainBlock( block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions ){
 
         if (await this.simulateNewBlock(block, false, revertActions,
 
                 async ()=>{
-                    return await inheritBlockchain.prototype.includeBlockchainBlock.call(this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
+                    return await inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
                 }
 
             )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
-
-
 
         return true;
     }
@@ -174,7 +151,7 @@ class MiniBlockchain extends  inheritBlockchain{
             return true;
 
         } catch (exception){
-            console.error("Couldn't save MiniBlockchain", exception)
+            console.error("Couldn't save MiniBlockchain", exception);
             return false;
         }
     }
@@ -191,14 +168,18 @@ class MiniBlockchain extends  inheritBlockchain{
         try {
 
             let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
-            let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
-            //let serializationAccountantTreeFinal = this.accountantTree.serializeMiniAccountant();
+            let result;
 
-            result = result && await inheritBlockchain.prototype.loadBlockchain.call( this  );
-
-            if (result === false){
-                throw {message: "Problem loading the blockchain"};
+            try {
+                result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
+            } catch (exception){
+                console.error("accountant Tree returned an error", exception);
             }
+
+            result = await inheritBlockchain.prototype.loadBlockchain.call( this  );
+
+            if ( result === false )
+                throw {message: "Problem loading the blockchain"};
 
             //check the accountant Tree if matches
             console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);

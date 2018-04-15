@@ -145,7 +145,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
     }
 
-    async solveFork(fork) {
+    async _solveFork(fork) {
 
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
@@ -162,12 +162,11 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             //downloading the accountant tree
             StatusEvents.emit( "agent/status", {message: "Downloading Accountant Tree", blockHeight: fork.forkStartingHeight } );
-
             let answer = await this.protocol.getAccountantTree(socket, fork.forkStartingHeight);
 
             fork.forkPrevAccountantTree = answer;
 
-            //downloading the light settings
+            //Downloading Proof Xi and light settings
             answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkStartingHeight  }, fork.forkStartingHeight );
 
             if (answer === null) throw {message: "get-light-settings never received ", forkChainStartingPoint: fork.forkChainStartingPoint};
@@ -201,7 +200,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
                     throw {message: "block for difficulty never received ", blockRequested: blockRequested};
 
                 let blockValidation = fork._createBlockValidation_ForkValidation(blockRequested, fork.forkBlocks.length-1);
-                let block = this._deserializeForkBlock( answer.block, blockRequested , blockValidation);
+                let block = this._deserializeForkBlock( fork, answer.block, blockRequested , blockValidation);
 
                 if (blockRequested < fork.forkDifficultyCalculation.difficultyCalculationStarts)
                     block.difficultyTarget = fork.forkDifficultyCalculation.difficultyAdditionalBlockFirstDifficulty;
@@ -230,8 +229,30 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevHashPrev = null;
         }
 
-        return await inheritForkSolver.prototype.solveFork.call(this, fork);
+        return await inheritForkSolver.prototype._solveFork.call(this, fork);
     }
+
+
+    async optionalProcess ( socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint ){
+
+        if (binarySearchResult.position === -1 && currentBlockchainLength < forkChainLength){
+
+            let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: forkChainStartingPoint }, forkChainStartingPoint );
+
+            if (answer === null || answer === undefined )
+                throw {message: "connection dropped headers-info forkChainStartingPoint"};
+
+            if (answer.result !== true || answer.header === undefined)
+                throw {message: "headers-info 0 malformed"};
+
+            binarySearchResult.position = {position: forkChainStartingPoint, header: answer.header};
+
+        }
+
+        await inheritForkSolver.prototype.optionalProcess.call(this, socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint )
+
+    }
+
 
 }
 

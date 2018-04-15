@@ -18,6 +18,7 @@ class NodesList {
         console.log("NodesList constructor");
 
         this.emitter = new EventEmitter();
+        this.emitter.setMaxListeners(100);
 
         this.nodes = [];
         this.nodesTotal = 0;
@@ -26,41 +27,40 @@ class NodesList {
     }
 
 
-    searchNodeSocketByAddress(sckAddress, type, validationDoubleConnectionsTypes){
+    searchNodeSocketByAddress(sckAddress, connectionType, validationDoubleConnectionsTypes){
 
-        if (type === undefined) type = 'all';
+        if (connectionType === undefined) connectionType = 'all';
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
         for (let i=0; i<this.nodes.length; i++)
-            if ( (this.nodes[i].type === type || type  === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress, validationDoubleConnectionsTypes))){
+            if ( (this.nodes[i].connectionType === connectionType || connectionType === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress, validationDoubleConnectionsTypes))){
                 return this.nodes[i];
             }
 
         return null;
     }
 
-    registerUniqueSocket(socket, type, validationDoubleConnectionsTypes){
+    registerUniqueSocket(socket, connectionType, type, validationDoubleConnectionsTypes){
 
-        if (type === undefined) throw ("type is necessary");
-
-        socket.node.type = type;
-        socket.node.index = ++this.nodesTotal;
+        if (type === undefined) throw {message: "type is necessary"};
 
         if (!socket.node || !socket.node.protocol || !socket.node.protocol.helloValidated ) {
-
-            //console.error("Error - registerUniqueSocket rejected by invalid helloValidated", ( socket.node !== undefined ? socket.node.protocol.helloValidated : undefined ) );
-
             socket.disconnect(true);
             return false;
         }
+
+        socket.node.connectionType = connectionType;
+        socket.node.type = type;
+
+        socket.node.index = ++this.nodesTotal;
 
         // avoiding double connections                              unless it is allowed to double connections
         if ( this.searchNodeSocketByAddress(socket, undefined, validationDoubleConnectionsTypes ) === null ) {
 
             // it is a unique connection, I should register this connection
 
-            let object = new NodesListObject(socket, type);
+            let object = new NodesListObject(socket, connectionType, type);
             this.nodes.push(object);
 
             this.emitter.emit("nodes-list/connected", object);
@@ -76,7 +76,7 @@ class NodesList {
     }
 
     //Removing socket from the list (the connection was terminated)
-    disconnectSocket(socket, type){
+    disconnectSocket(socket, connectionType){
 
 
         if (socket !== null && !socket.hasOwnProperty("node") ) {
@@ -87,12 +87,12 @@ class NodesList {
             return false;
         }
 
-        if (type === undefined) type = 'all';
+        if (connectionType === undefined) connectionType = 'all';
 
         //console.log("disconnecting", socket, this.nodes);
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if ((this.nodes[i].type === type || type  === "all") &&
+            if ((this.nodes[i].connectionType === connectionType || connectionType  === "all") &&
                 (this.nodes[i].socket === socket  || this.nodes[i].socket.node.sckAddress.uuid === socket.node.sckAddress.uuid   )) {
 
                 console.error('deleting client socket '+ i +" "+ socket.node.sckAddress.toString());
@@ -113,39 +113,39 @@ class NodesList {
     }
 
     //return the JOIN of the clientSockets and serverSockets
-    getNodes(type){
+    getNodes(connectionType){
 
-        if ( type === undefined) type = 'all';
+        if ( connectionType === undefined) connectionType = 'all';
 
         let list = [];
 
         for (let i=0; i<this.nodes.length; i++)
 
-            if (typeof type === 'string') { // in case type is just a simple string
-                if (type === this.nodes[i].type || type === "all")
+            if (Array.isArray(connectionType)) { //in case type is an Array
+                if (this.nodes[i].connectionType in connectionType)
                     list.push(this.nodes[i]);
-            }
-            else if (Array.isArray(type)) //in case type is an Array
-                if (this.nodes[i].type in type)
-                    list.push(this.nodes[i]);
+            } else
+            // in case type is just a simple string
+            if (connectionType === this.nodes[i].connectionType || connectionType === "all")
+                list.push(this.nodes[i]);
 
         return list;
     }
 
-    countNodes(type){
-        if ( type === undefined) type = 'all';
+    countNodes(connectionType){
+
+        if ( connectionType === undefined) connectionType = 'all';
 
         let count = 0;
 
         for (let i=0; i<this.nodes.length; i++)
-
-            if (typeof type === 'string') { // in case type is just a simple string
-                if (type === this.nodes[i].type || type === "all")
+            if (Array.isArray(connectionType)) { //in case type is an Array
+                if (this.nodes[i].connectionType in connectionType)
                     count++;
             }
-            else if (Array.isArray(type)) //in case type is an Array
-                if (this.nodes[i].type in type)
-                    count++;
+            else
+            if (connectionType === this.nodes[i].connectionType || connectionType === "all")
+                count++;
 
         return count;
     }

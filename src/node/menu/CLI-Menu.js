@@ -8,7 +8,7 @@ class CLI{
 
     constructor(){
 
-        if ( process.env.BROWSER)
+        if (process.env.BROWSER)
             return;
 
         this.WEBD_CLI = readline.createInterface({
@@ -93,7 +93,6 @@ class CLI{
             addressId = -1;
 
         return addressId;
-
     }
 
     _showCommands() {
@@ -108,9 +107,31 @@ class CLI{
         return true;
     }
 
+    _sync(sync = true) {
+
+        /*let callback = () => {
+
+            Blockchain.startMiningNextTimeSynchronized = true;
+        };
+
+        if (!Blockchain._blockchainInitiated) {
+            Blockchain.createBlockchain("full-node", () => {
+                Node.NodeServer.startServer();
+                Node.NodeClientsService.startService();
+                Blockchain.Mining.stopMining();
+                callback();
+            });
+        } else {
+            Blockchain.Mining.stopMining();
+            callback();
+        }*/
+    }
+
     async listAddresses() {
 
         console.info('\nWallet addresses:');
+
+        this._sync(true);
 
         let miningAddress = Blockchain.blockchain.mining.minerAddress;
         if (miningAddress === undefined)
@@ -138,6 +159,8 @@ class CLI{
             balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
         }
         console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
+
+        this._sync(false);
 
         return true;
     }
@@ -320,8 +343,7 @@ class CLI{
 
                 callback();
             });
-        }
-        else {
+        } else {
             callback();
         }
 

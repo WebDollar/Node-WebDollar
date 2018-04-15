@@ -17,8 +17,8 @@ class GeoHelper {
             sckAddress = SocketAddress.createSocketAddress(address);
             address = sckAddress.getAddress(false);
 
-            if ( sckAddress.geoLocation !== undefined && sckAddress.geoLocation !== null)
-                return sckAddress.geoLocation;
+            if ( sckAddress._geoLocation !== undefined && sckAddress._geoLocation !== null)
+                return sckAddress._geoLocation;
         }
 
         try{
@@ -29,7 +29,11 @@ class GeoHelper {
                 localIP = true;
             }
 
-            let data = await DownloadHelper.downloadMultipleFiles(["https://ip-api.com/json/"+address, "https://freegeoip.net/json/"+address ], 30000);
+            let list = [];
+            list.push("https://freegeoip.net/json/"+address);
+            // list.push ( ["https://geoip-db.com/json/"+address,  ]); //don't support domains
+
+            let data = await DownloadHelper.downloadMultipleFiles(list, 30000);
 
             if (data !== null && data !== undefined){
 
@@ -54,10 +58,11 @@ class GeoHelper {
                 let geoLocation = {
                     country: country,
                     countryCode: countryCode,
+                    city: data.city||'',
+                    state: data.state||'',
                     region: data.regionname||data.region_name||'',
                     regionCode: data.regioncode||data.region_code||'',
 
-                    city: data.city,
                     lat: (data.latitude||data.lat||22.2120780) + (localIP ? 0.05* (-1 + 2*Math.random() ) : 0),
                     lng: (data.longitude||data.lng||data.lon||-40.1109744) + (localIP ? 0.05*(-1 + 2*Math.random()) : 0),
                     isp: data.isp,
@@ -68,7 +73,7 @@ class GeoHelper {
                 };
 
                 if (!skipSocketAddress)
-                    sckAddress.geoLocation = geoLocation;
+                    sckAddress._geoLocation = geoLocation;
 
                 return geoLocation;
             }

@@ -13,7 +13,7 @@ class InterfaceTree{
     }
 
     createRoot(){
-        this.root = new InterfaceTreeNode(null, null, null, [], null);
+        this.root = new InterfaceTreeNode(null, null,  [], null);
         this.root.root = this.root;
     }
 
@@ -35,8 +35,8 @@ class InterfaceTree{
         if (parent === null || parent === undefined)
             parent = this.root;
 
-        let node = this.root.createNewNode( parent, undefined, [], data )
-        parent.edges.push( this.root.createNewEdge( node ) );
+        let node = this.root.createNewNode( parent,  [], data )
+        parent.edgesPush( this.root.createNewEdge( node ) );
 
         node._changedNode();
         return node;
@@ -75,7 +75,7 @@ class InterfaceTree{
             // incase the current node has children, let's move the childrens
             if (node.edges.length > 0)
                 for (let i = 0; i < node.edges.length; i++) {
-                    nodeParent.edges.push(this.root.createNewEdge(node.edges[i].targetNode))
+                    nodeParent.edgesPush( this.root.createNewEdge(node.edges[i].targetNode))
                     node.edges[i].targetNode.parent = nodeParent;
                 }
 

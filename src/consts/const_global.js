@@ -1,9 +1,7 @@
 const uuid = require('uuid');
 
 let consts = {
-
     DEBUG: false,
-
 };
 
 consts.BLOCKCHAIN = {
@@ -25,6 +23,7 @@ consts.BLOCKCHAIN = {
     LIGHT:{
         VALIDATE_LAST_BLOCKS: 10 , //overwrite below
         SAFETY_LAST_BLOCKS: 40, //overwrite below
+
         SAFETY_LAST_BLOCKS_DELETE: 400, //overwrite below
     },
 
@@ -57,11 +56,14 @@ consts.MINI_BLOCKCHAIN = {
 
 
 consts.POPOW_PARAMS={
-    m: 6,
-    k: 6,
+    m: 30, //length proof Pi for validating the Genesis
+
+    k: 5, //length proof Xi for Accountant Tree
+    k1: 5, //length
+
     d: 0.5,
-    BLOCKS_LEVEL_INFINITE: 1 << 30,
-    ACTIVATED : false,
+
+    ACTIVATED : true,
 };
 
 
@@ -111,7 +113,6 @@ consts.ADDRESSES = {
             VERSION_PREFIX : "00", //ending BASE64 HEX
             CHECK_SUM_LENGTH : 4, //in bytes   //ending BASE64 HEX
 
-
             PREFIX_BASE64 : "584043fe", //BASE64 HEX  WEBD$
             //WEBD  584043
             //WEBD$ 584043FF
@@ -134,11 +135,11 @@ consts.ADDRESSES.ADDRESS.WIF.LENGTH = consts.ADDRESSES.ADDRESS.LENGTH + consts.A
 
 
 consts.HASH_ARGON2_PARAMS = {
-    salt: 'WebDollar_make_$',
-    saltBuffer: Buffer.from("WebDollar_make_$"),
+    salt: 'Satoshi_is_Finney',
+    saltBuffer: Buffer.from("Satoshi_is_Finney"),
     time: 2,
-    memPower:10,
-    memBytes: 1024,
+    memPower:9,
+    memBytes: 512,
     parallelism: 2,
     //argon2d
     algoNode: 0,
@@ -192,8 +193,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.278",
-        VERSION_COMPATIBILITY: "0.278",
+        VERSION: "0.5",
+        VERSION_COMPATIBILITY: "0.5",
         PROTOCOL: "WebDollar",
         SSL: true,
 
@@ -206,8 +207,8 @@ consts.SETTINGS = {
         STATUS_INTERVAL: 60 * 1000,                      //miliseconds
 
         WAITLIST: {
-            TRY_RECONNECT_AGAIN: 60 * 1000,             //miliseconds
-            INTERVAL: 5 * 1000,                         //miliseconds
+            TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
+            INTERVAL: 2 * 1000,                         //miliseconds
         },
 
         SIGNALING: {
@@ -228,16 +229,21 @@ consts.SETTINGS = {
 
         CONNECTIONS:{
 
-            NODES: {
-                MAXIMUM_CONNECTIONS: 100,
+            SOCKETS: {
+                MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
+                MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
             },
 
             WEBRTC: {
-                MAXIMUM_CONNECTIONS: 5,
+                MAXIMUM_CONNECTIONS: 7,
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 40,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 20,
+            },
+
+            TIMEOUT: {
+                WAIT_ASYNC_DISCOVERY_TIMEOUT: 6500,
             }
 
         },
@@ -252,7 +258,6 @@ consts.SETTINGS = {
 
     },
 
-    MAX_UINT32: 1 << 30,
 
 };
 
@@ -262,6 +267,7 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.VERSION += "1";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "1";
     consts.SETTINGS.NODE.SSL = false;
+    consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 }
 
 
