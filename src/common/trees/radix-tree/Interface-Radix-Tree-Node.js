@@ -60,7 +60,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                     offset += valueLength;
 
                     let targetNode = this.createNewNode();
-                    this.edges.push( this.root.createNewEdge(label, targetNode) );
+                    this.edgesPush( this.root.createNewEdge(label, targetNode) );
 
 
                     arguments[1] = offset;

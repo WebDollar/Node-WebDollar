@@ -790,7 +790,7 @@ describe('MiniBlockchainAccountantTree', () => {
 
             let address = addresses[index];
 
-            let value = Math.floor( Math.random() * WebDollarCoins.MAX_SAFE_COINS / 100 );
+            let value = Math.floor( Math.random() * WebDollarCoins.MAX_SAFE_COINS / 1000 );
 
             tests.push({
                 address:address,
