@@ -138,7 +138,7 @@ consts.HASH_ARGON2_PARAMS = {
     salt: 'Satoshi_is_Finney',
     saltBuffer: Buffer.from("Satoshi_is_Finney"),
     time: 2,
-    memPower:10,
+    memPower:9,
     memBytes: 512,
     parallelism: 2,
     //argon2d
