@@ -268,7 +268,12 @@ class InterfaceRadixTree extends InterfaceTree{
                             for (let i = 0; i < grandParent.edges.length; i++)
                                 if (grandParent.edges[i].targetNode === nodeParent) {
 
-                                    grandParent.edgesPush( this.root.createNewEdge( Buffer.concat( [ grandParent.edges[i].label, edge.label  ] ), node ) );
+
+                                    let label =  Buffer.concat( [ grandParent.edges[i].label, edge.label  ]);
+                                    grandParent.edges.splice(i,1);
+                                    grandParent.edgesPush( this.root.createNewEdge( label, node )) ;
+
+                                    node.parent = grandParent;
 
                                     // it is not necessary its parent
                                     //console.log("this._changedNode 1_2");
