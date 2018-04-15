@@ -101,6 +101,8 @@ class InterfaceBlockchainProtocolForksManager {
 
                 fork = this.blockchain.forksAdministrator.forks[i];
 
+                if (!fork.ready) continue;
+
                 if (bestFork === null || bestFork.forkChainLength < fork.forkChainLength)
                     bestFork = fork;
 
