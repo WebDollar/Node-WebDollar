@@ -7,16 +7,34 @@ import StatusEvents from "common/events/Status-Events";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
-    async initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers){
+    async initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, ready){
 
-        InterfaceBlockchainFork.prototype.initializeConstructor.call(this, blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers);
+        InterfaceBlockchainFork.prototype.initializeConstructor.call(this, blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, ready);
 
         this.forkProofPi = null;
         this._forkProofPiClone = null;
 
-        if (this.blockchain.agent.light && (forkChainStartingPoint === forkStartingHeight)) {
+    }
 
-            //Downloading Proof Pi
+    set ready(newValue){
+        this._ready = newValue;
+
+        if (newValue)
+            if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+                this._ready = false;
+                this._downloadProof();
+            }
+    }
+
+    get ready(){
+        return this._ready;
+    }
+
+    async _downloadProof(){
+
+        //Downloading Proof Pi
+        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+
 
             StatusEvents.emit( "agent/status", {message: "Downloading Proofs", blockHeight: this.forkStartingHeight } );
 
@@ -35,36 +53,14 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             StatusEvents.emit( "agent/status", {message: "Proofs Validated", blockHeight: this.forkStartingHeight } );
 
+            this._ready = true;
         }
-
-    }
-
-    //light validation Proof Xi
-    _validateProofXi(){
-        
-        if (!this.blockchain.agent.light) return true;
-        if (this.forkChainStartingPoint !== this.forkStartingHeight || this.forkProofPi === null) return true;
-
-        //for (let i=this.forkBlocks.length-consts.POPOW_PARAMS.k; i<this.forkBlocks.length; i++) {
-        for (let i=0; i<this.forkBlocks.length; i++) {
-
-            this.forkBlocks[i].blockValidation.getBlockCallBack = this.getForkProofsPiBlock.bind(this);
-
-            if (!this.forkBlocks[i]._validateInterlink()) {
-                throw {message: "validate Interlink Failed"};
-            }
-
-            this.forkProofPi.blocks.push( this.forkBlocks[i] );
-
-        }
-
-        return true;
 
     }
 
     _validateFork(validateHashesAgain){
 
-        this._validateProofXi();
+        //this._validateProofXi();
 
         return InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
 
@@ -89,7 +85,14 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     getForkProofsPiBlock(height){
         if (height <= 0)  return BlockchainGenesis; // based on genesis block
-        else return this.forkProofPi.hasBlock(height - 1);
+        else {
+
+            let block = this.forkProofPi.hasBlock(height - 1);
+            if (block !== null) return block;
+
+            return this.getForkBlock(height);
+
+        }
     }
 
 

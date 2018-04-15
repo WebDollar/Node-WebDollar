@@ -84,7 +84,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
             validationType["skip-validation-timestamp"] = true;
 
-        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        if (this.forkProofPi !== null && forkHeight < this.forkChainLength - consts.POPOW_PARAMS.m)
+            validationType["skip-validation-interlinks"] = true;
+
+        return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== null ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
     _createBlockValidation_BlockchainValidation(height, forkHeight){
@@ -100,7 +103,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
             validationType["skip-validation-timestamp"] = true;
 
-        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        if (this.forkProofPi !== null && forkHeight < this.forkChainLength - consts.POPOW_PARAMS.m)
+            validationType["skip-validation-interlinks"] = true;
+
+        return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== null ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
     preForkClone(){
@@ -183,6 +189,14 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         }
 
         return answer;
+    }
+
+
+    postFork(forkedSuccessfully){
+
+        if (forkedSuccessfully)
+            this.blockchain.proofPi = this.forkProofPi;
+
     }
 
 

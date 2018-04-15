@@ -62,7 +62,7 @@ class InterfaceBlockchainBlock {
         return true;
     }
 
-    async validateBlock(height){
+    async validateBlock( height ){
 
         if (typeof this.version !== 'number') throw {message: 'version is empty'};
         if (typeof this.nonce !== 'number') throw {message: 'nonce is empty'};
@@ -250,7 +250,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, prevBlock, offset){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")

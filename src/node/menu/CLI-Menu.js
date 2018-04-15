@@ -30,7 +30,7 @@ class CLI{
             return;
         }
 
-        let answer =  await this.question('Command: ');
+        let answer = await this.question('Command: ');
 
         switch(answer.trim()) {
             case '1':

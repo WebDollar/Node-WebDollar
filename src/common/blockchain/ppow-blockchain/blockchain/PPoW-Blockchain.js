@@ -18,12 +18,8 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     async _blockIncluded(block){
 
-        let N = this.blocks.length;
-        let prevBlock = (N >= 2) ? this.blocks[N-2] : null;
-
-        block.updateInterlink(prevBlock);
+        block.updateInterlink();
         block.level = block.getLevel(); //computing the level
-
 
         //TODO generate proofs as a LightNode
         if (!this.agent.light)

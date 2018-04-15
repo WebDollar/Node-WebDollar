@@ -5,15 +5,39 @@ import NodesList from 'node/lists/nodes-list'
 class NodePropagationProtocol {
 
     constructor(){
-        console.log("NodePropagation constructor");
+
+        this._newNodesWaitList = [];
+
+        this.processNewNodeInterval();
+
     }
 
+    processNewNodeInterval(){
+
+        if (this._newNodesWaitList.length > 0) {
+
+            let waitlist = null;
+            while (waitlist === null && this._newNodesWaitList.length > 0) {
+
+                let index = 0;
+                let newNode = this._newNodesWaitList[index];
+                waitlist = NodesWaitlist.addNewNodeToWaitlist(newNode.address.addr, newNode.address.port, newNode.address.type, newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
+
+               this._newNodesWaitList.splice(index, 1);
+            }
+        }
+
+        setTimeout(this.processNewNodeInterval.bind(this), 300);
+
+    }
 
     initializeSocketForPropagation(socket){
 
         this.initializeNodesPropagation(socket);
 
-        socket.node.sendRequestWaitOnce("propagation/request-all-wait-list-nodes");
+        setTimeout( ()=>{
+            socket.node.sendRequest("propagation/request-all-wait-list-nodes");
+        },  1000);
 
         NodesList.emitter.on("nodes-list/connected", nodeListObject => { this._newNodeConnected(socket, nodeListObject) } );
         NodesList.emitter.on("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected(socket, nodeListObject) });
@@ -59,8 +83,18 @@ class NodePropagationProtocol {
 
                     case "new-nodes":
 
-                        for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.addNewNodeToWaitlist(addresses[i].addr, addresses[i].port, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket );
+                        for (let i = 0; i < addresses.length; i++) {
+
+                            let found = false;
+                            for (let j=0;  j<this._newNodesWaitList.length; j++)
+                                if (this._newNodesWaitList[j].addr === addresses[i].addr) {
+                                    found = true;
+                                    break;
+                                }
+
+                            if (!found)
+                                this._newNodesWaitList.push({address: addresses[i], socket: socket});
+                        }
 
                         break;
 

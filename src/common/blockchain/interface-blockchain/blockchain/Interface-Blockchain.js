@@ -159,7 +159,7 @@ class InterfaceBlockchain {
 
 
         //validate difficulty & hash
-        if (! (await block.validateBlock(block.height)))
+        if (! (await block.validateBlock( block.height )))
             throw {message: 'block validation failed'};
 
         //recalculate next target difficulty

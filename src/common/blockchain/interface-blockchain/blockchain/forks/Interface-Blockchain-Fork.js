@@ -12,13 +12,14 @@ class InterfaceBlockchainFork {
 
 
     constructor (){
+
     }
 
     /**
      * initializeConstructor is used to initialize the constructor dynamically using .apply method externally passing the arguments
      */
 
-    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers){
+    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, ready=false){
 
         this.blockchain = blockchain;
 
@@ -43,21 +44,26 @@ class InterfaceBlockchainFork {
         });
 
         this._blocksCopy = [];
+
+        this._ready = ready;
+    }
+
+    set ready(newValue){
+        this._ready = newValue;
+    }
+
+    get ready(){
+        return this._ready;
     }
 
     async _validateFork(validateHashesAgain){
 
-        let useFork = false;
-
-        if (this.blockchain.blocks.length < this.forkStartingHeight + this.forkBlocks.length)
-            useFork = true;
+        if (this.blockchain.blocks.length > this.forkStartingHeight + this.forkBlocks.length + 1)
+            throw {message: "my blockchain is larger than yours", position: this.forkStartingHeight + this.forkBlocks.length};
         else
         if (this.blockchain.blocks.length === this.forkStartingHeight + this.forkBlocks.length) //I need to check
-            if (this.forkBlocks[this.forkBlocks.length-1].hash.compare( this.blockchain.getHashPrev(this.blockchain.blocks.length) ) < 0)
-                useFork = true;
-
-        if (!useFork)
-            return false;
+            if (this.forkBlocks[this.forkBlocks.length-1].hash.compare( this.blockchain.getHashPrev(this.blockchain.blocks.length) ) >= 0)
+                throw {message: "blockchain has same length, but your block is not better than mine"}
 
         if (validateHashesAgain)
             for (let i = 0; i < this.forkBlocks.length; i++){
@@ -88,7 +94,7 @@ class InterfaceBlockchainFork {
         //calculate the forkHeight
         let forkHeight = block.height - this.forkStartingHeight;
 
-        if (block.height < this.forkStartingHeight) throw {message: 'block height is smaller than the fork itself', blockHeight: block.height, height:height};
+        if (block.height < this.forkStartingHeight) throw {message: 'block height is smaller than the fork itself', blockHeight: block.height, forkStartingHeight:this.forkStartingHeight };
         if (block.height !== height) throw {message:"block height is different than block's height", blockHeight: block.height, height:height};
 
         let result = await this.blockchain.validateBlockchainBlock( block );
@@ -283,6 +289,8 @@ class InterfaceBlockchainFork {
 
             await this.postForkTransactions(forkedSuccessfully);
 
+            this.postFork(forkedSuccessfully);
+
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();
                 setTimeout( ()=>{ this._forkPromiseResolver(true) } , 10 ); //making it async
@@ -408,6 +416,9 @@ class InterfaceBlockchainFork {
 
     }
 
+    postFork(forkedSuccessfully){
+
+    }
 
     async saveIncludeBlock(index, revertActions){
 

@@ -16,6 +16,7 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
             for (let i = 0; i < this.blockchain.forksAdministrator.forks.length; i++) {
 
                 fork = this.blockchain.forksAdministrator.forks[i];
+                if (!fork.ready) continue;
 
                 if (fork.forkChainStartingPoint < fork.forkStartingHeight && (bestFork === null || bestFork.forkChainLength < fork.forkChainLength) ) //it is a small fork that I already have the first forks, but I will download the remaning blocks
                 {

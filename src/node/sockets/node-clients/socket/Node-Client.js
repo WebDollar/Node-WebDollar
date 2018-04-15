@@ -54,12 +54,6 @@ class NodeClient {
 
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
-                        timeout: 1000, //10 sec, default 20 sec
-
-                        connect_timeout: 1000, //4 sec, default 20
-                                               //probably it won't work
-
-                        reconnectionDelayMax: 1000,
 
                         secure: consts.SETTINGS.NODE.SSL, //https
                     });
