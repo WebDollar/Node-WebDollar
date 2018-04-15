@@ -284,7 +284,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
     async validateBlock(height){
 
-        let answer = InterfaceBlockchainBlock.prototype.validateBlock.call(this, height);
+        let answer = await InterfaceBlockchainBlock.prototype.validateBlock.call(this, height);
 
         if (!answer) return answer;
 
