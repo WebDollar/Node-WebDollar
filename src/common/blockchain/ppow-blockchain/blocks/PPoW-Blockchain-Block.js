@@ -269,12 +269,6 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 if (!BufferExtended.safeCompare(interlink[i].blockId, this.interlink[i].blockId)) throw {message: "interlink prevBlock height is different"};
             }
 
-            console.warn("****************************************************", this.height)
-            console.warn("****************************************************", this.difficultyTargetPrev.toString("hex"))
-            console.warn("****************************************************", this.getLevel())
-            console.warn("****************************************************", this.interlink.length)
-            console.warn("****************************************************", this.interlink)
-
         }
 
 
