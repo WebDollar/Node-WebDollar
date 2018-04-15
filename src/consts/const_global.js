@@ -193,8 +193,8 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "0.4999",
-        VERSION_COMPATIBILITY: "0.4999",
+        VERSION: "0.5",
+        VERSION_COMPATIBILITY: "0.5",
         PROTOCOL: "WebDollar",
         SSL: true,
 
@@ -239,11 +239,11 @@ consts.SETTINGS = {
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 40,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 20,
             },
 
             TIMEOUT: {
-                WAIT_ASYNC_DISCOVERY_TIMEOUT: 4500,
+                WAIT_ASYNC_DISCOVERY_TIMEOUT: 6500,
             }
 
         },
