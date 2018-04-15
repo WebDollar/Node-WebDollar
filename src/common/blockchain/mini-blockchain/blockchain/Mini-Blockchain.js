@@ -168,10 +168,15 @@ class MiniBlockchain extends  inheritBlockchain{
         try {
 
             let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
-            let result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
-            //let serializationAccountantTreeFinal = this.accountantTree.serializeMiniAccountant();
+            let result;
 
-            result = result && await inheritBlockchain.prototype.loadBlockchain.call( this  );
+            try {
+                result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
+            } catch (exception){
+                console.error("accountant Tree returned an error", exception);
+            }
+
+            result = await inheritBlockchain.prototype.loadBlockchain.call( this  );
 
             if ( result === false )
                 throw {message: "Problem loading the blockchain"};
