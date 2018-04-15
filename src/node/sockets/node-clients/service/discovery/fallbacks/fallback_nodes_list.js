@@ -6,7 +6,7 @@ export default {
   "nodes": [
     {
       "addr": ["webdollar.ddns.net"],
-       "port": 8080,
+       "port": 80,
     },
     {
       "addr": ["skyhub.me", "92.222.85.90"],
