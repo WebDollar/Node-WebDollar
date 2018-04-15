@@ -305,6 +305,9 @@ class InterfaceBlockchainFork {
         if (success){
             //propagate last block
             this.blockchain.propagateBlocks( this.blockchain.blocks.length-1, this.sockets );
+
+            this.blockchain.agent.protocol.askBlockchain(socket);
+
         }
 
         return success;
