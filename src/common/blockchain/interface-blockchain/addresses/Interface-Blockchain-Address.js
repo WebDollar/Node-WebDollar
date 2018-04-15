@@ -414,6 +414,11 @@ class InterfaceBlockchainAddress{
             if (password === null)
                 return null;
 
+            if( password.trim().split(' ').length !== 12 ){
+                AdvancedMessages.alert("Your password doesn't have 12 words");
+                return null;
+            }
+
         } else password = undefined;
 
         privateKey = await this.getPrivateKey(password);
