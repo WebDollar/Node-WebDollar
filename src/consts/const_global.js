@@ -235,7 +235,7 @@ consts.SETTINGS = {
             },
 
             SERVER: {
-                MAXIMUM_CLIENT_CONNECTIONS: 150,
+                MAXIMUM_CLIENT_CONNECTIONS: 60,
             },
 
             WEBRTC: {
