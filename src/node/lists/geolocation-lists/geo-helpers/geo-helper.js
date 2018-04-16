@@ -9,11 +9,16 @@ class GeoHelper {
 
     async getLocationFromAddress(address, skipSocketAddress){
 
+        if (!process.env.BROWSER){
+            return false;
+        }
+
         if ( skipSocketAddress === undefined) skipSocketAddress = false;
 
         let sckAddress = null;
 
         if (!skipSocketAddress) {
+
             sckAddress = SocketAddress.createSocketAddress(address);
             address = sckAddress.getAddress(false);
 
