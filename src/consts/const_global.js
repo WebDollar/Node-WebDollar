@@ -196,7 +196,7 @@ consts.SETTINGS = {
         VERSION: "1",
         VERSION_COMPATIBILITY: "1",
         PROTOCOL: "WebDollar",
-        SSL: false,
+        SSL: true,
 
 
         PORT: 80, //port
@@ -266,7 +266,7 @@ consts.SETTINGS = {
 if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.VERSION += "1";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "1";
-    consts.SETTINGS.NODE.SSL = true;
+    consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 }
 
