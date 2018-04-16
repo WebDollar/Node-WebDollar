@@ -234,6 +234,10 @@ consts.SETTINGS = {
                 MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
             },
 
+            SERVER: {
+                MAXIMUM_CLIENT_CONNECTIONS: 100,
+            },
+
             WEBRTC: {
                 MAXIMUM_CONNECTIONS: 7,
             },

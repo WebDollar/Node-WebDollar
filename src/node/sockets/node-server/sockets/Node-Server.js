@@ -1,3 +1,5 @@
+import CONNECTION_TYPE from "../../../lists/types/Connections-Type";
+
 let io = require('socket.io');
 
 import consts from 'consts/const_global'
@@ -41,6 +43,11 @@ class NodeServer {
             this.nodeServer = server;
 
             server.on("connection", socket => {
+
+                if (NodesList.countNodes(CONNECTION_TYPE.CONNECTION_SERVER_SOCKET) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CLIENT_CONNECTIONS){
+                    socket.disconnect();
+                    return false;
+                }
 
                 SocketExtend.extendSocket(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort, undefined, 1);
 
