@@ -1,6 +1,7 @@
 import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
 import NodesType from "node/lists/types/Nodes-Type"
+import CONNECTION_TYPE from "../../../node/lists/types/Connections-Type";
 
 class NodeProtocol {
 
@@ -11,6 +12,8 @@ class NodeProtocol {
 
 
         // Waiting for Protocol Confirmation
+
+        console.log("sendHello")
 
         let response;
         for (let i=0; i< 4; i++) {
@@ -42,7 +45,7 @@ class NodeProtocol {
             }
 
             if ( [NodesType.NODE_TERMINAL, NodesType.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
-                console.error("invalid node type", response.nodeType);
+                console.error("invalid node type", response);
                 return false;
             }
 
@@ -58,8 +61,17 @@ class NodeProtocol {
                 node.protocol.helloValidated = true;
                 console.log("hello validated");
                 return true;
+
+
             } else {
-                console.log("hello not validated because double connection");
+
+                if (response.nodeType === NodesType.NODE_WEB_PEER) {
+                    node.protocol.helloValidated = true;
+                    return true;
+                } else {
+                    console.log("hello not validated because double connection");
+                }
+
             }
         }
         //delete socket;

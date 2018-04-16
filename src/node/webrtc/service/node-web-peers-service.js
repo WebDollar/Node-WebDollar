@@ -15,11 +15,11 @@ class NodeWebPeersService {
         Blockchain.onLoaded.then((answer)=>{
             // in case the Blockchain was not loaded, I will not be interested in transactions
 
-            setTimeout(()=>{
-
-                NodeWebPeersDiscoveryService.startDiscovery();
-
-            }, 3000)
+            // setTimeout(()=>{
+            //
+            //     NodeWebPeersDiscoveryService.startDiscovery();
+            //
+            // }, 3000)
 
         });
 

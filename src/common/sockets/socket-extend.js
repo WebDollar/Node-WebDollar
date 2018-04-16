@@ -124,6 +124,7 @@ class SocketExtend{
                 if (global.TERMINATED) return;
 
                 if (timeoutId !== undefined) clearTimeout(timeoutId);
+                if (timeoutId === undefined ) return false;
 
                 this._processBufferArray(resData);
 

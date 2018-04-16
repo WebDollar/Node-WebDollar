@@ -4,6 +4,85 @@ let consts = {
     DEBUG: false,
 };
 
+
+
+consts.SETTINGS = {
+
+    UUID: uuid.v4(),
+
+    NODE: {
+        VERSION: "1.01",
+        VERSION_COMPATIBILITY: "1.01",
+        PROTOCOL: "WebDollar",
+        SSL: true,
+
+
+        PORT: 80, //port
+    },
+
+    PARAMS: {
+        FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
+        STATUS_INTERVAL: 60 * 1000,                      //miliseconds
+
+        WAITLIST: {
+            TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
+            INTERVAL: 2 * 1000,                         //miliseconds
+        },
+
+        SIGNALING: {
+            SERVER_PROTOCOL_CONNECTING_WEB_PEERS_INTERVAL: 2 * 1000,
+        },
+
+        MAX_SIZE: {
+            BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,       // in bytes
+            SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50,    // in bytes
+
+            SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 32 * 1024, //32 kb
+            MINIMUM_SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 32 *1024, //32 kb
+        },
+
+        WALLET:{
+            VERSION: "0.1"
+        },
+
+        CONNECTIONS:{
+
+            SOCKETS: {
+                MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
+                MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
+            },
+
+            SERVER: {
+                MAXIMUM_CLIENT_CONNECTIONS: 60,
+            },
+
+            WEBRTC: {
+                MAXIMUM_CONNECTIONS: 7,
+            },
+
+            FORKS:{
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 20,
+            },
+
+            TIMEOUT: {
+                WAIT_ASYNC_DISCOVERY_TIMEOUT: 6500,
+            }
+
+        },
+
+    },
+
+    MEM_POOL : {
+
+        TIME_LOCK : {
+            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
+        }
+
+    },
+
+
+};
+
 consts.BLOCKCHAIN = {
 
     DIFFICULTY:{
@@ -187,83 +266,6 @@ consts.MINING_POOL = {
 
 
 
-
-consts.SETTINGS = {
-
-    UUID: uuid.v4(),
-
-    NODE: {
-        VERSION: "1",
-        VERSION_COMPATIBILITY: "1",
-        PROTOCOL: "WebDollar",
-        SSL: true,
-
-
-        PORT: 80, //port
-    },
-
-    PARAMS: {
-        FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
-        STATUS_INTERVAL: 60 * 1000,                      //miliseconds
-
-        WAITLIST: {
-            TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
-            INTERVAL: 2 * 1000,                         //miliseconds
-        },
-
-        SIGNALING: {
-            SERVER_PROTOCOL_CONNECTING_WEB_PEERS_INTERVAL: 2 * 1000,
-        },
-
-        MAX_SIZE: {
-            BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,       // in bytes
-            SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50,    // in bytes
-
-            SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 32 * 1024, //32 kb
-            MINIMUM_SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 32 *1024, //32 kb
-        },
-
-        WALLET:{
-            VERSION: "0.1"
-        },
-
-        CONNECTIONS:{
-
-            SOCKETS: {
-                MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
-                MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
-            },
-
-            SERVER: {
-                MAXIMUM_CLIENT_CONNECTIONS: 60,
-            },
-
-            WEBRTC: {
-                MAXIMUM_CONNECTIONS: 7,
-            },
-
-            FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 20,
-            },
-
-            TIMEOUT: {
-                WAIT_ASYNC_DISCOVERY_TIMEOUT: 6500,
-            }
-
-        },
-
-    },
-
-    MEM_POOL : {
-
-        TIME_LOCK : {
-            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
-        }
-
-    },
-
-
-};
 
 
 

@@ -65,7 +65,7 @@ class InterfaceBlockchainProtocol {
     propagateHeader(block,  socketsAvoidBroadcast){
 
         // broadcasting the new block, to everybody else
-        NodeProtocol.broadcastRequest( "g/new-block", {
+        NodeProtocol.broadcastRequest( "head/new-block", {
             l: this.blockchain.blocks.length,
             h: this.blockchain.blocks.last.hash,
             s: this.blockchain.blocks.blocksStartingPoint,
@@ -113,10 +113,10 @@ class InterfaceBlockchainProtocol {
 
         // sending the last block using the protocol
         if (this.acceptBlockHeaders)
-            socket.node.on("g/last-block", async (data)=>{
+            socket.node.on("head/last-block",  ()=>{
 
                 if (this.blockchain.blocks.length > 0) {
-                    socket.node.sendRequest("g/last-block/a", {
+                    socket.node.sendRequest("head/last-block/a", {
                         l: this.blockchain.blocks.length,
                         h: this.blockchain.blocks.last.hash,
                         s: this.blockchain.blocks.blocksStartingPoint,
@@ -126,7 +126,7 @@ class InterfaceBlockchainProtocol {
             });
 
         if (this.acceptBlockHeaders)
-            socket.node.on("head/new-block", async (data) => {
+            socket.node.on("head/new-block",  (data) => {
 
                 /*
                     h hash
@@ -147,23 +147,24 @@ class InterfaceBlockchainProtocol {
 
                 console.log("newForkTip");
 
-                await this.forksManager.newForkTip( socket, data.l, data.s, data.h );
+                this.forksManager.newForkTip( socket, data.l, data.s, data.h );
 
             });
 
         if (this.acceptBlockHeaders)
-            socket.node.on("g/hash", (h) => {
+            socket.node.on("head/hash", (h) => {
 
                 // height
 
-                if (typeof h !== 'number') return;
-
-                if (this.blockchain.blocks.length <= h) return;
+                if (typeof h !== 'number' || this.blockchain.blocks.length <= h){
+                    socket.node.sendRequest("head/hash", null);
+                    return;
+                }
 
                 let block = this.blockchain.blocks[h];
                 if (block === undefined) socket.node.sendRequest("head/hash", null);
 
-                socket.node.sendRequest("head/hash/" + h , block.hash );
+                socket.node.sendRequest("head/hash/" + h , {hash: block.hash } );
 
             });
 
@@ -218,7 +219,9 @@ class InterfaceBlockchainProtocol {
 
     async askBlockchain(socket){
 
-        let data = await socket.node.sendRequestWaitOnce("g/last-block", undefined, "a");
+        let data = await socket.node.sendRequestWaitOnce("head/last-block", undefined, "a");
+
+        if (data === null ) return false;
 
         //in case the hashes are the same, and I have already the block
         if (( data.l > 0 && this.blockchain.blocks.length === data.l )) {

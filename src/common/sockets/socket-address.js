@@ -51,8 +51,13 @@ class SocketAddress {
             port = consts.SETTINGS.NODE.PORT;
 
         try {
-            if (typeof address === 'string')
+            if (typeof address === 'string') {
+                if (address.lastIndexOf(":")>0) {
+                    port = address.substr(address.lastIndexOf(":")+1)
+                    address = address.substr(0, address.lastIndexOf(":"));
+                }
                 address = ipaddr.parse(address);
+            }
             else
             if (Array.isArray(address))
                 address = ipaddr.fromByteArray(address);
@@ -60,7 +65,8 @@ class SocketAddress {
         } catch (Exception){
         }
 
-        this.addressString = address.toString();
+        this.addressString = address.toNormalizedString();
+
         this.address = address;
         this.port = port;
         this._geoLocation = null;
@@ -142,7 +148,7 @@ class SocketAddress {
                 return addressString + (includePort ? ':' + this.port : '');
             }
 
-            return this.address.toString() + (includePort ? ':'+this.port : '');
+            return this.address.toNormalizedString() + (includePort ? ':'+this.port : '');
 
         } catch(Exception){
             console.error("getAddress exception", Exception, this.address);

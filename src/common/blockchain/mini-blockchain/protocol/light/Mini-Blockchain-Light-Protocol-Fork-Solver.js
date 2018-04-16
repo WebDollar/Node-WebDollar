@@ -14,12 +14,12 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
     async _getLastBlocks(socket, heightRequired){
 
-        let hash = await socket.node.sendRequestWaitOnce("g/hash", heightRequired, heightRequired );
+        let hash = await socket.node.sendRequestWaitOnce("head/hash", heightRequired, heightRequired );
 
         if (hash === null)
             throw { message: "LightProtocolForkSolver _calculateForkBinarySearch headers-info dropped ", heightRequired };
 
-        return {position: heightRequired, header: hash};
+        return {position: heightRequired, header: hash.hash};
 
     }
 
@@ -237,11 +237,11 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
         if (binarySearchResult.position === -1 && currentBlockchainLength < forkChainLength){
 
-            let hash = await socket.node.sendRequestWaitOnce("g/hash", forkChainStartingPoint, forkChainStartingPoint );
+            let hash = await socket.node.sendRequestWaitOnce("head/hash", forkChainStartingPoint, forkChainStartingPoint ).hash;
 
             if (hash === null || hash === undefined) throw {message: "connection dropped headers-info forkChainStartingPoint"};
 
-            binarySearchResult.position = {position: forkChainStartingPoint, header: hash};
+            binarySearchResult.position = {position: forkChainStartingPoint, header: hash.hash};
 
         }
 
