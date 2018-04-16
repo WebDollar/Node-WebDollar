@@ -56,10 +56,17 @@ class NodesWaitlist {
 
             let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
-            let foundWaitList = this._searchNodesWaitlist(sckAddress);
+            if (backedBy !==  "fallback" ) {
 
-            if ( foundWaitList !== null)  foundWaitList.pushBackedBy(backedBy);
-            else  sckAddresses.push(sckAddress);
+                let foundWaitList = this._searchNodesWaitlist(sckAddress);
+
+                if (foundWaitList !== null) foundWaitList.pushBackedBy(backedBy);
+                else sckAddresses.push(sckAddress);
+
+            } else {
+                sckAddresses.push(sckAddress);
+            }
+
 
         }
 
