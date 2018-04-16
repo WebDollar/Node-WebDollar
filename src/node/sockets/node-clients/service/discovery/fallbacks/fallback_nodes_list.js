@@ -17,6 +17,10 @@ export default {
             "addr": ["webdollar.zapto.org"],
             "port": 8080,
         },
+        {
+            "addr": ["presa7.ro"],
+            "port": 443,
+        },
 
     ]
 }
