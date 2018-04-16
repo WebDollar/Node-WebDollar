@@ -12,13 +12,21 @@ class NodeProtocol {
 
         // Waiting for Protocol Confirmation
 
-        let response = node.sendRequestWaitOnce("HelloNode", {
-            version: consts.SETTINGS.NODE.VERSION,
-            uuid: consts.SETTINGS.UUID,
-            nodeType: process.env.BROWSER ? NodesType.NODE_WEB_PEER : NodesType.NODE_TERMINAL
-        });
+        let response;
+        for (let i=0; i< 4; i++) {
 
-        response = await response;
+            response = node.sendRequestWaitOnce("HelloNode", {
+                version: consts.SETTINGS.NODE.VERSION,
+                uuid: consts.SETTINGS.UUID,
+                nodeType: process.env.BROWSER ? NodesType.NODE_WEB_PEER : NodesType.NODE_TERMINAL
+            });
+
+            await response;
+
+            if ( typeof response === "object" && response !== null && response.hasOwnProperty("uuid") )
+                break;
+
+        }
 
         if (typeof response !== "object")
             return false;

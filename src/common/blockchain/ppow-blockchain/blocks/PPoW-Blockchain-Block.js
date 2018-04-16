@@ -25,8 +25,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
     getLevel(){
 
-        //TODO optimization
-        //if (this._level !== undefined) return this._level;
+        if (this._level !== undefined) return this._level;
 
         //we use difficultyTargetPrev instead of current difficultyTarget
         let T = this.difficultyTargetPrev;
