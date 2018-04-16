@@ -24,7 +24,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         //TODO generate proofs as a LightNode
         if (!this.agent.light) {
 
-            if (!block.blockValidation.blockValidationType.blockValidationType["avoid-calculating-proofs"]){
+            if (!block.blockValidation.blockValidationType["avoid-calculating-proofs"]){
 
                 this.prover.createProofs();
 
