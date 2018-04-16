@@ -168,29 +168,29 @@ class NodesWaitlist {
         nextWaitListObject.connecting = true;
 
         //trying to connect to each sckAddresses
-        for (let i=0; i<nextWaitListObject.sckAddresses.length; i++) {
 
-            //search if the new protocol was already connected in the past
-            let nodeClient = NodesList.searchNodeSocketByAddress(nextWaitListObject.sckAddresses[i], 'all', ["id","uuid"]);
-            if (nodeClient !== null) return nodeClient;
+        let index = Math.floor( Math.random() * nextWaitListObject.sckAddresses.length );
 
-            if (nextWaitListObject.socket !== null) nodeClient = nextWaitListObject.socket;
-            else nodeClient = new NodeClient();
+        //search if the new protocol was already connected in the past
+        let nodeClient = NodesList.searchNodeSocketByAddress(nextWaitListObject.sckAddresses[index], 'all', ["id","uuid"]);
+        if (nodeClient !== null) return nodeClient;
 
-            try {
-                let answer = await nodeClient.connectTo(nextWaitListObject.sckAddresses[i], undefined, nextWaitListObject.level+1);
+        if (nextWaitListObject.socket !== null) nodeClient = nextWaitListObject.socket;
+        else nodeClient = new NodeClient();
 
-                if (answer) nextWaitListObject.socketConnected(nodeClient);
-                else nextWaitListObject.socketErrorConnected();
+        try {
+            let answer = await nodeClient.connectTo(nextWaitListObject.sckAddresses[index], undefined, nextWaitListObject.level+1);
 
-                nextWaitListObject.connecting = false;
-                return answer;
-            }
-            catch (Exception) {
-                console.log("Error connecting to new protocol waitlist", Exception)
-            }
+            if (answer) nextWaitListObject.socketConnected(nodeClient);
+            else nextWaitListObject.socketErrorConnected();
 
+            nextWaitListObject.connecting = false;
+            return answer;
         }
+        catch (Exception) {
+            console.log("Error connecting to new protocol waitlist", Exception)
+        }
+
         nextWaitListObject.connecting = false;
         return false;
     }

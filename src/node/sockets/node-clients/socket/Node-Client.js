@@ -33,7 +33,7 @@ class NodeClient {
 
             try
             {
-                if (address.length < 3){
+                if ( address.length < 3 ){
                     console.log("rejecting address... invalid ",address);
                     resolve(false);
                     return false;
@@ -50,7 +50,7 @@ class NodeClient {
                 try {
 
                     // params described in the documentation https://socket.io/docs/client-api#manager
-                    socket = io(address, {
+                    socket = io( address, {
 
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
@@ -66,7 +66,7 @@ class NodeClient {
                 this.socket = socket;
 
 
-                socket.once("connect", (response) =>{
+                socket.once("connect", ( response ) =>{
 
                     //Connection Established
 
