@@ -1,14 +1,22 @@
 export default {
 
-  "protocol": "WebDollar",
-  "name": "fallback nodes",
+    "protocol": "WebDollar",
+    "name": "fallback nodes",
 
-  "nodes": [
+    "nodes": [
 
-    {
-      "addr": ["127.0.0.1"],
-       "port": 2095,
-    },
+        {
+            "addr": ["webdollar.ddns.net"],
+            "port": 80,
+        },
+        {
+            "addr": ["skyhub.me", "92.222.85.90"],
+            "port": 80,
+        },
+        {
+            "addr": ["webdollar.zapto.org"],
+            "port": 8080,
+        },
 
-  ]
+    ]
 }
