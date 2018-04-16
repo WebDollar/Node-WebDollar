@@ -65,7 +65,8 @@ class SocketAddress {
         } catch (Exception){
         }
 
-        this.addressString = address.toNormalizedString();
+        if (typeof address === "string") this.addressString = address;
+        else this.addressString = address.toNormalizedString();
 
         this.address = address;
         this.port = port;
@@ -123,7 +124,11 @@ class SocketAddress {
 
             if (typeof this.address === 'object') {
 
-                let initialAddress = this.address.toNormalizedString();
+                let initialAddress;
+
+                if (typeof this.address === "string") initialAddress = this.address;
+                else initialAddress = this.address.toNormalizedString();
+
                 let addressString =  '';
 
                 //avoiding ipv4 shows as ipv6
@@ -148,7 +153,12 @@ class SocketAddress {
                 return addressString + (includePort ? ':' + this.port : '');
             }
 
-            return this.address.toNormalizedString() + (includePort ? ':'+this.port : '');
+            let initialAddress;
+
+            if (typeof this.address === "string") initialAddress = this.address;
+            else initialAddress = this.address.toNormalizedString();
+
+            return initialAddress + (includePort ? ':'+this.port : '');
 
         } catch(Exception){
             console.error("getAddress exception", Exception, this.address);
