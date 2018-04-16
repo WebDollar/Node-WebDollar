@@ -30,7 +30,7 @@ class InterfaceBlockchainProtocolForkSolver{
             answer = await socket.node.sendRequestWaitOnce("head/hash", mid, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
             if (left < 0 || answer === null || !Buffer.isBuffer(answer.hash) )
-                return {position: null, header: answer.hash };
+                return {position: null, header: answer };
 
             //i have finished the binary search
             if (left >= right) {
@@ -61,7 +61,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         } catch (Exception){
 
-            console.error("_discoverForkBinarySearch raised an exception" , Exception, answer.hash);
+            console.error("_discoverForkBinarySearch raised an exception" , Exception, answer);
 
             return {position: null, header: null};
 
