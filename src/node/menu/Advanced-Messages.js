@@ -2,12 +2,12 @@ import CLI from "./CLI-Menu";
 
 class AdvancedMessages{
 
-    alert(){
+    alert(param){
 
         if (process.env.BROWSER)
-            alert(arguments);
+            alert(param);
         else
-            console.warn(arguments);
+            console.warn(param);
     }
 
     async confirm(message){

@@ -436,32 +436,24 @@ class InterfaceBlockchainAddressHelper{
 
         return new Promise( async (resolve) => {
 
-            if (process.env.BROWSER){
-                let answer =  prompt(message||"Please enter your last password (12 words separated by space):");
-                
-                let oldPassword = answer.trim().split(' ');
+            let answer;
 
-                if (oldPassword.length !== 12) {
-                    AdvancedMessages.alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
-                    resolve(null);
-                    return;
-                }
-                
-                resolve(oldPassword);
+            if (process.env.BROWSER)
+                answer =  prompt(message||"Please enter your last password (12 words separated by space):");
+            else
+                answer =  await CLI.question(message||"Please enter your last password (12 words separated by space):");
+
+            let oldPassword = answer.trim().split(' ');
+
+            if (oldPassword.length !== 12) {
+                AdvancedMessages.alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                resolve(null);
+                return;
             }
-            else {
-                let answer =  await CLI.question(message||"Please enter your last password (12 words separated by space):");
-                    
-                let oldPassword = answer.trim().split(' ');
 
-                if (oldPassword.length !== 12) {
-                    console.log('Your old password has ' + oldPassword.length + ' words. It must have 12!');
-                    resolve(null);
-                    return;
-                }
+            resolve(oldPassword);
 
-                resolve(oldPassword);
-            }
+
         });
 
     }
