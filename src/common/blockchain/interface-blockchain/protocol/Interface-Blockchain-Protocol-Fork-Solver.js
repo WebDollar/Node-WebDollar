@@ -20,51 +20,51 @@ class InterfaceBlockchainProtocolForkSolver{
 
     async _discoverForkBinarySearch(socket, initialLeft, left, right){
 
-        let blockHeaderResult;
+        let hash;
 
         try {
 
             let mid = Math.trunc((left + right) / 2);
 
-            console.log("_discoverForkBinarySearch", initialLeft, left, right, 1111);
-            blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: mid}, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
+            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
+            hash = await socket.node.sendRequestWaitOnce("g/hash", mid, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
-            if (left < 0 || blockHeaderResult === null || blockHeaderResult === undefined || blockHeaderResult.result !== true || blockHeaderResult.header === undefined || blockHeaderResult.header === null || blockHeaderResult.header.hash === undefined ||  !Buffer.isBuffer(blockHeaderResult.header.hash) )
-                return {position: null, header: (blockHeaderResult === null ? null : blockHeaderResult.header) };
+            if (left < 0 || hash === null || !Buffer.isBuffer(hash) )
+                return {position: null, header: hash };
 
             //i have finished the binary search
             if (left >= right) {
                 //it the block actually is the same
-                if (blockHeaderResult.header.hash.equals( this.blockchain.getHashPrev( mid+1 ) ) )
-                    return {position: mid, header: blockHeaderResult.header};
+                if (hash.equals( this.blockchain.getHashPrev( mid+1 ) ) )
+                    return {position: mid, header: hash };
                 else {
 
                     //it is not a match, but it was previously a match
                     if (mid-1 >= 0 && initialLeft <= mid-1 && initialLeft < left){
 
-                        blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: mid-1}, mid-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                        hash = await socket.node.sendRequestWaitOnce("g/hash", mid-1, mid-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
-                        if ( blockHeaderResult !== null && blockHeaderResult !== undefined && blockHeaderResult.result && blockHeaderResult.header !== undefined && blockHeaderResult.header !== null && blockHeaderResult.header.hash !== undefined && Buffer.isBuffer(blockHeaderResult.header.hash) )
-                            if (blockHeaderResult.header.hash.equals( this.blockchain.getHashPrev(mid-1 +1) ) )
-                                return {position: mid-1, header: blockHeaderResult.header};
+                        if ( hash !== null && Buffer.isBuffer(hash) )
+                            if (hash.equals( this.blockchain.getHashPrev(mid-1 +1) ) )
+                                return {position: mid-1, header: hash };
                     }
-                    return {position: -1, header: blockHeaderResult.header};
+                    return {position: -1, header: hash};
                 }
             }
 
             //was not not found, search left because it must be there
-            if (blockHeaderResult.header.hash.equals( this.blockchain.getHashPrev(mid+1)  ) === false)
+            if (! hash.equals( this.blockchain.getHashPrev(mid+1)  ) )
                 return await this._discoverForkBinarySearch(socket, initialLeft, left, mid);
             else
             //was found, search right because the fork must be there
                 return await this._discoverForkBinarySearch(socket, initialLeft, mid + 1, right);
 
-
         } catch (Exception){
 
-            console.error("_discoverForkBinarySearch raised an exception" , Exception, blockHeaderResult);
+            console.error("_discoverForkBinarySearch raised an exception" , Exception, hash);
 
             return {position: null, header: null};
+
         }
 
     }
@@ -122,20 +122,16 @@ class InterfaceBlockchainProtocolForkSolver{
             //check if n-2 was ok, but I need at least 1 block
             if (currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
 
-                let answer = await socket.node.sendRequestWaitOnce( "blockchain/headers-info/request-header-info-by-height", { height: currentBlockchainLength-1 }, currentBlockchainLength-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                let hash = await socket.node.sendRequestWaitOnce( "g/hash", currentBlockchainLength-1, currentBlockchainLength-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                if (hash === null || hash === undefined) throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };
 
-                if (answer === null || answer === undefined)
-                    throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };
+                if (  Buffer.compare ( this.blockchain.blocks.last.hash , hash ) <= 0 )
+                    throw {message: "hash is bigger than mine" };
 
-                if (answer.result !== true || answer.header === undefined || !Buffer.isBuffer(answer.header.hash) )
-                    throw {message: "connection headers-info malformed"};
-
-                if (  BufferExtended.safeCompare(answer.header.hash, this.blockchain.blocks.last.hash ) )
-
-                    binarySearchResult = {
-                        position : currentBlockchainLength,
-                        header: answer.header,
-                    };
+                binarySearchResult = {
+                    position : currentBlockchainLength,
+                    header: hash,
+                };
 
             }
 

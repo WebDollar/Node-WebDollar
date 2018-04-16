@@ -95,8 +95,7 @@ class InterfaceBlockchainForksAdministrator {
             if (this.forks[i] !== null)
             for (let j=0; j<this.forks[i].forkHeaders.length; j++) {
 
-                if (this.forks[i].forkHeaders[j] !== null && this.forks[i].forkHeaders[j].hash !== undefined && this.forks[i].forkHeaders[j].hash !== null &&
-                    BufferExtended.safeCompare(this.forks[i].forkHeaders[j].hash, header.hash))
+                if (this.forks[i].forkHeaders[j].equals(header.hash))
                     return this.forks[i];
             }
 

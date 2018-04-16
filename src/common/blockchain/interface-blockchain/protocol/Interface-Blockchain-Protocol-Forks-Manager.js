@@ -22,7 +22,11 @@ class InterfaceBlockchainProtocolForksManager {
 
         if (newChainLength < this.blockchain.blocks.length){
 
-            socket.node.sendRequest( "blockchain/header/new-block", this.blockchain.blocks.last.getBlockHeaderWithInformation() );
+            socket.node.sendRequest( "head/new-block", {
+                l: this.blockchain.blocks.length,
+                h: this.blockchain.blocks.last.hash,
+                s: this.blockchain.blocks.blocksStartingPoint,
+            } );
 
             if (newChainLength < this.blockchain.blocks.length - 50)
                 BansList.addBan( socket, 500, "Your blockchain is smaller than mine" );

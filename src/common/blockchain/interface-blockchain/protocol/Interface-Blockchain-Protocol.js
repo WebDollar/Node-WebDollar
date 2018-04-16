@@ -65,7 +65,11 @@ class InterfaceBlockchainProtocol {
     propagateHeader(block,  socketsAvoidBroadcast){
 
         // broadcasting the new block, to everybody else
-        NodeProtocol.broadcastRequest( "blockchain/header/new-block", block.getBlockHeaderWithInformation(), "all", socketsAvoidBroadcast);
+        NodeProtocol.broadcastRequest( "g/new-block", {
+            l: this.blockchain.blocks.length,
+            h: this.blockchain.blocks.last.hash,
+            s: this.blockchain.blocks.blocksStartingPoint,
+        }, "all", socketsAvoidBroadcast);
 
     }
 
@@ -109,131 +113,58 @@ class InterfaceBlockchainProtocol {
 
         // sending the last block using the protocol
         if (this.acceptBlockHeaders)
-            socket.node.on("get/blockchain/header/last-block", async (data)=>{
+            socket.node.on("g/last-block", async (data)=>{
 
-                try {
-
-                    let answer = {};
-
-                    console.log("get/blockchain/header/last-block length", this.blockchain.blocks.length);
-                    console.log("get/blockchain/header/last-block last", this.blockchain.blocks.last === undefined);
-
-                    if (this.blockchain.blocks.length > 0 && this.blockchain.blocks.last !== undefined)
-                        answer = {
-                            result: true,
-                            data: this.blockchain.blocks.last.getBlockHeaderWithInformation()
-                        };
-                    else
-                        answer = { result: false,  message: "no blocks"};
-
-                    socket.node.sendRequest("get/blockchain/header/last-block/answer", answer );
-
-                } catch (exception) {
-
-                    console.error("Socket Error - get/blockchain/header/last-block/answer", exception);
-
-                    socket.node.sendRequest( "get/blockchain/header/last-block/answer", {
-                        result: false,
-                        message: exception
-                    });
-
+                if (this.blockchain.blocks.length > 0) {
+                    socket.node.sendRequest("g/last-block/a", {
+                        l: this.blockchain.blocks.length,
+                        h: this.blockchain.blocks.last.hash,
+                        s: this.blockchain.blocks.blocksStartingPoint,
+                    } );
                 }
 
             });
 
         if (this.acceptBlockHeaders)
-            socket.node.on("blockchain/header/new-block", async (data) => {
+            socket.node.on("head/new-block", async (data) => {
 
                 /*
-                    data.header.height
-                    data.header.chainLength
-                    data.header.prevHash
-                    data.header.hash
-
-                    data.header.data.hashData
+                    h hash
+                    l chainLength
+                    s chainStartingPoint
                  */
 
-                try {
+                if (data === null || (data.l < 0) || ( data.s >= data.l ) ) return;
 
-                    if (data === null )
-                        throw {message: "last block is not valid"};
+                //in case the hashes are the same, and I have already the block
+                if (( data.l > 0 && this.blockchain.blocks.length === data.l )) {
 
-                    console.log("blockchain/header/new-block received", data.chainLength||0);
-
-                    this._validateBlockchainHeader(data);
-
-                    if (data.height < 0)
-                        throw {message: "your block is invalid"};
-
-                    //in case the hashes are the same, and I have already the block
-                    if (( data.height >= 0 && this.blockchain.blocks.length - 1 >= data.height && this.blockchain.blocks.length >= data.chainLength )) {
-
-                        //in case the hashes are exactly the same, there is no reason why we should download it
-
-                        if (this.blockchain.agent.light && this.blockchain.blocks.blocksStartingPoint > data.height ){
-                            //you are ok
-                        } else
-                        if ( BufferExtended.safeCompare(this.blockchain.blocks[data.height].hash, data.header.hash) === true)
-                            throw {message: "your block is not new, because I have the same block at same height"};
-
-                    }
-
-                    console.log("blockchain/header/new-block newForkTip");
-
-                    await this.forksManager.newForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
-
-                } catch (exception) {
-
-                    if (! (typeof exception === "object" && exception.message === "your block is not new, because I have the same block at same height"))
-                        console.error("Socket Error - blockchain/new-block-header", socket.node.sckAddress.addressString, exception, data);
+                    //in case the hashes are exactly the same, there is no reason why we should download it
+                    if ( Buffer.compare(this.blockchain.blocks[this.blockchain.blocks.length-1].hash, data.h) <= 0 )
+                        return;
 
                 }
 
+                console.log("newForkTip");
+
+                await this.forksManager.newForkTip( socket, data.l, data.s, data.h );
 
             });
 
         if (this.acceptBlockHeaders)
-            socket.node.on("blockchain/headers-info/request-header-info-by-height", (data) => {
+            socket.node.on("g/hash", (h) => {
 
-                // data.height
+                // height
 
-                try {
+                if (typeof h !== 'number') return;
 
-                    if (typeof data.height !== 'number')
-                        throw {message: "data.height is not defined"};
+                if (this.blockchain.blocks.length <= h) return;
 
-                    if (this.blockchain.blocks.length <= data.height)
-                        throw {message: "data.height is higher than I have ", myBlockchainLength: this.blockchain.blocks.length, height: data.height};
+                let block = this.blockchain.blocks[h];
+                if (block === undefined) socket.node.sendRequest("head/hash", null);
 
+                socket.node.sendRequest("head/hash/" + h , block.hash );
 
-                    let block = this.blockchain.blocks[data.height];
-
-                    if (block === undefined)
-                        throw {message: "Block not found: ", height:data.height};
-
-                    //console.log("blooock", block);
-
-                    socket.node.sendRequest("blockchain/headers-info/request-header-info-by-height/" + data.height || 0, {
-                        result: true,
-                        header: {
-                            height: block.height,
-                            prevHash: block.hashPrev,
-                            hash: block.hash,
-                            chainLength: this.blockchain.blocks.length,
-                            chainStartingPoint: this.blockchain.blocks.blocksStartingPoint
-                        }
-                    });
-
-
-
-                } catch (exception) {
-
-                    console.error("Socket Error - blockchain/headers-info/request-header-info-by-height", exception);
-                    socket.node.sendRequest("blockchain/headers-info/request-header-info-by-height/" + data.height || 0, {
-                        result: false,
-                        message: exception,
-                    });
-                }
             });
 
 
@@ -287,43 +218,18 @@ class InterfaceBlockchainProtocol {
 
     async askBlockchain(socket){
 
-        let data = await socket.node.sendRequestWaitOnce("get/blockchain/header/last-block", undefined, "answer");
+        let data = await socket.node.sendRequestWaitOnce("g/last-block", undefined, "a");
 
-        //console.log("get/blockchain/header/last-block2", data);
+        //in case the hashes are the same, and I have already the block
+        if (( data.l > 0 && this.blockchain.blocks.length === data.l )) {
 
-        try {
+            //in case the hashes are exactly the same, there is no reason why we should download it
+            if ( Buffer.compare( this.blockchain.getHashPrev( data.l ), data.h ) <= 0 )
+                return;
 
-            if (data === null || data.result !== true)
-                throw {message: "last block is not valid"};
-
-            data = data.data;
-
-            this._validateBlockchainHeader(data);
-
-            //validate header
-            //TODO !!!
-            //in case the hashes are the same, and I have already the block
-            if (( data.height >= 0 && this.blockchain.blocks.length - 1 >= data.height && this.blockchain.blocks.length >= data.chainLength )) {
-
-                //in case the hashes are exactly the same, there is no reason why we should download it
-                let myHash = this.blockchain.getHashPrev(data.height+1);
-                if ( myHash !== undefined && myHash !== null && BufferExtended.safeCompare(myHash, data.header.hash) === true )
-                    throw {message: "your block is not new, because I have the same block at same height"};
-
-            }
-
-            let result = await this.forksManager.newForkTip(socket, data.chainLength, data.chainStartingPoint, data.header);
-
-
-            return result;
-
-        } catch (exception) {
-
-            if (! (typeof exception === "object" && exception.message === "your block is not new, because I have the same block at same height"))
-                console.error("Socket Error - get/blockchain/header/last-block", exception, data);
-
-            return false;
         }
+
+        this.forksManager.newForkTip(socket, data.l, data.s, data.h );
 
     }
 

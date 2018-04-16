@@ -14,12 +14,12 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
     async _getLastBlocks(socket, heightRequired){
 
-        let blockHeaderResult = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", {height: heightRequired }, heightRequired );
+        let hash = await socket.node.sendRequestWaitOnce("g/hash", heightRequired, heightRequired );
 
-        if (blockHeaderResult === null)
-            throw {message: "LightProtocolForkSolver _calculateForkBinarySearch headers-info dropped ", heightRequired};
+        if (hash === null)
+            throw { message: "LightProtocolForkSolver _calculateForkBinarySearch headers-info dropped ", heightRequired };
 
-        return {position: heightRequired, header: blockHeaderResult};
+        return {position: heightRequired, header: hash};
 
     }
 
@@ -237,15 +237,11 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
         if (binarySearchResult.position === -1 && currentBlockchainLength < forkChainLength){
 
-            let answer = await socket.node.sendRequestWaitOnce("blockchain/headers-info/request-header-info-by-height", { height: forkChainStartingPoint }, forkChainStartingPoint );
+            let hash = await socket.node.sendRequestWaitOnce("g/hash", forkChainStartingPoint, forkChainStartingPoint );
 
-            if (answer === null || answer === undefined )
-                throw {message: "connection dropped headers-info forkChainStartingPoint"};
+            if (hash === null || hash === undefined) throw {message: "connection dropped headers-info forkChainStartingPoint"};
 
-            if (answer.result !== true || answer.header === undefined)
-                throw {message: "headers-info 0 malformed"};
-
-            binarySearchResult.position = {position: forkChainStartingPoint, header: answer.header};
+            binarySearchResult.position = {position: forkChainStartingPoint, header: hash};
 
         }
 
