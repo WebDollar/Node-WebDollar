@@ -22,8 +22,16 @@ class PPoWBlockchain extends InterfaceBlockchain {
         block.level = block.getLevel(); //computing the level
 
         //TODO generate proofs as a LightNode
-        if (!this.agent.light)
-            this.prover.createProofs();
+        if (!this.agent.light) {
+
+            if (!block.blockValidation.blockValidationType.blockValidationType["avoid-calculating-proofs"]){
+
+                this.prover.createProofs();
+
+            }
+
+
+        }
 
     }
 

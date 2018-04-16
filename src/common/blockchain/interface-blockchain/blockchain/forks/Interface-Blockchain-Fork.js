@@ -176,6 +176,9 @@ class InterfaceBlockchainFork {
         if (height === this.forkChainLength-1)
             validationType["validation-timestamp-adjusted-time"] = true;
 
+        if (height !== this.forkChainLength-1)
+            validationType["avoid-calculating-proofs"] = true;
+
         return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
