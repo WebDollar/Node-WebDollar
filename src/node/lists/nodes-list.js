@@ -150,6 +150,24 @@ class NodesList {
         return count;
     }
 
+    countNodesByType(connectionType){
+
+        if ( connectionType === undefined) connectionType = 'all';
+
+        let count = 0;
+
+        for (let i=0; i<this.nodes.length; i++)
+            if (Array.isArray(connectionType)) { //in case type is an Array
+                if (this.nodes[i].nodeType in connectionType)
+                    count++;
+            }
+            else
+            if (connectionType === this.nodes[i].nodeType || connectionType === "all")
+                count++;
+
+        return count;
+    }
+
 
     removeDisconnectedSockets(){
 

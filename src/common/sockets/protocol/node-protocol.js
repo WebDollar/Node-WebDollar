@@ -13,7 +13,7 @@ class NodeProtocol {
 
         // Waiting for Protocol Confirmation
 
-        console.log("sendHello")
+        console.log("sendHello");
 
         let response;
         for (let i=0; i< 4; i++) {
@@ -32,10 +32,11 @@ class NodeProtocol {
         if (typeof response !== "object")
             return false;
 
-        if (response === null || !response.hasOwnProperty("uuid") ){
+        if (response === null || !response.hasOwnProperty("uuid") ) {
             console.error("hello received, but there is not uuid", response);
             return false;
         }
+
 
         if (response.hasOwnProperty("version")){
 
@@ -46,6 +47,16 @@ class NodeProtocol {
 
             if ( [NodesType.NODE_TERMINAL, NodesType.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
                 console.error("invalid node type", response);
+                return false;
+            }
+
+            if (NodesList.countNodesByType(NodesType.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
+                node.disconnect();
+                return false;
+            }
+
+            if (NodesList.countNodesByType(NodesType.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
+                node.disconnect();
                 return false;
             }
 

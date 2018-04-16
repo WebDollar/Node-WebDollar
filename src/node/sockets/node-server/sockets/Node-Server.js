@@ -44,11 +44,6 @@ class NodeServer {
 
             server.on("connection", socket => {
 
-                if (NodesList.countNodes(CONNECTION_TYPE.CONNECTION_SERVER_SOCKET) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CLIENT_CONNECTIONS){
-                    socket.disconnect();
-                    return false;
-                }
-
                 SocketExtend.extendSocket(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort, undefined, 1);
 
                 console.warn('New connection from ' + socket.node.sckAddress.getAddress(true));
