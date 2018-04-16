@@ -9,9 +9,8 @@ class GeoHelper {
 
     async getLocationFromAddress(address, skipSocketAddress){
 
-        if (!process.env.BROWSER){
-            return false;
-        }
+        if (!process.env.BROWSER)
+            return null;
 
         if ( skipSocketAddress === undefined) skipSocketAddress = false;
 
