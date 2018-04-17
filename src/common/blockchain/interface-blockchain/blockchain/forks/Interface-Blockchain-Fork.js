@@ -59,7 +59,7 @@ class InterfaceBlockchainFork {
     async _validateFork(validateHashesAgain){
 
         if (this.blockchain.blocks.length > this.forkStartingHeight + this.forkBlocks.length + 1)
-            throw {message: "my blockchain is larger than yours", position: this.forkStartingHeight + this.forkBlocks.length};
+            throw {message: "my blockchain is larger than yours", position: this.forkStartingHeight + this.forkBlocks.length, blockchain: this.blockchain.blocks.length};
         else
         if (this.blockchain.blocks.length === this.forkStartingHeight + this.forkBlocks.length + 1) //I need to check
             if ( this.forkBlocks[this.forkBlocks.length - 1].hash.compare(this.blockchain.getHashPrev(this.blockchain.blocks.length)) < 0)
