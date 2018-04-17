@@ -31,12 +31,12 @@ class NodesStats {
         let string1 = "";
         let clients = NodesList.getNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
         for (let i=0; i<clients.length; i++)
-            string1 += '('+clients[i].socket.node.sckAddress.getOriginalAddress()+' , '+clients[i].socket.node.sckAddress.uuid+')   ';
+            string1 += '('+clients[i].socket.node.sckAddress.toString()+' , '+clients[i].socket.node.sckAddress.uuid+')   ';
 
         let string2 = "";
         let server = NodesList.getNodes( ConnectionsType.CONNECTION_SERVER_SOCKET );
         for (let i=0; i<server.length; i++)
-            string2 += '(' + server[i].socket.node.sckAddress.getOriginalAddress() + ' , ' + server[i].socket.node.sckAddress.uuid + ')   ';
+            string2 += '(' + server[i].socket.node.sckAddress.toString() + ' , ' + server[i].socket.node.sckAddress.uuid + ')   ';
 
         console.log("clients: ",string1);
         console.log("server: ",string2);

@@ -47,16 +47,13 @@ class SocketAddress {
         if (port === undefined)
             port = consts.SETTINGS.NODE.PORT;
 
-        this._originalAddress = address;
-
-        console.log("address", address);
         try {
             if (ipaddr.IPv6.isIPv6(address)) {
 
                 let ip = ipaddr.IPv6.parse(address);
 
                 if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
-                    address = ip.toIPv4Address().toString();
+                    address = ip.toIPv4Address().toNormalizedString();
                 else // ipString is IPv6
                     address = ip.toNormalizedString();
 
@@ -136,12 +133,6 @@ class SocketAddress {
 
         return this.address + (includePort ? ':'+this.port : '');
 
-    }
-
-
-
-    getOriginalAddress(){
-        return this._originalAddress;
     }
 
     get geoLocation(){

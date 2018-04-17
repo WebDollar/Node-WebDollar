@@ -90,7 +90,7 @@ class NodesWaitlistObject {
         return {
 
             type: this.type,
-            addr: this.sckAddresses[0].getOriginalAddress(),
+            addr: this.sckAddresses[0].toString(),
             port: this.sckAddresses[0].port,
 
         }

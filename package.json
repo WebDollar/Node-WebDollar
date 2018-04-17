@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build_terminal": "webpack --config build_webpack/webpack.terminal.config.js",
-    "build_terminal2": "cross-env SERVER_PORT=2095 webpack --config build_webpack/webpack.terminal.config.js",
+    "build_terminal2": "cross-env SERVER_PORT=8081 webpack --config build_webpack/webpack.terminal.config.js",
     "build_terminal_test": "webpack --config build_webpack/tests/webpack.terminal.test.config.js",
     "build_terminal_menu": "cross-env SERVER_PORT=3333 webpack --config build_webpack/webpack.terminal.menu.config.js",
     "build_browser": "webpack --config build_webpack/webpack.browser.config.js",
