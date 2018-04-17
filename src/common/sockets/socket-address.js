@@ -54,10 +54,11 @@ class SocketAddress {
             if (address.lastIndexOf(":")>0) {
                 port = address.substr(address.lastIndexOf(":")+1)
                 address = address.substr(0, address.lastIndexOf(":"));
-            }
-        }
 
-        this._originalAddress = address;
+                this._originalAddress = address;
+            } else
+                this._originalAddress = address.toNormalizedString();
+        }
 
         try {
             if (typeof address === 'string')

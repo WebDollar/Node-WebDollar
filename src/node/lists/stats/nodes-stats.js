@@ -24,7 +24,6 @@ class NodesStats {
         setInterval( () => { return this._printStats() }, consts.SETTINGS.PARAMS.STATUS_INTERVAL)
     }
 
-
     _printStats(){
 
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Waitlist:",this.statsWaitlist,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
