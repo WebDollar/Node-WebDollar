@@ -25,9 +25,6 @@ class NodesWaitlist {
 
         this._connectedQueue = [];
 
-        // this.MAX_WAITLIST_CONNECTIONS = 500;
-        // this.MAX_ERROR_TRIALS = 100;
-
         this.MAX_FULLNODE_WAITLIST_CONNECTIONS = 500;
         this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS = 500;
         this.MAX_ERROR_TRIALS = 100;
