@@ -27,7 +27,7 @@ class NodePropagationProtocol {
             }
         }
 
-        setTimeout(this.processNewNodeInterval.bind(this), 300);
+        setTimeout( this.processNewNodeInterval.bind(this), 300);
 
     }
 
@@ -100,8 +100,8 @@ class NodePropagationProtocol {
 
                     case "deleted-nodes":
 
-                        // for (let i = 0; i < addresses.length; i++)
-                        //     NodesWaitlist.removedWaitListElement( addresses[i].addr, addresses[i].port, socket );
+                        for (let i = 0; i < addresses.length; i++)
+                            NodesWaitlist.removedWaitListElement( addresses[i].addr, addresses[i].port, socket );
 
                         break;
 
