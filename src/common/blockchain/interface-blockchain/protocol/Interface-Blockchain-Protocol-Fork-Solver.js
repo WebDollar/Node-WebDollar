@@ -117,18 +117,16 @@ class InterfaceBlockchainProtocolForkSolver{
 
             //optimization
             //check if n-2 was ok, but I need at least 1 block
-            if (currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
+            if (currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 ){
 
                 let answer = await socket.node.sendRequestWaitOnce( "head/hash", currentBlockchainLength-1, currentBlockchainLength-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                 if (answer === null || answer.hash === undefined) throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };
 
-                if (  Buffer.compare ( this.blockchain.blocks.last.hash , answer.hash ) < 0 )
-                    throw {message: "hash is bigger than mine" };
-
-                binarySearchResult = {
-                    position : currentBlockchainLength,
-                    header: answer.hash,
-                };
+                if (  this.blockchain.blocks.last.hash.equals( answer.hash ) )
+                    binarySearchResult = {
+                        position : currentBlockchainLength,
+                        header: answer.hash,
+                    };
 
             }
 
