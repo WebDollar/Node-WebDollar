@@ -29,8 +29,10 @@ class NodeProtocol {
 
         }
 
-        if (typeof response !== "object")
+        if (typeof response !== "object" || response === null) {
+            console.error("No Hello");
             return false;
+        }
 
         if (response === null || !response.hasOwnProperty("uuid") ) {
             console.error("hello received, but there is not uuid", response);
