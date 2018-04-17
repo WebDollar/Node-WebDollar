@@ -19,7 +19,6 @@ class NodesWaitlist {
         this.emitter = new EventEmitter();
         this.emitter.setMaxListeners(100);
 
-        // this.waitlist = [];
         this.waitListFullNodes = [];
         this.waitListLightNodes = [];
         this.started = false;
@@ -58,7 +57,7 @@ class NodesWaitlist {
 
             if (backedBy !==  "fallback") {
 
-                let foundWaitList = this._searchNodesWaitlist(sckAddress);
+                let foundWaitList = this._searchNodesWaitlist(sckAddress, type);
 
                 if (foundWaitList !== null)foundWaitList.pushBackedBy(backedBy);
                 else sckAddresses.push(sckAddress);
@@ -105,7 +104,7 @@ class NodesWaitlist {
 
     }
 
-    _searchNodesWaitlist(address, port, listType){
+    _searchNodesWaitlist(address, listType, port){
 
         let list = [];
 
@@ -114,7 +113,7 @@ class NodesWaitlist {
         else if( listType === NodesType.NODE_WEB_PEER )
             list = this.waitListLightNodes;
 
-        let index = this._findNodesWaitlist(address, port);
+        let index = this._findNodesWaitlist(address, port, listType);
 
         if (index === -1) return null;
 
@@ -127,21 +126,18 @@ class NodesWaitlist {
     */
     _connectNewNodesWaitlist(){
 
-        this._deleteUselessWaitlist();
-
-        //TODO shuffle them
+        this._deleteUselessWaitlist(NodesType.NODE_TERMINAL);
 
         if (NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) === 0){
 
-            for (let i=0; i < this.waitlist.length; i++)
-                if ( this.waitlist[i].type === NodesType.NODE_TERMINAL && this.waitlist[i].findBackedBy("fallback") !== null)
-                    this._tryToConnectNextNode(this.waitlist[i]);
+            for (let i=0; i < this.waitListFullNodes.length; i++)
+                if ( this.waitListFullNodes[i].findBackedBy("fallback") !== null)
+                    this._tryToConnectNextNode(this.waitListFullNodes[i]);
 
         } else {
 
-            for (let i=0; i < this.waitlist.length; i++)
-                if ( this.waitlist[i].type === NodesType.NODE_TERMINAL )
-                    this._tryToConnectNextNode(this.waitlist[i]);
+            for (let i=0; i < this.waitListFullNodes.length; i++)
+                this._tryToConnectNextNode(this.waitListFullNodes[i]);
 
         }
 
@@ -168,8 +164,6 @@ class NodesWaitlist {
                 nextWaitListObject.blocked = true;
                 this._connectedQueue.push(nextWaitListObject);
 
-                //console.log("connectNewNodesWaitlist ", nextNode.sckAddresses.toString() );
-
                 this._connectNowToNewNode(nextWaitListObject).then((connected) => {
 
                     for (let i=0; i<this._connectedQueue.length; i++)
@@ -181,6 +175,7 @@ class NodesWaitlist {
                     nextWaitListObject.blocked = false;
                     nextWaitListObject.connected = connected;
                     nextWaitListObject.refreshLastTimeChecked();
+
                 });
 
             }
@@ -270,7 +265,7 @@ class NodesWaitlist {
         else if ( listType === NodesType.NODE_WEB_PEER )
             list = this.waitListLightNodes;
 
-        let index = this._findNodesWaitlist(address, port);
+        let index = this._findNodesWaitlist(address, port, listType);
 
         if (index !== -1) {
 
