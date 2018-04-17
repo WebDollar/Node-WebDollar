@@ -6,7 +6,7 @@ export default {
     "nodes": [
 
         {
-            "addr": ["webdollar.ddns.net:80", "webdollar.ddns.net:8081", "webdollar.ddns.net:8082", "webdollar.ddns.net:8084"],
+            "addr": ["127.0.0.1:2095"],
         },
 
     ]

@@ -1,7 +1,7 @@
 const uuid = require('uuid');
 
 let consts = {
-    DEBUG: false,
+    DEBUG: true,
 };
 
 
@@ -194,8 +194,9 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "1.01",
-        VERSION_COMPATIBILITY: "1.01",
+
+        VERSION: "1.02",
+        VERSION_COMPATIBILITY: "1.02",
         PROTOCOL: "WebDollar",
         SSL: true,
 
