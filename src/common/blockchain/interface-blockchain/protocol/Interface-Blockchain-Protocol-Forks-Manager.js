@@ -17,34 +17,40 @@ class InterfaceBlockchainProtocolForksManager {
     */
     async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader){
 
-        if (typeof newChainLength !== "number") throw "newChainLength is not a number";
-        if (typeof newChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";
+        try {
+            if (typeof newChainLength !== "number") throw "newChainLength is not a number";
+            if (typeof newChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";
 
-        if (newChainStartingPoint > newChainLength) throw "Incorrect newChainStartingPoint";
-        if (newChainStartingPoint < 0 ) throw "Incorrect2 newChainStartingPoint";
-        if (newChainStartingPoint > forkLastBlockHeader.height ) throw "Incorrect3 newChainStartingPoint";
+            if (newChainStartingPoint > newChainLength) throw "Incorrect newChainStartingPoint";
+            if (newChainStartingPoint < 0) throw "Incorrect2 newChainStartingPoint";
+            if (newChainStartingPoint > forkLastBlockHeader.height) throw "Incorrect3 newChainStartingPoint";
 
-        if (newChainLength < this.blockchain.blocks.length){
+            if (newChainLength < this.blockchain.blocks.length) {
 
-            socket.node.sendRequest( "head/new-block", {
-                l: this.blockchain.blocks.length,
-                h: this.blockchain.blocks.last.hash,
-                s: this.blockchain.blocks.blocksStartingPoint,
-            } );
+                socket.node.sendRequest("head/new-block", {
+                    l: this.blockchain.blocks.length,
+                    h: this.blockchain.blocks.last.hash,
+                    s: this.blockchain.blocks.blocksStartingPoint,
+                });
 
-            if (newChainLength < this.blockchain.blocks.length - 50)
-                BansList.addBan( socket, 500, "Your blockchain is smaller than mine" );
+                if (newChainLength < this.blockchain.blocks.length - 50)
+                    BansList.addBan(socket, 500, "Your blockchain is way smaller than mine");
 
-            throw "Your blockchain is smaller than mine";
+                throw "Your blockchain is smaller than mine";
 
-        }
+            }
 
-        let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+            let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
 
-        if (answer.result && answer.fork !== undefined)
-            return answer.fork.forkPromise;
-        else
+            if (answer.result && answer.fork !== undefined)
+                return answer.fork.forkPromise;
+            else
+                return false;
+
+        } catch (exception){
+            console.warn(exception);
             return false;
+        }
 
     }
 
