@@ -17,8 +17,12 @@ class InterfaceBlockchainProtocolForksManager {
     */
     async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader){
 
-        if (typeof newChainLength !== "number") throw {message: "newChainLength is not a number"};
-        if (typeof newChainStartingPoint !== "number") throw {message: "newChainStartingPoint is not a number"};
+        if (typeof newChainLength !== "number") throw "newChainLength is not a number";
+        if (typeof newChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";
+
+        if (newChainStartingPoint > newChainLength) throw "Incorrect newChainStartingPoint";
+        if (newChainStartingPoint < 0 ) throw "Incorrect2 newChainStartingPoint";
+        if (newChainStartingPoint > forkLastBlockHeader.height ) throw "Incorrect3 newChainStartingPoint";
 
         if (newChainLength < this.blockchain.blocks.length){
 
@@ -31,14 +35,9 @@ class InterfaceBlockchainProtocolForksManager {
             if (newChainLength < this.blockchain.blocks.length - 50)
                 BansList.addBan( socket, 500, "Your blockchain is smaller than mine" );
 
-            throw {message: "Your blockchain is smaller than mine"};
+            throw "Your blockchain is smaller than mine";
 
         }
-
-        if (newChainStartingPoint > newChainLength) throw {message: "Incorrect newChainStartingPoint"};
-        if (newChainStartingPoint < 0 ) throw {message: "Incorrect2 newChainStartingPoint"};
-        if (newChainStartingPoint > forkLastBlockHeader.height ) throw {message: "Incorrect3 newChainStartingPoint"};
-
 
         let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
 
