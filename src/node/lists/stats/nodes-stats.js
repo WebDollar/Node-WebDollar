@@ -13,7 +13,9 @@ class NodesStats {
         this.statsClients = 0;
         this.statsServer = 0;
         this.statsWebPeers = 0;
-        this.statsWaitlist = 0;
+
+        this.statsWaitlistFullNodes = 0;
+        this.statsWaitlistLightNodes = 0;
 
         NodesList.emitter.on("nodes-list/connected", (nodesListObject) => { this._recalculateStats(nodesListObject) } );
         NodesList.emitter.on("nodes-list/disconnected", (nodesListObject ) => { this._recalculateStats(nodesListObject ) });
@@ -26,7 +28,7 @@ class NodesStats {
 
     _printStats(){
 
-        console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Network:",this.statsWaitlist,  "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
+        console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
 
         let string1 = "";
         let clients = NodesList.getNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
@@ -48,7 +50,9 @@ class NodesStats {
         this.statsClients = NodesList.countNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
         this.statsServer = NodesList.countNodes(ConnectionsType.CONNECTION_SERVER_SOCKET);
         this.statsWebPeers = NodesList.countNodes(ConnectionsType.CONNECTION_WEBRTC);
-        this.statsWaitlist = NodesWaitlist.waitlist.length;
+
+        this.statsWaitlistFullNodes= NodesWaitlist.waitListFullNodes.length;
+        this.statsWaitlistLightNodes = NodesWaitlist.waitListLightNodes.length;
 
         if (printStats)
             this._printStats();
