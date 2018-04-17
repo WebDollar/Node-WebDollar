@@ -145,7 +145,7 @@ class InterfaceBlockchainProtocol {
 
                 }
 
-                console.log("newForkTip");
+                console.log("newForkTip", data.l);
 
                 this.forksManager.newForkTip( socket, data.l, data.s, data.h );
 

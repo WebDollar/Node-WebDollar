@@ -46,7 +46,7 @@ class NodesList {
         if (type === undefined) throw {message: "type is necessary"};
 
         if (!socket.node || !socket.node.protocol || !socket.node.protocol.helloValidated ) {
-            socket.disconnect(true);
+            socket.disconnect();
             return false;
         }
 
@@ -71,7 +71,7 @@ class NodesList {
         }
 
         console.error("Already connected to ", socket.node.sckAddress.getAddress(true));
-        socket.disconnect(true);
+        socket.disconnect();
         return false;
     }
 
@@ -83,7 +83,7 @@ class NodesList {
 
             //console.error("Error - disconnectSocket rejected by invalid helloValidated");
             //if (socket.hasOwnProperty("node")) console.log("hello validated value",socket.node.protocol.helloValidated);
-            socket.disconnect(true);
+            socket.disconnect();
             return false;
         }
 
@@ -102,13 +102,13 @@ class NodesList {
 
                 this.emitter.emit("nodes-list/disconnected", nodeToBeDeleted);
 
-                socket.disconnect(true);
+                socket.disconnect();
                 return true;
             }
 
         //console.error("Disconnecting Socket but it was not validated before...", socket.node.sckAddress.getAddress());
 
-        socket.disconnect(true);
+        socket.disconnect();
         return false;
     }
 

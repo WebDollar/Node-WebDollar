@@ -52,6 +52,8 @@ class NodeServer {
 
                     if (answer)
                         this.initializeSocket(socket, ["uuid"]);
+                    else
+                        socket.disconnect();
 
                 });
 
