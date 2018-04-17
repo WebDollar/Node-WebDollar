@@ -81,7 +81,7 @@ class InterfaceBlockchainProtocolForksManager {
             } catch (exception) {
 
                 console.error("processForksQueue returned an error", exception);
-                console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.addressString, exception.message);
+                console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
 
             }
 

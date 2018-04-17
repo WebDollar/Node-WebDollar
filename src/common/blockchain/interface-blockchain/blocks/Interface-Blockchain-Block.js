@@ -273,9 +273,11 @@ class InterfaceBlockchainBlock {
             offset += consts.BLOCKCHAIN.BLOCKS_NONCE;
 
 
+            //TODO 1 byte version
             this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) );
             offset += 2;
 
+            //TODO  put hashPrev into block.data
             this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 

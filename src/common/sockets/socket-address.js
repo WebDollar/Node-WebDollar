@@ -43,32 +43,45 @@ class SocketAddress {
 
         if (address === undefined)
             address = '';
-        
-        if (typeof address === 'string')
-            address = address.toLowerCase();
 
         if (port === undefined)
             port = consts.SETTINGS.NODE.PORT;
 
         try {
-            if (typeof address === 'string') {
-                if (address.lastIndexOf(":")>0) {
-                    port = address.substr(address.lastIndexOf(":")+1)
-                    address = address.substr(0, address.lastIndexOf(":"));
-                }
-                address = ipaddr.parse(address);
-            }
-            else
-            if (Array.isArray(address))
-                address = ipaddr.fromByteArray(address);
+            if (ipaddr.IPv6.isIPv6(address)) {
 
-        } catch (Exception){
+                let ip = ipaddr.IPv6.parse(address);
+
+                if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
+                    address = ip.toIPv4Address().toNormalizedString();
+                else // ipString is IPv6
+                    address = ip.toNormalizedString();
+
+            }
+
+
+            if (address.lastIndexOf(":") > 0) {//port
+                port = address.substr(address.lastIndexOf(":") + 1);
+                address = address.substr(0, address.lastIndexOf(":"));
+            }
+
+            if (ipaddr.IPv4.isIPv4(address)) {
+
+                let ip = ipaddr.IPv4.parse(address);
+                address = ip.toNormalizedString(); //IPv4
+
+            } else {
+            }// it is a domain
+
+        } catch (exception){
+
+            address = "0.0.0.0";
+
         }
 
-        if (typeof address === "string") this.addressString = address;
-        else this.addressString = address.toNormalizedString();
 
-        this.address = address;
+        this.address = address; //always ipv6
+
         this.port = port;
         this._geoLocation = null;
 
@@ -116,54 +129,10 @@ class SocketAddress {
     /*
         returns ipv6 ip standard
      */
-    getAddress(includePort){
+    getAddress(includePort=true){
 
-        try {
-            if ( includePort === undefined)
-                includePort = true;
+        return this.address + (includePort ? ':'+this.port : '');
 
-            if (typeof this.address === 'object') {
-
-                let initialAddress;
-
-                if (typeof this.address === "string") initialAddress = this.address;
-                else initialAddress = this.address.toNormalizedString();
-
-                let addressString =  '';
-
-                //avoiding ipv4 shows as ipv6
-                if (ipaddr.IPv4.isValid(initialAddress)) {
-                    // ipString is IPv4
-                    addressString = initialAddress;
-                } else if (ipaddr.IPv6.isValid(initialAddress)) {
-                    let ip = ipaddr.IPv6.parse(initialAddress);
-                    if (ip.isIPv4MappedAddress()) {
-                        // ip.toIPv4Address().toString() is IPv4
-                        addressString = ip.toIPv4Address().toString();
-                    } else {
-                        // ipString is IPv6
-                        addressString = initialAddress;
-                    }
-                } else {
-                    // ipString is invalid
-                    throw {message: "NO VALID IP", address: this.address};
-                }
-
-
-                return addressString + (includePort ? ':' + this.port : '');
-            }
-
-            let initialAddress;
-
-            if (typeof this.address === "string") initialAddress = this.address;
-            else initialAddress = this.address.toNormalizedString();
-
-            return initialAddress + (includePort ? ':'+this.port : '');
-
-        } catch(Exception){
-            console.error("getAddress exception", Exception, this.address);
-            return '';
-        }
     }
 
     get geoLocation(){
