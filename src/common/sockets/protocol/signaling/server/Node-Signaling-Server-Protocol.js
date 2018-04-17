@@ -86,10 +86,8 @@ class NodeSignalingServerProtocol {
             if ( initiatorAnswer.accepted === false && initiatorAnswer.message  === "Already connected")
                 connection.status  = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
             else
-            if ( initiatorAnswer.accepted === false && initiatorAnswer.message === "I can't accept WebPeers anymore") {
+            if ( initiatorAnswer.accepted === false && initiatorAnswer.message === "I can't accept WebPeers anymore")
                 this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
-                return false;
-            }
             else
 
             if ( initiatorAnswer.accepted === true) {
@@ -123,10 +121,8 @@ class NodeSignalingServerProtocol {
             if ( answer.accepted === false && answer.message === "Already connected")
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
             else
-            if ( answer.accepted === false && answer.message === "I can't accept WebPeers anymore") {
+            if ( answer.accepted === false && answer.message === "I can't accept WebPeers anymore")
                 this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
-                return false;
-            }
             else
             if ( answer.accepted === true) {
 
@@ -157,10 +153,9 @@ class NodeSignalingServerProtocol {
             if ( result.established === false && result.message === "Already connected")
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
             else
-            if ( result.established === false && result.message === "I can't accept WebPeers anymore") {
+            if ( result.established === false && result.message === "I can't accept WebPeers anymore")
                 this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
-                return false;
-            } else
+            else
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished;
 
         });
@@ -170,7 +165,7 @@ class NodeSignalingServerProtocol {
         //socket is client2
         socket.node.on("signals/server/new-answer-ice-candidate", async (iceCandidate) => {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(result.id);
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.id);
 
             let answer = await connection.client1.node.sendRequest("signals/client/initiator/receive-ice-candidate",{  //sendRequestWaitOnce returns errors
                 id: connection.id,
@@ -186,10 +181,8 @@ class NodeSignalingServerProtocol {
             if ( answer === null || answer === undefined )
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
             else
-            if ( answer.established === false && answer.message === "I can't accept WebPeers anymore") {
+            if ( answer.established === false && answer.message === "I can't accept WebPeers anymore")
                 this._clientIsNotAcceptingAnymoreWebPeers(connection.client1, connection);
-                return false;
-            }
 
         });
 
@@ -197,7 +190,7 @@ class NodeSignalingServerProtocol {
         //client 1
         socket.node.on("signals/server/new-initiator-ice-candidate", async (iceCandidate) => {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(result.id);
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.id);
 
             let answer = await connection.client1.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
                 id: connection.id,
@@ -212,10 +205,8 @@ class NodeSignalingServerProtocol {
             if ( answer === null || answer === undefined )
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
             else
-            if ( answer.established === false && answer.message === "I can't accept WebPeers anymore") {
+            if ( answer.established === false && answer.message === "I can't accept WebPeers anymore")
                 this._clientIsNotAcceptingAnymoreWebPeers(connection.client2, connection);
-                return false;
-            }
 
         });
 
