@@ -79,9 +79,11 @@ class NodeClient {
 
                     socket.node.protocol.sendHello(["ip","uuid"]).then( (answer)=>{
 
-                        this.initializeSocket(socket, ["ip","uuid"]);
+                        if (answer) {
+                            this.initializeSocket(socket, ["ip", "uuid"]);
+                        }
 
-                        resolve(true);
+                        resolve(answer);
                     });
 
                 });

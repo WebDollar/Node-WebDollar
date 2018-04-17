@@ -49,7 +49,10 @@ class NodeServer {
                 console.warn('New connection from ' + socket.node.sckAddress.getAddress(true));
 
                 socket.node.protocol.sendHello(["uuid"]).then( (answer)=>{
-                    this.initializeSocket(socket, ["uuid"]);
+
+                    if (answer)
+                        this.initializeSocket(socket, ["uuid"]);
+
                 });
 
                 socket.once("disconnect", () => {
