@@ -10,12 +10,8 @@ const EventEmitter = require('events');
 
 class NodesWaitlist {
 
-    /*
-        waitlist = []     //Addresses where it should connect too
-        stated = false;
-    */
-
     constructor(){
+
         console.log("NodesWaitlist constructor");
 
         this.NodesWaitlistObject = NodesWaitlistObject;
@@ -23,12 +19,18 @@ class NodesWaitlist {
         this.emitter = new EventEmitter();
         this.emitter.setMaxListeners(100);
 
-        this.waitlist = [];
+        // this.waitlist = [];
+        this.waitListFullNodes = [];
+        this.waitListLightNodes = [];
         this.started = false;
 
-        this._connectedQueue = []
+        this._connectedQueue = [];
 
-        this.MAX_WAITLIST_CONNECTIONS = 500;
+        // this.MAX_WAITLIST_CONNECTIONS = 500;
+        // this.MAX_ERROR_TRIALS = 100;
+
+        this.MAX_FULLNODE_WAITLIST_CONNECTIONS = 500;
+        this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS = 500;
         this.MAX_ERROR_TRIALS = 100;
 
     }
@@ -45,35 +47,35 @@ class NodesWaitlist {
 
     addNewNodeToWaitlist(addresses, port, type, nodeConnected, level, backedBy){
 
-        // addresses = "127.0.0.1";
-
-        if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[]))) return false;
-
-        if (typeof addresses === "string" || !Array.isArray(addresses)) addresses = [addresses];
+        if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[])) ) return false;
+        if ( typeof addresses === "string" || !Array.isArray(addresses) ) addresses = [addresses];
 
         let sckAddresses = [];
+
         for (let i=0; i<addresses.length; i++){
 
             let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
-            if (backedBy !==  "fallback" ) {
+            if (backedBy !==  "fallback") {
 
                 let foundWaitList = this._searchNodesWaitlist(sckAddress);
 
-                if (foundWaitList !== null) foundWaitList.pushBackedBy(backedBy);
+                if (foundWaitList !== null)foundWaitList.pushBackedBy(backedBy);
                 else sckAddresses.push(sckAddress);
 
-            } else {
+            } else
                 sckAddresses.push(sckAddress);
-            }
-
 
         }
 
         if (sckAddresses.length > 0){
 
             let waitListObject = new NodesWaitlistObject( sckAddresses, type, nodeConnected, level, backedBy );
-            this.waitlist.push(waitListObject);
+
+            if (waitListObject.type === NodesType.NODE_TERMINAL)
+                this.waitListFullNodes.push(waitListObject);
+            else
+                this.waitListLightNodes.push(waitListObject);
 
             this.emitter.emit("waitlist/new-node", waitListObject);
             return waitListObject;
@@ -92,6 +94,7 @@ class NodesWaitlist {
                     return i;
 
         return -1;
+
     }
 
     _searchNodesWaitlist(address, port){
@@ -207,22 +210,39 @@ class NodesWaitlist {
      * It will delete addresses that tried way too much
      * @returns {boolean}
      */
-    _deleteUselessWaitlist(){
+    _deleteUselessWaitlist(type){
 
-        if (this.waitlist.length < this.MAX_WAITLIST_CONNECTIONS)
-            return false;
+        let list = [];
 
-        for (let i=this.waitlist.length-1; i>=0; i--) {
+        if (type === NodesType.NODE_TERMINAL ){
 
-            if (this.waitlist[i].errorTrial > this.MAX_ERROR_TRIALS ||
-                this.waitlist[i].type === NodesType.NODE_WEB_PEER) {
+            list = this.waitListFullNodes.length;
 
-                this.emitter.emit("waitlist/delete-node", this.waitlist[i]);
-                this.waitlist.splice(i, 1);
+            if (list < this.MAX_FULLNODE_WAITLIST_CONNECTIONS)
+                return false;
+
+
+        }else if (type === NodesType.NODE_WEB_PEER ){
+
+            list = this.waitListFullNodes.length;
+
+            if (list < this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS)
+                return false;
+
+        }
+
+        for (let i=list-1; i>=0; i--) {
+
+            if ( list[i].errorTrial > this.MAX_ERROR_TRIALS || list[i].type === NodesType.NODE_WEB_PEER ) {
+
+                this.emitter.emit("waitlist/delete-node", list[i]);
+                list.splice(i, 1);
 
             }
 
         }
+
+        return false;
 
     }
 
