@@ -88,6 +88,7 @@ class NodesWaitlist {
     _findNodesWaitlist(address, port, listType){
 
         let list = [];
+
         let sckAddress = SocketAddress.createSocketAddress( address, port );
 
         if (listType === NodesType.NODE_TERMINAL )
@@ -104,13 +105,20 @@ class NodesWaitlist {
 
     }
 
-    _searchNodesWaitlist(address, port){
+    _searchNodesWaitlist(address, port, listType){
+
+        let list = [];
+
+        if (listType === NodesType.NODE_TERMINAL )
+            list = this.waitListFullNodes;
+        else if( listType === NodesType.NODE_WEB_PEER )
+            list = this.waitListLightNodes;
 
         let index = this._findNodesWaitlist(address, port);
 
         if (index === -1) return null;
 
-        return this.waitlist[index];
+        return list[index];
 
     }
 
@@ -217,23 +225,23 @@ class NodesWaitlist {
      * It will delete addresses that tried way too much
      * @returns {boolean}
      */
-    _deleteUselessWaitlist(type){
+    _deleteUselessWaitlist(listTyep){
 
         let list = [];
 
-        if (type === NodesType.NODE_TERMINAL ){
+        if (listTyep === NodesType.NODE_TERMINAL ){
 
-            list = this.waitListFullNodes.length;
+            list = this.waitListFullNodes;
 
-            if (list < this.MAX_FULLNODE_WAITLIST_CONNECTIONS)
+            if (list.length < this.MAX_FULLNODE_WAITLIST_CONNECTIONS)
                 return false;
 
 
-        }else if (type === NodesType.NODE_WEB_PEER ){
+        }else if (listTyep === NodesType.NODE_WEB_PEER ){
 
-            list = this.waitListFullNodes.length;
+            list = this.waitListFullNodes;
 
-            if (list < this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS)
+            if (list.length < this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS)
                 return false;
 
         }
@@ -253,18 +261,25 @@ class NodesWaitlist {
 
     }
 
-    removedWaitListElement(address, port, backedBy){
+    removedWaitListElement(address, port, backedBy, listType){
+
+        let list = [];
+
+        if( listType === NodesType.NODE_TERMINAL)
+            list = this.waitListFullNodes;
+        else if ( listType === NodesType.NODE_WEB_PEER )
+            list = this.waitListLightNodes;
 
         let index = this._findNodesWaitlist(address, port);
 
         if (index !== -1) {
 
-            this.waitlist[index].removeBackedBy(backedBy);
+            list[index].removeBackedBy(backedBy);
 
-            if ( this.waitlist[index].length === 0) {
+            if ( list[index].length === 0) {
 
-                this.emitter.emit("waitlist/delete-node", this.waitlist[index]);
-                this.waitlist.splice(index, 1);
+                this.emitter.emit("waitlist/delete-node", list[index]);
+                list.splice(index, 1);
 
             }
 
@@ -274,10 +289,17 @@ class NodesWaitlist {
         return false;
     }
 
-    resetWaitlist(){
+    resetWaitlist(listType){
 
-        for (let i=0; i<this.waitlist.length; i++)
-            this.waitlist[i].resetWaitlistNode();
+        let list = [];
+
+        if( listType === NodesType.NODE_TERMINAL)
+            list = this.waitListFullNodes;
+        else if ( listType === NodesType.NODE_WEB_PEER )
+            list = this.waitListLightNodes;
+
+        for (let i=0; i<list.length; i++)
+            list[i].resetWaitlistNode();
 
     }
 
