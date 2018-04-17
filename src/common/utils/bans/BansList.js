@@ -79,7 +79,7 @@ class BansList{
 
         console.info("BANNNNNNNNNNNNNNS");
         for (let i=0; i<this.bans.length; i++)
-            console.warn( "Address", this.bans[i].sckAddress.addressString,
+            console.warn( "Address", this.bans[i].sckAddress.getOriginalAddress(),
                           "banTime", this.bans[i].banTime,
                           "timeLeft", new Date().getTime() -  (this.bans[i].banTimestamp + this.bans[i].banTime) ,
                           "messages", this.bans[i].banReasons );

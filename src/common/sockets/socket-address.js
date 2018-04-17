@@ -50,23 +50,26 @@ class SocketAddress {
         if (port === undefined)
             port = consts.SETTINGS.NODE.PORT;
 
-        try {
-            if (typeof address === 'string') {
-                if (address.lastIndexOf(":")>0) {
-                    port = address.substr(address.lastIndexOf(":")+1)
-                    address = address.substr(0, address.lastIndexOf(":"));
-                }
-                address = ipaddr.parse(address);
+        if (typeof address === 'string') {
+            if (address.lastIndexOf(":")>0) {
+                port = address.substr(address.lastIndexOf(":")+1)
+                address = address.substr(0, address.lastIndexOf(":"));
             }
+        }
+
+        this._originalAddress = address;
+
+        try {
+            if (typeof address === 'string')
+                address = ipaddr.parse(address);
             else
             if (Array.isArray(address))
                 address = ipaddr.fromByteArray(address);
 
         } catch (Exception){
+
         }
 
-        if (typeof address === "string") this.addressString = address;
-        else this.addressString = address.toNormalizedString();
 
         this.address = address;
         this.port = port;
@@ -164,6 +167,10 @@ class SocketAddress {
             console.error("getAddress exception", Exception, this.address);
             return '';
         }
+    }
+
+    getOriginalAddress(){
+        return this._originalAddress;
     }
 
     get geoLocation(){
