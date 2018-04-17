@@ -15,13 +15,13 @@ class NodesStats {
         this.statsWebPeers = 0;
         this.statsWaitlist = 0;
 
-        NodesList.emitter.on("nodes-list/connected", (nodesListObject) => { this._recalculateStats(nodesListObject) } );
-        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject ) => { this._recalculateStats(nodesListObject ) });
+        NodesList.emitter.on("nodes-list/connected", (nodesListObject) => { this._recalculateStats(nodesListObject, false ) } );
+        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject ) => { this._recalculateStats(nodesListObject, false ) });
 
         NodesWaitlist.emitter.on("waitlist/new-node", (nodesListObject ) => { this._recalculateStats(nodesListObject, false ) });
         NodesWaitlist.emitter.on("waitlist/delete-node", (nodesListObject ) => { this._recalculateStats(nodesListObject, false ) });
 
-        setInterval( () => { return this._printStats() }, consts.SETTINGS.PARAMS.STATUS_INTERVAL)
+        setInterval( this._printStats.bind(this), consts.SETTINGS.PARAMS.STATUS_INTERVAL)
     }
 
     _printStats(){
@@ -31,12 +31,12 @@ class NodesStats {
         let string1 = "";
         let clients = NodesList.getNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
         for (let i=0; i<clients.length; i++)
-            string1 += '('+clients[i].socket.node.sckAddress.toString()+' , '+clients[i].socket.node.sckAddress.uuid+')   ';
+            string1 += '('+clients[i].socket.node.sckAddress.toString() + ')   ';
 
         let string2 = "";
         let server = NodesList.getNodes( ConnectionsType.CONNECTION_SERVER_SOCKET );
         for (let i=0; i<server.length; i++)
-            string2 += '(' + server[i].socket.node.sckAddress.toString() + ' , ' + server[i].socket.node.sckAddress.uuid + ')   ';
+            string2 += '(' + server[i].socket.node.sckAddress.toString() + ')   ';
 
         console.log("clients: ",string1);
         console.log("server: ",string2);
