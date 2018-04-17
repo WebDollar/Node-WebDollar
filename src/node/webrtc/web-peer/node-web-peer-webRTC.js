@@ -11,6 +11,16 @@ import NodesList from 'node/lists/nodes-list'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import ConnectionsType from "node/lists/types/Connections-Type"
 
+let wrtc = window;
+
+if (!process.env.BROWSER)
+    wrtc = require("wrtc");
+
+let RTCPeerConnection = wrtc.RTCPeerConnection;
+let RTCSessionDescription = wrtc.RTCSessionDescription;
+let RTCIceCandidate = wrtc.RTCIceCandidate;
+
+
 const config = {
 
     /*
@@ -32,7 +42,7 @@ const config = {
         }
 
     ]
-}
+};
 
 class NodeWebPeerRTC {
 
@@ -56,8 +66,6 @@ class NodeWebPeerRTC {
 
     createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
 
-        let pcConstraint = null;
-        let dataConstraint = null;
         console.log('Using SCTP based data channels');
 
         // SCTP is supported from Chrome 31 and is supported in FF.
@@ -66,21 +74,18 @@ class NodeWebPeerRTC {
         // Add localConnection to global scope to make it visible
         // from the browser console.
 
-        const wrtc = require("wrtc");
-        let RTCPeerConnection = wrtc.RTCPeerConnection;
-        let RTCSessionDescription = wrtc.RTCSessionDescription;
-        let RTCIceCandidate = wrtc.RTCIceCandidate;
-
-        this.peer =  new RTCPeerConnection(config, pcConstraint);
+        this.peer =  new RTCPeerConnection(config);
 
         this.peer.connected = false;
         this.enableEventsHandling();
 
         this.peer.onicecandidate = (event) => {
+
             if (event.candidate) {
                 console.log("onicecandidate",event.candidate);
                 callbackSignalingServerSendIceCandidate(event.candidate);
             }
+
         };
 
         /*
@@ -105,7 +110,7 @@ class NodeWebPeerRTC {
 
             console.log('WEBRTC PEER CONNECTED', this.peer);
 
-            let remoteData = this.processDescription(this.peer.remoteDescription);
+            let remoteData = this._processDescription(this.peer.remoteDescription);
 
 
             this.peer.remoteAddress = remoteAddress||remoteData.address;
@@ -439,7 +444,7 @@ class NodeWebPeerRTC {
         return data;
     }
 
-    processDescription(description) {
+    _processDescription(description) {
 
         let str = '';
         if (description.sdp) {
@@ -479,14 +484,14 @@ class NodeWebPeerRTC {
                     if (Array.isArray(element) && element.length > 1) {
                         for (let j = 0; j < element.length; j++)
                             if (element[j] === "udp" || element[j] === "tcp")
-                                if (j + 2 < element.length && this.checkValidRemoteAddress(element[j+2])) {
+                                if (j + 2 < element.length && this._checkValidRemoteAddress(element[j+2])) {
                                     address = element[j+2];
                                     done = true;
                                     break;
                                 }
                     }
                     else if (data[i] === "udp" || data[i] === "tcp")
-                        if (i + 2 < data.length && this.checkValidRemoteAddress(element[j+2])) {
+                        if (i + 2 < data.length && this._checkValidRemoteAddress(element[j+2])) {
                             address = data[i+2];
                             break;
                         }
@@ -511,7 +516,7 @@ class NodeWebPeerRTC {
         }
     }
 
-    checkValidRemoteAddress(ip) {
+    _checkValidRemoteAddress(ip) {
 
         //based on this https://www.arin.net/knowledge/address_filters.html
 
