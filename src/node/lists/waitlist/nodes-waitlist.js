@@ -74,23 +74,30 @@ class NodesWaitlist {
 
             if (waitListObject.type === NodesType.NODE_TERMINAL)
                 this.waitListFullNodes.push(waitListObject);
-            else
+            else  if (waitListObject.type === NodesType.NODE_WEB_PEER)
                 this.waitListLightNodes.push(waitListObject);
 
             this.emitter.emit("waitlist/new-node", waitListObject);
             return waitListObject;
+
         }
         
         return null;
     }
 
-    _findNodesWaitlist(address, port){
+    _findNodesWaitlist(address, port, listType){
 
+        let list = [];
         let sckAddress = SocketAddress.createSocketAddress( address, port );
 
-        for (let i=0; i<this.waitlist.length; i++)
-            for (let j=0; j<this.waitlist[i].sckAddresses.length; j++)
-                if (this.waitlist[i].sckAddresses[j].matchAddress(sckAddress) )
+        if (listType === NodesType.NODE_TERMINAL )
+            list = this.waitListFullNodes;
+        else if( listType === NodesType.NODE_WEB_PEER )
+            list = this.waitListLightNodes;
+
+        for (let i=0; i<this.list.length; i++)
+            for (let j=0; j<this.list[i].sckAddresses.length; j++)
+                if (this.list[i].sckAddresses[j].matchAddress(sckAddress) )
                     return i;
 
         return -1;
