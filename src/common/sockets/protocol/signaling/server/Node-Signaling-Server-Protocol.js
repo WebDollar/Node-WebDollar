@@ -98,7 +98,7 @@ class NodeSignalingServerProtocol {
                 // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
 
                 connection.client2.node.sendRequest("signals/client/answer/receive-initiator-signal", {
-                    id: connection.connectionId,
+                    connectionId: connection.id,
                     initiatorSignal: connection.initiatorSignal,
 
                     remoteAddress: socket.node.sckAddress.getAddress(false),
@@ -130,7 +130,7 @@ class NodeSignalingServerProtocol {
 
                 // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
                 connection.client1.node.sendRequest("signals/client/initiator/join-answer-signal", {
-                    id: connection.connectionId,
+                    connectionId: connection.id,
                     initiatorSignal: answer.initiatorSignal,
                     answerSignal: answer.answerSignal,
 
