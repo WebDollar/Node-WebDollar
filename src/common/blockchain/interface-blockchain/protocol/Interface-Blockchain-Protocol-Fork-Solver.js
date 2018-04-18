@@ -254,6 +254,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
         let nextBlockHeight = fork.forkStartingHeightDownloading;
 
+        //maybe it was deleted before
+        if (fork.sockets.length === 0){
+            return false;
+        }
 
         //interval timer
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
