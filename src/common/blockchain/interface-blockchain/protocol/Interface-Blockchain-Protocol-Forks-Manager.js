@@ -17,35 +17,40 @@ class InterfaceBlockchainProtocolForksManager {
     */
     async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader){
 
-        if (typeof newChainLength !== "number") throw {message: "newChainLength is not a number"};
-        if (typeof newChainStartingPoint !== "number") throw {message: "newChainStartingPoint is not a number"};
+        try {
+            if (typeof newChainLength !== "number") throw "newChainLength is not a number";
+            if (typeof newChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";
 
-        if (newChainLength < this.blockchain.blocks.length){
+            if (newChainStartingPoint > newChainLength) throw "Incorrect newChainStartingPoint";
+            if (newChainStartingPoint < 0) throw "Incorrect2 newChainStartingPoint";
+            if (newChainStartingPoint > forkLastBlockHeader.height) throw "Incorrect3 newChainStartingPoint";
 
-            socket.node.sendRequest( "head/new-block", {
-                l: this.blockchain.blocks.length,
-                h: this.blockchain.blocks.last.hash,
-                s: this.blockchain.blocks.blocksStartingPoint,
-            } );
+            if (newChainLength < this.blockchain.blocks.length) {
 
-            if (newChainLength < this.blockchain.blocks.length - 50)
-                BansList.addBan( socket, 500, "Your blockchain is smaller than mine" );
+                socket.node.sendRequest("head/new-block", {
+                    l: this.blockchain.blocks.length,
+                    h: this.blockchain.blocks.last.hash,
+                    s: this.blockchain.blocks.blocksStartingPoint,
+                });
 
-            throw {message: "Your blockchain is smaller than mine"};
+                if (newChainLength < this.blockchain.blocks.length - 50)
+                    BansList.addBan(socket, 500, "Your blockchain is way smaller than mine");
 
-        }
+                throw "Your blockchain is smaller than mine";
 
-        if (newChainStartingPoint > newChainLength) throw {message: "Incorrect newChainStartingPoint"};
-        if (newChainStartingPoint < 0 ) throw {message: "Incorrect2 newChainStartingPoint"};
-        if (newChainStartingPoint > forkLastBlockHeader.height ) throw {message: "Incorrect3 newChainStartingPoint"};
+            }
 
+            let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
 
-        let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+            if (answer.result && answer.fork !== undefined)
+                return answer.fork.forkPromise;
+            else
+                return false;
 
-        if (answer.result && answer.fork !== undefined)
-            return answer.fork.forkPromise;
-        else
+        } catch (exception){
+            console.warn(exception);
             return false;
+        }
 
     }
 

@@ -61,7 +61,6 @@ class BlockchainDifficulty{
             how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
 
             console.warn("blocktimestamp", blockTimestamp);
-            console.warn("how_much_it_took_to_mine_X_Blocks ", how_much_it_took_to_mine_X_Blocks );
 
             if ( how_much_it_took_to_mine_X_Blocks <= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK )
                 throw {message: "how_much_it_took_to_mine_X_Blocks kess than consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK", how_much_it_took_to_mine_X_Blocks: how_much_it_took_to_mine_X_Blocks};
@@ -74,7 +73,6 @@ class BlockchainDifficulty{
             ratio = BigNumber.minimum(ratio, 8);
             ratio = BigNumber.maximum(ratio, 0.05);
 
-            console.warn( "ratio2", ratio.toString() );
             console.warn( "should_have_taken_X_Blocks / took_to_mine_X_Blocks", how_much_it_should_have_taken_X_Blocks, "/", how_much_it_took_to_mine_X_Blocks );
 
             let newBlockDifficulty = prevBlockDifficulty.multipliedBy(ratio);

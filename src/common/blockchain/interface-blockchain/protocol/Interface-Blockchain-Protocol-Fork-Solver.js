@@ -115,25 +115,23 @@ class InterfaceBlockchainProtocolForkSolver{
                 return {result: true, fork: forkFound};
             }
 
+            //optimization
+            //check if n-2 was ok, but I need at least 1 block
+            if (currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 ){
+
+                let answer = await socket.node.sendRequestWaitOnce( "head/hash", currentBlockchainLength-1, currentBlockchainLength-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                if (answer === null || answer.hash === undefined) throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };
+
+                if (  this.blockchain.blocks.last.hash.equals( answer.hash ) )
+                    binarySearchResult = {
+                        position : currentBlockchainLength,
+                        header: answer.hash,
+                    };
+
+            }
+
             fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHeader], false );
             fork.ready = false;
-
-            // //optimization
-            // //check if n-2 was ok, but I need at least 1 block
-            // if (currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 && currentBlockchainLength > 0){
-            //
-            //     let answer = await socket.node.sendRequestWaitOnce( "head/hash", currentBlockchainLength-1, currentBlockchainLength-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
-            //     if (answer === null || answer.hash === undefined) throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };
-            //
-            //     if (  Buffer.compare ( this.blockchain.blocks.last.hash , answer.hash ) <= 0 )
-            //         throw {message: "hash is bigger than mine" };
-            //
-            //     binarySearchResult = {
-            //         position : currentBlockchainLength,
-            //         header: answer.hash,
-            //     };
-            //
-            // }
 
             // in case it was you solved previously && there is something in the blockchain
 
@@ -200,7 +198,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             this.blockchain.forksAdministrator.deleteFork(fork);
 
-            console.error("discoverAndProcessFork raised an exception", exception );
+            console.error("discoverAndProcessFork", exception );
 
             BansList.addBan(socket, 2000, exception.message);
 

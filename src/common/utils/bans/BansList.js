@@ -1,10 +1,23 @@
 import BanObject from "./BanObject"
+import NodesList from 'node/lists/nodes-list';
 
 class BansList{
 
     constructor(){
 
         this.bans = [];
+
+        NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
+
+            for (let i=0; i<this.bans.length; i++)
+                for (let j=0; j<this.bans[i].sockets.length; j++)
+                    if (this.bans[i].sockets[j].sckAddress === undefined || this.bans[i].sockets[j].sckAddress.matchAddress(nodesListObject.socket.sckAddress)){
+                        this.bans[i].sockets.splice(j,1);
+                        break;
+                    }
+
+        });
+
 
     }
 

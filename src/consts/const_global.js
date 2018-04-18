@@ -205,7 +205,7 @@ consts.SETTINGS = {
 
     PARAMS: {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
-        STATUS_INTERVAL: 60 * 1000,                      //miliseconds
+        STATUS_INTERVAL: 20 * 1000,                      //miliseconds
 
         WAITLIST: {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
