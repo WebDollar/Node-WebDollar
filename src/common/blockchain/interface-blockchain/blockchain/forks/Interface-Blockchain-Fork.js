@@ -29,6 +29,8 @@ class InterfaceBlockchainFork {
             sockets = [sockets];
 
         this.sockets = sockets;
+
+        this.forkIsSaving = false;
         this.forkStartingHeight = forkStartingHeight||0;
         this.forkStartingHeightDownloading = forkStartingHeight||0;
 
@@ -206,18 +208,16 @@ class InterfaceBlockchainFork {
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
-            //make a copy of the current accountant tree
-            //let accountantTreeCopy = this.blockchain.accountantTree.serializeMiniAccountant(false);
-
-            //making a copy of the current blockchain
+            this.forkIsSaving = true;
 
             try {
 
+                //making a copy of the current blockchain
                 this.preForkClone();
 
             } catch (exception){
                 console.error("preForkBefore raised an error", exception);
-                //this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeCopy, undefined, false);
+                this.forkIsSaving = false;
                 return false;
             }
 
@@ -227,16 +227,13 @@ class InterfaceBlockchainFork {
 
             } catch (exception){
 
-                console.error('----------------------------------------');
                 console.error("preFork raised an error", exception);
-                console.error('----------------------------------------');
 
                 revertActions.revertOperations('', "all");
                 this._blocksCopy = []; //We didn't use them so far
                 await this.revertFork();
 
-                //this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeCopy, undefined, false);
-
+                this.forkIsSaving = false;
                 return false;
             }
 
@@ -288,7 +285,6 @@ class InterfaceBlockchainFork {
                 //reverting back to the clones, especially light settings
                 await this.revertFork();
 
-                //this.blockchain.accountantTree.deserializeMiniAccountant( accountantTreeCopy, undefined, false);
             }
 
             await this.postForkTransactions(forkedSuccessfully);
@@ -300,6 +296,7 @@ class InterfaceBlockchainFork {
                 setTimeout( ()=>{ this._forkPromiseResolver(true) } , 10 ); //making it async
             }
 
+            this.forkIsSaving = false;
             return forkedSuccessfully;
         });
 

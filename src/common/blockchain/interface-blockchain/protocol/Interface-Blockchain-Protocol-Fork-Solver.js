@@ -34,6 +34,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             //i have finished the binary search
             if (left >= right) {
+
                 //it the block actually is the same
                 if (answer.hash.equals( this.blockchain.getHashPrev( mid+1 ) ) )
                     return {position: mid, header: answer.hash };
@@ -47,9 +48,12 @@ class InterfaceBlockchainProtocolForkSolver{
                         if ( answer !== null && Buffer.isBuffer(answer.hash) )
                             if (answer.hash.equals( this.blockchain.getHashPrev(mid-1 +1) ) )
                                 return {position: mid-1, header: answer.hash };
+
                     }
-                    return {position: -1, header: answer.hash};
+
+                    return {position: -1, header: answer.hash}
                 }
+
             }
 
             //was not not found, search left because it must be there
@@ -59,9 +63,9 @@ class InterfaceBlockchainProtocolForkSolver{
             //was found, search right because the fork must be there
                 return await this._discoverForkBinarySearch(socket, initialLeft, mid + 1, right);
 
-        } catch (Exception){
+        } catch (exception){
 
-            console.error("_discoverForkBinarySearch raised an exception" , Exception, answer);
+            console.error("_discoverForkBinarySearch raised an exception" , exception, answer);
 
             return {position: null, header: null};
 
@@ -250,6 +254,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
         let nextBlockHeight = fork.forkStartingHeightDownloading;
 
+        //maybe it was deleted before
+        if (fork.sockets.length === 0){
+            return false;
+        }
 
         //interval timer
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];

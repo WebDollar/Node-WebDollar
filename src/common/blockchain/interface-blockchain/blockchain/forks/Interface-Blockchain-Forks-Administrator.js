@@ -22,11 +22,16 @@ class InterfaceBlockchainForksAdministrator {
         NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
 
             for (let i=0; i<this.forks.length; i++)
-                for (let j=0; j<this.forks[i].sockets.length; j++)
-                    if (this.forks[i].sockets[j].sckAddress === undefined || this.forks[i].sockets[j].sckAddress.matchAddress(nodesListObject.socket.sckAddress)){
-                        this.forks[i].sockets.splice(j,1);
-                        break;
-                    }
+                if (!this.forks[i].forkIsSaving) {
+                    for (let j = 0; j < this.forks[i].sockets.length; j++)
+                        if (this.forks[i].sockets[j].sckAddress === undefined || this.forks[i].sockets[j].sckAddress.matchAddress(nodesListObject.socket.sckAddress)) {
+                            this.forks[i].sockets.splice(j, 1);
+                            break;
+                        }
+
+                    if (this.forks[i].sockets.length === 0)
+                        this.forks.splice(i, 1);
+                }
 
         });
 

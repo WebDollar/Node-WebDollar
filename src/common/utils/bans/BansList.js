@@ -9,12 +9,7 @@ class BansList{
 
         NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
 
-            for (let i=0; i<this.bans.length; i++)
-                for (let j=0; j<this.bans[i].sockets.length; j++)
-                    if (this.bans[i].sockets[j].sckAddress === undefined || this.bans[i].sockets[j].sckAddress.matchAddress(nodesListObject.socket.sckAddress)){
-                        this.bans[i].sockets.splice(j,1);
-                        break;
-                    }
+            //sckAddresses shouldn't be deleted after a socket is disconnected
 
         });
 
@@ -83,7 +78,7 @@ class BansList{
     _removeEmptyBans(){
 
         for (let i=this.bans.length-1; i>=0; i--)
-            if (!this.bans[i].isBanned() )
+            if (this.bans[i].sckAddress === undefined || !this.bans[i].isBanned() )
                 this.bans.splice(i,1)
 
     }
