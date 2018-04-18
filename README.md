@@ -10,6 +10,7 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 ## 0. Node.js
 
 **Required: v8.x**
+It doesn't work with the new version 9.x
 
 Windows: just download and install from URL: https://nodejs.org/en/download/
 
