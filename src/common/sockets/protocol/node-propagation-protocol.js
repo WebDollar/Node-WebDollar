@@ -128,36 +128,38 @@ class NodePropagationProtocol {
                 let op = response.op || '';
                 switch (op) {
 
-                    case "new-full-nodes":
+                    case "new-nodes":
+
+                        let found = false;
 
                         for (let i = 0; i < addresses.length; i++) {
 
-                            let found = false;
-                            for (let j=0;  j<this._newFullNodesWaitList.length; j++)
-                                if (this._newFullNodesWaitList[j].addr === addresses[i].addr) {
-                                    found = true;
-                                    break;
-                                }
+                            if(addresses[i].type === NODES_TYPE.NODE_WEB_PEER){
 
-                            if (!found)
-                                this._newFullNodesWaitList.push({address: addresses[i], socket: socket});
-                        }
+                                for (let j=0;  j<this._newFullNodesWaitList.length; j++)
+                                    if (this._newLightNodesWaitList[j].addr === addresses[i].addr) {
+                                        found = true;
+                                        break;
+                                    }
 
-                        break;
+                                if (!found)
+                                    this._newLightNodesWaitList.push({address: addresses[i], socket: socket});
 
-                    case "new-light-nodes":
+                            }else if(addresses[i].type === NODES_TYPE.NODE_TERMINAL){
 
-                        for (let i = 0; i < addresses.length; i++) {
+                                for (let j=0;  j<this._newFullNodesWaitList.length; j++)
+                                    if (this._newFullNodesWaitList[j].addr === addresses[i].addr) {
+                                        found = true;
+                                        break;
+                                    }
 
-                            let found = false;
-                            for (let j=0;  j<this._newFullNodesWaitList.length; j++)
-                                if (this._newLightNodesWaitList[j].addr === addresses[i].addr) {
-                                    found = true;
-                                    break;
-                                }
+                                if (!found)
+                                    this._newFullNodesWaitList.push({address: addresses[i], socket: socket});
 
-                            if (!found)
-                                this._newLightNodesWaitList.push({address: addresses[i], socket: socket});
+                            }
+
+
+
                         }
 
                         break;
