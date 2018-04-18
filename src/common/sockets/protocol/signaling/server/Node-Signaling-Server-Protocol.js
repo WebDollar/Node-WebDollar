@@ -78,7 +78,7 @@ class NodeSignalingServerProtocol {
         //socket is client1
         socket.node.on("signals/client/initiator/generate-initiator-signal/answer", (initiatorAnswer)=>{
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(initiatorAnswer.id);
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(initiatorAnswer.connectionId);
 
             if ( initiatorAnswer === null || initiatorAnswer.initiatorSignal === undefined )
                 connection.status =  SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
@@ -98,7 +98,7 @@ class NodeSignalingServerProtocol {
                 // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
 
                 connection.client2.node.sendRequest("signals/client/answer/receive-initiator-signal", {
-                    id: connection.id,
+                    id: connection.connectionId,
                     initiatorSignal: connection.initiatorSignal,
 
                     remoteAddress: socket.node.sckAddress.getAddress(false),
@@ -113,7 +113,7 @@ class NodeSignalingServerProtocol {
         //socket is client2
         socket.node.on("signals/client/answer/receive-initiator-signal/answer", (answer)=>{
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.id);
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
 
             if ( answer === null || answer === undefined || answer.answerSignal === undefined )
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
@@ -130,7 +130,7 @@ class NodeSignalingServerProtocol {
 
                 // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
                 connection.client1.node.sendRequest("signals/client/initiator/join-answer-signal", {
-                    id: connection.id,
+                    id: connection.connectionId,
                     initiatorSignal: answer.initiatorSignal,
                     answerSignal: answer.answerSignal,
 
@@ -145,7 +145,7 @@ class NodeSignalingServerProtocol {
         //socket is client1
         socket.on("signals/client/initiator/join-answer-signal", (result)=> {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(result.id);
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(result.connectionId);
 
             if ( result === null || result === undefined )
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
@@ -165,10 +165,10 @@ class NodeSignalingServerProtocol {
         //socket is client2
         socket.node.on("signals/server/new-answer-ice-candidate", async (iceCandidate) => {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.id);
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
 
             let answer = await connection.client1.node.sendRequest("signals/client/initiator/receive-ice-candidate",{  //sendRequestWaitOnce returns errors
-                id: connection.id,
+                connectionId: connection.id,
 
                 initiatorSignal: connection.initiatorSignal,
                 iceCandidate: iceCandidate,
@@ -190,10 +190,10 @@ class NodeSignalingServerProtocol {
         //client 1
         socket.node.on("signals/server/new-initiator-ice-candidate", async (iceCandidate) => {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.id);
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
 
             let answer = await connection.client1.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
-                id: connection.id,
+                connectionId: connection.id,
 
                 initiatorSignal: connection.initiatorSignal,
                 iceCandidate: iceCandidate,
@@ -231,7 +231,7 @@ class NodeSignalingServerProtocol {
             // Step1, send the request to generate the INITIATOR SIGNAL
             client1.node.sendRequest("signals/client/initiator/generate-initiator-signal", {
 
-                id: connection.id,
+                connectionId: connection.id,
 
                 remoteAddress: client2.node.sckAddress.getAddress(false),
                 remoteUUID: client2.node.sckAddress.uuid,

@@ -11,6 +11,12 @@ import NodesList from 'node/lists/nodes-list'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import ConnectionsType from "node/lists/types/Connections-Type"
 
+const wrtc = require("wrtc");
+let RTCPeerConnection = wrtc.RTCPeerConnection;
+let RTCSessionDescription = wrtc.RTCSessionDescription;
+let RTCIceCandidate = wrtc.RTCIceCandidate;
+
+
 const config = {
 
     /*
@@ -65,11 +71,6 @@ class NodeWebPeerRTC {
         // For SCTP, reliable and ordered is true by default.
         // Add localConnection to global scope to make it visible
         // from the browser console.
-
-        const wrtc = require("wrtc");
-        let RTCPeerConnection = wrtc.RTCPeerConnection;
-        let RTCSessionDescription = wrtc.RTCSessionDescription;
-        let RTCIceCandidate = wrtc.RTCIceCandidate;
 
         this.peer =  new RTCPeerConnection(config, pcConstraint);
 
@@ -251,13 +252,18 @@ class NodeWebPeerRTC {
                             });
                     }
                 }, error => console.error(error));
+
+
+
             } else if (inputSignal.candidate) {
 
                 // Add the new ICE candidate to our connections remote description
                 try {
                     console.log("inputSignal.candidate", inputSignal);
 
-                    this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
+                    let candidate = new RTCIceCandidate(inputSignal.candidate);
+                    this.peer.addIceCandidate(candidate);
+
                     resolve({result: true, message:"iceCandidate successfully introduced"});
 
                 } catch (Exception){
