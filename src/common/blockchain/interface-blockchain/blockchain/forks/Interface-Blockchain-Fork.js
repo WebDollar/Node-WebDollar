@@ -13,6 +13,12 @@ class InterfaceBlockchainFork {
 
     constructor (){
 
+        // setTimeout(()=>{
+        //
+        //     this
+        //
+        // }, 60*1000)
+
     }
 
     /**

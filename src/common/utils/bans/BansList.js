@@ -27,6 +27,8 @@ class BansList{
 
     addBan(sckAddress, banTime = 10000, banReason){
 
+        if (sckAddress === undefined || sckAddress === null) return false;
+
         if (typeof sckAddress === "object" && sckAddress.hasOwnProperty("node")) sckAddress = sckAddress.node.sckAddress;
         if (typeof sckAddress === "object" && sckAddress.hasOwnProperty("sckAddress")) sckAddress = sckAddress.node.sckAddress;
 

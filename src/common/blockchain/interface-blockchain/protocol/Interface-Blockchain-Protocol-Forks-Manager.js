@@ -79,7 +79,7 @@ class InterfaceBlockchainProtocolForksManager {
                 let answer = await this.protocol.forkSolver._solveFork ( bestFork );
 
                 if (!answer)
-                    throw { message: "Invalid Fork" }
+                    throw { message: "Fork couldn't be solved" }
 
             } catch (exception) {
 
@@ -106,6 +106,7 @@ class InterfaceBlockchainProtocolForksManager {
         let fork = null;
 
         try {
+
             for (let i = 0; i < this.blockchain.forksAdministrator.forks.length; i++)
                 if (this.blockchain.forksAdministrator.forks[i].forkReady) {
 
@@ -117,7 +118,9 @@ class InterfaceBlockchainProtocolForksManager {
                 }
 
 
+            if (Math.random() < 0.1)
             console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork !== null)
+
         } catch (exception){
 
             console.error("_getBestFork returned an exception", exception );

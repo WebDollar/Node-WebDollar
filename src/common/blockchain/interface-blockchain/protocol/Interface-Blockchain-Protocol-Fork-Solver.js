@@ -233,7 +233,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
-        while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength && !global.TERMINATED ) {
+        while ( (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED ) {
 
 
             // TODO you can paralyze the downloading code from multiple sockets
