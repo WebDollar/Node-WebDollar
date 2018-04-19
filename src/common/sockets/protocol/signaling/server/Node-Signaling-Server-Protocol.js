@@ -230,6 +230,8 @@ class NodeSignalingServerProtocol {
 
     connectWebPeer(client1, client2){
 
+        if (client1 === null || client2 === null) return false;
+
         let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
         if ( previousEstablishedConnection === null
