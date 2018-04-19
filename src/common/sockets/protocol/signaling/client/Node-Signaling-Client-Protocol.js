@@ -125,6 +125,9 @@ class NodeSignalingClientProtocol {
                 if (data.iceCandidate === undefined)
                     throw {message: "data.iceCandidate 4 was not specified"};
 
+                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
+                    throw {message: "I can't accept WebPeers anymore" };
+
                 let webPeerSignalingClientListObject = SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID);
 
                 if ( webPeerSignalingClientListObject === null )

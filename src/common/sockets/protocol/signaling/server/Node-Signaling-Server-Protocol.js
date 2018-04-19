@@ -75,7 +75,7 @@ class NodeSignalingServerProtocol {
 
 
         // Step1, send the request to generate the INITIATOR SIGNAL
-        //socket is client1
+        //client1
         socket.node.on("signals/client/initiator/generate-initiator-signal/answer", (initiatorAnswer)=>{
 
             try {
@@ -116,7 +116,7 @@ class NodeSignalingServerProtocol {
 
         });
 
-        //socket is client2
+        //client2
         socket.node.on("signals/client/answer/receive-initiator-signal/answer", (answer)=>{
 
             try {
@@ -195,7 +195,10 @@ class NodeSignalingServerProtocol {
                     return;
                 }
 
-                let answer = await connection.client1.node.sendRequestWaitOnce("signals/client/initiator/receive-ice-candidate", {  //sendRequestWaitOnce returns errors
+                if (iceCandidate === null || iceCandidate === undefined)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+
+                await connection.client1.node.sendRequestWaitOnce("signals/client/initiator/receive-ice-candidate", {  //sendRequestWaitOnce returns errors
                     connectionId: connection.id,
 
                     initiatorSignal: connection.initiatorSignal,
@@ -203,18 +206,35 @@ class NodeSignalingServerProtocol {
 
                     remoteAddress: socket.node.sckAddress.getAddress(false),
                     remoteUUID: socket.node.sckAddress.uuid,
-                }, "answer");
+                });
 
-
-                if (answer === null || answer === undefined)
-                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-                else if (answer.established === false && answer.message === "I can't accept WebPeers anymore")
-                    this._clientIsNotAcceptingAnymoreWebPeers(connection.client1, connection);
 
             } catch (exception){
                 console.error("signals/server/new-answer-ice-candidate exception ", exception, iceCandidate);
             }
 
+        });
+
+        //client 1
+        socket.node.on("signals/client/initiator/receive-ice-candidate/answer", async (answer) => {
+            try {
+
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
+
+                if (connection === null) {
+                    console.error("signals/server/new-answer-ice-candidate connection is empty", answer.connectionId);
+                    return;
+                }
+
+                if (answer === null || answer === undefined)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+
+                else if (answer.established === false && answer.message === "I can't accept WebPeers anymore")
+                    this._clientIsNotAcceptingAnymoreWebPeers(connection.client1, connection);
+
+            } catch (exception){
+
+            }
         });
 
 
@@ -229,7 +249,7 @@ class NodeSignalingServerProtocol {
                     return;
                 }
 
-                let answer = await connection.client2.node.sendRequestWaitOnce("signals/client/answer/receive-ice-candidate", { //sendRequestWaitOnce returns errors
+                let answer = await connection.client2.node.sendRequest("signals/client/answer/receive-ice-candidate", { //sendRequestWaitOnce returns errors
                     connectionId: connection.id,
 
                     initiatorSignal: connection.initiatorSignal,
@@ -237,7 +257,7 @@ class NodeSignalingServerProtocol {
 
                     remoteAddress: connection.client1.node.sckAddress.getAddress(false),
                     remoteUUID: connection.client1.node.sckAddress.uuid,
-                }, "answer");
+                });
 
                 if (answer === null || answer === undefined)
                     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
@@ -250,6 +270,23 @@ class NodeSignalingServerProtocol {
 
         });
 
+
+        //client2
+        socket.node.on("signals/server/new-initiator-ice-candidate/answer", async (answer) => {
+
+            try {
+
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
+
+                if (answer === null || answer === undefined)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                else if (answer.established === false && answer.message === "I can't accept WebPeers anymore")
+                    this._clientIsNotAcceptingAnymoreWebPeers(connection.client2, connection);
+
+            } catch (exception){
+
+            }
+        });
 
     }
 
