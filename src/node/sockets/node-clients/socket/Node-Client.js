@@ -129,7 +129,7 @@ class NodeClient {
 
         console.log('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true));
 
-        this.socket.node.sckAddress.on("disconnect", () => {
+        this.socket.on("disconnect", () => {
 
             //disconnect over the time, so it was connected before
 
