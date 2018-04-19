@@ -45,6 +45,8 @@ if ( typeof describe !== 'undefined') {
     require ('tests/blockchain/interface-blockchain/mining-pools/pool-management/PoolData.test');
 
     require ('tests/benchmarks/BigNumber-benchmark.test');
+    
+    require ('tests/threads/ThreadPool.test');
 
     // require ('tests/blockchain/Node-Web-Peer.test');
 
