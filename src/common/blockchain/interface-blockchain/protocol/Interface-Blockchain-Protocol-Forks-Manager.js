@@ -106,16 +106,15 @@ class InterfaceBlockchainProtocolForksManager {
         let fork = null;
 
         try {
-            for (let i = 0; i <= this.blockchain.forksAdministrator.forks.length; i++) {
+            for (let i = 0; i <= this.blockchain.forksAdministrator.forks.length; i++)
+                if (this.blockchain.forksAdministrator.forks[i].forkReady) {
 
-                fork = this.blockchain.forksAdministrator.forks[i];
+                    fork = this.blockchain.forksAdministrator.forks[i];
 
-                if (!fork.forkReady) continue;
+                    if (bestFork === null || bestFork.forkChainLength < fork.forkChainLength)
+                        bestFork = fork;
 
-                if (bestFork === null || bestFork.forkChainLength < fork.forkChainLength)
-                    bestFork = fork;
-
-            }
+                }
         } catch (exception){
 
             console.error("_getBestFork returned an exception", exception );
