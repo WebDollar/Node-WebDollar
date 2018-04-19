@@ -80,6 +80,8 @@ class NodeSignalingServerProtocol {
 
             let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(initiatorAnswer.connectionId);
 
+            if (connection === null) console.error("signals/client/initiator/generate-initiator-signal/answer connection is empty", initiatorAnswer.connectionId);
+
             if ( initiatorAnswer === null || initiatorAnswer.initiatorSignal === undefined )
                 connection.status =  SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
             else
@@ -115,6 +117,8 @@ class NodeSignalingServerProtocol {
 
             let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
 
+            if ( connection === null ) console.error("signals/client/answer/receive-initiator-signal/answer connection is empty", answer.connectionId);
+
             if ( answer === null || answer === undefined || answer.answerSignal === undefined )
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
             else
@@ -147,6 +151,8 @@ class NodeSignalingServerProtocol {
 
             let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(result.connectionId);
 
+            if ( connection === null ) console.error("signals/client/initiator/join-answer-signal connection is empty", result.connectionId);
+
             if ( result === null || result === undefined )
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
             else
@@ -165,7 +171,9 @@ class NodeSignalingServerProtocol {
         //socket is client2
         socket.node.on("signals/server/new-answer-ice-candidate", async (iceCandidate) => {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById( iceCandidate.connectionId );
+
+            if ( connection === null ) console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
 
             let answer = await connection.client1.node.sendRequest("signals/client/initiator/receive-ice-candidate",{  //sendRequestWaitOnce returns errors
                 connectionId: connection.id,
@@ -191,6 +199,8 @@ class NodeSignalingServerProtocol {
         socket.node.on("signals/server/new-initiator-ice-candidate", async (iceCandidate) => {
 
             let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
+
+            if ( connection === null ) console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
 
             let answer = await connection.client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
                 connectionId: connection.id,
