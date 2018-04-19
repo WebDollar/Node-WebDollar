@@ -183,7 +183,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     fork.forkChainStartingPoint = forkChainStartingPoint;
                     fork.forkChainLength = forkChainLength;
                     fork.forkHeaders.push(binarySearchResult.header);
-                    fork.ready = true;
+                    fork.initializeFork();
 
                 } catch (exception){
 

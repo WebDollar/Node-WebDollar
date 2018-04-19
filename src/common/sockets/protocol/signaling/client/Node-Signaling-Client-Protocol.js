@@ -239,7 +239,7 @@ class NodeSignalingClientProtocol {
             } catch (exception){
 
                 if (exception.message !== "Already connected" && exception.message !== "I can't accept WebPeers anymore")
-                    console.error("signals/client/answer/receive-ice-candidate/"+ data.connectionId, exception);
+                    console.error("signals/client/answer/receive-ice-candidate", data.connectionId, exception);
 
                 socket.node.sendRequest("signals/client/answer/receive-ice-candidate", {connectionId: data.connectionId, accepted:false, answerSignal: undefined, message: exception.message });
             }

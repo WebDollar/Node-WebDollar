@@ -16,18 +16,13 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     }
 
-    set ready(newValue){
-        this._ready = newValue;
+    async initializeFork(){
 
-        if (newValue)
-            if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
-                this._ready = false;
-                this._downloadProof();
-            }
-    }
+        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) )
+            await this._downloadProof();
 
-    get ready(){
-        return this._ready;
+        InterfaceBlockchainFork.prototype.initializeFork.call(this);
+
     }
 
     async _downloadProof(){
@@ -53,7 +48,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             StatusEvents.emit( "agent/status", {message: "Proofs Validated", blockHeight: this.forkStartingHeight } );
 
-            this._ready = true;
         }
 
     }

@@ -192,14 +192,14 @@ class NodeSignalingServerProtocol {
 
             let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
 
-            let answer = await connection.client1.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
+            let answer = await connection.client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
                 connectionId: connection.id,
 
                 initiatorSignal: connection.initiatorSignal,
                 iceCandidate: iceCandidate,
 
-                remoteAddress: connection.client2.node.sckAddress.getAddress(false),
-                remoteUUID: connection.client2.node.sckAddress.uuid,
+                remoteAddress: connection.client1.node.sckAddress.getAddress(false),
+                remoteUUID: connection.client1.node.sckAddress.uuid,
             });
 
             if ( answer === null || answer === undefined )
