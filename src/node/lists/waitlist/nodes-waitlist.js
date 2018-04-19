@@ -21,6 +21,7 @@ class NodesWaitlist {
 
         this.waitListFullNodes = [];
         this.waitListLightNodes = [];
+
         this.started = false;
 
         this._connectedQueue = [];
@@ -54,7 +55,7 @@ class NodesWaitlist {
 
             if (backedBy !==  "fallback") {
 
-                let foundWaitList = this._searchNodesWaitlist(sckAddress, type);
+                let foundWaitList = this._searchNodesWaitlist(sckAddress, port, type);
 
                 if (foundWaitList !== null)foundWaitList.pushBackedBy(backedBy);
                 else sckAddresses.push(sckAddress);
@@ -68,10 +69,8 @@ class NodesWaitlist {
 
             let waitListObject = new NodesWaitlistObject( sckAddresses, type, nodeConnected, level, backedBy );
 
-            if (waitListObject.type === NodesType.NODE_TERMINAL)
-                this.waitListFullNodes.push(waitListObject);
-            else  if (waitListObject.type === NodesType.NODE_WEB_PEER)
-                this.waitListLightNodes.push(waitListObject);
+            if (waitListObject.type === NodesType.NODE_TERMINAL)  this.waitListFullNodes.push(waitListObject);
+            else  if (waitListObject.type === NodesType.NODE_WEB_PEER) this.waitListLightNodes.push(waitListObject);
 
             this.emitter.emit("waitlist/new-node", waitListObject);
             return waitListObject;
@@ -87,28 +86,24 @@ class NodesWaitlist {
 
         let sckAddress = SocketAddress.createSocketAddress( address, port );
 
-        if (listType === NodesType.NODE_TERMINAL )
-            list = this.waitListFullNodes;
-        else if( listType === NodesType.NODE_WEB_PEER )
-            list = this.waitListLightNodes;
+        if (listType === NodesType.NODE_TERMINAL )  list = this.waitListFullNodes;
+        else if( listType === NodesType.NODE_WEB_PEER ) list = this.waitListLightNodes;
 
-        for (let i=0; i<this.list.length; i++)
-            for (let j=0; j<this.list[i].sckAddresses.length; j++)
-                if (this.list[i].sckAddresses[j].matchAddress(sckAddress) )
+        for (let i=0; i<list.length; i++)
+            for (let j=0; j<list[i].sckAddresses.length; j++)
+                if (list[i].sckAddresses[j].matchAddress(sckAddress) )
                     return i;
 
         return -1;
 
     }
 
-    _searchNodesWaitlist(address, listType, port){
+    _searchNodesWaitlist(address, port, listType ){
 
         let list = [];
 
-        if (listType === NodesType.NODE_TERMINAL )
-            list = this.waitListFullNodes;
-        else if( listType === NodesType.NODE_WEB_PEER )
-            list = this.waitListLightNodes;
+        if (listType === NodesType.NODE_TERMINAL ) list = this.waitListFullNodes;
+        else if( listType === NodesType.NODE_WEB_PEER ) list = this.waitListLightNodes;
 
         let index = this._findNodesWaitlist(address, port, listType);
 
@@ -217,11 +212,11 @@ class NodesWaitlist {
      * It will delete addresses that tried way too much
      * @returns {boolean}
      */
-    _deleteUselessWaitlist(listTyep){
+    _deleteUselessWaitlist(listType){
 
         let list = [];
 
-        if (listTyep === NodesType.NODE_TERMINAL ){
+        if (listType === NodesType.NODE_TERMINAL ){
 
             list = this.waitListFullNodes;
 
@@ -229,7 +224,7 @@ class NodesWaitlist {
                 return false;
 
 
-        }else if (listTyep === NodesType.NODE_WEB_PEER ){
+        }else if (listType === NodesType.NODE_WEB_PEER ){
 
             list = this.waitListFullNodes;
 
@@ -257,10 +252,8 @@ class NodesWaitlist {
 
         let list = [];
 
-        if( listType === NodesType.NODE_TERMINAL)
-            list = this.waitListFullNodes;
-        else if ( listType === NodesType.NODE_WEB_PEER )
-            list = this.waitListLightNodes;
+        if( listType === NodesType.NODE_TERMINAL)  list = this.waitListFullNodes;
+        else if ( listType === NodesType.NODE_WEB_PEER ) list = this.waitListLightNodes;
 
         let index = this._findNodesWaitlist(address, port, listType);
 
@@ -285,10 +278,8 @@ class NodesWaitlist {
 
         let list = [];
 
-        if( listType === NodesType.NODE_TERMINAL)
-            list = this.waitListFullNodes;
-        else if ( listType === NodesType.NODE_WEB_PEER )
-            list = this.waitListLightNodes;
+        if( listType === NodesType.NODE_TERMINAL)  list = this.waitListFullNodes;
+        else if ( listType === NodesType.NODE_WEB_PEER ) list = this.waitListLightNodes;
 
         for (let i=0; i<list.length; i++)
             list[i].resetWaitlistNode();

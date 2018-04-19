@@ -9,6 +9,7 @@ import NodesList from 'node/lists/nodes-list';
 import StatusEvents from "common/events/Status-Events";
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist';
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+import NODES_TYPE from "../node/lists/types/Nodes-Type";
 
 class Blockchain{
 
@@ -173,7 +174,7 @@ class Blockchain{
                 StatusEvents.emit('blockchain/status', { message: "Error Synchronizing" });
 
                 if (NodesList.nodes.length === 0)
-                    NodesWaitlist.resetWaitlist();
+                    NodesWaitlist.resetWaitlist(NODES_TYPE.NODE_WEB_PEER);
 
                 this.Agent.initializeAgentPromise();
             }

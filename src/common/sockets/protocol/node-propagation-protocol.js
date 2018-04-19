@@ -167,7 +167,8 @@ class NodePropagationProtocol {
                     case "deleted-nodes":
 
                         for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.removedWaitListElement( addresses[i].addr, addresses[i].port, socket );
+                            NodesWaitlist.removedWaitListElement( addresses[i].addr, addresses[i].port, socket, addresses.type );
+
 
                         break;
 
