@@ -117,7 +117,7 @@ class InterfaceBlockchainProtocolForksManager {
                 }
 
 
-            console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork)
+            console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork !== null)
         } catch (exception){
 
             console.error("_getBestFork returned an exception", exception );
