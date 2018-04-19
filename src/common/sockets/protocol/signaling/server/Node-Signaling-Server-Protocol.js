@@ -78,36 +78,35 @@ class NodeSignalingServerProtocol {
         //socket is client1
         socket.node.on("signals/client/initiator/generate-initiator-signal/answer", (initiatorAnswer)=>{
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(initiatorAnswer.connectionId);
+            try {
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(initiatorAnswer.connectionId);
 
-            if (connection === null) console.error("signals/client/initiator/generate-initiator-signal/answer connection is empty", initiatorAnswer.connectionId);
+                if (initiatorAnswer === null || initiatorAnswer.initiatorSignal === undefined)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                else if (initiatorAnswer.accepted === false && initiatorAnswer.message === "Already connected")
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
+                else if (initiatorAnswer.accepted === false && initiatorAnswer.message === "I can't accept WebPeers anymore")
+                    this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
+                else if (initiatorAnswer.accepted === true) {
 
-            if ( initiatorAnswer === null || initiatorAnswer.initiatorSignal === undefined )
-                connection.status =  SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-            else
-            if ( initiatorAnswer.accepted === false && initiatorAnswer.message  === "Already connected")
-                connection.status  = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
-            else
-            if ( initiatorAnswer.accepted === false && initiatorAnswer.message === "I can't accept WebPeers anymore")
-                this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
-            else
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating;
+                    connection.initiatorSignal = initiatorAnswer.initiatorSignal;
 
-            if ( initiatorAnswer.accepted === true) {
+                    // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
 
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating;
-                connection.initiatorSignal = initiatorAnswer.initiatorSignal;
+                    connection.client2.node.sendRequest("signals/client/answer/receive-initiator-signal", {
+                        connectionId: connection.id,
+                        initiatorSignal: connection.initiatorSignal,
 
-                // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
+                        remoteAddress: socket.node.sckAddress.getAddress(false),
+                        remoteUUID: socket.node.sckAddress.uuid,
 
-                connection.client2.node.sendRequest("signals/client/answer/receive-initiator-signal", {
-                    connectionId: connection.id,
-                    initiatorSignal: connection.initiatorSignal,
+                    });
 
-                    remoteAddress: socket.node.sckAddress.getAddress(false),
-                    remoteUUID: socket.node.sckAddress.uuid,
+                }
 
-                });
-
+            } catch (exception){
+                console.error("signals/client/initiator/generate-initiator-signal/answer exception", exception, initiatorAnswer);
             }
 
         });
@@ -115,32 +114,34 @@ class NodeSignalingServerProtocol {
         //socket is client2
         socket.node.on("signals/client/answer/receive-initiator-signal/answer", (answer)=>{
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
+            try {
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
 
-            if ( connection === null ) console.error("signals/client/answer/receive-initiator-signal/answer connection is empty", answer.connectionId);
+                if (connection === null) console.error("signals/client/answer/receive-initiator-signal/answer connection is empty", answer.connectionId);
 
-            if ( answer === null || answer === undefined || answer.answerSignal === undefined )
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-            else
-            if ( answer.accepted === false && answer.message === "Already connected")
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
-            else
-            if ( answer.accepted === false && answer.message === "I can't accept WebPeers anymore")
-                this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
-            else
-            if ( answer.accepted === true) {
+                if (answer === null || answer === undefined || answer.answerSignal === undefined)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                else if (answer.accepted === false && answer.message === "Already connected")
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
+                else if (answer.accepted === false && answer.message === "I can't accept WebPeers anymore")
+                    this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
+                else if (answer.accepted === true) {
 
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablishing;
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablishing;
 
-                // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
-                connection.client1.node.sendRequest("signals/client/initiator/join-answer-signal", {
-                    connectionId: connection.id,
-                    initiatorSignal: answer.initiatorSignal,
-                    answerSignal: answer.answerSignal,
+                    // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
+                    connection.client1.node.sendRequest("signals/client/initiator/join-answer-signal", {
+                        connectionId: connection.id,
+                        initiatorSignal: answer.initiatorSignal,
+                        answerSignal: answer.answerSignal,
 
-                    remoteAddress: socket.node.sckAddress.getAddress(false),
-                    remoteUUID: socket.node.sckAddress.uuid,
-                });
+                        remoteAddress: socket.node.sckAddress.getAddress(false),
+                        remoteUUID: socket.node.sckAddress.uuid,
+                    });
+                }
+
+            } catch (exception){
+                console.error("signals/client/answer/receive-initiator-signal/answer exception", exception, answer);
             }
 
         });
@@ -149,20 +150,24 @@ class NodeSignalingServerProtocol {
         //socket is client1
         socket.on("signals/client/initiator/join-answer-signal", (result)=> {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(result.connectionId);
+            try {
 
-            if ( connection === null ) console.error("signals/client/initiator/join-answer-signal connection is empty", result.connectionId);
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(result.connectionId);
 
-            if ( result === null || result === undefined )
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-            else
-            if ( result.established === false && result.message === "Already connected")
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
-            else
-            if ( result.established === false && result.message === "I can't accept WebPeers anymore")
-                this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
-            else
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished;
+                if (connection === null) console.error("signals/client/initiator/join-answer-signal connection is empty", result.connectionId);
+
+                if (result === null || result === undefined)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                else if (result.established === false && result.message === "Already connected")
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
+                else if (result.established === false && result.message === "I can't accept WebPeers anymore")
+                    this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
+                else
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished;
+
+            } catch (exception){
+                console.error("signals/client/initiator/join-answer-signal exception",exception,  result);
+            }
 
         });
 
@@ -171,26 +176,30 @@ class NodeSignalingServerProtocol {
         //socket is client2
         socket.node.on("signals/server/new-answer-ice-candidate", async (iceCandidate) => {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById( iceCandidate.connectionId );
+            try {
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
 
-            if ( connection === null ) console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
+                if (connection === null) console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
 
-            let answer = await connection.client1.node.sendRequestWaitOnce("signals/client/initiator/receive-ice-candidate",{  //sendRequestWaitOnce returns errors
-                connectionId: connection.id,
+                let answer = await connection.client1.node.sendRequestWaitOnce("signals/client/initiator/receive-ice-candidate", {  //sendRequestWaitOnce returns errors
+                    connectionId: connection.id,
 
-                initiatorSignal: connection.initiatorSignal,
-                iceCandidate: iceCandidate,
+                    initiatorSignal: connection.initiatorSignal,
+                    iceCandidate: iceCandidate,
 
-                remoteAddress: socket.node.sckAddress.getAddress(false),
-                remoteUUID: socket.node.sckAddress.uuid,
-            }, "answer");
+                    remoteAddress: socket.node.sckAddress.getAddress(false),
+                    remoteUUID: socket.node.sckAddress.uuid,
+                }, "answer");
 
 
-            if ( answer === null || answer === undefined )
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-            else
-            if ( answer.established === false && answer.message === "I can't accept WebPeers anymore")
-                this._clientIsNotAcceptingAnymoreWebPeers(connection.client1, connection);
+                if (answer === null || answer === undefined)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                else if (answer.established === false && answer.message === "I can't accept WebPeers anymore")
+                    this._clientIsNotAcceptingAnymoreWebPeers(connection.client1, connection);
+
+            } catch (exception){
+                console.error("signals/server/new-answer-ice-candidate exception ", exception, iceCandidate);
+            }
 
         });
 
@@ -198,25 +207,29 @@ class NodeSignalingServerProtocol {
         //client 1
         socket.node.on("signals/server/new-initiator-ice-candidate", async (iceCandidate) => {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
+            try {
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
 
-            if ( connection === null ) console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
+                if (connection === null) console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
 
-            let answer = await connection.client2.node.sendRequestWaitOnce("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
-                connectionId: connection.id,
+                let answer = await connection.client2.node.sendRequestWaitOnce("signals/client/answer/receive-ice-candidate", { //sendRequestWaitOnce returns errors
+                    connectionId: connection.id,
 
-                initiatorSignal: connection.initiatorSignal,
-                iceCandidate: iceCandidate,
+                    initiatorSignal: connection.initiatorSignal,
+                    iceCandidate: iceCandidate,
 
-                remoteAddress: connection.client1.node.sckAddress.getAddress(false),
-                remoteUUID: connection.client1.node.sckAddress.uuid,
-            }, "answer");
+                    remoteAddress: connection.client1.node.sckAddress.getAddress(false),
+                    remoteUUID: connection.client1.node.sckAddress.uuid,
+                }, "answer");
 
-            if ( answer === null || answer === undefined )
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-            else
-            if ( answer.established === false && answer.message === "I can't accept WebPeers anymore")
-                this._clientIsNotAcceptingAnymoreWebPeers(connection.client2, connection);
+                if (answer === null || answer === undefined)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                else if (answer.established === false && answer.message === "I can't accept WebPeers anymore")
+                    this._clientIsNotAcceptingAnymoreWebPeers(connection.client2, connection);
+
+            } catch (exception){
+                console.error("signals/server/new-initiator-ice-candidate exception ", exception, iceCandidate);
+            }
 
         });
 
@@ -230,26 +243,32 @@ class NodeSignalingServerProtocol {
 
     connectWebPeer(client1, client2){
 
-        if (client1 === null || client2 === null) return false;
+        try {
 
-        let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
+            if (client1 === null || client2 === null) return false;
 
-        if ( previousEstablishedConnection === null
-            || (previousEstablishedConnection.checkLastTimeChecked(10*1000) && [ SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished].indexOf( previousEstablishedConnection.status) !== -1   )
-            || (previousEstablishedConnection.checkLastTimeChecked(20*1000) && [ SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError ].indexOf( previousEstablishedConnection.status) !== -1 )) {
+            let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
-            let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
+            if (previousEstablishedConnection === null
+                || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished].indexOf(previousEstablishedConnection.status) !== -1   )
+                || (previousEstablishedConnection.checkLastTimeChecked(20 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError].indexOf(previousEstablishedConnection.status) !== -1 )) {
 
-            // Step1, send the request to generate the INITIATOR SIGNAL
-            client1.node.sendRequest("signals/client/initiator/generate-initiator-signal", {
+                let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating);
 
-                connectionId: connection.id,
+                // Step1, send the request to generate the INITIATOR SIGNAL
+                client1.node.sendRequest("signals/client/initiator/generate-initiator-signal", {
 
-                remoteAddress: client2.node.sckAddress.getAddress(false),
-                remoteUUID: client2.node.sckAddress.uuid,
+                    connectionId: connection.id,
 
-            });
+                    remoteAddress: client2.node.sckAddress.getAddress(false),
+                    remoteUUID: client2.node.sckAddress.uuid,
 
+                });
+
+            }
+
+        } catch (exception){
+            console.error("connectWebPeer exception ", exception);
         }
 
     }
