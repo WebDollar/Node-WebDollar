@@ -135,7 +135,6 @@ class InterfaceBlockchainProtocolForkSolver{
             }
 
             fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHeader], false );
-            fork.forkReady = false;
 
             // in case it was you solved previously && there is something in the blockchain
 
@@ -158,8 +157,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            //console.warn("discoverFork 7777" , binarySearchResult);
-
             //process light and NiPoPow
             await this.optionalProcess(socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint);
 
@@ -180,7 +177,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 fork.forkChainStartingPoint = forkChainStartingPoint;
                 fork.forkChainLength = forkChainLength;
                 fork.forkHeaders.push(binarySearchResult.header);
-                await fork.initializeFork(); //download the requirments and make it ready
+
+                await fork.initializeFork(); //download the requirements and make it ready
 
                 if (!fork.forkReady)
                     throw {message:" FORK IS NOT READY "};

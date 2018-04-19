@@ -50,6 +50,7 @@ class InterfaceBlockchainForksAdministrator {
         fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, headers, ready );
 
         this.forks.push(fork);
+
         return fork;
     }
 
