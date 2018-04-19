@@ -175,7 +175,7 @@ class NodeSignalingServerProtocol {
 
             if ( connection === null ) console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
 
-            let answer = await connection.client1.node.sendRequest("signals/client/initiator/receive-ice-candidate",{  //sendRequestWaitOnce returns errors
+            let answer = await connection.client1.node.sendRequestWaitOnce("signals/client/initiator/receive-ice-candidate",{  //sendRequestWaitOnce returns errors
                 connectionId: connection.id,
 
                 initiatorSignal: connection.initiatorSignal,
@@ -183,7 +183,7 @@ class NodeSignalingServerProtocol {
 
                 remoteAddress: socket.node.sckAddress.getAddress(false),
                 remoteUUID: socket.node.sckAddress.uuid,
-            });
+            }, "answer");
 
 
             if ( answer === null || answer === undefined )
@@ -202,7 +202,7 @@ class NodeSignalingServerProtocol {
 
             if ( connection === null ) console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
 
-            let answer = await connection.client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
+            let answer = await connection.client2.node.sendRequestWaitOnce("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
                 connectionId: connection.id,
 
                 initiatorSignal: connection.initiatorSignal,
@@ -210,7 +210,7 @@ class NodeSignalingServerProtocol {
 
                 remoteAddress: connection.client1.node.sckAddress.getAddress(false),
                 remoteUUID: connection.client1.node.sckAddress.uuid,
-            });
+            }, "answer");
 
             if ( answer === null || answer === undefined )
                 connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
