@@ -106,7 +106,7 @@ class InterfaceBlockchainProtocolForksManager {
         let fork = null;
 
         try {
-            for (let i = 0; i <= this.blockchain.forksAdministrator.forks.length; i++)
+            for (let i = 0; i < this.blockchain.forksAdministrator.forks.length; i++)
                 if (this.blockchain.forksAdministrator.forks[i].forkReady) {
 
                     fork = this.blockchain.forksAdministrator.forks[i];
