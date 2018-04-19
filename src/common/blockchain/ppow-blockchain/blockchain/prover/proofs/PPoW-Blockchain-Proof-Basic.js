@@ -38,7 +38,7 @@ class PPoWBlockchainProofBasic{
             throw {message: "proof blocks is invalid"};
 
         for (let i = this.blocks.length - lastElements; i < this.blocks.length; ++i)
-            if (!this.blocks[i]._validateInterlink())
+            if ( ! this.blocks[i]._validateInterlink() )
                 throw {message: "validate Interlink Failed"};
 
         return true;

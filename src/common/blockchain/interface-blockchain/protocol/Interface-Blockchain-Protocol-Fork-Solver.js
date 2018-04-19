@@ -135,11 +135,10 @@ class InterfaceBlockchainProtocolForkSolver{
             }
 
             fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHeader], false );
-            fork.ready = false;
+            fork.forkReady = false;
 
             // in case it was you solved previously && there is something in the blockchain
 
-            //console.warn("discoverFork 555" , binarySearchResult);
             //Binary Search to detect the Fork Position
             if ( binarySearchResult.position === -1 ) {
 
@@ -181,7 +180,10 @@ class InterfaceBlockchainProtocolForkSolver{
                 fork.forkChainStartingPoint = forkChainStartingPoint;
                 fork.forkChainLength = forkChainLength;
                 fork.forkHeaders.push(binarySearchResult.header);
-                fork.initializeFork(); //download the requirments and make it ready
+                await fork.initializeFork(); //download the requirments and make it ready
+
+                if (!fork.forkReady)
+                    throw {message:" FORK IS NOT READY "};
 
             } else {
                 //it is a totally new blockchain (maybe genesis was mined)

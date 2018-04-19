@@ -7,9 +7,9 @@ import StatusEvents from "common/events/Status-Events";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
-    async initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, ready){
+    async initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, forkReady){
 
-        InterfaceBlockchainFork.prototype.initializeConstructor.call(this, blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, ready);
+        InterfaceBlockchainFork.prototype.initializeConstructor.call(this, blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, forkReady);
 
         this.forkProofPi = null;
         this._forkProofPiClone = null;
@@ -18,11 +18,12 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     async initializeFork(){
 
-        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) )
-            await this._downloadProof();
+        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+            if (! (await this._downloadProof()))
+                return false;
+        }
 
-        InterfaceBlockchainFork.prototype.initializeFork.call(this);
-
+        return InterfaceBlockchainFork.prototype.initializeFork.call(this);
     }
 
     async _downloadProof(){
@@ -34,7 +35,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             StatusEvents.emit( "agent/status", {message: "Downloading Proofs", blockHeight: this.forkStartingHeight } );
 
             let answer = await this.getSocket().node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi", {}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
-            if (answer === null || answer === undefined) throw {message: "Proof is invalid"};
+
+            if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
             //importing Proof
             this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
@@ -44,9 +46,12 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             await this.importForkProofHeaders( answer );
 
             //this.forkProofPi.validateProof();
-            this.forkProofPi.validateProofLastElements(consts.POPOW_PARAMS.m);
+            if (! this.forkProofPi.validateProofLastElements(consts.POPOW_PARAMS.m))
+                throw {message: "Prof Pi is invalid"};
 
             StatusEvents.emit( "agent/status", {message: "Proofs Validated", blockHeight: this.forkStartingHeight } );
+
+            return true;
 
         }
 

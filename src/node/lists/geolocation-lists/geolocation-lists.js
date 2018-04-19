@@ -28,7 +28,7 @@ class GeoLocationLists {
         let location = await GeoHelper.getLocationFromAddress(sckAddress);
 
         if (location === null || location === undefined){
-            console.warn("LOCATION was not been able to get");
+            //console.warn("LOCATION was not been able to get");
             return null;
         }
 
