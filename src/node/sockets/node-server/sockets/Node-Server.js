@@ -57,11 +57,6 @@ class NodeServer {
 
                 });
 
-                socket.once("disconnect", () => {
-                    console.log("Socket disconnected", socket.node.sckAddress.getAddress());
-                    NodesList.disconnectSocket(socket);
-                });
-
             });
 
             try {
@@ -96,6 +91,11 @@ class NodeServer {
         if (NodesList.registerUniqueSocket(socket, ConnectionsType.CONNECTION_SERVER_SOCKET, socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
+
+        socket.once("disconnect", () => {
+            console.log("Socket disconnected", socket.node.sckAddress.getAddress());
+            NodesList.disconnectSocket(socket);
+        });
 
         console.log('Socket Server Initialized ' + socket.node.sckAddress.getAddress(true));
 

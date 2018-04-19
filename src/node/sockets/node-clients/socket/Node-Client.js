@@ -105,16 +105,6 @@ class NodeClient {
                     resolve(false);
                 });
 
-                socket.on("disconnect", () => {
-
-                    //disconnect over the time, so it was connected before
-
-                    console.warn("Client disconnected ", address);
-                    NodesList.disconnectSocket(this.socket);
-
-                });
-
-
                 socket.connect();
 
             }
@@ -138,6 +128,16 @@ class NodeClient {
         }
 
         console.log('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true));
+
+        this.socket.node.sckAddress.on("disconnect", () => {
+
+            //disconnect over the time, so it was connected before
+
+            console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true) );
+            NodesList.disconnectSocket(this.socket);
+
+        });
+
 
         this.socket.node.protocol.propagation.initializePropagation();
 

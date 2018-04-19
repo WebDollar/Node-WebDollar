@@ -1,10 +1,18 @@
 import BanObject from "./BanObject"
+import NodesList from 'node/lists/nodes-list';
 
 class BansList{
 
     constructor(){
 
         this.bans = [];
+
+        NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
+
+            //sckAddresses shouldn't be deleted after a socket is disconnected
+
+        });
+
 
     }
 
@@ -70,7 +78,7 @@ class BansList{
     _removeEmptyBans(){
 
         for (let i=this.bans.length-1; i>=0; i--)
-            if (!this.bans[i].isBanned() )
+            if (this.bans[i].sckAddress === undefined || !this.bans[i].isBanned() )
                 this.bans.splice(i,1)
 
     }
