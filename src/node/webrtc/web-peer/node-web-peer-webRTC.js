@@ -62,8 +62,6 @@ class NodeWebPeerRTC {
 
     createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
 
-        let pcConstraint = null;
-        let dataConstraint = null;
         console.log('Using SCTP based data channels');
 
         // SCTP is supported from Chrome 31 and is supported in FF.
@@ -72,16 +70,19 @@ class NodeWebPeerRTC {
         // Add localConnection to global scope to make it visible
         // from the browser console.
 
-        this.peer =  new RTCPeerConnection(config, pcConstraint);
+        this.peer =  new RTCPeerConnection(config);
 
         this.peer.connected = false;
         this.enableEventsHandling();
 
         this.peer.onicecandidate = (event) => {
-            if (event.candidate) {
-                console.log("onicecandidate",event.candidate);
-                callbackSignalingServerSendIceCandidate(event.candidate);
-            }
+
+            if (!event || !event.candidate) return;
+
+
+            console.log("onicecandidate",event.candidate);
+            callbackSignalingServerSendIceCandidate(event.candidate);
+
         };
 
         /*
@@ -90,6 +91,7 @@ class NodeWebPeerRTC {
         this.peer.signaling = {};
         this.peer.signaling.socketSignaling = socketSignaling;
         this.peer.signaling.connectionId =  signalingServerConnectionId;
+        this.peer.inputSignalsQueue = [];
 
         console.log('Created webRTC peer', "initiator", initiator, "signalingServerConnectionId", signalingServerConnectionId, "remoteAddress", remoteAddress, "remoteUUID", remoteUUID, "remotePort", remotePort);
 
@@ -171,7 +173,11 @@ class NodeWebPeerRTC {
                                 this.peer.signalData = {"sdp": this.peer.localDescription};
                                 this.peer.signalInitiatorData = this.peer.signalData;
 
+                                this.peer.setLocalDescription1 = true;
+
                                 resolve(  {result: true, signal: this.peer.signalData} )
+
+
                             },
                             (error) => {
                                 resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +error.toString()});
@@ -235,9 +241,18 @@ class NodeWebPeerRTC {
                             (desc)=>{
                                 this.peer.setLocalDescription(
                                     desc,
-                                    () => {
+                                    async () => {
+
                                         this.peer.signalData = {'sdp': this.peer.localDescription};
+                                        this.peer.setLocalDescription2 = true;
+
                                         resolve(  {result: true, signal: this.peer.signalData}  );
+
+                                        for (let i=0; i<this.peer.inputSignalsQueue.length; i++) {
+                                            let answer = await this.createSignal(this.peer.inputSignalsQueue[i].inputSignal);
+                                            this.peer.inputSignalsQueue[i].resolve(answer);
+                                        }
+
                                     },
                                     (error) => {
                                         resolve({result:false, message: "Error Setting Local Description"+error.toString()});
@@ -261,10 +276,16 @@ class NodeWebPeerRTC {
                 try {
                     console.log("inputSignal.candidate", inputSignal);
 
-                    let candidate = new RTCIceCandidate(inputSignal.candidate);
-                    this.peer.addIceCandidate(candidate);
+                    if (this.peer.setLocalDescription2 === true) {
 
-                    resolve({result: true, message:"iceCandidate successfully introduced"});
+                        let candidate = new RTCIceCandidate(inputSignal.candidate);
+                        this.peer.addIceCandidate(candidate);
+
+                        resolve({result: true, message:"iceCandidate successfully introduced"});
+
+                    } else {
+                        this.peer.inputSignalsQueue.push( { inputSignal: inputSignal, resolve: resolve });
+                    }
 
                 } catch (Exception){
                     resolve({result:false, message: "iceCandidate error ", exception: Exception });

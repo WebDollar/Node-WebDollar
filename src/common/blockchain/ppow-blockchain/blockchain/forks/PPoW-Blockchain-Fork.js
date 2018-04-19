@@ -52,7 +52,9 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             let proofsList = [];
             while (i*length < proofPiData.length){
 
-                let answer = await this.getSocket().node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", {starting: i*length, length: length}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( i*length, proofPiData.length )  } );
+
+                let answer = await this.getSocket().node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", {starting: i * length, length: length}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                 if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
                 for (let i=0; i<answer.length; i++)
@@ -61,7 +63,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 i++;
             }
 
-            StatusEvents.emit( "agent/status", {message: "Preparing Proof", blockHeight: this.forkStartingHeight } );
+            StatusEvents.emit( "agent/status", {message: "Proofs - Preparing", blockHeight: this.forkStartingHeight } );
 
             await this.importForkProofPiHeaders( proofsList );
 

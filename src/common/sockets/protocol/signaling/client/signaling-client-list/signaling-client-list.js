@@ -81,6 +81,7 @@ class SignalingClientList {
 
         for (let i=0; i<this.connected.length; i++)
             if (this.connected[i].uuid === uuid ){
+                this.connected[i].webPeer.peer.close();
                 this.connected.splice(i,1);
                 return true;
             }
