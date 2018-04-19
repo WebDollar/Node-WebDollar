@@ -22,6 +22,7 @@ import InterfaceBlockchainBlockValidation from "common/blockchain/interface-bloc
 
 import BlockchainTimestamp from "common/blockchain/interface-blockchain/timestmap/Blockchain-Timestamp"
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
+import InterfaceBlockchainTipsAdministrator from "./tips/Interface-Blockchain-Tips-Administrator";
 
 
 const SEMAPHORE_PROCESSING_INTERVAL = 10;
@@ -44,6 +45,7 @@ class InterfaceBlockchain {
         this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER);
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
+        this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator ( this );
 
         this._createBlockchainElements();
 
