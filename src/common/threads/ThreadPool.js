@@ -15,50 +15,37 @@ class ThreadPool {
 
     }
 
-    runTask(task, message) {
-
-        if (typeof task === "string") {
-            this.pool.run(task).send({ do : message });
-        }
+    addTask(taskCallback, inputData) {
+       this.pool.run(taskCallback).send(inputData);
     }
 
     _runDemo() {
 
-// Run a script
-        this.pool.run('src/common/threads/Worker.js').send({ do : 'something' });
-
-//Send a task
-        this.pool.send({ do : 'something else' });
-
-// Run inline code
-        const jobC = this.pool.run(
-            function(input, done) {
-                console.log("job C input:", input);
-                let output = input + "<-modified";
-                done(output, input);
-            }, {
-                // dependencies; resolved using node's require() or the web workers importScript()
-                // md5 : 'js-md5'
-            }
-        ).send('Hash this string!');
-
-        jobC.on('done', function(hash, input) {
-            console.log(`Job C hashed: md5("${input}") = "${hash}"`);
-        });
-
-        this.pool.on('done', function(job, message) {
+//        this.pool.run('src/common/threads/Worker.js').send({ do : 'something' });
+        this.pool
+        .on('done', function(job, message) {
             console.log('Job done:', message);
             console.log();
         })
-            .on('error', function(job, error) {
-                console.error('Job errored:', error);
-            })
-            .on('finished', function() {
-                console.log('Thread pool finished properly!!!.');
-                pool.killAll();
-            });
+        .on('error', function(job, error) {
+            console.error('Job errored:', error);
+        })
+        .on('finished', function() {
+            console.log('Thread pool finished properly!!!.');
+            this.pool.killAll();
+        });
     }
 }
 
+function callback(input) {
+    console.log("Callback: ", input);
+}
 
-//export default ThreadPool;
+let TP = new ThreadPool(4);
+TP.addTask(callback, "cosmin");
+TP.addTask(callback, "dumitru");
+TP.addTask(callback, "oprea");
+
+console.log();
+
+export default ThreadPool;
