@@ -42,7 +42,7 @@ class NodeSignalingClientProtocol {
                     throw {message: "Already connected"};
 
                 if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
-                    throw {message: "I can not accept connections anymore" };
+                    throw {message: "I can't accept WebPeers anymore" };
 
 
                 let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, undefined, data.remoteUUID);
