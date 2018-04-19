@@ -31,19 +31,39 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
         //Downloading Proof Pi
         if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
 
-
             StatusEvents.emit( "agent/status", {message: "Downloading Proofs", blockHeight: this.forkStartingHeight } );
 
-            let answer = await this.getSocket().node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi", {}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
+            let proofPiData = await this.getSocket().node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi/hash", {}, "answer", 3000 );
 
-            if (answer === null || answer === undefined) throw { message: "Proof is empty" };
+            if (proofPiData === null || proofPiData === undefined) throw { message: "Proof Failed to answer" };
+
+            if (typeof proofPiData.length !== "number" || proofPiData.length <= 0) throw {message: "Proof Pi length is invalid"};
+
+            if (this.blockchain.proofPi !== null && this.blockchain.proofPi.hash.equals(proofPiData.hash))
+                throw {message: "Proof Pi is the same with mine"};
+
+            if (this.blockchain.forksAdministrator.findForkByProofs(proofPiData.hash) !== null)
+                throw {message: "fork proof was already downloaded"};
 
             //importing Proof
             this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
 
+            let i = 0, length = 100;
+            let proofsList = [];
+            while (i*length < proofPiData.length){
+
+                let answer = await this.getSocket().node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", {starting: i*length, length: length}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                if (answer === null || answer === undefined) throw { message: "Proof is empty" };
+
+                for (let i=0; i<answer.length; i++)
+                    proofsList.push(answer[i]);
+
+                i++;
+            }
+
             StatusEvents.emit( "agent/status", {message: "Preparing Proof", blockHeight: this.forkStartingHeight } );
 
-            await this.importForkProofHeaders( answer );
+            await this.importForkProofPiHeaders( proofsList );
 
             //this.forkProofPi.validateProof();
             if (! this.forkProofPi.validateProofLastElements(consts.POPOW_PARAMS.m))
@@ -65,7 +85,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     }
 
-    async importForkProofHeaders(blocksHeader){
+    async importForkProofPiHeaders(blocksHeader){
 
         for (let i=0; i<blocksHeader.length; i++){
 
@@ -78,6 +98,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             StatusEvents.emit( "agent/status", {message: "Validating Proof ", blockHeight: i } );
         }
+
+        this.forkProofPi.calculateProofHash();
 
     }
 

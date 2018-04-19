@@ -34,7 +34,7 @@ class InterfaceBlockchainProtocolForksManager {
                 });
 
                 if (newChainLength < this.blockchain.blocks.length - 50)
-                    BansList.addBan(socket, 500, "Your blockchain is way smaller than mine");
+                    BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine");
 
                 throw "Your blockchain is smaller than mine";
 
@@ -83,10 +83,16 @@ class InterfaceBlockchainProtocolForksManager {
 
             } catch (exception) {
 
-                console.error("processForksQueue returned an error", exception);
-                console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
+                try {
 
-                BansList.addBan(bestFork.getSocket(), 10000, exception.message );
+                    console.error("processForksQueue returned an error", exception);
+                    console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
+
+                    BansList.addBan(bestFork.getSocket(), 10000, exception.message);
+
+                } catch (exception){
+
+                }
 
             }
 

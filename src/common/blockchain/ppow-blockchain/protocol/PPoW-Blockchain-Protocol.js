@@ -19,14 +19,50 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
     _initializeNodeNiPoPoW(socket){
 
-        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi", async ()=>{
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi/hash",  ()=>{
 
-            if (this.blockchain.agent.light) //light
-                return null;
-                //TODO generate proofs
-                //socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi"+"/answer", this.blockchain.proofPi.getProofHeaders() );
-            else  // full node
-                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi"+"/answer", this.blockchain.prover.proofPi.getProofHeaders() );
+            try {
+
+                let answer;
+
+                if (this.blockchain.agent.light) //TODO generate proofs
+                    answer = null;
+                else  // full node
+                    answer = {
+                        hash: this.blockchain.prover.proofPi.hash,
+                        length: this.blockchain.prover.proofPi.blocks.length
+                    };
+
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi/hash" + "/answer", answer);
+
+            } catch (exception){
+
+            }
+
+        });
+
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi", (data)=>{
+
+            try {
+
+                if (data.starting === undefined) data.starting = 0;
+                if (data.length === undefined) data.length = 1000;
+
+                if (typeof data.starting !== "number") throw "starting is not a number";
+                if (typeof data.length !== "number") throw "length is not a number";
+
+                let proof;
+
+                if (this.blockchain.agent.light) //TODO generate proofs
+                    proof = null;
+                else  // full node
+                    proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length);
+
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", proof);
+
+            } catch (exception){
+
+            }
 
         });
 

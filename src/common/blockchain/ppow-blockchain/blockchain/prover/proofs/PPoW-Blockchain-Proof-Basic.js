@@ -1,4 +1,5 @@
 import BufferExtended from "common/utils/BufferExtended"
+import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 
 class PPoWBlockchainProofBasic{
 
@@ -8,15 +9,16 @@ class PPoWBlockchainProofBasic{
         this.blockchain = blockchain;
         this.blocks = blocks;
 
+        this.hash = undefined;
     }
 
-    getProofHeaders(){
+    getProofHeaders(starting, length){
 
         let list = [];
-        for (let i=0; i<this.blocks.length; i++)
+        for (let i=starting; i<Math.min( starting+length, this.blocks.length); i++)
             list.push( this.blocks[i].getBlockHeader() )
 
-        return list;
+        return list
     }
 
 
@@ -55,21 +57,28 @@ class PPoWBlockchainProofBasic{
 
     }
 
-    equalsProofs(proof2){
+    equalsProofs(proofHash){
 
-        if (this.blocks.length !== proof2.blocks.length)
-            return false;
+        if ( typeof proofHash === "object" && proofHash.hasOwnProperty("hash") ) proofHash = proofHash.hash;
 
-        for (let i=0; i<this.blocks.length; i++){
+        if (proofHash.equals(this.hash))
+            return true;
 
-            if (this.blocks[i].height !== proof2.blocks[i].height) return false;
-            if (! BufferExtended.safeCompare(this.blocks[i].hash, proof2[i].blocks[i].blockId)) return false;
-            if (! BufferExtended.safeCompare(this.blocks[i].difficultyTarget, proof2[i].blocks[i].difficultyTarget)) return false;
-            if (! BufferExtended.safeCompare(this.blocks[i].data.hashData, proof2[i].blocks[i].data.hashData)) return false;
+        return false;
 
-        }
+    }
 
-        return true;
+    calculateProofHash(){
+
+        let buffers = [];
+        for (let i=0; i <this.blocks.length; i++)
+            buffers.push(this.blocks[i].hash);
+
+        let buffer = Buffer.concat(buffers);
+
+        this.hash = WebDollarCrypto.SHA256(buffer);
+
+        return this.hash;
 
     }
 

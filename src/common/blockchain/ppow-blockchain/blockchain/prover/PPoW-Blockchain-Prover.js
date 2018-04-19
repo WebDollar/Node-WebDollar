@@ -83,6 +83,9 @@ class PPoWBlockchainProver{
 
         }
 
+        if (underlyingChain !== null)
+            underlyingChain.calculateProofHash();
+
         return underlyingChain;
 
     }
