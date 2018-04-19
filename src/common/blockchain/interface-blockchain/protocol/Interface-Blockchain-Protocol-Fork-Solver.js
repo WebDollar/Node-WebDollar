@@ -172,28 +172,22 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === -1)
                     binarySearchResult.position = 0;
 
-                try {
+                //maximum blocks to download
+                if (!this.blockchain.agent.light)
+                    forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
 
-                    //maximum blocks to download
-                    if (!this.blockchain.agent.light)
-                        forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
+                fork.forkStartingHeight = binarySearchResult.position;
+                fork.forkStartingHeightDownloading  = binarySearchResult.position;
+                fork.forkChainStartingPoint = forkChainStartingPoint;
+                fork.forkChainLength = forkChainLength;
+                fork.forkHeaders.push(binarySearchResult.header);
+                fork.initializeFork(); //download the requirments and make it ready
 
-                    fork.forkStartingHeight = binarySearchResult.position;
-                    fork.forkStartingHeightDownloading  = binarySearchResult.position;
-                    fork.forkChainStartingPoint = forkChainStartingPoint;
-                    fork.forkChainLength = forkChainLength;
-                    fork.forkHeaders.push(binarySearchResult.header);
-                    fork.initializeFork();
-
-                } catch (exception){
-
-                    console.error( "discoverAndProcessFork - creating a fork raised an exception" , exception, "binarySearchResult", binarySearchResult )
-                    throw exception;
-                }
-
-            } else
+            } else {
                 //it is a totally new blockchain (maybe genesis was mined)
                 console.log("fork is something new");
+                throw {message: "fork is something new", binarySearchResult:binarySearchResult, forkChainStartingPoint:forkChainStartingPoint, forkChainLength:forkChainLength} ;
+            }
 
 
             return {result: true, fork:fork };
