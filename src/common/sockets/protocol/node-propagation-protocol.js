@@ -1,33 +1,60 @@
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import NodeProtocol from 'common/sockets/protocol/node-protocol';
 import NodesList from 'node/lists/nodes-list'
+import NODES_TYPE from "../../../node/lists/types/Nodes-Type";
 
 class NodePropagationProtocol {
 
     constructor(){
 
-        this._newNodesWaitList = [];
-
-        this.processNewNodeInterval();
+        this._newFullNodesWaitList = [];
+        this._newLightNodesWaitList = [];
 
     }
 
-    processNewNodeInterval(){
+    processNewFullNodeInterval(){
 
-        if (this._newNodesWaitList.length > 0) {
+        if (this._newFullNodesWaitList.length > 0) {
 
             let waitlist = null;
-            while (waitlist === null && this._newNodesWaitList.length > 0) {
+
+            while (waitlist === null && this._newFullNodesWaitList.length > 0) {
 
                 let index = 0;
-                let newNode = this._newNodesWaitList[index];
+                let newNode = this._newFullNodesWaitList[index];
+
                 waitlist = NodesWaitlist.addNewNodeToWaitlist(newNode.address.addr, newNode.address.port, newNode.address.type, newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
 
-               this._newNodesWaitList.splice(index, 1);
+                this._newFullNodesWaitList.splice(index, 1);
+
             }
+
         }
 
-        setTimeout( this.processNewNodeInterval.bind(this), 300);
+        setTimeout( this.processNewFullNodeInterval.bind(this), 300);
+
+    }
+
+    processNewLightNodeInterval(){
+
+        if (this._newLightNodesWaitList.length > 0) {
+
+            let waitlist = null;
+
+            while (waitlist === null && this._newLightNodesWaitList.length > 0) {
+
+                let index = 0;
+                let newNode = this._newLightNodesWaitList[index];
+
+                waitlist = NodesWaitlist.addNewNodeToWaitlist(newNode.address.addr, newNode.address.port, newNode.address.type, newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
+
+                this._newLightNodesWaitList.splice(index, 1);
+
+            }
+
+        }
+
+        setTimeout( this.processNewLightNodeInterval.bind(this), 300);
 
     }
 
@@ -49,7 +76,7 @@ class NodePropagationProtocol {
 
     initializeNodesPropagation(socket){
 
-        socket.node.on("propagation/request-all-wait-list-nodes", response =>{
+        socket.node.on("propagation/request-all-wait-list-full-nodes", response =>{
 
             try{
 
@@ -58,10 +85,30 @@ class NodePropagationProtocol {
                 for (let i=0; i<NodesList.nodes.length; i++)
                     list.push(NodesList.nodes[i].toJSON());
 
-                for (let i=0; i<NodesWaitlist.waitlist.length; i++)
-                    list.push(NodesWaitlist.waitlist[i].toJSON());
+                for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++)
+                    list.push(NodesWaitlist.waitListFullNodes[i].toJSON());
 
-                socket.node.sendRequest("propagation/nodes", {"op": "new-nodes", addresses: list });
+                socket.node.sendRequest("propagation/nodes", {"op": "new-full-nodes", addresses: list });
+
+            } catch(exception){
+
+            }
+
+        });
+
+        socket.node.on("propagation/request-all-wait-list-light-nodes", response =>{
+
+            try{
+
+                let list = [];
+
+                for (let i=0; i<NodesList.nodes.length; i++)
+                    list.push(NodesList.nodes[i].toJSON());
+
+                for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++)
+                    list.push(NodesWaitlist.waitListLightNodes[i].toJSON());
+
+                socket.node.sendRequest("propagation/nodes", {"op": "new-light-nodes", addresses: list });
 
             } catch(exception){
 
@@ -83,17 +130,36 @@ class NodePropagationProtocol {
 
                     case "new-nodes":
 
+                        let found = false;
+
                         for (let i = 0; i < addresses.length; i++) {
 
-                            let found = false;
-                            for (let j=0;  j<this._newNodesWaitList.length; j++)
-                                if (this._newNodesWaitList[j].addr === addresses[i].addr) {
-                                    found = true;
-                                    break;
-                                }
+                            if(addresses[i].type === NODES_TYPE.NODE_WEB_PEER){
 
-                            if (!found)
-                                this._newNodesWaitList.push({address: addresses[i], socket: socket});
+                                for (let j=0;  j<this._newFullNodesWaitList.length; j++)
+                                    if (this._newLightNodesWaitList[j].addr === addresses[i].addr) {
+                                        found = true;
+                                        break;
+                                    }
+
+                                if (!found)
+                                    this._newLightNodesWaitList.push({address: addresses[i], socket: socket});
+
+                            }else if(addresses[i].type === NODES_TYPE.NODE_TERMINAL){
+
+                                for (let j=0;  j<this._newFullNodesWaitList.length; j++)
+                                    if (this._newFullNodesWaitList[j].addr === addresses[i].addr) {
+                                        found = true;
+                                        break;
+                                    }
+
+                                if (!found)
+                                    this._newFullNodesWaitList.push({address: addresses[i], socket: socket});
+
+                            }
+
+
+
                         }
 
                         break;
@@ -118,12 +184,22 @@ class NodePropagationProtocol {
         });
     }
 
-    _newNodeConnected(socket, address){
-        socket.node.sendRequest("propagation/nodes", {op: "new-nodes", addresses: [address.toJSON() ]},)
+    _newNodeConnected(socket, nodeWaitListObject){
+
+        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL)
+            socket.node.sendRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
+        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER)
+            socket.node.sendRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
+
     }
 
-    _nodeDisconnected(socket, address){
-        socket.node.sendRequest("propagation/nodes", {op: "deleted-nodes", addresses: [address.toJSON() ]},)
+    _nodeDisconnected(socket, nodeWaitListObject){
+
+        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL)
+            socket.node.sendRequest("propagation/nodes", {op: "deleted-full-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
+        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER)
+            socket.node.sendRequest("propagation/nodes", {op: "deleted-light-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
+
     }
 
 }

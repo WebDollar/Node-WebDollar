@@ -10,12 +10,8 @@ const EventEmitter = require('events');
 
 class NodesWaitlist {
 
-    /*
-        waitlist = []     //Addresses where it should connect too
-        stated = false;
-    */
-
     constructor(){
+
         console.log("NodesWaitlist constructor");
 
         this.NodesWaitlistObject = NodesWaitlistObject;
@@ -23,12 +19,14 @@ class NodesWaitlist {
         this.emitter = new EventEmitter();
         this.emitter.setMaxListeners(100);
 
-        this.waitlist = [];
+        this.waitListFullNodes = [];
+        this.waitListLightNodes = [];
         this.started = false;
 
-        this._connectedQueue = []
+        this._connectedQueue = [];
 
-        this.MAX_WAITLIST_CONNECTIONS = 500;
+        this.MAX_FULLNODE_WAITLIST_CONNECTIONS = 500;
+        this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS = 500;
         this.MAX_ERROR_TRIALS = 100;
 
     }
@@ -45,62 +43,78 @@ class NodesWaitlist {
 
     addNewNodeToWaitlist(addresses, port, type, nodeConnected, level, backedBy){
 
-        // addresses = "127.0.0.1";
-
-        if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[]))) return false;
-
-        if (typeof addresses === "string" || !Array.isArray(addresses)) addresses = [addresses];
+        if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[])) ) return false;
+        if ( typeof addresses === "string" || !Array.isArray(addresses) ) addresses = [addresses];
 
         let sckAddresses = [];
+
         for (let i=0; i<addresses.length; i++){
 
             let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
-            if (backedBy !==  "fallback" ) {
+            if (backedBy !==  "fallback") {
 
-                let foundWaitList = this._searchNodesWaitlist(sckAddress);
+                let foundWaitList = this._searchNodesWaitlist(sckAddress, type);
 
-                if (foundWaitList !== null) foundWaitList.pushBackedBy(backedBy);
+                if (foundWaitList !== null)foundWaitList.pushBackedBy(backedBy);
                 else sckAddresses.push(sckAddress);
 
-            } else {
+            } else
                 sckAddresses.push(sckAddress);
-            }
-
 
         }
 
         if (sckAddresses.length > 0){
 
             let waitListObject = new NodesWaitlistObject( sckAddresses, type, nodeConnected, level, backedBy );
-            this.waitlist.push(waitListObject);
+
+            if (waitListObject.type === NodesType.NODE_TERMINAL)
+                this.waitListFullNodes.push(waitListObject);
+            else  if (waitListObject.type === NodesType.NODE_WEB_PEER)
+                this.waitListLightNodes.push(waitListObject);
 
             this.emitter.emit("waitlist/new-node", waitListObject);
             return waitListObject;
+
         }
         
         return null;
     }
 
-    _findNodesWaitlist(address, port){
+    _findNodesWaitlist(address, port, listType){
+
+        let list = [];
 
         let sckAddress = SocketAddress.createSocketAddress( address, port );
 
-        for (let i=0; i<this.waitlist.length; i++)
-            for (let j=0; j<this.waitlist[i].sckAddresses.length; j++)
-                if (this.waitlist[i].sckAddresses[j].matchAddress(sckAddress) )
+        if (listType === NodesType.NODE_TERMINAL )
+            list = this.waitListFullNodes;
+        else if( listType === NodesType.NODE_WEB_PEER )
+            list = this.waitListLightNodes;
+
+        for (let i=0; i<this.list.length; i++)
+            for (let j=0; j<this.list[i].sckAddresses.length; j++)
+                if (this.list[i].sckAddresses[j].matchAddress(sckAddress) )
                     return i;
 
         return -1;
+
     }
 
-    _searchNodesWaitlist(address, port){
+    _searchNodesWaitlist(address, listType, port){
 
-        let index = this._findNodesWaitlist(address, port);
+        let list = [];
+
+        if (listType === NodesType.NODE_TERMINAL )
+            list = this.waitListFullNodes;
+        else if( listType === NodesType.NODE_WEB_PEER )
+            list = this.waitListLightNodes;
+
+        let index = this._findNodesWaitlist(address, port, listType);
 
         if (index === -1) return null;
 
-        return this.waitlist[index];
+        return list[index];
 
     }
 
@@ -109,21 +123,18 @@ class NodesWaitlist {
     */
     _connectNewNodesWaitlist(){
 
-        this._deleteUselessWaitlist();
-
-        //TODO shuffle them
+        this._deleteUselessWaitlist(NodesType.NODE_TERMINAL);
 
         if (NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) === 0){
 
-            for (let i=0; i < this.waitlist.length; i++)
-                if ( this.waitlist[i].type === NodesType.NODE_TERMINAL && this.waitlist[i].findBackedBy("fallback") !== null)
-                    this._tryToConnectNextNode(this.waitlist[i]);
+            for (let i=0; i < this.waitListFullNodes.length; i++)
+                if ( this.waitListFullNodes[i].findBackedBy("fallback") !== null)
+                    this._tryToConnectNextNode(this.waitListFullNodes[i]);
 
         } else {
 
-            for (let i=0; i < this.waitlist.length; i++)
-                if ( this.waitlist[i].type === NodesType.NODE_TERMINAL )
-                    this._tryToConnectNextNode(this.waitlist[i]);
+            for (let i=0; i < this.waitListFullNodes.length; i++)
+                this._tryToConnectNextNode(this.waitListFullNodes[i]);
 
         }
 
@@ -150,8 +161,6 @@ class NodesWaitlist {
                 nextWaitListObject.blocked = true;
                 this._connectedQueue.push(nextWaitListObject);
 
-                //console.log("connectNewNodesWaitlist ", nextNode.sckAddresses.toString() );
-
                 this._connectNowToNewNode(nextWaitListObject).then((connected) => {
 
                     for (let i=0; i<this._connectedQueue.length; i++)
@@ -163,6 +172,7 @@ class NodesWaitlist {
                     nextWaitListObject.blocked = false;
                     nextWaitListObject.connected = connected;
                     nextWaitListObject.refreshLastTimeChecked();
+
                 });
 
             }
@@ -207,37 +217,61 @@ class NodesWaitlist {
      * It will delete addresses that tried way too much
      * @returns {boolean}
      */
-    _deleteUselessWaitlist(){
+    _deleteUselessWaitlist(listTyep){
 
-        if (this.waitlist.length < this.MAX_WAITLIST_CONNECTIONS)
-            return false;
+        let list = [];
 
-        for (let i=this.waitlist.length-1; i>=0; i--) {
+        if (listTyep === NodesType.NODE_TERMINAL ){
 
-            if (this.waitlist[i].errorTrial > this.MAX_ERROR_TRIALS ||
-                this.waitlist[i].type === NodesType.NODE_WEB_PEER) {
+            list = this.waitListFullNodes;
 
-                this.emitter.emit("waitlist/delete-node", this.waitlist[i]);
-                this.waitlist.splice(i, 1);
+            if (list.length < this.MAX_FULLNODE_WAITLIST_CONNECTIONS)
+                return false;
+
+
+        }else if (listTyep === NodesType.NODE_WEB_PEER ){
+
+            list = this.waitListFullNodes;
+
+            if (list.length < this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS)
+                return false;
+
+        }
+
+        for (let i=list-1; i>=0; i--) {
+
+            if ( list[i].errorTrial > this.MAX_ERROR_TRIALS || list[i].type === NodesType.NODE_WEB_PEER ) {
+
+                this.emitter.emit("waitlist/delete-node", list[i]);
+                list.splice(i, 1);
 
             }
 
         }
 
+        return false;
+
     }
 
-    removedWaitListElement(address, port, backedBy){
+    removedWaitListElement(address, port, backedBy, listType){
 
-        let index = this._findNodesWaitlist(address, port);
+        let list = [];
+
+        if( listType === NodesType.NODE_TERMINAL)
+            list = this.waitListFullNodes;
+        else if ( listType === NodesType.NODE_WEB_PEER )
+            list = this.waitListLightNodes;
+
+        let index = this._findNodesWaitlist(address, port, listType);
 
         if (index !== -1) {
 
-            this.waitlist[index].removeBackedBy(backedBy);
+            list[index].removeBackedBy(backedBy);
 
-            if ( this.waitlist[index].length === 0) {
+            if ( list[index].length === 0) {
 
-                this.emitter.emit("waitlist/delete-node", this.waitlist[index]);
-                this.waitlist.splice(index, 1);
+                this.emitter.emit("waitlist/delete-node", list[index]);
+                list.splice(index, 1);
 
             }
 
@@ -247,10 +281,17 @@ class NodesWaitlist {
         return false;
     }
 
-    resetWaitlist(){
+    resetWaitlist(listType){
 
-        for (let i=0; i<this.waitlist.length; i++)
-            this.waitlist[i].resetWaitlistNode();
+        let list = [];
+
+        if( listType === NodesType.NODE_TERMINAL)
+            list = this.waitListFullNodes;
+        else if ( listType === NodesType.NODE_WEB_PEER )
+            list = this.waitListLightNodes;
+
+        for (let i=0; i<list.length; i++)
+            list[i].resetWaitlistNode();
 
     }
 

@@ -39,7 +39,7 @@ class NodeDiscoveryService {
 
     startDiscovery(){
 
-        this.processFallbackNodes(FallBackNodesList)
+        this.processFallbackNodes(FallBackNodesList);
         this._discoverFallbackNodes(true);
 
     }
@@ -123,13 +123,11 @@ class NodeDiscoveryService {
                     if (Array.isArray(nodes)) {
 
                         //let's shuffle
-                        console.warn("NEW NODES", nodes);
+                        console.warn("Signal nodes", nodes);
 
                         let marked = [];
 
                         for (let i = 0; i < nodes.length; i++) {
-
-
 
                             let pos = Math.floor( Math.random(  ) * nodes.length );
 

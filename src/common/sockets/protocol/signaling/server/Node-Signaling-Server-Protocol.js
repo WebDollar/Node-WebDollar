@@ -73,6 +73,144 @@ class NodeSignalingServerProtocol {
         });
 
 
+
+        // Step1, send the request to generate the INITIATOR SIGNAL
+        //socket is client1
+        socket.node.on("signals/client/initiator/generate-initiator-signal/answer", (initiatorAnswer)=>{
+
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(initiatorAnswer.connectionId);
+
+            if ( initiatorAnswer === null || initiatorAnswer.initiatorSignal === undefined )
+                connection.status =  SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+            else
+            if ( initiatorAnswer.accepted === false && initiatorAnswer.message  === "Already connected")
+                connection.status  = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
+            else
+            if ( initiatorAnswer.accepted === false && initiatorAnswer.message === "I can't accept WebPeers anymore")
+                this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
+            else
+
+            if ( initiatorAnswer.accepted === true) {
+
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating;
+                connection.initiatorSignal = initiatorAnswer.initiatorSignal;
+
+                // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
+
+                connection.client2.node.sendRequest("signals/client/answer/receive-initiator-signal", {
+                    connectionId: connection.id,
+                    initiatorSignal: connection.initiatorSignal,
+
+                    remoteAddress: socket.node.sckAddress.getAddress(false),
+                    remoteUUID: socket.node.sckAddress.uuid,
+
+                });
+
+            }
+
+        });
+
+        //socket is client2
+        socket.node.on("signals/client/answer/receive-initiator-signal/answer", (answer)=>{
+
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
+
+            if ( answer === null || answer === undefined || answer.answerSignal === undefined )
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+            else
+            if ( answer.accepted === false && answer.message === "Already connected")
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
+            else
+            if ( answer.accepted === false && answer.message === "I can't accept WebPeers anymore")
+                this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
+            else
+            if ( answer.accepted === true) {
+
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablishing;
+
+                // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
+                connection.client1.node.sendRequest("signals/client/initiator/join-answer-signal", {
+                    connectionId: connection.id,
+                    initiatorSignal: answer.initiatorSignal,
+                    answerSignal: answer.answerSignal,
+
+                    remoteAddress: socket.node.sckAddress.getAddress(false),
+                    remoteUUID: socket.node.sckAddress.uuid,
+                });
+            }
+
+        });
+
+        // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
+        //socket is client1
+        socket.on("signals/client/initiator/join-answer-signal", (result)=> {
+
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(result.connectionId);
+
+            if ( result === null || result === undefined )
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+            else
+            if ( result.established === false && result.message === "Already connected")
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
+            else
+            if ( result.established === false && result.message === "I can't accept WebPeers anymore")
+                this._clientIsNotAcceptingAnymoreWebPeers(socket, connection);
+            else
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished;
+
+        });
+
+
+
+        //socket is client2
+        socket.node.on("signals/server/new-answer-ice-candidate", async (iceCandidate) => {
+
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
+
+            let answer = await connection.client1.node.sendRequest("signals/client/initiator/receive-ice-candidate",{  //sendRequestWaitOnce returns errors
+                connectionId: connection.id,
+
+                initiatorSignal: connection.initiatorSignal,
+                iceCandidate: iceCandidate,
+
+                remoteAddress: socket.node.sckAddress.getAddress(false),
+                remoteUUID: socket.node.sckAddress.uuid,
+            });
+
+
+            if ( answer === null || answer === undefined )
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+            else
+            if ( answer.established === false && answer.message === "I can't accept WebPeers anymore")
+                this._clientIsNotAcceptingAnymoreWebPeers(connection.client1, connection);
+
+        });
+
+
+        //client 1
+        socket.node.on("signals/server/new-initiator-ice-candidate", async (iceCandidate) => {
+
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
+
+            let answer = await connection.client1.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
+                connectionId: connection.id,
+
+                initiatorSignal: connection.initiatorSignal,
+                iceCandidate: iceCandidate,
+
+                remoteAddress: connection.client2.node.sckAddress.getAddress(false),
+                remoteUUID: connection.client2.node.sckAddress.uuid,
+            });
+
+            if ( answer === null || answer === undefined )
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+            else
+            if ( answer.established === false && answer.message === "I can't accept WebPeers anymore")
+                this._clientIsNotAcceptingAnymoreWebPeers(connection.client2, connection);
+
+        });
+
+
     }
 
 
@@ -82,145 +220,21 @@ class NodeSignalingServerProtocol {
 
     connectWebPeer(client1, client2){
 
-
         let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
-        if (previousEstablishedConnection === null
+        if ( previousEstablishedConnection === null
             || (previousEstablishedConnection.checkLastTimeChecked(10*1000) && [ SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished].indexOf( previousEstablishedConnection.status) !== -1   )
-            || (previousEstablishedConnection.checkLastTimeChecked(20*1000) && [ SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError ].indexOf( previousEstablishedConnection.status) !== -1 )){
+            || (previousEstablishedConnection.checkLastTimeChecked(20*1000) && [ SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError ].indexOf( previousEstablishedConnection.status) !== -1 )) {
 
             let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating );
 
             // Step1, send the request to generate the INITIATOR SIGNAL
-            client1.node.sendRequestWaitOnce("signals/client/initiator/generate-initiator-signal", {
+            client1.node.sendRequest("signals/client/initiator/generate-initiator-signal", {
 
-                id: connection.id,
+                connectionId: connection.id,
 
                 remoteAddress: client2.node.sckAddress.getAddress(false),
                 remoteUUID: client2.node.sckAddress.uuid,
-
-            }, connection.id ).then ( (initiatorAnswer) =>{
-
-                if ( initiatorAnswer === null || initiatorAnswer.initiatorSignal === undefined )
-                    connection.status =  SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-                else
-                if ( initiatorAnswer.accepted === false && initiatorAnswer.message  === "Already connected")
-                    connection.status  = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
-                else
-                if ( initiatorAnswer.accepted === false && initiatorAnswer.message === "I can't accept WebPeers anymore") {
-                    this.clientIsNotAcceptingAnymoreWebPeers(client1, connection);
-                    return false;
-                }
-                else
-
-                if ( initiatorAnswer.accepted === true) {
-
-                    SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.answerSignalGenerating );
-
-                    // Step 2, send the Initiator Signal to the 2nd Peer to get ANSWER SIGNAL
-
-                    client2.node.sendRequestWaitOnce("signals/client/answer/receive-initiator-signal", {
-                        id: connection.id,
-                        initiatorSignal: initiatorAnswer.initiatorSignal,
-
-                        remoteAddress: client1.node.sckAddress.getAddress(false),
-                        remoteUUID: client1.node.sckAddress.uuid,
-
-                    }, connection.id).then((answer)=>{
-
-                        if ( answer === null || answer === undefined || answer.answerSignal === undefined )
-                            connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-                        else
-                        if ( answer.accepted === false && answer.message === "Already connected")
-                            connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
-                        else
-                        if ( answer.accepted === false && answer.message === "I can't accept WebPeers anymore") {
-                            this.clientIsNotAcceptingAnymoreWebPeers(client2, connection);
-                            return false;
-                        }
-                        else
-                        if ( answer.accepted === true) {
-
-
-                            SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablishing );
-
-
-                            // Step 3, send the Answer Signal to the 1st Peer (initiator) to establish connection
-                            client1.node.sendRequestWaitOnce("signals/client/initiator/join-answer-signal",{
-                                id: connection.id,
-                                initiatorSignal: initiatorAnswer.initiatorSignal,
-                                answerSignal: answer.answerSignal,
-
-                                remoteAddress: client2.node.sckAddress.getAddress(false),
-                                remoteUUID: client2.node.sckAddress.uuid,
-                            }, connection.id).then( (result)=>{
-
-
-                                if ( result === null || result === undefined )
-                                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-                                else
-                                if ( answer.established === false && answer.message === "Already connected")
-                                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionAlreadyConnected;
-                                else
-                                if ( answer.established === false && initiatorAnswer.message === "I can't accept WebPeers anymore") {
-                                    this.clientIsNotAcceptingAnymoreWebPeers(client1, connection);
-                                    return false;
-                                }
-
-                            });
-                        }
-
-                        client2.node.on("signals/server/new-answer-ice-candidate/" + connection.id, async (iceCandidate) => {
-
-                            await client1.node.sendRequest("signals/client/initiator/receive-ice-candidate",{  //sendRequestWaitOnce returns errors
-                                id: connection.id,
-
-                                initiatorSignal: initiatorAnswer.initiatorSignal,
-                                iceCandidate: iceCandidate,
-
-                                remoteAddress: client2.node.sckAddress.getAddress(false),
-                                remoteUUID: client2.node.sckAddress.uuid,
-                            }, "connection.id");
-
-
-                            // if ( answer === null || answer === undefined )
-                            //     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-                            // else
-                            // if ( answer.established === false && initiatorAnswer.message === "I can't accept WebPeers anymore") {
-                            //     this.clientIsNotAcceptingAnymoreWebPeers(client2, connection);
-                            //     return false;
-                            // }
-
-                        });
-
-
-                    });
-
-                    client1.node.on("signals/server/new-initiator-ice-candidate/" + connection.id, async (iceCandidate) => {
-
-
-                        await client2.node.sendRequest("signals/client/answer/receive-ice-candidate",{ //sendRequestWaitOnce returns errors
-                            id: connection.id,
-
-                            initiatorSignal: initiatorAnswer.initiatorSignal,
-                            iceCandidate: iceCandidate,
-
-                            remoteAddress: client1.node.sckAddress.getAddress(false),
-                            remoteUUID: client1.node.sckAddress.uuid,
-                        });
-
-                        // if ( answer === null || answer === undefined )
-                        //     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
-                        // else
-                        // if ( answer.established === false && initiatorAnswer.message === "I can't accept WebPeers anymore") {
-                        //     this.clientIsNotAcceptingAnymoreWebPeers(client2, connection);
-                        //     return false;
-                        // }
-
-                    });
-
-
-                }
 
             });
 
@@ -228,7 +242,7 @@ class NodeSignalingServerProtocol {
 
     }
 
-    clientIsNotAcceptingAnymoreWebPeers(client, connection){
+    _clientIsNotAcceptingAnymoreWebPeers(client, connection){
 
         SignalingServerRoomList.removeServerRoomConnection(connection);
         client.acceptWebPeers = false;
