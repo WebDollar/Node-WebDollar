@@ -210,30 +210,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    async processFork(fork){
-
-        if (fork === null)
-            throw {message: "fork doesn't exist"};
-
-        try{
-
-            if (! (await this._solveFork(fork) ))
-                throw {message: "Fork Solved was failed"};
-
-            return true;
-
-        } catch (exception){
-
-            console.error("solving a fork raised an exception" , exception );
-
-            //let's ban the guy
-            BansList.addBan(fork.getSocket(), 10000, exception.message );
-
-            throw exception;
-        }
-
-    }
-
     /**
      * Solve Fork by Downloading  the blocks required in the fork
      * @param fork
@@ -249,9 +225,8 @@ class InterfaceBlockchainProtocolForkSolver{
         let nextBlockHeight = fork.forkStartingHeightDownloading;
 
         //maybe it was deleted before
-        if (fork.sockets.length === 0){
+        if (fork.sockets.length === 0 || !fork.forkReady)
             return false;
-        }
 
         //interval timer
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
@@ -270,11 +245,8 @@ class InterfaceBlockchainProtocolForkSolver{
             //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
             let onlyHeader;
-            if (this.protocol.acceptBlocks)
-                onlyHeader = false;
-            else
-            if (this.protocol.acceptBlockHeaders)
-                onlyHeader = true;
+            if (this.protocol.acceptBlocks) onlyHeader = false; else
+            if (this.protocol.acceptBlockHeaders) onlyHeader = true;
 
 
             let answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight);

@@ -74,11 +74,9 @@ class InterfaceBlockchainProtocolForksManager {
 
         if (bestFork !== null) {
 
-            let answer= false;
-
             try {
 
-                answer = await this.protocol.forkSolver.processFork( bestFork );
+                let answer = await this.protocol.forkSolver._solveFork ( bestFork );
 
                 if (!answer)
                     throw { message: "Invalid Fork" }
@@ -87,6 +85,8 @@ class InterfaceBlockchainProtocolForksManager {
 
                 console.error("processForksQueue returned an error", exception);
                 console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
+
+                BansList.addBan(bestFork.getSocket(), 10000, exception.message );
 
             }
 
@@ -115,6 +115,9 @@ class InterfaceBlockchainProtocolForksManager {
                         bestFork = fork;
 
                 }
+
+
+            console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork)
         } catch (exception){
 
             console.error("_getBestFork returned an exception", exception );

@@ -229,7 +229,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevHashPrev = null;
         }
 
-        return await inheritForkSolver.prototype._solveFork.call(this, fork);
+        return inheritForkSolver.prototype._solveFork.call(this, fork);
     }
 
 
