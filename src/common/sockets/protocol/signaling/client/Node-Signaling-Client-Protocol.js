@@ -31,8 +31,6 @@ class NodeSignalingClientProtocol {
 
             try{
 
-                if (consts.DEBUG) console.warn("WEBRTC# 1 Generate Initiator Signal");
-
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "remoteUUID was not specified"};
 
@@ -43,8 +41,10 @@ class NodeSignalingClientProtocol {
                 if (SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) !== null)
                     throw {message: "Already connected"};
 
-                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
+                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID )/2 )
                     throw {message: "I can't accept WebPeers anymore" };
+
+                if (consts.DEBUG) console.warn("WEBRTC# 1 Generate Initiator Signal");
 
                 let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, undefined, data.remoteUUID);
                 let webPeer = webPeerSignalingClientListObject.webPeer;

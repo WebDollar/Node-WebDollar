@@ -169,13 +169,18 @@ class NodeWebPeerRTC {
                     (desc)=>{
                         this.peer.setLocalDescription(
                             desc,
-                            () => {
+                            async () => {
                                 this.peer.signalData = {"sdp": this.peer.localDescription};
                                 this.peer.signalInitiatorData = this.peer.signalData;
 
-                                this.peer.setLocalDescription1 = true;
+                                //this.peer.setLocalDescription = true;
 
-                                resolve(  {result: true, signal: this.peer.signalData} )
+                                resolve(  {result: true, signal: this.peer.signalData} );
+
+                                // for (let i=0; i<this.peer.inputSignalsQueue.length; i++) {
+                                //     let answer = await this.createSignal(this.peer.inputSignalsQueue[i].inputSignal);
+                                //     this.peer.inputSignalsQueue[i].resolve(answer);
+                                // }
 
 
                             },
@@ -210,24 +215,24 @@ class NodeWebPeerRTC {
                 try {
                     inputSignal = JSON.parse(inputSignal);
                 } catch (exception){
-                    console.error("Error processing JSON createSignal", inputSignal, exception)
+                    console.error("Error processing JSON createSignal", inputSignal, exception);
                     resolve({result:false, message: "Invalid input signal"});
                     return;
                 }
             }
 
 
+            if (this.peer.connected === true){
+                console.error("Error - Peer Already connected");
+                resolve({result:false, message: "Already connected in the past"});
+                return;
+            }
+
+
             if (inputSignal.sdp) {
 
-
-                if (this.peer.connected === true){
-                    console.error("Error - Peer Already connected");
-                    resolve({result:false, message: "Already connected in the past"});
-                    return;
-                }
-
                 // This is called after receiving an offer or answer from another peer
-                this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), () => {
+                this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), async () => {
 
                     console.log('pc.remoteDescription.type', this.peer.remoteDescription.type);
 
@@ -244,7 +249,7 @@ class NodeWebPeerRTC {
                                     async () => {
 
                                         this.peer.signalData = {'sdp': this.peer.localDescription};
-                                        this.peer.setLocalDescription2 = true;
+                                        this.peer.setLocalDescription = true;
 
                                         resolve(  {result: true, signal: this.peer.signalData}  );
 
@@ -254,19 +259,33 @@ class NodeWebPeerRTC {
                                         }
 
                                     },
-                                    (error) => {
-                                        resolve({result:false, message: "Error Setting Local Description"+error.toString()});
+                                    error => {
                                         console.error("Error Setting Local Description",error);
+                                        resolve({result:false, message: "Error Setting Local Description"+error.toString()});
                                     }
                                 )
                             },
-                            (error) => {
-                                resolve({result:false, message: "Error Creating Answer "+error.toString() });
+                            error => {
                                 console.error("Error Creating Answer ",error);
-
+                                resolve({result:false, message: "Error Creating Answer "+error.toString() });
                             });
+
+                    } else { //answer nothing else
+
+                        this.peer.setLocalDescription = true;
+
+                        for (let i=0; i<this.peer.inputSignalsQueue.length; i++) {
+                            let answer = await this.createSignal(this.peer.inputSignalsQueue[i].inputSignal);
+                            this.peer.inputSignalsQueue[i].resolve(answer);
+                        }
+
+                        resolve({result: true, message: ""})
                     }
-                }, error => console.error(error));
+
+                }, error => {
+                    console.error("Error setRemoteDescription", error);
+                    resolve({result:false, message: "setRemoteDescription failed"});
+                });
 
 
 
@@ -276,7 +295,7 @@ class NodeWebPeerRTC {
                 try {
                     console.log("inputSignal.candidate", inputSignal);
 
-                    if (this.peer.setLocalDescription2 === true) {
+                    if (this.peer.setLocalDescription === true) {
 
                         let candidate = new RTCIceCandidate(inputSignal.candidate);
                         this.peer.addIceCandidate(candidate);
