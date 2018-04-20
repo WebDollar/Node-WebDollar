@@ -4,6 +4,8 @@ import SignalingClientList from './signaling-client-list/signaling-client-list'
 import NodesList from 'node/lists/nodes-list'
 import NodeSignalingClientSerivce from "./signaling-client-service/Node-Signaling-Client-Service"
 
+consts.DEBUG = true;
+
 class NodeSignalingClientProtocol {
 
     constructor(){
@@ -57,7 +59,7 @@ class NodeSignalingClientProtocol {
 
                     answer = await webPeer.createSignalInitiator();
 
-                    console.log("###################### signals/client/initiator/generate-initiator-signal/answer" + data.connectionId, answer,  typeof answer);
+                    console.log("###################### signals/client/initiator/generate-initiator-signal/answer" + data.connectionId, answer, webPeer.peer, typeof answer);
 
                     if (answer.signal === undefined)
                         console.log("WEBRTC 1 is not supported !!!! being the initiator");
