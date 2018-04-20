@@ -270,7 +270,7 @@ class NodeSignalingServerProtocol {
                 if (iceCandidate === null || iceCandidate === undefined)
                     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
 
-                await connection.client1.node.sendRequestWaitOnce("signals/client/initiator/receive-ice-candidate", {  //sendRequestWaitOnce returns errors
+                connection.client1.node.sendRequest("signals/client/initiator/receive-ice-candidate", {  //sendRequestWaitOnce returns errors
                     connectionId: connection.id,
 
                     initiatorSignal: connection.initiatorSignal,
