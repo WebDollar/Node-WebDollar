@@ -46,7 +46,7 @@ class NodeServer {
 
                 SocketExtend.extendSocket(socket, socket.request.connection.remoteAddress, socket.request.connection.remotePort, undefined, 1);
 
-                console.warn('New connection from ' + socket.node.sckAddress.getAddress(true));
+                console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) );
 
                 socket.node.protocol.sendHello(["uuid"]).then( (answer)=>{
 

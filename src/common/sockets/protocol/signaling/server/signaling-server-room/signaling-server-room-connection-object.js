@@ -59,7 +59,7 @@ class SignalingServerRoomConnectionObject {
 
         }
         else
-        if ( [ConnectionStatus.peerConnectionNotEstablished, ConnectionStatus.peerConnectionError].indexOf(newValue) !== -1 ){
+        if ( [ ConnectionStatus.peerConnectionNotEstablished, ConnectionStatus.peerConnectionError ].indexOf(newValue) !== -1 ){
             this.errorTrials++;
             this.lastTimeChecked = new Date().getTime();
         }

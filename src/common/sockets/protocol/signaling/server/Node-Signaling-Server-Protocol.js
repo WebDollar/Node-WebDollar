@@ -33,12 +33,15 @@ class NodeSignalingServerProtocol {
 
         socket.node.on("signals/server/connections/established-connection-was-dropped", (data) => {
 
-            if (!data.connectionId) {
+            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
-                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+            if (connection !== null) {
+                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished;
 
-                if (connection !== null)
-                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished;
+                let waitlist = NodeSignalingServerService.findNodeSignalingServerWaitlist(socket);
+
+                if (waitlist !== null)
+                    waitlist.acceptWebPeers = true;
 
             }
 
@@ -331,8 +334,8 @@ class NodeSignalingServerProtocol {
             let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
             if (previousEstablishedConnection === null
-                || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished].indexOf(previousEstablishedConnection.status) !== -1   )
-                || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError].indexOf(previousEstablishedConnection.status) !== -1 )) {
+                || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished].indexOf( previousEstablishedConnection.status ) !== -1   )
+                || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError].indexOf( previousEstablishedConnection.status ) !== -1 )) {
 
                 let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating);
 
