@@ -214,9 +214,6 @@ class NodeSignalingClientProtocol {
                 if (data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "data.remoteUUID 3 is empty"};
 
-                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
-                    throw {message: "I can't accept WebPeers anymore" };
-
                 let webPeer = this._searchWebPeerSignalingClientList2(socket, data);
 
                 let answer = await webPeer.createSignal(data.iceCandidate);
