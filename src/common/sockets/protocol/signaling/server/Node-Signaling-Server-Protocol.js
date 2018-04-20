@@ -38,7 +38,7 @@ class NodeSignalingServerProtocol {
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
                 if (connection !== null)
-                    SignalingServerRoomList.setSignalingServerRoomConnectionStatus(connection.client1, connection.client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished;
 
             }
 
@@ -53,7 +53,7 @@ class NodeSignalingServerProtocol {
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
                 if (connection !== null)
-                    SignalingServerRoomList.setSignalingServerRoomConnectionStatus(connection.client1, connection.client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished;
 
             }
 
@@ -66,7 +66,7 @@ class NodeSignalingServerProtocol {
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
                 if (connection !== null)
-                    SignalingServerRoomList.setSignalingServerRoomConnectionStatus(connection.client1, connection.client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError)
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
 
             }
 
@@ -269,6 +269,7 @@ class NodeSignalingServerProtocol {
                     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
 
                 connection.client1.node.sendRequest("signals/client/initiator/receive-ice-candidate", {  //sendRequestWaitOnce returns errors
+
                     connectionId: connection.id,
 
                     initiatorSignal: connection.initiatorSignal,
@@ -276,6 +277,7 @@ class NodeSignalingServerProtocol {
 
                     remoteAddress: connection.client2.node.sckAddress.getAddress(false),
                     remoteUUID: connection.client2.node.sckAddress.uuid,
+
                 });
 
 
@@ -330,9 +332,9 @@ class NodeSignalingServerProtocol {
 
             if (previousEstablishedConnection === null
                 || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished].indexOf(previousEstablishedConnection.status) !== -1   )
-                || (previousEstablishedConnection.checkLastTimeChecked(20 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError].indexOf(previousEstablishedConnection.status) !== -1 )) {
+                || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError].indexOf(previousEstablishedConnection.status) !== -1 )) {
 
-                let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating);
+                let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating);
 
                 // Step1, send the request to generate the INITIATOR SIGNAL
                 client1.node.sendRequest("signals/client/initiator/generate-initiator-signal", {

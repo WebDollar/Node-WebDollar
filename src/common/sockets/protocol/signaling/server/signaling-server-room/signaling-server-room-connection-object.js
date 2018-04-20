@@ -26,40 +26,48 @@ class SignalingServerRoomConnectionObject {
 
         this.client1 = client1;
         this.client2 = client2;
-        this.status = status;
+        this._status = status;
         this.id = id;
 
         this.errorTrials = 0;
 
         this.established = false;
-        this.connectingNow = false;
 
         this.lastTimeChecked = 0;
         this.lastTimeConnected = 0;
-    }
-
-    refreshLastTimeErrorChecked(){
-
-        this.errorTrials++;
-        this.status = ConnectionStatus.peerConnectionNotEstablished;
-        this.lastTimeChecked = new Date().getTime();
     }
 
     checkLastTimeChecked(timeTryReconnectAgain){
 
         let time = new Date().getTime();
 
-        if ( (time - this.lastTimeChecked) >= ( timeTryReconnectAgain + this.errorTrials*5000 ))
+        if ( (time - this.lastTimeChecked) >= ( timeTryReconnectAgain + this.errorTrials*2000 ))
             return true;
 
         return false;
     }
 
-    refreshLastTimeConnected(){
+    set status(newValue){
 
-        this.errorTrials = 0;
-        this.status = ConnectionStatus.peerConnectionEstablished;
-        this.lastTimeConnected = new Date().getTime();
+        this._status = newValue;
+
+        if (newValue === ConnectionStatus.peerConnectionEstablished) {
+
+            this.errorTrials = 0;
+            this.lastTimeConnected = new Date().getTime();
+            this.lastTimeChecked = new Date().getTime();
+
+        }
+        else
+        if ( [ConnectionStatus.peerConnectionNotEstablished, ConnectionStatus.peerConnectionError].indexOf(newValue) !== -1 ){
+            this.errorTrials++;
+            this.lastTimeChecked = new Date().getTime();
+        }
+
+    }
+
+    get status(){
+        return this._status;
     }
 
 }
