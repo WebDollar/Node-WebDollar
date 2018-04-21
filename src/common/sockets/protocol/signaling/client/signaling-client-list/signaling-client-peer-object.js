@@ -8,10 +8,11 @@ class SignalingClientPeerObject {
         uuid
      */
 
-    constructor(webPeer, uuid){
+    constructor(webPeer, uuid, signalingClientType){
 
         this.webPeer = webPeer;
         this.uuid = uuid;
+        this.signalingClientType = signalingClientType;
 
         this.lastTimeChecked = 0;
 

@@ -31,22 +31,22 @@ class NodeSignalingClientProtocol {
 
             try{
 
-                if (data.remoteUUID === undefined || data.remoteUUID === null)
+                if ( data.remoteUUID === undefined || data.remoteUUID === null)
                     throw {message: "remoteUUID was not specified"};
 
                 //search if the new protocol was already connected in the past
-                if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null) //already connected in the past
+                if ( NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null) //already connected in the past
                     throw {message: "Already connected"};
 
-                if (SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) !== null)
+                if ( SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) !== null)
                     throw {message: "Already connected"};
 
-                if (SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID )/2 )
+                if ( SignalingClientList.countConnectedByType("initiator") > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ) )
                     throw {message: "I can't accept WebPeers anymore" };
 
                 if (consts.DEBUG) console.warn("WEBRTC# 1 Generate Initiator Signal");
 
-                let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, undefined, data.remoteUUID);
+                let webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, undefined, data.remoteUUID, "initiator");
                 let webPeer = webPeerSignalingClientListObject.webPeer;
 
                 if (webPeer.peer === null)
@@ -145,10 +145,10 @@ class NodeSignalingClientProtocol {
 
         if (webPeerSignalingClientListObject === null) {
 
-            if ( SignalingClientList.connected.length > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
+            if ( SignalingClientList.countConnectedByType("answer") > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ))
                 throw {message: "I can't accept WebPeers anymore" };
 
-            webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, undefined, data.remoteUUID);
+            webPeerSignalingClientListObject = SignalingClientList.registerWebPeerSignalingClientListBySignal(undefined, undefined, data.remoteUUID, "answer");
         }
 
         let webPeer = webPeerSignalingClientListObject.webPeer;

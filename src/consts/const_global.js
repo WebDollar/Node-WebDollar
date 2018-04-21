@@ -62,8 +62,8 @@ consts.MINI_BLOCKCHAIN = {
 consts.POPOW_PARAMS={
     m: 30, //length proof Pi for validating the Genesis
 
-    k: 5, //length proof Xi for Accountant Tree
-    k1: 5, //length
+    k: 30, //length proof Xi for Accountant Tree
+    k1: 30, //length
 
     d: 0.5,
 

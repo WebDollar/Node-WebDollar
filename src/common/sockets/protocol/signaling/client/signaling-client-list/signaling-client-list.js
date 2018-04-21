@@ -31,14 +31,14 @@ class SignalingClientList {
 
     }
 
-    registerWebPeerSignalingClientListBySignal(signalInitiator, signalAnswer, uuid) {
+    registerWebPeerSignalingClientListBySignal(signalInitiator, signalAnswer, uuid, signalingClientType) {
 
         let signalingClientPeerObject = this.searchWebPeerSignalingClientList(signalInitiator, signalAnswer, uuid);
 
         if (signalingClientPeerObject === null){
 
             let webPeer = new NodeWebPeerRTC();
-            signalingClientPeerObject = new SignalingClientPeerObject(webPeer, uuid);
+            signalingClientPeerObject = new SignalingClientPeerObject(webPeer, uuid, signalingClientType);
 
             this.connected.push(signalingClientPeerObject);
 
@@ -91,6 +91,16 @@ class SignalingClientList {
 
     computeMaxWebPeersConnected( uuid ){
         return consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS + (this.findWebPeerSignalingClientList( undefined, undefined, uuid ) !== -1 ? 1 : 0 )
+    }
+
+    countConnectedByType(signalingClientType){
+
+        let count = 0;
+        for (let i=0; i<this.connected.length; i++)
+            if (this.connected[i].signalingClientType === signalingClientType )
+                count ++ ;
+
+        return count;
     }
 
 }
