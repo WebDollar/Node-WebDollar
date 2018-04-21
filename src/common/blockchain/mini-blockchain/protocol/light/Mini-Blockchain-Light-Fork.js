@@ -87,6 +87,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (this.forkProofPi !== null && forkHeight < this.forkChainLength - consts.POPOW_PARAMS.m)
             validationType["skip-validation-interlinks"] = true;
 
+
         return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== null ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
@@ -105,6 +106,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         if (this.forkProofPi !== null && forkHeight < this.forkChainLength - consts.POPOW_PARAMS.m)
             validationType["skip-validation-interlinks"] = true;
+
+        if ( forkHeight === 0)
+            validationType["skip-interlinks-update"] = true;
 
         return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== null ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }

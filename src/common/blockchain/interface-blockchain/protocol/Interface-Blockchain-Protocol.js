@@ -128,43 +128,55 @@ class InterfaceBlockchainProtocol {
         if (this.acceptBlockHeaders)
             socket.node.on("head/new-block",  (data) => {
 
-                /*
-                    h hash
-                    l chainLength
-                    s chainStartingPoint
-                 */
+                try {
 
-                if (data === null || (data.l < 0) || ( data.s >= data.l ) ) return;
+                    /*
+                        h hash
+                        l chainLength
+                        s chainStartingPoint
+                     */
 
-                //in case the hashes are the same, and I have already the block
-                if (( data.l > 0 && this.blockchain.blocks.length === data.l )) {
+                    if (data === null || (data.l < 0) || ( data.s >= data.l )) return;
 
-                    //in case the hashes are exactly the same, there is no reason why we should download it
-                    if ( Buffer.compare(this.blockchain.blocks[this.blockchain.blocks.length-1].hash, data.h) <= 0 )
-                        return;
+                    //in case the hashes are the same, and I have already the block
+                    if (( data.l > 0 && this.blockchain.blocks.length === data.l )) {
+
+                        //in case the hashes are exactly the same, there is no reason why we should download it
+                        if (Buffer.compare(this.blockchain.blocks[this.blockchain.blocks.length - 1].hash, data.h) <= 0)
+                            return;
+
+                    }
+
+                    console.log("newForkTip", data.l);
+
+                    this.forksManager.newForkTip(socket, data.l, data.s, data.h);
+
+                } catch (exception){
 
                 }
-
-                console.log("newForkTip", data.l);
-
-                this.forksManager.newForkTip( socket, data.l, data.s, data.h );
 
             });
 
         if (this.acceptBlockHeaders)
             socket.node.on("head/hash", (h) => {
 
-                // height
+                try {
 
-                if (typeof h !== 'number' || this.blockchain.blocks.length <= h){
-                    socket.node.sendRequest("head/hash", null);
-                    return;
+                    // height
+
+                    if (typeof h !== 'number' || this.blockchain.blocks.length <= h) {
+                        socket.node.sendRequest("head/hash", null);
+                        return;
+                    }
+
+                    let block = this.blockchain.blocks[h];
+                    if (block === undefined) socket.node.sendRequest("head/hash", null);
+
+                    socket.node.sendRequest("head/hash/" + h, {hash: block.hash});
+
+                } catch (exception){
+
                 }
-
-                let block = this.blockchain.blocks[h];
-                if (block === undefined) socket.node.sendRequest("head/hash", null);
-
-                socket.node.sendRequest("head/hash/" + h , {hash: block.hash } );
 
             });
 

@@ -62,6 +62,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
      */
     calculateInterlink(){
 
+        if (this.blockValidation.blockValidationType["skip-interlinks-update"] === true) return this.interlink;
+
         let interlink = [{height: -1, blockId: BlockchainGenesis.hashPrev}];
         if (this.height === 0) return interlink;
 

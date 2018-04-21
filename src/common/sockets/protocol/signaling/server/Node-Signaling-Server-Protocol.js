@@ -24,36 +24,54 @@ class NodeSignalingServerProtocol {
 
         socket.node.on("signals/server/register/accept-web-peer-connections", (data) => {
 
-            let acceptWebPeers = false;
-            if (typeof data.acceptWebPeers === "boolean") acceptWebPeers = data.acceptWebPeers;
+            try {
 
-            NodeSignalingServerService.registerSocketForSignaling(socket, acceptWebPeers);
+                let acceptWebPeers = false;
+                if (typeof data.acceptWebPeers === "boolean") acceptWebPeers = data.acceptWebPeers;
+
+                NodeSignalingServerService.registerSocketForSignaling(socket, acceptWebPeers);
+
+            } catch (exception){
+
+            }
 
         });
 
         socket.node.on("signals/server/connections/established-connection-was-dropped", (data) => {
 
-            if (!data.connectionId) {
+            try {
 
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
-                if (connection !== null)
-                    SignalingServerRoomList.setSignalingServerRoomConnectionStatus(connection.client1, connection.client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished)
+                if (connection !== null) {
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished;
+
+                    let waitlist = NodeSignalingServerService.searchNodeSignalingServerWaitlist(socket);
+
+                    if (waitlist !== null)
+                        waitlist.acceptWebPeers = true;
+
+                }
+
+            } catch (exception){
 
             }
-
 
         });
 
 
         socket.node.on("signals/server/connections/was-established-successfully", (data) => {
 
-            if (!data.connectionId) {
+            try {
+                if (!data.connectionId) {
 
-                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+                    let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
-                if (connection !== null)
-                    SignalingServerRoomList.setSignalingServerRoomConnectionStatus(connection.client1, connection.client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished)
+                    if (connection !== null)
+                        connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished;
+
+                }
+            } catch (exception){
 
             }
 
@@ -61,12 +79,18 @@ class NodeSignalingServerProtocol {
 
         socket.node.on("signals/server/connections/error-establishing-connection", (data) => {
 
-            if (!data.connectionId) {
+            try {
 
-                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+                if (!data.connectionId) {
 
-                if (connection !== null)
-                    SignalingServerRoomList.setSignalingServerRoomConnectionStatus(connection.client1, connection.client2, SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError)
+                    let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+
+                    if (connection !== null)
+                        connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+
+                }
+
+            } catch (exception){
 
             }
 
@@ -219,12 +243,12 @@ class NodeSignalingServerProtocol {
             try {
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
 
-                if (consts.DEBUG) console.warn("WEBRTC SERVER 2_1", connection.id);
-
                 if (connection === null){
                     console.error("signals/client/answer/receive-initiator-signal/answer connection is empty", answer.connectionId);
                     return;
                 }
+
+                if (consts.DEBUG) console.warn("WEBRTC SERVER 2_1", connection.id);
 
                 if (answer === null || answer === undefined || answer.answerSignal === undefined)
                     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
@@ -265,10 +289,13 @@ class NodeSignalingServerProtocol {
                     return;
                 }
 
+                if (consts.DEBUG) console.warn("WEBRTC SERVER 2_2", connection.id);
+
                 if (iceCandidate === null || iceCandidate === undefined)
                     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
 
                 connection.client1.node.sendRequest("signals/client/initiator/receive-ice-candidate", {  //sendRequestWaitOnce returns errors
+
                     connectionId: connection.id,
 
                     initiatorSignal: connection.initiatorSignal,
@@ -276,6 +303,7 @@ class NodeSignalingServerProtocol {
 
                     remoteAddress: connection.client2.node.sckAddress.getAddress(false),
                     remoteUUID: connection.client2.node.sckAddress.uuid,
+
                 });
 
 
@@ -298,8 +326,6 @@ class NodeSignalingServerProtocol {
                     console.error("signals/server/new-initiator-ice-candidate/answer", answer.connectionId);
                     return;
                 }
-
-                if (consts.DEBUG) console.warn("WEBRTC SERVER 2_2", connection.id);
 
                 if (consts.DEBUG) console.warn("WEBRTC SERVER 2_3", connection.id);
 
@@ -329,10 +355,10 @@ class NodeSignalingServerProtocol {
             let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
             if (previousEstablishedConnection === null
-                || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished].indexOf(previousEstablishedConnection.status) !== -1   )
-                || (previousEstablishedConnection.checkLastTimeChecked(20 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError].indexOf(previousEstablishedConnection.status) !== -1 )) {
+                || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished].indexOf( previousEstablishedConnection.status ) !== -1   )
+                || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError].indexOf( previousEstablishedConnection.status ) !== -1 )) {
 
-                let connection = SignalingServerRoomList.setSignalingServerRoomConnectionStatus(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating);
+                let connection = SignalingServerRoomList.registerSignalingServerRoomConnection(client1, client2, SignalingServerRoomConnectionObject.ConnectionStatus.initiatorSignalGenerating);
 
                 // Step1, send the request to generate the INITIATOR SIGNAL
                 client1.node.sendRequest("signals/client/initiator/generate-initiator-signal", {
