@@ -17,7 +17,7 @@ class NodeSignalingServerService{
 
     _desinitializeNode(socket){
 
-        for (let i=0; i<this.waitlist.length; i++)
+        for (let i=this.waitlist.length-1; i>=0; i--)
             if ( this.waitlist[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress, ["uuid"] ) ){
                 this.waitlist.splice(i,1);
                 return;
@@ -39,12 +39,11 @@ class NodeSignalingServerService{
 
     startConnectingWebPeers(){
 
-        if (this.started === true)
+        if ( this.started === true )
             return;
 
         this.started = true;
 
-        this._determineWebPeersAvailability();
         this._connectWebPeers();
     }
 
@@ -61,14 +60,6 @@ class NodeSignalingServerService{
         if (pos !== -1) return this.waitlist[pos];
 
         return null;
-    }
-
-    async _determineWebPeersAvailability(){
-
-        for (let i=0; i<this.waitlist.length; i++)
-            await this.waitlist[i].checkAvailability();
-
-        setTimeout( this._determineWebPeersAvailability.bind(this), 5000 );
     }
 
     _connectWebPeers(){

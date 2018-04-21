@@ -7,66 +7,71 @@ describe('RewardSimulator', () => {
 
     it('reward simulator test - general formula', ()=>{
         
-        let T = 20; //Number of seconds per block
-        let Y = 100; //Number of total mining years
-        let TS = 42000000000; //Total Supply WEBDs
-        let CP = 4; //Cycle period in years
-        let N = Y / CP; //Number of cycles
-        let MAX_REWARD = TS;
-        let BPC = (3600 / T) * 24 * 365 * CP; //blocks per cycle
-        let X; // The reward per cycle: X + X/2 + X/4 + X/8 + ... + X/2^(N-1) === TS
+        let TIME_PER_BLOCK = 40; //Number of seconds per block
+        let MINING_YEARS = 100; //Number of total mining years
+        let CYCLE_PERIOD = 4; //Cycle period in years
+        let TOTAL_SUPPLY = 42000000000; //Total Supply WEBDs
+        let GENESIS_PERCENT = 9.99 / 100; //9.99%
+        let INITIAL_REWARD_PER_BLOCK = 6000;
         
-        let sum = 0.0;
+        let GENESIS_SUPPLY = 4156801128; //TOTAL_SUPPLY * GENESIS_PERCENT;    
+        let MINING_REWARD = TOTAL_SUPPLY - GENESIS_SUPPLY;
+        
+        let MINING_CYCLES = MINING_YEARS / CYCLE_PERIOD; //Number of cycles
+        let BLOCKS_PER_CYCLE = (3600 / TIME_PER_BLOCK) * 24 * 365 * CYCLE_PERIOD; //blocks per cycle
+        
+        let REWARD_PER_CYCLE; // The reward per cycle: X + X/2 + X/4 + X/8 + ... + X/2^(N-1) === TOTAL_SUPPLY
+        
+        let MINED_SUPPPLY = 0.0;
         //first mining cycle mines >= half of total supply
-        for (X = TS/2; X < MAX_REWARD; ++X) {
-            sum = 0.0;
-            for (let i = 0; i < N; ++i)
-                sum += X / (1 << i);
-            if (sum >= TS)
+        for (REWARD_PER_CYCLE = MINING_REWARD/2; REWARD_PER_CYCLE < MINING_REWARD; ++REWARD_PER_CYCLE) {
+            MINED_SUPPPLY = 0.0;
+            for (let i = 0; i < MINING_CYCLES; ++i)
+                MINED_SUPPPLY += REWARD_PER_CYCLE / (1 << i);
+            if (MINED_SUPPPLY >= MINING_REWARD)
                 break;
         }
         
-        let SR = X / BPC;
+        let STARTING_REWARD = REWARD_PER_CYCLE / BLOCKS_PER_CYCLE;
 
-        console.log("Blocks per cycle:", BPC);
-        //console.log("Total supply:", sum);
-        //console.log("Total reward per first cycle:", X);
-        //console.log("Number of blocks mined per cycle:", BPC);
-        //console.log("Starting reward:", SR);
-        //console.log("Total supply for Y years, CP year cycle, T seconds per block, SR starting reward: ~SR*(3600/T)*24*365*4*2");
-        //console.log("Simplified formula and more accurate(using 1.9999999403953552 instead of 2): 252288000 * SR / T");
+        console.log("Blocks per cycle:", BLOCKS_PER_CYCLE);
+        console.log("Total supply after " + MINING_YEARS + " :" + MINED_SUPPPLY);
+        //console.log("Total reward per first cycle:", REWARD_PER_CYCLE);
+        console.log("Blocks mined per cycle:", BLOCKS_PER_CYCLE);
+        console.log("Starting reward:", STARTING_REWARD);
+        //console.log("Total supply for Y years, CYCLE_PERIOD year cycle, T seconds per block, STARTING_REWARD starting reward: ~STARTING_REWARD*(3600/T)*24*365*4*2");
+        //console.log("Simplified formula and more accurate(using 1.9999999403953552 instead of 2): 252288000 * STARTING_REWARD / T");
         
-        SR = 3000;
-        let TOTALSUPPLY = 0.0;
-        for (let i = 0; i < N; ++i){
-            TOTALSUPPLY += (SR * BPC) / (1 << i);
+        STARTING_REWARD = 6000;
+        let MINED_REWARD = 0.0;
+        for (let i = 0; i < MINING_CYCLES; ++i){
+            MINED_REWARD += (STARTING_REWARD * BLOCKS_PER_CYCLE) / (1 << i);
         }
 
-        //console.log("Total supply is", TOTALSUPPLY);
-        
-        //console.log("Total supply is", SR*(3600/T)*24*365*4*1.9999999403953552);
+        console.log("Mined reward starting with " + STARTING_REWARD + " is " + MINED_REWARD);
+        console.log("Total supply starting with " + STARTING_REWARD + " is " + (MINED_REWARD + GENESIS_SUPPLY));
     });
-    
+
     it('reward simulator test - particular formula', ()=>{
 
         let reward = 0;
         let smallestReward = 0.0001;
-        let BPC = 6307200;
-        for (let height = 41; height < BPC; height += 1024) {
+        let BLOCKS_PER_CYCLE = 6307200;
+        for (let height = 41; height < BLOCKS_PER_CYCLE; height += 1024) {
             reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
             assert(reward === 3000, "Wrong reward for bock " + height + ": " + reward.toString() + "!==3000");
         }
 
         //TODO Budisteanu Shifts
         for (let cycle = 1; cycle <= 25; ++cycle) {
-            let height = cycle * (BPC) - 1;
+            let height = cycle * (BLOCKS_PER_CYCLE) - 1;
             reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
             let targetReward = 3000 / (1 << (cycle-1));
 
             if (targetReward < smallestReward) targetReward = smallestReward;
             assert(reward === targetReward, "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
 
-            height = cycle * (BPC);
+            height = cycle * (BLOCKS_PER_CYCLE);
             reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
             targetReward = 3000 / (1 << cycle);
 

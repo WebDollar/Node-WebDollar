@@ -13,34 +13,34 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
 
         try {
 
-            for (let i = 0; i < this.blockchain.forksAdministrator.forks.length; i++) {
+            for (let i = 0; i < this.blockchain.forksAdministrator.forks.length; i++)
+                if (this.blockchain.forksAdministrator.forks[i].forkReady) {
 
-                fork = this.blockchain.forksAdministrator.forks[i];
-                if (!fork.ready) continue;
+                    fork = this.blockchain.forksAdministrator.forks[i];
 
-                if (fork.forkChainStartingPoint < fork.forkStartingHeight && (bestFork === null || bestFork.forkChainLength < fork.forkChainLength) ) //it is a small fork that I already have the first forks, but I will download the remaning blocks
-                {
+                    //it is a small fork that I already have the first forks, but I will download the remaning blocks
+                    if (fork.forkChainStartingPoint <= fork.forkStartingHeight && (bestFork === null || bestFork.forkChainLength < fork.forkChainLength) ){
 
-                    bestFork = fork;
+                        bestFork = fork;
 
-                } else if ( bestFork !==  null && bestFork.forkProofPi !== null && fork.forkProofPi !== null ) {
+                    } else if ( bestFork !==  null && bestFork.forkProofPi !== null && fork.forkProofPi !== null ) {
 
-                    let compare = await this.blockchain.verifier.compareProofs(bestFork.forkProofPi, fork.forkProofPi);
+                        let compare = await this.blockchain.verifier.compareProofs(bestFork.forkProofPi, fork.forkProofPi);
 
-                    if (compare < 0 //better proof
-                        || (compare === 0 && bestFork.forkChainLength < fork.forkChainLength)) {
+                        if (compare < 0 //better proof
+                            || (compare === 0 && bestFork.forkChainLength < fork.forkChainLength)) {
+
+                            bestFork = fork;
+
+                        }
+
+                    } else if ( (bestFork ===  null || bestFork.forkProofPi === null) && fork.forkProofPi !== null){
 
                         bestFork = fork;
 
                     }
 
-                } else if ( (bestFork ===  null || bestFork.forkProofPi === null) && fork.forkProofPi !== null){
-
-                    bestFork = fork;
-
                 }
-
-            }
 
         } catch (exception){
             console.error("_getBestFork returned an exception", exception );

@@ -229,7 +229,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevHashPrev = null;
         }
 
-        return await inheritForkSolver.prototype._solveFork.call(this, fork);
+        return inheritForkSolver.prototype._solveFork.call(this, fork);
     }
 
 
@@ -239,7 +239,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             let hash = await socket.node.sendRequestWaitOnce("head/hash", forkChainStartingPoint, forkChainStartingPoint ).hash;
 
-            if (hash === null || hash === undefined) throw {message: "connection dropped headers-info forkChainStartingPoint"};
+            if (hash === null || hash === undefined) throw {message: "connection dropped headers-info optionalProcess"};
 
             binarySearchResult.position = {position: forkChainStartingPoint, header: hash.hash};
 

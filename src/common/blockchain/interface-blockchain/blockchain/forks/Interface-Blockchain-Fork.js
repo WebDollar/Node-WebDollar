@@ -13,13 +13,19 @@ class InterfaceBlockchainFork {
 
     constructor (){
 
+        // setTimeout(()=>{
+        //
+        //     this
+        //
+        // }, 60*1000)
+
     }
 
     /**
      * initializeConstructor is used to initialize the constructor dynamically using .apply method externally passing the arguments
      */
 
-    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, ready=false){
+    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, forkReady = false){
 
         this.blockchain = blockchain;
 
@@ -29,6 +35,8 @@ class InterfaceBlockchainFork {
             sockets = [sockets];
 
         this.sockets = sockets;
+
+        this.forkReady = false;
 
         this.forkIsSaving = false;
         this.forkStartingHeight = forkStartingHeight||0;
@@ -46,16 +54,6 @@ class InterfaceBlockchainFork {
         });
 
         this._blocksCopy = [];
-
-        this._ready = ready;
-    }
-
-    set ready(newValue){
-        this._ready = newValue;
-    }
-
-    get ready(){
-        return this._ready;
     }
 
     async _validateFork(validateHashesAgain){
@@ -102,6 +100,11 @@ class InterfaceBlockchainFork {
         let result = await this.blockchain.validateBlockchainBlock( block );
 
         return result;
+    }
+
+    initializeFork(){
+        this.forkReady = true;
+        return true;
     }
 
     getForkBlock(height){

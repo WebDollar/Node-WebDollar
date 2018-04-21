@@ -11,6 +11,12 @@ import NodesList from 'node/lists/nodes-list'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import ConnectionsType from "node/lists/types/Connections-Type"
 
+const wrtc = require("wrtc");
+let RTCPeerConnection = wrtc.RTCPeerConnection;
+let RTCSessionDescription = wrtc.RTCSessionDescription;
+let RTCIceCandidate = wrtc.RTCIceCandidate;
+
+
 const config = {
 
     /*
@@ -56,8 +62,6 @@ class NodeWebPeerRTC {
 
     createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
 
-        let pcConstraint = null;
-        let dataConstraint = null;
         console.log('Using SCTP based data channels');
 
         // SCTP is supported from Chrome 31 and is supported in FF.
@@ -66,21 +70,19 @@ class NodeWebPeerRTC {
         // Add localConnection to global scope to make it visible
         // from the browser console.
 
-        const wrtc = require("wrtc");
-        let RTCPeerConnection = wrtc.RTCPeerConnection;
-        let RTCSessionDescription = wrtc.RTCSessionDescription;
-        let RTCIceCandidate = wrtc.RTCIceCandidate;
-
-        this.peer =  new RTCPeerConnection(config, pcConstraint);
+        this.peer =  new RTCPeerConnection(config);
 
         this.peer.connected = false;
         this.enableEventsHandling();
 
         this.peer.onicecandidate = (event) => {
-            if (event.candidate) {
-                console.log("onicecandidate",event.candidate);
-                callbackSignalingServerSendIceCandidate(event.candidate);
-            }
+
+            if (!event || !event.candidate) return;
+
+
+            console.log("onicecandidate",event.candidate);
+            callbackSignalingServerSendIceCandidate(event.candidate);
+
         };
 
         /*
@@ -89,6 +91,7 @@ class NodeWebPeerRTC {
         this.peer.signaling = {};
         this.peer.signaling.socketSignaling = socketSignaling;
         this.peer.signaling.connectionId =  signalingServerConnectionId;
+        this.peer.inputSignalsQueue = [];
 
         console.log('Created webRTC peer', "initiator", initiator, "signalingServerConnectionId", signalingServerConnectionId, "remoteAddress", remoteAddress, "remoteUUID", remoteUUID, "remotePort", remotePort);
 
@@ -166,11 +169,20 @@ class NodeWebPeerRTC {
                     (desc)=>{
                         this.peer.setLocalDescription(
                             desc,
-                            () => {
+                            async () => {
                                 this.peer.signalData = {"sdp": this.peer.localDescription};
                                 this.peer.signalInitiatorData = this.peer.signalData;
 
-                                resolve(  {result: true, signal: this.peer.signalData} )
+                                //this.peer.setLocalDescription = true;
+
+                                resolve(  {result: true, signal: this.peer.signalData} );
+
+                                // for (let i=0; i<this.peer.inputSignalsQueue.length; i++) {
+                                //     let answer = await this.createSignal(this.peer.inputSignalsQueue[i].inputSignal);
+                                //     this.peer.inputSignalsQueue[i].resolve(answer);
+                                // }
+
+
                             },
                             (error) => {
                                 resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +error.toString()});
@@ -203,24 +215,24 @@ class NodeWebPeerRTC {
                 try {
                     inputSignal = JSON.parse(inputSignal);
                 } catch (exception){
-                    console.error("Error processing JSON createSignal", inputSignal, exception)
+                    console.error("Error processing JSON createSignal", inputSignal, exception);
                     resolve({result:false, message: "Invalid input signal"});
                     return;
                 }
             }
 
 
+            if (this.peer.connected === true){
+                console.error("Error - Peer Already connected");
+                resolve({result:false, message: "Already connected in the past"});
+                return;
+            }
+
+
             if (inputSignal.sdp) {
 
-
-                if (this.peer.connected === true){
-                    console.error("Error - Peer Already connected");
-                    resolve({result:false, message: "Already connected in the past"});
-                    return;
-                }
-
                 // This is called after receiving an offer or answer from another peer
-                this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), () => {
+                this.peer.setRemoteDescription(new RTCSessionDescription(inputSignal.sdp), async () => {
 
                     console.log('pc.remoteDescription.type', this.peer.remoteDescription.type);
 
@@ -234,31 +246,65 @@ class NodeWebPeerRTC {
                             (desc)=>{
                                 this.peer.setLocalDescription(
                                     desc,
-                                    () => {
+                                    async () => {
+
                                         this.peer.signalData = {'sdp': this.peer.localDescription};
+                                        this.peer.setLocalDescription = true;
+
                                         resolve(  {result: true, signal: this.peer.signalData}  );
+
+                                        for (let i=0; i<this.peer.inputSignalsQueue.length; i++) {
+                                            let answer = await this.createSignal(this.peer.inputSignalsQueue[i].inputSignal);
+                                            this.peer.inputSignalsQueue[i].resolve(answer);
+                                        }
+
                                     },
-                                    (error) => {
-                                        resolve({result:false, message: "Error Setting Local Description"+error.toString()});
+                                    error => {
                                         console.error("Error Setting Local Description",error);
+                                        resolve({result:false, message: "Error Setting Local Description"+error.toString()});
                                     }
                                 )
                             },
-                            (error) => {
-                                resolve({result:false, message: "Error Creating Answer "+error.toString() });
+                            error => {
                                 console.error("Error Creating Answer ",error);
-
+                                resolve({result:false, message: "Error Creating Answer "+error.toString() });
                             });
+
+                    } else { //answer nothing else
+
+                        this.peer.setLocalDescription = true;
+
+                        for (let i=0; i<this.peer.inputSignalsQueue.length; i++) {
+                            let answer = await this.createSignal(this.peer.inputSignalsQueue[i].inputSignal);
+                            this.peer.inputSignalsQueue[i].resolve(answer);
+                        }
+
+                        resolve({result: true, message: ""})
                     }
-                }, error => console.error(error));
+
+                }, error => {
+                    console.error("Error setRemoteDescription", error);
+                    resolve({result:false, message: "setRemoteDescription failed"});
+                });
+
+
+
             } else if (inputSignal.candidate) {
 
                 // Add the new ICE candidate to our connections remote description
                 try {
                     console.log("inputSignal.candidate", inputSignal);
 
-                    this.peer.addIceCandidate(new RTCIceCandidate(inputSignal.candidate));
-                    resolve({result: true, message:"iceCandidate successfully introduced"});
+                    if (this.peer.setLocalDescription === true) {
+
+                        let candidate = new RTCIceCandidate(inputSignal.candidate);
+                        this.peer.addIceCandidate(candidate);
+
+                        resolve({result: true, message:"iceCandidate successfully introduced"});
+
+                    } else {
+                        this.peer.inputSignalsQueue.push( { inputSignal: inputSignal, resolve: resolve });
+                    }
 
                 } catch (Exception){
                     resolve({result:false, message: "iceCandidate error ", exception: Exception });

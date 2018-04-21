@@ -34,7 +34,7 @@ class InterfaceBlockchainProtocolForksManager {
                 });
 
                 if (newChainLength < this.blockchain.blocks.length - 50)
-                    BansList.addBan(socket, 500, "Your blockchain is way smaller than mine");
+                    BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine");
 
                 throw "Your blockchain is smaller than mine";
 
@@ -74,19 +74,25 @@ class InterfaceBlockchainProtocolForksManager {
 
         if (bestFork !== null) {
 
-            let answer= false;
-
             try {
 
-                answer = await this.protocol.forkSolver.processFork( bestFork );
+                let answer = await this.protocol.forkSolver._solveFork ( bestFork );
 
                 if (!answer)
-                    throw { message: "Invalid Fork" }
+                    throw { message: "Fork couldn't be solved" }
 
             } catch (exception) {
 
-                console.error("processForksQueue returned an error", exception);
-                console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
+                try {
+
+                    console.error("processForksQueue returned an error", exception);
+                    console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
+
+                    BansList.addBan(bestFork.getSocket(), 10000, exception.message);
+
+                } catch (exception){
+
+                }
 
             }
 
@@ -106,16 +112,21 @@ class InterfaceBlockchainProtocolForksManager {
         let fork = null;
 
         try {
-            for (let i = 0; i < this.blockchain.forksAdministrator.forks.length; i++) {
 
-                fork = this.blockchain.forksAdministrator.forks[i];
+            for (let i = 0; i < this.blockchain.forksAdministrator.forks.length; i++)
+                if (this.blockchain.forksAdministrator.forks[i].forkReady) {
 
-                if (!fork.ready) continue;
+                    fork = this.blockchain.forksAdministrator.forks[i];
 
-                if (bestFork === null || bestFork.forkChainLength < fork.forkChainLength)
-                    bestFork = fork;
+                    if (bestFork === null || bestFork.forkChainLength < fork.forkChainLength)
+                        bestFork = fork;
 
-            }
+                }
+
+
+            if (Math.random() < 0.1)
+            console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork !== null)
+
         } catch (exception){
 
             console.error("_getBestFork returned an exception", exception );

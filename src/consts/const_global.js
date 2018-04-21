@@ -194,8 +194,9 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-        VERSION: "1.01",
-        VERSION_COMPATIBILITY: "1.01",
+
+        VERSION: "1.02",
+        VERSION_COMPATIBILITY: "1.02",
         PROTOCOL: "WebDollar",
         SSL: true,
 
@@ -241,7 +242,7 @@ consts.SETTINGS = {
             },
 
             WEBRTC: {
-                MAXIMUM_CONNECTIONS: 7,
+                MAXIMUM_CONNECTIONS: 14,
             },
 
             FORKS:{

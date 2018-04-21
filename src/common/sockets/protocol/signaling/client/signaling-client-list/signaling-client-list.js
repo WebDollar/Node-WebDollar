@@ -81,6 +81,7 @@ class SignalingClientList {
 
         for (let i=0; i<this.connected.length; i++)
             if (this.connected[i].uuid === uuid ){
+                this.connected[i].webPeer.peer.close();
                 this.connected.splice(i,1);
                 return true;
             }
@@ -89,7 +90,7 @@ class SignalingClientList {
     }
 
     computeMaxWebPeersConnected( uuid ){
-        return consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS + (this.findWebPeerSignalingClientList( uuid ) !== -1 ? -1 : 0 )
+        return consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS + (this.findWebPeerSignalingClientList( undefined, undefined, uuid ) !== -1 ? 1 : 0 )
     }
 
 }

@@ -50,6 +50,7 @@ class InterfaceBlockchainForksAdministrator {
         fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, headers, ready );
 
         this.forks.push(fork);
+
         return fork;
     }
 
@@ -143,11 +144,9 @@ class InterfaceBlockchainForksAdministrator {
         if (fork === undefined || fork === null)
             return false;
 
-        for (let i=0; i<this.forks.length; i++)
-            if (this.forks[i] === fork || this.forks[i].forkId === fork) {
+        for (let i=this.forks.length-1; i>=0; i--)
+            if (this.forks[i] === undefined || this.forks[i] === null || this.forks[i] === fork || this.forks[i].forkId === fork)
                 this.forks.splice(i,1);
-                return true;
-            }
 
         return false;
     }

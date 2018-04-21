@@ -135,11 +135,9 @@ class InterfaceBlockchainProtocolForkSolver{
             }
 
             fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHeader], false );
-            fork.ready = false;
 
             // in case it was you solved previously && there is something in the blockchain
 
-            //console.warn("discoverFork 555" , binarySearchResult);
             //Binary Search to detect the Fork Position
             if ( binarySearchResult.position === -1 ) {
 
@@ -159,8 +157,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            //console.warn("discoverFork 7777" , binarySearchResult);
-
             //process light and NiPoPow
             await this.optionalProcess(socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint);
 
@@ -172,28 +168,26 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === -1)
                     binarySearchResult.position = 0;
 
-                try {
+                //maximum blocks to download
+                if (!this.blockchain.agent.light)
+                    forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
 
-                    //maximum blocks to download
-                    if (!this.blockchain.agent.light)
-                        forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
+                fork.forkStartingHeight = binarySearchResult.position;
+                fork.forkStartingHeightDownloading  = binarySearchResult.position;
+                fork.forkChainStartingPoint = forkChainStartingPoint;
+                fork.forkChainLength = forkChainLength;
+                fork.forkHeaders.push(binarySearchResult.header);
 
-                    fork.forkStartingHeight = binarySearchResult.position;
-                    fork.forkStartingHeightDownloading  = binarySearchResult.position;
-                    fork.forkChainStartingPoint = forkChainStartingPoint;
-                    fork.forkChainLength = forkChainLength;
-                    fork.forkHeaders.push(binarySearchResult.header);
-                    fork.ready = true;
+                await fork.initializeFork(); //download the requirements and make it ready
 
-                } catch (exception){
+                if (!fork.forkReady)
+                    throw {message:" FORK IS NOT READY "};
 
-                    console.error( "discoverAndProcessFork - creating a fork raised an exception" , exception, "binarySearchResult", binarySearchResult )
-                    throw exception;
-                }
-
-            } else
+            } else {
                 //it is a totally new blockchain (maybe genesis was mined)
                 console.log("fork is something new");
+                throw {message: "fork is something new", binarySearchResult:binarySearchResult, forkChainStartingPoint:forkChainStartingPoint, forkChainLength:forkChainLength} ;
+            }
 
 
             return {result: true, fork:fork };
@@ -216,30 +210,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    async processFork(fork){
-
-        if (fork === null)
-            throw {message: "fork doesn't exist"};
-
-        try{
-
-            if (! (await this._solveFork(fork) ))
-                throw {message: "Fork Solved was failed"};
-
-            return true;
-
-        } catch (exception){
-
-            console.error("solving a fork raised an exception" , exception );
-
-            //let's ban the guy
-            BansList.addBan(fork.getSocket(), 10000, exception.message );
-
-            throw exception;
-        }
-
-    }
-
     /**
      * Solve Fork by Downloading  the blocks required in the fork
      * @param fork
@@ -255,16 +225,15 @@ class InterfaceBlockchainProtocolForkSolver{
         let nextBlockHeight = fork.forkStartingHeightDownloading;
 
         //maybe it was deleted before
-        if (fork.sockets.length === 0){
+        if (fork.sockets.length === 0 || !fork.forkReady)
             return false;
-        }
 
         //interval timer
         let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
 
         console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
-        while (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength && !global.TERMINATED ) {
+        while ( (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED ) {
 
 
             // TODO you can paralyze the downloading code from multiple sockets
@@ -276,11 +245,8 @@ class InterfaceBlockchainProtocolForkSolver{
             //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
 
             let onlyHeader;
-            if (this.protocol.acceptBlocks)
-                onlyHeader = false;
-            else
-            if (this.protocol.acceptBlockHeaders)
-                onlyHeader = true;
+            if (this.protocol.acceptBlocks) onlyHeader = false; else
+            if (this.protocol.acceptBlockHeaders) onlyHeader = true;
 
 
             let answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight);

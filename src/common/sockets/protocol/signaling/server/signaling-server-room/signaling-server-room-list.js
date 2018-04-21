@@ -7,6 +7,8 @@ import NodesType from "node/lists/types/Nodes-Type"
     The List is populated with Node Sockets who are available for WebRTC
  */
 
+const uuid = require('uuid');
+
 class SignalingServerRoomList {
 
     // signalingRoom = []               - storing the connected sockets
@@ -33,7 +35,7 @@ class SignalingServerRoomList {
 
         if (connection === null) {
 
-            let roomConnectionObject = new SignalingServerRoomConnectionObject(client1, client2, status, ++this.lastConnectionsId);
+            let roomConnectionObject = new SignalingServerRoomConnectionObject(client1, client2, status, uuid.v4());
 
             this.list.push(roomConnectionObject);
             this.list.push(roomConnectionObject);
