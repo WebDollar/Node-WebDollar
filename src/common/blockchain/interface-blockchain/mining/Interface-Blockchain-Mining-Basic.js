@@ -159,6 +159,7 @@ class InterfaceBlockchainMiningBasic {
 
     resetMining(){
         this.reset = true;
+
         StatusEvents.emit('mining/reset', true);
     }
 

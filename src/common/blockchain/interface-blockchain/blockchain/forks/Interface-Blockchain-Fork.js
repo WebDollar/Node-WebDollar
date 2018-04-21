@@ -211,6 +211,11 @@ class InterfaceBlockchainFork {
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
+            if (! (await this._validateFork(false))) {
+                console.error("validateFork was not passed");
+                return false
+            }
+
             this.forkIsSaving = true;
 
             try {

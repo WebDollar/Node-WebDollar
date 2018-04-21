@@ -47,6 +47,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             //importing Proof
             this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
+            this.forkProofPi.hash = proofPiData.hash;
 
             let i = 0, length = 100;
             let proofsList = [];
