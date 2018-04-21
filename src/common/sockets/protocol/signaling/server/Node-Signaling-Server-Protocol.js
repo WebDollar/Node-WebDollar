@@ -80,7 +80,7 @@ class NodeSignalingServerProtocol {
         socket.node.on("signals/server/connections/error-establishing-connection", (data) => {
 
             try {
-                
+
                 if (!data.connectionId) {
 
                     let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
@@ -243,12 +243,12 @@ class NodeSignalingServerProtocol {
             try {
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
 
-                if (consts.DEBUG) console.warn("WEBRTC SERVER 2_1", connection.id);
-
                 if (connection === null){
                     console.error("signals/client/answer/receive-initiator-signal/answer connection is empty", answer.connectionId);
                     return;
                 }
+
+                if (consts.DEBUG) console.warn("WEBRTC SERVER 2_1", connection.id);
 
                 if (answer === null || answer === undefined || answer.answerSignal === undefined)
                     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
@@ -289,6 +289,8 @@ class NodeSignalingServerProtocol {
                     return;
                 }
 
+                if (consts.DEBUG) console.warn("WEBRTC SERVER 2_2", connection.id);
+
                 if (iceCandidate === null || iceCandidate === undefined)
                     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
 
@@ -324,8 +326,6 @@ class NodeSignalingServerProtocol {
                     console.error("signals/server/new-initiator-ice-candidate/answer", answer.connectionId);
                     return;
                 }
-
-                if (consts.DEBUG) console.warn("WEBRTC SERVER 2_2", connection.id);
 
                 if (consts.DEBUG) console.warn("WEBRTC SERVER 2_3", connection.id);
 

@@ -65,9 +65,15 @@ class PoolLeaderProtocol {
 
         socket.node.on("mining-pool-protocol/get-minner-work", (data) => {
 
-            let higherHash = this.getHigherHashDifficulty(data);
+                try {
 
-            this.poolHigherHashesList(higherHash, data.address);
+                    let higherHash = this.getHigherHashDifficulty(data);
+
+                    this.poolHigherHashesList(higherHash, data.address);
+
+                } catch (exception){
+
+                }
 
         });
 

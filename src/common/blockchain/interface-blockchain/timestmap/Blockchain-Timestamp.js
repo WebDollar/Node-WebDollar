@@ -44,7 +44,13 @@ class BlockchainTimestamp{
         let socket = nodesListObject.socket;
 
         socket.node.on("timestamp/request-timeUTC", (data) => {
-            this._sendUTC(socket);
+            try {
+
+                this._sendUTC(socket);
+
+            } catch (exception){
+
+            }
         });
 
     }
