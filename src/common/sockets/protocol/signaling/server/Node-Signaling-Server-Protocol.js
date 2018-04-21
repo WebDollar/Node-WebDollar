@@ -24,39 +24,54 @@ class NodeSignalingServerProtocol {
 
         socket.node.on("signals/server/register/accept-web-peer-connections", (data) => {
 
-            let acceptWebPeers = false;
-            if (typeof data.acceptWebPeers === "boolean") acceptWebPeers = data.acceptWebPeers;
+            try {
 
-            NodeSignalingServerService.registerSocketForSignaling(socket, acceptWebPeers);
+                let acceptWebPeers = false;
+                if (typeof data.acceptWebPeers === "boolean") acceptWebPeers = data.acceptWebPeers;
+
+                NodeSignalingServerService.registerSocketForSignaling(socket, acceptWebPeers);
+
+            } catch (exception){
+
+            }
 
         });
 
         socket.node.on("signals/server/connections/established-connection-was-dropped", (data) => {
 
-            let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+            try {
 
-            if (connection !== null) {
-                connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished;
+                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
-                let waitlist = NodeSignalingServerService.searchNodeSignalingServerWaitlist(socket);
+                if (connection !== null) {
+                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished;
 
-                if (waitlist !== null)
-                    waitlist.acceptWebPeers = true;
+                    let waitlist = NodeSignalingServerService.searchNodeSignalingServerWaitlist(socket);
+
+                    if (waitlist !== null)
+                        waitlist.acceptWebPeers = true;
+
+                }
+
+            } catch (exception){
 
             }
-
 
         });
 
 
         socket.node.on("signals/server/connections/was-established-successfully", (data) => {
 
-            if (!data.connectionId) {
+            try {
+                if (!data.connectionId) {
 
-                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+                    let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
-                if (connection !== null)
-                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished;
+                    if (connection !== null)
+                        connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished;
+
+                }
+            } catch (exception){
 
             }
 
@@ -64,12 +79,18 @@ class NodeSignalingServerProtocol {
 
         socket.node.on("signals/server/connections/error-establishing-connection", (data) => {
 
-            if (!data.connectionId) {
+            try {
+                
+                if (!data.connectionId) {
 
-                let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
+                    let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
-                if (connection !== null)
-                    connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+                    if (connection !== null)
+                        connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
+
+                }
+
+            } catch (exception){
 
             }
 
