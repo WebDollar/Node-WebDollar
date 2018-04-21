@@ -142,7 +142,7 @@ class InterfaceBlockchainProtocol {
                     if (( data.l > 0 && this.blockchain.blocks.length === data.l )) {
 
                         //in case the hashes are exactly the same, there is no reason why we should download it
-                        if (Buffer.compare(this.blockchain.blocks[this.blockchain.blocks.length - 1].hash, data.h) <= 0)
+                        if ( this.blockchain.blocks[this.blockchain.blocks.length - 1].hash.compare( data.h ) <= 0)
                             return;
 
                     }
@@ -239,7 +239,7 @@ class InterfaceBlockchainProtocol {
         if (( data.l > 0 && this.blockchain.blocks.length === data.l )) {
 
             //in case the hashes are exactly the same, there is no reason why we should download it
-            if ( Buffer.compare( this.blockchain.getHashPrev( data.l ), data.h ) <= 0 )
+            if ( this.blockchain.getHashPrev( data.l ).compare( data.h ) <= 0 )
                 return;
 
         }

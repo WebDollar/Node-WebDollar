@@ -1,4 +1,7 @@
 import NodesList from 'node/lists/nodes-list'
+import BansList from "common/utils/bans/BansList"
+
+const MAX_TIPS_PROCESSING = 10;
 
 class InterfaceBlockchainProtocolTipsManager {
 
@@ -7,7 +10,9 @@ class InterfaceBlockchainProtocolTipsManager {
         this.blockchain = blockchain;
         this.protocol = protocol;
 
-        setTimeout( async () => { return await this.processTips(); }, 100);
+        this._queue = [];
+
+        setTimeout( async () => { return await this.processTips(); }, 200);
 
     }
 
@@ -16,12 +21,22 @@ class InterfaceBlockchainProtocolTipsManager {
 
         if (this.blockchain === undefined) {
 
-            setTimeout( async () => { return await this.processTips(); }, 100 );
+            setTimeout( async () => { return await this.processTips(); }, 200 );
             return false;
 
         }
 
         this.blockchain.tipsAdministrator.processTipsNewForkLengths();
+
+        for (let i=0; i<this._queue.length; i++){
+
+            if (this._queue[i] === undefined || this._queue[i] === null){
+
+
+
+            }
+
+        }
 
         let bestTip = this.blockchain.tipsAdministrator.getBestTip();
         let result = false;
@@ -41,7 +56,6 @@ class InterfaceBlockchainProtocolTipsManager {
 
             if (!forkAnswer.result) {
 
-                console.log("BANNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
                 this.blockchain.tipsAdministrator.addBan(bestTip.socket.node.sckAddress);
 
                 if (bestTip.forkResolve !== undefined)
@@ -74,9 +88,17 @@ class InterfaceBlockchainProtocolTipsManager {
 
         if (newChainLength < this.blockchain.blocks.length){
 
-            socket.node.sendRequest( "blockchain/header/new-block", this.blockchain.blocks.last.getBlockHeaderWithInformation() );
+            socket.node.sendRequest("head/new-block", {
+                l: this.blockchain.blocks.length,
+                h: this.blockchain.blocks.last.hash,
+                s: this.blockchain.blocks.blocksStartingPoint,
+            });
 
-            throw {message: "Your blockchain is smaller than mine"};
+
+            if (newChainLength < this.blockchain.blocks.length - 50)
+                BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine");
+
+            throw "Your blockchain is smaller than mine";
 
         }
 

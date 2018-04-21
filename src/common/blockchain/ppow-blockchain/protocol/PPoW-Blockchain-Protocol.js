@@ -25,8 +25,11 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 let answer;
 
-                if (this.blockchain.agent.light) //TODO generate proofs
-                    answer = null;
+                if (this.blockchain.agent.light)
+                    answer = {
+                        hash: this.blockchain.proofPi.hash,
+                        length: this.blockchain.proofPi.blocks.length
+                    };
                 else  // full node
                     answer = {
                         hash: this.blockchain.prover.proofPi.hash,
@@ -53,8 +56,8 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 let proof;
 
-                if (this.blockchain.agent.light) //TODO generate proofs
-                    proof = null;
+                if (this.blockchain.agent.light)
+                    proof = this.blockchain.proofPi.getProofHeaders(data.starting, data.length);
                 else  // full node
                     proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length);
 

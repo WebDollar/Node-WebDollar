@@ -51,9 +51,10 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             let i = 0, length = 100;
             let proofsList = [];
-            while (i*length < proofPiData.length){
 
-                StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( i*length, proofPiData.length )  } );
+            while ( i*length < proofPiData.length ){
+
+                StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
 
                 let answer = await this.getSocket().node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", {starting: i * length, length: length}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                 if (answer === null || answer === undefined) throw { message: "Proof is empty" };
@@ -65,6 +66,9 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             }
 
             StatusEvents.emit( "agent/status", {message: "Proofs - Preparing", blockHeight: this.forkStartingHeight } );
+
+            if (this.blockchain.proofPi !== null && this.blockchain.verifier.compareProofs(this.blockchain.proofPi, this.forkProofPi) >= 0)
+                throw {message: "Proof is worst than mine"};
 
             await this.importForkProofPiHeaders( proofsList );
 
@@ -83,6 +87,19 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
     _validateFork(validateHashesAgain){
 
         //this._validateProofXi();
+
+        if ( this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+
+            if (this.blockchain.proofPi !== null && this.blockchain.proofPi.hash.equals(this.forkProofPi.hash))
+                throw {message: "Proof Pi is the same with mine"};
+
+            if (this.blockchain.proofPi !== null && this.blockchain.verifier.compareProofs(this.blockchain.proofPi, this.forkProofPi) >= 0)
+                throw {message: "Proof is worst than mine"};
+
+            return true;
+
+        }
+
 
         return InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
 

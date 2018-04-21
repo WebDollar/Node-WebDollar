@@ -58,11 +58,13 @@ class InterfaceBlockchainFork {
 
     async _validateFork(validateHashesAgain){
 
-        if (this.blockchain.blocks.length > this.forkStartingHeight + this.forkBlocks.length + 1)
+        //forkStartingHeight is offseted by 1
+
+        if (this.blockchain.blocks.length > this.forkStartingHeight + this.forkBlocks.length )
             throw {message: "my blockchain is larger than yours", position: this.forkStartingHeight + this.forkBlocks.length, blockchain: this.blockchain.blocks.length};
         else
-        if (this.blockchain.blocks.length === this.forkStartingHeight + this.forkBlocks.length + 1) //I need to check
-            if ( this.forkBlocks[0].hash.compare(this.blockchain.getHashPrev(this.forkStartingHeight)) < 0)
+        if (this.blockchain.blocks.length === this.forkStartingHeight + this.forkBlocks.length ) //I need to check
+            if ( this.forkBlocks[0].hash.compare(this.blockchain.getHashPrev(this.forkStartingHeight)) <= 0)
                 throw { message: "blockchain has same length, but your block is not better than mine" };
 
         if (validateHashesAgain)
@@ -270,7 +272,8 @@ class InterfaceBlockchainFork {
                 }
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
-                console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully);
+
+                console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
 
 
                 //successfully, let's delete the backup blocks

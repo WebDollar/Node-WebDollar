@@ -18,6 +18,7 @@ class InterfaceBlockchainProtocolForksManager {
     async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader){
 
         try {
+
             if (typeof newChainLength !== "number") throw "newChainLength is not a number";
             if (typeof newChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";
 
@@ -25,7 +26,9 @@ class InterfaceBlockchainProtocolForksManager {
             if (newChainStartingPoint < 0) throw "Incorrect2 newChainStartingPoint";
             if (newChainStartingPoint > forkLastBlockHeader.height) throw "Incorrect3 newChainStartingPoint";
 
-            if (newChainLength < this.blockchain.blocks.length) {
+            //for Light Nodes, I am also processing the smaller blocks
+
+            if ( !this.blockchain.agent.light && newChainLength < this.blockchain.blocks.length) {
 
                 socket.node.sendRequest("head/new-block", {
                     l: this.blockchain.blocks.length,
