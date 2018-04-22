@@ -52,7 +52,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         if (  !block.blockValidation.blockValidationType['skip-validation'] ) {
 
-            console.log("block.height > ", block.height);
+            console.log("block.height > ", block.height, block.hash.toString("hex") );
 
             if ( await this.simulateNewBlock(block, false, revertActions,
 

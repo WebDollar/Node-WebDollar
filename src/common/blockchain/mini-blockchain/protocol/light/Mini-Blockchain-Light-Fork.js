@@ -198,7 +198,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     postFork(forkedSuccessfully){
 
-        if (forkedSuccessfully)
+        if (forkedSuccessfully && this.forkProofPi !== null)
             this.blockchain.proofPi = this.forkProofPi;
 
     }

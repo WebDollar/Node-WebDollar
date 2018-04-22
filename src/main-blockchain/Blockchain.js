@@ -46,7 +46,6 @@ class Blockchain{
 
                 console.warn("################### RESYNCHRONIZATION STARTED ##########");
                 this.Mining.stopMining();
-                StatusEvents.emit('blockchain/status', {message: "No Internet Access"});
 
                 if (this.synchronized)
                     await this.synchronizeBlockchain();
@@ -171,7 +170,10 @@ class Blockchain{
 
             } else {
 
-                StatusEvents.emit('blockchain/status', { message: "Error Synchronizing" });
+                if (firstTime)
+                    StatusEvents.emit('blockchain/status', { message: "Error Synchronizing" });
+                else
+                    StatusEvents.emit('blockchain/status', {message: "No Internet Access"});
 
                 if (NodesList.nodes.length === 0)
                     NodesWaitlist.resetWaitlist(NODES_TYPE.NODE_WEB_PEER);

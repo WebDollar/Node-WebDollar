@@ -525,7 +525,7 @@ class NodeWebPeerRTC {
                 for (let i = 0; i < data.length && !done; i++) {
 
                     let element = data[i].split(" ");
-                    console.log("candiate", data[i], element);
+                    //console.log("candiate", data[i], element);
 
                     if (Array.isArray(element) && element.length > 1) {
                         for (let j = 0; j < element.length; j++)

@@ -4,6 +4,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended"
 import StatusEvents from "common/events/Status-Events";
+import PPoWHelper from '../helpers/PPoW-Helper'
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -18,7 +19,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     async initializeFork(){
 
-        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+        if ( this.blockchain.agent.light ) {
             if (! (await this._downloadProof()))
                 return false;
         }
@@ -29,7 +30,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
     async _downloadProof(){
 
         //Downloading Proof Pi
-        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+        if (this.blockchain.agent.light ) {
 
             StatusEvents.emit( "agent/status", {message: "Downloading Proofs", blockHeight: this.forkStartingHeight } );
 
@@ -39,8 +40,14 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (typeof proofPiData.length !== "number" || proofPiData.length <= 0) throw {message: "Proof Pi length is invalid"};
 
-            if (this.blockchain.proofPi !== null && this.blockchain.proofPi.hash.equals(proofPiData.hash))
-                throw {message: "Proof Pi is the same with mine"};
+            if (this.blockchain.proofPi !== null && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
+
+                if (this.forkChainStartingPoint === this.forkStartingHeight) // it is a new fork
+                    throw {message: "Proof Pi is the same with mine"}
+                else
+                    return true; //i already have this forkProof
+
+            }
 
             if (this.blockchain.forksAdministrator.findForkByProofs(proofPiData.hash) !== null)
                 throw {message: "fork proof was already downloaded"};
@@ -67,10 +74,33 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             StatusEvents.emit( "agent/status", {message: "Proofs - Preparing", blockHeight: this.forkStartingHeight } );
 
-            if (this.blockchain.proofPi !== null && this.blockchain.verifier.compareProofs(this.blockchain.proofPi, this.forkProofPi) >= 0)
-                throw {message: "Proof is worst than mine"};
+            if (this.blockchain.proofPi !== null) {
 
-            await this.importForkProofPiHeaders( proofsList );
+                this.forkProofPi.blocks = proofsList;
+
+                let LCA = PPoWHelper.LCA(this.blockchain.proofPi, this.forkProofPi);
+
+                let comparison = this.blockchain.verifier.compareProofs( this.blockchain.proofPi, this.forkProofPi, LCA );
+
+                //in case my proof is better than yours
+                if (comparison > 0) throw {message: "Proof is worst than mine"};
+
+                //in case my proof is equals with yours and it is not a new proof
+
+                this.forkProofPi.blocks = [];
+
+                for (let i=0; i<this.blockchain.proofPi.blocks.length; i++)
+                    if (this.blockchain.proofPi.blocks[i].height <= LCA.height )
+                        this.forkProofPi.blocks.push( this.blockchain.proofPi.blocks[i] );
+
+                if (this.forkProofPi.blocks.length === 0) throw {message: "Proof is invalid LCA nothing"};
+
+                await this.importForkProofPiHeaders( proofsList, LCA.height );
+
+            } else {
+                await this.importForkProofPiHeaders( proofsList );
+            }
+
 
             //this.forkProofPi.validateProof();
             if (! this.forkProofPi.validateProofLastElements(consts.POPOW_PARAMS.m))
@@ -105,9 +135,11 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     }
 
-    async importForkProofPiHeaders(blocksHeader){
+    async importForkProofPiHeaders(blocksHeader, LCAHeight = -1 ){
 
         for (let i=0; i<blocksHeader.length; i++){
+
+            if (blocksHeader[i].height <= LCAHeight) continue;
 
             let block = this.blockchain.blockCreator.createEmptyBlock( blocksHeader[i].height );
             block.blockValidation.getBlockCallBack = this.getForkProofsPiBlock.bind(this);
@@ -116,7 +148,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             this.forkProofPi.blocks.push(block);
 
-            StatusEvents.emit( "agent/status", {message: "Validating Proof ", blockHeight: i } );
+            StatusEvents.emit( "agent/status", { message: "Validating Proof ", blockHeight: i } );
         }
 
         this.forkProofPi.calculateProofHash();
@@ -139,9 +171,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     preForkClone(cloneBlocks=true){
 
-        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+        if (this.blockchain.agent.light )
             this._forkProofPiClone = this.blockchain.proofPi;
-        }
 
         return InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
 
@@ -158,9 +189,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     revertFork(){
 
-        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+        if (this.blockchain.agent.light )
             this.blockchain.proofPi = this._forkProofPiClone;
-        }
 
         return InterfaceBlockchainFork.prototype.revertFork.call(this);
 

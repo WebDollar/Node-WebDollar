@@ -89,10 +89,17 @@ class InterfaceBlockchainProtocolForksManager {
                 try {
 
                     console.error("processForksQueue returned an error", exception);
-                    console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
 
-                    if (exception.message !== "blockchain has same length, but your block is not better than mine")
+                    let bIncludeBan = true;
+
+                    if (this.blockchain.agent.light)
+                        if (["fork is something new", "blockchain has same length, but your block is not better than mine", "discoverAndProcessFork - fork already found by socket", "my blockchain is larger than yours"].indexOf( exception.message ) >= 0)
+                            bIncludeBan = false;
+
+                    if (bIncludeBan) {
+                        console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
                         BansList.addBan(bestFork.getSocket(), 10000, exception.message);
+                    }
 
                 } catch (exception){
 
