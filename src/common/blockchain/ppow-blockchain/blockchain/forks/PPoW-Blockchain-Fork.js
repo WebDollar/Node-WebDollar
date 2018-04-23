@@ -5,6 +5,7 @@ import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended"
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
+import BansList from "../../../../utils/bans/BansList";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -34,16 +35,31 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             StatusEvents.emit( "agent/status", {message: "Downloading Proofs", blockHeight: this.forkStartingHeight } );
 
-            let proofPiData = await this.getSocket().node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi/hash", {}, "answer", 3000 );
+            let socket, proofPiData;
 
-            if (proofPiData === null || proofPiData === undefined) throw { message: "Proof Failed to answer" };
+            //TODO parallel downloading
+
+            for (let i=0; i<this.sockets.length; i++){
+
+                socket = this.sockets[i];
+
+                proofPiData = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi/hash", {}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+
+                if (proofPiData === null || proofPiData === undefined)
+                    BansList.addBan(socket, 10000, "proofPiFailed");
+                else
+                    break;
+            }
+
+            if (proofPiData === null || proofPiData === undefined)
+                throw { message: "Proof Failed to answer" };
 
             if (typeof proofPiData.length !== "number" || proofPiData.length <= 0) throw {message: "Proof Pi length is invalid"};
 
             if (this.blockchain.proofPi !== null && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
 
                 if (this.forkChainStartingPoint === this.forkStartingHeight) // it is a new fork
-                    throw {message: "Proof Pi is the same with mine"}
+                    throw {message: "Proof Pi is the same with mine"};
                 else
                     return true; //i already have this forkProof
 
@@ -52,6 +68,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             if (this.blockchain.forksAdministrator.findForkByProofs(proofPiData.hash) !== null)
                 throw {message: "fork proof was already downloaded"};
 
+
             //importing Proof
             this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
             this.forkProofPi.hash = proofPiData.hash;
@@ -59,11 +76,11 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             let i = 0, length = 100;
             let proofsList = [];
 
-            while ( i*length < proofPiData.length ){
+            while ( i*length < proofPiData.length ) {
 
                 StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
 
-                let answer = await this.getSocket().node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", {starting: i * length, length: length}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                let answer = await this.getSocket().node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                 if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
                 for (let i=0; i<answer.length; i++)
@@ -97,6 +114,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 await this.importForkProofPiHeaders( proofsList, LCA.height );
 
+                //todo validate alsoo the last few changes
             } else {
                 await this.importForkProofPiHeaders( proofsList );
             }
@@ -109,6 +127,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             StatusEvents.emit( "agent/status", {message: "Proofs Validated", blockHeight: this.forkStartingHeight } );
 
             return true;
+
+
 
         }
 

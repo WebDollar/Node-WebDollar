@@ -21,7 +21,7 @@ class Blockchain{
         this._synchronized = false;
         this._walletLoaded = false;
 
-        this.Chain = new MainBlockchain(undefined);
+        this.Chain = new MainBlockchain( undefined );
         this.blockchain = this.Chain;
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
@@ -42,7 +42,7 @@ class Blockchain{
 
         NodesList.emitter.on("nodes-list/disconnected", async (result) => {
 
-            if (NodesList.nodes.length === 0) { //no more sockets, maybe I no longer have internet
+            if (this.agent.isDesynchronized()) { //no more sockets, maybe I no longer have internet
 
                 console.warn("################### RESYNCHRONIZATION STARTED ##########");
                 this.Mining.stopMining();

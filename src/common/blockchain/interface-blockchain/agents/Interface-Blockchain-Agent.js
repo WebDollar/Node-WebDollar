@@ -3,7 +3,7 @@ import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Prot
 import MiniBlockchainProtocol from "common/blockchain/mini-blockchain/protocol/Mini-Blockchain-Protocol"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
 import VersionChecker from "common/utils/helpers/Version-Checker"
-import CONNECTION_TYPE from "../../../../node/lists/types/Connections-Type";
+import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 
 const EventEmitter = require('events');
 
@@ -22,9 +22,9 @@ class InterfaceBlockchainAgent{
         this.blockchain = blockchain;
 
         if (VersionChecker.detectMobileAndTablet())
-            this.AGENT_TIME_OUT = 50000;
+            this.AGENT_TIME_OUT = 110000;
         else
-            this.AGENT_TIME_OUT = 40000;
+            this.AGENT_TIME_OUT = 60000;
 
         this.AGENT_TIME_INTERVAL = 500;
 
@@ -84,18 +84,20 @@ class InterfaceBlockchainAgent{
 
     }
 
+    _agentConfirmationIntervalFunction(){
+
+        if (this.blockchain.blocks.length <= 0) return false;
+        if ( NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0 ) return false;
+
+        this.synchronized = true;
+
+    }
+
     _setStartAgentInterval(){
 
         if (this._startAgentInterval !== undefined) return;
 
-        this._startAgentInterval = setInterval( ()=>{
-
-            if (this.blockchain.blocks.length <= 0) return false;
-            if ( NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0 ) return false;
-
-            this.synchronized = true;
-
-        }, this.AGENT_TIME_INTERVAL );
+        this._startAgentInterval = setInterval( this._agentConfirmationIntervalFunction.bind(this) , this.AGENT_TIME_INTERVAL );
 
     }
 
@@ -154,13 +156,20 @@ class InterfaceBlockchainAgent{
         return new Promise((resolve)=>{
 
             this._eventEmitter.once('agent/synchronized',(answer)=>{
-
                 resolve(answer);
-
             });
 
         });
 
+    }
+
+
+    isDesynchronized(){
+
+        if (NodesList.nodes.length === 0) //no more sockets, maybe I no longer have internet
+            return true;
+
+        return false;
     }
 
 }

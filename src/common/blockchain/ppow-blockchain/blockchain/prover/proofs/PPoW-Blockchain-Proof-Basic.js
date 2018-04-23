@@ -22,12 +22,12 @@ class PPoWBlockchainProofBasic{
     }
 
 
-    validateProof(){
+    validateProof(startingPoint = 0){
 
         if (!Array.isArray(this.blocks))
             throw {message: "proof blocks is invalid"};
 
-        for (let i = 0; i < this.blocks.length; ++i)
+        for (let i = startingPoint; i < this.blocks.length; ++i)
             if (!this.blocks[i]._validateInterlink())
                 throw {message: "validate Interlink Failed"};
 
@@ -36,14 +36,8 @@ class PPoWBlockchainProofBasic{
 
     validateProofLastElements(lastElements){
 
-        if (!Array.isArray(this.blocks))
-            throw {message: "proof blocks is invalid"};
+        return this.validateProof(this.blocks.length - lastElements);
 
-        for (let i = this.blocks.length - lastElements; i < this.blocks.length; ++i)
-            if ( ! this.blocks[i]._validateInterlink() )
-                throw {message: "validate Interlink Failed"};
-
-        return true;
     }
 
     //TODO should be optimized using Object {}
