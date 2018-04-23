@@ -75,6 +75,21 @@ class PPoWBlockchainProofBasic{
 
     }
 
+    get lastProofBlock(){
+        return this.blocks[this.blocks.length-1];
+    }
+
+    validatesLastBlock(){
+
+        if (this.blocks.length <= 0) return false;
+
+        if (this.blocks[this.blocks.length-1].hash.equals( this.blockchain.blocks.last.hash ))
+            return true;
+        else
+            return false;
+
+    }
+
 }
 
 export default PPoWBlockchainProofBasic

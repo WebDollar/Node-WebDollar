@@ -494,6 +494,25 @@ class InterfaceBlockchainFork {
         return socket;
     }
 
+    _findSocket(socket){
+        for (let i=0; i<this.sockets.length; i++)
+            if (this.sockets[i] === socket)
+                return i;
+
+        return -1;
+    }
+
+    _pushSocket(socket, priority){
+
+        if (this._findSocket(socket) === -1) {
+
+            if (priority)
+                this.sockets.splice(0,0, socket);
+            else
+                this.sockets.push(socket)
+        }
+    }
+
 }
 
 export default InterfaceBlockchainFork;

@@ -76,7 +76,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             let i = 0, length = 100;
             let proofsList = [];
 
-            while ( i*length < proofPiData.length ) {
+            while ( i*length < proofPiData.length && i < 100 ) {
 
                 StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
 
@@ -88,6 +88,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 i++;
             }
+
+            if (proofsList.length === 0) throw {message: "Proofs was not downloaded successfully"};
 
             StatusEvents.emit( "agent/status", {message: "Proofs - Preparing", blockHeight: this.forkStartingHeight } );
 

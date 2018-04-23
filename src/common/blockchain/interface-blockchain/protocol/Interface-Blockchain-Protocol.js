@@ -69,6 +69,7 @@ class InterfaceBlockchainProtocol {
             l: this.blockchain.blocks.length,
             h: this.blockchain.blocks.last.hash,
             s: this.blockchain.blocks.blocksStartingPoint,
+            p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== null && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
         }, "all", socketsAvoidBroadcast);
 
     }
@@ -120,6 +121,7 @@ class InterfaceBlockchainProtocol {
                         l: this.blockchain.blocks.length,
                         h: this.blockchain.blocks.last.hash,
                         s: this.blockchain.blocks.blocksStartingPoint,
+                        p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== null && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
                     } );
                 }
 
@@ -138,18 +140,9 @@ class InterfaceBlockchainProtocol {
 
                     if (data === null || (data.l < 0) || ( data.s >= data.l )) return;
 
-                    //in case the hashes are the same, and I have already the block
-                    if (( data.l > 0 && this.blockchain.blocks.length === data.l )) {
+                    console.log("newForkTip", data.l, "from", socket.node.sckAddress.uuid );
 
-                        //in case the hashes are exactly the same, there is no reason why we should download it
-                        if ( this.blockchain.blocks[this.blockchain.blocks.length - 1].hash.compare( data.h ) <= 0)
-                            return;
-
-                    }
-
-                    console.log("newForkTip", data.l);
-
-                    this.forksManager.newForkTip(socket, data.l, data.s, data.h);
+                    this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
 
                 } catch (exception){
 
@@ -231,20 +224,17 @@ class InterfaceBlockchainProtocol {
 
     async askBlockchain(socket){
 
-        let data = await socket.node.sendRequestWaitOnce("head/last-block", undefined, "a");
+        try {
 
-        if (data === null ) return false;
+            let data = await socket.node.sendRequestWaitOnce("head/last-block", undefined, "a");
 
-        //in case the hashes are the same, and I have already the block
-        if (( data.l > 0 && this.blockchain.blocks.length === data.l )) {
+            if (data === null) return false;
 
-            //in case the hashes are exactly the same, there is no reason why we should download it
-            if ( this.blockchain.getHashPrev( data.l ).compare( data.h ) <= 0 )
-                return;
+            this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
+
+        } catch (exception){
 
         }
-
-        this.forksManager.newForkTip(socket, data.l, data.s, data.h );
 
     }
 

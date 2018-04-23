@@ -15,7 +15,7 @@ class InterfaceBlockchainProtocolForksManager {
     /*
         may the fork2 be with you Otto
     */
-    async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader){
+    async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader, forkProof){
 
         try {
 
@@ -28,12 +28,22 @@ class InterfaceBlockchainProtocolForksManager {
 
             //for Light Nodes, I am also processing the smaller blocks
 
-            if ( !this.blockchain.agent.light && newChainLength < this.blockchain.blocks.length) {
+            //in case the hashes are the same, and I have already the block
+            if (( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof)) && newChainLength > 0 && this.blockchain.blocks.length === newChainLength )) {
+
+                //in case the hashes are exactly the same, there is no reason why we should download it
+                if ( this.blockchain.blocks[this.blockchain.blocks.length - 1].hash.compare( forkLastBlockHeader ) <= 0)
+                    return;
+
+            }
+
+            if ( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof) ) && newChainLength < this.blockchain.blocks.length) {
 
                 socket.node.sendRequest("head/new-block", {
                     l: this.blockchain.blocks.length,
                     h: this.blockchain.blocks.last.hash,
                     s: this.blockchain.blocks.blocksStartingPoint,
+                    p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== null && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
                 });
 
                 if (newChainLength < this.blockchain.blocks.length - 50)
@@ -43,7 +53,7 @@ class InterfaceBlockchainProtocolForksManager {
 
             }
 
-            let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+            let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader, forkProof);
 
             if (answer.result && answer.fork !== undefined)
                 return answer.fork.forkPromise;
