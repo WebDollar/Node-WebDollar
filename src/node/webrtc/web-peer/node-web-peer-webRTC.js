@@ -58,6 +58,8 @@ class NodeWebPeerRTC {
         this.emitter = new EventEmitter();
         this.emitter.setMaxListeners(20);
 
+        this._messages = [];
+
     }
 
     createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
@@ -344,13 +346,73 @@ class NodeWebPeerRTC {
         this.peer.dataChannel.onmessage = (event) => {
 
             try {
-                let data = JSON.parse(event.data);
+                let data  = event.data;
 
-                let name = data.name;
-                let value = data.value;
+                if (data.indexOf("chunk") === 0){
 
-                if (name !== '')
-                    this.emitter.emit(name, value);
+                    let pos = data.indexOf("chunk");
+                    let index = data.substr( pos + "chunk".length,  data.indexOf("/") - pos - "chunk".length );
+                    let chunks = data.substr( data.indexOf("/")+1, data.indexOf("@") - data.indexOf("/")-1 );
+                    let id = data.substr( data.indexOf("@")+1, data.indexOf("#") - data.indexOf("@")-1 );
+                    let value = data.substr( data.indexOf("#")+1);
+
+                    let done = false;
+                    let message = undefined;
+
+                    if (chunks > 0){
+
+                        //let's find _messages
+                        message = this._findMessages(id);
+
+                        if (message === null) {
+                            this._messages.push({
+                                id: id,
+                                chunks: {},
+                                timestamp: new Date(),
+                            });
+
+                            message = this._messages[this._messages.length-1];
+                        }
+
+                        message.chunks[index] = value;
+
+                        done = true;
+
+                        for (let i=0; i < chunks; i++)
+                            if (message.chunks[i] === undefined){
+                                done = false;
+                                break;
+                            }
+
+                    } else {
+                        done = true;
+                    }
+
+                    if (done){
+
+                        if (chunks > 0) {
+                            data = '';
+                            for (let i = 0; i < chunks; i++)
+                                data = data + message.chunks[i];
+                        } else
+                            data = value;
+
+                        data = JSON.parse(data);
+
+                        let name = data.name;
+                        let value = data.value;
+
+                        if (name !== '') {
+                            this.emitter.emit(name, value);
+                        }
+
+                    }
+
+
+
+                }
+
+
 
             } catch (exception){
                 console.error("Error onMessage", event.data, exception);
@@ -439,7 +501,20 @@ class NodeWebPeerRTC {
                 return null;
             }
 
-            this.peer.dataChannel.send(JSON.stringify(data));
+            data = JSON.stringify(data);
+
+            //webrtc must have 16kb per message
+            const SIZE = 16*1024-100;
+            let chunks = data.length / SIZE;
+            let id = Math.floor( Math.random() * 10000000000);
+
+            let i=0;
+            while (i < chunks){
+
+                this.peer.dataChannel.send("chunk"+i+"/"+chunks+"@"+id+"#"+data.substr(i*SIZE, SIZE ));
+                i++;
+            }
+
         };
     }
 
@@ -575,6 +650,15 @@ class NodeWebPeerRTC {
             if (ip.indexOf("172." + i.toString() + ".") === 0) return false;
 
         return true;
+    }
+
+
+    _findMessages(id){
+        for (let i=0; i<this._messages.length; i++)
+            if (this._messages[i].id === id)
+                return this._messages[i];
+
+        return null;
     }
 
 }

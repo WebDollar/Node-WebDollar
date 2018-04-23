@@ -222,11 +222,46 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     _interlinksToJSON(interlinks){
 
         let data = [];
-        for (let i=0; i<interlinks.length; i++)
-            data.push({
-                height: interlinks[i].height,
-                blockId: interlinks[i].blockId,
-            })
+
+        let prevInterlink = null;
+        for (let i=0; i<interlinks.length; i++) {
+
+            if (prevInterlink !== null && prevInterlink.blockId.equals(interlinks[i].blockId)){
+                data.push(0);
+            } else
+                data.push({
+                    h: interlinks[i].height,
+                    bId: interlinks[i].blockId,
+                });
+
+            prevInterlink = this.interlink[i];
+        }
+
+        return data;
+    }
+
+    _importInterlinksFromJSON(interlinks){
+
+        let data = [];
+
+        let prevInterlink = null;
+
+        for (let i=0; i<interlinks.length; i++) {
+
+            if (interlinks[i] === 0){
+                data.push({
+                    height:prevInterlink.h,
+                    blockId: prevInterlink.bId,
+                });
+            } else {
+                data.push({
+                    height: interlinks[i].h||interlinks[i].height,
+                    blockId: interlinks[i].bId||interlinks[i].blockId,
+                })
+
+                prevInterlink = interlinks[i];
+            }
+        }
 
         return data;
     }
@@ -250,7 +285,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
     importBlockFromHeader(json){
 
-        this.interlink = this._interlinksToJSON(json.interlinks);
+        this.interlink = this._importInterlinksFromJSON(json.interlinks);
 
         return InterfaceBlockchainBlock.prototype.importBlockFromHeader.call(this, json);
 

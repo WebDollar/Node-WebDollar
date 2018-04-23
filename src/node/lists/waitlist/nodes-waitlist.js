@@ -5,6 +5,8 @@ import SocketAddress from 'common/sockets/socket-address'
 import consts from 'consts/const_global'
 import NodesType from "node/lists/types/Nodes-Type"
 import CONNECTION_TYPE from "../types/Connections-Type";
+import Blockchain from "main-blockchain/Blockchain";
+import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 
 const EventEmitter = require('events');
 
@@ -120,7 +122,7 @@ class NodesWaitlist {
 
         this._deleteUselessWaitlist(NodesType.NODE_TERMINAL);
 
-        if (NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) === 0){
+        if (NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) === 0){
 
             for (let i=0; i < this.waitListFullNodes.length; i++)
                 if ( this.waitListFullNodes[i].findBackedBy("fallback") !== null)
@@ -144,8 +146,11 @@ class NodesWaitlist {
 
     _tryToConnectNextNode(nextWaitListObject){
 
-        if ( process.env.BROWSER && (this._connectedQueue.length + NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_BROWSER ) return;
-        if ( !process.env.BROWSER && (this._connectedQueue.length + NodesList.countNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_TERMINAL ) return;
+        if ( process.env.BROWSER && (this._connectedQueue.length + NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_BROWSER ) return;
+        if ( !process.env.BROWSER && (this._connectedQueue.length + NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) > consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS.MAXIMUM_CONNECTIONS_IN_TERMINAL ) return;
+
+        if (Blockchain.Agent.light && Blockchain.Agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC)
+            return;
 
         //connect only to TERMINAL NODES
         if ( nextWaitListObject.type === NodesType.NODE_TERMINAL) {

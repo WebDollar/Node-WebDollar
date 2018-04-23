@@ -18,11 +18,12 @@ class Blockchain{
         this._startMiningNextTimeSynchronized = false;
         this._blockchainInitiated = false;
 
-        this._synchronized = false;
         this._walletLoaded = false;
 
         this.Chain = new MainBlockchain( undefined );
         this.blockchain = this.Chain;
+
+        this._synchronized = true;
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
 
@@ -40,18 +41,6 @@ class Blockchain{
         });
         this._loaded = false;
 
-        NodesList.emitter.on("nodes-list/disconnected", async (result) => {
-
-            if (this.agent.isDesynchronized()) { //no more sockets, maybe I no longer have internet
-
-                console.warn("################### RESYNCHRONIZATION STARTED ##########");
-                this.Mining.stopMining();
-
-                if (this.synchronized)
-                    await this.synchronizeBlockchain();
-
-            }
-        });
 
     }
 
@@ -116,7 +105,7 @@ class Blockchain{
         if (typeof initializationCallback === "function")
             initializationCallback();
 
-        await this.Agent.initializeStartAgent();
+        await this.Agent.initializeStartAgentOnce();
 
         if (process.env.BROWSER || !blockchainLoaded) {
             //it tries synchronizing multiple times
@@ -153,8 +142,14 @@ class Blockchain{
      */
     async synchronizeBlockchain(firstTime, synchronizeComplete=false){
 
-        StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});
+        if (this.synchronized === false) return false;
+
         this.synchronized = false;
+
+        console.warn("################### RESYNCHRONIZATION STARTED ##########");
+
+        StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});
+        this.Mining.stopMining();
 
         while (!this.synchronized){
 

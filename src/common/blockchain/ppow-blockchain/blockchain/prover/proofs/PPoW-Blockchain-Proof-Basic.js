@@ -21,7 +21,6 @@ class PPoWBlockchainProofBasic{
         return list
     }
 
-
     validateProof(startingPoint = 0){
 
         if (!Array.isArray(this.blocks))
