@@ -48,9 +48,9 @@ class NodesStats {
 
     _recalculateStats(nodesListObject, printStats = true){
 
-        this.statsClients = NodesList.countNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
-        this.statsServer = NodesList.countNodes(ConnectionsType.CONNECTION_SERVER_SOCKET);
-        this.statsWebPeers = NodesList.countNodes(ConnectionsType.CONNECTION_WEBRTC);
+        this.statsClients = NodesList.countNodesByConnectionType(ConnectionsType.CONNECTION_CLIENT_SOCKET);
+        this.statsServer = NodesList.countNodesByConnectionType(ConnectionsType.CONNECTION_SERVER_SOCKET);
+        this.statsWebPeers = NodesList.countNodesByConnectionType(ConnectionsType.CONNECTION_WEBRTC);
 
         this.statsWaitlistFullNodes= NodesWaitlist.waitListFullNodes.length;
         this.statsWaitlistLightNodes = NodesWaitlist.waitListLightNodes.length;

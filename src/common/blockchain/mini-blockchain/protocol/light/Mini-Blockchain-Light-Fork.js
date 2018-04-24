@@ -137,6 +137,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     preFork(revertActions) {
 
+        if (this.blockchain.agent.light && this._shouldTakeNewProof() ) {
+            this.blockchain.proofPi = this.forkProofPi;
+        }
+
         // I have a new accountant Tree, so it is a new [:-m] light proof
 
         if (this.forkChainStartingPoint === this.forkStartingHeight &&
@@ -194,15 +198,6 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         return answer;
     }
-
-
-    postFork(forkedSuccessfully){
-
-        if (forkedSuccessfully)
-            this.blockchain.proofPi = this.forkProofPi;
-
-    }
-
 
 }
 

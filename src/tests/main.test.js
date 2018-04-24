@@ -46,7 +46,7 @@ if ( typeof describe !== 'undefined') {
 
     require ('tests/benchmarks/BigNumber-benchmark.test');
     
-    require ('tests/threads/ThreadPool.test');
+//    require ('tests/threads/ThreadPool.test');
 
     // require ('tests/blockchain/Node-Web-Peer.test');
 

@@ -15,9 +15,10 @@ class InterfaceBlockchainProtocolForksManager {
     /*
         may the fork2 be with you Otto
     */
-    async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader){
+    async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader, forkProof){
 
         try {
+
             if (typeof newChainLength !== "number") throw "newChainLength is not a number";
             if (typeof newChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";
 
@@ -25,12 +26,24 @@ class InterfaceBlockchainProtocolForksManager {
             if (newChainStartingPoint < 0) throw "Incorrect2 newChainStartingPoint";
             if (newChainStartingPoint > forkLastBlockHeader.height) throw "Incorrect3 newChainStartingPoint";
 
-            if (newChainLength < this.blockchain.blocks.length) {
+            //for Light Nodes, I am also processing the smaller blocks
+
+            //in case the hashes are the same, and I have already the block
+            if (( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof)) && newChainLength > 0 && this.blockchain.blocks.length === newChainLength )) {
+
+                //in case the hashes are exactly the same, there is no reason why we should download it
+                if ( this.blockchain.blocks[this.blockchain.blocks.length - 1].hash.compare( forkLastBlockHeader ) <= 0)
+                    return;
+
+            }
+
+            if ( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof) ) && newChainLength < this.blockchain.blocks.length) {
 
                 socket.node.sendRequest("head/new-block", {
                     l: this.blockchain.blocks.length,
                     h: this.blockchain.blocks.last.hash,
                     s: this.blockchain.blocks.blocksStartingPoint,
+                    p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== null && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
                 });
 
                 if (newChainLength < this.blockchain.blocks.length - 50)
@@ -40,7 +53,7 @@ class InterfaceBlockchainProtocolForksManager {
 
             }
 
-            let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+            let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader, forkProof);
 
             if (answer.result && answer.fork !== undefined)
                 return answer.fork.forkPromise;
@@ -86,10 +99,17 @@ class InterfaceBlockchainProtocolForksManager {
                 try {
 
                     console.error("processForksQueue returned an error", exception);
-                    console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
 
-                    if (exception.message !== "blockchain has same length, but your block is not better than mine")
+                    let bIncludeBan = true;
+
+                    if (this.blockchain.agent.light)
+                        if (["fork is something new", "blockchain has same length, but your block is not better than mine", "discoverAndProcessFork - fork already found by socket", "my blockchain is larger than yours"].indexOf( exception.message ) >= 0)
+                            bIncludeBan = false;
+
+                    if (bIncludeBan) {
+                        console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
                         BansList.addBan(bestFork.getSocket(), 10000, exception.message);
+                    }
 
                 } catch (exception){
 
@@ -125,8 +145,8 @@ class InterfaceBlockchainProtocolForksManager {
                 }
 
 
-            if (Math.random() < 0.1)
-            console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork !== null)
+            // if (Math.random() < 0.1)
+                // console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork !== null)
 
         } catch (exception){
 

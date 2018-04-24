@@ -72,8 +72,6 @@ class PPoWBlockchainProver{
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
                         B = superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m];
 
-
-
                 }
 
         } catch (exception){
@@ -83,8 +81,14 @@ class PPoWBlockchainProver{
 
         }
 
-        if (underlyingChain !== null)
+        if (underlyingChain !== null) {
+
+            underlyingChain.blocks.sort(function(a, b) {
+                return a.height - b.height;
+            });
+
             underlyingChain.calculateProofHash();
+        }
 
         return underlyingChain;
 

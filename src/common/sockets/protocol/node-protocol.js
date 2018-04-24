@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
-import NodesType from "node/lists/types/Nodes-Type"
-import CONNECTION_TYPE from "../../../node/lists/types/Connections-Type";
+import NODES_TYPE from "node/lists/types/Nodes-Type"
+import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 
 class NodeProtocol {
 
@@ -21,7 +21,7 @@ class NodeProtocol {
             response = await node.sendRequestWaitOnce("HelloNode", {
                 version: consts.SETTINGS.NODE.VERSION,
                 uuid: consts.SETTINGS.UUID,
-                nodeType: process.env.BROWSER ? NodesType.NODE_WEB_PEER : NodesType.NODE_TERMINAL
+                nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL
             }, undefined, 1000);
 
             if ( typeof response === "object" && response !== null && response.hasOwnProperty("uuid") )
@@ -47,17 +47,17 @@ class NodeProtocol {
                 return false;
             }
 
-            if ( [NodesType.NODE_TERMINAL, NodesType.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
+            if ( [NODES_TYPE.NODE_TERMINAL, NODES_TYPE.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
                 console.error("invalid node type", response);
                 return false;
             }
 
-            if (NodesList.countNodesByType(NodesType.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
+            if (NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
                 node.disconnect();
                 return false;
             }
 
-            if (NodesList.countNodesByType(NodesType.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
+            if (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
                 node.disconnect();
                 return false;
             }
@@ -78,7 +78,7 @@ class NodeProtocol {
 
             } else {
 
-                if (response.nodeType === NodesType.NODE_WEB_PEER) {
+                if (response.nodeType === NODES_TYPE.NODE_WEB_PEER) {
                     node.protocol.helloValidated = true;
                     return true;
                 } else {

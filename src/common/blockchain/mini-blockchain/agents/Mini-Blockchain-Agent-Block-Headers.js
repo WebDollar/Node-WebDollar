@@ -18,7 +18,7 @@ class MiniBlockchainAgentBlockHeaders extends inheritAgentClass{
         return fork;
     }
 
-    newProtocol(){
+    _newProtocol(){
         this.protocol = new MiniBlockchainAdvancedProtocol(this.blockchain, this);
     }
 

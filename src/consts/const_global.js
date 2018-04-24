@@ -1,4 +1,5 @@
 const uuid = require('uuid');
+import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 
 let consts = {
     DEBUG: false,
@@ -195,8 +196,8 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.02",
-        VERSION_COMPATIBILITY: "1.02",
+        VERSION: "1.03",
+        VERSION_COMPATIBILITY: "1.03",
         PROTOCOL: "WebDollar",
         SSL: true,
 
@@ -276,6 +277,12 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "1";
     consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
+
+    consts.SETTINGS.NODE.PORT = 8085;
+
+    FallBackNodesList.nodes = [{
+        "addr": ["webdollar.ddns.net:2095"],
+    }];
 }
 
 
