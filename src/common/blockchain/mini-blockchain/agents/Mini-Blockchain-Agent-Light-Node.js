@@ -13,6 +13,9 @@ let inheritAgentClass;
 if (consts.POPOW_PARAMS.ACTIVATED) inheritAgentClass = PPoWBlockchainAgentFullNode;
 else  inheritAgentClass = InterfaceBlockchainAgentFullNode;
 
+const WEBRTC_MINIMUM_LIGHT = 6;
+const WEBRTC_MINIMUM_LIGHT_PROBABILITY = 1/WEBRTC_MINIMUM_LIGHT;
+
 class MiniBlockchainAgentLightNode extends inheritAgentClass{
 
     constructor(blockchain){
@@ -20,6 +23,16 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
         super(blockchain);
 
         this.light = true;
+
+        setInterval( ()=>{
+
+            if (this.blockchain.proofPi !== null)
+                if ( new Date().getTime() - this.blockchain.proofPi.date.getTime() >= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 5)
+
+                    if ( Math.random() < WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC  )
+                        Blockchain.synchronizeBlockchain(); //let's synchronize again
+
+        }, consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 1000);
     }
 
 
@@ -41,6 +54,8 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
 
         NodesList.emitter.on("nodes-list/disconnected", async (result) => {
 
+
+
             if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC) < 3)
                 Blockchain.synchronizeBlockchain(); //let's synchronize again
 
@@ -48,17 +63,18 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
 
         NodesList.emitter.on("nodes-list/connected", async (result) => {
 
-            if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC) > 6) {
+            if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC) > WEBRTC_MINIMUM_LIGHT) {
                 //let's disconnect from full nodes
 
-                if (Math.random() < 0.9) {
+                if (this.status !== AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC ) {
 
                     this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC;
 
-                    for (let i=NodesList.nodes.length-1; i>=0; i--)
-                        if ( NodesList.nodes[i].connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET ){
-                            NodesList.nodes[i].socket.disconnect();
-                        }
+                    if (Math.random() < WEBRTC_MINIMUM_LIGHT_PROBABILITY) // most will disconnect from full nodes
+                        for (let i=NodesList.nodes.length-1; i>=0; i--)
+                            if ( NodesList.nodes[i].connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET ){
+                                NodesList.nodes[i].socket.disconnect();
+                            }
 
                 }
             }

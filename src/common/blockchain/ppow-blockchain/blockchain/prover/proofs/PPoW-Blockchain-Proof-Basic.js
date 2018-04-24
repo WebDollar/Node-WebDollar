@@ -7,6 +7,8 @@ class PPoWBlockchainProofBasic{
 
     constructor(blockchain, blocks){
 
+        this.date = new Date();
+
         this.blockchain = blockchain;
         this.blocks = blocks;
 
