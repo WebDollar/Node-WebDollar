@@ -59,7 +59,9 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 if (transaction === undefined) throw {message: "Transaction was not specified"};
 
-                transaction.isTransactionOK();
+                if (!transaction.isTransactionOK())
+                    return false;
+
 
                 if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket))
                     throw {message: "I already have this transaction"};
@@ -132,7 +134,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
     propagateNewPendingTransaction(transaction, exceptSockets){
 
-        NodeProtocol.broadcastRequest("transactions/new-pending-transaction", { format: "buffer", buffer: transaction.serializeTransaction() }, undefined, exceptSockets );
+        NodeProtocol.broadcastRequest( "transactions/new-pending-transaction", { format: "buffer", buffer: transaction.serializeTransaction() }, undefined, exceptSockets );
 
     }
 
