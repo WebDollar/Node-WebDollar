@@ -66,7 +66,7 @@ describe('test PPoW-Blockchain interlink data structure', () => {
             ];
 
         //create a dummy block and deserialize from serialized array
-        
+
         for (let i = 0; i < serialized.length; ++i) {
 
             let block = new MiniBlockcainBlock( blockchain, blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, blockchain.db );
