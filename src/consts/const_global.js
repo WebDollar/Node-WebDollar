@@ -2,7 +2,7 @@ const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 
 let consts = {
-    DEBUG: true,
+    DEBUG: false,
 };
 
 
@@ -196,8 +196,8 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.02",
-        VERSION_COMPATIBILITY: "1.02",
+        VERSION: "1.03",
+        VERSION_COMPATIBILITY: "1.03",
         PROTOCOL: "WebDollar",
         SSL: true,
 
