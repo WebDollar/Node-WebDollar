@@ -162,7 +162,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 let i = this.blockchain.blocks.length-1;
                 let count = 0;
 
-                while ( i >= 0 && this.blockchain.blocks[i].data.minerAddress.equals( this.unencodedMinerAddress ) ){
+                while ( !consts.DEBUG && i >= 0 && this.blockchain.blocks[i].data.minerAddress.equals( this.unencodedMinerAddress ) ){
 
                     count ++;
                     i--;

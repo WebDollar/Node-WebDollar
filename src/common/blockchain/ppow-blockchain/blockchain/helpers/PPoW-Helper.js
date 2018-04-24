@@ -26,7 +26,7 @@ class PPoWHelper{
             const block1 = proofs1.blocks[i1];
             const block2 = proofs2.blocks[i2];
 
-            if (BufferExtended.safeCompare(block1, block2))
+            if (block1.hash.equals( block2.hash ))
                 return block1;
             else if (block1.height > block2.height)
                 i1--;

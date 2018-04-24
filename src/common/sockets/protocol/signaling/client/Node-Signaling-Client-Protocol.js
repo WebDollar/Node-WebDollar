@@ -4,8 +4,6 @@ import SignalingClientList from './signaling-client-list/signaling-client-list'
 import NodesList from 'node/lists/nodes-list'
 import NodeSignalingClientSerivce from "./signaling-client-service/Node-Signaling-Client-Service"
 
-consts.DEBUG = true;
-
 class NodeSignalingClientProtocol {
 
     constructor(){

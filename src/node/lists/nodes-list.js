@@ -132,7 +132,7 @@ class NodesList {
         return list;
     }
 
-    countNodes(connectionType){
+    countNodesByConnectionType(connectionType){
 
         if ( connectionType === undefined) connectionType = 'all';
 

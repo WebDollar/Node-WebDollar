@@ -21,13 +21,12 @@ class PPoWBlockchainProofBasic{
         return list
     }
 
-
-    validateProof(){
+    validateProof(startingPoint = 0){
 
         if (!Array.isArray(this.blocks))
             throw {message: "proof blocks is invalid"};
 
-        for (let i = 0; i < this.blocks.length; ++i)
+        for (let i = startingPoint; i < this.blocks.length; ++i)
             if (!this.blocks[i]._validateInterlink())
                 throw {message: "validate Interlink Failed"};
 
@@ -36,14 +35,8 @@ class PPoWBlockchainProofBasic{
 
     validateProofLastElements(lastElements){
 
-        if (!Array.isArray(this.blocks))
-            throw {message: "proof blocks is invalid"};
+        return this.validateProof(this.blocks.length - lastElements);
 
-        for (let i = this.blocks.length - lastElements; i < this.blocks.length; ++i)
-            if ( ! this.blocks[i]._validateInterlink() )
-                throw {message: "validate Interlink Failed"};
-
-        return true;
     }
 
     //TODO should be optimized using Object {}
@@ -79,6 +72,21 @@ class PPoWBlockchainProofBasic{
         this.hash = WebDollarCrypto.SHA256(buffer);
 
         return this.hash;
+
+    }
+
+    get lastProofBlock(){
+        return this.blocks[this.blocks.length-1];
+    }
+
+    validatesLastBlock(){
+
+        if (this.blocks.length <= 0) return false;
+
+        if (this.blocks[this.blocks.length-1].hash.equals( this.blockchain.blocks.last.hash ))
+            return true;
+        else
+            return false;
 
     }
 

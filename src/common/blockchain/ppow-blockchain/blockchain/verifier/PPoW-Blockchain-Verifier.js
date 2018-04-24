@@ -90,43 +90,50 @@ class PPoWBlockchainVerifier{
     }
 
 
+    _bestArg (proofPi, b) {
+
+        //M ← {µ : |π↑µ {b :}| ≥ m } ∪ {0}
+
+        // Obs M is a counter of how many blocks have the level[i]
+        let M = this.calculateM(proofPi, b);
+
+
+        //return max µ ∈ M {2^µ · | π↑µ {b : }| }
+        let max = BigInteger(0);
+        for (let i = 0; i < M.length; ++i)
+            //if there are blocks of level i
+            if (M[i] > 0){
+                let miu = i;
+
+                let formula = new BigInteger(2).pow(miu).multiply( M [miu] );
+                if ( max < formula )
+                    max = formula;
+            }
+
+        return max;
+    };
+
     /**
      * Algorithm 4. Compare 2 proofs. aka bestArg
      * @param proofs1
      * @param proofs2
      * @returns {boolean}
      */
-    compareProofs(proofPi1, proofPi2){
-
-        let bestArg = (proofPi, b) => {
-
-            //M ← {µ : |π↑µ {b :}| ≥ m } ∪ {0}
-
-            // Obs M is a counter of how many blocks have the level[i]
-            let M = this.calculateM(proofPi, b);
+    compareProofs(proofPi1, proofPi2, LCA){
 
 
-            //return max µ ∈ M {2^µ · | π↑µ {b : }| }
-            let max = BigInteger(0);
-            for (let i = 0; i < M.length; ++i)
-                //if there are blocks of level i
-                if (M[i] > 0){
-                    let miu = i;
-
-                    let formula = new BigInteger(2).pow(miu).multiply( M [miu] );
-                    if ( max < formula )
-                        max = formula;
-                }
-
-            return max;
-        };
 
         //calculating the interesection
-        let b = PPoWHelper.LCA(proofPi1, proofPi2);
+        let b;
+
+        if (LCA !== undefined)
+            b = LCA;
+        else
+            b = PPoWHelper.LCA(proofPi1, proofPi2);
 
         //best-argm(πA, b) ≥ best-argm(πB, b)
-        let val1 = bestArg(proofPi1, b);
-        let val2 = bestArg(proofPi2, b);
+        let val1 = this._bestArg(proofPi1, b);
+        let val2 = this._bestArg(proofPi2, b);
 
         //console.log(val1.toString(), " ", val2.toString() )
         return val1.compare( val2 );

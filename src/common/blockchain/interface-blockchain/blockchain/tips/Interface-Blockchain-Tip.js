@@ -1,6 +1,6 @@
 class InterfaceBlockchainTip{
 
-    constructor(blockchain, socket, forkChainLength,forkChainStartingPoint, forkLastBlockHeader){
+    constructor(blockchain, socket, forkChainLength,forkChainStartingPoint, forkLastBlockHeader, forkType){
 
         this.blockchain = blockchain;
 

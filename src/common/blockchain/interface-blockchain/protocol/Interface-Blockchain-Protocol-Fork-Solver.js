@@ -95,7 +95,7 @@ class InterfaceBlockchainProtocolForkSolver{
      */
 
     //TODO it will not update positions
-    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHeader ){
+    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHeader, forkProof ){
 
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.blocks.length;
@@ -104,8 +104,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
         try{
 
-            if (currentBlockchainLength > forkChainLength)
-                throw {message: "discoverAndProcessFork a smaller fork than I have"};
+            if (!this.blockchain.agent.light  && currentBlockchainLength > forkChainLength)
+                throw {message: "discoverAndProcessFork - fork is smaller fork than mine"};
 
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
             if ( forkFound !== null ) {
@@ -115,8 +115,11 @@ class InterfaceBlockchainProtocolForkSolver{
 
             forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHeader);
             if ( forkFound !== null ) {
+
                 console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
+                forkFound._pushSocket(socket, forkProof );
                 return {result: true, fork: forkFound};
+
             }
 
             //optimization
