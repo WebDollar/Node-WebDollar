@@ -7,9 +7,9 @@ if ( typeof describe !== 'undefined') {
 
     require('tests/blockchain/mini-blockchain/Mini-Blockchain-Accountant-Tree.test');
 
-    // require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test');
-    //
-    // require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Difficulty.test');
+    require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Address.test');
+
+    require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Difficulty.test');
     // require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Block-LocalStore.test');
     // require ('tests/blockchain/interface-blockchain/Interface-Blockchain-LocalStore.test');
     // require ('tests/blockchain/interface-blockchain/Interface-Blockchain-Transactions.test');
@@ -19,11 +19,11 @@ if ( typeof describe !== 'undefined') {
     // require ('tests/blockchain/ppow-blockchain/PPoW-Blockchain-Block-LocalStore.test');
     // require ('tests/blockchain/ppow-blockchain/PPoW-Blockchain-LocalStore.test');
     // require ('tests/blockchain/ppow-blockchain/PPoW-Blockchain-Interlink.test');
-    //
+
     // require ('tests/main-blockchain/Main-Blockchain-Wallets.test');
-    // require ('tests/main-blockchain/Interface-Blockchain-Address.test');
-    //
-    // require ('tests/satoshmindb/Interface-SatoshminDB.test');
+    require ('tests/main-blockchain/Interface-Blockchain-Address.test');
+
+    require ('tests/satoshmindb/Interface-SatoshminDB.test');
 
     require ('tests/trees/radix/Interface-Radix-Tree.test');
     /*require ('tests/trees/radix/accountant/Interface-Accountant-Radix-Tree.test');*/

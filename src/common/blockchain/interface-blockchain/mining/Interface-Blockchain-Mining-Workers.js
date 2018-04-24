@@ -146,6 +146,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         if (this.reset) {
             console.warn("WORKERS MINING RESTARTED", this.reset);
+            this._hashesPerSecond = 0;
         }
 
         return false;

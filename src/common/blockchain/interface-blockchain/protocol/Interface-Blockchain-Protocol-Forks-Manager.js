@@ -88,7 +88,8 @@ class InterfaceBlockchainProtocolForksManager {
                     console.error("processForksQueue returned an error", exception);
                     console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
 
-                    BansList.addBan(bestFork.getSocket(), 10000, exception.message);
+                    if (exception.message !== "blockchain has same length, but your block is not better than mine")
+                        BansList.addBan(bestFork.getSocket(), 10000, exception.message);
 
                 } catch (exception){
 
