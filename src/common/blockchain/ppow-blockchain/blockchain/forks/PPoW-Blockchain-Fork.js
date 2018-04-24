@@ -58,10 +58,11 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (this.blockchain.proofPi !== null && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
 
-                if (this.forkChainStartingPoint === this.forkStartingHeight) // it is a new fork
-                    throw {message: "Proof Pi is the same with mine"};
-                else
-                    return true; //i already have this forkProof
+                if (this.forkChainLength > this.blockchain.blocks.length ){
+                    this.forkProofPi = this.blockchain.proofPi;
+                    return true;
+                } //you have actually more forks but with the same proof
+                else throw {message: "same proof, but your blockchain is smaller than mine"}
 
             }
 
@@ -99,24 +100,26 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 let LCA = PPoWHelper.LCA(this.blockchain.proofPi, this.forkProofPi);
 
-                let comparison = this.blockchain.verifier.compareProofs( this.blockchain.proofPi, this.forkProofPi, LCA );
-
-                //in case my proof is better than yours
-                if (comparison > 0) throw {message: "Proof is worst than mine"};
-
-                //in case my proof is equals with yours and it is not a new proof
+                this._isProofBetter(LCA);
 
                 this.forkProofPi.blocks = [];
 
                 for (let i=0; i<this.blockchain.proofPi.blocks.length; i++)
-                    if (this.blockchain.proofPi.blocks[i].height <= LCA.height )
-                        this.forkProofPi.blocks.push( this.blockchain.proofPi.blocks[i] );
+                    if (this.blockchain.proofPi.blocks[i].height <= LCA.height ) {
+
+                        let found = false;
+                        for (let j=0; j<proofsList.length; j++)
+                            if (proofsList[j].height === this.blockchain.proofPi.blocks[i].height )
+                                found = true;
+
+                        if (found)
+                            this.forkProofPi.blocks.push(this.blockchain.proofPi.blocks[i]);
+                    }
 
                 if (this.forkProofPi.blocks.length === 0) throw {message: "Proof is invalid LCA nothing"};
 
                 await this.importForkProofPiHeaders( proofsList, LCA.height );
 
-                //todo validate alsoo the last few changes
             } else {
                 await this.importForkProofPiHeaders( proofsList );
             }
@@ -140,20 +143,17 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         //this._validateProofXi();
 
-        if ( this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
+        if (!this.blockchain.agent.light)
+            return InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
 
-            if (this.blockchain.proofPi !== null && this.blockchain.proofPi.hash.equals(this.forkProofPi.hash))
-                throw {message: "Proof Pi is the same with mine"};
+        if (this.forkProofPi === null) throw {message: "Proof is invalid being null"};
 
-            if (this.blockchain.proofPi !== null && this.blockchain.verifier.compareProofs(this.blockchain.proofPi, this.forkProofPi) >= 0)
-                throw {message: "Proof is worst than mine"};
+        if ( this.blockchain.proofPi !== null ) {
 
-            return true;
+            if (this._isProofBetter())
+                return true;
 
-        }
-
-
-        return InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
+        } else return true;
 
     }
 
@@ -200,21 +200,56 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     }
 
-    preFork(revertActions){
-
-        if (this.blockchain.agent.light && (this.forkChainStartingPoint === this.forkStartingHeight) ) {
-            this.blockchain.proofPi = this.forkProofPi;
-        }
-
-        return InterfaceBlockchainFork.prototype.preFork.call(this, revertActions);
-    }
-
     revertFork(){
 
         if (this.blockchain.agent.light )
             this.blockchain.proofPi = this._forkProofPiClone;
 
         return InterfaceBlockchainFork.prototype.revertFork.call(this);
+
+    }
+
+    _isProofBetter(LCA){
+
+        let comparison = this.blockchain.verifier.compareProofs( this.blockchain.proofPi, this.forkProofPi, LCA );
+
+        //in case my proof is equals with yours and it is not a new proof
+
+        if (comparison > 0)
+            if (this.forkStartingHeight < this.blockchain.proofPi.lastProofBlock.height) //it didn't make a real fork, but it has new blocks
+                throw {message: "Proof is worst than mine"};
+
+        if (comparison === 0 && this.forkProofPi.lastProofBlock.height <= this.blockchain.proofPi.lastProofBlock.height ) {
+
+            if (comparison === 0 && this.forkChainLength < this.blockchain.blocks.length) throw {message: "Your proof is worst than mine"};
+
+            if (comparison === 0 && this.forkChainLength === this.blockchain.blocks.length && this.forkHeaders[0].compare(this.blockchain.getHashPrev(this.forkStartingHeight + 1)) >= 0)
+                throw {message: "Your proof is worst than mine because you have the same block"};
+
+        }
+
+        return true;
+
+    }
+
+    _shouldTakeNewProof(){
+
+        if (this.blockchain.proofPi === null) return true;
+
+        let comparison = this.blockchain.verifier.compareProofs( this.blockchain.proofPi, this.forkProofPi );
+
+        //in case my proof is equals with yours and it is not a new proof
+
+        if (comparison > 0) //it is worst than my proof
+            return false;
+        else
+        if (comparison === 0 && this.forkProofPi.lastProofBlock.height <= this.blockchain.proofPi.lastProofBlock.height ) //you have less than my proof
+            return false;
+
+        //your proof is better than mine
+
+        return true;
+
 
     }
 

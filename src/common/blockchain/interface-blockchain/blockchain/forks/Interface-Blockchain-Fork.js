@@ -64,7 +64,7 @@ class InterfaceBlockchainFork {
             throw {message: "my blockchain is larger than yours", position: this.forkStartingHeight + this.forkBlocks.length, blockchain: this.blockchain.blocks.length};
         else
         if (this.blockchain.blocks.length === this.forkStartingHeight + this.forkBlocks.length ) //I need to check
-            if ( this.forkBlocks[0].hash.compare(this.blockchain.getHashPrev(this.forkStartingHeight)) <= 0)
+            if ( this.forkBlocks[0].hash.compare(this.blockchain.getHashPrev(this.forkStartingHeight + 1)) >= 0 )
                 throw { message: "blockchain has same length, but your block is not better than mine" };
 
         if (validateHashesAgain)

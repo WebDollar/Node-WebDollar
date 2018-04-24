@@ -81,12 +81,14 @@ class PPoWBlockchainProver{
 
         }
 
-        underlyingChain.blocks.sort(function(a, b) {
-            return a.height - b.height;
-        });
+        if (underlyingChain !== null) {
 
-        if (underlyingChain !== null)
+            underlyingChain.blocks.sort(function(a, b) {
+                return a.height - b.height;
+            });
+
             underlyingChain.calculateProofHash();
+        }
 
         return underlyingChain;
 

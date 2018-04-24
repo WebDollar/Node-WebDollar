@@ -1,5 +1,6 @@
 import BufferExtended from "common/utils/BufferExtended"
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+import consts from 'consts/const_global'
 
 class PPoWBlockchainProofBasic{
 
@@ -82,11 +83,18 @@ class PPoWBlockchainProofBasic{
     validatesLastBlock(){
 
         if (this.blocks.length <= 0) return false;
+        if (this.blocks.length <= consts.POPOW_PARAMS.m) return false;
 
-        if (this.blocks[this.blocks.length-1].hash.equals( this.blockchain.blocks.last.hash ))
-            return true;
-        else
-            return false;
+        try {
+
+            if (this.blocks[this.blocks.length - 1].hash.equals( this.blockchain.blocks[this.blockchain.blocks.length - consts.POPOW_PARAMS.m - 1  ].hash ))
+                return true;
+            else
+                return false;
+
+        } catch (exception){
+
+        }
 
     }
 

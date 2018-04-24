@@ -145,8 +145,8 @@ class InterfaceBlockchainProtocolForksManager {
                 }
 
 
-            if (Math.random() < 0.1)
-            console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork !== null)
+            // if (Math.random() < 0.1)
+                // console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork !== null)
 
         } catch (exception){
 
