@@ -102,7 +102,7 @@ class NodeProtocol {
      */
     broadcastRequest (request, data, type, exceptSockets){
 
-        if (exceptSockets === "all") return false;
+        if (exceptSockets === "all") return true;
 
         let nodes = NodesList.getNodes(type);
 
@@ -138,6 +138,7 @@ class NodeProtocol {
             }
         }
 
+        return true;
     }
 
 

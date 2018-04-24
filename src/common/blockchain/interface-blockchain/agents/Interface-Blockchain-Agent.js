@@ -184,7 +184,7 @@ class InterfaceBlockchainAgent{
     }
 
     get status(){
-
+        return this._status;
     }
 
 
