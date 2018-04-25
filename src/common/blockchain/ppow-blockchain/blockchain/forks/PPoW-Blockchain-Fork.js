@@ -142,7 +142,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     }
 
-    _validateFork(validateHashesAgain){
+    _validateFork(validateHashesAgain, firstValidation ){
 
         //this._validateProofXi();
 

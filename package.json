@@ -82,7 +82,6 @@
     "utf-8-validate": "^3.0.4",
     "uuid": "^3.2.1",
     "webworkify-webpack": "^2.1.1",
-    "wrtc": "0.0.62"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

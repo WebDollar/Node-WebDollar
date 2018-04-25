@@ -56,7 +56,7 @@ class InterfaceBlockchainFork {
         this._blocksCopy = [];
     }
 
-    async _validateFork(validateHashesAgain){
+    async _validateFork(validateHashesAgain, firstValidation ){
 
         //forkStartingHeight is offseted by 1
 
@@ -201,7 +201,7 @@ class InterfaceBlockchainFork {
         if (global.TERMINATED)
             return false;
 
-        if (! (await this._validateFork(false))) {
+        if (! (await this._validateFork(false, true))) {
             console.error("validateFork was not passed");
             return false
         }
@@ -213,7 +213,7 @@ class InterfaceBlockchainFork {
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
-            if (! (await this._validateFork(false))) {
+            if (! (await this._validateFork(false, false))) {
                 console.error("validateFork was not passed");
                 return false
             }

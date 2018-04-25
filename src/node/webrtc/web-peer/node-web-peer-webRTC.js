@@ -11,10 +11,16 @@ import NodesList from 'node/lists/nodes-list'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 
-const wrtc = require("wrtc");
-let RTCPeerConnection = wrtc.RTCPeerConnection;
-let RTCSessionDescription = wrtc.RTCSessionDescription;
-let RTCIceCandidate = wrtc.RTCIceCandidate;
+
+let RTCPeerConnection;
+let RTCSessionDescription;
+let RTCIceCandidate;
+
+if (typeof window !== "undefined") {
+    RTCPeerConnection = window.RTCPeerConnection;
+    RTCSessionDescription = window.RTCSessionDescription;
+    RTCIceCandidate = window.RTCIceCandidate;
+}
 
 
 const config = {

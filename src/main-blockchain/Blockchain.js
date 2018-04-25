@@ -23,7 +23,7 @@ class Blockchain{
         this.Chain = new MainBlockchain( undefined );
         this.blockchain = this.Chain;
 
-        this._synchronized = true;
+        this._synchronized = undefined;
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
 
