@@ -142,14 +142,18 @@ class Blockchain{
      */
     async synchronizeBlockchain(firstTime, synchronizeComplete=false){
 
-        if (this.synchronized === false) return false;
+        if (this.synchronized === false) return;
 
         this.synchronized = false;
-
         console.warn("################### RESYNCHRONIZATION STARTED ##########");
 
-        StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});
-        this.Mining.stopMining();
+        let suspendMining = false;
+        if (!this.blockchain.light || (this.blockchain.light && NodesList.nodes.length <= 0)) suspendMining = true;
+
+        if (suspendMining) {
+            StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});
+            this.Mining.stopMining();
+        }
 
         while (!this.synchronized){
 
@@ -179,10 +183,13 @@ class Blockchain{
         }
 
         this.synchronized = true;
-        this.startMining();
-
         console.warn( "Blockchain Ready to Mine" );
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine" } );
+
+        if (suspendMining) {
+            this.startMining();
+            StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"});
+        }
+
     }
 
     get loaded(){

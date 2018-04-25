@@ -47,8 +47,10 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 if (proofPiData === null || proofPiData === undefined)
                     BansList.addBan(socket, 10000, "proofPiFailed");
-                else
+                else {
+                    this.sockets[0] = socket;
                     break;
+                }
             }
 
             if (proofPiData === null || proofPiData === undefined)
