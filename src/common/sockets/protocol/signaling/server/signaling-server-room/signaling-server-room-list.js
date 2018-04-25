@@ -1,8 +1,8 @@
 import SocketAddress from 'common/sockets/socket-address'
 import SignalingServerRoomConnectionObject from './signaling-server-room-connection-object';
 import NodesList from 'node/lists/nodes-list'
-import ConnectionsType from "node/lists/types/Connections-Type"
-import NodesType from "node/lists/types/Nodes-Type"
+import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
+import NODES_TYPE from "node/lists/types/Nodes-Type"
 /*
     The List is populated with Node Sockets who are available for WebRTC
  */
@@ -77,7 +77,7 @@ class SignalingServerRoomList {
 
     _disconnectedNode(nodesListObject){
 
-        if ( [ ConnectionsType.CONNECTION_CLIENT_SOCKET, ConnectionsType.CONNECTION_WEBRTC].indexOf(nodesListObject.connectionType) )    // signaling service on webpeer
+        if ( [ CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, CONNECTIONS_TYPE.CONNECTION_WEBRTC].indexOf(nodesListObject.connectionType) )    // signaling service on webpeer
 
             for (let i = this.list.length-1; i >= 0 ; i--)
                 if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){

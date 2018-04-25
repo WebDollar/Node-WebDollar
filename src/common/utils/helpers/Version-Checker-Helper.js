@@ -1,4 +1,4 @@
-class VersionChecker{
+class VersionCheckerHelper{
 
     detectMobile(){
 
@@ -22,4 +22,4 @@ class VersionChecker{
 
 }
 
-export default new VersionChecker();
+export default new VersionCheckerHelper();

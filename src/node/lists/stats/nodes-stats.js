@@ -2,7 +2,7 @@ import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
-import ConnectionsType from "node/lists/types/Connections-Type"
+import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 
 class NodesStats {
 
@@ -32,12 +32,12 @@ class NodesStats {
 
 
         let string1 = "";
-        let clients = NodesList.getNodes(ConnectionsType.CONNECTION_CLIENT_SOCKET);
+        let clients = NodesList.getNodes(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
         for (let i=0; i<clients.length; i++)
             string1 += '('+clients[i].socket.node.sckAddress.toString() + ')   ';
 
         let string2 = "";
-        let server = NodesList.getNodes( ConnectionsType.CONNECTION_SERVER_SOCKET );
+        let server = NodesList.getNodes( CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET );
         for (let i=0; i<server.length; i++)
             string2 += '(' + server[i].socket.node.sckAddress.toString() + ')   ';
 
@@ -48,9 +48,9 @@ class NodesStats {
 
     _recalculateStats(nodesListObject, printStats = true){
 
-        this.statsClients = NodesList.countNodesByConnectionType(ConnectionsType.CONNECTION_CLIENT_SOCKET);
-        this.statsServer = NodesList.countNodesByConnectionType(ConnectionsType.CONNECTION_SERVER_SOCKET);
-        this.statsWebPeers = NodesList.countNodesByConnectionType(ConnectionsType.CONNECTION_WEBRTC);
+        this.statsClients = NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
+        this.statsServer = NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET);
+        this.statsWebPeers = NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_WEBRTC);
 
         this.statsWaitlistFullNodes= NodesWaitlist.waitListFullNodes.length;
         this.statsWaitlistLightNodes = NodesWaitlist.waitListLightNodes.length;

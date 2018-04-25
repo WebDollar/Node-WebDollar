@@ -1,7 +1,7 @@
 import NodesList from 'node/lists/nodes-list'
 import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
-import VersionChecker from "common/utils/helpers/Version-Checker"
+import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain"
 const EventEmitter = require('events');
@@ -20,7 +20,7 @@ class InterfaceBlockchainAgent{
 
         this.blockchain = blockchain;
 
-        if (VersionChecker.detectMobileAndTablet())
+        if (VersionCheckerHelper.detectMobileAndTablet())
             this.AGENT_TIME_OUT = 110000;
         else
             this.AGENT_TIME_OUT = 60000;

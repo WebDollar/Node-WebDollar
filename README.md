@@ -135,7 +135,7 @@ open web page `dist_bundle/browser/browser.html`
 #### 5.7 Running Server in Node.js
 
 ```
-npm run start_double_connections
+npm run commands
 npm run start
 ```
 

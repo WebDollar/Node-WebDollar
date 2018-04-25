@@ -51,9 +51,9 @@ User-Interface-WebDollar/dist_bundle/WebDollar-Protocol-bundle\.js\.map
 
 blockchainDB/
 
-poolDB/
+defaultDB/
 
-"blockchainDB"/
+poolDB/
 
 blockchainDB2/
 

@@ -9,7 +9,7 @@ const EventEmitter = require('events');
 import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
-import ConnectionsType from "node/lists/types/Connections-Type"
+import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 
 const wrtc = require("wrtc");
 let RTCPeerConnection = wrtc.RTCPeerConnection;
@@ -446,7 +446,7 @@ class NodeWebPeerRTC {
     initializePeer(validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(this.peer, ConnectionsType.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (NodesList.registerUniqueSocket(this.peer, CONNECTIONS_TYPE.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 

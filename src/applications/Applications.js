@@ -2,8 +2,9 @@ import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper'
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 import consts from 'consts/const_global'
-import NodesType from 'node/lists/types/Nodes-Type'
-import ConnectionsType from 'node/lists/types/Connections-Type'
+import NODES_TYPE from 'node/lists/types/Nodes-Type'
+import CONNECTIONS_TYPE from 'node/lists/types/Connections-Type'
+import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 
 class Applications{
 
@@ -12,10 +13,13 @@ class Applications{
         this.GeoHelper = GeoHelper;
         this.AddressHelper = InterfaceBlockchainAddressHelper;
         this.CoinsHelper = WebDollarCoins;
+        this.VersionCheckerHelper = VersionCheckerHelper;
+
+
         this.CONSTS = consts;
 
-        this.NodesType = NodesType;
-        this.ConnectionsType = ConnectionsType;
+        this.NODES_TYPE = NODES_TYPE;
+        this.CONNECTIONS_TYPE = CONNECTIONS_TYPE;
     }
 
 }

@@ -1,5 +1,5 @@
 import NodesList from 'node/lists/nodes-list'
-import NodesType from "node/lists/types/Nodes-Type"
+import NODES_TYPE from "node/lists/types/Nodes-Type"
 
 class NodesWaitlistObject {
 
@@ -23,7 +23,7 @@ class NodesWaitlistObject {
 
         this.level = level||0;
 
-        if (type === undefined) type = NodesType.NODE_TERMINAL;
+        if (type === undefined) type = NODES_TYPE.NODE_TERMINAL;
 
         this.type = type;
     }
