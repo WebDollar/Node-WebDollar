@@ -3,6 +3,7 @@ import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
 import consts from 'consts/const_global'
+import Blockchain from "main-blockchain/Blockchain"
 
 class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
@@ -23,7 +24,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
             if (includeEdges) {
 
-                if (this.blockchain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.ACCOUNTANT_TREE_HARD_FORK )
+                if ( Blockchain.Chain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.ACCOUNTANT_TREE_HARD_FORK )
                     buffer.push(Serialization.serializeNumber2Bytes(this.edges.length));
                 else
                     buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
@@ -58,7 +59,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
                 for (let i = 0; i < length; i++) {
 
                     let valueLength;
-                    if (this.blockchain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.ACCOUNTANT_TREE_HARD_FORK ){
+                    if ( Blockchain.Chain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.ACCOUNTANT_TREE_HARD_FORK ){
 
                         valueLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 bytes
                         offset += 2;
