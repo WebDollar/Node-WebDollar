@@ -34,6 +34,8 @@ consts.BLOCKCHAIN = {
 
     HARD_FORKS : {
 
+        ACCOUNTANT_TREE_HARD_FORK: 38678,
+
     }
 
 

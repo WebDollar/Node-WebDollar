@@ -2,6 +2,7 @@ import InterfaceTreeNode from 'common/trees/Interface-Tree-Node'
 import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
+import consts from 'consts/const_global'
 
 class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
@@ -22,7 +23,10 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
             if (includeEdges) {
 
-                buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
+                if (this.blockchain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.ACCOUNTANT_TREE_HARD_FORK )
+                    buffer.push(Serialization.serializeNumber2Bytes(this.edges.length));
+                else
+                    buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
 
                 for (let i = 0; i < this.edges.length; i++) {
                     buffer.push(Serialization.serializeNumber1Byte(this.edges[i].label.length));
@@ -53,8 +57,16 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
                 for (let i = 0; i < length; i++) {
 
-                    let valueLength = buffer[offset]; //1 byte
-                    offset += 1;
+                    let valueLength;
+                    if (this.blockchain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.ACCOUNTANT_TREE_HARD_FORK ){
+
+                        valueLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 bytes
+                        offset += 2;
+
+                    } else {
+                        valueLength = buffer[offset]; //1 byte
+                        offset += 1;
+                    }
 
                     let label = BufferExtended.substr(buffer, offset, valueLength);
                     offset += valueLength;

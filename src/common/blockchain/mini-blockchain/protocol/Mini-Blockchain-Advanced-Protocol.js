@@ -41,7 +41,7 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
 
                         if ((serialization.length - data.substr.startIndex) > data.substr.count)
-                            moreChunks = true
+                            moreChunks = true;
                         else
                             moreChunks = false;
 
