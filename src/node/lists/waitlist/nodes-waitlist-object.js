@@ -52,8 +52,13 @@ class NodesWaitlistObject {
     socketErrorConnected(){
         this.errorTrial++;
 
-        if (this.findBackedBy("fallback") !== null)
-            this.errorTrial = Math.min( this.errorTrial, 10);
+        if (this.findBackedBy("fallback") !== null) {
+
+            if (process.env.BROWSER)
+                this.errorTrial = Math.min(this.errorTrial, 5);
+            else
+                this.errorTrial = Math.min(this.errorTrial, 5 + Math.floor( Math.random() * 5) );
+        }
 
     }
 
