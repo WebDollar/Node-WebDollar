@@ -7,13 +7,11 @@ let consts = {
 
 
 
-
-
 consts.BLOCKCHAIN = {
 
     DIFFICULTY:{
         NO_BLOCKS : 10,
-        TIME_PER_BLOCK : 20, //in s, timestamp in UNIX format
+        TIME_PER_BLOCK : 40, //in s, timestamp in UNIX format
     },
 
     TIMESTAMP:{
@@ -34,7 +32,6 @@ consts.BLOCKCHAIN = {
 
     HARD_FORKS : {
 
-        ACCOUNTANT_TREE_HARD_FORK: 38678,
 
     }
 
@@ -198,10 +195,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.03",
-        VERSION_COMPATIBILITY: "1.03",
+        VERSION: "1.04",
+        VERSION_COMPATIBILITY: "1.04",
         PROTOCOL: "WebDollar",
-        SSL: true,
+        SSL: false,
 
 
         PORT: 80, //port

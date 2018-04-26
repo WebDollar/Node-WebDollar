@@ -24,10 +24,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
             if (includeEdges) {
 
-                if ( Blockchain.Chain.agent.light || Blockchain.Chain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.ACCOUNTANT_TREE_HARD_FORK )
-                    buffer.push(Serialization.serializeNumber2Bytes(this.edges.length));
-                else
-                    buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
+                buffer.push(Serialization.serializeNumber2Bytes(this.edges.length));
 
                 for (let i = 0; i < this.edges.length; i++) {
                     buffer.push(Serialization.serializeNumber1Byte(this.edges[i].label.length));
@@ -55,15 +52,8 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
                 let length ; //1 byte
 
-                if ( Blockchain.Chain.agent.light || Blockchain.Chain.blocks.length > consts.BLOCKCHAIN.HARD_FORKS.ACCOUNTANT_TREE_HARD_FORK ){
-
-                    length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 bytes
-                    offset += 2;
-
-                } else {
-                    length = buffer[offset]; //1 byte
-                    offset += 1;
-                }
+                length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 bytes
+                offset += 2;
 
 
                 for (let i = 0; i < length; i++) {
