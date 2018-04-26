@@ -416,6 +416,18 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     }
 
+
+    getAccountantTreeList(list){
+
+        if (this.isLeaf())
+            list.push({address:this.getAddress(), balance: this.getBalance() });
+
+        for (let i = 0; i < this.edges.length; i++)
+            this.edges[i].targetNode.getAccountantTreeList( list );
+
+        return list;
+    }
+
 }
 
 export default MiniBlockchainAccountantTreeNode

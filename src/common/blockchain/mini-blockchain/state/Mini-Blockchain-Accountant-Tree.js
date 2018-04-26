@@ -242,16 +242,33 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
     }
 
-    printAccountantTree(node, count = 0) {
+    printAccountantTree() {
 
-        if (node === undefined) node = this.root;
+        let list = this.getAccountantTreeList();
 
-        if (node.isLeaf()) {
-            console.info(++count, node.getAddress(), node.getBalance() / WebDollarCoins.WEBD );
+        let obj = {};
+        for (let i=0; i<list.length; i++) {
+            console.info( i, list[i].address, list[i].balance / WebDollarCoins.WEBD );
+
+            obj[list[i].address] = list[i].balance / WebDollarCoins.WEBD;
         }
 
-        for (let i = 0; i < node.edges.length; i++)
-            this.printAccountantTree( node.edges[i].targetNode, count );
+        console.log(JSON.stringify(obj));
+
+        return list;
+    }
+
+    getAccountantTreeList(){
+
+        let list = [];
+        this.root.getAccountantTreeList(list);
+
+        list.sort(function(a, b) {
+            return a.balance - b.balance;
+        });
+
+        return list;
+
     }
 
 }
