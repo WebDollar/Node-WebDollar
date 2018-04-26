@@ -46,5 +46,9 @@ export default {
             "addr": ["hcern.ddns.net:80"]
         },
 
+        {
+            "addr": ["hcern.ddns.net:443"]
+        },
+
     ]
 }

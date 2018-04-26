@@ -122,18 +122,23 @@ class NodesWaitlist {
 
         this._deleteUselessWaitlist(NODES_TYPE.NODE_TERMINAL);
 
-        if (NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) === 0){
 
-            for (let i=0; i < this.waitListFullNodes.length; i++)
-                if ( this.waitListFullNodes[i].findBackedBy("fallback") !== null)
-                    this._tryToConnectNextNode(this.waitListFullNodes[i]);
-
-        } else {
-
-            for (let i=0; i < this.waitListFullNodes.length; i++)
+        for (let i=0; i < this.waitListFullNodes.length; i++)
+            if ( this.waitListFullNodes[i].findBackedBy("fallback") !== null)
                 this._tryToConnectNextNode(this.waitListFullNodes[i]);
 
-        }
+        // if (NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) === 0){
+        //
+        //     for (let i=0; i < this.waitListFullNodes.length; i++)
+        //         if ( this.waitListFullNodes[i].findBackedBy("fallback") !== null)
+        //             this._tryToConnectNextNode(this.waitListFullNodes[i]);
+        //
+        // } else {
+        //
+        //     for (let i=0; i < this.waitListFullNodes.length; i++)
+        //         this._tryToConnectNextNode(this.waitListFullNodes[i]);
+        //
+        // }
 
     }
 
