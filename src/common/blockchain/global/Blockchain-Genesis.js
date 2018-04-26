@@ -5,7 +5,7 @@ class BlockchainGenesis{
 
     constructor(){
 
-        this.hashPrev = new Buffer("166AFE589A3B2AC6EFE88EFF8735B26933576EB751FA565DCA37FC5974C58F80", "hex");
+        this.hashPrev = new Buffer("166AFE589A322AC6EFE88EFF8735B26933576EB751FA565DCA37FC5974C58F80", "hex");
 
         this.timeStamp = 0;
         this.timeStampOffset = 1523836074;
