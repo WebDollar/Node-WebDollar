@@ -113,8 +113,6 @@ class NodeClient {
                 resolve(false);
             }
 
-            resolve(true);
-
         });
 
     }

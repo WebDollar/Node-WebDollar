@@ -51,6 +51,10 @@ class NodesWaitlistObject {
 
     socketErrorConnected(){
         this.errorTrial++;
+
+        if (this.findBackedBy("fallback") !== null)
+            this.errorTrial = Math.min( this.errorTrial, 10);
+
     }
 
     checkIsConnected() {
