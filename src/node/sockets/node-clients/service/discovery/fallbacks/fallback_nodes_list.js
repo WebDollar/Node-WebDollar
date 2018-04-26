@@ -19,6 +19,14 @@ export default {
         },
 
         {
+            "addr": ["webdollar.ddns.net:8082"],
+        },
+
+        {
+            "addr": ["webdollar.ddns.net:8089"],
+        },
+
+        {
             "addr": ["webdollar.ddns.net:2095"],
         },
 
