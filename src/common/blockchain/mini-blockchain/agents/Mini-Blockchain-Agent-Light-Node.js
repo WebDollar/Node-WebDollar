@@ -64,24 +64,32 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
 
         NodesList.emitter.on("nodes-list/connected", async (result) => {
 
-            if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC) > WEBRTC_MINIMUM_LIGHT) {
+            let webrtc = NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC);
+            if ( webrtc > WEBRTC_MINIMUM_LIGHT) {
                 //let's disconnect from full nodes
 
                 if ( this.status !== AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC ) {
 
                     this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC;
 
-                    if (Math.random() > WEBRTC_MINIMUM_LIGHT_PROBABILITY) // most will disconnect from full nodes
-                        for (let i=NodesList.nodes.length-1; i>=0; i--)
-                            if ( NodesList.nodes[i].connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET ){
-                                NodesList.nodes[i].socket.disconnect();
-                            }
+                    if (Math.random() > WEBRTC_MINIMUM_LIGHT_PROBABILITY + 0.15) // most will disconnect from full nodes
+                        NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
 
                 }
+
+            }
+
+            if ( webrtc > WEBRTC_MINIMUM_LIGHT + 2) {
+
+                if (Math.random() <= 0.1)
+                    NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
+
             }
 
         });
     }
+
+
 
 }
 

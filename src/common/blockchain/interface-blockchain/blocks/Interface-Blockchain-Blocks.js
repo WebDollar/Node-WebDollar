@@ -1,5 +1,6 @@
 import consts from 'consts/const_global'
-import StatusEvents from "common/events/Status-Events.js"
+import StatusEvents from "common/events/Status-Events"
+var BigNumber = require ('bignumber.js');
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
  **/
@@ -12,6 +13,8 @@ class InterfaceBlockchainBlocks{
 
         this.blocksStartingPoint = 0;
         this.length = 0;
+
+        this.networkHashRate = 0 ;
     }
 
     addBlock(block){
@@ -74,6 +77,29 @@ class InterfaceBlockchainBlocks{
         return this[ this.blocksStartingPoint ];
     }
 
+    recalculateNetworkHashRate(){
+
+        let MaxTarget = new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+        let SumDiff = new BigNumber( 0 );
+
+        let how_much_it_took_to_mine_X_Blocks = 0;
+        for (let i=this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; i<this.blockchain.blocks.endingPosition; i++) {
+
+            if (this.blockchain.blocks[i] === undefined) continue;
+
+            let Diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
+            SumDiff = SumDiff.plus(Diff);
+
+            how_much_it_took_to_mine_X_Blocks += this.blockchain.getTimeStamp(i+1) - this.blockchain.getTimeStamp(i);
+        }
+
+        let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toNumber();
+
+        StatusEvents.emit("blockchain/new-network-hash-rate", answer);
+
+        return answer;
+
+    }
 
 }
 

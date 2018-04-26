@@ -131,6 +131,8 @@ class InterfaceBlockchain {
 
     _onBlockCreated(block, saveBlock){
 
+        this.blocks.recalculateNetworkHashRate();
+
     }
 
     /**

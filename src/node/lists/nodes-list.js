@@ -1,6 +1,7 @@
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import SocketAddress from 'common/sockets/socket-address'
 import NodesListObject from './node-list-object.js';
+import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 
 const EventEmitter = require('events');
 
@@ -176,6 +177,15 @@ class NodesList {
                 this.nodes.splice(i,1);
 
         setTimeout(()=>{this.removeDisconnectedSockets()}, 2000);
+    }
+
+    disconnectAllNodes(connectionType = CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET){
+
+        for (let i=NodesList.nodes.length-1; i>=0; i--)
+            if ( NodesList.nodes[i].connectionType === connectionType ){
+                NodesList.nodes[i].socket.disconnect();
+            }
+
     }
 
 }
