@@ -198,7 +198,7 @@ consts.SETTINGS = {
         VERSION: "1.05",
         VERSION_COMPATIBILITY: "1.05",
         PROTOCOL: "WebDollar",
-        SSL: false,
+        SSL: true,
 
 
         PORT: 80, //port
