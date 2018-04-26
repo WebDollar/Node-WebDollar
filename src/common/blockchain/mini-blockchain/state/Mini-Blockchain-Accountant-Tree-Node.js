@@ -4,6 +4,7 @@ import consts from 'consts/const_global'
 import InterfaceMerkleRadixTreeNode from "common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree-Node"
 import Blockchain from "main-blockchain/Blockchain"
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 
 class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
@@ -386,6 +387,32 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             throw {message: "Label is longer than any address"}
         else
             return false;
+
+    }
+
+    getAddress(){
+
+        let node = this;
+        let buffers = [];
+
+        while (node !== null){
+
+            if (node.parent !== null)
+                for (let i=0; i<node.parent.edges.length; i++)
+                    if (node.parent.edges[i].targetNode === node){
+
+                        buffers.push( node.parent.edges[i].label );
+                        break;
+                    }
+
+
+            node = node.parent;
+
+        }
+
+
+        if (buffers.length === 0) return null;
+        else return BufferExtended.toBase (  InterfaceBlockchainAddressHelper.generateAddressWIF( Buffer.concat( buffers ) ) );
 
     }
 
