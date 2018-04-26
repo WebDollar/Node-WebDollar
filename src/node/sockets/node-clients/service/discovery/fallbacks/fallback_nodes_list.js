@@ -21,6 +21,9 @@ export default {
         {
             "addr": ["webdollar.ddns.net:8082"],
         },
+        {
+            "addr": ["webdollar.ddns.net:8083"],
+        },
 
         {
             "addr": ["webdollar.ddns.net:8089"],
@@ -45,6 +48,9 @@ export default {
             "addr": ["hcern.ddns.net:443"]
         },
         {
+            "addr": ["hcern.ddns.net:8080"]
+        },
+        {
             "addr": ["robitza.ddns.net:80"]
         },
         {
@@ -56,7 +62,6 @@ export default {
         {
             "addr": ["robitza.ddns.net:8081"]
         },
-
 
     ]
 }

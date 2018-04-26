@@ -113,6 +113,10 @@ class NodeClient {
                 resolve(false);
             }
 
+            setTimeout(()=>{
+                resolve(false);
+            }, 15000)
+
         });
 
     }
