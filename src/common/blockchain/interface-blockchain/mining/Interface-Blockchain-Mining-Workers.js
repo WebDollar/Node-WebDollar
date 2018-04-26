@@ -56,7 +56,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
 
     _getWorker(){
-        return null;
+        return {};
     }
 
 
@@ -97,9 +97,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         if (number === 0)
             return;
 
-        console.log("number", number);
+        console.log( "number", number );
 
-        this.workers.addWorkers(-number);
+        this.workers.addWorkers( - number );
 
         this.workers.reduceWorkers();
 
@@ -166,30 +166,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             this._hashesPerSecond += event.data.nonceWork;
 
         } else
-        if (event.data.message === "algorithm"){
-
-            console.log("algorithm information", event.data.answer);
-
-            if (event.data.answer === "WebAssembly supported" || event.data.answer === "ASM.JS supported" ){
-
-                if (event.data.answer === "ASM.JS supported")
-                    StatusEvents.emit("validation/status", {type: "MINING", message: "WebAssembly not supported"});
-
-                this.workers._initializeWorker( worker );
-
-            } else { // Argon2 is not supported in Browser
-
-                StatusEvents.emit("validation/status", {type: "MINING", message: "ASM.JS not supported"});
-
-                this.stopMining();
-            }
-
-        } else
-        if (event.data.message === "error"){
-
-        }
-        else
         if (event.data.message === "results") {
+
+            worker.dateLast = new Date();
 
             //console.log("REEESULTS!!!", event.data, worker.suspended);
 
@@ -215,16 +194,16 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                             //this._semaphoreProcessing.processSempahoreCallback( ()=>{
 
-                                console.log('processing');
+                            console.log('processing');
 
-                                this._suspendMiningWorking();
-                                this.workers.suspendWorkers();
+                            this._suspendMiningWorking();
+                            this.workers.suspendWorkers();
 
-                                this._workerResolve({
-                                    result: true,
-                                    hash: new Buffer(event.data.hash),
-                                    nonce: event.data.nonce,
-                                });
+                            this._workerResolve({
+                                result: true,
+                                hash: new Buffer(event.data.hash),
+                                nonce: event.data.nonce,
+                            });
 
                             //});
 
@@ -242,6 +221,28 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             this._nonce += this.WORKER_NONCES_WORK;
 
         } else
+        if (event.data.message === "algorithm"){
+
+            console.log("algorithm information", event.data.answer);
+
+            if (event.data.answer === "WebAssembly supported" || event.data.answer === "ASM.JS supported" ){
+
+                if (event.data.answer === "ASM.JS supported")
+                    StatusEvents.emit("validation/status", {type: "MINING", message: "WebAssembly not supported"});
+
+                this.workers._initializeWorker( worker );
+
+            } else { // Argon2 is not supported in Browser
+
+                StatusEvents.emit("validation/status", {type: "MINING", message: "ASM.JS not supported"});
+
+                this.stopMining();
+            }
+
+        } else
+        if (event.data.message === "error"){
+
+        }
         if (event.data.message === "log") {
             console.log("worker", event.data.log);
         }

@@ -122,9 +122,14 @@ class MiniBlockchain extends  inheritBlockchain{
 
         await inheritBlockchain.prototype._onBlockCreated.call(this, block, saveBlock);
 
-        if (saveBlock)
-            if ( ! (await this.accountantTree.saveMiniAccountant(true)))
+        if (saveBlock) {
+
+            if (process.env.BROWSER)
+                return false;
+
+            if (!(await this.accountantTree.saveMiniAccountant(true)))
                 console.error("Error Saving Mini Accountant Tree");
+        }
     }
 
     getBalances(address){

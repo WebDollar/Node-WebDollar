@@ -1,8 +1,8 @@
 import StatusEvents from "common/events/Status-Events";
 
-class InterfaceBlockchainMiningWorkersList{
+class InterfaceBlockchainMiningWorkersList {
 
-    constructor(mining){
+    constructor(mining) {
 
         this.mining = mining;
 
@@ -14,6 +14,34 @@ class InterfaceBlockchainMiningWorkersList{
         this.difficultyTarget = undefined;
 
         this.workers = 0; // browser webWorkers, backbone cores
+
+        this._id = 0;
+
+        setInterval(this._makeUnworkingWorkersToWork.bind(this), 2000);
+
+    }
+
+
+    _makeUnworkingWorkersToWork() {
+
+        //TODO avoid terminating workers
+
+        let time = new Date().getTime();
+        let terminated = false;
+
+        for (let i = this._workersList.length-1; i >= 0; i--){
+
+            if ( this._workersList[i].dateLast !== undefined && ( time - this._workersList[i].dateLast.getTime() > 4000)  ){
+
+                this.terminateWorker(this._workersList[i]);
+                this._workersList.splice(i, 1);
+
+                terminated = true;
+            }
+        }
+
+        if (terminated)
+            this.createWorkers();
 
     }
 
@@ -33,7 +61,7 @@ class InterfaceBlockchainMiningWorkersList{
         StatusEvents.emit('mining/workers-changed', this.workers);
     }
 
-    initializeWorkerFirstTime(worker){
+    _initializeWorkerFirstTime(worker){
 
         worker.suspended = false;
         worker.postMessage( {message: "initialize-algorithm"} );
@@ -46,6 +74,8 @@ class InterfaceBlockchainMiningWorkersList{
 
         this.mining._nonce += this.mining.WORKER_NONCES_WORK;
         this.mining._hashesPerSecond += this.mining.WORKER_NONCES_WORK;
+
+        worker.dateLast = new Date();
     }
 
     initializeWorkers(block, difficultyTarget){
@@ -64,7 +94,7 @@ class InterfaceBlockchainMiningWorkersList{
         while (this._workersList.length < this.workers) {
             console.log("createWorkers");
             let worker = this.createWorker();
-            this.initializeWorkerFirstTime(worker);
+            this._initializeWorkerFirstTime(worker);
         }
     }
 
@@ -101,6 +131,9 @@ class InterfaceBlockchainMiningWorkersList{
 
         if (worker === undefined || worker === null)
             throw {message: 'No Worker specified'};
+
+        worker.id = ++this._id;
+        worker.dateLast = new Date();
 
         this._workersList.push(worker);
 
