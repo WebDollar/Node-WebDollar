@@ -7,6 +7,7 @@ import NODES_TYPE from "node/lists/types/Nodes-Type"
 import CONNECTION_TYPE from "../types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain";
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
+import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 
 const EventEmitter = require('events');
 
@@ -122,10 +123,20 @@ class NodesWaitlist {
 
         this._deleteUselessWaitlist(NODES_TYPE.NODE_TERMINAL);
 
+        //mobiles usually use mobile internet are they mostly block non 80 blocks
+        let isMobile =  VersionCheckerHelper.detectMobile();
 
         for (let i=0; i < this.waitListFullNodes.length; i++)
-            if ( this.waitListFullNodes[i].findBackedBy("fallback") !== null)
+            if ( this.waitListFullNodes[i].findBackedBy("fallback") !== null) {
+
+                if (isMobile)
+                    if ( this.waitListFullNodes[i].sckAddresses[0].port !== "80" )
+                        continue;
+
+
+
                 this._tryToConnectNextNode(this.waitListFullNodes[i]);
+            }
 
         // if (NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) === 0){
         //
