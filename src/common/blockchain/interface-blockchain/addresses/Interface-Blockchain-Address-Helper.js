@@ -131,8 +131,6 @@ class InterfaceBlockchainAddressHelper{
         //could use publicKeyBytesCompressed as well
 
         //bitcoin original
-        //let hash160 = CryptoJS.RIPEMD160(CryptoJS.util.hexToBytes(CryptoJS.SHA256(publicKey.toBytes())))
-
         let hash160 =  WebDollarCrypto.RIPEMD160(WebDollarCrypto.SHA256(publicKey));
 
         if (showDebug)
