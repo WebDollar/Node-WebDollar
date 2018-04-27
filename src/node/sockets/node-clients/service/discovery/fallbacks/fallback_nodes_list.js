@@ -29,7 +29,7 @@ export default {
         },
 
         {
-            "addr": ["webdollar.ddns.net:8089"],
+            "addr": ["webdollar.ddns.net:8091"],
         },
 
         {

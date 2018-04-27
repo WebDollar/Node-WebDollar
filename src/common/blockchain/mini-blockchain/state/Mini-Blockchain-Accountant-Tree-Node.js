@@ -5,6 +5,7 @@ import InterfaceMerkleRadixTreeNode from "common/trees/radix-tree/merkle-tree/In
 import Blockchain from "main-blockchain/Blockchain"
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
 class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
@@ -417,13 +418,25 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     }
 
 
-    getAccountantTreeList(list){
+    getAccountantTreeList(list, bIncludeMiningReward = true, excludeEmpty = true ){
 
-        if (this.isLeaf())
-            list.push({address:this.getAddress(), balance: this.getBalance() });
+        if (this.isLeaf()) {
+
+            let balance = this.getBalance();
+
+            if (excludeEmpty)
+                if (balance === 0) return false;
+
+            if (bIncludeMiningReward)
+                for (let i=1; i<=40; i++ )
+                    if ( balance === BlockchainMiningReward.getReward(i) )
+                        return;
+
+            list.push({address: this.getAddress(), balance: balance });
+        }
 
         for (let i = 0; i < this.edges.length; i++)
-            this.edges[i].targetNode.getAccountantTreeList( list );
+            this.edges[i].targetNode.getAccountantTreeList(list);
 
         return list;
     }
