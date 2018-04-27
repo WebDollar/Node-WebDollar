@@ -65,6 +65,7 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
         NodesList.emitter.on("nodes-list/connected", async (result) => {
 
             let webrtc = NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC);
+
             if ( webrtc > WEBRTC_MINIMUM_LIGHT) {
                 //let's disconnect from full nodes
 

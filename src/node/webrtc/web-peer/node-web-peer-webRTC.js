@@ -10,7 +10,7 @@ import SocketExtend from 'common/sockets/socket-extend'
 import NodesList from 'node/lists/nodes-list'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
-
+import consts from 'consts/const_global'
 
 let RTCPeerConnection;
 let RTCSessionDescription;
@@ -57,7 +57,8 @@ class NodeWebPeerRTC {
 
     constructor(){
 
-        console.log("Peer WebRTC Client constructor");
+        if (consts.DEBUG)
+            console.log("Peer WebRTC Client constructor");
 
         this.peer = null;
 
@@ -88,7 +89,7 @@ class NodeWebPeerRTC {
             if (!event || !event.candidate) return;
 
 
-            console.log("onicecandidate",event.candidate);
+            //console.log("onicecandidate",event.candidate);
             callbackSignalingServerSendIceCandidate(event.candidate);
 
         };
@@ -301,7 +302,9 @@ class NodeWebPeerRTC {
 
                 // Add the new ICE candidate to our connections remote description
                 try {
-                    console.log("inputSignal.candidate", inputSignal);
+
+                    if (consts.DEBUG)
+                        console.log("inputSignal.candidate", inputSignal);
 
                     if (this.peer.setLocalDescription === true) {
 

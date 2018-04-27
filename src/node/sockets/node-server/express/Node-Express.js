@@ -5,6 +5,9 @@ const express = require('express')
 const cors = require('cors');
 const fs = require('fs')
 import consts from 'consts/const_global'
+import Blockchain from "main-blockchain/Blockchain"
+import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
+import NodesList from 'node/lists/nodes-list'
 
 class NodeExpress{
 
@@ -70,8 +73,19 @@ class NodeExpress{
         this.app.get('/', (req, res) => {
 
             res.json({
+
                 protocol: 'WebDollar',
-                version: consts.SETTINGS.NODE.VERSION
+                version: consts.SETTINGS.NODE.VERSION,
+                blocks: {
+                    length: Blockchain.blockchain.blocks.length,
+                    lastBlockHash: Blockchain.blockchain.blocks.last.hash.toString("hex"),
+                },
+                sockets:{
+                    clients: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET),
+                    servers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET),
+                    webpeers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_WEBRTC),
+                }
+
             });
 
         });
