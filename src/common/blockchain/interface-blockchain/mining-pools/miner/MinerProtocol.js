@@ -8,8 +8,9 @@ class MinerProtocol {
         NodesList.emitter.on("nodes-list/connected", (result) => { this._subscribeMiner(result) } );
         NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._unsubscribeMiner(result ) });
         
-        this.hashList = [];
+        this._hashList = [];
 
+        this._miningData = {blockData: undefined, difficultyTarget: undefined};
     }
 
     _subscribeMiner(nodesListObject){
@@ -40,6 +41,9 @@ class MinerProtocol {
     
     getMiningData() {
         //TODO: get data from PoolLeader and deserialize
+        //mining data should be like {blockData: , difficultyTarget: }
+        //blockData should be like this:  {height: , difficultyTargetPrev: , computedBlockPrefix: , nonce: }
+        return this._miningData;
     }
 
     sendTaskResponse(socket){
@@ -81,7 +85,7 @@ class MinerProtocol {
 
     }
 
-    async _mine() {
+    async _mine(blockData, difficultyTarget) {
 
     }
 
@@ -90,11 +94,13 @@ class MinerProtocol {
         //TODO: create a list with best X hashes
         let answer;
         try {
-            answer = await this.mine(block, difficulty);
+            answer = await this._mine(this._miningData.blockData, this._miningData.difficultyTarget);
         } catch (exception){
-            console.error("Couldn't mine block ", block.height, exception);
+            console.error("Couldn't mine block ", this._miningData.blockData, exception);
             answer.result = false;
         }
+
+        return answer;
 
     }
 
