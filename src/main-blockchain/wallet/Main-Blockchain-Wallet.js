@@ -131,7 +131,7 @@ class MainBlockchainWallet{
 
     async loadAddresses() {
 
-        let buffer = await this.db.get( this.walletFileName, 6000, true );
+        let buffer = await this.db.get( this.walletFileName, 60000, true );
 
         if ( buffer === null || buffer === undefined)
             return false;
