@@ -1,4 +1,4 @@
-1. npm install pm2 -g
+1. npm install pm2 -g --unsafe-perm
 
 
 2. pm2 start npm -- run start 
@@ -49,3 +49,6 @@ pm2 start pm2.json
   ]
 }
 ```
+
+
+pm2 start pm2-start.json

@@ -73,7 +73,8 @@ class CLI{
 
     async _start() {
 
-        await Blockchain.loadWallet();
+        if (Blockchain !== undefined)
+            await Blockchain.loadWallet();
 
         this._showCommands();
         this.WEBD_CLI.prompt();

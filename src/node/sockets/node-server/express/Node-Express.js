@@ -27,7 +27,13 @@ class NodeExpress{
             this.app.use(cors({ credentials: true }));
 
 
-            this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
+            try {
+                this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
+            } catch (exception){
+
+                console.error("Couldn't read the SSL certificates");
+
+            }
 
             let options = {};
 

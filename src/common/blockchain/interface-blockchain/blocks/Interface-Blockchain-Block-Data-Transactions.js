@@ -158,6 +158,15 @@ class InterfaceBlockchainBlockDataTransactions {
         return true;
     }
 
+    calculateFees(){
+
+        let fee = 0;
+        for (let i=0; i < this.transactions.length; i++){
+            fee += this.transactions.fee();
+        }
+
+        return fee;
+    }
 
 }
 
