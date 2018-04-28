@@ -1,7 +1,7 @@
-SERVER_PORT=80 INSTANCE_PREFIX=80 pm2 start  npm -- run start -- n=80
+SERVER_PORT=80 INSTANCE_PREFIX=80 pm2 start  npm -- run start
 pm2 restart npm --name "80" --update-env
 
-SERVER_PORT=443 INSTANCE_PREFIX=443 pm2 start  npm -- run start -- n=443
+SERVER_PORT=443 INSTANCE_PREFIX=443 pm2 start  npm -- run start
 pm2 restart npm --name "443" --update-env
 
 SERVER_PORT=8080 INSTANCE_PREFIX=8080 pm2 start npm -- run start
