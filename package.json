@@ -1,6 +1,6 @@
 {
   "name": "node-webdollar",
-  "version": "1.2",
+  "version": "0.1.2",
   "description": "Node of WebDollar",
   "main": "index.js",
   "scripts": {
