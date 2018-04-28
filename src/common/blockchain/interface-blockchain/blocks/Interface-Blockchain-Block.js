@@ -218,19 +218,43 @@ class InterfaceBlockchainBlock {
         return this.computedBlockPrefix;
     }
 
-
+    /**
+     * Computes block's hash
+     * @param newNonce
+     * @returns {Promise<Buffer>}
+     */
     async computeHash(newNonce){
 
         // hash is hashPow ( block header + nonce )
 
         let buffer = Buffer.concat ( [
-                                       Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
-                                       Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
-                                       this.computedBlockPrefix,
-                                       Serialization.serializeNumber4Bytes(newNonce||this.nonce ),
-                                     ] );
+            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
+            Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
+            this.computedBlockPrefix,
+            Serialization.serializeNumber4Bytes(newNonce || this.nonce),
+        ] );
 
         return  await WebDollarCrypto.hashPOW(buffer);
+    }
+
+    /**
+     * Computes a hash based on static block data
+     * @param newNonce
+     * @param height
+     * @param difficultyTargetPrev
+     * @param computedBlockPrefix
+     * @param blockNonce
+     * @returns {Promise<Buffer>}
+     */
+    static async computeHashStatic(newNonce, height, difficultyTargetPrev, computedBlockPrefix, blockNonce) {
+        let buffer = Buffer.concat ( [
+            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(height) ),
+            Serialization.serializeBufferRemovingLeadingZeros( difficultyTargetPrev ),
+            computedBlockPrefix,
+            Serialization.serializeNumber4Bytes(newNonce || blockNonce ),
+        ] );
+
+        return await WebDollarCrypto.hashPOW(buffer)
     }
 
     serializeBlock(requestHeader){
