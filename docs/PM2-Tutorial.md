@@ -52,3 +52,27 @@ pm2 start pm2.json
 
 
 pm2 start pm2-start.json
+
+pm2 script has an issue with scripts. I published an issue at pm2 github https://github.com/Unitech/pm2/issues/3633
+
+
+SERVER_PORT=80 INSTANCE_PREFIX=80 pm2 start  npm -- run start -- n=80 ;
+pm2 restart npm --name "80" --update-env ;
+
+SERVER_PORT=8080 INSTANCE_PREFIX=8080 pm2 start npm -- run start ;
+pm2 restart npm --name "8080" --update-env ;
+
+SERVER_PORT=8081 INSTANCE_PREFIX=8081 pm2 start npm -- run start ;
+pm2 restart npm --name "8081" --update-env ;
+
+SERVER_PORT=8082 INSTANCE_PREFIX=8082 pm2 start npm -- run start ;
+pm2 restart npm --name "8082" --update-env ;
+
+SERVER_PORT=8083 INSTANCE_PREFIX=8083 pm2 start npm -- run start ;
+pm2 restart npm --name "8083" --update-env ;
+
+SERVER_PORT=8084 INSTANCE_PREFIX=8084 pm2 start npm -- run start ;
+pm2 restart npm --name "8084" --update-env  
+
+SERVER_PORT=8085 INSTANCE_PREFIX=8085 pm2 start npm -- run start ;
+pm2 restart npm --name "8085" --update-env
