@@ -53,11 +53,13 @@ class NodeProtocol {
             }
 
             if (NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
+                console.warn("too many terminal connections");
                 node.disconnect();
                 return false;
             }
 
             if (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
+                console.warn("too many browser connections");
                 node.disconnect();
                 return false;
             }
