@@ -140,7 +140,8 @@ class InterfaceBlockchainProtocol {
 
                     if (data === null || (data.l < 0) || ( data.s >= data.l )) return;
 
-                    console.log("newForkTip", data.l, "from", socket.node.sckAddress.uuid );
+                    if (Math.random() < 0.1)
+                        console.log("newForkTip", data.l );
 
                     this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
 
