@@ -37,6 +37,7 @@ class GeoLocationLists {
         this._addGeoLocationContinentByAddress(sckAddress, location);
 
         return location;
+
     }
 
     async includeSocket(socket){

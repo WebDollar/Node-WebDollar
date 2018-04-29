@@ -11,8 +11,6 @@ export default {
         {"addr": ["webdollar.ddns.net:8081"], },
         {"addr": ["webdollar.ddns.net:8082"], },
         {"addr": ["webdollar.ddns.net:8083"],},
-        {"addr": ["webdollar.ddns.net:8084"],},
-        {"addr": ["webdollar.ddns.net:8091"],},
         {"addr": ["webdollar.ddns.net:2095"],},
 
         { "addr": ["skyhub.me:80"], },
@@ -29,7 +27,6 @@ export default {
 
         {"addr": ["webdollar-vps1.ddns.net:80"],},
         {"addr": ["webdollar-vps1.ddns.net:443"],},
-        {"addr": ["webdollar-vps1.ddns.net:8080"],},
         {"addr": ["webdollar-vps1.ddns.net:8081"],},
         {"addr": ["webdollar-vps1.ddns.net:8082"],},
 

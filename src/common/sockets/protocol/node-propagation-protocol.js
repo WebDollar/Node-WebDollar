@@ -28,6 +28,8 @@ class NodePropagationProtocol {
                 waitlist = NodesWaitlist.addNewNodeToWaitlist(newNode.address.addr, newNode.address.port, newNode.address.type, newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
 
                 list.splice(index, 1);
+
+                return;
             }
 
         }
@@ -40,7 +42,7 @@ class NodePropagationProtocol {
         this._processList(this._newLightNodesWaitList);
 
 
-        setTimeout( this._processNewWaitlistInterval.bind(this), 300);
+        setTimeout( this._processNewWaitlistInterval.bind(this), 2000 + Math.floor( Math.random() * 20 ) );
 
     }
 
