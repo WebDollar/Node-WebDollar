@@ -19,14 +19,11 @@ export default {
         { "addr": ["skyhub.me:80"], },
         { "addr": ["skyhub.me:443"], },
 
+        {"addr": ["presa7.ro:80"],},
         {"addr": ["presa7.ro:443"],},
-        {"addr": ["presa7.ro:8080"],},
-
 
         {"addr": ["webdollar-vps1.ddns.net:80"],},
         {"addr": ["webdollar-vps1.ddns.net:443"],},
-        {"addr": ["webdollar-vps1.ddns.net:8081"],},
-        {"addr": ["webdollar-vps1.ddns.net:8082"],},
 
 
         { "addr": ["hcern.ddns.net:80"]},

@@ -248,7 +248,7 @@ consts.SETTINGS = {
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 20,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 50,
             },
 
             TIMEOUT: {
