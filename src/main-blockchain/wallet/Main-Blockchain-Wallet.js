@@ -131,7 +131,24 @@ class MainBlockchainWallet{
 
     async loadAddresses() {
 
-        let buffer = await this.db.get( this.walletFileName, 60000, true );
+        let timeout = setTimeout(()=>{
+
+            StatusEvents.emit("validation/status", {type: "WALLET", message: "Wallet is not loaded successfully"});
+
+            setTimeout(()=>{
+
+                if (process.env.BROWSER)
+                    location.reload();
+                else
+                    process.exit(1);
+
+            }, 10*1000);
+
+        }, 20*1000 );
+
+        let buffer = await this.db.get( this.walletFileName, 30*1000, true );
+
+        clearTimeout(timeout);
 
         if ( buffer === null || buffer === undefined)
             return false;

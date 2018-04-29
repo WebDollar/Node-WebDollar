@@ -245,16 +245,16 @@ class InterfaceSatoshminDB {
         })
     }
 
-    get(key, timeout=6000, throwTimeOutError=false) {
+    get(key, timeout=6000, freeze=false) {
 
         return new Promise((resolve)=>{
 
             //timeout, max 10 seconds to load the database
             let timeoutInterval = setTimeout(()=>{
-                console.error("SathoshminDB Get failed !!", key);
 
-                if (throwTimeOutError===true )
-                    throw {message: "SatoshminDB Get Failed !!", key};
+                console.error("SatoshminDB Get failed !!", key);
+
+                if (freeze === true ) return;
 
                 resolve(null);
             }, timeout);
@@ -271,8 +271,9 @@ class InterfaceSatoshminDB {
                 clearTimeout(timeoutInterval);
                 console.error("db.get error " + key, exception);
 
-                if (exception.status === 500)
-                    StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
+                StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
+
+                if (freeze === true ) return;
 
                 resolve(null);
             });

@@ -84,14 +84,16 @@ class NodeSignalingServerService{
                 let client1, client2 = null;
 
                 if (Math.random() > 0.5) {
+
                     client1 = this.waitlist[i];
                     client2 = this.waitlist[j];
+
                 } else {
                     client1 = this.waitlist[j];
                     client2 = this.waitlist[i];
                 }
 
-                NodeSignalingServerProtocol.connectWebPeer(client1.socket, client2.socket);
+                NodeSignalingServerProtocol.connectWebPeer( client1.socket, client2.socket );
 
             }
         }
