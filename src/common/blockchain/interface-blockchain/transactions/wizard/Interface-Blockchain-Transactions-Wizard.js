@@ -1,5 +1,5 @@
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
-import consts from "consts/global"
+import consts from 'consts/const_global'
 
 class InterfaceBlockchainTransactionsWizard{
 
