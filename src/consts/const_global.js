@@ -239,7 +239,7 @@ consts.SETTINGS = {
             },
 
             SERVER: {
-                MAXIMUM_CONNECTIONS_FROM_BROWSER: 40,
+                MAXIMUM_CONNECTIONS_FROM_BROWSER: 100,
                 MAXIMUM_CONNECTIONS_FROM_TERMINAL: 10,
             },
 
@@ -282,7 +282,7 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.PORT = 8085;
 
     FallBackNodesList.nodes = [{
-        "addr": ["webdollar.ddns.net:2095"],
+        "addr": ["127.0.0.1:8085"],
     }];
 }
 

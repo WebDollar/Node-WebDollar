@@ -11,18 +11,16 @@ export default {
         {"addr": ["webdollar.ddns.net:8081"], },
         {"addr": ["webdollar.ddns.net:8082"], },
         {"addr": ["webdollar.ddns.net:8083"],},
-        {"addr": ["webdollar.ddns.net:2095"],},
+        {"addr": ["webdollar.ddns.net:8084"],},
+        {"addr": ["webdollar.ddns.net:8085"],},
+        {"addr": ["webdollar.ddns.net:8086"],},
+        {"addr": ["webdollar.ddns.net:8087"],},
 
         { "addr": ["skyhub.me:80"], },
         { "addr": ["skyhub.me:443"], },
-        { "addr": ["skyhub.me:8080"], },
-        { "addr": ["skyhub.me:8081"], },
-        { "addr": ["skyhub.me:8082"], },
 
         {"addr": ["presa7.ro:443"],},
         {"addr": ["presa7.ro:8080"],},
-        {"addr": ["presa7.ro:8081"],},
-        {"addr": ["presa7.ro:8082"],},
 
 
         {"addr": ["webdollar-vps1.ddns.net:80"],},
