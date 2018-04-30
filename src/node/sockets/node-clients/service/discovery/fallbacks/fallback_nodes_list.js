@@ -25,6 +25,13 @@ export default {
         {"addr": ["webdollar-vps1.ddns.net:80"],},
         {"addr": ["webdollar-vps1.ddns.net:443"],},
 
+        {"addr": ["webdollar-vps2.ddns.net:80"],},
+        {"addr": ["webdollar-vps2.ddns.net:443"],},
+
+
+        {"addr": ["webdollar-vps3.ddns.net:80"],},
+        {"addr": ["webdollar-vps3.ddns.net:443"],},
+
 
         { "addr": ["hcern.ddns.net:80"]},
         {"addr": ["hcern.ddns.net:443"]},
