@@ -11,10 +11,6 @@ export default {
         {"addr": ["webdollar.ddns.net:8081"], },
         {"addr": ["webdollar.ddns.net:8082"], },
         {"addr": ["webdollar.ddns.net:8083"],},
-        {"addr": ["webdollar.ddns.net:8084"],},
-        {"addr": ["webdollar.ddns.net:8085"],},
-        {"addr": ["webdollar.ddns.net:8086"],},
-        {"addr": ["webdollar.ddns.net:8087"],},
 
         { "addr": ["skyhub.me:80"], },
         { "addr": ["skyhub.me:443"], },
