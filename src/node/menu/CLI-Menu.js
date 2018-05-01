@@ -27,6 +27,7 @@ class CLI{
 
         if (this._exitMenu === true) {
             this.WEBD_CLI.close();
+            process.exit();
             return;
         }
 
