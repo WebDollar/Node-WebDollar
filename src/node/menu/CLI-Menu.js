@@ -90,8 +90,8 @@ class CLI{
         let answer = await this.question('Choose the address number: ');
 
         let addressId = parseInt(answer);
-        if (addressId === NaN || addressId < 0 || Blockchain.Wallet.addresses.length < addressId)
-            addressId = -1;
+        if (isNaN(addressId) || addressId < 0 || Blockchain.Wallet.addresses.length <= addressId)
+            return -1;
 
         return addressId;
     }
