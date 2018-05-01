@@ -81,7 +81,7 @@ class CLI{
         this.WEBD_CLI.prompt();
 
         this._exitMenu = false;
-        this._runMenu();
+        await this._runMenu();
     }
 
     async _chooseAddress() {
