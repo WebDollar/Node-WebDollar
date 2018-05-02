@@ -31,6 +31,8 @@ describe('test pool mining', () => {
 
     it('test backbone mining block sample', async () => {
         //TODO: check if backbone mining works
+       // let miner = new MinerProtocol(10);
+        //await miner.run();
         
     });
 
