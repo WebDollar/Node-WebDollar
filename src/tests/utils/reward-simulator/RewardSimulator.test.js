@@ -56,24 +56,24 @@ describe('RewardSimulator', () => {
 
         let reward = 0;
         let smallestReward = 0.0001;
-        let BLOCKS_PER_CYCLE = 6307200;
+        let BLOCKS_PER_CYCLE = 3153600;
         for (let height = 41; height < BLOCKS_PER_CYCLE; height += 1024) {
             reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
-            assert(reward === 3000, "Wrong reward for bock " + height + ": " + reward.toString() + "!==3000");
+            assert(reward === 6000, "Wrong reward for bock " + height + ": " + reward.toString() + "!==3000");
         }
 
         //TODO Budisteanu Shifts
         for (let cycle = 1; cycle <= 25; ++cycle) {
             let height = cycle * (BLOCKS_PER_CYCLE) - 1;
             reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
-            let targetReward = 3000 / (1 << (cycle-1));
+            let targetReward = 6000 / (1 << (cycle-1));
 
             if (targetReward < smallestReward) targetReward = smallestReward;
             assert(reward === targetReward, "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
 
             height = cycle * (BLOCKS_PER_CYCLE);
             reward = BlockchainMiningReward.getReward(height) / WebDollarCoins.WEBD;
-            targetReward = 3000 / (1 << cycle);
+            targetReward = 6000 / (1 << cycle);
 
             if (targetReward < smallestReward) targetReward = smallestReward;
             assert(reward === targetReward, "Wrong reward for bock " + height + ": " + reward.toString() + "!==" + targetReward.toString());
@@ -89,7 +89,7 @@ describe('RewardSimulator', () => {
         let GENESIS_SUPPLY = TOTAL_SUPPLY * GENESIS_PERCENT;    
         
         let MINING_REWARD = TOTAL_SUPPLY - GENESIS_SUPPLY;
-        let INITIAL_REWARD_PER_BLOCK = 3000;
+        let INITIAL_REWARD_PER_BLOCK = 6000;
         
         console.log("GENESIS_SUPPLY=", GENESIS_SUPPLY);
         console.log("MINING_REWARD=", MINING_REWARD);

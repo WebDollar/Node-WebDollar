@@ -1,9 +1,9 @@
-var assert = require('assert')
+let assert = require('assert');
 
-import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockchain/Interface-Blockchain'
-import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
-import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transactions'
-import consts from 'consts/const_global'
+import InterfaceBlockchain from 'common/blockchain/interface-blockchain/blockchain/Interface-Blockchain';
+import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block';
+import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transactions';
+import consts from 'consts/const_global';
 
 describe('test transactions', () => {
 
