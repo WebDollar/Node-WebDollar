@@ -43,6 +43,7 @@ if ( typeof describe !== 'undefined') {
 
     require ('tests/blockchain/interface-blockchain/mining-pools/pool-management/PoolLeaderProtocol.test');
     require ('tests/blockchain/interface-blockchain/mining-pools/pool-management/PoolData.test');
+    require ('tests/blockchain/interface-blockchain/mining-pools/miner/MinerProtocol.test');
 
     require ('tests/benchmarks/BigNumber-benchmark.test');
     
