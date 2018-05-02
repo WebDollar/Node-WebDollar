@@ -3,16 +3,18 @@ import MiningTransactionsSelector from "./transactions-selector/Mining-Transacti
 const BigInteger = require('big-integer');
 
 
-import consts from 'consts/const_global'
-import global from 'consts/global'
+import consts from 'consts/const_global';
+import global from 'consts/global';
 
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
-import Serialization from 'common/utils/Serialization'
+import Serialization from 'common/utils/Serialization';
 
 import InterfaceBlockchainMiningBasic from "./Interface-Blockchain-Mining-Basic";
 
-import AdvancedMessages from "node/menu/Advanced-Messages"
-import StatusEvents from "common/events/Status-Events"
+import AdvancedMessages from "node/menu/Advanced-Messages";
+import StatusEvents from "common/events/Status-Events";
+
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
@@ -155,7 +157,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             if (answer.result && this.blockchain.blocks.length === block.height ){
 
                 console.warn( "----------------------------------------------------------------------------");
-                console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", answer.hash.toString("hex"), " reward", block.reward, "WEBD", block.data.minerAddress.toString("hex"));
+                console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", answer.hash.toString("hex"), " reward", (block.reward / WebDollarCoins.WEBD), "WEBD", block.data.minerAddress.toString("hex"));
                 console.warn( "----------------------------------------------------------------------------");
 
                 //check if I mined all the last K blocks
