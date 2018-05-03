@@ -17,4 +17,4 @@ class InterfaceBlockchainBrowserMining extends InterfaceBlockchainMiningWorkers{
 
 }
 
-export default InterfaceBlockchainBrowserMining
+export default InterfaceBlockchainBrowserMining;

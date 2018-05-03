@@ -9,7 +9,7 @@ class MinerProtocol {
      *
      * @param poolData should contain connectivity information
      */
-    constructor(poolData){
+    constructor(miningFeeThreshold, poolData){
 
         NodesList.emitter.on("nodes-list/connected", (result) => { 
             this._subscribeMiner(result);
@@ -23,7 +23,7 @@ class MinerProtocol {
 
         this._miningData = {blockData: undefined, difficultyTarget: undefined};
         
-        //this._miningWorker = new PoolMiningWorker();
+        this._miningWorker = new PoolMiningWorker(miningFeeThreshold);
     }
 
     _subscribeMiner(nodesListObject){

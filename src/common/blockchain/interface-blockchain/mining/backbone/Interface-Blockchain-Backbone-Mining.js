@@ -77,4 +77,4 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
 }
 
-export default InterfaceBlockchainBackboneMining
+export default InterfaceBlockchainBackboneMining;
