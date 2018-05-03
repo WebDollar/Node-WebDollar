@@ -40,5 +40,7 @@ export default {
         {"addr": ["robitza.ddns.net:8081"]},
         {"addr": ["robitza.ddns.net:8082"]},
 
+        {"addr": ["webdollar.network:5000"]},
+
     ]
 }
