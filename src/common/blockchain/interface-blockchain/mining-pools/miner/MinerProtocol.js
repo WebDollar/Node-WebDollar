@@ -100,7 +100,8 @@ class MinerProtocol {
     }*/
 
     async _mine(blockData, difficultyTarget) {
-
+        
+        this._miningWorker.mine(blockData, difficultyTarget);
     }
 
     async createMiningHashes(){
@@ -119,6 +120,8 @@ class MinerProtocol {
     }
     
     async run() {
+        
+        await this._mine(this._miningData.blockData, this._miningData.difficultyTarget);
         
     }
 

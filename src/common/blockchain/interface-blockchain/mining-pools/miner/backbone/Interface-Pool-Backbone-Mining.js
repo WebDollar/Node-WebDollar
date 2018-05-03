@@ -22,6 +22,7 @@ class InterfacePoolBackboneMining extends InterfaceBlockchainBackboneMining {
             for (let i = 0; i < this.WORKER_NONCES_WORK; i++) {
 
                 if (this._nonce > 0xFFFFFFFF || !this.started || this.reset) {
+                    console.log("heh");
                     this._workerResolve({result: false});
                     return false;
                 }
@@ -67,7 +68,8 @@ class InterfacePoolBackboneMining extends InterfaceBlockchainBackboneMining {
 
         this.difficulty = difficultyTarget;
         this.blockData = blockData;
-
+        this.started = true;
+        
         let promiseResolve = new Promise ( (resolve) => {
 
 
