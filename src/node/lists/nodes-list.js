@@ -35,11 +35,31 @@ class NodesList {
         sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
         for (let i=0; i<this.nodes.length; i++)
-            if ( (this.nodes[i].connectionType === connectionType || connectionType === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress, validationDoubleConnectionsTypes))){
+            if ( (this.nodes[i].connectionType === connectionType || connectionType === "all") && (this.nodes[i].socket.node.sckAddress.matchAddress(sckAddress, validationDoubleConnectionsTypes)))
                 return this.nodes[i];
-            }
 
         return null;
+    }
+
+    countNodeSocketByAddress(sckAddress, connectionType){
+
+        if (connectionType === undefined) connectionType = "all";
+
+        sckAddress = SocketAddress.createSocketAddress(sckAddress);
+
+        let countUUIDs = 0, countIPs = 0;
+        for (let i=0; i<this.nodes.length; i++)
+            if (this.nodes[i].connectionType === connectionType || connectionType === "all") {
+
+                if (this.nodes[i].socket.node.sckAddress.uuid === sckAddress.uuid)
+                    countUUIDs++;
+                else
+                if (this.nodes[i].socket.node.sckAddress.address === sckAddress.address)
+                    countIPs++;
+            }
+
+        return {countUUIDs: countUUIDs, countIPs: countIPs};
+
     }
 
     registerUniqueSocket(socket, connectionType, type, validationDoubleConnectionsTypes){

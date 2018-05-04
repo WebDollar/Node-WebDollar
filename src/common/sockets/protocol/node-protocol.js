@@ -2,26 +2,108 @@ import consts from 'consts/const_global'
 import NodesList from 'node/lists/nodes-list'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
+import Blockchain from "main-blockchain/Blockchain"
+
+let NodeExpress;
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+}
 
 class NodeProtocol {
 
     /*
         HELLO PROTOCOL
      */
-    async sendHello (node, validationDoubleConnectionsTypes) {
+
+    justSendHello(node){
+        return node.sendRequestWaitOnce("HelloNode", {
+            version: consts.SETTINGS.NODE.VERSION,
+            uuid: consts.SETTINGS.UUID,
+            nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
+            SSL: process.env.BROWSER ? 1 : NodeExpress.SSL & 1,
+            UTC: Blockchain.blockchain.timestamp.timeUTC,
+        });
+    }
+
+    processHello( node, response, validationDoubleConnectionsTypes ){
+
+        if (typeof response !== "object" || response === null || response === undefined) {
+            console.error("No Hello");
+            return false;
+        }
+
+        if (response.uuid === undefined || response.version === undefined) {
+            console.error("hello received, but there is not uuid or version", response);
+            return false;
+        }
+
+
+        if (response.version < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
+            console.log("hello received, VERSION is not right", response.version, consts.SETTINGS.NODE.VERSION_COMPATIBILITY);
+            return false;
+        }
+
+        if ( [NODES_TYPE.NODE_TERMINAL, NODES_TYPE.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
+            console.error("invalid node type", response);
+            return false;
+        }
+
+        if (NODES_TYPE.NODE_TERMINAL === response.nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
+            console.warn("too many terminal connections");
+            return false;
+        }
+
+        if (NODES_TYPE.NODE_WEB_PEER === response.nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
+            console.warn("too many browser connections");
+            return false;
+        }
+
+        node.sckAddress.uuid = response.uuid;
+
+        //check if it is a unique connection, add it to the list
+        let connections = NodesList.countNodeSocketByAddress(node.sckAddress, "all");
+
+        for (let i=0; i<validationDoubleConnectionsTypes.length; i++){
+
+            if (validationDoubleConnectionsTypes[i] === "uuid" && connections.countUUIDs !== 0 )
+                return false;
+            else if (validationDoubleConnectionsTypes[i] === "ip" && connections.countIPs > consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS  )
+                return false;
+
+        }
+
+        console.log("RECEIVED HELLO NODE BACK", response.version, response.uuid);
+
+        node.protocol.nodeType = response.nodeType;
+
+        if (typeof response.SSL === "string") response.SSL = parseInt(response.SSL);
+        if (typeof response.SSL === "number") response.SSL = response.SSL === 1;
+
+        node.protocol.nodeSSL = response.SSL;
+        node.protocol.nodeUTC = response.UTC;
+        node.protocol.helloValidated = true;
+
+        //delete socket;
+        return true;
+    }
+
+    async sendHello ( node, validationDoubleConnectionsTypes ) {
 
 
         // Waiting for Protocol Confirmation
-
         console.log("sendHello");
 
         let response;
         for (let i=0; i < 3; i++) {
 
             response = await node.sendRequestWaitOnce("HelloNode", {
+
                 version: consts.SETTINGS.NODE.VERSION,
                 uuid: consts.SETTINGS.UUID,
-                nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL
+                nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
+                SSL: process.env.BROWSER ? 1 : NodeExpress.SSL & 1,
+                UTC: Blockchain.blockchain.timestamp.timeUTC,
+
             }, undefined, 1000);
 
             if ( typeof response === "object" && response !== null && response.hasOwnProperty("uuid") )
@@ -29,68 +111,7 @@ class NodeProtocol {
 
         }
 
-        if (typeof response !== "object" || response === null) {
-            console.error("No Hello");
-            return false;
-        }
-
-        if (response === null || !response.hasOwnProperty("uuid") ) {
-            console.error("hello received, but there is not uuid", response);
-            return false;
-        }
-
-
-        if (response.hasOwnProperty("version")){
-
-            if (response.version < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
-                console.log("hello received, VERSION is not right", response.version, consts.SETTINGS.NODE.VERSION_COMPATIBILITY);
-                return false;
-            }
-
-            if ( [NODES_TYPE.NODE_TERMINAL, NODES_TYPE.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
-                console.error("invalid node type", response);
-                return false;
-            }
-
-            if (NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
-                console.warn("too many terminal connections");
-                node.disconnect();
-                return false;
-            }
-
-            if (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
-                console.warn("too many browser connections");
-                node.disconnect();
-                return false;
-            }
-
-            node.sckAddress.uuid = response.uuid;
-            node.protocol.nodeType = response.nodeType;
-
-            //check if it is a unique connection, add it to the list
-            let previousConnection = NodesList.searchNodeSocketByAddress(node.sckAddress, "all", validationDoubleConnectionsTypes);
-
-            if ( previousConnection === null ){
-                console.log("RECEIVED HELLO NODE BACK", response.version, response.uuid);
-
-                node.protocol.helloValidated = true;
-                console.log("hello validated");
-                return true;
-
-
-            } else {
-
-                if (response.nodeType === NODES_TYPE.NODE_WEB_PEER) {
-                    node.protocol.helloValidated = true;
-                    return true;
-                } else {
-                    console.log("hello not validated because double connection");
-                }
-
-            }
-        }
-        //delete socket;
-        return false;
+        return this.processHello(node, response, validationDoubleConnectionsTypes);
 
     }
 

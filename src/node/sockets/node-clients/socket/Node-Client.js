@@ -5,6 +5,13 @@ import SocketExtend from 'common/sockets/socket-extend'
 import SocketAddress from 'common/sockets/socket-address'
 import NodesList from 'node/lists/nodes-list'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
+import NODES_TYPE from "node/lists/types/Nodes-Type";
+import Blockchain from "main-blockchain/Blockchain"
+
+let NodeExpress;
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+}
 
 class NodeClient {
 
@@ -59,6 +66,16 @@ class NodeClient {
                         timeout: 20000,
 
                         secure: consts.SETTINGS.NODE.SSL, //https
+
+                        query:{
+                            msg: "HelloNode",
+                            version: consts.SETTINGS.NODE.VERSION,
+                            uuid: consts.SETTINGS.UUID,
+                            nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
+                            SSL: process.env.BROWSER ? 1 : NodeExpress.SSL & 1,
+                            UTC: Blockchain.blockchain.timestamp.timeUTC,
+                        },
+
                     });
 
                 }  catch (Exception){
@@ -75,9 +92,12 @@ class NodeClient {
 
                     SocketExtend.extendSocket( socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
 
-                    console.warn("Client connected to " + socket.node.sckAddress.getAddress(true) );
+                    console.warn("Client connected to " + socket.node.sckAddress.address);
 
-                    socket.node.protocol.sendHello(["ip","uuid"]).then( (answer)=>{
+
+                    socket.on("HelloNode",(response)=>{
+
+                        let answer = socket.node.protocol.processHello(response, ["ip","uuid"] );
 
                         if (answer)
                             this.initializeSocket(socket, ["ip", "uuid"]);
@@ -85,6 +105,7 @@ class NodeClient {
                             socket.disconnect();
 
                         resolve(answer);
+
                     });
 
                 });

@@ -17,6 +17,8 @@ class NodeExpress{
         this.app = undefined;
         this.https = undefined;
 
+        this.SSL = false;
+
     }
 
     startExpress(){
@@ -49,6 +51,8 @@ class NodeExpress{
 
                 this.server = https.createServer(options, this.app).listen(port, ()=>{
 
+                    this.SSL = true;
+
                     this._initializeRouter();
 
                     console.log("HTTPS Express was opened on port "+port);
@@ -60,7 +64,9 @@ class NodeExpress{
 
                 //cloudflare generates its own SSL certificate
                 this.server = http.createServer(this.app).listen(port, ()=>{
-                    console.log(`server started at localhost:${port}`)
+
+                    console.log(`server started at localhost:${port}`);
+
                     this._initializeRouter();
 
                     resolve(true);

@@ -6,13 +6,9 @@ class SocketAddress {
 
     static checkIsSocketAddress(sckAddress){
 
-        //console.log("checkIsSocketAddress", sckAddress);
+        if (typeof sckAddress !== 'object' || sckAddress === null) return false;
 
-        if (typeof sckAddress !== 'object' || sckAddress === null)
-            return false;
-
-        if (! (sckAddress.constructor.name === "SocketAddress" ))
-            return false;
+        if (! (sckAddress.constructor.name === "SocketAddress" )) return false;
 
         return true;
     }
@@ -32,20 +28,14 @@ class SocketAddress {
         if (SocketAddress.checkIsSocketAddress(address))
             return address;
 
-        if (  port === undefined || port === '')
-            port = consts.SETTINGS.NODE.PORT;
-
         return new SocketAddress(address, port, uuid);
     }
 
 
     constructor(address, port, uuid){
 
-        if (address === undefined)
-            address = '';
-
-        if (port === undefined)
-            port = consts.SETTINGS.NODE.PORT;
+        if (address === undefined) address = '';
+        if (port === undefined) port = consts.SETTINGS.NODE.PORT;
 
         try {
             if (ipaddr.IPv6.isIPv6(address)) {
@@ -90,8 +80,7 @@ class SocketAddress {
 
     matchAddress(address, validationDoubleConnectionsTypes){
 
-        if (validationDoubleConnectionsTypes === undefined)
-            validationDoubleConnectionsTypes = ["ip","uuid"];
+        if (validationDoubleConnectionsTypes === undefined) validationDoubleConnectionsTypes = ["ip","uuid"];
         else
         if (!Array.isArray(validationDoubleConnectionsTypes))
             validationDoubleConnectionsTypes = [validationDoubleConnectionsTypes];
@@ -100,20 +89,15 @@ class SocketAddress {
         let sckAddress = SocketAddress.createSocketAddress(address);
 
         //uuid validation
-        if ( validationDoubleConnectionsTypes.indexOf("uuid") >= 0 ){
+        for (let i=0; i<validationDoubleConnectionsTypes.length; i++){
 
-            if (this.uuid !== null && this.uuid !== undefined && this.uuid === sckAddress.uuid)
-                return true;
-
-        }
-
-        //ip validation
-        if ( validationDoubleConnectionsTypes.indexOf("ip") >=0 ){
-
-            let myAddressString = this.getAddress(false);
-            let addressString = sckAddress.getAddress(false);
-
-            if ( myAddressString === addressString ) return true;
+            if (validationDoubleConnectionsTypes[i] === "uuid") {
+                if (this.uuid !== null && this.uuid !== undefined && this.uuid === sckAddress.uuid)
+                    return true;
+            }
+            if (validationDoubleConnectionsTypes[i] === "ip") {
+                if ( this.address === sckAddress.address ) return true;
+            }
         }
 
         return false;

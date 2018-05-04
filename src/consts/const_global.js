@@ -233,6 +233,8 @@ consts.SETTINGS = {
 
         CONNECTIONS:{
 
+            NO_OF_IDENTICAL_IPS: 10,
+
             SOCKETS: {
                 MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
                 MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
@@ -274,15 +276,15 @@ consts.SETTINGS = {
 
 
 if ( consts.DEBUG === true ){
-    consts.SETTINGS.NODE.VERSION += "1";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "1";
+    consts.SETTINGS.NODE.VERSION += "2";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "2";
     consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 8085;
+    consts.SETTINGS.NODE.PORT = 9095;
 
     FallBackNodesList.nodes = [{
-        "addr": ["127.0.0.1:8085"],
+        "addr": ["webdollar.ddns.net:9095"],
     }];
 }
 

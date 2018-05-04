@@ -12,8 +12,10 @@ class BlockchainNetworkAdjustedTime {
         this.networkAdjustedTimeClusters = new NetworkAdjustedTimeClusters();
 
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
-            await this._initializingNewNode(nodesListObject);
-        } );
+
+            this._initializingNewNodeTimestmap(nodesListObject.socket, nodesListObject.socket.node.protocol.nodeUTC);
+
+        });
 
         NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
             await this._desinitializeNode(nodesListObject);
@@ -30,35 +32,23 @@ class BlockchainNetworkAdjustedTime {
     }
 
 
-    async _initializingNewNode(nodesListObject){
+    async _initializingNewNodeTimestmap( socket, timestamp ){
 
-        this.blockchainTimestamp._initializeNewSocket(nodesListObject)
-
-        let socket = nodesListObject.socket;
+        this.blockchainTimestamp._initializeNewSocket();
 
         try {
 
-            let answer;
-            for (let i=0; i<=2; i++) {
+            if (timestamp === null || timestamp === undefined) throw {message: "The node answer for timestamp returned null or empty"};
 
-                this.blockchainTimestamp._sendUTC(socket);
-                answer = await socket.node.sendRequestWaitOnce( "timestamp/request-timeUTC", {}, 'answer', 1000 );
-                if (answer !== null) break;
-
-            }
-
-            if (answer === null || answer === undefined) throw {message: "The node answer for timestamp returned null or empty"};
-
-            if (answer.result === false) throw {message: "The node answer for timestamp is false"};
-
-            if (typeof answer.timeUTC !== "number") throw {message: "The node didn't answer to my request-timeUTC"};
+            if (typeof timestamp === "string") timestamp = parseInt(timestamp);
+            if (typeof timestamp !== "number") throw {message: "The node didn't answer to my request-timeUTC"};
 
             //avoiding double counting the same timestamp from the same node
-            this._addNodeTimeAdjusted(socket, answer.timeUTC);
+            this._addNodeTimeAdjusted(socket, timestamp);
 
 
         } catch (exception){
-            console.error("Error includeNodeNetworkAdjustedTime to the node", exception, nodesListObject.socket.node.sckAddress.toString());
+            console.error("Error includeNodeNetworkAdjustedTime to the node", exception, socket.node.sckAddress.toString());
         }
 
     }

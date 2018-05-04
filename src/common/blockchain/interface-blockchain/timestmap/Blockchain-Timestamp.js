@@ -39,19 +39,7 @@ class BlockchainTimestamp{
     }
 
 
-    _initializeNewSocket(nodesListObject){
-
-        let socket = nodesListObject.socket;
-
-        socket.node.on("timestamp/request-timeUTC", (data) => {
-            try {
-
-                this._sendUTC(socket);
-
-            } catch (exception){
-
-            }
-        });
+    _initializeNewSocket(socket){
 
     }
 
