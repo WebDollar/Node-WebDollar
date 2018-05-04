@@ -8,8 +8,12 @@ class PPoWBlockchainProofBasic{
 
         this.blockchain = undefined;
 
-        for (let i=0; i<this.blocks.length; i++)
-            this.blocks[i].destroy();
+        for (let i=this.blocks.length-1; i>=0; i--) {
+
+            if (this.blocks[i] !== undefined && this.blocks[i] !== null)
+                this.blocks[i].destroy();
+
+        }
 
     }
 

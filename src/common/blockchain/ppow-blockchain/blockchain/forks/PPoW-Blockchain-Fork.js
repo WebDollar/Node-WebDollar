@@ -19,17 +19,17 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     destroy(){
 
-        InterfaceBlockchainFork.prototype.destroy.call(this);
-
-        if (this.blockchain.proofPi !== this._forkProofPiClone)
+        if (this._forkProofPiClone !== null && this._forkProofPiClone !== undefined && this.blockchain.proofPi !== this._forkProofPiClone )
             this._forkProofPiClone.destroy();
 
         this._forkProofPiClone = undefined;
 
-        if (this.forkProofPi)
+        if (this.forkProofPi !== null && this.forkProofPi !== undefined && this.blockchain.proofPi !== this.forkProofPi )
             this.forkProofPi.destroy();
 
         this.forkProofPi = undefined;
+
+        InterfaceBlockchainFork.prototype.destroy.call(this);
 
     }
 

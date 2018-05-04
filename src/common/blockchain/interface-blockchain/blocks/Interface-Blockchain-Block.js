@@ -19,7 +19,9 @@ class InterfaceBlockchainBlock {
     destroy(){
         this.blockchain = undefined;
 
-        this.data.destroy();
+        if (this.data !== undefined && this.data !== null)
+            this.data.destroy();
+
         this.data = undefined;
     }
 

@@ -16,10 +16,16 @@ class InterfaceBlockchainFork {
 
     destroy(){
 
+        for (let i=0; i<this.forkBlocks.length; i++)
+            if (this.forkBlocks[i] !== undefined && this.forkBlocks[i] !== this.blockchain.blocks[ this.forkBlocks[i].height ])
+                this.forkBlocks[i].destroy();
+
         this.blockchain = undefined;
         this.headers = [];
         this.sockets = [];
         this.forkPromise = [];
+
+
     }
 
     /**
