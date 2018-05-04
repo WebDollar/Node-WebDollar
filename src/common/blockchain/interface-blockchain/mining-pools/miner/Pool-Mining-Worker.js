@@ -1,5 +1,6 @@
 let InheritedPoolWorker;
 
+
 if (process.env.BROWSER){
     InheritedPoolWorker = require('./browser/Interface-Pool-Browser-Worker').default;
 }  else {
