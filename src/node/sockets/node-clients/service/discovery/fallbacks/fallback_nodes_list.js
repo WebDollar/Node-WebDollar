@@ -7,7 +7,7 @@ export default {
 
 
         {"addr": ["webdollar.ddns.net:80"],},
-        { "addr": ["webdollar.ddns.net:8080"], },
+        {"addr": ["webdollar.ddns.net:8080"], },
         {"addr": ["webdollar.ddns.net:8081"], },
         {"addr": ["webdollar.ddns.net:8082"], },
         {"addr": ["webdollar.ddns.net:8083"],},
