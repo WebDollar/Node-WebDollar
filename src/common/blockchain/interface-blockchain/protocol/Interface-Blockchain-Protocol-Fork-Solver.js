@@ -182,8 +182,6 @@ class InterfaceBlockchainProtocolForkSolver{
                 fork.forkChainLength = forkChainLength;
                 fork.forkHeaders.push(binarySearchResult.header);
 
-                console.warn("was it deleted", fork);
-
                 await fork.initializeFork(); //download the requirements and make it ready
 
                 if (!fork.forkReady)
