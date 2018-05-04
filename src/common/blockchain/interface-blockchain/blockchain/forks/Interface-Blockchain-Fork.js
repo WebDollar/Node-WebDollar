@@ -12,18 +12,27 @@ class InterfaceBlockchainFork {
 
 
     constructor (){
+
+        this._blocksCopy = [];
+
     }
 
-    destroy(){
+    destroyFork(){
 
         for (let i=0; i<this.forkBlocks.length; i++)
-            if (this.forkBlocks[i] !== undefined && this.forkBlocks[i] !== this.blockchain.blocks[ this.forkBlocks[i].height ])
-                this.forkBlocks[i].destroy();
+            if (this.forkBlocks[i] !== undefined && this.forkBlocks[i] !== null) {
+
+                if ( this.blockchain.blocks[ this.forkBlocks[i].height ] === undefined || this.blockchain.blocks[ this.forkBlocks[i].height ] !== this.forkBlocks[i] )
+                    this.forkBlocks[i].destroyBlock();
+
+                this.forkBlocks[i] = undefined;
+            }
 
         this.blockchain = undefined;
         this.headers = [];
         this.sockets = [];
         this.forkPromise = [];
+        this._blocksCopy = [];
 
 
     }
@@ -283,9 +292,6 @@ class InterfaceBlockchainFork {
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
 
 
-                //successfully, let's delete the backup blocks
-                this._deleteBackupBlocks();
-
             } catch (exception){
 
                 console.error('-----------------------------------------');
@@ -322,6 +328,10 @@ class InterfaceBlockchainFork {
         console.log("FORK SOLVER SUCCESS", success);
 
         if (success){
+
+            //successfully, let's delete the backup blocks
+            this._deleteBackupBlocks();
+
             //propagate last block
             this.blockchain.propagateBlocks( this.blockchain.blocks.length-1, this.sockets );
 
@@ -455,8 +465,10 @@ class InterfaceBlockchainFork {
     _deleteBackupBlocks(){
 
 
-        for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++)
+        for (let i = 0; i < this._blocksCopy.length; i++) {
+            this._blocksCopy[i].destroyBlock();
             delete this._blocksCopy[i];
+        }
 
         this._blocksCopy = [];
 

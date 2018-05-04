@@ -18,6 +18,13 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
+    destroyBlockDataTransactions(){
+
+        for (let i=0; i<this.transactions.length; i++)
+            this.transactions[i].destroyTransaction();
+
+    }
+
     validateTransactions(blockHeight, blockValidationType){
 
         let hashTransactions = this.calculateHashTransactions();

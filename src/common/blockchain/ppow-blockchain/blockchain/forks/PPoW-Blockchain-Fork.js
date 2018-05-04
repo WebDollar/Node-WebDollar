@@ -17,19 +17,19 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     }
 
-    destroy(){
+    destroyFork(){
 
-        if (this._forkProofPiClone !== null && this._forkProofPiClone !== undefined && this.blockchain.proofPi !== this._forkProofPiClone )
-            this._forkProofPiClone.destroy();
+        if (this._forkProofPiClone !== null && (this.blockchain.proofPi === null || this.blockchain.proofPi !== this._forkProofPiClone) )
+            this._forkProofPiClone.destroyProof();
 
         this._forkProofPiClone = undefined;
 
-        if (this.forkProofPi !== null && this.forkProofPi !== undefined && this.blockchain.proofPi !== this.forkProofPi )
-            this.forkProofPi.destroy();
+        if (this.forkProofPi !== null && (this.blockchain.proofPi === null || this.blockchain.proofPi !== this.forkProofPi) )
+            this.forkProofPi.destroyProof();
 
         this.forkProofPi = undefined;
 
-        InterfaceBlockchainFork.prototype.destroy.call(this);
+        InterfaceBlockchainFork.prototype.destroyFork.call(this);
 
     }
 
@@ -112,7 +112,12 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             StatusEvents.emit( "agent/status", {message: "Proofs - Preparing", blockHeight: this.forkStartingHeight } );
 
-            if (this.blockchain.proofPi !== null) {
+            if (this.blockchain === undefined){
+                console.warn("Strange this.blockchain is empty");
+                return;
+            }
+
+            if ( this.blockchain.proofPi !== null) {
 
                 this.forkProofPi.blocks = proofsList;
 
@@ -122,6 +127,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 this.forkProofPi.blocks = [];
 
+                this.forkProofPi._forkLCAStarts = 0;
+
                 for (let i=0; i<this.blockchain.proofPi.blocks.length; i++)
                     if (this.blockchain.proofPi.blocks[i].height <= LCA.height ) {
 
@@ -130,8 +137,12 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                             if (proofsList[j].height === this.blockchain.proofPi.blocks[i].height )
                                 found = true;
 
-                        if (found)
+                        if (found) {
                             this.forkProofPi.blocks.push(this.blockchain.proofPi.blocks[i]);
+                            this.forkProofPi.blocks[this.forkProofPi.blocks.length-1].blockValidation.getBlockCallBack = this.getForkProofsPiBlock.bind(this);
+
+                            this.forkProofPi._forkLCAStarts = this.forkProofPi.blocks.length; //it is used for destroy
+                        }
                     }
 
                 if (this.forkProofPi.blocks.length === 0) throw {message: "Proof is invalid LCA nothing"};
@@ -179,7 +190,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         for (let i=0; i<blocksHeader.length; i++){
 
-            if (blocksHeader[i].height <= LCAHeight) continue;
+            if (blocksHeader[i].height <= LCAHeight)
+                continue;
 
             let block = this.blockchain.blockCreator.createEmptyBlock( blocksHeader[i].height );
             block.blockValidation.getBlockCallBack = this.getForkProofsPiBlock.bind(this);

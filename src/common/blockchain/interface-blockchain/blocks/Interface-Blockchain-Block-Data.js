@@ -36,10 +36,12 @@ class InterfaceBlockchainBlockData {
 
     }
 
-    destroy(){
+    destroyBlockData(){
 
         this.blockchain = undefined;
         this._minerAddress = undefined;
+
+        this.transactions.destroyBlockDataTransactions();
 
     }
 

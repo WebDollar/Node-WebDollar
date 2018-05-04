@@ -76,6 +76,10 @@ class InterfaceBlockchainTransaction{
         this.txId = txId;
     }
 
+    destroyTransaction(){
+        this.blockchain = undefined;
+    }
+
     _createTransactionFrom(from){
         return new InterfaceBlockchainTransactionFrom(this, from);
     }

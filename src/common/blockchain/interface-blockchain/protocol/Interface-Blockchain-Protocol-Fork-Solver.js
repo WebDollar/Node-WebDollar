@@ -108,6 +108,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 throw {message: "discoverAndProcessFork - fork is smaller fork than mine"};
 
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
+
             if ( forkFound !== null ) {
                 console.error("discoverAndProcessFork - fork already found by socket");
                 return {result: true, fork: forkFound};
@@ -180,6 +181,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 fork.forkChainStartingPoint = forkChainStartingPoint;
                 fork.forkChainLength = forkChainLength;
                 fork.forkHeaders.push(binarySearchResult.header);
+
+                console.warn("was it deleted", fork);
 
                 await fork.initializeFork(); //download the requirements and make it ready
 

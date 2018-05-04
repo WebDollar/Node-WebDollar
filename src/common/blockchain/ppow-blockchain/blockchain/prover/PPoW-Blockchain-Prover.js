@@ -112,8 +112,13 @@ class PPoWBlockchainProver{
         if ( !this.proofActivated )
             return false;
 
+        if (this.proofPi !== null){
+            this.proofPi.destroyProof();
+        }
+
         this.proofPi = this._createProofPi(this.blockchain);
-        this.proofXi = this._createProofXi(this.blockchain);
+
+        //this.proofXi = this._createProofXi(this.blockchain);
 
         // if (consts.DEBUG)
         //     if (this.proofPi !== null && this.proofXi !== null)

@@ -4,16 +4,36 @@ import consts from 'consts/const_global'
 
 class PPoWBlockchainProofBasic{
 
-    destroy(){
+    destroyProof(){
 
-        this.blockchain = undefined;
+        for (let i=0; i<this.blocks.length; i++) {
 
-        for (let i=this.blocks.length-1; i>=0; i--) {
+            if (this.blocks[i] !== undefined && this.blocks[i] !== null) {
 
-            if (this.blocks[i] !== undefined && this.blocks[i] !== null)
-                this.blocks[i].destroy();
+                let found = false;
+
+                //TODO optimization instead of using for j
+
+                if (this.blockchain.proofPi !== null)
+                    for (let j=0; j<this.blockchain.proofPi.blocks.length; j++)
+                        if (this.blockchain.proofPi.blocks[j] === this.blocks[i] ){
+                            found = true;
+                            break;
+                        }
+
+                if (!found) {
+
+                    if (typeof this.blocks[i].destroyBlock === "function")
+                        this.blocks[i].destroyBlock();
+
+                }
+
+                this.blocks[i] = undefined;
+            }
 
         }
+
+        this.blockchain = undefined;
 
     }
 
@@ -25,6 +45,7 @@ class PPoWBlockchainProofBasic{
         this.blocks = blocks;
 
         this.hash = undefined;
+
     }
 
     getProofHeaders(starting, length){

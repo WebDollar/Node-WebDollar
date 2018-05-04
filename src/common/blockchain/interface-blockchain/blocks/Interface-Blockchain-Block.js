@@ -16,14 +16,7 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-    destroy(){
-        this.blockchain = undefined;
 
-        if (this.data !== undefined && this.data !== null)
-            this.data.destroy();
-
-        this.data = undefined;
-    }
 
     constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db){
 
@@ -65,6 +58,17 @@ class InterfaceBlockchainBlock {
 
         this.db = db;
 
+    }
+
+    destroyBlock(){
+        this.blockchain = undefined;
+
+        if (this.data !== undefined && this.data !== null)
+            this.data.destroyBlockData();
+
+        this.db = undefined;
+        this.data = undefined;
+        this.blockValidation = undefined;
     }
 
     async _supplementaryValidation() {
