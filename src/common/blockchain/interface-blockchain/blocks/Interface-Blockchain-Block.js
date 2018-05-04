@@ -16,6 +16,13 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
+    destroy(){
+        this.blockchain = undefined;
+
+        this.data.destroy();
+        this.data = undefined;
+    }
+
     constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db){
 
         this.blockchain = blockchain;

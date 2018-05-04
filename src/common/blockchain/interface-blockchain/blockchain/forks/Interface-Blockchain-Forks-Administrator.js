@@ -146,8 +146,11 @@ class InterfaceBlockchainForksAdministrator {
             return false;
 
         for (let i=this.forks.length-1; i>=0; i--)
-            if (this.forks[i] === undefined || this.forks[i] === null || this.forks[i] === fork || this.forks[i].forkId === fork)
-                this.forks.splice(i,1);
+            if (this.forks[i] === undefined || this.forks[i] === null || this.forks[i] === fork || this.forks[i].forkId === fork) {
+
+                this.forks[i].destroy();
+                this.forks.splice(i, 1);
+            }
 
         return false;
     }

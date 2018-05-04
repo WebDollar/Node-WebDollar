@@ -94,10 +94,17 @@ class NodeClient {
 
                     console.warn("Client connected to " + socket.node.sckAddress.address);
 
+                    let timeout = setTimeout(()=>{
 
-                    socket.on("HelloNode",(response)=>{
+                        socket.disconnect();
+                        resolve(false);
+
+                    }, 10*1000);
+
+                    socket.once("HelloNode",(response)=>{
 
                         let answer = socket.node.protocol.processHello(response, ["ip","uuid"] );
+                        clearTimeout(timeout);
 
                         if (answer)
                             this.initializeSocket(socket, ["ip", "uuid"]);
@@ -105,7 +112,6 @@ class NodeClient {
                             socket.disconnect();
 
                         resolve(answer);
-
                     });
 
                 });

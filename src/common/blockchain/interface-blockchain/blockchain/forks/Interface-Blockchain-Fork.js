@@ -12,13 +12,14 @@ class InterfaceBlockchainFork {
 
 
     constructor (){
+    }
 
-        // setTimeout(()=>{
-        //
-        //     this
-        //
-        // }, 60*1000)
+    destroy(){
 
+        this.blockchain = undefined;
+        this.headers = [];
+        this.sockets = [];
+        this.forkPromise = [];
     }
 
     /**

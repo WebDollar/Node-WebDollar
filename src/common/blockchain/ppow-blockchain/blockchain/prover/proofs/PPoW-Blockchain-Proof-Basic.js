@@ -4,6 +4,14 @@ import consts from 'consts/const_global'
 
 class PPoWBlockchainProofBasic{
 
+    destroy(){
+
+        this.blockchain = undefined;
+
+        for (let i=0; i<this.blocks.length; i++)
+            this.blocks[i].destroy();
+
+    }
 
     constructor(blockchain, blocks){
 

@@ -36,6 +36,12 @@ class InterfaceBlockchainBlockData {
 
     }
 
+    destroy(){
+
+        this.blockchain = undefined;
+
+    }
+
     validateBlockData(blockHeight, blockValidation){
 
         if (!Buffer.isBuffer(this.minerAddress) || this.minerAddress.length !==  consts.ADDRESSES.ADDRESS.LENGTH )

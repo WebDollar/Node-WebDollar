@@ -2,10 +2,9 @@ import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/bloc
 import PPoWBlockchainProofPi from './../prover/proofs/PPoW-Blockchain-Proof-Pi'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import consts from 'consts/const_global'
-import BufferExtended from "common/utils/BufferExtended"
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
-import BansList from "../../../../utils/bans/BansList";
+import BansList from "common/utils/bans/BansList";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -15,6 +14,22 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         this.forkProofPi = null;
         this._forkProofPiClone = null;
+
+    }
+
+    destroy(){
+
+        InterfaceBlockchainFork.prototype.destroy.call(this);
+
+        if (this.blockchain.proofPi !== this._forkProofPiClone)
+            this._forkProofPiClone.destroy();
+
+        this._forkProofPiClone = undefined;
+
+        if (this.forkProofPi)
+            this.forkProofPi.destroy();
+
+        this.forkProofPi = undefined;
 
     }
 
