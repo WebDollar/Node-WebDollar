@@ -81,6 +81,8 @@ class SignalingServerRoomList {
 
             for (let i = this.list.length-1; i >= 0 ; i--)
                 if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){
+                    this.list[i].client1 = undefined;
+                    this.list[i].client2 = undefined;
                     this.list.splice(i, 1);
                 }
 

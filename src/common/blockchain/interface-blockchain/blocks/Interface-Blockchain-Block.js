@@ -67,7 +67,11 @@ class InterfaceBlockchainBlock {
             this.data.destroyBlockData();
 
         this.db = undefined;
-        this.data = undefined;
+        delete this.data;
+
+        if (this.blockValidation !== undefined && this.blockValidation !== null)
+            this.blockValidation.destroyBlockValidation();
+
         this.blockValidation = undefined;
     }
 

@@ -30,6 +30,20 @@ class InterfaceTreeNode {
         this.value = value;
     }
 
+    destroyNode(){
+
+        for (let i=0; i<this.edges.length; i++) {
+            this.edges[i].destroyEdge();
+            this.edges[i] = undefined;
+        }
+
+        this.root = undefined;
+        this.parent = undefined;
+
+        delete this.value;
+        delete this.edges
+    }
+
     isLeaf(){
         return this.value !== null
     }

@@ -8,9 +8,7 @@ class PPoWBlockchainProofBasic{
 
         if (!this.blockchain.agent.light) {
             this.blocks = [];
-            return;
-        }
-
+        } else
         for (let i=0; i<this.blocks.length; i++) {
 
             if (this.blocks[i] === undefined || this.blocks[i] === null) continue;

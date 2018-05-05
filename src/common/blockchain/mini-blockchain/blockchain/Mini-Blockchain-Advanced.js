@@ -37,7 +37,9 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         if (height === -1){
             let emptyAccountantTree = new MiniBlockchainAccountantTree(this.db);
-            return emptyAccountantTree.serializeMiniAccountant();
+            let data =  emptyAccountantTree.serializeMiniAccountant();
+            emptyAccountantTree.destroyTree();
+            return data;
         }
 
         if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) )

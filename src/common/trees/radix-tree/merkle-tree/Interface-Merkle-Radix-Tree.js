@@ -9,10 +9,6 @@ import InterfaceMerkleTree from "common/trees/merkle-tree/Interface-Merkle-Tree"
 
 class InterfaceRadixMerkleTree extends InterfaceRadixTree {
 
-    constructor(db){
-        super(db);
-    }
-
     createRoot(){
         this.root = new InterfaceMerkleRadixTreeNode(null, null, [], null);
         this.root.autoMerklify = true;

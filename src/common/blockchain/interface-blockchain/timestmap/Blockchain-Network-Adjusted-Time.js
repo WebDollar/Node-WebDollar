@@ -55,9 +55,8 @@ class BlockchainNetworkAdjustedTime {
 
     _desinitializeNode(nodesListObject) {
 
-        let socket = nodesListObject.socket;
+        this._removeNodeTimeAdjusted(nodesListObject.socket);
 
-        this._removeNodeTimeAdjusted(socket);
     }
 
     _addNodeTimeAdjusted(socket, socketTimeUTC ){

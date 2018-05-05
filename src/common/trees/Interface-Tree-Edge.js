@@ -16,6 +16,14 @@ class InterfaceTreeEdge {
 
     }
 
+    destroyEdge(){
+
+        if (this.targetNode !== undefined && this.targetNode !== null)
+            this.targetNode.destroyNode();
+
+        this.targetNode = undefined;
+    }
+
     serializeEdge(){
         return Buffer.concat ( this.targetNode.serializeNode() );
     }

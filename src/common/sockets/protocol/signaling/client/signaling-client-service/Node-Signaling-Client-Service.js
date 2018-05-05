@@ -17,7 +17,8 @@ class NodeSignalingClientService {
     _desinitializeNode(socket){
 
         for (let i=0; i<this.serversList.length; i++)
-            if ( this.serversList[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress, ["uuid"] ) ){
+            if ( this.serversList[i].socket.node.sckAddress.uuid === socket.node.sckAddress.uuid ){
+                this.serversList[i].socket = undefined;
                 this.serversList.splice(i,1);
                 return;
             }

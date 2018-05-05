@@ -23,14 +23,18 @@ class InterfaceBlockchainForksAdministrator {
 
             for (let i=0; i<this.forks.length; i++)
                 if (!this.forks[i].forkIsSaving) {
-                    for (let j = 0; j < this.forks[i].sockets.length; j++)
-                        if (this.forks[i].sockets[j].sckAddress === undefined || this.forks[i].sockets[j].sckAddress.matchAddress(nodesListObject.socket.sckAddress)) {
+                    for (let j = this.forks[i].sockets.length-1; j >=0 ; j--)
+                        if (this.forks[i].sockets[j].sckAddress === undefined || this.forks[i].sockets[j].sckAddress.uuid === nodesListObject.socket.sckAddress.uuid ) {
                             this.forks[i].sockets.splice(j, 1);
                             break;
                         }
 
-                    if (this.forks[i].sockets.length === 0)
+                    if (this.forks[i].sockets.length === 0) {
+
+                        this.forks[i].destroyFork();
                         this.forks.splice(i, 1);
+
+                    }
                 }
 
         });
@@ -151,7 +155,8 @@ class InterfaceBlockchainForksAdministrator {
                 let fork = this.forks[i];
                 this.forks.splice(i, 1);
 
-                fork.destroyFork();
+                if (this.forks[i] !== undefined && this.forks[i] !== null)
+                    fork.destroyFork();
             }
 
         return false;

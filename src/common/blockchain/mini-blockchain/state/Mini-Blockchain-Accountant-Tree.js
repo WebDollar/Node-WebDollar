@@ -11,12 +11,13 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
     createRoot() {
+
         this.root = new MiniBlockchainAccountantTreeNode(null, null, [], null);
         this.root.autoMerklify = true;
         this.root.deleteEmptyAddresses = false;
         this.root.root = this.root;
-    }
 
+    }
 
     /**
      *
