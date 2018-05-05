@@ -81,6 +81,7 @@ class NodeServer {
 
                 if (NODES_TYPE.NODE_WEB_PEER === nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
                     console.warn("too many browser connections");
+                    socket.disconnect();
                     return;
                 }
 
