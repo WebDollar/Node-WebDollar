@@ -4,7 +4,7 @@ const readline = require('readline');
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 
-class CLI{
+class CLI {
 
     constructor(){
 

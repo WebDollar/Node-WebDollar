@@ -30,6 +30,8 @@ class NodeServer {
         if (!NodeExpress.loaded)
             await NodeExpress.startExpress();
 
+        if (!consts.OPEN_SERVER) return false;
+
         try
         {
             let server = null;
