@@ -13,8 +13,10 @@ class BufferExtended {
 
         let length = Math.min(index + count, buffer.length);
 
-        if (length-index <= 0)
+        if (length-index < 0)
             throw {message: "length-index <= 0...", buffer: buffer.toString("hex"), index:index, length:length, count: count};
+
+        if (length-index === 0) return new Buffer(0);
 
         let buf = new Buffer(length-index);
         buffer.copy(buf, 0, index, length);
