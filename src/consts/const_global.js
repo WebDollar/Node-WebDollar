@@ -241,8 +241,8 @@ consts.SETTINGS = {
             },
 
             SERVER: {
-                MAXIMUM_CONNECTIONS_FROM_BROWSER: 100,
-                MAXIMUM_CONNECTIONS_FROM_TERMINAL: 10,
+                MAXIMUM_CONNECTIONS_FROM_BROWSER: 150,
+                MAXIMUM_CONNECTIONS_FROM_TERMINAL: 20,
             },
 
             WEBRTC: {
