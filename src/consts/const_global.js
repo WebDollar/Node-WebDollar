@@ -2,9 +2,8 @@ const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 
 let consts = {
-    DEBUG: true,
+    DEBUG: false,
 };
-
 
 
 consts.BLOCKCHAIN = {

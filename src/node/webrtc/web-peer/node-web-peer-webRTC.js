@@ -471,9 +471,14 @@ class NodeWebPeerRTC {
         this.peer.on("disconnect", ()=>{
 
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
-            NodesList.disconnectSocket( this.peer );
+            try {
+                NodesList.disconnectSocket(this.peer);
 
-            NodeSignalingClientProtocol.webPeerDisconnected(this);
+                NodeSignalingClientProtocol.webPeerDisconnected(this);
+            } catch (exception){
+            }
+
+            delete this.peer;
 
         });
 

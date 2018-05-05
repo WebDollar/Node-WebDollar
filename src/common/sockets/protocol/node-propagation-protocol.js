@@ -1,7 +1,8 @@
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
-import NodeProtocol from 'common/sockets/protocol/node-protocol';
 import NodesList from 'node/lists/nodes-list'
-import NODES_TYPE from "../../../node/lists/types/Nodes-Type";
+import NODES_TYPE from "node/lists/types/Nodes-Type";
+import NodeProtocol from 'common/sockets/protocol/node-protocol';
+
 
 class NodePropagationProtocol {
 
@@ -12,6 +13,14 @@ class NodePropagationProtocol {
 
         setTimeout(this._processNewWaitlistInterval.bind(this), 5000);
 
+    }
+
+    initializePropagationProtocol(){
+        NodesList.emitter.once("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
+        NodesList.emitter.once("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected( nodeListObject) });
+
+        NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
+        NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
     }
 
     _processList(list){
@@ -55,11 +64,6 @@ class NodePropagationProtocol {
             socket.node.sendRequest("propagation/request-all-wait-list/light-nodes");
         },  1000);
 
-        NodesList.emitter.on("nodes-list/connected", nodeListObject => { this._newNodeConnected(socket, nodeListObject) } );
-        NodesList.emitter.on("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected(socket, nodeListObject) });
-
-        NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected(socket, nodeWaitListObject) } );
-        NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected(socket, nodeWaitListObject) });
 
     }
 
@@ -162,17 +166,17 @@ class NodePropagationProtocol {
         });
     }
 
-    _newNodeConnected(socket, nodeWaitListObject){
+    _newNodeConnected( nodeWaitListObject ){
 
-        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) socket.node.sendRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
-        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) socket.node.sendRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
+        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
+        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
 
     }
 
-    _nodeDisconnected(socket, nodeWaitListObject){
+    _nodeDisconnected(nodeWaitListObject){
 
-        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) socket.node.sendRequest("propagation/nodes", {op: "deleted-full-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
-        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) socket.node.sendRequest("propagation/nodes", {op: "deleted-light-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
+        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "deleted-full-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
+        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "deleted-light-nodes", addresses: [nodeWaitListObject.toJSON() ]},);
 
     }
 

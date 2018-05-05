@@ -148,8 +148,14 @@ class NodeServer {
         }
 
         socket.once("disconnect", () => {
-            console.log("Socket disconnected", socket.node.sckAddress.getAddress());
-            NodesList.disconnectSocket(socket);
+
+            try {
+                console.log("Socket disconnected", socket.node.sckAddress.getAddress());
+                NodesList.disconnectSocket(socket);
+            } catch (exception){
+
+            }
+
         });
 
         console.log('Socket Server Initialized ' + socket.node.sckAddress.getAddress(true));

@@ -162,8 +162,14 @@ class NodeClient {
 
             //disconnect over the time, so it was connected before
 
-            console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true) );
-            NodesList.disconnectSocket(this.socket);
+            try {
+                console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true));
+                NodesList.disconnectSocket(this.socket);
+            } catch (exception){
+
+            }
+
+            delete this.socket;
 
         });
 

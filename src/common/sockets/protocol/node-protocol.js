@@ -83,7 +83,6 @@ class NodeProtocol {
         node.protocol.nodeUTC = response.UTC;
         node.protocol.helloValidated = true;
 
-        //delete socket;
         return true;
     }
 
