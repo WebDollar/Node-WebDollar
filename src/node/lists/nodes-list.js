@@ -1,5 +1,5 @@
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
-import SocketAddress from 'common/sockets/socket-address'
+import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NodesListObject from './node-list-object.js';
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 
@@ -171,19 +171,19 @@ class NodesList {
         return count;
     }
 
-    countNodesByType(connectionType){
+    countNodesByType(nodeType){
 
-        if ( connectionType === undefined) connectionType = 'all';
+        if ( nodeType === undefined) nodeType = 'all';
 
         let count = 0;
 
         for (let i=0; i<this.nodes.length; i++)
-            if (Array.isArray(connectionType)) { //in case type is an Array
-                if (this.nodes[i].nodeType in connectionType)
+            if (Array.isArray(nodeType)) { //in case type is an Array
+                if (this.nodes[i].nodeType in nodeType)
                     count++;
             }
             else
-            if (connectionType === this.nodes[i].nodeType || connectionType === "all")
+            if (nodeType === this.nodes[i].nodeType || nodeType === "all")
                 count++;
 
         return count;

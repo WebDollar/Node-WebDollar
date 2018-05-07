@@ -235,6 +235,8 @@ consts.SETTINGS = {
 
             NO_OF_IDENTICAL_IPS: 10,
 
+            PROPAGATE_BLOCKS_TO_SOCKETS: 50,
+
             SOCKETS: {
                 MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
                 MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,

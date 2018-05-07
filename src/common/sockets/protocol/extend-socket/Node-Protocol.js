@@ -15,8 +15,8 @@ class NodeProtocol {
         HELLO PROTOCOL
      */
 
-    justSendHello(node){
-        return node.sendRequestWaitOnce("HelloNode", {
+    justSendHello(){
+        return this.node.sendRequestWaitOnce("HelloNode", {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
@@ -25,7 +25,7 @@ class NodeProtocol {
         });
     }
 
-    processHello( node, response, validationDoubleConnectionsTypes ){
+    processHello( response, validationDoubleConnectionsTypes ){
 
         if (typeof response !== "object" || response === null || response === undefined) {
             console.error("No Hello");
@@ -58,10 +58,10 @@ class NodeProtocol {
             return false;
         }
 
-        node.sckAddress.uuid = response.uuid;
+        this.node.sckAddress.uuid = response.uuid;
 
         //check if it is a unique connection, add it to the list
-        let connections = NodesList.countNodeSocketByAddress(node.sckAddress, "all");
+        let connections = NodesList.countNodeSocketByAddress(this.node.sckAddress, "all");
 
         for (let i=0; i<validationDoubleConnectionsTypes.length; i++){
 
@@ -74,19 +74,19 @@ class NodeProtocol {
 
         console.log("RECEIVED HELLO NODE BACK", response.version, response.uuid);
 
-        node.protocol.nodeType = response.nodeType;
+        this.node.protocol.nodeType = response.nodeType;
 
         if (typeof response.SSL === "string") response.SSL = parseInt(response.SSL);
         if (typeof response.SSL === "number") response.SSL = response.SSL === 1;
 
-        node.protocol.nodeSSL = response.SSL;
-        node.protocol.nodeUTC = response.UTC;
-        node.protocol.helloValidated = true;
+        this.node.protocol.nodeSSL = response.SSL;
+        this.node.protocol.nodeUTC = response.UTC;
+        this.node.protocol.helloValidated = true;
 
         return true;
     }
 
-    async sendHello ( node, validationDoubleConnectionsTypes ) {
+    async sendHello ( validationDoubleConnectionsTypes ) {
 
 
         // Waiting for Protocol Confirmation
@@ -95,7 +95,7 @@ class NodeProtocol {
         let response;
         for (let i=0; i < 3; i++) {
 
-            response = await node.sendRequestWaitOnce("HelloNode", {
+            response = await this.node.sendRequestWaitOnce("HelloNode", {
 
                 version: consts.SETTINGS.NODE.VERSION,
                 uuid: consts.SETTINGS.UUID,
@@ -110,7 +110,7 @@ class NodeProtocol {
 
         }
 
-        return this.processHello(node, response, validationDoubleConnectionsTypes);
+        return this.node.protocol.processHello( response, validationDoubleConnectionsTypes );
 
     }
 
@@ -122,7 +122,7 @@ class NodeProtocol {
      * @param type
      * @param exceptSockets
      */
-    broadcastRequest (request, data, type, exceptSockets){
+    static broadcastRequest (request, data, type, exceptSockets){
 
         if (exceptSockets === "all") return true;
 
@@ -163,7 +163,19 @@ class NodeProtocol {
         return true;
     }
 
+    sendLastBlock(callback){
+
+        if (Blockchain.blockchain.blocks.last === undefined) return;
+
+        this.node.sendRequest("head/new-block", {
+            l: Blockchain.blockchain.blocks.length,
+            h: Blockchain.blockchain.blocks.last.hash,
+            s: Blockchain.blockchain.blocks.blocksStartingPoint,
+            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi !== null && Blockchain.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
+        }, callback);
+    }
+
 
 }
 
-export default new NodeProtocol();
+export default NodeProtocol

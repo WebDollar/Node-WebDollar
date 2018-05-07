@@ -3,8 +3,9 @@ import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protoc
 import InterfaceBlockchainProtocolForksManager from "./Interface-Blockchain-Protocol-Forks-Manager"
 
 import Serialization from 'common/utils/Serialization';
-import NodeProtocol from 'common/sockets/protocol/node-protocol'
+import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol'
 import BufferExtended from "common/utils/BufferExtended"
+import NodeBlockchainPropagation from "../../../sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 /**
  * Blockchain Protocol
@@ -60,18 +61,6 @@ class InterfaceBlockchainProtocol {
 
     createForksManager(){
         this.forksManager = new InterfaceBlockchainProtocolForksManager(this.blockchain, this);
-    }
-
-    propagateHeader(block,  socketsAvoidBroadcast){
-
-        // broadcasting the new block, to everybody else
-        NodeProtocol.broadcastRequest( "head/new-block", {
-            l: this.blockchain.blocks.length,
-            h: this.blockchain.blocks.last.hash,
-            s: this.blockchain.blocks.blocksStartingPoint,
-            p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== null && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
-        }, "all", socketsAvoidBroadcast);
-
     }
 
     _validateBlockchainHeader(data){

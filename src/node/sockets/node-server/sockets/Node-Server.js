@@ -1,10 +1,10 @@
 
-import SocketAddress from "common/sockets/socket-address";
+import SocketAddress from "common/sockets/protocol/extend-socket/Socket-Address";
 
 let io = require('socket.io');
 
 import consts from 'consts/const_global'
-import SocketExtend from 'common/sockets/socket-extend'
+import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
 import NodesList from 'node/lists/nodes-list'
 import NodeExpress from "./../express/Node-Express";
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
@@ -74,6 +74,10 @@ class NodeServer {
                     socket.disconnect();
                     return;
                 }
+
+                console.log("nodeType", nodeType);
+                console.log("NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL)", NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) );
+                console.log("NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER)", NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) );
 
                 if (NODES_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
                     console.warn("too many terminal connections");

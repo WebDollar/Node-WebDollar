@@ -6,7 +6,7 @@
 // TUTORIAL BASED ON https://www.scaledrone.com/blog/posts/webrtc-chat-tutorial
 
 const EventEmitter = require('events');
-import SocketExtend from 'common/sockets/socket-extend'
+import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
 import NodesList from 'node/lists/nodes-list'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
@@ -129,6 +129,7 @@ class NodeWebPeerRTC {
             this.peer.remoteAddress = remoteAddress||remoteData.address;
             this.peer.remoteUUID = remoteUUID||remoteData.uuid;
             this.peer.remotePort = remotePort||remoteData.port;
+            this.peer.webRTC = true;
 
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, socketSignaling.node.level + 1 );
 

@@ -1,10 +1,8 @@
 import consts from 'consts/const_global'
 import global from "consts/global"
-import Serialization from "common/utils/Serialization";
 import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
-import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-
+import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -65,7 +63,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             ) throw {message: "Error Including Blockchain Light Block"};
 
             if (saveBlock )
-                this.propagateBlocks(block.height, socketsAvoidBroadcast)
+                NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
 
         } else {
 

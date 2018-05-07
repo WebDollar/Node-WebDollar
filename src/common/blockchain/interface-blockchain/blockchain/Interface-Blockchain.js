@@ -23,7 +23,7 @@ import InterfaceBlockchainBlockValidation from "common/blockchain/interface-bloc
 import BlockchainTimestamp from "common/blockchain/interface-blockchain/timestmap/Blockchain-Timestamp"
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import InterfaceBlockchainTipsAdministrator from "./tips/Interface-Blockchain-Tips-Administrator";
-
+import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 const SEMAPHORE_PROCESSING_INTERVAL = 10;
 
@@ -115,10 +115,11 @@ class InterfaceBlockchain {
         await this._blockIncluded( block);
 
         if (saveBlock) {
+
             await this.saveNewBlock(block);
 
             // propagating a new block in the network
-            this.propagateBlocks(block.height, socketsAvoidBroadcast)
+            NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
         }
 
         this._onBlockCreated(block,  saveBlock);
@@ -402,22 +403,6 @@ class InterfaceBlockchain {
         this.blocks.spliceBlocks(index);
 
         return true;
-    }
-
-
-    propagateBlocks(height, socketsAvoidBroadcast){
-
-        if (this.agent !== undefined) {
-            for (let i = Math.max(0, height); i < this.blocks.length; i++) {
-
-                if (this.blocks[i] === undefined)
-                    console.error("PROPAGATE ERROR"+i, this.blocks[i]);
-                else
-                    this.agent.protocol.propagateHeader(this.blocks[i],  socketsAvoidBroadcast);
-
-            }
-
-        }
     }
 
     createBlockValidation(){

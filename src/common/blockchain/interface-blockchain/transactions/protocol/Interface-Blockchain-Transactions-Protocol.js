@@ -1,4 +1,4 @@
-import NodeProtocol from 'common/sockets/protocol/node-protocol';
+import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import NodesList from 'node/lists/nodes-list'
 
 import Blockchain from "main-blockchain/Blockchain"
