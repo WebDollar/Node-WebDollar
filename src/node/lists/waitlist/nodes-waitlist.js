@@ -33,6 +33,11 @@ class NodesWaitlist {
         this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS = 500;
         this.MAX_ERROR_TRIALS = 100;
 
+
+        NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
+            await this._desinitializeNode(nodesListObject.socket);
+        });
+
     }
 
 
@@ -304,6 +309,29 @@ class NodesWaitlist {
 
         for (let i=0; i<list.length; i++)
             list[i].resetWaitlistNode();
+
+    }
+
+    _desinitializeNode(nodesListObject){
+
+        let socket = nodesListObject.socket;
+
+        this._removeBackedBySocket(socket, this.waitListFullNodes);
+        this._removeBackedBySocket(socket, this.waitListLightNodes);
+
+    }
+
+    _removeBackedBySocket(socket, list){
+
+        for (let i=0; i<list.length; i++){
+            list[i].removeBackedBy(socket);
+
+            if (list[i].backedBy.length === 0){
+
+                this.emitter.emit("waitlist/delete-node", list[i]);
+                list.splice(i, 1);
+            }
+        }
 
     }
 
