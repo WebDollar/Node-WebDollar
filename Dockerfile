@@ -10,4 +10,6 @@ RUN rm -rf /tmp/* /var/cache/apk/*
 
 EXPOSE 80
 
+RUN chmod +x start1.sh
+
 CMD ["./start1.sh"]
