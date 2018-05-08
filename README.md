@@ -13,7 +13,7 @@ https://docs.docker.com/install/
 
 ## 2. Run prebuilt Container (automated build https://hub.docker.com/r/xkid/webdollar/)
 ```
-docker run -d --restart=always --name webdollar -p 80:80 xkid/webdollar
+docker run -d --restart=always -e DOMAIN=<ENTER DOMAIN HERE> -e EMAIL=<ENTER EMAIL HERE> --name webdollar -p 80:80 -p 443:443 xkid/webdollar
 ```
 
 # Installing (Poor tech skills required)
