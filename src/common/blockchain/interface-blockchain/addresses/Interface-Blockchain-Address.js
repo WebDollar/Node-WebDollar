@@ -1,8 +1,6 @@
-import AdvancedMessages from "node/menu/Advanced-Messages"
-
-const FileSystem = require('fs');
 import ed25519 from "common/crypto/ed25519";
 
+import AdvancedMessages from "node/menu/Advanced-Messages";
 import consts from 'consts/const_global'
 import InterfaceBlockchainAddressHelper from './Interface-Blockchain-Address-Helper';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
@@ -12,6 +10,8 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto';
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data';
 import BufferExtended from 'common/utils/BufferExtended';
 import MultiSig from "./MultiSig";
+
+const FileSystem = require('fs');
 
 
 class InterfaceBlockchainAddress{
@@ -32,7 +32,7 @@ class InterfaceBlockchainAddress{
     async createNewAddress(salt, privateKeyWIF){
 
         if (this.address !== null){
-            console.log("WARNING! You overwrite the initial address")
+            console.log("WARNING! You overwrite the initial address");
         }
 
         let result = InterfaceBlockchainAddressHelper.generateAddress(salt, privateKeyWIF);
@@ -278,11 +278,6 @@ class InterfaceBlockchainAddress{
         return this.address;
     }
 
-    //TODO REMOVE THIS FUNCTION!!!!!!!!!!!!!!
-    async exportAddressPrivateKeyToHex(){
-        return (await this.getPrivateKey()).toString("hex");
-    }
-
     async serializeAddress(serializePrivateKey = false){
 
         let privateKeyArray = [];
@@ -317,7 +312,7 @@ class InterfaceBlockchainAddress{
             len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
             offset += 1;
 
-            this.address = BufferExtended.toBase( BufferExtend.substr(buffer, offset, len));
+            this.address = BufferExtended.toBase( BufferExtend.substr(buffer, offset, len) );
             offset += len;
 
             //read unencodedAddress
@@ -379,7 +374,8 @@ class InterfaceBlockchainAddress{
         try {
             let value = await this.db.get(key);
 
-            if (value === null) return false;
+            if (value === null)
+                return false;
 
             await this.deserializeAddress(value);
 
@@ -411,6 +407,7 @@ class InterfaceBlockchainAddress{
 
             if (password === undefined)
                 password = await InterfaceBlockchainAddressHelper.askForPassword();
+
             if (password === null)
                 return null;
 
@@ -422,13 +419,14 @@ class InterfaceBlockchainAddress{
 
             let answer = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey);
 
-            if (! answer.result) throw { message: "private key is invalid" };
+            if (!answer.result)
+                throw { message: "private key is invalid" };
 
             privateKey = answer.privateKey;
 
         } catch (exception) {
 
-            AdvancedMessages.alert('Your password is incorrect!!! ');
+            AdvancedMessages.alert('Your password is incorrect!!!');
 
             return null;
         }
@@ -440,7 +438,8 @@ class InterfaceBlockchainAddress{
 
             addressIndex = transaction.from.findAddressIndex(addressGenerated.unencodedAddress);
 
-            if (addressIndex === -1) throw {message: "transaction not found"};
+            if (addressIndex === -1)
+                throw {message: "transaction not found"};
 
             transaction.from.addresses[addressIndex].publicKey = addressGenerated.publicKey;
 
