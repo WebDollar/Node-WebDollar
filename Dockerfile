@@ -1,7 +1,7 @@
 FROM node:8-alpine
 
 # Install build packages
-RUN apk add --no-cache make gcc g++ python
+RUN apk update && apk add --no-cache make gcc g++ python certbot
 
 # Copy files
 COPY . .
@@ -20,6 +20,15 @@ RUN npm ls -gp --depth=0 | awk -F/ '/node_modules/ && !/\/npm$/ {print $NF}' | x
 	rm -rf /tmp/* /var/cache/apk/* &&\
 	npm cache clean --force
 
-EXPOSE 80
+# Install pm2
+RUN npm install -g pm2
 
-CMD ["node","dist_bundle/terminal-bundle.js"]
+# Ports
+EXPOSE 80
+EXPOSE 443
+
+# Make script executable
+
+RUN chmod +x start_docker_letsencrypt.sh
+
+CMD ["sh","start_docker_letsencrypt.sh"]
