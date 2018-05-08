@@ -1,7 +1,8 @@
-var BigInteger = require('big-integer');
-var BigNumber = require ('bignumber.js');
+import consts from 'consts/const_global';
 
-import consts from 'consts/const_global'
+let BigInteger = require('big-integer');
+let BigNumber = require ('bignumber.js');
+
 
 class BlockchainDifficulty{
 
@@ -32,7 +33,8 @@ class BlockchainDifficulty{
 
         if (Buffer.isBuffer(prevBlockDifficulty))
             prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex"));
-        else if (typeof prevBlockDifficulty === "string") // it must be hex
+        else
+        if (typeof prevBlockDifficulty === "string") // it must be hex
             prevBlockDifficulty = new BigNumber(prevBlockDifficulty);
 
         //let's suppose BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 10
