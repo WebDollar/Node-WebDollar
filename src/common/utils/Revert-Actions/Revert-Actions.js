@@ -37,7 +37,7 @@ class RevertActions {
                 }
                 else if (action.name === "block-added" && (actionName === '' || actionName === action.name)) {
 
-                    this.blockchain.blocks.spliceBlocks(action.height);
+                    this.blockchain.blocks.spliceBlocks(action.height, true);
 
                 } else if (action.name === "breakpoint" && (actionName === '' || actionName === action.name)) {
 

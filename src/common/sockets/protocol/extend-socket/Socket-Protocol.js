@@ -1,13 +1,17 @@
 import global from 'consts/global';
 import isArrayBuffer from 'is-array-buffer';
 
+/**
+ * acknowledgment doesn't make much difference between event vs ackwnowledgment
+ */
+
 class SocketProtocol {
 
-    sendRequestSocket (request, requestData, callback ) {
+    sendRequestSocket (request, requestData ) {
 
         try {
 
-            return this.emit(request, requestData, callback); //socket io and Simple-Peer WebRTC
+            return this.emit(request, requestData,); //socket io and Simple-Peer WebRTC
 
         } catch (exception){
             console.error("Error sending request" + exception, exception);
@@ -17,18 +21,11 @@ class SocketProtocol {
     }
 
 
-    sendRequestWebPeer (request, requestData, callback) {
+    sendRequestWebPeer (request, requestData, ) {
 
         try {
 
-            let answer = this.send(request, requestData); // Simple Peer WebRTC - socket
-
-            if (callback !== undefined)
-                setTimeout(()=>{
-                    callback(true);
-                }, 100);
-
-            return answer;
+            return this.send(request, requestData); // Simple Peer WebRTC - socket
 
         } catch (exception){
             console.error("Error sending request" + exception, exception);

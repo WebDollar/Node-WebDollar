@@ -75,7 +75,9 @@ class NodeBlockchainPropagation{
                 this._socketsPropagating.push(socket);
 
                 //let send the block, but once we receive any kind of confirmation, we need to delete it from the socketsWaitlist
-                socket.node.protocol.sendLastBlock((confirmation)=>{
+                socket.node.protocol.sendLastBlock();
+
+                setTimeout(()=>{
 
                     if (block === this._blockPropagating){
                         this._socketsAlreadyBroadcast.push(socket);
@@ -86,7 +88,7 @@ class NodeBlockchainPropagation{
                         if (this._socketsPropagating[i] === socket)
                             this._socketsPropagating.splice(i,1);
 
-                });
+                }, 200);
 
             }
 

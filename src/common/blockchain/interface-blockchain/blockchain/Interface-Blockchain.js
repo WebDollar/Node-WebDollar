@@ -400,7 +400,7 @@ class InterfaceBlockchain {
             }
         }
 
-        this.blocks.spliceBlocks(index);
+        this.blocks.spliceBlocks(index, true);
 
         return true;
     }

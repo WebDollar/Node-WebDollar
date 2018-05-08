@@ -26,6 +26,7 @@ class PPoWBlockchainProofBasic{
 
             if (!found) {
 
+                // avoid destroying real blocks
                 if (typeof this.blocks[i].destroyBlock === "function")
                     this.blocks[i].destroyBlock();
 
@@ -133,6 +134,16 @@ class PPoWBlockchainProofBasic{
 
         }
 
+    }
+
+    findBlockByHeight(height){
+
+        for (let i=0; i<this.blocks.length; i++)
+            if (this.blocks[i].height === height){
+                return this.blocks[i];
+            }
+
+        return null;
     }
 
 }

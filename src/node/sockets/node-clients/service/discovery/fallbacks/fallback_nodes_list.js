@@ -36,6 +36,7 @@ export default {
         {"addr": ["robitza.ddns.net:8082"]},
 
         {"addr": ["webdollar.network:5000"]},
+        {"addr": ["webd.5q.ro:3333"]}
 
     ]
 }

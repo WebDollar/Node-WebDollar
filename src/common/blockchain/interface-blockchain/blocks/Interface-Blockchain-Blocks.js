@@ -42,8 +42,10 @@ class InterfaceBlockchainBlocks{
 
         for (let i = this.length - 1; i >= after; i--)
             if (this[i] !== undefined){
-                if (freeMemory)
+                if (freeMemory) {
+                    this[i].destroyBlock();
                     delete this[i];
+                }
                 else
                     this[i] = undefined;
             }
@@ -55,7 +57,7 @@ class InterfaceBlockchainBlocks{
 
     clear(){
 
-        this.spliceBlocks(0)
+        this.spliceBlocks(0, true);
 
     }
 
