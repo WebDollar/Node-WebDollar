@@ -6,15 +6,20 @@ RUN apk add --no-cache make gcc g++ python
 # Copy files
 COPY . .
 
-# Run npm install production
-RUN npm install --only=production
+# Run npm install for build
+RUN npm install
 
 # Install global packages
 RUN npm install -g cross-env webpack webpack-cli
 
-# Delete build pagages and clear cache
-RUN apk del make gcc g++ python && rm -rf /tmp/* /var/cache/apk/*
+# Build
+RUN npm run build_terminal
+
+# Clean Everything
+RUN npm ls -gp --depth=0 | awk -F/ '/node_modules/ && !/\/npm$/ {print $NF}' | xargs npm -g rm && apk del make gcc g++ python &&\
+	rm -rf /tmp/* /var/cache/apk/* &&\
+	npm cache clean --force
 
 EXPOSE 80
 
-CMD ["npm","run","start"]
+CMD ["node","dist_bundle/terminal-bundle.js"]
