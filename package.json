@@ -10,7 +10,7 @@
     "build_browser": "webpack --config build_webpack/webpack.browser.config.js",
     "build_browser_user_interface": "cross-env WEBPACK_TYPE=user_interface webpack --config build_webpack/webpack.browser.config.js ",
     "show_browser_test": "node src/tests/browser/show-browser.test.js",
-    "start": "webpack --config build_webpack/webpack.terminal.config.js && node dist_bundle/terminal-bundle.js  ",
+    "start": "webpack --config build_webpack/webpack.terminal.config.js && node dist_bundle/terminal-bundle.js --max_old_space_size=4096 ",
     "start_mining": "webpack --config build_webpack/webpack.terminal-mining.config.js && node dist_bundle/terminal-bundle.js ",
     "test": "npm run build_terminal_test && mocha --exit --timeout 10000 dist_bundle/terminal-mocha-bundle.js --reporter mochawesome && npm run show_mocha_report",
     "test_browser": "webpack --config build_webpack/tests/webpack.browser.test.config.js && npm run show_browser_test",
