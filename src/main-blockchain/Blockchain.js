@@ -26,7 +26,7 @@ class Blockchain{
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
 
-        this.Mining = new MainBlockchainMining(this.Chain, undefined );
+        this.Mining = new MainBlockchainMining(this.Chain, undefined);
 
         this.Transactions = this.Chain.transactions;
         this.Transactions.setWallet(this.Wallet);
@@ -38,8 +38,8 @@ class Blockchain{
         this.onLoaded = new Promise((resolve)=>{
             this._onLoadedResolver = resolve;
         });
+        
         this._loaded = false;
-
 
     }
 
@@ -147,7 +147,8 @@ class Blockchain{
         console.warn("################### RESYNCHRONIZATION STARTED ##########");
 
         let suspendMining = false;
-        if (!this.blockchain.light || (this.blockchain.light && NodesList.nodes.length <= 0)) suspendMining = true;
+        if (!this.blockchain.light || (this.blockchain.light && NodesList.nodes.length <= 0))
+            suspendMining = true;
 
         if (suspendMining) {
             StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});

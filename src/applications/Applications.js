@@ -1,13 +1,13 @@
-import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper'
-import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
-import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
-import consts from 'consts/const_global'
-import NODES_TYPE from 'node/lists/types/Nodes-Type'
-import CONNECTIONS_TYPE from 'node/lists/types/Connections-Type'
-import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
+import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper';
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
+import consts from 'consts/const_global';
+import NODES_TYPE from 'node/lists/types/Nodes-Type';
+import CONNECTIONS_TYPE from 'node/lists/types/Connections-Type';
+import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper";
 import BufferExtended from "common/utils/BufferExtended";
 
-class Applications{
+class Applications {
 
     constructor() {
 
@@ -26,4 +26,4 @@ class Applications{
 
 }
 
-export default new Applications()
+export default new Applications();

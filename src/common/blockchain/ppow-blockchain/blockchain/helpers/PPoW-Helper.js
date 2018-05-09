@@ -79,7 +79,7 @@ class PPoWHelper{
 
         // local-good δ (C↑ µ [−m' :], C↑µ [−m' :]↓ , µ).
         let mP = consts.POPOW_PARAMS.m;
-        while ( mP >= consts.POPOW_PARAMS.m  && mP <underlyingChain.blocks.length){
+        while (mP >= consts.POPOW_PARAMS.m  && mP < underlyingChain.blocks.length){
 
             // C↑µ [−m':]
             let upperChain = underlyingChain.blocksGreaterLevel(miu);
