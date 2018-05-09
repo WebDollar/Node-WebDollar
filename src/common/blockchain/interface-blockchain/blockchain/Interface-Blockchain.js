@@ -344,8 +344,14 @@ class InterfaceBlockchain {
             if (indexStartLoadingOffset )
                 indexStart = numBlocks - indexStartLoadingOffset;
 
-            if (indexStartProcessingOffset !== undefined)
+            if (indexStartProcessingOffset !== undefined) {
                 indexStartProcessingOffset = numBlocks - indexStartProcessingOffset;
+
+                console.warn("===========================================================");
+                console.warn("BLocks Processing starts at: ", indexStartProcessingOffset);
+                console.warn("===========================================================");
+
+            }
 
             this.blocks.length = indexStart || 0; // marking the first blocks as undefined
 
