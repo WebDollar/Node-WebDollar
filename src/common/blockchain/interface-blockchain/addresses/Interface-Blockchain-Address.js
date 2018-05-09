@@ -166,6 +166,10 @@ class InterfaceBlockchainAddress{
         }
     }
 
+    async exportAddressPrivateKeyToHex(){
+        return (await this.getPrivateKey()).toString("hex");
+    }
+
     /**
      *
      * @param fileName stores the path for privateKey file
