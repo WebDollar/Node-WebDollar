@@ -284,8 +284,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 result = await fork.includeForkBlock(block);
 
-                if (block.interlink !== undefined)
-                    console.log("block.interlink", block.interlink.length);
+                // if (block.interlink !== undefined)
+                //     console.log("block.interlink", block.interlink.length);
 
             } catch (Exception) {
 

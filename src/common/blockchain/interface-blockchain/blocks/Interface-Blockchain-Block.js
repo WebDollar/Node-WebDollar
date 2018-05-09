@@ -167,8 +167,6 @@ class InterfaceBlockchainBlock {
         if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget) )
             throw {message: 'previousDifficultyTarget is not given'};
 
-        //console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
-
         if (! (this.hash.compare( prevDifficultyTarget ) <= 0))
             throw {message: "block doesn't match the difficulty target is not ", hash:this.hash, prevDifficultyTarget: prevDifficultyTarget};
 

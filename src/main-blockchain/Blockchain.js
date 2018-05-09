@@ -133,6 +133,7 @@ class Blockchain{
 
         StatusEvents.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
         return chainLoaded;
+
     }
 
     /**
