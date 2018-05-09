@@ -309,6 +309,7 @@ class InterfaceBlockchain {
                 validationType["skip-block-data-validation"] = true;
                 validationType["skip-block-data-transactions-validation"] = true;
                 validationType["skip-validation-interlinks"] = true;
+                validationType["skip-validation"] = true;
 
                 if (Math.random() < 0.001)
                     validationType["skip-validation-PoW-hash"] = true;

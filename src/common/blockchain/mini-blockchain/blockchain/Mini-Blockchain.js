@@ -83,6 +83,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
                 if (revertException)
                     return false;
+
             }
 
 
