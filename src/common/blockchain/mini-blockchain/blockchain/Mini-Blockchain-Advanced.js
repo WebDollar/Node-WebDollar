@@ -21,8 +21,10 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         //delete old lightAccountantTreeSerializations
 
+
         let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
-        while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
+
+        while (this.lightAccountantTreeSerializations[index] !== undefined){
             delete this.lightAccountantTreeSerializations[index];
             index--;
         }
@@ -50,8 +52,49 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
     }
 
+    async saveBlockchain(startingHeight, endingHeight){
+
+        if (process.env.BROWSER)
+            return true;
+
+        if (this.blocks.length === 0) return false;
+
+        try {
+
+            if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE)
+                if (!(await this.accountantTree.saveMiniAccountant(true, "miniBlockchainAccountantTreeAdvanced", this.lightAccountantTreeSerializations[ this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE + 1 ])))
+                    throw {message: "saveMiniAccountant couldn't be saved"};
+
+            if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
+                throw {message: "couldn't sae the blockchain"};
+
+            return true;
+
+        } catch (exception){
+            console.error("Couldn't save MiniBlockchain", exception);
+            return false;
+        }
+
+    }
+
+    async loadBlockchain(){
+
+        if (process.env.BROWSER)
+            return true;
+
+        //AccountantTree[:-BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS]
+
+        if (! (await this.accountantTree.loadMiniAccountant(undefined, undefined, true, "miniBlockchainAccountantTreeAdvanced"))) {
+
+            return await this.inheritBlockchain.prototype.loadBlockchain.call( this );
+
+        }
+
+        return await this.inheritBlockchain.prototype.loadBlockchain.call( this, undefined, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE );
+
+    }
+
 
 }
-
 
 export default MiniBlockchainAdvanced

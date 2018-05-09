@@ -2,7 +2,7 @@ const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 
 let consts = {
-    DEBUG: false,
+    DEBUG: true,
     OPEN_SERVER: true,
 };
 
@@ -27,7 +27,11 @@ consts.BLOCKCHAIN = {
         VALIDATE_LAST_BLOCKS: 10 , //overwrite below
         SAFETY_LAST_BLOCKS: 40, //overwrite below
 
-        SAFETY_LAST_BLOCKS_DELETE: 400, //overwrite below
+        SAFETY_LAST_BLOCKS_DELETE_BROWSER: 500, //overwrite below
+        SAFETY_LAST_BLOCKS_DELETE_NODE: 4500, //overwrite below
+
+        SAFETY_LAST_BLOCKS_DELETE: undefined,
+
     },
 
     HARD_FORKS : {
@@ -35,8 +39,9 @@ consts.BLOCKCHAIN = {
 
     }
 
-
 };
+
+consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE = (process.env.BROWSER ? consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE_BROWSER : consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE_NODE );
 
 consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 1 ;
 consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS + 2* consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ;

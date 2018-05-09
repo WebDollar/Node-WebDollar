@@ -15,6 +15,7 @@ export default {
         {"addr": ["webd.5q.ro:3333"]},
         {"addr": ["webdollar.bitcoinplusplus.com:443"]},
         {"addr": ["amsterdam.wdpool.io:443"]},
+        {"addr": ["paris.wdpool.io:443"]},
 
         {"addr": ["skyhub.me:80"], },
 

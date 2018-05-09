@@ -150,7 +150,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             // console.warn("this.blocks.blocksStartingPoint ", this.blocks.blocksStartingPoint );
 
             let treeSerialization = this.getSerializedAccountantTree(diffIndex);
-            //console.warn("this.getSerializedAccountantTree ", diffIndex, treeSerialization !== undefined ? treeSerialization.toString('hex') : '');
 
             if (! (await this.accountantTree.saveMiniAccountant(true, undefined, treeSerialization)))
                 throw {message: "saveMiniAccountant", diffIndex};
@@ -300,7 +299,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
             this._difficultyNotValidated = false;
 
-            if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, answer.numBlocks - answer.diffIndex -1 )))
+            if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, answer.diffIndex -1 )))
                 throw {message: "Problem loading the blockchain"};
 
             //check the accountant Tree if matches
