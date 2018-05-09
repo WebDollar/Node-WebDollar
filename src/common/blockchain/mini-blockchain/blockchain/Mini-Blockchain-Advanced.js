@@ -90,7 +90,15 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         }
 
-        return await this.inheritBlockchain.prototype.loadBlockchain.call( this, undefined, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE );
+        let answer = await this.inheritBlockchain.prototype.loadBlockchain.call( this, undefined, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE );
+
+        if (!answer){
+
+            //couldn't load the last K blocks
+            console.warn("couldn't load the last K blocks");
+            return await this.inheritBlockchain.prototype.loadBlockchain.call( this );
+
+        }
 
     }
 

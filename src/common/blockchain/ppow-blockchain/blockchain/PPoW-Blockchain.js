@@ -41,16 +41,16 @@ class PPoWBlockchain extends InterfaceBlockchain {
         this.prover.proofActivated = false;
 
         try {
-            await InterfaceBlockchain.prototype.loadBlockchain.call(this, indexStartLoadingOffset , indexStartProcessingOffset );
+            if (! (await InterfaceBlockchain.prototype.loadBlockchain.call(this, indexStartLoadingOffset , indexStartProcessingOffset ))) return false;
         } catch (exception){
 
             console.error("loadBlockchain raised an error", exception);
         }
 
         this.prover.proofActivated = true;
-
-
         this.prover.createProofs();
+
+        return true;
 
     }
 
