@@ -132,7 +132,8 @@ class InterfaceBlockchain {
 
     _onBlockCreated(block, saveBlock){
 
-        this.blocks.recalculateNetworkHashRate();
+        if (saveBlock)
+            this.blocks.recalculateNetworkHashRate();
 
     }
 
@@ -347,6 +348,7 @@ class InterfaceBlockchain {
             this.blocks.length = indexStart || 0; // marking the first blocks as undefined
 
             let index;
+
             try {
 
                 for (index = indexStart; index < numBlocks; ++index ) {
@@ -382,10 +384,9 @@ class InterfaceBlockchain {
     }
 
 
-    async _loadBlock(indexStart, i, blockValidation, revertActions){
+    async _loadBlock(indexStart, i, blockValidation){
 
-        if (revertActions === undefined)
-            revertActions = new RevertActions(this);
+        let revertActions = new RevertActions(this);
 
         revertActions.push( { name: "breakpoint" } );
 
@@ -414,9 +415,12 @@ class InterfaceBlockchain {
         } catch (exception){
             console.error("blockchain LOADING stopped at " + i, exception);
             revertActions.revertOperations();
+            revertActions.destroyRevertActions();
+
             throw exception;
         }
 
+        revertActions.destroyRevertActions();
         return block;
     }
 

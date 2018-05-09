@@ -225,6 +225,7 @@ class InterfaceBlockchainFork {
 
 
         let revertActions = new RevertActions(this.blockchain);
+        revertActions.push({action: "breakpoint"});
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
@@ -325,6 +326,8 @@ class InterfaceBlockchainFork {
 
         // it was done successfully
         console.log("FORK SOLVER SUCCESS", success);
+
+        revertActions.destroyRevertActions();
 
         if (success){
 
