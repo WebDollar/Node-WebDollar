@@ -1,6 +1,7 @@
 import consts from "consts/const_global";
 import MiniBlockchain from "./Mini-Blockchain";
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
+import global from "consts/global"
 
 class MiniBlockchainAdvanced extends  MiniBlockchain{
 
@@ -61,6 +62,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         try {
 
+            global.MINIBLOCKCHAIN_LIGHT_SAVED = false;
+
             if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE)
                 if (!(await this.accountantTree.saveMiniAccountant(true, "miniBlockchainAccountantTreeAdvanced", this.lightAccountantTreeSerializations[ this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE + 1 ])))
                     throw {message: "saveMiniAccountant couldn't be saved"};
@@ -68,12 +71,14 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
                 throw {message: "couldn't sae the blockchain"};
 
-            return true;
-
         } catch (exception){
             console.error("Couldn't save MiniBlockchain", exception);
+            global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
             return false;
         }
+
+        global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
+        return true;
 
     }
 
