@@ -75,10 +75,6 @@ class NodeServer {
                     return;
                 }
 
-                console.log("nodeType", nodeType);
-                console.log("NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL)", NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) );
-                console.log("NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER)", NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) );
-
                 if (NODES_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
                     console.warn("too many terminal connections");
                     socket.disconnect();

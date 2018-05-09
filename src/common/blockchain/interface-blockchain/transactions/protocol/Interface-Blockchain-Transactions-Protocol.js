@@ -84,7 +84,6 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 let list = [];
 
-                console.warn("pendingQueue length", Blockchain.blockchain.transactions.pendingQueue.list.length);
                 Blockchain.blockchain.transactions.pendingQueue.list.forEach((pendingTransaction)=>{
 
                     if (response.format === "json")

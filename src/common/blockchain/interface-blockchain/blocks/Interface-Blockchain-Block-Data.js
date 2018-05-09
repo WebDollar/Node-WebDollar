@@ -54,13 +54,20 @@ class InterfaceBlockchainBlockData {
             throw {message: 'hashData is empty'};
 
         //validate hash
-        let hashData = this.calculateHashBlockData();
+        if (!blockValidation.blockValidationType["skip-block-data-validation"]) {
 
-        if (! BufferExtended.safeCompare(hashData, this.hashData))
-            throw {message: "block.data hashData is not right"};
+            let hashData = this.calculateHashBlockData();
 
-        if (!this.transactions.validateTransactions(blockHeight, blockValidation.blockValidationType ))
-            throw {message: "transactions failed to validate"};
+            if (!BufferExtended.safeCompare(hashData, this.hashData))
+                throw {message: "block.data hashData is not right"};
+        }
+
+        if (!blockValidation.blockValidationType["skip-block-data-transactions-validation"]) {
+
+            if (!this.transactions.validateTransactions(blockHeight, blockValidation.blockValidationType))
+                throw {message: "transactions failed to validate"};
+
+        }
 
         return true;
     }

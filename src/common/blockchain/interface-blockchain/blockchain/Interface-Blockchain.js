@@ -303,7 +303,10 @@ class InterfaceBlockchain {
                 validationType["skip-accountant-tree-validation"] = true;
                 validationType["skip-mini-blockchain-simulation"] = true;
                 validationType["skip-validation-transactions-from-values"] = true;
-
+                validationType["skip-validation-timestamp"] = true;
+                validationType["validation-timestamp-adjusted-time"] = true;
+                validationType["skip-block-data-validation"] = true;
+                validationType["skip-block-data-transactions-validation"] = true;
 
                 if (Math.random() < 0.001)
                     validationType["skip-validation-PoW-hash"] = true;
