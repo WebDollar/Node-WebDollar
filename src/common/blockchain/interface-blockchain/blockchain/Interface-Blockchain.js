@@ -338,13 +338,24 @@ class InterfaceBlockchain {
 
             this.blocks.length = indexStart || 0; // marking the first blocks as undefined
 
-            for (let i = indexStart; i < numBlocks; ++i) {
+            let index;
+            try {
 
-                let validationType = this._getLoadBlockchainValidationType(indexStart, i, numBlocks, indexStartProcessingOffset );
+                for (index = indexStart; index < numBlocks; ++index ) {
 
-                let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
+                    let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
 
-                await this._loadBlock(indexStart, i, blockValidation);
+                    let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
+
+                    await this._loadBlock(indexStart, index, blockValidation);
+
+                }
+
+            } catch (exception){
+                console.error("Error loading block", index);
+
+                if ( this.blocks.length < 10)
+                    return false;
 
             }
 
