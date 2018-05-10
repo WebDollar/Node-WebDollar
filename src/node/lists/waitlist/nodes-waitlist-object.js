@@ -106,7 +106,7 @@ class NodesWaitlistObject {
 
     }
 
-    pushBackedBy(socket){
+    pushBackedBy( socket, connected ){
 
         for (let i=0; i< this.backedBy.length; i++)
             if (this.backedBy[i] === socket)
