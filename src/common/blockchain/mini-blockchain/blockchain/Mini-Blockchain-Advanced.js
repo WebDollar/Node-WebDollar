@@ -23,7 +23,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         //delete old lightAccountantTreeSerializations
 
 
-        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES;
+        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES - 2;
 
         while (this.lightAccountantTreeSerializations[index] !== undefined){
             delete this.lightAccountantTreeSerializations[index];
@@ -64,9 +64,16 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             global.MINIBLOCKCHAIN_LIGHT_SAVED = false;
 
-            if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES)
-                if (!(await this.accountantTree.saveMiniAccountant(true, "miniBlockchainAccountantTreeAdvanced", this.lightAccountantTreeSerializations[ this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1 ])))
+            if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) {
+
+                console.log("saving ", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES.toString());
+
+                if (! (await this.db.save("lightAccountantTreeAdvanced_offset", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES )))
+                    throw {message: "Couldn't be saved _lightAccountantTreeAdvanced_offset", index: this._blockchainFileName + consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES};
+
+                if (!(await this.accountantTree.saveMiniAccountant( true, "lightAccountantTreeAdvanced", this.lightAccountantTreeSerializations[this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1])))
                     throw {message: "saveMiniAccountant couldn't be saved"};
+            }
 
             if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
                 throw {message: "couldn't sae the blockchain"};
@@ -89,21 +96,32 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         //AccountantTree[:-BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS]
 
-        if (! (await this.accountantTree.loadMiniAccountant(undefined, undefined, true, "miniBlockchainAccountantTreeAdvanced"))) {
+        try {
 
-            return await this.inheritBlockchain.prototype.loadBlockchain.call( this );
+            let offset = await this.db.get("lightAccountantTreeAdvanced_offset");
 
+            if (offset === null || offset < consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES)
+                throw "load blockchain simple";
+
+            if (!(await this.accountantTree.loadMiniAccountant(undefined, undefined, true,  "lightAccountantTreeAdvanced")))
+                throw "load blockchain simple";
+
+            let answer = await this.inheritBlockchain.prototype.loadBlockchain.call(this, undefined, offset);
+
+            if (!answer) {
+                //couldn't load the last K blocks
+                console.warn("couldn't load the last K blocks");
+
+                throw "load blockchain simple";
+            }
+
+        } catch (exception){
+
+            if (exception === "load blockchain simple")
+                return await this.inheritBlockchain.prototype.loadBlockchain.call(this);
         }
 
-        let answer = await this.inheritBlockchain.prototype.loadBlockchain.call( this, undefined, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES );
-
-        if (!answer){
-
-            //couldn't load the last K blocks
-            console.warn("couldn't load the last K blocks");
-            return await this.inheritBlockchain.prototype.loadBlockchain.call( this );
-
-        }
+        return false;
 
     }
 
