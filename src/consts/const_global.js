@@ -2,6 +2,7 @@ const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 
 let consts = {
+
     DEBUG: false,
     OPEN_SERVER: true,
 };
@@ -24,11 +25,12 @@ consts.BLOCKCHAIN = {
     BLOCKS_NONCE : 4,
 
     LIGHT:{
+
         VALIDATE_LAST_BLOCKS: 10 , //overwrite below
         SAFETY_LAST_BLOCKS: 40, //overwrite below
 
         SAFETY_LAST_BLOCKS_DELETE_BROWSER: 500, //overwrite below
-        SAFETY_LAST_BLOCKS_DELETE_NODE: 4500, //overwrite below
+        SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
 
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
@@ -282,6 +284,7 @@ consts.SETTINGS = {
 
 
 if ( consts.DEBUG === true ){
+
     consts.SETTINGS.NODE.VERSION += "3";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "3";
     consts.SETTINGS.NODE.SSL = false;
@@ -292,6 +295,9 @@ if ( consts.DEBUG === true ){
     FallBackNodesList.nodes = [{
         "addr": ["webdollar.ddns.net:9095"],
     }];
+
+
+
 }
 
 
