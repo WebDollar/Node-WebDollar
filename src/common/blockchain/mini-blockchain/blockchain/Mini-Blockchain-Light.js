@@ -363,16 +363,14 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         //delete serializations older than [:-m]
 
-        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
+        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES;
 
-        while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
+        while (this.lightPrevDifficultyTargets.hasOwnProperty(index)){
+
             delete this.lightAccountantTreeSerializations[index];
             delete this.lightPrevDifficultyTargets[index];
             delete this.lightPrevHashPrevs[index];
             delete this.lightPrevTimeStamps[index];
-
-            if ( this.blocksStartingPoint === index )
-                this.blocksStartingPoint++;
 
             index--;
         }

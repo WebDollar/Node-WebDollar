@@ -79,7 +79,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                let revertActions = new RevertActions();
+                let revertActions = new RevertActions( this.blockchain );
 
                 if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
 

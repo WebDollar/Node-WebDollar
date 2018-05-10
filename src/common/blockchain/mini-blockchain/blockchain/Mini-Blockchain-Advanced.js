@@ -23,7 +23,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         //delete old lightAccountantTreeSerializations
 
 
-        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
+        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES;
 
         while (this.lightAccountantTreeSerializations[index] !== undefined){
             delete this.lightAccountantTreeSerializations[index];
@@ -64,8 +64,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             global.MINIBLOCKCHAIN_LIGHT_SAVED = false;
 
-            if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE)
-                if (!(await this.accountantTree.saveMiniAccountant(true, "miniBlockchainAccountantTreeAdvanced", this.lightAccountantTreeSerializations[ this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE + 1 ])))
+            if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES)
+                if (!(await this.accountantTree.saveMiniAccountant(true, "miniBlockchainAccountantTreeAdvanced", this.lightAccountantTreeSerializations[ this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1 ])))
                     throw {message: "saveMiniAccountant couldn't be saved"};
 
             if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
@@ -95,7 +95,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         }
 
-        let answer = await this.inheritBlockchain.prototype.loadBlockchain.call( this, undefined, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE );
+        let answer = await this.inheritBlockchain.prototype.loadBlockchain.call( this, undefined, consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES );
 
         if (!answer){
 
