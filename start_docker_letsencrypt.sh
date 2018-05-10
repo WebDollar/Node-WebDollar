@@ -10,15 +10,13 @@ certbot certonly  --text --non-interactive --rsa-key-size 4096 \
 			      --reinstall -d $DOMAIN
 
 # Sym links
-ln -s /etc/letsencrypt/live/$DOMAIN/privkey.pem /certificates/private.key
-ln -s /etc/letsencrypt/live/$DOMAIN/cert.pem /certificates/certificate.crt
-ln -s /etc/letsencrypt/live/$DOMAIN/chain.pem /certificates/ca_bundle.crt
+ln -s /etc/letsencrypt/live/$DOMAIN/privkey.pem certificates/private.key
+ln -s /etc/letsencrypt/live/$DOMAIN/cert.pem certificates/certificate.crt
+ln -s /etc/letsencrypt/live/$DOMAIN/chain.pem certificates/ca_bundle.crt
 
 # START NODE 443
-SERVER_PORT=443 INSTANCE_PREFIX=443 pm2 start dist_bundle/terminal-bundle.js
+SERVER_PORT=443 INSTANCE_PREFIX=443 pm2 start  npm -- run start
 sleep 1;
 pm2 restart npm --name "443" --update-env
-
-sleep 1;
 
 pm2 logs
