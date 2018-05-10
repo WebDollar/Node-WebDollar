@@ -6,11 +6,6 @@ pm2 restart npm --name "80" --update-env
 
 sleep 5;
 
-MAXIMUM_CONNECTIONS_FROM_BROWSER=550 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=443 INSTANCE_PREFIX=443 pm2 start  npm -- run start
-sleep 1;
-pm2 restart npm --name "443" --update-env
-
-sleep 5;
 
 MAXIMUM_CONNECTIONS_FROM_BROWSER=550 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=8080 INSTANCE_PREFIX=8080 pm2 start npm -- run start
 sleep 1;
@@ -24,3 +19,9 @@ pm2 restart npm --name "8081" --update-env
 
 sleep 5;
 
+
+MAXIMUM_CONNECTIONS_FROM_BROWSER=550 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=8082 INSTANCE_PREFIX=8082 pm2 start npm -- run start
+sleep 1;
+pm2 restart npm --name "8082" --update-env
+
+sleep 5;
