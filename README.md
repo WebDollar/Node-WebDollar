@@ -5,6 +5,17 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 ![JS Version](https://d3nmt5vlzunoa1.cloudfront.net/webstorm/files/2015/05/js-version.png "Javascript ECMAScript 6 config")
 
+# Docker (No skills, only docker)
+
+## 1. Install Docker 
+
+https://docs.docker.com/install/
+
+## 2. Run prebuilt Container (automated build https://hub.docker.com/r/xkid/webdollar/)
+```
+docker run -d --restart=always -e DOMAIN=<ENTER DOMAIN HERE> -e EMAIL=<ENTER EMAIL HERE> --name webdollar -p 80:80 -p 443:443 xkid/webdollar
+```
+
 # Installing (Poor tech skills required)
 
 ## Follow the following instructions: http://webdollar.aji.ro/webdollar-mining-with-windows-terminal/
