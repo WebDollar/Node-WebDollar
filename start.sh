@@ -1,3 +1,5 @@
+#!/bin/sh
+
 SERVER_PORT=80 INSTANCE_PREFIX=80 pm2 start  npm -- run start
 sleep 1;
 pm2 restart npm --name "80" --update-env
