@@ -7,8 +7,9 @@ console.log("TESTING MODE");
 //                            light-node
 
 Blockchain.createBlockchain("full-node", ()=>{
-    Node.NodeServer.startServer();
     Node.NodeClientsService.startService();
+}, ()=>{
+    Node.NodeServer.startServer();
 });
 
 

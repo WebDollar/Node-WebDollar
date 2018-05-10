@@ -220,10 +220,12 @@ class InterfaceBlockchainProtocol {
 
             if (data === null) return false;
 
-            this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
+            return await this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
 
         } catch (exception){
 
+            console.error("Error asking for Blockchain", exception);
+            return false;
         }
 
     }

@@ -110,14 +110,19 @@ class InterfaceBlockchainProtocolForkSolver{
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
 
             if ( forkFound !== null ) {
-                console.error("discoverAndProcessFork - fork already found by socket");
+
+                if (Math.random() < 0.001)
+                    console.error("discoverAndProcessFork - fork already found by socket");
+
                 return {result: true, fork: forkFound};
             }
 
             forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHeader);
             if ( forkFound !== null ) {
 
-                console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
+                if (Math.random() < 0.001)
+                    console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
+
                 forkFound._pushSocket(socket, forkProof );
                 return {result: true, fork: forkFound};
 

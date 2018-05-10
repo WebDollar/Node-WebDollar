@@ -6,7 +6,6 @@ console.log("BROWSER MODE");
 //Blockchain.createBlockchain("headers-node");
 Blockchain.createBlockchain("light-node", ()=>{
     Node.NodeClientsService.startService();
-
     Node.NodeWebPeersService.startService();
 });
 

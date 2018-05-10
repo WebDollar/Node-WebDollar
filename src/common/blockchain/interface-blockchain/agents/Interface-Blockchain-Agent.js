@@ -6,6 +6,8 @@ import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain"
 const EventEmitter = require('events');
 import AGENT_STATUS from "./Agent-Status";
+import consts from 'consts/const_global'
+
 /**
  *
  * Agent 47   - The place I was raised, they didn't give us names. They gave us numbers. Mine was 47.
@@ -111,7 +113,42 @@ class InterfaceBlockchainAgent{
         if (this.blockchain.blocks.length <= 0) return false;
         if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0 ) return false;
 
-        this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+
+        if (process.env.BROWSER)
+            this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+        else { //terminal
+
+            //let's check if we downloaded blocks in the last 2 minutes
+            let set = false;
+
+            if (this.lastTimeChecked !== undefined ){
+
+                if ( new Date().getTime() -  this.lastTimeChecked.date > 2*60*1000 ){
+
+                    let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
+
+                    if ( diffBlocks !== 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD  ){
+
+                        this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+
+                    }
+
+                    set = true;
+                }
+
+            }  else
+                set = true;
+
+
+            if (set)
+                this.lastTimeChecked ={
+
+                    date: new Date().getTime(),
+                    blocks: this.blockchain.blocks.length,
+
+                }
+
+        }
 
     }
 

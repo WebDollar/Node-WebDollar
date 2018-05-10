@@ -5,6 +5,8 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import StatusEvents from "common/events/Status-Events";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
+import consts from 'consts/const_global'
+
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -335,9 +337,13 @@ class InterfaceBlockchainFork {
             this._deleteBackupBlocks();
 
             //propagate last block
-            NodeBlockchainPropagation.propagateBlock( this.blockchain.blocks[this.blockchain.blocks.length-1], this.sockets);
+            NodeBlockchainPropagation.propagateBlock( this.blockchain.blocks[ this.blockchain.blocks.length-1 ], this.sockets);
 
-            this.blockchain.agent.protocol.askBlockchain(this.getSocket());
+            if (this.forkBlocks.length === consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD ) {
+
+                this.blockchain.agent.protocol.askBlockchain(this.getSocket());
+
+            }
 
         }
 
