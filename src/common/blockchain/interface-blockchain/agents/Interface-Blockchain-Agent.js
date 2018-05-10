@@ -127,7 +127,7 @@ class InterfaceBlockchainAgent{
 
                     let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
 
-                    if ( diffBlocks !== 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD  ){
+                    if ( NodesList.nodes.length > 0 && diffBlocks !== 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD ){
 
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
