@@ -123,7 +123,7 @@ class InterfaceBlockchainAgent{
 
             if (this.lastTimeChecked !== undefined ){
 
-                if ( new Date().getTime() -  this.lastTimeChecked.date > 2*60*1000 ){
+                if ( new Date().getTime() -  this.lastTimeChecked.date > 3*60*1000 ){
 
                     let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
 
