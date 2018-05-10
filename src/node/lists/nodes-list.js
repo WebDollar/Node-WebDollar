@@ -72,6 +72,7 @@ class NodesList {
         }
 
         socket.node.connectionType = connectionType;
+        socket.node.protocol.connectionType = connectionType;
         socket.node.type = type;
 
         socket.node.index = ++this.nodesTotal;
@@ -143,11 +144,11 @@ class NodesList {
         for (let i=0; i<this.nodes.length; i++)
 
             if (Array.isArray(connectionType)) { //in case type is an Array
-                if (this.nodes[i].connectionType in connectionType)
+                if (this.nodes[i].socket.node.protocol.connectionType in connectionType)
                     list.push(this.nodes[i]);
             } else
             // in case type is just a simple string
-            if (connectionType === this.nodes[i].connectionType || connectionType === "all")
+            if (connectionType === this.nodes[i].socket.node.protocol.connectionType || connectionType === "all")
                 list.push(this.nodes[i]);
 
         return list;
@@ -179,11 +180,11 @@ class NodesList {
 
         for (let i=0; i<this.nodes.length; i++)
             if (Array.isArray(nodeType)) { //in case type is an Array
-                if (this.nodes[i].nodeType in nodeType)
+                if (this.nodes[i].socket.node.protocol.nodeType in nodeType)
                     count++;
             }
             else
-            if (nodeType === this.nodes[i].nodeType || nodeType === "all")
+            if (nodeType === this.nodes[i].socket.node.protocol.nodeType || nodeType === "all")
                 count++;
 
         return count;
@@ -202,9 +203,8 @@ class NodesList {
     disconnectAllNodes(connectionType = CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET){
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if ( this.nodes[i].connectionType === connectionType ){
+            if ( this.nodes[i].socket.node.protocol.connectionType === connectionType )
                 this.nodes[i].socket.disconnect();
-            }
 
     }
 

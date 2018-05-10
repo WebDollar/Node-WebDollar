@@ -248,11 +248,12 @@ consts.SETTINGS = {
             SOCKETS: {
                 MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
                 MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
+                MAXIMUM_CONNECTIONS_IN_TERMINAL_NO_SSL: 1,
             },
 
             SERVER: {
-                MAXIMUM_CONNECTIONS_FROM_BROWSER: 150,
-                MAXIMUM_CONNECTIONS_FROM_TERMINAL: 20,
+                MAXIMUM_CONNECTIONS_FROM_BROWSER: 250,
+                MAXIMUM_CONNECTIONS_FROM_TERMINAL: 30,
             },
 
             WEBRTC: {
