@@ -26,7 +26,7 @@ class Blockchain{
 
         this.Wallet = new MainBlockchainWallet(this.Chain);
 
-        this.Mining = new MainBlockchainMining(this.Chain, undefined );
+        this.Mining = new MainBlockchainMining(this.Chain, undefined);
 
         this.Transactions = this.Chain.transactions;
         this.Transactions.setWallet(this.Wallet);
@@ -38,12 +38,12 @@ class Blockchain{
         this.onLoaded = new Promise((resolve)=>{
             this._onLoadedResolver = resolve;
         });
+        
         this._loaded = false;
-
 
     }
 
-    async createBlockchain(agentName, initializationCallback){
+    async createBlockchain(agentName, afterBlockchainLoadCallback, afterSynchronizationCallback){
 
         this._blockchainInitiated = true;
 
@@ -70,7 +70,7 @@ class Blockchain{
         StatusEvents.emit('blockchain/status', {message: "Single Window"});
 
 
-        await this.initializeBlockchain( initializationCallback );
+        await this.initializeBlockchain( afterBlockchainLoadCallback, afterSynchronizationCallback );
 
     }
 
@@ -86,7 +86,7 @@ class Blockchain{
         }
     }
 
-    async initializeBlockchain(initializationCallback){
+    async initializeBlockchain(afterBlockchainLoadCallback, afterSynchronizationCallback){
 
         await this.loadWallet();
 
@@ -101,8 +101,8 @@ class Blockchain{
         //loading the blockchain
         let blockchainLoaded = await this.loadBlockchain();
 
-        if (typeof initializationCallback === "function")
-            initializationCallback();
+        if (typeof afterBlockchainLoadCallback === "function")
+            afterBlockchainLoadCallback();
 
         await this.Agent.initializeStartAgentOnce();
 
@@ -112,6 +112,9 @@ class Blockchain{
         } else {
             this.synchronized = true;
         }
+
+        if (typeof afterSynchronizationCallback === "function")
+            afterSynchronizationCallback();
 
         this.loaded = true;
     }
@@ -133,6 +136,7 @@ class Blockchain{
 
         StatusEvents.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
         return chainLoaded;
+
     }
 
     /**
@@ -147,7 +151,8 @@ class Blockchain{
         console.warn("################### RESYNCHRONIZATION STARTED ##########");
 
         let suspendMining = false;
-        if (!this.blockchain.light || (this.blockchain.light && NodesList.nodes.length <= 0)) suspendMining = true;
+        if (!this.blockchain.light || (this.blockchain.light && NodesList.nodes.length <= 0))
+            suspendMining = true;
 
         if (suspendMining) {
             StatusEvents.emit('blockchain/status', {message: "Start Synchronizing"});

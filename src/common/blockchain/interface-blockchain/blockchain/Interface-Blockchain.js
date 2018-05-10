@@ -132,7 +132,8 @@ class InterfaceBlockchain {
 
     _onBlockCreated(block, saveBlock){
 
-        this.blocks.recalculateNetworkHashRate();
+        if (saveBlock)
+            this.blocks.recalculateNetworkHashRate();
 
     }
 
@@ -291,13 +292,38 @@ class InterfaceBlockchain {
         return result;
     }
 
-    _getLoadBlockchainValidationType(indexStart, i, numBlocks, onlyLastBlocks){
+    _getLoadBlockchainValidationType(indexStart, i, numBlocks, indexStartProcessingOffset){
 
-        return {};
+        let validationType = {};
+
+        if (indexStartProcessingOffset !== undefined ){
+
+            if ( i <= indexStartProcessingOffset ){
+
+                validationType["skip-prev-hash-validation"] = true;
+                validationType["skip-accountant-tree-validation"] = true;
+                validationType["skip-mini-blockchain-simulation"] = true;
+                validationType["skip-validation-transactions-from-values"] = true;
+                validationType["skip-validation-timestamp"] = true;
+                validationType["validation-timestamp-adjusted-time"] = true;
+                validationType["skip-block-data-validation"] = true;
+                validationType["skip-block-data-transactions-validation"] = true;
+                validationType["skip-validation-interlinks"] = true;
+                validationType["skip-validation"] = true;
+
+                if (Math.random() < 0.001)
+                    validationType["skip-validation-PoW-hash"] = true;
+
+            }
+
+        }
+
+
+        return validationType;
 
     }
 
-    async loadBlockchain(onlyLastBlocks = undefined){
+    async loadBlockchain( indexStartLoadingOffset = undefined, indexStartProcessingOffset = undefined ){
 
         if (process.env.BROWSER)
             return true;
@@ -309,30 +335,45 @@ class InterfaceBlockchain {
             return false;
         }
 
-        console.warn("validateLastBlocks", numBlocks);
-        console.warn("validateLastBlocks", numBlocks);
-        console.warn("validateLastBlocks", numBlocks);
-
         this.blocks.clear();
 
         try {
 
             let indexStart = 0;
 
-            if (this.agent !== undefined && this.agent.light === true) {
+            if (indexStartLoadingOffset )
+                indexStart = numBlocks - indexStartLoadingOffset;
 
-                indexStart = Math.max(0, numBlocks - onlyLastBlocks-1);
+            if (indexStartProcessingOffset !== undefined) {
+                indexStartProcessingOffset = numBlocks - indexStartProcessingOffset;
 
-                this.blocks.length = indexStart||0; // marking the first blocks as undefined
+                console.warn("===========================================================");
+                console.warn("BLocks Processing starts at: ", indexStartProcessingOffset);
+                console.warn("===========================================================");
+
             }
 
-            for (let i = indexStart; i < numBlocks; ++i) {
+            this.blocks.length = indexStart || 0; // marking the first blocks as undefined
 
-                let validationType = this._getLoadBlockchainValidationType(indexStart, i, numBlocks, onlyLastBlocks);
+            let index;
 
-                let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
+            try {
 
-                await this._loadBlock(indexStart, i, blockValidation);
+                for (index = indexStart; index < numBlocks; ++index ) {
+
+                    let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
+
+                    let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
+
+                    await this._loadBlock(indexStart, index, blockValidation);
+
+                }
+
+            } catch (exception){
+                console.error("Error loading block", index);
+
+                if ( this.blocks.length < 10)
+                    return false;
 
             }
 
@@ -351,10 +392,9 @@ class InterfaceBlockchain {
     }
 
 
-    async _loadBlock(indexStart, i, blockValidation, revertActions){
+    async _loadBlock(indexStart, i, blockValidation){
 
-        if (revertActions === undefined)
-            revertActions = new RevertActions(this);
+        let revertActions = new RevertActions(this);
 
         revertActions.push( { name: "breakpoint" } );
 
@@ -383,9 +423,12 @@ class InterfaceBlockchain {
         } catch (exception){
             console.error("blockchain LOADING stopped at " + i, exception);
             revertActions.revertOperations();
+            revertActions.destroyRevertActions();
+
             throw exception;
         }
 
+        revertActions.destroyRevertActions();
         return block;
     }
 

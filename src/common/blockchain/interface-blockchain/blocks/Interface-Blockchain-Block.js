@@ -103,7 +103,7 @@ class InterfaceBlockchainBlock {
         if (height !== this.height)
             throw {message: 'height is different', height: height, myHeight: this.height};
 
-        if (! (await this._validateBlockHash()))
+        if ( ! (await this._validateBlockHash()) )
             throw {message: "validateBlockchain returned false"};
 
         this._validateTargetDifficulty();
@@ -166,8 +166,6 @@ class InterfaceBlockchainBlock {
 
         if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget) )
             throw {message: 'previousDifficultyTarget is not given'};
-
-        //console.log("difficulty block",this.height, "diff", prevDifficultyTarget.toString("hex"), "hash", this.hash.toString("hex"));
 
         if (! (this.hash.compare( prevDifficultyTarget ) <= 0))
             throw {message: "block doesn't match the difficulty target is not ", hash:this.hash, prevDifficultyTarget: prevDifficultyTarget};

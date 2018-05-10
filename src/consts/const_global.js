@@ -2,6 +2,7 @@ const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 
 let consts = {
+
     DEBUG: false,
     OPEN_SERVER: true,
 };
@@ -24,10 +25,17 @@ consts.BLOCKCHAIN = {
     BLOCKS_NONCE : 4,
 
     LIGHT:{
+
         VALIDATE_LAST_BLOCKS: 10 , //overwrite below
         SAFETY_LAST_BLOCKS: 40, //overwrite below
 
-        SAFETY_LAST_BLOCKS_DELETE: 400, //overwrite below
+        SAFETY_LAST_BLOCKS_DELETE_BROWSER: 500, //overwrite below
+        SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
+
+        SAFETY_LAST_ACCOUNTANT_TREES: 50, //overwrite below
+
+        SAFETY_LAST_BLOCKS_DELETE: undefined,
+
     },
 
     HARD_FORKS : {
@@ -35,8 +43,9 @@ consts.BLOCKCHAIN = {
 
     }
 
-
 };
+
+consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE = (process.env.BROWSER ? consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE_BROWSER : consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE_NODE );
 
 consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 1 ;
 consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS + 2* consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ;
@@ -154,9 +163,6 @@ consts.HASH_ARGON2_PARAMS = {
 
 // change also to Browser-Mining-WebWorker.js
 
-
-console.log("INSTANCE_PREFIX", (process.env.INSTANCE_PREFIX||""));
-
 //DATABASE NAMES
 consts.DATABASE_NAMES = {
 
@@ -236,18 +242,32 @@ consts.SETTINGS = {
 
             PROPAGATE_BLOCKS_TO_SOCKETS: 50,
 
-            SOCKETS: {
-                MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
-                MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
+            TERMINAL:{
+
+                CLIENT: {
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_NO_SSL: 2,
+                },
+
+                SERVER: {
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 650,
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 30,
+                },
+
             },
 
-            SERVER: {
-                MAXIMUM_CONNECTIONS_FROM_BROWSER: 150,
-                MAXIMUM_CONNECTIONS_FROM_TERMINAL: 20,
-            },
+            BROWSER:{
 
-            WEBRTC: {
-                MAXIMUM_CONNECTIONS: 8,
+                CLIENT: {
+                    MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
+                },
+
+                SERVER: {},
+
+                WEBRTC: {
+                    MAXIMUM_CONNECTIONS: 13,
+                },
+
             },
 
             FORKS:{
@@ -275,8 +295,15 @@ consts.SETTINGS = {
 
 
 
+if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
+    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER = process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER;
+
+if (process.env.MAXIMUM_CONNECTIONS_IN_TERMINAL !== undefined)
+    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL = process.env.MAXIMUM_CONNECTIONS_IN_TERMINAL;
+
 
 if ( consts.DEBUG === true ){
+
     consts.SETTINGS.NODE.VERSION += "3";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "3";
     consts.SETTINGS.NODE.SSL = false;
@@ -287,6 +314,8 @@ if ( consts.DEBUG === true ){
     FallBackNodesList.nodes = [{
         "addr": ["webdollar.ddns.net:9095"],
     }];
+
+
 }
 
 

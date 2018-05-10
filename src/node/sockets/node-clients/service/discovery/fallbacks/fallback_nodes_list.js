@@ -15,6 +15,8 @@ export default {
         {"addr": ["webd.5q.ro:3333"]},
         {"addr": ["webdollar.bitcoinplusplus.com:443"]},
         {"addr": ["amsterdam.wdpool.io:443"]},
+        {"addr": ["strasbourg.wdpool.io:443"]},
+        {"addr": ["paris.wdpool.io:443"]},
 
         {"addr": ["skyhub.me:80"], },
 
@@ -25,6 +27,8 @@ export default {
         {"addr": ["webdollar-vps2.ddns.net:80"],},
 
         {"addr": ["webdollar-vps3.ddns.net:80"],},
+
+        {"addr": ["webdollar.csland.ro:443"],},
 
         {"addr": ["hcern.ddns.net:80"]},
         {"addr": ["hcern.ddns.net:443"]},

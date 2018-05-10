@@ -68,6 +68,8 @@ class NodeExpress{
                 //cloudflare generates its own SSL certificate
                 this.server = http.createServer(this.app).listen(port, ()=>{
 
+                    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_NO_SSL;
+
                     console.log(`server started at localhost:${port}`);
 
                     this._initializeRouter();

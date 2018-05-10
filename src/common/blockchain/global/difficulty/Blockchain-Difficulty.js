@@ -1,7 +1,8 @@
-var BigInteger = require('big-integer');
-var BigNumber = require ('bignumber.js');
+import consts from 'consts/const_global';
 
-import consts from 'consts/const_global'
+let BigInteger = require('big-integer');
+let BigNumber = require ('bignumber.js');
+
 
 class BlockchainDifficulty{
 
@@ -32,7 +33,8 @@ class BlockchainDifficulty{
 
         if (Buffer.isBuffer(prevBlockDifficulty))
             prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex"));
-        else if (typeof prevBlockDifficulty === "string") // it must be hex
+        else
+        if (typeof prevBlockDifficulty === "string") // it must be hex
             prevBlockDifficulty = new BigNumber(prevBlockDifficulty);
 
         //let's suppose BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 10
@@ -60,8 +62,6 @@ class BlockchainDifficulty{
             //adding block 9
             how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
 
-            console.warn("blocktimestamp", blockTimestamp);
-
             if ( how_much_it_took_to_mine_X_Blocks <= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK )
                 throw {message: "how_much_it_took_to_mine_X_Blocks kess than consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK", how_much_it_took_to_mine_X_Blocks: how_much_it_took_to_mine_X_Blocks};
 
@@ -73,12 +73,11 @@ class BlockchainDifficulty{
             ratio = BigNumber.minimum(ratio, 8);
             ratio = BigNumber.maximum(ratio, 0.05);
 
-            console.warn( "should_have_taken_X_Blocks / took_to_mine_X_Blocks", how_much_it_should_have_taken_X_Blocks, "/", how_much_it_took_to_mine_X_Blocks );
+            console.warn( how_much_it_should_have_taken_X_Blocks, "/", how_much_it_took_to_mine_X_Blocks );
 
             let newBlockDifficulty = prevBlockDifficulty.multipliedBy(ratio);
             newBlockDifficulty = newBlockDifficulty.decimalPlaces(0);
 
-            console.warn( "newBlockDifficulty2", newBlockDifficulty.toString(16) );
             return BigInteger( newBlockDifficulty.toString(16), 16 );
         }
 

@@ -29,9 +29,16 @@ class InterfaceBlockchainBlocks{
         if (this.blockchain.agent !== undefined && this.blockchain.agent.light){
 
             let index = this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
+
             while (this[index] !== undefined){
+                this[index].destroyBlock();
                 delete this[index];
+
                 index--;
+            }
+
+            while (this.length > 0 && this[this.blocksStartingPoint] === undefined && this.blocksStartingPoint < this.length){
+                this.blocksStartingPoint++;
             }
 
         }

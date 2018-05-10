@@ -36,21 +36,21 @@ class PPoWBlockchain extends InterfaceBlockchain {
     }
 
 
-    async loadBlockchain(onlyLastBlocks = undefined){
+    async loadBlockchain( indexStartLoadingOffset , indexStartProcessingOffset ){
 
         this.prover.proofActivated = false;
 
         try {
-            await InterfaceBlockchain.prototype.loadBlockchain.call(this, onlyLastBlocks);
+            if (! (await InterfaceBlockchain.prototype.loadBlockchain.call(this, indexStartLoadingOffset , indexStartProcessingOffset ))) return false;
         } catch (exception){
 
             console.error("loadBlockchain raised an error", exception);
         }
 
         this.prover.proofActivated = true;
-
-
         this.prover.createProofs();
+
+        return true;
 
     }
 

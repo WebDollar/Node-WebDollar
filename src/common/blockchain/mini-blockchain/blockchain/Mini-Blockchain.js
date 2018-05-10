@@ -34,34 +34,35 @@ class MiniBlockchain extends  inheritBlockchain{
 
     async simulateNewBlock(block, revertAutomatically, revertActions, callback){
 
-        if (revertActions === undefined)
-            revertActions = new RevertActions(this);
-
         revertActions.push( { name: "breakpoint" } );
 
         let revertException = false;
 
         try{
 
-            //updating reward
-            let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions );
+            if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
 
-            //reward
-            if (result === null || result === undefined)
-                throw {message: "reward couldn't be set to the minerAddress"};
+                //updating reward
+                let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions );
 
-            if (!block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType))
-                throw {message: "Validate Transactions is wrong"};
+                //reward
+                if (result === null || result === undefined)
+                    throw {message: "reward couldn't be set to the minerAddress"};
+
+                if (!block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType))
+                    throw {message: "Validate Transactions is wrong"};
 
 
-            if (block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] !== true) {
+                if (block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] !== true) {
 
-                block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = true;
-                revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
+                    block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = true;
+                    revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
+                }
+
+                if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions ))
+                    throw {message: "Process Block Data Transactions failed"};
+
             }
-
-            if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions ))
-                throw {message: "Process Block Data Transactions failed"};
 
             let callbackDone = await callback();
 
@@ -82,15 +83,19 @@ class MiniBlockchain extends  inheritBlockchain{
 
                 if (revertException)
                     return false;
+
             }
 
 
         } catch (exception){
 
             console.log("MiniBlockchain Reverting Error raised an exception", exception);
-            return false;
+            revertActions.clearUntilBreakpoint();
 
+            return false;
         }
+
+        revertActions.clearUntilBreakpoint();
 
         return true;
 
@@ -142,10 +147,9 @@ class MiniBlockchain extends  inheritBlockchain{
         if (process.env.BROWSER)
             return true;
 
-        try {
+        if (this.blocks.length === 0) return false;
 
-            if (this.blocks.length === 0)
-                return false;
+        try {
 
             if (! (await this.accountantTree.saveMiniAccountant( true )))
                 throw {message: "Couldn't save the Account Tree"};

@@ -15,6 +15,7 @@ import AdvancedMessages from "node/menu/Advanced-Messages";
 import StatusEvents from "common/events/Status-Events";
 
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
+import RevertActions from "../../../utils/Revert-Actions/Revert-Actions";
 
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
@@ -78,7 +79,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                let revertActions = undefined;
+                let revertActions = new RevertActions( this.blockchain );
+
                 if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
 
                     ()=>{
@@ -90,6 +92,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     }) === false) throw {message: "Mining1 returned False"};
 
+
+                revertActions.destroyRevertActions();
 
             } catch (Exception){
                 console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);

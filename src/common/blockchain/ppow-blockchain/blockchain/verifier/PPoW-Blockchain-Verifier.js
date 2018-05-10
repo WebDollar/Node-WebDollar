@@ -183,10 +183,10 @@ class PPoWBlockchainVerifier{
 
         }
 
-        for (let miu=0; miu<levels.length; miu++)
+        for (let miu = 0; miu < levels.length; miu++)
             if (levels[miu] >= consts.POPOW_PARAMS.m){
                     M[miu] = levels[miu] ;
-                }
+            }
 
         return M;
 

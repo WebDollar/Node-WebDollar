@@ -105,7 +105,7 @@ class InterfaceBlockchainProtocol {
         if (this.acceptBlockHeaders)
             socket.node.on("head/last-block",  ()=>{
 
-                if (this.blockchain.blocks.length > 0) {
+                if (this.blockchain.blocks.length > 0 && this.blockchain.blocks.last !== undefined) {
                     socket.node.sendRequest("head/last-block/a", {
                         l: this.blockchain.blocks.length,
                         h: this.blockchain.blocks.last.hash,
@@ -220,10 +220,12 @@ class InterfaceBlockchainProtocol {
 
             if (data === null) return false;
 
-            this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
+            return await this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
 
         } catch (exception){
 
+            console.error("Error asking for Blockchain", exception);
+            return false;
         }
 
     }
