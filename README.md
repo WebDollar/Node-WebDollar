@@ -7,7 +7,14 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 # Docker (No skills, only docker)
 
-## (soon)
+## 1. Install Docker 
+
+https://docs.docker.com/install/
+
+## 2. Run prebuilt Container (automated build https://hub.docker.com/r/xkid/webdollar/)
+```
+docker run -d --restart=always --name webdollar -p 80:80 xkid/webdollar
+```
 
 # Installing (Poor tech skills required)
 
