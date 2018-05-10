@@ -53,6 +53,8 @@ class NodeProtocol {
             return false;
         }
 
+        console.warn("MAXIMUM_CONNECTIONS_FROM_BROWSER", consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER );
+
         if (NODES_TYPE.NODE_WEB_PEER === response.nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
             console.warn("too many browser connections");
             return false;

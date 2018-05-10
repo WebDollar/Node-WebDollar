@@ -163,9 +163,6 @@ consts.HASH_ARGON2_PARAMS = {
 
 // change also to Browser-Mining-WebWorker.js
 
-
-console.log("INSTANCE_PREFIX", (process.env.INSTANCE_PREFIX||""));
-
 //DATABASE NAMES
 consts.DATABASE_NAMES = {
 
@@ -245,19 +242,32 @@ consts.SETTINGS = {
 
             PROPAGATE_BLOCKS_TO_SOCKETS: 50,
 
-            SOCKETS: {
-                MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
-                MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
-                MAXIMUM_CONNECTIONS_IN_TERMINAL_NO_SSL: 1,
+            TERMINAL:{
+
+                CLIENT: {
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_NO_SSL: 2,
+                },
+
+                SERVER: {
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 650,
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 30,
+                },
+
             },
 
-            SERVER: {
-                MAXIMUM_CONNECTIONS_FROM_BROWSER: 250,
-                MAXIMUM_CONNECTIONS_FROM_TERMINAL: 30,
-            },
+            BROWSER:{
 
-            WEBRTC: {
-                MAXIMUM_CONNECTIONS: 8,
+                CLIENT: {
+                    MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
+                },
+
+                SERVER: {},
+
+                WEBRTC: {
+                    MAXIMUM_CONNECTIONS: 13,
+                },
+
             },
 
             FORKS:{
@@ -285,6 +295,12 @@ consts.SETTINGS = {
 
 
 
+if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
+    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER = process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER;
+
+if (process.env.MAXIMUM_CONNECTIONS_IN_TERMINAL !== undefined)
+    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL = process.env.MAXIMUM_CONNECTIONS_IN_TERMINAL;
+
 
 if ( consts.DEBUG === true ){
 
@@ -298,7 +314,6 @@ if ( consts.DEBUG === true ){
     FallBackNodesList.nodes = [{
         "addr": ["webdollar.ddns.net:9095"],
     }];
-
 
 
 }
