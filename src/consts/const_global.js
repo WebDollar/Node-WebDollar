@@ -32,6 +32,8 @@ consts.BLOCKCHAIN = {
         SAFETY_LAST_BLOCKS_DELETE_BROWSER: 500, //overwrite below
         SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
 
+        SAFETY_LAST_ACCOUNTANT_TREES: 50, //overwrite below
+
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
     },
