@@ -34,7 +34,8 @@ class InterfaceBlockchainFork {
         this.sockets = [];
         this.forkPromise = [];
         this._blocksCopy = [];
-
+        this._forkPromiseResolver = undefined;
+        this.forkPromise = undefined;
 
     }
 
@@ -319,7 +320,7 @@ class InterfaceBlockchainFork {
 
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();
-                setTimeout( ()=>{ this._forkPromiseResolver(true) } , 10 ); //making it async
+                this._forkPromiseResolver(true) //making it async
             }
 
             this.forkIsSaving = false;

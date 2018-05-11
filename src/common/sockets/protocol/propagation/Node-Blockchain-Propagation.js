@@ -80,6 +80,10 @@ class NodeBlockchainPropagation{
                 setTimeout(()=>{
 
                     if (block === this._blockPropagating){
+
+                        if (socket.disconnected)
+                            return;
+
                         this._socketsAlreadyBroadcast.push(socket);
                     }
 

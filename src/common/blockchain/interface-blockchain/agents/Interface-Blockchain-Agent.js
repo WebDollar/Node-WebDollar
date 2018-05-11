@@ -111,7 +111,7 @@ class InterfaceBlockchainAgent{
     _agentConfirmationIntervalFunction(){
 
         if (this.blockchain.blocks.length <= 0) return false;
-        if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0 ) return false;
+        if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0 && !consts.DEBUG  ) return false;
 
 
         if (process.env.BROWSER)
@@ -123,11 +123,11 @@ class InterfaceBlockchainAgent{
 
             if (this.lastTimeChecked !== undefined ){
 
-                if ( new Date().getTime() -  this.lastTimeChecked.date > 3*60*1000 ){
+                if ( (new Date().getTime() -  this.lastTimeChecked.date > 3*60*1000) || consts.DEBUG ){
 
                     let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
 
-                    if ( NodesList.nodes.length > 0 && diffBlocks > 1 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD ){
+                    if (  (NodesList.nodes.length > 0 && diffBlocks > 1 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD) || consts.DEBUG ){
 
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
