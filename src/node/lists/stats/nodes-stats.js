@@ -3,6 +3,7 @@ import NodesList from 'node/lists/nodes-list'
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
+import Blockchain from "main-blockchain/Blockchain"
 
 class NodesStats {
 
@@ -28,6 +29,7 @@ class NodesStats {
 
     _printStats(){
 
+        console.info(" blocks: ", Blockchain.blockchain.blocks.length);
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
 
 

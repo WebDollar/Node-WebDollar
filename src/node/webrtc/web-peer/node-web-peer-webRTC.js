@@ -82,6 +82,8 @@ class NodeWebPeerRTC {
         this.peer =  new RTCPeerConnection(config);
 
         this.peer.connected = false;
+        this.peer.disconnected = true;
+
         this.enableEventsHandling();
 
         this.peer.onicecandidate = (event) => {
@@ -113,6 +115,7 @@ class NodeWebPeerRTC {
         };
 
         this.socket =  this.peer;
+
         this.peer.signalData = null;
         this.peer.signalInitiatorData = null;
 
@@ -349,13 +352,16 @@ class NodeWebPeerRTC {
 
         this.peer.oniceconnectionstatechange = () => {
 
-            if(this.peer.iceConnectionState === 'disconnected') {
+            if (this.peer.iceConnectionState === 'disconnected') {
+
                 console.log('iceConnection Disconnected');
                 if (this.peer.connected === true) {
                     this.peer.connected = false;
+                    this.peer.disconnected = true;
 
                     this.emitter.emit("disconnect", {})
                 }
+
             }
         };
 
@@ -446,6 +452,7 @@ class NodeWebPeerRTC {
         if (this.peer.dataChannel.readyState === 'open') {
             if (!this.peer.connected ) {
                 this.peer.connected = true;
+                this.peer.disconnected = false;
                 this.emitter.emit("connect", {});
             }
         }
@@ -453,6 +460,7 @@ class NodeWebPeerRTC {
         if (this.peer.dataChannel.readyState === 'closed') {
             if (this.peer.connected){
                 this.peer.connected = false;
+                this.peer.disconnected = true;
                 this.emitter.emit("disconnect", {});
             }
         }
@@ -472,6 +480,10 @@ class NodeWebPeerRTC {
         this.peer.on("disconnect", ()=>{
 
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
+
+            this.disconnected = true;
+            this.connected = false;
+
             try {
                 NodesList.disconnectSocket(this.peer);
 

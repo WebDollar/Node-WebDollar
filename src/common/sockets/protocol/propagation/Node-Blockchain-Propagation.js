@@ -24,6 +24,9 @@ class NodeBlockchainPropagation{
         });
 
         setTimeout( this.processPropagation.bind(this), 300);
+
+        //remove disconnected sockets
+        setInterval( this._deleteDisconenctedSockets.bind(this), 20000)
     }
 
     propagateBlock(block, socketsAvoidBroadcast){
@@ -115,6 +118,19 @@ class NodeBlockchainPropagation{
                 return true;
 
         return false;
+    }
+
+    _deleteDisconenctedSockets(){
+
+        for (let i=this._socketsAlreadyBroadcast.length-1; i>=0; i--)
+            if (this._socketsAlreadyBroadcast[i].disconnected)
+                this._socketsAlreadyBroadcast.splice(i,1);
+
+        for (let i=this._socketsPropagating.length-1; i>=0; i--)
+            if (this._socketsPropagating[i].disconnected)
+                this._socketsPropagating.splice(i,1);
+
+
     }
 
 }
