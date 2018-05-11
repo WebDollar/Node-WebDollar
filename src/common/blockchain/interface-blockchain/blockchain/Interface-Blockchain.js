@@ -306,6 +306,7 @@ class InterfaceBlockchain {
 
         if (indexStartProcessingOffset !== undefined ){
 
+            //fast loading Blockchain
             if ( i <= indexStartProcessingOffset ){
 
                 validationType["skip-prev-hash-validation"] = true;
