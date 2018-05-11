@@ -155,7 +155,7 @@ class InterfaceBlockchainForksAdministrator {
                 let fork = this.forks[i];
                 this.forks.splice(i, 1);
 
-                if (this.forks[i] !== undefined && this.forks[i] !== null)
+                if (fork !== undefined && fork !== null)
                     fork.destroyFork();
             }
 

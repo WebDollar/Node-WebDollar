@@ -240,7 +240,7 @@ consts.SETTINGS = {
 
             NO_OF_IDENTICAL_IPS: 10,
 
-            PROPAGATE_BLOCKS_TO_SOCKETS: 50,
+            SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP: 50,
 
             TERMINAL:{
 
@@ -271,7 +271,7 @@ consts.SETTINGS = {
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 50,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 100,
             },
 
             TIMEOUT: {
