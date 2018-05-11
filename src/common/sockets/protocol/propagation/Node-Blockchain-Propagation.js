@@ -57,7 +57,7 @@ class NodeBlockchainPropagation{
             return true;
         }
 
-        if (this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.PROPAGATE_BLOCKS_TO_SOCKETS) {
+        if (this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP) {
 
             let list = [];
             for (let i=0; i<NodesList.nodes.length; i++)
@@ -65,7 +65,7 @@ class NodeBlockchainPropagation{
                     list.push(NodesList.nodes[i].socket);
 
 
-            while ( list.length > 0 && this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.PROPAGATE_BLOCKS_TO_SOCKETS ) {
+            while ( list.length > 0 && this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP ) {
 
                 let index = Math.floor( Math.random() * list.length );
 

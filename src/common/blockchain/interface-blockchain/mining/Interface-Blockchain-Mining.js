@@ -183,6 +183,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 try {
 
+                    let revertActions = new RevertActions(this.blockchain);
+
                     if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
                             block.hash = answer.hash;
                             block.nonce = answer.nonce;
@@ -191,8 +193,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                             if (this.blockchain.blocks.length !== block.height)
                                 return false;
 
-                            return this.blockchain.includeBlockchainBlock(block, false, [], true);
+                            return this.blockchain.includeBlockchainBlock(block, false, [], true, revertActions);
                         }) === false) throw {message: "Mining2 returned false"};
+
+                    revertActions.destroyRevertActions();
 
                     //confirming transactions
                     block.data.transactions.transactions.forEach((transaction) => {
