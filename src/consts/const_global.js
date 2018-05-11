@@ -238,7 +238,7 @@ consts.SETTINGS = {
 
         CONNECTIONS:{
 
-            NO_OF_IDENTICAL_IPS: 10,
+            NO_OF_IDENTICAL_IPS: 3,
 
             SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP: 50,
 
