@@ -19,12 +19,15 @@ class PPoWBlockchain extends InterfaceBlockchain {
     async _blockIncluded(block){
 
         block.updateInterlink();
-        block.level = block.getLevel(); //computing the level
+
+
+        if ( !block.blockValidation.blockValidationType["skip-calculating-block-nipopow-level"])
+            block.level = block.getLevel(); //computing the level
 
         //TODO generate proofs as a LightNode
         if (!this.agent.light) {
 
-            if (!block.blockValidation.blockValidationType["avoid-calculating-proofs"]){
+            if (!block.blockValidation.blockValidationType["skip-calculating-proofs"]){
 
                 this.prover.createProofs();
 

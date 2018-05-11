@@ -183,7 +183,7 @@ class InterfaceBlockchain {
 
             block.difficultyTarget = block.blockValidation.getDifficulty( block.timeStamp, block.height );
 
-            block.difficultyTarget = Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(block.difficultyTarget) );
+            block.difficultyTarget = Serialization.serializeBigNumber(block.difficultyTarget, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
 
         }
 
@@ -313,13 +313,18 @@ class InterfaceBlockchain {
                 validationType["skip-mini-blockchain-simulation"] = true;
                 validationType["skip-validation-transactions-from-values"] = true;
                 validationType["skip-validation-timestamp"] = true;
-                validationType["validation-timestamp-adjusted-time"] = true;
+                validationType["validation-timestamp-adjusted-time"] = false;
                 validationType["skip-block-data-validation"] = true;
                 validationType["skip-block-data-transactions-validation"] = true;
                 validationType["skip-validation-interlinks"] = true;
                 validationType["skip-validation"] = true;
+                validationType["skip-interlinks-update"] = true;
+                validationType["skip-target-difficulty-validation"] = true;
+                validationType["skip-calculating-proofs"] = true;
+                validationType["skip-calculating-block-nipopow-level"] = true;
+                validationType["skip-saving-light-accountant-tree-serializations"] = true;
 
-                if (Math.random() < 0.001)
+                if (Math.random() > 0.0001)
                     validationType["skip-validation-PoW-hash"] = true;
 
             }
@@ -382,7 +387,9 @@ class InterfaceBlockchain {
 
                     let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
 
-                    await this._loadBlock(indexStart, index, blockValidation);
+                    let block = await this._loadBlock(indexStart, index, blockValidation);
+
+                    block.blockValidation.blockValidationType = {};
 
                 }
 

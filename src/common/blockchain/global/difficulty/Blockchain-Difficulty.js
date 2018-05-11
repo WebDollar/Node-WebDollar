@@ -42,7 +42,7 @@ class BlockchainDifficulty{
         // it should recalcule using [0...9]
 
         if ( (blockNumber+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS !== 0)
-            return  BigInteger( prevBlockDifficulty.toString(16), 16 );
+            return  prevBlockDifficulty;
         else {
 
             let how_much_it_should_have_taken_X_Blocks = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
@@ -73,12 +73,13 @@ class BlockchainDifficulty{
             ratio = BigNumber.minimum(ratio, 8);
             ratio = BigNumber.maximum(ratio, 0.05);
 
-            console.warn( how_much_it_should_have_taken_X_Blocks, "/", how_much_it_took_to_mine_X_Blocks );
+            if (Math.random() < 0.1)
+                console.warn( how_much_it_should_have_taken_X_Blocks, "/", how_much_it_took_to_mine_X_Blocks );
 
             let newBlockDifficulty = prevBlockDifficulty.multipliedBy(ratio);
             newBlockDifficulty = newBlockDifficulty.decimalPlaces(0);
 
-            return BigInteger( newBlockDifficulty.toString(16), 16 );
+            return newBlockDifficulty;
         }
 
     }
