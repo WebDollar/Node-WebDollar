@@ -26,6 +26,9 @@ class NodeExpress{
 
     startExpress(){
 
+        if (this.loaded) //already open
+            return;
+
         return new Promise((resolve)=>{
 
             this.app = express();
@@ -43,6 +46,8 @@ class NodeExpress{
             let options = {};
 
             let port = process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
+
+            this.loaded = true;
 
             try {
 

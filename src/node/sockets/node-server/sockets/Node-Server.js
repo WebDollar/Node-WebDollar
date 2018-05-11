@@ -27,13 +27,15 @@ class NodeServer {
 
         this.nodeServer = null;
 
-        if (!NodeExpress.loaded)
-            await NodeExpress.startExpress();
+        await NodeExpress.startExpress();
 
         if (!consts.OPEN_SERVER) return false;
 
         try
         {
+
+            console.warn("Starting Socket.io Server");
+
             let server = null;
             try {
 
@@ -45,6 +47,8 @@ class NodeServer {
                 console.log("Error Importing io() library", Exception);
             }
             this.nodeServer = server;
+
+            console.warn("Starting Socket.io was started successfully");
 
             server.on("connection", socket => {
 

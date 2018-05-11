@@ -6,8 +6,9 @@ console.log("TESTING MODE");
 
 //                            light-node
 
-Blockchain.createBlockchain("full-node", ()=>{
+Blockchain.createBlockchain("full-node", async ()=>{
     Node.NodeClientsService.startService();
+    await Node.NodeExpress.startExpress();
 }, ()=>{
     Node.NodeServer.startServer();
 });

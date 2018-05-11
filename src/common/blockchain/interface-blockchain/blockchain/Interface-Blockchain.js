@@ -98,6 +98,14 @@ class InterfaceBlockchain {
 
         if (block.blockValidation === undefined)
             block.blockValidation = this.createBlockValidation();
+        else {
+
+            block.blockValidation.getBlockCallBack = this.getBlock.bind(this);
+            block.blockValidation.getDifficultyCallback = this.getDifficultyTarget.bind(this);
+            block.blockValidation.getTimeStampCallback = this.getTimeStamp.bind(this);
+            block.blockValidation.getHashPrevCallback = this.getHashPrev.bind(this);
+
+        }
 
 
         if (! (await this.validateBlockchainBlock(block)) ) // the block has height === this.blocks.length
@@ -328,11 +336,20 @@ class InterfaceBlockchain {
         if (process.env.BROWSER)
             return true;
 
-        //load the number of blocks
-        let numBlocks = await this.db.get(this._blockchainFileName);
-        if (numBlocks === null ) {
-            console.error("numBlocks was not found");
-            return false;
+        let numBlocks = 0;
+
+        try {
+            //load the number of blocks
+            numBlocks = await this.db.get(this._blockchainFileName);
+            if (numBlocks === null) {
+                console.error("numBlocks was not found");
+                return false;
+            }
+
+        } catch (exception){
+
+            numBlocks = 0;
+
         }
 
         this.blocks.clear();
@@ -355,7 +372,7 @@ class InterfaceBlockchain {
 
             this.blocks.length = indexStart || 0; // marking the first blocks as undefined
 
-            let index;
+            let index = 0;
 
             try {
 

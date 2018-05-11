@@ -104,7 +104,8 @@ class InterfaceBlockchainProtocolForksManager {
                             bIncludeBan = false;
 
                     if (bIncludeBan) {
-                        console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
+                        let socket = bestFork.getSocket();
+                        console.warn("BANNNNNNNNNNNNNNNNN", socket !== undefined ? socket.node.sckAddress.toString() : '', exception.message);
                         BansList.addBan(bestFork.getSocket(), 10000, exception.message);
                     }
 

@@ -201,7 +201,7 @@ class NodeWebPeerRTC {
 
                             },
                             (error) => {
-                                resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +error.toString()});
+                                resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +(error !== undefined ? error.toString() : '')});
                                 console.error("Generating Initiator - Error Setting Local Description ", error);
                             }
                         );
