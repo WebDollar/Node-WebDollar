@@ -35,6 +35,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     async initializeFork(){
 
+        if (this.blockchain === undefined) return false;
+
         if ( this.blockchain.agent.light ) {
             if (! (await this._downloadProof()))
                 return false;
