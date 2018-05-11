@@ -81,13 +81,19 @@ class NodeServer {
 
 
                 if (NODES_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
-                    console.warn("too many terminal connections");
+
+                    if (Math.random() < 0.05)
+                        console.warn("too many terminal connections");
+
                     socket.disconnect();
                     return;
                 }
 
                 if (NODES_TYPE.NODE_WEB_PEER === nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
-                    console.warn("too many browser connections");
+
+                    if (Math.random() < 0.05)
+                        console.warn("too many browser connections");
+
                     socket.disconnect();
                     return;
                 }
