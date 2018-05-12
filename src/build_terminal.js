@@ -16,7 +16,7 @@ Blockchain.createBlockchain("full-node", async ()=>{
 
 process.on('SIGINT', function() {
 
-    console.warn("SIGINT FIRED")
+    console.warn("SIGINT FIRED");
     global.TERMINATED = true;
 
     setInterval(()=>{

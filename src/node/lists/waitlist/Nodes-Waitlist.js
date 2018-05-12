@@ -339,22 +339,14 @@ class NodesWaitlist {
 
         let socket = nodesListObject.socket;
 
-        this._removeBackedBySocket(socket, this.waitListFullNodes);
-        this._removeBackedBySocket(socket, this.waitListLightNodes);
+        this._removeSocket(socket, this.waitListFullNodes);
+        this._removeSocket(socket, this.waitListLightNodes);
 
     }
 
-    _removeBackedBySocket(socket, list){
+    _removeSocket(socket, list){
 
         for (let i=list.length-1; i>=0; i--){
-
-            list[i].removeBackedBy(socket);
-
-            if (list[i].backedBy.length === 0){
-
-                this.emitter.emit("waitlist/delete-node", list[i]);
-                list.splice(i, 1);
-            }
 
             if (list[i].socket === socket)
                 list.splice(i, 1);

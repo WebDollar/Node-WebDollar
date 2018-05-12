@@ -1,6 +1,8 @@
 import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 
+const MAX_NUMBER_OF_BACKED_BY = 30;
+
 class NodesWaitlistObject {
 
     constructor( sckAddresses, type, level, backedBy, connected){
@@ -112,11 +114,14 @@ class NodesWaitlistObject {
 
     }
 
-    pushBackedBy( socket, connected ){
+    pushBackedBy( sckAddress, connected ){
+
+        if (typeof sckAddress === "object" && sckAddress.node !== undefined && sckAddress.node.sckAddress !== undefined)
+            sckAddress = sckAddress.node.sckAddress;
 
         //check if it is already found
         for (let i=0; i< this.backedBy.length; i++)
-            if ( this.backedBy[i].sckAddress === socket.node.sckAddress ) {
+            if ( this.backedBy[i].sckAddress === sckAddress ) {
 
                 if (this.backedBy[i].connected !== connected) {
                     this.backedBy[i].connected = connected;
@@ -128,17 +133,23 @@ class NodesWaitlistObject {
                 return false;
             }
 
-        this.backedBy.push({
-            socket: socket,
-            connected: connected,
-        });
+        if (this.backedBy.length < MAX_NUMBER_OF_BACKED_BY){
 
-        if (connected) this.backedByConnected++;
+            this.backedBy.push({
+                socket: sckAddress,
+                connected: connected,
+            });
+
+            if (connected) this.backedByConnected++;
+
+        }
+
     }
 
-    removeBackedBy(socket){
+    removeBackedBy(sckAddress){
+
         for (let i=0; i< this.backedBy.length; i++)
-            if (this.backedBy[i].socket === socket.node.sckAddress) {
+            if (this.backedBy[i].sckAddress === sckAddress) {
 
                 if (this.backedBy[i].connected)
                     this.backedByConnected --;
@@ -146,12 +157,13 @@ class NodesWaitlistObject {
                 this.backedBy.splice(i, 1);
                 return;
             }
+
     }
 
-    findBackedBy(socket){
+    findBackedBy(sckAddress){
 
         for (let i=0; i<this.backedBy.length; i++)
-            if (this.backedBy[i].sckAddress === socket.node.sckAddress)
+            if (this.backedBy[i].sckAddress === sckAddress)
                 return true;
 
         return null;
