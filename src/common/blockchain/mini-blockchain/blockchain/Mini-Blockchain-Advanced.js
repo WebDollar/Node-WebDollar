@@ -24,7 +24,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             //delete old lightAccountantTreeSerializations
 
-
             let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES - 2;
 
             while (this.lightAccountantTreeSerializations[index] !== undefined){
@@ -114,9 +113,10 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             if (!answer) {
                 //couldn't load the last K blocks
-                console.warn("couldn't load the last K blocks");
+                console.error("couldn't load the last K blocks");
 
-                throw "load blockchain simple";
+                this.accountantTree.loadMiniAccountant(new Buffer(0));
+                throw "load blockchain simple"; //let's force to load a simple blockchain
             }
 
         } catch (exception){

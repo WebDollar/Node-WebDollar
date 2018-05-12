@@ -338,7 +338,7 @@ class InterfaceTree{
         this.root.destroyNode();
         this.createRoot();
 
-        if (buffer.length === 1) return true; // nothing to deserialize
+        if (buffer.length === 1 || buffer.length === 0) return true; // nothing to deserialize
         return this.root.deserializeNode(buffer, offset, true, includeHashes);
     }
 

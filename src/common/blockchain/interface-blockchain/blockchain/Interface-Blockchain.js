@@ -400,6 +400,10 @@ class InterfaceBlockchain {
                 if ( this.blocks.length < 10)
                     return false;
 
+                if (indexStartProcessingOffset !== undefined){
+                    return false;
+                }
+
             }
 
         } catch (exception){
