@@ -7,7 +7,7 @@
 
 const EventEmitter = require('events');
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import consts from 'consts/const_global'

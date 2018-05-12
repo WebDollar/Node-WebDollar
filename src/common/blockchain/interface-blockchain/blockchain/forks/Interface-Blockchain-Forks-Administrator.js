@@ -1,6 +1,6 @@
 import InterfaceBlockchainFork from './Interface-Blockchain-Fork'
 import BufferExtended from "common/utils/BufferExtended"
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work

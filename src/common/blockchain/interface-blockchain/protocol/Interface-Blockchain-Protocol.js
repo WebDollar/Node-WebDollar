@@ -1,4 +1,4 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
 import InterfaceBlockchainProtocolForksManager from "./Interface-Blockchain-Protocol-Forks-Manager"
 

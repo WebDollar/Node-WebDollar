@@ -1,5 +1,5 @@
 import consts from "consts/const_global";
-import NodesList from "node/lists/nodes-list";
+import NodesList from "node/lists/Nodes-List";
 import Serialization from "common/utils/Serialization";
 import PoolMiningWorker from "common/blockchain/interface-blockchain/mining-pools/miner/Pool-Mining-Worker";
 

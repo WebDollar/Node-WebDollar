@@ -1,5 +1,5 @@
-import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
-import NodesList from 'node/lists/nodes-list'
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 

@@ -1,5 +1,5 @@
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 
 import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";

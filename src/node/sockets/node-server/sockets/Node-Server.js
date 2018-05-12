@@ -5,7 +5,7 @@ let io = require('socket.io');
 
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import NodeExpress from "./../express/Node-Express";
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import NODES_TYPE from "node/lists/types/Nodes-Type";

@@ -1,6 +1,6 @@
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
-import NodesListObject from './node-list-object.js';
+import NodesListObject from './Mode-List-Object.js';
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 
 const EventEmitter = require('events');

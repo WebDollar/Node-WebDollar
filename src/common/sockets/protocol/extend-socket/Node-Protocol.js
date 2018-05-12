@@ -1,5 +1,5 @@
 import consts from 'consts/const_global'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain"

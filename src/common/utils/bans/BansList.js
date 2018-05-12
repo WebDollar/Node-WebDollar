@@ -1,5 +1,5 @@
 import BanObject from "./BanObject"
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 
 class BansList{
 

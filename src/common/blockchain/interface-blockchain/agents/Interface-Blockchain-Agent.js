@@ -1,4 +1,4 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"

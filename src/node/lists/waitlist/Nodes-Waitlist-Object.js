@@ -1,20 +1,24 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 
 class NodesWaitlistObject {
 
-    constructor( sckAddresses, type, nodeConnected, level, backedBy){
+    constructor( sckAddresses, type, level, backedBy, connected){
 
         this.sckAddresses = sckAddresses;
         this.socket = null;
 
-        this.nodeConnected = nodeConnected || false;
+        this.connected = false;
         this.blocked = false;
         this.checked = false;
 
-        if (backedBy === undefined) backedBy = [];
-        if ( !Array.isArray(backedBy) ) backedBy = [backedBy];
-        this.backedBy = backedBy;
+        if (backedBy === "fallback")
+            this.isFallback = true;
+
+        //backed by
+        this.backedByConnected = 0;
+        this.backedBy = [];
+        this.pushBackedBy( backedBy, connected );
 
         this.connecting = false;
 
@@ -22,6 +26,8 @@ class NodesWaitlistObject {
         this.lastTimeChecked = 0;
 
         this.level = level||0;
+
+        this.date = new Date().getTime();
 
         if (type === undefined) type = NODES_TYPE.NODE_TERMINAL;
 
@@ -52,7 +58,7 @@ class NodesWaitlistObject {
     socketErrorConnected(){
         this.errorTrial++;
 
-        if (this.findBackedBy("fallback") !== null) {
+        if (this.isFallback === true) {
 
             if (process.env.BROWSER)
                 this.errorTrial = Math.min(this.errorTrial, 5);
@@ -108,16 +114,35 @@ class NodesWaitlistObject {
 
     pushBackedBy( socket, connected ){
 
+        //check if it is already found
         for (let i=0; i< this.backedBy.length; i++)
-            if (this.backedBy[i] === socket)
-                return false;
+            if ( this.backedBy[i].sckAddress === socket.node.sckAddress ) {
 
-        this.backedBy.push(socket);
+                if (this.backedBy[i].connected !== connected) {
+                    this.backedBy[i].connected = connected;
+
+                    if (connected) this.backedByConnected++;
+                    else this.backedByConnected--;
+                }
+
+                return false;
+            }
+
+        this.backedBy.push({
+            socket: socket,
+            connected: connected,
+        });
+
+        if (connected) this.backedByConnected++;
     }
 
     removeBackedBy(socket){
         for (let i=0; i< this.backedBy.length; i++)
-            if (this.backedBy[i] === socket) {
+            if (this.backedBy[i].socket === socket.node.sckAddress) {
+
+                if (this.backedBy[i].connected)
+                    this.backedByConnected --;
+
                 this.backedBy.splice(i, 1);
                 return;
             }
@@ -126,10 +151,29 @@ class NodesWaitlistObject {
     findBackedBy(socket){
 
         for (let i=0; i<this.backedBy.length; i++)
-            if (this.backedBy[i] === socket)
+            if (this.backedBy[i].sckAddress === socket.node.sckAddress)
                 return true;
 
         return null;
+    }
+
+    sortingScore(){
+
+        if (this.isFallback === true) return 100000 - this.errorTrial*100;
+
+        let score = 200;
+
+        if (this.backedBy.length > 0){
+
+            score += 10 * this.backedBy.length;
+            score += 100 * this.backedByConnected;
+
+        }
+
+        score -= this.errorTrial * 100;
+
+        return score;
+
     }
 
 }

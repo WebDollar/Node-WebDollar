@@ -3,7 +3,7 @@ import * as io from 'socket.io-client';
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import Blockchain from "main-blockchain/Blockchain"

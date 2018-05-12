@@ -1,5 +1,5 @@
 import BlockchainnetworkTime from "./Blockchain-Network-Adjusted-Time"
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class BlockchainTimestamp{

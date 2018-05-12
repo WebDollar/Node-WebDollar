@@ -3,7 +3,7 @@ import InterfaceBlockchainAgentFullNode from 'common/blockchain/interface-blockc
 import MiniBlockchainLightProtocol from "common/blockchain/mini-blockchain/protocol/light/Mini-Blockchain-Light-Protocol"
 import MiniBlockchainForkLight from '../protocol/light/Mini-Blockchain-Light-Fork'
 import consts from "consts/const_global";
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain"
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";

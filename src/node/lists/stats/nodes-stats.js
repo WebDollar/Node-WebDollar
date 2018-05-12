@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
-import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import Blockchain from "main-blockchain/Blockchain"
 

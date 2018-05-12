@@ -371,7 +371,8 @@ class InterfaceBlockchain {
                 indexStartProcessingOffset = numBlocks - indexStartProcessingOffset;
 
                 console.warn("===========================================================");
-                console.warn("BLocks Processing starts at: ", indexStartProcessingOffset);
+                console.warn("Fast Blockchain Loading");
+                console.warn("Blocks Processing starts at: ", indexStartProcessingOffset);
                 console.warn("===========================================================");
 
             }

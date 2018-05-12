@@ -1,6 +1,6 @@
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import SignalingServerRoomConnectionObject from './signaling-server-room-connection-object';
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 /*

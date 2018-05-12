@@ -10,7 +10,7 @@ const fs = require('fs')
 import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain"
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 
 class NodeExpress{
 
