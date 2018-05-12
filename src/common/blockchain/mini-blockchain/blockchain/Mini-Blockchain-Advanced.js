@@ -70,8 +70,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) {
 
-                console.log("saving ", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES.toString());
-
                 if (! (await this.db.save("lightAccountantTreeAdvanced_offset", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES )))
                     throw {message: "Couldn't be saved _lightAccountantTreeAdvanced_offset", index: this._blockchainFileName + consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES};
 
