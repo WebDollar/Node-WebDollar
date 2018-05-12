@@ -250,8 +250,8 @@ consts.SETTINGS = {
                 },
 
                 SERVER: {
-                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 650,
-                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 100,
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 850,
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 150,
                 },
 
             },
