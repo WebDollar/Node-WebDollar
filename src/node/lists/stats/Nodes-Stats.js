@@ -34,12 +34,12 @@ class NodesStats {
 
 
         let string1 = "";
-        let clients = NodesList.getNodes(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
+        let clients = NodesList.getNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
         for (let i=0; i<clients.length; i++)
             string1 += '('+clients[i].socket.node.sckAddress.toString() + ')   ';
 
         let string2 = "";
-        let server = NodesList.getNodes( CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET );
+        let server = NodesList.getNodesByConnectionType( CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET );
         for (let i=0; i<server.length; i++)
             string2 += '(' + server[i].socket.node.sckAddress.toString() + ')   ';
 

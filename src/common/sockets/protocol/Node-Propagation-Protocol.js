@@ -6,6 +6,12 @@ import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 
 class NodePropagationProtocol {
 
+    constructor(){
+
+        //waitlist to be propagated to termination
+        this._waitlistForTermination = [];
+
+    }
 
     initializePropagationProtocol(){
 
@@ -14,6 +20,8 @@ class NodePropagationProtocol {
 
         NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
         NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
+
+        setInterval( this._recalculateWaitlistForTermination.bind(this), 15*1000)
 
     }
 
@@ -79,8 +87,8 @@ class NodePropagationProtocol {
 
                         break;
 
-                    case "deleted-light-nodes":
-                    case "deleted-full-nodes":
+                    case "disconnected-light-nodes":
+                    case "disconnected-full-nodes":
 
                         for (let i = 0; i < addresses.length; i++)
                             NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, addresses[i].port, addresses[i].type, addresses[i].https, addresses[i].connected, socket.node.level + 1, socket);
@@ -112,6 +120,57 @@ class NodePropagationProtocol {
         if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
         else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
 
+    }
+
+
+    _recalculateWaitlistForTermination(){
+
+        let number = 15+ Math.floor( Math.random()*15 );
+
+        let list = [];
+
+
+        let nodesList = NodesList.getNodesByType(NODES_TYPE.NODE_TERMINAL);
+        for (let i=nodesList.length-1; i>=0; i--)
+            if (nodesList.isFallback){
+                nodesList.splice(i, 1);
+            }
+
+        //some from NodesList
+
+        let generateMarket = (nodes)=>{
+
+            let count = 0;
+            while ( count < number && count < nodes.length ){
+
+                let index = Math.floor( Math.random() * nodes.length );
+                let node = nodes[index];
+
+                let found  = 0;
+                for (let i=0; i<list.length; i++ )
+                    if (list[i] === node){
+                        found = true;
+                        break;
+                    }
+
+                if (node) {
+                    list.push(node);
+                    count++;
+                }
+            }
+
+        };
+
+
+        generateMarket(NodesList.nodes);
+        generateMarket( NodesWaitlist.waitListFullNodes);
+
+
+        let answer = [];
+        for (let i=0; i<list.length; i++)
+            answer.push( list[i].toJSON() );
+
+        return answer;
     }
 
 }

@@ -136,7 +136,7 @@ class NodesList {
     }
 
     //return the JOIN of the clientSockets and serverSockets
-    getNodes(connectionType){
+    getNodesByConnectionType(connectionType){
 
         if ( connectionType === undefined) connectionType = 'all';
 
@@ -154,6 +154,27 @@ class NodesList {
 
         return list;
     }
+
+    //return the JOIN of the clientSockets and serverSockets
+    getNodesByType(type){
+
+        if ( type === undefined) type = 'all';
+
+        let list = [];
+
+        for (let i=0; i<this.nodes.length; i++)
+
+            if (Array.isArray(type)) { //in case type is an Array
+                if (this.nodes[i].socket.node.protocol.type in type)
+                    list.push(this.nodes[i]);
+            } else
+            // in case type is just a simple string
+            if (type === this.nodes[i].socket.node.protocol.type || type === "all")
+                list.push(this.nodes[i]);
+
+        return list;
+    }
+
 
     countNodesByConnectionType(connectionType){
 

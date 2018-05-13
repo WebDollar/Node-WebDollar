@@ -117,11 +117,11 @@ class NodeProtocol {
      * @param type
      * @param exceptSockets
      */
-    static broadcastRequest (request, data, type, exceptSockets){
+    static broadcastRequest (request, data, connectionType, exceptSockets){
 
         if (exceptSockets === "all") return true;
 
-        let nodes = NodesList.getNodes(type);
+        let nodes = NodesList.getNodesByConnectionType(connectionType);
 
         if (exceptSockets !== undefined && exceptSockets !== null && !Array.isArray(exceptSockets))
             exceptSockets = [exceptSockets];
