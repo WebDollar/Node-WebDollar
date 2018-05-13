@@ -28,7 +28,7 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
 
             if (this.blockchain.proofPi !== null)
                 if ( new Date().getTime() - this.blockchain.proofPi.date.getTime() >= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK *1000 * 2) {
-                    if (Math.random() < 2*WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC)
+                    if (Math.random() < 2*WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES)
                         Blockchain.synchronizeBlockchain(); //let's synchronize again
                 }
 
@@ -84,9 +84,9 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
             if ( webrtc > WEBRTC_MINIMUM_LIGHT) {
                 //let's disconnect from full nodes
 
-                if ( this.status !== AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC ) {
+                if ( this.status !== AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES ) {
 
-                    this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC;
+                    this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
 
                     if (Math.random() > WEBRTC_MINIMUM_LIGHT_PROBABILITY + 0.15) // most will disconnect from full nodes
                         NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);

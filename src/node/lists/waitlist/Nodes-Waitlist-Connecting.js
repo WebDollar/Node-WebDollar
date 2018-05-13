@@ -39,25 +39,16 @@ class NodesWaitlistConnecting {
 
     _connectNewNodesWaitlist(){
 
-        for (let i=0; i < NodesWaitlist.waitListFullNodes.length; i++)
-            if ( NodesWaitlist.waitListFullNodes[i].isFallback) {
+        for (let i=0; i < NodesWaitlist.waitListFullNodes.length; i++){
 
-                if (this._connectedOnlyTo80 && NodesWaitlist.waitListFullNodes[i].sckAddresses[0].port !== "80")
-                    continue;
 
-                this._tryToConnectNextNode( NodesWaitlist.waitListFullNodes[i] );
-            }
+            // in case it is not synchronized, it should connect to the fallback node
+            if ( Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && !NodesWaitlist.waitListFullNodes[i].isFallback)  continue;
 
-        if (NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) === 0){
+            // in case it needs to connect only to port 80
+            if (this._connectedOnlyTo80 && NodesWaitlist.waitListFullNodes[i].sckAddresses[0].port !== "80") continue;
 
-            for (let i=0; i < this.waitListFullNodes.length; i++)
-                if ( this.waitListFullNodes[i].findBackedBy("fallback") !== null)
-                    this._tryToConnectNextNode(this.waitListFullNodes[i]);
-
-        } else {
-
-            for (let i=0; i < this.waitListFullNodes.length; i++)
-                this._tryToConnectNextNode(this.waitListFullNodes[i]);
+            this._tryToConnectNextNode(NodesWaitlist.waitListFullNodes[i]);
 
         }
 
@@ -75,7 +66,7 @@ class NodesWaitlistConnecting {
         if ( process.env.BROWSER && (this._connectingQueue.length + NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) >= consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER) return;
         if ( !process.env.BROWSER && (this._connectingQueue.length + NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) >= consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL) return;
 
-        if (Blockchain.Agent.light && Blockchain.Agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC)
+        if (Blockchain.Agent.light && Blockchain.Agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES)
             return;
 
         //connect only to TERMINAL NODES

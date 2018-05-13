@@ -147,7 +147,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[pos]; //a simple string Address
                             }
 
-                            NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, https, nodeType, false, 1, "fallback" );
+                            NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType, https, false, 1, "fallback" );
                         }
 
                     }
