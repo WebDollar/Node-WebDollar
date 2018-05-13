@@ -11,7 +11,7 @@ class NodePropagationProtocol {
         this._newFullNodesWaitList = [];
         this._newLightNodesWaitList = [];
 
-        setTimeout(this._processNewWaitlistInterval.bind(this), 5000);
+        setTimeout(this._processNewWaitlistInterval.bind(this), 4000);
 
     }
 
@@ -36,7 +36,7 @@ class NodePropagationProtocol {
                 let index = 0;
                 let newNode = list[index];
 
-                waitlist = NodesWaitlist.addNewNodeToWaitlist(newNode.address.addr, newNode.address.port, newNode.address.type, newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
+                waitlist = NodesWaitlist.addNewNodeToWaitlist(newNode.address.addr, newNode.address.port, newNode.address.https, newNode.address.type, newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
 
                 list.splice(index, 1);
 

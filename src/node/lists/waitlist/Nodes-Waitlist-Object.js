@@ -5,7 +5,7 @@ const MAX_NUMBER_OF_BACKED_BY = 30;
 
 class NodesWaitlistObject {
 
-    constructor( sckAddresses, type, level, backedBy, connected){
+    constructor ( sckAddresses, type, https, level, backedBy, connected ){
 
         this.sckAddresses = sckAddresses;
         this.socket = null;
@@ -13,6 +13,7 @@ class NodesWaitlistObject {
         this.connected = false;
         this.blocked = false;
         this.checked = false;
+        this.https = https;
 
         if (backedBy === "fallback")
             this.isFallback = true;
@@ -109,6 +110,8 @@ class NodesWaitlistObject {
             type: this.type,
             addr: this.sckAddresses[0].toString(),
             port: this.sckAddresses[0].port,
+            conn: this.connected,
+            https: this.https,
 
         }
 

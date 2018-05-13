@@ -114,6 +114,7 @@ class NodeDiscoveryService {
 
                 let nodes = [];
                 let name = '';
+                let https = true;
 
                 if ((data.hasOwnProperty('protocol')) && (data['protocol'] === consts.SETTINGS.NODE.PROTOCOL)) {
                     name = data.name || '';
@@ -131,9 +132,8 @@ class NodeDiscoveryService {
 
                             let pos = Math.floor( Math.random(  ) * nodes.length );
 
-                            while (marked[pos] !== undefined){
+                            while (marked[pos] !== undefined)
                                 pos = Math.floor( Math.random(  ) * nodes.length );
-                            }
 
                             marked[pos] = true;
 
@@ -147,7 +147,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[pos]; //a simple string Address
                             }
 
-                            NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType, false, 1, "fallback" );
+                            NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, https, nodeType, false, 1, "fallback" );
                         }
 
                     }
