@@ -132,7 +132,7 @@ class NodePropagationProtocol {
 
         let nodesList = NodesList.getNodesByType(NODES_TYPE.NODE_TERMINAL);
         for (let i=nodesList.length-1; i>=0; i--)
-            if (nodesList.isFallback){
+            if (nodesList[i].isFallback || nodesList[i].type !== NODES_TYPE.NODE_TERMINAL){
                 nodesList.splice(i, 1);
             }
 
@@ -145,16 +145,17 @@ class NodePropagationProtocol {
 
                 let index = Math.floor( Math.random() * nodes.length );
                 let node = nodes[index];
+                let json = node.toJSON();
 
-                let found  = 0;
+                let found  = false;
                 for (let i=0; i<list.length; i++ )
-                    if (list[i] === node){
+                    if (list[i].addr === json.addr){
                         found = true;
                         break;
                     }
 
-                if (node) {
-                    list.push(node);
+                if (found === false) {
+                    list.push(json);
                     count++;
                 }
             }
@@ -165,12 +166,7 @@ class NodePropagationProtocol {
         generateMarket(NodesList.nodes);
         generateMarket( NodesWaitlist.waitListFullNodes);
 
-
-        let answer = [];
-        for (let i=0; i<list.length; i++)
-            answer.push( list[i].toJSON() );
-
-        return answer;
+        return list;
     }
 
 }
