@@ -1,7 +1,9 @@
 import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
+import consts from 'consts/const_global'
 
-const MAX_NUMBER_OF_BACKED_BY = 30;
+const MAX_NUMBER_OF_BACKED_BY_FULL_NODE = 30;
+const MAX_NUMBER_OF_BACKED_BY_LIGHT_NODE = 3;
 
 class NodesWaitlistObject {
 
@@ -109,7 +111,7 @@ class NodesWaitlistObject {
 
         };
 
-        if (this.sckAddresses[0] !== consts.SETTINGS.NODE.PORT ) obj.port = this.sckAddresses[0].port;
+        if (this.sckAddresses[0].port !== consts.SETTINGS.NODE.PORT ) obj.port = this.sckAddresses[0].port;
 
         if (this.connected) obj.connected = this.connected;
 
@@ -137,7 +139,14 @@ class NodesWaitlistObject {
                 return false;
             }
 
-        if (this.backedBy.length < MAX_NUMBER_OF_BACKED_BY){
+        let max;
+
+        if (this.type === NODES_TYPE.NODE_WEB_PEER)
+            max = MAX_NUMBER_OF_BACKED_BY_LIGHT_NODE;
+        else if (this.type === NODES_TYPE.NODE_TERMINAL)
+            max  = MAX_NUMBER_OF_BACKED_BY_FULL_NODE;
+
+        if ( this.backedBy.length < max ){
 
             this.backedBy.push({
                 socket: sckAddress,

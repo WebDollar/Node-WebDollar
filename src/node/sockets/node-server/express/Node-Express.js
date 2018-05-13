@@ -63,7 +63,10 @@ class NodeExpress{
 
                     this._initializeRouter();
 
-                    console.log("HTTPS Express was opened on port "+port);
+                    console.info("========================================");
+                    console.info("HTTPS Express was opened on port "+port);
+                    console.info("========================================");
+
                     resolve(true);
 
                 });
@@ -75,7 +78,9 @@ class NodeExpress{
 
                     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_NO_SSL;
 
-                    console.log(`server started at localhost:${port}`);
+                    console.info("========================================");
+                    console.info(`Express started at localhost:${port}`);
+                    console.info("========================================");
 
                     this._initializeRouter();
 
