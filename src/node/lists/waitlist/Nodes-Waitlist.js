@@ -180,7 +180,7 @@ class NodesWaitlist {
 
     removedWaitListElement(address, port, backedBy, listType){
 
-        let list = [];
+        let list;
 
         if( listType === NODES_TYPE.NODE_TERMINAL)  list = this.waitListFullNodes;
         else if ( listType === NODES_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;

@@ -6,14 +6,6 @@ import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 
 class NodePropagationProtocol {
 
-    constructor(){
-
-        this._newFullNodesWaitList = [];
-        this._newLightNodesWaitList = [];
-
-        setTimeout(this._processNewWaitlistInterval.bind(this), 4000);
-
-    }
 
     initializePropagationProtocol(){
 
@@ -22,38 +14,6 @@ class NodePropagationProtocol {
 
         NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
         NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
-
-    }
-
-    _processList(list){
-
-        for (let i=0; i<list.length; i++) {
-
-            let waitlist = null;
-
-            while (waitlist === null && list.length > 0) {
-
-                let index = 0;
-                let newNode = list[index];
-
-                waitlist = NodesWaitlist.addNewNodeToWaitlist(newNode.address.addr, newNode.address.port, newNode.address.https, newNode.address.type, newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
-
-                list.splice(index, 1);
-
-                return;
-            }
-
-        }
-
-    }
-
-    _processNewWaitlistInterval(){
-
-        this._processList(this._newFullNodesWaitList);
-        this._processList(this._newLightNodesWaitList);
-
-
-        setTimeout( this._processNewWaitlistInterval.bind(this), 2000 + Math.floor( Math.random() * 200 ) );
 
     }
 
@@ -76,7 +36,6 @@ class NodePropagationProtocol {
             try{
 
                 let list = [];
-                for (let i=0; i<NodesList.nodes.length; i++) list.push(NodesList.nodes[i].toJSON());
                 for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++) list.push(NodesWaitlist.waitListFullNodes[i].toJSON());
 
                 socket.node.sendRequest("propagation/nodes", {"op": "new-full-nodes", addresses: list });
@@ -91,7 +50,6 @@ class NodePropagationProtocol {
             try{
 
                 let list = [];
-                for (let i=0; i<NodesList.nodes.length; i++) list.push(NodesList.nodes[i].toJSON());
                 for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++) list.push(NodesWaitlist.waitListLightNodes[i].toJSON());
 
                 socket.node.sendRequest("propagation/nodes", {"op": "new-light-nodes", addresses: list });
@@ -111,47 +69,22 @@ class NodePropagationProtocol {
                 if (!Array.isArray(addresses)) throw {message: "addresses is not an array"};
 
                 let op = response.op || '';
+
                 switch (op) {
 
                     case "new-full-nodes":
                     case "new-light-nodes":
 
-                        let list, type;
-                        if(op === "new-full-nodes") {
-                            list = this._newFullNodesWaitList;
-                            type = NODES_TYPE.NODE_TERMINAL
-                        } else {
-                            list = this._newLightNodesWaitList;
-                            type = NODES_TYPE.NODE_WEB_PEER;
-                        }
-
                         for (let i = 0; i < addresses.length; i++)
-                            if(addresses[i].type === type){
-
-                                let found = false;
-                                for (let j=0;  j<this._newFullNodesWaitList.length; j++)
-                                    if (this._newLightNodesWaitList[j].addr === addresses[i].addr) {
-                                        found = true;
-                                        break;
-                                    }
-
-                                if (!found)
-                                    this._newLightNodesWaitList.push({address: addresses[i], socket: socket});
-                            }
+                            NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, addresses[i].port, addresses[i].https, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket);
 
                         break;
 
                     case "deleted-light-nodes":
-
-                        for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.removedWaitListElement( addresses[i].addr, addresses[i].port, socket, NODES_TYPE.NODE_WEB_PEER );
-
-                        break;
-
                     case "deleted-full-nodes":
 
                         for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.removedWaitListElement( addresses[i].addr, addresses[i].port, socket, NODES_TYPE.NODE_TERMINAL );
+                            NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, addresses[i].port, addresses[i].https, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket);
 
                         break;
 
@@ -177,19 +110,9 @@ class NodePropagationProtocol {
 
     _nodeDisconnected(nodeWaitListObject){
 
-        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "deleted-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "deleted-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
+        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
 
-        this._deleteWaitlist(nodeWaitListObject.socket, this._newLightNodesWaitList);
-        this._deleteWaitlist(nodeWaitListObject.socket, this._newFullNodesWaitList);
-
-    }
-
-    _deleteWaitlist(socket, list){
-
-        for (let i=list.length; i>=0; i--)
-            if (list[i].socket === socket )
-                list.splice(i,1);
     }
 
 }
