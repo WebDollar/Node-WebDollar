@@ -14,6 +14,7 @@ class NodeClientsService {
 
 
     startService(){
+        NodesWaitlist.initializeWaitlist();
         NodeDiscoveryService.startDiscovery();
         NodesWaitlistConnecting.startConnecting();
     }

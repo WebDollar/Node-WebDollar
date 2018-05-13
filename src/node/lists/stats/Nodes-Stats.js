@@ -46,6 +46,18 @@ class NodesStats {
         console.log("clients: ",string1);
         console.log("server: ",string2);
 
+
+        let waitlist1 = [];
+        for ( let i=0; i<NodesWaitlist.waitListFullNodes.length; i++ )
+            waitlist1.push( NodesWaitlist.waitListFullNodes[i].toJSON() );
+
+        let waitlist2 = [];
+        for ( let i=0; i<NodesWaitlist.waitListLightNodes.length; i++ )
+            waitlist2.push( NodesWaitlist.waitListLightNodes[i].toJSON() );
+
+        console.log("waitlist full node ", waitlist1.length, waitlist1);
+        console.log("waitlist light nod ", waitlist2);
+
     }
 
     _recalculateStats(nodesListObject, printStats = true){

@@ -25,6 +25,10 @@ class NodesWaitlist {
 
         this.MAX_ERROR_TRIALS = 100;
 
+    }
+
+    initializeWaitlist(){
+
         NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
             await this._desinitializeNode(nodesListObject.socket);
         });
@@ -35,7 +39,7 @@ class NodesWaitlist {
     }
 
 
-    addNewNodeToWaitlist(addresses, port, type, https, connected, level, backedBy){
+    addNewNodeToWaitlist (addresses, port, type, https, connected, level, backedBy, socket){
 
         if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[])) ) return false;
 
@@ -51,12 +55,13 @@ class NodesWaitlist {
 
             if (backedBy !==  "fallback") {
 
-                let answer = this._searchNodesWaitlist( sckAddress, port, type );;
+                let answer = this._searchNodesWaitlist( sckAddress, port, type );
 
                 if (answer.waitlist!== null) {
 
                     //already found, let's add a new pushBackedBy
                     answer.waitlist.pushBackedBy(backedBy, connected);
+                    answer.waitlist.socket = socket;
 
                 }
                 else sckAddresses.push( sckAddress );
@@ -69,14 +74,14 @@ class NodesWaitlist {
         // incase this new waitlist is new
         if (sckAddresses.length > 0){
 
-            let waitListObject = new NodesWaitlistObject( sckAddresses, type, https, level, backedBy , connected);
+            let waitListObject = new NodesWaitlistObject( sckAddresses, type, https, level, backedBy , connected, socket );
 
             let list;
 
             if (waitListObject.type === NODES_TYPE.NODE_TERMINAL)  list = this.waitListFullNodes;
             else  if (waitListObject.type === NODES_TYPE.NODE_WEB_PEER) list = this.waitListLightNodes;
 
-            //v
+            // v
             list.push(waitListObject);
 
             this.emitter.emit( "waitlist/new-node", waitListObject );
@@ -114,7 +119,7 @@ class NodesWaitlist {
 
         let index = this._findNodesWaitlist( address, port, listType );
 
-        if (index === -1) return null;
+        if (index === -1) return { index: -1, waitlist: null};
 
         return { index: index, waitlist: list[index] };
 

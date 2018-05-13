@@ -26,7 +26,6 @@ class NodePropagationProtocol {
             socket.node.sendRequest("propagation/request-all-wait-list/light-nodes");
         },  1000);
 
-
     }
 
     initializeNodesPropagation(socket){

@@ -2,6 +2,7 @@ import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NodesListObject from './Mode-List-Object.js';
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
 const EventEmitter = require('events');
 
@@ -75,8 +76,6 @@ class NodesList {
         socket.node.protocol.connectionType = connectionType;
         socket.node.type = type;
 
-        socket.node.index = ++this.nodesTotal;
-
         // avoiding double connections                              unless it is allowed to double connections
         if ( this.searchNodeSocketByAddress(socket, undefined, validationDoubleConnectionsTypes ) === null ) {
 
@@ -88,6 +87,8 @@ class NodesList {
             this.emitter.emit("nodes-list/connected", object);
 
             GeoLocationLists.includeSocket(socket);
+
+            NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.type, socket.node.https, true, socket.node.level, socket, socket );
 
             return true;
         }

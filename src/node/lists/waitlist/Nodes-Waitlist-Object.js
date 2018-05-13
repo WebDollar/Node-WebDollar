@@ -5,10 +5,10 @@ const MAX_NUMBER_OF_BACKED_BY = 30;
 
 class NodesWaitlistObject {
 
-    constructor ( sckAddresses, type, https, level, backedBy, connected ){
+    constructor ( sckAddresses, type, https, level, backedBy, connected = false, socket = null ){
 
         this.sckAddresses = sckAddresses;
-        this.socket = null;
+        this.socket = socket;
 
         this.connected = false;
         this.blocked = false;
