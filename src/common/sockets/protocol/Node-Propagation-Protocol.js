@@ -9,7 +9,7 @@ class NodePropagationProtocol {
     constructor(){
 
         //waitlist to be propagated to termination
-        this._waitlistForTermination = [];
+        this._waitlistSimple = [];
 
     }
 
@@ -21,7 +21,7 @@ class NodePropagationProtocol {
         NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
         NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
 
-        setInterval( this._recalculateWaitlistForTermination.bind(this), 15*1000)
+        setInterval( this._recalculateWaitlistSimple.bind(this), 15*1000)
 
     }
 
@@ -123,7 +123,7 @@ class NodePropagationProtocol {
     }
 
 
-    _recalculateWaitlistForTermination(){
+    _recalculateWaitlistSimple(){
 
         let number = 15+ Math.floor( Math.random()*15 );
 
@@ -166,7 +166,19 @@ class NodePropagationProtocol {
         generateMarket(NodesList.nodes);
         generateMarket( NodesWaitlist.waitListFullNodes);
 
-        return list;
+        this._waitlistSimple = list;
+    }
+
+    propagateWaitlistSimple(socket, disconnectSocket = true){
+
+        socket.node.sendRequest("propagation/nodes", {op: "new-full-nodes", addresses: this._waitlistSimple} );
+
+        if (disconnectSocket){
+            setTimeout(()=>{
+                socket.disconnect();
+            }, 3000);
+        }
+
     }
 
 }

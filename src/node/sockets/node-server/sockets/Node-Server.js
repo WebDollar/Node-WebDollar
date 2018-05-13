@@ -9,6 +9,7 @@ import NodesList from 'node/lists/Nodes-List'
 import NodeExpress from "./../express/Node-Express";
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import NODES_TYPE from "node/lists/types/Nodes-Type";
+import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'
 
 class NodeServer {
 
@@ -85,7 +86,7 @@ class NodeServer {
                     if (Math.random() < 0.05)
                         console.warn("too many terminal connections");
 
-                    socket.disconnect();
+                    NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
                     return;
                 }
 
@@ -94,7 +95,8 @@ class NodeServer {
                     if (Math.random() < 0.05)
                         console.warn("too many browser connections");
 
-                    socket.disconnect();
+                    NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
+
                     return;
                 }
 
@@ -120,8 +122,7 @@ class NodeServer {
 
                 } else {
 
-                    socket.disconnect();
-
+                    NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
                 }
 
             });
