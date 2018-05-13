@@ -30,10 +30,7 @@ class NodesWaitlistObject {
 
         this.level = level||0;
 
-        this.date = new Date().getTime();
-
         if (type === undefined) type = NODES_TYPE.NODE_TERMINAL;
-
         this.type = type;
     }
 
@@ -105,16 +102,20 @@ class NodesWaitlistObject {
 
     toJSON(){
 
-        return {
+        let obj = {
 
             type: this.type,
             addr: this.sckAddresses[0].toString(),
-            port: this.sckAddresses[0].port,
-            conn: this.connected,
-            https: this.https,
 
-        }
+        };
 
+        if (this.sckAddresses[0] !== consts.SETTINGS.NODE.PORT ) obj.port = this.sckAddresses[0].port;
+
+        if (this.connected) obj.connected = this.connected;
+
+        if (this.https === true) obj.https = this.https;
+
+        return obj;
     }
 
     pushBackedBy( sckAddress, connected ){

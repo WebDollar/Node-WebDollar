@@ -109,8 +109,7 @@ class NodesWaitlistConnecting {
         let nodeClient = NodesList.searchNodeSocketByAddress(nextWaitListObject.sckAddresses[index], 'all', ["id","uuid"]);
         if (nodeClient !== null) return nodeClient;
 
-        if (nextWaitListObject.socket !== null) nodeClient = nextWaitListObject.socket;
-        else nodeClient = new NodeClient();
+        nodeClient = new NodeClient();
 
         try {
 

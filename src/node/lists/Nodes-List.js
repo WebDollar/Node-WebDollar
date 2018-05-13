@@ -88,7 +88,7 @@ class NodesList {
 
             GeoLocationLists.includeSocket(socket);
 
-            NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.type, socket.node.https, true, socket.node.level, socket, socket );
+            NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.type, socket.node.protocol.nodeSSL, true, socket.node.level, socket, socket );
 
             return true;
         }
