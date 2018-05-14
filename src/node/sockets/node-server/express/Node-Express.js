@@ -69,12 +69,19 @@ class NodeExpress{
 
                     resolve(true);
 
+                }).on('error', function(err) {
+
+                    console.error("Error Creating HTTPS Express Server");
+                    console.error(err);
+
+                    throw err;
+
                 });
 
             } catch (exception){
 
                 //cloudflare generates its own SSL certificate
-                this.server = http.createServer(this.app).listen(port, ()=>{
+                this.server = http.createServer(this.app).listen(port, () => {
 
                     console.info("========================================");
                     console.info(`Express started at localhost:${port}`);
@@ -83,7 +90,12 @@ class NodeExpress{
                     this._initializeRouter();
 
                     resolve(true);
-                })
+                }).on('error', function(err) {
+
+                    console.error("Error Creating Express Server");
+                    console.error(err);
+
+                });
 
 
             }
