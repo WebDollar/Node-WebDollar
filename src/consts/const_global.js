@@ -245,8 +245,8 @@ consts.SETTINGS = {
             TERMINAL:{
 
                 CLIENT: {
-                    MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
-                    MAXIMUM_CONNECTIONS_IN_TERMINAL_NO_SSL: 2,
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST: 20,
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK: 2,
                 },
 
                 SERVER: {
@@ -259,7 +259,8 @@ consts.SETTINGS = {
             BROWSER:{
 
                 CLIENT: {
-                    MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
+                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST: 2,
+                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK: 1,
                 },
 
                 SERVER: {},
@@ -268,6 +269,15 @@ consts.SETTINGS = {
                     MAXIMUM_CONNECTIONS: 13,
                 },
 
+            },
+
+            COMPUTED: {
+                CLIENT:{
+
+                },
+                SERVER:{
+
+                },
             },
 
             FORKS:{
@@ -292,8 +302,6 @@ consts.SETTINGS = {
 
 
 };
-
-
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER = process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER;

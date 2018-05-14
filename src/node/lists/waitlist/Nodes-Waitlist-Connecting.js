@@ -41,9 +41,9 @@ class NodesWaitlistConnecting {
 
         for (let i=0; i < NodesWaitlist.waitListFullNodes.length; i++){
 
-
             // in case it is not synchronized, it should connect to the fallback node
             if ( Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && !NodesWaitlist.waitListFullNodes[i].isFallback)  continue;
+            if ( Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && NodesWaitlist.waitListFullNodes[i].isFallback)  continue;
 
             // in case it needs to connect only to port 80
             if (this._connectedOnlyTo80 && NodesWaitlist.waitListFullNodes[i].sckAddresses[0].port !== "80") continue;
@@ -61,10 +61,21 @@ class NodesWaitlistConnecting {
         setTimeout( this._connectNewNodesWaitlistInterval.bind(this), consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
     }
 
-    _tryToConnectNextNode(nextWaitListObject){
+    _tryToConnectNextNode( nextWaitListObject){
 
-        if ( process.env.BROWSER && (this._connectingQueue.length + NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) >= consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER) return;
-        if ( !process.env.BROWSER && (this._connectingQueue.length + NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)) >= consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL) return;
+        let count = this._connectingQueue.length + NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET, nextWaitListObject.isFallback);
+
+        if ( process.env.BROWSER ){ //browser
+
+            if (nextWaitListObject.isFallback && count >= consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK) return;
+            else if ( !nextWaitListObject.isFallback && count >= consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST) return;
+
+        } else {
+
+            if (nextWaitListObject.isFallback && count >= consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK) return;
+            else if ( !nextWaitListObject.isFallback && count >= consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST) return;
+
+        }
 
         if (Blockchain.Agent.light && Blockchain.Agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES)
             return;

@@ -4,9 +4,9 @@ import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/bloc
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain"
-const EventEmitter = require('events');
 import AGENT_STATUS from "./Agent-Status";
 import consts from 'consts/const_global'
+import InterfaceBlockchainAgentBasic from "./Interface-Blockchain-Agent-Basic"
 
 /**
  *
@@ -16,11 +16,11 @@ import consts from 'consts/const_global'
  * An Agent is a class that force your machine to synchronize to the network based on the protocol you use it
  */
 
-class InterfaceBlockchainAgent{
+class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
     constructor( blockchain ){
 
-        this.blockchain = blockchain;
+        super(blockchain);
 
         if (VersionCheckerHelper.detectMobileAndTablet())
             this.AGENT_TIME_OUT = 140*1000;
@@ -32,28 +32,10 @@ class InterfaceBlockchainAgent{
         this._startAgentTimeOut = undefined;
         this._startAgentInterval = undefined;
 
-        this._status = AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED;
-
-        this._eventEmitter = new EventEmitter();
-        this._eventEmitter.setMaxListeners(100);
-
         this._newProtocol();
 
-        this._eventEmitter.on("agent/synchronized",(data)=>{
-
-            if (data.result)
-                console.warn("Synchronization done");
-            else
-                console.warn( "Synchronization done FAILED");
-
-        });
-
     }
 
-    setBlockchain(blockchain){
-        this.blockchain = blockchain;
-        this.protocol.setBlockchain(blockchain);
-    }
 
     newFork(){
         let fork = new InterfaceBlockchainFork();
@@ -220,9 +202,7 @@ class InterfaceBlockchainAgent{
 
     }
 
-    get status(){
-        return this._status;
-    }
+
 
 
 }
