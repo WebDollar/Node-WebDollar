@@ -3,6 +3,7 @@ import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NodesListObject from './Mode-List-Object.js';
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import NODES_TYPE from "node/lists/types/Nodes-Type"
 
 const EventEmitter = require('events');
 
@@ -86,9 +87,11 @@ class NodesList {
 
             this.emitter.emit("nodes-list/connected", object);
 
-            GeoLocationLists.includeSocket(socket);
+            if (socket.node.protocol.nodePort !== undefined && socket.node.protocol.nodeHTTP !== '' && socket.node.type === NODES_TYPE.NODE_TERMINAL) {
+                NodesWaitlist.addNewNodeToWaitlist( socket.node.protocol.nodeHTTP +"://"+ socket.node.sckAddress.getAddress(false, false), socket.node.protocol.nodePort, socket.node.type, socket.node.level, socket, socket);
+            }
 
-            NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.type, socket.node.protocol.nodeSSL, true, socket.node.level, socket, socket );
+            GeoLocationLists.includeSocket(socket);
 
             return true;
         }
@@ -204,14 +207,12 @@ class NodesList {
         let count = 0;
 
         for (let i=0; i<this.nodes.length; i++) {
-
             if (Array.isArray(nodeType)) { //in case type is an Array
                 if (nodeType.indexOf(this.nodes[i].socket.node.protocol.nodeType) >= 0)
                     count++;
             }
             else if (nodeType === this.nodes[i].socket.node.protocol.nodeType || nodeType === "all")
                 count++;
-
         }
 
         return count;

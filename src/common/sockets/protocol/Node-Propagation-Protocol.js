@@ -85,7 +85,7 @@ class NodePropagationProtocol {
                     case "new-light-nodes":
 
                         for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, addresses[i].port, addresses[i].type, addresses[i].https, addresses[i].connected, socket.node.level + 1, socket);
+                            NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, undefined, addresses[i].type,  addresses[i].connected, socket.node.level + 1, socket);
 
                         break;
 
@@ -93,7 +93,7 @@ class NodePropagationProtocol {
                     case "disconnected-full-nodes":
 
                         for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, addresses[i].port, addresses[i].type, addresses[i].https, addresses[i].connected, socket.node.level + 1, socket);
+                            NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, undefined, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket);
 
                         break;
 
@@ -172,6 +172,8 @@ class NodePropagationProtocol {
     }
 
     propagateWaitlistSimple(socket, disconnectSocket = true){
+
+        if (socket === undefined || socket.node === undefined) return;
 
         socket.node.sendRequest("propagation/nodes", {op: "new-full-nodes", addresses: this._waitlistSimple} );
 

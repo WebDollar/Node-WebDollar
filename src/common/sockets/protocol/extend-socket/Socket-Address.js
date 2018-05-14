@@ -37,6 +37,22 @@ class SocketAddress {
         if (address === undefined) address = '';
         if (port === undefined) port = consts.SETTINGS.NODE.PORT;
 
+        try{
+
+            if (address.indexOf("https://") >= 0){
+                address = address.replace("https://", "");
+                this.SSL = true;
+            } else
+            if (address.indexOf("http://") >= 0){
+                address = address.replace("http://","");
+            }
+
+        }catch (exception){
+
+
+
+        }
+
         try {
             if (ipaddr.IPv6.isIPv6(address)) {
 
@@ -113,9 +129,9 @@ class SocketAddress {
     /*
         returns ipv6 ip standard
      */
-    getAddress(includePort=true){
+    getAddress(includePort=true, includeHTTP=false){
 
-        return this.address + (includePort ? ':'+this.port : '');
+        return (includeHTTP ? 'http'+ (this.SSL ? 's': '')  + '://' : '' )+this.address + (includePort ? ':'+this.port : '');
 
     }
 

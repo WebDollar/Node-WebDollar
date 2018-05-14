@@ -20,8 +20,7 @@ class NodesListObject {
 
         return {
             type: this.type,
-            addr: this.socket.node.sckAddress.toString(),
-            port: this.socket.node.sckAddress.port,
+            addr: this.socket.node.sckAddress.getAddress(true, true),
             connected: true,
         }
 

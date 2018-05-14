@@ -11,6 +11,7 @@ import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'
 import Blockchain from "main-blockchain/Blockchain"
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
 const TIME_DISCONNECT_TERMINAL = 15*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
@@ -73,12 +74,19 @@ class NodeServer {
                 let nodeType = socket.request._query["nodeType"];
                 if (typeof nodeType  === "string") nodeType = parseInt(nodeType);
 
-                let nodeSSL = socket.request._query["SSL"];
-                if (typeof nodeSSL === "string") nodeSSL = parseInt(nodeSSL);
-                if (typeof nodeSSL === "number") nodeSSL = nodeSSL === 1;
+                let nodeHTTP = socket.request._query["HTTP"];
+                if ( nodeHTTP === undefined) nodeHTTP = "";
+                if ( ["http", "https", ""].indexOf( nodeHTTP) === -1){
+                    console.error("invalid http");
+                    socket.disconnect();
+                    return;
+                }
 
                 let nodeUTC = socket.request._query["UTC"];
                 if (typeof nodeUTC === "string") nodeUTC = parseInt(nodeUTC);
+
+                let nodePort = socket.request._query["port"];
+                if (typeof nodePort === "string") nodePort = parseInt(nodePort);
 
                 if ( socket.request._query["uuid"] === undefined || [NODES_TYPE.NODE_TERMINAL, NODES_TYPE.NODE_WEB_PEER].indexOf( nodeType ) === -1) {
                     console.error("invalid uuid or nodeType");
@@ -120,8 +128,10 @@ class NodeServer {
                     socket.node.protocol.justSendHello();
 
                     socket.node.protocol.nodeType = nodeType;
-                    socket.node.protocol.nodeSSL = nodeSSL;
+                    socket.node.protocol.nodeHTTP = nodeHTTP;
                     socket.node.protocol.nodeUTC = nodeUTC;
+                    socket.node.protocol.nodePort = nodePort;
+
                     socket.node.protocol.helloValidated = true;
 
                     this.initializeSocket(socket, ["uuid"]);

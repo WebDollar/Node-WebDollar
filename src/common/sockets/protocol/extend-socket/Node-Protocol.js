@@ -20,7 +20,7 @@ class NodeProtocol {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
-            SSL: process.env.BROWSER ? 1 : NodeExpress.SSL & 1,
+            HTTP: process.env.BROWSER ? "https" : (NodeExpress.loaded ? ( NodeExpress.SSL ? 'https' :'http') : '' ),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
         });
     }
@@ -71,10 +71,12 @@ class NodeProtocol {
 
         this.node.protocol.nodeType = response.nodeType;
 
-        if (typeof response.SSL === "string") response.SSL = parseInt(response.SSL);
-        if (typeof response.SSL === "number") response.SSL = response.SSL === 1;
+        let nodeHTTP = response.HTTP;
+        if ( nodeHTTP === undefined) nodeHTTP = "";
+        if ( ["http", "https", ""].indexOf( nodeHTTP) === -1)
+            return false;
 
-        this.node.protocol.nodeSSL = response.SSL;
+        this.node.protocol.nodeHTTP = response.nodeHTTP;
         this.node.protocol.nodeUTC = response.UTC;
         this.node.protocol.helloValidated = true;
 

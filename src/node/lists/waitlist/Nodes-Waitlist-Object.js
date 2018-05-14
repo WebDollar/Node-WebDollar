@@ -7,7 +7,7 @@ const MAX_NUMBER_OF_BACKED_BY_LIGHT_NODE = 3;
 
 class NodesWaitlistObject {
 
-    constructor ( sckAddresses, type, https, level, backedBy, connected = false, socket = null ){
+    constructor ( sckAddresses, type, level, backedBy, connected = false, socket = null ){
 
         this.sckAddresses = sckAddresses;
         this.socket = socket;
@@ -15,7 +15,6 @@ class NodesWaitlistObject {
         this.connected = false;
         this.blocked = false;
         this.checked = false;
-        this.https = https;
 
         if (backedBy === "fallback")
             this.isFallback = true;
@@ -107,15 +106,11 @@ class NodesWaitlistObject {
         let obj = {
 
             type: this.type,
-            addr: this.sckAddresses[0].toString(),
+            addr: this.sckAddresses[0].getAddress(true, true),
 
         };
 
-        if (this.sckAddresses[0].port !== consts.SETTINGS.NODE.PORT ) obj.port = this.sckAddresses[0].port;
-
         if (this.connected) obj.connected = this.connected;
-
-        if (this.https === true) obj.https = this.https;
 
         return obj;
     }

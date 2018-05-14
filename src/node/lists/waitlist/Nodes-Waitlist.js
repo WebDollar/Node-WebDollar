@@ -3,6 +3,7 @@ import NodesList from 'node/lists/Nodes-List'
 import NodesWaitlistObject from './Nodes-Waitlist-Object';
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
 const EventEmitter = require('events');
 
@@ -39,7 +40,7 @@ class NodesWaitlist {
     }
 
 
-    addNewNodeToWaitlist (addresses, port, type, https, connected, level, backedBy, socket){
+    addNewNodeToWaitlist (addresses, port, type,  connected, level, backedBy, socket){
 
         if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[])) ) return false;
 
@@ -74,7 +75,7 @@ class NodesWaitlist {
         // incase this new waitlist is new
         if (sckAddresses.length > 0){
 
-            let waitListObject = new NodesWaitlistObject( sckAddresses, type, https, level, backedBy , connected, socket );
+            let waitListObject = new NodesWaitlistObject( sckAddresses, type, level, backedBy , connected, socket );
 
             let list;
 

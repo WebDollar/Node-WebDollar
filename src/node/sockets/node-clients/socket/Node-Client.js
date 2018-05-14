@@ -23,7 +23,7 @@ class NodeClient {
 
     }
 
-    connectTo(address, port, level){
+    connectTo(address, port, level, ssl){
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
@@ -33,7 +33,7 @@ class NodeClient {
             return false;
         }
 
-        address = sckAddress.getAddress(false);
+        address = sckAddress.getAddress(true, true);
         port = sckAddress.port;
 
         return new Promise( (resolve) => {
@@ -49,8 +49,6 @@ class NodeClient {
                 // in case the port is not included
                 if (address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
 
-                if (address.indexOf("http" + (consts.SETTINGS.NODE.SSL ? 's' : '') +"://") === -1 )  address = "http"+ (consts.SETTINGS.NODE.SSL ? 's' : '') +"://"+address;
-
                 console.log("connecting... to:                ", address);
 
                 let socket = null;
@@ -65,15 +63,16 @@ class NodeClient {
                         connection_timeout : 20000,
                         timeout: 20000,
 
-                        secure: consts.SETTINGS.NODE.SSL, //https
+                        secure: ssl, //https
 
                         query:{
                             msg: "HelloNode",
                             version: consts.SETTINGS.NODE.VERSION,
                             uuid: consts.SETTINGS.UUID,
                             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
-                            SSL: process.env.BROWSER ? 1 : NodeExpress.SSL & 1,
                             UTC: Blockchain.blockchain.timestamp.timeUTC,
+                            HTTP: process.env.BROWSER ? "https" : (NodeExpress.loaded ? ( NodeExpress.SSL ? 'https' :'http') : '' ),
+                            port: NodeExpress === undefined ? 0 :  (NodeExpress.loaded ? NodeExpress.port  : 0 )
                         },
 
                     });

@@ -21,6 +21,7 @@ class NodeExpress{
         this.https = undefined;
 
         this.SSL = false;
+        this.port = 0;
 
     }
 
@@ -45,7 +46,7 @@ class NodeExpress{
 
             let options = {};
 
-            let port = process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
+            this.port = process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
 
             this.loaded = true;
 
@@ -57,14 +58,14 @@ class NodeExpress{
                 options.cert = fs.readFileSync('./certificates/certificate.crt', 'utf8');
                 options.ca = fs.readFileSync('./certificates/ca_bundle.crt', 'utf8');
 
-                this.server = https.createServer(options, this.app).listen(port, ()=>{
+                this.server = https.createServer(options, this.app).listen( this.port, ()=>{
 
                     this.SSL = true;
 
                     this._initializeRouter();
 
                     console.info("========================================");
-                    console.info("HTTPS Express was opened on port "+port);
+                    console.info("HTTPS Express was opened on port "+ this.port);
                     console.info("========================================");
 
                     resolve(true);
@@ -81,10 +82,10 @@ class NodeExpress{
             } catch (exception){
 
                 //cloudflare generates its own SSL certificate
-                this.server = http.createServer(this.app).listen(port, () => {
+                this.server = http.createServer(this.app).listen(this.port, () => {
 
                     console.info("========================================");
-                    console.info(`Express started at localhost:${port}`);
+                    console.info(`Express started at localhost: ${this.port}`);
                     console.info("========================================");
 
                     this._initializeRouter();
