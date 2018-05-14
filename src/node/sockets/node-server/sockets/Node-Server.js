@@ -10,6 +10,10 @@ import NodeExpress from "./../express/Node-Express";
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'
+import Blockchain from "main-blockchain/Blockchain"
+
+const TIME_DISCONNECT_TERMINAL = 15*60*1000;
+const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
 class NodeServer {
 
@@ -21,6 +25,8 @@ class NodeServer {
 
         console.log("NodeServer constructor");
         this.nodeServer = null;
+
+        setInterval( this._disconenctOldSockets.bind(this), 30*1000 );
 
     }
 
@@ -179,6 +185,54 @@ class NodeServer {
         socket.node.protocol.signaling.server.initializeSignalingServerService();
     }
 
+    _disconenctOldSockets() {
+
+        let time = new Date().getTime();
+
+        //disconnect unresponsive nodes
+        for (let i = 0; i < NodesList.nodes.length; i++)
+            if (NodesList.nodes[i].socket.node.protocol.type === NODES_TYPE.NODE_TERMINAL)
+
+                if (NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS) {
+
+                    if (NodesList.nodes[i].socket.node.protocol.blocks === NodesList.nodes[i].socket.node.protocol.blocksPrevious){
+
+                        NodesList.nodes[i].socket.node.protocol.sendLastBlock();
+
+                        setTimeout(() => {
+
+                            if (NodesList.nodes[i] !== undefined)
+                                NodesList.nodes[i].socket.disconnect();
+
+                        }, 3000);
+
+                    } else {
+
+                        NodesList.nodes[i].socket.node.protocol.blocksPrevious = NodesList.nodes[i].socket.node.protocol.blocks;
+
+                    }
+
+                }
+
+
+
+
+        let count = NodesList.countNodesByType( NODES_TYPE.NODE_TERMINAL );
+        if ( count < consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL / 2 )
+            return; //nothing to do
+
+
+        for (let i=0; i<NodesList.nodes.length; i++)
+            if (NodesList.nodes[i].socket.node.protocol.type === NODES_TYPE.NODE_TERMINAL)
+                if ( !NodesList.nodes[i].isFallback && NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL )
+
+                    if ( NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL ){
+
+                        NodesList.nodes[i].socket.disconnect();
+
+                    }
+
+    }
 
 }
 

@@ -55,6 +55,9 @@ class SocketExtend{
         socket.node.protocol = {};
         socket.node.protocol.helloValidated = false;
 
+        socket.node.protocol.blocks = 0;
+        socket.node.protocol.blocksPrevious = 0;
+
         socket.node.protocol.justSendHello = NodeProtocol.prototype.justSendHello.bind(socket);
         socket.node.protocol.sendHello = NodeProtocol.prototype.sendHello.bind(socket);
         socket.node.protocol.processHello = NodeProtocol.prototype.processHello.bind(socket);

@@ -241,6 +241,14 @@ class NodesWaitlist {
 
     }
 
+    isAddressFallback(address){
+
+        let answer = this._searchNodesWaitlist(address, undefined, NODES_TYPE.NODE_TERMINAL);
+        if ( answer.waitlist !== null) return answer.waitlist.isFallback;
+
+        return false;
+    }
+
 }
 
 

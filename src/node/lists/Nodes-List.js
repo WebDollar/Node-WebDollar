@@ -81,7 +81,7 @@ class NodesList {
 
             // it is a unique connection, I should register this connection
 
-            let object = new NodesListObject(socket, connectionType, type);
+            let object = new NodesListObject(socket, connectionType, type, NodesWaitlist.isAddressFallback(socket.node.sckAddress));
             this.nodes.push(object);
 
             this.emitter.emit("nodes-list/connected", object);

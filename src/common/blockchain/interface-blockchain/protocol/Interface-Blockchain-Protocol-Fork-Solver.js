@@ -95,7 +95,7 @@ class InterfaceBlockchainProtocolForkSolver{
      */
 
     //TODO it will not update positions
-    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHeader, forkProof ){
+    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof ){
 
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.blocks.length;
@@ -117,7 +117,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 return {result: true, fork: forkFound};
             }
 
-            forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHeader);
+            forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHash);
             if ( forkFound !== null ) {
 
                 if (Math.random() < 0.001)
@@ -143,7 +143,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHeader], false );
+            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHash], false );
 
             // in case it was you solved previously && there is something in the blockchain
 
