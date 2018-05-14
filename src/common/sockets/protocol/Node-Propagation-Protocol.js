@@ -143,7 +143,7 @@ class NodePropagationProtocol {
         let generateMarket = (nodes)=>{
 
             let count = 0;
-            while ( count < number && count < nodes.length ){
+            while ( count < number ){
 
                 let index = Math.floor( Math.random() * nodes.length );
                 let node = nodes[index];
@@ -156,10 +156,10 @@ class NodePropagationProtocol {
                         break;
                     }
 
-                if (found === false) {
+                if (found === false)
                     list.push(json);
-                    count++;
-                }
+
+                count++;
             }
 
         };

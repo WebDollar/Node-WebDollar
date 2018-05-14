@@ -91,6 +91,7 @@ class NodeExpress{
                     this._initializeRouter();
 
                     resolve(true);
+
                 }).on('error', (err) => {
 
                     console.error("Error Creating Express Server");
