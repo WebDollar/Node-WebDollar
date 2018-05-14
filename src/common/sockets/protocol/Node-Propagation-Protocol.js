@@ -142,11 +142,14 @@ class NodePropagationProtocol {
 
         let generateMarket = (nodes)=>{
 
+            if (nodes.length === 0) return;
+
             let count = 0;
             while ( count < number ){
 
                 let index = Math.floor( Math.random() * nodes.length );
                 let node = nodes[index];
+
                 let json = node.toJSON();
 
                 let found  = false;

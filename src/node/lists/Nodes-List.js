@@ -88,7 +88,7 @@ class NodesList {
             this.emitter.emit("nodes-list/connected", object);
 
             if (socket.node.protocol.nodePort !== undefined && socket.node.protocol.nodeHTTP !== '' && socket.node.type === NODES_TYPE.NODE_TERMINAL) {
-                NodesWaitlist.addNewNodeToWaitlist( socket.node.protocol.nodeHTTP +"://"+ socket.node.sckAddress.getAddress(false, false), socket.node.protocol.nodePort, socket.node.type, socket.node.level, socket, socket);
+                NodesWaitlist.addNewNodeToWaitlist( socket.node.protocol.nodeHTTP +"://"+ socket.node.sckAddress.getAddress(false, false), socket.node.protocol.nodePort, socket.node.type, true, socket.node.level, socket, socket);
             }
 
             GeoLocationLists.includeSocket(socket);
