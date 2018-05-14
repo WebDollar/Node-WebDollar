@@ -1,5 +1,6 @@
-import {Node, Blockchain} from './index.js';
-import global from "consts/global.js";
+import {Node, Blockchain} from './index';
+import global from "consts/global";
+import consts from "consts/const_global";
 import CLI from "node/menu/CLI-Menu";
 
 console.log("TESTING MODE");
@@ -9,6 +10,10 @@ console.log("TESTING MODE");
 Blockchain.createBlockchain("full-node", async ()=>{
     Node.NodeClientsService.startService();
     await Node.NodeExpress.startExpress();
+
+    if (consts.DEBUG)
+        Node.NodeServer.startServer();
+
 }, ()=>{
     Node.NodeServer.startServer();
 });

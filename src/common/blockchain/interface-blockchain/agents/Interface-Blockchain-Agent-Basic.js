@@ -50,9 +50,7 @@ class InterfaceBlockchainAgentBasic{
         this.protocol.setBlockchain(blockchain);
     }
 
-    get status(){
-        return this._status;
-    }
+
 
 }
 

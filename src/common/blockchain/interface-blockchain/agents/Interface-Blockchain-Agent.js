@@ -93,7 +93,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
     _agentConfirmationIntervalFunction(){
 
         if (this.blockchain.blocks.length <= 0) return false;
-        if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0 && !consts.DEBUG  ) return false;
+        if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0   ) return false;
 
 
         if (process.env.BROWSER)
@@ -105,11 +105,11 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
             if (this.lastTimeChecked !== undefined ){
 
-                if ( (new Date().getTime() -  this.lastTimeChecked.date > 4*60*1000) || consts.DEBUG ){
+                if ( new Date().getTime() -  this.lastTimeChecked.date > 4*60*1000 ){
 
                     let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
 
-                    if (  (NodesList.nodes.length > 0 && diffBlocks > 1 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD) || consts.DEBUG ){
+                    if (  NodesList.nodes.length > 0 && diffBlocks > 1 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD) {
 
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
@@ -202,7 +202,9 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
     }
 
-
+    get status(){
+        return this._status;
+    }
 
 
 }
