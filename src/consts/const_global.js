@@ -3,7 +3,7 @@ import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallb
 
 let consts = {
 
-    DEBUG: false,
+    DEBUG: true,
     OPEN_SERVER: true,
 };
 
@@ -323,7 +323,7 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.PORT = 9095;
 
     FallBackNodesList.nodes = [{
-        "addr": ["webdollar.ddns.net:9095"],
+        "addr": ["http://127.0.0.1:9095"],
     }];
 
 

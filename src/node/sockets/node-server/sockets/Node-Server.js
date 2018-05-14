@@ -27,6 +27,8 @@ class NodeServer {
         console.log("NodeServer constructor");
         this.nodeServer = null;
 
+        this.loaded = false;
+
         setInterval( this._disconenctOldSockets.bind(this), 30*1000 );
 
     }
@@ -139,6 +141,7 @@ class NodeServer {
                 } else {
 
                     NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
+
                 }
 
             });
@@ -148,12 +151,17 @@ class NodeServer {
 
                 let port = process.env.SERVER_PORT||consts.SETTINGS.NODE.PORT;
 
-                try{
-                    server.listen (NodeExpress.server);
-                } catch (Exception) {
+                server.listen (NodeExpress.server).on('error',  (err) => {
+
                     console.error( "Couldn't open server on port ", port, " try next port") ;
-                    process.exit(1);
-                }
+                    this.loaded = false;
+
+                    throw err;
+
+                });
+
+                this.loaded = true;
+
             } catch(Exception){
                 console.error("Error Calling node_server.listen", Exception);
             }

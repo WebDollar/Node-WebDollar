@@ -70,7 +70,7 @@ class NodeExpress{
 
                     resolve(true);
 
-                }).on('error', function(err) {
+                }).on('error',  (err) => {
 
                     console.error("Error Creating HTTPS Express Server");
                     console.error(err);
@@ -91,10 +91,12 @@ class NodeExpress{
                     this._initializeRouter();
 
                     resolve(true);
-                }).on('error', function(err) {
+                }).on('error', (err) => {
 
                     console.error("Error Creating Express Server");
                     console.error(err);
+                    
+                    resolve(false);
 
                 });
 

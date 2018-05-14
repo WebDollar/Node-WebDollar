@@ -4,9 +4,11 @@ import NODES_TYPE from "node/lists/types/Nodes-Type"
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain"
 
-let NodeExpress;
+let NodeExpress, NodeServer;
+
 if (!process.env.BROWSER) {
     NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
 }
 
 class NodeProtocol {
@@ -20,7 +22,8 @@ class NodeProtocol {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
-            HTTP: process.env.BROWSER ? "https" : (NodeExpress.loaded ? ( NodeExpress.SSL ? 'https' :'http') : '' ),
+            HTTP: process.env.BROWSER ? "https" : (NodeServer.loaded &&  NodeExpress.loaded ? ( NodeExpress.SSL ? 'https' :'http') : '' ),
+            port: NodeExpress === undefined ? 0 :  (NodeServer.loaded && NodeExpress.loaded ? NodeExpress.port  : 0 ),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
         });
     }

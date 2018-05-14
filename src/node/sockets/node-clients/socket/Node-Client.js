@@ -8,9 +8,11 @@ import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import Blockchain from "main-blockchain/Blockchain"
 
-let NodeExpress;
+let NodeExpress, NodeServer;
+
 if (!process.env.BROWSER) {
     NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
 }
 
 class NodeClient {
@@ -71,8 +73,8 @@ class NodeClient {
                             uuid: consts.SETTINGS.UUID,
                             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
                             UTC: Blockchain.blockchain.timestamp.timeUTC,
-                            HTTP: process.env.BROWSER ? "https" : (NodeExpress.loaded ? ( NodeExpress.SSL ? 'https' :'http') : '' ),
-                            port: NodeExpress === undefined ? 0 :  (NodeExpress.loaded ? NodeExpress.port  : 0 )
+                            HTTP: process.env.BROWSER ? "https" : (NodeServer.loaded &&  NodeExpress.loaded ? ( NodeExpress.SSL ? 'https' :'http') : '' ),
+                            port: NodeExpress === undefined ? 0 :  (NodeServer.loaded && NodeExpress.loaded ? NodeExpress.port  : 0 )
                         },
 
                     });
