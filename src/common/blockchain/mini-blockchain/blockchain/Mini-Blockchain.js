@@ -151,18 +151,22 @@ class MiniBlockchain extends  inheritBlockchain{
 
         try {
 
-            if (! (await this.accountantTree.saveMiniAccountant( true )))
-                throw {message: "Couldn't save the Account Tree"};
+            global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
 
             if (! (await inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
                 throw {message: "couldn't sae the blockchain"};
 
-            return true;
+            if (! (await this.accountantTree.saveMiniAccountant( true )))
+                throw {message: "Couldn't save the Account Tree"};
 
         } catch (exception){
             console.error("Couldn't save MiniBlockchain", exception);
+            global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
             return false;
         }
+
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
+        return true;
     }
 
     /**

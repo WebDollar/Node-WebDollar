@@ -279,6 +279,8 @@ class InterfaceBlockchain {
         //save the number of blocks
         let result = true;
 
+        global.INTERFACE_BLOCKCHAIN_SAVED = false;
+
         if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true)
             console.error("Error saving the blocks.length");
         else {
@@ -294,8 +296,11 @@ class InterfaceBlockchain {
                     if (! ( await this.blocks[i].saveBlock()) )
                         break
                 }
+
             console.warn("Successfully saving blocks ", startingHeight, endingHeight);
         }
+
+        global.INTERFACE_BLOCKCHAIN_SAVED = true;
 
         return result;
     }

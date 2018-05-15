@@ -29,7 +29,10 @@ process.on('SIGINT', function() {
     setInterval(()=>{
         if ( global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED &&
              global.SEMAPHORE_PROCESS_DONE &&
-             global.MINIBLOCKCHAIN_LIGHT_SAVED) {
+             global.MINIBLOCKCHAIN_LIGHT_SAVED &&
+             global.MINIBLOCKCHAIN_ADVANCED_SAVED &&
+             global.MINIBLOCKCHAIN_SAVED &&
+             global.INTERFACE_BLOCKCHAIN_SAVED) {
 
             console.log(global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED);
             console.log(global.SEMAPHORE_PROCESS_DONE);
@@ -38,6 +41,6 @@ process.on('SIGINT', function() {
             console.warn("process.exit(0)");
             process.exit(0);
         }
-    })
+    }, 100)
 
 });

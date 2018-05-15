@@ -16,14 +16,17 @@ window.onbeforeunload = () => {
     setInterval(()=>{
         if ( global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED &&
             global.SEMAPHORE_PROCESS_DONE &&
-            global.MINIBLOCKCHAIN_LIGHT_SAVED) {
+            global.MINIBLOCKCHAIN_LIGHT_SAVED &&
+            global.MINIBLOCKCHAIN_ADVANCED_SAVED &&
+            global.MINIBLOCKCHAIN_SAVED &&
+            global.INTERFACE_BLOCKCHAIN_SAVED) {
 
-            console.log(global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED)
-            console.log(global.SEMAPHORE_PROCESS_DONE)
-            console.log(global.MINIBLOCKCHAIN_LIGHT_SAVED)
+            console.log(global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED);
+            console.log(global.SEMAPHORE_PROCESS_DONE);
+            console.log(global.MINIBLOCKCHAIN_LIGHT_SAVED);
 
             console.warn("process.exit(0)");
         }
-    })
+    }, 100)
 }
 
