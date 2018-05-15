@@ -48,12 +48,20 @@ class NodesStats {
 
 
         let waitlist1 = [];
-        for ( let i=0; i<NodesWaitlist.waitListFullNodes.length; i++ )
-            waitlist1.push( NodesWaitlist.waitListFullNodes[i].toJSON() );
+        for ( let i=0; i<NodesWaitlist.waitListFullNodes.length; i++ ) {
+            let obj = NodesWaitlist.waitListFullNodes[i].toJSON();
+            obj.score = NodesWaitlist.waitListFullNodes[i].sortingScore();
+            obj.connected = NodesWaitlist.waitListFullNodes[i].connected;
+            waitlist1.push(obj);
+        }
 
         let waitlist2 = [];
-        for ( let i=0; i<NodesWaitlist.waitListLightNodes.length; i++ )
-            waitlist2.push( NodesWaitlist.waitListLightNodes[i].toJSON() );
+        for ( let i=0; i<NodesWaitlist.waitListLightNodes.length; i++ ) {
+            let obj = NodesWaitlist.waitListLightNodes[i].toJSON();
+            obj.score = NodesWaitlist.waitListLightNodes[i].sortingScore();
+            obj.connected = NodesWaitlist.waitListLightNodes[i].connected;
+            waitlist2.push(obj);
+        }
 
         console.log("waitlist full node ", waitlist1.length, waitlist1);
         console.log("waitlist light nod ", waitlist2);

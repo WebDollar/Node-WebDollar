@@ -18,13 +18,15 @@ class NodeProtocol {
      */
 
     justSendHello(){
+
         return this.node.sendRequestWaitOnce("HelloNode", {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
             domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
-        }, undefined, 3000);
+        }, undefined, 4000);
+
     }
 
     processHello( response, validationDoubleConnectionsTypes ){

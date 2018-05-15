@@ -69,7 +69,7 @@ class NodeServer {
 
             console.warn("Starting Socket.io was started successfully");
 
-            server.on("connection", socket => {
+            server.on("connection", async (socket) => {
 
                 if (socket.request._query["msg"] !== "HelloNode"){
                     socket.disconnect();
@@ -128,7 +128,7 @@ class NodeServer {
 
                     console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) );
 
-                    socket.node.protocol.sendHello(false);
+                    await socket.node.protocol.sendHello(false);
 
                     socket.node.protocol.nodeType = nodeType;
                     socket.node.protocol.nodeUTC = nodeUTC;

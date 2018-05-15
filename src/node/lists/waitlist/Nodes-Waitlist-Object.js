@@ -185,10 +185,15 @@ class NodesWaitlistObject {
 
         let score = 200;
 
+        score += 1000 * this.connected;
+
         if (this.backedBy.length > 0){
 
             score += 10 * this.backedBy.length;
             score += 100 * this.backedByConnected;
+
+            if (this.sckAddresses[0].SSL) //SSL +5000
+                score += 5000;
 
         }
 

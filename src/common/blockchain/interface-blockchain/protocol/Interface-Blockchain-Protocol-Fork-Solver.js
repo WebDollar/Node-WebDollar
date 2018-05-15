@@ -26,8 +26,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let mid = Math.trunc((left + right) / 2);
 
-            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
             answer = await socket.node.sendRequestWaitOnce("head/hash", mid, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
+
+            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right, answer);
 
             if (left < 0 || answer === null || !Buffer.isBuffer(answer.hash) )
                 return {position: null, header: answer };
@@ -178,8 +179,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     binarySearchResult.position = 0;
 
                 //maximum blocks to download
-                if (!this.blockchain.agent.light)
-                    forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
+                forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
 
                 fork.forkStartingHeight = binarySearchResult.position;
                 fork.forkStartingHeightDownloading  = binarySearchResult.position;

@@ -30,12 +30,17 @@ class NodesWaitlist {
 
     initializeWaitlist(){
 
+        NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
+            await this._initializeNode(nodesListObject.socket);
+        });
+
         NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
             await this._desinitializeNode(nodesListObject.socket);
         });
 
-        //interval to delete useless waitlist
-        this._deleteUselessWaitlists();
+        //interval to delete useless waitlist and resort scores
+
+        setInterval( this._deleteUselessWaitlists.bind(this), 30*1000);
 
     }
 
@@ -81,6 +86,11 @@ class NodesWaitlist {
 
             if (waitListObject.type === NODES_TYPE.NODE_TERMINAL)  list = this.waitListFullNodes;
             else  if (waitListObject.type === NODES_TYPE.NODE_WEB_PEER) list = this.waitListLightNodes;
+
+            if ( socket !== undefined){
+                waitListObject.socket = socket;
+                waitListObject.connected = true;
+            }
 
             // v
             list.push(waitListObject);
@@ -184,32 +194,6 @@ class NodesWaitlist {
 
     }
 
-    removedWaitListElement(address, port, backedBy, listType){
-
-        let list;
-
-        if( listType === NODES_TYPE.NODE_TERMINAL)  list = this.waitListFullNodes;
-        else if ( listType === NODES_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
-
-        let index = this._findNodesWaitlist(address, port, listType);
-
-        if (index !== -1) {
-
-            list[index].removeBackedBy(backedBy);
-
-            if ( list[index].length === 0) {
-
-                this.emitter.emit("waitlist/delete-node", list[index]);
-                list.splice(index, 1);
-
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
     resetWaitlist(listType){
 
         let list = [];
@@ -222,9 +206,20 @@ class NodesWaitlist {
 
     }
 
-    _desinitializeNode(nodesListObject){
+    _initializeNode(socket){
 
-        let socket = nodesListObject.socket;
+        let answer = this._searchNodesWaitlist(socket.node.sckAddress, undefined, socket.node.protocol.type);
+
+        if ( answer.waitlist !== null ){
+
+            answer.socket = socket;
+            answer.connected = true;
+
+        }
+
+    }
+
+    _desinitializeNode(socket){
 
         this._removeSocket(socket, this.waitListFullNodes);
         this._removeSocket(socket, this.waitListLightNodes);
@@ -233,12 +228,13 @@ class NodesWaitlist {
 
     _removeSocket(socket, list){
 
-        for (let i=list.length-1; i>=0; i--){
+        for (let i=list.length-1; i>=0; i--)
 
-            if (list[i].socket === socket)
+            if (list[i].socket === socket) {
+                list[i].connected = false;
                 list[i].socket = undefined;
+            }
 
-        }
 
     }
 

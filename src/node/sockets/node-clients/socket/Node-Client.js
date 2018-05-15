@@ -27,11 +27,11 @@ class NodeClient {
 
     connectToWaitlist(waitlist, index){
 
-        return this.connectTo( waitlist.sckAddresses[index], undefined, waitlist.level+1, waitlist.sckAddresses[index].SSL )
+        return this.connectTo( waitlist.sckAddresses[index], undefined, waitlist.level+1, waitlist.sckAddresses[index].SSL, waitlist )
 
     }
 
-    connectTo(address, port, level, SSL){
+    connectTo(address, port, level, SSL, waitlist){
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
@@ -118,7 +118,7 @@ class NodeClient {
                     clearTimeout(timeout);
 
                     if (answer)
-                        this.initializeSocket(socket, ["ip", "uuid"]);
+                        this.initializeSocket(socket, ["ip", "uuid"], waitlist);
                     else
                         socket.disconnect();
 
@@ -160,13 +160,16 @@ class NodeClient {
 
     }
 
-    initializeSocket(validationDoubleConnectionsTypes){
+    initializeSocket(validationDoubleConnectionsTypes, waitlist){
 
         //it is not unique... then I have to disconnect
 
         if (NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
+
+        waitlist.socket = this.socket;
+        waitlist.connected = true;
 
         console.log('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true));
 
