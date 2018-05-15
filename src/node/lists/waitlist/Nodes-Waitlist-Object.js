@@ -185,7 +185,7 @@ class NodesWaitlistObject {
 
         let score = 200;
 
-        score += 1000 * this.connected;
+        score += (this.connected ? 1000 : 0);
 
         if (this.backedBy.length > 0){
 

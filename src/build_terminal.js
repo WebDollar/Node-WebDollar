@@ -11,10 +11,10 @@ Blockchain.createBlockchain("full-node", async ()=>{
 
     await Node.NodeExpress.startExpress();
 
-    Node.NodeClientsService.startService();
-
     if (consts.DEBUG)
-        Node.NodeServer.startServer();
+        await Node.NodeServer.startServer();
+
+    Node.NodeClientsService.startService();
 
 }, ()=>{
     Node.NodeServer.startServer();

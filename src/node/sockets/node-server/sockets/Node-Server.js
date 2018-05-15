@@ -35,8 +35,9 @@ class NodeServer {
 
     getServerHTTPAddress() {
 
-        if ( !this.loaded || !NodeExpress.loaded) return '';
+        if ( !this.loaded || !NodeExpress.loaded ) return '';
         if (NodeExpress.port === 0) return '';
+        if (NodeExpress.domain  === '') return '';
 
         return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
 

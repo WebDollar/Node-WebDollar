@@ -52,28 +52,34 @@ class NodesWaitlist {
         //converting to array
         if ( typeof addresses === "string" || !Array.isArray(addresses) ) addresses = [addresses];
 
+
         let sckAddresses = [];
 
         //let's determine the sckAddresses
         for (let i=0; i<addresses.length; i++){
 
-            let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
+            try {
 
-            if (backedBy !==  "fallback") {
+                let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
-                let answer = this._searchNodesWaitlist( sckAddress, port, type );
+                let answer = this._searchNodesWaitlist(sckAddress, port, type);
 
-                if (answer.waitlist!== null) {
+                if (answer.waitlist !== null) {
 
                     //already found, let's add a new pushBackedBy
                     answer.waitlist.pushBackedBy(backedBy, connected);
-                    answer.waitlist.socket = socket;
+
+                    if (socket !== undefined) {
+                        answer.waitlist.socket = socket;
+                        answer.waitlist.connected = true;
+                    }
 
                 }
-                else sckAddresses.push( sckAddress );
+                else sckAddresses.push(sckAddress);
 
-            } else //definitely it is a fallback
-                sckAddresses.push( sckAddress );
+            } catch (exception){
+
+            }
 
         }
 
@@ -114,7 +120,7 @@ class NodesWaitlist {
 
         for (let i=0; i<list.length; i++)
             for (let j=0; j<list[i].sckAddresses.length; j++)
-                if (list[i].sckAddresses[j].matchAddress(sckAddress) )
+                if (list[i].sckAddresses[j].matchAddress(sckAddress, ["ip","uuid", "port"]) ) //match also the port
                     return i;
 
         return -1;
@@ -233,6 +239,8 @@ class NodesWaitlist {
             if (list[i].socket === socket) {
                 list[i].connected = false;
                 list[i].socket = undefined;
+
+                console.info("_removeSocket");
             }
 
 
