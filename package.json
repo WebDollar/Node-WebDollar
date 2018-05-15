@@ -65,6 +65,7 @@
     "ipaddr.js": "^1.6.0",
     "is-array-buffer": "^1.0.0",
     "md5": "^2.2.1",
+    "my-ip": "^1.1.1",
     "node-gyp": "^3.6.2",
     "opn": "^5.2.0",
     "path": "^0.12.7",
@@ -80,7 +81,8 @@
     "tweetnacl": "^1.0.0",
     "utf-8-validate": "^3.0.4",
     "uuid": "^3.2.1",
-    "webworkify-webpack": "^2.1.1"
+    "webworkify-webpack": "^2.1.1",
+    "x509": "^0.3.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

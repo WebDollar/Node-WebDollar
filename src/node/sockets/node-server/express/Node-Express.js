@@ -18,11 +18,23 @@ class NodeExpress{
 
         this.loaded = false;
         this.app = undefined;
-        this.https = undefined;
 
         this.SSL = false;
         this.port = 0;
+        this.domain = '';
 
+    }
+
+    _extractDomain( fileName ){
+
+        const x509 = require('x509');
+        var subject = x509.getSubject( fileName );
+
+        let domain = subject.commonName;
+
+        domain = domain.replace( "*.", "" );
+
+        return domain;
     }
 
     startExpress(){
@@ -54,6 +66,10 @@ class NodeExpress{
 
                 if (!consts.SETTINGS.NODE.SSL) throw {message: "no ssl"};
 
+                this.domain = this._extractDomain('./certificates/certificate.crt');
+                console.info("========================================");
+                console.info("SSL certificate found for ", this.domain);
+
                 options.key = fs.readFileSync('./certificates/private.key', 'utf8');
                 options.cert = fs.readFileSync('./certificates/certificate.crt', 'utf8');
                 options.ca = fs.readFileSync('./certificates/ca_bundle.crt', 'utf8');
@@ -84,6 +100,9 @@ class NodeExpress{
                 //cloudflare generates its own SSL certificate
                 this.server = http.createServer(this.app).listen(this.port, () => {
 
+                    let myIP = require('my-ip');
+                    this.domain = myIP();
+
                     console.info("========================================");
                     console.info(`Express started at localhost: ${this.port}`);
                     console.info("========================================");
@@ -93,6 +112,8 @@ class NodeExpress{
                     resolve(true);
 
                 }).on('error', (err) => {
+
+                    this.domain = '';
 
                     console.error("Error Creating Express Server");
                     console.error(err);

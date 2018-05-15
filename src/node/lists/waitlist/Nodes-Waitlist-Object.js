@@ -57,6 +57,7 @@ class NodesWaitlistObject {
     }
 
     socketErrorConnected(){
+
         this.errorTrial++;
 
         if (this.isFallback === true) {
@@ -65,6 +66,7 @@ class NodesWaitlistObject {
                 this.errorTrial = Math.min(this.errorTrial, 5);
             else
                 this.errorTrial = Math.min(this.errorTrial, 5 + Math.floor( Math.random() * 5) );
+
         }
 
     }

@@ -236,7 +236,7 @@ class NodesWaitlist {
         for (let i=list.length-1; i>=0; i--){
 
             if (list[i].socket === socket)
-                list.splice(i, 1);
+                list[i].socket = undefined;
 
         }
 

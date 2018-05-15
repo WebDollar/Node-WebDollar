@@ -22,14 +22,23 @@ class NodeServer {
         nodeServer : null,        //Node IO Server Socket
     */
 
-    constructor(){
+    constructor() {
 
         console.log("NodeServer constructor");
         this.nodeServer = null;
 
         this.loaded = false;
 
-        setInterval( this._disconenctOldSockets.bind(this), 30*1000 );
+        setInterval(this._disconenctOldSockets.bind(this), 30 * 1000);
+
+    }
+
+    getServerHTTPAddress() {
+
+        if (this.loaded === false) return '';
+        if (NodeExpress.port === 0) return '';
+
+        return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
 
     }
 
@@ -76,19 +85,11 @@ class NodeServer {
                 let nodeType = socket.request._query["nodeType"];
                 if (typeof nodeType  === "string") nodeType = parseInt(nodeType);
 
-                let nodeHTTP = socket.request._query["HTTP"];
-                if ( nodeHTTP === undefined) nodeHTTP = "";
-                if ( ["http", "https", ""].indexOf( nodeHTTP) === -1){
-                    console.error("invalid http");
-                    socket.disconnect();
-                    return;
-                }
+                let nodeDomain = socket.request._query["domain"];
+                if ( nodeDomain === undefined) nodeDomain = "";
 
                 let nodeUTC = socket.request._query["UTC"];
                 if (typeof nodeUTC === "string") nodeUTC = parseInt(nodeUTC);
-
-                let nodePort = socket.request._query["port"];
-                if (typeof nodePort === "string") nodePort = parseInt(nodePort);
 
                 if ( socket.request._query["uuid"] === undefined || [NODES_TYPE.NODE_TERMINAL, NODES_TYPE.NODE_WEB_PEER].indexOf( nodeType ) === -1) {
                     console.error("invalid uuid or nodeType");
@@ -130,9 +131,8 @@ class NodeServer {
                     socket.node.protocol.justSendHello();
 
                     socket.node.protocol.nodeType = nodeType;
-                    socket.node.protocol.nodeHTTP = nodeHTTP;
                     socket.node.protocol.nodeUTC = nodeUTC;
-                    socket.node.protocol.nodePort = nodePort;
+                    socket.node.protocol.nodeDomain = nodeDomain;
 
                     socket.node.protocol.helloValidated = true;
 

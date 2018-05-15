@@ -22,10 +22,9 @@ class NodeProtocol {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
-            HTTP: process.env.BROWSER ? "https" : (NodeServer.loaded &&  NodeExpress.loaded ? ( NodeExpress.SSL ? 'https' :'http') : '' ),
-            port: NodeExpress === undefined ? 0 :  (NodeServer.loaded && NodeExpress.loaded ? NodeExpress.port  : 0 ),
+            domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
-        });
+        }, undefined, 3000);
     }
 
     processHello( response, validationDoubleConnectionsTypes ){
@@ -74,12 +73,8 @@ class NodeProtocol {
 
         this.node.protocol.nodeType = response.nodeType;
 
-        let nodeHTTP = response.HTTP;
-        if ( nodeHTTP === undefined) nodeHTTP = "";
-        if ( ["http", "https", ""].indexOf( nodeHTTP) === -1)
-            return false;
+        this.node.protocol.nodeDomain = response.domain;
 
-        this.node.protocol.nodeHTTP = response.nodeHTTP;
         this.node.protocol.nodeUTC = response.UTC;
         this.node.protocol.helloValidated = true;
 

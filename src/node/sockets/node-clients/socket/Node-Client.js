@@ -1,3 +1,6 @@
+const myIP = require('my-ip');
+
+
 import * as io from 'socket.io-client';
 
 import consts from 'consts/const_global'
@@ -73,8 +76,7 @@ class NodeClient {
                             uuid: consts.SETTINGS.UUID,
                             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
                             UTC: Blockchain.blockchain.timestamp.timeUTC,
-                            HTTP: process.env.BROWSER ? "https" : (NodeServer.loaded &&  NodeExpress.loaded ? ( NodeExpress.SSL ? 'https' :'http') : '' ),
-                            port: NodeExpress === undefined ? 0 :  (NodeServer.loaded && NodeExpress.loaded ? NodeExpress.port  : 0 )
+                            domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
                         },
 
                     });

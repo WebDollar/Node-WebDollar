@@ -87,8 +87,9 @@ class NodesList {
 
             this.emitter.emit("nodes-list/connected", object);
 
-            if (socket.node.protocol.nodePort !== undefined && socket.node.protocol.nodeHTTP !== '' && socket.node.type === NODES_TYPE.NODE_TERMINAL) {
-                NodesWaitlist.addNewNodeToWaitlist( socket.node.protocol.nodeHTTP +"://"+ socket.node.sckAddress.getAddress(false, false), socket.node.protocol.nodePort, socket.node.type, true, socket.node.level, socket, socket);
+            if (socket.node.protocol.nodePort !== undefined && socket.node.protocol.nodeDomain !== '' && socket.node.type === NODES_TYPE.NODE_TERMINAL) {
+
+                NodesWaitlist.addNewNodeToWaitlist( socket.node.nodeDomain, undefined, socket.node.type, true, socket.node.level, socket, socket);
             }
 
             GeoLocationLists.includeSocket(socket);
@@ -173,7 +174,7 @@ class NodesList {
             } else
             // in case type is just a simple string
             if (type === this.nodes[i].socket.node.protocol.type || type === "all")
-                list.push(this.nodes[i]);
+                list.push( this.nodes[i] );
 
         return list;
     }
