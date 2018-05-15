@@ -35,7 +35,7 @@ class NodeServer {
 
     getServerHTTPAddress() {
 
-        if (this.loaded === false) return '';
+        if ( !this.loaded || !NodeExpress.loaded) return '';
         if (NodeExpress.port === 0) return '';
 
         return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
@@ -149,11 +149,9 @@ class NodeServer {
             try {
                 //multiple ports, but doesn't work
 
-                let port = process.env.SERVER_PORT||consts.SETTINGS.NODE.PORT;
-
                 server.listen (NodeExpress.server).on('error',  (err) => {
 
-                    console.error( "Couldn't open server on port ", port, " try next port") ;
+                    console.error( "Couldn't open server on port ", NodeExpress.port, " try next port") ;
                     this.loaded = false;
 
                     throw err;
