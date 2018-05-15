@@ -291,11 +291,17 @@ class InterfaceBlockchain {
             console.warn("Saving Blockchain. Starting from ", startingHeight, endingHeight);
             for (let i = startingHeight; i < endingHeight; i++ )
 
-                if (this.blocks[i] !== undefined && this.blocks[i] !== null) {
+                if (this.blocks[i] !== undefined && this.blocks[i] !== null)
 
-                    if (! ( await this.blocks[i].saveBlock()) )
-                        break
-                }
+                    try {
+
+                        if (!( await this.blocks[i].saveBlock()))
+                            throw {message: "couldn't save block", block: i}
+
+                    } catch (exception){
+                        console.error(exception);
+                    }
+
 
             console.warn("Successfully saving blocks ", startingHeight, endingHeight);
         }
