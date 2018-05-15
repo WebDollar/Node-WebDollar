@@ -28,7 +28,13 @@ class NodeClient {
 
     }
 
-    connectTo(address, port, level, ssl){
+    connectToWaitlist(waitlist, index){
+
+        return this.connectTo( waitlist.sckAddresses[index], undefined, waitlist.level+1, waitlist.sckAddresses[index].SSL )
+
+    }
+
+    connectTo(address, port, level, SSL){
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
@@ -52,7 +58,12 @@ class NodeClient {
                 }
 
                 // in case the port is not included
-                if (address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
+
+                if (port !== undefined && address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
+
+                //it is required in browser to use SSL
+                if (process.env.BROWSER && consts.SETTINGS.NODE.SSL )
+                    SSL = true;
 
                 console.log("connecting... to:                ", address);
 
@@ -68,7 +79,7 @@ class NodeClient {
                         connection_timeout : 20000,
                         timeout: 20000,
 
-                        secure: ssl, //https
+                        secure: SSL, //https
 
                         query:{
                             msg: "HelloNode",
