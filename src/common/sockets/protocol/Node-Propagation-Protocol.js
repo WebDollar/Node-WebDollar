@@ -176,9 +176,11 @@ class NodePropagationProtocol {
 
     propagateWaitlistSimple(socket, disconnectSocket = true){
 
-        if (socket === undefined || socket.node === undefined) return;
+        if (socket === undefined ) return;
 
-        socket.node.sendRequest("propagation/nodes", {op: "new-full-nodes", addresses: this._waitlistSimple} );
+        if (socket.emit === undefined) console.warn("socket.emit is not supported");
+
+        socket.emit( "propagation/nodes", { op: "new-full-nodes", addresses: this._waitlistSimple } );
 
         if (disconnectSocket){
             setTimeout(()=>{

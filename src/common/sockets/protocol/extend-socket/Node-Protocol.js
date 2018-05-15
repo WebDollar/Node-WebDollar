@@ -81,7 +81,7 @@ class NodeProtocol {
         return true;
     }
 
-    async sendHello ( validationDoubleConnectionsTypes ) {
+    async sendHello ( validationDoubleConnectionsTypes, process = true ) {
 
 
         // Waiting for Protocol Confirmation
@@ -90,20 +90,15 @@ class NodeProtocol {
         let response;
         for (let i=0; i < 3; i++) {
 
-            response = await this.node.sendRequestWaitOnce("HelloNode", {
-
-                version: consts.SETTINGS.NODE.VERSION,
-                uuid: consts.SETTINGS.UUID,
-                nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
-                SSL: process.env.BROWSER ? 1 : NodeExpress.SSL & 1,
-                UTC: Blockchain.blockchain.timestamp.timeUTC,
-
-            }, undefined, 1000);
+            response = await this.node.protocol.justSendHello();
 
             if ( typeof response === "object" && response !== null && response.hasOwnProperty("uuid") )
                 break;
 
         }
+
+        if (!process)
+            return true;
 
         return this.node.protocol.processHello( response, validationDoubleConnectionsTypes );
 

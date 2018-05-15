@@ -1,6 +1,3 @@
-const myIP = require('my-ip');
-
-
 import * as io from 'socket.io-client';
 
 import consts from 'consts/const_global'
@@ -100,11 +97,11 @@ class NodeClient {
                 this.socket = socket;
 
 
-                socket.once("connect", ( response ) =>{
+                socket.once("connect", async ( response ) =>{
 
                     //Connection Established
 
-                    SocketExtend.extendSocket( socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
+                    SocketExtend.extendSocket( socket, socket.io.opts.hostname || sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
 
                     console.warn("Client connected to " + socket.node.sckAddress.address);
 
@@ -115,18 +112,17 @@ class NodeClient {
 
                     }, 10*1000);
 
-                    socket.once("HelloNode",(response)=>{
 
-                        let answer = socket.node.protocol.processHello(response, ["ip","uuid"] );
-                        clearTimeout(timeout);
+                    let answer = await socket.node.protocol.sendHello(["ip","uuid"]);
 
-                        if (answer)
-                            this.initializeSocket(socket, ["ip", "uuid"]);
-                        else
-                            socket.disconnect();
+                    clearTimeout(timeout);
 
-                        resolve(answer);
-                    });
+                    if (answer)
+                        this.initializeSocket(socket, ["ip", "uuid"]);
+                    else
+                        socket.disconnect();
+
+                    resolve(answer);
 
                 });
 

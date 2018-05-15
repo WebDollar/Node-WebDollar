@@ -128,7 +128,7 @@ class NodeServer {
 
                     console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) );
 
-                    socket.node.protocol.justSendHello();
+                    socket.node.protocol.sendHello(false);
 
                     socket.node.protocol.nodeType = nodeType;
                     socket.node.protocol.nodeUTC = nodeUTC;
