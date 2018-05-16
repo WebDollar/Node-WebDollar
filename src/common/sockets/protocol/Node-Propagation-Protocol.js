@@ -130,38 +130,30 @@ class NodePropagationProtocol {
 
         let number = 20 + Math.floor( Math.random()*15 );
 
-        let nodesList = NodesList.getNodesByType(NODES_TYPE.NODE_TERMINAL);
-        for (let i=nodesList.length-1; i>=0; i--)
-            if (nodesList[i].isFallback || nodesList[i].type !== NODES_TYPE.NODE_TERMINAL)
-                nodesList.splice(i, 1);
-
         //some from NodesList
-
-        this._waitlistSimple = [];
 
         let generateWailistRandomList = (nodes, list, onlySSL = false )=>{
 
             if (nodes.length === 0) return;
 
-            let count = 0;
-            while ( count < number ){
+            let index = 0;
+            while ( index < number && index < nodes.length ){
 
-                let index = Math.floor( Math.random() * nodes.length );
                 let node = nodes[index];
 
                 let json = node.toJSON();
 
                 let found  = false;
-                for (let i=0; i<list.length; i++ )
+                for (let i=0; i < list.length; i++ )
                     if (list[i].addr === json.addr){
                         found = true;
                         break;
                     }
 
-                if (found === false && (!onlySSL || onlySSL && node.sckAddresses[0].SSL))
+                if (found === false && !node.isFallback && (!onlySSL || onlySSL && node.sckAddresses[0].SSL))
                     list.push(json);
 
-                count++;
+                index++;
             }
 
         };

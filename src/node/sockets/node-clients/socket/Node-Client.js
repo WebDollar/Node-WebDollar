@@ -110,7 +110,7 @@ class NodeClient {
                         socket.disconnect();
                         resolve(false);
 
-                    }, 10*1000);
+                    }, 20*1000);
 
 
                     let answer = await socket.node.protocol.sendHello(["ip","uuid"]);
