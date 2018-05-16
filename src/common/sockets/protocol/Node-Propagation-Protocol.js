@@ -158,7 +158,7 @@ class NodePropagationProtocol {
                         break;
                     }
 
-                if (found === false && (!onlySSL || onlySSL && found.sckAddresses[0].SSL))
+                if (found === false && (!onlySSL || onlySSL && node.sckAddresses[0].SSL))
                     list.push(json);
 
                 count++;
