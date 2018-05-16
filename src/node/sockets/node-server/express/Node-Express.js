@@ -100,8 +100,7 @@ class NodeExpress{
                 //cloudflare generates its own SSL certificate
                 this.server = http.createServer(this.app).listen(this.port, () => {
 
-                    let myIP = require('my-ip');
-                    this.domain = myIP();
+                    this.domain = 'my-ip';
 
                     console.info("========================================");
                     console.info(`Express started at localhost: ${this.port}`);

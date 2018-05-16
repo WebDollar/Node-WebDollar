@@ -10,6 +10,7 @@ class NodePropagationProtocol {
 
         //waitlist to be propagated to termination
         this._waitlistSimple = [];
+        this._waitlistSimpleSSL = [];
 
     }
 
@@ -127,20 +128,18 @@ class NodePropagationProtocol {
 
     _recalculateWaitlistSimple(){
 
-        let number = 15+ Math.floor( Math.random()*15 );
-
-        let list = [];
-
+        let number = 20 + Math.floor( Math.random()*15 );
 
         let nodesList = NodesList.getNodesByType(NODES_TYPE.NODE_TERMINAL);
         for (let i=nodesList.length-1; i>=0; i--)
-            if (nodesList[i].isFallback || nodesList[i].type !== NODES_TYPE.NODE_TERMINAL){
+            if (nodesList[i].isFallback || nodesList[i].type !== NODES_TYPE.NODE_TERMINAL)
                 nodesList.splice(i, 1);
-            }
 
         //some from NodesList
 
-        let generateMarket = (nodes)=>{
+        this._waitlistSimple = [];
+
+        let generateWailistRandomList = (nodes, list, onlySSL = false )=>{
 
             if (nodes.length === 0) return;
 
@@ -159,7 +158,7 @@ class NodePropagationProtocol {
                         break;
                     }
 
-                if (found === false)
+                if (found === false && (!onlySSL || onlySSL && found.sckAddresses[0].SSL))
                     list.push(json);
 
                 count++;
@@ -168,10 +167,12 @@ class NodePropagationProtocol {
         };
 
 
-        generateMarket(NodesList.nodes);
-        generateMarket( NodesWaitlist.waitListFullNodes);
+        this._waitlistSimple = [];
+        generateWailistRandomList( NodesWaitlist.waitListFullNodes, this._waitlistSimple);
 
-        this._waitlistSimple = list;
+        this._waitlistSimpleSSL = [];
+        generateWailistRandomList( NodesWaitlist.waitListFullNodes, this._waitlistSimpleSSL, true);
+
     }
 
     propagateWaitlistSimple(socket, disconnectSocket = true){
@@ -180,7 +181,12 @@ class NodePropagationProtocol {
 
         if (socket.emit === undefined) console.warn("socket.emit is not supported");
 
-        socket.emit( "propagation/nodes", { op: "new-full-nodes", addresses: this._waitlistSimple } );
+        let list = this._waitlistSimple;
+
+        if (socket.node.protocol.nodeType === NODES_TYPE.NODE_WEB_PEER) //let's send only SSL
+            list = this._waitlistSimpleSSL;
+
+        socket.emit( "propagation/nodes", { op: "new-full-nodes", addresses: list } );
 
         if (disconnectSocket){
             setTimeout(()=>{

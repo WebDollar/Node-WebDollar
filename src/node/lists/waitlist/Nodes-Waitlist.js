@@ -62,6 +62,8 @@ class NodesWaitlist {
 
                 let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
 
+                if (sckAddress.address.indexOf("192.168") === 0 ) continue;
+
                 let answer = this._searchNodesWaitlist(sckAddress, port, type);
 
                 if (answer.waitlist !== null) {
@@ -188,7 +190,7 @@ class NodesWaitlist {
     _sortList(list){
 
         list.sort(function(a, b) {
-            return a.sortingScore()- b.sortingScore();
+            return b.sortingScore() - a.sortingScore();
         });
 
     }
