@@ -4,6 +4,8 @@ import NodesWaitlistObject from './Nodes-Waitlist-Object';
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import DownloadHelper from "common/utils/helpers/Download-Helper"
+import consts from 'consts/const_global'
 
 const EventEmitter = require('events');
 
@@ -46,7 +48,7 @@ class NodesWaitlist {
     }
 
 
-    addNewNodeToWaitlist (addresses, port, type,  connected, level, backedBy, socket){
+    async addNewNodeToWaitlist (addresses, port, type,  connected, level, backedBy, socket){
 
         if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[])) ) return false;
 
@@ -78,7 +80,17 @@ class NodesWaitlist {
                     }
 
                 }
-                else sckAddresses.push(sckAddress);
+                else{
+
+                    if (backedBy === "fallback")
+                        sckAddresses.push(sckAddress);
+                    else {
+                        answer = await DownloadHelper.downloadFile(sckAddress.getAddress(true, true), 5000);
+
+                        if (answer !== null && answer.protocol === consts.SETTINGS.NODE.PROTOCOL)
+                            sckAddresses.push(sckAddress);
+                    }
+                }
 
             } catch (exception){
 

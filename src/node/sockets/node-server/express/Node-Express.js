@@ -138,7 +138,7 @@ class NodeExpress{
 
             res.json({
 
-                protocol: 'WebDollar',
+                protocol: consts.SETTINGS.NODE.PROTOCOL,
                 version: consts.SETTINGS.NODE.VERSION,
                 blocks: {
                     length: Blockchain.blockchain.blocks.length,
