@@ -241,8 +241,6 @@ class NodesWaitlist {
             if (list[i].socket === socket) {
                 list[i].connected = false;
                 list[i].socket = undefined;
-
-                console.info("_removeSocket");
             }
 
 
