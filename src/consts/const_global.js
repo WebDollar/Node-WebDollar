@@ -245,13 +245,15 @@ consts.SETTINGS = {
             TERMINAL:{
 
                 CLIENT: {
-                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST: 20,
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST: 40,
                     MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK: 2,
                 },
 
                 SERVER: {
                     MAXIMUM_CONNECTIONS_FROM_BROWSER: 850,
-                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 150,
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 200,
+
+                    TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 100,
                 },
 
             },

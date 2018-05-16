@@ -7,6 +7,13 @@ import Blockchain from "main-blockchain/Blockchain"
 import AGENT_STATUS from "./Agent-Status";
 import consts from 'consts/const_global'
 import InterfaceBlockchainAgentBasic from "./Interface-Blockchain-Agent-Basic"
+import NODES_TYPE from "../../../../node/lists/types/Nodes-Type";
+
+let NodeExpress;
+
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+}
 
 /**
  *
@@ -78,6 +85,21 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
             }
 
         });
+
+
+        if (!this.light)
+            NodesList.emitter.on("nodes-list/connected", async (result) => {
+
+                if (!NodeExpress.amIFallback() )
+                    if ( NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK){
+
+                        this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
+                        NodesList.disconnectFromFallbacks();
+
+                    }
+
+            });
+
     }
 
     async startAgent(firsTime, synchronizeComplete=false){
@@ -101,7 +123,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
         else { //terminal
 
             //let's check if we downloaded blocks in the last 2 minutes
-            let set = false;
+            let set = true;
 
             if (this.lastTimeChecked !== undefined ){
 
@@ -115,11 +137,10 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
                     }
 
-                    set = true;
-                }
 
-            }  else
-                set = true;
+                } else set = false;
+
+            }
 
 
             if (set)

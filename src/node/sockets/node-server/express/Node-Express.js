@@ -1,5 +1,6 @@
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
 const https = require('https');
 const http = require('http');
@@ -106,6 +107,8 @@ class NodeExpress{
                     console.info(`Express started at localhost: ${this.port}`);
                     console.info("========================================");
 
+                    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL + consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER;
+
                     this._initializeRouter();
 
                     resolve(true);
@@ -211,6 +214,16 @@ class NodeExpress{
             res.json( { ping: "pong" });
         });
 
+
+    }
+
+    amIFallback(){
+
+        for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++)
+            if (NodesWaitlist.waitListFullNodes[i].isFallback && NodesWaitlist.waitListFullNodes[i].sckAddresses[0].address === this.domain)
+                return true;
+
+        return false;
 
     }
 
