@@ -26,7 +26,7 @@ class NodesWaitlistObject {
 
         this.connecting = false;
 
-        this.errorTrial = 0;
+        this.errorTrials = 0;
         this.lastTimeChecked = 0;
 
         this.level = level||0;
@@ -43,7 +43,7 @@ class NodesWaitlistObject {
 
         let time = new Date().getTime();
 
-        if ( (time - this.lastTimeChecked) >= timeTryReconnectAgain + this.errorTrial*5000 )
+        if ( (time - this.lastTimeChecked) >= timeTryReconnectAgain + this.errorTrials*5000 )
             return true;
 
         return false;
@@ -51,21 +51,21 @@ class NodesWaitlistObject {
 
     socketConnected(socket){
 
-        this.errorTrial = 0;
+        this.errorTrials = 0;
         this.socket = socket;
 
     }
 
     socketErrorConnected(){
 
-        this.errorTrial++;
+        this.errorTrials++;
 
         if (this.isFallback === true) {
 
             if (process.env.BROWSER)
-                this.errorTrial = Math.min(this.errorTrial, 5);
+                this.errorTrials = Math.min(this.errorTrials, 5);
             else
-                this.errorTrial = Math.min(this.errorTrial, 5 + Math.floor( Math.random() * 5) );
+                this.errorTrials = Math.min(this.errorTrials, 5 + Math.floor( Math.random() * 5) );
 
         }
 
@@ -98,7 +98,7 @@ class NodesWaitlistObject {
     resetWaitlistNode(){
 
         this.lastTimeChecked = 0;
-        this.errorTrial = 0;
+        this.errorTrials = 0;
 
     }
 
@@ -181,7 +181,7 @@ class NodesWaitlistObject {
 
     sortingScore(){
 
-        if (this.isFallback === true) return 100000 - this.errorTrial*100;
+        if (this.isFallback === true) return 100000 - this.errorTrials*100;
 
         let score = 200;
 
@@ -197,7 +197,7 @@ class NodesWaitlistObject {
 
         }
 
-        score -= this.errorTrial * 100;
+        score -= this.errorTrials * 100;
 
         return score;
 

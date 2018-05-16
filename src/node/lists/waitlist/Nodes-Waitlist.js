@@ -24,7 +24,8 @@ class NodesWaitlist {
         this.MAX_FULLNODE_WAITLIST_CONNECTIONS = 1500;
         this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS = 500;
 
-        this.MAX_ERROR_TRIALS = 100;
+        this.MAX_ERROR_TRIALS_FALLBACK = 100;
+        this.MAX_ERROR_TRIALS_SIMPLE = 100;
 
     }
 
@@ -169,7 +170,8 @@ class NodesWaitlist {
         //sorting by formula connectedBy
 
         for (let i=list.length-1; i>=0; i--)
-            if ( list[i].errorTrial > this.MAX_ERROR_TRIALS) {
+            if (  ( list[i].isFallback && list[i].errorTrials > this.MAX_ERROR_TRIALS_FALLBACK ) ||
+                  ( list[i].errorTrials > this.MAX_ERROR_TRIALS_SIMPLE)) {
 
                 this.emitter.emit("waitlist/delete-node", list[i]);
                 list.splice(i, 1);
