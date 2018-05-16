@@ -319,13 +319,13 @@ if ( consts.DEBUG === true ){
 
     consts.SETTINGS.NODE.VERSION += "3";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "3";
-    consts.SETTINGS.NODE.SSL = false;
+    consts.SETTINGS.NODE.SSL = true;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
     consts.SETTINGS.NODE.PORT = 9095;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://webdollar.ddns.net:9095"],
+        "addr": ["https://webdollar-vps2.ddns.net:9095"],
     }];
 
 
