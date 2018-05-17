@@ -64,7 +64,7 @@ class NodesList {
 
     }
 
-    registerUniqueSocket(socket, connectionType, type, validationDoubleConnectionsTypes){
+    async registerUniqueSocket(socket, connectionType, type, validationDouableConnectionsTypes){
 
         if (type === undefined) throw {message: "type is necessary"};
 
@@ -92,7 +92,7 @@ class NodesList {
                 if (socket.node.protocol.nodeDomain.indexOf("my-ip:")>=0)
                     socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("my-ip", socket.node.sckAddress.address);
 
-                NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.type, true, socket.node.level, socket, socket);
+                await NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.type, true, socket.node.level, socket, socket);
             }
 
 

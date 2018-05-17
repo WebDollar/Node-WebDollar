@@ -108,7 +108,8 @@ class SocketAddress {
 
                 if (validationDoubleConnectionsTypes.indexOf("port") >= 0){
 
-                    if (this.address+":"+this.port === sckAddress.address+":"+sckAddress.port) return true;
+                    if (this.address+":"+this.port === sckAddress.address+":"+sckAddress.port)
+                        return true;
 
                     return false;
 

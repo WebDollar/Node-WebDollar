@@ -118,7 +118,7 @@ class NodeClient {
                     clearTimeout(timeout);
 
                     if (answer)
-                        this.initializeSocket(socket, ["ip", "uuid"], waitlist);
+                        await this.initializeSocket(socket, ["ip", "uuid"], waitlist);
                     else
                         socket.disconnect();
 
@@ -160,11 +160,11 @@ class NodeClient {
 
     }
 
-    initializeSocket(validationDoubleConnectionsTypes, waitlist){
+    async initializeSocket(validationDoubleConnectionsTypes, waitlist){
 
         //it is not unique... then I have to disconnect
 
-        if (NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 

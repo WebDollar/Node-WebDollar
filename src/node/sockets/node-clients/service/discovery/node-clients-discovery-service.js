@@ -54,7 +54,7 @@ class NodeDiscoveryService {
                     let answer = await this._downloadFallBackList(this.fallbackLists[i]);
 
                     if (answer !== null)
-                        return this.processFallbackNodes(answer)
+                        return await this.processFallbackNodes(answer)
                 }
         }
 
@@ -96,7 +96,7 @@ class NodeDiscoveryService {
         return null;
     }
 
-    processFallbackNodes(data){
+    async processFallbackNodes(data){
 
         try {
             //console.log(data);
@@ -146,7 +146,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[pos]; //a simple string Address
                             }
 
-                            NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType,  false, 1, "fallback" );
+                            await NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType,  false, 1, "fallback" );
                         }
 
                     }

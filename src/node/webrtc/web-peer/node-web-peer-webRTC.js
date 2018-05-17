@@ -69,7 +69,7 @@ class NodeWebPeerRTC {
 
     }
 
-    createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
+    async createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
 
         console.log('Using SCTP based data channels');
 
@@ -467,10 +467,10 @@ class NodeWebPeerRTC {
     }
 
 
-    initializePeer(validationDoubleConnectionsTypes){
+    async initializePeer(validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(this.peer, CONNECTIONS_TYPE.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.peer, CONNECTIONS_TYPE.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 

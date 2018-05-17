@@ -137,7 +137,7 @@ class NodeServer {
 
                     socket.node.protocol.helloValidated = true;
 
-                    this.initializeSocket(socket, ["uuid"]);
+                    await this.initializeSocket(socket, ["uuid"]);
 
                 } else {
 
@@ -177,10 +177,10 @@ class NodeServer {
 
 
 
-    initializeSocket(socket, validationDoubleConnectionsTypes){
+    async initializeSocket(socket, validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(socket, CONNECTION_TYPE.CONNECTION_SERVER_SOCKET, socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(socket, CONNECTION_TYPE.CONNECTION_SERVER_SOCKET, socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 

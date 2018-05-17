@@ -87,6 +87,8 @@ class NodesWaitlist {
                     else {
                         answer = await DownloadHelper.downloadFile(sckAddress.getAddress(true, true), 5000);
 
+                        answer = {protocol: consts.SETTINGS.NODE.PROTOCOL};
+
                         if (answer !== null && answer.protocol === consts.SETTINGS.NODE.PROTOCOL)
                             sckAddresses.push(sckAddress);
                     }
@@ -151,7 +153,7 @@ class NodesWaitlist {
 
         let index = this._findNodesWaitlist( address, port, listType );
 
-        if (index === -1) return { index: -1, waitlist: null};
+        if (index === -1) return { index: -1, waitlist: null };
 
         return { index: index, waitlist: list[index] };
 

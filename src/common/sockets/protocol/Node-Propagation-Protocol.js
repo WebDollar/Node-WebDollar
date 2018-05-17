@@ -69,7 +69,7 @@ class NodePropagationProtocol {
 
         });
 
-        socket.node.on("propagation/nodes", response => {
+        socket.node.on("propagation/nodes", async (response) => {
 
             try {
 
@@ -86,7 +86,7 @@ class NodePropagationProtocol {
                     case "new-light-nodes":
 
                         for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, undefined, addresses[i].type,  addresses[i].connected, socket.node.level + 1, socket);
+                            await NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, undefined, addresses[i].type,  addresses[i].connected, socket.node.level + 1, socket);
 
                         break;
 
@@ -94,7 +94,7 @@ class NodePropagationProtocol {
                     case "disconnected-full-nodes":
 
                         for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, undefined, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket);
+                            await NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, undefined, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket);
 
                         break;
 
