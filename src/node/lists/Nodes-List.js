@@ -64,7 +64,7 @@ class NodesList {
 
     }
 
-    async registerUniqueSocket(socket, connectionType, type, validationDouableConnectionsTypes){
+    async registerUniqueSocket(socket, connectionType, type, validationDoubleConnectionsTypes){
 
         if (type === undefined) throw {message: "type is necessary"};
 
