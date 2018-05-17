@@ -83,11 +83,11 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
 
-                    ()=>{
+                    async ()=>{
 
-                        return  this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
-                            ()=>{
-                                return this._simulatedNextBlockMining(nextBlock);
+                        return await this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
+                            async ()=>{
+                                return await this._simulatedNextBlockMining(nextBlock);
                             });
 
                     }) === false) throw {message: "Mining1 returned False"};
@@ -185,7 +185,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     let revertActions = new RevertActions(this.blockchain);
 
-                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
+                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+
                             block.hash = answer.hash;
                             block.nonce = answer.nonce;
 
@@ -194,6 +195,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                                 return false;
 
                             return this.blockchain.includeBlockchainBlock(block, false, [], true, revertActions);
+
                         }) === false) throw {message: "Mining2 returned false"};
 
                     revertActions.destroyRevertActions();

@@ -1,13 +1,9 @@
 
 class SemaphoreProcessing{
 
-    constructor(processingSemaphoreInterval = 10){
+    constructor(){
 
         this._list = [];
-
-        this.processingSemaphoreInterval = processingSemaphoreInterval;
-
-        setTimeout(this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);
 
     }
 
@@ -17,40 +13,47 @@ class SemaphoreProcessing{
      * @returns {Promise.<void>}
      */
 
-    processSempahoreCallback(callback){
+    processSempahoreCallback( callback ){
 
-        return new Promise ((resolve) =>{
-            this._list .push({callback: callback, resolver: resolve});
-        });
+        let resolver = undefined, index;
 
-    }
+        let promise = new Promise ( async (resolve) => {
 
-
-    _processingSemaphoreList(){
-
-        if (this._list.length > 0){
-
-            let answer = false;
-            try {
-                answer = this._list[0].callback();
-            } catch (ex){
-                console.error("error processingSemaphoreList !!!!!!!!!!!!!!!!!!!!!!!!", ex);
+            if (index > 0) {
+                await this._list[index - 1].promise;
+                this.sleep(100);
             }
 
+            let answer;
+
             try {
-                let resolver = this._list[0].resolver;
-                this._list.splice(0, 1);
+                answer = await callback();
+                this.sleep(100);
+            } catch (ex){
+                console.error("error processingSemaphoreList callback !!!!!!!!!!!!!!!!!!!!!!!!", ex);
+            }
 
-                resolver(answer);
 
+            try {
+                resolve(answer);
+                this.sleep(100);
             } catch (ex){
                 console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
             }
 
-        }
+            this._list.splice(index, 1);
 
-        setTimeout(this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);
+        });
 
+        this._list.push({callback: callback, resolver: resolver, promise: promise});
+        index = this._list.length-1;
+
+        return new promise;
+
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 }

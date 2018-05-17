@@ -212,6 +212,9 @@ class InterfaceBlockchainFork {
         return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     /**
      * Validate the Fork and Use the fork as main blockchain
@@ -242,6 +245,8 @@ class InterfaceBlockchainFork {
                 return false
             }
 
+            this.sleep(100);
+
             this.forkIsSaving = true;
 
             try {
@@ -254,6 +259,8 @@ class InterfaceBlockchainFork {
                 this.forkIsSaving = false;
                 return false;
             }
+
+            this.sleep(100);
 
             try {
 
@@ -270,6 +277,8 @@ class InterfaceBlockchainFork {
                 this.forkIsSaving = false;
                 return false;
             }
+
+            this.sleep(100);
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
 
@@ -293,9 +302,12 @@ class InterfaceBlockchainFork {
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});
 
+                    this.sleep(10);
                 }
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
+
+                this.sleep(100);
 
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
 
@@ -319,9 +331,15 @@ class InterfaceBlockchainFork {
 
             }
 
+            this.sleep(100);
+
             await this.postForkTransactions(forkedSuccessfully);
 
+            this.sleep(100);
+
             this.postFork(forkedSuccessfully);
+
+            this.sleep(100);
 
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();
@@ -342,6 +360,8 @@ class InterfaceBlockchainFork {
             //successfully, let's delete the backup blocks
             this._deleteBackupBlocks();
 
+            this.sleep(100);
+
             //propagate last block
             NodeBlockchainPropagation.propagateBlock( this.blockchain.blocks[ this.blockchain.blocks.length-1 ], this.sockets);
 
@@ -350,6 +370,8 @@ class InterfaceBlockchainFork {
                 this.blockchain.agent.protocol.askBlockchain(this.getSocket());
 
             }
+
+            this.sleep(100);
 
         }
 
