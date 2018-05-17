@@ -79,6 +79,8 @@ class NodeExpress{
 
                     this.SSL = true;
 
+                    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_SSL;
+
                     this._initializeRouter();
 
                     console.info("========================================");
