@@ -73,8 +73,8 @@ class NodeClient {
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
 
-                        connection_timeout : 20000,
-                        timeout: 20000,
+                        connection_timeout : process.env.BROWSER ? 15000 : 50000,
+                        timeout: process.env.BROWSER ? 15000 : 50000,
 
                         secure: SSL, //https
 
