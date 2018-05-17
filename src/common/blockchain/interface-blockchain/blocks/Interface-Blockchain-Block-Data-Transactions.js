@@ -39,8 +39,6 @@ class InterfaceBlockchainBlockDataTransactions {
         if (! BufferExtended.safeCompare(this.hashTransactions, hashTransactions))
             throw {message: "hash transaction is invalid at", hashTransactionsOriginal: this.hashTransactions, hashTransactions: hashTransactions, };
 
-        console.log("######################################");
-        console.log("this.transactions.length", this.transactions.length);
 
         for (let i=0; i<this.transactions.length; i++) {
 

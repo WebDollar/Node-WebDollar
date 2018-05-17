@@ -124,7 +124,12 @@ class NodeServer {
                     return;
                 }
 
-                if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && nodeDomain !== ''){
+                if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
+
+                    if (nodeDomain !== ''){
+                        socket.disconnect();
+                        return;
+                    }
 
                     let waitlist = NodesWaitlist._findNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
 
