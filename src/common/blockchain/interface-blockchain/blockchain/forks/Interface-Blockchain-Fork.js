@@ -302,7 +302,7 @@ class InterfaceBlockchainFork {
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});
 
-                    this.sleep(10);
+                    this.sleep(100);
                 }
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );

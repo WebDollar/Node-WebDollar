@@ -308,6 +308,8 @@ class InterfaceBlockchainProtocolForkSolver{
             else
                 throw {message: "Fork didn't work at height ", nextBlockHeight};
 
+            this.blockchain.sleep(30);
+
         }
 
         if (fork.forkStartingHeight + fork.forkBlocks.length >= fork.forkChainLength ) {
