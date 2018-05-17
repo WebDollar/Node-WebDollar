@@ -59,7 +59,7 @@ class DownloadHelper{
 
             for (let i=0; i<addresses.length; i++){
 
-                DownloadHelper.downloadFile(addresses[i], timeout ).then((answer)=>{
+                this.downloadFile(addresses[i], timeout ).then((answer)=>{
 
                     if (answer !== null && resolve !== undefined){
 

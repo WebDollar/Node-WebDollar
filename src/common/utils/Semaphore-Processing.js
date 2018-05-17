@@ -48,7 +48,7 @@ class SemaphoreProcessing{
         this._list.push({callback: callback, resolver: resolver, promise: promise});
         index = this._list.length-1;
 
-        return new promise;
+        return promise;
 
     }
 
