@@ -25,8 +25,6 @@ import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import InterfaceBlockchainTipsAdministrator from "./tips/Interface-Blockchain-Tips-Administrator";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
-const SEMAPHORE_PROCESSING_INTERVAL = 10;
-
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -51,7 +49,7 @@ class InterfaceBlockchain {
 
         this.timestamp = new BlockchainTimestamp();
 
-        this.semaphoreProcessing = new SemaphoreProcessing(SEMAPHORE_PROCESSING_INTERVAL);
+        this.semaphoreProcessing = new SemaphoreProcessing();
     }
 
     _setAgent(newAgent){
@@ -297,7 +295,9 @@ class InterfaceBlockchain {
                     try {
 
                         if (!( await this.blocks[i].saveBlock()))
-                            throw {message: "couldn't save block", block: i}
+                            throw {message: "couldn't save block", block: i};
+
+                        this.sleep(20);
 
                     } catch (exception){
                         console.error(exception);
@@ -492,6 +492,10 @@ class InterfaceBlockchain {
 
     createBlockValidation(){
         return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 

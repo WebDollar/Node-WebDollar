@@ -57,6 +57,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
     }
 
+
     async saveBlockchain(startingHeight, endingHeight){
 
         if (process.env.BROWSER)
@@ -71,13 +72,18 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
                 throw {message: "couldn't sae the blockchain"};
 
+
             if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) {
 
                 if (! (await this.db.save("lightAccountantTreeAdvanced_offset", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES )))
                     throw {message: "Couldn't be saved _lightAccountantTreeAdvanced_offset", index: this._blockchainFileName + consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES};
 
+                this.sleep(10);
+
                 if (!(await this.accountantTree.saveMiniAccountant( true, "lightAccountantTreeAdvanced", this.lightAccountantTreeSerializations[this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1])))
                     throw {message: "saveMiniAccountant couldn't be saved"};
+
+                this.sleep(100);
             }
 
         } catch (exception){
