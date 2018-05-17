@@ -108,7 +108,7 @@ class NodeServer {
                     if (Math.random() < 0.05) console.warn("too many terminal connections");
 
                     if (Math.random() < 0.1) NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
-                    else socket.close();
+                    else socket.disconnect();
 
                     return;
                 }
@@ -118,8 +118,8 @@ class NodeServer {
                     if (Math.random() < 0.05) console.warn("too many browser connections");
 
                     if (Math.random() < 0.1) NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
-                    else socket.close();
-                    
+                    else socket.disconnect();
+
                     return;
                 }
 
