@@ -83,6 +83,14 @@ env CXX=g++-5 npm install argon2
 
 Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 
+
+
+Install x509 on Windows
+
+1. Install python2.7
+2. npm config set python python2.7
+3. Download and paste it in the C:\OpenSSL-Win64\lib\libeay32.lib the file from https://github.com/ReadyTalk/win32/blob/master/msvc/lib/libeay32.lib
+
 ## 4 SSL (Secured Socket Layer) Certificate
 
 WebDollar uses SSL (Secured Socket Layer) and in order to generate your SSL Certificate you need a Domain or to generate your own SSL Certificate for your IP
@@ -181,8 +189,7 @@ Follow the Tutorial [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
 
 
 # Resources to learn
-7
-Ethereum https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369
+7 Ethereum https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369
 
 Mining in Bitcoins
 1.  http://blog.jameslarisch.com/mining-bitcoin-blocks-yourself-for-fun-and-no-profit
