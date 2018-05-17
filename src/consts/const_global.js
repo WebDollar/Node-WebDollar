@@ -247,7 +247,9 @@ consts.SETTINGS = {
                 CLIENT: {
                     MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST: 40,
                     MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_SSL: 10,
+
                     MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK: 2,
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK_SSL: 10,
                 },
 
                 SERVER: {

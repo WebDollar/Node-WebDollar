@@ -124,6 +124,17 @@ class NodeServer {
                     return;
                 }
 
+                if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && nodeDomain !== ''){
+
+                    let waitlist = NodesWaitlist._findNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
+
+                    if (waitlist.waitlist === null || !waitlist.isFallback) {
+                        socket.disconnect();
+                        return;
+                    }
+                }
+
+
                 //check if it is a unique connection, add it to the list
                 let sckAddress = new SocketAddress(socket.request.connection.remoteAddress, socket.request.connection.remotePort, socket.request._query["uuid"]);
 
