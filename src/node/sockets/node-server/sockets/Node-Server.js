@@ -129,7 +129,7 @@ class NodeServer {
 
                 if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
 
-                    if (nodeDomain !== ''){
+                    if (nodeDomain === '' || nodeDomain === undefined){
                         socket.disconnect();
                         return;
                     }
