@@ -32,7 +32,10 @@ class DownloadHelper{
             return null;
         }
         catch(exception){
-            console.error("ERROR downloading list: ", address );
+
+            if (consts.DEBUG)
+                console.error("ERROR downloading list: ", address );
+            
             return null;
         }
     }
