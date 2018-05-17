@@ -91,7 +91,7 @@ class NodesWaitlistConnecting {
 
                 this._connectNowToNewNode(nextWaitListObject).then((connected) => {
 
-                    for (let i=0; i<this._connectingQueue.length; i++)
+                    for (let i=this._connectingQueue.length-1; i>=0; i--)
                         if (this._connectingQueue[i] === nextWaitListObject){
                             this._connectingQueue.splice(i,1);
                         }
