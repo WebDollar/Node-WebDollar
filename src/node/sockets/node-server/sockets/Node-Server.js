@@ -214,7 +214,7 @@ class NodeServer {
 
         //disconnect unresponsive nodes
         for (let i = 0; i < NodesList.nodes.length; i++)
-            if (NodesList.nodes[i].socket.node.protocol.type === NODES_TYPE.NODE_TERMINAL)
+            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.type === NODES_TYPE.NODE_TERMINAL)
 
                 if (NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS) {
 
@@ -246,7 +246,7 @@ class NodeServer {
 
 
         for (let i=0; i<NodesList.nodes.length; i++)
-            if (NodesList.nodes[i].socket.node.protocol.type === NODES_TYPE.NODE_TERMINAL)
+            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.type === NODES_TYPE.NODE_TERMINAL)
                 if ( !NodesList.nodes[i].isFallback && NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL )
                         NodesList.nodes[i].socket.disconnect();
 

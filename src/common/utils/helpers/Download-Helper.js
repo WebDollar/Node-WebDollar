@@ -35,7 +35,7 @@ class DownloadHelper{
 
             if (consts.DEBUG)
                 console.error("ERROR downloading list: ", address );
-            
+
             return null;
         }
     }

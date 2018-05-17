@@ -241,6 +241,8 @@ class NodesWaitlist {
 
     _initializeNode(socket){
 
+        if (socket.node.protocol === undefined) return;
+
         let answer = this._searchNodesWaitlist(socket.node.sckAddress, undefined, socket.node.protocol.type);
 
         if ( answer.waitlist !== null ){

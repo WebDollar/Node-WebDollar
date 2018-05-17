@@ -169,7 +169,7 @@ class NodePropagationProtocol {
 
     propagateWaitlistSimple(socket, disconnectSocket = true){
 
-        if (socket === undefined ) return;
+        if (socket === undefined || socket.node === undefined ) return;
 
         if (socket.emit === undefined) console.warn("socket.emit is not supported");
 
