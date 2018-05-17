@@ -3,7 +3,8 @@ import consts from 'consts/const_global'
 
 class DownloadHelper{
 
-    static async downloadFile(address, timeout){
+    async downloadFile(address, timeout){
+
         try{
             let axiosInstance = axios.create({
                 timeout: timeout,
@@ -21,6 +22,8 @@ class DownloadHelper{
 
                     if (consts.DEBUG)
                         console.error("Error processing downloadFile data", data, exception);
+
+                    return null;
                 }
             }
 
@@ -34,7 +37,7 @@ class DownloadHelper{
         }
     }
 
-    static async downloadMultipleFiles(addresses, timeout){
+    async downloadMultipleFiles(addresses, timeout){
 
         if (!Array.isArray(addresses))
             addresses = [addresses];
@@ -75,4 +78,4 @@ class DownloadHelper{
 
 }
 
-export default DownloadHelper
+export default new DownloadHelper();
