@@ -13,6 +13,7 @@ class BansList{
 
         });
 
+        setInterval( this._listBans.bind(this), 20*1000  )
 
     }
 
@@ -44,8 +45,6 @@ class BansList{
         ban.increaseBanTrials(banTime, banReason);
 
         this._removeEmptyBans();
-
-        this._listBans();
 
         return ban;
     }
