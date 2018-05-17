@@ -77,12 +77,22 @@ class InterfaceTransactionsPendingQueue {
 
     findPendingTransaction(transaction){
 
-
         for (let i = 0; i < this.list.length; i++)
-            if ( BufferExtended.safeCompare ( this.list[i].txId, transaction.txId ))
+            if (  this.list[i].txId.equals( transaction.txId )) //it is not required to use BufferExtended.safeCompare
                 return i;
 
         return -1;
+    }
+
+    searchPendingTransactionByTxId(transactionId){
+
+        if (typeof transactionId === "string") transactionId = new Buffer(transactionId, 16);
+
+        for (let i=0; i< this.list.length; i++)
+            if (transactionId.equals( this.list[i].txId ))
+                return this.list[i];
+
+        return null;
     }
 
     _removePendingTransaction (transaction){
