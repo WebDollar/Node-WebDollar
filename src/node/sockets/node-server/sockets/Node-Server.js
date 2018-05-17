@@ -129,8 +129,6 @@ class NodeServer {
 
                 if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
 
-                    console.log("nodeDomain1", nodeDomain);
-
                     if (nodeDomain === '' || nodeDomain === undefined){
                         socket.disconnect();
                         return;
@@ -140,10 +138,14 @@ class NodeServer {
 
                     let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
 
+                    console.log("nodeDomain3", waitlist, waitlist.waitlist.isFallback);
+
                     if (waitlist.waitlist === null || !waitlist.isFallback) {
                         socket.disconnect();
                         return;
                     }
+
+                    console.log("nodeDomain4", 'success');
                 }
 
 
