@@ -28,12 +28,24 @@ class NodeExpress{
 
     _extractDomain( fileName ){
 
-        const x509 = require('x509');
-        var subject = x509.getSubject( fileName );
+        // const x509 = require('x509');
+        // var subject = x509.getSubject( fileName );
+        //
+        // let domain = subject.commonName;
+        //
+        // domain = domain.replace( "*.", "" );
 
-        let domain = subject.commonName;
+        if (process.env.DOMAIN === undefined){
+            console.error("DOMAIN is not specified. Please specify the domain for SSL");
+            console.error("DOMAIN is not specified. Please specify the domain for SSL");
+            console.error("DOMAIN is not specified. Please specify the domain for SSL");
+            console.error("DOMAIN is not specified. Please specify the domain for SSL");
+            console.error("DOMAIN is not specified. Please specify the domain for SSL");
+            console.error("DOMAIN is not specified. Please specify the domain for SSL");
+            console.error("DOMAIN is not specified. Please specify the domain for SSL");
+        }
 
-        domain = domain.replace( "*.", "" );
+        let domain = process.ENV.DOMAIN;
 
         return domain;
     }
