@@ -150,7 +150,7 @@ class NodeServer {
 
                     console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) );
 
-                    if (await socket.node.protocol.sendHello(undefined, false) === false){
+                    if (await socket.node.protocol.sendHello(["uuid","ip", "port"], false) === false){
 
                         socket.disconnect();
                         return false;
