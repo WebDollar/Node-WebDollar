@@ -119,6 +119,8 @@ class NodeServer {
 
                     if (Math.random() < 0.1) NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
                     else socket.close();
+                    
+                    return;
                 }
 
                 if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
