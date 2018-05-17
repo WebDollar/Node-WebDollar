@@ -71,7 +71,7 @@ class NodeProtocol {
 
         }
 
-        console.log("RECEIVED HELLO NODE BACK", response.version, response.uuid);
+        console.log("RECEIVED HELLO NODE BACK", response.version);
 
         this.node.protocol.nodeType = response.nodeType;
 
