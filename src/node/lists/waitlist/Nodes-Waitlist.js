@@ -4,7 +4,7 @@ import NodesWaitlistObject from './Nodes-Waitlist-Object';
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import DownloadHelper from "common/utils/helpers/Download-Helper"
+import DownloadManager from "common/utils/helpers/Download-Manager"
 import consts from 'consts/const_global'
 
 const EventEmitter = require('events');
@@ -72,7 +72,7 @@ class NodesWaitlist {
                     if (backedBy === "fallback")
                         sckAddresses.push(sckAddress);
                     else {
-                        let response = await DownloadHelper.downloadFile(sckAddress.getAddress(true, true), 5000);
+                        let response = await DownloadManager.downloadFile(sckAddress.getAddress(true, true), 5000);
 
                         if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL) {
 
