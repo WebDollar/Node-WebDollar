@@ -128,7 +128,7 @@ class NodePropagationProtocol {
 
     _recalculateWaitlistSimple(){
 
-        let number = 20 + Math.floor( Math.random()*15 );
+        let number = 5 + Math.floor( Math.random()*10 );
 
         //some from NodesList
 
