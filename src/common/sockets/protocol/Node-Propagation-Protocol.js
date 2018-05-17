@@ -137,14 +137,14 @@ class NodePropagationProtocol {
                             if(addresses[i].type === type) {
 
                                 let found = false;
-                                for (let j = 0; j < this._newFullNodesWaitList.length; j++)
-                                    if (this._newLightNodesWaitList[j].addr === addresses[i].addr) {
+                                for (let j = 0; j < list.length; j++)
+                                    if (list[j].addr === addresses[i].addr) {
                                         found = true;
                                         break;
                                     }
 
                                 if (!found)
-                                    this._newLightNodesWaitList.push({address: addresses[i], socket: socket});
+                                    list.push({address: addresses[i], socket: socket});
                             }
 
 
