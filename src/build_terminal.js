@@ -16,8 +16,9 @@ Blockchain.createBlockchain("full-node", async ()=>{
 
     Node.NodeClientsService.startService();
 
-}, ()=>{
     Node.NodeServer.startServer();
+
+}, ()=>{
 });
 
 

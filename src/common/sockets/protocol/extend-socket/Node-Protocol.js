@@ -92,6 +92,8 @@ class NodeProtocol {
         let response;
         for (let i=0; i < 3; i++) {
 
+            if (this.connected === false) return false;
+
             response = await this.node.protocol.justSendHello();
 
             if ( typeof response === "object" && response !== null && response.hasOwnProperty("uuid") )

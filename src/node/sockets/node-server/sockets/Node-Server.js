@@ -12,6 +12,7 @@ import NODES_TYPE from "node/lists/types/Nodes-Type";
 import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'
 import Blockchain from "main-blockchain/Blockchain"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 
 const TIME_DISCONNECT_TERMINAL = 15*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
@@ -101,8 +102,7 @@ class NodeServer {
 
                 if (NODES_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
 
-                    if (Math.random() < 0.05)
-                        console.warn("too many terminal connections");
+                    if (Math.random() < 0.05) console.warn("too many terminal connections");
 
                     NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
                     return;
@@ -110,11 +110,17 @@ class NodeServer {
 
                 if (NODES_TYPE.NODE_WEB_PEER === nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
 
-                    if (Math.random() < 0.05)
-                        console.warn("too many browser connections");
+                    if (Math.random() < 0.05) console.warn("too many browser connections");
 
                     NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
+                    return;
+                }
 
+                if (NODES_TYPE.NODE_WEB_PEER === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
+
+                    if (Math.random() < 0.05) console.warn("browser connections not ready");
+
+                    NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
                     return;
                 }
 
