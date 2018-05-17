@@ -87,7 +87,6 @@ class NodeProtocol {
 
 
         // Waiting for Protocol Confirmation
-        console.log("sendHello");
 
         let response;
         for (let i=0; i < 3; i++) {

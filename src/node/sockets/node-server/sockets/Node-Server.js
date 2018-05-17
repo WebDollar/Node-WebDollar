@@ -107,24 +107,18 @@ class NodeServer {
 
                     if (Math.random() < 0.05) console.warn("too many terminal connections");
 
-                    NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
+                    if (Math.random() < 0.1) NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
+                    else socket.close();
+
                     return;
                 }
 
-                if (NODES_TYPE.NODE_WEB_PEER === nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
+                if (NODES_TYPE.NODE_WEB_PEER === nodeType && (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)) {
 
                     if (Math.random() < 0.05) console.warn("too many browser connections");
 
-                    NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
-                    return;
-                }
-
-                if (NODES_TYPE.NODE_WEB_PEER === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
-
-                    if (Math.random() < 0.05) console.warn("browser connections not ready");
-
-                    NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
-                    return;
+                    if (Math.random() < 0.1) NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
+                    else socket.close();
                 }
 
                 if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
@@ -156,7 +150,12 @@ class NodeServer {
 
                     console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) );
 
-                    await socket.node.protocol.sendHello(false);
+                    if (await socket.node.protocol.sendHello(false) === false){
+
+                        socket.disconnect();
+                        return false;
+
+                    }
 
                     socket.node.protocol.nodeType = nodeType;
                     socket.node.protocol.nodeUTC = nodeUTC;
@@ -221,8 +220,6 @@ class NodeServer {
             }
 
         });
-
-        console.log('Socket Server Initialized ' + socket.node.sckAddress.getAddress(true));
 
 
         socket.node.protocol.propagation.initializePropagation();
