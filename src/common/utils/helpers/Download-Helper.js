@@ -1,4 +1,5 @@
 const axios = require('axios');
+import consts from 'consts/const_global'
 
 class DownloadHelper{
 
@@ -17,7 +18,9 @@ class DownloadHelper{
                 try {
                     data = JSON.parse(data);
                 } catch (exception){
-                    console.error("Error processing downloadFile data", data, exception);
+
+                    if (consts.DEBUG)
+                        console.error("Error processing downloadFile data", data, exception);
                 }
             }
 
