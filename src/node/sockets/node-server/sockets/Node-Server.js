@@ -90,6 +90,9 @@ class NodeServer {
                 let nodeDomain = socket.request._query["domain"];
                 if ( nodeDomain === undefined) nodeDomain = "";
 
+                if (nodeDomain.indexOf("my-ip:")>=0)
+                    nodeDomain = nodeDomain.replace("my-ip", socket.request.connection.remoteAddress);
+
                 let nodeUTC = socket.request._query["UTC"];
                 if (typeof nodeUTC === "string") nodeUTC = parseInt(nodeUTC);
 
