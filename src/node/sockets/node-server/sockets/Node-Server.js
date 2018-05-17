@@ -134,18 +134,14 @@ class NodeServer {
                         return;
                     }
 
-                    console.log("nodeDomain2", nodeDomain);
-
                     let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
 
-                    console.log("nodeDomain3", waitlist, waitlist.waitlist.isFallback);
 
-                    if (waitlist.waitlist === null || !waitlist.isFallback) {
+                    if (waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
                         socket.disconnect();
                         return;
                     }
 
-                    console.log("nodeDomain4", 'success');
                 }
 
 
