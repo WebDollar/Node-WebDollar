@@ -1,5 +1,5 @@
-import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
-import NodesList from 'node/lists/nodes-list'
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 
@@ -8,6 +8,10 @@ class NodePropagationProtocol {
 
     constructor(){
 
+        //waitlist to be propagated to termination
+        this._waitlistSimple = [];
+        this._waitlistSimpleSSL = [];
+
         this._newFullNodesWaitList = [];
         this._newLightNodesWaitList = [];
 
@@ -15,17 +19,7 @@ class NodePropagationProtocol {
 
     }
 
-    initializePropagationProtocol(){
-
-        NodesList.emitter.once("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
-        NodesList.emitter.once("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected( nodeListObject) });
-
-        NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
-        NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
-
-    }
-
-    _processList(list){
+    async _processList(list){
 
         for (let i=0; i<list.length; i++) {
 
@@ -36,7 +30,7 @@ class NodePropagationProtocol {
                 let index = 0;
                 let newNode = list[index];
 
-                waitlist = NodesWaitlist.addNewNodeToWaitlist(newNode.address.addr, newNode.address.port, newNode.address.type, newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
+                waitlist = await NodesWaitlist.addNewNodeToWaitlist( newNode.address.addr, undefined, newNode.address.type,  newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
 
                 list.splice(index, 1);
 
@@ -47,13 +41,26 @@ class NodePropagationProtocol {
 
     }
 
-    _processNewWaitlistInterval(){
+    async _processNewWaitlistInterval(){
 
-        this._processList(this._newFullNodesWaitList);
-        this._processList(this._newLightNodesWaitList);
+        await this._processList(this._newFullNodesWaitList);
+        await this._processList(this._newLightNodesWaitList);
 
 
-        setTimeout( this._processNewWaitlistInterval.bind(this), 2000 + Math.floor( Math.random() * 200 ) );
+        setTimeout( async ()=>{ await this._processNewWaitlistInterval() } , 2000 + Math.floor( Math.random() * 200 ) );
+
+    }
+
+
+    initializePropagationProtocol(){
+
+        NodesList.emitter.once("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
+        NodesList.emitter.once("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected( nodeListObject) });
+
+        NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
+        NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
+
+        //setInterval( this._recalculateWaitlistSimple.bind(this), 15*1000)
 
     }
 
@@ -62,10 +69,11 @@ class NodePropagationProtocol {
         this.initializeNodesPropagation(socket);
 
         setTimeout( ()=>{
+
             socket.node.sendRequest("propagation/request-all-wait-list/full-nodes");
             socket.node.sendRequest("propagation/request-all-wait-list/light-nodes");
-        },  1000);
 
+        },  2000+Math.floor( Math.random()*5000));
 
     }
 
@@ -76,7 +84,6 @@ class NodePropagationProtocol {
             try{
 
                 let list = [];
-                for (let i=0; i<NodesList.nodes.length; i++) list.push(NodesList.nodes[i].toJSON());
                 for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++) list.push(NodesWaitlist.waitListFullNodes[i].toJSON());
 
                 socket.node.sendRequest("propagation/nodes", {"op": "new-full-nodes", addresses: list });
@@ -91,7 +98,6 @@ class NodePropagationProtocol {
             try{
 
                 let list = [];
-                for (let i=0; i<NodesList.nodes.length; i++) list.push(NodesList.nodes[i].toJSON());
                 for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++) list.push(NodesWaitlist.waitListLightNodes[i].toJSON());
 
                 socket.node.sendRequest("propagation/nodes", {"op": "new-light-nodes", addresses: list });
@@ -101,7 +107,7 @@ class NodePropagationProtocol {
 
         });
 
-        socket.node.on("propagation/nodes", response => {
+        socket.node.on("propagation/nodes", async (response) => {
 
             try {
 
@@ -111,12 +117,14 @@ class NodePropagationProtocol {
                 if (!Array.isArray(addresses)) throw {message: "addresses is not an array"};
 
                 let op = response.op || '';
+
                 switch (op) {
 
                     case "new-full-nodes":
                     case "new-light-nodes":
 
                         let list, type;
+
                         if(op === "new-full-nodes") {
                             list = this._newFullNodesWaitList;
                             type = NODES_TYPE.NODE_TERMINAL
@@ -126,32 +134,31 @@ class NodePropagationProtocol {
                         }
 
                         for (let i = 0; i < addresses.length; i++)
-                            if(addresses[i].type === type){
+                            if(addresses[i].type === type) {
 
                                 let found = false;
-                                for (let j=0;  j<this._newFullNodesWaitList.length; j++)
-                                    if (this._newLightNodesWaitList[j].addr === addresses[i].addr) {
+                                for (let j = 0; j < list.length; j++)
+                                    if (list[j].addr === addresses[i].addr) {
                                         found = true;
                                         break;
                                     }
 
                                 if (!found)
-                                    this._newLightNodesWaitList.push({address: addresses[i], socket: socket});
+                                    list.push({address: addresses[i], socket: socket});
                             }
 
-                        break;
-
-                    case "deleted-light-nodes":
-
-                        for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.removedWaitListElement( addresses[i].addr, addresses[i].port, socket, NODES_TYPE.NODE_WEB_PEER );
 
                         break;
 
-                    case "deleted-full-nodes":
+                    case "disconnected-light-nodes":
+                    case "disconnected-full-nodes":
 
-                        for (let i = 0; i < addresses.length; i++)
-                            NodesWaitlist.removedWaitListElement( addresses[i].addr, addresses[i].port, socket, NODES_TYPE.NODE_TERMINAL );
+                        for (let i = 0; i < addresses.length; i++) {
+
+                            if (NodesWaitlist._findNodesWaitlist(addresses[i].addr, undefined, addresses[i].type) !== -1)
+                                await NodesWaitlist.addNewNodeToWaitlist(addresses[i].addr, undefined, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket);
+
+                        }
 
                         break;
 
@@ -177,19 +184,72 @@ class NodePropagationProtocol {
 
     _nodeDisconnected(nodeWaitListObject){
 
-        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "deleted-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "deleted-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
-
-        this._deleteWaitlist(nodeWaitListObject.socket, this._newLightNodesWaitList);
-        this._deleteWaitlist(nodeWaitListObject.socket, this._newFullNodesWaitList);
+        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
 
     }
 
-    _deleteWaitlist(socket, list){
 
-        for (let i=list.length; i>=0; i--)
-            if (list[i].socket === socket )
-                list.splice(i,1);
+    _recalculateWaitlistSimple(){
+
+        let number = 5 + Math.floor( Math.random()*10 );
+
+        //some from NodesList
+
+        let generateWailistRandomList = (nodes, list, onlySSL = false )=>{
+
+            if (nodes.length === 0) return;
+
+            let index = 0;
+            while ( index < number && index < nodes.length ){
+
+                let node = nodes[index];
+
+                let json = node.toJSON();
+
+                let found  = false;
+                for (let i=0; i < list.length; i++ )
+                    if (list[i].addr === json.addr){
+                        found = true;
+                        break;
+                    }
+
+                if (found === false && !node.isFallback && (!onlySSL || onlySSL && node.sckAddresses[0].SSL))
+                    list.push(json);
+
+                index++;
+            }
+
+        };
+
+
+        this._waitlistSimple = [];
+        generateWailistRandomList( NodesWaitlist.waitListFullNodes, this._waitlistSimple);
+
+        this._waitlistSimpleSSL = [];
+        generateWailistRandomList( NodesWaitlist.waitListFullNodes, this._waitlistSimpleSSL, true);
+
+    }
+
+    propagateWaitlistSimple(socket, disconnectSocket = true){
+
+        if (socket === undefined || socket.node === undefined ) return;
+
+        if (socket.emit === undefined) console.warn("socket.emit is not supported");
+
+        let list = this._waitlistSimple;
+
+        if (socket.node.protocol.nodeType === NODES_TYPE.NODE_WEB_PEER) //let's send only SSL
+            list = this._waitlistSimpleSSL;
+
+        socket.emit( "propagation/nodes", { op: "new-full-nodes", addresses: list } );
+
+        if (disconnectSocket){
+            setTimeout(()=>{
+                socket.disconnect();
+            }, 3000);
+        }
+
     }
 
 }

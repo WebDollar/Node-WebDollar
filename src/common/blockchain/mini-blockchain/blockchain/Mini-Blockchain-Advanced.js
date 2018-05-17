@@ -28,6 +28,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             while (this.lightAccountantTreeSerializations[index] !== undefined){
                 delete this.lightAccountantTreeSerializations[index];
+                this.lightAccountantTreeSerializations[index] = undefined;
                 index--;
             }
 
@@ -65,7 +66,10 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         try {
 
-            global.MINIBLOCKCHAIN_LIGHT_SAVED = false;
+            global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
+
+            if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
+                throw {message: "couldn't sae the blockchain"};
 
             if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) {
 
@@ -76,16 +80,13 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                     throw {message: "saveMiniAccountant couldn't be saved"};
             }
 
-            if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
-                throw {message: "couldn't sae the blockchain"};
-
         } catch (exception){
             console.error("Couldn't save MiniBlockchain", exception);
-            global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
+            global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
             return false;
         }
 
-        global.MINIBLOCKCHAIN_LIGHT_SAVED = true;
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
         return true;
 
     }
@@ -121,8 +122,13 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         } catch (exception){
 
-            if (exception === "load blockchain simple")
-                return await this.inheritBlockchain.prototype.loadBlockchain.call(this);
+            if (exception === "load blockchain simple") {
+                let answer = await this.inheritBlockchain.prototype.loadBlockchain.call(this);
+
+                if (answer)
+                    await this.saveBlockchain(this.blocks.length, this.blocks.length);
+
+            }
         }
 
         return false;

@@ -3,14 +3,16 @@ import * as io from 'socket.io-client';
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import Blockchain from "main-blockchain/Blockchain"
 
-let NodeExpress;
+let NodeExpress, NodeServer;
+
 if (!process.env.BROWSER) {
     NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
 }
 
 class NodeClient {
@@ -23,7 +25,13 @@ class NodeClient {
 
     }
 
-    connectTo(address, port, level){
+    connectToWaitlist(waitlist, index){
+
+        return this.connectTo( waitlist.sckAddresses[index], undefined, waitlist.level+1, waitlist.sckAddresses[index].SSL, waitlist )
+
+    }
+
+    connectTo(address, port, level, SSL, waitlist){
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
@@ -33,7 +41,7 @@ class NodeClient {
             return false;
         }
 
-        address = sckAddress.getAddress(false);
+        address = sckAddress.getAddress(true, true);
         port = sckAddress.port;
 
         return new Promise( (resolve) => {
@@ -47,9 +55,12 @@ class NodeClient {
                 }
 
                 // in case the port is not included
-                if (address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
 
-                if (address.indexOf("http" + (consts.SETTINGS.NODE.SSL ? 's' : '') +"://") === -1 )  address = "http"+ (consts.SETTINGS.NODE.SSL ? 's' : '') +"://"+address;
+                if (port !== undefined && address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
+
+                //it is required in browser to use SSL
+                if (process.env.BROWSER && consts.SETTINGS.NODE.SSL )
+                    SSL = true;
 
                 console.log("connecting... to:                ", address);
 
@@ -62,18 +73,18 @@ class NodeClient {
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
 
-                        connection_timeout : 20000,
-                        timeout: 20000,
+                        connection_timeout : process.env.BROWSER ? 15000 : 50000,
+                        timeout: process.env.BROWSER ? 15000 : 50000,
 
-                        secure: consts.SETTINGS.NODE.SSL, //https
+                        secure: SSL, //https
 
                         query:{
                             msg: "HelloNode",
                             version: consts.SETTINGS.NODE.VERSION,
                             uuid: consts.SETTINGS.UUID,
                             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
-                            SSL: process.env.BROWSER ? 1 : NodeExpress.SSL & 1,
                             UTC: Blockchain.blockchain.timestamp.timeUTC,
+                            domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
                         },
 
                     });
@@ -86,11 +97,11 @@ class NodeClient {
                 this.socket = socket;
 
 
-                socket.once("connect", ( response ) =>{
+                socket.once("connect", async ( response ) =>{
 
                     //Connection Established
 
-                    SocketExtend.extendSocket( socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
+                    SocketExtend.extendSocket( socket, socket.io.opts.hostname || sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
 
                     console.warn("Client connected to " + socket.node.sckAddress.address);
 
@@ -99,20 +110,19 @@ class NodeClient {
                         socket.disconnect();
                         resolve(false);
 
-                    }, 10*1000);
+                    }, 20*1000);
 
-                    socket.once("HelloNode",(response)=>{
 
-                        let answer = socket.node.protocol.processHello(response, ["ip","uuid"] );
-                        clearTimeout(timeout);
+                    let answer = await socket.node.protocol.sendHello(["ip","uuid"]);
 
-                        if (answer)
-                            this.initializeSocket(socket, ["ip", "uuid"]);
-                        else
-                            socket.disconnect();
+                    clearTimeout(timeout);
 
-                        resolve(answer);
-                    });
+                    if (answer)
+                        await this.initializeSocket(socket, ["ip", "uuid"], waitlist);
+                    else
+                        socket.disconnect();
+
+                    resolve(answer);
 
                 });
 
@@ -146,15 +156,20 @@ class NodeClient {
 
         });
 
+
+
     }
 
-    initializeSocket(validationDoubleConnectionsTypes){
+    async initializeSocket(validationDoubleConnectionsTypes, waitlist){
 
         //it is not unique... then I have to disconnect
 
-        if (NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
+
+        waitlist.socket = this.socket;
+        waitlist.connected = true;
 
         console.log('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true));
 

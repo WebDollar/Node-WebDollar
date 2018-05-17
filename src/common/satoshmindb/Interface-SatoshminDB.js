@@ -239,6 +239,7 @@ class InterfaceSatoshminDB {
                 if (exception.status === 500)
                     StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
+                clearTimeout(timeoutInterval);
                 resolve(null);
             }
 

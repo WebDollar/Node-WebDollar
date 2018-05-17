@@ -1,6 +1,6 @@
 import consts from 'consts/const_global'
 
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 
 import SignalingServerRoomList from './signaling-server-room/signaling-server-room-list'
 import SignalingServerRoomConnectionObject from './signaling-server-room/signaling-server-room-connection-object'

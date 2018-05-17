@@ -1,8 +1,10 @@
 const axios = require('axios');
+import consts from 'consts/const_global'
 
 class DownloadHelper{
 
-    static async downloadFile(address, timeout){
+    async downloadFile(address, timeout){
+
         try{
             let axiosInstance = axios.create({
                 timeout: timeout,
@@ -17,7 +19,11 @@ class DownloadHelper{
                 try {
                     data = JSON.parse(data);
                 } catch (exception){
-                    console.error("Error processing downloadFile data", data, exception);
+
+                    if (consts.DEBUG)
+                        console.error("Error processing downloadFile data", data, exception);
+
+                    return null;
                 }
             }
 
@@ -26,12 +32,15 @@ class DownloadHelper{
             return null;
         }
         catch(exception){
-            console.error("ERROR downloading list: ", address );
+
+            if (consts.DEBUG)
+                console.error("ERROR downloading list: ", address );
+
             return null;
         }
     }
 
-    static async downloadMultipleFiles(addresses, timeout){
+    async downloadMultipleFiles(addresses, timeout){
 
         if (!Array.isArray(addresses))
             addresses = [addresses];
@@ -72,4 +81,4 @@ class DownloadHelper{
 
 }
 
-export default DownloadHelper
+export default new DownloadHelper();

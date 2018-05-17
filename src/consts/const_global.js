@@ -245,13 +245,18 @@ consts.SETTINGS = {
             TERMINAL:{
 
                 CLIENT: {
-                    MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
-                    MAXIMUM_CONNECTIONS_IN_TERMINAL_NO_SSL: 2,
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST: 40,
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_SSL: 10,
+
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK: 2,
+                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK_SSL: 10,
                 },
 
                 SERVER: {
                     MAXIMUM_CONNECTIONS_FROM_BROWSER: 850,
-                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 150,
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 200,
+
+                    TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 100,
                 },
 
             },
@@ -259,7 +264,8 @@ consts.SETTINGS = {
             BROWSER:{
 
                 CLIENT: {
-                    MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
+                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST: 2,
+                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK: 1,
                 },
 
                 SERVER: {},
@@ -268,6 +274,15 @@ consts.SETTINGS = {
                     MAXIMUM_CONNECTIONS: 13,
                 },
 
+            },
+
+            COMPUTED: {
+                CLIENT:{
+
+                },
+                SERVER:{
+
+                },
             },
 
             FORKS:{
@@ -293,8 +308,6 @@ consts.SETTINGS = {
 
 };
 
-
-
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER = process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER;
 
@@ -309,13 +322,13 @@ if ( consts.DEBUG === true ){
 
     consts.SETTINGS.NODE.VERSION += "3";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "3";
-    consts.SETTINGS.NODE.SSL = false;
+    consts.SETTINGS.NODE.SSL = true;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
     consts.SETTINGS.NODE.PORT = 9095;
 
     FallBackNodesList.nodes = [{
-        "addr": ["webdollar.ddns.net:9095"],
+        "addr": ["https://webdollar-vps2.ddns.net:9095"],
     }];
 
 

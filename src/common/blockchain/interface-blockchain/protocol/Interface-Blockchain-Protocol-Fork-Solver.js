@@ -26,8 +26,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let mid = Math.trunc((left + right) / 2);
 
-            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
             answer = await socket.node.sendRequestWaitOnce("head/hash", mid, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
+
+            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
 
             if (left < 0 || answer === null || !Buffer.isBuffer(answer.hash) )
                 return {position: null, header: answer };
@@ -95,7 +96,7 @@ class InterfaceBlockchainProtocolForkSolver{
      */
 
     //TODO it will not update positions
-    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHeader, forkProof ){
+    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof ){
 
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.blocks.length;
@@ -117,7 +118,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 return {result: true, fork: forkFound};
             }
 
-            forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHeader);
+            forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHash);
             if ( forkFound !== null ) {
 
                 if (Math.random() < 0.001)
@@ -143,7 +144,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHeader], false );
+            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHash], false );
 
             // in case it was you solved previously && there is something in the blockchain
 
@@ -178,8 +179,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     binarySearchResult.position = 0;
 
                 //maximum blocks to download
-                if (!this.blockchain.agent.light)
-                    forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
+                forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
 
                 fork.forkStartingHeight = binarySearchResult.position;
                 fork.forkStartingHeightDownloading  = binarySearchResult.position;

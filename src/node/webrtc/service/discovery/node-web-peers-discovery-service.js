@@ -1,4 +1,4 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import consts from "consts/const_global";
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 

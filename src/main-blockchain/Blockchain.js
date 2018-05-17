@@ -4,9 +4,9 @@ import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining'
 import MainBlockchainAgent from 'main-blockchain/agents/Main-Blockchain-Agent';
 import MainBlockchainBalances from "main-blockchain/balances/Main-Blockchain-Balances";
 import ValidationsUtils from "common/utils/validation/Validations-Utils";
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 import StatusEvents from "common/events/Status-Events";
-import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist';
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist';
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import NODES_TYPE from "../node/lists/types/Nodes-Type";
 

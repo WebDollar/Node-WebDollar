@@ -186,9 +186,10 @@ class InterfaceBlockchainTransaction{
     }
 
 
-    isTransactionOK(){
+    isTransactionOK(avoidValidatingSignature = false){
 
-        this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
+        if (!avoidValidatingSignature)
+            this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
 
         try {
             let blockValidationType = {
@@ -223,6 +224,10 @@ class InterfaceBlockchainTransaction{
         ];
 
         return Buffer.concat (array);
+    }
+
+    serializeTransactionId(){
+        return this.txId;
     }
 
     deserializeTransaction(buffer, offset){

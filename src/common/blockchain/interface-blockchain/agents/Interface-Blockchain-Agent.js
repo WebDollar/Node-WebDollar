@@ -1,12 +1,19 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain"
-const EventEmitter = require('events');
 import AGENT_STATUS from "./Agent-Status";
 import consts from 'consts/const_global'
+import InterfaceBlockchainAgentBasic from "./Interface-Blockchain-Agent-Basic"
+import NODES_TYPE from "../../../../node/lists/types/Nodes-Type";
+
+let NodeExpress;
+
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+}
 
 /**
  *
@@ -16,11 +23,11 @@ import consts from 'consts/const_global'
  * An Agent is a class that force your machine to synchronize to the network based on the protocol you use it
  */
 
-class InterfaceBlockchainAgent{
+class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
     constructor( blockchain ){
 
-        this.blockchain = blockchain;
+        super(blockchain);
 
         if (VersionCheckerHelper.detectMobileAndTablet())
             this.AGENT_TIME_OUT = 140*1000;
@@ -32,28 +39,10 @@ class InterfaceBlockchainAgent{
         this._startAgentTimeOut = undefined;
         this._startAgentInterval = undefined;
 
-        this._status = AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED;
-
-        this._eventEmitter = new EventEmitter();
-        this._eventEmitter.setMaxListeners(100);
-
         this._newProtocol();
 
-        this._eventEmitter.on("agent/synchronized",(data)=>{
-
-            if (data.result)
-                console.warn("Synchronization done");
-            else
-                console.warn( "Synchronization done FAILED");
-
-        });
-
     }
 
-    setBlockchain(blockchain){
-        this.blockchain = blockchain;
-        this.protocol.setBlockchain(blockchain);
-    }
 
     newFork(){
         let fork = new InterfaceBlockchainFork();
@@ -96,6 +85,21 @@ class InterfaceBlockchainAgent{
             }
 
         });
+
+
+        if (!this.light)
+            NodesList.emitter.on("nodes-list/connected", async (result) => {
+
+                if (!NodeExpress.amIFallback() )
+                    if ( NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK){
+
+                        this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
+                        NodesList.disconnectFromFallbacks();
+
+                    }
+
+            });
+
     }
 
     async startAgent(firsTime, synchronizeComplete=false){
@@ -111,7 +115,7 @@ class InterfaceBlockchainAgent{
     _agentConfirmationIntervalFunction(){
 
         if (this.blockchain.blocks.length <= 0) return false;
-        if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0 && !consts.DEBUG  ) return false;
+        if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0   ) return false;
 
 
         if (process.env.BROWSER)
@@ -119,25 +123,25 @@ class InterfaceBlockchainAgent{
         else { //terminal
 
             //let's check if we downloaded blocks in the last 2 minutes
-            let set = false;
+            let set = true;
 
             if (this.lastTimeChecked !== undefined ){
 
-                if ( (new Date().getTime() -  this.lastTimeChecked.date > 4*60*1000) || consts.DEBUG ){
+                if ( new Date().getTime() -  this.lastTimeChecked.date > 4*60*1000 ){
 
                     let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
 
-                    if (  (NodesList.nodes.length > 0 && diffBlocks > 1 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD) || consts.DEBUG ){
+                    if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
+                          NodesList.nodes.length >= consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK / 2) {
 
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
                     }
 
-                    set = true;
-                }
 
-            }  else
-                set = true;
+                } else set = false;
+
+            }
 
 
             if (set)

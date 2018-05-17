@@ -150,8 +150,13 @@ class InterfaceBlockchainFork {
             return BlockchainGenesis.difficultyTarget; // based on genesis block
         else if ( forkHeight === 0)
             return this.blockchain.getDifficultyTarget(height);
-        else if ( forkHeight > 0)
+        else if ( forkHeight > 0) {
+
+            if ( forkHeight-1 >= this.forkBlocks.length )
+                console.warn("getForkDifficultyTarget FAILED", forkHeight);
+
             return this.forkBlocks[forkHeight - 1].difficultyTarget; // just the fork
+        }
         else
             return this.blockchain.getDifficultyTarget(height) // the blockchain
     }

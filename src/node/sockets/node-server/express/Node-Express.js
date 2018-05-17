@@ -1,5 +1,6 @@
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
 const https = require('https');
 const http = require('http');
@@ -10,7 +11,7 @@ const fs = require('fs')
 import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain"
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 
 class NodeExpress{
 
@@ -18,10 +19,23 @@ class NodeExpress{
 
         this.loaded = false;
         this.app = undefined;
-        this.https = undefined;
 
         this.SSL = false;
+        this.port = 0;
+        this.domain = '';
 
+    }
+
+    _extractDomain( fileName ){
+
+        const x509 = require('x509');
+        var subject = x509.getSubject( fileName );
+
+        let domain = subject.commonName;
+
+        domain = domain.replace( "*.", "" );
+
+        return domain;
     }
 
     startExpress(){
@@ -45,7 +59,7 @@ class NodeExpress{
 
             let options = {};
 
-            let port = process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
+            this.port = process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
 
             this.loaded = true;
 
@@ -53,34 +67,65 @@ class NodeExpress{
 
                 if (!consts.SETTINGS.NODE.SSL) throw {message: "no ssl"};
 
+                this.domain = this._extractDomain('./certificates/certificate.crt');
+                console.info("========================================");
+                console.info("SSL certificate found for ", this.domain);
+
                 options.key = fs.readFileSync('./certificates/private.key', 'utf8');
                 options.cert = fs.readFileSync('./certificates/certificate.crt', 'utf8');
                 options.ca = fs.readFileSync('./certificates/ca_bundle.crt', 'utf8');
 
-                this.server = https.createServer(options, this.app).listen(port, ()=>{
+                this.server = https.createServer(options, this.app).listen( this.port, ()=>{
 
                     this.SSL = true;
 
+                    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_SSL;
+                    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK_SSL;
+
                     this._initializeRouter();
 
-                    console.log("HTTPS Express was opened on port "+port);
+                    console.info("========================================");
+                    console.info("HTTPS Express was opened on port "+ this.port);
+                    console.info("========================================");
+
                     resolve(true);
+
+                }).on('error',  (err) => {
+
+                    console.error("Error Creating HTTPS Express Server");
+                    console.error(err);
+
+                    throw err;
 
                 });
 
             } catch (exception){
 
                 //cloudflare generates its own SSL certificate
-                this.server = http.createServer(this.app).listen(port, ()=>{
+                this.server = http.createServer(this.app).listen(this.port, () => {
 
-                    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_NO_SSL;
+                    this.domain = 'my-ip';
 
-                    console.log(`server started at localhost:${port}`);
+                    console.info("========================================");
+                    console.info(`Express started at localhost: ${this.port}`);
+                    console.info("========================================");
+
+                    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL + consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER;
 
                     this._initializeRouter();
 
                     resolve(true);
-                })
+
+                }).on('error', (err) => {
+
+                    this.domain = '';
+
+                    console.error("Error Creating Express Server");
+                    console.error(err);
+                    
+                    resolve(false);
+
+                });
 
 
             }
@@ -96,7 +141,7 @@ class NodeExpress{
 
             res.json({
 
-                protocol: 'WebDollar',
+                protocol: consts.SETTINGS.NODE.PROTOCOL,
                 version: consts.SETTINGS.NODE.VERSION,
                 blocks: {
                     length: Blockchain.blockchain.blocks.length,
@@ -172,6 +217,16 @@ class NodeExpress{
             res.json( { ping: "pong" });
         });
 
+
+    }
+
+    amIFallback(){
+
+        for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++)
+            if (NodesWaitlist.waitListFullNodes[i].isFallback && NodesWaitlist.waitListFullNodes[i].sckAddresses[0].address === this.domain)
+                return true;
+
+        return false;
 
     }
 

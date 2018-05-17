@@ -279,6 +279,8 @@ class InterfaceBlockchain {
         //save the number of blocks
         let result = true;
 
+        global.INTERFACE_BLOCKCHAIN_SAVED = false;
+
         if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true)
             console.error("Error saving the blocks.length");
         else {
@@ -287,15 +289,25 @@ class InterfaceBlockchain {
             if (endingHeight === undefined) endingHeight = this.blocks.length;
 
             console.warn("Saving Blockchain. Starting from ", startingHeight, endingHeight);
+
             for (let i = startingHeight; i < endingHeight; i++ )
 
-                if (this.blocks[i] !== undefined && this.blocks[i] !== null) {
+                if (this.blocks[i] !== undefined && this.blocks[i] !== null)
 
-                    if (! ( await this.blocks[i].saveBlock()) )
-                        break
-                }
+                    try {
+
+                        if (!( await this.blocks[i].saveBlock()))
+                            throw {message: "couldn't save block", block: i}
+
+                    } catch (exception){
+                        console.error(exception);
+                    }
+
+
             console.warn("Successfully saving blocks ", startingHeight, endingHeight);
         }
+
+        global.INTERFACE_BLOCKCHAIN_SAVED = true;
 
         return result;
     }
@@ -371,7 +383,8 @@ class InterfaceBlockchain {
                 indexStartProcessingOffset = numBlocks - indexStartProcessingOffset;
 
                 console.warn("===========================================================");
-                console.warn("BLocks Processing starts at: ", indexStartProcessingOffset);
+                console.warn("Fast Blockchain Loading");
+                console.warn("Blocks Processing starts at: ", indexStartProcessingOffset);
                 console.warn("===========================================================");
 
             }
@@ -400,11 +413,9 @@ class InterfaceBlockchain {
                 if ( this.blocks.length < 10)
                     return false;
 
-
-                if (indexStartProcessingOffset !== undefined && index < indexStartProcessingOffset){
+                if (indexStartProcessingOffset !== undefined){
                     return false;
                 }
-
 
             }
 

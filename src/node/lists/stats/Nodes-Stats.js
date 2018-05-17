@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
-import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import Blockchain from "main-blockchain/Blockchain"
 
@@ -34,17 +34,39 @@ class NodesStats {
 
 
         let string1 = "";
-        let clients = NodesList.getNodes(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
+        let clients = NodesList.getNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
         for (let i=0; i<clients.length; i++)
             string1 += '('+clients[i].socket.node.sckAddress.toString() + ')   ';
 
         let string2 = "";
-        let server = NodesList.getNodes( CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET );
+        let server = NodesList.getNodesByConnectionType( CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET );
         for (let i=0; i<server.length; i++)
             string2 += '(' + server[i].socket.node.sckAddress.toString() + ')   ';
 
         console.log("clients: ",string1);
         console.log("server: ",string2);
+
+
+        // let waitlist1 = [];
+        // for ( let i=0; i<NodesWaitlist.waitListFullNodes.length; i++ )
+        //     if ( ! NodesWaitlist.waitListFullNodes[i].isFallback) {
+        //         let obj = NodesWaitlist.waitListFullNodes[i].toJSON();
+        //         obj.score = NodesWaitlist.waitListFullNodes[i].sortingScore();
+        //         obj.connected = NodesWaitlist.waitListFullNodes[i].connected;
+        //         waitlist1.push(obj);
+        //     }
+        //
+        // let waitlist2 = [];
+        // for ( let i=0; i<NodesWaitlist.waitListLightNodes.length; i++ )
+        //     if ( ! NodesWaitlist.waitListLightNodes[i].isFallback) {
+        //         let obj = NodesWaitlist.waitListLightNodes[i].toJSON();
+        //         obj.score = NodesWaitlist.waitListLightNodes[i].sortingScore();
+        //         obj.connected = NodesWaitlist.waitListLightNodes[i].connected;
+        //         waitlist2.push(obj);
+        //     }
+
+        console.log("waitlist full node ", NodesWaitlist.waitListFullNodes.length);
+        console.log("waitlist full node ", NodesWaitlist.waitListLightNodes.length);
 
     }
 

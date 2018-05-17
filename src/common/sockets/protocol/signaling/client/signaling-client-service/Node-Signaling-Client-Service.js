@@ -1,6 +1,6 @@
 import consts from 'consts/const_global'
 import SignalingClientList from "../signaling-client-list/signaling-client-list"
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 
 class NodeSignalingClientService {
 

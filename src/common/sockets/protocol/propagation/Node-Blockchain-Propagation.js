@@ -1,6 +1,6 @@
 import Blockchain from "main-blockchain/Blockchain"
 import consts from 'consts/const_global'
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 
 class NodeBlockchainPropagation{
 
