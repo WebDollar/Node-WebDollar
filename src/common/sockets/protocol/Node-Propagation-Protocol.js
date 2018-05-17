@@ -60,7 +60,7 @@ class NodePropagationProtocol {
         NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
         NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
 
-        setInterval( this._recalculateWaitlistSimple.bind(this), 15*1000)
+        //setInterval( this._recalculateWaitlistSimple.bind(this), 15*1000)
 
     }
 

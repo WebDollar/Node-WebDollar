@@ -192,18 +192,18 @@ class NodesWaitlist {
             max = this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS;
         }
 
-        //sorting by formula connectedBy
-
-        for (let i=list.length-1; i>=0; i--)
-            if (  ( list[i].isFallback && list[i].errorTrials > this.MAX_ERROR_TRIALS_FALLBACK ) ||
-                  ( list[i].errorTrials > this.MAX_ERROR_TRIALS_SIMPLE)) {
-
-                this.emitter.emit("waitlist/delete-node", list[i]);
-                list.splice(i, 1);
-
-            }
-
-        this._sortList(list);
+        // //sorting by formula connectedBy
+        //
+        // for (let i=list.length-1; i>=0; i--)
+        //     if (  ( list[i].isFallback && list[i].errorTrials > this.MAX_ERROR_TRIALS_FALLBACK ) ||
+        //           ( list[i].errorTrials > this.MAX_ERROR_TRIALS_SIMPLE)) {
+        //
+        //         this.emitter.emit("waitlist/delete-node", list[i]);
+        //         list.splice(i, 1);
+        //
+        //     }
+        //
+        // this._sortList(list);
 
         //make sure the list has a maximum length
         if (list.length > max){

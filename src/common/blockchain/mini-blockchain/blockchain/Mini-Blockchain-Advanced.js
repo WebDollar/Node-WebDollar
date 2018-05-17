@@ -28,6 +28,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             while (this.lightAccountantTreeSerializations[index] !== undefined){
                 delete this.lightAccountantTreeSerializations[index];
+                this.lightAccountantTreeSerializations[index] = undefined;
                 index--;
             }
 
