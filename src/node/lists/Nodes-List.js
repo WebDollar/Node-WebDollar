@@ -87,7 +87,7 @@ class NodesList {
 
             this.emitter.emit("nodes-list/connected", object);
 
-            if (socket.node.protocol.nodeDomain !== '' && socket.node.type === NODES_TYPE.NODE_TERMINAL) {
+            if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && socket.node.type === NODES_TYPE.NODE_TERMINAL) {
 
                 if (socket.node.protocol.nodeDomain.indexOf("my-ip:")>=0)
                     socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("my-ip", socket.node.sckAddress.address);
