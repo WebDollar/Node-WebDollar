@@ -23,7 +23,7 @@ class NodesWaitlist {
         this.waitListFullNodes = [];
         this.waitListLightNodes = [];
 
-        this.MAX_FULLNODE_WAITLIST_CONNECTIONS = 1500;
+        this.MAX_FULLNODE_WAITLIST_CONNECTIONS = 500;
         this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS = 500;
 
         this.MAX_ERROR_TRIALS_FALLBACK = 100;
@@ -177,6 +177,8 @@ class NodesWaitlist {
      */
     _deleteUselessWaitlist(listType){
 
+        console.warn("_deleteUselessWaitlist started");
+
         let list, max;
 
 
@@ -207,6 +209,8 @@ class NodesWaitlist {
         if (list.length > max){
             list.splice(max);
         }
+
+        console.warn("_deleteUselessWaitlist ended");
 
         return false;
 
