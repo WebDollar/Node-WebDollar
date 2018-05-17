@@ -28,7 +28,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             answer = await socket.node.sendRequestWaitOnce("head/hash", mid, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
-            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right, (answer !== null ? answer.hash.toString("hex") : 0));
+            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
 
             if (left < 0 || answer === null || !Buffer.isBuffer(answer.hash) )
                 return {position: null, header: answer };
