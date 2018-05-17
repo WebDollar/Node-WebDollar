@@ -7,18 +7,24 @@ export default {
 
 
         {"addr": ["https://webdollar.ddns.net:80"],},
+
+        {"addr": ["https://nodecstl.ddns.net:80"]},
+
         {"addr": ["https://webdollar.ddns.net:8080"], },
+        {"addr": ["https://webdollar.network:5000"]},
+
         {"addr": ["https://webdollar.ddns.net:8081"], },
+
+        {"addr": ["https://skyhub.me:80"], },
+
         {"addr": ["https://webdollar.ddns.net:8082"], },
 
-        {"addr": ["https://webdollar.network:5000"]},
         {"addr": ["https://webd.5q.ro:3333"]},
         {"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
         {"addr": ["https://amsterdam.wdpool.io:443"]},
         {"addr": ["https://strasbourg.wdpool.io:443"]},
         {"addr": ["https://paris.wdpool.io:443"]},
 
-        {"addr": ["https://skyhub.me:80"], },
 
         {"addr": ["https://presa7.ro:80"], },
 
