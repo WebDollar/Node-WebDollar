@@ -12,7 +12,45 @@ class NodePropagationProtocol {
         this._waitlistSimple = [];
         this._waitlistSimpleSSL = [];
 
+        this._newFullNodesWaitList = [];
+        this._newLightNodesWaitList = [];
+
+        setTimeout(this._processNewWaitlistInterval.bind(this), 5000);
+
     }
+
+    async _processList(list){
+
+        for (let i=0; i<list.length; i++) {
+
+            let waitlist = null;
+
+            while (waitlist === null && list.length > 0) {
+
+                let index = 0;
+                let newNode = list[index];
+
+                waitlist = await NodesWaitlist.addNewNodeToWaitlist( newNode.address.addr, undefined, newNode.address.type,  newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
+
+                list.splice(index, 1);
+
+                return;
+            }
+
+        }
+
+    }
+
+    async _processNewWaitlistInterval(){
+
+        await this._processList(this._newFullNodesWaitList);
+        await this._processList(this._newLightNodesWaitList);
+
+
+        setTimeout( async ()=>{ await this._processNewWaitlistInterval() } , 2000 + Math.floor( Math.random() * 200 ) );
+
+    }
+
 
     initializePropagationProtocol(){
 
@@ -35,7 +73,7 @@ class NodePropagationProtocol {
             socket.node.sendRequest("propagation/request-all-wait-list/full-nodes");
             socket.node.sendRequest("propagation/request-all-wait-list/light-nodes");
 
-        },  1000);
+        },  2000+Math.floor( Math.random()*5000));
 
     }
 
@@ -85,16 +123,42 @@ class NodePropagationProtocol {
                     case "new-full-nodes":
                     case "new-light-nodes":
 
+                        let list, type;
+
+                        if(op === "new-full-nodes") {
+                            list = this._newFullNodesWaitList;
+                            type = NODES_TYPE.NODE_TERMINAL
+                        } else {
+                            list = this._newLightNodesWaitList;
+                            type = NODES_TYPE.NODE_WEB_PEER;
+                        }
+
                         for (let i = 0; i < addresses.length; i++)
-                            await NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, undefined, addresses[i].type,  addresses[i].connected, socket.node.level + 1, socket);
+                            if(addresses[i].type === type) {
+
+                                let found = false;
+                                for (let j = 0; j < this._newFullNodesWaitList.length; j++)
+                                    if (this._newLightNodesWaitList[j].addr === addresses[i].addr) {
+                                        found = true;
+                                        break;
+                                    }
+
+                                if (!found)
+                                    this._newLightNodesWaitList.push({address: addresses[i], socket: socket});
+                            }
+
 
                         break;
 
                     case "disconnected-light-nodes":
                     case "disconnected-full-nodes":
 
-                        for (let i = 0; i < addresses.length; i++)
-                            await NodesWaitlist.addNewNodeToWaitlist( addresses[i].addr, undefined, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket);
+                        for (let i = 0; i < addresses.length; i++) {
+
+                            if (NodesWaitlist._findNodesWaitlist(addresses[i].addr, undefined, addresses[i].type) !== -1)
+                                await NodesWaitlist.addNewNodeToWaitlist(addresses[i].addr, undefined, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket);
+
+                        }
 
                         break;
 
