@@ -140,6 +140,8 @@ class InterfaceBlockchainTransactionsProtocol{
 
         node.on("transactions/get-all-pending-transactions", response => {
 
+            if (Math.random() >= 0.3) return false; // avoid spamming
+
             try{
 
                 if (typeof response === "object") return false;

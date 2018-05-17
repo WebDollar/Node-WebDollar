@@ -106,8 +106,11 @@ class InterfaceBlockchain {
         }
 
 
+        this.sleep(70);
         if (! (await this.validateBlockchainBlock(block)) ) // the block has height === this.blocks.length
             return false;
+
+        this.sleep(80);
 
         //let's check again the heights
         if (block.height !== this.blocks.length)

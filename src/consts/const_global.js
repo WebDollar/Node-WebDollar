@@ -253,10 +253,10 @@ consts.SETTINGS = {
                 },
 
                 SERVER: {
-                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 850,
-                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 200,
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 550,
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 120,
 
-                    TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 100,
+                    TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
                 },
 
             },
@@ -322,13 +322,13 @@ if ( consts.DEBUG === true ){
 
     consts.SETTINGS.NODE.VERSION += "3";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "3";
-    consts.SETTINGS.NODE.SSL = true;
+    consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
     consts.SETTINGS.NODE.PORT = 9095;
 
     FallBackNodesList.nodes = [{
-        "addr": ["https://webdollar-vps2.ddns.net:9095"],
+        "addr": ["http://127.0.0.1:9095"],
     }];
 
 
