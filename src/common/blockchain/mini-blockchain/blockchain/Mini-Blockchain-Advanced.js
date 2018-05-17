@@ -69,6 +69,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
 
+            console.log("saving started");
+
             if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
                 throw {message: "couldn't sae the blockchain"};
 
@@ -85,6 +87,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
                 this.sleep(100);
             }
+
+            console.log("saving ended");
 
         } catch (exception){
             console.error("Couldn't save MiniBlockchain", exception);
