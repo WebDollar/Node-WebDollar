@@ -41,8 +41,6 @@ class NodesWaitlistConnecting {
 
         for (let i=0; i < NodesWaitlist.waitListFullNodes.length; i++){
 
-            console.log(NodesWaitlist.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), "    ",Blockchain.blockchain.agent.status, NodesWaitlist.waitListFullNodes[i].isFallback );
-
             // in case it is not synchronized, it should connect to the fallback node
             // if ( Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && !NodesWaitlist.waitListFullNodes[i].isFallback)  continue;
             // if ( Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && NodesWaitlist.waitListFullNodes[i].isFallback)  continue;
