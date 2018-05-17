@@ -134,7 +134,7 @@ class NodeServer {
                         return;
                     }
 
-                    let waitlist = NodesWaitlist._findNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
+                    let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
 
                     if (waitlist.waitlist === null || !waitlist.isFallback) {
                         socket.disconnect();
