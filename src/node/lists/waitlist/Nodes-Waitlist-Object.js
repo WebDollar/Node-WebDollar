@@ -43,7 +43,7 @@ class NodesWaitlistObject {
 
         let time = new Date().getTime();
 
-        if ( (time - this.lastTimeChecked) >= timeTryReconnectAgain + this.errorTrials*5000 )
+        if ( (time - this.lastTimeChecked) >= timeTryReconnectAgain + this.errorTrials * ( 3000 + Math.random()*8000 ) )
             return true;
 
         return false;
@@ -63,9 +63,9 @@ class NodesWaitlistObject {
         if (this.isFallback === true) {
 
             if (process.env.BROWSER)
-                this.errorTrials = Math.min(this.errorTrials, 5);
+                this.errorTrials = Math.min(this.errorTrials, 4 + Math.floor( Math.random() * 2) );
             else
-                this.errorTrials = Math.min(this.errorTrials, 5 + Math.floor( Math.random() * 5) );
+                this.errorTrials = Math.min(this.errorTrials, 7 + Math.floor( Math.random() * 5) );
 
         }
 
@@ -183,7 +183,7 @@ class NodesWaitlistObject {
 
         if (this.isFallback === true) return 100000 - this.errorTrials*100;
 
-        let score = 200;
+        let score = 200 + Math.random()*10;
 
         score += (this.connected ? 1000 : 0);
 

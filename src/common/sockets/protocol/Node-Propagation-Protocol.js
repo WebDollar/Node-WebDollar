@@ -60,7 +60,7 @@ class NodePropagationProtocol {
         NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
         NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
 
-        //setInterval( this._recalculateWaitlistSimple.bind(this), 15*1000)
+        setInterval( this._recalculateWaitlistSimple.bind(this), 15*1000 + Math.random() * 10*1000 )
 
     }
 
@@ -73,7 +73,7 @@ class NodePropagationProtocol {
             socket.node.sendRequest("propagation/request-all-wait-list/full-nodes");
             socket.node.sendRequest("propagation/request-all-wait-list/light-nodes");
 
-        },  2000+Math.floor( Math.random()*5000));
+        },  3000 + Math.floor( Math.random()*5000));
 
     }
 
@@ -201,9 +201,13 @@ class NodePropagationProtocol {
             if (nodes.length === 0) return;
 
             let index = 0;
-            while ( index < number && index < nodes.length ){
+            for (let index =0; index < number && index < nodes.length; index++){
 
                 let node = nodes[index];
+                if (!node.isFallback ){
+                    index++;
+                    continue;
+                }
 
                 let json = node.toJSON();
 
@@ -214,7 +218,7 @@ class NodePropagationProtocol {
                         break;
                     }
 
-                if (found === false && !node.isFallback && (!onlySSL || onlySSL && node.sckAddresses[0].SSL))
+                if ( !found && (!onlySSL || onlySSL && node.sckAddresses[0].SSL))
                     list.push(json);
 
                 index++;

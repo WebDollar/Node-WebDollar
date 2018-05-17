@@ -31,6 +31,8 @@ class SemaphoreProcessing{
                 this.sleep(100);
             } catch (ex){
                 console.error("error processingSemaphoreList callback !!!!!!!!!!!!!!!!!!!!!!!!", ex);
+                resolve(false);
+                return;
             }
 
 
@@ -39,6 +41,8 @@ class SemaphoreProcessing{
                 this.sleep(100);
             } catch (ex){
                 console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
+                resolve(false)
+                return;
             }
 
             this._list.splice(index, 1);
