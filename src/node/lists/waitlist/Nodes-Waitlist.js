@@ -64,10 +64,28 @@ class NodesWaitlist {
             try {
 
                 let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
-
                 if (sckAddress.address.indexOf("192.168") === 0 ) continue;
 
                 let answer = this._searchNodesWaitlist(sckAddress, port, type);
+
+                if (answer.waitlist === null){
+                    if (backedBy === "fallback")
+                        sckAddresses.push(sckAddress);
+                    else {
+                        let response = await DownloadHelper.downloadFile(sckAddress.getAddress(true, true), 5000);
+
+                        if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL) {
+
+                            //search again because i have waited for a promise
+                            let answer = this._searchNodesWaitlist(sckAddress, port, type);
+
+                            if (answer.waitlist === null)
+                                sckAddresses.push(sckAddress);
+                        }
+
+
+                    }
+                }
 
                 if (answer.waitlist !== null) {
 
@@ -82,16 +100,7 @@ class NodesWaitlist {
                 }
                 else{
 
-                    if (backedBy === "fallback")
-                        sckAddresses.push(sckAddress);
-                    else {
-                        answer = await DownloadHelper.downloadFile(sckAddress.getAddress(true, true), 5000);
 
-                        answer = {protocol: consts.SETTINGS.NODE.PROTOCOL};
-
-                        if (answer !== null && answer.protocol === consts.SETTINGS.NODE.PROTOCOL)
-                            sckAddresses.push(sckAddress);
-                    }
                 }
 
             } catch (exception){
