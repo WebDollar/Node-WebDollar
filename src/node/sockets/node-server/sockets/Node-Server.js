@@ -17,7 +17,8 @@ import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-St
 const TIME_DISCONNECT_TERMINAL = 15*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
-const TIME_TO_PASS_TO_CONNECT_NEW_CLIENT = 6*1000;
+const TIME_TO_PASS_TO_CONNECT_NEW_CLIENT = 10*1000;
+const SERVER_FREE_ROOM = 5;
 
 class NodeServer {
 
@@ -35,6 +36,7 @@ class NodeServer {
         setInterval(this._disconenctOldSockets.bind(this), 30 * 1000);
 
         this.timeLastConnected = 0;
+        this.serverSits = SERVER_FREE_ROOM;
 
     }
 
@@ -144,12 +146,21 @@ class NodeServer {
 
                 }
 
-                if ( new Date().getTime() - this.timeLastConnected < TIME_TO_PASS_TO_CONNECT_NEW_CLIENT){
-                    socket.disconnect();
-                    return;
+                if ( this.serverSits <= 0){
+
+                    if (new Date().getTime() - this.timeLastConnected >= TIME_TO_PASS_TO_CONNECT_NEW_CLIENT){
+
+                        this.serverSits = SERVER_FREE_ROOM;
+                        this.timeLastConnected = new Date().getTime();
+
+                    }else {
+
+                        socket.disconnect();
+                        return;
+
+                    }
                 }
 
-                this.timeLastConnected = new Date().getTime();
 
                 //check if it is a unique connection, add it to the list
                 let sckAddress = new SocketAddress(socket.request.connection.remoteAddress, socket.request.connection.remotePort, socket.request._query["uuid"]);
@@ -161,6 +172,8 @@ class NodeServer {
                     SocketExtend.extendSocket(socket, sckAddress, undefined, undefined, 1);
 
                     console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) );
+
+                    this.serverSits--;
 
                     if (await socket.node.protocol.sendHello(["uuid","ip", "port"], false) === false){
 
