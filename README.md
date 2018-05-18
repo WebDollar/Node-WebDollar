@@ -85,11 +85,15 @@ Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 
 
 
-Install x509 on Windows
-
-1. Install python2.7
-2. npm config set python python2.7
-3. Download and paste it in the C:\OpenSSL-Win64\lib\libeay32.lib the file from https://github.com/ReadyTalk/win32/blob/master/msvc/lib/libeay32.lib
+### Install x509 on Windows
+``` 
+npm install python2.7
+npm config set python python2.7
+git clone https://github.com/ReadyTalk/win32.git
+mkdir C:\OpenSSL-Win64\lib\
+cp .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
+rm -r -fo .\win32\
+``` 
 
 ## 4 SSL (Secured Socket Layer) Certificate
 
