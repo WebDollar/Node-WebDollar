@@ -362,7 +362,20 @@ class CLI {
         
         console.info('Mining inside a pool.');
         console.info('Your current mining pool is: ', 'demo at the moment');
-
+        
+        return new Promise ( async (resolve)=> {
+            let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool');
+            
+            if (response == false) {
+                let miningPoolLink = await this.question('Enter the new mining pool link: ');
+                console.info('Your new mining pool is: ', miningPoolLink);
+                //TODO: Save the mining pool link
+            }
+            
+            //TODO: Code for start mining inside a pool
+            
+            resolve(true);
+        });
     }
     
     async createMiningPool(){
