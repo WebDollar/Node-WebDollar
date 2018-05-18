@@ -17,6 +17,8 @@ import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-St
 const TIME_DISCONNECT_TERMINAL = 15*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
+const TIME_TO_PASS_TO_CONNECT_NEW_CLIENT = 20*1000;
+
 class NodeServer {
 
     /*
@@ -31,6 +33,8 @@ class NodeServer {
         this.loaded = false;
 
         setInterval(this._disconenctOldSockets.bind(this), 30 * 1000);
+
+        this.timeLastConnected = 0;
 
     }
 
@@ -140,6 +144,12 @@ class NodeServer {
 
                 }
 
+                if ( new Date().getTime() - this.timeLastConnected < TIME_TO_PASS_TO_CONNECT_NEW_CLIENT){
+                    socket.disconnect();
+                    return;
+                }
+
+                this.timeLastConnected = new Date().getTime();
 
                 //check if it is a unique connection, add it to the list
                 let sckAddress = new SocketAddress(socket.request.connection.remoteAddress, socket.request.connection.remotePort, socket.request._query["uuid"]);
