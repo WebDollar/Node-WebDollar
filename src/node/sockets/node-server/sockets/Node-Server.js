@@ -18,7 +18,7 @@ const TIME_DISCONNECT_TERMINAL = 15*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
 const TIME_TO_PASS_TO_CONNECT_NEW_CLIENT = 10*1000;
-const SERVER_FREE_ROOM = 5;
+const SERVER_FREE_ROOM = 10;
 
 class NodeServer {
 
@@ -113,9 +113,7 @@ class NodeServer {
 
                     if (Math.random() < 0.05) console.warn("too many terminal connections");
 
-                    if (Math.random() < 0.5) await NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
-                    else socket.disconnect();
-
+                    await NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
                     return;
                 }
 
@@ -123,9 +121,7 @@ class NodeServer {
 
                     if (Math.random() < 0.05) console.warn("too many browser connections");
 
-                    if (Math.random() < 0.5) await NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
-                    else socket.disconnect();
-
+                    await NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
                     return;
                 }
 
