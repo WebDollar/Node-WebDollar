@@ -130,8 +130,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                 throw "load blockchain simple"; //let's force to load a simple blockchain
             }
 
-            await this.saveBlockchain();
-
         } catch (exception){
 
             if (exception === "load blockchain simple") {
