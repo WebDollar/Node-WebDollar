@@ -46,8 +46,12 @@ class NodeClient {
 
         return new Promise( (resolve) => {
 
+            let timeoutConnection = 7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 );
+            let timeoutTotal =  7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*30*1000 : 0 );
+
             try
             {
+
                 if ( address.length < 3 ){
                     console.log("rejecting address... invalid ",address);
                     resolve(false);
@@ -73,8 +77,8 @@ class NodeClient {
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
 
-                        connection_timeout : process.env.BROWSER ? 15000 : 50000,
-                        timeout: process.env.BROWSER ? 15000 : 50000,
+                        connection_timeout : timeoutTotal,
+                        timeout: timeoutTotal,
 
                         secure: SSL, //https
 
@@ -110,7 +114,7 @@ class NodeClient {
                         socket.disconnect();
                         resolve(false);
 
-                    }, 5*1000 + Math.floor( Math.random()*6*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 ) );
+                    }, timeoutConnection);
 
 
                     let answer = await socket.node.protocol.sendHello(["ip","uuid"]);
@@ -152,7 +156,7 @@ class NodeClient {
 
             setTimeout(()=>{
                 resolve(false);
-            }, 5*1000 + Math.floor(Math.random() * 5*1000) + ( !process.env.BROWSER ?  Math.random()*10*1000 : 0) )
+            }, timeoutTotal + Math.floor(Math.random() * 5*1000));
 
         });
 

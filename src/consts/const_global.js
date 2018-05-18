@@ -255,7 +255,7 @@ consts.SETTINGS = {
                 },
 
                 SERVER: {
-                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 400,
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 450,
                     MAXIMUM_CONNECTIONS_FROM_TERMINAL: 120,
 
                     TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
