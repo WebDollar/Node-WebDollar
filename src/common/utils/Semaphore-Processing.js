@@ -21,14 +21,14 @@ class SemaphoreProcessing{
 
             if (index > 0) {
                 await this._list[index - 1].promise;
-                await this.sleep(100);
+                await this.sleep(70);
             }
 
             let answer;
 
             try {
                 answer = await callback();
-                await this.sleep(100);
+                await this.sleep(70);
             } catch (ex){
                 console.error("error processingSemaphoreList callback !!!!!!!!!!!!!!!!!!!!!!!!", ex);
                 resolve(false);
@@ -38,7 +38,7 @@ class SemaphoreProcessing{
 
             try {
                 resolve(answer);
-                await this.sleep(100);
+                await this.sleep(70);
             } catch (ex){
                 console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
                 resolve(false)

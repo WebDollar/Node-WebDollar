@@ -17,6 +17,9 @@ import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-St
 const TIME_DISCONNECT_TERMINAL = 15*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
+const TIME_TO_PASS_TO_CONNECT_NEW_CLIENT = 10*1000;
+const SERVER_FREE_ROOM = 5;
+
 class NodeServer {
 
     /*
@@ -31,6 +34,9 @@ class NodeServer {
         this.loaded = false;
 
         setInterval(this._disconenctOldSockets.bind(this), 30 * 1000);
+
+        this.timeLastConnected = 0;
+        this.serverSits = SERVER_FREE_ROOM;
 
     }
 
@@ -123,21 +129,39 @@ class NodeServer {
                     return;
                 }
 
-                if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
+                if ( socket.request._query["uuid"] === consts.SETTINGS.UUID )
+                    return false;
 
-                    if (nodeDomain === '' || nodeDomain === undefined){
+                // if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
+                //
+                //     if (nodeDomain === '' || nodeDomain === undefined){
+                //         socket.disconnect();
+                //         return;
+                //     }
+                //
+                //     let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
+                //
+                //
+                //     if (waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
+                //         socket.disconnect();
+                //         return;
+                //     }
+                //
+                // }
+
+                if ( this.serverSits <= 0){
+
+                    if (new Date().getTime() - this.timeLastConnected >= TIME_TO_PASS_TO_CONNECT_NEW_CLIENT){
+
+                        this.serverSits = SERVER_FREE_ROOM;
+                        this.timeLastConnected = new Date().getTime();
+
+                    }else {
+
                         socket.disconnect();
                         return;
+
                     }
-
-                    let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
-
-
-                    if (waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
-                        socket.disconnect();
-                        return;
-                    }
-
                 }
 
 
@@ -151,6 +175,8 @@ class NodeServer {
                     SocketExtend.extendSocket(socket, sckAddress, undefined, undefined, 1);
 
                     console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) );
+
+                    this.serverSits--;
 
                     if (await socket.node.protocol.sendHello(["uuid","ip", "port"], false) === false){
 

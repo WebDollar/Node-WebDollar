@@ -4,6 +4,8 @@ import NODES_TYPE from "node/lists/types/Nodes-Type";
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import Blockchain from "main-blockchain/Blockchain"
 
+const MAX_WAITLIST_QUEUE_LENGTH = 100;
+
 class NodePropagationProtocol {
 
     constructor(){
@@ -12,8 +14,11 @@ class NodePropagationProtocol {
         this._waitlistSimple = [];
         this._waitlistSimpleSSL = [];
 
-        this._newFullNodesWaitList = [];
-        this._newLightNodesWaitList = [];
+        this._newFullNodesWaitList = {length: 0};  //for key-value
+        this._newLightNodesWaitList = {length: 0}; //for key-value
+
+
+        this._waitlistProccessed = {};
 
         setTimeout(this._processNewWaitlistInterval.bind(this), 5000 + Math.random()*2000 );
 
@@ -21,23 +26,24 @@ class NodePropagationProtocol {
 
     async _processList(list){
 
-        for (let i=0; i<list.length; i++) {
+        for (let key in list){
 
-            let waitlist = null;
+            if (key === "length") continue;
+            if (!list.hasOwnProperty(key)) continue;
 
-            while (waitlist === null && list.length > 0) {
+            let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
 
-                let index = 0;
-                let newNode = list[index];
+            if (answer !== null ){
 
-                waitlist = await NodesWaitlist.addNewNodeToWaitlist( newNode.address.addr, undefined, newNode.address.type,  newNode.address.connected, newNode.socket.node.level + 1, newNode.socket);
-
-                list.splice(index, 1);
+                this._waitlistProccessed[key] = true;
 
                 return;
             }
 
+            delete list[key];
+            list.length--;
         }
+
 
     }
 
@@ -84,6 +90,7 @@ class NodePropagationProtocol {
             try{
 
                 let list = [];
+
                 for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++) {
 
                     if (socket.node.protocol.nodeType === NODES_TYPE.NODE_WEB_PEER && !NodesWaitlist.waitListFullNodes[i].sckAddresses[0].SSL) //let's send only SSL
@@ -120,7 +127,9 @@ class NodePropagationProtocol {
                 let addresses = response.addresses || [];
                 if (typeof addresses === "string") addresses = [addresses];
 
-                if (!Array.isArray(addresses)) throw {message: "addresses is not an array"};
+                if (!Array.isArray(addresses)) throw { message: "addresses is not an array" };
+
+                if (addresses.length > 50) addresses.splice(50); //only the first 50 nodes
 
                 let op = response.op || '';
 
@@ -139,39 +148,47 @@ class NodePropagationProtocol {
                             type = NODES_TYPE.NODE_WEB_PEER;
                         }
 
-                        for (let i = 0; i < addresses.length; i++)
-                            if(addresses[i].type === type) {
+                        if (list.length > MAX_WAITLIST_QUEUE_LENGTH)
+                            break;
 
-                                let found = false;
-                                for (let j = 0; j < list.length; j++)
-                                    if (list[j].addr === addresses[i].addr) {
-                                        found = true;
-                                        break;
-                                    }
 
-                                if (i%20 === 0)
-                                    await Blockchain.blockchain.sleep(50);
+                        for (let i = 0; i < addresses.length; i++){
 
-                                if (!found)
-                                    list.push({address: addresses[i], socket: socket});
+                            if ( typeof addresses[ i ].a === "string" && list[ addresses[ i ].a ] === undefined && addresses[ i ].a !== "length"){
+
+                                list[ addresses[ i ].a ] = {
+                                    a: addresses[i].a,
+                                    t: addresses[i].t,
+                                    c: addresses[i].c,
+                                    sock: socket,
+                                };
+
+                                list.length++;
+
+                                if (list.length > MAX_WAITLIST_QUEUE_LENGTH)
+                                    break;
+
                             }
 
+                        }
 
                         break;
 
-                    case "disconnected-light-nodes":
-                    case "disconnected-full-nodes":
+                    //TODO remove addresses from list
 
-                        for (let i = 0; i < addresses.length; i++) {
-
-                            let answer = NodesWaitlist._searchNodesWaitlist(addresses[i].addr, undefined, addresses[i].type);
-                            if (answer.waitlist !== null)
-                                answer.removeBackedBy(socket.sckAddress);
-
-                            if (i%20 === 0)
-                                await Blockchain.blockchain.sleep(50);
-
-                        }
+                    // case "disconnected-light-nodes":
+                    // case "disconnected-full-nodes":
+                    //
+                    //     for (let i = 0; i < addresses.length; i++) {
+                    //
+                    //         let answer = NodesWaitlist._searchNodesWaitlist(addresses[i].addr, undefined, addresses[i].type);
+                    //         if (answer.waitlist !== null)
+                    //             answer.removeBackedBy(socket.sckAddress);
+                    //
+                    //         if (i%20 === 0)
+                    //             await Blockchain.blockchain.sleep(50);
+                    //
+                    //     }
 
                         break;
 
@@ -190,15 +207,15 @@ class NodePropagationProtocol {
 
     _newNodeConnected( nodeWaitListObject ){
 
-        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        // if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        // else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
 
     }
 
     _nodeDisconnected(nodeWaitListObject){
 
-        if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
+        // if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        // else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
 
     }
 

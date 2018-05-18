@@ -110,7 +110,7 @@ class NodeClient {
                         socket.disconnect();
                         resolve(false);
 
-                    }, 15*1000 + Math.floor(Math.random()*10));
+                    }, 15*1000 + Math.floor( Math.random()*10*1000) );
 
 
                     let answer = await socket.node.protocol.sendHello(["ip","uuid"]);

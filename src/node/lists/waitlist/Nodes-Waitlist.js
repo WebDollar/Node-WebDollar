@@ -43,7 +43,7 @@ class NodesWaitlist {
 
         //interval to delete useless waitlist and resort scores
 
-        setInterval( this._deleteUselessWaitlists.bind(this), 30*1000 + Math.random()*20 );
+        setTimeout( this._deleteUselessWaitlists.bind(this), 30*1000 + Math.random()*3000 );
 
     }
 
@@ -64,9 +64,9 @@ class NodesWaitlist {
             try {
 
                 let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
-                if (sckAddress.address.indexOf("192.168") === 0 ) continue;
+                if (sckAddress.address.indexOf("192.168") === 0 && !consts.DEBUG ) continue;
 
-                if (process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL) continue;
+                if (process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL && !consts.DEBUG )  continue;
 
                 let answer = this._searchNodesWaitlist(sckAddress, port, type);
 
@@ -179,8 +179,6 @@ class NodesWaitlist {
      */
     _deleteUselessWaitlist(listType){
 
-        console.warn("_deleteUselessWaitlist started");
-
         let list, max;
 
 
@@ -212,8 +210,6 @@ class NodesWaitlist {
             list.splice(max);
         }
 
-        console.warn("_deleteUselessWaitlist ended");
-
         return false;
 
     }
@@ -231,6 +227,7 @@ class NodesWaitlist {
         this._deleteUselessWaitlist( NODES_TYPE.NODE_TERMINAL );
         this._deleteUselessWaitlist( NODES_TYPE.NODE_WEB_PEER );
 
+        setTimeout( this._deleteUselessWaitlists.bind(this), 30*1000 + Math.random()*3000 );
     }
 
     resetWaitlist(listType){

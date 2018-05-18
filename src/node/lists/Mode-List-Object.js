@@ -19,9 +19,9 @@ class NodesListObject {
     toJSON(){
 
         return {
-            type: this.type,
-            addr: this.socket.node.sckAddress.getAddress(true, true),
-            connected: true,
+            a: this.socket.node.sckAddress.getAddress(true, true), //addresses
+            t: this.type, //type
+            c: true, //connected
         }
 
     }

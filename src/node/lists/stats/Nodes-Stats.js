@@ -47,26 +47,26 @@ class NodesStats {
         console.log("server: ",string2);
 
 
-        // let waitlist1 = [];
-        // for ( let i=0; i<NodesWaitlist.waitListFullNodes.length; i++ )
-        //     if ( ! NodesWaitlist.waitListFullNodes[i].isFallback) {
-        //         let obj = NodesWaitlist.waitListFullNodes[i].toJSON();
-        //         obj.score = NodesWaitlist.waitListFullNodes[i].sortingScore();
-        //         obj.connected = NodesWaitlist.waitListFullNodes[i].connected;
-        //         waitlist1.push(obj);
-        //     }
-        //
-        // let waitlist2 = [];
-        // for ( let i=0; i<NodesWaitlist.waitListLightNodes.length; i++ )
-        //     if ( ! NodesWaitlist.waitListLightNodes[i].isFallback) {
-        //         let obj = NodesWaitlist.waitListLightNodes[i].toJSON();
-        //         obj.score = NodesWaitlist.waitListLightNodes[i].sortingScore();
-        //         obj.connected = NodesWaitlist.waitListLightNodes[i].connected;
-        //         waitlist2.push(obj);
-        //     }
+        let waitlist1 = [];
+        for ( let i=0; i<NodesWaitlist.waitListFullNodes.length; i++ )
+            if ( ! NodesWaitlist.waitListFullNodes[i].isFallback) {
+                let obj = NodesWaitlist.waitListFullNodes[i].toJSON();
+                obj.score = NodesWaitlist.waitListFullNodes[i].sortingScore();
+                obj.connected = NodesWaitlist.waitListFullNodes[i].connected;
+                waitlist1.push(obj);
+            }
+
+        let waitlist2 = [];
+        for ( let i=0; i<NodesWaitlist.waitListLightNodes.length; i++ )
+            if ( ! NodesWaitlist.waitListLightNodes[i].isFallback) {
+                let obj = NodesWaitlist.waitListLightNodes[i].toJSON();
+                obj.score = NodesWaitlist.waitListLightNodes[i].sortingScore();
+                obj.connected = NodesWaitlist.waitListLightNodes[i].connected;
+                waitlist2.push(obj);
+            }
 
         console.log("waitlist full node ", NodesWaitlist.waitListFullNodes.length);
-        console.log("waitlist full node ", NodesWaitlist.waitListLightNodes.length);
+        console.log("waitlist light node ", NodesWaitlist.waitListLightNodes.length);
 
     }
 

@@ -23,7 +23,7 @@ class NodeBlockchainPropagation{
 
         });
 
-        setTimeout( this.processPropagation.bind(this), 300);
+        setTimeout( this.processPropagation.bind(this), 400);
 
         //remove disconnected sockets
         setInterval( this._deleteDisconenctedSockets.bind(this), 20000)
@@ -95,7 +95,7 @@ class NodeBlockchainPropagation{
                         if (this._socketsPropagating[i] === socket)
                             this._socketsPropagating.splice(i,1);
 
-                }, 200);
+                }, 500 + Math.random()*400 );
 
             }
 
