@@ -32,7 +32,6 @@ export default {
         {"addr": ["https://webdollar.ddns.net:80"]},
         {"addr": ["https://webdollar.ddns.net:8080"]},
         {"addr": ["https://webdollar.ddns.net:8081"]},
-        {"addr": ["https://webdollar.ddns.net:8082"]},
 
         {"addr": ["https://skyhub.me:80"]},
         {"addr": ["https://presa7.ro:80"]},
