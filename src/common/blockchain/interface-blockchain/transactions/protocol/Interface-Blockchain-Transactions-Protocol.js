@@ -17,8 +17,10 @@ class InterfaceBlockchainTransactionsProtocol{
 
         let socket = nodesListObject.socket;
 
+        this.initializeTransactionsPropagation(socket);
+
         if (Blockchain.loaded){
-            this.initializeTransactionsPropagation(socket);
+            this.downloadTransactions(socket, 0, 30);
             return;
         }
 
@@ -28,9 +30,9 @@ class InterfaceBlockchainTransactionsProtocol{
 
             setTimeout(()=>{
 
-                this.initializeTransactionsPropagation(socket);
+                this.downloadTransactions(socket, 0, 30);
 
-            }, 8000)
+            }, 5000 + Math.random()*5000 );
 
         });
 
@@ -83,7 +85,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
             try{
 
-                if (typeof response === "object") return false;
+                if (typeof response !== "object") return false;
 
                 if (response.format !== "json")  response.format = "buffer";
                 if (typeof response.start  !== "number") response.start = 0;
@@ -117,7 +119,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
             try{
 
-                if (typeof response === "object") return false;
+                if (typeof response !== "object") return false;
 
                 if (response.format !== "json")  response.format = "buffer";
 
@@ -182,8 +184,6 @@ class InterfaceBlockchainTransactionsProtocol{
         });
 
 
-        this.downloadTransactions(socket, 0, 30);
-
     }
 
 
@@ -191,7 +191,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
         try {
 
-            let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-by-ids", {format: "buffer", start: start, count: count}, 'answer', 5000);
+            let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 5000);
 
             if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
 
@@ -209,6 +209,9 @@ class InterfaceBlockchainTransactionsProtocol{
                 }
 
             await Blockchain.blockchain.sleep(40);
+
+            if ( downloadingTransactions.length ) //nothing to download
+                return;
 
             let answerTransactions = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-by-ids", {format: "buffer", ids: downloadingTransactions }, "answer" , 5000);
 

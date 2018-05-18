@@ -23,7 +23,7 @@ class NodeBlockchainPropagation{
 
         });
 
-        setTimeout( this.processPropagation.bind(this), 300);
+        setTimeout( this.processPropagation.bind(this), 400);
 
         //remove disconnected sockets
         setInterval( this._deleteDisconenctedSockets.bind(this), 20000)
