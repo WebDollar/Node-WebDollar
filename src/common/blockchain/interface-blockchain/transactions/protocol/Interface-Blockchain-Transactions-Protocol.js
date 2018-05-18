@@ -41,7 +41,7 @@ class InterfaceBlockchainTransactionsProtocol{
         // in case the Blockchain was not loaded, I will not be interested in transactions
         let node = socket.node;
 
-        node.on("transactions/new-pending-transaction", response =>{
+        node.on("transactions/new-pending-transaction", async (response) =>{
 
             try {
 
@@ -64,6 +64,7 @@ class InterfaceBlockchainTransactionsProtocol{
                 if (!transaction.isTransactionOK())
                     return false;
 
+                await Blockchain.blockchain.sleep(25);
 
                 if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket))
                     throw {message: "I already have this transaction"};
@@ -78,7 +79,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
         });
 
-        node.on("transactions/get-pending-transactions-ids", response => {
+        node.on("transactions/get-pending-transactions-ids", async (response) => {
 
             try{
 
@@ -95,11 +96,15 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 let length = Math.min( response.start + response.count, Blockchain.blockchain.transactions.pendingQueue.list.length );
 
+                await Blockchain.blockchain.sleep(20);
+
                 for (let i=response.start; i < length; i++ ){
 
                     if (response.format === "json") list.push( Blockchain.blockchain.transactions.pendingQueue.list[i].txId.toString("hex") ); else
                     if (response.format === "buffer") list.push( Blockchain.blockchain.transactions.pendingQueue.list[i].txId );
                 }
+
+                await Blockchain.blockchain.sleep(15);
 
                 node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.index + response.count, length: Blockchain.blockchain.transactions.pendingQueue.list.length } );
 
@@ -108,7 +113,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
         });
 
-        node.on("transactions/get-pending-transactions-by-ids", response => {
+        node.on("transactions/get-pending-transactions-by-ids", async (response) => {
 
             try{
 
@@ -119,6 +124,8 @@ class InterfaceBlockchainTransactionsProtocol{
                 if (response.ids === undefined || response.ids === null || !Array.isArray ( response.ids) ) return false;
 
                 let list = [];
+
+                await Blockchain.blockchain.sleep(20);
 
                 for (let i=0; i<response.ids.length; i++ ){
 
@@ -131,6 +138,8 @@ class InterfaceBlockchainTransactionsProtocol{
                     if (response.format === "buffer") list.push( transaction.serializeTransaction() );
                 }
 
+                await Blockchain.blockchain.sleep(25);
+
                 node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list } );
 
             } catch (exception){
@@ -138,7 +147,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
         });
 
-        node.on("transactions/get-all-pending-transactions", response => {
+        node.on("transactions/get-all-pending-transactions", async (response) => {
 
             if (Math.random() >= 0.3) return false; // avoid spamming
 
@@ -156,6 +165,12 @@ class InterfaceBlockchainTransactionsProtocol{
 
                     if (response.format === "json") list.push(Blockchain.blockchain.transactions.pendingQueue.list[i].toJSON()); else
                     if (response.format === "buffer") list.push(Blockchain.blockchain.transactions.pendingQueue.list[i].serializeTransaction());
+
+                    if (i % 10 === 0){
+
+                        await Blockchain.blockchain.sleep(25);
+
+                    }
 
                 }
 
@@ -183,6 +198,8 @@ class InterfaceBlockchainTransactionsProtocol{
             let ids = answer.transactions;
             let downloadingTransactions = [];
 
+            await Blockchain.blockchain.sleep(30);
+
             for (let i=0; i<ids.length; i++)
 
                 if (Blockchain.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId(ids[i]) === null){
@@ -190,6 +207,8 @@ class InterfaceBlockchainTransactionsProtocol{
                     downloadingTransactions.push(ids[i]);
 
                 }
+
+            await Blockchain.blockchain.sleep(40);
 
             let answerTransactions = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-by-ids", {format: "buffer", ids: downloadingTransactions }, "answer" , 5000);
 
@@ -213,9 +232,11 @@ class InterfaceBlockchainTransactionsProtocol{
 
             }
 
+            await Blockchain.blockchain.sleep(50);
+
 
             if (start + count < answer.length)
-                setTimeout( async ()=>{ await this.downloadTransactions(this, start+count, count)}, 1500 );
+                setTimeout( async ()=>{ await this.downloadTransactions(this, start+count, count)}, 1500 + (Math.random()*1000) );
 
 
         } catch (exception){

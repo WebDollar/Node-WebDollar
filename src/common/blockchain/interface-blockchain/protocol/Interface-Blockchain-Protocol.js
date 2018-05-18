@@ -117,7 +117,7 @@ class InterfaceBlockchainProtocol {
             });
 
         if (this.acceptBlockHeaders)
-            socket.node.on("head/new-block",  (data) => {
+            socket.node.on("head/new-block", async (data) => {
 
                 try {
 
@@ -132,6 +132,8 @@ class InterfaceBlockchainProtocol {
                     if (Math.random() < 0.1)
                         console.log("newForkTip", data.l );
 
+                    await this.blockchain.sleep(15+Math.random()*20);
+
                     this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
 
                 } catch (exception){
@@ -141,11 +143,13 @@ class InterfaceBlockchainProtocol {
             });
 
         if (this.acceptBlockHeaders)
-            socket.node.on("head/hash", (h) => {
+            socket.node.on("head/hash", async (h) => {
 
                 try {
 
                     // height
+
+                    await this.blockchain.sleep(15+Math.random()*20);
 
                     if (typeof h !== 'number' || this.blockchain.blocks.length <= h) {
                         socket.node.sendRequest("head/hash", null);
@@ -166,7 +170,7 @@ class InterfaceBlockchainProtocol {
 
         if (this.acceptBlocks)
 
-            socket.node.on("blockchain/blocks/request-block-by-height", (data) => {
+            socket.node.on("blockchain/blocks/request-block-by-height", async (data) => {
 
                 // data.height
                 // data.onlyHeader
@@ -183,6 +187,8 @@ class InterfaceBlockchainProtocol {
 
                     if (block === undefined)
                         throw {message: "block is empty", height: data.height};
+
+                    await this.blockchain.sleep( 15 + Math.random() * 20 );
 
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                         result: true,
@@ -219,6 +225,8 @@ class InterfaceBlockchainProtocol {
             let data = await socket.node.sendRequestWaitOnce("head/last-block", undefined, "a");
 
             if (data === null) return false;
+
+            await this.blockchain.sleep(15+Math.random()*20);
 
             return await this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
 

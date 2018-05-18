@@ -110,6 +110,8 @@ class InterfaceBlockchainProtocolForkSolver{
             if (!this.blockchain.agent.light  && currentBlockchainLength > forkChainLength)
                 throw {message: "discoverAndProcessFork - fork is smaller fork than mine"};
 
+            await this.blockchain.sleep(15);
+
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
 
             if ( forkFound !== null ) {
@@ -130,6 +132,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 return {result: true, fork: forkFound};
 
             }
+
+            await this.blockchain.sleep(15);
 
             //optimization
             //check if n-2 was ok, but I need at least 1 block
@@ -168,6 +172,8 @@ class InterfaceBlockchainProtocolForkSolver{
                     throw {message: "connection dropped discoverForkBinarySearch"}
 
             }
+
+            await this.blockchain.sleep(15);
 
             //process light and NiPoPow
             await this.optionalProcess(socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint);
@@ -221,6 +227,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 console.warn("BANNNNNNNNNNNNNNNNN", socket.node.sckAddress.toString(), exception.message);
                 BansList.addBan(socket, 2000, exception.message);
             }
+
+            await this.blockchain.sleep(15);
 
             return { result:false, error: exception };
 
@@ -284,6 +292,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
             let block = this._deserializeForkBlock(fork, answer.block, nextBlockHeight, blockValidation );
+
+            await this.blockchain.sleep(15);
 
             let result;
 

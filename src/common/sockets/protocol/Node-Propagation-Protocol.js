@@ -2,7 +2,7 @@ import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
-
+import Blockchain from "main-blockchain/Blockchain"
 
 class NodePropagationProtocol {
 
@@ -15,7 +15,7 @@ class NodePropagationProtocol {
         this._newFullNodesWaitList = [];
         this._newLightNodesWaitList = [];
 
-        setTimeout(this._processNewWaitlistInterval.bind(this), 5000);
+        setTimeout(this._processNewWaitlistInterval.bind(this), 5000 + Math.random()*2000 );
 
     }
 
@@ -149,6 +149,9 @@ class NodePropagationProtocol {
                                         break;
                                     }
 
+                                if (i%20 === 0)
+                                    await Blockchain.blockchain.sleep(50);
+
                                 if (!found)
                                     list.push({address: addresses[i], socket: socket});
                             }
@@ -161,8 +164,12 @@ class NodePropagationProtocol {
 
                         for (let i = 0; i < addresses.length; i++) {
 
-                            if (NodesWaitlist._findNodesWaitlist(addresses[i].addr, undefined, addresses[i].type) !== -1)
-                                await NodesWaitlist.addNewNodeToWaitlist(addresses[i].addr, undefined, addresses[i].type, addresses[i].connected, socket.node.level + 1, socket);
+                            let answer = NodesWaitlist._searchNodesWaitlist(addresses[i].addr, undefined, addresses[i].type);
+                            if (answer.waitlist !== null)
+                                answer.removeBackedBy(socket.sckAddress);
+
+                            if (i%20 === 0)
+                                await Blockchain.blockchain.sleep(50);
 
                         }
 
@@ -240,7 +247,7 @@ class NodePropagationProtocol {
 
     }
 
-    propagateWaitlistSimple(socket, disconnectSocket = true){
+    async propagateWaitlistSimple(socket, disconnectSocket = true){
 
         if (socket === undefined || socket.node === undefined ) return;
 
@@ -252,6 +259,8 @@ class NodePropagationProtocol {
             list = this._waitlistSimpleSSL;
 
         socket.emit( "propagation/nodes", { op: "new-full-nodes", addresses: list } );
+
+        await Blockchain.blockchain.sleep(50);
 
         if (disconnectSocket){
             setTimeout(()=>{
