@@ -104,12 +104,12 @@ class InterfaceBlockchain {
 
         }
 
+        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
 
-        await this.sleep(70);
         if (! (await this.validateBlockchainBlock(block)) ) // the block has height === this.blocks.length
             return false;
 
-        await this.sleep(80);
+        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
 
         //let's check again the heights
         if (block.height !== this.blocks.length)
@@ -316,7 +316,7 @@ class InterfaceBlockchain {
 
     _getLoadBlockchainValidationType(indexStart, i, numBlocks, indexStartProcessingOffset){
 
-        let validationType = {};
+        let validationType = {"skip-sleep": true} ;
 
         if (indexStartProcessingOffset !== undefined ){
 

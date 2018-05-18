@@ -245,7 +245,7 @@ class InterfaceBlockchainFork {
                 return false
             }
 
-            await this.sleep(100);
+            await this.sleep(50);
 
             this.forkIsSaving = true;
 
@@ -260,7 +260,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            await this.sleep(100);
+            await this.sleep(70);
 
             try {
 
@@ -278,7 +278,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            await this.sleep(100);
+            await this.sleep(70);
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
 
@@ -302,12 +302,12 @@ class InterfaceBlockchainFork {
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});
 
-                    await this.sleep(100);
+                    await this.sleep(30);
                 }
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
 
-                await this.sleep(100);
+                await this.sleep(30);
 
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
 
@@ -325,23 +325,23 @@ class InterfaceBlockchainFork {
                 //revert the accountant tree
                 //revert the last K block
                 revertActions.revertOperations('', "all");
-                await this.sleep(100);
+                await this.sleep(30);
 
                 //reverting back to the clones, especially light settings
                 await this.revertFork();
-                await this.sleep(100);
+                await this.sleep(30);
 
             }
 
-            await this.sleep(100);
+            await this.sleep(30);
 
             await this.postForkTransactions(forkedSuccessfully);
 
-            await this.sleep(100);
+            await this.sleep(30);
 
             this.postFork(forkedSuccessfully);
 
-            await this.sleep(100);
+            await this.sleep(30);
 
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();
