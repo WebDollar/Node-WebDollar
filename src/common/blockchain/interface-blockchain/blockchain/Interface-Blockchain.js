@@ -141,7 +141,7 @@ class InterfaceBlockchain {
 
     _onBlockCreated(block, saveBlock){
 
-        if (saveBlock)
+        if (!block.blockValidation.blockValidationType["skip-recalculating-hash-rate"] )
             this.blocks.recalculateNetworkHashRate();
 
     }
@@ -339,6 +339,7 @@ class InterfaceBlockchain {
                 validationType["skip-calculating-proofs"] = true;
                 validationType["skip-calculating-block-nipopow-level"] = true;
                 validationType["skip-saving-light-accountant-tree-serializations"] = true;
+                validationType["skip-recalculating-hash-rate"] = true;
 
                 if (Math.random() > 0.0001)
                     validationType["skip-validation-PoW-hash"] = true;

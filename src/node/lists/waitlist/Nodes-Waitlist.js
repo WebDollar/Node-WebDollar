@@ -66,6 +66,8 @@ class NodesWaitlist {
                 let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
                 if (sckAddress.address.indexOf("192.168") === 0 ) continue;
 
+                if (process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL) continue;
+
                 let answer = this._searchNodesWaitlist(sckAddress, port, type);
 
                 if (answer.waitlist === null){

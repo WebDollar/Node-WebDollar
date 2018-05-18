@@ -290,7 +290,7 @@ consts.SETTINGS = {
             },
 
             TIMEOUT: {
-                WAIT_ASYNC_DISCOVERY_TIMEOUT: 6500,
+                WAIT_ASYNC_DISCOVERY_TIMEOUT: 7500,
             }
 
         },

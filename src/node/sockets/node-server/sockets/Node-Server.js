@@ -113,7 +113,7 @@ class NodeServer {
                     return;
                 }
 
-                if (NODES_TYPE.NODE_WEB_PEER === nodeType && (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)) {
+                if (NODES_TYPE.NODE_WEB_PEER === nodeType && (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
 
                     if (Math.random() < 0.05) console.warn("too many browser connections");
 
@@ -215,7 +215,6 @@ class NodeServer {
         socket.once("disconnect", () => {
 
             try {
-                console.log("Socket disconnected", socket.node.sckAddress.getAddress());
                 NodesList.disconnectSocket(socket);
             } catch (exception){
 

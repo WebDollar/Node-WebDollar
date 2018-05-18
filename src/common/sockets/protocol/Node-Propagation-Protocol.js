@@ -84,7 +84,13 @@ class NodePropagationProtocol {
             try{
 
                 let list = [];
-                for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++) list.push(NodesWaitlist.waitListFullNodes[i].toJSON());
+                for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++) {
+
+                    if (socket.node.protocol.nodeType === NODES_TYPE.NODE_WEB_PEER && !NodesWaitlist.waitListFullNodes[i].sckAddresses[0].SSL) //let's send only SSL
+                        continue;
+
+                    list.push(NodesWaitlist.waitListFullNodes[i].toJSON());
+                }
 
                 socket.node.sendRequest("propagation/nodes", {"op": "new-full-nodes", addresses: list });
 
@@ -200,7 +206,6 @@ class NodePropagationProtocol {
 
             if (nodes.length === 0) return;
 
-            let index = 0;
             for (let index =0; index < number && index < nodes.length; index++){
 
                 let node = nodes[index];
@@ -218,7 +223,7 @@ class NodePropagationProtocol {
                         break;
                     }
 
-                if ( !found && (!onlySSL || onlySSL && node.sckAddresses[0].SSL))
+                if ( !found && (!onlySSL || onlySSL && node.sckAddresses[0].SSL === true))
                     list.push(json);
 
                 index++;
