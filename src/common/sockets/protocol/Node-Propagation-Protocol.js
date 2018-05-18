@@ -28,7 +28,9 @@ class NodePropagationProtocol {
 
         for (let key in list){
 
-            let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t,  list[key].c, list[key].socket.node.level + 1, list[key].socket );
+            if (key === "length") continue;
+
+            let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
 
             if (answer !== null ){
 
@@ -38,6 +40,7 @@ class NodePropagationProtocol {
             }
 
             list[key] = undefined;
+            list.length--;
         }
 
 
@@ -55,6 +58,8 @@ class NodePropagationProtocol {
 
 
     initializePropagationProtocol(){
+
+        console.log("XXXXXXXXXXXX", "initializePropagationProtocol");
 
         NodesList.emitter.once("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
         NodesList.emitter.once("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected( nodeListObject) });
@@ -86,6 +91,7 @@ class NodePropagationProtocol {
             try{
 
                 let list = [];
+
                 for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++) {
 
                     if (socket.node.protocol.nodeType === NODES_TYPE.NODE_WEB_PEER && !NodesWaitlist.waitListFullNodes[i].sckAddresses[0].SSL) //let's send only SSL
@@ -149,10 +155,14 @@ class NodePropagationProtocol {
 
                         for (let i = 0; i < addresses.length; i++){
 
-                            if ( list[ addresses[ i ].a ] === undefined && addresses[ i ].a !== "length"){
+                            if ( typeof addresses[ i ].a === "string" && list[ addresses[ i ].a ] === undefined && addresses[ i ].a !== "length"){
 
-                                list[ addresses[ i ].a ] = addresses[i];
-                                list[ addresses[ i ].a ].socket = socket;
+                                list[ addresses[ i ].a ] = {
+                                    a: addresses[i].a,
+                                    t: addresses[i].t,
+                                    c: addresses[i].c,
+                                    sock: sock,
+                                };
 
                                 list.length++;
 

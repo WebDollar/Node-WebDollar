@@ -57,6 +57,9 @@ class NodeProtocol {
             return false;
         }
 
+        if (response.uuid === consts.SETTINGS.UUID)
+            return false;
+
         this.node.sckAddress.uuid = response.uuid;
 
         //check if it is a unique connection, add it to the list

@@ -129,22 +129,25 @@ class NodeServer {
                     return;
                 }
 
-                if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
+                if ( socket.request._query["uuid"] === consts.SETTINGS.UUID )
+                    return false;
 
-                    if (nodeDomain === '' || nodeDomain === undefined){
-                        socket.disconnect();
-                        return;
-                    }
-
-                    let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
-
-
-                    if (waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
-                        socket.disconnect();
-                        return;
-                    }
-
-                }
+                // if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
+                //
+                //     if (nodeDomain === '' || nodeDomain === undefined){
+                //         socket.disconnect();
+                //         return;
+                //     }
+                //
+                //     let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
+                //
+                //
+                //     if (waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
+                //         socket.disconnect();
+                //         return;
+                //     }
+                //
+                // }
 
                 if ( this.serverSits <= 0){
 
