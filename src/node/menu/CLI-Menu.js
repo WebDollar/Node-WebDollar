@@ -65,9 +65,6 @@ class CLI {
             case 'p':
                 await this.startMiningInsidePool();
                 break;
-            case 'c':
-                await this.createMiningPool();
-                break;
             case 'exit':
                 this._exitMenu = true;
                 break;
@@ -362,25 +359,7 @@ class CLI {
         
         console.info('Mining inside a pool.');
         console.info('Your current mining pool is: ', 'demo at the moment');
-        
-        return new Promise ((resolve)=> {
-            let response = AdvancedMessages.confirm('Do you want to continue mining in the same pool');
-            
-            if (response == false) {
-                let miningPoolLink = await this.question('Enter the new mining pool link: ');
-                console.info('Your new mining pool is: ', miningPoolLink);
-                //TODO: Save the mining pool link
-            }
-            
-            //TODO: Code for start mining inside a pool
-            
-            resolve(true);
-        }
-    }
-    
-    async createMiningPool(){
-        
-        console.info('Create Mining Pool.');
+
     }
 
     question(message){
@@ -406,7 +385,6 @@ const commands = [
         '8. Start Mining',
         '9. Start Mining Instantly Even Unsynchronized',
         'p. Start Mining Inside a Pool',
-        'c. Create a New Mining Pool',
     ];
 
 const lineSeparator =
