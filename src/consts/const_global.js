@@ -190,7 +190,7 @@ consts.MINING_POOL = {
     BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
 
     MINING:{
-        FEE_THRESHOLD: 100,
+        FEE_THRESHOLD: 100000,
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
 
@@ -333,7 +333,5 @@ if ( consts.DEBUG === true ){
 
 
 }
-
-consts.SETTINGS.NODE.PORT = 8081;
 
 export default consts

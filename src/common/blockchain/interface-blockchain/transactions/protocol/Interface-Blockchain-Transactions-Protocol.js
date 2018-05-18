@@ -21,7 +21,6 @@ class InterfaceBlockchainTransactionsProtocol{
 
         if (Blockchain.loaded){
             this.downloadTransactions(socket, 0, 30);
-            return;
         }
 
         //after
@@ -142,7 +141,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 await Blockchain.blockchain.sleep(25);
 
-                node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list } );
+                node.sendRequest('transactions/get-pending-transactions-by-ids/answer', { result: true, format: response.format, transactions: list } );
 
             } catch (exception){
             }
@@ -210,7 +209,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
             await Blockchain.blockchain.sleep(40);
 
-            if ( downloadingTransactions.length ) //nothing to download
+            if ( downloadingTransactions.length === 0) //nothing to download
                 return;
 
             let answerTransactions = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-by-ids", {format: "buffer", ids: downloadingTransactions }, "answer" , 5000);
