@@ -87,10 +87,13 @@ class NodesList {
 
             this.emitter.emit("nodes-list/connected", object);
 
-            if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && socket.node.type === NODES_TYPE.NODE_TERMINAL) {
+            if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && ( socket.node.type === NODES_TYPE.NODE_TERMINAL || socket.node.type === NODES_TYPE.NODE_WEB_PEER )) {
 
                 if (socket.node.protocol.nodeDomain.indexOf("my-ip:")>=0)
                     socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("my-ip", socket.node.sckAddress.address);
+
+                if (socket.node.protocol.nodeDomain.indexOf("browser")===0)
+                    socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("browser", socket.node.sckAddress.address);
 
                 await NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.type, true, socket.node.level, socket, socket);
             }

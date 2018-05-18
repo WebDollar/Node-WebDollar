@@ -29,6 +29,7 @@ class NodePropagationProtocol {
         for (let key in list){
 
             if (key === "length") continue;
+            if (!list.hasOwnProperty(key)) continue;
 
             let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
 
@@ -39,7 +40,7 @@ class NodePropagationProtocol {
                 return;
             }
 
-            list[key] = undefined;
+            delete list[key];
             list.length--;
         }
 
@@ -58,8 +59,6 @@ class NodePropagationProtocol {
 
 
     initializePropagationProtocol(){
-
-        console.log("XXXXXXXXXXXX", "initializePropagationProtocol");
 
         NodesList.emitter.once("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
         NodesList.emitter.once("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected( nodeListObject) });
@@ -161,7 +160,7 @@ class NodePropagationProtocol {
                                     a: addresses[i].a,
                                     t: addresses[i].t,
                                     c: addresses[i].c,
-                                    sock: sock,
+                                    sock: socket,
                                 };
 
                                 list.length++;
