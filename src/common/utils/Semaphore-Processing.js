@@ -41,7 +41,7 @@ class SemaphoreProcessing{
                 await this.sleep(70);
             } catch (ex){
                 console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
-                resolve(false)
+                resolve(false);
                 return;
             }
 

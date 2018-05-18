@@ -291,27 +291,27 @@ class InterfaceBlockchainTransaction{
         return true;
     }
 
-    processTransaction(multiplicationFactor = 1 , minerAddress, revertActions){
+    processTransaction(multiplicationFactor = 1 , minerAddress, revertActions, showUpdate){
 
-        if ( multiplicationFactor === 1 ) {
-
-            //nonce
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions)) return false;
-
-            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false;
-            if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
-
-            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions) === null) return false;
-
-        } else if (multiplicationFactor === -1) {
+        if ( multiplicationFactor === 1 ) { // adding transaction
 
             //nonce
-            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions) === null) return false;
+            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
 
-            if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
-            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false;
+            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
+            if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
 
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions)) return false;
+            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions, showUpdate) === null) return false;
+
+        } else if (multiplicationFactor === -1) { // removing transaction
+
+            //nonce
+            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions, showUpdate) === null) return false;
+
+            if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
+            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
+
+            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
 
 
         }else

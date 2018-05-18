@@ -32,7 +32,7 @@ class MiniBlockchain extends  inheritBlockchain{
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
     }
 
-    async simulateNewBlock(block, revertAutomatically, revertActions, callback){
+    async simulateNewBlock(block, revertAutomatically, revertActions, callback, showUpdate = true ){
 
         revertActions.push( { name: "breakpoint" } );
 
@@ -43,7 +43,7 @@ class MiniBlockchain extends  inheritBlockchain{
             if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
 
                 //updating reward
-                let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions );
+                let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions, showUpdate);
 
                 //reward
                 if (result === null || result === undefined)
@@ -60,7 +60,7 @@ class MiniBlockchain extends  inheritBlockchain{
                     revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
                 }
 
-                if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions ))
+                if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions, showUpdate ))
                     throw {message: "Process Block Data Transactions failed"};
 
 

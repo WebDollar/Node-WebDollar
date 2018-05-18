@@ -23,12 +23,12 @@ class RevertActions {
 
                 if (action.name === "revert-updateAccount" && (actionName === '' || actionName === action.name)) {
 
-                    this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
+                    this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId, undefined, action.showUpdate);
 
                 }
                 else if (action.name === "revert-updateAccountNonce" && (actionName === '' || actionName === action.name)) {
 
-                    this.blockchain.accountantTree.updateAccountNonce(action.address, -action.nonceChange, action.tokenId);
+                    this.blockchain.accountantTree.updateAccountNonce(action.address, -action.nonceChange, action.tokenId, undefined, action.showUpdate);
 
                 }
                 else if (action.name === "revert-skip-validation-transactions-from-values" && (actionName === '' || actionName === action.name)) {

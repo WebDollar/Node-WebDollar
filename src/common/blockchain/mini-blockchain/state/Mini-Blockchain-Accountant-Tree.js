@@ -26,7 +26,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
      * @param tokenId
      * @returns {*}
      */
-    updateAccount(address, value, tokenId, revertActions) {
+    updateAccount(address, value, tokenId, revertActions, showUpdate) {
 
         if (tokenId === undefined || tokenId === '' || tokenId === null) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
@@ -55,19 +55,22 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
             name: "revert-updateAccount",
             address: address,
             value: value,
-            tokenId: tokenId
+            tokenId: tokenId,
+            showUpdate: showUpdate,
         });
 
         //WEBD
-        if (tokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH && tokenId[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) {
-            this.root.total += value;
-            this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
-        }
+        if (showUpdate) {
+            if (tokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH && tokenId[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) {
+                this.root.total += value;
+                this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
+            }
 
-        //optimization, but it doesn't work in browser
-        this.emitBalanceChangeEvent(address, () => {
-            return (resultUpdate !== null ? node.getBalances() : null);
-        });
+            //optimization, but it doesn't work in browser
+            this.emitBalanceChangeEvent(address, () => {
+                return (resultUpdate !== null ? node.getBalances() : null);
+            });
+        }
 
         //purging empty addresses
         if (!node.hasBalances()) {
@@ -86,7 +89,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         return resultUpdate;
     }
 
-    updateAccountNonce(address, nonceChange, revertActions) {
+    updateAccountNonce(address, nonceChange, revertActions, showUpdate) {
 
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null)
@@ -103,13 +106,16 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         node.nonce += nonceChange;
 
-        if (revertActions !== undefined) revertActions.push({
-            name: "revert-updateAccountNonce",
-            address: address,
-            nonceChange: nonceChange
-        });
+        if (showUpdate) {
+            if (revertActions !== undefined) revertActions.push({
+                name: "revert-updateAccountNonce",
+                address: address,
+                nonceChange: nonceChange,
+                showUpdate: showUpdate,
+            });
 
-        if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid", nonce: node.nonce};
+            if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid", nonce: node.nonce};
+        }
 
         node.nonce = node.nonce % 0xFFFF;
         if (node.nonce < 0) node.nonce = node.nonce + 0xFFFF;

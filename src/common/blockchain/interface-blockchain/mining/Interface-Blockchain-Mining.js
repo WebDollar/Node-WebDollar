@@ -87,8 +87,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                         return await this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
                             async ()=>{
-                                return await this._simulatedNextBlockMining(nextBlock);
-                            });
+                                return await this._simulatedNextBlockMining(nextBlock, false);
+                            },
+                            false); //avoid displaying the changes
 
                     }) === false) throw {message: "Mining1 returned False"};
 

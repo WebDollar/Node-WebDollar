@@ -150,7 +150,7 @@ class InterfaceBlockchainBlockDataTransactions {
         return offset;
     }
 
-    _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined, revertActions = undefined ){
+    _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined, revertActions = undefined, showUpdate ){
 
         //skipping checking the Transaction in case it requires reverting
         if (multiplicationFactor === 1) {
@@ -158,16 +158,16 @@ class InterfaceBlockchainBlockDataTransactions {
                 throw {message: "couldn't process the transaction ", transaction: transaction.txId };
         }
 
-        transaction.processTransaction(multiplicationFactor, minerAddress, revertActions );
+        transaction.processTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate );
 
         return true;
 
     }
 
-    processBlockDataTransactions( block, multiplicationFactor = 1, revertActions){
+    processBlockDataTransactions( block, multiplicationFactor = 1, revertActions, showUpdate){
 
         for (let i=0; i<block.data.transactions.transactions.length; i++)
-            if (! this._processBlockDataTransaction( block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress, revertActions ) )
+            if (! this._processBlockDataTransaction( block.height, block.data.transactions.transactions[i], multiplicationFactor, block.data.minerAddress, revertActions, showUpdate ) )
                 return false;
 
         return true;
