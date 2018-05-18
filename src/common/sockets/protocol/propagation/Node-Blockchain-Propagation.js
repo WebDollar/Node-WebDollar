@@ -95,7 +95,7 @@ class NodeBlockchainPropagation{
                         if (this._socketsPropagating[i] === socket)
                             this._socketsPropagating.splice(i,1);
 
-                }, 200);
+                }, 500 + Math.random()*400 );
 
             }
 

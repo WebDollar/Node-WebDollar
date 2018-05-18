@@ -334,5 +334,6 @@ if ( consts.DEBUG === true ){
 
 }
 
+consts.SETTINGS.NODE.PORT = 8081;
 
 export default consts

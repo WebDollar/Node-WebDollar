@@ -107,12 +107,12 @@ class NodesWaitlistObject {
 
         let obj = {
 
-            type: this.type,
-            addr: this.sckAddresses[0].getAddress(true, true),
+            a: this.sckAddresses[0].getAddress(true, true), // address
+            t: this.type, // type
 
         };
 
-        if (this.connected) obj.connected = this.connected;
+        if (this.connected) obj.c = this.connected;
 
         return obj;
     }
