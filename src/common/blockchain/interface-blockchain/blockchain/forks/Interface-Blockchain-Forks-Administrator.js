@@ -1,6 +1,6 @@
 import InterfaceBlockchainFork from './Interface-Blockchain-Fork'
 import BufferExtended from "common/utils/BufferExtended"
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -23,8 +23,9 @@ class InterfaceBlockchainForksAdministrator {
 
             for (let i=0; i<this.forks.length; i++)
                 if (!this.forks[i].forkIsSaving) {
+
                     for (let j = this.forks[i].sockets.length-1; j >=0 ; j--)
-                        if (this.forks[i].sockets[j].sckAddress === undefined || this.forks[i].sockets[j].sckAddress.uuid === nodesListObject.socket.sckAddress.uuid ) {
+                        if (this.forks[i].sockets[j].node.sckAddress === undefined || this.forks[i].sockets[j].node.sckAddress.uuid === nodesListObject.socket.node.sckAddress.uuid ) {
                             this.forks[i].sockets.splice(j, 1);
                             break;
                         }
@@ -155,7 +156,7 @@ class InterfaceBlockchainForksAdministrator {
                 let fork = this.forks[i];
                 this.forks.splice(i, 1);
 
-                if (this.forks[i] !== undefined && this.forks[i] !== null)
+                if (fork !== undefined && fork !== null)
                     fork.destroyFork();
             }
 

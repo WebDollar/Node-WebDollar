@@ -1,12 +1,14 @@
 import consts from 'consts/const_global'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain"
 
-let NodeExpress;
+let NodeExpress, NodeServer;
+
 if (!process.env.BROWSER) {
     NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
 }
 
 class NodeProtocol {
@@ -16,13 +18,15 @@ class NodeProtocol {
      */
 
     justSendHello(){
+
         return this.node.sendRequestWaitOnce("HelloNode", {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
-            SSL: process.env.BROWSER ? 1 : NodeExpress.SSL & 1,
+            domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
-        });
+        }, undefined, 4000);
+
     }
 
     processHello( response, validationDoubleConnectionsTypes ){
@@ -48,15 +52,13 @@ class NodeProtocol {
             return false;
         }
 
-        if (NODES_TYPE.NODE_TERMINAL === response.nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
+        if (NODES_TYPE.NODE_TERMINAL === response.nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
             console.warn("too many terminal connections");
             return false;
         }
 
-        if (NODES_TYPE.NODE_WEB_PEER === response.nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER){
-            console.warn("too many browser connections");
+        if (response.uuid === consts.SETTINGS.UUID)
             return false;
-        }
 
         this.node.sckAddress.uuid = response.uuid;
 
@@ -72,43 +74,37 @@ class NodeProtocol {
 
         }
 
-        console.log("RECEIVED HELLO NODE BACK", response.version, response.uuid);
+        console.log("RECEIVED HELLO NODE BACK", response.version);
 
         this.node.protocol.nodeType = response.nodeType;
 
-        if (typeof response.SSL === "string") response.SSL = parseInt(response.SSL);
-        if (typeof response.SSL === "number") response.SSL = response.SSL === 1;
+        this.node.protocol.nodeDomain = response.domain;
 
-        this.node.protocol.nodeSSL = response.SSL;
         this.node.protocol.nodeUTC = response.UTC;
         this.node.protocol.helloValidated = true;
 
         return true;
     }
 
-    async sendHello ( validationDoubleConnectionsTypes ) {
+    async sendHello ( validationDoubleConnectionsTypes, process = true ) {
 
 
         // Waiting for Protocol Confirmation
-        console.log("sendHello");
 
         let response;
         for (let i=0; i < 3; i++) {
 
-            response = await this.node.sendRequestWaitOnce("HelloNode", {
+            if (this.connected === false) return false;
 
-                version: consts.SETTINGS.NODE.VERSION,
-                uuid: consts.SETTINGS.UUID,
-                nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
-                SSL: process.env.BROWSER ? 1 : NodeExpress.SSL & 1,
-                UTC: Blockchain.blockchain.timestamp.timeUTC,
-
-            }, undefined, 1000);
+            response = await this.node.protocol.justSendHello();
 
             if ( typeof response === "object" && response !== null && response.hasOwnProperty("uuid") )
                 break;
 
         }
+
+        if (!process)
+            return true;
 
         return this.node.protocol.processHello( response, validationDoubleConnectionsTypes );
 
@@ -122,11 +118,11 @@ class NodeProtocol {
      * @param type
      * @param exceptSockets
      */
-    static broadcastRequest (request, data, type, exceptSockets){
+    static broadcastRequest (request, data, connectionType, exceptSockets){
 
         if (exceptSockets === "all") return true;
 
-        let nodes = NodesList.getNodes(type);
+        let nodes = NodesList.getNodesByConnectionType(connectionType);
 
         if (exceptSockets !== undefined && exceptSockets !== null && !Array.isArray(exceptSockets))
             exceptSockets = [exceptSockets];

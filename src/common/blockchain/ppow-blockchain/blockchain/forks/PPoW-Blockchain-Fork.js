@@ -35,6 +35,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     async initializeFork(){
 
+        if (this.blockchain === undefined) return false;
+
         if ( this.blockchain.agent.light ) {
             if (! (await this._downloadProof()))
                 return false;
@@ -108,7 +110,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 i++;
             }
 
-            if (proofsList.length === 0) throw {message: "Proofs was not downloaded successfully"};
+            if (proofsList.length === 0)
+                throw {message: "Proofs was not downloaded successfully"};
 
             if (proofsList.length < 150){
 
@@ -173,7 +176,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     async importForkProofPiHeaders( proofsList ){
 
-        for (let i=0; i< proofsList.length; i++){
+        for (let i = 0; i < proofsList.length; i++){
 
             //let's verify if I already have this block
             let found = false, block = undefined;
@@ -207,11 +210,14 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
 
     getForkProofsPiBlock(height){
-        if (height <= 0)  return BlockchainGenesis; // based on genesis block
+        
+        if (height <= 0) 
+            return BlockchainGenesis; // based on genesis block
         else {
 
             let block = this.forkProofPi.hasBlock(height - 1);
-            if (block !== null) return block;
+            if (block !== null)
+                return block;
 
             return this.getForkBlock(height);
 
@@ -262,7 +268,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     _shouldTakeNewProof(){
 
-        if (this.blockchain.proofPi === null) return true;
+        if (this.blockchain.proofPi === null)
+            return true;
 
         let comparison = this.blockchain.verifier.compareProofs( this.blockchain.proofPi, this.forkProofPi );
 
@@ -277,7 +284,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
         //your proof is better than mine
 
         return true;
-
 
     }
 

@@ -1,3 +1,4 @@
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import MiniBlockchainAddress from 'common/blockchain/mini-blockchain/Mini-Blockchain-Address';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data';
@@ -5,15 +6,14 @@ import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
 import consts from 'consts/const_global';
 import BufferExtend from "common/utils/BufferExtended";
-import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 import StatusEvents from "common/events/Status-Events";
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+
+import AdvancedMessages from "node/menu/Advanced-Messages";
+
 const EventEmitter = require('events');
 const FileSystem = require('fs');
-
-import AdvancedMessages from "node/menu/Advanced-Messages"
-
 
 class MainBlockchainWallet{
 
@@ -71,7 +71,7 @@ class MainBlockchainWallet{
             return false;
 
         this.addresses.push(blockchainAddress);
-        this.emitter.emit('wallet/address-changes', blockchainAddress.address );
+        this.emitter.emit('wallet/address-changes', blockchainAddress.address);
 
         await this.saveWallet();
 
@@ -146,7 +146,7 @@ class MainBlockchainWallet{
 
         }, 20*1000 );
 
-        let buffer = await this.db.get( this.walletFileName, 30*1000, true );
+        let buffer = await this.db.get(this.walletFileName, 30*1000, true);
 
         clearTimeout(timeout);
 
@@ -163,7 +163,7 @@ class MainBlockchainWallet{
         }
 
         if (this.addresses.length > 0)
-            this.emitter.emit('wallet/changes', this.addresses );
+            this.emitter.emit('wallet/changes', this.addresses);
 
         return true;
     }
@@ -303,12 +303,12 @@ class MainBlockchainWallet{
                 //Deserialize public addresses and push back to addresses array
                 let offset = 0;
 
-                let numAddresses = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+                let numAddresses = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
                 offset += 1;
 
                 for (let i = 0; i < numAddresses; ++i) {
 
-                    let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+                    let len = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
                     offset += 1;
 
                     let blockchainAddress = await this._justCreateNewAddress();
@@ -338,7 +338,7 @@ class MainBlockchainWallet{
             let address, publicKey;
             let privateKey = inputData;
 
-            //private Key object {version: "xxx", address: "HEX", publicKet: "HEX", privateKey: "HEX" }
+            //private Key object {version: "xxx", address: "HEX", publicKey: "HEX", privateKey: "HEX" }
             if (typeof inputData === "object"){
                 if (!inputData.hasOwnProperty("version"))
                     throw {message:"address.version not specified", inputData: inputData};
@@ -394,7 +394,7 @@ class MainBlockchainWallet{
 
         } catch (exception){
             console.error("importAddressFromJSON raised an exception", exception);
-            return {result:false, message: JSON.stringify(exception) };
+            return {result: false, message: JSON.stringify(exception) };
         }
 
     }
@@ -409,7 +409,7 @@ class MainBlockchainWallet{
         for (let i = 0; i < this.addresses.length; i++)
             if (address === this.addresses[i].address || address === this.addresses[i].unencodedAddress){
                 return {
-                    result:true,
+                    result: true,
 
                     data: {
                         version: consts.SETTINGS.PARAMS.WALLET.VERSION,
@@ -422,8 +422,8 @@ class MainBlockchainWallet{
             }
 
         return {
-            result:false,
-            message: "Address was not found",
+            result: false,
+            message: "Address was not found"
         }
 
     }
@@ -564,7 +564,7 @@ class MainBlockchainWallet{
 
             this.emitter.emit('wallet/changes', this.addresses );
 
-            return {result:true, length: this.addresses.length }
+            return {result: true, length: this.addresses.length }
 
         } else {
 

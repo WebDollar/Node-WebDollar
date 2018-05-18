@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
-import NodesWaitlist from 'node/lists/waitlist/nodes-waitlist'
-import NodesWaitlistObject  from 'node/lists/waitlist/nodes-waitlist-object';
-import NodesList from 'node/lists/nodes-list'
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import NodesWaitlistObject  from 'node/lists/waitlist/Nodes-Waitlist-Object';
+import NodesList from 'node/lists/Nodes-List'
 import FallBackObject from './fallbacks/fallback-object';
 import FallBackNodesList from './fallbacks/fallback_nodes_list';
 import NODES_TYPE from "node/lists/types/Nodes-Type"
@@ -54,7 +54,7 @@ class NodeDiscoveryService {
                     let answer = await this._downloadFallBackList(this.fallbackLists[i]);
 
                     if (answer !== null)
-                        return this.processFallbackNodes(answer)
+                        return await this.processFallbackNodes(answer)
                 }
         }
 
@@ -96,7 +96,7 @@ class NodeDiscoveryService {
         return null;
     }
 
-    processFallbackNodes(data){
+    async processFallbackNodes(data){
 
         try {
             //console.log(data);
@@ -131,9 +131,8 @@ class NodeDiscoveryService {
 
                             let pos = Math.floor( Math.random(  ) * nodes.length );
 
-                            while (marked[pos] !== undefined){
+                            while (marked[pos] !== undefined)
                                 pos = Math.floor( Math.random(  ) * nodes.length );
-                            }
 
                             marked[pos] = true;
 
@@ -147,7 +146,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[pos]; //a simple string Address
                             }
 
-                            NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType, false, 1, "fallback" );
+                            await NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType,  false, 1, "fallback" );
                         }
 
                     }

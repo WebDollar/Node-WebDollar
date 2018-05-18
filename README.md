@@ -5,6 +5,17 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 ![JS Version](https://d3nmt5vlzunoa1.cloudfront.net/webstorm/files/2015/05/js-version.png "Javascript ECMAScript 6 config")
 
+# Docker (No skills, only docker)
+
+## 1. Install Docker 
+
+https://docs.docker.com/install/
+
+## 2. Run prebuilt Container (automated build https://hub.docker.com/r/xkid/webdollar/)
+```
+docker run -d --restart=always -e DOMAIN=<ENTER DOMAIN HERE> -e EMAIL=<ENTER EMAIL HERE> --name webdollar -p 80:80 -p 443:443 xkid/webdollar
+```
+
 # Installing (Poor tech skills required)
 
 ## Follow the following instructions: http://webdollar.aji.ro/webdollar-mining-with-windows-terminal/
@@ -71,6 +82,14 @@ env CXX=g++-5 npm install argon2
 ```
 
 Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
+
+
+
+Install x509 on Windows
+
+1. Install python2.7
+2. npm config set python python2.7
+3. Download and paste it in the C:\OpenSSL-Win64\lib\libeay32.lib the file from https://github.com/ReadyTalk/win32/blob/master/msvc/lib/libeay32.lib
 
 ## 4 SSL (Secured Socket Layer) Certificate
 
@@ -170,8 +189,7 @@ Follow the Tutorial [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
 
 
 # Resources to learn
-7
-Ethereum https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369
+7 Ethereum https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369
 
 Mining in Bitcoins
 1.  http://blog.jameslarisch.com/mining-bitcoin-blocks-yourself-for-fun-and-no-profit

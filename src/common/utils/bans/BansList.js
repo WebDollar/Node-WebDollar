@@ -1,5 +1,5 @@
 import BanObject from "./BanObject"
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 
 class BansList{
 
@@ -13,6 +13,7 @@ class BansList{
 
         });
 
+        setInterval( this._listBans.bind(this), 20*1000  )
 
     }
 
@@ -44,8 +45,6 @@ class BansList{
         ban.increaseBanTrials(banTime, banReason);
 
         this._removeEmptyBans();
-
-        this._listBans();
 
         return ban;
     }

@@ -1,7 +1,9 @@
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
-import NodesListObject from './node-list-object.js';
+import NodesListObject from './Mode-List-Object.js';
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import NODES_TYPE from "node/lists/types/Nodes-Type"
 
 const EventEmitter = require('events');
 
@@ -62,7 +64,7 @@ class NodesList {
 
     }
 
-    registerUniqueSocket(socket, connectionType, type, validationDoubleConnectionsTypes){
+    async registerUniqueSocket(socket, connectionType, type, validationDoubleConnectionsTypes){
 
         if (type === undefined) throw {message: "type is necessary"};
 
@@ -72,19 +74,30 @@ class NodesList {
         }
 
         socket.node.connectionType = connectionType;
+        socket.node.protocol.connectionType = connectionType;
         socket.node.type = type;
-
-        socket.node.index = ++this.nodesTotal;
 
         // avoiding double connections                              unless it is allowed to double connections
         if ( this.searchNodeSocketByAddress(socket, undefined, validationDoubleConnectionsTypes ) === null ) {
 
             // it is a unique connection, I should register this connection
 
-            let object = new NodesListObject(socket, connectionType, type);
+            let object = new NodesListObject(socket, connectionType, type, NodesWaitlist.isAddressFallback(socket.node.sckAddress));
             this.nodes.push(object);
 
             this.emitter.emit("nodes-list/connected", object);
+
+            if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && ( socket.node.type === NODES_TYPE.NODE_TERMINAL || socket.node.type === NODES_TYPE.NODE_WEB_PEER )) {
+
+                if (socket.node.protocol.nodeDomain.indexOf("my-ip:")>=0)
+                    socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("my-ip", socket.node.sckAddress.address);
+
+                if (socket.node.protocol.nodeDomain.indexOf("browser")===0)
+                    socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("browser", socket.node.sckAddress.address);
+
+                await NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.type, true, socket.node.level, socket, socket);
+            }
+
 
             GeoLocationLists.includeSocket(socket);
 
@@ -134,7 +147,7 @@ class NodesList {
     }
 
     //return the JOIN of the clientSockets and serverSockets
-    getNodes(connectionType){
+    getNodesByConnectionType( connectionType, fallback = undefined ){
 
         if ( connectionType === undefined) connectionType = 'all';
 
@@ -142,31 +155,55 @@ class NodesList {
 
         for (let i=0; i<this.nodes.length; i++)
 
-            if (Array.isArray(connectionType)) { //in case type is an Array
-                if (this.nodes[i].connectionType in connectionType)
+            if ( Array.isArray(connectionType) ) { //in case type is an Array
+                if ( connectionType.indexOf( this.nodes[i].socket.node.protocol.connectionType) >= 0 )
                     list.push(this.nodes[i]);
             } else
             // in case type is just a simple string
-            if (connectionType === this.nodes[i].connectionType || connectionType === "all")
+            if ( connectionType === this.nodes[i].socket.node.protocol.connectionType || connectionType === "all" )
                 list.push(this.nodes[i]);
 
         return list;
     }
 
-    countNodesByConnectionType(connectionType){
+    //return the JOIN of the clientSockets and serverSockets
+    getNodesByType(type){
+
+        if ( type === undefined) type = 'all';
+
+        let list = [];
+
+        for (let i=0; i<this.nodes.length; i++)
+
+            if (Array.isArray(type)) { //in case type is an Array
+                if ( type.indexOf( this.nodes[i].socket.node.protocol.type) >= 0)
+                    list.push(this.nodes[i]);
+            } else
+            // in case type is just a simple string
+            if (type === this.nodes[i].socket.node.protocol.type || type === "all")
+                list.push( this.nodes[i] );
+
+        return list;
+    }
+
+
+    countNodesByConnectionType(connectionType, fallback){
 
         if ( connectionType === undefined) connectionType = 'all';
 
         let count = 0;
 
-        for (let i=0; i<this.nodes.length; i++)
+        for (let i=0; i<this.nodes.length; i++) {
+
+            if (fallback !== undefined && this.nodes[i].isFallback !== fallback) continue;
+
             if (Array.isArray(connectionType)) { //in case type is an Array
-                if (this.nodes[i].connectionType in connectionType)
+                if (connectionType.indexOf(this.nodes[i].connectionType) >= 0)
                     count++;
             }
-            else
-            if (connectionType === this.nodes[i].connectionType || connectionType === "all")
+            else if (connectionType === this.nodes[i].connectionType || connectionType === "all")
                 count++;
+        }
 
         return count;
     }
@@ -177,14 +214,14 @@ class NodesList {
 
         let count = 0;
 
-        for (let i=0; i<this.nodes.length; i++)
+        for (let i=0; i<this.nodes.length; i++) {
             if (Array.isArray(nodeType)) { //in case type is an Array
-                if (this.nodes[i].nodeType in nodeType)
+                if (nodeType.indexOf(this.nodes[i].socket.node.protocol.nodeType) >= 0)
                     count++;
             }
-            else
-            if (nodeType === this.nodes[i].nodeType || nodeType === "all")
+            else if (nodeType === this.nodes[i].socket.node.protocol.nodeType || nodeType === "all")
                 count++;
+        }
 
         return count;
     }
@@ -202,9 +239,16 @@ class NodesList {
     disconnectAllNodes(connectionType = CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET){
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if ( this.nodes[i].connectionType === connectionType ){
+            if ( this.nodes[i].socket.node.protocol.connectionType === connectionType )
                 this.nodes[i].socket.disconnect();
-            }
+
+    }
+
+    disconnectFromFallbacks(){
+
+        for (let i=this.nodes.length-1; i>=0; i--)
+            if (this.nodes[i].isFallback)
+                this.nodes.splice(i,1);
 
     }
 

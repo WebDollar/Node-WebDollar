@@ -37,6 +37,8 @@ class PPoWBlockchainProver{
 
         try {
 
+            console.info("_createProofPi ProofPi CREATOR");
+
             //for µ = |C[−k].interlink| down to 0 do
 
             if (chainLength - consts.POPOW_PARAMS.k >= 0)
@@ -73,6 +75,8 @@ class PPoWBlockchainProver{
                         B = superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m];
 
                 }
+
+            console.info("_createProofPi ProofPi FINAL");
 
         } catch (exception){
 

@@ -1,13 +1,9 @@
 
 class SemaphoreProcessing{
 
-    constructor(processingSemaphoreInterval = 10){
+    constructor(){
 
         this._list = [];
-
-        this.processingSemaphoreInterval = processingSemaphoreInterval;
-
-        setTimeout(this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);
 
     }
 
@@ -17,40 +13,51 @@ class SemaphoreProcessing{
      * @returns {Promise.<void>}
      */
 
-    processSempahoreCallback(callback){
+    processSempahoreCallback( callback ){
 
-        return new Promise ((resolve) =>{
-            this._list .push({callback: callback, resolver: resolve});
+        let resolver = undefined, index;
+
+        let promise = new Promise ( async (resolve) => {
+
+            if (index > 0) {
+                await this._list[index - 1].promise;
+                await this.sleep(70);
+            }
+
+            let answer;
+
+            try {
+                answer = await callback();
+                await this.sleep(70);
+            } catch (ex){
+                console.error("error processingSemaphoreList callback !!!!!!!!!!!!!!!!!!!!!!!!", ex);
+                resolve(false);
+                return;
+            }
+
+
+            try {
+                resolve(answer);
+                await this.sleep(70);
+            } catch (ex){
+                console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
+                resolve(false)
+                return;
+            }
+
+            this._list.splice(index, 1);
+
         });
+
+        this._list.push({callback: callback, resolver: resolver, promise: promise});
+        index = this._list.length-1;
+
+        return promise;
 
     }
 
-
-    _processingSemaphoreList(){
-
-        if (this._list.length > 0){
-
-            let answer = false;
-            try {
-                answer = this._list[0].callback();
-            } catch (ex){
-                console.error("error processingSemaphoreList !!!!!!!!!!!!!!!!!!!!!!!!", ex);
-            }
-
-            try {
-                let resolver = this._list[0].resolver;
-                this._list.splice(0, 1);
-
-                resolver(answer);
-
-            } catch (ex){
-                console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
-            }
-
-        }
-
-        setTimeout(this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);
-
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 }

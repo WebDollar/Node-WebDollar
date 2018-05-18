@@ -37,37 +37,46 @@ class SocketAddress {
         if (address === undefined) address = '';
         if (port === undefined) port = consts.SETTINGS.NODE.PORT;
 
-        try {
-            if (ipaddr.IPv6.isIPv6(address)) {
+        try{
 
-                let ip = ipaddr.IPv6.parse(address);
-
-                if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
-                    address = ip.toIPv4Address().toNormalizedString();
-                else // ipString is IPv6
-                    address = ip.toNormalizedString();
-
+            if (address.indexOf("https://") >= 0){
+                address = address.replace("https://", "");
+                this.SSL = true;
+            } else
+            if (address.indexOf("http://") >= 0){
+                address = address.replace("http://","");
             }
 
-
-            if (address.lastIndexOf(":") > 0) {//port
-                port = address.substr(address.lastIndexOf(":") + 1);
-                address = address.substr(0, address.lastIndexOf(":"));
-            }
-
-            if (ipaddr.IPv4.isIPv4(address)) {
-
-                let ip = ipaddr.IPv4.parse(address);
-                address = ip.toNormalizedString(); //IPv4
-
-            } else {
-            }// it is a domain
-
-        } catch (exception){
-
-            address = "0.0.0.0";
+        }catch (exception){
 
         }
+
+
+        if (ipaddr.IPv6.isIPv6(address)) {
+
+            let ip = ipaddr.IPv6.parse(address);
+
+            if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
+                address = ip.toIPv4Address().toNormalizedString();
+            else // ipString is IPv6
+                address = ip.toNormalizedString();
+
+        }
+
+
+        if (address.lastIndexOf(":") > 0) {//port
+            port = address.substr(address.lastIndexOf(":") + 1);
+            address = address.substr(0, address.lastIndexOf(":"));
+        }
+
+        if (ipaddr.IPv4.isIPv4(address)) {
+
+            let ip = ipaddr.IPv4.parse(address);
+            address = ip.toNormalizedString(); //IPv4
+
+        } else {
+        }// it is a domain
+
 
 
         this.address = address; //always ipv6
@@ -80,7 +89,7 @@ class SocketAddress {
 
     matchAddress(address, validationDoubleConnectionsTypes){
 
-        if (validationDoubleConnectionsTypes === undefined) validationDoubleConnectionsTypes = ["ip","uuid"];
+        if (validationDoubleConnectionsTypes === undefined) validationDoubleConnectionsTypes = ["ip","uuid"]; // port
         else
         if (!Array.isArray(validationDoubleConnectionsTypes))
             validationDoubleConnectionsTypes = [validationDoubleConnectionsTypes];
@@ -96,6 +105,15 @@ class SocketAddress {
                     return true;
             }
             if (validationDoubleConnectionsTypes[i] === "ip") {
+
+                if (validationDoubleConnectionsTypes.indexOf("port") >= 0){
+
+                    if (this.address+":"+this.port === sckAddress.address+":"+sckAddress.port)
+                        return true;
+
+                    return false;
+
+                } else
                 if ( this.address === sckAddress.address ) return true;
             }
         }
@@ -113,9 +131,9 @@ class SocketAddress {
     /*
         returns ipv6 ip standard
      */
-    getAddress(includePort=true){
+    getAddress(includePort=true, includeHTTP=false){
 
-        return this.address + (includePort ? ':'+this.port : '');
+        return (includeHTTP ? 'http'+ (this.SSL ? 's': '')  + '://' : '' )+this.address + (includePort ? ':'+this.port : '');
 
     }
 

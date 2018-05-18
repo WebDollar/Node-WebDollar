@@ -1,6 +1,6 @@
 import Blockchain from "main-blockchain/Blockchain"
 import consts from 'consts/const_global'
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 
 class NodeBlockchainPropagation{
 
@@ -23,7 +23,10 @@ class NodeBlockchainPropagation{
 
         });
 
-        setTimeout( this.processPropagation.bind(this), 300);
+        setTimeout( this.processPropagation.bind(this), 400);
+
+        //remove disconnected sockets
+        setInterval( this._deleteDisconenctedSockets.bind(this), 20000)
     }
 
     propagateBlock(block, socketsAvoidBroadcast){
@@ -57,7 +60,7 @@ class NodeBlockchainPropagation{
             return true;
         }
 
-        if (this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.PROPAGATE_BLOCKS_TO_SOCKETS) {
+        if (this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP) {
 
             let list = [];
             for (let i=0; i<NodesList.nodes.length; i++)
@@ -65,7 +68,7 @@ class NodeBlockchainPropagation{
                     list.push(NodesList.nodes[i].socket);
 
 
-            while ( list.length > 0 && this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.PROPAGATE_BLOCKS_TO_SOCKETS ) {
+            while ( list.length > 0 && this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP ) {
 
                 let index = Math.floor( Math.random() * list.length );
 
@@ -80,6 +83,10 @@ class NodeBlockchainPropagation{
                 setTimeout(()=>{
 
                     if (block === this._blockPropagating){
+
+                        if (socket.disconnected)
+                            return;
+
                         this._socketsAlreadyBroadcast.push(socket);
                     }
 
@@ -88,7 +95,7 @@ class NodeBlockchainPropagation{
                         if (this._socketsPropagating[i] === socket)
                             this._socketsPropagating.splice(i,1);
 
-                }, 200);
+                }, 200 + Math.random()*200 );
 
             }
 
@@ -111,6 +118,19 @@ class NodeBlockchainPropagation{
                 return true;
 
         return false;
+    }
+
+    _deleteDisconenctedSockets(){
+
+        for (let i=this._socketsAlreadyBroadcast.length-1; i>=0; i--)
+            if (this._socketsAlreadyBroadcast[i].disconnected)
+                this._socketsAlreadyBroadcast.splice(i,1);
+
+        for (let i=this._socketsPropagating.length-1; i>=0; i--)
+            if (this._socketsPropagating[i].disconnected)
+                this._socketsPropagating.splice(i,1);
+
+
     }
 
 }

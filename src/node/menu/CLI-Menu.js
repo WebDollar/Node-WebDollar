@@ -372,7 +372,7 @@ const commands = [
         '6. Encrypt address',
         '7. Set mining address',
         '8. Start Mining',
-        '9. Start Mining Genesis Instantly',
+        '9. Start Mining Instantly Even Unsynchronized',
     ];
 
 const lineSeparator =

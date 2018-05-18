@@ -5,6 +5,8 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import StatusEvents from "common/events/Status-Events";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
+import consts from 'consts/const_global'
+
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -32,7 +34,8 @@ class InterfaceBlockchainFork {
         this.sockets = [];
         this.forkPromise = [];
         this._blocksCopy = [];
-
+        this._forkPromiseResolver = undefined;
+        this.forkPromise = undefined;
 
     }
 
@@ -147,8 +150,13 @@ class InterfaceBlockchainFork {
             return BlockchainGenesis.difficultyTarget; // based on genesis block
         else if ( forkHeight === 0)
             return this.blockchain.getDifficultyTarget(height);
-        else if ( forkHeight > 0)
+        else if ( forkHeight > 0) {
+
+            if ( forkHeight-1 >= this.forkBlocks.length )
+                console.warn("getForkDifficultyTarget FAILED", forkHeight);
+
             return this.forkBlocks[forkHeight - 1].difficultyTarget; // just the fork
+        }
         else
             return this.blockchain.getDifficultyTarget(height) // the blockchain
     }
@@ -199,11 +207,14 @@ class InterfaceBlockchainFork {
             validationType["validation-timestamp-adjusted-time"] = true;
 
         if (height !== this.forkChainLength-1)
-            validationType["avoid-calculating-proofs"] = true;
+            validationType["skip-calculating-proofs"] = true;
 
         return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     /**
      * Validate the Fork and Use the fork as main blockchain
@@ -225,6 +236,7 @@ class InterfaceBlockchainFork {
 
 
         let revertActions = new RevertActions(this.blockchain);
+        revertActions.push({action: "breakpoint"});
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
@@ -232,6 +244,8 @@ class InterfaceBlockchainFork {
                 console.error("validateFork was not passed");
                 return false
             }
+
+            await this.sleep(50);
 
             this.forkIsSaving = true;
 
@@ -245,6 +259,8 @@ class InterfaceBlockchainFork {
                 this.forkIsSaving = false;
                 return false;
             }
+
+            await this.sleep(70);
 
             try {
 
@@ -261,6 +277,8 @@ class InterfaceBlockchainFork {
                 this.forkIsSaving = false;
                 return false;
             }
+
+            await this.sleep(70);
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
 
@@ -281,12 +299,17 @@ class InterfaceBlockchainFork {
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
                     this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
 
+                    if (process.env.BROWSER) this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
+
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});
 
+                    if (!process.env.BROWSER) await this.sleep(70);
                 }
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
+
+                await this.sleep(30);
 
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
 
@@ -304,19 +327,27 @@ class InterfaceBlockchainFork {
                 //revert the accountant tree
                 //revert the last K block
                 revertActions.revertOperations('', "all");
+                await this.sleep(30);
 
                 //reverting back to the clones, especially light settings
                 await this.revertFork();
+                await this.sleep(30);
 
             }
 
+            await this.sleep(30);
+
             await this.postForkTransactions(forkedSuccessfully);
+
+            await this.sleep(30);
 
             this.postFork(forkedSuccessfully);
 
+            await this.sleep(30);
+
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();
-                setTimeout( ()=>{ this._forkPromiseResolver(true) } , 10 ); //making it async
+                this._forkPromiseResolver(true) //making it async
             }
 
             this.forkIsSaving = false;
@@ -326,15 +357,25 @@ class InterfaceBlockchainFork {
         // it was done successfully
         console.log("FORK SOLVER SUCCESS", success);
 
+        revertActions.destroyRevertActions();
+
         if (success){
 
             //successfully, let's delete the backup blocks
             this._deleteBackupBlocks();
 
-            //propagate last block
-            NodeBlockchainPropagation.propagateBlock( this.blockchain.blocks[this.blockchain.blocks.length-1], this.sockets);
+            await this.sleep(100);
 
-            this.blockchain.agent.protocol.askBlockchain(this.getSocket());
+            //propagate last block
+            NodeBlockchainPropagation.propagateBlock( this.blockchain.blocks[ this.blockchain.blocks.length-1 ], this.sockets);
+
+            if (this.forkBlocks.length === consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD ) {
+
+                this.blockchain.agent.protocol.askBlockchain(this.getSocket());
+
+            }
+
+            await this.sleep(100);
 
         }
 

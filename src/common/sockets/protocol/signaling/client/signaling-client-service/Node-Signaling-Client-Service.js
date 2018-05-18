@@ -1,6 +1,6 @@
 import consts from 'consts/const_global'
 import SignalingClientList from "../signaling-client-list/signaling-client-list"
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 
 class NodeSignalingClientService {
 
@@ -44,7 +44,7 @@ class NodeSignalingClientService {
     }
 
     _askSignalingServer(socket){
-        socket.node.sendRequest("signals/server/register/accept-web-peer-connections", {acceptWebPeers : SignalingClientList.connected.length < consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS } );
+        socket.node.sendRequest("signals/server/register/accept-web-peer-connections", {acceptWebPeers : SignalingClientList.connected.length < consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.WEBRTC.MAXIMUM_CONNECTIONS } );
     }
 
 }

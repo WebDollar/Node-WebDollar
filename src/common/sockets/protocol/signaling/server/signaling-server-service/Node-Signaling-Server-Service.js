@@ -1,4 +1,4 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingServerWaitlistObject from "./Node-Signaling-Server-Waitlist-Object"
 import NodeSignalingServerProtocol from "./../Node-Signaling-Server-Protocol"
 

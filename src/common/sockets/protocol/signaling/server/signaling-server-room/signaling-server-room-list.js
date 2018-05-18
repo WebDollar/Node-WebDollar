@@ -1,6 +1,6 @@
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import SignalingServerRoomConnectionObject from './signaling-server-room-connection-object';
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 /*
@@ -37,7 +37,6 @@ class SignalingServerRoomList {
 
             let roomConnectionObject = new SignalingServerRoomConnectionObject(client1, client2, status, uuid.v4());
 
-            this.list.push(roomConnectionObject);
             this.list.push(roomConnectionObject);
 
             return roomConnectionObject;
@@ -77,7 +76,7 @@ class SignalingServerRoomList {
 
     _disconnectedNode(nodesListObject){
 
-        if ( [ CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, CONNECTIONS_TYPE.CONNECTION_WEBRTC].indexOf(nodesListObject.connectionType) )    // signaling service on webpeer
+        if ( [ CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, CONNECTIONS_TYPE.CONNECTION_WEBRTC].indexOf(nodesListObject.connectionType) >= 0 )    // signaling service on webpeer
 
             for (let i = this.list.length-1; i >= 0 ; i--)
                 if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){

@@ -1,4 +1,4 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import consts from 'consts/const_global'
 import NetworkAdjustedTimeClusters from "./clusters/Network-Adjusted-Time-Clusters";
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'

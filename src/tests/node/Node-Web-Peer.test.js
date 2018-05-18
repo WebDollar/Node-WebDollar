@@ -5,7 +5,8 @@ describe('test node WebPeer', async () =>{
 
     let webpeer = new NodeWebPeer();
 
-    webpeer.createPeer();
+    await webpeer.createPeer();
+
     console.log("SIGNAL", await webpeer.createSignal());
 
 });

@@ -7,7 +7,7 @@
 
 const EventEmitter = require('events');
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import consts from 'consts/const_global'
@@ -69,7 +69,7 @@ class NodeWebPeerRTC {
 
     }
 
-    createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
+    async createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
 
         console.log('Using SCTP based data channels');
 
@@ -82,6 +82,8 @@ class NodeWebPeerRTC {
         this.peer =  new RTCPeerConnection(config);
 
         this.peer.connected = false;
+        this.peer.disconnected = true;
+
         this.enableEventsHandling();
 
         this.peer.onicecandidate = (event) => {
@@ -113,6 +115,7 @@ class NodeWebPeerRTC {
         };
 
         this.socket =  this.peer;
+
         this.peer.signalData = null;
         this.peer.signalInitiatorData = null;
 
@@ -201,7 +204,7 @@ class NodeWebPeerRTC {
 
                             },
                             (error) => {
-                                resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +error.toString()});
+                                resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +(error !== undefined ? error.toString() : '')});
                                 console.error("Generating Initiator - Error Setting Local Description ", error);
                             }
                         );
@@ -349,13 +352,16 @@ class NodeWebPeerRTC {
 
         this.peer.oniceconnectionstatechange = () => {
 
-            if(this.peer.iceConnectionState === 'disconnected') {
+            if (this.peer.iceConnectionState === 'disconnected') {
+
                 console.log('iceConnection Disconnected');
                 if (this.peer.connected === true) {
                     this.peer.connected = false;
+                    this.peer.disconnected = true;
 
                     this.emitter.emit("disconnect", {})
                 }
+
             }
         };
 
@@ -446,6 +452,7 @@ class NodeWebPeerRTC {
         if (this.peer.dataChannel.readyState === 'open') {
             if (!this.peer.connected ) {
                 this.peer.connected = true;
+                this.peer.disconnected = false;
                 this.emitter.emit("connect", {});
             }
         }
@@ -453,16 +460,17 @@ class NodeWebPeerRTC {
         if (this.peer.dataChannel.readyState === 'closed') {
             if (this.peer.connected){
                 this.peer.connected = false;
+                this.peer.disconnected = true;
                 this.emitter.emit("disconnect", {});
             }
         }
     }
 
 
-    initializePeer(validationDoubleConnectionsTypes){
+    async initializePeer(validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(this.peer, CONNECTIONS_TYPE.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.peer, CONNECTIONS_TYPE.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 
@@ -472,6 +480,10 @@ class NodeWebPeerRTC {
         this.peer.on("disconnect", ()=>{
 
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
+
+            this.disconnected = true;
+            this.connected = false;
+
             try {
                 NodesList.disconnectSocket(this.peer);
 
