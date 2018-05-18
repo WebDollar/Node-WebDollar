@@ -33,7 +33,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (left < 0 || answer === null || !Buffer.isBuffer(answer.hash) )
                 return {position: null, header: answer };
 
-            this.blockchain.sleep(5);
+            await this.blockchain.sleep(5);
 
             //i have finished the binary search
             if (left >= right) {
@@ -308,7 +308,7 @@ class InterfaceBlockchainProtocolForkSolver{
             else
                 throw {message: "Fork didn't work at height ", nextBlockHeight};
 
-            this.blockchain.sleep(30);
+            await this.blockchain.sleep(30);
 
         }
 

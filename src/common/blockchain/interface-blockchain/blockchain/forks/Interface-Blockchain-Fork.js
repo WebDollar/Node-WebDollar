@@ -245,7 +245,7 @@ class InterfaceBlockchainFork {
                 return false
             }
 
-            this.sleep(100);
+            await this.sleep(100);
 
             this.forkIsSaving = true;
 
@@ -260,7 +260,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            this.sleep(100);
+            await this.sleep(100);
 
             try {
 
@@ -278,7 +278,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            this.sleep(100);
+            await this.sleep(100);
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
 
@@ -302,12 +302,12 @@ class InterfaceBlockchainFork {
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});
 
-                    this.sleep(100);
+                    await this.sleep(100);
                 }
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
 
-                this.sleep(100);
+                await this.sleep(100);
 
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
 
@@ -325,23 +325,23 @@ class InterfaceBlockchainFork {
                 //revert the accountant tree
                 //revert the last K block
                 revertActions.revertOperations('', "all");
-                this.sleep(100);
+                await this.sleep(100);
 
                 //reverting back to the clones, especially light settings
                 await this.revertFork();
-                this.sleep(100);
+                await this.sleep(100);
 
             }
 
-            this.sleep(100);
+            await this.sleep(100);
 
             await this.postForkTransactions(forkedSuccessfully);
 
-            this.sleep(100);
+            await this.sleep(100);
 
             this.postFork(forkedSuccessfully);
 
-            this.sleep(100);
+            await this.sleep(100);
 
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();
@@ -362,7 +362,7 @@ class InterfaceBlockchainFork {
             //successfully, let's delete the backup blocks
             this._deleteBackupBlocks();
 
-            this.sleep(100);
+            await this.sleep(100);
 
             //propagate last block
             NodeBlockchainPropagation.propagateBlock( this.blockchain.blocks[ this.blockchain.blocks.length-1 ], this.sockets);
@@ -373,7 +373,7 @@ class InterfaceBlockchainFork {
 
             }
 
-            this.sleep(100);
+            await this.sleep(100);
 
         }
 
