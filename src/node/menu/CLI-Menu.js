@@ -61,6 +61,9 @@ class CLI {
             case '9':
                 await this.startMining(true);
                 break;
+            case 'p':
+                await this.startMiningInsidePool(true);
+                break;
             case 'exit':
                 this._exitMenu = true;
                 break;
@@ -350,6 +353,10 @@ class CLI {
         }
 
     }
+    
+    async startMiningInsidePool(){
+        
+    }
 
     question(message){
 
@@ -373,6 +380,7 @@ const commands = [
         '7. Set mining address',
         '8. Start Mining',
         '9. Start Mining Instantly Even Unsynchronized',
+        'p. Start Mining Inside a Pool'
     ];
 
 const lineSeparator =
