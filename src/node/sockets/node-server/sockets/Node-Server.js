@@ -17,8 +17,8 @@ import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-St
 const TIME_DISCONNECT_TERMINAL = 15*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
-const TIME_TO_PASS_TO_CONNECT_NEW_CLIENT = 5*1000;
-const SERVER_FREE_ROOM = 10;
+const TIME_TO_PASS_TO_CONNECT_NEW_CLIENT = 4*1000;
+const SERVER_FREE_ROOM = 20;
 
 class NodeServer {
 
