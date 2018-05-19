@@ -26,7 +26,7 @@ class SemaphoreProcessing{
                 } catch (exception) {
 
                 }
-                
+
                 await this.sleep(70);
             }
 
