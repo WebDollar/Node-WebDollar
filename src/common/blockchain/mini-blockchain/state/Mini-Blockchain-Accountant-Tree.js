@@ -118,7 +118,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         }
 
         node.nonce = node.nonce % 0x10000;
-        if (node.nonce < 0) node.nonce = node.nonce + 0x1000;
+        if (node.nonce < 0) node.nonce = node.nonce + 0x10000;
 
         //force to delete first time miner
         if (node.nonce === 0 && !node.hasBalances(address)) { //TODO Window Transactions for Purging
