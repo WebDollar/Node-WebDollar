@@ -204,8 +204,8 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.12",
-        VERSION_COMPATIBILITY: "1.12",
+        VERSION: "1.13",
+        VERSION_COMPATIBILITY: "1.13",
         PROTOCOL: "WebDollar",
         SSL: true,
 
