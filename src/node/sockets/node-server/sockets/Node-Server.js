@@ -107,7 +107,8 @@ class NodeServer {
                 }
 
                 if (socket.request._query["version"] === undefined || socket.request._query["version"] < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
-                    console.error("version is invalid", socket.request._query["version"]);
+                    if (Math.random() < 0.05)
+                        console.error("version is invalid", socket.request._query["version"]);
                     socket.disconnect();
                     return
                 }
