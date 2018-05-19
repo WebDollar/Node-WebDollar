@@ -110,7 +110,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (!this.blockchain.agent.light  && currentBlockchainLength > forkChainLength)
                 throw {message: "discoverAndProcessFork - fork is smaller fork than mine"};
 
-            await this.blockchain.sleep(15);
+            await this.blockchain.sleep(10);
 
             let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
 
@@ -133,7 +133,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            await this.blockchain.sleep(15);
+            await this.blockchain.sleep(10);
 
             //optimization
             //check if n-2 was ok, but I need at least 1 block
@@ -173,7 +173,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            await this.blockchain.sleep(15);
+            await this.blockchain.sleep(10);
 
             //process light and NiPoPow
             await this.optionalProcess(socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint);
@@ -231,7 +231,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 BansList.addBan(socket, 2000, exception.message);
             }
 
-            await this.blockchain.sleep(15);
+            await this.blockchain.sleep(10);
 
             return { result:false, error: exception };
 
@@ -296,7 +296,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
             let block = this._deserializeForkBlock(fork, answer.block, nextBlockHeight, blockValidation );
 
-            await this.blockchain.sleep(15);
+            if (!fork.downloadAllBlocks) await this.blockchain.sleep(15);
 
             let result;
 
@@ -321,7 +321,7 @@ class InterfaceBlockchainProtocolForkSolver{
             else
                 throw {message: "Fork didn't work at height ", nextBlockHeight};
 
-            await this.blockchain.sleep(30);
+            if (!fork.downloadAllBlocks) await this.blockchain.sleep(30);
 
         }
 

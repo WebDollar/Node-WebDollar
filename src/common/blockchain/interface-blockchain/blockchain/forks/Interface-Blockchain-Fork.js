@@ -249,7 +249,7 @@ class InterfaceBlockchainFork {
                 return false
             }
 
-            await this.sleep(50);
+            if (!this.downloadAllBlocks) await this.sleep(50);
 
             this.forkIsSaving = true;
 
@@ -264,7 +264,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            await this.sleep(70);
+            if (!this.downloadAllBlocks) await this.sleep(70);
 
             try {
 
@@ -283,7 +283,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            await this.sleep(70);
+            if (!this.downloadAllBlocks) await this.sleep(70);
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
 
@@ -330,7 +330,7 @@ class InterfaceBlockchainFork {
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
 
-                await this.sleep(30);
+                if (!this.downloadAllBlocks) await this.sleep(30);
 
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
 
@@ -397,7 +397,7 @@ class InterfaceBlockchainFork {
 
                 this.blockchain.agent.protocol.askBlockchain(this.getSocket());
 
-                await this.sleep(20);
+                await this.sleep(10);
 
             } else await this.sleep(100);
 
