@@ -7,6 +7,7 @@ import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 import consts from 'consts/const_global'
 import MiniBlockchainAccountantTree from "../../../mini-blockchain/state/Mini-Blockchain-Accountant-Tree";
+import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -280,7 +281,7 @@ class InterfaceBlockchainFork {
                 try {
                     await this.revertFork();
                 } catch (exception){
-
+                    console.log("revertFork rasied an error", exception );
                 }
 
                 this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
@@ -357,7 +358,12 @@ class InterfaceBlockchainFork {
                 await this.sleep(30);
 
                 //reverting back to the clones, especially light settings
-                await this.revertFork();
+
+                try {
+                    await this.revertFork();
+                } catch (exception){
+                    console.log("revertFork rasied an error", exception );
+                }
                 await this.sleep(30);
 
                 this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
@@ -440,8 +446,10 @@ class InterfaceBlockchainFork {
     async revertFork(){
         try {
 
+            let revertActions = new RevertActions(this.blockchain);
+
             for (let i=0; i<this._blocksCopy.length; i++)
-                if (! (await this.blockchain.includeBlockchainBlock(this._blocksCopy[i], false, "all", false))) {
+                if (! (await this.blockchain.includeBlockchainBlock( this._blocksCopy[i], false, "all", false,revertActions ))) {
 
                     console.error("----------------------------------------------------------");
                     console.error("----------------------------------------------------------");
