@@ -251,7 +251,7 @@ class NodePropagationProtocol {
             for (let index = 0; index < number && index < nodes.length; index++){
 
                 let node = nodes[index];
-                if (!node.isFallback ){
+                if ( node.isFallback ){
                     index++;
                     continue;
                 }
