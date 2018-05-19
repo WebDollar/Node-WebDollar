@@ -231,7 +231,7 @@ class InterfaceBlockchainTransaction{
 
             Serialization.serializeNumber1Byte( this.version ),
 
-            this.version === 0x01 ? Serialization.serializeNumber1Byte( this.nonce ) :  Serialization.serializeNumber2Bytes( this.nonce ),
+            this.version === 0x00 ? Serialization.serializeNumber1Byte( this.nonce ) :  Serialization.serializeNumber2Bytes( this.nonce ),
 
             Serialization.serializeNumber3Bytes( this.timeLock ), //16777216 it should be to 4 bytes afterwards
 
