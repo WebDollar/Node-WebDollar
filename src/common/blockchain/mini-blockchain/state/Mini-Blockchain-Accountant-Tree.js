@@ -106,16 +106,14 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         node.nonce += nonceChange;
 
-        if (showUpdate) {
-            if (revertActions !== undefined) revertActions.push({
-                name: "revert-updateAccountNonce",
-                address: address,
-                nonceChange: nonceChange,
-                showUpdate: showUpdate,
-            });
+        if (revertActions !== undefined) revertActions.push({
+            name: "revert-updateAccountNonce",
+            address: address,
+            nonceChange: nonceChange,
+            showUpdate: showUpdate,
+        });
 
-            if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid", nonce: node.nonce};
-        }
+        if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid", nonce: node.nonce};
 
         node.nonce = node.nonce % 0x10000;
         if (node.nonce < 0) node.nonce = node.nonce + 0x10000;
