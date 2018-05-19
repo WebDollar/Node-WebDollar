@@ -1,3 +1,22 @@
+# ignore .git and .cache folders
+.git
+.cache
+
+# ignore dockerfile
+Dockerfile
+
+# ignore all *.class files in all folders, including build root
+**/*.class
+
+# Ignore all MD
+*.md
+
+# ignore docs
+docs/
+
+# ignore scripts folder
+
+scripts/
 
 \.idea/
 node_modules/
@@ -66,4 +85,3 @@ transactionsDB/
 certificates/ca_bundle.crt
 certificates/certificate.crt
 certificates/private.key
-Dockerfile
