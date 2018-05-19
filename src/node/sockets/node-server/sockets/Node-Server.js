@@ -17,8 +17,19 @@ import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-St
 const TIME_DISCONNECT_TERMINAL = 15*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
-const TIME_TO_PASS_TO_CONNECT_NEW_CLIENT = 4*1000;
-const SERVER_FREE_ROOM = 15;
+const ROOMS = {
+
+    TERMINALS:{
+        TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
+        SERVER_FREE_ROOM : 10,
+    },
+
+    BROWSERS:{
+        TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
+        SERVER_FREE_ROOM : 5,
+    },
+
+};
 
 class NodeServer {
 
@@ -35,8 +46,19 @@ class NodeServer {
 
         setInterval(this._disconenctOldSockets.bind(this), 30 * 1000);
 
-        this.timeLastConnected = 0;
-        this.serverSits = SERVER_FREE_ROOM;
+        this._rooms = {
+
+            terminals:{
+                timeLastConnected : 0,
+                serverSits : ROOMS.TERMINALS.SERVER_FREE_ROOM,
+            },
+
+            browsers:{
+                timeLastConnected : 0,
+                serverSits : ROOMS.BROWSERS.SERVER_FREE_ROOM,
+            },
+
+        }
 
     }
 
@@ -90,6 +112,9 @@ class NodeServer {
                     return
                 }
 
+                if ( socket.request._query["uuid"] === consts.SETTINGS.UUID )
+                    return false;
+
                 let nodeType = socket.request._query["nodeType"];
                 if (typeof nodeType  === "string") nodeType = parseInt(nodeType);
 
@@ -113,20 +138,17 @@ class NodeServer {
 
                     if (Math.random() < 0.05) console.warn("too many terminal connections");
 
-                    await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
-                    return;
-                }
+                    return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
-                if (NODES_TYPE.NODE_WEB_PEER === nodeType && (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
+                } else
+
+                if (NODES_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
 
                     if (Math.random() < 0.05) console.warn("too many browser connections");
 
-                    await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
-                    return;
-                }
+                    return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
-                if ( socket.request._query["uuid"] === consts.SETTINGS.UUID )
-                    return false;
+                }
 
                 // if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
                 //
@@ -145,20 +167,23 @@ class NodeServer {
                 //
                 // }
 
-                if ( this.serverSits <= 0){
+                if (NODES_TYPE.NODE_TERMINAL === nodeType && this._rooms.terminals.serverSits <= 0)
 
-                    if (new Date().getTime() - this.timeLastConnected >= TIME_TO_PASS_TO_CONNECT_NEW_CLIENT){
+                    if (new Date().getTime() - this._rooms.terminals.timeLastConnected >= ROOMS.TERMINALS.TIME_TO_PASS_TO_CONNECT_NEW_CLIENT){
 
-                        this.serverSits = SERVER_FREE_ROOM;
-                        this.timeLastConnected = new Date().getTime();
+                        this._rooms.terminals.serverSits = ROOMS.TERMINALS.SERVER_FREE_ROOM;
+                        this._rooms.terminals.timeLastConnected = new Date().getTime();
 
-                    }else {
+                    }else return  await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
-                        socket.disconnect();
-                        return;
 
-                    }
-                }
+                else if (NODES_TYPE.NODE_WEB_PEER === nodeType && this._rooms.browsers.serverSits <= 0)
+                        if (new Date().getTime() - this._rooms.browsers.timeLastConnected >= ROOMS.BROWSERS.TIME_TO_PASS_TO_CONNECT_NEW_CLIENT) {
+
+                            this._rooms.browsers.serverSits = ROOMS.BROWSERS.SERVER_FREE_ROOM;
+                            this._rooms.browsers.timeLastConnected = new Date().getTime();
+
+                        } else return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
 
                 //check if it is a unique connection, add it to the list
@@ -172,7 +197,8 @@ class NodeServer {
 
                     console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) );
 
-                    this.serverSits--;
+                    if (nodeType === NODES_TYPE.NODE_TERMINAL ) this._rooms.terminals.serverSits--;
+                    else if (nodeType === NODES_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
 
                     if (await socket.node.protocol.sendHello(["uuid","ip", "port"], false) === false){
 
