@@ -18,7 +18,7 @@ class DownloadManager{
                 return this.array[key];
             }
 
-        let answer = DownloadHelper.downloadFile(address, timeout);
+        let answer = await DownloadHelper.downloadFile(address, timeout);
         this.array[address] = answer;
 
     }

@@ -50,7 +50,7 @@ class NodePropagationProtocol {
         await this._processList(this._newLightNodesWaitList);
 
 
-        setTimeout( async ()=>{ await this._processNewWaitlistInterval() } , 2000 + Math.floor( Math.random() * 200 ) );
+        setTimeout( async ()=>{ await this._processNewWaitlistInterval() } , 1500 + Math.floor( Math.random() * 200 ) );
 
     }
 
