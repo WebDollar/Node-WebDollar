@@ -20,7 +20,7 @@ call npm install
 
 ::Install x509
 ::(dir 2>&1 *`|(echo CMD);&<# rem #>echo PowerShell
-call npm config set python python2.7
+call npm install --python=python2.7
 git clone https://github.com/ReadyTalk/win32.git
 call md C:\OpenSSL-Win64\lib\
 call copy /y .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
