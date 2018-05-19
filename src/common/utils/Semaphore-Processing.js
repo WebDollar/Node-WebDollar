@@ -64,7 +64,7 @@ class SemaphoreProcessing{
                 await this.sleep(70);
             }
 
-            let answer;
+            let answer = false;
 
             try {
 
@@ -79,13 +79,13 @@ class SemaphoreProcessing{
 
             try {
 
-                resolve(answer);
                 resolver(answer);
+                resolve(answer);
 
             } catch (ex){
                 console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
-                resolve(false);
                 resolver(false);
+                resolve(false);
             }
 
         });
