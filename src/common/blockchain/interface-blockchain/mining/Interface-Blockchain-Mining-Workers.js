@@ -68,6 +68,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         if (newWorkers > this.workers.workers)
             await this.increaseWorkers( newWorkers - this.workers.workers );
         else
+        if (newWorkers < this.workers.workers)
             await this.decreaseWorkers( - (newWorkers - this.workers.workers)  );
 
     }
