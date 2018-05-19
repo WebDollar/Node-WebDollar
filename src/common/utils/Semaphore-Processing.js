@@ -50,7 +50,7 @@ class SemaphoreProcessing{
 
         }
 
-        setTimeout( async ()=>{ await this._processingSemaphoreList.bind(this)}, this.processingSemaphoreInterval);
+        setTimeout( async ()=>{ await this._processingSemaphoreList()}, this.processingSemaphoreInterval);
 
     }
 
