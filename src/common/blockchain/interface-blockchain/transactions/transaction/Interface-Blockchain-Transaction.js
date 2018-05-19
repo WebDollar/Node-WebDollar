@@ -30,7 +30,14 @@ class InterfaceBlockchainTransaction{
         if (timeLock === undefined)
             this.timeLock = blockchain.blocks.length-1;
 
-        this.version = version||0x00; //version
+        if (version === undefined){
+
+            if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
+            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x01;
+
+        }
+
+        this.version = version; //version
 
         try {
 
@@ -68,10 +75,8 @@ class InterfaceBlockchainTransaction{
         if (nonce === undefined || nonce === null)
             nonce = this._computeNonce();
 
-        if (blockchain.blocks.length < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES)
-            nonce = nonce % 0x100;
-        else
-            nonce = nonce % 0X10000;
+        if (version === 0x00) nonce = nonce % 0x100;
+        else if (version === 0x01) nonce = nonce % 0X10000;
 
         this.nonce = nonce; //1 bytes
 
@@ -135,7 +140,9 @@ class InterfaceBlockchainTransaction{
         if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
         if (typeof this.timeLock !== "number") throw {message: 'timeLock is empty', timeLock:this.timeLock};
 
-        if (this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
+        if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
+        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x01) throw {message: "version is ivnalid", version: this.version};
+
         if (this.nonce > 0xFFFF) throw {message: "nonce is ivnalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
 
@@ -224,7 +231,7 @@ class InterfaceBlockchainTransaction{
 
             Serialization.serializeNumber1Byte( this.version ),
 
-            this.blockchain.blocks.length < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ? Serialization.serializeNumber1Byte( this.nonce ) : Serialization.serializeNumber2Bytes( this.nonce ),
+            this.version === 0x01 ? Serialization.serializeNumber1Byte( this.nonce ) :  Serialization.serializeNumber2Bytes( this.nonce ),
 
             Serialization.serializeNumber3Bytes( this.timeLock ), //16777216 it should be to 4 bytes afterwards
 
@@ -252,11 +259,11 @@ class InterfaceBlockchainTransaction{
             this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
             offset += 1;
 
-            if (this.blockchain.blocks.length < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES) {
+            //hard fork
+            if (this.version === 0x00){
                 this.nonce = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 1));
                 offset += 1;
-            } else
-            if (this.blockchain.blocks.length >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES) {
+            } else if (this.version === 0x01){
                 this.nonce = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 2));
                 offset += 2;
             }

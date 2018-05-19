@@ -294,6 +294,20 @@ class InterfaceBlockchainFork {
 
             //TODO use the revertActions to revert the process
 
+            //accountant tree
+
+            console.log( "accountant tree", this.blockchain.accountantTree.root.hash.sha256.toString("hex") );
+
+            for (let i=0; i < this.forkBlocks.length; i++){
+
+                console.log("transactions");
+                for (let j=0; j< this.forkBlocks[i].data.transactions.transactions.length; j++)
+                    console.log("transaction", this.forkBlocks[i].data.transactions.transactions[j].toJSON());
+
+                console.log("transactions hash", this.forkBlocks[i].data.transactions.transactions);
+
+            }
+
             let index;
             try {
 
