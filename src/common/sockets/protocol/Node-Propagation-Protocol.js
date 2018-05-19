@@ -3,6 +3,7 @@ import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import Blockchain from "main-blockchain/Blockchain"
+import NodePropagationList from 'common/sockets/protocol/Node-Propagation-List'
 
 const MAX_WAITLIST_QUEUE_LENGTH = 100;
 
@@ -186,12 +187,12 @@ class NodePropagationProtocol {
 
             try{
 
-                let list = NodesWaitlist._waitlistSimpleSSL;
+                let list;
 
                 if (socket.node.protocol.nodeType === NODES_TYPE.NODE_WEB_PEER) //let's send only SSL
-                    list = NodesWaitlist._waitlistSimpleSSL;
+                    list = NodePropagationList._waitlistSimpleSSL;
                 else
-                    list = NodesWaitlist._waitlistSimple;
+                    list = NodePropagationList._waitlistSimple;
 
                 socket.node.sendRequest("propagation/nodes", {"op": "new-full-nodes", addresses: list });
 
