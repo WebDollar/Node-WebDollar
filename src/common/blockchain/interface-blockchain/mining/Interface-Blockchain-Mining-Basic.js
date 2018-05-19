@@ -170,7 +170,8 @@ class InterfaceBlockchainMiningBasic {
 
         this._intervalMiningOutput = setInterval(() => {
 
-            console.log( this._hashesPerSecond+ " hashes/s");
+            if (typeof this._hashesPerSecond === "number")
+                console.log( this._hashesPerSecond+ " hashes/s");
 
             StatusEvents.emit("mining/hash-rate", this._hashesPerSecond );
 
@@ -188,8 +189,11 @@ class InterfaceBlockchainMiningBasic {
 
     _destroyMiningInterval(){
         if (this._intervalMiningOutput !== undefined) {
+
             clearInterval(this._intervalMiningOutput);
-            this._intervalMiningOutput = 0;
+            this._intervalMiningOutput = undefined;
+            this._hashesPerSecond = 0;
+
         }
     }
 
