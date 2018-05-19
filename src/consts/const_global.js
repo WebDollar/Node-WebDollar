@@ -266,8 +266,8 @@ consts.SETTINGS = {
             BROWSER:{
 
                 CLIENT: {
-                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST: 2,
-                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK: 1,
+                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST: 4,
+                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK: 2,
                 },
 
                 SERVER: {},
