@@ -276,7 +276,13 @@ class InterfaceBlockchainFork {
 
                 revertActions.revertOperations('', "all");
                 this._blocksCopy = []; //We didn't use them so far
-                await this.revertFork();
+
+                try {
+                    await this.revertFork();
+                } catch (exception){
+
+                }
+                
                 this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
 
                 this.forkIsSaving = false;
