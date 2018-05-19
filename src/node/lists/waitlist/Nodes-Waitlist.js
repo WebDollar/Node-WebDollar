@@ -75,9 +75,10 @@ class NodesWaitlist {
                     if (backedBy === "fallback")
                         sckAddresses.push(sckAddress);
                     else {
+
                         let response = await DownloadManager.downloadFile(sckAddress.getAddress(true, true), 5000);
 
-                        if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL) {
+                        if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY) {
 
                             //search again because i have waited for a promise
                             let answer = this._searchNodesWaitlist(sckAddress, port, type);

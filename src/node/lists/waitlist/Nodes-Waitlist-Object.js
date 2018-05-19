@@ -183,7 +183,7 @@ class NodesWaitlistObject {
 
         if (this.isFallback === true) return 100000 - this.errorTrials*100;
 
-        let score = 200 + Math.random()*10;
+        let score = 200 + Math.random()*100;
 
         score += (this.connected ? 1000 : 0);
 
