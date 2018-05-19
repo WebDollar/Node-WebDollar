@@ -284,7 +284,7 @@ class InterfaceBlockchainFork {
                     console.log("revertFork rasied an error", exception );
                 }
 
-                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
+                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone, undefined, true);
 
                 this.forkIsSaving = false;
                 return false;
@@ -303,15 +303,18 @@ class InterfaceBlockchainFork {
 
             //accountant tree
 
-            console.log( "accountant tree", this.blockchain.accountantTree.root.hash.sha256.toString("hex") );
+            if (consts.DEBUG) {
 
-            for (let i=0; i < this.forkBlocks.length; i++){
+                console.log("accountant tree", this.blockchain.accountantTree.root.hash.sha256.toString("hex"));
 
-                console.log("transactions");
-                for (let j=0; j< this.forkBlocks[i].data.transactions.transactions.length; j++)
-                    console.log("transaction", this.forkBlocks[i].data.transactions.transactions[j].toJSON());
+                for (let i = 0; i < this.forkBlocks.length; i++) {
 
-                console.log("transactions hash", this.forkBlocks[i].data.transactions.hashTransactions.toString("hex"));
+                    console.log("transactions");
+                    for (let j = 0; j < this.forkBlocks[i].data.transactions.transactions.length; j++)
+                        console.log("transaction", this.forkBlocks[i].data.transactions.transactions[j].toJSON());
+
+                    console.log("transactions hash", this.forkBlocks[i].data.transactions.hashTransactions.toString("hex"));
+                }
 
             }
 

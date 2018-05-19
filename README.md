@@ -16,7 +16,7 @@ https://docs.docker.com/install/
 docker run -d --restart=always -e DOMAIN=<ENTER DOMAIN HERE> -e EMAIL=<ENTER EMAIL HERE> --name webdollar -p 80:80 -p 443:443 xkid/webdollar
 ```
 
-# Installing (Poor tech skills required)
+# Installing (Non-techie skills required)
 
 ## Follow the following instructions: http://webdollar.aji.ro/webdollar-mining-with-windows-terminal/
 

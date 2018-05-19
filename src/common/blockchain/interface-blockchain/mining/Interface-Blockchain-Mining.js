@@ -92,7 +92,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     }) === false) throw {message: "Mining1 returned False"};
 
-
                 revertActions.destroyRevertActions();
 
             } catch (Exception){
