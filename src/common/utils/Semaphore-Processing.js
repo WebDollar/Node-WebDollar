@@ -1,10 +1,14 @@
-const uuid = require('uuid');
+const colors = require('colors/safe');
 
 class SemaphoreProcessing{
 
-    constructor(){
+    constructor(processingSemaphoreInterval = 50){
 
         this._list = [];
+
+        this.processingSemaphoreInterval = processingSemaphoreInterval;
+
+        setTimeout(this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);
 
     }
 
@@ -14,86 +18,40 @@ class SemaphoreProcessing{
      * @returns {Promise.<void>}
      */
 
-    _deleteSemaphore(uuid){
+    processSempahoreCallback(callback){
 
-        let index = -1;
-        for (let i=0; i<this._list.length; i++)
-            if (this._list[i].uuid === uuid) {
-                index = i;
-                break;
-            }
-
-        this._list.splice(index, 1);
+        return new Promise ((resolve) =>{
+            this._list .push({callback: callback, resolver: resolve});
+        });
 
     }
 
-    processSempahoreCallback( callback ){
 
-        let id = uuid.v4();
-        let resolver;
+    _processingSemaphoreList(){
 
-        let promise = new Promise ( async (resolve) => {
-            resolver = resolve;
-        });
-
-        this._list.push({uuid: id, callback: callback, resolver: resolver, promise: promise});
-
-        return new Promise( async (resolve)=>{
-
-            let index = -1;
-
-            for (let i=0; i<this._list.length; i++)
-                if (this._list[i].uuid === id) {
-                    index = i;
-                    break;
-                }
-
-            if (index === -1)
-                console.error("STRANGE!!!! uuid was not found");
-
-            if (index > 0) {
-
-                try {
-
-                    await this._list[ index - 1 ].promise;
-
-                } catch (exception) {
-
-                }
-
-                await this.sleep(70);
-            }
+        if (this._list.length > 0){
 
             let answer = false;
-
             try {
-
-                answer = await callback();
-                await this.sleep(70);
-
+                answer = this._list[0].callback();
             } catch (ex){
-                console.error("error processingSemaphoreList callback !!!!!!!!!!!!!!!!!!!!!!!!", ex);
+                console.error("error processingSemaphoreList !!!!!!!!!!!!!!!!!!!!!!!!", ex);
             }
 
-            this._deleteSemaphore(id);
-
             try {
+                let resolver = this._list[0].resolver;
+                this._list.splice(0, 1);
 
                 resolver(answer);
-                resolve(answer);
 
             } catch (ex){
                 console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
-                resolver(false);
-                resolve(false);
             }
 
-        });
+        }
 
-    }
+        setTimeout(this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);
 
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 }
