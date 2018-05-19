@@ -10,7 +10,7 @@ class NodePropagationList{
         this._waitlistSimple = [];
         this._waitlistSimpleSSL = [];
 
-        this._recalculateWaitlistSimple.bind(this);
+        setTimeout( this._recalculateWaitlistSimple.bind(this) , 10*1000 + Math.random() * 10*1000 );
     }
 
     _generateWailistRandomList (number, nodes, list, onlySSL = false ) {
@@ -28,7 +28,7 @@ class NodePropagationList{
 
             let json = node.toJSON();
 
-            if ( (!onlySSL || onlySSL && node.sckAddresses[0].SSL === true))
+            if ( (!onlySSL || (onlySSL && node.sckAddresses[0].SSL === true)))
                 list.push(json);
 
             index++;
@@ -49,7 +49,7 @@ class NodePropagationList{
         this._waitlistSimpleSSL = [];
         this._generateWailistRandomList( number, NodesWaitlist.waitListFullNodes, this._waitlistSimpleSSL, true);
 
-        setTimeout( this._recalculateWaitlistSimple.bind(this , 15*1000 + Math.random() * 10*1000 ))
+        setTimeout( this._recalculateWaitlistSimple.bind(this) , 10*1000 + Math.random() * 10*1000 );
 
     }
 
