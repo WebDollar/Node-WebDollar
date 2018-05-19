@@ -9,10 +9,10 @@ export default {
         //--------------Community FallBack Nodes-------------------
         //---------------------------------------------------------
 
-        {"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
-        {"addr": ["https://amsterdam.wdpool.io:443"]},
-        {"addr": ["https://strasbourg.wdpool.io:443"]},
-        {"addr": ["https://paris.wdpool.io:443"]},
+        //{"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
+        //{"addr": ["https://amsterdam.wdpool.io:443"]},
+        //{"addr": ["https://strasbourg.wdpool.io:443"]},
+        //{"addr": ["https://paris.wdpool.io:443"]},
         {"addr": ["https://webdollar.csland.ro:443"]},
         {"addr": ["https://nodecstl.ddns.net:80"]},
         {"addr": ["https://webd.5q.ro:3333"]},

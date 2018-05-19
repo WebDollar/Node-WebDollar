@@ -6,6 +6,7 @@ import StatusEvents from "common/events/Status-Events";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 import consts from 'consts/const_global'
+import MiniBlockchainAccountantTree from "../../../mini-blockchain/state/Mini-Blockchain-Accountant-Tree";
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -241,6 +242,8 @@ class InterfaceBlockchainFork {
 
         let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
+            let accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant(true);
+
             if (! (await this._validateFork(false, false))) {
                 console.error("validateFork was not passed");
                 return false
@@ -274,6 +277,7 @@ class InterfaceBlockchainFork {
                 revertActions.revertOperations('', "all");
                 this._blocksCopy = []; //We didn't use them so far
                 await this.revertFork();
+                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
 
                 this.forkIsSaving = false;
                 return false;
@@ -336,6 +340,7 @@ class InterfaceBlockchainFork {
                 await this.revertFork();
                 await this.sleep(30);
 
+                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
             }
 
             if (!this.downloadAllBlocks) await this.sleep(30);
@@ -351,6 +356,8 @@ class InterfaceBlockchainFork {
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();
                 this._forkPromiseResolver(true) //making it async
+            } else {
+                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
             }
 
             this.forkIsSaving = false;
