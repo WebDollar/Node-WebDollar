@@ -10,9 +10,6 @@ class NodePropagationProtocol {
 
     constructor(){
 
-        //waitlist to be propagated to termination
-        this._waitlistSimple = [];
-        this._waitlistSimpleSSL = [];
 
         this._newFullNodesWaitList = {length: 0};  //for key-value
         this._newLightNodesWaitList = {length: 0}; //for key-value
@@ -65,8 +62,6 @@ class NodePropagationProtocol {
 
         NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
         NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
-
-        setInterval( this._recalculateWaitlistSimple.bind(this), 15*1000 + Math.random() * 10*1000 )
 
     }
 
@@ -238,87 +233,6 @@ class NodePropagationProtocol {
     }
 
 
-    _recalculateWaitlistSimple(){
-
-        let number = 8 + Math.floor( Math.random()*10 );
-
-        //some from NodesList
-
-        let generateWailistRandomList = (nodes, list, onlySSL = false )=>{
-
-            if (nodes.length === 0) return;
-
-            for (let index = 0; index < number && index < nodes.length; index++){
-
-                let node = nodes[index];
-                if ( node.isFallback ){
-                    index++;
-                    continue;
-                }
-
-                let json = node.toJSON();
-
-                let found  = false;
-                for (let i=0; i < list.length; i++ )
-                    if ( list[i].a === json.a ){
-                        found = true;
-                        break;
-                    }
-
-                if ( !found && (!onlySSL || onlySSL && node.sckAddresses[0].SSL === true))
-                    list.push(json);
-
-                index++;
-            }
-
-        };
-
-
-        this._waitlistSimple = [];
-        generateWailistRandomList( NodesWaitlist.waitListFullNodes, this._waitlistSimple);
-
-        this._waitlistSimpleSSL = [];
-        generateWailistRandomList( NodesWaitlist.waitListFullNodes, this._waitlistSimpleSSL, true);
-
-    }
-
-    /**
-     * Only supports simple Socket
-     * @param socket
-     * @param nodeType
-     * @param disconnectSocket
-     * @returns {Promise.<void>}
-     */
-
-    async propagateWaitlistSimple(socket, nodeType, disconnectSocket = true){
-
-        if ( socket === undefined ) return;
-
-        if (socket.emit === undefined) console.warn("socket.emit is not supported");
-
-        let list;
-
-        if (nodeType === NODES_TYPE.NODE_WEB_PEER) //let's send only SSL
-            list = this._waitlistSimpleSSL;
-        else
-            list = this._waitlistSimple;
-
-        let timeout;
-        if (disconnectSocket)
-            timeout = setTimeout( ()=>{ socket.disconnect() }, 7000 + Math.floor(Math.random() * 5*1000));
-
-        socket.emit( "propagation/simple-waitlist-nodes", { op: "new-full-nodes", addresses: list }, (data)=>{
-
-            if ( disconnectSocket )
-                socket.disconnect();
-
-            clearTimeout(timeout);
-
-        });
-
-        await Blockchain.blockchain.sleep(20);
-
-    }
 
 }
 

@@ -9,7 +9,7 @@ import NodesList from 'node/lists/Nodes-List'
 import NodeExpress from "./../express/Node-Express";
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import NODES_TYPE from "node/lists/types/Nodes-Type";
-import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'
+import NodePropagationList from 'common/sockets/protocol/Node-Propagation-List'
 import Blockchain from "main-blockchain/Blockchain"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
@@ -113,7 +113,7 @@ class NodeServer {
 
                     if (Math.random() < 0.05) console.warn("too many terminal connections");
 
-                    await NodePropagationProtocol.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
+                    await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
                     return;
                 }
 
@@ -121,29 +121,29 @@ class NodeServer {
 
                     if (Math.random() < 0.05) console.warn("too many browser connections");
 
-                    await NodePropagationProtocol.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
+                    await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
                     return;
                 }
 
                 if ( socket.request._query["uuid"] === consts.SETTINGS.UUID )
                     return false;
 
-                // if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
-                //
-                //     if (nodeDomain === '' || nodeDomain === undefined){
-                //         socket.disconnect();
-                //         return;
-                //     }
-                //
-                //     let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
-                //
-                //
-                //     if (waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
-                //         socket.disconnect();
-                //         return;
-                //     }
-                //
-                // }
+                if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
+
+                    if (nodeDomain === '' || nodeDomain === undefined){
+                        socket.disconnect();
+                        return;
+                    }
+
+                    let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
+
+
+                    if (waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
+                        socket.disconnect();
+                        return;
+                    }
+
+                }
 
                 if ( this.serverSits <= 0){
 
@@ -191,7 +191,7 @@ class NodeServer {
 
                 } else {
 
-                    await NodePropagationProtocol.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
+                    await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
                 }
 
