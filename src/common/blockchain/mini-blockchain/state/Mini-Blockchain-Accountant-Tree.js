@@ -59,12 +59,15 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
             showUpdate: showUpdate,
         });
 
+        if (tokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH && tokenId[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) {
+            this.root.total += value;
+
+            if (showUpdate)
+                this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
+        }
+
         //WEBD
         if (showUpdate) {
-            if (tokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH && tokenId[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) {
-                this.root.total += value;
-                this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
-            }
 
             //optimization, but it doesn't work in browser
             this.emitBalanceChangeEvent(address, () => {
