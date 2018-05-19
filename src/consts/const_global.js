@@ -40,6 +40,7 @@ consts.BLOCKCHAIN = {
 
     HARD_FORKS : {
 
+        TRANSACTIONS_BUG_2_BYTES: 46700,
 
     }
 

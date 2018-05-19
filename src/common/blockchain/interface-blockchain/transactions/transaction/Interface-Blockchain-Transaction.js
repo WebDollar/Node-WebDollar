@@ -68,6 +68,11 @@ class InterfaceBlockchainTransaction{
         if (nonce === undefined || nonce === null)
             nonce = this._computeNonce();
 
+        if (blockchain.blocks.length < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES)
+            nonce = nonce % 0x100;
+        else
+            nonce = nonce % 0X10000;
+
         this.nonce = nonce; //1 bytes
 
         if (txId === undefined || txId === null)
@@ -131,9 +136,11 @@ class InterfaceBlockchainTransaction{
         if (typeof this.timeLock !== "number") throw {message: 'timeLock is empty', timeLock:this.timeLock};
 
         if (this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
+        if (this.nonce > 0xFFFF) throw {message: "nonce is ivnalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
 
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock, blockHeight: blockHeight };
+        if (this.timeLock - blockHeight > 100) throw { message: "timelock - blockHeight < 100", timelock : this.timelock };
 
         let txId = this._computeTxId();
         if (! BufferExtended.safeCompare(txId, this.txId ) ) throw {message: "txid don't match"};
@@ -216,11 +223,14 @@ class InterfaceBlockchainTransaction{
         let array = [
 
             Serialization.serializeNumber1Byte( this.version ),
-            Serialization.serializeNumber1Byte( this.nonce ),
+
+            this.blockchain.blocks.length < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ? Serialization.serializeNumber1Byte( this.nonce ) : Serialization.serializeNumber2Bytes( this.nonce ),
+
             Serialization.serializeNumber3Bytes( this.timeLock ), //16777216 it should be to 4 bytes afterwards
 
             this.from.serializeFrom(),
             this.to.serializeTo(),
+
         ];
 
         return Buffer.concat (array);
@@ -242,8 +252,14 @@ class InterfaceBlockchainTransaction{
             this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
             offset += 1;
 
-            this.nonce =   Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
-            offset += 1;
+            if (this.blockchain.blocks.length < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES) {
+                this.nonce = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 1));
+                offset += 1;
+            } else
+            if (this.blockchain.blocks.length >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES) {
+                this.nonce = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 2));
+                offset += 2;
+            }
 
             this.timeLock =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 3) );
             offset += 3;
