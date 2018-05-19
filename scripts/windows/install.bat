@@ -10,8 +10,8 @@ set INSTALATION_DIR=.
 md %INSTALATION_DIR% 2>nul
 cd %INSTALATION_DIR%
 
-git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
-cd Node-WebDollar
+::git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
+::cd Node-WebDollar
 
 call npm install --global --production windows-build-tools
 call npm install -g node-gyp
