@@ -20,7 +20,13 @@ class SemaphoreProcessing{
         let promise = new Promise ( async (resolve) => {
 
             if (index > 0) {
-                await this._list[index - 1].promise;
+
+                try {
+                    await this._list[index - 1].promise;
+                } catch (exception) {
+
+                }
+                
                 await this.sleep(70);
             }
 
