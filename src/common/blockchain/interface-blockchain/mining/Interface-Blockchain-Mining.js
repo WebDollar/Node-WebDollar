@@ -25,7 +25,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         super(blockchain, minerAddress, miningFeeThreshold);
 
         this.miningTransactionSelector = new MiningTransactionsSelector(blockchain);
-
     }
 
 
@@ -120,8 +119,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      */
     async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
 
-        let intervalMiningOutput;
-
         console.log("");
         console.log(" ----------- mineBlock-------------");
 
@@ -147,7 +144,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             //calculating the hashes per second
 
             if (showMiningOutput)
-                intervalMiningOutput = this.setMiningHashRateInterval();
+                this.setMiningHashRateInterval();
 
 
             let answer;
@@ -222,15 +219,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 this._hashesPerSecond = 0;
             }
 
-            if ( intervalMiningOutput !== undefined)
-                clearInterval(intervalMiningOutput);
+            this._destroyMiningInterval();
 
         } catch (Exception){
 
             console.error( "Error mining block ", Exception, block);
+            this._destroyMiningInterval();
 
-            if (intervalMiningOutput !== undefined)
-                clearInterval(intervalMiningOutput);
             throw Exception;
         }
 

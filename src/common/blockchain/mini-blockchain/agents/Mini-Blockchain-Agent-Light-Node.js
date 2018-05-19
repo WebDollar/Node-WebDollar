@@ -67,42 +67,42 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
     initializeStartAgentOnce(){
 
         this._initializeProtocol();
-
-        NodesList.emitter.on("nodes-list/disconnected", async (result) => {
-
-
-
-            if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC) < 3)
-                Blockchain.synchronizeBlockchain(); //let's synchronize again
-
-        });
-
-        NodesList.emitter.on("nodes-list/connected", async (result) => {
-
-            let webrtc = NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC);
-
-            if ( webrtc > WEBRTC_MINIMUM_LIGHT) {
-                //let's disconnect from full nodes
-
-                if ( this.status !== AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES ) {
-
-                    this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
-
-                    if (Math.random() > WEBRTC_MINIMUM_LIGHT_PROBABILITY + 0.15) // most will disconnect from full nodes
-                        NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
-
-                }
-
-            }
-
-            if ( webrtc > WEBRTC_MINIMUM_LIGHT + 2) {
-
-                if (Math.random() <= 0.1)
-                    NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
-
-            }
-
-        });
+        //
+        // NodesList.emitter.on("nodes-list/disconnected", async (result) => {
+        //
+        //
+        //
+        //     if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC) < 3)
+        //         Blockchain.synchronizeBlockchain(); //let's synchronize again
+        //
+        // });
+        //
+        // NodesList.emitter.on("nodes-list/connected", async (result) => {
+        //
+        //     let webrtc = NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC);
+        //
+        //     if ( webrtc > WEBRTC_MINIMUM_LIGHT) {
+        //         //let's disconnect from full nodes
+        //
+        //         if ( this.status !== AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES ) {
+        //
+        //             this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
+        //
+        //             if (Math.random() > WEBRTC_MINIMUM_LIGHT_PROBABILITY + 0.15) // most will disconnect from full nodes
+        //                 NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
+        //
+        //         }
+        //
+        //     }
+        //
+        //     if ( webrtc > WEBRTC_MINIMUM_LIGHT + 2) {
+        //
+        //         if (Math.random() <= 0.1)
+        //             NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
+        //
+        //     }
+        //
+        // });
     }
 
 

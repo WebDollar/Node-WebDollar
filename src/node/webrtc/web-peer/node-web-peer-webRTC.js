@@ -345,14 +345,16 @@ class NodeWebPeerRTC {
 
     // Hook up data channel event handlers
     setupDataChannel() {
+
         this.checkDataChannelState();
+
         this.peer.dataChannel.onopen = ()=>{this.checkDataChannelState()};
         this.peer.dataChannel.onclose = ()=>{ this.checkDataChannelState()};
         this.peer.dataChannel.onerror = ()=>{ this.checkDataChannelState()};
 
-        this.peer.oniceconnectionstatechange = () => {
+        this.peer.oniceconnectionstatechange = function() {
 
-            if (this.peer.iceConnectionState === 'disconnected') {
+            if (this.peer !== undefined && this.peer.iceConnectionState === 'disconnected') {
 
                 console.log('iceConnection Disconnected');
                 if (this.peer.connected === true) {
@@ -363,7 +365,7 @@ class NodeWebPeerRTC {
                 }
 
             }
-        };
+        }.bind(this);
 
         this.peer.dataChannel.onmessage = (event) => {
 
@@ -447,6 +449,8 @@ class NodeWebPeerRTC {
 
     checkDataChannelState() {
 
+        if (this.peer === undefined) return;
+
         console.log('WebRTC channel state is:', this.peer.dataChannel.readyState);
 
         if (this.peer.dataChannel.readyState === 'open') {
@@ -519,7 +523,7 @@ class NodeWebPeerRTC {
 
             let data = {name: name, value: value};
 
-            if (this.peer.dataChannel.readyState !== "open") {
+            if (this.peer !== undefined && this.peer.dataChannel.readyState !== "open") {
 
                 console.error("Error sending data to webRTC because it is not open", data);
                 this.peer.errorTrials++;
@@ -542,6 +546,7 @@ class NodeWebPeerRTC {
             let id = Math.floor( Math.random() * 10000000000);
 
             let i=0;
+
             while (i < chunks){
 
                 this.peer.dataChannel.send("chunk"+i+"/"+chunks+"@"+id+"#"+data.substr(i*SIZE, SIZE ));

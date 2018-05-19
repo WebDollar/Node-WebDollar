@@ -305,7 +305,8 @@ class InterfaceBlockchainFork {
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});
 
-                    if ( !process.env.BROWSER ) await this.sleep(70);
+                    if ( !process.env.BROWSER )
+                        await this.sleep( this.downloadAllBlocks ? 10 : 100 );
 
                 }
 
@@ -366,7 +367,7 @@ class InterfaceBlockchainFork {
             //successfully, let's delete the backup blocks
             this._deleteBackupBlocks();
 
-            await this.sleep( this.forkBlocks.length === consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD ? 10 : 100 );
+            await this.sleep( this.downloadAllBlocks ? 10 : 100 );
 
             //propagate last block
             NodeBlockchainPropagation.propagateBlock( this.blockchain.blocks[ this.blockchain.blocks.length-1 ], this.sockets);
