@@ -117,8 +117,8 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
             if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid", nonce: node.nonce};
         }
 
-        node.nonce = node.nonce % 0xFFFF;
-        if (node.nonce < 0) node.nonce = node.nonce + 0xFFFF;
+        node.nonce = node.nonce % 0x10000;
+        if (node.nonce < 0) node.nonce = node.nonce + 0x1000;
 
         //force to delete first time miner
         if (node.nonce === 0 && !node.hasBalances(address)) { //TODO Window Transactions for Purging
