@@ -36,6 +36,7 @@ class InterfaceBlockchainFork {
         this._blocksCopy = [];
         this._forkPromiseResolver = undefined;
         this.forkPromise = undefined;
+        this.downloadAllBlocks = 0;
 
     }
 
@@ -299,12 +300,13 @@ class InterfaceBlockchainFork {
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
                     this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
 
-                    if (process.env.BROWSER) this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
+                    if (process.env.BROWSER || this.downloadAllBlocks) this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
 
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});
 
-                    if (!process.env.BROWSER) await this.sleep(70);
+                    if ( !process.env.BROWSER ) await this.sleep(70);
+
                 }
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
@@ -335,15 +337,15 @@ class InterfaceBlockchainFork {
 
             }
 
-            await this.sleep(30);
+            if (!this.downloadAllBlocks) await this.sleep(30);
 
             await this.postForkTransactions(forkedSuccessfully);
 
-            await this.sleep(30);
+            if (!this.downloadAllBlocks) await this.sleep(30);
 
             this.postFork(forkedSuccessfully);
 
-            await this.sleep(30);
+            if (!this.downloadAllBlocks) await this.sleep(30);
 
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();
@@ -364,18 +366,18 @@ class InterfaceBlockchainFork {
             //successfully, let's delete the backup blocks
             this._deleteBackupBlocks();
 
-            await this.sleep(100);
+            await this.sleep( this.forkBlocks.length === consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD ? 10 : 100 );
 
             //propagate last block
             NodeBlockchainPropagation.propagateBlock( this.blockchain.blocks[ this.blockchain.blocks.length-1 ], this.sockets);
 
-            if (this.forkBlocks.length === consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD ) {
+            if ( this.downloadAllBlocks ) {
 
                 this.blockchain.agent.protocol.askBlockchain(this.getSocket());
 
-            }
+                await this.sleep(20);
 
-            await this.sleep(100);
+            } else await this.sleep(100);
 
         }
 

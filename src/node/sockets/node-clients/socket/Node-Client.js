@@ -7,6 +7,7 @@ import NodesList from 'node/lists/Nodes-List'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import NODES_TYPE from "node/lists/types/Nodes-Type";
 import Blockchain from "main-blockchain/Blockchain"
+import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'
 
 let NodeExpress, NodeServer;
 
@@ -47,7 +48,7 @@ class NodeClient {
         return new Promise( (resolve) => {
 
             let timeoutConnection = 7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 );
-            let timeoutTotal =  7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*30*1000 : 0 );
+            let timeoutTotal =  7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
 
             try
             {
@@ -100,6 +101,7 @@ class NodeClient {
                 }
                 this.socket = socket;
 
+                NodePropagationProtocol.initializeNodesSimpleWaitlist(socket);
 
                 socket.once("connect", async ( response ) =>{
 

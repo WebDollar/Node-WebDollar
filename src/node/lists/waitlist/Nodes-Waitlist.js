@@ -6,6 +6,7 @@ import NODES_TYPE from "node/lists/types/Nodes-Type"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import DownloadManager from "common/utils/helpers/Download-Manager"
 import consts from 'consts/const_global'
+import Blockchain from "../../../main-blockchain/Blockchain";
 
 const EventEmitter = require('events');
 
@@ -27,7 +28,7 @@ class NodesWaitlist {
         this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS = 500;
 
         this.MAX_ERROR_TRIALS_FALLBACK = 100;
-        this.MAX_ERROR_TRIALS_SIMPLE = 100;
+        this.MAX_ERROR_TRIALS_SIMPLE = 5;
 
     }
 
@@ -43,7 +44,7 @@ class NodesWaitlist {
 
         //interval to delete useless waitlist and resort scores
 
-        setTimeout( this._deleteUselessWaitlists.bind(this), 30*1000 + Math.random()*3000 );
+        setTimeout( this._deleteUselessWaitlists.bind(this), 20*1000 + Math.random()*3000 );
 
     }
 
@@ -177,7 +178,7 @@ class NodesWaitlist {
      * It will delete addresses that tried way too much
      * @returns {boolean}
      */
-    _deleteUselessWaitlist(listType){
+    async _deleteUselessWaitlist(listType){
 
         let list, max;
 
@@ -196,14 +197,18 @@ class NodesWaitlist {
 
         for (let i=list.length-1; i>=0; i--)
             if (  ( list[i].isFallback && list[i].errorTrials > this.MAX_ERROR_TRIALS_FALLBACK ) ||
-                  ( list[i].errorTrials > this.MAX_ERROR_TRIALS_SIMPLE)) {
+                  ( !list[i].isFallback && list[i].errorTrials > this.MAX_ERROR_TRIALS_SIMPLE)) {
 
                 this.emitter.emit("waitlist/delete-node", list[i]);
                 list.splice(i, 1);
 
             }
 
+        await Blockchain.blockchain.sleep(20);
+
         this._sortList(list);
+
+        await Blockchain.blockchain.sleep(50);
 
         //make sure the list has a maximum length
         if (list.length > max){

@@ -113,7 +113,7 @@ class NodeServer {
 
                     if (Math.random() < 0.05) console.warn("too many terminal connections");
 
-                    await NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
+                    await NodePropagationProtocol.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
                     return;
                 }
 
@@ -121,7 +121,7 @@ class NodeServer {
 
                     if (Math.random() < 0.05) console.warn("too many browser connections");
 
-                    await NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
+                    await NodePropagationProtocol.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
                     return;
                 }
 
@@ -191,7 +191,7 @@ class NodeServer {
 
                 } else {
 
-                    await NodePropagationProtocol.propagateWaitlistSimple(socket, true); //it will also disconnect the socket
+                    await NodePropagationProtocol.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
                 }
 
