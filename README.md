@@ -88,7 +88,7 @@ Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 ### Install x509 on Windows
 Open a powershell terminal
 ``` 
-npm install python2.7
+npm install --python=python2.7
 npm config set python python2.7
 git clone https://github.com/ReadyTalk/win32.git
 mkdir C:\OpenSSL-Win64\lib\
@@ -97,7 +97,7 @@ rm -r -fo .\win32\
 ``` 
 or cmd
 ``` 
-npm install python2.7
+npm install --python=python2.7
 npm config set python python2.7
 git clone https://github.com/ReadyTalk/win32.git
 md C:\OpenSSL-Win64\lib\
