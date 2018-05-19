@@ -27,13 +27,13 @@ class SemaphoreProcessing{
     }
 
 
-    _processingSemaphoreList(){
+    async _processingSemaphoreList(){
 
         if (this._list.length > 0){
 
             let answer = false;
             try {
-                answer = this._list[0].callback();
+                answer = await this._list[0].callback();
             } catch (ex){
                 console.error("error processingSemaphoreList !!!!!!!!!!!!!!!!!!!!!!!!", ex);
             }
@@ -50,7 +50,7 @@ class SemaphoreProcessing{
 
         }
 
-        setTimeout(this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);
+        setTimeout( async ()=>{ await this._processingSemaphoreList.bind(this)}, this.processingSemaphoreInterval);
 
     }
 
