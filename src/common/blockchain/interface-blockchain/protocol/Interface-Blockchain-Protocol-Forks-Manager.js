@@ -51,7 +51,8 @@ class InterfaceBlockchainProtocolForksManager {
                 if (this.blockchain.blocks[newChainLength] !== undefined && this.blockchain.blocks[newChainLength].hash.equals( forkLastBlockHash ))
                     socket.node.protocol.blocks = newChainLength;
 
-                socket.node.protocol.sendLastBlock();
+                if (Math.random() < 0.5)
+                    socket.node.protocol.sendLastBlock();
 
                 if (newChainLength < this.blockchain.blocks.length - 50)
                     BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+newChainLength+" / "+this.blockchain.blocks.length );

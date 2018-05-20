@@ -88,7 +88,8 @@ class InterfaceBlockchainProtocolTipsManager {
 
         if (newChainLength < this.blockchain.blocks.length){
 
-            socket.node.protocol.sendLastBlock();
+            if (Math.random() < 0.5)
+                socket.node.protocol.sendLastBlock();
 
             if (newChainLength < this.blockchain.blocks.length - 50)
                 BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+newChainLength+" / "+this.blockchain.blocks.length );
