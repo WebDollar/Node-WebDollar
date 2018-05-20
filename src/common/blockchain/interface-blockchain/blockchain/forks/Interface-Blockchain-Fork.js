@@ -608,7 +608,7 @@ class InterfaceBlockchainFork {
         return -1;
     }
 
-    _pushSocket(socket, priority){
+    pushSocket(socket, priority){
 
         if (this._findSocket(socket) === -1) {
 

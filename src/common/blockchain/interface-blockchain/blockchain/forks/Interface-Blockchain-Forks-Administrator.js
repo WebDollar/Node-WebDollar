@@ -61,7 +61,7 @@ class InterfaceBlockchainForksAdministrator {
             if (Math.random() < 0.001)
                 console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
 
-            forkFound._pushSocket( socket, forkProof );
+            forkFound.pushSocket( socket, forkProof );
             return {result: true, fork: forkFound};
 
         }

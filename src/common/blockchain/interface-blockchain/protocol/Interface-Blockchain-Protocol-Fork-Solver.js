@@ -136,7 +136,10 @@ class InterfaceBlockchainProtocolForkSolver{
                     forkFound = this.blockchain.forksAdministrator.findForkByHeaders(answer.hash);
                     if (forkFound !== null) {
                         if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
-                        forkFound.push( forkLastBlockHash ); //this lead to a new fork
+
+                        forkFound.pushHeader( forkLastBlockHash ); //this lead to a new fork
+                        forkFound.pushSocket(socket, forkProof);
+
                         return {result: true, fork: forkFound};
                     }
 
@@ -166,9 +169,12 @@ class InterfaceBlockchainProtocolForkSolver{
                 forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHash);
 
                 if ( forkFound !== null ){
+
                     if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by hash after binary search");
-                    forkFound.push( forkLastBlockHash );
-                    forkFound.push( binarySearchResult.header );
+
+                    forkFound.pushHeader( forkLastBlockHash );
+                    forkFound.pushHeader( binarySearchResult.header );
+                    forkFound.pushSocket( socket, forkProof );
 
                     return {result: true, fork: forkFound};
                 }
