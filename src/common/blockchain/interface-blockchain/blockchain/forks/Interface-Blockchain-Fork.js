@@ -24,16 +24,17 @@ class InterfaceBlockchainFork {
 
     destroyFork(){
 
-        this.blockchain = undefined;
-
         for (let i=0; i<this.forkBlocks.length; i++)
-            if (this.forkBlocks[i] !== undefined && this.forkBlocks[i] !== null) {
+            if (this.forkBlocks[i] !== undefined && this.forkBlocks[i] !== null && this.blockchain.blocks[this.forkBlocks[i].height] !== this.forkBlocks[i] ) {
 
                 this.forkBlocks[i].destroyBlock();
 
                 this.forkBlocks[i] = undefined;
             }
 
+        this.blockchain = undefined;
+
+        this.forkBlocks = [];
         this.headers = [];
         this.sockets = [];
         this.forkPromise = [];
@@ -557,10 +558,11 @@ class InterfaceBlockchainFork {
     _deleteBackupBlocks(){
 
 
-        for (let i = 0; i < this._blocksCopy.length; i++) {
-            this._blocksCopy[i].destroyBlock();
-            this._blocksCopy[i] = undefined;
-        }
+        for (let i = 0; i < this._blocksCopy.length; i++)
+            if ( this._blocksCopy[i] !== undefined && this._blocksCopy[i] !== null && this.blockchain.blocks[ this._blocksCopy[i].height ] !== this._blocksCopy[i] ) {
+                this._blocksCopy[i].destroyBlock();
+                this._blocksCopy[i] = undefined;
+            }
 
         this._blocksCopy = [];
 
