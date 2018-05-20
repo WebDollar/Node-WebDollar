@@ -252,8 +252,6 @@ class InterfaceBlockchainFork {
         else
         success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
-            let accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant(true);
-
             if (! (await this._validateFork(false, false))) {
                 console.error("validateFork was not passed");
                 return false
@@ -290,8 +288,6 @@ class InterfaceBlockchainFork {
                 } catch (exception){
                     console.log("revertFork rasied an error", exception );
                 }
-
-                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone, undefined, true);
 
                 this.forkIsSaving = false;
                 return false;
@@ -377,7 +373,6 @@ class InterfaceBlockchainFork {
                 }
 
                 await this.sleep(30);
-                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
 
             }
 
@@ -394,8 +389,6 @@ class InterfaceBlockchainFork {
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();
                 this._forkPromiseResolver(true) //making it async
-            } else {
-                this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
             }
 
             this.forkIsSaving = false;
