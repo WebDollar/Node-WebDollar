@@ -1,5 +1,5 @@
 # Node-WebDollar [![Build Status](https://travis-ci.org/WebDollar/Node-WebDollar.svg)](https://travis-ci.org/WebDollar/Node-WebDollar)
-# Webstorm ES6 
+# Webstorm ES6
 
 Settings => Languages & Frameworks => JavaScript language version and choose **ECMAScript 6**
 
@@ -7,14 +7,14 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 # Docker (No skills, only docker)
 
-## 1. Install Docker 
+## 1. Install Docker
 
 https://docs.docker.com/install/
 
 ## 2. Run prebuilt Container (automated build https://hub.docker.com/r/webdollar/node/)
 AutoSSL
 ```
-docker run -d --restart=always -v /webdollar/data:/blockchainDB3 -e DOMAIN=<ENTER DOMAIN HERE> -e EMAIL=<ENTER EMAIL HERE> --name webdollar -p 80:80 -p 443:443 webdollar/node
+docker run -d --restart=always -v /webdollar/ssl:/etc/letsencrypt/live -v /webdollar/data:/blockchainDB3 -e DOMAIN=<ENTER DOMAIN HERE> -e EMAIL=<ENTER EMAIL HERE> --name webdollar -p 80:80 -p 443:443 webdollar/node
 ```
 
 NoSSL
@@ -35,29 +35,29 @@ It doesn't work with the new version 9.x
 
 Windows: just download and install from URL: https://nodejs.org/en/download/
 
-Linux: tutorial how to install Node.js using NVM (recommended) [Install Node.js using NVM](/docs/Install-Debian.md) 
+Linux: tutorial how to install Node.js using NVM (recommended) [Install Node.js using NVM](/docs/Install-Debian.md)
 
-## 1. Cloning Repository 
+## 1. Cloning Repository
 ```
 git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
 ```
 ## 2. Installing modules
-`cd Node-WebDollar` to enter in the downloaded folder of the repository   
+`cd Node-WebDollar` to enter in the downloaded folder of the repository
 ```
 npm install
 ```
 
-###In case you will get errors: 
+###In case you will get errors:
 ## 3. **node-gyp**
 
-In case your will get errors from **node-gyp** especially for **Argon2** or **webrtc** 
+In case your will get errors from **node-gyp** especially for **Argon2** or **webrtc**
 
 #### 3.1 node-gyp on Windows
 open a Command Prompt with **Administrator rights**
 
 ```
 cd C:\Path\To\Node-WebDollar\
-npm install --global --production windows-build-tools                                    
+npm install --global --production windows-build-tools
 npm install
 ```
 
@@ -65,10 +65,10 @@ npm install
 
 Installing Argon2 node.js
 ```
-sudo apt install linuxbrew-wrapper 
+sudo apt install linuxbrew-wrapper
 ```
 In case your receive some errors, try ```sudo apt-get -f install```
- 
+
 To check the version `gcc --version`
 In case the GCC is not installed, install gcc `brew install gcc`
 
@@ -81,8 +81,8 @@ npm install -g node-gyp
 
 Replace `g++-5` with your version
 Verify if you can access `g++-5` or whatever version you have.
-then install  
-``` 
+then install
+```
 env CXX=g++-5 npm install
 env CXX=g++-5 npm install argon2
 ```
@@ -93,21 +93,21 @@ Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 
 ### Install x509 on Windows
 Open a powershell terminal
-``` 
+```
 npm install --python=python2.7
 git clone https://github.com/ReadyTalk/win32.git
 mkdir C:\OpenSSL-Win64\lib\
 cp .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
 rm -r -fo .\win32\
-``` 
+```
 or cmd
-``` 
+```
 npm install --python=python2.7
 git clone https://github.com/ReadyTalk/win32.git
 md C:\OpenSSL-Win64\lib\
 copy /y .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
 rd /s /q .\win32\
-``` 
+```
 
 ## 4 SSL (Secured Socket Layer) Certificate
 
@@ -115,13 +115,13 @@ WebDollar uses SSL (Secured Socket Layer) and in order to generate your SSL Cert
 
 ### 4.1 No-IP solution for Free Domain
 
-Follow the Tutorial [Install No-Ip using ddns.net ](/docs/Install-No-Ip.md) 
+Follow the Tutorial [Install No-Ip using ddns.net ](/docs/Install-No-Ip.md)
 
 
 ### 4.2 Generate your SSL certificate
 
 
-Follow the Tutorial [Get SSL Certificates ](/docs/Get-SSL-Certificates.md) 
+Follow the Tutorial [Get SSL Certificates ](/docs/Get-SSL-Certificates.md)
 
 
 #### Firewall acceptable
@@ -146,7 +146,7 @@ install pm2
 npm install pm2 -g --unsafe-perm
 ```
 
-##### Linux 
+##### Linux
 
 run pm2
 
@@ -154,14 +154,14 @@ run pm2
 chmod +x start.sh
 ./start.sh
 ```
-to kill 
+to kill
 
 ##### Windows
 start.sh ???
 
 #### 5.2 Run Mocha Tests (optional)
 ```
-npm run test                                                       
+npm run test
 ```
 
 #### 5.3 Missing Packages or Errors
@@ -196,9 +196,9 @@ npm run commands
 npm run start
 ```
 
-#### 5.8 PM2 to run the Node run indefinitely 
+#### 5.8 PM2 to run the Node run indefinitely
 
-Follow the Tutorial [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md) 
+Follow the Tutorial [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
 
 # To do:
 
@@ -219,5 +219,5 @@ Mining in Bitcoins
 <dl>
     <a href="http://t.me/WebDollar">
         <img src="http://icons.iconarchive.com/icons/froyoshark/enkel/64/Telegram-icon.png">
-    </a> 
+    </a>
 </dl>
