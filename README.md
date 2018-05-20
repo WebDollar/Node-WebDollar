@@ -11,9 +11,15 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 
 https://docs.docker.com/install/
 
-## 2. Run prebuilt Container (automated build https://hub.docker.com/r/xkid/webdollar/)
+## 2. Run prebuilt Container (automated build https://hub.docker.com/r/webdollar/node/)
+AutoSSL
 ```
-docker run -d --restart=always -e DOMAIN=<ENTER DOMAIN HERE> -e EMAIL=<ENTER EMAIL HERE> --name webdollar -p 80:80 -p 443:443 xkid/webdollar
+docker run -d --restart=always -v /webdollar/data:/blockchainDB3 -e DOMAIN=<ENTER DOMAIN HERE> -e EMAIL=<ENTER EMAIL HERE> --name webdollar -p 80:80 -p 443:443 webdollar/node
+```
+
+NoSSL
+```
+docker run -d --restart=always -v /webdollar/data:/blockchainDB3 -e NOSSL=true -e SERVER_PORT=80 --name webdollar -p 80:80 webdollar/node
 ```
 
 # Installing (Non-techie skills required)
