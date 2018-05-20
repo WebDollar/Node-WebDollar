@@ -204,7 +204,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.133",
+        VERSION: "1.133.1",
         VERSION_COMPATIBILITY: "1.13",
         PROTOCOL: "WebDollar",
         SSL: true,
@@ -248,6 +248,7 @@ consts.SETTINGS = {
                 CLIENT: {
                     MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST: 10,
                     MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK: 2,
+                    MINIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK: 1,
 
                     SSL:{
                         MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_WHEN_SSL: 10,
@@ -269,6 +270,7 @@ consts.SETTINGS = {
                 CLIENT: {
                     MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST: 4,
                     MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK: 2,
+                    MINIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK: 1,
                 },
 
                 SERVER: {},

@@ -608,7 +608,7 @@ class InterfaceBlockchainFork {
         return -1;
     }
 
-    _pushSocket(socket, priority){
+    pushSocket(socket, priority){
 
         if (this._findSocket(socket) === -1) {
 
@@ -617,6 +617,16 @@ class InterfaceBlockchainFork {
             else
                 this.sockets.push(socket)
         }
+    }
+
+    pushHeader(hash){
+
+        for (let i=0; i<this.forkHeaders.length; i++)
+            if (this.forkHeaders[i].equals( hash ) )
+                return;
+
+        this.forkHeaders.push(hash);
+
     }
 
 }

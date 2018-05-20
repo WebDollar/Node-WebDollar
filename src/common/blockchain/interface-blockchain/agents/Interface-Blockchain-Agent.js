@@ -132,7 +132,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
                     let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
 
                     if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
-                          NodesList.nodes.length >= consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK / 2) {
+                          NodesList.nodes.length >= consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MINIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK ) {
 
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
