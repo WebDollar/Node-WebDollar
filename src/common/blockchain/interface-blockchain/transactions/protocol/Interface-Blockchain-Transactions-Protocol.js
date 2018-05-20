@@ -190,6 +190,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
         try {
 
+            if (socket === undefined) return;
             let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 5000);
 
             if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
@@ -211,6 +212,8 @@ class InterfaceBlockchainTransactionsProtocol{
 
             if ( downloadingTransactions.length === 0) //nothing to download
                 return;
+
+            if (socket === undefined) return;
 
             let answerTransactions = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-by-ids", {format: "buffer", ids: downloadingTransactions }, "answer" , 5000);
 
@@ -245,7 +248,7 @@ class InterfaceBlockchainTransactionsProtocol{
 
 
             if (start + count < answer.length)
-                setTimeout( async ()=>{ await this.downloadTransactions(this, start+count, count)}, 1500 + (Math.random()*1000) );
+                setTimeout( async ()=>{ await this.downloadTransactions(socket, start+count, count)}, 1500 + (Math.random()*1000) );
 
 
         } catch (exception){
