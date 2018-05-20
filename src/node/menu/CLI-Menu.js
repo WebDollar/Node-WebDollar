@@ -1,9 +1,12 @@
-import {Node, Blockchain} from '../../index.js';
 const FileSystem = require('fs');
 const readline = require('readline');
-import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
+
+import consts from 'consts/const_global';
+import {Node, Blockchain} from '../../index.js';
 import AdvancedMessages from './Advanced-Messages';
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import PoolLeaderProtocol from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolLeaderProtocol';
 
 class CLI {
 
@@ -91,13 +94,23 @@ class CLI {
         await this._runMenu();
     }
 
+    async _pickNumber(message, isFloat = false) {
+        
+        let answer = await this.question(message);
+        
+        let num = isFloat ? parseFloat(answer) : parseInt(answer);
+        if (isNaN(num))
+            return NaN;
+
+        return num;
+    }
+    
     async _chooseAddress() {
 
         await this.listAddresses();
 
-        let answer = await this.question('Choose the address number: ');
+        let addressId = await this._pickNumber('Choose the address number: ');
 
-        let addressId = parseInt(answer);
         if (isNaN(addressId) || addressId < 0 || Blockchain.Wallet.addresses.length <= addressId)
             return -1;
 
@@ -381,6 +394,17 @@ class CLI {
     async createMiningPool(){
         
         console.info('Create Mining Pool.');
+        
+        let poolLeaderFee = await this._pickNumber('Choose a fee(0...100): ', true);
+        
+        if (isNaN(poolLeaderFee) || poolLeaderFee < 0 || 100 < poolLeaderFee){
+            console.log("You have entered an invalid number:", poolLeaderFee);
+            return false;
+        }
+        else
+            console.log("your fee is", poolLeaderFee);
+
+        let poolLeader = new PoolLeaderProtocol(poolLeaderFee);
     }
 
     question(message){
