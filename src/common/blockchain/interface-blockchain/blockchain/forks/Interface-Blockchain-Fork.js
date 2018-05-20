@@ -373,7 +373,7 @@ class InterfaceBlockchainFork {
 
                 await this.sleep(30);
                 this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
-                
+
             }
 
             if (!this.downloadAllBlocks) await this.sleep(30);
