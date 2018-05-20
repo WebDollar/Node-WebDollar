@@ -216,21 +216,28 @@ class InterfaceBlockchainTransactionsProtocol{
 
             if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) return false;
 
+            let errors = 0;
             for (let i=0; i<answerTransactions.transactions.length; i++){
 
                 let transaction = Blockchain.blockchain.transactions._createTransactionFromBuffer(answerTransactions.transactions[i]).transaction;
 
                 try {
 
-                    if ( !transaction.isTransactionOK() )
+                    if ( !transaction.isTransactionOK(true) ) {
+                        errors++;
                         continue;
+                    }
 
                     if (!Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket))
                         ; //console.warn("I already have this transaction", transaction.txId.toString("hex"))
 
                 } catch (exception){
-
+                    errors++;
                 }
+
+                if (errors > 6)
+                    return;
+
 
             }
 
