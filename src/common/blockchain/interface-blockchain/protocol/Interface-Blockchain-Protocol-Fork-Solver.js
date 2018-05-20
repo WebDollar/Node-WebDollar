@@ -30,7 +30,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
 
-            if (left < 0 || answer === null || !Buffer.isBuffer(answer.hash) )
+            if (left < 0 || answer === null  || !Buffer.isBuffer(answer.hash) ) // timeout
                 return {position: null, header: answer };
 
             await this.blockchain.sleep(7);
@@ -48,9 +48,11 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         answer = await socket.node.sendRequestWaitOnce("head/hash", mid-1, mid-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
-                        if ( answer !== null && Buffer.isBuffer(answer.hash) )
-                            if (answer.hash.equals( this.blockchain.getHashPrev(mid-1 +1) ) )
-                                return {position: mid-1, header: answer.hash };
+                        if (answer === null || !Buffer.isBuffer(answer.hash))
+                            return {position: null, header: answer }; // timeout
+
+                        if (answer.hash.equals( this.blockchain.getHashPrev(mid-1 +1) ) ) // it is a match
+                            return {position: mid-1, header: answer.hash };
 
                     }
 

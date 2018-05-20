@@ -30,7 +30,7 @@ class InterfaceBlockchainForksAdministrator {
                             break;
                         }
 
-                    if (this.forks[i].sockets.length === 0) {
+                    if (this.forks[i].sockets.length === 0 && !this.forks[i].forkIsSaving ) {
 
                         this.forks[i].destroyFork();
                         this.forks.splice(i, 1);
