@@ -326,12 +326,18 @@ class InterfaceBlockchainFork {
             let index;
             try {
 
+                console.log("this.blockchain === undefined 1111", this.blockchain === undefined);
+
                 for (index = 0; index < this.forkBlocks.length; index++) {
+
+                    console.log("this.blockchain === undefined 2222", this.blockchain === undefined);
 
                     StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
                     this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
+
+                    console.log("this.blockchain === undefined 3333", this.blockchain === undefined);
 
                     if (process.env.BROWSER || this.downloadAllBlocks) this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
 
@@ -349,7 +355,6 @@ class InterfaceBlockchainFork {
 
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
 
-
             } catch (exception){
 
                 console.error('-----------------------------------------');
@@ -359,6 +364,7 @@ class InterfaceBlockchainFork {
                 console.error('-----------------------------------------');
                 forkedSuccessfully = false;
 
+                console.log("this.blockchain === undefined 1", this.blockchain === undefined);
 
                 //revert the accountant tree
                 //revert the last K block
@@ -369,6 +375,8 @@ class InterfaceBlockchainFork {
                     console.error("revertOptions rasied an error", exception );
                 }
                 await this.sleep(30);
+
+                console.log("this.blockchain === undefined 2", this.blockchain === undefined);
 
                 try {
                     //reverting back to the clones, especially light settings
@@ -465,7 +473,7 @@ class InterfaceBlockchainFork {
             let revertActions = new RevertActions(this.blockchain);
 
             for (let i=0; i<this._blocksCopy.length; i++)
-                if (! (await this.blockchain.includeBlockchainBlock( this._blocksCopy[i], false, "all", false,revertActions ))) {
+                if (! (await this.blockchain.includeBlockchainBlock( this._blocksCopy[i], false, "all", false, revertActions ))) {
 
                     console.error("----------------------------------------------------------");
                     console.error("----------------------------------------------------------");

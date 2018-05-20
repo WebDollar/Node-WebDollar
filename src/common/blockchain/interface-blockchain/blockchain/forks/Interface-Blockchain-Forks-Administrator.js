@@ -153,11 +153,10 @@ class InterfaceBlockchainForksAdministrator {
         for (let i=this.forks.length-1; i>=0; i--)
             if (this.forks[i] === undefined || this.forks[i] === null || this.forks[i] === fork || this.forks[i].forkId === fork) {
 
-                let fork = this.forks[i];
-                this.forks.splice(i, 1);
+                if (this.forks[i] !== undefined && this.forks[i] !== null)
+                    this.forks[i].destroyFork();
 
-                if (fork !== undefined && fork !== null)
-                    fork.destroyFork();
+                this.forks.splice(i, 1);
             }
 
         return false;

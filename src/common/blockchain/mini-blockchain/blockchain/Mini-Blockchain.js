@@ -41,9 +41,8 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
             console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@DEBUG BEFORE")
-            console.log(block);
-            console.log(block.blockValidation);
-            console.log(block.blockValidation.blockValidationType);
+            console.log("block.blockchain === undefined", block.blockchain === undefined);
+            console.log("block.blockValidation", block.blockValidation);
             console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@DEBUG BEFORE")
 
             if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
@@ -75,10 +74,8 @@ class MiniBlockchain extends  inheritBlockchain{
             }
 
             console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@DEBUG AFTER")
-            console.log(block);
-            console.log(block.blockValidation);
-            console.log(block.blockValidation.blockValidationType);
-
+            console.log("block.blockchain === undefined", block.blockchain === undefined);
+            console.log("block.blockValidation", block.blockValidation);
             console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@DEBUG BEFORE CALLBACK")
 
             let callbackDone = await callback();
