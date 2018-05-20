@@ -42,6 +42,34 @@ class InterfaceBlockchainForksAdministrator {
 
     }
 
+
+    findFork(socket, hashes, forkProof){
+
+        let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
+
+        if ( forkFound !== null ) {
+
+            if (Math.random() < 0.001)
+                console.error("discoverAndProcessFork - fork already found by socket");
+
+            return {result: true, fork: forkFound};
+        }
+
+        forkFound = this.blockchain.forksAdministrator.findForkByHeaders(hashes);
+        if ( forkFound !== null ) {
+
+            if (Math.random() < 0.001)
+                console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
+
+            forkFound._pushSocket( socket, forkProof );
+            return {result: true, fork: forkFound};
+
+        }
+
+        return null;
+
+    }
+
     createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, headers, ready){
 
         if (!Array.isArray(sockets)) sockets = [sockets];
@@ -77,7 +105,7 @@ class InterfaceBlockchainForksAdministrator {
                 for (let q = 0; q < this.forks[j].sockets.length; q++)
 
                     if ( this.forks[j].sockets[q].node.sckAddress === sockets[i].node.sckAddress ||
-                         this.forks[j].sockets[q].node.sckAddress.matchAddress(sockets[i].node.sckAddress) )
+                         this.forks[j].sockets[q].node.sckAddress.uuid === sockets[i].node.sckAddress.uuid )
 
                         return this.forks[j];
             }

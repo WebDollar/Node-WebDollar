@@ -619,6 +619,16 @@ class InterfaceBlockchainFork {
         }
     }
 
+    pushHeader(hash){
+
+        for (let i=0; i<this.forkHeaders.length; i++)
+            if (this.forkHeaders[i].equals( hash ) )
+                return;
+
+        this.forkHeaders.push(hash);
+
+    }
+
 }
 
 export default InterfaceBlockchainFork;
