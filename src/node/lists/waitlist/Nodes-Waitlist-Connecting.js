@@ -126,7 +126,7 @@ class NodesWaitlistConnecting {
 
             let answer = await nodeClient.connectToWaitlist (nextWaitListObject, index);
 
-            if (answer) nextWaitListObject.socketConnected(nodeClient);
+            if (answer) nextWaitListObject.socketConnected(nodeClient.socket);
             else nextWaitListObject.socketErrorConnected();
 
             nextWaitListObject.connecting = false;

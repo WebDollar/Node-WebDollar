@@ -96,10 +96,8 @@ class NodesWaitlist {
                     //already found, let's add a new pushBackedBy
                     answer.waitlist.pushBackedBy(backedBy, connected);
 
-                    if (socket !== undefined) {
-                        answer.waitlist.socket = socket;
-                        answer.waitlist.connected = true;
-                    }
+                    if (socket !== undefined)
+                        answer.waitlist.socketConnected(socket);
 
                 }
                 else{
@@ -222,8 +220,12 @@ class NodesWaitlist {
 
     _sortList(list){
 
+        for (let i=0; i<list.length; i++){
+            list[i].score = list[i].sortingScore();
+        }
+
         list.sort(function(a, b) {
-            return b.sortingScore() - a.sortingScore();
+            return b.score - a.score;
         });
 
     }

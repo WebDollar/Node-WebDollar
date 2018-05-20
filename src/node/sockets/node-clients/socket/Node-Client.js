@@ -124,7 +124,7 @@ class NodeClient {
                     clearTimeout(timeout);
 
                     if (answer)
-                        await this.initializeSocket(socket, ["ip", "uuid"], waitlist);
+                        await this.initializeSocket( ["ip", "uuid"], waitlist);
                     else
                         socket.disconnect();
 
@@ -174,8 +174,7 @@ class NodeClient {
             return false;
         }
 
-        waitlist.socket = this.socket;
-        waitlist.connected = true;
+        waitlist.socketConnected(this.socket);
 
         console.log('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true));
 

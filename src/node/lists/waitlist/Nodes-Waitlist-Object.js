@@ -1,6 +1,7 @@
 import NodesList from 'node/lists/Nodes-List'
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 import consts from 'consts/const_global'
+import Blockchain from "main-blockchain/Blockchain"
 
 const MAX_NUMBER_OF_BACKED_BY_FULL_NODE = 30;
 const MAX_NUMBER_OF_BACKED_BY_LIGHT_NODE = 3;
@@ -181,20 +182,37 @@ class NodesWaitlistObject {
 
     sortingScore(){
 
-        if (this.isFallback === true) return 100000 - this.errorTrials*100;
+        if (this.isFallback === true) return 1000000 - this.errorTrials*100;
 
         let score = 200 + Math.random()*100;
 
-        score += (this.connected ? 1000 : 0);
+        score += (this.connected ? 50000 : 0);
 
         if (this.backedBy.length > 0){
 
             score += 10 * this.backedBy.length;
             score += 100 * this.backedByConnected;
 
-            if (this.sckAddresses[0].SSL) //SSL +5000
-                score += 5000;
+        }
 
+        if (this.sckAddresses[0].SSL) //SSL +5000
+            score += 80000;
+
+        if (this.socket !== undefined && this.socket !== null){
+
+            let socket = this.socket;
+            if (socket.hasOwnProperty("socket")) socket = socket.socket;
+
+            if (socket.node.protocol.blocks === undefined) score -= 300;
+            else {
+
+                let diff = Math.abs ( Blockchain.blockchain.blocks.length - socket.node.protocol.blocks);
+                if ( diff <= 2 ) score += 10000; else
+                if ( diff <= 5 ) score += 5000; else
+                if ( diff <= 10 ) score += 1000; else
+                if ( diff <= 30 ) score += 100; else
+                if ( diff >= 30 ) score -= 3000 - diff;
+            }
         }
 
         score -= this.errorTrials * 100;
