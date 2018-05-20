@@ -135,8 +135,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            await this.blockchain.sleep(10);
-
             //optimization
             //check if n-2 was ok, but I need at least 1 block
             if ( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof)) && currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 ){
@@ -152,7 +150,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHash], false );
+            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHash, binarySearchResult.header ], false );
 
             // in case it was you solved previously && there is something in the blockchain
 
@@ -173,9 +171,21 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === null)
                     throw {message: "connection dropped discoverForkBinarySearch"}
 
-            }
+                forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHash);
 
-            await this.blockchain.sleep(10);
+                if ( forkFound !== null && forkFound !== fork ){
+
+                    if (Math.random() < 0.01)
+                        console.error("discoverAndProcessFork - fork already found by hash after binary search");
+
+                    this.blockchain.forksAdministrator.deleteFork(fork);
+
+                    return {result: true, fork: forkFound};
+                }
+
+                fork.forkHeaders.push(binarySearchResult.header);
+
+            }
 
             //process light and NiPoPow
             await this.optionalProcess(socket, binarySearchResult, currentBlockchainLength, forkChainLength, forkChainStartingPoint);
@@ -198,7 +208,6 @@ class InterfaceBlockchainProtocolForkSolver{
                 fork.forkStartingHeightDownloading  = binarySearchResult.position;
                 fork.forkChainStartingPoint = forkChainStartingPoint;
                 fork.forkChainLength = forkChainLength;
-                fork.forkHeaders.push(binarySearchResult.header);
 
                 await fork.initializeFork(); //download the requirements and make it ready
 
@@ -210,6 +219,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 console.log("fork is something new");
                 throw {message: "fork is something new", binarySearchResult:binarySearchResult, forkChainStartingPoint:forkChainStartingPoint, forkChainLength:forkChainLength} ;
             }
+
+            await this.blockchain.sleep(30);
 
 
             return {result: true, fork:fork };

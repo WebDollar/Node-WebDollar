@@ -18,10 +18,13 @@ class InterfaceBlockchainFork {
     constructor (){
 
         this._blocksCopy = [];
+        this.forkIsSaving = false;
 
     }
 
     destroyFork(){
+
+        this.blockchain = undefined;
 
         for (let i=0; i<this.forkBlocks.length; i++)
             if (this.forkBlocks[i] !== undefined && this.forkBlocks[i] !== null) {
@@ -31,7 +34,6 @@ class InterfaceBlockchainFork {
                 this.forkBlocks[i] = undefined;
             }
 
-        this.blockchain = undefined;
         this.headers = [];
         this.sockets = [];
         this.forkPromise = [];
@@ -59,7 +61,6 @@ class InterfaceBlockchainFork {
 
         this.forkReady = false;
 
-        this.forkIsSaving = false;
         this.forkStartingHeight = forkStartingHeight||0;
         this.forkStartingHeightDownloading = forkStartingHeight||0;
 
@@ -230,6 +231,9 @@ class InterfaceBlockchainFork {
         if (global.TERMINATED)
             return false;
 
+        this.forkIsSaving = true; //marking it saved because we want to avoid the forksAdministrator to delete it
+        if (this.blockchain === undefined) return false; //fork was already destroyed
+
         if (! (await this._validateFork(false, true))) {
             console.error("validateFork was not passed");
             return false
@@ -241,9 +245,11 @@ class InterfaceBlockchainFork {
         let revertActions = new RevertActions(this.blockchain);
         revertActions.push({action: "breakpoint"});
 
-        this.forkIsSaving = true; //marking it saved because we want to avoid the forksAdministrator to delete it
+        let success;
 
-        let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+        if (this.blockchain === undefined) success = false ; //fork was already destroyed
+        else
+        success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
             let accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant(true);
 
