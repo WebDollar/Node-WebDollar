@@ -241,9 +241,9 @@ class InterfaceBlockchainFork {
         let revertActions = new RevertActions(this.blockchain);
         revertActions.push({action: "breakpoint"});
 
-        let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+        this.forkIsSaving = true; //marking it saved because we want to avoid the forksAdministrator to delete it
 
-            this.forkIsSaving = true;
+        let success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
             let accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant(true);
 
@@ -309,7 +309,6 @@ class InterfaceBlockchainFork {
 
                 for (let i = 0; i < this.forkBlocks.length; i++) {
 
-                    console.log("transactions");
                     for (let j = 0; j < this.forkBlocks[i].data.transactions.transactions.length; j++)
                         console.log("transaction", this.forkBlocks[i].data.transactions.transactions[j].toJSON());
 
@@ -357,19 +356,24 @@ class InterfaceBlockchainFork {
 
                 //revert the accountant tree
                 //revert the last K block
-                revertActions.revertOperations('', "all");
-                await this.sleep(30);
-
-                //reverting back to the clones, especially light settings
 
                 try {
-                    await this.revertFork();
+                    revertActions.revertOperations('', "all");
                 } catch (exception){
-                    console.log("revertFork rasied an error", exception );
+                    console.error("revertOptions rasied an error", exception );
                 }
                 await this.sleep(30);
 
+                try {
+                    //reverting back to the clones, especially light settings
+                    await this.revertFork();
+                } catch (exception){
+                    console.error("revertFork rasied an error", exception );
+                }
+
+                await this.sleep(30);
                 this.blockchain.accountantTree.deserializeMiniAccountant(accountantTreeClone,undefined, true);
+                
             }
 
             if (!this.downloadAllBlocks) await this.sleep(30);
