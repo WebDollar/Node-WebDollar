@@ -40,6 +40,12 @@ class MiniBlockchain extends  inheritBlockchain{
 
         try{
 
+            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@DEBUG BEFORE")
+            console.log(block);
+            console.log(block.blockValidation);
+            console.log(block.blockValidation.blockValidationType);
+            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@DEBUG BEFORE")
+
             if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
 
                 //updating reward
@@ -58,17 +64,26 @@ class MiniBlockchain extends  inheritBlockchain{
 
                     block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = true;
                     revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
+
                 }
 
                 if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions, showUpdate ))
                     throw {message: "Process Block Data Transactions failed"};
 
-
                 if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
 
             }
 
+            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@DEBUG AFTER")
+            console.log(block);
+            console.log(block.blockValidation);
+            console.log(block.blockValidation.blockValidationType);
+
+            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@DEBUG BEFORE CALLBACK")
+
             let callbackDone = await callback();
+
+            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@DEBUG AFTER CALLBACK")
 
             if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
 
