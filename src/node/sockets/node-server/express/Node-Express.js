@@ -1,6 +1,7 @@
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import NODES_TYPE from "node/lists/types/Nodes-Type"
 
 const https = require('https');
 const http = require('http');
@@ -151,6 +152,9 @@ class NodeExpress{
                     clients: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET),
                     servers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET),
                     webpeers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_WEBRTC),
+                },
+                waitlist:{
+                    list: NodesWaitlist.getJSONList( NODES_TYPE.NODE_TERMINAL, false ),
                 }
 
             });

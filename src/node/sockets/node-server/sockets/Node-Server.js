@@ -135,11 +135,25 @@ class NodeServer {
                 }
 
 
-                if (NODES_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
+                if (NODES_TYPE.NODE_TERMINAL === nodeType){
 
-                    if (Math.random() < 0.05) console.warn("too many terminal connections");
+                    let bDisconnect = false;
 
-                    return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
+                    //be sure it is not a fallback node
+                    if ( NodesList.countNodesByType( NODES_TYPE.NODE_TERMINAL ) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL ){
+
+                        let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL); //it should need a confirmation
+
+                        if (nodeDomain === '' || nodeDomain === undefined || waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
+
+                            if (bDisconnect)
+                                if (Math.random() < 0.05) console.warn("too many terminal connections");
+
+                            return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
+
+                        }
+
+                    }
 
                 } else
 
