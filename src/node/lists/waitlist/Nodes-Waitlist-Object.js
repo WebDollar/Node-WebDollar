@@ -19,6 +19,8 @@ class NodesWaitlistObject {
 
         if (backedBy === "fallback")
             this.isFallback = true;
+        else
+            this.isFallback = false;
 
         //backed by
         this.backedByConnected = 0;

@@ -292,6 +292,26 @@ class NodesWaitlist {
         return false;
     }
 
+    getJSONList(listType, fallback){
+
+        let list = [];
+
+        if (listType === NODES_TYPE.NODE_TERMINAL ) list = this.waitListFullNodes;
+        else if ( listType === NODES_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
+
+        let answer = [];
+
+        for (let i=0; i<list.length; i++){
+
+            if (fallback === undefined || (fallback === list[i].isFallback))
+                answer.push(list[i].toJSON() );
+
+        }
+
+        return answer;
+
+    }
+
 }
 
 
