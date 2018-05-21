@@ -265,7 +265,6 @@ consts.SETTINGS = {
                 },
 
                 SERVER: {
-                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 530,
                     MAXIMUM_CONNECTIONS_FROM_TERMINAL: 100,
 
                     TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
@@ -349,6 +348,5 @@ if ( consts.DEBUG === true ){
 
 }
 
-consts.SETTINGS.NODE.PORT = 9095;
 
 export default consts
