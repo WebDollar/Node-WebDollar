@@ -17,7 +17,7 @@ class PPoWBlockchainProofBasic{
 
             //TODO optimization instead of using for j
 
-            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi !== null)
+            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi !== undefined)
                 for (let j=0; j<this.blockchain.proofPi.blocks.length; j++)
                     if (this.blockchain.proofPi.blocks[j] === this.blocks[i] ){
                         found = true;

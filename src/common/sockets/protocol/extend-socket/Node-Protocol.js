@@ -167,7 +167,7 @@ class NodeProtocol {
             l: Blockchain.blockchain.blocks.length,
             h: Blockchain.blockchain.blocks.last.hash,
             s: Blockchain.blockchain.blocks.blocksStartingPoint,
-            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi !== null && Blockchain.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
+            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi !== undefined && Blockchain.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
         }, callback);
     }
 
