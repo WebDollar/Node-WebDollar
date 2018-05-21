@@ -391,9 +391,10 @@ class InterfaceBlockchainFork {
                 this._forkPromiseResolver(true) //making it async
             }
 
-            this.forkIsSaving = false;
             return forkedSuccessfully;
         });
+
+        this.forkIsSaving = false;
 
         // it was done successfully
         console.log("FORK SOLVER SUCCESS", success);
