@@ -621,6 +621,8 @@ class InterfaceBlockchainFork {
 
     pushHeader(hash){
 
+        if (hash === undefined || hash === null) return;
+
         for (let i=0; i<this.forkHeaders.length; i++)
             if (this.forkHeaders[i].equals( hash ) )
                 return;
