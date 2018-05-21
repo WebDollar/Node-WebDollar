@@ -26,9 +26,6 @@ export default {
         {"addr": ["https://titan.serg.at:8080/"]}, // Thanks to @SergiuWX
         {"addr": ["https://titan.serg.at:8081/"]}, // Thanks to @SergiuWX
         {"addr": ["https://titan.serg.at:8082/"]}, // Thanks to @SergiuWX
-        {"addr": ["https://node1.petreus.ro/:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node2.petreus.ro/:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node3.petreus.ro/:443"]}, // Thanks to Dani Petreus
 
         {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
         {"addr": ["https://robitza.ddns.net:80"]}, // Thanks to @robertclaudiu
