@@ -14,7 +14,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 
-const TIME_DISCONNECT_TERMINAL = 15*60*1000;
+const TIME_DISCONNECT_TERMINAL = 5*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
 const ROOMS = {

@@ -120,6 +120,8 @@ class InterfaceBlockchainProtocolForkSolver{
             let answer = this.blockchain.forksAdministrator.findFork(socket, forkLastBlockHash, forkProof);
             if (answer !== null) return answer;
 
+            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [ forkLastBlockHash ], false );
+
             //optimization
             //check if n-2 was ok, but I need at least 1 block
             if ( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof)) && currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 ){
@@ -133,15 +135,20 @@ class InterfaceBlockchainProtocolForkSolver{
                         header: answer.hash,
                     };
 
-                    forkFound = this.blockchain.forksAdministrator.findForkByHeaders(answer.hash);
-                    if (forkFound !== null) {
+                    forkFound = this.blockchain.forksAdministrator._findForkyByHeader(answer.hash);
+
+                    if (forkFound !== null && forkFound !== fork) {
                         if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
 
                         forkFound.pushHeader( forkLastBlockHash ); //this lead to a new fork
                         forkFound.pushSocket(socket, forkProof);
 
+                        fork.destroyFork(); //destroy fork
+
                         return {result: true, fork: forkFound};
                     }
+
+                    fork.pushHeader(binarySearchResult.header);
 
                 }
 
@@ -166,18 +173,21 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === null)
                     throw {message: "connection dropped discoverForkBinarySearch"}
 
-                forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHash);
+                forkFound = this.blockchain.forksAdministrator._findForkyByHeader(binarySearchResult.header);
 
-                if ( forkFound !== null ){
+                if ( forkFound !== null && forkFound !== fork ){
 
                     if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by hash after binary search");
 
                     forkFound.pushHeader( forkLastBlockHash );
-                    forkFound.pushHeader( binarySearchResult.header );
                     forkFound.pushSocket( socket, forkProof );
+
+                    fork.destroyFork(); //destroy fork
 
                     return {result: true, fork: forkFound};
                 }
+
+                fork.pushHeader(binarySearchResult.header);
 
             }
 
@@ -191,8 +201,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 if (binarySearchResult.position === -1)
                     binarySearchResult.position = 0;
-
-                fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHash, binarySearchResult.header ], false );
 
                 //maximum blocks to download
                 if ( forkChainLength >= this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD){

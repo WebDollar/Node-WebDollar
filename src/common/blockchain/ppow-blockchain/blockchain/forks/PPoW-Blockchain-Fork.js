@@ -12,19 +12,19 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         InterfaceBlockchainFork.prototype.initializeConstructor.call(this, blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, forkReady);
 
-        this.forkProofPi = null;
-        this._forkProofPiClone = null;
+        this.forkProofPi = undefined;
+        this._forkProofPiClone = undefined;
 
     }
 
     destroyFork(){
 
-        if (this._forkProofPiClone !== null && (this.blockchain.proofPi === null || this.blockchain.proofPi !== this._forkProofPiClone) )
+        if (this._forkProofPiClone !== undefined && (this.blockchain.proofPi === undefined || this.blockchain.proofPi !== this._forkProofPiClone) )
             this._forkProofPiClone.destroyProof();
 
         this._forkProofPiClone = undefined;
 
-        if (this.forkProofPi !== null && (this.blockchain.proofPi === null || this.blockchain.proofPi !== this.forkProofPi) )
+        if (this.forkProofPi !== undefined && (this.blockchain.proofPi === undefined || this.blockchain.proofPi !== this.forkProofPi) )
             this.forkProofPi.destroyProof();
 
         this.forkProofPi = undefined;
@@ -75,7 +75,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (typeof proofPiData.length !== "number" || proofPiData.length <= 0) throw {message: "Proof Pi length is invalid"};
 
-            if (this.blockchain.proofPi !== null && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
+            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
 
                 if (this.forkChainLength > this.blockchain.blocks.length ){
                     this.forkProofPi = this.blockchain.proofPi;
@@ -126,7 +126,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 return;
             }
 
-            if ( this.blockchain.proofPi !== null) {
+            if ( this.blockchain.proofPi !== undefined) {
 
                 this.forkProofPi.blocks = proofsList;
 
@@ -163,9 +163,9 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
         if (!this.blockchain.agent.light)
             return InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
 
-        if (this.forkProofPi === null) throw {message: "Proof is invalid being null"};
+        if (this.forkProofPi === undefined) throw {message: "Proof is invalid being null"};
 
-        if ( this.blockchain.proofPi !== null ) {
+        if ( this.blockchain.proofPi !== undefined ) {
 
             if (this._isProofBetter())
                 return true;
@@ -181,7 +181,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             //let's verify if I already have this block
             let found = false, block = undefined;
 
-            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi !== null) {
+            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi !== undefined) {
 
                 let searchBlock = this.blockchain.proofPi.findBlockByHeight(proofsList[i].height);
 
@@ -268,7 +268,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     _shouldTakeNewProof(){
 
-        if (this.blockchain.proofPi === null)
+        if (this.blockchain.proofPi === undefined)
             return true;
 
         let comparison = this.blockchain.verifier.compareProofs( this.blockchain.proofPi, this.forkProofPi );

@@ -252,6 +252,18 @@ class NodesList {
 
     }
 
+    countFallbacks(){
+
+        let count = 0;
+
+        for (let i=this.nodes.length-1; i>=0; i--)
+            if (this.nodes[i].isFallback)
+                count ++;
+
+        return count;
+
+    }
+
 }
 
 export default new NodesList();

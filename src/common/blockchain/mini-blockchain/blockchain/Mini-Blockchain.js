@@ -162,7 +162,7 @@ class MiniBlockchain extends  inheritBlockchain{
             if (! (await inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
                 throw {message: "couldn't sae the blockchain"};
 
-            if (! (await this.accountantTree.saveMiniAccountant( true )))
+            if (! (await this.accountantTree.saveMiniAccountant( true, undefined, undefined, 10*1000 )))
                 throw {message: "Couldn't save the Account Tree"};
 
         } catch (exception){

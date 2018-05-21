@@ -391,9 +391,10 @@ class InterfaceBlockchainFork {
                 this._forkPromiseResolver(true) //making it async
             }
 
-            this.forkIsSaving = false;
             return forkedSuccessfully;
         });
+
+        this.forkIsSaving = false;
 
         // it was done successfully
         console.log("FORK SOLVER SUCCESS", success);
@@ -620,6 +621,8 @@ class InterfaceBlockchainFork {
     }
 
     pushHeader(hash){
+
+        if (hash === undefined || hash === null) return;
 
         for (let i=0; i<this.forkHeaders.length; i++)
             if (this.forkHeaders[i].equals( hash ) )
