@@ -148,6 +148,8 @@ class InterfaceBlockchainProtocolForkSolver{
                         return {result: true, fork: forkFound};
                     }
 
+                    fork.pushHeader(binarySearchResult.header);
+
                 }
 
             }
@@ -171,20 +173,21 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === null)
                     throw {message: "connection dropped discoverForkBinarySearch"}
 
-                forkFound = this.blockchain.forksAdministrator._findForkyByHeader(forkLastBlockHash);
+                forkFound = this.blockchain.forksAdministrator._findForkyByHeader(binarySearchResult.header);
 
                 if ( forkFound !== null && forkFound !== fork ){
 
                     if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by hash after binary search");
 
                     forkFound.pushHeader( forkLastBlockHash );
-                    forkFound.pushHeader( binarySearchResult.header );
                     forkFound.pushSocket( socket, forkProof );
 
                     fork.destroyFork(); //destroy fork
 
                     return {result: true, fork: forkFound};
                 }
+
+                fork.pushHeader(binarySearchResult.header);
 
             }
 
