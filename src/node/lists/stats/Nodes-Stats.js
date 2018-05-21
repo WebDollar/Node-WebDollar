@@ -40,13 +40,15 @@ class NodesStats {
 
         let string1 = "";
         let clients = NodesList.getNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
-        for (let i=0; i<Math.min( clients.length, 200); i++)
+        for (let i=0; i<Math.min( clients.length, 100); i++)
             string1 += '('+clients[i].socket.node.sckAddress.toString() + ')   ';
+        if (clients.length > 100) string1 += ".........";
 
         let string2 = "";
         let server = NodesList.getNodesByConnectionType( CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET );
-        for (let i=0; i<Math.min( server.length, 200); i++)
+        for (let i=0; i<Math.min( server.length, 100); i++)
             string2 += '(' + server[i].socket.node.sckAddress.toString() + ')   ';
+        if (server.length > 100) string1 += ".........";
 
         console.log("clients: ",string1);
         console.log("server: ",string2);

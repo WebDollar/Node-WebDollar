@@ -43,19 +43,9 @@ class InterfaceBlockchainForksAdministrator {
     }
 
 
-    findFork(socket, hashes, forkProof){
+    findFork(socket, hash, forkProof){
 
-        let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
-
-        if ( forkFound !== null ) {
-
-            if (Math.random() < 0.001)
-                console.error("discoverAndProcessFork - fork already found by socket");
-
-            return {result: true, fork: forkFound};
-        }
-
-        forkFound = this.blockchain.forksAdministrator.findForkByHeaders(hashes);
+        let forkFound = this._findForkyByHeader(hash);
         if ( forkFound !== null ) {
 
             if (Math.random() < 0.001)
@@ -65,6 +55,17 @@ class InterfaceBlockchainForksAdministrator {
             return {result: true, fork: forkFound};
 
         }
+
+        forkFound = this.findForkBySockets(socket);
+        if ( forkFound !== null ) {
+
+            if (Math.random() < 0.001)
+                console.error("discoverAndProcessFork - fork already found by socket");
+
+            return {result: true, fork: forkFound};
+        }
+
+
 
         return null;
 
