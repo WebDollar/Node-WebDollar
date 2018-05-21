@@ -10,8 +10,8 @@ class PPoWBlockchainProver{
         this.proofActivated = true;
 
         this.blockchain = blockchain;
-        this.proofPi = null;
-        this.proofXi = null;
+        this.proofPi = undefined;
+        this.proofXi = undefined;
 
     }
 
@@ -116,7 +116,7 @@ class PPoWBlockchainProver{
         if ( !this.proofActivated )
             return false;
 
-        if (this.proofPi !== null){
+        if (this.proofPi !== undefined){
             this.proofPi.destroyProof();
         }
 
@@ -125,7 +125,7 @@ class PPoWBlockchainProver{
         //this.proofXi = this._createProofXi(this.blockchain);
 
         // if (consts.DEBUG)
-        //     if (this.proofPi !== null && this.proofXi !== null)
+        //     if (this.proofPi !== undefined && this.proofXi !== null)
         //         this.blockchain.verifier.validateChain(this.proofPi, this.proofXi);
 
     }

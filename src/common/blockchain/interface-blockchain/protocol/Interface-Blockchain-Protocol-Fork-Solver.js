@@ -99,13 +99,16 @@ class InterfaceBlockchainProtocolForkSolver{
         may the fork be with you Otto
      */
 
+
+
     //TODO it will not update positions
     async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof ){
 
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.blocks.length;
 
-        let fork;
+        let fork, forkFound;
+        let headers = [forkLastBlockHash];
 
         try{
 
@@ -114,26 +117,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
             await this.blockchain.sleep(10);
 
-            let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
+            let answer = this.blockchain.forksAdministrator.findFork(socket, forkLastBlockHash, forkProof);
+            if (answer !== null) return answer;
 
-            if ( forkFound !== null ) {
-
-                if (Math.random() < 0.001)
-                    console.error("discoverAndProcessFork - fork already found by socket");
-
-                return {result: true, fork: forkFound};
-            }
-
-            forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHash);
-            if ( forkFound !== null ) {
-
-                if (Math.random() < 0.001)
-                    console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
-
-                forkFound._pushSocket(socket, forkProof );
-                return {result: true, fork: forkFound};
-
-            }
+            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [ forkLastBlockHash ], false );
 
             //optimization
             //check if n-2 was ok, but I need at least 1 block
@@ -142,15 +129,30 @@ class InterfaceBlockchainProtocolForkSolver{
                 let answer = await socket.node.sendRequestWaitOnce( "head/hash", currentBlockchainLength-1, currentBlockchainLength-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                 if (answer === null || answer.hash === undefined) throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };
 
-                if (  this.blockchain.blocks.last.hash.equals( answer.hash ) )
+                if (  this.blockchain.blocks.last.hash.equals( answer.hash ) ) {
                     binarySearchResult = {
-                        position : currentBlockchainLength,
+                        position: currentBlockchainLength,
                         header: answer.hash,
                     };
 
-            }
+                    forkFound = this.blockchain.forksAdministrator._findForkyByHeader(answer.hash);
 
-            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHash, binarySearchResult.header ], false );
+                    if (forkFound !== null && forkFound !== fork) {
+                        if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
+
+                        forkFound.pushHeader( forkLastBlockHash ); //this lead to a new fork
+                        forkFound.pushSocket(socket, forkProof);
+
+                        fork.destroyFork(); //destroy fork
+
+                        return {result: true, fork: forkFound};
+                    }
+
+                    fork.pushHeader(binarySearchResult.header);
+
+                }
+
+            }
 
             // in case it was you solved previously && there is something in the blockchain
 
@@ -171,19 +173,21 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === null)
                     throw {message: "connection dropped discoverForkBinarySearch"}
 
-                forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHash);
+                forkFound = this.blockchain.forksAdministrator._findForkyByHeader(binarySearchResult.header);
 
                 if ( forkFound !== null && forkFound !== fork ){
 
-                    if (Math.random() < 0.01)
-                        console.error("discoverAndProcessFork - fork already found by hash after binary search");
+                    if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by hash after binary search");
 
-                    this.blockchain.forksAdministrator.deleteFork(fork);
+                    forkFound.pushHeader( forkLastBlockHash );
+                    forkFound.pushSocket( socket, forkProof );
+
+                    fork.destroyFork(); //destroy fork
 
                     return {result: true, fork: forkFound};
                 }
 
-                fork.forkHeaders.push(binarySearchResult.header);
+                fork.pushHeader(binarySearchResult.header);
 
             }
 

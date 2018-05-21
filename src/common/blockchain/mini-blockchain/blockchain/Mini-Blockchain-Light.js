@@ -18,7 +18,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
     _initializeMiniBlockchainLight(){
 
-        this.proofPi = null;
+        this.proofPi = undefined;
         this.blocks.clear();
         this.blocks.blocksStartingPoint = 0;
 
@@ -384,9 +384,9 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         if (this.agent !== undefined && this.agent.light === true && height !== 0) {
 
-            if (this.proofPi !== null) {
+            if (this.proofPi !== undefined) {
                 let proofPiBlock = this.proofPi.hasBlock(height-1);
-                if (proofPiBlock !== null)
+                if (proofPiBlock !== undefined)
                     return proofPiBlock;
             }
 

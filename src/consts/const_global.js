@@ -204,7 +204,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.133",
+        VERSION: "1.133.2",
         VERSION_COMPATIBILITY: "1.13",
         PROTOCOL: "WebDollar",
         SSL: true,
@@ -246,17 +246,25 @@ consts.SETTINGS = {
             TERMINAL:{
 
                 CLIENT: {
-                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST: 10,
-                    MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK: 2,
+
+                    MAX_SOCKET_CLIENTS_WAITLIST: 3,
+                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+
+                    MIN_SOCKET_CLIENTS_WAITLIST: 0,
+                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+
+                    SERVER_OPEN:{
+                        MAX_SOCKET_CLIENTS_WAITLIST: 5,
+                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 3,
+                    },
 
                     SSL:{
-                        MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_WHEN_SSL: 10,
-                        MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK_WHEN_SSL: 10,
+                        MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL: 8,
+                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL: 8,
                     },
                 },
 
                 SERVER: {
-                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 430,
                     MAXIMUM_CONNECTIONS_FROM_TERMINAL: 100,
 
                     TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
@@ -269,6 +277,9 @@ consts.SETTINGS = {
                 CLIENT: {
                     MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST: 4,
                     MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK: 2,
+
+                    MIN_SOCKET_CLIENTS_WAITLIST: 0,
+                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
                 },
 
                 SERVER: {},

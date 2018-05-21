@@ -8,6 +8,13 @@ import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-St
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 import NODES_TYPE from "node/lists/types/Nodes-Type"
 
+let NodeExpress;
+
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+}
+
+
 class NodesWaitlistConnecting {
 
     constructor(){
@@ -21,6 +28,17 @@ class NodesWaitlistConnecting {
 
         if (VersionCheckerHelper.detectMobile())
             this._connectedOnlyTo80 = true;
+
+        this.connectingMaximum = {
+            maximum_fallbacks: 0,
+            maximum_waitlist: 0,
+
+            minimum_fallbacks:0,
+            minimum_waitlist:0,
+        };
+
+        setInterval(this._calculateNumberOfConnections.bind(this), 5000);
+        this._calculateNumberOfConnections();
 
     }
 
@@ -63,17 +81,15 @@ class NodesWaitlistConnecting {
 
     _tryToConnectNextNode( nextWaitListObject){
 
-        let count = this._connectingQueue.length + NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET, nextWaitListObject.isFallback);
+        if (nextWaitListObject.isFallback) {
 
-        if ( process.env.BROWSER ){ //browser
-
-            if (nextWaitListObject.isFallback && count >= consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK) return;
-            else if ( !nextWaitListObject.isFallback && count >= consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST) return;
+            let fallbacks = this._countConnectingToFallbacks() + NodesList.countFallbacks();
+            if (fallbacks >= this.connectingMaximum.maximum_fallbacks) return true;
 
         } else {
 
-            if (nextWaitListObject.isFallback && count >= consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST_FALLBACK) return;
-            else if ( !nextWaitListObject.isFallback && count >= consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL_WAITLIST) return;
+            let simple = (this._connectingQueue.length - this._countConnectingToFallbacks()) + ( NodesList.nodes.length - NodesList.countFallbacks() );
+            if (simple >= this.connectingMaximum.maximum_waitlist) return true;
 
         }
 
@@ -140,6 +156,55 @@ class NodesWaitlistConnecting {
         return false;
     }
 
+    _countConnectingToFallbacks(){
+
+        let count = 0;
+        for (let i=0; i<this._connectingQueue.length; i++)
+            if (this._connectingQueue[i].isFallback)
+                count ++;
+
+        return count;
+    }
+
+
+    _calculateNumberOfConnections() {
+
+
+        let server = NodesList.countNodesByType(CONNECTION_TYPE.CONNECTION_SERVER_SOCKET);
+
+        if (process.env.BROWSER) { //browser
+
+            this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK;
+            this.connectingMaximum.maximum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST;
+
+            this.connectingMaximum.minimum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK;
+            this.connectingMaximum.minimum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST;
+
+        }
+        else { // server
+
+            this.connectingMaximum.minimum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK;
+            this.connectingMaximum.minimum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST;
+
+            if ( server <= 5) {
+
+                this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK;
+                this.connectingMaximum.maximum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAX_SOCKET_CLIENTS_WAITLIST;
+
+            } else { //people already connected
+
+                this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SERVER_OPEN.MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK;
+                this.connectingMaximum.maximum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SERVER_OPEN.MAX_SOCKET_CLIENTS_WAITLIST;
+
+                if (NodeExpress.SSL){
+                    this.connectingMaximum.maximum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SSL.MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL;
+                    this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SSL.MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL;
+                }
+
+            }
+
+        }
+    }
 
 }
 

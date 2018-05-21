@@ -10,7 +10,7 @@ class NodePropagationList{
         this._waitlistSimple = [];
         this._waitlistSimpleSSL = [];
 
-        setTimeout( this._recalculateWaitlistSimple.bind(this) , 10*1000 + Math.random() * 10*1000 );
+        setTimeout( this._recalculateWaitlistSimple.bind(this) , 5*1000 + Math.random() * 5*1000 );
     }
 
     _generateWailistRandomList (number, nodes, list, onlySSL = false ) {
