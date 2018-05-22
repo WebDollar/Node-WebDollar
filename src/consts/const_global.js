@@ -348,7 +348,5 @@ if ( consts.DEBUG === true ){
 
 }
 
-consts.SETTINGS.NODE.PORT = 9095;
-consts.SETTINGS.NODE.SSL = false;
 
 export default consts
