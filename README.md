@@ -6,7 +6,6 @@ Settings => Languages & Frameworks => JavaScript language version and choose **E
 ![JS Version](https://d3nmt5vlzunoa1.cloudfront.net/webstorm/files/2015/05/js-version.png "Javascript ECMAScript 6 config")
 
 # Docker (No skills, only docker)
-======
 
 ## 1. Install Docker
 
@@ -24,12 +23,10 @@ docker run -d --restart=always -v /webdollar/data:/blockchainDB3 -e NOSSL=true -
 ```
 
 # Installing (Non-techie skills required)
-======
 
 ## Follow the following instructions: http://webdollar.aji.ro/webdollar-mining-with-windows-terminal/
 
 # Installing (High tech skills required)
-======
 
 ## 0. Node.js
 
@@ -210,7 +207,6 @@ Follow the Tutorial [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
 
 
 # Resources to learn
-======
 7 Ethereum https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369
 
 Mining in Bitcoins
@@ -219,7 +215,6 @@ Mining in Bitcoins
 3. https://steemit.com/blockchain/@verifyas/what-you-should-know-about-nonces-and-difficulty
 
 # Join WebDollar community
-======
 
 <dl>
     <a href="http://t.me/WebDollar">
