@@ -13,10 +13,10 @@ export default {
         //{"addr": ["https://amsterdam.wdpool.io:443"]},
         //{"addr": ["https://strasbourg.wdpool.io:443"]},
         //{"addr": ["https://paris.wdpool.io:443"]},
-        {"addr": ["webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8442"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
+        {"addr": ["https://webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
+        {"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
+        {"addr": ["https://webdollar.csland.ro:8442"]}, // Thanks to @mariotheodor
+        {"addr": ["https://webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
         {"addr": ["https://nodecstl.ddns.net:80"]},
         {"addr": ["https://webd.5q.ro:3333"]},
         {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
