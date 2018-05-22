@@ -46,7 +46,7 @@ class InterfaceBlockchainFork {
             this.downloadAllBlocks = 0;
 
         } catch (exception){
-
+            console.error("destroy fork raised an exception",  exception);
         }
 
     }
@@ -407,24 +407,28 @@ class InterfaceBlockchainFork {
 
         revertActions.destroyRevertActions();
 
-        if (success){
+        try {
+            if (success) {
 
-            //successfully, let's delete the backup blocks
-            this._deleteBackupBlocks();
+                //successfully, let's delete the backup blocks
+                this._deleteBackupBlocks();
 
-            await this.sleep( this.downloadAllBlocks ? 10 : 100 );
+                await this.sleep(this.downloadAllBlocks ? 10 : 100);
 
-            //propagate last block
-            NodeBlockchainPropagation.propagateBlock( this.blockchain.blocks[ this.blockchain.blocks.length-1 ], this.sockets);
+                //propagate last block
+                NodeBlockchainPropagation.propagateBlock(this.blockchain.blocks[this.blockchain.blocks.length - 1], this.sockets);
 
-            if ( this.downloadAllBlocks ) {
+                if (this.downloadAllBlocks) {
 
-                this.blockchain.agent.protocol.askBlockchain(this.getSocket());
+                    this.blockchain.agent.protocol.askBlockchain(this.getSocket());
 
-                await this.sleep(10);
+                    await this.sleep(10);
 
-            } else await this.sleep(100);
+                } else await this.sleep(100);
 
+            }
+        } catch (exception){
+            console.error("saveFork - saving the fork returned an exception", exception);
         }
 
         return success;
