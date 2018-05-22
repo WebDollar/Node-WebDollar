@@ -13,11 +13,10 @@ export default {
         //{"addr": ["https://amsterdam.wdpool.io:443"]},
         //{"addr": ["https://strasbourg.wdpool.io:443"]},
         //{"addr": ["https://paris.wdpool.io:443"]},
-        {"addr": ["webdollar.csland.ro:8080"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8081"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8082"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8083"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8084"]}, // Thanks to @mariotheodor
+        {"addr": ["https://webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
+        {"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
+        {"addr": ["https://webdollar.csland.ro:8442"]}, // Thanks to @mariotheodor
+        {"addr": ["https://webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
         {"addr": ["https://nodecstl.ddns.net:80"]},
         {"addr": ["https://webd.5q.ro:3333"]},
         {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
@@ -26,6 +25,10 @@ export default {
         {"addr": ["https://titan.serg.at:8080/"]}, // Thanks to @SergiuWX
         {"addr": ["https://titan.serg.at:8081/"]}, // Thanks to @SergiuWX
         {"addr": ["https://titan.serg.at:8082/"]}, // Thanks to @SergiuWX
+        {"addr": ["https://node1.petreus.ro/:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node2.petreus.ro/:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node3.petreus.ro/:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic
 
         {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
         {"addr": ["https://robitza.ddns.net:80"]}, // Thanks to @robertclaudiu
@@ -34,10 +37,8 @@ export default {
         {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
         {"addr": ["https://wd1.hoste.ro:51261"]}, // Thanks to @morion4000
-        {"addr": ["https://wd1.hoste.ro:53642"]}, // Thanks to @morion4000
         {"addr": ["https://wd1.hoste.ro:60260"]}, // Thanks to @morion4000
         {"addr": ["https://wd1.hoste.ro:61099"]}, // Thanks to @morion4000
-        {"addr": ["https://wd2.hoste.ro:55700"]}, // Thanks to @morion4000
         {"addr": ["https://wd2.hoste.ro:55974"]}, // Thanks to @morion4000
         {"addr": ["https://wd2.hoste.ro:63980"]}, // Thanks to @morion4000
         {"addr": ["https://wd2.hoste.ro:65279"]}, // Thanks to @morion4000
