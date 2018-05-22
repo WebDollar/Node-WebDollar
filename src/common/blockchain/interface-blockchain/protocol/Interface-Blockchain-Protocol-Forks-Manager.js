@@ -24,7 +24,7 @@ class InterfaceBlockchainProtocolForksManager {
 
             if (newChainStartingPoint > newChainLength) throw "Incorrect newChainStartingPoint";
             if (newChainStartingPoint < 0) throw "Incorrect2 newChainStartingPoint";
-            if (newChainStartingPoint > this.blockchain.blocks.length) throw "Incorrect3 newChainStartingPoint";
+            if (newChainStartingPoint > this.blockchain.blocks.length) throw {message: "Incorrect3 newChainStartingPoint", newChainStartingPoint:newChainStartingPoint, blocks: this.blockchain.blocks.length};
 
             //for Light Nodes, I am also processing the smaller blocks
 

@@ -204,7 +204,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.133.3",
+        VERSION: "1.133.4",
         VERSION_COMPATIBILITY: "1.13",
         PROTOCOL: "WebDollar",
         SSL: true,
@@ -348,5 +348,7 @@ if ( consts.DEBUG === true ){
 
 }
 
+consts.SETTINGS.NODE.PORT = 9095;
+consts.SETTINGS.NODE.SSL = false;
 
 export default consts
