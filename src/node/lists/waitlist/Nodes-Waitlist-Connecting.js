@@ -181,7 +181,7 @@ class NodesWaitlistConnecting {
         }
         else { // server
 
-            let server = NodesList.countNodesByType(CONNECTION_TYPE.CONNECTION_SERVER_SOCKET);
+            let server = NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_SERVER_SOCKET);
 
             this.connectingMaximum.minimum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK;
             this.connectingMaximum.minimum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST;
