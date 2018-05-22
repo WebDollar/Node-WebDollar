@@ -52,21 +52,16 @@ class SocketAddress {
         }
 
 
+        let errorIPv6=false;
         try{
 
-            if (ipaddr.IPv6.isIPv6(address)) {
-
-                let ip = ipaddr.IPv6.parse(address);
-
-                if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
-                    address = ip.toIPv4Address().toNormalizedString();
-                else // ipString is IPv6
-                    address = ip.toNormalizedString();
-
-            }
+            if (ipaddr.IPv6.isIPv6(address))
+              address = this._extractIPv6(address);
 
         } catch (exception){
 
+            console.error("invalid ipv6", address);
+            errorIPv6 = true;
         }
 
 
@@ -74,6 +69,9 @@ class SocketAddress {
             port = address.substr(address.lastIndexOf(":") + 1);
             address = address.substr(0, address.lastIndexOf(":"));
         }
+
+        if (errorIPv6 && ipaddr.IPv6.isIPv6(address))
+            address = this._extractIPv6(address);
 
         if (ipaddr.IPv4.isIPv4(address)) {
 
@@ -91,6 +89,17 @@ class SocketAddress {
         this._geoLocation = null;
 
         this.uuid = uuid;
+    }
+
+    _extractIPv6(address){
+        let ip = ipaddr.IPv6.parse(address);
+
+        if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
+            address = ip.toIPv4Address().toNormalizedString();
+        else // ipString is IPv6
+            address = ip.toNormalizedString();
+
+        return address;
     }
 
     matchAddress(address, validationDoubleConnectionsTypes){
