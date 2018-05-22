@@ -52,14 +52,20 @@ class SocketAddress {
         }
 
 
-        if (ipaddr.IPv6.isIPv6(address)) {
+        try{
 
-            let ip = ipaddr.IPv6.parse(address);
+            if (ipaddr.IPv6.isIPv6(address)) {
 
-            if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
-                address = ip.toIPv4Address().toNormalizedString();
-            else // ipString is IPv6
-                address = ip.toNormalizedString();
+                let ip = ipaddr.IPv6.parse(address);
+
+                if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
+                    address = ip.toIPv4Address().toNormalizedString();
+                else // ipString is IPv6
+                    address = ip.toNormalizedString();
+
+            }
+
+        } catch (exception){
 
         }
 
