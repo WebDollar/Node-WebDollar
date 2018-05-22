@@ -13,11 +13,10 @@ export default {
         //{"addr": ["https://amsterdam.wdpool.io:443"]},
         //{"addr": ["https://strasbourg.wdpool.io:443"]},
         //{"addr": ["https://paris.wdpool.io:443"]},
-        {"addr": ["webdollar.csland.ro:8080"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8081"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8082"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8083"]}, // Thanks to @mariotheodor
-        {"addr": ["webdollar.csland.ro:8084"]}, // Thanks to @mariotheodor
+        {"addr": ["webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
+        {"addr": ["webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
+        {"addr": ["webdollar.csland.ro:8442"]}, // Thanks to @mariotheodor
+        {"addr": ["webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
         {"addr": ["https://nodecstl.ddns.net:80"]},
         {"addr": ["https://webd.5q.ro:3333"]},
         {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
@@ -29,6 +28,7 @@ export default {
         {"addr": ["https://node1.petreus.ro/:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node2.petreus.ro/:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node3.petreus.ro/:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic
 
         {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
         {"addr": ["https://robitza.ddns.net:80"]}, // Thanks to @robertclaudiu
