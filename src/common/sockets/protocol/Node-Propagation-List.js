@@ -13,11 +13,13 @@ class NodePropagationList{
         setTimeout( this._recalculateWaitlistSimple.bind(this) , 5*1000 + Math.random() * 5*1000 );
     }
 
-    _generateWailistRandomList (number, nodes, list, onlySSL = false ) {
+    _getWailistElements (number, nodes, answer, onlySSL = false ) {
 
         if (nodes.length === 0) return;
 
-        for (let index = 0; list.length <= number && index < nodes.length; index++){
+        let list = [];
+
+        for (let index = 0; index < nodes.length; index++){
 
             let node = nodes[index];
 
@@ -26,15 +28,37 @@ class NodePropagationList{
                 continue;
             }
 
-            let json = node.toJSON();
-
             if ( (!onlySSL || (onlySSL && node.sckAddresses[0].SSL === true)))
-                list.push(json);
+                list.push(node.toJSON());
 
-            index++;
         }
 
+        //first number
+        for (let i=0; i<number && answer.length < list.length; i++){
+            answer.push(list[i]);
+        }
+
+        let index = 0 ;
+        while (index < number && answer.length < list.length){
+
+            let pos = Math.floor( Math.random()*list.length );
+            let found = false;
+
+            for (let i=0; i<answer.length; i++)
+                if (answer[i].a === list[pos].a ){
+                    found = true;
+                    break;
+                }
+
+            if (!found){
+                answer.push(list[pos]);
+            }
+
+        }
+
+
     };
+
 
     _recalculateWaitlistSimple(){
 
@@ -44,10 +68,10 @@ class NodePropagationList{
 
 
         this._waitlistSimple = [];
-        this._generateWailistRandomList( number, NodesWaitlist.waitListFullNodes, this._waitlistSimple);
+        this._getWailistElements( number, NodesWaitlist.waitListFullNodes, this._waitlistSimple);
 
         this._waitlistSimpleSSL = [];
-        this._generateWailistRandomList( number, NodesWaitlist.waitListFullNodes, this._waitlistSimpleSSL, true);
+        this._getWailistElements( number, NodesWaitlist.waitListFullNodes, this._waitlistSimpleSSL, true);
 
         setTimeout( this._recalculateWaitlistSimple.bind(this) , 10*1000 + Math.random() * 10*1000 );
 
