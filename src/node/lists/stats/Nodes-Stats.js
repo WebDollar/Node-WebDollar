@@ -48,7 +48,7 @@ class NodesStats {
         let server = NodesList.getNodesByConnectionType( CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET );
         for (let i=0; i<Math.min( server.length, 100); i++)
             string2 += '(' + server[i].socket.node.sckAddress.toString() + ')   ';
-        if (server.length > 100) string1 += ".........";
+        if (server.length > 100) string2 += ".........";
 
         console.log("clients: ",string1);
         console.log("server: ",string2);

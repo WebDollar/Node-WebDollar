@@ -170,8 +170,6 @@ class NodesWaitlistConnecting {
     _calculateNumberOfConnections() {
 
 
-        let server = NodesList.countNodesByType(CONNECTION_TYPE.CONNECTION_SERVER_SOCKET);
-
         if (process.env.BROWSER) { //browser
 
             this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK;
@@ -183,21 +181,23 @@ class NodesWaitlistConnecting {
         }
         else { // server
 
+            let server = NodesList.countNodesByType(CONNECTION_TYPE.CONNECTION_SERVER_SOCKET);
+
             this.connectingMaximum.minimum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK;
             this.connectingMaximum.minimum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST;
 
             if ( server <= 5) {
 
                 this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK;
-                this.connectingMaximum.maximum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAX_SOCKET_CLIENTS_WAITLIST;
+                this.connectingMaximum.maximum_waitlist =  consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAX_SOCKET_CLIENTS_WAITLIST;
 
             } else { //people already connected
 
                 this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SERVER_OPEN.MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK;
-                this.connectingMaximum.maximum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SERVER_OPEN.MAX_SOCKET_CLIENTS_WAITLIST;
+                this.connectingMaximum.maximum_waitlist =  consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SERVER_OPEN.MAX_SOCKET_CLIENTS_WAITLIST;
 
                 if (NodeExpress.SSL){
-                    this.connectingMaximum.maximum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SSL.MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL;
+                    this.connectingMaximum.maximum_waitlist =  consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SSL.MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL;
                     this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SSL.MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL;
                 }
 
