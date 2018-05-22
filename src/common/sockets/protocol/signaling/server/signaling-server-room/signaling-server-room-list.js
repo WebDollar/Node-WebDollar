@@ -76,14 +76,14 @@ class SignalingServerRoomList {
 
     _disconnectedNode(nodesListObject){
 
-        if ( [ CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, CONNECTIONS_TYPE.CONNECTION_WEBRTC].indexOf(nodesListObject.connectionType) >= 0 )    // signaling service on webpeer
+        if ( [ CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET, CONNECTIONS_TYPE.CONNECTION_WEBRTC].indexOf(nodesListObject.connectionType) < 0 ) return;    // signaling service on webpeer
 
-            for (let i = this.list.length-1; i >= 0 ; i--)
-                if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){
-                    this.list[i].client1 = undefined;
-                    this.list[i].client2 = undefined;
-                    this.list.splice(i, 1);
-                }
+        for (let i = this.list.length-1; i >= 0 ; i--)
+            if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){
+                this.list[i].client1 = undefined;
+                this.list[i].client2 = undefined;
+                this.list.splice(i, 1);
+            }
 
     }
 
