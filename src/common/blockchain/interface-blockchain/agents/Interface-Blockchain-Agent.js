@@ -198,7 +198,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         this._status = newValue;
 
-        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED].indexOf(newValue) >= 0){
+        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES].indexOf(newValue) >= 0){
 
             clearTimeout(this._startAgentTimeOut);
             this._startAgentTimeOut = undefined;
@@ -208,7 +208,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         }
 
-        if ( AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED === newValue)
+        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES].indexOf(newValue) >= 0)
 
             this._eventEmitter.emit('agent/synchronized', {
                 result: true,
