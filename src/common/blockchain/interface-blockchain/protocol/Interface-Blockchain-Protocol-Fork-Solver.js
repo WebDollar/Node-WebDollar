@@ -143,7 +143,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         forkFound.pushHeader( forkLastBlockHash ); //this lead to a new fork
                         forkFound.pushSocket(socket, forkProof);
 
-                        fork.destroyFork(); //destroy fork
+                        this.blockchain.forksAdministrator.deleteFork(fork); //destroy fork
 
                         return {result: true, fork: forkFound};
                     }
@@ -182,7 +182,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     forkFound.pushHeader( forkLastBlockHash );
                     forkFound.pushSocket( socket, forkProof );
 
-                    fork.destroyFork(); //destroy fork
+                    this.blockchain.forksAdministrator.deleteFork(fork); //destroy fork
 
                     return {result: true, fork: forkFound};
                 }
