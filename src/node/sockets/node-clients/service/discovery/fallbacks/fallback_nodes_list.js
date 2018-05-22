@@ -25,9 +25,13 @@ export default {
         {"addr": ["https://titan.serg.at:8080/"]}, // Thanks to @SergiuWX
         {"addr": ["https://titan.serg.at:8081/"]}, // Thanks to @SergiuWX
         {"addr": ["https://titan.serg.at:8082/"]}, // Thanks to @SergiuWX
-        {"addr": ["https://node1.petreus.ro/:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node2.petreus.ro/:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node3.petreus.ro/:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node5.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node6.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic
 
         {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
