@@ -68,7 +68,7 @@ class NodeExpress{
 
                 if (!consts.SETTINGS.NODE.SSL) throw {message: "no ssl"};
 
-                this.domain = this._extractDomain('./certificates/certificate.crt');
+                this.domain = process.env.DOMAIN || this._extractDomain('./certificates/certificate.crt');
                 console.info("========================================");
                 console.info("SSL certificate found for ", this.domain);
 
