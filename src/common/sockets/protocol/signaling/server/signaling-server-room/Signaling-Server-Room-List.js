@@ -43,7 +43,7 @@ class SignalingServerRoomList {
 
             let roomConnectionObject = new SignalingServerRoomConnectionObject(client1, client2, status, this.getConnectionUuid(client1, client2) );
 
-            this.list.push(roomConnectionObject);
+            this.list[roomConnectionObject.id] = roomConnectionObject;
 
             return roomConnectionObject;
 
@@ -75,17 +75,21 @@ class SignalingServerRoomList {
             if (this.list[key].client1 === nodesListObject.socket || this.list[key].client2 === nodesListObject.socket){
                 this.list[key].client1 = undefined;
                 this.list[key].client2 = undefined;
-                this.list.splice(i, 1);
+
+                this.list[key] = undefined;
+                delete this.list[key];
             }
 
     }
 
     removeServerRoomConnection( connection ) {
 
-        for (let i=0; this.list.length; i++)
-            if (this.list[i].id === connection.id){
-                this.list.splice(i,1);
-                return;
+        for (let key in this.list)
+            if (this.list[key].id === connection.id){
+
+                this.list[key] = undefined;
+                delete this.list[key];
+
             }
 
     }
