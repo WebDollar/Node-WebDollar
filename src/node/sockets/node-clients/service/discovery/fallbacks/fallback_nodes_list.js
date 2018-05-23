@@ -49,6 +49,12 @@ export default {
         {"addr": ["https://wd2.hoste.ro:63980"]}, // Thanks to @morion4000
         {"addr": ["https://wd2.hoste.ro:65279"]}, // Thanks to @morion4000
 
+        {"addr": ["https://noden01.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
+        {"addr": ["https://noden02.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
+        {"addr": ["https://noden03.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
+        {"addr": ["https://noden04.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
+        {"addr": ["https://noden05.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
+
         //---------------------------------------------------------
         //--------------WebDollar FallBack Nodes-------------------
         //---------------------------------------------------------
