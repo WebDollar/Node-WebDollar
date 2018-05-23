@@ -1,13 +1,12 @@
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
-import SignalingServerRoomConnectionObject from './signaling-server-room-connection-object';
+import SignalingServerRoomConnectionObject from './Signaling-Server-Room-Connection-Object';
 import NodesList from 'node/lists/Nodes-List'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import NODES_TYPE from "node/lists/types/Nodes-Type"
+
 /*
     The List is populated with Node Sockets who are available for WebRTC
  */
-
-const uuid = require('uuid');
 
 class SignalingServerRoomList {
 
@@ -18,12 +17,19 @@ class SignalingServerRoomList {
 
         console.log("SignalingRoomList constructor");
 
-        this.lastConnectionsId = 0;
-
-        this.list = [];
+        this.list = {}; //it could extend with HashMap
 
         //{type: ["webpeer", "client"]}
         NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._disconnectedNode( result ) });
+
+    }
+
+    getConnectionUuid(client1, client2){
+
+        if (client2.uuid < client1.uuid)
+            return client2.node.sckAddress.uuid +"_"+ client1.node.sckAddress.uuid;
+
+        return client1.node.sckAddress.uuid +"_"+ client2.node.sckAddress.uuid;
     }
 
     registerSignalingServerRoomConnection(client1, client2, status) {
@@ -33,9 +39,9 @@ class SignalingServerRoomList {
 
         let connection = this.searchSignalingServerRoomConnection(client1, client2);
 
-        if (connection === null) {
+        if (connection === undefined) {
 
-            let roomConnectionObject = new SignalingServerRoomConnectionObject(client1, client2, status, uuid.v4());
+            let roomConnectionObject = new SignalingServerRoomConnectionObject(client1, client2, status, this.getConnectionUuid() );
 
             this.list.push(roomConnectionObject);
 
@@ -49,39 +55,26 @@ class SignalingServerRoomList {
         return connection;
     }
 
-    searchSignalingServerRoomConnection(client1, client2, skipReverse) {
+    searchSignalingServerRoomConnection(client1, client2) {
 
-        //previous established connection
-        for (let i = 0; i < this.list.length; i++)
-            if ((this.list[i].client1 === client1 && this.list[i].client2 === client2) || (this.list[i].client1 === client2 && this.list[i].client2 === client1)) {
-
-                return this.list[i];
-
-            }
-
-        if ( skipReverse === undefined || skipReverse === false)
-            return this.searchSignalingServerRoomConnection(client2, client1, true);
-
-        return null;
+        let uuid = this.getConnectionUuid(client1, client2);
+        return this.list[uuid];
     }
 
-    searchSignalingServerRoomConnectionById(id){
+    searchSignalingServerRoomConnectionById(uuid){
 
-        for (let i = 0; i < this.list.length; i++)
-            if (this.list[i].id === id)
-                return this.list[i];
+        return this.list[uuid];
 
-        return null;
     }
 
     _disconnectedNode(nodesListObject){
 
         if ( [ CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET, CONNECTIONS_TYPE.CONNECTION_WEBRTC].indexOf(nodesListObject.connectionType) < 0 ) return;    // signaling service on webpeer
 
-        for (let i = this.list.length-1; i >= 0 ; i--)
-            if (this.list[i].client1 === nodesListObject.socket || this.list[i].client2 === nodesListObject.socket){
-                this.list[i].client1 = undefined;
-                this.list[i].client2 = undefined;
+        for (let key in this.list)
+            if (this.list[key].client1 === nodesListObject.socket || this.list[key].client2 === nodesListObject.socket){
+                this.list[key].client1 = undefined;
+                this.list[key].client2 = undefined;
                 this.list.splice(i, 1);
             }
 

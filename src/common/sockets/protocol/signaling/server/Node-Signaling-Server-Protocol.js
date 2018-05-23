@@ -2,8 +2,8 @@ import consts from 'consts/const_global'
 
 import NodesList from 'node/lists/Nodes-List'
 
-import SignalingServerRoomList from './signaling-server-room/signaling-server-room-list'
-import SignalingServerRoomConnectionObject from './signaling-server-room/signaling-server-room-connection-object'
+import SignalingServerRoomList from './signaling-server-room/Signaling-Server-Room-List'
+import SignalingServerRoomConnectionObject from './signaling-server-room/Signaling-Server-Room-Connection-Object'
 import NodeSignalingServerService from "./signaling-server-service/Node-Signaling-Server-Service"
 
 class NodeSignalingServerProtocol {
@@ -43,7 +43,7 @@ class NodeSignalingServerProtocol {
 
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
-                if (connection !== null) {
+                if (connection !== undefined) {
                     connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished;
 
                     let waitlist = NodeSignalingServerService.searchNodeSignalingServerWaitlist(socket);
@@ -67,7 +67,7 @@ class NodeSignalingServerProtocol {
 
                     let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
-                    if (connection !== null)
+                    if (connection !== undefined)
                         connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionEstablished;
 
                 }
@@ -85,7 +85,7 @@ class NodeSignalingServerProtocol {
 
                     let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(data.connectionId);
 
-                    if (connection !== null)
+                    if (connection !== undefined)
                         connection.status = SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError;
 
                 }
@@ -111,9 +111,9 @@ class NodeSignalingServerProtocol {
             try {
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(initiatorAnswer.connectionId);
 
-                if (connection === null) {
+                if (connection === undefined) {
                     console.error("signals/client/initiator/generate-initiator-signal/answer connection is null");
-                    return null;
+                    return;
                 }
 
                 if (consts.DEBUG) console.warn("WEBRTC SERVER 1_1", connection.id);
@@ -155,7 +155,7 @@ class NodeSignalingServerProtocol {
 
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(result.connectionId);
 
-                if (connection === null){
+                if (connection === undefined){
                     console.error("signals/client/initiator/join-answer-signal/answer connection is empty", result.connectionId);
                     return;
                 }
@@ -184,7 +184,7 @@ class NodeSignalingServerProtocol {
             try {
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById( iceCandidate.connectionId );
 
-                if (connection === null) {
+                if (connection === undefined) {
                     console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
                     return;
                 }
@@ -213,7 +213,7 @@ class NodeSignalingServerProtocol {
 
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
 
-                if (connection === null) {
+                if (connection === undefined) {
                     console.error("signals/server/new-answer-ice-candidate connection is empty", answer.connectionId);
                     return;
                 }
@@ -243,7 +243,7 @@ class NodeSignalingServerProtocol {
             try {
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
 
-                if (connection === null){
+                if (connection === undefined){
                     console.error("signals/client/answer/receive-initiator-signal/answer connection is empty", answer.connectionId);
                     return;
                 }
@@ -284,7 +284,7 @@ class NodeSignalingServerProtocol {
             try {
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(iceCandidate.connectionId);
 
-                if (connection === null) {
+                if (connection === undefined) {
                     console.error("signals/server/new-answer-ice-candidate connection is empty", iceCandidate.connectionId);
                     return;
                 }
@@ -322,7 +322,7 @@ class NodeSignalingServerProtocol {
 
                 let connection = SignalingServerRoomList.searchSignalingServerRoomConnectionById(answer.connectionId);
 
-                if (connection === null) {
+                if (connection === undefined) {
                     console.error("signals/server/new-initiator-ice-candidate/answer", answer.connectionId);
                     return;
                 }
@@ -354,7 +354,7 @@ class NodeSignalingServerProtocol {
 
             let previousEstablishedConnection = SignalingServerRoomList.searchSignalingServerRoomConnection(client1, client2);
 
-            if (previousEstablishedConnection === null
+            if ( previousEstablishedConnection === undefined
                 || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionNotEstablished].indexOf( previousEstablishedConnection.status ) !== -1   )
                 || (previousEstablishedConnection.checkLastTimeChecked(10 * 1000) && [SignalingServerRoomConnectionObject.ConnectionStatus.peerConnectionError].indexOf( previousEstablishedConnection.status ) !== -1 )) {
 
