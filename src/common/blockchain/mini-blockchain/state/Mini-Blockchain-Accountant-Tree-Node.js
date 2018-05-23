@@ -184,7 +184,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             let dataBuffer = new Buffer(0);
 
-            if ( this.isLeafBasedOnParents() ) {
+            if ( this.isLeaf() ) {
 
                 let balancesBuffers = [];
                 if (this.balances.length > 0) {
@@ -306,7 +306,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         if (!InterfaceMerkleRadixTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
 
-        if (!this.isLeafBasedOnParents()) {
+        if (!this.isLeaf()) {
 
             if (this.balances !== undefined) throw {message: "balance is not undefined"};
             if (this.nonce !== undefined) throw {message: "nonce is not undefined"};

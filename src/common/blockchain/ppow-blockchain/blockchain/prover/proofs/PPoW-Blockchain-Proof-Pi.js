@@ -76,6 +76,39 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
         }
     }
 
+    //optimized
+    downSuperChainGetUnderlyingChainLength(underlyingChain ){
+
+        //finding C[ C'[0] :
+        let first = -1, last = -1;
+
+        for (let i=0; i<this.blocks.length; i++)
+            if (underlyingChain.blocks[i] === this.blocks[0]) {
+                first = i;
+                break;
+            }
+
+        //finding C[ : C'[-1] ]
+        for (let i=0; i<underlyingChain.blocks.length; i++)
+            if (underlyingChain.blocks[i] === this.blocks[this.blocks.length-1]) {
+                last = i;
+                break;
+            }
+
+        if (first === -1 || last === -1)
+            return 0 ;
+        else {
+
+            if (last < first){
+                let aux = last;
+                last = first;
+                first = aux;
+            }
+
+            return last-first+1;
+        }
+    }
+
 }
 
 export default PPowBlockchainProofPi;

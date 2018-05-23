@@ -85,9 +85,9 @@ class PPoWHelper{
             let upperChain = underlyingChain.blocksGreaterLevel(miu);
 
             // downChain C'↓ C is defined as C[ C'[0] : C'[−1] ].          simply write C'↓
-            let downChain = upperChain.downSuperChainGetUnderlyingChain(underlyingChain, );
+            let downChain = upperChain.downSuperChainGetUnderlyingChainLength(underlyingChain, );
 
-            if (! this._localGood( Math.min( upperChain.blocks.length, mP ), Math.min( downChain.blocks.length, mP ) , miu) )
+            if (! this._localGood( Math.min( upperChain.blocks.length, mP ), Math.min( downChain, mP ) , miu) )
                 return false;
 
             mP++;
