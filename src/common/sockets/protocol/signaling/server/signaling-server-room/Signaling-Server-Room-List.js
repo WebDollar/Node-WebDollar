@@ -41,7 +41,7 @@ class SignalingServerRoomList {
 
         if (connection === undefined) {
 
-            let roomConnectionObject = new SignalingServerRoomConnectionObject(client1, client2, status, this.getConnectionUuid() );
+            let roomConnectionObject = new SignalingServerRoomConnectionObject(client1, client2, status, this.getConnectionUuid(client1, client2) );
 
             this.list.push(roomConnectionObject);
 
