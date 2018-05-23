@@ -34,6 +34,7 @@ class NodesStats {
     _printStats(){
 
         console.info(" blocks: ", Blockchain.blockchain.blocks.length);
+        console.info(" v: ", consts.SETTINGS.NODE.VERSION);
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers WEBRTC", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
         console.log(" browsers: ", this.statsBrowsers, " terminal: ", this.statsTerminal);
 
