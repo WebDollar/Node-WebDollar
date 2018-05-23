@@ -33,6 +33,8 @@ export default {
         {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic
+        {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
+        {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
 
         {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
         {"addr": ["https://robitza.ddns.net:80"]}, // Thanks to @robertclaudiu
@@ -46,6 +48,12 @@ export default {
         {"addr": ["https://wd2.hoste.ro:55974"]}, // Thanks to @morion4000
         {"addr": ["https://wd2.hoste.ro:63980"]}, // Thanks to @morion4000
         {"addr": ["https://wd2.hoste.ro:65279"]}, // Thanks to @morion4000
+
+        {"addr": ["https://noden01.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
+        {"addr": ["https://noden02.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
+        {"addr": ["https://noden03.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
+        {"addr": ["https://noden04.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
+        {"addr": ["https://noden05.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
 
         //---------------------------------------------------------
         //--------------WebDollar FallBack Nodes-------------------
