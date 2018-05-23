@@ -77,17 +77,24 @@ class PPoWHelper{
 
         //m ∈ N states that for all m' ≥ m
 
+        /**
+         *  upperChain and downChain are calculated only once based on miu
+         */
+
+        //uuperChain and down is calculated only once
+        // C↑µ [−m':]
+        let upperChain = underlyingChain.blocksGreaterLevel(miu);
+
+        // downChain C'↓ C is defined as C[ C'[0] : C'[−1] ].          simply write C'↓
+        let downChain = upperChain.downSuperChainGetUnderlyingChain(underlyingChain, );
+
+
+
         // local-good δ (C↑ µ [−m' :], C↑µ [−m' :]↓ , µ).
         let mP = consts.POPOW_PARAMS.m;
         while (mP >= consts.POPOW_PARAMS.m  && mP < underlyingChain.blocks.length){
 
-            // C↑µ [−m':]
-            let upperChain = underlyingChain.blocksGreaterLevel(miu);
-
-            // downChain C'↓ C is defined as C[ C'[0] : C'[−1] ].          simply write C'↓
-            let downChain = upperChain.downSuperChainGetUnderlyingChainLength(underlyingChain, );
-
-            if (! this._localGood( Math.min( upperChain.blocks.length, mP ), Math.min( downChain, mP ) , miu) )
+            if (! this._localGood( Math.min( upperChain.blocks.length, mP ), Math.min( downChain.blocks.length, mP ) , miu) )
                 return false;
 
             mP++;

@@ -80,7 +80,7 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
     downSuperChainGetUnderlyingChainLength(underlyingChain ){
 
         //finding C[ C'[0] :
-        let first = -1, last = -1;
+        let first, last;
 
         for (let i=0; i<this.blocks.length; i++)
             if (underlyingChain.blocks[i] === this.blocks[0]) {
@@ -89,13 +89,13 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
             }
 
         //finding C[ : C'[-1] ]
-        for (let i=0; i<underlyingChain.blocks.length; i++)
+        for (let i=underlyingChain.blocks.length-1; i>=0; i--)
             if (underlyingChain.blocks[i] === this.blocks[this.blocks.length-1]) {
                 last = i;
                 break;
             }
 
-        if (first === -1 || last === -1)
+        if (first === undefined || last === undefined)
             return 0 ;
         else {
 
