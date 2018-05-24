@@ -5,7 +5,8 @@ import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import Blockchain from "main-blockchain/Blockchain"
 import NodePropagationList from 'common/sockets/protocol/Node-Propagation-List'
 
-const MAX_WAITLIST_QUEUE_LENGTH = 100;
+const MAX_WAITLIST_QUEUE_LENGTH = 1000;
+const DOWNLOAD_WAITLIST_COUNT = 20;
 
 class NodePropagationProtocol {
 
@@ -22,7 +23,7 @@ class NodePropagationProtocol {
 
     }
 
-    async _processList(list){
+    async _processList(list, nodeType){
 
         for (let key in list){
 
@@ -31,14 +32,16 @@ class NodePropagationProtocol {
 
             let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
 
+            //downloading the next elements
+            if (list[key].next !== undefined && list[key].next > 0)
+                list[key].sock.node.sendRequest( (nodeType === NODES_TYPE.NODE_TERMINAL ? "propagation/request-all-wait-list/full-nodes" : "propagation/request-all-wait-list/light-nodes"), { index: list[key].next, count: DOWNLOAD_WAITLIST_COUNT });
+
             delete list[key];
             list.length--;
 
             if (answer !== null ){
-
                 this._waitlistProccessed[key] = true;
                 return;
-
             }
 
         }
@@ -48,8 +51,8 @@ class NodePropagationProtocol {
 
     async _processNewWaitlistInterval(){
 
-        await this._processList(this._newFullNodesWaitList);
-        await this._processList(this._newLightNodesWaitList);
+        await this._processList(this._newFullNodesWaitList, NODES_TYPE.NODE_TERMINAL);
+        await this._processList(this._newLightNodesWaitList, NODES_TYPE.NODE_WEB_PEER);
 
 
         setTimeout( async ()=>{ await this._processNewWaitlistInterval() } , 1500 + Math.floor( Math.random() * 200 ) );
@@ -73,8 +76,8 @@ class NodePropagationProtocol {
 
         setTimeout( ()=>{
 
-            socket.node.sendRequest("propagation/request-all-wait-list/full-nodes");
-            socket.node.sendRequest("propagation/request-all-wait-list/light-nodes");
+            socket.node.sendRequest("propagation/request-all-wait-list/full-nodes", { index: 0, count: DOWNLOAD_WAITLIST_COUNT });
+            socket.node.sendRequest("propagation/request-all-wait-list/light-nodes", { index:0, count: DOWNLOAD_WAITLIST_COUNT });
 
         },  3000 + Math.floor( Math.random()*5000));
 
@@ -88,7 +91,7 @@ class NodePropagationProtocol {
         socket.on("propagation/simple-waitlist-nodes", async ( data, callback )=>{
 
 
-            await this._processNodesList(data, socket)
+            await this._processNodesList(data, socket);
 
             callback("received",{ });
 
@@ -127,6 +130,7 @@ class NodePropagationProtocol {
                     if (list.length > MAX_WAITLIST_QUEUE_LENGTH)
                         break;
 
+                    let lastWaitlist = undefined;
 
                     for (let i = 0; i < addresses.length; i++){
 
@@ -139,6 +143,8 @@ class NodePropagationProtocol {
                                 sock: socket,
                             };
 
+                            lastWaitlist = list[ addresses[ i ].a ];
+
                             list.length++;
 
                             if (list.length > MAX_WAITLIST_QUEUE_LENGTH)
@@ -148,13 +154,16 @@ class NodePropagationProtocol {
 
                     }
 
+                    if (lastWaitlist !== undefined && response.next !== undefined && response.next > 0  )
+                        lastWaitlist.next = response.next ;
+
                     break;
 
                     //TODO remove addresses from list
 
-                    // case "disconnected-light-nodes":
-                    // case "disconnected-full-nodes":
-                    //
+                    case "disconnected-light-nodes":
+                    case "disconnected-full-nodes":
+
                     //     for (let i = 0; i < addresses.length; i++) {
                     //
                     //         let answer = NodesWaitlist._searchNodesWaitlist(addresses[i].addr, undefined, addresses[i].type);
@@ -186,37 +195,44 @@ class NodePropagationProtocol {
 
         socket.node.on("propagation/request-all-wait-list/full-nodes", response =>{
 
-            try{
+            let answer = this._getWaitlist( response, NodesWaitlist.waitListFullNodes );
 
-                let list;
-
-                if (socket.node.protocol.nodeType === NODES_TYPE.NODE_WEB_PEER) //let's send only SSL
-                    list = NodePropagationList._waitlistSimpleSSL;
-                else
-                    list = NodePropagationList._waitlistSimple;
-
-                socket.node.sendRequest("propagation/nodes", {"op": "new-full-nodes", addresses: list });
-
-            } catch(exception){
-            }
+            if (answer !== null && answer.list.length > 0)
+                socket.node.sendRequest("propagation/nodes", {"op": "new-full-nodes", addresses: answer.list, next: answer.next});
 
         });
 
         socket.node.on("propagation/request-all-wait-list/light-nodes", response =>{
 
-            try{
+            let answer = this._getWaitlist( response, NodesWaitlist.waitListFullNodes );
 
-                let list = [];
-                for (let i=0; i<NodesWaitlist.waitListFullNodes.length; i++) list.push(NodesWaitlist.waitListLightNodes[i].toJSON());
-
-                socket.node.sendRequest("propagation/nodes", {"op": "new-light-nodes", addresses: list });
-
-            } catch(exception){
-            }
+            if (answer !== null && answer.list.length > 0)
+                socket.node.sendRequest("propagation/nodes", {"op": "new-light-nodes", addresses: answer.list, next: answer.next});
 
         });
 
         this.initializeNodesSimpleWaitlist(socket);
+
+    }
+
+    _getWaitlist(response, list){
+
+        try {
+            let index = response.index || 0;
+            let count = response.count || 50;
+            count = Math.min(count, 50);
+            count = Math.max(count, 5);
+
+            let answer = [];
+            for (let i = index * count; i < (index + 1) * count && i < list.length; i++)
+                answer.push(list[i].toJSON());
+
+            return {list: answer, next:  ( (index+1) * count < list.length ) ? (index+1) : 0 }
+
+        } catch (exception){
+
+            return null;
+        }
 
     }
 
