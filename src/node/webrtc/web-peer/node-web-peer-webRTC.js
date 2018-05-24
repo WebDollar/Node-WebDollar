@@ -549,6 +549,8 @@ class NodeWebPeerRTC {
 
             while (i < chunks){
 
+                if (this.peer === undefined) return; //already disconnected
+
                 this.peer.dataChannel.send("chunk"+i+"/"+chunks+"@"+id+"#"+data.substr(i*SIZE, SIZE ));
                 i++;
             }

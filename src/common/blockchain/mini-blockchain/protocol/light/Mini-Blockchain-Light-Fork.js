@@ -81,10 +81,10 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             validationType["validation-timestamp-adjusted-time"] = true;
 
         //it's a new light fork && i have less than forkHeight
-        if (this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
+        if ( this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
             validationType["skip-validation-timestamp"] = true;
 
-        if (this.forkProofPi !== undefined && forkHeight < this.forkChainLength - consts.POPOW_PARAMS.m)
+        if ( this.forkProofPi !== undefined && forkHeight < ( this.forkChainLength - consts.POPOW_PARAMS.m))
             validationType["skip-validation-interlinks"] = true;
 
 
@@ -104,7 +104,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
             validationType["skip-validation-timestamp"] = true;
 
-        if (this.forkProofPi !== undefined && forkHeight < this.forkChainLength - consts.POPOW_PARAMS.m)
+        if (this.forkProofPi !== undefined && forkHeight < ( this.forkChainLength - consts.POPOW_PARAMS.m))
             validationType["skip-validation-interlinks"] = true;
 
         if ( forkHeight === 0)

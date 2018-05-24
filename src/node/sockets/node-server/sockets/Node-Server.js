@@ -134,24 +134,15 @@ class NodeServer {
                     return;
                 }
 
-
-                if (NODES_TYPE.NODE_TERMINAL === nodeType){
-
-                    let bDisconnect = false;
+                if (NODES_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODES_TYPE.NODE_TERMINAL ) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL ) {
 
                     //be sure it is not a fallback node
-                    if ( NodesList.countNodesByType( NODES_TYPE.NODE_TERMINAL ) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL ){
+                    let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL); //it should need a confirmation
 
-                        let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL); //it should need a confirmation
+                    if (nodeDomain === '' || nodeDomain === undefined || waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
 
-                        if (nodeDomain === '' || nodeDomain === undefined || waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
-
-                            if (bDisconnect)
-                                if (Math.random() < 0.05) console.warn("too many terminal connections");
-
-                            return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
-
-                        }
+                        if (Math.random() < 0.05) console.warn("too many terminal connections");
+                        return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
                     }
 
@@ -160,27 +151,10 @@ class NodeServer {
                 if (NODES_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
 
                     if (Math.random() < 0.05) console.warn("too many browser connections");
-
                     return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
                 }
 
-                // if (NODES_TYPE.NODE_TERMINAL === nodeType && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED){
-                //
-                //     if (nodeDomain === '' || nodeDomain === undefined){
-                //         socket.disconnect();
-                //         return;
-                //     }
-                //
-                //     let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL);
-                //
-                //
-                //     if (waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
-                //         socket.disconnect();
-                //         return;
-                //     }
-                //
-                // }
 
                 if (NODES_TYPE.NODE_TERMINAL === nodeType && this._rooms.terminals.serverSits <= 0)
 
@@ -189,7 +163,13 @@ class NodeServer {
                         this._rooms.terminals.serverSits = ROOMS.TERMINALS.SERVER_FREE_ROOM;
                         this._rooms.terminals.timeLastConnected = new Date().getTime();
 
-                    }else return  await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
+                    }else {
+
+                        let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL); //it should need a confirmation
+                        if ( waitlist === null || waitlist.waitlist === null) //it will also disconnect the socket
+                            return  await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true);
+
+                    }
 
 
                 else if (NODES_TYPE.NODE_WEB_PEER === nodeType && this._rooms.browsers.serverSits <= 0)

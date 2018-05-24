@@ -5,6 +5,7 @@ let consts = {
 
     DEBUG: false,
     OPEN_SERVER: true,
+
 };
 
 
@@ -266,6 +267,7 @@ consts.SETTINGS = {
 
                 SERVER: {
                     MAXIMUM_CONNECTIONS_FROM_TERMINAL: 100,
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 600,
 
                     TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
                 },
@@ -327,9 +329,6 @@ if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL !== undefined)
     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL = process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL;
-
-if (process.env.MAXIMUM_CONNECTIONS_IN_TERMINAL !== undefined)
-    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MAXIMUM_CONNECTIONS_IN_TERMINAL = process.env.MAXIMUM_CONNECTIONS_IN_TERMINAL;
 
 
 if ( consts.DEBUG === true ){
