@@ -224,7 +224,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         let data = [];
 
         let prevInterlink = null;
-        for (let i=0; i<interlinks.length; i++) {
+        for (let i = 0; i < interlinks.length; i++) {
 
             if (prevInterlink !== null && prevInterlink.blockId.equals(interlinks[i].blockId)){
                 data.push(0);
@@ -246,7 +246,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         let prevInterlink = null;
 
-        for (let i=0; i<interlinks.length; i++) {
+        for (let i = 0; i < interlinks.length; i++) {
 
             if (interlinks[i] === 0){
                 data.push({
@@ -298,11 +298,15 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
             let interlink = this.calculateInterlink();
 
-            if (interlink.length !== this.interlink.length) throw {message: "interlink has different sizes"};
+            if (interlink.length !== this.interlink.length)
+                throw {message: "interlink has different sizes"};
 
             for (let i = 0; i < interlink.length; i++) {
-                if (interlink[i].height !== this.interlink[i].height) throw {message: "interlink height is different"};
-                if (!BufferExtended.safeCompare(interlink[i].blockId, this.interlink[i].blockId)) throw {message: "interlink prevBlock height is different"};
+                if (interlink[i].height !== this.interlink[i].height)
+                    throw {message: "interlink height is different"};
+
+                if (!BufferExtended.safeCompare(interlink[i].blockId, this.interlink[i].blockId))
+                    throw {message: "interlink prevBlock height is different"};
             }
 
         }
@@ -316,7 +320,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         let answer = await InterfaceBlockchainBlock.prototype.validateBlock.call(this, height);
 
-        if (!answer) return answer;
+        if (!answer)
+            return answer;
 
         this.validateBlockInterlinks();
 

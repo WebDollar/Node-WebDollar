@@ -1,6 +1,6 @@
 import consts from 'consts/const_global'
 import SignalingClientList from "../signaling-client-list/signaling-client-list"
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 
 class NodeSignalingClientService {
 
@@ -17,7 +17,8 @@ class NodeSignalingClientService {
     _desinitializeNode(socket){
 
         for (let i=0; i<this.serversList.length; i++)
-            if ( this.serversList[i].socket.node.sckAddress.matchAddress(socket.node.sckAddress, ["uuid"] ) ){
+            if ( this.serversList[i].socket.node.sckAddress.uuid === socket.node.sckAddress.uuid ){
+                this.serversList[i].socket = undefined;
                 this.serversList.splice(i,1);
                 return;
             }
@@ -43,7 +44,7 @@ class NodeSignalingClientService {
     }
 
     _askSignalingServer(socket){
-        socket.node.sendRequest("signals/server/register/accept-web-peer-connections", {acceptWebPeers : SignalingClientList.connected.length < consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS } );
+        socket.node.sendRequest("signals/server/register/accept-web-peer-connections", {acceptWebPeers : SignalingClientList.connected.length < consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.WEBRTC.MAXIMUM_CONNECTIONS } );
     }
 
 }

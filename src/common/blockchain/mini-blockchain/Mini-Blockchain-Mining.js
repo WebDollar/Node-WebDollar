@@ -20,4 +20,4 @@ class MiniBlockchainMining extends  InterfaceBlockchainMining {
 
 }
 
-export default MiniBlockchainMining
+export default MiniBlockchainMining;

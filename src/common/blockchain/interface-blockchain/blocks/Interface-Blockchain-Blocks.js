@@ -29,9 +29,16 @@ class InterfaceBlockchainBlocks{
         if (this.blockchain.agent !== undefined && this.blockchain.agent.light){
 
             let index = this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
+
             while (this[index] !== undefined){
+                this[index].destroyBlock();
                 delete this[index];
+
                 index--;
+            }
+
+            while (this.length > 0 && this[this.blocksStartingPoint] === undefined && this.blocksStartingPoint < this.length){
+                this.blocksStartingPoint++;
             }
 
         }
@@ -42,8 +49,10 @@ class InterfaceBlockchainBlocks{
 
         for (let i = this.length - 1; i >= after; i--)
             if (this[i] !== undefined){
-                if (freeMemory)
+                if (freeMemory) {
+                    this[i].destroyBlock();
                     delete this[i];
+                }
                 else
                     this[i] = undefined;
             }
@@ -55,7 +64,7 @@ class InterfaceBlockchainBlocks{
 
     clear(){
 
-        this.spliceBlocks(0)
+        this.spliceBlocks(0, true);
 
     }
 

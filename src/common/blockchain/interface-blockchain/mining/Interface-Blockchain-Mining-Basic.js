@@ -27,6 +27,7 @@ class InterfaceBlockchainMiningBasic {
 
         this.walletDB = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
 
+        this._intervalMiningOutput = undefined;
     }
 
     get minerAddress(){
@@ -165,8 +166,12 @@ class InterfaceBlockchainMiningBasic {
 
     setMiningHashRateInterval(){
 
-        return setInterval(() => {
-            console.log( this._hashesPerSecond+ " hashes/s");
+        if (this._intervalMiningOutput !== undefined) return;
+
+        this._intervalMiningOutput = setInterval(() => {
+
+            if (typeof this._hashesPerSecond === "number")
+                console.log( this._hashesPerSecond+ " hashes/s");
 
             StatusEvents.emit("mining/hash-rate", this._hashesPerSecond );
 
@@ -180,6 +185,16 @@ class InterfaceBlockchainMiningBasic {
 
     async mineNextBlock(showMiningOutput, suspend){
         //overwritten
+    }
+
+    _destroyMiningInterval(){
+        if (this._intervalMiningOutput !== undefined) {
+
+            clearInterval(this._intervalMiningOutput);
+            this._intervalMiningOutput = undefined;
+            this._hashesPerSecond = 0;
+
+        }
     }
 
 }

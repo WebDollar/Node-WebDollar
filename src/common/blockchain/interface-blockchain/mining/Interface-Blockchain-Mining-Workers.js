@@ -5,8 +5,6 @@ import Serialization from 'common/utils/Serialization';
 import SemaphoreProcessing from "common/utils/Semaphore-Processing";
 import StatusEvents from "common/events/Status-Events";
 
-const SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL = 20;
-
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
 
@@ -24,7 +22,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this.workers = new InterfaceBlockchainMiningWorkersList(this);
 
-        this._semaphoreProcessing = new SemaphoreProcessing(SEMAPHORE_MINING_PROCESSING_WORKERS_INTERVAL);
 
     }
 
@@ -71,6 +68,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         if (newWorkers > this.workers.workers)
             await this.increaseWorkers( newWorkers - this.workers.workers );
         else
+        if (newWorkers < this.workers.workers)
             await this.decreaseWorkers( - (newWorkers - this.workers.workers)  );
 
     }

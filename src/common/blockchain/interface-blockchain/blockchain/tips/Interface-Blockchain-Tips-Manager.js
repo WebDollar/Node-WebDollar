@@ -1,4 +1,4 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import BansList from "common/utils/bans/BansList"
 
 const MAX_TIPS_PROCESSING = 10;
@@ -88,16 +88,11 @@ class InterfaceBlockchainProtocolTipsManager {
 
         if (newChainLength < this.blockchain.blocks.length){
 
-            socket.node.sendRequest("head/new-block", {
-                l: this.blockchain.blocks.length,
-                h: this.blockchain.blocks.last.hash,
-                s: this.blockchain.blocks.blocksStartingPoint,
-                p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== null && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
-            });
-
+            if (Math.random() < 0.5)
+                socket.node.protocol.sendLastBlock();
 
             if (newChainLength < this.blockchain.blocks.length - 50)
-                BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine");
+                BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+newChainLength+" / "+this.blockchain.blocks.length );
 
             throw "Your blockchain is smaller than mine";
 

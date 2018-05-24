@@ -81,14 +81,14 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             validationType["validation-timestamp-adjusted-time"] = true;
 
         //it's a new light fork && i have less than forkHeight
-        if (this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
+        if ( this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
             validationType["skip-validation-timestamp"] = true;
 
-        if (this.forkProofPi !== null && forkHeight < this.forkChainLength - consts.POPOW_PARAMS.m)
+        if ( this.forkProofPi !== undefined && height < ( this.forkChainLength - consts.POPOW_PARAMS.m))
             validationType["skip-validation-interlinks"] = true;
 
 
-        return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== null ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
     _createBlockValidation_BlockchainValidation(height, forkHeight){
@@ -104,13 +104,13 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if (this.forkChainStartingPoint === this.forkStartingHeight && forkHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
             validationType["skip-validation-timestamp"] = true;
 
-        if (this.forkProofPi !== null && forkHeight < this.forkChainLength - consts.POPOW_PARAMS.m)
+        if (this.forkProofPi !== undefined && height < ( this.forkChainLength - consts.POPOW_PARAMS.m))
             validationType["skip-validation-interlinks"] = true;
 
         if ( forkHeight === 0)
             validationType["skip-interlinks-update"] = true;
 
-        return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== null ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
     preForkClone(){

@@ -1,7 +1,7 @@
 const ipaddr = require('ipaddr.js');
 
 import {getContinentFromCountry} from './data/continents.js';
-import SocketAddress from 'common/sockets/socket-address'
+import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 
 import DownloadHelper from "common/utils/helpers/Download-Helper"
 

@@ -15,6 +15,7 @@ import AdvancedMessages from "node/menu/Advanced-Messages";
 import StatusEvents from "common/events/Status-Events";
 
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
+import RevertActions from "../../../utils/Revert-Actions/Revert-Actions";
 
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
@@ -24,7 +25,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         super(blockchain, minerAddress, miningFeeThreshold);
 
         this.miningTransactionSelector = new MiningTransactionsSelector(blockchain);
-
     }
 
 
@@ -78,18 +78,21 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
                 //simulating the new block and calculate the hashAccountantTree
-                let revertActions = undefined;
+                let revertActions = new RevertActions( this.blockchain );
+
                 if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
 
-                    ()=>{
+                    async ()=>{
 
-                        return  this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
-                            ()=>{
-                                return this._simulatedNextBlockMining(nextBlock);
-                            });
+                        return await this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
+                            async ()=>{
+                                return await this._simulatedNextBlockMining(nextBlock, false);
+                            },
+                            false); //avoid displaying the changes
 
                     }) === false) throw {message: "Mining1 returned False"};
 
+                revertActions.destroyRevertActions();
 
             } catch (Exception){
                 console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);
@@ -114,8 +117,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      * @param initialNonce
      */
     async mineBlock( block,  difficulty, initialNonce, showMiningOutput ){
-
-        let intervalMiningOutput;
 
         console.log("");
         console.log(" ----------- mineBlock-------------");
@@ -142,7 +143,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             //calculating the hashes per second
 
             if (showMiningOutput)
-                intervalMiningOutput = this.setMiningHashRateInterval();
+                this.setMiningHashRateInterval();
 
 
             let answer;
@@ -179,7 +180,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 try {
 
-                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(() => {
+                    let revertActions = new RevertActions(this.blockchain);
+
+                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+
                             block.hash = answer.hash;
                             block.nonce = answer.nonce;
 
@@ -187,8 +191,11 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                             if (this.blockchain.blocks.length !== block.height)
                                 return false;
 
-                            return this.blockchain.includeBlockchainBlock(block, false, [], true);
+                            return this.blockchain.includeBlockchainBlock(block, false, [], true, revertActions);
+
                         }) === false) throw {message: "Mining2 returned false"};
+
+                    revertActions.destroyRevertActions();
 
                     //confirming transactions
                     block.data.transactions.transactions.forEach((transaction) => {
@@ -211,15 +218,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 this._hashesPerSecond = 0;
             }
 
-            if ( intervalMiningOutput !== undefined)
-                clearInterval(intervalMiningOutput);
+            this._destroyMiningInterval();
 
         } catch (Exception){
 
             console.error( "Error mining block ", Exception, block);
+            this._destroyMiningInterval();
 
-            if (intervalMiningOutput !== undefined)
-                clearInterval(intervalMiningOutput);
             throw Exception;
         }
 

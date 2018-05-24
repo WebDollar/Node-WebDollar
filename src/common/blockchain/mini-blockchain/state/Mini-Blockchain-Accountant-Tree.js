@@ -11,12 +11,13 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
     createRoot() {
+
         this.root = new MiniBlockchainAccountantTreeNode(null, null, [], null);
         this.root.autoMerklify = true;
         this.root.deleteEmptyAddresses = false;
         this.root.root = this.root;
-    }
 
+    }
 
     /**
      *
@@ -25,7 +26,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
      * @param tokenId
      * @returns {*}
      */
-    updateAccount(address, value, tokenId, revertActions) {
+    updateAccount(address, value, tokenId, revertActions, showUpdate) {
 
         if (tokenId === undefined || tokenId === '' || tokenId === null) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
@@ -54,19 +55,23 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
             name: "revert-updateAccount",
             address: address,
             value: value,
-            tokenId: tokenId
+            tokenId: tokenId,
+            showUpdate: showUpdate,
         });
 
-        //WEBD
         if (tokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH && tokenId[0] === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE) {
             this.root.total += value;
-            this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
+
+            if (showUpdate)
+                this.emitter.emit("accountant-tree/root/total", this.root.total.toString());
         }
 
-        //optimization, but it doesn't work in browser
-        this.emitBalanceChangeEvent(address, () => {
-            return (resultUpdate !== null ? node.getBalances() : null);
-        });
+        //WEBD
+        if (showUpdate)
+            //optimization, but it doesn't work in browser
+            this.emitBalanceChangeEvent(address, () => {
+                return (resultUpdate !== null ? node.getBalances() : null);
+            });
 
         //purging empty addresses
         if (!node.hasBalances()) {
@@ -85,7 +90,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         return resultUpdate;
     }
 
-    updateAccountNonce(address, nonceChange, revertActions) {
+    updateAccountNonce(address, nonceChange, revertActions, showUpdate) {
 
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
         if (address === null)
@@ -105,13 +110,14 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         if (revertActions !== undefined) revertActions.push({
             name: "revert-updateAccountNonce",
             address: address,
-            nonceChange: nonceChange
+            nonceChange: nonceChange,
+            showUpdate: showUpdate,
         });
 
         if (!Number.isInteger(node.nonce)) throw {message: "nonce is invalid", nonce: node.nonce};
 
-        node.nonce = node.nonce % 0xFFFF;
-        if (node.nonce < 0) node.nonce = node.nonce + 0xFFFF;
+        node.nonce = node.nonce % 0x10000;
+        if (node.nonce < 0) node.nonce = node.nonce + 0x10000;
 
         //force to delete first time miner
         if (node.nonce === 0 && !node.hasBalances(address)) { //TODO Window Transactions for Purging
@@ -201,8 +207,8 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         return this._deserializeTree(buffer, offset, includeHashes);
     }
 
-    async saveMiniAccountant(includeHashes, name, serialization) {
-        return await this.saveTree(name || "accountantTree", includeHashes, serialization);
+    async saveMiniAccountant(includeHashes, name, serialization, timeout) {
+        return await this.saveTree(name || "accountantTree", includeHashes, serialization, timeout);
     }
 
     async loadMiniAccountant(buffer, offset, includeHashes, name = "accountantTree") {

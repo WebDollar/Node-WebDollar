@@ -14,7 +14,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
     async _getLastBlocks(socket, heightRequired){
 
-        let hash = await socket.node.sendRequestWaitOnce("head/hash", heightRequired, heightRequired );
+        let hash = await socket.node.sendRequestWaitOnce("head/hash", heightRequired, heightRequired , consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
         if (hash === null)
             throw { message: "LightProtocolForkSolver _calculateForkBinarySearch headers-info dropped ", heightRequired };
@@ -130,7 +130,8 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
         //downloading the difficulty for the first element
         let blockFirstPosition = forkAdditionalBlocksBlocksRequired[0];
-        let answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: blockFirstPosition+1 }, blockFirstPosition+1 );
+        let answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: blockFirstPosition+1 }, blockFirstPosition+1,  consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+
         if (answer === null) throw {message: "get-accountant-tree[0] never received ", height: (blockFirstPosition+1)};
         if (!answer.result) throw {message: "get-accountant-tree[0] return false ", answer: answer.message};
 
@@ -167,7 +168,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevAccountantTree = answer;
 
             //Downloading Proof Xi and light settings
-            answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkStartingHeight  }, fork.forkStartingHeight );
+            answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkStartingHeight  }, fork.forkStartingHeight,  consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
             if (answer === null) throw {message: "get-light-settings never received ", forkChainStartingPoint: fork.forkChainStartingPoint};
 
@@ -191,7 +192,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
                     StatusEvents.emit( "agent/status", {message: "Synchronizing - Downloading First Blocks", blockHeight: blockRequested, blockHeightMax: fork.forkChainLength } );
 
                 //TODO it is not necessary to download full blocks, but rather also other nodes will require
-                answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: blockRequested, onlyHeader: false }, blockRequested );
+                answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: blockRequested, onlyHeader: false }, blockRequested,  consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
                 if ( answer === null || answer === undefined )
                     throw {message: "block never received ", answer: blockRequested};
@@ -237,7 +238,11 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
         if (binarySearchResult.position === -1 && currentBlockchainLength < forkChainLength){
 
-            let hash = await socket.node.sendRequestWaitOnce("head/hash", forkChainStartingPoint, forkChainStartingPoint ).hash;
+            let hash = await socket.node.sendRequestWaitOnce("head/hash", forkChainStartingPoint, forkChainStartingPoint,  consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+
+            if (hash === null || hash === undefined) throw {message: "connection dropped headers-info optionalProcess"};
+
+            hash = hash.hash;
 
             if (hash === null || hash === undefined) throw {message: "connection dropped headers-info optionalProcess"};
 

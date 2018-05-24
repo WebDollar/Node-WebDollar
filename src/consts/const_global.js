@@ -2,9 +2,11 @@ const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 
 let consts = {
-    DEBUG: false,
-};
 
+    DEBUG: false,
+    OPEN_SERVER: true,
+
+};
 
 
 consts.BLOCKCHAIN = {
@@ -24,21 +26,30 @@ consts.BLOCKCHAIN = {
     BLOCKS_NONCE : 4,
 
     LIGHT:{
+
         VALIDATE_LAST_BLOCKS: 10 , //overwrite below
         SAFETY_LAST_BLOCKS: 40, //overwrite below
 
-        SAFETY_LAST_BLOCKS_DELETE: 400, //overwrite below
+        SAFETY_LAST_BLOCKS_DELETE_BROWSER: 500, //overwrite below
+        SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
+
+        SAFETY_LAST_ACCOUNTANT_TREES: 50, //overwrite below
+
+        SAFETY_LAST_BLOCKS_DELETE: undefined,
+
     },
 
     HARD_FORKS : {
 
+        TRANSACTIONS_BUG_2_BYTES: 46950,
 
     }
 
-
 };
 
-consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 1 ;
+consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE = (process.env.BROWSER ? consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE_BROWSER : consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE_NODE );
+
+consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 2 ;
 consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS + 2* consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ;
 
 consts.MINI_BLOCKCHAIN = {
@@ -154,9 +165,6 @@ consts.HASH_ARGON2_PARAMS = {
 
 // change also to Browser-Mining-WebWorker.js
 
-
-console.log("INSTANCE_PREFIX", (process.env.INSTANCE_PREFIX||""));
-
 //DATABASE NAMES
 consts.DATABASE_NAMES = {
 
@@ -184,7 +192,7 @@ consts.MINING_POOL = {
     BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
 
     MINING:{
-        FEE_THRESHOLD: 100,
+        FEE_THRESHOLD: 100000,
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
 
@@ -197,11 +205,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.10",
-        VERSION_COMPATIBILITY: "1.10",
+        VERSION: "1.133.9",
+        VERSION_COMPATIBILITY: "1.13",
         PROTOCOL: "WebDollar",
         SSL: true,
-
 
         PORT: 80, //port
     },
@@ -233,26 +240,73 @@ consts.SETTINGS = {
 
         CONNECTIONS:{
 
-            SOCKETS: {
-                MAXIMUM_CONNECTIONS_IN_BROWSER: 1,
-                MAXIMUM_CONNECTIONS_IN_TERMINAL: 4,
+            NO_OF_IDENTICAL_IPS: 3,
+
+            SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP: 50,
+
+            TERMINAL:{
+
+                CLIENT: {
+
+                    MAX_SOCKET_CLIENTS_WAITLIST: 3,
+                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+
+                    MIN_SOCKET_CLIENTS_WAITLIST: 0,
+                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+
+                    SERVER_OPEN:{
+                        MAX_SOCKET_CLIENTS_WAITLIST: 5,
+                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 3,
+                    },
+
+                    SSL:{
+                        MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL: 8,
+                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL: 8,
+                    },
+                },
+
+                SERVER: {
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 100,
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 600,
+
+                    TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
+                },
+
             },
 
-            SERVER: {
-                MAXIMUM_CONNECTIONS_FROM_BROWSER: 100,
-                MAXIMUM_CONNECTIONS_FROM_TERMINAL: 10,
+            BROWSER:{
+
+                CLIENT: {
+                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST: 4,
+                    MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK: 2,
+
+                    MIN_SOCKET_CLIENTS_WAITLIST: 0,
+                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+                },
+
+                SERVER: {},
+
+                WEBRTC: {
+                    MAXIMUM_CONNECTIONS: 13,
+                },
+
             },
 
-            WEBRTC: {
-                MAXIMUM_CONNECTIONS: 8,
+            COMPUTED: {
+                CLIENT:{
+
+                },
+                SERVER:{
+
+                },
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 50,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 100,
             },
 
             TIMEOUT: {
-                WAIT_ASYNC_DISCOVERY_TIMEOUT: 6500,
+                WAIT_ASYNC_DISCOVERY_TIMEOUT: 7500,
             }
 
         },
@@ -270,20 +324,27 @@ consts.SETTINGS = {
 
 };
 
+if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
+    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER = process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER;
 
+if (process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL !== undefined)
+    consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL = process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL;
 
 
 if ( consts.DEBUG === true ){
-    consts.SETTINGS.NODE.VERSION += "1";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "1";
+
+    consts.SETTINGS.NODE.VERSION += "3";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "3";
     consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 8085;
+    consts.SETTINGS.NODE.PORT = 9095;
 
     FallBackNodesList.nodes = [{
-        "addr": ["127.0.0.1:8085"],
+        "addr": ["http://192.168.2.8:9095"],
     }];
+
+
 }
 
 

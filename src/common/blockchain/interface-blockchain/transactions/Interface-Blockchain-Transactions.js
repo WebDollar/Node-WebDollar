@@ -21,6 +21,7 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         this.wizard = new InterfaceBlockchainTransactionsWizard(this, blockchain, wallet);
     }
 
+
     _createTransaction(from, to, nonce, timeLock, version, txId, validateFrom, validateTo){
         return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo);
     }

@@ -3,7 +3,7 @@ import InterfaceBlockchainAgentFullNode from 'common/blockchain/interface-blockc
 import MiniBlockchainLightProtocol from "common/blockchain/mini-blockchain/protocol/light/Mini-Blockchain-Light-Protocol"
 import MiniBlockchainForkLight from '../protocol/light/Mini-Blockchain-Light-Fork'
 import consts from "consts/const_global";
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 import CONNECTION_TYPE from "node/lists/types/Connections-Type";
 import Blockchain from "main-blockchain/Blockchain"
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
@@ -26,9 +26,9 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
 
         setInterval( () => {
 
-            if (this.blockchain.proofPi !== null)
+            if (this.blockchain.proofPi !== undefined)
                 if ( new Date().getTime() - this.blockchain.proofPi.date.getTime() >= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK *1000 * 2) {
-                    if (Math.random() < 2*WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC)
+                    if (Math.random() < 2*WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES)
                         Blockchain.synchronizeBlockchain(); //let's synchronize again
                 }
 
@@ -67,42 +67,42 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
     initializeStartAgentOnce(){
 
         this._initializeProtocol();
-
-        NodesList.emitter.on("nodes-list/disconnected", async (result) => {
-
-
-
-            if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC) < 3)
-                Blockchain.synchronizeBlockchain(); //let's synchronize again
-
-        });
-
-        NodesList.emitter.on("nodes-list/connected", async (result) => {
-
-            let webrtc = NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC);
-
-            if ( webrtc > WEBRTC_MINIMUM_LIGHT) {
-                //let's disconnect from full nodes
-
-                if ( this.status !== AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC ) {
-
-                    this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_WEBRTC;
-
-                    if (Math.random() > WEBRTC_MINIMUM_LIGHT_PROBABILITY + 0.15) // most will disconnect from full nodes
-                        NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
-
-                }
-
-            }
-
-            if ( webrtc > WEBRTC_MINIMUM_LIGHT + 2) {
-
-                if (Math.random() <= 0.1)
-                    NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
-
-            }
-
-        });
+        //
+        // NodesList.emitter.on("nodes-list/disconnected", async (result) => {
+        //
+        //
+        //
+        //     if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC) < 3)
+        //         Blockchain.synchronizeBlockchain(); //let's synchronize again
+        //
+        // });
+        //
+        // NodesList.emitter.on("nodes-list/connected", async (result) => {
+        //
+        //     let webrtc = NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_WEBRTC);
+        //
+        //     if ( webrtc > WEBRTC_MINIMUM_LIGHT) {
+        //         //let's disconnect from full nodes
+        //
+        //         if ( this.status !== AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES ) {
+        //
+        //             this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
+        //
+        //             if (Math.random() > WEBRTC_MINIMUM_LIGHT_PROBABILITY + 0.15) // most will disconnect from full nodes
+        //                 NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
+        //
+        //         }
+        //
+        //     }
+        //
+        //     if ( webrtc > WEBRTC_MINIMUM_LIGHT + 2) {
+        //
+        //         if (Math.random() <= 0.1)
+        //             NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
+        //
+        //     }
+        //
+        // });
     }
 
 

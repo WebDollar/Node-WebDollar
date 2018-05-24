@@ -6,13 +6,9 @@ class SocketAddress {
 
     static checkIsSocketAddress(sckAddress){
 
-        //console.log("checkIsSocketAddress", sckAddress);
+        if (typeof sckAddress !== 'object' || sckAddress === null) return false;
 
-        if (typeof sckAddress !== 'object' || sckAddress === null)
-            return false;
-
-        if (! (sckAddress.constructor.name === "SocketAddress" ))
-            return false;
+        if (! (sckAddress.constructor.name === "SocketAddress" )) return false;
 
         return true;
     }
@@ -32,52 +28,59 @@ class SocketAddress {
         if (SocketAddress.checkIsSocketAddress(address))
             return address;
 
-        if (  port === undefined || port === '')
-            port = consts.SETTINGS.NODE.PORT;
-
         return new SocketAddress(address, port, uuid);
     }
 
 
     constructor(address, port, uuid){
 
-        if (address === undefined)
-            address = '';
+        if (address === undefined) address = '';
+        if (port === undefined) port = consts.SETTINGS.NODE.PORT;
 
-        if (port === undefined)
-            port = consts.SETTINGS.NODE.PORT;
+        try{
 
-        try {
-            if (ipaddr.IPv6.isIPv6(address)) {
-
-                let ip = ipaddr.IPv6.parse(address);
-
-                if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
-                    address = ip.toIPv4Address().toNormalizedString();
-                else // ipString is IPv6
-                    address = ip.toNormalizedString();
-
+            if (address.indexOf("https://") >= 0){
+                address = address.replace("https://", "");
+                this.SSL = true;
+            } else
+            if (address.indexOf("http://") >= 0){
+                address = address.replace("http://","");
             }
 
+        }catch (exception){
 
-            if (address.lastIndexOf(":") > 0) {//port
-                port = address.substr(address.lastIndexOf(":") + 1);
-                address = address.substr(0, address.lastIndexOf(":"));
-            }
+        }
 
-            if (ipaddr.IPv4.isIPv4(address)) {
 
-                let ip = ipaddr.IPv4.parse(address);
-                address = ip.toNormalizedString(); //IPv4
+        let errorIPv6=false;
+        try{
 
-            } else {
-            }// it is a domain
+            if (ipaddr.IPv6.isIPv6(address))
+              address = this._extractIPv6(address);
 
         } catch (exception){
 
-            address = "0.0.0.0";
-
+            console.error("invalid ipv6", address);
+            errorIPv6 = true;
         }
+
+
+        if (address.lastIndexOf(":") > 0) {//port
+            port = address.substr(address.lastIndexOf(":") + 1);
+            address = address.substr(0, address.lastIndexOf(":"));
+        }
+
+        if (errorIPv6 && ipaddr.IPv6.isIPv6(address))
+            address = this._extractIPv6(address);
+
+        if (ipaddr.IPv4.isIPv4(address)) {
+
+            let ip = ipaddr.IPv4.parse(address);
+            address = ip.toNormalizedString(); //IPv4
+
+        } else {
+        }// it is a domain
+
 
 
         this.address = address; //always ipv6
@@ -88,10 +91,20 @@ class SocketAddress {
         this.uuid = uuid;
     }
 
+    _extractIPv6(address){
+        let ip = ipaddr.IPv6.parse(address);
+
+        if (ip.isIPv4MappedAddress()) // ip.toIPv4Address().toString() is IPv4
+            address = ip.toIPv4Address().toNormalizedString();
+        else // ipString is IPv6
+            address = ip.toNormalizedString();
+
+        return address;
+    }
+
     matchAddress(address, validationDoubleConnectionsTypes){
 
-        if (validationDoubleConnectionsTypes === undefined)
-            validationDoubleConnectionsTypes = ["ip","uuid"];
+        if (validationDoubleConnectionsTypes === undefined) validationDoubleConnectionsTypes = ["ip","uuid"]; // port
         else
         if (!Array.isArray(validationDoubleConnectionsTypes))
             validationDoubleConnectionsTypes = [validationDoubleConnectionsTypes];
@@ -100,20 +113,24 @@ class SocketAddress {
         let sckAddress = SocketAddress.createSocketAddress(address);
 
         //uuid validation
-        if ( validationDoubleConnectionsTypes.indexOf("uuid") >= 0 ){
+        for (let i=0; i<validationDoubleConnectionsTypes.length; i++){
 
-            if (this.uuid !== null && this.uuid !== undefined && this.uuid === sckAddress.uuid)
-                return true;
+            if (validationDoubleConnectionsTypes[i] === "uuid") {
+                if (this.uuid !== null && this.uuid !== undefined && this.uuid === sckAddress.uuid)
+                    return true;
+            }
+            if (validationDoubleConnectionsTypes[i] === "ip") {
 
-        }
+                if (validationDoubleConnectionsTypes.indexOf("port") >= 0){
 
-        //ip validation
-        if ( validationDoubleConnectionsTypes.indexOf("ip") >=0 ){
+                    if (this.address+":"+this.port === sckAddress.address+":"+sckAddress.port)
+                        return true;
 
-            let myAddressString = this.getAddress(false);
-            let addressString = sckAddress.getAddress(false);
+                    return false;
 
-            if ( myAddressString === addressString ) return true;
+                } else
+                if ( this.address === sckAddress.address ) return true;
+            }
         }
 
         return false;
@@ -129,9 +146,9 @@ class SocketAddress {
     /*
         returns ipv6 ip standard
      */
-    getAddress(includePort=true){
+    getAddress(includePort=true, includeHTTP=false){
 
-        return this.address + (includePort ? ':'+this.port : '');
+        return (includeHTTP ? 'http'+ (this.SSL ? 's': '')  + '://' : '' )+this.address + (includePort ? ':'+this.port : '');
 
     }
 

@@ -1,6 +1,7 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingServerWaitlistObject from "./Node-Signaling-Server-Waitlist-Object"
 import NodeSignalingServerProtocol from "./../Node-Signaling-Server-Protocol"
+import SignalingServerRoomList from '../signaling-server-room/Signaling-Server-Room-List'
 
 class NodeSignalingServerService{
 
@@ -64,40 +65,34 @@ class NodeSignalingServerService{
 
     _connectWebPeers(){
 
-        //TODO instead of using Interval, to use an event based Protocol
 
         //mixing users
-        for (let i = 0; i < this.waitlist.length; i++) {
+        for (let i = 0; i < this.waitlist.length; i++)
+            if (this.waitlist[i].acceptWebPeers)
 
-            if (!this.waitlist[i].acceptWebPeers)
-                continue;
+                for (let j = i+1; j < this.waitlist.length; j++)
+                    if (this.waitlist[j].acceptWebPeers) {
 
-            for (let j = i+1; j < this.waitlist.length; j++){
 
-                if (!this.waitlist[j].acceptWebPeers)
-                    continue;
+                        // Step 0 , finding two different clients
+                        // clients are already already with socket
 
-                // Step 0 , finding two different clients
-                // clients are already already with socket
+                        //shuffling them, the sockets to change the orders
+                        let client1, client2 = null;
 
-                //shuffling them, the sockets to change the orders
-                let client1, client2 = null;
+                        if (Math.random() > 0.5) {
 
-                if (Math.random() > 0.5) {
+                            client1 = this.waitlist[i];
+                            client2 = this.waitlist[j];
 
-                    client1 = this.waitlist[i];
-                    client2 = this.waitlist[j];
+                        } else {
+                            client1 = this.waitlist[j];
+                            client2 = this.waitlist[i];
+                        }
 
-                } else {
-                    client1 = this.waitlist[j];
-                    client2 = this.waitlist[i];
-                }
+                        NodeSignalingServerProtocol.connectWebPeer( client1.socket, client2.socket );
 
-                NodeSignalingServerProtocol.connectWebPeer( client1.socket, client2.socket );
-
-            }
-        }
-
+                    }
 
         setTimeout(this._connectWebPeers.bind(this), 2000);
     }

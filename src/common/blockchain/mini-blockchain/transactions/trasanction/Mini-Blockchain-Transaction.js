@@ -15,9 +15,9 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return new MiniBlockchainTransactionTo(this, to);
     }
 
-    _preProcessTransaction(multiplicationFactor = 1 , minerAddress, revertActions){
+    _preProcessTransaction(multiplicationFactor = 1 , minerAddress, revertActions, showUpdate){
 
-        this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions);
+        this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions, showUpdate);
 
         return true;
     }
@@ -84,7 +84,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return nonce;
     }
 
-    _processTransactionFees(multiplicationFactor=1, minerAddress = undefined, revertActions){
+    _processTransactionFees(multiplicationFactor=1, minerAddress = undefined, revertActions, showUpdate){
 
         //validate amount
         let inputSum = this.from.calculateInputSum();
@@ -99,7 +99,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
             throw {message: "Accountant Tree is negative" };
 
 
-        this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees * multiplicationFactor, this.from.currencyTokenId, revertActions);
+        this.blockchain.accountantTree.updateAccount( minerAddress, diffInFees * multiplicationFactor, this.from.currencyTokenId, revertActions, showUpdate);
 
         return {fees: diffInFees, currencyTokenId: this.currencyTokenId};
 

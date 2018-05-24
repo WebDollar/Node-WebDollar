@@ -1,5 +1,5 @@
-import consts from 'consts/const_global'
-import BufferExtended from "common/utils/BufferExtended"
+import consts from 'consts/const_global';
+import BufferExtended from "common/utils/BufferExtended";
 
 class BlockchainGenesis{
 

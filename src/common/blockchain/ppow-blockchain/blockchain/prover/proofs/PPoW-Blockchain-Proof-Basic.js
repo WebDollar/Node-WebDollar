@@ -4,6 +4,41 @@ import consts from 'consts/const_global'
 
 class PPoWBlockchainProofBasic{
 
+    destroyProof(){
+
+        if (!this.blockchain.agent.light) {
+            this.blocks = [];
+        } else
+        for (let i=0; i<this.blocks.length; i++) {
+
+            if (this.blocks[i] === undefined || this.blocks[i] === null) continue;
+
+            let found = false;
+
+            //TODO optimization instead of using for j
+
+            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi !== undefined)
+                for (let j=0; j<this.blockchain.proofPi.blocks.length; j++)
+                    if (this.blockchain.proofPi.blocks[j] === this.blocks[i] ){
+                        found = true;
+                        break;
+                    }
+
+            if (!found) {
+
+                // avoid destroying real blocks
+                if (typeof this.blocks[i].destroyBlock === "function")
+                    this.blocks[i].destroyBlock();
+
+            }
+
+            this.blocks[i] = undefined;
+
+        }
+
+        this.blockchain = undefined;
+
+    }
 
     constructor(blockchain, blocks){
 
@@ -13,6 +48,7 @@ class PPoWBlockchainProofBasic{
         this.blocks = blocks;
 
         this.hash = undefined;
+
     }
 
     getProofHeaders(starting, length){
@@ -98,6 +134,16 @@ class PPoWBlockchainProofBasic{
 
         }
 
+    }
+
+    findBlockByHeight(height){
+
+        for (let i=0; i<this.blocks.length; i++)
+            if (this.blocks[i].height === height){
+                return this.blocks[i];
+            }
+
+        return null;
     }
 
 }

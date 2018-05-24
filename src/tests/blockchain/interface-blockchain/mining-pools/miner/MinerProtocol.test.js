@@ -6,31 +6,71 @@ import TestsHelper from 'tests/Tests.helper';
 
 describe('test pool mining', () => {
 
-    let minersList = [
-        {
-            address: "WEBD$gDDEDYafT8ur7EkSQzkVAZU4egSgEkH25#9TM3zKKN#Yj#eH@HsPw==",
-            reward: 100,
-            bestHash: TestsHelper.makeIdHex(32),
-            difficulty: 0
-        },
-        {
-            address: "WEBD$gD$q9AkZPN29xeHnuS$ykXHCqpv1@NT@R5yn4PkY#9bcxztwcDsPw==",
-            reward: 201243,
-            bestHash: TestsHelper.makeIdHex(32),
-            difficulty: 0
-        },
-        {
-            address: "WEBD$gCBzvQdKroa&yU4sp2X3y8*mf#q&r5k3BG3J3mBvogbE3U$SPHsPw==",
-            reward: 3034556,
-            bestHash: TestsHelper.makeIdHex(32),
-            difficulty: 0
-        },
+    let blocksData = [{
+            "height":0,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("0001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a4000004476c1d355b03205412204804e427f9a56de15f10f0c80fc530fecde9a48ae6aede861e9903e5422f7c111358032dfe6ca37aad8bdd5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456000000000a1cfceb215aeac46c0b7eea0d5da9defd927e24504b757e6c3d3702853c9c9901000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a4", "hex"),
+            "nonce":59172
+        }, {
+            "height":1,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("000100007e3013711bc126a8708a324472fdfcf6855cef1f979b0df43475c9568e3300000472920ffd31f9752f90a0bd4c9fba25790b5340d7900b0438273a76b834b9f17856bd87b88551446a84650bdb7525ec27326e55ffd85df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c945600000000229cba7cd7926a980ddae11625db7a7a5e0f5a86267d44ab1689f140cd7a4b7303000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a400000200007e3013711bc126a8708a324472fdfcf6855cef1f979b0df43475c9568e33000000", "hex"),
+            "nonce":15398
+        }, {
+            "height":2,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("0001000125988a04e701c324eaa43798751e24422a8c65a3fc2fa78d5dd8d81d6cb60000047e5feda917aaa3bb30a8ed20eb69b20704f19f173e0148d3dc69b6db8172b48a22ce5ac968eb922693d0cb5894ec3d1774a0cc67515df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c945600000000321cf1c8157a085a6c2cb0e3e3282bf79d535f51b6cac06f58236336ca50c0ef03000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a4000003000125988a04e701c324eaa43798751e24422a8c65a3fc2fa78d5dd8d81d6cb600000200007e3013711bc126a8708a324472fdfcf6855cef1f979b0df43475c9568e33", "hex"),
+            "nonce":20467
+        }, {
+            "height":3,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("0001000283c869d2359cd18433f8ca570cf7ea4694e8b46c29e33fb53a602f0d6a910000048eb2d8f9e2ba00ffc6a28346aa796ab80adcce01b3c803aa10ce0d5124206944caf37c68c72b61d58bbdc64d4db422ed568e47c7655df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c945600000000ab5f994c54c3b182a4a42c2f8f2b4cbfa94aa6783e6aeae33ec83f8aa0bd53b703000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a4000003000125988a04e701c324eaa43798751e24422a8c65a3fc2fa78d5dd8d81d6cb600000200007e3013711bc126a8708a324472fdfcf6855cef1f979b0df43475c9568e33", "hex"),
+            "nonce":7856
+        }, {
+            "height":4,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("000100008a40c66617831ab0a6b7f160b08f228b90ccdb3b12d34fe3c342f6809d8c0000049466553362b66b767abdff2acd94a93f60f786fe3c7c76732fb24a58327a00c7d58263f7b8b901a9184bf2adaa1f08e84f0be6512a5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c945600000000aa8fea4f18a6a81cfbdfa867e477d2330d37a84b7602fdf14c94eb24b258eabb03000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a400000500008a40c66617831ab0a6b7f160b08f228b90ccdb3b12d34fe3c342f6809d8c000000", "hex"),
+            "nonce":16847
+        }, {
+            "height":5,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("000100025e446210fbf8daeba9729587a1dba4bd1485fa40c08409f06bad8e3c555a0000049f4700c26257611308d4972a026cd1f3acdc0c675e6a99a37a5bce564b7b94c70117110a69e30df4728841f3b7f082de37dc1326875df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456000000001766f51dc8ad81f9038b47d828621aae1e969780f3528dd36ff4760075ee39ed03000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a400000500008a40c66617831ab0a6b7f160b08f228b90ccdb3b12d34fe3c342f6809d8c000000", "hex"),
+            "nonce":42975
+        }, {
+            "height":6,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("000100010a222f890abf1c34464d2d03428c7af50708a5fb934f867fed72e41403f4000004bcf1e6f0aaa41b351e3046d65ac87967dcf0cd70c3ad2ca41250c98ab5823f9bce513b37f90dd143d9a563f2c055e7255f380245f95df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c945600000000997d7fcbcfef268f4d3582bcbeaa8fb28acde79969aa4d850605f7f99b28179503000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a400000700010a222f890abf1c34464d2d03428c7af50708a5fb934f867fed72e41403f400000500008a40c66617831ab0a6b7f160b08f228b90ccdb3b12d34fe3c342f6809d8c", "hex"),
+            "nonce":23380
+        }, {
+            "height":7,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("00010001e262d2520d0204552d3cb2c6252994ef7222a747ad26e6aeb68786013bb4000004cdd59005d9d6bd440012612dde35addbfdf13d11f39a59c0332fc191a9b6184320be0cd4a43ebcea56702f2a3a75df55ab844ae70a5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456000000001b734c258fea2530cc63ff07862749dd0fc30442ada072f98c13d109c690453a03000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a400000700010a222f890abf1c34464d2d03428c7af50708a5fb934f867fed72e41403f400000500008a40c66617831ab0a6b7f160b08f228b90ccdb3b12d34fe3c342f6809d8c", "hex"),
+            "nonce":45429
+        }, {
+            "height":8,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("000100026bcbe367f8d8da260dfa18d6ad758799cc7d824eb764ef10ae0de9b86d0b000004f00a24f8b240e83991a2cbbc32effd69e72ee8f1071c2b463afca671bd5978ccb4dd62a73d768083ffc308ef673fe32516e6d74b295df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c945600000000038696debb9c977c6da04cfacd85b71c06b0840619db8768b4e6edbd70e32b1103000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a400000700010a222f890abf1c34464d2d03428c7af50708a5fb934f867fed72e41403f400000500008a40c66617831ab0a6b7f160b08f228b90ccdb3b12d34fe3c342f6809d8c", "hex"),
+            "nonce":24499
+        }, {
+            "height":9,
+            "difficultyTargetPrev":new Buffer("00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex"),
+            "computedBlockPrefix":new Buffer("00010001ac6d145215e09a60752063f1fa76ac934da0a4075fb14cac66fb6da9fce9000005034918821cb0567c9c85c36f7826f7801790d685906b8b0a42c0bfd7a756f3b9fb7f0bdb94e13a7664dd3613ce78705fd281d45b4b5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456000000000185739fc474482f42afcdece0d3e81a0b445f7d331f07c44088731275255da303000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a400000700010a222f890abf1c34464d2d03428c7af50708a5fb934f867fed72e41403f400000500008a40c66617831ab0a6b7f160b08f228b90ccdb3b12d34fe3c342f6809d8c", "hex"),
+            "nonce":94818
+        }
     ];
 
     let response = null;
 
     it('test backbone mining block sample', async () => {
         //TODO: check if backbone mining works
+        let miningFeeThreshold = 10;
+        let poolData = undefined;
+        let minerProtocol = new MinerProtocol(miningFeeThreshold, poolData);
+        
+        minerProtocol._miningData.blockData = blocksData[0];
+        minerProtocol._miningData.difficultyTarget = blocksData[1].difficultyTargetPrev;
+        
+        await minerProtocol.run();
         
     });
 

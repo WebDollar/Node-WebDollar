@@ -8,8 +8,15 @@ class InterfaceTree{
     constructor(db){
 
         this.db = db;
+        this.root = undefined;
 
         this.createRoot();
+    }
+
+    destroyTree(){
+        this.db = undefined;
+        this.root.destroyNode();
+        delete this.root;
     }
 
     createRoot(){
@@ -62,28 +69,36 @@ class InterfaceTree{
         let deleted = false;
 
         let nodeParent = node.parent;
+
         while (nodeParent !== null && nodeParent !== undefined && node.value === null){
 
             //delete the edge from parent to deleted child
             for (let i = 0; i < nodeParent.edges.length; i++)
                 if (nodeParent.edges[i].targetNode === node){
+
                     nodeParent.edges.splice(i,1);
+
                     deleted = true;
+
                     break;
                 }
 
-            // incase the current node has children, let's move the childrens
+            // in case the current node has children, let's move the children
             if (node.edges.length > 0)
                 for (let i = 0; i < node.edges.length; i++) {
-                    nodeParent.edgesPush( this.root.createNewEdge(node.edges[i].targetNode))
+                    nodeParent.edgesPush( this.root.createNewEdge(node.edges[i].targetNode) )
                     node.edges[i].targetNode.parent = nodeParent;
                 }
 
-            if (nodeParent.edges.length === 0 && nodeParent.value === null){ //let's delete also the parent
+            node.edges = [];
+            node.destroyNode();
+
+            if (nodeParent.edges.length === 0 && nodeParent.value === null) //let's delete also the parent
                 node = nodeParent;
-            } else break;
+            else break;
 
             nodeParent = node.parent;
+
         }
 
         if (deleted) {
@@ -320,9 +335,10 @@ class InterfaceTree{
 
     _deserializeTree(buffer, offset, includeHashes){
 
+        this.root.destroyNode();
         this.createRoot();
 
-        if (buffer.length === 1) return true; // nothing to deserialize
+        if (buffer.length === 1 || buffer.length === 0) return true; // nothing to deserialize
         return this.root.deserializeNode(buffer, offset, true, includeHashes);
     }
 
@@ -334,12 +350,12 @@ class InterfaceTree{
 
     }
 
-    async saveTree(key, includeHashes, serialization){
+    async saveTree(key, includeHashes, serialization, timeout){
 
         if (serialization === undefined || serialization === null)
             serialization = this._serializeTree(includeHashes);
 
-        return await this.db.save(key, serialization);
+        return await this.db.save(key, serialization, timeout);
     }
 
     async loadTree(key, buffer, offset, includeHashes){

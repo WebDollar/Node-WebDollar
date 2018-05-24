@@ -32,10 +32,7 @@ class MiniBlockchain extends  inheritBlockchain{
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
     }
 
-    async simulateNewBlock(block, revertAutomatically, revertActions, callback){
-
-        if (revertActions === undefined)
-            revertActions = new RevertActions(this);
+    async simulateNewBlock(block, revertAutomatically, revertActions, callback, showUpdate = true ){
 
         revertActions.push( { name: "breakpoint" } );
 
@@ -43,27 +40,37 @@ class MiniBlockchain extends  inheritBlockchain{
 
         try{
 
-            //updating reward
-            let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions );
+            if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
 
-            //reward
-            if (result === null || result === undefined)
-                throw {message: "reward couldn't be set to the minerAddress"};
+                //updating reward
+                let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions, showUpdate);
 
-            if (!block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType))
-                throw {message: "Validate Transactions is wrong"};
+                //reward
+                if (result === null || result === undefined)
+                    throw {message: "reward couldn't be set to the minerAddress"};
 
+                if (!block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType))
+                    throw {message: "Validate Transactions is wrong"};
 
-            if (block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] !== true) {
+                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
 
-                block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = true;
-                revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
+                if (block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] !== true) {
+
+                    block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = true;
+                    revertActions.push( { name: "revert-skip-validation-transactions-from-values", block:block, value: true} );
+
+                }
+
+                if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions, showUpdate ))
+                    throw {message: "Process Block Data Transactions failed"};
+
+                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
+
             }
 
-            if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions ))
-                throw {message: "Process Block Data Transactions failed"};
-
             let callbackDone = await callback();
+
+            if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
 
             if (callbackDone === false)
                 throw {message: "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock"};
@@ -82,15 +89,19 @@ class MiniBlockchain extends  inheritBlockchain{
 
                 if (revertException)
                     return false;
+
             }
 
 
         } catch (exception){
 
             console.log("MiniBlockchain Reverting Error raised an exception", exception);
-            return false;
+            revertActions.clearUntilBreakpoint();
 
+            return false;
         }
+
+        revertActions.clearUntilBreakpoint();
 
         return true;
 
@@ -142,23 +153,26 @@ class MiniBlockchain extends  inheritBlockchain{
         if (process.env.BROWSER)
             return true;
 
+        if (this.blocks.length === 0) return false;
+
         try {
 
-            if (this.blocks.length === 0)
-                return false;
-
-            if (! (await this.accountantTree.saveMiniAccountant( true )))
-                throw {message: "Couldn't save the Account Tree"};
+            global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
 
             if (! (await inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
                 throw {message: "couldn't sae the blockchain"};
 
-            return true;
+            if (! (await this.accountantTree.saveMiniAccountant( true, undefined, undefined, 10*1000 )))
+                throw {message: "Couldn't save the Account Tree"};
 
         } catch (exception){
             console.error("Couldn't save MiniBlockchain", exception);
+            global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
             return false;
         }
+
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
+        return true;
     }
 
     /**

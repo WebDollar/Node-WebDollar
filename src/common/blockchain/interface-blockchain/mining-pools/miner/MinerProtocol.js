@@ -1,16 +1,29 @@
-import NodesList from 'node/lists/nodes-list';
+import consts from "consts/const_global";
+import NodesList from "node/lists/Nodes-List";
 import Serialization from "common/utils/Serialization";
+import PoolMiningWorker from "common/blockchain/interface-blockchain/mining-pools/miner/Pool-Mining-Worker";
 
 class MinerProtocol {
 
-    constructor(){
+    /**
+     *
+     * @param poolData should contain connectivity information
+     */
+    constructor(miningFeeThreshold, poolData){
 
-        NodesList.emitter.on("nodes-list/connected", (result) => { this._subscribeMiner(result) } );
-        NodesList.emitter.on("nodes-list/disconnected", (result ) => { this._unsubscribeMiner(result ) });
+        NodesList.emitter.on("nodes-list/connected", (result) => { 
+            this._subscribeMiner(result);
+        });
+        NodesList.emitter.on("nodes-list/disconnected", (result ) => {
+            this._unsubscribeMiner(result);
+        });
         
-        this._hashList = [];
+        //this stores the last sent hash
+        this._activeHash = consts.MINING_POOL.BASE_HASH_STRING;
 
         this._miningData = {blockData: undefined, difficultyTarget: undefined};
+        
+        this._miningWorker = new PoolMiningWorker(miningFeeThreshold);
     }
 
     _subscribeMiner(nodesListObject){
@@ -65,6 +78,7 @@ class MinerProtocol {
 
     }
     
+    /*
     getTaskResult() {
         return this._serializeHashList();
     }
@@ -83,10 +97,11 @@ class MinerProtocol {
 
         return Buffer.concat(list);
 
-    }
+    }*/
 
     async _mine(blockData, difficultyTarget) {
-
+        
+        this._miningWorker.mine(blockData, difficultyTarget);
     }
 
     async createMiningHashes(){
@@ -103,7 +118,13 @@ class MinerProtocol {
         return answer;
 
     }
+    
+    async run() {
+        
+        await this._mine(this._miningData.blockData, this._miningData.difficultyTarget);
+        
+    }
 
 }
 
-export default new MinerProtocol();
+export default MinerProtocol;

@@ -2,7 +2,7 @@ const BigInteger = require('big-integer');
 
 import consts from 'consts/const_global';
 import Convert from 'common/utils/Convert';
-import NodesList from 'node/lists/nodes-list';
+import NodesList from 'node/lists/Nodes-List';
 import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
@@ -37,7 +37,7 @@ class PoolLeaderProtocol {
         this._poolLeaderReward = 0;
 
         //TODO: Check is needed to store/load from database, Update hardcoded value
-        this._bestHash = new Buffer("00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex");
+        this._bestHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
 
         //TODO: this stores the entire reward of pool(miners + poolLeader), this goes to Accountant Tree
         this._poolRewardsAddress = null;

@@ -6,8 +6,8 @@
 // TUTORIAL BASED ON https://www.scaledrone.com/blog/posts/webrtc-chat-tutorial
 
 const EventEmitter = require('events');
-import SocketExtend from 'common/sockets/socket-extend'
-import NodesList from 'node/lists/nodes-list'
+import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
+import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import consts from 'consts/const_global'
@@ -69,7 +69,7 @@ class NodeWebPeerRTC {
 
     }
 
-    createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
+    async createPeer(initiator, socketSignaling, signalingServerConnectionId, callbackSignalingServerSendIceCandidate, remoteAddress, remoteUUID, remotePort, level){
 
         console.log('Using SCTP based data channels');
 
@@ -82,6 +82,8 @@ class NodeWebPeerRTC {
         this.peer =  new RTCPeerConnection(config);
 
         this.peer.connected = false;
+        this.peer.disconnected = true;
+
         this.enableEventsHandling();
 
         this.peer.onicecandidate = (event) => {
@@ -104,9 +106,16 @@ class NodeWebPeerRTC {
 
         console.log('Created webRTC peer', "initiator", initiator, "signalingServerConnectionId", signalingServerConnectionId, "remoteAddress", remoteAddress, "remoteUUID", remoteUUID, "remotePort", remotePort);
 
-        this.peer.disconnect = () => { this.peer.close()  };
+        this.peer.disconnect = () => {
+
+            this.emitter.removeAllListeners();
+            delete this._messages;
+
+            this.peer.close()
+        };
 
         this.socket =  this.peer;
+
         this.peer.signalData = null;
         this.peer.signalInitiatorData = null;
 
@@ -123,6 +132,7 @@ class NodeWebPeerRTC {
             this.peer.remoteAddress = remoteAddress||remoteData.address;
             this.peer.remoteUUID = remoteUUID||remoteData.uuid;
             this.peer.remotePort = remotePort||remoteData.port;
+            this.peer.webRTC = true;
 
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, socketSignaling.node.level + 1 );
 
@@ -194,7 +204,7 @@ class NodeWebPeerRTC {
 
                             },
                             (error) => {
-                                resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +error.toString()});
+                                resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +(error !== undefined ? error.toString() : '')});
                                 console.error("Generating Initiator - Error Setting Local Description ", error);
                             }
                         );
@@ -335,22 +345,27 @@ class NodeWebPeerRTC {
 
     // Hook up data channel event handlers
     setupDataChannel() {
+
         this.checkDataChannelState();
+
         this.peer.dataChannel.onopen = ()=>{this.checkDataChannelState()};
         this.peer.dataChannel.onclose = ()=>{ this.checkDataChannelState()};
         this.peer.dataChannel.onerror = ()=>{ this.checkDataChannelState()};
 
-        this.peer.oniceconnectionstatechange = () => {
+        this.peer.oniceconnectionstatechange = function() {
 
-            if(this.peer.iceConnectionState === 'disconnected') {
+            if (this.peer !== undefined && this.peer.iceConnectionState === 'disconnected') {
+
                 console.log('iceConnection Disconnected');
                 if (this.peer.connected === true) {
                     this.peer.connected = false;
+                    this.peer.disconnected = true;
 
                     this.emitter.emit("disconnect", {})
                 }
+
             }
-        };
+        }.bind(this);
 
         this.peer.dataChannel.onmessage = (event) => {
 
@@ -434,11 +449,14 @@ class NodeWebPeerRTC {
 
     checkDataChannelState() {
 
+        if (this.peer === undefined) return;
+
         console.log('WebRTC channel state is:', this.peer.dataChannel.readyState);
 
         if (this.peer.dataChannel.readyState === 'open') {
             if (!this.peer.connected ) {
                 this.peer.connected = true;
+                this.peer.disconnected = false;
                 this.emitter.emit("connect", {});
             }
         }
@@ -446,16 +464,17 @@ class NodeWebPeerRTC {
         if (this.peer.dataChannel.readyState === 'closed') {
             if (this.peer.connected){
                 this.peer.connected = false;
+                this.peer.disconnected = true;
                 this.emitter.emit("disconnect", {});
             }
         }
     }
 
 
-    initializePeer(validationDoubleConnectionsTypes){
+    async initializePeer(validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (NodesList.registerUniqueSocket(this.peer, CONNECTIONS_TYPE.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.peer, CONNECTIONS_TYPE.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 
@@ -465,9 +484,18 @@ class NodeWebPeerRTC {
         this.peer.on("disconnect", ()=>{
 
             console.log("Peer disconnected", this.peer.node.sckAddress.getAddress());
-            NodesList.disconnectSocket( this.peer );
 
-            NodeSignalingClientProtocol.webPeerDisconnected(this);
+            this.disconnected = true;
+            this.connected = false;
+
+            try {
+                NodesList.disconnectSocket(this.peer);
+
+                NodeSignalingClientProtocol.webPeerDisconnected(this);
+            } catch (exception){
+            }
+
+            delete this.peer;
 
         });
 
@@ -495,7 +523,7 @@ class NodeWebPeerRTC {
 
             let data = {name: name, value: value};
 
-            if (this.peer.dataChannel.readyState !== "open") {
+            if (this.peer !== undefined && this.peer.dataChannel.readyState !== "open") {
 
                 console.error("Error sending data to webRTC because it is not open", data);
                 this.peer.errorTrials++;
@@ -518,7 +546,10 @@ class NodeWebPeerRTC {
             let id = Math.floor( Math.random() * 10000000000);
 
             let i=0;
+
             while (i < chunks){
+
+                if (this.peer === undefined) return; //already disconnected
 
                 this.peer.dataChannel.send("chunk"+i+"/"+chunks+"@"+id+"#"+data.substr(i*SIZE, SIZE ));
                 i++;

@@ -1,10 +1,8 @@
 import consts from 'consts/const_global'
 import global from "consts/global"
-import Serialization from "common/utils/Serialization";
 import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
-import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-
+import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -20,7 +18,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
     _initializeMiniBlockchainLight(){
 
-        this.proofPi = null;
+        this.proofPi = undefined;
         this.blocks.clear();
         this.blocks.blocksStartingPoint = 0;
 
@@ -65,7 +63,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             ) throw {message: "Error Including Blockchain Light Block"};
 
             if (saveBlock )
-                this.propagateBlocks(block.height, socketsAvoidBroadcast)
+                NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
 
         } else {
 
@@ -152,7 +150,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             // console.warn("this.blocks.blocksStartingPoint ", this.blocks.blocksStartingPoint );
 
             let treeSerialization = this.getSerializedAccountantTree(diffIndex);
-            //console.warn("this.getSerializedAccountantTree ", diffIndex, treeSerialization !== undefined ? treeSerialization.toString('hex') : '');
 
             if (! (await this.accountantTree.saveMiniAccountant(true, undefined, treeSerialization)))
                 throw {message: "saveMiniAccountant", diffIndex};
@@ -302,7 +299,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
             this._difficultyNotValidated = false;
 
-            if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, answer.numBlocks - answer.diffIndex -1 )))
+            if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, answer.diffIndex -1 )))
                 throw {message: "Problem loading the blockchain"};
 
             //check the accountant Tree if matches
@@ -366,16 +363,14 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         //delete serializations older than [:-m]
 
-        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
+        let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES - 2;
 
-        while (this.lightAccountantTreeSerializations.hasOwnProperty(index)){
+        while (this.lightPrevDifficultyTargets.hasOwnProperty(index)){
+
             delete this.lightAccountantTreeSerializations[index];
             delete this.lightPrevDifficultyTargets[index];
             delete this.lightPrevHashPrevs[index];
             delete this.lightPrevTimeStamps[index];
-
-            if ( this.blocksStartingPoint === index )
-                this.blocksStartingPoint++;
 
             index--;
         }
@@ -389,9 +384,9 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         if (this.agent !== undefined && this.agent.light === true && height !== 0) {
 
-            if (this.proofPi !== null) {
+            if (this.proofPi !== undefined) {
                 let proofPiBlock = this.proofPi.hasBlock(height-1);
-                if (proofPiBlock !== null)
+                if (proofPiBlock !== undefined && proofPiBlock !== null)
                     return proofPiBlock;
             }
 

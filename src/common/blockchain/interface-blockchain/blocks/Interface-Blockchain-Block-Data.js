@@ -36,6 +36,16 @@ class InterfaceBlockchainBlockData {
 
     }
 
+    destroyBlockData(){
+
+        this.blockchain = undefined;
+        this._minerAddress = undefined;
+
+        this.transactions.destroyBlockDataTransactions();
+        this.transactions = undefined;
+
+    }
+
     validateBlockData(blockHeight, blockValidation){
 
         if (!Buffer.isBuffer(this.minerAddress) || this.minerAddress.length !==  consts.ADDRESSES.ADDRESS.LENGTH )
@@ -45,13 +55,20 @@ class InterfaceBlockchainBlockData {
             throw {message: 'hashData is empty'};
 
         //validate hash
-        let hashData = this.calculateHashBlockData();
+        if (!blockValidation.blockValidationType["skip-block-data-validation"]) {
 
-        if (! BufferExtended.safeCompare(hashData, this.hashData))
-            throw {message: "block.data hashData is not right"};
+            let hashData = this.calculateHashBlockData();
 
-        if (!this.transactions.validateTransactions(blockHeight, blockValidation.blockValidationType ))
-            throw {message: "transactions failed to validate"};
+            if (!BufferExtended.safeCompare(hashData, this.hashData))
+                throw {message: "block.data hashData is not right"};
+        }
+
+        if (!blockValidation.blockValidationType["skip-block-data-transactions-validation"]) {
+
+            if (!this.transactions.validateTransactions(blockHeight, blockValidation.blockValidationType))
+                throw {message: "transactions failed to validate"};
+
+        }
 
         return true;
     }

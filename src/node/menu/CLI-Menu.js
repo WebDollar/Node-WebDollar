@@ -1,10 +1,14 @@
-import {Node, Blockchain} from '../../index.js';
 const FileSystem = require('fs');
 const readline = require('readline');
-import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 
-class CLI{
+import consts from 'consts/const_global';
+import {Node, Blockchain} from '../../index.js';
+import AdvancedMessages from './Advanced-Messages';
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import PoolLeaderProtocol from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolLeaderProtocol';
+
+class CLI {
 
     constructor(){
 
@@ -61,6 +65,12 @@ class CLI{
             case '9':
                 await this.startMining(true);
                 break;
+            case 'p':
+                await this.startMiningInsidePool();
+                break;
+            case 'c':
+                await this.createMiningPool();
+                break;
             case 'exit':
                 this._exitMenu = true;
                 break;
@@ -84,13 +94,23 @@ class CLI{
         await this._runMenu();
     }
 
+    async _pickNumber(message, isFloat = false) {
+        
+        let answer = await this.question(message);
+        
+        let num = isFloat ? parseFloat(answer) : parseInt(answer);
+        if (isNaN(num))
+            return NaN;
+
+        return num;
+    }
+    
     async _chooseAddress() {
 
         await this.listAddresses();
 
-        let answer = await this.question('Choose the address number: ');
+        let addressId = await this._pickNumber('Choose the address number: ');
 
-        let addressId = parseInt(answer);
         if (isNaN(addressId) || addressId < 0 || Blockchain.Wallet.addresses.length <= addressId)
             return -1;
 
@@ -350,6 +370,42 @@ class CLI{
         }
 
     }
+    
+    async startMiningInsidePool(){
+        
+        console.info('Mining inside a pool.');
+        console.info('Your current mining pool is: ', 'demo at the moment');
+        
+        return new Promise ( async (resolve)=> {
+            let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool');
+            
+            if (response == false) {
+                let miningPoolLink = await this.question('Enter the new mining pool link: ');
+                console.info('Your new mining pool is: ', miningPoolLink);
+                //TODO: Save the mining pool link
+            }
+            
+            //TODO: Code for start mining inside a pool
+            
+            resolve(true);
+        });
+    }
+    
+    async createMiningPool(){
+        
+        console.info('Create Mining Pool.');
+        
+        let poolLeaderFee = await this._pickNumber('Choose a fee(0...100): ', true);
+        
+        if (isNaN(poolLeaderFee) || poolLeaderFee < 0 || 100 < poolLeaderFee){
+            console.log("You have entered an invalid number:", poolLeaderFee);
+            return false;
+        }
+        else
+            console.log("your fee is", poolLeaderFee);
+
+        let poolLeader = new PoolLeaderProtocol(poolLeaderFee);
+    }
 
     question(message){
 
@@ -372,7 +428,9 @@ const commands = [
         '6. Encrypt address',
         '7. Set mining address',
         '8. Start Mining',
-        '9. Start Mining Genesis Instantly',
+        '9. Start Mining Instantly Even Unsynchronized',
+        'p. Start Mining Inside a Pool',
+        'c. Create a New Mining Pool',
     ];
 
 const lineSeparator =

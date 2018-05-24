@@ -10,8 +10,8 @@ class PPoWBlockchainProver{
         this.proofActivated = true;
 
         this.blockchain = blockchain;
-        this.proofPi = null;
-        this.proofXi = null;
+        this.proofPi = undefined;
+        this.proofXi = undefined;
 
     }
 
@@ -36,6 +36,8 @@ class PPoWBlockchainProver{
         let chainLength =  chain.blocks.length;
 
         try {
+
+            console.info("_createProofPi ProofPi CREATOR");
 
             //for µ = |C[−k].interlink| down to 0 do
 
@@ -73,6 +75,8 @@ class PPoWBlockchainProver{
                         B = superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m];
 
                 }
+
+            console.info("_createProofPi ProofPi FINAL");
 
         } catch (exception){
 
@@ -112,11 +116,16 @@ class PPoWBlockchainProver{
         if ( !this.proofActivated )
             return false;
 
+        if (this.proofPi !== undefined){
+            this.proofPi.destroyProof();
+        }
+
         this.proofPi = this._createProofPi(this.blockchain);
-        this.proofXi = this._createProofXi(this.blockchain);
+
+        //this.proofXi = this._createProofXi(this.blockchain);
 
         // if (consts.DEBUG)
-        //     if (this.proofPi !== null && this.proofXi !== null)
+        //     if (this.proofPi !== undefined && this.proofXi !== null)
         //         this.blockchain.verifier.validateChain(this.proofPi, this.proofXi);
 
     }

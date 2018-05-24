@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
 import SignalingClientPeerObject from './signaling-client-peer-object';
 import NodeWebPeerRTC from "node/webrtc/web-peer/node-web-peer-webRTC";
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingClientService from "../signaling-client-service/Node-Signaling-Client-Service"
 /*
     The List is populated with Node Sockets who are available for WebRTC
@@ -90,7 +90,7 @@ class SignalingClientList {
     }
 
     computeMaxWebPeersConnected( uuid ){
-        return consts.SETTINGS.PARAMS.CONNECTIONS.WEBRTC.MAXIMUM_CONNECTIONS + (this.findWebPeerSignalingClientList( undefined, undefined, uuid ) !== -1 ? 1 : 0 )
+        return consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.WEBRTC.MAXIMUM_CONNECTIONS + (this.findWebPeerSignalingClientList( undefined, undefined, uuid ) !== -1 ? 1 : 0 )
     }
 
     countConnectedByType(signalingClientType){

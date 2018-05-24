@@ -25,6 +25,23 @@ class Serialization{
 
         return buffer;
     }
+
+    serializeBigNumber( bigNumber, length ){
+        //converting number value into a buffer
+
+        let buffer = new Buffer(length);
+        let count = length-1;
+
+        while (bigNumber.isGreaterThan(0)){
+
+            buffer[count] = bigNumber.modulo(256).toNumber();
+            bigNumber = bigNumber.dividedToIntegerBy(256);
+
+            count --;
+        }
+
+        return buffer;
+    }
     
     serializeNumber1Byte(data){
         //converting number value into a buffer

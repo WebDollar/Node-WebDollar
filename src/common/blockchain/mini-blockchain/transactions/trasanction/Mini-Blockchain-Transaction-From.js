@@ -74,14 +74,14 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
     }
 
 
-    processTransactionFrom(multiplicationFactor = 1, revertActions){
+    processTransactionFrom(multiplicationFactor = 1, revertActions, showUpdate){
 
         for (let i = 0; i < this.addresses.length; i++) {
 
             if (!WebDollarCoins.validateCoinsNumber(this.addresses[i].amount))
                 throw {message: "amount is not number",  address: this.addresses[i]};
 
-            this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, - this.addresses[i].amount * multiplicationFactor, this.currencyTokenId, revertActions);
+            this.transaction.blockchain.accountantTree.updateAccount( this.addresses[i].unencodedAddress, - this.addresses[i].amount * multiplicationFactor, this.currencyTokenId, revertActions, showUpdate);
 
         }
 

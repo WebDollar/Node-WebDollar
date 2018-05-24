@@ -1,5 +1,5 @@
 import BlockchainnetworkTime from "./Blockchain-Network-Adjusted-Time"
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class BlockchainTimestamp{
@@ -39,19 +39,7 @@ class BlockchainTimestamp{
     }
 
 
-    _initializeNewSocket(nodesListObject){
-
-        let socket = nodesListObject.socket;
-
-        socket.node.on("timestamp/request-timeUTC", (data) => {
-            try {
-
-                this._sendUTC(socket);
-
-            } catch (exception){
-
-            }
-        });
+    _initializeNewSocket(socket){
 
     }
 

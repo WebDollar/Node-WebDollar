@@ -26,11 +26,14 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let mid = Math.trunc((left + right) / 2);
 
-            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
             answer = await socket.node.sendRequestWaitOnce("head/hash", mid, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
-            if (left < 0 || answer === null || !Buffer.isBuffer(answer.hash) )
+            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
+
+            if (left < 0 || answer === null  || !Buffer.isBuffer(answer.hash) ) // timeout
                 return {position: null, header: answer };
+
+            await this.blockchain.sleep(7);
 
             //i have finished the binary search
             if (left >= right) {
@@ -45,9 +48,11 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         answer = await socket.node.sendRequestWaitOnce("head/hash", mid-1, mid-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
-                        if ( answer !== null && Buffer.isBuffer(answer.hash) )
-                            if (answer.hash.equals( this.blockchain.getHashPrev(mid-1 +1) ) )
-                                return {position: mid-1, header: answer.hash };
+                        if (answer === null || !Buffer.isBuffer(answer.hash))
+                            return {position: null, header: answer }; // timeout
+
+                        if (answer.hash.equals( this.blockchain.getHashPrev(mid-1 +1) ) ) // it is a match
+                            return {position: mid-1, header: answer.hash };
 
                     }
 
@@ -94,33 +99,28 @@ class InterfaceBlockchainProtocolForkSolver{
         may the fork be with you Otto
      */
 
+
+
     //TODO it will not update positions
-    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHeader, forkProof ){
+    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof ){
 
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.blocks.length;
 
-        let fork;
+        let fork, forkFound;
+        let headers = [forkLastBlockHash];
 
         try{
 
             if (!this.blockchain.agent.light  && currentBlockchainLength > forkChainLength)
                 throw {message: "discoverAndProcessFork - fork is smaller fork than mine"};
 
-            let forkFound = this.blockchain.forksAdministrator.findForkBySockets(socket);
-            if ( forkFound !== null ) {
-                console.error("discoverAndProcessFork - fork already found by socket");
-                return {result: true, fork: forkFound};
-            }
+            await this.blockchain.sleep(10);
 
-            forkFound = this.blockchain.forksAdministrator.findForkByHeaders(forkLastBlockHeader);
-            if ( forkFound !== null ) {
+            let answer = this.blockchain.forksAdministrator.findFork(socket, forkLastBlockHash, forkProof);
+            if (answer !== null) return answer;
 
-                console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
-                forkFound._pushSocket(socket, forkProof );
-                return {result: true, fork: forkFound};
-
-            }
+            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [ forkLastBlockHash ], false );
 
             //optimization
             //check if n-2 was ok, but I need at least 1 block
@@ -129,15 +129,30 @@ class InterfaceBlockchainProtocolForkSolver{
                 let answer = await socket.node.sendRequestWaitOnce( "head/hash", currentBlockchainLength-1, currentBlockchainLength-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                 if (answer === null || answer.hash === undefined) throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };
 
-                if (  this.blockchain.blocks.last.hash.equals( answer.hash ) )
+                if (  this.blockchain.blocks.last.hash.equals( answer.hash ) ) {
                     binarySearchResult = {
-                        position : currentBlockchainLength,
+                        position: currentBlockchainLength,
                         header: answer.hash,
                     };
 
-            }
+                    forkFound = this.blockchain.forksAdministrator._findForkyByHeader(answer.hash);
 
-            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [forkLastBlockHeader], false );
+                    if (forkFound !== null && forkFound !== fork) {
+                        if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
+
+                        forkFound.pushHeader( forkLastBlockHash ); //this lead to a new fork
+                        forkFound.pushSocket(socket, forkProof);
+
+                        this.blockchain.forksAdministrator.deleteFork(fork); //destroy fork
+
+                        return {result: true, fork: forkFound};
+                    }
+
+                    fork.pushHeader(binarySearchResult.header);
+
+                }
+
+            }
 
             // in case it was you solved previously && there is something in the blockchain
 
@@ -158,6 +173,22 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === null)
                     throw {message: "connection dropped discoverForkBinarySearch"}
 
+                forkFound = this.blockchain.forksAdministrator._findForkyByHeader(binarySearchResult.header);
+
+                if ( forkFound !== null && forkFound !== fork ){
+
+                    if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by hash after binary search");
+
+                    forkFound.pushHeader( forkLastBlockHash );
+                    forkFound.pushSocket( socket, forkProof );
+
+                    this.blockchain.forksAdministrator.deleteFork(fork); //destroy fork
+
+                    return {result: true, fork: forkFound};
+                }
+
+                fork.pushHeader(binarySearchResult.header);
+
             }
 
             //process light and NiPoPow
@@ -172,14 +203,15 @@ class InterfaceBlockchainProtocolForkSolver{
                     binarySearchResult.position = 0;
 
                 //maximum blocks to download
-                if (!this.blockchain.agent.light)
+                if ( !this.blockchain.agent.light && forkChainLength >= this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD){
+                    fork.downloadAllBlocks = true;
                     forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
+                }
 
                 fork.forkStartingHeight = binarySearchResult.position;
                 fork.forkStartingHeightDownloading  = binarySearchResult.position;
                 fork.forkChainStartingPoint = forkChainStartingPoint;
                 fork.forkChainLength = forkChainLength;
-                fork.forkHeaders.push(binarySearchResult.header);
 
                 await fork.initializeFork(); //download the requirements and make it ready
 
@@ -191,6 +223,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 console.log("fork is something new");
                 throw {message: "fork is something new", binarySearchResult:binarySearchResult, forkChainStartingPoint:forkChainStartingPoint, forkChainLength:forkChainLength} ;
             }
+
+            await this.blockchain.sleep(30);
 
 
             return {result: true, fork:fork };
@@ -213,6 +247,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 console.warn("BANNNNNNNNNNNNNNNNN", socket.node.sckAddress.toString(), exception.message);
                 BansList.addBan(socket, 2000, exception.message);
             }
+
+            await this.blockchain.sleep(10);
 
             return { result:false, error: exception };
 
@@ -277,14 +313,16 @@ class InterfaceBlockchainProtocolForkSolver{
             let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
             let block = this._deserializeForkBlock(fork, answer.block, nextBlockHeight, blockValidation );
 
+            if (!fork.downloadAllBlocks) await this.blockchain.sleep(15);
+
             let result;
 
             try {
 
                 result = await fork.includeForkBlock(block);
 
-                if (block.interlink !== undefined)
-                    console.log("block.interlink", block.interlink.length);
+                // if (block.interlink !== undefined)
+                //     console.log("block.interlink", block.interlink.length);
 
             } catch (Exception) {
 
@@ -299,6 +337,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 nextBlockHeight++;
             else
                 throw {message: "Fork didn't work at height ", nextBlockHeight};
+
+            if (!fork.downloadAllBlocks) await this.blockchain.sleep(30);
 
         }
 

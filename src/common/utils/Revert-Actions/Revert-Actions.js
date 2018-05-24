@@ -17,18 +17,18 @@ class RevertActions {
 
             let action = this._actions [i];
 
-
             let done = true;
 
             try {
+
                 if (action.name === "revert-updateAccount" && (actionName === '' || actionName === action.name)) {
 
-                    this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId);
+                    this.blockchain.accountantTree.updateAccount(action.address, -action.value, action.tokenId, undefined, action.showUpdate);
 
                 }
                 else if (action.name === "revert-updateAccountNonce" && (actionName === '' || actionName === action.name)) {
 
-                    this.blockchain.accountantTree.updateAccountNonce(action.address, -action.nonceChange, action.tokenId);
+                    this.blockchain.accountantTree.updateAccountNonce(action.address, -action.nonceChange, action.tokenId, undefined, action.showUpdate);
 
                 }
                 else if (action.name === "revert-skip-validation-transactions-from-values" && (actionName === '' || actionName === action.name)) {
@@ -37,7 +37,7 @@ class RevertActions {
                 }
                 else if (action.name === "block-added" && (actionName === '' || actionName === action.name)) {
 
-                    this.blockchain.blocks.spliceBlocks(action.height);
+                    this.blockchain.blocks.spliceBlocks(action.height, true);
 
                 } else if (action.name === "breakpoint" && (actionName === '' || actionName === action.name)) {
 
@@ -64,6 +64,32 @@ class RevertActions {
 
         }
 
+
+    }
+
+    clearUntilBreakpoint(){
+
+        for (let i=this._actions .length-1; i>=0; i--) {
+
+            let action = this._actions[i];
+
+            if (action.name === "breakpoint") {
+
+                this._actions.splice(i);
+                return;
+
+            }
+
+        }
+
+        this._actions = [];
+
+    }
+
+    destroyRevertActions(){
+
+        this.blockchain = undefined;
+        this._actions = [];
 
     }
 

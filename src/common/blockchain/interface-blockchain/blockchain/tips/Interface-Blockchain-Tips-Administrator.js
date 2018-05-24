@@ -1,5 +1,5 @@
 import InterfaceBlockchainTip from './Interface-Blockchain-Tip'
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import BansList from "common/utils/bans/BansList"
 
 /**
@@ -27,10 +27,16 @@ class InterfaceBlockchainTipsAdministrator {
             for (let i = 0; i < this._tips.length; i++)
                 if (this._tips[i].socket === nodesListObject.socket ) {
 
-                    if (this._tips[i].forkResolve !== undefined)
-                        this._tips[i].forkResolve(true);
+                    try {
+                        if (this._tips[i].forkResolve !== undefined)
+                            this._tips[i].forkResolve(true);
+                    } catch (exception){
 
+                    }
+
+                    this._tips[i].socket = undefined;
                     this._tips.splice(i,1);
+
                     return true;
 
                 }

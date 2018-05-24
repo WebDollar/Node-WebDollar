@@ -30,7 +30,14 @@ class InterfaceBlockchainTransaction{
         if (timeLock === undefined)
             this.timeLock = blockchain.blocks.length-1;
 
-        this.version = version||0x00; //version
+        if (version === undefined){
+
+            if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
+            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x01;
+
+        }
+
+        this.version = version; //version
 
         try {
 
@@ -68,12 +75,19 @@ class InterfaceBlockchainTransaction{
         if (nonce === undefined || nonce === null)
             nonce = this._computeNonce();
 
+        if (version === 0x00) nonce = nonce % 0x100;
+        else if (version === 0x01) nonce = nonce % 0X10000;
+
         this.nonce = nonce; //1 bytes
 
         if (txId === undefined || txId === null)
             txId = this._computeTxId();
 
         this.txId = txId;
+    }
+
+    destroyTransaction(){
+        this.blockchain = undefined;
     }
 
     _createTransactionFrom(from){
@@ -126,10 +140,14 @@ class InterfaceBlockchainTransaction{
         if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
         if (typeof this.timeLock !== "number") throw {message: 'timeLock is empty', timeLock:this.timeLock};
 
-        if (this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
+        if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
+        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x01) throw {message: "version is ivnalid", version: this.version};
+
+        if (this.nonce > 0xFFFF) throw {message: "nonce is ivnalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
 
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock, blockHeight: blockHeight };
+        if (this.timeLock - blockHeight > 100) throw { message: "timelock - blockHeight < 100", timelock : this.timelock };
 
         let txId = this._computeTxId();
         if (! BufferExtended.safeCompare(txId, this.txId ) ) throw {message: "txid don't match"};
@@ -182,9 +200,10 @@ class InterfaceBlockchainTransaction{
     }
 
 
-    isTransactionOK(){
+    isTransactionOK(avoidValidatingSignature = false){
 
-        this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
+        if (!avoidValidatingSignature)
+            this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
 
         try {
             let blockValidationType = {
@@ -211,14 +230,21 @@ class InterfaceBlockchainTransaction{
         let array = [
 
             Serialization.serializeNumber1Byte( this.version ),
-            Serialization.serializeNumber1Byte( this.nonce ),
+
+            this.version === 0x00 ? Serialization.serializeNumber1Byte( this.nonce ) :  Serialization.serializeNumber2Bytes( this.nonce ),
+
             Serialization.serializeNumber3Bytes( this.timeLock ), //16777216 it should be to 4 bytes afterwards
 
             this.from.serializeFrom(),
             this.to.serializeTo(),
+
         ];
 
         return Buffer.concat (array);
+    }
+
+    serializeTransactionId(){
+        return this.txId;
     }
 
     deserializeTransaction(buffer, offset){
@@ -233,8 +259,14 @@ class InterfaceBlockchainTransaction{
             this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
             offset += 1;
 
-            this.nonce =   Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
-            offset += 1;
+            //hard fork
+            if (this.version === 0x00){
+                this.nonce = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 1));
+                offset += 1;
+            } else if (this.version === 0x01){
+                this.nonce = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 2));
+                offset += 2;
+            }
 
             this.timeLock =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 3) );
             offset += 3;
@@ -282,27 +314,27 @@ class InterfaceBlockchainTransaction{
         return true;
     }
 
-    processTransaction(multiplicationFactor = 1 , minerAddress, revertActions){
+    processTransaction(multiplicationFactor = 1 , minerAddress, revertActions, showUpdate){
 
-        if ( multiplicationFactor === 1 ) {
-
-            //nonce
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions)) return false;
-
-            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false;
-            if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
-
-            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions) === null) return false;
-
-        } else if (multiplicationFactor === -1) {
+        if ( multiplicationFactor === 1 ) { // adding transaction
 
             //nonce
-            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions) === null) return false;
+            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
 
-            if (!this.to.processTransactionTo(multiplicationFactor, revertActions)) return false;
-            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions)) return false;
+            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
+            if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
 
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions)) return false;
+            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions, showUpdate) === null) return false;
+
+        } else if (multiplicationFactor === -1) { // removing transaction
+
+            //nonce
+            if (this._processTransactionFees(multiplicationFactor, minerAddress, revertActions, showUpdate) === null) return false;
+
+            if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
+            if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
+
+            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
 
 
         }else

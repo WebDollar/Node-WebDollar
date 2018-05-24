@@ -1,10 +1,20 @@
 import * as io from 'socket.io-client';
 
 import consts from 'consts/const_global'
-import SocketExtend from 'common/sockets/socket-extend'
-import SocketAddress from 'common/sockets/socket-address'
-import NodesList from 'node/lists/nodes-list'
+import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
+import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
+import NodesList from 'node/lists/Nodes-List'
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
+import NODES_TYPE from "node/lists/types/Nodes-Type";
+import Blockchain from "main-blockchain/Blockchain"
+import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'
+
+let NodeExpress, NodeServer;
+
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+}
 
 class NodeClient {
 
@@ -16,7 +26,13 @@ class NodeClient {
 
     }
 
-    connectTo(address, port, level){
+    connectToWaitlist(waitlist, index){
+
+        return this.connectTo( waitlist.sckAddresses[index], undefined, waitlist.level+1, waitlist.sckAddresses[index].SSL, waitlist )
+
+    }
+
+    connectTo(address, port, level, SSL, waitlist){
 
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
@@ -26,13 +42,17 @@ class NodeClient {
             return false;
         }
 
-        address = sckAddress.getAddress(false);
+        address = sckAddress.getAddress(true, true);
         port = sckAddress.port;
 
         return new Promise( (resolve) => {
 
+            let timeoutConnection = 7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 );
+            let timeoutTotal =  7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
+
             try
             {
+
                 if ( address.length < 3 ){
                     console.log("rejecting address... invalid ",address);
                     resolve(false);
@@ -40,9 +60,12 @@ class NodeClient {
                 }
 
                 // in case the port is not included
-                if (address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
 
-                if (address.indexOf("http" + (consts.SETTINGS.NODE.SSL ? 's' : '') +"://") === -1 )  address = "http"+ (consts.SETTINGS.NODE.SSL ? 's' : '') +"://"+address;
+                if (port !== undefined && address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
+
+                //it is required in browser to use SSL
+                if (process.env.BROWSER && consts.SETTINGS.NODE.SSL )
+                    SSL = true;
 
                 console.log("connecting... to:                ", address);
 
@@ -55,10 +78,20 @@ class NodeClient {
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
 
-                        connection_timeout : 20000,
-                        timeout: 20000,
+                        connection_timeout : timeoutTotal,
+                        timeout: timeoutTotal,
 
-                        secure: consts.SETTINGS.NODE.SSL, //https
+                        secure: SSL, //https
+
+                        query:{
+                            msg: "HelloNode",
+                            version: consts.SETTINGS.NODE.VERSION,
+                            uuid: consts.SETTINGS.UUID,
+                            nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
+                            UTC: Blockchain.blockchain.timestamp.timeUTC,
+                            domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
+                        },
+
                     });
 
                 }  catch (Exception){
@@ -68,24 +101,34 @@ class NodeClient {
                 }
                 this.socket = socket;
 
+                NodePropagationProtocol.initializeNodesSimpleWaitlist(socket);
 
-                socket.once("connect", ( response ) =>{
+                socket.once("connect", async ( response ) =>{
 
                     //Connection Established
 
-                    SocketExtend.extendSocket( socket, socket.io.opts.hostname||sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
+                    SocketExtend.extendSocket( socket, socket.io.opts.hostname || sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
 
-                    console.warn("Client connected to " + socket.node.sckAddress.getAddress(true) );
+                    console.warn("Client connected to " + socket.node.sckAddress.address);
 
-                    socket.node.protocol.sendHello(["ip","uuid"]).then( (answer)=>{
+                    let timeout = setTimeout(()=>{
 
-                        if (answer)
-                            this.initializeSocket(socket, ["ip", "uuid"]);
-                        else
-                            socket.disconnect();
+                        socket.disconnect();
+                        resolve(false);
 
-                        resolve(answer);
-                    });
+                    }, timeoutConnection);
+
+
+                    let answer = await socket.node.protocol.sendHello(["ip","uuid"]);
+
+                    clearTimeout(timeout);
+
+                    if (answer)
+                        await this.initializeSocket( ["ip", "uuid"], waitlist);
+                    else
+                        socket.disconnect();
+
+                    resolve(answer);
 
                 });
 
@@ -115,19 +158,23 @@ class NodeClient {
 
             setTimeout(()=>{
                 resolve(false);
-            }, 15000)
+            }, timeoutTotal + Math.floor(Math.random() * 5*1000));
 
         });
 
+
+
     }
 
-    initializeSocket(validationDoubleConnectionsTypes){
+    async initializeSocket(validationDoubleConnectionsTypes, waitlist){
 
         //it is not unique... then I have to disconnect
 
-        if (NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
             return false;
         }
+
+        waitlist.socketConnected(this.socket);
 
         console.log('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true));
 
@@ -135,8 +182,14 @@ class NodeClient {
 
             //disconnect over the time, so it was connected before
 
-            console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true) );
-            NodesList.disconnectSocket(this.socket);
+            try {
+                console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true));
+                NodesList.disconnectSocket(this.socket);
+            } catch (exception){
+
+            }
+
+            delete this.socket;
 
         });
 

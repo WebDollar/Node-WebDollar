@@ -1,10 +1,11 @@
-import NodesList from 'node/lists/nodes-list'
+import NodesList from 'node/lists/Nodes-List'
 import InterfaceBlockchainProtocolForkSolver from './Interface-Blockchain-Protocol-Fork-Solver'
 import InterfaceBlockchainProtocolForksManager from "./Interface-Blockchain-Protocol-Forks-Manager"
 
 import Serialization from 'common/utils/Serialization';
-import NodeProtocol from 'common/sockets/protocol/node-protocol'
+import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol'
 import BufferExtended from "common/utils/BufferExtended"
+import NodeBlockchainPropagation from "../../../sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 /**
  * Blockchain Protocol
@@ -62,18 +63,6 @@ class InterfaceBlockchainProtocol {
         this.forksManager = new InterfaceBlockchainProtocolForksManager(this.blockchain, this);
     }
 
-    propagateHeader(block,  socketsAvoidBroadcast){
-
-        // broadcasting the new block, to everybody else
-        NodeProtocol.broadcastRequest( "head/new-block", {
-            l: this.blockchain.blocks.length,
-            h: this.blockchain.blocks.last.hash,
-            s: this.blockchain.blocks.blocksStartingPoint,
-            p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== null && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
-        }, "all", socketsAvoidBroadcast);
-
-    }
-
     _validateBlockchainHeader(data){
 
         if ( data === undefined || data === null) throw {message: "data is not defined"};
@@ -116,19 +105,19 @@ class InterfaceBlockchainProtocol {
         if (this.acceptBlockHeaders)
             socket.node.on("head/last-block",  ()=>{
 
-                if (this.blockchain.blocks.length > 0) {
+                if (this.blockchain.blocks.length > 0 && this.blockchain.blocks.last !== undefined) {
                     socket.node.sendRequest("head/last-block/a", {
                         l: this.blockchain.blocks.length,
                         h: this.blockchain.blocks.last.hash,
                         s: this.blockchain.blocks.blocksStartingPoint,
-                        p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== null && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
+                        p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== undefined && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
                     } );
                 }
 
             });
 
         if (this.acceptBlockHeaders)
-            socket.node.on("head/new-block",  (data) => {
+            socket.node.on("head/new-block", async (data) => {
 
                 try {
 
@@ -143,6 +132,8 @@ class InterfaceBlockchainProtocol {
                     if (Math.random() < 0.1)
                         console.log("newForkTip", data.l );
 
+                    await this.blockchain.sleep(15+Math.random()*20);
+
                     this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
 
                 } catch (exception){
@@ -152,11 +143,13 @@ class InterfaceBlockchainProtocol {
             });
 
         if (this.acceptBlockHeaders)
-            socket.node.on("head/hash", (h) => {
+            socket.node.on("head/hash", async (h) => {
 
                 try {
 
                     // height
+
+                    await this.blockchain.sleep(15+Math.random()*20);
 
                     if (typeof h !== 'number' || this.blockchain.blocks.length <= h) {
                         socket.node.sendRequest("head/hash", null);
@@ -177,7 +170,7 @@ class InterfaceBlockchainProtocol {
 
         if (this.acceptBlocks)
 
-            socket.node.on("blockchain/blocks/request-block-by-height", (data) => {
+            socket.node.on("blockchain/blocks/request-block-by-height", async (data) => {
 
                 // data.height
                 // data.onlyHeader
@@ -194,6 +187,8 @@ class InterfaceBlockchainProtocol {
 
                     if (block === undefined)
                         throw {message: "block is empty", height: data.height};
+
+                    await this.blockchain.sleep( 15 + Math.random() * 20 );
 
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                         result: true,
@@ -231,10 +226,14 @@ class InterfaceBlockchainProtocol {
 
             if (data === null) return false;
 
-            this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
+            await this.blockchain.sleep(15+Math.random()*20);
+
+            return await this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
 
         } catch (exception){
 
+            console.error("Error asking for Blockchain", exception);
+            return false;
         }
 
     }

@@ -18,14 +18,12 @@ import InterfaceRadixTreeEdge from "./Interface-Radix-Tree-Edge"
 import InterfaceTree from "common/trees/Interface-Tree"
 import BufferExtended from "common/utils/BufferExtended"
 
-class InterfaceRadixTree extends InterfaceTree{
+class InterfaceRadixTree extends InterfaceTree {
 
     createRoot(){
         this.root = new InterfaceRadixTreeNode(null, null, [], null);
         this.root.root = this.root;
     }
-
-
 
     /**
      * Adding an input to the Radix Tree
@@ -207,9 +205,11 @@ class InterfaceRadixTree extends InterfaceTree{
         node._previousEdges = node.edges.slice();
         node.edges = [];
 
+
         // node must be deleted
         while ( !finished && node !== null){
 
+            let toDelete = node;
             let nodeParent = node.parent;
 
             finished = true;
@@ -246,6 +246,10 @@ class InterfaceRadixTree extends InterfaceTree{
                         break;
 
                     } else
+
+                    // prefix slow => slowly
+                    //             => slowby
+
                     if ( node._previousEdges.length > 1 ){
 
                         node.edges = node._previousEdges;
@@ -293,8 +297,9 @@ class InterfaceRadixTree extends InterfaceTree{
                         //console.log("this._changedNode 1_4");
                     }
 
-                    finished = false;
                     nodeParent = node.parent;
+
+                    finished = false;
 
                     //console.log("this._changedNode 2");
 
@@ -312,10 +317,11 @@ class InterfaceRadixTree extends InterfaceTree{
                     if (nodeParent.edges[i].targetNode === node) {
 
                         nodeParent.edges.splice(i, 1);
-                        finished = false;
 
                         node = node.parent;
                         nodeParent = node.parent;
+
+                        finished = false;
 
                         //console.log(" this._changedNode 3 ");
 
@@ -323,8 +329,17 @@ class InterfaceRadixTree extends InterfaceTree{
                     }
             }
 
+            // in case we actually deleted a node
+            if (toDelete !== node ) {
+                toDelete.edges = [];
+                toDelete._previousEdges = [];
+                toDelete.destroyNode();
+
+            }
+
         }
 
+        //for testing only
 
         //console.log("this.printLevelSearch() node", node);
         //this.printLevelSearch();

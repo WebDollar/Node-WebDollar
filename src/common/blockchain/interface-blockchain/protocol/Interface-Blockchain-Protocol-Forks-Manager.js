@@ -15,7 +15,7 @@ class InterfaceBlockchainProtocolForksManager {
     /*
         may the fork2 be with you Otto
     */
-    async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader, forkProof){
+    async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHash, forkProof){
 
         try {
 
@@ -24,7 +24,7 @@ class InterfaceBlockchainProtocolForksManager {
 
             if (newChainStartingPoint > newChainLength) throw "Incorrect newChainStartingPoint";
             if (newChainStartingPoint < 0) throw "Incorrect2 newChainStartingPoint";
-            if (newChainStartingPoint > forkLastBlockHeader.height) throw "Incorrect3 newChainStartingPoint";
+            if (newChainStartingPoint > this.blockchain.blocks.length) throw {message: "Incorrect3 newChainStartingPoint", newChainStartingPoint:newChainStartingPoint, blocks: this.blockchain.blocks.length};
 
             //for Light Nodes, I am also processing the smaller blocks
 
@@ -32,33 +32,46 @@ class InterfaceBlockchainProtocolForksManager {
             if (( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof)) && newChainLength > 0 && this.blockchain.blocks.length === newChainLength )) {
 
                 //in case the hashes are exactly the same, there is no reason why we should download it
-                if ( this.blockchain.blocks[this.blockchain.blocks.length - 1].hash.compare( forkLastBlockHeader ) <= 0)
-                    return;
+                let comparison = this.blockchain.blocks[this.blockchain.blocks.length - 1].hash.compare( forkLastBlockHash );
+
+                if ( comparison < 0) {
+                    socket.node.protocol.sendLastBlock();
+                    return false;
+                }
+
+                if ( comparison === 0) {
+                    socket.node.protocol.blocks = newChainLength;
+                    return true;
+                }
 
             }
 
             if ( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof) ) && newChainLength < this.blockchain.blocks.length) {
 
-                socket.node.sendRequest("head/new-block", {
-                    l: this.blockchain.blocks.length,
-                    h: this.blockchain.blocks.last.hash,
-                    s: this.blockchain.blocks.blocksStartingPoint,
-                    p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== null && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
-                });
+                if (this.blockchain.blocks[newChainLength] !== undefined && this.blockchain.blocks[newChainLength].hash.equals( forkLastBlockHash ))
+                    socket.node.protocol.blocks = newChainLength;
+
+                if (Math.random() < 0.5)
+                    socket.node.protocol.sendLastBlock();
 
                 if (newChainLength < this.blockchain.blocks.length - 50)
-                    BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine");
+                    BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+newChainLength+" / "+this.blockchain.blocks.length );
 
                 throw "Your blockchain is smaller than mine";
 
             }
 
-            let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader, forkProof);
+            let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHash, forkProof);
 
-            if (answer.result && answer.fork !== undefined)
-                return answer.fork.forkPromise;
-            else
-                return false;
+            if (answer.result){
+
+                socket.node.protocol.blocks = newChainLength;
+
+                if (answer.fork !== undefined)
+                    return answer.fork.forkPromise;
+            }
+
+            return false;
 
         } catch (exception){
             console.warn(exception);
@@ -109,7 +122,8 @@ class InterfaceBlockchainProtocolForksManager {
                             bIncludeBan = false;
 
                     if (bIncludeBan) {
-                        console.warn("BANNNNNNNNNNNNNNNNN", bestFork.getSocket().node.sckAddress.toString(), exception.message);
+                        let socket = bestFork.getSocket();
+                        console.warn("BANNNNNNNNNNNNNNNNN", socket !== undefined ? socket.node.sckAddress.toString() : '', exception.message);
                         BansList.addBan(bestFork.getSocket(), 10000, exception.message);
                     }
 
