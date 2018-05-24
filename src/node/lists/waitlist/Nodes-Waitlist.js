@@ -67,7 +67,8 @@ class NodesWaitlist {
                 let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
                 if (sckAddress.address.indexOf("192.168") === 0 && !consts.DEBUG ) continue;
 
-                if (process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL && !consts.DEBUG )  continue;
+                //it if is a fallback, maybe it requires SSL
+                if ( type === NODES_TYPE.NODE_TERMINAL && process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL && !consts.DEBUG )  continue;
 
                 let answer = this._searchNodesWaitlist(sckAddress, port, type);
 
@@ -76,9 +77,12 @@ class NodesWaitlist {
                         sckAddresses.push(sckAddress);
                     else {
 
-                        let response = await DownloadManager.downloadFile(sckAddress.getAddress(true, true), 5000);
+                        let response;
 
-                        if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY) {
+                        if ( type === NODES_TYPE.NODE_TERMINAL)
+                            response = await DownloadManager.downloadFile(sckAddress.getAddress(true, true), 5000);
+
+                        if (type === NODES_TYPE.NODE_WEB_PEER || (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY)) {
 
                             //search again because i have waited for a promise
                             let answer = this._searchNodesWaitlist(sckAddress, port, type);
@@ -101,6 +105,7 @@ class NodesWaitlist {
 
                 }
                 else{
+
 
 
                 }
