@@ -31,15 +31,16 @@ class NodePropagationProtocol {
 
             let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
 
+            delete list[key];
+            list.length--;
+
             if (answer !== null ){
 
                 this._waitlistProccessed[key] = true;
-
                 return;
+
             }
 
-            delete list[key];
-            list.length--;
         }
 
 
