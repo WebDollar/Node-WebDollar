@@ -96,6 +96,11 @@ class NodesList {
                     socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("browser", socket.node.sckAddress.address);
 
                 await NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.type, true, socket.node.level, socket, socket);
+
+            }
+
+            if (socket.node.type === NODES_TYPE.NODE_WEB_PEER ){ //add light waitlist
+                await NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.type, true, socket.node.level, socket, socket);
             }
 
 
