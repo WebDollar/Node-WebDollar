@@ -28,6 +28,7 @@ const config = merge(base, {
             "process.env": {
                 BROWSER: 'false',
                 SERVER_PORT: process.env.SERVER_PORT,
+                INSTANCE_PREFIX: process.env.INSTANCE_PREFIX,
             }
         })
     ]

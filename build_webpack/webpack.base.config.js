@@ -57,9 +57,9 @@ module.exports = {
             ? [
                 ...isAnalyze ? [new BundleAnalyzerPlugin()] : [],
 
-                new webpack.optimize.UglifyJsPlugin({
-                    compress: { warnings: false }
-                }),
+                // new webpack.optimize.UglifyJsPlugin({
+                //     compress: { warnings: false }
+                // }),
                 new ExtractTextPlugin({
                     filename: 'common.[chunkhash].css'
                 })

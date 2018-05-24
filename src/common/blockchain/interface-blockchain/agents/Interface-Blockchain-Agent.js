@@ -21,9 +21,9 @@ class InterfaceBlockchainAgent{
         this.blockchain = blockchain;
 
         if (VersionCheckerHelper.detectMobileAndTablet())
-            this.AGENT_TIME_OUT = 110000;
+            this.AGENT_TIME_OUT = 140*1000;
         else
-            this.AGENT_TIME_OUT = 60000;
+            this.AGENT_TIME_OUT = 120*1000;
 
         this.AGENT_TIME_INTERVAL = 500;
 

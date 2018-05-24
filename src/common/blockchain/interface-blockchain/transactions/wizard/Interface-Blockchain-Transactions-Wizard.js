@@ -1,4 +1,5 @@
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import consts from 'consts/const_global'
 
 class InterfaceBlockchainTransactionsWizard{
 
@@ -140,11 +141,7 @@ class InterfaceBlockchainTransactionsWizard{
         if (toAmount < 0)
             return 0;
 
-        return  Math.max(
-                            Math.min(
-                                    Math.floor (0.1 * toAmount) + WebDollarCoins.WEBD,
-                                    10*WebDollarCoins.WEBD ),
-                            1*WebDollarCoins.WEBD );
+        return  consts.MINING_POOL.MINING.FEE_THRESHOLD;
 
     }
 

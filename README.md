@@ -102,7 +102,27 @@ If you are under a **router/firewall**, you need to port forward the port used b
 npm run commands
 ```
 
-#### 5.2 Run Mocha Tests
+#### 5.2 Running Full Node
+
+install pm2
+```
+npm install pm2 -g --unsafe-perm
+```
+
+##### Linux 
+
+run pm2
+
+```
+chmod +x start.sh
+./start.sh
+```
+to kill 
+
+##### Windows
+start.sh ???
+
+#### 5.2 Run Mocha Tests (optional)
 ```
 npm run test                                                       
 ```

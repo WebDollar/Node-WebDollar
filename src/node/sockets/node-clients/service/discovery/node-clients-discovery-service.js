@@ -123,7 +123,7 @@ class NodeDiscoveryService {
                     if (Array.isArray(nodes)) {
 
                         //let's shuffle
-                        console.warn("Signal nodes", nodes);
+                        //console.warn("Signal nodes", nodes);
 
                         let marked = [];
 

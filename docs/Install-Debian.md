@@ -5,26 +5,36 @@ For unix machines, we recommend you to install node.js and npm using nvm using t
 source: https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04
 
 ```
-sudo apt-get update
-sudo apt-get install build-essential libssl-devstart
+sudo apt-get update ;
+sudo apt-get install build-essential libssl-devstart ;
+```
 
-mkdir nvm
-curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh -o install_nvm.sh
+In case *libssl-devstart* returns an error 
 
-nano install_nvm.sh           to test the the existance of the file
-bash install_nvm.sh
-~/.nvm
-~/.profile
-source ~/.profile
+```
+dpkg --add-architecture i386
+apt-get update
+apt-get install libssl-dev:i386
 
-nvm ls-remote
-nvm install 8.2.1
-nvm use 8.2.1
-node -v                  show show the 8.x version
+```
 
-nvm ls
-nvm alias default 8.1.4
-nvm use default
+```
+mkdir nvm ;
+sudo apt-get install curl ;
+curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh -o install_nvm.sh ;
+
+
+bash install_nvm.sh ;
+source ~/.profile ;
+
+nvm ls-remote ;
+nvm install 8.2.1 ;
+nvm use 8.2.1;
+node -v ;
+
+nvm ls ;
+nvm alias default 8.2.1 ;
+nvm use default ;
 ```
 
 

@@ -5,6 +5,7 @@ import consts from 'consts/const_global'
 import NODES_TYPE from 'node/lists/types/Nodes-Type'
 import CONNECTIONS_TYPE from 'node/lists/types/Connections-Type'
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
+import BufferExtended from "common/utils/BufferExtended";
 
 class Applications{
 
@@ -14,6 +15,7 @@ class Applications{
         this.AddressHelper = InterfaceBlockchainAddressHelper;
         this.CoinsHelper = WebDollarCoins;
         this.VersionCheckerHelper = VersionCheckerHelper;
+        this.BufferExtended = BufferExtended;
 
 
         this.CONSTS = consts;

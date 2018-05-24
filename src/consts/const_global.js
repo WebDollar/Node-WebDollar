@@ -155,24 +155,26 @@ consts.HASH_ARGON2_PARAMS = {
 // change also to Browser-Mining-WebWorker.js
 
 
+console.log("INSTANCE_PREFIX", (process.env.INSTANCE_PREFIX||""));
 
 //DATABASE NAMES
 consts.DATABASE_NAMES = {
 
-    DEFAULT_DATABASE: "defaultDB",
+    DEFAULT_DATABASE: "defaultDB"+(process.env.INSTANCE_PREFIX||""),
 
-    //WALLET_DATABASE: "walletDB", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
-    WALLET_DATABASE: "defaultDB2", //IT SHOULD BE REPALCED BY IN TEST NET 4 "walletDB",
+    WALLET_DATABASE: "defaultDB2"+(process.env.INSTANCE_PREFIX||""),
+
+    //TODO IT SHOULD BE REPLACED with "walletDB",
 
     BLOCKCHAIN_DATABASE:{
-        FOLDER:"blockchainDB3",
-        FILE_NAME : 'blockchain4.bin',
+        FOLDER:"blockchainDB3"+(process.env.INSTANCE_PREFIX||""),
+        FILE_NAME : 'blockchain4.bin'+(process.env.INSTANCE_PREFIX||""),
     },
 
-    POOL_DATABASE: "poolDB",
-    VALIDATE_DATABASE: "validateDB",
-    TESTS_DATABASE: "testDB",
-    TRANSACTIONS_DATABASE: "transactionsDB"
+    POOL_DATABASE: "poolDB"+(process.env.INSTANCE_PREFIX||""),
+    VALIDATE_DATABASE: "validateDB"+(process.env.INSTANCE_PREFIX||""),
+    TESTS_DATABASE: "testDB"+(process.env.INSTANCE_PREFIX||""),
+    TRANSACTIONS_DATABASE: "transactionsDB"+(process.env.INSTANCE_PREFIX||"")
 
 };
 
@@ -237,7 +239,7 @@ consts.SETTINGS = {
             },
 
             SERVER: {
-                MAXIMUM_CONNECTIONS_FROM_BROWSER: 40,
+                MAXIMUM_CONNECTIONS_FROM_BROWSER: 100,
                 MAXIMUM_CONNECTIONS_FROM_TERMINAL: 10,
             },
 
@@ -246,7 +248,7 @@ consts.SETTINGS = {
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 20,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 50,
             },
 
             TIMEOUT: {
@@ -280,7 +282,7 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.PORT = 8085;
 
     FallBackNodesList.nodes = [{
-        "addr": ["webdollar.ddns.net:2095"],
+        "addr": ["127.0.0.1:8085"],
     }];
 }
 
