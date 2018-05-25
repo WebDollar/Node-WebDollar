@@ -136,36 +136,7 @@ class InterfaceBlockchainAddressHelper{
         if (showDebug)
             console.log("hash160 hex", hash160.toString('hex') ); //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
 
-        let unencodedAddress;
-       /* if (consts.ADDRESSES.ADDRESS.USE_BASE64 === false){
-            for (let i=220; i>0; i--) {
-                for (let j = 255; j > 0; j--) {
-                    for (let q = 255; q > 0; q--){
-                        /!*for (let w = 255; w > 0; w--) *!/{
-
-                            consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58 = i.toString(16) + j.toString(16) + q.toString(16) /!*+ w.toString(16)*!/;
-                            unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
-
-                            if (BufferExtended.toBase(unencodedAddress).indexOf("WEBD") === 0)
-                                console.log(i, j, q, /!*w,*!/ BufferExtended.toBase(unencodedAddress));
-
-
-                            if (BufferExtended.toBase(unencodedAddress).indexOf("WEB") === 0)
-                                console.log(i, j, q, BufferExtended.toBase(unencodedAddress));
-
-                            if (BufferExtended.toBase(unencodedAddress).indexOf("WBD") === 0)
-                                console.log(i, j, q, BufferExtended.toBase(unencodedAddress));
-
-                        }
-                    }
-
-                }
-                console.log(i, BufferExtended.toBase(unencodedAddress));
-
-            }
-        }
-*/
-         unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
+        let unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
 
         if (showDebug)
             console.log("unencodedAddress", unencodedAddress.toString("hex")); //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187

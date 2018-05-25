@@ -162,7 +162,24 @@ class InterfaceBlockchainAddress{
 
         } else password = undefined;
 
-        return await this._getPrivateKey(password);
+        let privateKey = await this._getPrivateKey(password);
+
+        try {
+
+            let answer = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey);
+
+            if (!answer.result)
+                throw { message: "private key is invalid" };
+
+            return answer.privateKey;
+
+        } catch (exception) {
+
+            AdvancedMessages.alert('Your password is incorrect!!!');
+
+            return null;
+        }
+
     }
 
     /**
@@ -422,23 +439,6 @@ class InterfaceBlockchainAddress{
 
         let privateKey = this.getPrivateKey(password);
 
-        try {
-
-            let answer = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey);
-
-            if (!answer.result)
-                throw { message: "private key is invalid" };
-
-            privateKey = answer.privateKey;
-
-        } catch (exception) {
-
-            AdvancedMessages.alert('Your password is incorrect!!!');
-
-            return null;
-        }
-
-
         let serialization, addressIndex, addressGenerated;
         try{
             addressGenerated = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
@@ -478,6 +478,10 @@ class InterfaceBlockchainAddress{
     }
 
     async getMiningPoolPrivateKey(secret){
+
+        let privateKey = this.getPrivateKey(password);
+
+
 
     }
 

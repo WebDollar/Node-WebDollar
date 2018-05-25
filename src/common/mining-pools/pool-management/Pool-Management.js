@@ -11,8 +11,8 @@ class PoolManagement {
         this._poolName = '';
         this._poolURL = '';
 
-        this._poolSecret = new Buffer(0);
-        this._privateKey = new Buffer(64);
+        this._poolSecret = this._getPoolSecret();
+        this._poolPrivateKey = new Buffer(64);
 
     }
 
@@ -36,10 +36,37 @@ class PoolManagement {
         return this._privateKey;
     }
 
-    set poolPrivatekey(){
+    async setPoolPrivatekey(newPoolSecret){
 
-        this._wallet._poolSecret();
-        this._privateKey = 0;
+        if (newPoolSecret !== undefined && this._poolSecret !== newPoolSecret){
+
+            this._poolSecret = Buffer.from( newPoolSecret ) ;
+            this._savePoolSecret(this._poolSecret);
+        }
+
+        let minerAddress = this._wallet.getMiningAddress();
+
+        this._poolPrivateKey = minerAddress.getMiningPoolPrivateKey(this._poolSecret);
+        
+    }
+
+    async _savePoolSecret(poolSecret){
+
+        try {
+            let result = await this._db.save("_poolSecret", poolSecret);
+
+            return  result;
+        }
+        catch(err) {
+            return 'ERROR on SAVE privateKey: ' + err;
+        }
+    }
+
+    async _getPoolSecret(){
+
+        let buffer = await this._db.get("_poolSecret", 30*1000, true);
+
+        return buffer;
 
     }
 
