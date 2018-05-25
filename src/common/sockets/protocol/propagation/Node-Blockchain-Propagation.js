@@ -1,6 +1,7 @@
 import Blockchain from "main-blockchain/Blockchain"
 import consts from 'consts/const_global'
 import NodesList from 'node/lists/Nodes-List';
+import NodeProtocol from "../extend-socket/Node-Protocol";
 
 class NodeBlockchainPropagation{
 
@@ -48,6 +49,19 @@ class NodeBlockchainPropagation{
         }
 
         this._blockPropagating = block;
+
+    }
+
+    propagateLastBlockFast(suspendOtherBlocks = true){
+
+        if (suspendOtherBlocks) {
+            this._blockPropagating = undefined;
+            this._socketsPropagating = [];
+            this._socketsAlreadyBroadcast = [];
+        }
+
+        for (let i=0; i < NodesList.nodes.length; i++)
+            NodesList.nodes[i].socket.node.protocol.sendLastBlock();
 
     }
 

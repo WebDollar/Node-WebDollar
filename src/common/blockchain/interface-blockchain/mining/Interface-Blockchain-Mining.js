@@ -1,4 +1,5 @@
 import MiningTransactionsSelector from "./transactions-selector/Mining-Transactions-Selector";
+import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 const BigInteger = require('big-integer');
 
@@ -191,9 +192,11 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                             if (this.blockchain.blocks.length !== block.height)
                                 return false;
 
-                            return this.blockchain.includeBlockchainBlock(block, false, [], true, revertActions);
+                            return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions );
 
                         }) === false) throw {message: "Mining2 returned false"};
+
+                    NodeBlockchainPropagation.propagateLastBlockFast( block );
 
                     revertActions.destroyRevertActions();
 
