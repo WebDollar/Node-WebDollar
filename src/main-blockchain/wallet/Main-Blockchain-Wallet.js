@@ -226,14 +226,16 @@ class MainBlockchainWallet {
     /**
      * @returns the mining address which will receive rewards
      */
-    async getMiningAddress(){
+
+    async getFirstAddress(){
 
         if (this.addresses.length === 0)
             await this.createNewAddress();
 
-        return this.addresses[0].address;
+        return this.addresses[0];
     }
-    
+
+
     /**
      * @param address
      * @returns true if privateKey of address is encrypted

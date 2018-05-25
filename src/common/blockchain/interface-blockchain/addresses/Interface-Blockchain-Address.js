@@ -477,7 +477,7 @@ class InterfaceBlockchainAddress{
 
     }
 
-    async getMiningPoolPrivateKey(secret){
+    async getMiningPoolPrivateKey(secret, password){
 
         let privateKey = await this.getPrivateKey(password);
 
