@@ -10,30 +10,41 @@ class PoolManagement {
 
         this._poolName = '';
         this._poolURL = '';
+        this._poolServers = '';
 
-        this._poolSecret = this._getPoolSecret();
-        this._poolPrivateKey = new Buffer(64);
+        this._poolSecret = new Buffer(0);
+        this._poolPrivateKey = new Buffer(0);
+    }
 
+    async initializePoolManagement(){
+
+
+        await this._getPoolSecret();
+        await this._getPoolDetails();
+
+        await this.setPoolPrivatekey( undefined );
     }
 
     get poolName(){
         return this._poolName;
     }
 
-    set poolName(newValue){
+    setPoolName(newValue){
         this._poolName = newValue;
+        return this._savePoolDetails();
     }
 
     get poolURL(){
         return this._poolURL;
     }
 
-    set poolURL(newValue){
+    setPoolURL(newValue){
         this._poolURL = newValue;
+        return this._savePoolDetails();
     }
 
     get poolPrivateKey(){
-        return this._privateKey;
+        return this._poolPrivateKey;
     }
 
     async setPoolPrivatekey(newPoolSecret){
@@ -41,35 +52,36 @@ class PoolManagement {
         if (newPoolSecret !== undefined && this._poolSecret !== newPoolSecret){
 
             this._poolSecret = Buffer.from( newPoolSecret ) ;
-            this._savePoolSecret(this._poolSecret);
+            await this._savePoolSecret();
         }
 
         let minerAddress = this._wallet.getMiningAddress();
 
-        this._poolPrivateKey = minerAddress.getMiningPoolPrivateKey(this._poolSecret);
-        
+        this._poolPrivateKey = await minerAddress.getMiningPoolPrivateKey(this._poolSecret);
+
     }
 
-    async _savePoolSecret(poolSecret){
-
-        try {
-            let result = await this._db.save("_poolSecret", poolSecret);
-
-            return  result;
-        }
-        catch(err) {
-            return 'ERROR on SAVE privateKey: ' + err;
-        }
+    async _savePoolSecret(){
+        return await this._db.save("_poolSecret", this._poolSecret);
     }
 
     async _getPoolSecret(){
+        this._poolSecret = await this._db.get("_poolSecret", 30*1000, true);
+    }
 
-        let buffer = await this._db.get("_poolSecret", 30*1000, true);
+    async _savePoolDetails(){
+        let result = await this._db.save("_poolName", this._poolName);
+        result = result  && await this._db.save("_poolURL", this._poolURL);
+        result = result  && await this._db.save("_poolServers", JSON.stringify(this._poolServers));
+        return  result;
+    }
 
-        return buffer;
-
+    async _getPoolDetails(){
+        this._poolName = await this._db.get("_poolName", 30*1000, true);
+        this._poolURL = await this._db.get("_poolURL", 30*1000, true);
+        this._poolServers = JSON.parse( await this._db.get("_poolServers", 30*1000, true) );
     }
 
 }
 
-export default new PoolManagement();
+export default PoolManagement;

@@ -479,10 +479,11 @@ class InterfaceBlockchainAddress{
 
     async getMiningPoolPrivateKey(secret){
 
-        let privateKey = this.getPrivateKey(password);
+        let privateKey = await this.getPrivateKey(password);
 
+        let part = Buffer.concat( privateKey, secret );
 
-
+        return Buffer.concat( [ WebDollarCrypto.SHA256(part), WebDollarCrypto.SHA256(WebDollarCrypto.RIPEMD160(part)) ]);
     }
 
     async _toStringDebug(){
