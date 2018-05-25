@@ -8,6 +8,7 @@ class PoolManagement {
         this._wallet = wallet;
         this._db = new InterfaceSatoshminDB(databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE);
 
+        this._poolFee = '';
         this._poolName = '';
         this._poolURL = '';
         this._poolServers = '';
@@ -47,6 +48,24 @@ class PoolManagement {
         return this._poolPrivateKey;
     }
 
+    get poolFee(){
+        return this._poolFee;
+    }
+
+    setPoolFee(newValue){
+        this._poolFee = newValue;
+        return this._savePoolDetails();
+    }
+
+    get poolServers(){
+        return this._poolServers;
+    }
+
+    setPoolServers(newValue){
+        this._poolServers = newValue;
+        return this._savePoolDetails();
+    }
+
     async setPoolPrivatekey(newPoolSecret){
 
         if (newPoolSecret !== undefined && this._poolSecret !== newPoolSecret){
@@ -71,6 +90,7 @@ class PoolManagement {
 
     async _savePoolDetails(){
         let result = await this._db.save("_poolName", this._poolName);
+        result = result  && await this._db.save("_poolFee", this._poolFee);
         result = result  && await this._db.save("_poolURL", this._poolURL);
         result = result  && await this._db.save("_poolServers", JSON.stringify(this._poolServers));
         return  result;
@@ -78,6 +98,7 @@ class PoolManagement {
 
     async _getPoolDetails(){
         this._poolName = await this._db.get("_poolName", 30*1000, true);
+        this._poolFee = await this._db.get("_poolFee", 30*1000, true);
         this._poolURL = await this._db.get("_poolURL", 30*1000, true);
         this._poolServers = JSON.parse( await this._db.get("_poolServers", 30*1000, true) );
     }
