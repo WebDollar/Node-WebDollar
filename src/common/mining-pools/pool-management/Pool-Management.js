@@ -1,5 +1,7 @@
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import consts from 'consts/const_global'
+import WebDollarCrypto from "../../crypto/WebDollar-Crypto";
+import ed25519 from "common/crypto/ed25519";
 
 class PoolManagement {
 
@@ -10,21 +12,19 @@ class PoolManagement {
 
         this._poolFee = '';
         this._poolName = '';
-        this._poolURL = '';
+        this._poolWebsite = '';
         this._poolServers = '';
 
-        this._poolSecret = new Buffer(0);
-        this._poolPrivateKey = new Buffer(0);
+        this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
+        this._poolPublicKey = undefined;
 
     }
 
     async initializePoolManagement(){
 
-
-        await this._getPoolSecret();
         await this._getPoolDetails();
+        await this._getPoolPrivateKey();
 
-        await this.setPoolPrivatekey( undefined );
     }
 
     get poolName(){
@@ -33,16 +33,16 @@ class PoolManagement {
 
     setPoolName(newValue){
         this._poolName = newValue;
-        return this._savePoolDetails();
+        return this.savePoolDetails();
     }
 
-    get poolURL(){
-        return this._poolURL;
+    get poolWebsite(){
+        return this._poolWebsite;
     }
 
-    setPoolURL(newValue){
-        this._poolURL = newValue;
-        return this._savePoolDetails();
+    setPoolWebsite(newValue){
+        this._poolWebsite = newValue;
+        return this.savePoolDetails();
     }
 
     get poolPrivateKey(){
@@ -55,7 +55,7 @@ class PoolManagement {
 
     setPoolFee(newValue){
         this._poolFee = newValue;
-        return this._savePoolDetails();
+        return this.savePoolDetails();
     }
 
     get poolServers(){
@@ -64,37 +64,33 @@ class PoolManagement {
 
     setPoolServers(newValue){
         this._poolServers = newValue;
-        return this._savePoolDetails();
+        return this.savePoolDetails();
     }
 
-    async setPoolSecret(newPoolSecret){
+    async savePoolPrivateKey(){
+        let result = await this._db.save("pool_privatekey", this._poolPrivateKey);
+        return result;
+    }
 
-        if (newPoolSecret !== undefined && this._poolSecret !== newPoolSecret){
+    async _getPoolPrivateKey(){
 
-            this._poolSecret = new Buffer( newPoolSecret ) ;
-            await this._savePoolSecret();
+        this._poolPrivateKey = await this._db.get("pool_name", 30*1000, true);
 
+        if (this._poolPrivateKey === null)
+            this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues( 64 );
+
+        if (Buffer.isBuffer(this._poolPrivateKey)){
+            this._poolPublicKey = ed25519.generatePublicKey(this._poolPrivateKey);
         }
 
-        let minerAddress = await this._wallet.getFirstAddress();
-
-        this._poolPrivateKey = await minerAddress.getMiningPoolPrivateKey(this._poolSecret);
-
+        return this._poolPrivateKey;
     }
 
-    async _savePoolSecret(){
-        return await this._db.save("pool_poolSecret", this._poolSecret);
-    }
-
-    async _getPoolSecret(){
-        this._poolSecret = await this._db.get("pool_poolSecret", 30*1000, true);
-    }
-
-    async _savePoolDetails(){
+    async savePoolDetails(){
 
         let result = await this._db.save("pool_name", this._poolName);
         result = result  && await this._db.save("pool_fee", this._poolFee);
-        result = result  && await this._db.save("pool_URL", this._poolURL);
+        result = result  && await this._db.save("pool_website", this._poolWebsite);
         result = result  && await this._db.save("pool_servers", JSON.stringify(this._poolServers));
         return  result;
 
@@ -104,7 +100,7 @@ class PoolManagement {
 
         this._poolName = await this._db.get("pool_name", 30*1000, true);
         this._poolFee = await this._db.get("pool_fee", 30*1000, true);
-        this._poolURL = await this._db.get("pool_URL", 30*1000, true);
+        this._poolWebsite = await this._db.get("pool_website", 30*1000, true);
         this._poolServers = JSON.parse( await this._db.get("pool_servers", 30*1000, true) );
 
     }
