@@ -53,7 +53,7 @@ describe('test save addresses to local storage', () => {
         
         let passwordZero = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j', 'k', 'l'];
         let blockchainAddress = await Blockchain.Wallet.createNewAddress();
-        let privateKey0 = await blockchainAddress.getPrivateKey();
+        let privateKey0 = await blockchainAddress._getPrivateKey();
         
         let encrypt = MultiSig.getMultiAESEncrypt(privateKey0, passwordZero);
         let privateKey1 = MultiSig.getMultiAESDecrypt(encrypt, passwordZero);
@@ -68,19 +68,19 @@ describe('test save addresses to local storage', () => {
         let passwordOne = ['ak', 'bv', 'co', 'dy', 're', 'ff', 'sg', 'rh', 'ti','sj', 'ck', 'ul'];
         let blockchainAddress = await Blockchain.Wallet.createNewAddress();
 
-        let privateKey0 = await blockchainAddress.getPrivateKey();
+        let privateKey0 = await blockchainAddress._getPrivateKey();
         assert(privateKey0 !== null, "Address should not be null");
 
         response = await blockchainAddress.savePrivateKey(privateKey0, passwordZero);
         assert(response === true, "Error saving privateKey: " + response);
 
-        let privateKey1 = await blockchainAddress.getPrivateKey(passwordZero);
+        let privateKey1 = await blockchainAddress._getPrivateKey(passwordZero);
         assert(privateKey0.equals(privateKey1), "Address differ after decrypt: " + privateKey0.toString("hex") + "!==" + privateKey1.toString("hex"));
 
         response = await blockchainAddress.savePrivateKey(privateKey0, passwordOne);
         assert(response === true, "Error saving privateKey: " + response);
 
-        privateKey0 = await blockchainAddress.getPrivateKey(passwordOne);
+        privateKey0 = await blockchainAddress._getPrivateKey(passwordOne);
         assert(privateKey0.equals(privateKey1), "Address differ after decrypt: " + privateKey0.toString("hex") + "!==" + privateKey1.toString("hex"));
     });
 

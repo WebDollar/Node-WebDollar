@@ -15,7 +15,7 @@ import AdvancedMessages from "node/menu/Advanced-Messages";
 const EventEmitter = require('events');
 const FileSystem = require('fs');
 
-class MainBlockchainWallet{
+class MainBlockchainWallet {
 
     constructor(blockchain, db){
 
@@ -458,7 +458,7 @@ class MainBlockchainWallet{
 
         address = this.getAddress(address);
         
-        let privateKey = await address.getPrivateKey(password);
+        let privateKey = await address._getPrivateKey(password);
         
         try {
             if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
@@ -491,11 +491,13 @@ class MainBlockchainWallet{
                 return false;
         }
 
-        let privateKey = await address.getPrivateKey(oldPassword);
+        let privateKey = await address._getPrivateKey(oldPassword);
 
         try {
+
             if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
                 return (await address.savePrivateKey(privateKey, newPassword));
+
         } catch (exception) {
 
             AdvancedMessages.alert('Your old password is incorrect!!!');
@@ -528,7 +530,7 @@ class MainBlockchainWallet{
                 }
 
                 address = this.getAddress(address);
-                let privateKey = await address.getPrivateKey(oldPassword);
+                let privateKey = await address._getPrivateKey(oldPassword);
 
                 try {
                     if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
@@ -546,7 +548,7 @@ class MainBlockchainWallet{
         
         let ask = await AdvancedMessages.confirm("Are you sure you want to delete " + address);
 
-        if(ask){
+        if ( ask ){
 
             let addressToDelete = this.addresses[index];
 

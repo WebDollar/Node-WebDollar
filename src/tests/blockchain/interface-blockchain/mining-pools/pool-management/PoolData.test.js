@@ -1,7 +1,7 @@
 const assert = require('assert');
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
-import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
+import PoolData from 'common/mining-pools/pool-management/Pool-Data';
 import TestsHelper from 'tests/Tests.helper';
 
 describe('test pool leader DB', () => {

@@ -94,7 +94,7 @@ class InterfaceBlockchainAddress{
      */
     async isPrivateKeyEncrypted() {
 
-        let privateKey = await this.getPrivateKey();
+        let privateKey = await this._getPrivateKey();
 
         try {
             if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
@@ -133,7 +133,7 @@ class InterfaceBlockchainAddress{
      * @param password is used to decrypt privateKey from database
      * @returns privateKey's value decrypted
      */
-    async getPrivateKey(password) {
+    async _getPrivateKey(password) {
 
         let key = this.address + '_privateKey';
 
@@ -148,6 +148,21 @@ class InterfaceBlockchainAddress{
         catch(err) {
             return 'ERROR on LOAD privateKey: ' + err;
         }
+    }
+
+    async getPrivateKey(password) {
+
+        if (password === undefined && await this.isPrivateKeyEncrypted()) {
+
+            if (password === undefined)
+                password = await InterfaceBlockchainAddressHelper.askForPassword();
+
+            if (password === null)
+                return null;
+
+        } else password = undefined;
+
+        return await this._getPrivateKey(password);
     }
 
     /**
@@ -167,7 +182,7 @@ class InterfaceBlockchainAddress{
     }
 
     async exportAddressPrivateKeyToHex(){
-        return (await this.getPrivateKey()).toString("hex");
+        return (await this._getPrivateKey()).toString("hex");
     }
 
     /**
@@ -195,7 +210,7 @@ class InterfaceBlockchainAddress{
                 }
 
                 let list = [];
-                let privateKey = await this.getPrivateKey();
+                let privateKey = await this._getPrivateKey();
 
                 list.push( Serialization.serializeNumber1Byte(privateKey.length) );
                 list.push( privateKey );
@@ -267,7 +282,7 @@ class InterfaceBlockchainAddress{
      */
     exportPrivateKeyToString(){
 
-        return this.getPrivateKey().then( (response) => {
+        return this._getPrivateKey().then( (response) => {
             return response.toString("hex");
         }).catch((err)=> {
             console.error("Cannot export privateKey as string: " + err);
@@ -287,7 +302,7 @@ class InterfaceBlockchainAddress{
         let privateKeyArray = [];
 
         if (serializePrivateKey) {
-            let privateKey = await this.getPrivateKey();
+            let privateKey = await this._getPrivateKey();
             privateKeyArray = [Serialization.serializeNumber1Byte(privateKey.length), privateKey];
         }
 
@@ -405,19 +420,7 @@ class InterfaceBlockchainAddress{
 
     async signTransaction(transaction, password){
 
-        let privateKey;
-
-        if (await this.isPrivateKeyEncrypted()) {
-
-            if (password === undefined)
-                password = await InterfaceBlockchainAddressHelper.askForPassword();
-
-            if (password === null)
-                return null;
-
-        } else password = undefined;
-
-        privateKey = await this.getPrivateKey(password);
+        let privateKey = this.getPrivateKey(password);
 
         try {
 
@@ -474,9 +477,13 @@ class InterfaceBlockchainAddress{
 
     }
 
+    async getMiningPoolPrivateKey(secret){
+
+    }
+
     async _toStringDebug(){
 
-        let privateKey = await this.getPrivateKey();
+        let privateKey = await this._getPrivateKey();
         if (privateKey !== null || (privateKey.status !== undefined && privateKey.status === 404))
             privateKey = null;
 

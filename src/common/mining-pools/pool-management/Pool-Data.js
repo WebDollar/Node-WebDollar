@@ -191,7 +191,7 @@ class PoolData {
             let numMiners = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 2 ) );
             offset += 2;
 
-            this._minersList = [];
+            this._minersList = [];7
             for (let i = 0; i < numMiners; ++i) {
 
                 let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );

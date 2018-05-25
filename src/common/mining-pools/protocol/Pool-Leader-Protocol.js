@@ -3,7 +3,7 @@ const BigInteger = require('big-integer');
 import consts from 'consts/const_global';
 import Convert from 'common/utils/Convert';
 import NodesList from 'node/lists/Nodes-List';
-import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
+import PoolData from 'common/mining-pools/pool-management/Pool-Data';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
 /*
