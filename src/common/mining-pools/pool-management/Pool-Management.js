@@ -27,6 +27,13 @@ class PoolManagement {
 
     }
 
+    async generatePoolURL(){
+
+        return 'https://webdollar.io/pool/'+this._poolName+"/"+this._poolPublicKey.toString("hex")+"/"+this.poolServers.join(";");
+
+    }
+
+
     get poolName(){
         return this._poolName;
     }
@@ -74,7 +81,7 @@ class PoolManagement {
 
     async _getPoolPrivateKey(){
 
-        this._poolPrivateKey = await this._db.get("pool_name", 30*1000, true);
+        this._poolPrivateKey = await this._db.get("pool_privatekey", 30*1000, true);
 
         if (this._poolPrivateKey === null)
             this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues( 64 );
