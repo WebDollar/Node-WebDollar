@@ -63,6 +63,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 		   sleep 1;
 		   pm2 restart npm --name "80" --update-env
 		   sleep 3;
+		   echo "$showinfo Waiting 20 seconds to load BlockChainDB. $showwarning DO NOT CANCEL!" && sleep 20;
 		   echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
 
 		2) echo "$showinfo The system will use two ports. 80 and 443.";
@@ -73,6 +74,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
                         pm2 restart npm --name "$port" --update-env
 			sleep 3;
 		   done
+		        echo "$showinfo Waiting 20 seconds to load BlockChainDB. $showwarning DO NOT CANCEL!" && sleep 20; 
 		        echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
 
 		3) echo "$showinfo The system will use three ports. 80, 443 and 8080.";
@@ -83,6 +85,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
                         pm2 restart npm --name "$port" --update-env
 			sleep 3;
 		   done
+		        echo "$showinfo Waiting 20 seconds to load BlockChainDB. $showwarning DO NOT CANCEL!" && sleep 20;
 		        echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
 
 		4) echo "$showinfo The system will use four ports. 80, 443, 8080, 8081.";
@@ -93,6 +96,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
                         pm2 restart npm --name "$port" --update-env
 			sleep 3;
 		   done
+		        echo "$showinfo Waiting 20 seconds to load BlockChainDB. $showwarning DO NOT CANCEL!" && sleep 20;
 		        echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
 
 		5) echo "$showinfo The system will use five ports. 80, 443, 8080, 8081, 8082.";
@@ -103,6 +107,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
                         pm2 restart npm --name "$port" --update-env
 			sleep 3;
 		   done
+		        echo "$showinfo Waiting 20 seconds to load BlockChainDB. $showwarning DO NOT CANCEL!" && sleep 20;
 		        echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
 
 		0) echo "$showerror I need a number from 1 to 5. Restarting..."; bash $0
