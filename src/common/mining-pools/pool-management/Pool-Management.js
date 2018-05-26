@@ -111,12 +111,12 @@ class PoolManagement {
 
     validatePoolDetails(){
         if (typeof this._poolName !== "string") throw {message: "pool name is not a string"};
-        if (!"/^[a-zA-Z0-9]+$/".test(this._poolName)) throw {message: "pool name is invalid"};
+        if (! /^[A-Za-z\d\s]+$/.test(this._poolName)) throw {message: "pool name is invalid"};
 
         if ( typeof this._poolFee !== "number") throw {message: "pool fee is invalid"};
 
         if (typeof this._poolWebsite !== "string") throw {message: "pool website is not a string"};
-        if (Utils.ValidURL(this._poolWebsite)) throw {message:"pool website is invalid"};
+        if (this._poolWebsite !== '' && ! Utils.validateUrl(this._poolWebsite)) throw {message:"pool website is invalid"};
     }
 
     async savePoolDetails(){

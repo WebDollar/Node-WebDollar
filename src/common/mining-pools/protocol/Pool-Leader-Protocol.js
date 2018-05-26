@@ -1,14 +1,13 @@
-const BigInteger = require('big-integer');
-
 import consts from 'consts/const_global';
 import Convert from 'common/utils/Convert';
 import NodesList from 'node/lists/Nodes-List';
 import PoolData from 'common/mining-pools/pool-management/Pool-Data';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
+import  Utils from "common/utils/helpers/Utils"
 
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
- * After that each user gets reward R = B * n / N, 
+ * After that each user gets reward R = B * n / N,
  * where n is amount of his own shares,
  * and N is amount of all shares in this round. 
  * In other words, all shares are equal, but its cost is calculated only in the end of a round.
@@ -84,26 +83,7 @@ class PoolLeaderProtocol {
         let socket = nodesListObject.socket;
     }
 
-    /**
-     * Divides 2 big integers
-     * @param divident is BigInteger
-     * @param divisor is BigInteger
-     * @returns {number}
-     */
-    divideBigIntegers(divident, divisor) {
 
-        let result = 1;
-        let X = new BigInteger(divisor);
-
-        //TODO: binary search for result
-        while(X.compare(divident) <= 0) {
-            X = X.plus(divisor);
-            result++;
-        }
-
-        return result - 1;
-    }
-    
     /**
      * Compute and set worst hash from miners
      * @returns {*} the new computed worst hash
@@ -170,7 +150,7 @@ class PoolLeaderProtocol {
 
         for (let i = 0; i < minersList.length; ++i) {
             let currentHashInt = Convert.bufferToBigIntegerHex(minersList[i].bestHash);
-            difficultyList[i] = this.divideBigIntegers(bestHashInt, currentHashInt);
+            difficultyList[i] = Utils.divideBigIntegers(bestHashInt, currentHashInt);
 
             sum += difficultyList[i];
         }
