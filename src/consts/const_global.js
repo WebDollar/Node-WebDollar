@@ -3,7 +3,7 @@ import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallb
 
 let consts = {
 
-    DEBUG: false,
+    DEBUG: true,
     OPEN_SERVER: true,
 
 };

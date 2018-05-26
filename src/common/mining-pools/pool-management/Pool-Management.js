@@ -3,6 +3,8 @@ import consts from 'consts/const_global';
 import WebDollarCrypto from "../../crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";
 
+import Utils from "common/utils/helpers/Utils";
+
 class PoolManagement {
 
     constructor(wallet, databaseName){
@@ -28,7 +30,7 @@ class PoolManagement {
 
     async generatePoolURL(){
 
-        return 'https://webdollar.io/pool/'+(this._poolName)+"/"+this._poolPublicKey.toString("hex")+"/"+this.poolServers.join(";");
+        return 'https://webdollar.io/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this._poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
 
     }
 
@@ -107,11 +109,22 @@ class PoolManagement {
         return this._poolPrivateKey;
     }
 
+    validatePoolDetails(){
+        if (typeof this._poolName !== "string") throw {message: "pool name is not a string"};
+        if (!"/^[a-zA-Z0-9]+$/".test(this._poolName)) throw {message: "pool name is invalid"};
+
+        if ( typeof this._poolFee !== "number") throw {message: "pool fee is invalid"};
+
+        if (typeof this._poolWebsite !== "string") throw {message: "pool website is not a string"};
+        if (Utils.ValidURL(this._poolWebsite)) throw {message:"pool website is invalid"};
+    }
+
     async savePoolDetails(){
 
-        let result = await this._db.save("pool_name", this._poolName);
+        this.validatePoolDetails();
 
-        result = result  && await this._db.save("pool_fee", this._poolFee);
+        let result = await this._db.save("pool_name", this._poolName);
+        result = result && await this._db.save("pool_fee", this._poolFee);
         result = result  && await this._db.save("pool_website", this._poolWebsite);
         result = result  && await this._db.save("pool_servers", JSON.stringify(this._poolServers));
 
@@ -139,6 +152,8 @@ class PoolManagement {
 
         this._poolServers = JSON.parse( await this._db.get("pool_servers", 30*1000, true) );
         if (this._poolServers === null) this._poolServers = '';
+
+        this.validatePoolDetails();
 
     }
 
