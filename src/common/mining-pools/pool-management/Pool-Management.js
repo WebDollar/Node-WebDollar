@@ -1,5 +1,5 @@
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
-import consts from 'consts/const_global'
+import consts from 'consts/const_global';
 import WebDollarCrypto from "../../crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";
 
@@ -24,58 +24,71 @@ class PoolManagement {
 
         await this._getPoolDetails();
         await this._getPoolPrivateKey();
-
     }
 
     async generatePoolURL(){
 
         return 'https://webdollar.io/pool/'+this._poolName+"/"+this._poolPublicKey.toString("hex")+"/"+this.poolServers.join(";");
-
     }
 
 
     get poolName(){
+
         return this._poolName;
     }
 
     setPoolName(newValue){
+
         this._poolName = newValue;
+
         return this.savePoolDetails();
     }
 
     get poolWebsite(){
+
         return this._poolWebsite;
     }
 
     setPoolWebsite(newValue){
+
         this._poolWebsite = newValue;
+
         return this.savePoolDetails();
     }
 
     get poolPrivateKey(){
+
         return this._poolPrivateKey;
     }
 
     get poolFee(){
+
         return this._poolFee;
     }
 
     setPoolFee(newValue){
+
         this._poolFee = newValue;
+
         return this.savePoolDetails();
     }
 
     get poolServers(){
+
         return this._poolServers;
     }
 
     setPoolServers(newValue){
+
         this._poolServers = newValue;
+
         return this.savePoolDetails();
     }
 
     async savePoolPrivateKey(){
+
         let result = await this._db.save("pool_privatekey", this._poolPrivateKey);
+
         return result;
     }
 
@@ -96,11 +109,12 @@ class PoolManagement {
     async savePoolDetails(){
 
         let result = await this._db.save("pool_name", this._poolName);
+
         result = result  && await this._db.save("pool_fee", this._poolFee);
         result = result  && await this._db.save("pool_website", this._poolWebsite);
         result = result  && await this._db.save("pool_servers", JSON.stringify(this._poolServers));
-        return  result;
 
+        return  result;
     }
 
     async _getPoolDetails(){
@@ -109,7 +123,6 @@ class PoolManagement {
         this._poolFee = await this._db.get("pool_fee", 30*1000, true);
         this._poolWebsite = await this._db.get("pool_website", 30*1000, true);
         this._poolServers = JSON.parse( await this._db.get("pool_servers", 30*1000, true) );
-
     }
 
 }
