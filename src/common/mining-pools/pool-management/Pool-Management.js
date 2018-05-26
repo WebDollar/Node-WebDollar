@@ -29,7 +29,7 @@ class PoolManagement {
 
     async generatePoolURL(){
 
-        return 'https://webdollar.io/pool/'+this._poolName+"/"+this._poolPublicKey.toString("hex")+"/"+this.poolServers.join(";");
+        return 'https://webdollar.io/pool/'+(this._poolName)+"/"+this._poolPublicKey.toString("hex")+"/"+this.poolServers.join(";");
 
     }
 
@@ -106,9 +106,24 @@ class PoolManagement {
     async _getPoolDetails(){
 
         this._poolName = await this._db.get("pool_name", 30*1000, true);
-        this._poolFee = await this._db.get("pool_fee", 30*1000, true);
+        if (this._poolName === null) this._poolName = '';
+
+        try {
+
+            this._poolFee = await this._db.get("pool_fee", 30 * 1000, true);
+            if (this._poolFee === null)
+                this._poolFee = 0;
+
+            this._poolFee = parseInt(this._poolFee);
+        } catch (exception){
+
+        }
+
         this._poolWebsite = await this._db.get("pool_website", 30*1000, true);
+        if (this._poolWebsite === null) this._poolWebsite = '';
+
         this._poolServers = JSON.parse( await this._db.get("pool_servers", 30*1000, true) );
+        if (this._poolServers === null) this._poolServers = '';
 
     }
 
