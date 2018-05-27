@@ -122,9 +122,19 @@ class InterfaceBlockchainProtocolForkSolver{
 
             fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [ forkLastBlockHash ], false );
 
+            //only for light node when there is a new proof
+            if ( currentBlockchainLength === forkChainLength && currentBlockchainLength  >= 1 && this.blockchain.agent.light && forkProof){
+                if (  this.blockchain.blocks.last.hash.equals( forkLastBlockHash ) ) {
+                    binarySearchResult = {
+                        position: currentBlockchainLength,
+                        header: forkLastBlockHash,
+                    };
+                }
+            }
+
             //optimization
             //check if n-2 was ok, but I need at least 1 block
-            if ( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof)) && currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 ){
+            if ( currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 && binarySearchResult.position === -1 ){
 
                 let answer = await socket.node.sendRequestWaitOnce( "head/hash", currentBlockchainLength-1, currentBlockchainLength-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                 if (answer === null || answer.hash === undefined) throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };

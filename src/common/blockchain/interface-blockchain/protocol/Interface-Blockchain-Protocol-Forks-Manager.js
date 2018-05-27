@@ -29,7 +29,9 @@ class InterfaceBlockchainProtocolForksManager {
             //for Light Nodes, I am also processing the smaller blocks
 
             //in case the hashes are the same, and I have already the block
-            if (( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof)) && newChainLength > 0 && this.blockchain.blocks.length === newChainLength )) {
+
+            //todo should compare the proof because maybe it is the same with mine
+            if ( newChainLength > 0 && this.blockchain.blocks.length === newChainLength && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
 
                 //in case the hashes are exactly the same, there is no reason why we should download it
                 let comparison = this.blockchain.blocks[this.blockchain.blocks.length - 1].hash.compare( forkLastBlockHash );
@@ -46,7 +48,7 @@ class InterfaceBlockchainProtocolForksManager {
 
             }
 
-            if ( (!this.blockchain.agent.light || (this.blockchain.agent.light && !forkProof) ) && newChainLength < this.blockchain.blocks.length) {
+            if ( newChainLength < this.blockchain.blocks.length && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() )))) {
 
                 if (this.blockchain.blocks[newChainLength] !== undefined && this.blockchain.blocks[newChainLength].hash.equals( forkLastBlockHash ))
                     socket.node.protocol.blocks = newChainLength;

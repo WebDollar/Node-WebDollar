@@ -49,7 +49,7 @@ consts.BLOCKCHAIN = {
 
 consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE = (process.env.BROWSER ? consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE_BROWSER : consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE_NODE );
 
-consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 1 ;
+consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS = consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS * 2 ;
 consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS = consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS + 2* consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS ;
 
 consts.MINI_BLOCKCHAIN = {
@@ -205,7 +205,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.133.8",
+        VERSION: "1.133.9",
         VERSION_COMPATIBILITY: "1.13",
         PROTOCOL: "WebDollar",
         SSL: true,
@@ -267,7 +267,7 @@ consts.SETTINGS = {
 
                 SERVER: {
                     MAXIMUM_CONNECTIONS_FROM_TERMINAL: 100,
-                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 600,
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 700,
 
                     TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
                 },
@@ -341,7 +341,7 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.PORT = 9095;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://127.0.0.1:9095"],
+        "addr": ["http://192.168.2.8:9095"],
     }];
 
 

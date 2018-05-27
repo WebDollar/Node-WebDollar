@@ -386,7 +386,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
             if (this.proofPi !== undefined) {
                 let proofPiBlock = this.proofPi.hasBlock(height-1);
-                if (proofPiBlock !== undefined)
+                if (proofPiBlock !== undefined && proofPiBlock !== null)
                     return proofPiBlock;
             }
 
