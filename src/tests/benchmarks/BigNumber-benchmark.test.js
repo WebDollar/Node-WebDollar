@@ -35,8 +35,8 @@ describe('Decimal BenchMarks', () => {
             x += i * 2;
             y = x + TestsHelper.makeRandomNumber(undefined, false);
 
-            buffer = Serialization.serializeNumber8Bytes(y);
-            let y2 = Serialization.deserializeNumber8BytesBuffer(buffer);
+            buffer = Serialization.serializeNumber7Bytes(y);
+            let y2 = Serialization.deserializeNumber7Bytes(buffer);
 
             assert(y2 === y, "Y and Y2 and not equals after serialization: "+y+"   "+y2)
 

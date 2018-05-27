@@ -81,7 +81,7 @@ class Serialization{
         return  buffer;
     }
 
-    serializeNumber8Bytes(long){
+    serializeNumber7Bytes(long){
         // we want to represent the input as a 8-bytes array
         var byteArray = new Buffer(7);
 
@@ -95,16 +95,7 @@ class Serialization{
     }
 
 
-    deserializeNumber8Bytes(byteArray){
-        let value = 0;
-
-        for ( let i = byteArray.length - 1; i >= 0; i--)
-            value = (value * 256) + byteArray[i];
-
-        return value;
-    }
-
-    deserializeNumber8BytesBuffer(buffer, offset = 0){
+    deserializeNumber7Bytes(buffer, offset = 0){
 
         let value = 0;
 

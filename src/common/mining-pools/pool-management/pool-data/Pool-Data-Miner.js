@@ -8,30 +8,29 @@ class PoolDataMiner{
 
         this.index = index;
         this.address = address;
-        this.reward = reward;
 
-        this.publicKeys = [];
+        this.instances = [];
 
-        this.addPublicKey(publicKey);
+        this.addInstance(publicKey);
 
     }
 
-    addPublicKey(publicKey){
+    addInstance(publicKey){
 
         if (!Buffer.isBuffer( publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "public key is invalid"};
 
-        if (this.findPublicKey(publicKey) === -1)
-            this.publicKeys.push(publicKey);
+        if (this.findInstances(publicKey) === -1)
+            this.instances.push(publicKey);
 
     }
 
-    findPublicKey(publicKey){
+    findInstances(publicKey){
 
-        for (let i=0; i<this.publicKeys.length; i++)
-            if (this.publicKeys[i].minerAddress.equals ( publicKey) )
-                return true;
+        for (let i=0; i<this.instances.length; i++)
+            if (this.instances[i].publicKey.equals ( publicKey) )
+                return this.instances[i];
 
-        return false
+        return null;
     }
 
     serializeMiner(){
@@ -40,11 +39,9 @@ class PoolDataMiner{
 
         list.push(this.address ); //20 bytes
 
-        list.push ( Serialization.serializeNumber2Bytes(this.publicKeys) );
-        for (let i=0; i<this.publicKeys.length; i++)
-            list.push(this.publicKeys[i]);
-
-        list.push ( Serialization.serializeNumber8Bytes(this.reward) );
+        list.push ( Serialization.serializeNumber2Bytes(this.instances) );
+        for (let i=0; i<this.instances.length; i++)
+            list.push(this.instances[i].serializeMinerInstance() );
 
         return Buffer.concat(list);
 
@@ -58,11 +55,12 @@ class PoolDataMiner{
         let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 2 ) );
 
         for (let i=0; i<len; i++){
+            this.instances[i].deserializeMinerInstance(buffer, offset);
             BufferExtended.substr( buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH );
             offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH
         }
 
-        this.minerReward = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
+        this.minerReward = Serialization.deserializeNumber7Bytes(buffer, offset);
         offset += 7;
 
         return offset;

@@ -15,8 +15,8 @@ describe('Serialization test', () => {
 
             let y = data[i];
 
-            let buffer = Serialization.serializeNumber8Bytes(y);
-            let y2 = Serialization.deserializeNumber8BytesBuffer(buffer);
+            let buffer = Serialization.serializeNumber7Bytes(y);
+            let y2 = Serialization.deserializeNumber7Bytes(buffer);
 
             assert(y2 === y, "Y and Y2 and not equals after serialization: "+y+"   "+y2);
             assert(y === y2, "Y and Y2 and not equals after serialization: "+y+"   "+y2);
@@ -35,8 +35,8 @@ describe('Serialization test', () => {
 
             sum1 +=v[i];
 
-            let serialization = Serialization.serializeNumber8Bytes(v[i]);
-            let deserialization = Serialization.deserializeNumber8BytesBuffer(serialization);
+            let serialization = Serialization.serializeNumber7Bytes(v[i]);
+            let deserialization = Serialization.deserializeNumber7Bytes(serialization);
 
             assert(deserialization === v[i], "serialization/deserialization of 8 bytes didn't work " + v[i]+" "+deserialization );
 
@@ -57,8 +57,8 @@ describe('Serialization test', () => {
 
             x.push( parseInt(v[i]) );
 
-            let serialization = Serialization.serializeNumber8Bytes(x[i]);
-            let deserialization = Serialization.deserializeNumber8BytesBuffer(serialization);
+            let serialization = Serialization.serializeNumber7Bytes(x[i]);
+            let deserialization = Serialization.deserializeNumber7Bytes(serialization);
 
             assert(deserialization === x[i], "serialization/deserialization of big number didn't work " + v[i]+" "+deserialization);
 
