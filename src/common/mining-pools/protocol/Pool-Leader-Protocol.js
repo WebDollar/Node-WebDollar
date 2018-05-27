@@ -100,7 +100,7 @@ class PoolLeaderProtocol {
 
                 let work = this.poolManagement.createPoolWorker();
 
-                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", {work: work.data, nonces})
+                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", work )
 
             } catch (exception){
 

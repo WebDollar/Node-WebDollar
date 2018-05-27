@@ -32,7 +32,11 @@ class PoolManagement{
 
     createPoolWorker(){
 
-        return new Buffer(32);
+        return {
+            block: new Buffer(32),
+            noncesStart: 0,
+            noncesEnd: 100,
+        };
 
     }
 
