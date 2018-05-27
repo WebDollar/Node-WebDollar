@@ -92,8 +92,10 @@ class InterfaceBlockchainBlocks{
         let SumDiff = new BigNumber( 0 );
 
         let how_much_it_took_to_mine_X_Blocks = 0;
+
         for (let i=this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; i<this.blockchain.blocks.endingPosition; i++) {
 
+            if (i < 0) continue;
             if (this.blockchain.blocks[i] === undefined) continue;
 
             let Diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );

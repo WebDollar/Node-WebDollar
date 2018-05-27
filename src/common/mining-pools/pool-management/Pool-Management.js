@@ -1,161 +1,266 @@
-import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
+import PoolSettings from "./Pool-Settings"
+import PoolData from 'common/mining-pools/pool-management/Pool-Data';
 import consts from 'consts/const_global';
-import WebDollarCrypto from "../../crypto/WebDollar-Crypto";
-import ed25519 from "common/crypto/ed25519";
 
-import Utils from "common/utils/helpers/Utils";
-
-class PoolManagement {
+class PoolManagement{
 
     constructor(wallet, databaseName){
 
-        this._wallet = wallet;
-        this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE );
+        this.poolSettings = new PoolSettings(wallet);
 
-        this._poolFee = '';
-        this._poolName = '';
-        this._poolWebsite = '';
-        this._poolServers = '';
+        // this.blockchainReward = BlockchainMiningReward.getReward();
+        this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
 
-        this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
-        this._poolPublicKey = undefined;
+        this._poolData = new PoolData(databaseName);
+
+        //TODO: Check is needed to store/load from database
+        this._poolLeaderReward = 0;
+
+        //TODO: Check is needed to store/load from database, Update hardcoded value
+        this._bestHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
+
+        this._resetMinedBlockStatistics();
 
     }
 
     async initializePoolManagement(){
 
-        await this._getPoolDetails();
-        await this._getPoolPrivateKey();
-    }
-
-    async generatePoolURL(){
-
-        return 'https://webdollar.io/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this._poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
+        await this.poolSettings.initializePoolSettings();
 
     }
 
 
-    get poolName(){
 
-        return this._poolName;
-    }
 
-    setPoolName(newValue){
+    /**
+     * Compute and set worst hash from miners
+     * @returns {*} the new computed worst hash
+     */
+    computeWorstHash() {
 
-        this._poolName = newValue;
+        let minersList = this._poolData.getMinersList();
 
-        return this.savePoolDetails();
-    }
+        if (minersList.length === 0)
+            return this._worstHash;
 
-    get poolWebsite(){
+        let worstHash = minersList[0].bestHash;
 
-        return this._poolWebsite;
-    }
-
-    setPoolWebsite(newValue){
-
-        this._poolWebsite = newValue;
-
-        return this.savePoolDetails();
-    }
-
-    get poolPrivateKey(){
-
-        return this._poolPrivateKey;
-    }
-
-    get poolFee(){
-
-        return this._poolFee;
-    }
-
-    setPoolFee(newValue){
-
-        this._poolFee = newValue;
-
-        return this.savePoolDetails();
-    }
-
-    get poolServers(){
-
-        return this._poolServers;
-    }
-
-    setPoolServers(newValue){
-
-        this._poolServers = newValue;
-
-        return this.savePoolDetails();
-    }
-
-    async savePoolPrivateKey(){
-
-        let result = await this._db.save("pool_privatekey", this._poolPrivateKey);
-
-        return result;
-    }
-
-    async _getPoolPrivateKey(){
-
-        this._poolPrivateKey = await this._db.get("pool_privatekey", 30*1000, true);
-
-        if (this._poolPrivateKey === null)
-            this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues( 64 );
-
-        if (Buffer.isBuffer(this._poolPrivateKey)){
-            this._poolPublicKey = ed25519.generatePublicKey(this._poolPrivateKey);
+        for (let i = 1; i < minersList.length; ++i) {
+            if (worstHash.compare(minersList[i].bestHash) > 0)
+                worstHash = minersList[i].bestHash;
         }
 
-        return this._poolPrivateKey;
+        this._worstHash = worstHash;
+
+        return worstHash;
     }
 
-    validatePoolDetails(){
-        if (typeof this._poolName !== "string") throw {message: "pool name is not a string"};
-        if (! /^[A-Za-z\d\s]+$/.test(this._poolName)) throw {message: "pool name is invalid"};
+    /**
+     * Compute and set best hash from miners
+     * @returns {*} the new computed best hash
+     */
+    computeBestHash() {
 
-        if ( typeof this._poolFee !== "number") throw {message: "pool fee is invalid"};
+        let minersList = this._poolData.getMinersList();
 
-        if (typeof this._poolWebsite !== "string") throw {message: "pool website is not a string"};
-        if (this._poolWebsite !== '' && ! Utils.validateUrl(this._poolWebsite)) throw {message:"pool website is invalid"};
-    }
+        if (minersList.length === 0)
+            return this._bestHash;
 
-    async savePoolDetails(){
+        let bestHash = minersList[0].bestHash;
 
-        this.validatePoolDetails();
-
-        let result = await this._db.save("pool_name", this._poolName);
-        result = result && await this._db.save("pool_fee", this._poolFee);
-        result = result  && await this._db.save("pool_website", this._poolWebsite);
-        result = result  && await this._db.save("pool_servers", JSON.stringify(this._poolServers));
-
-        return  result;
-    }
-
-    async _getPoolDetails(){
-
-        this._poolName = await this._db.get("pool_name", 30*1000, true);
-        if (this._poolName === null) this._poolName = '';
-
-        try {
-
-            this._poolFee = await this._db.get("pool_fee", 30 * 1000, true);
-            if (this._poolFee === null)
-                this._poolFee = 0;
-
-            this._poolFee = parseInt(this._poolFee);
-        } catch (exception){
-
+        for (let i = 1; i < minersList.length; ++i) {
+            if (bestHash.compare(minersList[i].bestHash) < 0)
+                bestHash = minersList[i].bestHash;
         }
 
-        this._poolWebsite = await this._db.get("pool_website", 30*1000, true);
-        if (this._poolWebsite === null) this._poolWebsite = '';
+        this._bestHash = bestHash;
 
-        this._poolServers = JSON.parse( await this._db.get("pool_servers", 30*1000, true) );
-        if (this._poolServers === null) this._poolServers = '';
+        return bestHash;
+    }
 
-        this.validatePoolDetails();
+    /**
+     * Calculate difficulty for all miner's hashed.
+     * Each miner has associated a bestHash difficulty number
+     * @returns {*} difficultyList of miners and sum(difficultyList)
+     */
+    computeHashDifficulties() {
+
+        this.computeBestHash();
+        this.computeWorstHash();
+
+        let minersList = this._poolData.getMinersList();
+
+        let bestHashInt = Convert.bufferToBigIntegerHex(this._bestHash);
+        let worstHashInt = Convert.bufferToBigIntegerHex(this._worstHash);
+
+        let difficultyList = [];
+        let sum = 0;
+
+        for (let i = 0; i < minersList.length; ++i) {
+            let currentHashInt = Convert.bufferToBigIntegerHex(minersList[i].bestHash);
+            difficultyList[i] = Utils.divideBigIntegers(bestHashInt, currentHashInt);
+
+            sum += difficultyList[i];
+        }
+
+        return {difficultyList: difficultyList, sum: sum};
+    }
+
+    /**
+     * Update rewards for all miners. This function must be called at every block reward
+     * @param newReward is the total new reward of the pool
+     */
+    updateRewards(newReward) {
+
+        let newLeaderReward = Math.floor( newReward * PoolManagement.poolLeaderFee / 100);
+        this._poolLeaderReward += newLeaderReward;
+
+        let minersReward = newReward - newLeaderReward;
+
+        let response = this.computeHashDifficulties();
+        let difficultyList = response.difficultyList;
+        let difficultySum = response.sum;
+        let rewardPerDifficultyLevel =  minersReward / difficultySum;
+
+        //update rewards for each miner
+        for (let i = 0; i < difficultyList.length; ++i) {
+            let incReward = rewardPerDifficultyLevel * difficultyList[i];
+            this._poolData.increaseMinerRewardById(i, incReward);
+        }
 
     }
+
+    /**
+     * Do a transaction from reward wallet to miner's address
+     */
+    static sendReward(miner) {
+
+        let minerAddress = miner.address;
+        let reward = miner.reward;
+
+        //TODO: Do the transaction
+    }
+
+    /**
+     * Send rewards for miners and reset rewards from storage
+     */
+    async sendRewardsToMiners() {
+
+        let minersList = this._poolData.getMinersList();
+
+        for (let i = 0; i < minersList.length; ++i) {
+            this.sendReward(minersList[i]);
+        }
+
+        //After sending rewards we must reset rewards
+        await this._poolData.resetRewards();
+    }
+
+    /**
+     * Pool has mined a new block and has received a new reward.
+     * The new reward must be shared with miners.
+     * @param newReward
+     */
+    async onMinedBlock(newReward) {
+
+        this._logMinedBlockStatistics();
+
+        this.updateRewards(newReward);
+        await this.sendRewardsToMiners();
+
+    }
+
+    /**
+     * This function updates the mining statistics for the last mined blocks.
+     * The PoolData class manages the statistics
+     */
+    _logMinedBlockStatistics() {
+
+        this._poolData.addMinedBlockStatistics( this._currentBlockStatistics );
+        this._resetMinedBlockStatistics();
+    }
+
+    _resetMinedBlockStatistics() {
+        /**
+         * To be able to mine a block, the pool should generate ~ numBaseHashes of difficulty baseHashDifficulty
+         * In other words: The arithmetic mean of all generated hashes by pool to mine a block should be
+         * equal with numBaseHashes * baseHashDifficulty
+         * Each miner will receive a reward wighted on the number of baseHashDifficulty sent to pool leader.
+         */
+        this._currentBlockStatistics = {
+            baseHashDifficulty: Buffer.from(this._baseHash),
+            numBaseHashes: 0
+        };
+    }
+
+    /**
+     * Insert a new miner if not exists. Synchronizes with DB.
+     * @param minerAddress
+     * @returns true/false
+     */
+    addMiner(minerAddress) {
+
+        return this._poolData.setMiner(minerAddress);
+    }
+
+    /**
+     * Remove a miner if exists. Synchronizes with DB.
+     * @param minerAddress
+     * @returns true/false
+     */
+    removeMiner(minerAddress) {
+
+        return this._poolData.removeMiner(minerAddress);
+    }
+
+    /**
+     * Reset the rewards that must be sent(pool leader + miners)
+     */
+    async resetRewards() {
+
+        this._poolLeaderReward = 0;
+        await this._poolData.resetRewards();
+    }
+
+    /**
+     * Set pool's best hash
+     * @param fee
+     */
+    setBestHash(bestHash) {
+
+        this._bestHash = bestHash;
+    }
+
+    /**
+     * @returns pool's best hash
+     */
+    getBestHash() {
+
+        return this._bestHash;
+    }
+
+    /**
+     * @returns pool leader's reward
+     */
+    getPoolLeaderReward() {
+
+        return this._poolLeaderReward;
+    }
+
+    /**
+     * @returns pool's miner list
+     */
+    getMinersList() {
+
+        return this._poolData.getMinersList();
+    }
+
+    createMinerTask() {
+
+        //To create miner task puzzle
+
+    }
+
 
 }
 
