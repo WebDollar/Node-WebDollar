@@ -41,6 +41,10 @@ class PoolData {
         
         if (this.getMiner(minerAddress) === null) {
 
+            if ( !Buffer.isBuffer(minerAddress) || minerAddress.length !== consts.ADDRESSES.PUBLIC_KEY )
+                throw {message: "miner address is invalid" };
+
+
             this._minersList.push( new PoolDataMiner( uuid.v4(), minerAddress, minerReward, [] ) );
 
             return (await this.saveMinersList());

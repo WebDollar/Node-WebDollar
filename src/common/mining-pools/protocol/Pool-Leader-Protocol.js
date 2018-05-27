@@ -45,8 +45,9 @@ class PoolLeaderProtocol {
 
                 // save minerPublicKey
                 let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
+
                 if (miner === null )
-                    miner = this.poolManagement.poolData.addMiner(data.minerAddress, 0);
+                    miner = this.poolManagement.poolData.addMiner(data.minerAddress);
 
                 miner.addPublicKey(data.minerPublicKey);
 
