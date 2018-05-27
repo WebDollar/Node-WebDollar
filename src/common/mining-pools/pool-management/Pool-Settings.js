@@ -164,6 +164,11 @@ class PoolSettings {
 
     }
 
+    poolDigitalSign(message){
+        let signature = ed25519.sign( message, this._poolPrivateKey );
+        return signature;
+    }
+
 }
 
 export default PoolSettings;

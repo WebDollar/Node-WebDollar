@@ -194,26 +194,6 @@ class PoolManagement{
     }
 
     /**
-     * Insert a new miner if not exists. Synchronizes with DB.
-     * @param minerAddress
-     * @returns true/false
-     */
-    addMiner(minerAddress) {
-
-        return this._poolData.setMiner(minerAddress);
-    }
-
-    /**
-     * Remove a miner if exists. Synchronizes with DB.
-     * @param minerAddress
-     * @returns true/false
-     */
-    removeMiner(minerAddress) {
-
-        return this._poolData.removeMiner(minerAddress);
-    }
-
-    /**
      * Reset the rewards that must be sent(pool leader + miners)
      */
     async resetRewards() {

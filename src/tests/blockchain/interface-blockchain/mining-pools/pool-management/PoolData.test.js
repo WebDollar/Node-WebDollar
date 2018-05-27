@@ -54,9 +54,9 @@ describe('test pool leader DB', () => {
 
         let pd = new PoolData();
 
-        await pd.setMiner(minersList[0].address, minersList[0].reward);
+        await pd.addMiner(minersList[0].address, minersList[0].reward);
         
-        response = await pd.setMiner(minersList[0].address, minersList[0].reward);
+        response = await pd.addMiner(minersList[0].address, minersList[0].reward);
         assert(response === false, "Miner inserted twice");
         
         let miner = pd.getMinersList()[0];
@@ -79,7 +79,7 @@ describe('test pool leader DB', () => {
         
         for (let i = 0; i < minersList.length; ++i){
 
-            await pd.setMiner(minersList[i].address, minersList[i].reward);
+            await pd.addMiner(minersList[i].address, minersList[i].reward);
             pd.increaseMinerReward(minersList[i].address, 10133333);
         }
 

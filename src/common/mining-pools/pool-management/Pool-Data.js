@@ -2,6 +2,8 @@ import consts from 'consts/const_global';
 import Serialization from "common/utils/Serialization";
 import BufferExtended from 'common/utils/BufferExtended';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
+import PoolDataMiner from "common/mining-pools/pool-management/Pool-Data-Miner"
+const uuid = require('uuid');
 
 class PoolData {
 
@@ -24,7 +26,7 @@ class PoolData {
         
         for (let i = 0; i < this._minersList.length; ++i) 
             if (this._minersList[i].address === minerAddress)
-                return {index: i, miner: this._minersList[i]};
+                return this._minersList[i];
                 
         return null;
     }
@@ -35,10 +37,12 @@ class PoolData {
      * @param minerReward
      * @returns true/false
      */
-    async setMiner(minerAddress, minerReward = 0){
+    async addMiner(minerAddress, minerReward = 0){
         
         if (this.getMiner(minerAddress) === null) {
-            this._minersList.push( {address: minerAddress, reward: minerReward} );
+
+
+            this._minersList.push( new PoolDataMiner( uuid.v4(), minerAddress, minerReward, [] ) );
             return (await this.saveMinersList());
         }
         
@@ -141,7 +145,7 @@ class PoolData {
         if (response === null)
             return false;
         
-        response.miner.reward = reward;
+        response.reward = reward;
         
         return true;
     }
@@ -167,19 +171,15 @@ class PoolData {
     increaseMinerRewardById(id, reward) {
 
         this._minersList[id].reward += reward;
+
     }
     
     _serializeMiners() {
         
-        let list = [Serialization.serializeNumber2Bytes(this._minersList.length)];
+        let list = [Serialization.serializeNumber4Bytes(this._minersList.length)];
 
-        for (let i = 0; i < this._minersList.length; ++i) {
-
-            list.push( Serialization.serializeNumber1Byte(BufferExtended.fromBase(this._minersList[i].address).length) );
-            list.push( BufferExtended.fromBase(this._minersList[i].address) );
-            
-            list.push ( Serialization.serializeNumber8Bytes(this._minersList[i].reward) );
-        }
+        for (let i = 0; i < this._minersList.length; ++i)
+            list.push(this._minersList[i].serializeMiner());
 
         return Buffer.concat(list);
     }
@@ -188,22 +188,15 @@ class PoolData {
 
         try {
             
-            let numMiners = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 2 ) );
-            offset += 2;
+            let numMiners = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
+            offset += 4;
 
             this._minersList = [];
             for (let i = 0; i < numMiners; ++i) {
 
-                let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
-                offset += 1;
+                let miner = new PoolDataMiner(0,undefined, []);
+                offset = miner.deserializeMiner(offset, buffer);
 
-                let minerAddress = BufferExtended.toBase( BufferExtended.substr(buffer, offset, len) );
-                offset += len;
-
-                let minerReward = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
-                offset += 7;
-
-                this._minersList.push( {address: minerAddress, reward: minerReward} );
             }
             
             return true;
@@ -288,9 +281,8 @@ class PoolData {
      */
     static compareMiners(miner1, miner2) {
 
-        return !( typeof miner1 === typeof miner2 &&
-            miner1.address === miner2.address &&
-            miner1.reward === miner2.reward);
+        return miner1 === miner2 || miner1.address === miner2.address;
+
     }
 
 }

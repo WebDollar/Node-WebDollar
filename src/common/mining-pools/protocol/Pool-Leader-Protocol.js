@@ -15,8 +15,9 @@ import PoolManagement from "../pool-management/Pool-Settings";
  */
 class PoolLeaderProtocol {
 
-    constructor(databaseName = consts.DATABASE_NAMES.POOL_DATABASE) {
+    constructor(poolManagement, databaseName = consts.DATABASE_NAMES.POOL_DATABASE) {
 
+        this.poolManagement = poolManagement;
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeMiner(result)
@@ -37,6 +38,20 @@ class PoolLeaderProtocol {
         socket.node.on("mining-pool/hello-pool", (data) => {
 
             try{
+
+                if (Buffer.isBuffer( data.message )  || data.message.length !== 32) throw {message: "message is invalid"};
+                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length < 32) throw {message: "minerPublicKey is invalid"};
+                if (Buffer.isBuffer( data.minerAddress )  || data.minerAddress.length < 32) throw {message: "minerPublicKey is invalid"};
+
+                // save minerPublicKey
+                let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
+                if (miner === null )
+                    miner = this.poolManagement.poolData.addMiner(data.minerAddress, 0);
+
+                miner.addPublicKey(data.minerPublicKey);
+
+                let signature = this.poolManagement.poolSettings.poolDigitalSign(data.message);
+                socket.node.sendRequest("mining-pool/hello-pool"+"/answer", { signature: signature, status: "great" } );
 
             } catch (exception){
 
