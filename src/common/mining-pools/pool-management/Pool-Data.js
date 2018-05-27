@@ -41,9 +41,10 @@ class PoolData {
         
         if (this.getMiner(minerAddress) === null) {
 
-
             this._minersList.push( new PoolDataMiner( uuid.v4(), minerAddress, minerReward, [] ) );
+
             return (await this.saveMinersList());
+
         }
         
         return false; //miner already exists
@@ -195,7 +196,7 @@ class PoolData {
             for (let i = 0; i < numMiners; ++i) {
 
                 let miner = new PoolDataMiner(0,undefined, []);
-                offset = miner.deserializeMiner(offset, buffer);
+                offset = miner.deserializeMiner(buffer, offset );
 
             }
             

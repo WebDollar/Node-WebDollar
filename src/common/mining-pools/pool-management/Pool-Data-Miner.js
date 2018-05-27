@@ -1,22 +1,24 @@
 import Serialization from 'common/utils/Serialization';
 import BufferExtended from 'common/utils/BufferExtended';
+import consts from 'consts/const_global'
 
 class PoolDataMiner{
 
-    constructor(index, address, reward, publicKeys){
+    constructor(index, address, reward, publicKey){
 
         this.index = index;
         this.address = address;
-        this.reward =reward;
+        this.reward = reward;
 
-        if (!Array.isArray(publicKeys))
-            publicKeys = [publicKeys];
+        this.publicKeys = [];
 
-        this.publicKeys = publicKeys;
+        this.addPublicKey(publicKey);
 
     }
 
     addPublicKey(publicKey){
+
+        if (!Buffer.isBuffer( publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "public key is invalid"};
 
         if (this.findPublicKey(publicKey) === -1)
             this.publicKeys.push(publicKey);
@@ -36,8 +38,11 @@ class PoolDataMiner{
 
         let list = [];
 
-        list.push( Serialization.serializeNumber1Byte(BufferExtended.fromBase(this.address).length) );
-        list.push( BufferExtended.fromBase(this.address) );
+        list.push(this.address ); //20 bytes
+
+        list.push ( Serialization.serializeNumber2Bytes(this.publicKeys) );
+        for (let i=0; i<this.publicKeys.length; i++)
+            list.push(this.publicKeys[i]);
 
         list.push ( Serialization.serializeNumber8Bytes(this.reward) );
 
@@ -45,13 +50,17 @@ class PoolDataMiner{
 
     }
 
-    deserializeMiner(offset, buffer){
+    deserializeMiner( buffer, offset ){
 
-        let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
-        offset += 1;
+        this.address = BufferExtended.toBase( BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH ) );
+        offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
-        this.address = BufferExtended.toBase( BufferExtended.substr(buffer, offset, len) );
-        offset += len;
+        let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 2 ) );
+
+        for (let i=0; i<len; i++){
+            BufferExtended.substr( buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH );
+            offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH
+        }
 
         this.minerReward = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
         offset += 7;
