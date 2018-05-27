@@ -63,9 +63,12 @@ export default {
 
         {"addr": ["https://webdollarinfinitypool.io"]}, //Thanks to @Tibi Popescu
 <<<<<<< HEAD
+<<<<<<< HEAD
         {"addr": ["https://webdollarinfinitypool.io:80"]}, //Thanks to @Tibi Popescu
 =======
 >>>>>>> b59f6d0478faf31c106378deb3efeb0400c6b357
+=======
+>>>>>>> 370f84c4f43cedaa15ebcc6968c86ed971071e45
 
         //---------------------------------------------------------
         //--------------WebDollar FallBack Nodes-------------------
