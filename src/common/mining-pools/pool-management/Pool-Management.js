@@ -1,5 +1,5 @@
 import PoolSettings from "./Pool-Settings"
-import PoolData from 'common/mining-pools/pool-management/Pool-Data';
+import PoolData from 'common/mining-pools/pool-management/pool-data/Pool-Data';
 import consts from 'consts/const_global';
 
 class PoolManagement{
@@ -30,30 +30,12 @@ class PoolManagement{
     }
 
 
+    createPoolWorker(){
 
+        return new Buffer(32);
 
-    /**
-     * Compute and set worst hash from miners
-     * @returns {*} the new computed worst hash
-     */
-    computeWorstHash() {
-
-        let minersList = this._poolData.getMinersList();
-
-        if (minersList.length === 0)
-            return this._worstHash;
-
-        let worstHash = minersList[0].bestHash;
-
-        for (let i = 1; i < minersList.length; ++i) {
-            if (worstHash.compare(minersList[i].bestHash) > 0)
-                worstHash = minersList[i].bestHash;
-        }
-
-        this._worstHash = worstHash;
-
-        return worstHash;
     }
+
 
     /**
      * Compute and set best hash from miners
@@ -77,6 +59,8 @@ class PoolManagement{
 
         return bestHash;
     }
+
+
 
     /**
      * Calculate difficulty for all miner's hashed.

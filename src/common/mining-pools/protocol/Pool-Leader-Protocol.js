@@ -1,7 +1,7 @@
 import consts from 'consts/const_global';
 import Convert from 'common/utils/Convert';
 import NodesList from 'node/lists/Nodes-List';
-import PoolData from 'common/mining-pools/pool-management/Pool-Data';
+import PoolData from 'common/mining-pools/pool-management/pool-data/Pool-Data';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 import  Utils from "common/utils/helpers/Utils"
 import PoolManagement from "../pool-management/Pool-Settings";
@@ -40,8 +40,8 @@ class PoolLeaderProtocol {
             try{
 
                 if (Buffer.isBuffer( data.message )  || data.message.length !== 32) throw {message: "message is invalid"};
-                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length < 32) throw {message: "minerPublicKey is invalid"};
-                if (Buffer.isBuffer( data.minerAddress )  || data.minerAddress.length < 32) throw {message: "minerPublicKey is invalid"};
+                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                if (Buffer.isBuffer( data.minerAddress )  || data.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "minerAddress is invalid"};
 
                 // save minerPublicKey
                 let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
@@ -64,6 +64,13 @@ class PoolLeaderProtocol {
 
             try{
 
+                if (Buffer.isBuffer( data.minerAddress )  || data.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "minerAddress is invalid"};
+
+                // load minerPublicKey
+                let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
+
+                if (miner === null) throw {message: "mine was not found"};
+
             } catch (exception){
 
             }
@@ -83,6 +90,17 @@ class PoolLeaderProtocol {
         socket.node.on("mining-pool/get-miner-work", (data) => {
 
             try{
+
+                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+
+                // save minerPublicKey
+                let miner = this.poolManagement.poolData.getMinerByPublicKey(data.minerPublicKey);
+
+                if (miner === null) throw {message: "publicKey was not found"}
+
+                let work = this.poolManagement.createPoolWorker();
+
+                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", {work: work.data, nonces})
 
             } catch (exception){
 

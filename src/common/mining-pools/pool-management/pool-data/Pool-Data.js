@@ -2,7 +2,7 @@ import consts from 'consts/const_global';
 import Serialization from "common/utils/Serialization";
 import BufferExtended from 'common/utils/BufferExtended';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
-import PoolDataMiner from "common/mining-pools/pool-management/Pool-Data-Miner"
+import PoolDataMiner from "common/mining-pools/pool-management/pool-data/Pool-Data-Miner"
 const uuid = require('uuid');
 
 class PoolData {
@@ -28,6 +28,19 @@ class PoolData {
             if (this._minersList[i].address === minerAddress)
                 return this._minersList[i];
                 
+        return null;
+    }
+
+    /**
+     * @param minerAddress
+     * @returns miner or null if it doesn't exist
+     */
+    getMinerByPublicKey(minerPublicKey){
+
+        for (let i = 0; i < this._minersList.length; ++i)
+            if (this._minersList[i].findPublicKey(minerPublicKey))
+                return this._minersList[i];
+
         return null;
     }
     
