@@ -17,6 +17,8 @@ export default {
         {"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
         {"addr": ["https://webdollar.csland.ro:8442"]}, // Thanks to @mariotheodor
         {"addr": ["https://webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
+        {"addr": ["https://node4.petreus.ro:443"]}, // Thanks to Timi
+        {"addr": ["https://wb.ciuc.ro:443"]}, // Thanks to Adi Clar
         {"addr": ["https://nodecstl.ddns.net:80"]},
         {"addr": ["https://webd.5q.ro:3333"]},
         {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
