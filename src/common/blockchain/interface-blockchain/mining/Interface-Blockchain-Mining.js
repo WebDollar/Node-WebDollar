@@ -33,6 +33,53 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     _simulatedNextBlockMining(nextBlock){
     }
 
+    async getNextBlock(){
+
+        let nextBlock, nextTransactions;
+
+        try {
+
+            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeeThreshold);
+
+            nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
+
+            nextBlock.difficultyTargetPrev = this.blockchain.getDifficultyTarget();
+            nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
+            nextBlock.updateInterlink();
+
+
+        } catch (Exception){
+            console.error("Error creating next block ", Exception, nextBlock);
+        }
+
+        try{
+
+
+            //simulating the new block and calculate the hashAccountantTree
+            let revertActions = new RevertActions( this.blockchain );
+
+            if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
+
+                async ()=>{
+
+                    return await this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
+                        async ()=>{
+                            return await this._simulatedNextBlockMining(nextBlock, false);
+                        },
+                        false); //avoid displaying the changes
+
+                }) === false) throw {message: "Mining1 returned False"};
+
+            revertActions.destroyRevertActions();
+
+        } catch (Exception){
+            console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);
+        }
+
+        return nextBlock;
+
+    }
+
     /**
      * mine next block
      */
@@ -58,46 +105,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             // if (this.blockchain.blocks.length === 12)
             //     return;
 
-            let nextBlock, nextTransactions;
-
-            try {
-
-                nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeeThreshold);
-
-                nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
-
-                nextBlock.difficultyTargetPrev = this.blockchain.getDifficultyTarget();
-                nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
-                nextBlock.updateInterlink();
-
-
-            } catch (Exception){
-                console.error("Error creating next block ", Exception, nextBlock);
-            }
-
-            try{
-
-
-                //simulating the new block and calculate the hashAccountantTree
-                let revertActions = new RevertActions( this.blockchain );
-
-                if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
-
-                    async ()=>{
-
-                        return await this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
-                            async ()=>{
-                                return await this._simulatedNextBlockMining(nextBlock, false);
-                            },
-                            false); //avoid displaying the changes
-
-                    }) === false) throw {message: "Mining1 returned False"};
-
-                revertActions.destroyRevertActions();
-
-            } catch (Exception){
-                console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);
-            }
+            let nextBlock = this.getNextBlock();
 
             try {
                 await this.mineBlock(nextBlock, this.blockchain.getDifficultyTarget(), undefined, showMiningOutput);

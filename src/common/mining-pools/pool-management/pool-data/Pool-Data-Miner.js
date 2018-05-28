@@ -1,6 +1,8 @@
 import Serialization from 'common/utils/Serialization';
 import BufferExtended from 'common/utils/BufferExtended';
 import consts from 'consts/const_global'
+import PoolData from "./Pool-Data";
+import PoolDataMinerInstance from "./Pool-Data-Miner-Instance";
 
 class PoolDataMiner{
 
@@ -19,12 +21,14 @@ class PoolDataMiner{
 
         if (!Buffer.isBuffer( publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "public key is invalid"};
 
-        if (this.findInstances(publicKey) === -1)
-            this.instances.push(publicKey);
+        if (this.findInstance(publicKey) === -1) {
+            let instance = new PoolDataMinerInstance(this, publicKey);
+            this.instances.push(instance);
+        }
 
     }
 
-    findInstances(publicKey){
+    findInstance(publicKey){
 
         for (let i=0; i<this.instances.length; i++)
             if (this.instances[i].publicKey.equals ( publicKey) )

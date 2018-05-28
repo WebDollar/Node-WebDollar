@@ -96,9 +96,9 @@ class PoolLeaderProtocol {
                 // save minerPublicKey
                 let miner = this.poolManagement.poolData.getMinerByPublicKey(data.minerPublicKey);
 
-                if (miner === null) throw {message: "publicKey was not found"}
+                if (miner === null) throw {message: "publicKey was not found"};
 
-                let work = this.poolManagement.createPoolWorker();
+                let work = this.poolManagement.generatePoolWorker(miner);
 
                 socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", work )
 

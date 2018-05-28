@@ -1,12 +1,16 @@
 import PoolSettings from "./Pool-Settings"
 import PoolData from 'common/mining-pools/pool-management/pool-data/Pool-Data';
 import consts from 'consts/const_global';
+import PoolWorkManagement from "./Pool-Work-Management";
 
 class PoolManagement{
 
-    constructor(wallet, databaseName){
+    constructor(blockchain, wallet, databaseName){
+
+        this.blockchain = blockchain;
 
         this.poolSettings = new PoolSettings(wallet);
+        this.poolWorkManagement = new PoolWorkManagement(blockchain);
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
         this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
@@ -15,9 +19,6 @@ class PoolManagement{
 
         //TODO: Check is needed to store/load from database
         this._poolLeaderReward = 0;
-
-        //TODO: Check is needed to store/load from database, Update hardcoded value
-        this._bestHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
 
         this._resetMinedBlockStatistics();
 
@@ -29,69 +30,14 @@ class PoolManagement{
 
     }
 
-
-    createPoolWorker(){
-
-        return {
-            block: new Buffer(32),
-            noncesStart: 0,
-            noncesEnd: 100,
-        };
-
+    generatePoolWorker(minerInstance){
+        return this.poolWorkManagement.getWork(minerInstance);
     }
 
+    receivePoolWork(work){
 
-    /**
-     * Compute and set best hash from miners
-     * @returns {*} the new computed best hash
-     */
-    computeBestHash() {
+        if (work === undefined) return;
 
-        let minersList = this._poolData.getMinersList();
-
-        if (minersList.length === 0)
-            return this._bestHash;
-
-        let bestHash = minersList[0].bestHash;
-
-        for (let i = 1; i < minersList.length; ++i) {
-            if (bestHash.compare(minersList[i].bestHash) < 0)
-                bestHash = minersList[i].bestHash;
-        }
-
-        this._bestHash = bestHash;
-
-        return bestHash;
-    }
-
-
-
-    /**
-     * Calculate difficulty for all miner's hashed.
-     * Each miner has associated a bestHash difficulty number
-     * @returns {*} difficultyList of miners and sum(difficultyList)
-     */
-    computeHashDifficulties() {
-
-        this.computeBestHash();
-        this.computeWorstHash();
-
-        let minersList = this._poolData.getMinersList();
-
-        let bestHashInt = Convert.bufferToBigIntegerHex(this._bestHash);
-        let worstHashInt = Convert.bufferToBigIntegerHex(this._worstHash);
-
-        let difficultyList = [];
-        let sum = 0;
-
-        for (let i = 0; i < minersList.length; ++i) {
-            let currentHashInt = Convert.bufferToBigIntegerHex(minersList[i].bestHash);
-            difficultyList[i] = Utils.divideBigIntegers(bestHashInt, currentHashInt);
-
-            sum += difficultyList[i];
-        }
-
-        return {difficultyList: difficultyList, sum: sum};
     }
 
     /**
@@ -190,22 +136,6 @@ class PoolManagement{
         await this._poolData.resetRewards();
     }
 
-    /**
-     * Set pool's best hash
-     * @param fee
-     */
-    setBestHash(bestHash) {
-
-        this._bestHash = bestHash;
-    }
-
-    /**
-     * @returns pool's best hash
-     */
-    getBestHash() {
-
-        return this._bestHash;
-    }
 
     /**
      * @returns pool leader's reward
