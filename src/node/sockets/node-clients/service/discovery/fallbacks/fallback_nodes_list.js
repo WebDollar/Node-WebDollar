@@ -62,7 +62,7 @@ export default {
         // {"addr": ["https://chucknorris.webdollarvpn.io:8082"]}, // Thanks to @cbusuioceanu
 
         {"addr": ["https://webdollarinfinitypool.io"]}, //Thanks to @Tibi Popescu
-
+        {"addr": ["https://webdollarinfinitypool.io:80"]}, //Thanks to @Tibi Popescu
         //---------------------------------------------------------
         //--------------WebDollar FallBack Nodes-------------------
         //---------------------------------------------------------
