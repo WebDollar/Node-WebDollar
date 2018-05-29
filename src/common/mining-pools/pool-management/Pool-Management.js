@@ -19,7 +19,7 @@ class PoolManagement{
         this.blockchain = blockchain;
 
         this.poolSettings = new PoolSettings(wallet);
-        this.poolWorkManagement = new PoolWorkManagement(blockchain);
+        this.poolWorkManagement = new PoolWorkManagement(this, blockchain);
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
         this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
@@ -45,7 +45,7 @@ class PoolManagement{
 
     }
 
-    async receivePoolWork(minerInstance, work){
+    receivePoolWork(minerInstance, work){
 
        return this.poolWorkManagement.processWork(minerInstance, work)
     }
@@ -54,7 +54,7 @@ class PoolManagement{
      * Update rewards for all miners. This function must be called at every block reward
      * @param newReward is the total new reward of the pool
      */
-    updateRewards(minerInstance) {
+    updateRewards(minerInstance, work) {
 
 
     }

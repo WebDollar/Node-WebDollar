@@ -1,4 +1,6 @@
 import Serialization from 'common/utils/Serialization';
+import BufferExtended from "common/utils/BufferExtended";
+import consts from 'consts/const_global';
 
 class PoolBlocksManagement{
 
@@ -56,19 +58,19 @@ class PoolBlocksManagement{
         if (minerInstance){
 
             //validate hash
-            if (Math.random() < this.poolWorkManagement.poolSettings.poolPOWValidationProbability ){
+            if ( Math.random() < this.poolManagement.poolSettings.poolPOWValidationProbability ){
 
                 let hash = await minerInstance.work.block.computeHash( work.bestNonce );
 
-                if ( ! BufferExtended.safeCompare(hash, work.bestHash ) )
-                {message: "work.hash is invalid"}
+                if ( ! BufferExtended.safeCompare(hash, work.bestHash ) ) throw {message: "work.hash is invalid"}
 
             }
 
             minerInstance.work.hash = work.hash;
-            let reward = this.updateRewards(minerInstance);
 
-            return {work: this.generatePoolWork(), reward: reward };
+            let reward = await this.poolManagement.updateRewards(minerInstance, work);
+
+            return {work: this.getWork(minerInstance), reward: reward };
         }
 
 
