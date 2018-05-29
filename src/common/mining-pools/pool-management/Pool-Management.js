@@ -1,4 +1,4 @@
-import PoolSettings from "./Pool-Settings"
+import PoolSettings from "./Pool-Settings";
 import PoolData from 'common/mining-pools/pool-management/pool-data/Pool-Data';
 import consts from 'consts/const_global';
 import PoolWorkManagement from "./Pool-Work-Management";

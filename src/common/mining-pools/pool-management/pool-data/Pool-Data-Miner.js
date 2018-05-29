@@ -10,6 +10,7 @@ class PoolDataMiner{
 
         this.index = index;
         this.address = address;
+        this.reward = reward;
 
         this.instances = [];
 
@@ -19,7 +20,7 @@ class PoolDataMiner{
 
     addInstance(publicKey){
 
-        if (!Buffer.isBuffer( publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) 
+        if (!Buffer.isBuffer(publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) 
             throw {message: "public key is invalid"};
 
         if (this.findInstance(publicKey) === null) {
