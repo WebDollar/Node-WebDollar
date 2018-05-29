@@ -24,7 +24,7 @@ class PoolManagement{
         // this.blockchainReward = BlockchainMiningReward.getReward();
         this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
 
-        this._poolData = new PoolData(databaseName);
+        this.poolData = new PoolData(databaseName);
 
         //TODO: Check is needed to store/load from database
         this._poolLeaderReward = 0;
@@ -68,6 +68,8 @@ class PoolManagement{
         let reward = miner.reward;
 
         //TODO: Do the transaction
+
+        return true;
     }
 
     /**
@@ -75,14 +77,14 @@ class PoolManagement{
      */
     async sendRewardsToMiners() {
 
-        let minersList = this._poolData.getMinersList();
+        let minersList = this.poolData.getMinersList();
 
         for (let i = 0; i < minersList.length; ++i) {
             this.sendReward(minersList[i]);
         }
 
         //After sending rewards we must reset rewards
-        await this._poolData.resetRewards();
+        await this.poolData.resetRewards();
     }
 
     /**
@@ -105,7 +107,7 @@ class PoolManagement{
      */
     _logMinedBlockStatistics() {
 
-        this._poolData.addMinedBlockStatistics( this._currentBlockStatistics );
+        this.poolData.addMinedBlockStatistics( this._currentBlockStatistics );
         this._resetMinedBlockStatistics();
     }
 

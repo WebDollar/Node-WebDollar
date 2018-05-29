@@ -53,29 +53,42 @@ class PoolLeaderProtocol {
 
         });
 
+        //TODO change-wallet
         socket.node.on("mining-pool/change-wallet", (data) => {
 
             try{
+
+                if (Buffer.isBuffer( data.address )  || data.address.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "address is invalid"};
+                if (Buffer.isBuffer( data.publicKey)  || data.publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "publicKey is invalid"};
+
+                let miner = this.poolManagement.poolData.getMiner(data.address);
+                if (miner === null) throw {message: "mine was not found"};
+
+
+
+            } catch (exception){
+                socket.node.sendRequest("mining-pool/change-wallet"+"/answer", {result: false, message: exception.message } )
+            }
+
+        });
+
+        //TODO request reward
+        socket.node.on("mining-pool/request-reward", async (data) => {
+
+            try {
 
                 if (Buffer.isBuffer( data.minerAddress )  || data.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "minerAddress is invalid"};
 
                 // load minerPublicKey
                 let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
-
                 if (miner === null) throw {message: "mine was not found"};
 
-            } catch (exception){
+                let answer = await this.poolManagement.sendReward(data.minerAddress);
 
-            }
-
-        });
-
-        socket.node.on("mining-pool/request-reward", (data) => {
-
-            try {
+                socket.node.sendRequest("mining-pool/request-reward"+"/answer", {result: answer } )
 
             } catch (exception) {
-
+                socket.node.sendRequest("mining-pool/request-reward"+"/answer", {result: false, message: exception.message } )
             }
         });
 
