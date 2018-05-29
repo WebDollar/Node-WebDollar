@@ -79,7 +79,24 @@ class PoolLeaderProtocol {
 
         socket.node.on("mining-pool/request-reward", (data) => {
 
+            try {
+
+            } catch (exception) {
+
+            }
+        });
+
+        socket.node.on("mining-pool/work-done", (data) => {
+
             try{
+
+                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+
+                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
+                if (minerInstance === null) throw {message: "publicKey was not found"};
+
+                this.poolManagement.receivePoolWork(minerInstance, data.work);
+
 
             } catch (exception){
 
@@ -93,12 +110,10 @@ class PoolLeaderProtocol {
 
                 if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
 
-                // save minerPublicKey
-                let miner = this.poolManagement.poolData.getMinerByPublicKey(data.minerPublicKey);
+                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
+                if (minerInstance === null) throw {message: "publicKey was not found"};
 
-                if (miner === null) throw {message: "publicKey was not found"};
-
-                let work = this.poolManagement.generatePoolWorker(miner);
+                let work = this.poolManagement.generatePoolWork(minerInstance);
 
                 socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", work )
 

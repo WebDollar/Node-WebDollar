@@ -35,7 +35,7 @@ class PoolData {
      * @param minerAddress
      * @returns miner or null if it doesn't exist
      */
-    getMinerByPublicKey(minerPublicKey){
+    getMinerInstanceByPublicKey(minerPublicKey){
 
         for (let i = 0; i < this._minersList.length; ++i)
             if (this._minersList[i].findInstance(minerPublicKey))

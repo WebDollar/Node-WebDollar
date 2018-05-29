@@ -12,6 +12,8 @@ class PoolDataMinerInstance{
         this.hashesPerSecond = 0;
         this.reward = 0;
 
+        this.work = undefined;
+
     }
 
     serializeMinerInstance(){

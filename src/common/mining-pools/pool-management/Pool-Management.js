@@ -30,13 +30,27 @@ class PoolManagement{
 
     }
 
-    generatePoolWorker(minerInstance){
+    generatePoolWork(minerInstance){
+
         return this.poolWorkManagement.getWork(minerInstance);
+
     }
 
-    receivePoolWork(work){
+    receivePoolWork(minerInstance, work){
 
-        if (work === undefined) return;
+        if (work === undefined) throw {message: "work is undefined"};
+        if ( Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
+
+        if (minerInstance){
+
+            //validate hash
+            if ( 1 !== 1) throw {message: "work.hash is invalid"};
+
+            minerInstance.work.hash = work.hash;
+            this.updateRewards(minerInstance);
+
+            return {result: true, work: this.generatePoolWork() }
+        }
 
     }
 
@@ -44,23 +58,8 @@ class PoolManagement{
      * Update rewards for all miners. This function must be called at every block reward
      * @param newReward is the total new reward of the pool
      */
-    updateRewards(newReward) {
+    updateRewards(minerInstance) {
 
-        let newLeaderReward = Math.floor( newReward * PoolManagement.poolLeaderFee / 100);
-        this._poolLeaderReward += newLeaderReward;
-
-        let minersReward = newReward - newLeaderReward;
-
-        let response = this.computeHashDifficulties();
-        let difficultyList = response.difficultyList;
-        let difficultySum = response.sum;
-        let rewardPerDifficultyLevel =  minersReward / difficultySum;
-
-        //update rewards for each miner
-        for (let i = 0; i < difficultyList.length; ++i) {
-            let incReward = rewardPerDifficultyLevel * difficultyList[i];
-            this._poolData.increaseMinerRewardById(i, incReward);
-        }
 
     }
 

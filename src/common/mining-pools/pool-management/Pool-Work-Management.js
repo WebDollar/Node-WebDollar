@@ -32,12 +32,16 @@ class PoolBlocksManagement{
         ]);
 
         let answer = {
+
             block: serialization,
             noncesStart: this._lastBlockNonce,
             noncesEnd: this._lastBlockNonce + minerInstance.hashesPerSecond,
+
         };
 
         this._lastBlockNonce += minerInstance.hashesPerSecond;
+
+        minerInstance.work = answer;
 
         return answer;
 
