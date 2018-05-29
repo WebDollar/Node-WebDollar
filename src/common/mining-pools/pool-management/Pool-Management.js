@@ -2,6 +2,7 @@ import PoolSettings from "./Pool-Settings"
 import PoolData from 'common/mining-pools/pool-management/pool-data/Pool-Data';
 import consts from 'consts/const_global';
 import PoolWorkManagement from "./Pool-Work-Management";
+import BufferExtended from "common/utils/BufferExtended"
 
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
@@ -44,22 +45,9 @@ class PoolManagement{
 
     }
 
-    receivePoolWork(minerInstance, work){
+    async receivePoolWork(minerInstance, work){
 
-        if (work === undefined) throw {message: "work is undefined"};
-        if ( Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
-
-        if (minerInstance){
-
-            //validate hash
-            if ( 1 !== 1) throw {message: "work.hash is invalid"};
-
-            minerInstance.work.hash = work.hash;
-            let reward = this.updateRewards(minerInstance);
-
-            return {work: this.generatePoolWork(), reward: reward };
-        }
-
+       return this.poolWorkManagement.processWork(minerInstance, work)
     }
 
     /**
@@ -134,37 +122,6 @@ class PoolManagement{
         };
     }
 
-    /**
-     * Reset the rewards that must be sent(pool leader + miners)
-     */
-    async resetRewards() {
-
-        this._poolLeaderReward = 0;
-        await this._poolData.resetRewards();
-    }
-
-
-    /**
-     * @returns pool leader's reward
-     */
-    getPoolLeaderReward() {
-
-        return this._poolLeaderReward;
-    }
-
-    /**
-     * @returns pool's miner list
-     */
-    getMinersList() {
-
-        return this._poolData.getMinersList();
-    }
-
-    createMinerTask() {
-
-        //To create miner task puzzle
-
-    }
 
 
 }

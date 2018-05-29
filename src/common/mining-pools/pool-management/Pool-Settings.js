@@ -16,6 +16,7 @@ class PoolSettings {
         this._poolName = '';
         this._poolWebsite = '';
         this._poolServers = '';
+        this._poolPOWValidationProbability = 0.10; //from 100
 
         this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
         this._poolPublicKey = undefined;
@@ -74,6 +75,10 @@ class PoolSettings {
     get poolFee(){
 
         return this._poolFee;
+    }
+
+    get poolPOWValidationProbability(){
+        return this._poolPOWValidationProbability;
     }
 
     setPoolFee(newValue){
