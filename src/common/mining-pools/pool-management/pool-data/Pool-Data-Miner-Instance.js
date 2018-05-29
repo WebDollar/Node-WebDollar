@@ -1,6 +1,6 @@
 import Serialization from 'common/utils/Serialization';
-import consts from 'consts/const_global'
-import BufferExtended from "common/utils/BufferExtended"
+import consts from 'consts/const_global';
+import BufferExtended from "common/utils/BufferExtended";
 
 class PoolDataMinerInstance{
 
