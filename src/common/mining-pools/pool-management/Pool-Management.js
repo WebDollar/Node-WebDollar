@@ -3,6 +3,14 @@ import PoolData from 'common/mining-pools/pool-management/pool-data/Pool-Data';
 import consts from 'consts/const_global';
 import PoolWorkManagement from "./Pool-Work-Management";
 
+/*
+ * Miners earn shares until the pool finds a block (the end of the mining round).
+ * After that each user gets reward R = B * n / N,
+ * where n is amount of his own shares,
+ * and N is amount of all shares in this round.
+ * In other words, all shares are equal, but its cost is calculated only in the end of a round.
+ */
+
 class PoolManagement{
 
     constructor(blockchain, wallet, databaseName){
@@ -47,9 +55,9 @@ class PoolManagement{
             if ( 1 !== 1) throw {message: "work.hash is invalid"};
 
             minerInstance.work.hash = work.hash;
-            this.updateRewards(minerInstance);
+            let reward = this.updateRewards(minerInstance);
 
-            return {result: true, work: this.generatePoolWork() }
+            return {work: this.generatePoolWork(), reward: reward };
         }
 
     }

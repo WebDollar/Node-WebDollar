@@ -6,13 +6,6 @@ import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-R
 import  Utils from "common/utils/helpers/Utils"
 import PoolManagement from "../pool-management/Pool-Settings";
 
-/*
- * Miners earn shares until the pool finds a block (the end of the mining round).
- * After that each user gets reward R = B * n / N,
- * where n is amount of his own shares,
- * and N is amount of all shares in this round. 
- * In other words, all shares are equal, but its cost is calculated only in the end of a round.
- */
 class PoolLeaderProtocol {
 
     constructor(poolManagement, databaseName = consts.DATABASE_NAMES.POOL_DATABASE) {
@@ -95,11 +88,12 @@ class PoolLeaderProtocol {
                 let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
                 if (minerInstance === null) throw {message: "publicKey was not found"};
 
-                this.poolManagement.receivePoolWork(minerInstance, data.work);
+                let answer = this.poolManagement.receivePoolWork(minerInstance, data.work);
 
+                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: true, work: answer.work, reward: answer.reward } ); //the new reward
 
             } catch (exception){
-
+                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", {result: false, message: exception.message } )
             }
 
         });
@@ -115,9 +109,11 @@ class PoolLeaderProtocol {
 
                 let work = this.poolManagement.generatePoolWork(minerInstance);
 
-                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", work )
+                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", {result: true, work: work } )
 
             } catch (exception){
+
+                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", {result: false, message: exception.message } );
 
             }
 
@@ -128,6 +124,7 @@ class PoolLeaderProtocol {
     _unsubscribeMiner(nodesListObject) {
 
         let socket = nodesListObject.socket;
+
     }
 
 
