@@ -113,7 +113,7 @@ class PoolLeaderProtocol {
 
         socket.node.on("mining-pool/get-miner-work", (data) => {
 
-            try{
+            try {
 
                 if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
 

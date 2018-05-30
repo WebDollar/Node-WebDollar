@@ -31,6 +31,8 @@ class PoolManagement{
 
         this._resetMinedBlockStatistics();
 
+        this._maxDifficulty = new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+
     }
 
     async initializePoolManagement(){
@@ -56,6 +58,16 @@ class PoolManagement{
      */
     updateRewards(minerInstance, work) {
 
+        // target     =     maximum target / difficulty
+        // difficulty =     maximum target / target
+
+        let difficulty = this._maxDifficulty.dividedToIntegerBy( new BigNumber ( "0x"+ work.hash.toString("hex") ) );
+
+        for (let i=0; i < this.poolData._minersList.length; i++ ){
+
+
+
+        }
 
     }
 
