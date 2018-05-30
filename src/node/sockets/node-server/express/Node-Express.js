@@ -174,6 +174,7 @@ class NodeExpress{
             }
 
             let answer = [];
+            let minedBlocks = [];
 
             for (let i=0; i<Blockchain.blockchain.blocks.length; i++) {
 
@@ -198,16 +199,24 @@ class NodeExpress{
                         answer.push(
                             {
                                 blockId: Blockchain.blockchain.blocks[i].height,
-                                timestamp: Blockchain.blockchain.blocks[i].timestamp + BlockchainGenesis.timestamp,
+                                timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
                                 transaction: transaction.toJSON()
                             });
                     }
+                    if (Blockchain.blockchain.blocks[i].data.minerAddress.toString("hex") === address.toString("hex")) {
+                        minedBlocks.push(
+                            {
+                                blockId: Blockchain.blockchain.blocks[i].height,
+                                timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
+                                transactions: Blockchain.blockchain.blocks[i].data.transactions.transactions.length
+                            });
+            		}
 
                 }
             }
 
 
-            res.send({result: true, transactions: answer});
+            res.send({result: true, minedBlocks: minedBlocks, transactions: answer});
 
         });
 
