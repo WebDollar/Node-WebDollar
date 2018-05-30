@@ -198,7 +198,7 @@ class NodeExpress{
                         answer.push(
                             {
                                 blockId: Blockchain.blockchain.blocks[i].height,
-                                timestamp: Blockchain.blockchain.blocks[i].timestamp + BlockchainGenesis.timestamp,
+                                timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
                                 transaction: transaction.toJSON()
                             });
                     }
