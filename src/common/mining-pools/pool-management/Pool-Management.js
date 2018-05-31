@@ -24,7 +24,7 @@ class PoolManagement{
         // this.blockchainReward = BlockchainMiningReward.getReward();
         this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
 
-        this.poolData = new PoolData(databaseName);
+        this.poolData = new PoolData(this, databaseName);
 
         this._resetMinedBlockStatistics();
 
@@ -99,8 +99,6 @@ class PoolManagement{
             numBaseHashes: 0
         };
     }
-
-
 
 }
 
