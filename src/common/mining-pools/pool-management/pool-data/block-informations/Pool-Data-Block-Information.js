@@ -3,6 +3,7 @@ import Serialization from "common/utils/Serialization";
 const BigNumber = require('bignumber.js');
 import PoolDataBlockInformationMinerInstance from "./Pool-Data-Block-Information-Miner-Instance"
 import BufferExtended from "common/utils/BufferExtended";
+import consts from 'consts/const_global'
 
 class PoolDataBlockInformation {
 
@@ -18,6 +19,18 @@ class PoolDataBlockInformation {
         this.totalDifficulty = totalDifficulty;
 
         this.blockInformationMinersInstances = [];
+
+    }
+
+    adjustBlockInformationDifficulty(difficulty, hash){
+
+        // target     =     maximum target / difficulty
+        // difficulty =     maximum target / target
+
+        if (difficulty === undefined)
+            difficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ hash.toString("hex") ) );
+
+        this.totalDifficulty  = this.totalDifficulty.plus(difficulty);
 
     }
 
@@ -43,8 +56,31 @@ class PoolDataBlockInformation {
         return blockInformationMinerInstance;
     }
 
-    updateWorkBlockInformationMinerInstance(minerInstance, work){
+    async updateWorkBlockInformationMinerInstance(minerInstance, work){
 
+        let blockInformationMinerInstance = this.findBlockInformationMinerInstance(minerInstance);
+        if (blockInformationMinerInstance === null) throw {message: "blockInformation - miner instance was not found "};
+
+        if ( await blockInformationMinerInstance.validateWorkHash( work.bestHash, work.bestHashNonce ) ){
+
+            blockInformationMinerInstance.workHash = work.bestHash;
+            blockInformationMinerInstance.workHashNonce = work.bestHashNonce;
+
+            blockInformationMinerInstance.adjustDifficulty(work.bestHash);
+
+            return {result: true, reward: blockInformationMinerInstance.reward};
+        }
+
+        return {result: false, reward: blockInformationMinerInstance.reward};
+
+    }
+
+    getRewardBlockInformationMinerInstance(){
+
+        let blockInformationMinerInstance = this.findBlockInformationMinerInstance(minerInstance);
+        if (blockInformationMinerInstance === null) throw {message: "blockInformation - miner instance was not found "};
+
+        return blockInformationMinerInstance.reward;
     }
 
     serializeBlockInformation(){

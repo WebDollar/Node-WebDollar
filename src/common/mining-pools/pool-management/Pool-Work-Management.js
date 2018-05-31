@@ -52,27 +52,12 @@ class PoolBlocksManagement{
 
     async processWork(minerInstance, work){
 
-        if (work === undefined) throw {message: "work is undefined"};
-        if ( Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
+        if (work === null || typeof work !== "object") throw {message: "work is undefined"};
 
-        if (minerInstance){
+        if ( Buffer.isBuffer(work.bestHash) || work.bestHash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "bestHash is invalid"};
+        if ( typeof work.bestHashNonce !== "number" ) throw {message: "bestHashNonce is invalid"};
 
-            //validate hash
-            if ( Math.random() < this.poolManagement.poolSettings.poolPOWValidationProbability ){
-
-                let hash = await minerInstance.work.block.computeHash( work.bestNonce );
-
-                if ( ! BufferExtended.safeCompare(hash, work.bestHash ) ) throw {message: "work.hash is invalid"}
-
-            }
-
-            minerInstance.work.hash = work.hash;
-
-            let reward = await this.poolManagement.updateRewards(minerInstance, work);
-
-            return {work: this.getWork(minerInstance), reward: reward };
-        }
-
+        return await this.poolManagement.poolData.lastBlockInformation.updateWorkBlockInformationMinerInstance(minerInstance, work);
 
     }
 

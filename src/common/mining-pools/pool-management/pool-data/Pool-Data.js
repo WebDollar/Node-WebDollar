@@ -18,6 +18,14 @@ class PoolData {
         this.blocksInfo = [];
 
     }
+
+    get lastBlockInformation(){
+
+        if (this.blocksInfo.length === 0)
+            this.addBlockInformation();
+
+        return this.blocksInfo[this.blocksInfo.length-1];
+    }
     
     /**
      * @param minerAddress
@@ -67,6 +75,16 @@ class PoolData {
         
         return false; //miner already exists
     }
+
+    addBlockInformation(){
+
+        let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined );
+        this.blocksInfo.push(blockInformation);
+
+        return blockInformation;
+    }
+
+
     
     /**
      * Remove a miner if exists. Synchronizes with DB.

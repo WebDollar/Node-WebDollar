@@ -103,7 +103,9 @@ class PoolLeaderProtocol {
 
                 let answer = this.poolManagement.receivePoolWork(minerInstance, data.work);
 
-                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: true, work: answer.work, reward: answer.reward } ); //the new reward
+                let newWork = this.poolManagement.getWork(minerInstance);
+
+                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: true, answer: answer.result, reward: answer.reward, newWork: newWork } ); //the new reward
 
             } catch (exception){
                 socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", {result: false, message: exception.message } )
