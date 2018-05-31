@@ -30,7 +30,7 @@ class PoolDataBlockInformation {
         if (difficulty === undefined)
             difficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ hash.toString("hex") ) );
 
-        this.totalDifficulty  = this.totalDifficulty.plus(difficulty);
+        this.totalDifficulty  = this.totalDifficulty.plus( difficulty );
 
     }
 
@@ -46,9 +46,11 @@ class PoolDataBlockInformation {
     addBlockMinerInstance(minerInstance){
 
         let blockInformationMinerInstance = this.findBlockInformationMinerInstance(minerInstance);
+
         if (blockInformationMinerInstance === null){
 
             blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, minerInstance);
+
             this.blockInformationMinersInstances.push(blockInformationMinerInstance);
 
         }
@@ -75,12 +77,14 @@ class PoolDataBlockInformation {
 
     }
 
-    getRewardBlockInformationMinerInstance(){
+    getRewardBlockInformationMinerInstance(minerInstance){
 
         let blockInformationMinerInstance = this.findBlockInformationMinerInstance(minerInstance);
+
         if (blockInformationMinerInstance === null) throw {message: "blockInformation - miner instance was not found "};
 
         return blockInformationMinerInstance.reward;
+
     }
 
     serializeBlockInformation(){

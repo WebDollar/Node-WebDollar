@@ -21,6 +21,7 @@ class PoolBlocksManagement{
 
     }
 
+
     getWork(minerInstance){
 
         if (this._lastBlock === undefined || ( this._lastBlockNonce + minerInstance.hashesPerSecond ) > 0xFFFFFFFF )

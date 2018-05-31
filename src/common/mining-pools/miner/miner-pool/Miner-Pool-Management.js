@@ -2,6 +2,8 @@ import consts from "consts/const_global";
 import NodesList from "node/lists/Nodes-List";
 import Serialization from "common/utils/Serialization";
 import PoolMiningWorker from "common/mining-pools/miner/miner-pool/Pool-Mining-Worker";
+import MinerPoolProtocol from "common/mining-pools/miner/miner-pool/protocol/M"
+import MinerPoolSettings from "common/mining-pools/miner/miner-pool/Miner-Pool-Settings"
 
 class MinerProtocol {
 
@@ -9,10 +11,11 @@ class MinerProtocol {
      *
      * @param poolData should contain connectivity information
      */
-    constructor(miningFeeThreshold, poolData){
+    constructor (miningFeeThreshold){
 
         //this stores the last sent hash
         this._activeHash = consts.MINING_POOL.BASE_HASH_STRING;
+        this.minerPoolSettings = new MinerPoolSettings();
 
         this._miningData = {
             blockData: undefined,
@@ -23,53 +26,18 @@ class MinerProtocol {
 
     }
 
+    async initializeMinerPoolManagement(){
+        await this.minerPoolSettings.initializeMinerPoolSettings();
+    }
 
     getMiningData() {
+
         //TODO: get data from PoolLeader and deserialize
         //mining data should be like {blockData: , difficultyTarget: }
         //blockData should be like this:  {height: , difficultyTargetPrev: , computedBlockPrefix: , nonce: }
         return this._miningData;
-    }
-
-    sendTaskResponse(socket){
-
-        socket.node.sendRequest("mining-pool-protocol/get-minner-work", (data) => {
-
-            try{
-
-                //TODO: Serialize mining-data and send to PoolLeader
-                let taskResponse = this.getTaskResult(socket);
-
-            } catch (exception) {
-
-                console.log("Miner didn't send task response");
-
-            }
-
-        });
 
     }
-    
-    /*
-    getTaskResult() {
-        return this._serializeHashList();
-    }
-    
-    _serializeHashList(hashList){
-
-        let list = [Serialization.serializeNumber2Bytes(hashList.length)];
-
-        for (let i = 0; i < hashList.length; ++i) {
-
-            list.push( Serialization.serializeNumber1Byte(BufferExtended.fromBase(hashList[i].address).length) );
-            list.push( BufferExtended.fromBase(hashList[i].address) );
-
-            list.push ( Serialization.serializeNumber7Bytes(hashList[i].reward) );
-        }
-
-        return Buffer.concat(list);
-
-    }*/
 
     async _mine(blockData, difficultyTarget) {
         

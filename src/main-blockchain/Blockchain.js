@@ -9,7 +9,9 @@ import StatusEvents from "common/events/Status-Events";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist';
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import NODES_TYPE from "../node/lists/types/Nodes-Type";
-import PoolManagement from "common/mining-pools/pool-management/Pool-Management"
+
+import PoolManagement from "common/mining-pools/pool/pool-management/Pool-Management"
+import MinerPoolManagement from "common/mining-pools/miner/miner-pool/Miner-Pool-Management"
 
 class Blockchain{
 
@@ -41,9 +43,11 @@ class Blockchain{
         });
 
         this.PoolManagement = new PoolManagement(this.Wallet);
+        this.MinerPoolManagement = new MinerPoolManagement();
 
         this.onLoaded.then( async (answer)=>{
             await this.PoolManagement.initializePoolManagement();
+            await this.MinerPoolManagement.initializeMinerPoolManagement();
         });
         
         this._loaded = false;
