@@ -203,15 +203,15 @@ class NodeExpress{
                                 transaction: transaction.toJSON()
                             });
                     }
-                    if (Blockchain.blockchain.blocks[i].data.minerAddress.toString("hex") === address.toString("hex")) {
-                        minedBlocks.push(
-                            {
-                                blockId: Blockchain.blockchain.blocks[i].height,
-                                timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
-                                transactions: Blockchain.blockchain.blocks[i].data.transactions.transactions.length
-                            });
-            		}
 
+                }
+                if (Blockchain.blockchain.blocks[i].data.minerAddress.toString("hex") === address.toString("hex")) {
+                    minedBlocks.push(
+                        {
+                            blockId: Blockchain.blockchain.blocks[i].height,
+                            timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
+                            transactions: Blockchain.blockchain.blocks[i].data.transactions.transactions.length
+                        });
                 }
             }
 
