@@ -38,7 +38,7 @@ class PoolSettings {
 
     async generatePoolURL(){
 
-        return 'https://webdollar.io/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this._poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
+        return 'https://webdollar.io/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this._poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
 
     }
 

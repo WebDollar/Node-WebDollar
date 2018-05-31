@@ -2,6 +2,7 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import consts from 'consts/const_global';
 import WebDollarCrypto from "../../crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";
+import StatusEvents from "common/events/Status-Events"
 
 import Utils from "common/utils/helpers/Utils";
 
@@ -19,6 +20,7 @@ class MinerPoolSettings {
         this._poolURL = undefined;
 
         this.poolName = "";
+        this.poolFee = 0;
         this.poolWebsite = "";
         this.poolDescription = "";
         this.poolServers = [];
@@ -49,11 +51,12 @@ class MinerPoolSettings {
     extractPoolURL(){
 
         this.poolName = "";
+        this.poolFee = 0;
         this.poolWebsite = "";
         this.poolDescription = "";
         this.poolServers = [];
 
-        if ( this._poolURL === "" || this._poolURL === undefined ) return;
+        if ( this._poolURL === "" || this._poolURL === undefined ) return this._emitPoolNotification();
 
         let loc = new URL(this._poolURL);
 
@@ -62,11 +65,21 @@ class MinerPoolSettings {
         this.poolName = search.substr(0, search.indexOf( "/" ));
         search = search.substr(search.indexOf( "/" )+1);
 
+        this.poolFee = search.substr(0, search.indexOf( "/" ));
+        search = search.substr(search.indexOf( "/" )+1);
+
         this.poolWebsite = search.substr( 0, search.indexOf( "/" ));
         search = search.substr(search.indexOf( "/" )+1);
 
         let servers = search.substr( 0, search.indexOf( "/" ));
         this.poolServers = JSON.parse( servers );
+
+        this._emitPoolNotification();
+    }
+
+    _emitPoolNotification(){
+
+        StatusEvents.emit("miner-pool/newPoolURL", { poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers });
 
     }
 

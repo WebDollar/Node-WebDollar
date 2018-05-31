@@ -10,9 +10,9 @@ if (process.env.BROWSER){
 
 class PoolMiningWorker extends InheritedPoolWorker {
 
-    constructor(miningFeeThreshold) {
+    constructor() {
 
-        super(miningFeeThreshold);
+        super();
 
     }
 }

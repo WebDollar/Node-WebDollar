@@ -26,6 +26,17 @@ class PoolData {
 
         return this.blocksInfo[this.blocksInfo.length-1];
     }
+
+    updateRewards(){
+
+        let blockInformation = this.lastBlockInformation;
+
+        for (let i=0; i<blockInformation.blockInformationMinersInstances.length; i++){
+            blockInformation.blockInformationMinersInstances[i].calculateReward();
+        }
+
+        return true;
+    }
     
     /**
      * @param minerAddress

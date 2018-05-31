@@ -52,12 +52,7 @@ class PoolManagement{
      * @param newReward is the total new reward of the pool
      */
     updateRewards() {
-
-        for (let i=0; i < this.poolData.miners.length; i++ ){
-
-
-        }
-
+        return this.poolData.updateRewards();
     }
 
     /**

@@ -7,14 +7,10 @@ import MinerPoolSettings from "common/mining-pools/miner/miner-pool/Miner-Pool-S
 
 class MinerProtocol {
 
-    /**
-     *
-     * @param poolData should contain connectivity information
-     */
-    constructor (miningFeeThreshold){
+    constructor (){
 
         //this stores the last sent hash
-        this._activeHash = consts.MINING_POOL.BASE_HASH_STRING;
+
         this.minerPoolSettings = new MinerPoolSettings();
 
         this._miningData = {
@@ -22,7 +18,7 @@ class MinerProtocol {
             difficultyTarget: undefined
         };
         
-        this._miningWorker = new PoolMiningWorker(miningFeeThreshold);
+        this._miningWorker = new PoolMiningWorker();
 
     }
 
@@ -49,7 +45,9 @@ class MinerProtocol {
         //TODO: create a list with best X hashes
         let answer;
         try {
+
             answer = await this._mine(this._miningData.blockData, this._miningData.difficultyTarget);
+
         } catch (exception){
             console.error("Couldn't mine block ", this._miningData.blockData, exception);
             answer.result = false;
