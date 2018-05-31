@@ -1,7 +1,7 @@
 import consts from "consts/const_global";
 import NodesList from "node/lists/Nodes-List";
 import Serialization from "common/utils/Serialization";
-import PoolMiningWorker from "common/mining-pools/miner/Pool-Mining-Worker";
+import PoolMiningWorker from "common/mining-pools/miner/miner-pool/Pool-Mining-Worker";
 
 class MinerProtocol {
 
@@ -11,47 +11,19 @@ class MinerProtocol {
      */
     constructor(miningFeeThreshold, poolData){
 
-        NodesList.emitter.on("nodes-list/connected", (result) => { 
-            this._subscribeMiner(result);
-        });
-        NodesList.emitter.on("nodes-list/disconnected", (result ) => {
-            this._unsubscribeMiner(result);
-        });
-        
         //this stores the last sent hash
         this._activeHash = consts.MINING_POOL.BASE_HASH_STRING;
 
-        this._miningData = {blockData: undefined, difficultyTarget: undefined};
+        this._miningData = {
+            blockData: undefined,
+            difficultyTarget: undefined
+        };
         
         this._miningWorker = new PoolMiningWorker(miningFeeThreshold);
-    }
-
-    _subscribeMiner(nodesListObject){
-
-        let socket = nodesListObject.socket;
-
-        socket.node.on("mining-pool-protocol/create-minner-task", (data) => {
-
-            try{
-
-                this.sendTaskResponse(socket);
-
-            } catch (exception) {
-
-                console.log("Miner didn't send task response");
-
-            }
-
-        });
 
     }
 
-    _unsubscribeMiner(nodesListObject){
 
-        let socket = nodesListObject.socket;
-
-    }
-    
     getMiningData() {
         //TODO: get data from PoolLeader and deserialize
         //mining data should be like {blockData: , difficultyTarget: }

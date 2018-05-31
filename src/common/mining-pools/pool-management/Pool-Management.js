@@ -26,12 +26,7 @@ class PoolManagement{
 
         this.poolData = new PoolData(databaseName);
 
-        //TODO: Check is needed to store/load from database
-        this._poolLeaderReward = 0;
-
         this._resetMinedBlockStatistics();
-
-        this._maxDifficulty = new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
 
     }
 
@@ -56,15 +51,9 @@ class PoolManagement{
      * Update rewards for all miners. This function must be called at every block reward
      * @param newReward is the total new reward of the pool
      */
-    updateRewards(minerInstance, work) {
+    updateRewards() {
 
-        // target     =     maximum target / difficulty
-        // difficulty =     maximum target / target
-
-        let difficulty = this._maxDifficulty.dividedToIntegerBy( new BigNumber ( "0x"+ work.hash.toString("hex") ) );
-
-        for (let i=0; i < this.poolData._minersList.length; i++ ){
-
+        for (let i=0; i < this.poolData.miners.length; i++ ){
 
 
         }
@@ -89,38 +78,13 @@ class PoolManagement{
      */
     async sendRewardsToMiners() {
 
-        let minersList = this.poolData.getMinersList();
-
-        for (let i = 0; i < minersList.length; ++i) {
-            this.sendReward(minersList[i]);
+        for (let i = 0; i < this.poolData.miners.length; ++i) {
+            this.sendReward(this.poolData.miners[i]);
         }
 
         //After sending rewards we must reset rewards
         await this.poolData.resetRewards();
-    }
 
-    /**
-     * Pool has mined a new block and has received a new reward.
-     * The new reward must be shared with miners.
-     * @param newReward
-     */
-    async onMinedBlock(newReward) {
-
-        this._logMinedBlockStatistics();
-
-        this.updateRewards(newReward);
-        await this.sendRewardsToMiners();
-
-    }
-
-    /**
-     * This function updates the mining statistics for the last mined blocks.
-     * The PoolData class manages the statistics
-     */
-    _logMinedBlockStatistics() {
-
-        this.poolData.addMinedBlockStatistics( this._currentBlockStatistics );
-        this._resetMinedBlockStatistics();
     }
 
     _resetMinedBlockStatistics() {

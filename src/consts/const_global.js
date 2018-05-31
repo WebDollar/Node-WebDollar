@@ -1,5 +1,6 @@
 const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
+const BigNumber = require('bignumber.js');
 
 let consts = {
 
@@ -23,6 +24,7 @@ consts.BLOCKCHAIN = {
     },
 
     BLOCKS_POW_LENGTH: 32,
+    BLOCKS_MAX_TARGET: new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
     BLOCKS_NONCE : 4,
 
     LIGHT:{
@@ -188,7 +190,6 @@ consts.DATABASE_NAMES = {
 
 consts.MINING_POOL = {
 
-    WINDOW_SIZE: 16,
     BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
 
     MINING:{

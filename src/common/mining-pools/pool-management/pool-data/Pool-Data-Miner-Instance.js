@@ -2,7 +2,8 @@ import Serialization from 'common/utils/Serialization';
 import consts from 'consts/const_global';
 import BufferExtended from "common/utils/BufferExtended";
 
-class PoolDataMinerInstance{
+
+class PoolDataMinerInstance {
 
     constructor(miner, publicKey){
 
@@ -10,11 +11,9 @@ class PoolDataMinerInstance{
         this.publicKey = publicKey;
         this.date = new Date().getTime();
         this.hashesPerSecond = 0;
-        this.reward = 0;
-
-        this.work = undefined;
 
     }
+
 
     serializeMinerInstance(){
 
@@ -25,6 +24,7 @@ class PoolDataMinerInstance{
             Serialization.serializeNumber7Bytes(this.date),
             Serialization.serializeNumber7Bytes(this.reward),
             Serialization.serializeNumber7Bytes(this.hashesPerSecond),
+            Serialization.serializeBigNumber(this.minerTotalDifficulty),
         ]);
 
         return Buffer.concat(list);
@@ -43,6 +43,10 @@ class PoolDataMinerInstance{
 
         this.hashesPerSecond = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
+
+        let answer = Serialization.deserializeBigNumber(buffer, offset);
+        this.minerTotalDifficulty = answer.number;
+        this.offset = answer.newOffset;
 
         return offset;
 

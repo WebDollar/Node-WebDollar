@@ -16,7 +16,7 @@ import AdvancedMessages from "node/menu/Advanced-Messages";
 import StatusEvents from "common/events/Status-Events";
 
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
-import RevertActions from "../../../utils/Revert-Actions/Revert-Actions";
+import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 

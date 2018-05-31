@@ -1,6 +1,6 @@
 const assert = require('assert');
 
-import MinerProtocol from 'common/mining-pools/miner/MinerProtocol';
+import MinerProtocol from 'common/mining-pools/miner/Miner-Pool-Protocol';
 import TestsHelper from 'tests/Tests.helper';
 
 

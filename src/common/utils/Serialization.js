@@ -26,7 +26,7 @@ class Serialization{
         return buffer;
     }
 
-    serializeBigNumber( bigNumber, length ){
+    convertBigNumberToBuffer( bigNumber, length ){
         //converting number value into a buffer
 
         let buffer = new Buffer(length);
@@ -190,6 +190,108 @@ class Serialization{
 
         return num;
     }
+
+
+    /**
+     * Serialize a Big Number object into an optimal Buffer
+     * based on https://stackoverflow.com/questions/8482309/converting-javascript-integer-to-byte-array-and-back
+     */
+    serializeBigNumber(data){
+        //9999999999.99999999999
+        // d: [999, 9999999, 9999999, 9999000]
+        // d biggest number is 0x5AF3107A3FFF
+        // e: 9  - it can also be negative
+        // s: 1
+
+        if (data instanceof BigNumber === false)
+            throw 'data is not big decimal';
+        if ( data.c.length === 0 )
+            throw "data is 0 and can't be ";
+
+        let buffer = new Buffer( 1 + 1 + data.c.length*6 );
+
+        buffer[0] = Math.abs(data.e) % 128 + (data.e >= 0 ? 0 : 1)*128;
+        buffer[1] = data.c.length % 128 + (data.s >= 0? 0 : 1)*128;
+
+        for (let i = 0; i < data.c.length; i++) {
+
+            //converting the number to buffer
+            let long = data.c[i], byte;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 1 )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 2 )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 3 )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 4 )]  = byte;
+            long = (long - byte) / 256 ;
+
+            byte = long & 0xff;
+            buffer[2 + (i * 6  + 5 )]  = byte;
+            long = (long - byte) / 256 ;
+
+        }
+
+        return buffer;
+    }
+
+    /**
+     * Deserialize a Big Number object from an optimal Buffer
+     * based on https://stackoverflow.com/questions/8482309/converting-javascript-integer-to-byte-array-and-back
+     */
+    deserializeBigNumber(buffer, offset ){
+
+        offset = offset || 0;
+
+        let bigNumber = {e:0, s:0, c: []};
+
+        if (!Buffer.isBuffer(buffer))
+            throw "Can't deserialize Big Number because it is not a buffer";
+
+        bigNumber.e = buffer[0 + offset ] % 128;
+        bigNumber.e *= Math.floor(buffer[0 + offset] / 128) === 0 ? 1 : -1;
+
+        let length = buffer[1 + offset ] % 128;
+        bigNumber.s = Math.floor(buffer[1 + offset] / 128) === 0 ? 1 : -1;
+
+        for (let i = 0; i < length; i++){
+
+            let nr = 0 ;
+
+            nr = buffer[2 + i*6 + 5 + offset ];
+            nr = (nr * 256) + buffer[2 + i*6 + 4 + offset ];
+            nr = (nr * 256) + buffer[2 + i*6 + 3 + offset ];
+            nr = (nr * 256) + buffer[2 + i*6 + 2 + offset ];
+            nr = (nr  * 256) + buffer[2 + i*6 + 1 + offset ];
+            nr = (nr  * 256) + buffer[2 + i*6 + 0 + offset ];
+
+            bigNumber.c.push(nr);
+        }
+
+        //console.log("bigNumber", bigNumber);
+        let res = new BigNumber(0);
+        res.c = bigNumber.c;
+        res.s = bigNumber.s;
+        res.e = bigNumber.e;
+
+        return {
+            number: res,
+            newOffset: 2+length*6 + offset,
+        }
+    }
+
 
 }
 

@@ -66,20 +66,9 @@ class InterfacePoolBackboneMining extends InterfaceBlockchainBackboneMining {
      */
     mine(blockData, difficultyTarget){
 
-        this.difficulty = difficultyTarget;
-        this.blockData = blockData;
         this.started = true;
-        
-        let promiseResolve = new Promise ( (resolve) => {
 
-
-            this._workerResolve = resolve;
-            setTimeout(async () => {return await this.mineNonces() }, 10);
-
-
-        } );
-
-        return promiseResolve;
+        return InterfaceBlockchainBackboneMining.prototype.mine.call(this, blockData, difficultyTarget);
 
     }
 }
