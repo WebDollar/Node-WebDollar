@@ -8,14 +8,14 @@ import Utils from "common/utils/helpers/Utils";
 
 class MinerPoolSettings {
 
-    constructor( databaseName ){
+    constructor( minerPoolManagement, databaseName ){
+
+        this.minerPoolManagement = minerPoolManagement;
 
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE );
 
         this._minerPoolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
-        this._minerPoolPublicKey = undefined;
-
-        this.poolPublicKey = new Buffer(0);
+        this.minerPoolPublicKey = undefined;
 
         this._poolURL = undefined;
 
@@ -24,6 +24,7 @@ class MinerPoolSettings {
         this.poolWebsite = "";
         this.poolDescription = "";
         this.poolServers = [];
+        this.poolPublicKey = new Buffer(0);
 
     }
 
@@ -35,7 +36,6 @@ class MinerPoolSettings {
 
 
     get poolURL(){
-
         return this._poolURL;
     }
 
@@ -54,6 +54,7 @@ class MinerPoolSettings {
         this.poolFee = 0;
         this.poolWebsite = "";
         this.poolDescription = "";
+        this.poolPublicKey = new Buffer(0);
         this.poolServers = [];
 
         if ( this._poolURL === "" || this._poolURL === undefined ) return this._emitPoolNotification();
@@ -67,6 +68,11 @@ class MinerPoolSettings {
 
         this.poolFee = search.substr(0, search.indexOf( "/" ));
         search = search.substr(search.indexOf( "/" )+1);
+
+        this.poolPublicKey = search.substr(0, search.indexOf( "/" ));
+        search = search.substr(search.indexOf( "/" )+1);
+
+        this.poolPublicKey = new Buffer(this.poolPublicKey, "hex");
 
         this.poolWebsite = search.substr( 0, search.indexOf( "/" ));
         search = search.substr(search.indexOf( "/" )+1);
@@ -98,7 +104,7 @@ class MinerPoolSettings {
             this._minerPoolPrivateKey = WebDollarCrypto.getBufferRandomValues( 64 );
 
         if ( Buffer.isBuffer(this._minerPoolPrivateKey) ) {
-            this._minerPoolPublicKey = ed25519.generatePublicKey(this._minerPoolPrivateKey);
+            this.minerPoolPublicKey = ed25519.generatePublicKey(this._minerPoolPrivateKey);
         }
 
         return this._minerPoolPrivateKey;

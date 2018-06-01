@@ -7,20 +7,22 @@ import Utils from "common/utils/helpers/Utils";
 
 class PoolSettings {
 
-    constructor(wallet, databaseName){
+    constructor(wallet, poolManagement, databaseName){
 
+        this.poolManagement = poolManagement;
         this._wallet = wallet;
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE );
 
-        this._poolFee = '';
+        this._poolFee = 0;
         this._poolName = '';
         this._poolWebsite = '';
         this._poolServers = '';
         this._poolPOWValidationProbability = 0.10; //from 100
 
         this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
-        this._poolPublicKey = undefined;
+        this.poolPublicKey = undefined;
 
+        this.poolURL = '';
 
         //TODO: this stores the entire reward of pool(miners + poolLeader), this goes to Accountant Tree
         this._poolRewardsAddress = null;
@@ -36,9 +38,13 @@ class PoolSettings {
         await this._getPoolPrivateKey();
     }
 
-    async generatePoolURL(){
+    _generatePoolURL(){
 
-        return 'https://webdollar.io/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this._poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
+        if (this._poolName === '' || this._poolFee === 0 ) return '';
+
+        this.poolURL = 'https://webdollar.io/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
+
+        return this.poolURL;
 
     }
 
@@ -115,13 +121,14 @@ class PoolSettings {
             this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues( 64 );
 
         if (Buffer.isBuffer(this._poolPrivateKey)){
-            this._poolPublicKey = ed25519.generatePublicKey(this._poolPrivateKey);
+            this.poolPublicKey = ed25519.generatePublicKey(this._poolPrivateKey);
         }
 
         return this._poolPrivateKey;
     }
 
     validatePoolDetails(){
+
         if (typeof this._poolName !== "string") throw {message: "pool name is not a string"};
         if (! /^[A-Za-z\d\s]+$/.test(this._poolName)) throw {message: "pool name is invalid"};
 
@@ -129,6 +136,13 @@ class PoolSettings {
 
         if (typeof this._poolWebsite !== "string") throw {message: "pool website is not a string"};
         if (this._poolWebsite !== '' && ! Utils.validateUrl(this._poolWebsite)) throw {message:"pool website is invalid"};
+
+        this._generatePoolURL();
+
+        if ( this.poolURL !== ''){ //start automatically
+            this.poolManagement.startPool();
+        }
+
     }
 
     async savePoolDetails(){

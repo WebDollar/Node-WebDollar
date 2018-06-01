@@ -5,12 +5,20 @@ import PoolData from 'common/mining-pools/pool/pool-management/pool-data/Pool-Da
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 import  Utils from "common/utils/helpers/Utils"
 import PoolManagement from "../pool-management/Pool-Settings";
+import ed25519 from "common/crypto/ed25519";
 
-class PoolLeaderProtocol {
+class PoolProtocol {
 
-    constructor(poolManagement, databaseName = consts.DATABASE_NAMES.POOL_DATABASE) {
+    constructor(poolManagement) {
 
         this.poolManagement = poolManagement;
+        this.loaded = false;
+
+    }
+
+    startPoolProtocol(){
+
+        if (this.loaded) return;
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeMiner(result)
@@ -20,7 +28,10 @@ class PoolLeaderProtocol {
             this._unsubscribeMiner(result)
         });
 
+        for (let i=0; i<NodesList.nodes.length; i++)
+            this._subscribeMiner(NodesList.nodes[i]);
 
+        this.loaded = true;
     }
 
     _subscribeMiner(nodesListObject) {
@@ -33,8 +44,19 @@ class PoolLeaderProtocol {
             try{
 
                 if (Buffer.isBuffer( data.message )  || data.message.length !== 32) throw {message: "message is invalid"};
+                if (Buffer.isBuffer( data.poolPublicKey )  || data.poolPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+
+                //validate poolPublicKey
+                if ( ! data.poolPublicKey.equals( this.poolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey doesn't match"};
+
                 if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
                 if (Buffer.isBuffer( data.minerAddress )  || data.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "minerAddress is invalid"};
+
+
+                //validate minerPool signature
+                if (Buffer.isBuffer( data.messageSignature ) || data.messageSignature.length < 10) throw {message: "messageSignature is invalid"};
+                if (! ed25519.verify(data.messageSignature, data.message, data.minerPublicKey)) throw {message: "messageSignature doesn't validate message"}
+
 
                 // save minerPublicKey
                 let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
@@ -42,13 +64,18 @@ class PoolLeaderProtocol {
                 if (miner === null )
                     miner = this.poolManagement.poolData.addMiner(data.minerAddress);
 
-                miner.addPublicKey(data.minerPublicKey);
+                miner.addPublic(data.minerPublicKey);
 
                 let signature = this.poolManagement.poolSettings.poolDigitalSign(data.message);
-                socket.node.sendRequest("mining-pool/hello-pool"+"/answer", { signature: signature, status: "great" } );
+
+                socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {
+                    result: true,
+                    signature: signature,
+                } );
 
             } catch (exception){
 
+                socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {result: false, message: exception.message, } );
             }
 
         });
@@ -146,4 +173,4 @@ class PoolLeaderProtocol {
 
 }
 
-export default PoolLeaderProtocol;
+export default PoolProtocol;

@@ -2,7 +2,7 @@ import consts from "consts/const_global";
 import NodesList from "node/lists/Nodes-List";
 import Serialization from "common/utils/Serialization";
 import PoolMiningWorker from "common/mining-pools/miner/miner-pool/Pool-Mining-Worker";
-import MinerPoolProtocol from "common/mining-pools/miner/miner-pool/protocol/M"
+import MinerPoolProtocol from "common/mining-pools/miner/miner-pool/protocol/Miner-Pool-Protocol"
 import MinerPoolSettings from "common/mining-pools/miner/miner-pool/Miner-Pool-Settings"
 
 class MinerProtocol {
@@ -11,7 +11,8 @@ class MinerProtocol {
 
         //this stores the last sent hash
 
-        this.minerPoolSettings = new MinerPoolSettings();
+        this.minerPoolSettings = new MinerPoolSettings(this);
+        this.minerPoolProtocol = new MinerPoolProtocol(this);
 
         this._miningData = {
             blockData: undefined,

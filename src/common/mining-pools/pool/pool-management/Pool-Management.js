@@ -2,8 +2,7 @@ import PoolSettings from "./Pool-Settings";
 import PoolData from 'common/mining-pools/pool/pool-management/pool-data/Pool-Data';
 import consts from 'consts/const_global';
 import PoolWorkManagement from "./Pool-Work-Management";
-import BufferExtended from "common/utils/BufferExtended"
-
+import PoolProtocol from "./../protocol/Pool-Protocol"
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,
@@ -18,8 +17,9 @@ class PoolManagement{
 
         this.blockchain = blockchain;
 
-        this.poolSettings = new PoolSettings(wallet);
-        this.poolWorkManagement = new PoolWorkManagement(this, blockchain);
+        this.poolSettings = new PoolSettings(wallet, this);
+        this.poolWorkManagement = new PoolWorkManagement( this );
+        this.poolProtocol = new PoolProtocol();
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
         this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
@@ -33,6 +33,12 @@ class PoolManagement{
     async initializePoolManagement(){
 
         await this.poolSettings.initializePoolSettings();
+
+    }
+
+    async startPool(){
+
+        this.poolProtocol.startPoolProtocol();
 
     }
 
@@ -65,6 +71,8 @@ class PoolManagement{
 
         //TODO: Do the transaction
 
+        //TODO: clear the poolTransaction
+
         return true;
     }
 
@@ -72,14 +80,8 @@ class PoolManagement{
      * Send rewards for miners and reset rewards from storage
      */
     async sendRewardsToMiners() {
-
-        for (let i = 0; i < this.poolData.miners.length; ++i) {
-            this.sendReward(this.poolData.miners[i]);
-        }
-
-        //After sending rewards we must reset rewards
-        await this.poolData.resetRewards();
-
+        for (let i = 0; i < this.poolData.miners.length; ++i)
+            await this.sendReward(this.poolData.miners[i]);
     }
 
     _resetMinedBlockStatistics() {
