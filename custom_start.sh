@@ -33,14 +33,6 @@ redhashtag="$REDbg$WHITE#$STAND"
 abortfm="$CYAN[abort for Menu]$STAND"
 ##
 
-### VARS
-port80="80"
-port443="443"
-port8080="8080"
-port8081="8081"
-port8082="8082"
-###
-
 #### ROOT User Check
 function checkroot(){
         if [[ $(id -u) = 0 ]]; then
@@ -57,56 +49,78 @@ read -e -p "$showinput How many ports to you want to use for the full node (from
 
 if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
-	case $nrofports in
-		1) echo "$showinfo The system will use port 80.";
-		   MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=80 INSTANCE_PREFIX=80 pm2 start  npm -- run start
-		   sleep 1;
-		   pm2 restart npm --name "80" --update-env
-		   sleep 3;
-		   echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
+	if [[ "$nrofports" == 1 ]];then
 
-		2) echo "$showinfo The system will use two ports. 80 and 443.";
-		   for port in $port80 $port443;
-		   do
-			MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start  npm -- run start
+		read -e -p "$showinput We'll use one port. Enter number (e.g.: 80): " readnrport1
+
+		echo "$showinfo The system will use port $readnrport1";
+
+		MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=$readnrport1 INSTANCE_PREFIX=$readnrport1 pm2 start npm -- run start
+		sleep 1;
+		pm2 restart npm --name "$readnrport1" --update-env
+		sleep 3;
+
+		echo "$showinfo Run pm2 dash to check if the blockchain is loading."
+
+	elif [[ "$nrofports" == 2 ]];then
+
+		read -e -p "$showinput We'll use two ports. Enter number (e.g.: 80 8080): " readnrport2_0 readnrport2_1
+
+		echo "$showinfo The system will use two ports. $readnrport2_0 and $readnrport2_1"
+
+		for port in $readnrport2_0 $readnrport2_1;
+		do
+			MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start npm -- run start
                         sleep 1;
                         pm2 restart npm --name "$port" --update-env
 			sleep 3;
-		   done
-		        echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
+		done
+			echo "$showinfo Run pm2 dash to check if the blockchain is loading."
 
-		3) echo "$showinfo The system will use three ports. 80, 443 and 8080.";
-		   for port in $port80 $port443 $port8080;
-		   do
-			MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start  npm -- run start
+	elif [[ "$nrofports" == 3 ]];then
+
+		read -e -p "$showinput We'll use three ports. Enter number (e.g.: 80 8080 8081): " readnrport3_0 readnrport3_1 readnrport3_2
+
+		echo "$showinfo The system will use three ports. $readnrport3_0, $readnrport3_1 and $readnrport3_2"
+
+		for port in $readnrport3_0 $readnrport3_1 $readnrport3_2;
+		do
+			MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start npm -- run start
                         sleep 1;
                         pm2 restart npm --name "$port" --update-env
 			sleep 3;
-		   done
-		        echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
+		done
+			echo "$showinfo Run pm2 dash to check if the blockchain is loading."
 
-		4) echo "$showinfo The system will use four ports. 80, 443, 8080, 8081.";
-		   for port in $port80 $port443 $port8080 $port8081;
-		   do
-			MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start  npm -- run start
+	elif [[ "$nrofports" == 4 ]];then
+
+		read -e -p "$showinput We'll use four ports. Enter number (e.g.: 80 8080 8081 8082): " readnrport4_0 readnrport4_1 readnrport4_2 readnrport4_3
+
+		echo "$showinfo The system will use four ports. $readnrport4_0, $readnrport4_1, $readnrport4_2, $readnrport4_3"
+
+		for port in $readnrport4_0 $readnrport4_1 $readnrport4_2 $readnrport4_3;
+		do
+			MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start npm -- run start
                         sleep 1;
                         pm2 restart npm --name "$port" --update-env
 			sleep 3;
-		   done
-		        echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
+		done
+			echo "$showinfo Run pm2 dash to check if the blockchain is loading."
 
-		5) echo "$showinfo The system will use five ports. 80, 443, 8080, 8081, 8082.";
-		   for port in $port80 $port443 $port8080 $port8081 $port8082;
-		   do
-			MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start  npm -- run start
+	elif [[ "$nrofports" == 5 ]];then
+
+		read -e -p "$showinput We'll use five ports. Enter number (e.g.: 80 8080 8081 8082 8083): " readnrport5_0 readnrport5_1 readnrport5_2 readnrport5_3 readnrport5_4
+
+		echo "$showinfo The system will use five ports. $readnrport5_0, $readnrport5_1, $readnrport5_2, $readnrport5_3 and $readnrport5_4"
+		for port in $readnrport5_0 $readnrport5_1 $readnrport5_2 $readnrport5_3 $readnrport5_4;
+		do
+			MAXIMUM_CONNECTIONS_FROM_BROWSER=450 MAXIMUM_CONNECTIONS_FROM_TERMINAL=100 SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start npm -- run start
                         sleep 1;
                         pm2 restart npm --name "$port" --update-env
 			sleep 3;
-		   done
-		        echo "$showinfo Run pm2 dash to check if the blockchain is loading." ;;
-
-		0) echo "$showerror I need a number from 1 to 5. Restarting..."; bash $0
-	esac
+		done
+		        echo "$showinfo Run pm2 dash to check if the blockchain is loading."
+	fi
 else
 	if [[ "$nrofports" == "" ]]; then
 		echo "$showerror No empty space allowed."
