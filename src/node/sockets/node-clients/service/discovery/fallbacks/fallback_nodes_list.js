@@ -72,10 +72,11 @@ export default {
         {"addr": ["https://webdollarinfinitypool.io"]}, //Thanks to @Tibi Popescu
         {"addr": ["https://webdollarinfinitypool.io:80"]}, //Thanks to @Tibi Popescu
         
-        {"addr": ["https://bacm.ro"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:8080"]}, //Thanks to @jigodia
+        {"addr": ["https://bacm.ro:8081"]}, //Thanks to @jigodia
+        {"addr": ["https://bacm.ro:8082"]}, //Thanks to @jigodia
         
         //---------------------------------------------------------
         //--------------WebDollar FallBack Nodes-------------------
