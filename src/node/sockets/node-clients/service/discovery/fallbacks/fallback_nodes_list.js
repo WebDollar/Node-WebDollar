@@ -51,12 +51,6 @@ export default {
         {"addr": ["https://wd2.hoste.ro:63980"]}, // Thanks to @morion4000
         {"addr": ["https://wd2.hoste.ro:65279"]}, // Thanks to @morion4000
 
-        {"addr": ["https://noden01.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
-        {"addr": ["https://noden02.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
-        {"addr": ["https://noden03.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
-        {"addr": ["https://noden04.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
-        {"addr": ["https://noden05.webd.trade:80"]}, // Thanks to @volvx & @vladflorin
-
         {"addr": ["https://chucknorris.webdollarvpn.io:80"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://chucknorris.webdollarvpn.io:443"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://chucknorris.webdollarvpn.io:8080"]}, // Thanks to @cbusuioceanu
