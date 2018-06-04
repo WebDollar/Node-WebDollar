@@ -1,5 +1,6 @@
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import NodesList from 'node/lists/Nodes-List'
+import consts from 'consts/const_global'
 
 import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
@@ -61,6 +62,9 @@ class InterfaceBlockchainTransactionsProtocol{
 
 
                 if (transaction === undefined) throw {message: "Transaction was not specified"};
+
+                if ( transaction.fee < consts.MINING_POOL.FEE_THRESHOLD  )  //not good
+                    return false;
 
                 if (!transaction.isTransactionOK())
                     return false;
@@ -132,11 +136,13 @@ class InterfaceBlockchainTransactionsProtocol{
 
                     let transaction = Blockchain.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId(response.ids[i]);
 
-                    if (transaction === null) continue;
-                    if (!transaction.isTransactionOK(true)) continue;
+                    if (transaction === null || transaction === undefined) continue;
+
+                    if (! transaction.isTransactionOK(true) ) continue;
 
                     if (response.format === "json") list.push( transaction.txId.toString("hex") ); else
                     if (response.format === "buffer") list.push( transaction.serializeTransaction() );
+
                 }
 
                 await Blockchain.blockchain.sleep(25);
@@ -148,39 +154,39 @@ class InterfaceBlockchainTransactionsProtocol{
 
         });
 
-        node.on("transactions/get-all-pending-transactions", async (response) => {
-
-            if (Math.random() >= 0.3) return false; // avoid spamming
-
-            try{
-
-                if (typeof response === "object") return false;
-
-                if (response.format !== "json") response.format = "buffer";
-
-                let list = [];
-
-                for (let i=0; i<Blockchain.blockchain.transactions.pendingQueue.list.length; i++){
-
-                    if (! Blockchain.blockchain.transactions.pendingQueue.list[i].isTransactionOK(true)) continue;
-
-                    if (response.format === "json") list.push(Blockchain.blockchain.transactions.pendingQueue.list[i].toJSON()); else
-                    if (response.format === "buffer") list.push(Blockchain.blockchain.transactions.pendingQueue.list[i].serializeTransaction());
-
-                    if (i % 10 === 0){
-
-                        await Blockchain.blockchain.sleep(25);
-
-                    }
-
-                }
-
-                node.sendRequest('transactions/get-all-pending-transactions/answer', {result: true, format: response.format, transactions: list });
-
-            } catch (exception){
-            }
-
-        });
+        // node.on("transactions/get-all-pending-transactions", async (response) => {
+        //
+        //     if (Math.random() >= 0.3) return false; // avoid spamming
+        //
+        //     try{
+        //
+        //         if (typeof response === "object") return false;
+        //
+        //         if (response.format !== "json") response.format = "buffer";
+        //
+        //         let list = [];
+        //
+        //         for (let i=0; i<Blockchain.blockchain.transactions.pendingQueue.list.length; i++){
+        //
+        //             if (! Blockchain.blockchain.transactions.pendingQueue.list[i].isTransactionOK(true)) continue;
+        //
+        //             if (response.format === "json") list.push(Blockchain.blockchain.transactions.pendingQueue.list[i].toJSON()); else
+        //             if (response.format === "buffer") list.push(Blockchain.blockchain.transactions.pendingQueue.list[i].serializeTransaction());
+        //
+        //             if (i % 10 === 0){
+        //
+        //                 await Blockchain.blockchain.sleep(25);
+        //
+        //             }
+        //
+        //         }
+        //
+        //         node.sendRequest('transactions/get-all-pending-transactions/answer', {result: true, format: response.format, transactions: list });
+        //
+        //     } catch (exception){
+        //     }
+        //
+        // });
 
 
     }
@@ -226,7 +232,12 @@ class InterfaceBlockchainTransactionsProtocol{
 
                 try {
 
-                    if ( !transaction.isTransactionOK(true) ) {
+                    if ( transaction.fee < consts.MINING_POOL.FEE_THRESHOLD  ) { //not good
+                        errors += 0.25;
+                        continue;
+                    }
+
+                    if ( !transaction.isTransactionOK(true) ) { //not good
                         errors++;
                         continue;
                     }
@@ -238,7 +249,7 @@ class InterfaceBlockchainTransactionsProtocol{
                     errors++;
                 }
 
-                if (errors > 6)
+                if (errors >= 4)
                     return;
 
 
