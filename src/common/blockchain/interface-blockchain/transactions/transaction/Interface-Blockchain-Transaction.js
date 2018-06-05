@@ -191,7 +191,7 @@ class InterfaceBlockchainTransaction{
 
         if (blockValidationType === undefined || !blockValidationType['skip-validation-transactions-from-values']){
 
-            if (! this._validateNonce(blockValidationType) ) throw {message: "Nonce is invalid" }
+            if (! this._validateNonce(blockValidationType) ) throw {message: "Nonce is invalid" };
 
             return this.from.validateFromEnoughMoney(blockValidationType);
         }
@@ -275,8 +275,10 @@ class InterfaceBlockchainTransaction{
             offset = this.to.deserializeTo(buffer, offset);
 
         } catch (exception){
+
             console.error("error deserializing a transaction ", exception);
             throw exception;
+
         }
 
         this.recalculateTxId();
