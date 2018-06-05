@@ -3,7 +3,7 @@ import Serialization from "common/utils/Serialization";
 const BigNumber = require('bignumber.js');
 import PoolDataBlockInformationMinerInstance from "./Pool-Data-Block-Information-Miner-Instance"
 import BufferExtended from "common/utils/BufferExtended";
-import consts from 'consts/const_global'
+import consts from 'consts/const_global';
 
 class PoolDataBlockInformation {
 
