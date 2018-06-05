@@ -9,9 +9,12 @@ class TransactionsListForPropagation{
 
     }
 
+    /**
+     * TODO: this function should not be used everything, but rather anytime something was changed
+     */
     refreshTransactionsForPropagationList(){
 
-        if ( this.blockchain.blocks.length > 0 && !this.blockHash.equals( this.blockchain.blocks.last.hash ) ){
+        if ( this.blockchain.blocks.length > 0 && ( !Buffer.isBuffer(this.blockHash) || !this.blockHash.equals( this.blockchain.blocks.last.hash ) )){
 
             let transactions = [];
 

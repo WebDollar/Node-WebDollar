@@ -106,19 +106,19 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 let list = [];
 
-                let length = Math.min( response.start + response.count, this.blockchain.transactions.pendingQueue.list.length );
+                this.transactionsForPropagation.refreshTransactionsForPropagationList();
+
+                let length = Math.min( response.start + response.count, this.transactionsForPropagation.list.length );
 
                 await this.blockchain.sleep(20);
 
                 for (let i=response.start; i < length; i++ ){
 
-                    if (response.format === "json") list.push( this.blockchain.transactions.pendingQueue.list[i].txId.toString("hex") ); else
-                    if (response.format === "buffer") list.push( this.blockchain.transactions.pendingQueue.list[i].txId );
+                    if (response.format === "json") list.push( this.transactionsForPropagation.list[i].txId.toString("hex") ); else
+                    if (response.format === "buffer") list.push( this.transactionsForPropagation.list[i].txId );
                 }
 
-                await this.blockchain.sleep(15);
-
-                node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.index + response.count, length: this.blockchain.transactions.pendingQueue.list.length } );
+                node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.start + response.count, length: this.transactionsForPropagation.list.length } );
 
             } catch (exception){
             }
@@ -144,8 +144,6 @@ class InterfaceBlockchainTransactionsProtocol {
                     let transaction = this.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId(response.ids[i]);
 
                     if (transaction === null || transaction === undefined) continue;
-
-                    if (! transaction.isTransactionOK(true) ) continue;
 
                     if (response.format === "json") list.push( transaction.txId.toString("hex") ); else
                     if (response.format === "buffer") list.push( transaction.serializeTransaction() );
