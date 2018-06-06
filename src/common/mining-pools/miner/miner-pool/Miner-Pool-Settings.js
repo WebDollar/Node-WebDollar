@@ -1,6 +1,6 @@
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import consts from 'consts/const_global';
-import WebDollarCrypto from "../../crypto/WebDollar-Crypto";
+import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";
 import StatusEvents from "common/events/Status-Events"
 
