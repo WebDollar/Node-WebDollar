@@ -136,7 +136,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
 
-            this._nonce = initialNonce||0;
+            if (initialNonce === undefined) //avoid mining the same nonces on every machine that is mining the same address
+                initialNonce = Math.floor( Math.random() * 3700000000 );
+
+            this._nonce = initialNonce;
 
             if (typeof this._nonce !== 'number')
                 return 'initial nonce is not a number';
