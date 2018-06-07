@@ -418,7 +418,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     }
 
 
-    getAccountantTreeList(list, bIncludeMiningReward = true, excludeEmpty = true ){
+    getAccountantTreeList(list, bIncludeMiningReward = false, excludeEmpty = true, countOnly = undefined ){
 
         if (this.isLeaf()) {
 
@@ -427,18 +427,42 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             if (excludeEmpty)
                 if (balance === 0) return false;
 
-            if (bIncludeMiningReward)
-                for (let i=1; i<=40; i++ )
-                    if ( balance === BlockchainMiningReward.getReward(i) )
+            if (!bIncludeMiningReward) {
+                for (let i = 1; i <= 40; i++)
+                    if (balance === BlockchainMiningReward.getReward(i))
                         return;
+            }
 
-            list.push({address: this.getAddress(), balance: balance });
+
+            list.push({node: this, balance: balance });
+
         }
 
         for (let i = 0; i < this.edges.length; i++)
-            this.edges[i].targetNode.getAccountantTreeList(list);
+            this.edges[i].targetNode.getAccountantTreeList(list, bIncludeMiningReward, excludeEmpty, countOnly );
 
-        return list;
+
+        if (this === this.root){ //root, let's process it
+
+            list.sort(function(a, b) {
+                return b.balance - a.balance;
+            });
+
+            if ( countOnly !== undefined )
+                list = list.splice(0, countOnly);
+
+            for (let i=0; i<list.length; i++) {
+                list[i].address = list[i].node.getAddress();
+
+                if (!bIncludeMiningReward)
+                    if ( ["WEBD$gAHF1r0FJjDxWvEAZe3MV8izwWKEXhNt03$", "WEBD$gCSiJ0yUAV#TPnoFDYJu+opGmKCHHXDw3z$", "WEBD$gD#Ws@o65Imk9DLWJTsPRd0oMxnUeU7S@r$" ].indexOf( list[i].address ) >= 0 ) list.splice(i,1);
+
+            }
+
+            return list;
+
+        }
+
     }
 
 }
