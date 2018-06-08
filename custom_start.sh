@@ -31,6 +31,9 @@ showremove="$GREEN[removing]$STAND"
 shownone="$MAGENTA[none]$STAND"
 redhashtag="$REDbg$WHITE#$STAND"
 abortte="$CYAN[abort to Exit]$STAND"
+terminalconn="$YELLOW[TERMINAL_CONNECTIONS]$STAND"
+browserconn="$YELLOW[BROWSER_CONNECTIONS]$STAND"
+ports="$YELLOW[PORTS]$STAND"
 ##
 
 #### ROOT User Check
@@ -45,11 +48,11 @@ function checkroot(){
 
 checkroot
 
-read -e -p "$showinput How many TERMINAL_CONNECTIONS do you want to offer (e.g.: 350): " readtermconn # this is a max_term_connections global setting that will apply for every pm2 instance.
+read -e -p "$showinput How many $terminalconn do you want to offer (e.g.: 350 or $abortte): " readtermconn # this is a max_term_connections global setting that will apply for every pm2 instance.
 
 ### Catch user input before anything - readtermconn
 if [[ "$readtermconn" =~ ^[[:digit:]]+$ ]]; then
-	read -e -p "$showinput How many BROWSER_CONNECTIONS do you want to offer (e.g.: 250 or $abortte): " readbrowserconn # if termconn is set ok, proceed to nr of browser_conn input # this is a max_browser_connections global setting that will apply for every pm2 instance.
+	read -e -p "$showinput How many $browserconn do you want to offer (e.g.: 250 or $abortte): " readbrowserconn # if termconn is set ok, proceed to nr of browser_conn input # this is a max_browser_connections global setting that will apply for every pm2 instance.
 
 elif [[ "$readtermconn" == "" ]]; then
 	echo "$showerror No empty space allowed."
@@ -60,7 +63,7 @@ elif [[ "$readtermconn" == abort ]]; then
 	exit 0
 
 elif [[ "$readtermconn" == * ]]; then
-	echo "$showerror Please enter how many connections you'll give for TERMINAL_CONNECTIONS"
+	echo "$showerror Please enter how many connections you'll give for $terminalconn"
 	exit 1
 fi
 ###
@@ -68,7 +71,7 @@ fi
 
 ### Catch user input before anything - readbrowserconn
 if [[ "$readbrowserconn" =~ ^[[:digit:]]+$ ]]; then
-	read -e -p "$showinput How many ports to you want to use for the full node (from 1 to 6 or $abortte): " nrofports # if browser_conn is set ok, proceed to nr of ports input
+	read -e -p "$showinput How many $ports to you want to use for the full node (from 1 to 6 or $abortte): " nrofports # if browser_conn is set ok, proceed to nr of ports input
 
 elif [[ "$readbrowserconn" == "" ]]; then
 	echo "$showerror No empty space allowed."
@@ -79,7 +82,7 @@ elif [[ "$readbrowserconn" == abort ]]; then
 	exit 0
 
 elif [[ "$readbrowserconn" == * ]]; then
-	echo "$showerror Please enter how many connections you'll give for BROWSER_CONNECTIONS"
+	echo "$showerror Please enter how many connections you'll give for $browserconn"
 	exit 1
 fi
 ###
@@ -102,6 +105,9 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 			sleep 3;
 
 			echo "$showinfo Run pm2 dash to check if the blockchain is loading."
+		elif [[ $readnrport1 == abort ]]; then
+
+			echo "$showinfo Ok, bye." && exit 0
 		else
 			echo "$showerror Please enter a PORT number."
 		fi
@@ -192,7 +198,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 		if [[ $readnrport6_0 =~ ^[[:digit:]]+$ && $readnrport6_1 =~ ^[[:digit:]]+$ && $readnrport6_2 =~ ^[[:digit:]]+$ && $readnrport6_3 =~ ^[[:digit:]]+$ && $readnrport6_4 =~ ^[[:digit:]]+$ && $readnrport6_5 =~ ^[[:digit:]]+$ ]]; then
 
-			echo "$showinfo The system will use $nrofports ports -> $readnrport5_0, $readnrport5_1, $readnrport5_2, $readnrport5_3 and $readnrport5_4"
+			echo "$showinfo The system will use $nrofports ports -> $readnrport6_0, $readnrport6_1, $readnrport6_2, $readnrport6_3, $readnrport6_4 and $readnrport6_5"
 
 			for port in $readnrport6_0 $readnrport6_1 $readnrport6_2 $readnrport6_3 $readnrport6_4 $readnrport6_5;
 			do
