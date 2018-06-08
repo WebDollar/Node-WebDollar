@@ -1,7 +1,7 @@
 import consts from "consts/const_global";
 import NodesList from "node/lists/Nodes-List";
 import Serialization from "common/utils/Serialization";
-import PoolMiningWorker from "common/mining-pools/miner/miner-pool/Pool-Mining-Worker";
+import PoolMining from "common/mining-pools/miner/miner-pool/mining/Pool-Mining";
 import MinerPoolProtocol from "common/mining-pools/miner/miner-pool/protocol/Miner-Pool-Protocol"
 import MinerPoolSettings from "common/mining-pools/miner/miner-pool/Miner-Pool-Settings"
 
@@ -19,7 +19,7 @@ class MinerProtocol {
             difficultyTarget: undefined
         };
         
-        this._miningWorker = new PoolMiningWorker();
+        this._poolMining = new PoolMining();
 
     }
 
@@ -38,7 +38,7 @@ class MinerProtocol {
 
     async _mine(blockData, difficultyTarget) {
         
-        this._miningWorker.mine(blockData, difficultyTarget);
+        this._poolMining.mine(blockData, difficultyTarget);
     }
 
     async createMiningHashes(){
