@@ -108,7 +108,8 @@ class InterfaceBlockchainBlocks{
         let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toNumber();
 
         StatusEvents.emit("blockchain/new-network-hash-rate", answer);
-
+        this.networkHashRate = answer;
+        
         return answer;
 
     }
