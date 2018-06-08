@@ -4,7 +4,7 @@ const BigInteger = require('big-integer');
 import consts from 'consts/const_global';
 import TestsHelper from 'tests/Tests.helper';
 import Convert from 'common/utils/Convert';
-import PoolLeaderProtocol from 'common/mining-pools/pool/protocol/Pool-Protocol';
+import PoolLeaderProtocol from 'common/mining-pools/pool/Pool-Protocol';
 
 describe('test pool leader protocol', () => {
 

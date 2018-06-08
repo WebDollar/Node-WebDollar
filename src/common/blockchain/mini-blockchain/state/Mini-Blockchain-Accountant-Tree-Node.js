@@ -452,6 +452,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 list = list.splice(0, countOnly);
 
             for (let i=list.length-1; i>=0; i--) {
+
                 list[i].address = list[i].node.getAddress();
 
                 if (!bIncludeMiningReward)

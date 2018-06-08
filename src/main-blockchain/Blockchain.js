@@ -11,7 +11,7 @@ import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import NODES_TYPE from "../node/lists/types/Nodes-Type";
 
 import PoolManagement from "common/mining-pools/pool/pool-management/Pool-Management"
-import MinerPoolManagement from "common/mining-pools/miner/miner-pool/Miner-Pool-Management"
+import MinerPoolManagement from "common/mining-pools/miner/Miner-Pool-Management"
 
 class Blockchain{
 

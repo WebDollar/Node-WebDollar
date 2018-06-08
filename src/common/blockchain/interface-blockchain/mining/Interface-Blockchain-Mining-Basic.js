@@ -188,6 +188,7 @@ class InterfaceBlockchainMiningBasic {
     }
 
     _destroyMiningInterval(){
+
         if (this._intervalMiningOutput !== undefined) {
 
             clearInterval(this._intervalMiningOutput);
@@ -195,6 +196,7 @@ class InterfaceBlockchainMiningBasic {
             this._hashesPerSecond = 0;
 
         }
+
     }
 
 }

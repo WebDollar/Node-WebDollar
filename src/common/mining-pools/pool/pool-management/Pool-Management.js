@@ -2,7 +2,7 @@ import PoolSettings from "./Pool-Settings";
 import PoolData from 'common/mining-pools/pool/pool-management/pool-data/Pool-Data';
 import consts from 'consts/const_global';
 import PoolWorkManagement from "./Pool-Work-Management";
-import PoolProtocol from "./../protocol/Pool-Protocol"
+import PoolProtocol from "../Pool-Protocol"
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,

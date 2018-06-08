@@ -4,7 +4,7 @@ import NodesList from 'node/lists/Nodes-List';
 import PoolData from 'common/mining-pools/pool/pool-management/pool-data/Pool-Data';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 import  Utils from "common/utils/helpers/Utils"
-import PoolManagement from "../pool-management/Pool-Settings";
+import PoolManagement from "./pool-management/Pool-Settings";
 import ed25519 from "common/crypto/ed25519";
 
 class PoolProtocol {
@@ -168,7 +168,6 @@ class PoolProtocol {
         let socket = nodesListObject.socket;
 
     }
-
 
 
 }

@@ -1,9 +1,9 @@
 import consts from "consts/const_global";
 import NodesList from "node/lists/Nodes-List";
 import Serialization from "common/utils/Serialization";
-import PoolMining from "common/mining-pools/miner/miner-pool/mining/Pool-Mining";
-import MinerPoolProtocol from "common/mining-pools/miner/miner-pool/protocol/Miner-Pool-Protocol"
-import MinerPoolSettings from "common/mining-pools/miner/miner-pool/Miner-Pool-Settings"
+import PoolMining from "common/mining-pools/miner/mining/Pool-Mining";
+import MinerPoolProtocol from "common/mining-pools/miner/protocol/Miner-Pool-Protocol"
+import MinerPoolSettings from "common/mining-pools/miner/Miner-Pool-Settings"
 
 class MinerProtocol {
 
