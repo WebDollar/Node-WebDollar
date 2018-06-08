@@ -347,7 +347,7 @@ class InterfaceBlockchain {
 
         } else {
 
-            if ( indexStart < numBlocks - consts.DEBUG ){
+            if ( indexStart < numBlocks ){
                 validationType["skip-recalculating-hash-rate"] = true;
                 validationType["skip-saving-light-accountant-tree-serializations"] = true;
                 validationType["skip-calculating-proofs"] = true;

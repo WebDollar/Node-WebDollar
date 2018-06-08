@@ -20,6 +20,7 @@ class InterfaceBlockchainBlocks{
     addBlock(block){
 
         this[this.length] =  block;
+
         this.length += 1;
 
         StatusEvents.emit("blockchain/blocks-count-changed", this.length);

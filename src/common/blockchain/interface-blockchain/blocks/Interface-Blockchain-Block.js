@@ -275,6 +275,7 @@ class InterfaceBlockchainBlock {
      * @returns {Promise<Buffer>}
      */
     static async computeHashStatic(newNonce, height, difficultyTargetPrev, computedBlockPrefix, blockNonce) {
+
         let buffer = Buffer.concat ( [
             Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(height) ),
             Serialization.serializeBufferRemovingLeadingZeros( difficultyTargetPrev ),

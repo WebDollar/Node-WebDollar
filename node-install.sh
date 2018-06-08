@@ -33,16 +33,6 @@ redhashtag="$REDbg$WHITE#$STAND"
 abortfm="$CYAN[abort for Menu]$STAND"
 ##
 
-### GENERAL VARS
-getwebdnodefolder=$(find / -name Node-WebDollar)
-getport80=$(iptables -L -n | grep -w 80 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getport443=$(iptables -L -n | grep -w 443 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getport8080=$(iptables -L -n | grep -w 8080 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getport8081=$(iptables -L -n | grep -w 8081 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getport8082=$(iptables -L -n | grep -w 8082 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getiptpersist=$(apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}')
-###
-
 #### ROOT User Check
 function checkroot(){
 	if [[ $(id -u) = 0 ]]; then
@@ -53,6 +43,16 @@ function checkroot(){
 	fi
 }
 ####
+checkroot
+
+### GENERAL VARS
+getport80=$(iptables -L -n | grep -w 80 | awk 'NR==1{print$7}' | cut -d ':' -f2)
+getport443=$(iptables -L -n | grep -w 443 | awk 'NR==1{print$7}' | cut -d ':' -f2)
+getport8080=$(iptables -L -n | grep -w 8080 | awk 'NR==1{print$7}' | cut -d ':' -f2)
+getport8081=$(iptables -L -n | grep -w 8081 | awk 'NR==1{print$7}' | cut -d ':' -f2)
+getport8082=$(iptables -L -n | grep -w 8082 | awk 'NR==1{print$7}' | cut -d ':' -f2)
+getiptpersist=$(apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}')
+###
 
 #### Dependencies check
 function getipt(){
@@ -69,23 +69,38 @@ fi
 }
 ####
 
-checkroot && getipt
+getipt
 
-apt update
-apt upgrade
-apt dist-upgrade
+sudo apt update
+sudo apt upgrade
+sudo apt dist-upgrade
 
-git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
+if [[ -n $(find / -name Node-WebDollar) ]]; then
+	echo "$showinfo Node-WebDollar is already cloned in $(find / -name Node-WebDollar)"
+else
+	git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
+fi
 
+sleep 2;
+echo "$showinfo Changing folder to $(find / -name Node-WebDollar)"
+cd $(find / -name Node-WebDollar)
+echo "$showinfo Current folder is $(pwd)"
+sleep 5;
 
-apt install linuxbrew-wrapper
-apt install clang
-apt install npm
-apt install nodejs
+sudo apt install linuxbrew-wrapper
+sudo apt install clang
+sudo apt install npm
+sudo apt install nodejs
+sudo apt install git
 
-npm install -g node-gyp
-npm install pm2 -g --unsafe-perm
+sudo npm install -g node-gyp
 
+sudo env CXX=g++-5 npm install
+sudo env CXX=g++-5 npm install argon2
+
+sudo npm install pm2 -g --unsafe-perm
+
+sudo npm install
 
 echo "$showinfo Setting IP Tables rules..."
 
@@ -97,16 +112,8 @@ if [[ "$getport8082" == 8082 ]]; then echo "$showwarning Port 8082 is already ac
 
 echo "$showinfo Don't forget to FORWARD PORTS on your router!"
 
-echo "$showinfo Changing folder to $getwebdnodefolder"
-
-cd $getwebdnodefolder
-sleep 1;
-npm install
-
 echo "$showinfo Now you may run sudo bash custom_start.sh"
 echo "$showinfo If you don't have custom_start.sh script, run: "
 echo "git clone https://github.com/cbusuioceanu/WebDollar-Node-Custom-Start.git"
 echo "$showinfo sudo bash custom_start.sh"
 echo "$showinfo Have fun. :)"
-
-

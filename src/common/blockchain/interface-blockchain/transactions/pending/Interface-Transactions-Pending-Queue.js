@@ -1,13 +1,16 @@
-import InterfaceBlockchainTransactionsProtocol from "../protocol/Interface-Blockchain-Transactions-Protocol"
-
 import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended"
+import TransactionsProtocol from "../protocol/Transactions-Protocol"
+
 
 class InterfaceTransactionsPendingQueue {
 
     constructor(transactions, blockchain, db){
 
+        this.transactionsProtocol = new TransactionsProtocol(blockchain);
+
         this.transactions = transactions;
+
         this.blockchain = blockchain;
         this.list = [];
 
@@ -30,6 +33,7 @@ class InterfaceTransactionsPendingQueue {
 
         this._insertPendingTransaction(transaction);
 
+        this.transactionsProtocol.transactionsForPropagation.addTransactionForPropagationList(transaction);
         this.propagateTransaction(transaction, exceptSockets);
 
         return true;
@@ -142,7 +146,7 @@ class InterfaceTransactionsPendingQueue {
     }
 
     propagateTransaction(transaction, exceptSocket){
-        InterfaceBlockchainTransactionsProtocol.propagateNewPendingTransaction(transaction, exceptSocket)
+        this.transactionsProtocol.propagateNewPendingTransaction(transaction, exceptSocket)
     }
 
 

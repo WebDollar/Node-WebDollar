@@ -20,6 +20,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions, showUpdate);
 
         return true;
+
     }
 
     _validateNonce(blockValidationType){
@@ -40,7 +41,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
                 if (transactionsList === undefined)
                     transactionsList = this.blockchain.transactions.pendingQueue.list;
 
-                transactionsList.forEach((transaction)=>{
+                transactionsList.forEach( (transaction)=>{
 
                     if ( BufferExtended.safeCompare(transaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress))
                         foundNonce[ transaction.nonce ] = true;
@@ -69,7 +70,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         //calculate how many transactions we already have to increment the current nonce
         try {
 
-            this.blockchain.transactions.pendingQueue.list.forEach((pendingTransaction) => {
+            this.blockchain.transactions.pendingQueue.list.forEach( (pendingTransaction) => {
 
                 if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce >= nonce ) {
                     nonce++;

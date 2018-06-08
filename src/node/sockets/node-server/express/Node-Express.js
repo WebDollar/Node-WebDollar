@@ -30,9 +30,11 @@ class NodeExpress{
     _extractDomain( fileName ){
 
         const x509 = require('x509');
-        var subject = x509.getSubject( fileName );
+        let subject = x509.getSubject( fileName );
 
         let domain = subject.commonName;
+
+        if (domain === undefined) domain = '';
 
         domain = domain.replace( "*.", "" );
 
@@ -69,8 +71,12 @@ class NodeExpress{
                 if (!consts.SETTINGS.NODE.SSL) throw {message: "no ssl"};
 
                 this.domain = process.env.DOMAIN || this._extractDomain('./certificates/certificate.crt');
+
                 console.info("========================================");
                 console.info("SSL certificate found for ", this.domain);
+                
+                if (this.domain === '')
+                    console.error("Your domain from certificate was not recognized");
 
                 options.key = fs.readFileSync('./certificates/private.key', 'utf8');
                 options.cert = fs.readFileSync('./certificates/certificate.crt', 'utf8');
