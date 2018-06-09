@@ -13,6 +13,8 @@ import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain"
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import NodesList from 'node/lists/Nodes-List'
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+var BigNumber = require ('bignumber.js');
 
 class NodeExpress{
 
@@ -74,7 +76,7 @@ class NodeExpress{
 
                 console.info("========================================");
                 console.info("SSL certificate found for ", this.domain);
-                
+
                 if (this.domain === '')
                     console.error("Your domain from certificate was not recognized");
 
@@ -126,7 +128,7 @@ class NodeExpress{
 
                     console.error("Error Creating Express Server");
                     console.error(err);
-                    
+
                     resolve(false);
 
                 });
@@ -224,6 +226,61 @@ class NodeExpress{
 
             res.send({result: true, minedBlocks: minedBlocks, transactions: answer});
 
+        });
+
+        this.app.get('/wallets/balance/:address', (req, res) => {
+            let address = decodeURIComponent(req.params.address);
+            let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
+
+            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+
+            res.json(balance);
+        });
+
+        this.app.get('/wallets/balance', (req, res) => {
+            let addressString = Blockchain.blockchain.mining.minerAddress;
+            let balance = Blockchain.blockchain.accountantTree.getBalance(addressString, undefined);
+
+            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+
+            res.json(balance);
+        });
+
+        this.app.get('/wallets/import', async (req, res) => {
+          var content = {
+            version: '0.1',
+            address: decodeURIComponent(req.query.address),
+            publicKey: req.query.publicKey,
+            privateKey: req.query.privateKey
+          };
+
+          try {
+              let answer = await Blockchain.Wallet.importAddressFromJSON(content);
+
+              if (answer.result === true) {
+                  console.log("Address successfully imported", answer.address);
+                  await Blockchain.Wallet.saveWallet();
+                  res.json(true);
+              } else {
+                  console.error(answer.message);
+                  res.json(false);
+              }
+
+          } catch(err) {
+              console.error(err.message);
+              res.json(false);
+          }
+        });
+
+        this.app.get('/wallets/transactions', async (req, res) => {
+          var from = decodeURIComponent(req.query.from);
+          var to = decodeURIComponent(req.query.to);
+          var amount = parseInt(req.query.amount) * WebDollarCoins.WEBD;
+          var fee = parseInt(req.query.fee) * WebDollarCoins.WEBD;
+
+          var result = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
+
+          res.json(result);
         });
 
         // respond with "hello world" when a GET request is made to the homepage
