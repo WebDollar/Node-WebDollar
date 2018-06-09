@@ -6,7 +6,7 @@ import {Node, Blockchain} from '../../index.js';
 import AdvancedMessages from './Advanced-Messages';
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-import PoolLeaderProtocol from 'common/mining-pools/pool/Pool-Protocol';
+import PoolLeaderProtocol from 'common/mining-pools/pool/pool-management/protocol/Pool-Protocol';
 
 class CLI {
 

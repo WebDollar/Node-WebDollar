@@ -1,8 +1,6 @@
 import consts from 'consts/const_global';
-import Convert from 'common/utils/Convert';
 import NodesList from 'node/lists/Nodes-List';
 import  Utils from "common/utils/helpers/Utils"
-import PoolManagement from "./pool-management/Pool-Settings";
 import ed25519 from "common/crypto/ed25519";
 
 class PoolProtocol {
@@ -11,6 +9,8 @@ class PoolProtocol {
 
         this.poolManagement = poolManagement;
         this.loaded = false;
+
+        this.poolConnectedServersProtocol = new PoolProtocol(this.poolManagement);
 
     }
 
@@ -28,6 +28,8 @@ class PoolProtocol {
 
         for (let i=0; i<NodesList.nodes.length; i++)
             this._subscribeMiner(NodesList.nodes[i]);
+
+        this.poolConnectedServersProtocol.startPoolConnectedServersProtocol();
 
         this.loaded = true;
     }

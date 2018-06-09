@@ -9,6 +9,10 @@ class PoolConnectedServersProtocol{
 
         this.connectedServers = [];
 
+    }
+
+    startPoolConnectedServersProtocol(){
+
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
             this._deleteConnectedServer(result.socket)
         });
