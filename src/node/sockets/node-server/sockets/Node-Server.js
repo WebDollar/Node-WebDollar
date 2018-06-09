@@ -7,8 +7,8 @@ import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
 import NodesList from 'node/lists/Nodes-List'
 import NodeExpress from "./../express/Node-Express";
-import CONNECTION_TYPE from "node/lists/types/Connections-Type";
-import NODES_TYPE from "node/lists/types/Nodes-Type";
+import CONNECTION_TYPE from "node/lists/types/Connection-Type";
+import NODE_TYPE from "node/lists/types/Node-Type";
 import NodePropagationList from 'common/sockets/protocol/Node-Propagation-List'
 import Blockchain from "main-blockchain/Blockchain"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
@@ -128,16 +128,16 @@ class NodeServer {
                 let nodeUTC = socket.request._query["UTC"];
                 if (typeof nodeUTC === "string") nodeUTC = parseInt(nodeUTC);
 
-                if ( socket.request._query["uuid"] === undefined || [NODES_TYPE.NODE_TERMINAL, NODES_TYPE.NODE_WEB_PEER].indexOf( nodeType ) === -1) {
+                if ( socket.request._query["uuid"] === undefined || [NODE_TYPE.NODE_TERMINAL, NODE_TYPE.NODE_WEB_PEER].indexOf( nodeType ) === -1) {
                     console.error("invalid uuid or nodeType");
                     socket.disconnect();
                     return;
                 }
 
-                if (NODES_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODES_TYPE.NODE_TERMINAL ) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL ) {
+                if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL ) {
 
                     //be sure it is not a fallback node
-                    let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL); //it should need a confirmation
+                    let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
 
                     if (nodeDomain === '' || nodeDomain === undefined || waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
 
@@ -148,7 +148,7 @@ class NodeServer {
 
                 } else
 
-                if (NODES_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
+                if (NODE_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODE_TYPE.NODE_WEB_PEER) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
 
                     if (Math.random() < 0.05) console.warn("too many browser connections");
                     return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
@@ -156,7 +156,7 @@ class NodeServer {
                 }
 
 
-                if (NODES_TYPE.NODE_TERMINAL === nodeType && this._rooms.terminals.serverSits <= 0)
+                if (NODE_TYPE.NODE_TERMINAL === nodeType && this._rooms.terminals.serverSits <= 0)
 
                     if (new Date().getTime() - this._rooms.terminals.timeLastConnected >= ROOMS.TERMINALS.TIME_TO_PASS_TO_CONNECT_NEW_CLIENT){
 
@@ -165,14 +165,14 @@ class NodeServer {
 
                     }else {
 
-                        let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODES_TYPE.NODE_TERMINAL); //it should need a confirmation
+                        let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
                         if ( waitlist === null || waitlist.waitlist === null) //it will also disconnect the socket
                             return  await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true);
 
                     }
 
 
-                else if (NODES_TYPE.NODE_WEB_PEER === nodeType && this._rooms.browsers.serverSits <= 0)
+                else if (NODE_TYPE.NODE_WEB_PEER === nodeType && this._rooms.browsers.serverSits <= 0)
                         if (new Date().getTime() - this._rooms.browsers.timeLastConnected >= ROOMS.BROWSERS.TIME_TO_PASS_TO_CONNECT_NEW_CLIENT) {
 
                             this._rooms.browsers.serverSits = ROOMS.BROWSERS.SERVER_FREE_ROOM;
@@ -190,10 +190,10 @@ class NodeServer {
 
                     SocketExtend.extendSocket(socket, sckAddress, undefined, undefined, 1);
 
-                    console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) + " "+ (nodeType === NODES_TYPE.NODE_WEB_PEER ? "browser" : "terminal") );
+                    console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) + " "+ (nodeType === NODE_TYPE.NODE_WEB_PEER ? "browser" : "terminal") );
 
-                    if (nodeType === NODES_TYPE.NODE_TERMINAL ) this._rooms.terminals.serverSits--;
-                    else if (nodeType === NODES_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
+                    if (nodeType === NODE_TYPE.NODE_TERMINAL ) this._rooms.terminals.serverSits--;
+                    else if (nodeType === NODE_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
 
                     if (await socket.node.protocol.sendHello(["uuid","ip", "port"], false) === false){
 
@@ -251,7 +251,7 @@ class NodeServer {
     async initializeSocket(socket, validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (await NodesList.registerUniqueSocket(socket, CONNECTION_TYPE.CONNECTION_SERVER_SOCKET, socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(socket, CONNECTION_TYPE.CONNECTION_SERVER_SOCKET, socket.node.protocol.nodeType, this.socket.node.protocol.nodeConsensusType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 
@@ -276,7 +276,7 @@ class NodeServer {
 
         //disconnect unresponsive nodes
         for (let i = 0; i < NodesList.nodes.length; i++)
-            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.type === NODES_TYPE.NODE_TERMINAL)
+            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
 
                 if (NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS) {
 
@@ -302,13 +302,13 @@ class NodeServer {
 
 
 
-        let count = NodesList.countNodesByType( NODES_TYPE.NODE_TERMINAL );
+        let count = NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL );
         if ( count < consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL / 2 )
             return; //nothing to do
 
 
         for (let i=0; i<NodesList.nodes.length; i++)
-            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.type === NODES_TYPE.NODE_TERMINAL)
+            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.nodeType === NODE_TYPE.NODE_TERMINAL)
                 if ( !NodesList.nodes[i].isFallback && NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL )
                         NodesList.nodes[i].socket.disconnect();
 

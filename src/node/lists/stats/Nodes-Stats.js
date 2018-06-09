@@ -2,9 +2,9 @@ import consts from 'consts/const_global'
 import NodesList from 'node/lists/Nodes-List'
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
+import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import Blockchain from "main-blockchain/Blockchain"
-import NODES_TYPE from "../types/Nodes-Type";
+import NODE_TYPE from "../types/Node-Type";
 
 class NodesStats {
 
@@ -84,8 +84,8 @@ class NodesStats {
         this.statsServer = NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET);
         this.statsWebPeers = NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_WEBRTC);
 
-        this.statsBrowsers = NodesList.countNodesByType(NODES_TYPE.NODE_WEB_PEER);
-        this.statsTerminal = NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL);
+        this.statsBrowsers = NodesList.countNodesByType(NODE_TYPE.NODE_WEB_PEER);
+        this.statsTerminal = NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL);
 
         this.statsWaitlistFullNodes= NodesWaitlist.waitListFullNodes.length;
         this.statsWaitlistLightNodes = NodesWaitlist.waitListLightNodes.length;

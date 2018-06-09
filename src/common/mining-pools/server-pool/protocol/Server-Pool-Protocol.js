@@ -37,12 +37,14 @@ class ServerPoolProtocol{
             try {
 
                 if ( typeof data.poolName !== "string" || data.poolName.length <  5) throw {message: "poolName is not correct"};
-                if ( typeof data.poolFee !== "number" || data.poolFee < 0 || data.poolFee > 100) throw {message: "poolFee is not correct"};
-                if ( typeof data.poolWebsite !== "string" || data.poolWebsite.length <  5) throw {message: "poolWebsite is not correct"};
-                if (!Buffer.isBuffer(data.poolPublicKey) || data.poolPublicKey.length < 10) throw {message: "poolPublicKey is not correct"};
+                if ( typeof data.poolFee !== "number" || data.poolFee < 0 || data.poolFee > 100) throw { message: "poolFee is not correct" };
+                if ( typeof data.poolWebsite !== "string" || data.poolWebsite.length <  5) throw { message: "poolWebsite is not correct" };
+                if (!Buffer.isBuffer(data.poolPublicKey) || data.poolPublicKey.length < 10) throw { message: "poolPublicKey is not correct" };
 
 
             } catch (exception){
+
+                socket.node.emit("server-pool/register-pool"+"/answer", {result: false} );
 
             }
 

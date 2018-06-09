@@ -2,7 +2,7 @@ import consts from "consts/const_global";
 import NodesList from "node/lists/Nodes-List";
 import Serialization from "common/utils/Serialization";
 import PoolMiningWorker from "common/mining-pools/miner/mining/Pool-Mining";
-import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
+import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import Blockchain from "main-blockchain/Blockchain"
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";

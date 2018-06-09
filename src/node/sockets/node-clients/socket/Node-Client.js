@@ -4,8 +4,8 @@ import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NodesList from 'node/lists/Nodes-List'
-import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
-import NODES_TYPE from "node/lists/types/Nodes-Type";
+import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
+import NODE_TYPE from "node/lists/types/Node-Type";
 import Blockchain from "main-blockchain/Blockchain"
 import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'
 
@@ -87,7 +87,7 @@ class NodeClient {
                             msg: "HelloNode",
                             version: consts.SETTINGS.NODE.VERSION,
                             uuid: consts.SETTINGS.UUID,
-                            nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
+                            nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
                             UTC: Blockchain.blockchain.timestamp.timeUTC,
                             domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
                         },
@@ -170,7 +170,7 @@ class NodeClient {
 
         //it is not unique... then I have to disconnect
 
-        if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, this.socket.node.protocol.nodeConsensusType,  validationDoubleConnectionsTypes) === false){
             return false;
         }
 

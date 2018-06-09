@@ -1,7 +1,7 @@
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import NODES_TYPE from "node/lists/types/Nodes-Type"
+import NODE_TYPE from "node/lists/types/Node-Type"
 
 const https = require('https');
 const http = require('http');
@@ -11,7 +11,7 @@ const cors = require('cors');
 const fs = require('fs')
 import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain"
-import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
+import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import NodesList from 'node/lists/Nodes-List'
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 var BigNumber = require ('bignumber.js');
@@ -162,7 +162,7 @@ class NodeExpress{
                     webpeers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_WEBRTC),
                 },
                 waitlist:{
-                    list: NodesWaitlist.getJSONList( NODES_TYPE.NODE_TERMINAL, false ),
+                    list: NodesWaitlist.getJSONList( NODE_TYPE.NODE_TERMINAL, false ),
                 }
 
             });

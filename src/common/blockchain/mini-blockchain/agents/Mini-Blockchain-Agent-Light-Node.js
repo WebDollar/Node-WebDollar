@@ -4,7 +4,7 @@ import MiniBlockchainLightProtocol from "common/blockchain/mini-blockchain/proto
 import MiniBlockchainForkLight from '../protocol/light/Mini-Blockchain-Light-Fork'
 import consts from "consts/const_global";
 import NodesList from 'node/lists/Nodes-List';
-import CONNECTION_TYPE from "node/lists/types/Connections-Type";
+import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import Blockchain from "main-blockchain/Blockchain"
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 

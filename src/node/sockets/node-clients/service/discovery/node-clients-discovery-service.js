@@ -4,7 +4,8 @@ import NodesWaitlistObject  from 'node/lists/waitlist/Nodes-Waitlist-Object';
 import NodesList from 'node/lists/Nodes-List'
 import FallBackObject from './fallbacks/fallback-object';
 import FallBackNodesList from './fallbacks/fallback_nodes_list';
-import NODES_TYPE from "node/lists/types/Nodes-Type"
+import NODE_TYPE from "node/lists/types/Node-Type"
+import NODES_CONSENSUS_TYPE from "../../../../lists/types/Node-Consensus-Type";
 
 const axios = require('axios');
 
@@ -137,7 +138,7 @@ class NodeDiscoveryService {
                             marked[pos] = true;
 
                             let nodeAddress = '', nodePort = undefined,
-                                nodeType = NODES_TYPE.NODE_TERMINAL;
+                                nodeType = NODE_TYPE.NODE_TERMINAL;
 
                             if (typeof nodes[pos] === "object") {
                                 nodeAddress = nodes[pos].addr || '';
@@ -146,7 +147,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[pos]; //a simple string Address
                             }
 
-                            await NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType,  false, 1, "fallback" );
+                            await NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType, NODES_CONSENSUS_TYPE.NODE_PEER_CONSENSUS, false, 1, "fallback" );
                         }
 
                     }

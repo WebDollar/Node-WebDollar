@@ -8,7 +8,7 @@ import NodesList from 'node/lists/Nodes-List';
 import StatusEvents from "common/events/Status-Events";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist';
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
-import NODES_TYPE from "../node/lists/types/Nodes-Type";
+import NODE_TYPE from "../node/lists/types/Node-Type";
 
 import PoolManagement from "common/mining-pools/pool/pool-management/Pool-Management"
 import MinerPoolManagement from "common/mining-pools/miner/Miner-Pool-Management"
@@ -190,7 +190,7 @@ class Blockchain{
                     StatusEvents.emit('blockchain/status', {message: "No Internet Access"});
 
                 if (NodesList.nodes.length === 0)
-                    NodesWaitlist.resetWaitlist(NODES_TYPE.NODE_WEB_PEER);
+                    NodesWaitlist.resetWaitlist(NODE_TYPE.NODE_WEB_PEER);
 
                 this.Agent.initializeAgentPromise();
             }

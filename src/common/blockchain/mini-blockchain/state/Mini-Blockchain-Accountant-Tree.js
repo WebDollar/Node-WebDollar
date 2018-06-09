@@ -254,6 +254,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         let obj = {};
         for (let i=0; i<list.length; i++) {
+
             console.info( i, list[i].address, list[i].balance / WebDollarCoins.WEBD );
 
             obj[list[i].address] = list[i].balance / WebDollarCoins.WEBD;
@@ -262,6 +263,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         console.log(JSON.stringify(obj));
 
         return list;
+
     }
 
     getAccountantTreeList(){

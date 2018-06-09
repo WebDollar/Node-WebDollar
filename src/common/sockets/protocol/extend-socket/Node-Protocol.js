@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
 import NodesList from 'node/lists/Nodes-List'
-import NODES_TYPE from "node/lists/types/Nodes-Type"
-import CONNECTION_TYPE from "node/lists/types/Connections-Type";
+import NODE_TYPE from "node/lists/types/Node-Type"
+import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import Blockchain from "main-blockchain/Blockchain"
 
 let NodeExpress, NodeServer;
@@ -22,7 +22,7 @@ class NodeProtocol {
         return this.node.sendRequestWaitOnce("HelloNode", {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
-            nodeType: process.env.BROWSER ? NODES_TYPE.NODE_WEB_PEER : NODES_TYPE.NODE_TERMINAL,
+            nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
             domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
         }, undefined, 4000);
@@ -47,12 +47,12 @@ class NodeProtocol {
             return false;
         }
 
-        if ( [NODES_TYPE.NODE_TERMINAL, NODES_TYPE.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
+        if ( [NODE_TYPE.NODE_TERMINAL, NODE_TYPE.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
             console.error("invalid node type", response);
             return false;
         }
 
-        if (NODES_TYPE.NODE_TERMINAL === response.nodeType && NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
+        if (NODE_TYPE.NODE_TERMINAL === response.nodeType && NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_FROM_TERMINAL){
             console.warn("too many terminal connections");
             return false;
         }
