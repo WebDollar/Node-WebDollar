@@ -456,7 +456,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 list[i].address = list[i].node.getAddress();
 
                 if (!bIncludeMiningReward)
-                    if ( ["WEBD$gAHF1r0FJjDxWvEAZe3MV8izwWKEXhNt03$", "WEBD$gCSiJ0yUAV#TPnoFDYJu+opGmKCHHXDw3z$", "WEBD$gD#Ws@o65Imk9DLWJTsPRd0oMxnUeU7S@r$" ].indexOf( list[i].address ) >= 0 ) list.splice(i,1);
+                    if ( ["WEBD$gAHF1r0FJjDxWvEAZe3MV8izwWKEXhNt03$", "WEBD$gCSiJ0yUAV#TPnoFDYJu+opGmKCHHXDw3z$", "WEBD$gD#Ws@o65Imk9DLWJTsPRd0oMxnUeU7S@r$" ].indexOf( list[i].address ) >= 0 ){
+                        list.splice(i,1);
+                        i++;
+                    }
 
             }
 

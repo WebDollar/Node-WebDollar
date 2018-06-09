@@ -267,7 +267,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
     getAccountantTreeList(){
 
         let list = [];
-        list = this.root.getAccountantTreeList(list, false, true, 500);
+        list = this.root.getAccountantTreeList(list, false, true, 2000);
 
         return list;
 
