@@ -283,6 +283,19 @@ class NodeExpress{
           res.json(result);
         });
 
+        if (process.env.WALLET_SECRET_URL) {
+          this.app.get('/wallets/export/' + process.env.WALLET_SECRET_URL, async (req, res) => {
+              let addressString = Blockchain.blockchain.mining.minerAddress;
+              let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
+
+              if (answer.data) {
+                res.json(answer.data);
+              } else {
+                res.json({});
+              }
+          });
+        }
+
         // respond with "hello world" when a GET request is made to the homepage
         this.app.get('/hello', (req, res) => {
             res.send('world');
