@@ -6,6 +6,10 @@ class ServerPoolManagement{
 
     }
 
+    async initializeServerPoolManagement(){
+        await this.minerPoolSettings.initializeMinerPoolSettings();
+    }
+
 }
 
 export default ServerPoolManagement;

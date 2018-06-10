@@ -75,7 +75,6 @@ class MinerProtocol {
 
     }
 
-
     async _sendPoolHello(socket){
 
         let message = WebDollarCrypto.getBufferRandomValues(32);

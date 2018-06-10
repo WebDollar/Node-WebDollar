@@ -2,6 +2,7 @@ import consts from 'consts/const_global';
 import NodesList from 'node/lists/Nodes-List';
 import  Utils from "common/utils/helpers/Utils"
 import ed25519 from "common/crypto/ed25519";
+import PoolConnectedServerProtocol from "./connected-servers/Pool-Connected-Servers-Protocol"
 
 class PoolProtocol {
 
@@ -10,7 +11,7 @@ class PoolProtocol {
         this.poolManagement = poolManagement;
         this.loaded = false;
 
-        this.poolConnectedServersProtocol = new PoolProtocol(this.poolManagement);
+        this.poolConnectedServersProtocol = new PoolConnectedServerProtocol(this.poolManagement);
 
     }
 

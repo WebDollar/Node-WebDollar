@@ -250,6 +250,14 @@ class NodesList {
 
     }
 
+    disconnectAllNodesByConsensusType(nodeConsensusType){
+
+        for (let i=this.nodes.length-1; i>=0; i--)
+            if ( this.nodes[i].socket.node.protocol.nodeConsensusType === nodeConsensusType )
+                this.nodes[i].socket.disconnect();
+
+    }
+
     disconnectFromFallbacks(){
 
         for (let i=this.nodes.length-1; i>=0; i--)

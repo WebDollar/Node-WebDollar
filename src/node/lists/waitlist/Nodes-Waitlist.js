@@ -175,7 +175,13 @@ class NodesWaitlist {
 
     }
 
+    deleteWaitlistByConsensusNode(nodeConsensusType){
 
+        for (let i=this.waitListFullNodes.length-1; i>=0; i--)
+            if (this.waitListFullNodes[i].nodeConsensusType === nodeConsensusType)
+                this.waitListFullNodes.splice(i,1);
+
+    }
 
     /**
      * It will delete useless waitlist WEB_PEER

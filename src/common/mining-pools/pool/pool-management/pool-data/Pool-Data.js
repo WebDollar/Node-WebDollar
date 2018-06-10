@@ -45,7 +45,7 @@ class PoolData {
     getMiner(minerAddress){
         
         for (let i = 0; i < this.miners.length; ++i)
-            if (this.miners[i].address === minerAddress)
+            if (this.miners[i].address.equals( minerAddress) )
                 return this.miners[i];
                 
         return null;

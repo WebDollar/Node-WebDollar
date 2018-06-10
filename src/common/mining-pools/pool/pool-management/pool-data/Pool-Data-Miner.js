@@ -6,11 +6,10 @@ import PoolDataMinerInstance from "./Pool-Data-Miner-Instance";
 
 class PoolDataMiner{
 
-    constructor(index, address, reward, publicKey){
+    constructor(index, address, publicKey){
 
         this.index = index;
         this.address = address;
-        this.reward = reward;
 
         this.instances = [];
 
@@ -45,7 +44,8 @@ class PoolDataMiner{
 
         list.push(this.address ); //20 bytes
 
-        list.push ( Serialization.serializeNumber2Bytes(this.instances) );
+        list.push ( Serialization.serializeNumber4Bytes(this.instances) );
+
         for (let i=0; i<this.instances.length; i++)
             list.push(this.instances[i].serializeMinerInstance() );
 
@@ -58,16 +58,16 @@ class PoolDataMiner{
         this.address = BufferExtended.toBase( BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH ) );
         offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
-        let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 2 ) );
+        let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
+        offset += 4;
 
+        this.instances = [];
         for (let i=0; i<len; i++){
-            this.instances[i].deserializeMinerInstance(buffer, offset);
-            BufferExtended.substr( buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH );
-            offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH
-        }
+            let instance = new PoolDataMinerInstance(this, undefined);
+            offset = instance.deserializeMinerInstance(buffer, offset);
 
-        this.minerReward = Serialization.deserializeNumber7Bytes(buffer, offset);
-        offset += 7;
+            this.instances.push(instance);
+        }
 
         return offset;
 

@@ -182,6 +182,7 @@ consts.DATABASE_NAMES = {
     },
 
     POOL_DATABASE: "poolDB"+(process.env.INSTANCE_PREFIX||""),
+    SERVER_POOL_DATABASE: "serverPoolDB"+(process.env.INSTANCE_PREFIX||""),
     VALIDATE_DATABASE: "validateDB"+(process.env.INSTANCE_PREFIX||""),
     TESTS_DATABASE: "testDB"+(process.env.INSTANCE_PREFIX||""),
     TRANSACTIONS_DATABASE: "transactionsDB"+(process.env.INSTANCE_PREFIX||"")
@@ -342,7 +343,7 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.PORT = 9095;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://192.168.2.8:9095"],
+        "addr": ["http://webdollar.ddns.net:9095"],
     }];
 
 

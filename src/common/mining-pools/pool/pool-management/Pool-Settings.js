@@ -100,15 +100,11 @@ class PoolSettings {
         return this._poolServers;
     }
 
-    setPoolServers(newValue, avoidSave = false ){
+    setPoolServers(newValue){
 
-        if (avoidSave)
-            this._poolServers = PoolsUtils.processServersList(newValue);
-
-        if (avoidSave)
-            return true;
-
+        this._poolServers = newValue;
         return this.savePoolDetails();
+
     }
 
     async savePoolPrivateKey(){
@@ -142,6 +138,10 @@ class PoolSettings {
 
         if (typeof this._poolWebsite !== "string") throw {message: "pool website is not a string"};
         if (this._poolWebsite !== '' && ! Utils.validateUrl(this._poolWebsite)) throw {message:"pool website is invalid"};
+
+        this._poolServers = PoolsUtils.processServersList( this.poolServers );
+
+        this.poolManagement.poolConnectedServersProtocol.insertServersListWaitlist(this._poolServers);
 
         this._generatePoolURL();
 

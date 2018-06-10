@@ -1,3 +1,4 @@
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List';
 import NODE_TYPE from "node/lists/types/Node-Type";
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
@@ -7,6 +8,21 @@ class PoolConnectedServersProtocol{
     constructor(poolManagement){
 
         this.poolManagement = poolManagement;
+
+    }
+
+    insertServersListWaitlist(serversListArray){
+
+        NodesWaitlist.deleteWaitlistByConsensusNode(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER);
+        NodesList.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER);
+
+        for (let i=0; i<serversListArray.length; i++){
+
+            let server = serversListArray[i];
+
+            NodesWaitlist.addNewNodeToWaitlist( server, undefined, NODE_TYPE.NODE_TERMINAL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER );
+
+        }
 
     }
 
@@ -22,15 +38,15 @@ class PoolConnectedServersProtocol{
 
         let socket = nodesListObject.socket;
 
-        if (socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER){
+        if ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER ){
 
-            await this.registerPoolToServerPool(socket);
+            await this._registerPoolToServerPool(socket);
 
         }
 
     }
 
-    async registerPoolToServerPool(socket) {
+    async _registerPoolToServerPool(socket) {
 
         let answer = await socket.sendRequestWaitOnce("server-pool/register-pool", {
             poolName: this.poolManagement.poolSettings.poolName,
@@ -43,20 +59,15 @@ class PoolConnectedServersProtocol{
 
         if (answer !== null && answer.result === true && typeof answer.serverFee === "number" ) {
 
-            this._extendSocketForServerPool(socket, answer.serverFee);
+            socket.node.protocol.serverProol = {
+                serverFee: serverFee,
+            };
+
+            socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_POOL;
 
         }
 
     }
-
-    _extendSocketForServerPool(socket, serverFee){
-
-        socket.node.protocol.serverProol = {
-            serverFee: serverFee,
-        };
-
-    }
-
 
 }
 
