@@ -100,9 +100,13 @@ class PoolSettings {
         return this._poolServers;
     }
 
-    setPoolServers(newValue){
+    setPoolServers(newValue, avoidSave = false ){
 
-        this._poolServers = PoolsUtils.processServersList(newValue);
+        if (avoidSave)
+            this._poolServers = PoolsUtils.processServersList(newValue);
+
+        if (avoidSave)
+            return true;
 
         return this.savePoolDetails();
     }
@@ -112,6 +116,7 @@ class PoolSettings {
         let result = await this._db.save("pool_privatekey", this._poolPrivateKey);
 
         return result;
+
     }
 
     async _getPoolPrivateKey(){
@@ -185,8 +190,10 @@ class PoolSettings {
     }
 
     poolDigitalSign(message){
+
         let signature = ed25519.sign( message, this._poolPrivateKey );
         return signature;
+
     }
 
 }
