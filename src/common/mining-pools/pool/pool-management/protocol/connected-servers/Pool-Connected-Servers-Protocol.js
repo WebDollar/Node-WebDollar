@@ -1,5 +1,6 @@
 import NodesList from 'node/lists/Nodes-List';
-import PoolConnectedServer from "./Pool-Connected-Server";
+import NODE_TYPE from "node/lists/types/Node-Type";
+import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 
 class PoolConnectedServersProtocol{
 
@@ -7,15 +8,25 @@ class PoolConnectedServersProtocol{
 
         this.poolManagement = poolManagement;
 
-        this.connectedServers = [];
-
     }
 
     startPoolConnectedServersProtocol(){
 
-        NodesList.emitter.on("nodes-list/disconnected", (result) => {
-            this._deleteConnectedServer(result.socket)
+        NodesList.emitter.on("nodes-list/connected", (nodesListObject) => {
+            this._subscribePoolConnectedServer(nodesListObject)
         });
+
+    }
+
+    async _subscribePoolConnectedServer(nodesListObject){
+
+        let socket = nodesListObject.socket;
+
+        if (socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_SERVER_CONSENSUS ){
+
+            await this.registerPoolToServerPool(socket);
+
+        }
 
     }
 
@@ -28,38 +39,24 @@ class PoolConnectedServersProtocol{
             poolPublicKey: this.poolManagement.poolSettings.poolPublicKey,
         });
 
+        //TODO make a confirmation using a digital signature
+
         if (answer !== null && answer.result === true && typeof answer.serverFee === "number" ) {
-            return this._addServerConnected(socket, answer.serverFee);
+
+            this._extendSocketForServerPool(socket, answer.serverFee);
+
         }
 
     }
 
-    _addServerConnected(socket, fee){
+    _extendSocketForServerPool(socket, serverFee){
 
-        let server = this._findConnectedServer(socket);
-        if (server !== null) return server;
+        socket.node.protocol.serverProol = {
+            serverFee: serverFee,
+        };
 
-        this.connectedServers.push(new PoolConnectedServer(socket, fee));
-        return this.connectedServers[this.connectedServers.length-1];
     }
 
-    _findConnectedServer(socket){
-
-        for (let i=0; i<this.connectedServers.length; i++)
-            if (this.connectedServers[i].socket === socket)
-                return this.connectedServers[i];
-
-        return null;
-    }
-
-    _deleteConnectedServer(socket){
-
-        for (let i=0; i<this.connectedServers.length; i++)
-            if (this.connectedServers[i] === socket) {
-                this.connectedServers.splice(i, 1);
-                return;
-            }
-    }
 
 }
 
