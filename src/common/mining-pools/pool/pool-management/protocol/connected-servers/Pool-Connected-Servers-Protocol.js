@@ -22,7 +22,7 @@ class PoolConnectedServersProtocol{
 
         let socket = nodesListObject.socket;
 
-        if (socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_SERVER_CONSENSUS ){
+        if (socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER){
 
             await this.registerPoolToServerPool(socket);
 

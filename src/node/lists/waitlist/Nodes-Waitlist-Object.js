@@ -38,7 +38,7 @@ class NodesWaitlistObject {
         if (nodeType === undefined) nodeType = NODE_TYPE.NODE_TERMINAL;
         this.nodeType = nodeType;
 
-        this.nodeConsensusType = nodeConsensusType || NODE_CONSENSUS_TYPE.NODE_PEER_CONSENSUS;
+        this.nodeConsensusType = nodeConsensusType || NODE_CONSENSUS_TYPE.NODE_CONSENSUS_PEER;
     }
 
     refreshLastTimeChecked(){

@@ -12,7 +12,7 @@ class NodesListObject {
 
         this.connectionType = connectionType;
         this.nodeType = nodeType;
-        this.nodeConsensusType = nodeConsensusType||NODE_CONSENSUS_TYPE.NODE_PEER_CONSENSUS;
+        this.nodeConsensusType = nodeConsensusType||NODE_CONSENSUS_TYPE.NODE_CONSENSUS_PEER;
 
         this.date = new Date().getTime();
         this.isFallback = isFallback;

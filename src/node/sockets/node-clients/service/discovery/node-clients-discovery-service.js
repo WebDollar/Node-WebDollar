@@ -147,7 +147,7 @@ class NodeDiscoveryService {
                                 nodeAddress = nodes[pos]; //a simple string Address
                             }
 
-                            await NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType, NODES_CONSENSUS_TYPE.NODE_PEER_CONSENSUS, false, 1, "fallback" );
+                            await NodesWaitlist.addNewNodeToWaitlist( nodeAddress, nodePort, nodeType, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER, false, 1, "fallback" );
                         }
 
                     }

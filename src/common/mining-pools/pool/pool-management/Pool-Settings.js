@@ -4,6 +4,7 @@ import WebDollarCrypto from "../../../crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";
 
 import Utils from "common/utils/helpers/Utils";
+import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 
 class PoolSettings {
 
@@ -101,7 +102,7 @@ class PoolSettings {
 
     setPoolServers(newValue){
 
-        this._poolServers = newValue;
+        this._poolServers = PoolsUtils.processServersList(newValue);
 
         return this.savePoolDetails();
     }
