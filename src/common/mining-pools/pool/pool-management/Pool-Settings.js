@@ -132,7 +132,7 @@ class PoolSettings {
     validatePoolDetails(){
 
         if (typeof this._poolName !== "string") throw {message: "pool name is not a string"};
-        if (! /^[A-Za-z\d\s]+$/.test(this._poolName)) throw {message: "pool name is invalid"};
+        if (this._poolName !=='' && ! /^[A-Za-z\d\s]+$/.test(this._poolName)) throw {message: "pool name is invalid"};
 
         if ( typeof this._poolFee !== "number") throw {message: "pool fee is invalid"};
 
@@ -141,7 +141,7 @@ class PoolSettings {
 
         this._poolServers = PoolsUtils.processServersList( this.poolServers );
 
-        this.poolManagement.poolConnectedServersProtocol.insertServersListWaitlist(this._poolServers);
+        this.poolManagement.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this._poolServers );
 
         this._generatePoolURL();
 

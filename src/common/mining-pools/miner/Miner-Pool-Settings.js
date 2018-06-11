@@ -57,7 +57,7 @@ class MinerPoolSettings {
         this.poolPublicKey = new Buffer(0);
         this.poolServers = [];
 
-        if ( this._poolURL === "" || this._poolURL === undefined ) return this._emitPoolNotification();
+        if ( this._poolURL === null || this._poolURL === "" || this._poolURL === undefined ) return this._emitPoolNotification();
 
         let loc = new URL(this._poolURL);
 

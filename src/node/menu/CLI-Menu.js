@@ -429,8 +429,9 @@ const commands = [
         '7. Set mining address',
         '8. Start Mining',
         '9. Start Mining Instantly Even Unsynchronized',
-        'p. Start Mining Inside a Pool',
-        'c. Create a New Mining Pool',
+        'p. Mining Pool: Create a New Pool',
+        'q. Mining Pool: Start Mining in a Pool',
+        'r. Server Mining Pool: Create a new Server Mining Pool',
     ];
 
 const lineSeparator =
