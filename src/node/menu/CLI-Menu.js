@@ -38,38 +38,41 @@ class CLI {
         let answer = await this.question('Command: ');
 
         switch(answer.trim()) {
-            case '1':
+            case '1': //  List addresses'
                 await this.listAddresses();
                 break;
-            case '2':
+            case '2': //  Create new address',
                 await this.createNewAddress();
                 break;
-            case '3':
+            case '3': //  Delete Address
                 await this.deleteAddress();
                 break;
-            case '4':
+            case '4': //  Import Address
                 await this.importAddress();
                 break;
-            case '5':
+            case '5': //  Export Address
                 await this.exportAddress();
                 break;
-            case '6':
+            case '6': //  Encrypt Address
                 await this.encryptAddress();
                 break;
-            case '7':
+            case '7': //  Set Mining Address
                 await this.setMiningAddress();
                 break;
-            case '8':
+            case '8': //  Start Mining
                 await this.startMining();
                 break;
-            case '9':
+            case '9': //  Start Mining Instantly
                 await this.startMining(true);
                 break;
-            case 'p':
+            case '10':  // Mining Pool: Create a New Pool
+                await this.createMiningPool();
+                break;
+            case '11': // Mining Pool: Start Mining in a Pool
                 await this.startMiningInsidePool();
                 break;
-            case 'c':
-                await this.createMiningPool();
+            case '12':  // Server Mining Pool: Create a new Server for Mining Pool
+                await this.createServerForMiningPool();
                 break;
             case 'exit':
                 this._exitMenu = true;
@@ -375,20 +378,17 @@ class CLI {
         
         console.info('Mining inside a pool.');
         console.info('Your current mining pool is: ', 'demo at the moment');
-        
-        return new Promise ( async (resolve)=> {
-            let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool');
-            
-            if (response == false) {
-                let miningPoolLink = await this.question('Enter the new mining pool link: ');
-                console.info('Your new mining pool is: ', miningPoolLink);
-                //TODO: Save the mining pool link
-            }
-            
-            //TODO: Code for start mining inside a pool
-            
-            resolve(true);
-        });
+
+        let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool');
+
+        if (response === false) {
+            let miningPoolLink = await this.question('Enter the new mining pool link: ');
+            console.info('Your new mining pool is: ', miningPoolLink);
+            //TODO: Save the mining pool link
+        }
+
+        //TODO: Code for start mining inside a pool
+
     }
     
     async createMiningPool(){
@@ -405,6 +405,10 @@ class CLI {
             console.log("your fee is", poolLeaderFee);
 
         let poolLeader = new PoolLeaderProtocol(poolLeaderFee);
+    }
+
+    async createServerForMiningPool(){
+
     }
 
     question(message){
@@ -429,9 +433,9 @@ const commands = [
         '7. Set mining address',
         '8. Start Mining',
         '9. Start Mining Instantly Even Unsynchronized',
-        'p. Mining Pool: Create a New Pool',
-        'q. Mining Pool: Start Mining in a Pool',
-        'r. Server Mining Pool: Create a new Server Mining Pool',
+        '10. Mining Pool: Create a New Pool',
+        '11. Mining Pool: Start Mining in a Pool',
+        '12. Server for Mining Pool: Create a new Server for Mining Pool',
     ];
 
 const lineSeparator =
