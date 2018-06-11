@@ -62,11 +62,24 @@ module.exports = {
                 // }),
                 new ExtractTextPlugin({
                     filename: 'common.[chunkhash].css'
+                }),
+
+                new webpack.DefinePlugin({
+                    "process.env": {
+                        MINING_POOL_STATUS: process.env.MINING_POOL_STATUS,
+                    }
                 })
             ]
             : [
                 ...isAnalyze ? [new BundleAnalyzerPlugin()] : [],
-                new FriendlyErrorsPlugin()
+                new FriendlyErrorsPlugin(),
+
+                new webpack.DefinePlugin({
+                    "process.env": {
+                        MINING_POOL_STATUS: process.env.MINING_POOL_STATUS,
+                    }
+                })
             ]
 
 }
+

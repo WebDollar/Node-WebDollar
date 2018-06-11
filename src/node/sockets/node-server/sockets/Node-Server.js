@@ -80,6 +80,8 @@ class NodeServer {
 
         if (!consts.OPEN_SERVER) return false;
 
+        if (this.loaded) return;
+
         try
         {
 

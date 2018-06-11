@@ -119,7 +119,8 @@ class ServerPoolData {
 
         try{
 
-            let buffer = await this._db.get("poolsList");
+            let buffer = await this._db.get("poolsList", 60000, true);
+
             let response = this._deserializePools(buffer);
 
             if (response !== true){

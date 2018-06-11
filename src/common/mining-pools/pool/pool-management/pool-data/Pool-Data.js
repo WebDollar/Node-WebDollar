@@ -198,7 +198,7 @@ class PoolData {
         
         try{
 
-            let buffer = await this._db.get("minersList");
+            let buffer = await this._db.get("minersList",  60000, true);
             let response = this._deserializeMiners(buffer);
 
             if (response !== true){
@@ -219,7 +219,7 @@ class PoolData {
 
         try{
 
-            let buffer = await this._db.get("blocksInformation");
+            let buffer = await this._db.get("blocksInformation", 60000, true);
             let response = this._deserializeBlockInformation(buffer);
 
             if (response !== true){

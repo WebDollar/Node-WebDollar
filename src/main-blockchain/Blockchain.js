@@ -13,6 +13,11 @@ import NODE_TYPE from "../node/lists/types/Node-Type";
 import PoolManagement from "common/mining-pools/pool/pool-management/Pool-Management"
 import MinerPoolManagement from "common/mining-pools/miner/Miner-Pool-Management"
 
+let ServerPoolManagement = undefined;
+if (process.env.BROWSER)
+    ServerPoolManagement = require("common/mining-pools/server-pool/Server-Pool-Management").default;
+
+
 class Blockchain{
 
     constructor(){
@@ -42,13 +47,7 @@ class Blockchain{
             this._onLoadedResolver = resolve;
         });
 
-        this.PoolManagement = new PoolManagement(this.Wallet);
-        this.MinerPoolManagement = new MinerPoolManagement();
-
-        this.onLoaded.then( async (answer)=>{
-            await this.PoolManagement.initializePoolManagement();
-            await this.MinerPoolManagement.initializeMinerPoolManagement();
-        });
+        this.initializeMiningPools();
         
         this._loaded = false;
 
@@ -232,6 +231,30 @@ class Blockchain{
 
         StatusEvents.emit('blockchain/synchronizing', !newValue );
         StatusEvents.emit('blockchain/synchronized', newValue );
+
+    }
+
+
+    //MINING POOLS SETTINGS
+    initializeMiningPools(){
+
+        if (this.PoolManagement === undefined)
+            this.PoolManagement = new PoolManagement(this.blockchain, this.Wallet);
+
+        if (this.MinerPoolManagement === undefined)
+            this.MinerPoolManagement = new MinerPoolManagement(this.blockchain);
+
+        if (ServerPoolManagement !== undefined && this.ServerPoolManagement === undefined)
+            this.ServerPoolManagement = new ServerPoolManagement();
+
+        this.onLoaded.then( async (answer)=>{
+            await this.PoolManagement.initializePoolManagement();
+            await this.MinerPoolManagement.initializeMinerPoolManagement();
+
+            if (this.ServerPoolManagement !== undefined)
+                await this.ServerPoolManagement.initializeServerPoolManagement();
+
+        });
 
     }
 
