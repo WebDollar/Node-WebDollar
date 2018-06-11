@@ -13,8 +13,13 @@ class PoolConnectedServersProtocol{
 
     insertServersListWaitlist(serversListArray){
 
+        if (!Array.isArray(serversListArray) || serversListArray.length === 0) return false;
+
         NodesWaitlist.deleteWaitlistByConsensusNode(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER);
         NodesList.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER);
+
+        NodesWaitlist.deleteWaitlistByConsensusNode(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_POOL);
+        NodesList.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_POOL);
 
         for (let i=0; i<serversListArray.length; i++){
 
@@ -60,11 +65,13 @@ class PoolConnectedServersProtocol{
         if (answer !== null && answer.result === true && typeof answer.serverFee === "number" ) {
 
             socket.node.protocol.serverProol = {
-                serverFee: serverFee,
+                serverFee: answer.serverFee,
             };
 
             socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_POOL;
 
+        } else {
+            socket.disconnect();
         }
 
     }

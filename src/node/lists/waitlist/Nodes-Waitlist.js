@@ -68,9 +68,9 @@ class NodesWaitlist {
                 if (sckAddress.address.indexOf("192.168") === 0 && !consts.DEBUG ) continue;
 
                 //it if is a fallback, maybe it requires SSL
-                if ( type === NODE_TYPE.NODE_TERMINAL && process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL && !consts.DEBUG )  continue;
+                if ( nodeType === NODE_TYPE.NODE_TERMINAL && process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL && !consts.DEBUG )  continue;
 
-                let answer = this._searchNodesWaitlist(sckAddress, port, type);
+                let answer = this._searchNodesWaitlist(sckAddress, port, nodeType);
 
                 if (answer.waitlist === null){
                     if (backedBy === "fallback")
@@ -79,13 +79,13 @@ class NodesWaitlist {
 
                         let response;
 
-                        if ( type === NODE_TYPE.NODE_TERMINAL)
+                        if ( nodeType === NODE_TYPE.NODE_TERMINAL)
                             response = await DownloadManager.downloadFile(sckAddress.getAddress(true, true), 5000);
 
-                        if (type === NODE_TYPE.NODE_WEB_PEER || (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY)) {
+                        if (nodeType === NODE_TYPE.NODE_WEB_PEER || (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY)) {
 
                             //search again because i have waited for a promise
-                            let answer = this._searchNodesWaitlist(sckAddress, port, type);
+                            let answer = this._searchNodesWaitlist(sckAddress, port, nodeType);
 
                             if (answer.waitlist === null)
                                 sckAddresses.push(sckAddress);

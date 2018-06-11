@@ -40,3 +40,5 @@ class ServerPoolDataPool{
     }
 
 }
+
+export default ServerPoolDataPool

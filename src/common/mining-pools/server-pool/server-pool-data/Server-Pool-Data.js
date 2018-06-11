@@ -83,7 +83,7 @@ class ServerPoolData {
         let list = [ Serialization.serializeNumber4Bytes(this.pools.length) ];
 
         for (let i = 0; i < this.pools.length; ++i)
-            list.push(this.pools[i].serializeMiner());
+            list.push( this.pools[i].serializeServerPoolData() );
 
         return Buffer.concat(list);
     }
@@ -99,7 +99,7 @@ class ServerPoolData {
             for (let i = 0; i < numPools; ++i) {
 
                 let miner = new ServerPoolDataPool(0, undefined, []);
-                offset = miner.deserializeMiner ( buffer, offset );
+                offset = miner.deserializeServerPoolData( buffer, offset );
 
             }
 

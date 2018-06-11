@@ -66,7 +66,7 @@ class NodesList {
 
     async registerUniqueSocket(socket, connectionType, nodeType, nodeConsensusType, validationDoubleConnectionsTypes){
 
-        if (type === undefined) throw {message: "type is necessary"};
+        if (nodeType === undefined) throw {message: "type is necessary"};
 
         if (!socket.node || !socket.node.protocol || !socket.node.protocol.helloValidated ) {
             socket.disconnect();
@@ -83,7 +83,7 @@ class NodesList {
 
             // it is a unique connection, I should register this connection
 
-            let object = new NodesListObject(socket, connectionType, type, consensusType,  NodesWaitlist.isAddressFallback(socket.node.sckAddress));
+            let object = new NodesListObject(socket, connectionType, nodeType, nodeConsensusType,  NodesWaitlist.isAddressFallback(socket.node.sckAddress));
             this.nodes.push(object);
 
             this.emitter.emit("nodes-list/connected", object);

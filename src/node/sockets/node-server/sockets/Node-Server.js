@@ -253,7 +253,7 @@ class NodeServer {
     async initializeSocket(socket, validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (await NodesList.registerUniqueSocket(socket, CONNECTION_TYPE.CONNECTION_SERVER_SOCKET, socket.node.protocol.nodeType, this.socket.node.protocol.nodeConsensusType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(socket, CONNECTION_TYPE.CONNECTION_SERVER_SOCKET, socket.node.protocol.nodeType, socket.node.protocol.nodeConsensusType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 

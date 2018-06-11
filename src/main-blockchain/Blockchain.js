@@ -1,3 +1,4 @@
+import consts from 'consts/const_global'
 import MainBlockchainWallet from 'main-blockchain/wallet/Main-Blockchain-Wallet';
 import MainBlockchain from 'main-blockchain/chain/Main-Blockchain';
 import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining';
@@ -46,10 +47,10 @@ class Blockchain{
         this.onLoaded = new Promise((resolve)=>{
             this._onLoadedResolver = resolve;
         });
-
-        this.initializeMiningPools();
         
         this._loaded = false;
+
+        this.initializeMiningPools();
 
     }
 
@@ -236,7 +237,7 @@ class Blockchain{
 
 
     //MINING POOLS SETTINGS
-    initializeMiningPools(){
+    async initializeMiningPools(){
 
         if (this.PoolManagement === undefined)
             this.PoolManagement = new PoolManagement(this.blockchain, this.Wallet);
@@ -247,14 +248,24 @@ class Blockchain{
         if (ServerPoolManagement !== undefined && this.ServerPoolManagement === undefined)
             this.ServerPoolManagement = new ServerPoolManagement();
 
-        this.onLoaded.then( async (answer)=>{
-            await this.PoolManagement.initializePoolManagement();
-            await this.MinerPoolManagement.initializeMinerPoolManagement();
+        if (this.loaded) //already opened
+            await this._openMiningPools();
+        else
+            this.onLoaded.then( async (answer)=>{
 
-            if (this.ServerPoolManagement !== undefined)
-                await this.ServerPoolManagement.initializeServerPoolManagement();
+                await this._openMiningPools();
 
-        });
+            });
+
+    }
+
+    async _openMiningPools(){
+
+        await this.PoolManagement.initializePoolManagement();
+        await this.MinerPoolManagement.initializeMinerPoolManagement();
+
+        if (this.ServerPoolManagement !== undefined && consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_STATUS.MINING_POOL_SERVER )
+            await this.ServerPoolManagement.initializeServerPoolManagement();
 
     }
 
