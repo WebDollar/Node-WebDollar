@@ -19,6 +19,7 @@ class InterfaceBlockchainAddress{
     constructor (db){
 
         this.address = null;
+        this.unencodedAddress = null;
         this.publicKey = null;
 
         if (db === undefined){
