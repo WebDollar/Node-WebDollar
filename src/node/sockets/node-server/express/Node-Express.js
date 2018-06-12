@@ -228,63 +228,75 @@ class NodeExpress{
 
         });
 
+        //Get Address
+        //TODO: optimize or limit the number of requests
         this.app.get('/wallets/balance/:address', (req, res) => {
+
             let address = decodeURIComponent(req.params.address);
             let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
 
             balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
 
             res.json(balance);
+
         });
 
-        this.app.get('/wallets/balance', (req, res) => {
-            let addressString = Blockchain.blockchain.mining.minerAddress;
-            let balance = Blockchain.blockchain.accountantTree.getBalance(addressString, undefined);
+        if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
-            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+            this.app.get('/'+process.env.WALLET_SECRET_URL+'/mining/balance', (req, res) => {
 
-            res.json(balance);
-        });
+                let addressString = Blockchain.blockchain.mining.minerAddress;
+                let balance = Blockchain.blockchain.accountantTree.getBalance(addressString, undefined);
 
-        this.app.get('/wallets/import', async (req, res) => {
-          var content = {
-            version: '0.1',
-            address: decodeURIComponent(req.query.address),
-            publicKey: req.query.publicKey,
-            privateKey: req.query.privateKey
-          };
+                balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
 
-          try {
-              let answer = await Blockchain.Wallet.importAddressFromJSON(content);
+                res.json(balance);
 
-              if (answer.result === true) {
-                  console.log("Address successfully imported", answer.address);
-                  await Blockchain.Wallet.saveWallet();
-                  res.json(true);
-              } else {
-                  console.error(answer.message);
-                  res.json(false);
-              }
+            });
 
-          } catch(err) {
-              console.error(err.message);
-              res.json(false);
-          }
-        });
+            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/import', async (req, res) => {
 
-        this.app.get('/wallets/transactions', async (req, res) => {
-          var from = decodeURIComponent(req.query.from);
-          var to = decodeURIComponent(req.query.to);
-          var amount = parseInt(req.query.amount) * WebDollarCoins.WEBD;
-          var fee = parseInt(req.query.fee) * WebDollarCoins.WEBD;
+                let content = {
+                    version: '0.1',
+                    address: decodeURIComponent(req.query.address),
+                    publicKey: req.query.publicKey,
+                    privateKey: req.query.privateKey
+                };
 
-          var result = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
+                try {
 
-          res.json(result);
-        });
+                    let answer = await Blockchain.Wallet.importAddressFromJSON(content);
 
-        if (process.env.WALLET_SECRET_URL) {
-          this.app.get('/wallets/export/' + process.env.WALLET_SECRET_URL, async (req, res) => {
+                    if (answer.result === true) {
+                        console.log("Address successfully imported", answer.address);
+                        await Blockchain.Wallet.saveWallet();
+                        res.json(true);
+                    } else {
+                        console.error(answer.message);
+                        res.json(false);
+                    }
+
+                } catch(err) {
+                    console.error(err.message);
+                    res.json(false);
+                }
+
+            });
+
+            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/transactions', async (req, res) => {
+
+              let from = decodeURIComponent(req.query.from);
+              let to = decodeURIComponent(req.query.to);
+              let amount = parseInt(req.query.amount) * WebDollarCoins.WEBD;
+              let fee = parseInt(req.query.fee) * WebDollarCoins.WEBD;
+
+              let result = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
+
+              res.json(result);
+
+            });
+
+          this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/export', async (req, res) => {
               let addressString = Blockchain.blockchain.mining.minerAddress;
               let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
 
@@ -294,6 +306,7 @@ class NodeExpress{
                 res.json({});
               }
           });
+
         }
 
         // respond with "hello world" when a GET request is made to the homepage
