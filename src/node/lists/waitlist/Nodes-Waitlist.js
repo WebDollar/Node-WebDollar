@@ -30,7 +30,7 @@ class NodesWaitlist {
         this.MAX_ERROR_TRIALS_FALLBACK = 1000;
         this.MAX_ERROR_TRIALS_SIMPLE = 50;
 
-        setInterval( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 7 + Math.floor( Math.random()*10 )) *60*1000 ); // 10 in 10 minutes
+        setInterval( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
 
     }
 
