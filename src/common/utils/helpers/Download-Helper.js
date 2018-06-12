@@ -3,6 +3,18 @@ import consts from 'consts/const_global'
 
 class DownloadHelper{
 
+    async post (request, data ){
+
+        try{
+
+            return await axios.post(request, data);
+
+        } catch (exception){
+            return null;
+        }
+
+    }
+
     async downloadFile(address, timeout){
 
         try{

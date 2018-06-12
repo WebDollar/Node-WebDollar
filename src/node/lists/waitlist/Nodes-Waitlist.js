@@ -30,6 +30,8 @@ class NodesWaitlist {
         this.MAX_ERROR_TRIALS_FALLBACK = 1000;
         this.MAX_ERROR_TRIALS_SIMPLE = 50;
 
+        setInterval( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
+
     }
 
     initializeWaitlist(){
@@ -153,7 +155,7 @@ class NodesWaitlist {
 
         for (let i=0; i<list.length; i++)
             for (let j=0; j<list[i].sckAddresses.length; j++)
-                if (list[i].sckAddresses[j].matchAddress(sckAddress, ["ip","uuid", "port"]) ) //match also the port
+                if (list[i].sckAddresses[j].matchAddress( sckAddress, ["ip","uuid", "port"]) ) //match also the port
                     return i;
 
         return -1;
@@ -180,6 +182,27 @@ class NodesWaitlist {
         for (let i=this.waitListFullNodes.length-1; i>=0; i--)
             if (this.waitListFullNodes[i].nodeConsensusType === nodeConsensusType)
                 this.waitListFullNodes.splice(i,1);
+
+    }
+    async _deleteObsoleteFullNodesWaitlist(){
+
+        for (let i=this.waitListFullNodes.length-1; i>=0; i--)
+            if (!this.waitListFullNodes.isFallback) {
+
+                try {
+                    let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 5000);
+
+                    if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY)
+                        continue;
+                    else
+                        this.waitListFullNodes.splice(i, 1);
+
+                } catch (exception){
+
+                }
+
+                await Blockchain.blockchain.sleep( 500 + Math.floor( Math.random()*2000) );
+            }
 
     }
 
