@@ -1,20 +1,27 @@
 import ServerPoolData from "./server-pool-data/Server-Pool-Data"
+import ServerPoolSettings from "./Server-Pool-Settings"
 
 class ServerPoolManagement{
 
-    constructor(blockchain, serverPoolFee = 0.01){
+    constructor(blockchain){
 
         this.blockchain = blockchain;
-        this.fee = serverPoolFee;
 
         this.serverPoolData = new ServerPoolData(this );
+        this.serverPoolSettings = new ServerPoolSettings(this);
 
     }
 
-    async initializeServerPoolManagement(){
+    async initializeServerPoolManagement(serverPoolFee){
 
         if ( false === await this.serverPoolData.loadPoolsList() )
-            throw {message: "loadPoolsList failed"}
+            throw {message: "loadPoolsList failed"};
+
+        await this.serverPoolSettings.initializeServerPoolSettings();
+
+        if (serverPoolFee !== undefined && typeof serverPoolFee === "number")
+            this.serverPoolSettings.setServerPoolFee(serverPoolFee);
+
 
     }
 

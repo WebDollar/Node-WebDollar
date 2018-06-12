@@ -2,11 +2,11 @@ const FileSystem = require('fs');
 const readline = require('readline');
 
 import consts from 'consts/const_global';
-import {Node, Blockchain} from '../../index.js';
+import {Node} from '../../index.js';
 import AdvancedMessages from './Advanced-Messages';
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-import PoolLeaderProtocol from 'common/mining-pools/pool/pool-management/protocol/Pool-Protocol';
+import Blockchain from "main-blockchain/Blockchain"
 
 class CLI {
 
@@ -395,19 +395,31 @@ class CLI {
         
         console.info('Create Mining Pool.');
         
-        let poolLeaderFee = await this._pickNumber('Choose a fee(0...100): ', true);
+        let poolFee = await this._pickNumber('Choose a fee(0...100): ', true);
         
-        if (isNaN(poolLeaderFee) || poolLeaderFee < 0 || 100 < poolLeaderFee){
-            console.log("You have entered an invalid number:", poolLeaderFee);
+        if (isNaN(poolFee) || poolFee < 0 || 100 < poolFee){
+            console.log("You have entered an invalid number:", poolFee);
             return false;
         }
         else
-            console.log("your fee is", poolLeaderFee);
+            console.log("your fee is", poolFee);
 
-        let poolLeader = new PoolLeaderProtocol(poolLeaderFee);
+        Blockchain.PoolManagement.initializePoolManagement(poolFee);
+
     }
 
     async createServerForMiningPool(){
+
+        let serverPoolFee = await this._pickNumber('Choose a fee(0...100): ', true);
+
+        if (isNaN(serverPoolFee) || serverPoolFee < 0 || 100 < serverPoolFee){
+            console.log("You have entered an invalid number:", serverPoolFee);
+            return false;
+        }
+        else
+            console.log("your fee is", serverPoolFee );
+
+        Blockchain.ServerPoolManagement.initializeServerPoolManagement(serverPoolFee);
 
     }
 

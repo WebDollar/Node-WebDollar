@@ -14,7 +14,7 @@ class PoolSettings {
         this._wallet = wallet;
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE );
 
-        this._poolFee = 0;
+        this._poolFee = 0.02;
         this._poolName = '';
         this._poolWebsite = '';
         this._poolServers = '';
@@ -33,10 +33,14 @@ class PoolSettings {
 
     }
 
-    async initializePoolSettings(){
+    async initializePoolSettings(poolFee){
 
         await this._getPoolDetails();
         await this._getPoolPrivateKey();
+
+        if (poolFee !== undefined)
+            this.setPoolFee(poolFee);
+
     }
 
     _generatePoolURL(){
@@ -135,6 +139,7 @@ class PoolSettings {
         if (this._poolName !=='' && ! /^[A-Za-z\d\s]+$/.test(this._poolName)) throw {message: "pool name is invalid"};
 
         if ( typeof this._poolFee !== "number") throw {message: "pool fee is invalid"};
+        if ( this._poolFee < 0 && this._poolFee > 1 ) throw {message: "pool fee is invalid"};
 
         if (typeof this._poolWebsite !== "string") throw {message: "pool website is not a string"};
         if (this._poolWebsite !== '' && ! Utils.validateUrl(this._poolWebsite)) throw {message:"pool website is invalid"};
@@ -172,7 +177,7 @@ class PoolSettings {
 
             this._poolFee = await this._db.get("pool_fee", 30 * 1000, true);
             if (this._poolFee === null)
-                this._poolFee = 0;
+                this._poolFee = 0.02;
 
             this._poolFee = parseInt(this._poolFee);
         } catch (exception){

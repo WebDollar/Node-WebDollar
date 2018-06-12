@@ -30,9 +30,9 @@ class PoolManagement{
 
     }
 
-    async initializePoolManagement(){
+    async initializePoolManagement(poolFee){
 
-        await this.poolSettings.initializePoolSettings();
+        await this.poolSettings.initializePoolSettings(poolFee);
 
     }
 
