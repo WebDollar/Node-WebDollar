@@ -161,6 +161,10 @@ class NodeExpress{
                     servers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET),
                     webpeers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_WEBRTC),
                 },
+                services:{
+                    serverPool: Blockchain.ServerPoolManagement.loaded,
+                    miningPool: Blockchain.MinerPoolManagement.loaded,
+                },
                 waitlist:{
                     list: NodesWaitlist.getJSONList( NODE_TYPE.NODE_TERMINAL, false ),
                 }

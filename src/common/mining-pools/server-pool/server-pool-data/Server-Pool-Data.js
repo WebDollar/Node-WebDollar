@@ -121,6 +121,8 @@ class ServerPoolData {
 
             let buffer = await this._db.get("poolsList", 60000, true);
 
+            if (buffer === null) return true; //nothing to load
+
             let response = this._deserializePools(buffer);
 
             if (response !== true){

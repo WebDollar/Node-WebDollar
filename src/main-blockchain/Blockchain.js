@@ -15,7 +15,8 @@ import PoolManagement from "common/mining-pools/pool/pool-management/Pool-Manage
 import MinerPoolManagement from "common/mining-pools/miner/Miner-Pool-Management"
 
 let ServerPoolManagement = undefined;
-if (process.env.BROWSER)
+
+if (!process.env.BROWSER)
     ServerPoolManagement = require("common/mining-pools/server-pool/Server-Pool-Management").default;
 
 
