@@ -182,7 +182,9 @@ consts.DATABASE_NAMES = {
     },
 
     POOL_DATABASE: "poolDB"+(process.env.INSTANCE_PREFIX||""),
-    SERVER_POOL_DATABASE: "serverpoolDB"+(process.env.INSTANCE_PREFIX||""),
+    SERVER_POOL_DATABASE: "serverPoolDB"+(process.env.INSTANCE_PREFIX||""),
+    MINER_POOL_DATABASE: "minerPoolDB"+(process.env.INSTANCE_PREFIX||""),
+
     VALIDATE_DATABASE: "validateDB"+(process.env.INSTANCE_PREFIX||""),
     TESTS_DATABASE: "testDB"+(process.env.INSTANCE_PREFIX||""),
     TRANSACTIONS_DATABASE: "transactionsDB"+(process.env.INSTANCE_PREFIX||"")

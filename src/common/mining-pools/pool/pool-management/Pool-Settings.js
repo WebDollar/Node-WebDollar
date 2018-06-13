@@ -5,6 +5,7 @@ import ed25519 from "common/crypto/ed25519";
 
 import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
 class PoolSettings {
 
@@ -35,17 +36,22 @@ class PoolSettings {
 
     async initializePoolSettings(poolFee){
 
-        await this._getPoolDetails();
-        await this._getPoolPrivateKey();
+        let result = await this._getPoolPrivateKey();
+        result = result && await this._getPoolDetails();
 
         if (poolFee !== undefined)
             this.setPoolFee(poolFee);
+
+        return result;
 
     }
 
     _generatePoolURL(){
 
-        if (this._poolName === '' || this._poolFee === 0 ) return '';
+        if (this._poolName === '' || this._poolFee === 0 ){
+            this.poolURL = '';
+            return '';
+        }
 
         this.poolURL = 'https://webdollar.io/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
 
@@ -121,16 +127,21 @@ class PoolSettings {
 
     async _getPoolPrivateKey(){
 
-        this._poolPrivateKey = await this._db.get("pool_privatekey", 30*1000, true);
+        this._poolPrivateKey = await this._db.get("pool_privateKey", 30*1000, true);
 
-        if (this._poolPrivateKey === null)
-            this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues( 64 );
+        if (this._poolPrivateKey === null) {
+
+            let privateKey = await Blockchain.Wallet.addresses[0].getPrivateKey();
+            this._poolPrivateKey = Buffer.concat( [ WebDollarCrypto.SHA256(WebDollarCrypto.MD5(privateKey)), WebDollarCrypto.SHA256( WebDollarCrypto.RIPEMD160(privateKey) )]);
+
+        }
 
         if (Buffer.isBuffer(this._poolPrivateKey)){
             this.poolPublicKey = ed25519.generatePublicKey(this._poolPrivateKey);
-        }
+        } else
+            throw {message: "poolPrivateKey is wrong"}
 
-        return this._poolPrivateKey;
+        return true;
     }
 
     validatePoolDetails(){
@@ -179,7 +190,7 @@ class PoolSettings {
             if (this._poolFee === null)
                 this._poolFee = 0.02;
 
-            this._poolFee = parseInt(this._poolFee);
+            this._poolFee = parseFloat(this._poolFee);
         } catch (exception){
 
         }
@@ -192,6 +203,8 @@ class PoolSettings {
 
         this.validatePoolDetails();
 
+
+        return true;
     }
 
     poolDigitalSign(message){

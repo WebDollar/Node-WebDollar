@@ -12,12 +12,12 @@ class MinerPoolSettings {
 
         this.minerPoolManagement = minerPoolManagement;
 
-        this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE );
+        this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.MINER_POOL_DATABASE );
 
         this._minerPoolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
         this.minerPoolPublicKey = undefined;
 
-        this._poolURL = undefined;
+        this._poolURL = '';
 
         this.poolName = "";
         this.poolFee = 0;

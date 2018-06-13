@@ -32,14 +32,23 @@ class PoolManagement{
 
     async initializePoolManagement(poolFee){
 
-        await this.poolSettings.initializePoolSettings(poolFee);
+        let answer = await this.poolSettings.initializePoolSettings(poolFee);
         console.info("The url is just your domain: "+ this.poolSettings.poolURL);
+
+        if (!answer ){
+            throw {message: "Pool Couldn't be started"};
+            return false;
+        }
+
+        if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined){
+            return this.poolProtocol.startServerPoolProtocol();
+        }
 
     }
 
     async startPool(){
 
-        this.poolProtocol.startPoolProtocol();
+        return await this.poolProtocol.startPoolProtocol();
 
     }
 

@@ -209,8 +209,7 @@ class NodeExpress{
                         }
 
                     if (found) {
-                        answer.push(
-                            {
+                        answer.push({
                                 blockId: Blockchain.blockchain.blocks[i].height,
                                 timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
                                 transaction: transaction.toJSON()

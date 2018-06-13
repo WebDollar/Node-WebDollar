@@ -20,10 +20,11 @@ class ServerPoolManagement{
 
     async initializeServerPoolManagement(serverPoolFee){
 
-        if ( false === await this.serverPoolData.loadPoolsList() )
+        if ( false === await this.serverPoolData.loadServerPoolsList() )
             throw {message: "loadPoolsList failed"};
 
-        await this.serverPoolSettings.initializeServerPoolSettings();
+        if ( false === await this.serverPoolSettings.initializeServerPoolSettings())
+            throw {message: "loadServer didn't work"}
 
         if (serverPoolFee !== undefined && typeof serverPoolFee === "number")
             this.serverPoolSettings.setServerPoolFee(serverPoolFee);

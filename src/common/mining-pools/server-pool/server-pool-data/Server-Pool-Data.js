@@ -46,7 +46,7 @@ class ServerPoolData {
 
             this.miners.push( new PoolDataMiner( uuid.v4(), poolAddress, poolReward, [] ) );
 
-            return (await this.savePoolsList());
+            return (await this.saveServerPoolsList());
 
         }
 
@@ -78,7 +78,7 @@ class ServerPoolData {
 
 
 
-    _serializePools() {
+    _serializeServerPools() {
 
         let list = [ Serialization.serializeNumber4Bytes(this.pools.length) ];
 
@@ -88,7 +88,7 @@ class ServerPoolData {
         return Buffer.concat(list);
     }
 
-    _deserializePools(buffer, offset = 0) {
+    _deserializeServerPools(buffer, offset = 0) {
 
         try {
 
@@ -115,15 +115,15 @@ class ServerPoolData {
      * Load miners from database
      * @returns {boolean} true is success, otherwise false
      */
-    async loadPoolsList() {
+    async loadServerPoolsList() {
 
         try{
 
-            let buffer = await this._db.get("poolsList", 60000, true);
+            let buffer = await this._db.get("ServersPoolList", 60000, true);
 
             if (buffer === null) return true; //nothing to load
 
-            let response = this._deserializePools(buffer);
+            let response = this._deserializeServerPools(buffer);
 
             if (response !== true){
                 console.log('Unable to load poolsList from DB');
@@ -144,13 +144,13 @@ class ServerPoolData {
      * Save miners to database
      * @returns {boolean} true is success, otherwise false
      */
-    async savePoolsList() {
+    async saveServerPoolsList() {
 
         try{
 
-            let buffer = this._serializePools();
+            let buffer = this._serializeServerPools();
 
-            let response = await this._db.save("poolsList", buffer);
+            let response = await this._db.save("ServersPoolList", buffer);
             if (response !== true) {
                 console.log('Unable to save poolsList to DB');
                 return false;
