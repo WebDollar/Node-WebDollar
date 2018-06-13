@@ -379,15 +379,25 @@ class CLI {
         console.info('Mining inside a pool.');
         console.info('Your current mining pool is: ', 'demo at the moment');
 
-        let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool');
+        let getNewLink = true;
 
-        if (response === false) {
-            let miningPoolLink = await this.question('Enter the new mining pool link: ');
-            console.info('Your new mining pool is: ', miningPoolLink);
-            //TODO: Save the mining pool link
+        if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== ''){
+
+            let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool');
+
+            if (response === true) getNewLink = false;
+
         }
 
-        //TODO: Code for start mining inside a pool
+        if (getNewLink) {
+
+            let miningPoolLink = await this.question('Enter the new mining pool link: ');
+            console.info('Your new mining pool is: ', miningPoolLink);
+
+            Blockchain.MinerPoolManagement.poolSettings.setPoolURL(miningPoolLink);
+        }
+
+        await Blockchain.MinerPoolManagement.initializeMinerPoolManagement();
 
     }
     
@@ -404,7 +414,7 @@ class CLI {
         else
             console.log("your fee is", poolFee);
 
-        Blockchain.PoolManagement.initializePoolManagement(poolFee);
+        await Blockchain.PoolManagement.initializePoolManagement(poolFee);
 
     }
 
@@ -419,7 +429,7 @@ class CLI {
         else
             console.log("your fee is", serverPoolFee );
 
-        Blockchain.ServerPoolManagement.initializeServerPoolManagement(serverPoolFee);
+        await Blockchain.ServerPoolManagement.initializeServerPoolManagement(serverPoolFee);
 
     }
 
