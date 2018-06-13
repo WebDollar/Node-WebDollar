@@ -23,8 +23,8 @@ class MinerProtocol {
 
     }
 
-    async initializeMinerPoolManagement(poolLink){
-        await this.minerPoolSettings.initializeMinerPoolSettings(poolLink);
+    async initializeMinerPoolManagement(poolURL){
+        await this.minerPoolSettings.initializeMinerPoolSettings(poolURL);
     }
 
     getMiningData() {

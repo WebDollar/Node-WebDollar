@@ -33,6 +33,7 @@ class PoolManagement{
     async initializePoolManagement(poolFee){
 
         await this.poolSettings.initializePoolSettings(poolFee);
+        console.info("The url is just your domain: "+ this.poolSettings.poolURL);
 
     }
 

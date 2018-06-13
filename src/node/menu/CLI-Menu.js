@@ -385,12 +385,13 @@ class CLI {
         if (getNewLink) {
 
             miningPoolLink = await this.question('Enter the new mining pool link: ');
-            console.info('Your new mining pool is: ', miningPoolLink);
+            console.info('Your new MiningPool is : ', miningPoolLink);
 
         }
 
-
-        await Blockchain.MinerPoolManagement.initializeMinerPoolManagement(miningPoolLink);
+        this._callCallbackBlockchainSync(async ()=>{
+            await Blockchain.MinerPoolManagement.initializeMinerPoolManagement(miningPoolLink);
+        }, false);
 
     }
     
@@ -406,11 +407,13 @@ class CLI {
             return false;
         }
         else
-            console.log("your fee is", poolFee);
+            console.log("Your fee is", poolFee);
 
-        await Blockchain.PoolManagement.initializePoolManagement(poolFee/100);
+        this._callCallbackBlockchainSync(async ()=>{
 
-        console.info("The url is just your domain: "+ Blockchain.PoolManagement.poolURL);
+            await Blockchain.PoolManagement.initializePoolManagement(poolFee/100);
+
+        }, true);
 
     }
 
@@ -428,9 +431,12 @@ class CLI {
         else
             console.log("your fee is", serverPoolFee );
 
-        await Blockchain.ServerPoolManagement.initializeServerPoolManagement(serverPoolFee/100);
+        this._callCallbackBlockchainSync(async ()=>{
 
-        console.info("The url is just your domain: "+ Blockchain.PoolManagement.poolURL);
+            await Blockchain.ServerPoolManagement.initializeServerPoolManagement( serverPoolFee / 100 );
+
+        }, true);
+
 
     }
 
@@ -444,7 +450,7 @@ class CLI {
 
     }
 
-    callCallbackBlockchainSync(callback, synchronize=true ){
+    _callCallbackBlockchainSync(callback, synchronize=true ){
 
         if (!Blockchain._blockchainInitiated) {
             Blockchain.createBlockchain("full-node", () => {

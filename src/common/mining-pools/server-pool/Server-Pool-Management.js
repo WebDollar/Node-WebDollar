@@ -1,6 +1,8 @@
 import ServerPoolData from "./server-pool-data/Server-Pool-Data"
 import ServerPoolSettings from "./Server-Pool-Settings"
 
+import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
+
 class ServerPoolManagement{
 
     constructor(blockchain){
@@ -22,6 +24,8 @@ class ServerPoolManagement{
         if (serverPoolFee !== undefined && typeof serverPoolFee === "number")
             this.serverPoolSettings.setServerPoolFee(serverPoolFee);
 
+
+        console.info("The url is just your domain: "+ NodeServer.getServerHTTPAddress() );
 
     }
 

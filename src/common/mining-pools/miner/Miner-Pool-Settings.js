@@ -28,13 +28,13 @@ class MinerPoolSettings {
 
     }
 
-    async initializeMinerPoolSettings(poolLink){
+    async initializeMinerPoolSettings(poolURL){
 
         await this._getPoolDetails();
         await this._getMinerPoolPrivateKey();
 
-        if (poolLink !== undefined)
-            this.setPoolURL(poolLink);
+        if (poolURL !== undefined)
+            this.setPoolURL(poolURL);
 
     }
 
