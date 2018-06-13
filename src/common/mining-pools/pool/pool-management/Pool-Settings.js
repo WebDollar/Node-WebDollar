@@ -5,7 +5,7 @@ import ed25519 from "common/crypto/ed25519";
 
 import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
-import Blockchain from "../../../../main-blockchain/Blockchain";
+import Blockchain from "main-blockchain/Blockchain";
 
 class PoolSettings {
 

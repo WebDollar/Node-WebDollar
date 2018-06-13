@@ -9,6 +9,7 @@ import ed25519 from "common/crypto/ed25519";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import NODE_TYPE from "node/lists/types/Node-Type"
+import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 
 class MinerProtocol {
 
@@ -46,26 +47,11 @@ class MinerProtocol {
 
     async insertServersListWaitlist(serversListArray){
 
-        if (!Array.isArray(serversListArray) || serversListArray.length === 0) return false;
+        return await PoolsUtils.insertServersListWaitlist(serversListArray, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER );
 
-        NodesWaitlist.deleteWaitlistByConsensusNode(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER);
-        NodesList.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER);
-
-        NodesWaitlist.deleteWaitlistByConsensusNode(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER);
-        NodesList.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER);
-
-
-        for (let i=0; i<serversListArray.length; i++){
-
-            let server = serversListArray[i];
-
-            await NodesWaitlist.addNewNodeToWaitlist( server, undefined, NODE_TYPE.NODE_TERMINAL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, undefined, undefined, undefined, undefined, true );
-
-        }
     }
 
     requestPoolWork(socket){
-
 
 
     }
