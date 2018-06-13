@@ -108,6 +108,13 @@ class PoolSettings {
     get poolServers(){
 
         return this._poolServers;
+
+    }
+
+    getPoolServersText(){
+        if (typeof this._poolServers === "string" ) return this._poolServers;
+
+        return PoolsUtils.convertServersList(this._poolServers);
     }
 
     setPoolServers(newValue){

@@ -36,7 +36,7 @@ class PoolsUtils {
 
     processServersList(serversList){
 
-        if (typeof serversList === "string") serversList =  serversList.split(",;: ");
+        if (typeof serversList === "string") serversList =  serversList.split(/[\s,]+/);
 
         if (!Array.isArray(serversList)) throw {message: "serversList is not array"};
 
@@ -48,7 +48,7 @@ class PoolsUtils {
                 if (serversList.length === 1)
                     serversList = [];
                 else
-                    serversList = serversList.splice(i,1);
+                    serversList.splice(i,1);
             }
 
         }
@@ -64,7 +64,7 @@ class PoolsUtils {
         let string = '';
 
         for (let key in  servers ){
-            string += servers[key]+",";
+            string += servers[key]+"\n";
         }
 
         return string;
