@@ -59,7 +59,7 @@ class MinerProtocol {
 
             let server = serversListArray[i];
 
-            await NodesWaitlist.addNewNodeToWaitlist( server, undefined, NODE_TYPE.NODE_TERMINAL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER );
+            await NodesWaitlist.addNewNodeToWaitlist( server, undefined, NODE_TYPE.NODE_TERMINAL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, undefined, undefined, undefined, undefined, true );
 
         }
     }
@@ -72,15 +72,22 @@ class MinerProtocol {
 
     async _subscribeMiner(nodesListObject){
 
+        let socket = nodesListObject.socket;
+
         //if it is not a server
         try {
 
-            let answer = await this._sendPoolHello(nodesListObject.socket);
+            if (socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
+                let answer = await this._sendPoolHello(socket);
+
+                if (!answer)
+                    socket.disconnect();
+            }
 
         } catch (exception){
 
-            console.error(exception);
-            nodesListObject.socket.disconnect();
+            console.error("subscribeMiner raised an error", exception);
+            socket.disconnect();
 
         }
 

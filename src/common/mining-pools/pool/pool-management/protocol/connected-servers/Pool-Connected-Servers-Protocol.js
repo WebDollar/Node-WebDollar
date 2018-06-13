@@ -25,7 +25,7 @@ class PoolConnectedServersProtocol{
 
             let server = serversListArray[i];
 
-            await NodesWaitlist.addNewNodeToWaitlist( server, undefined, NODE_TYPE.NODE_TERMINAL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER );
+            await NodesWaitlist.addNewNodeToWaitlist( server, undefined, NODE_TYPE.NODE_TERMINAL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, undefined, undefined, undefined, undefined, true );
 
         }
 
@@ -33,8 +33,8 @@ class PoolConnectedServersProtocol{
 
     startPoolConnectedServersProtocol(){
 
-        NodesList.emitter.on("nodes-list/connected", (nodesListObject) => {
-            this._subscribePoolConnectedServer(nodesListObject)
+        NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
+            await this._subscribePoolConnectedServer(nodesListObject)
         });
 
     }
@@ -43,11 +43,24 @@ class PoolConnectedServersProtocol{
 
         let socket = nodesListObject.socket;
 
-        if ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER ){
+        try{
 
-            await this._registerPoolToServerPool(socket);
+            if ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER ){
+
+                let answer = await this._registerPoolToServerPool(socket);
+
+                if (!answer)
+                    socket.disconnect();
+
+            }
+
+        } catch (exception){
+
+            console.error("PoolConnectedServersProtocol raised an error", exception);
+            socket.disconnect();
 
         }
+
 
     }
 
