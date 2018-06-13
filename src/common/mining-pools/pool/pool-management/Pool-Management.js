@@ -41,7 +41,7 @@ class PoolManagement{
         }
 
         if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined){
-            return this.poolProtocol.startServerPoolProtocol();
+            return this.poolProtocol.startPoolProtocol();
         }
 
     }

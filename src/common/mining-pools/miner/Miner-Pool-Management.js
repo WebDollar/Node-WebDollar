@@ -28,7 +28,7 @@ class MinerProtocol {
         await this.minerPoolSettings.initializeMinerPoolSettings(poolURL);
 
         if (this.minerPoolSettings.poolURL !== undefined && this.minerPoolSettings.poolURL !== ''){
-            await this.minerPoolProtocol.initializeMinerPoolManagement(this.minerPoolSettings.poolURL);
+            await this.minerPoolProtocol.startMinerProtocol(this.minerPoolSettings.poolURL);
         }
 
     }
