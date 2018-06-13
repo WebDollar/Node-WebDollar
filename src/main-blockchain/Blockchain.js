@@ -54,7 +54,7 @@ class Blockchain{
 
     }
 
-    async createBlockchain(agentName, afterBlockchainLoadCallback, afterSynchronizationCallback){
+    async createBlockchain(agentName, afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true ){
 
         this._blockchainInitiated = true;
 
@@ -81,7 +81,7 @@ class Blockchain{
         StatusEvents.emit('blockchain/status', {message: "Single Window"});
 
 
-        await this.initializeBlockchain( afterBlockchainLoadCallback, afterSynchronizationCallback );
+        await this.initializeBlockchain( afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize );
 
     }
 
@@ -97,7 +97,7 @@ class Blockchain{
         }
     }
 
-    async initializeBlockchain(afterBlockchainLoadCallback, afterSynchronizationCallback){
+    async initializeBlockchain(afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true){
 
         await this.loadWallet();
 
@@ -109,19 +109,26 @@ class Blockchain{
 
         }
 
-        //loading the blockchain
-        let blockchainLoaded = await this.loadBlockchain();
+        let blockchainLoaded = true;
+
+        if (synchronize)
+            //loading the blockchain
+            blockchainLoaded = await this.loadBlockchain();
 
         if (typeof afterBlockchainLoadCallback === "function")
             afterBlockchainLoadCallback();
 
-        await this.Agent.initializeStartAgentOnce();
+        if (synchronize){
 
-        if (process.env.BROWSER || !blockchainLoaded) {
-            //it tries synchronizing multiple times
-            await this.synchronizeBlockchain(true);
-        } else {
-            this.synchronized = true;
+            await this.Agent.initializeStartAgentOnce();
+
+            if (process.env.BROWSER || !blockchainLoaded) {
+                //it tries synchronizing multiple times
+                await this.synchronizeBlockchain(true);
+            } else {
+                this.synchronized = true;
+            }
+
         }
 
         if (typeof afterSynchronizationCallback === "function")

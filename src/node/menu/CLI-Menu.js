@@ -352,25 +352,16 @@ class CLI {
 
     async startMining(instantly){
 
-        let callback = () => {
+        let callback = async () => {
 
             if (instantly)
-                Blockchain.startMiningInstantly();
+                await Blockchain.startMiningInstantly();
             else
                 Blockchain.startMiningNextTimeSynchronized = true;
 
         };
 
-        if (!Blockchain._blockchainInitiated) {
-            Blockchain.createBlockchain("full-node", () => {
-                Node.NodeServer.startServer();
-                Node.NodeClientsService.startService();
-
-                callback();
-            });
-        } else {
-            callback();
-        }
+        this.callCallbackBlockchainSync( callback  );
 
     }
     
@@ -389,22 +380,25 @@ class CLI {
 
         }
 
+        let miningPoolLink = undefined;
+
         if (getNewLink) {
 
-            let miningPoolLink = await this.question('Enter the new mining pool link: ');
+            miningPoolLink = await this.question('Enter the new mining pool link: ');
             console.info('Your new mining pool is: ', miningPoolLink);
 
-            Blockchain.MinerPoolManagement.poolSettings.setPoolURL(miningPoolLink);
         }
 
-        await Blockchain.MinerPoolManagement.initializeMinerPoolManagement();
+
+        await Blockchain.MinerPoolManagement.initializeMinerPoolManagement(miningPoolLink);
 
     }
     
     async createMiningPool(){
         
         console.info('Create Mining Pool.');
-        
+        console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
+
         let poolFee = await this._pickNumber('Choose a fee(0...100): ', true);
         
         if (isNaN(poolFee) || poolFee < 0 || 100 < poolFee){
@@ -414,11 +408,16 @@ class CLI {
         else
             console.log("your fee is", poolFee);
 
-        await Blockchain.PoolManagement.initializePoolManagement(poolFee);
+        await Blockchain.PoolManagement.initializePoolManagement(poolFee/100);
+
+        console.info("The url is just your domain: "+ Blockchain.PoolManagement.poolURL);
 
     }
 
     async createServerForMiningPool(){
+
+        console.info('Create Server Pool.');
+        console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
 
         let serverPoolFee = await this._pickNumber('Choose a fee(0...100): ', true);
 
@@ -429,7 +428,9 @@ class CLI {
         else
             console.log("your fee is", serverPoolFee );
 
-        await Blockchain.ServerPoolManagement.initializeServerPoolManagement(serverPoolFee);
+        await Blockchain.ServerPoolManagement.initializeServerPoolManagement(serverPoolFee/100);
+
+        console.info("The url is just your domain: "+ Blockchain.PoolManagement.poolURL);
 
     }
 
@@ -440,6 +441,20 @@ class CLI {
                 resolve(answer);
             });
         });
+
+    }
+
+    callCallbackBlockchainSync(callback, synchronize=true ){
+
+        if (!Blockchain._blockchainInitiated) {
+            Blockchain.createBlockchain("full-node", () => {
+                Node.NodeServer.startServer();
+                Node.NodeClientsService.startService();
+
+                callback();
+            }, undefined, synchronize );
+        } else
+            callback();
 
     }
 

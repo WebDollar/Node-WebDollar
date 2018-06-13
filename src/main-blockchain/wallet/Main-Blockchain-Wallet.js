@@ -367,6 +367,10 @@ class MainBlockchainWallet {
             if (Buffer.isBuffer(inputData))
                 privateKey = new Buffer(inputData);
 
+            if (typeof privateKey === "string") privateKey = Buffer.from(privateKey, "hex");
+            if (typeof publicKey === "string") publicKey = Buffer.from(publicKey, "hex");
+
+
             if (address === undefined && publicKey === undefined) {
                 await blockchainAddress.createNewAddress(undefined, privateKey);
 
