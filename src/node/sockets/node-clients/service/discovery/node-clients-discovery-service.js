@@ -5,7 +5,7 @@ import NodesList from 'node/lists/Nodes-List'
 import FallBackObject from './fallbacks/fallback-object';
 import FallBackNodesList from './fallbacks/fallback_nodes_list';
 import NODE_TYPE from "node/lists/types/Node-Type"
-import NODES_CONSENSUS_TYPE from "../../../../lists/types/Node-Consensus-Type";
+import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 
 const axios = require('axios');
 

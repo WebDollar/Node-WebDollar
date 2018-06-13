@@ -144,7 +144,7 @@ class PoolSettings {
         return true;
     }
 
-    validatePoolDetails(){
+    async validatePoolDetails(){
 
         if (typeof this._poolName !== "string") throw {message: "pool name is not a string"};
         if (this._poolName !=='' && ! /^[A-Za-z\d\s]+$/.test(this._poolName)) throw {message: "pool name is invalid"};
@@ -157,7 +157,7 @@ class PoolSettings {
 
         this._poolServers = PoolsUtils.processServersList( this.poolServers );
 
-        this.poolManagement.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this._poolServers );
+        await this.poolManagement.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this._poolServers );
 
         this._generatePoolURL();
 
@@ -169,7 +169,7 @@ class PoolSettings {
 
     async savePoolDetails(){
 
-        this.validatePoolDetails();
+        await this.validatePoolDetails();
 
         let result = await this._db.save("pool_name", this._poolName);
         result = result && await this._db.save("pool_fee", this._poolFee);
@@ -201,7 +201,7 @@ class PoolSettings {
         this._poolServers = JSON.parse( await this._db.get("pool_servers", 30*1000, true) );
         if (this._poolServers === null) this._poolServers = '';
 
-        this.validatePoolDetails();
+        await this.validatePoolDetails();
 
 
         return true;

@@ -6,6 +6,9 @@ import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import Blockchain from "main-blockchain/Blockchain"
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
+import NODE_TYPE from "node/lists/types/Node-Type"
 
 class MinerProtocol {
 
@@ -22,12 +25,12 @@ class MinerProtocol {
 
     }
 
-    startMinerProtocol(){
+    async startMinerProtocol(){
 
         if (this.loaded) return;
 
-        NodesList.emitter.on("nodes-list/connected", (nodesListObject) => {
-            this._subscribeMiner(nodesListObject)
+        NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
+            await this._subscribeMiner(nodesListObject)
         });
 
         NodesList.emitter.on("nodes-list/disconnected", ( nodesListObject ) => {
@@ -35,20 +38,39 @@ class MinerProtocol {
         });
 
         for (let i=0; i<NodesList.nodes.length; i++)
-            this._subscribeMiner(NodesList.nodes[i]);
+            await this._subscribeMiner(NodesList.nodes[i]);
 
         this.loaded = true;
 
     }
 
+    async insertServersListWaitlist(serversListArray){
+
+        if (!Array.isArray(serversListArray) || serversListArray.length === 0) return false;
+
+        NodesWaitlist.deleteWaitlistByConsensusNode(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER);
+        NodesList.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER);
+
+        NodesWaitlist.deleteWaitlistByConsensusNode(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER);
+        NodesList.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER);
+
+
+        for (let i=0; i<serversListArray.length; i++){
+
+            let server = serversListArray[i];
+
+            await NodesWaitlist.addNewNodeToWaitlist( server, undefined, NODE_TYPE.NODE_TERMINAL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER );
+
+        }
+    }
+
     requestPoolWork(socket){
+
 
 
     }
 
     async _subscribeMiner(nodesListObject){
-
-        if ([ CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET ].indexOf(nodesListObject.connectionType) <= 0) return false;
 
         //if it is not a server
         try {

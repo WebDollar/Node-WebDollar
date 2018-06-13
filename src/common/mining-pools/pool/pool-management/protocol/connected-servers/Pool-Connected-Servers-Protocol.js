@@ -11,7 +11,7 @@ class PoolConnectedServersProtocol{
 
     }
 
-    insertServersListWaitlist(serversListArray){
+    async insertServersListWaitlist(serversListArray){
 
         if (!Array.isArray(serversListArray) || serversListArray.length === 0) return false;
 
@@ -25,7 +25,7 @@ class PoolConnectedServersProtocol{
 
             let server = serversListArray[i];
 
-            NodesWaitlist.addNewNodeToWaitlist( server, undefined, NODE_TYPE.NODE_TERMINAL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER );
+            await NodesWaitlist.addNewNodeToWaitlist( server, undefined, NODE_TYPE.NODE_TERMINAL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER );
 
         }
 

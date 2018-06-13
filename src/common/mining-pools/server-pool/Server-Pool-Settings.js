@@ -30,7 +30,7 @@ class PoolSettings {
         return this.savePoolDetails();
     }
 
-    validatePoolDetails(){
+    async validatePoolDetails(){
 
         if ( typeof this._serverPoolFee !== "number") throw {message: "ServerPool fee is invalid"};
         if ( this._serverPoolFee < 0 && this._serverPoolFee > 1 ) throw {message: "ServerPool fee is invalid"};
@@ -39,7 +39,7 @@ class PoolSettings {
 
     async savePoolDetails(){
 
-        this.validatePoolDetails();
+        await this.validatePoolDetails();
 
         let result = await this._db.save("serverPool_fee", this._serverPoolFee);
 
@@ -63,7 +63,7 @@ class PoolSettings {
 
         }
 
-        this.validatePoolDetails();
+        await this.validatePoolDetails();
 
     }
 
