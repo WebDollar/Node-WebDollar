@@ -73,10 +73,9 @@ class NodesList {
             return false;
         }
 
-        socket.node.connectionType = connectionType;
         socket.node.protocol.connectionType = connectionType;
-        socket.node.nodeType = nodeType;
-        socket.node.nodeConsensusType = nodeConsensusType;
+        socket.node.protocol.nodeType = nodeType;
+        socket.node.protocol.nodeConsensusType = nodeConsensusType;
 
         // avoiding double connections                              unless it is allowed to double connections
         if ( this.searchNodeSocketByAddress(socket, undefined, validationDoubleConnectionsTypes ) === null ) {
@@ -88,7 +87,7 @@ class NodesList {
 
             this.emitter.emit("nodes-list/connected", object);
 
-            if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && ( socket.node.nodeType === NODE_TYPE.NODE_TERMINAL || socket.node.nodeType === NODE_TYPE.NODE_WEB_PEER )) {
+            if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL || socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER )) {
 
                 if (socket.node.protocol.nodeDomain.indexOf("my-ip:")>=0)
                     socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("my-ip", socket.node.sckAddress.address);
@@ -96,12 +95,12 @@ class NodesList {
                 if (socket.node.protocol.nodeDomain.indexOf("browser")===0)
                     socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("browser", socket.node.sckAddress.address);
 
-                await NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.nodeType, socket.node.nodeConsensusType, true, socket.node.level, socket, socket);
+                await NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.protocol.nodeType, socket.node.protocol.nodeConsensusType, true, socket.node.level, socket, socket);
 
             }
 
-            if (socket.node.nodeType === NODE_TYPE.NODE_WEB_PEER ){ //add light waitlist
-                await NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.nodeType, socket.node.nodeConsensusType, true, socket.node.level, socket, socket);
+            if (socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER ){ //add light waitlist
+                await NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.protocol.nodeType, socket.node.protocol.nodeConsensusType, true, socket.node.level, socket, socket);
             }
 
 

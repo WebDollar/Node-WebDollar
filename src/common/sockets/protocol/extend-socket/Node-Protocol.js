@@ -3,6 +3,7 @@ import NodesList from 'node/lists/Nodes-List'
 import NODE_TYPE from "node/lists/types/Node-Type"
 import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import Blockchain from "main-blockchain/Blockchain"
+import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 
 let NodeExpress, NodeServer;
 
@@ -77,6 +78,7 @@ class NodeProtocol {
         console.log("RECEIVED HELLO NODE BACK", response.version);
 
         this.node.protocol.nodeType = response.nodeType;
+        this.node.protocol.nodeConsensusType = response.nodeConsensusType || NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER;
 
         this.node.protocol.nodeDomain = response.domain;
 

@@ -1,4 +1,4 @@
-
+import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 import SocketAddress from "common/sockets/protocol/extend-socket/Socket-Address";
 
 let io = require('socket.io');
@@ -121,6 +121,9 @@ class NodeServer {
                 let nodeType = socket.request._query["nodeType"];
                 if (typeof nodeType  === "string") nodeType = parseInt(nodeType);
 
+                let nodeConsensusType = socket.request._query["nodeConsensusType"];
+                if (typeof nodeConsensusType === "string") nodeConsensusType = parseInt(nodeConsensusType);
+
                 let nodeDomain = socket.request._query["domain"];
                 if ( nodeDomain === undefined) nodeDomain = "";
 
@@ -207,6 +210,8 @@ class NodeServer {
                     socket.node.protocol.nodeType = nodeType;
                     socket.node.protocol.nodeUTC = nodeUTC;
                     socket.node.protocol.nodeDomain = nodeDomain;
+
+                    socket.node.protocol.nodeConsensusType = nodeConsensusType || NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER;
 
                     socket.node.protocol.helloValidated = true;
 
@@ -310,7 +315,7 @@ class NodeServer {
 
 
         for (let i=0; i<NodesList.nodes.length; i++)
-            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.nodeType === NODE_TYPE.NODE_TERMINAL)
+            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
                 if ( !NodesList.nodes[i].isFallback && NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL )
                         NodesList.nodes[i].socket.disconnect();
 

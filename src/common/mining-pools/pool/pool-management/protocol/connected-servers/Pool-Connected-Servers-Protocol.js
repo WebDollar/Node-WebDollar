@@ -18,11 +18,14 @@ class PoolConnectedServersProtocol{
 
     }
 
-    startPoolConnectedServersProtocol(){
+    async startPoolConnectedServersProtocol(){
 
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
             await this._subscribePoolConnectedServer(nodesListObject)
         });
+
+        for (let i=0; i<NodesList.nodes.length; i++)
+            await this._subscribePoolConnectedServer(NodesList.nodes[i]);
 
     }
 
