@@ -82,7 +82,7 @@ class NodesWaitlist {
 
                         let response;
 
-                        if ( nodeType === NODE_TYPE.NODE_TERMINAL)
+                        if ( !forceInsertingWaitlist && nodeType === NODE_TYPE.NODE_TERMINAL)
                             response = await DownloadManager.downloadFile(sckAddress.getAddress(true, true), 5000);
 
                         if ( forceInsertingWaitlist || nodeType === NODE_TYPE.NODE_WEB_PEER || (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY)) {

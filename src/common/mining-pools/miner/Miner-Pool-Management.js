@@ -29,12 +29,16 @@ class MinerProtocol {
 
     }
 
-    async startMinerPool(){
+    async startMinerPool(poolURL){
 
-        if (this.minerPoolSettings.poolURL !== undefined && this.minerPoolSettings.poolURL !== ''){
-            await this.minerPoolProtocol.startMinerProtocol(this.minerPoolSettings.poolURL);
-        } else {
+        if (poolURL !== undefined)
+            this.minerPoolSettings.setPoolURL(poolURL);
+
+        if (this.minerPoolSettings.poolURL !== undefined && this.minerPoolSettings.poolURL !== '')
+            return await this.minerPoolProtocol.startMinerProtocol(this.minerPoolSettings.poolURL);
+        else {
             console.error("Couldn't start MinerPool");
+            return false;
         }
 
     }

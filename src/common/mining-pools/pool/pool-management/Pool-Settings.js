@@ -39,6 +39,7 @@ class PoolSettings {
     async initializePoolSettings(poolFee){
 
         let result = await this._getPoolPrivateKey();
+
         result = result && await this._getPoolDetails();
 
         if (poolFee !== undefined)
@@ -58,7 +59,7 @@ class PoolSettings {
             return '';
         }
 
-        this.poolURL = 'https://webdollar.io/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
+        this.poolURL =  ( consts.DEBUG? 'http://webdollar.ddns.net:9094' : 'https://webdollar.io') +'/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
 
         return this.poolURL;
 
@@ -176,8 +177,10 @@ class PoolSettings {
         this._generatePoolURL();
 
         if ( this.poolURL !== ''){ //start automatically
-            this.poolManagement.startPool();
+            await this.poolManagement.startPool();
         }
+
+        return true;
 
     }
 
@@ -217,10 +220,8 @@ class PoolSettings {
         this._poolServers = JSON.parse( await this._db.get("pool_servers", 30*1000, true) );
         if (this._poolServers === null) this._poolServers = '';
 
-        await this.validatePoolDetails();
+        return await this.validatePoolDetails();
 
-
-        return true;
     }
 
     poolDigitalSign(message){

@@ -14,7 +14,20 @@ class PoolSettings {
 
     async initializeServerPoolSettings(){
 
-        return await this._getPoolDetails();
+        let result;
+
+        try {
+            result = await this._getServerPoolDetails();
+        } catch (exception){
+
+            console.error("ServerPools returned an error ",exception);
+            if (process.env.BROWSER)
+                alert("ServerPools returned an error "+ exception.message);
+
+            return false;
+        }
+
+        return result;
 
     }
 
@@ -27,7 +40,7 @@ class PoolSettings {
 
         this._serverPoolFee = newValue;
 
-        return this.savePoolDetails();
+        return this.saveServerPoolDetails();
     }
 
     async validatePoolDetails(){
@@ -37,7 +50,7 @@ class PoolSettings {
 
     }
 
-    async savePoolDetails(){
+    async saveServerPoolDetails(){
 
         await this.validatePoolDetails();
 
@@ -46,7 +59,7 @@ class PoolSettings {
         return  result;
     }
 
-    async _getPoolDetails(){
+    async _getServerPoolDetails(){
 
         try {
 

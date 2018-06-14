@@ -30,7 +30,7 @@ class MinerPoolSettings {
 
     async initializeMinerPoolSettings(poolURL){
 
-        await this._getPoolDetails();
+        await this._getMinerPoolDetails();
         await this._getMinerPoolPrivateKey();
 
         if (poolURL !== undefined)
@@ -122,7 +122,7 @@ class MinerPoolSettings {
         return  result;
     }
 
-    async _getPoolDetails(){
+    async _getMinerPoolDetails(){
 
         let poolURL = await this._db.get("miner_pool_url", 30*1000, true);
 

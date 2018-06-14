@@ -271,11 +271,25 @@ class Blockchain{
 
     async _initializeMiningPools(){
 
-        await this.PoolManagement.initializePoolManagement();
-        await this.MinerPoolManagement.initializeMinerPoolManagement();
+        try {
+            await this.PoolManagement.initializePoolManagement();
+        } catch (exception){
+            console.error("PoolManagement raised an error", exception);
+        }
 
-        if (this.ServerPoolManagement !== undefined)
-            await this.ServerPoolManagement.initializeServerPoolManagement();
+        try {
+            await this.MinerPoolManagement.initializeMinerPoolManagement();
+        } catch (exception){
+            console.error("MinerPool raised an error", exception);
+        }
+
+        try {
+            if (this.ServerPoolManagement !== undefined)
+                await this.ServerPoolManagement.initializeServerPoolManagement();
+        } catch (exception){
+
+            console.error("ServerPool raised an error", exception)
+        }
 
     }
 
