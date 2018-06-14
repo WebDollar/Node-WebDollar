@@ -46,7 +46,7 @@ class ServerPoolConnectedMinersProtocol{
 
             } catch (exception){
 
-                socket.node.emit("server-pool/register-pool"+"/answer", {result: false} );
+                socket.node.sendRequest("server-pool/register-pool"+"/answer", {result: false} );
 
             }
 

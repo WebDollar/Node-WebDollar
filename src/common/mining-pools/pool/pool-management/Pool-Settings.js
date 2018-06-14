@@ -6,6 +6,7 @@ import ed25519 from "common/crypto/ed25519";
 import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import Blockchain from "main-blockchain/Blockchain";
+import ed25519 from "common/crypto/ed25519";
 
 class PoolSettings {
 
@@ -126,7 +127,7 @@ class PoolSettings {
 
     async savePoolPrivateKey(){
 
-        let result = await this._db.save("pool_privatekey", this._poolPrivateKey);
+        let result = await this._db.save("pool_privateKey", this._poolPrivateKey);
 
         return result;
 
@@ -139,7 +140,9 @@ class PoolSettings {
         if (this._poolPrivateKey === null) {
 
             let privateKey = await Blockchain.Wallet.addresses[0].getPrivateKey();
-            this._poolPrivateKey = Buffer.concat( [ WebDollarCrypto.SHA256(WebDollarCrypto.MD5(privateKey)), WebDollarCrypto.SHA256( WebDollarCrypto.RIPEMD160(privateKey) )]);
+            let finalPrivateKey = Buffer.concat( [ WebDollarCrypto.SHA256(WebDollarCrypto.MD5(privateKey)), WebDollarCrypto.SHA256( WebDollarCrypto.RIPEMD160(privateKey) )]);
+
+            this._poolPrivateKey = ed25519.generatePrivateKey(finalPrivateKey);
 
         }
 

@@ -55,7 +55,7 @@ class PoolSettings {
             if (this._serverPoolFee === null)
                 this._serverPoolFee = 0;
 
-            this._serverPoolFee = parseInt(this._serverPoolFee);
+            this._serverPoolFee = parseFloat(this._serverPoolFee);
 
 
 

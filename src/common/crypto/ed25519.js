@@ -12,9 +12,9 @@ import nacl from 'tweetnacl'
 
 class ED25519{
 
-    static generatePrivateKey(){
+    static generatePrivateKey(fromSecret){
 
-        let privateKey = nacl.sign.keyPair().secretKey;
+        let privateKey = nacl.sign.keyPair(fromSecret).secretKey;
 
         if ( ! Buffer.isBuffer(privateKey) )
             privateKey = new Buffer(privateKey);
