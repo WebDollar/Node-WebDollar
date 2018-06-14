@@ -7,6 +7,7 @@ import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import Blockchain from "main-blockchain/Blockchain";
 import ed25519 from "common/crypto/ed25519";
+import StatusEvents from "common/events/Status-Events";
 
 class PoolSettings {
 
@@ -42,6 +43,9 @@ class PoolSettings {
 
         if (poolFee !== undefined)
             this.setPoolFee(poolFee);
+
+        if (result)
+            this.poolManagement.poolInitialized = true;
 
         return result;
 
@@ -185,6 +189,8 @@ class PoolSettings {
         result = result && await this._db.save("pool_fee", this._poolFee);
         result = result  && await this._db.save("pool_website", this._poolWebsite);
         result = result  && await this._db.save("pool_servers", JSON.stringify(this._poolServers));
+
+        StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers });
 
         return  result;
     }

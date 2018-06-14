@@ -32,6 +32,8 @@ class PoolProtocol {
 
         this.poolConnectedServersProtocol.startPoolConnectedServersProtocol();
 
+        this.poolManagement.poolStarted = true;
+
         this.loaded = true;
     }
 

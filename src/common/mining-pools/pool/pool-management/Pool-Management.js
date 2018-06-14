@@ -3,6 +3,7 @@ import PoolData from 'common/mining-pools/pool/pool-management/pool-data/Pool-Da
 import consts from 'consts/const_global';
 import PoolWorkManagement from "./Pool-Work-Management";
 import PoolProtocol from "./protocol/Pool-Protocol"
+import StatusEvents from "common/events/Status-Events";
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,
@@ -20,6 +21,10 @@ class PoolManagement{
         this.poolSettings = new PoolSettings(wallet, this);
         this.poolWorkManagement = new PoolWorkManagement( this );
         this.poolProtocol = new PoolProtocol( this );
+
+        this._poolInitialized = false;
+        this._poolOpened = false;
+        this._poolStarted = false;
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
         this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
@@ -40,13 +45,15 @@ class PoolManagement{
             return false;
         }
 
+        if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
+            this.poolOpened = true;
+
     }
 
     async startPool(){
 
-        if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined){
+        if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
             return this.poolProtocol.startPoolProtocol();
-        }
 
     }
 
@@ -103,6 +110,33 @@ class PoolManagement{
             baseHashDifficulty: Buffer.from(this._baseHash),
             numBaseHashes: 0
         };
+    }
+
+    get poolOpened(){
+        return this._poolOpened;
+    }
+
+    get poolInitialized(){
+        return this._poolInitialized;
+    }
+
+    get poolStarted(){
+        return this._poolStarted;
+    }
+
+    set poolInitialized(value){
+        this._poolInitialized = value;
+        StatusEvents.emit("pools/status", {result: value, message: "Pool was Initialized" });
+    }
+
+    set poolOpened(value){
+        this._poolOpened = value;
+        StatusEvents.emit("pools/status", {result: value, message: "Pool was Opened" });
+    }
+
+    set poolStarted(value){
+        this._poolStarted = value;
+        StatusEvents.emit("pools/status", {result: value, message: "Pool was Started" });
     }
 
 }

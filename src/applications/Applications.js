@@ -6,6 +6,8 @@ import NODE_TYPE from 'node/lists/types/Node-Type';
 import CONNECTIONS_TYPE from 'node/lists/types/Connection-Type';
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper";
 import BufferExtended from "common/utils/BufferExtended";
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import NodesList from 'node/lists/Nodes-List';
 
 class Applications {
 
@@ -16,6 +18,9 @@ class Applications {
         this.CoinsHelper = WebDollarCoins;
         this.VersionCheckerHelper = VersionCheckerHelper;
         this.BufferExtended = BufferExtended;
+
+        this.NodesList = NodesList;
+        this.NodesWaitlist = NodesWaitlist;
 
 
         this.CONSTS = consts;
