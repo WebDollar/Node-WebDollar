@@ -95,17 +95,17 @@ class MinerPoolSettings {
 
     async saveMinerPoolPrivateKey(){
 
-        let result = await this._db.save("pool_privatekey", this._minerPoolPrivateKey);
+        let result = await this._db.save("pool_privateKey", this._minerPoolPrivateKey);
 
         return result;
     }
 
     async _getMinerPoolPrivateKey(){
 
-        this._minerPoolPrivateKey = await this._db.get("pool_privatekey", 30*1000, true);
+        this._minerPoolPrivateKey = await this._db.get("pool_privateKey", 30*1000, true);
 
         if (this._minerPoolPrivateKey === null)
-            this._minerPoolPrivateKey = WebDollarCrypto.getBufferRandomValues( 64 );
+            this._minerPoolPrivateKey = ed25519.generatePrivateKey();
 
         if ( Buffer.isBuffer(this._minerPoolPrivateKey) ) {
             this.minerPoolPublicKey = ed25519.generatePublicKey(this._minerPoolPrivateKey);
