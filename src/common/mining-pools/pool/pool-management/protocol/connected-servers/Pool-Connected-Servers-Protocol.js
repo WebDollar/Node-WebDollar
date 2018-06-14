@@ -56,7 +56,7 @@ class PoolConnectedServersProtocol{
 
     async _registerPoolToServerPool(socket) {
 
-        let answer = await socket.sendRequestWaitOnce("server-pool/register-pool", {
+        let answer = await socket.node.sendRequestWaitOnce("server-pool/register-pool", {
             poolName: this.poolManagement.poolSettings.poolName,
             poolFee: this.poolManagement.poolSettings.poolFee,
             poolWebsite: this.poolManagement.poolSettings.poolWebsite,

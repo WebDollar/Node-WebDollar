@@ -94,7 +94,7 @@ class MinerProtocol {
 
         let message = WebDollarCrypto.getBufferRandomValues(32);
 
-        let answer = await socket.sendRequestWaitOnce( "mining-pool/hello-pool", {
+        let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
             message: message,
             messageSignature: this.minerPoolManagement.minerPoolSettings.minerPoolDigitalSign(message),
             poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,

@@ -51,8 +51,6 @@ class Blockchain{
         
         this._loaded = false;
 
-        this.initializeMiningPools();
-
     }
 
     async createBlockchain(agentName, afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true ){
@@ -101,6 +99,8 @@ class Blockchain{
     async initializeBlockchain(afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true){
 
         await this.loadWallet();
+
+        await this.initializeMiningPools();
 
         if (process.env.BROWSER) { //let's make a hash first
 
@@ -256,24 +256,36 @@ class Blockchain{
         if (ServerPoolManagement !== undefined && this.ServerPoolManagement === undefined)
             this.ServerPoolManagement = new ServerPoolManagement();
 
+        await this._initializeMiningPools();
+
         if (this.loaded) //already opened
-            await this._openMiningPools();
+            await this._startMiningPools();
         else
             this.onLoaded.then( async (answer)=>{
 
-                await this._openMiningPools();
+                await this._startMiningPools();
 
             });
 
     }
 
-    async _openMiningPools(){
+    async _initializeMiningPools(){
 
         await this.PoolManagement.initializePoolManagement();
         await this.MinerPoolManagement.initializeMinerPoolManagement();
 
-        if (this.ServerPoolManagement !== undefined && consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_STATUS.MINING_POOL_SERVER )
+        if (this.ServerPoolManagement !== undefined)
             await this.ServerPoolManagement.initializeServerPoolManagement();
+
+    }
+
+    async _startMiningPools(){
+
+        await this.PoolManagement.startPool();
+        await this.MinerPoolManagement.startMinerPool();
+
+        if (this.ServerPoolManagement !== undefined && consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_STATUS.MINING_POOL_SERVER )
+            await this.ServerPoolManagement.startServerPoolProtocol();
 
     }
 

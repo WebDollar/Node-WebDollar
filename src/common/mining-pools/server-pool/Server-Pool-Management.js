@@ -29,6 +29,10 @@ class ServerPoolManagement{
         if (serverPoolFee !== undefined && typeof serverPoolFee === "number")
             this.serverPoolSettings.setServerPoolFee(serverPoolFee);
 
+    }
+
+    async startServerPoolProtocol(){
+
         this.serverPoolProtocol.startServerPoolProtocol();
 
         console.info("The url is just your domain: "+ NodeServer.getServerHTTPAddress() );

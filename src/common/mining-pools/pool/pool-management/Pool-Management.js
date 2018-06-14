@@ -19,7 +19,7 @@ class PoolManagement{
 
         this.poolSettings = new PoolSettings(wallet, this);
         this.poolWorkManagement = new PoolWorkManagement( this );
-        this.poolProtocol = new PoolProtocol();
+        this.poolProtocol = new PoolProtocol( this );
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
         this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
@@ -40,15 +40,13 @@ class PoolManagement{
             return false;
         }
 
-        if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined){
-            return this.poolProtocol.startPoolProtocol();
-        }
-
     }
 
     async startPool(){
 
-        return await this.poolProtocol.startPoolProtocol();
+        if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined){
+            return this.poolProtocol.startPoolProtocol();
+        }
 
     }
 

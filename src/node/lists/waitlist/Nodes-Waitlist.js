@@ -53,13 +53,14 @@ class NodesWaitlist {
 
     async addNewNodeToWaitlist (addresses, port, nodeType, nodeConsensusType,  connected, level, backedBy, socket, forceInsertingWaitlist=false){
 
-        if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[])) ) return false;
+        if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[])) ) return {result:false, waitlist: null};
 
         //converting to array
         if ( typeof addresses === "string" || !Array.isArray(addresses) ) addresses = [addresses];
 
 
         let sckAddresses = [];
+        let waitListFound = null;
 
         //let's determine the sckAddresses
         for (let i=0; i<addresses.length; i++){
@@ -91,6 +92,8 @@ class NodesWaitlist {
 
                             if (answer.waitlist === null)
                                 sckAddresses.push(sckAddress);
+                            else
+                                waitListFound = answer.waitlist;
                         }
 
 
@@ -104,6 +107,8 @@ class NodesWaitlist {
 
                     if (socket !== undefined)
                         answer.waitlist.socketConnected(socket);
+
+                    waitListFound = answer.waitlist;
 
                 }
                 else{
@@ -137,11 +142,10 @@ class NodesWaitlist {
             list.push(waitListObject);
 
             this.emitter.emit( "waitlist/new-node", waitListObject );
-            return waitListObject;
+            return {result: true, waitlist: waitListObject};
 
-        }
-        
-        return null;
+        } else
+            return {result:false, waitlist: waitListFound};
     }
 
     _findNodesWaitlist(address, port, listType){

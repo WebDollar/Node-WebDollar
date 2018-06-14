@@ -39,7 +39,7 @@ class NodePropagationProtocol {
             delete list[key];
             list.length--;
 
-            if (answer !== null ){
+            if (answer.result ){
                 this._waitlistProccessed[key] = true;
                 return;
             }
@@ -162,13 +162,13 @@ class NodePropagationProtocol {
                     //TODO remove addresses from list
 
                     case "disconnected-light-nodes":
-                    case "disconnected-full-nodes":
+                case "disconnected-full-nodes":
 
                     //     for (let i = 0; i < addresses.length; i++) {
                     //
                     //         let answer = NodesWaitlist._searchNodesWaitlist(addresses[i].addr, undefined, addresses[i].nodeType);
                     //         if (answer.waitlist !== null)
-                    //             answer.removeBackedBy(socket.sckAddress);
+                    //             answer.removeBackedBy(socket.node.sckAddress);
                     //
                     //         if (i%20 === 0)
                     //             await Blockchain.blockchain.sleep(50);
