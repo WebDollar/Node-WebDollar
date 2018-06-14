@@ -97,6 +97,8 @@ class PoolConnectedServersProtocol{
 
                 socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_POOL;
 
+                return true;
+
             } else {
                 throw {message: "ServerPool returned a wrong confirmation"};
             }
@@ -108,6 +110,8 @@ class PoolConnectedServersProtocol{
             socket.disconnect();
 
         }
+
+        return false;
 
 
     }
