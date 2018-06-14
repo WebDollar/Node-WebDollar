@@ -59,7 +59,12 @@ class PoolSettings {
             return '';
         }
 
-        this.poolURL =  ( consts.DEBUG? 'http://webdollar.ddns.net:9094' : 'https://webdollar.io') +'/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(this.poolServers.join(";"));
+        let servers = this.poolServers.join(";");
+        servers = servers.replace(/\//g, '@' );
+
+        let website = this.poolWebsite.replace(/\//g, '@' );
+
+        this.poolURL =  ( consts.DEBUG? 'http://webdollar.ddns.net:9094' : 'https://webdollar.io') +'/pool/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(website)+"/"+encodeURI(servers);
 
         return this.poolURL;
 
@@ -159,16 +164,16 @@ class PoolSettings {
         return true;
     }
 
+    async justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers){
+
+        return PoolsUtils.validatePoolsDetails(poolName, poolFee, poolWebsite, this.poolPublicKey, poolServers);
+
+    }
+
     async validatePoolDetails(){
 
-        if (typeof this._poolName !== "string") throw {message: "pool name is not a string"};
-        if (this._poolName !=='' && ! /^[A-Za-z\d\s]+$/.test(this._poolName)) throw {message: "pool name is invalid"};
-
-        if ( typeof this._poolFee !== "number") throw {message: "pool fee is invalid"};
-        if ( this._poolFee < 0 && this._poolFee > 1 ) throw {message: "pool fee is invalid"};
-
-        if (typeof this._poolWebsite !== "string") throw {message: "pool website is not a string"};
-        if (this._poolWebsite !== '' && ! Utils.validateUrl(this._poolWebsite)) throw {message:"pool website is invalid"};
+        if (!PoolsUtils.validatePoolsDetails(this._poolName, this._poolFee, this._poolWebsite, this.poolPublicKey, this._poolServers))
+            throw {message: "poolData is invalid"};
 
         this._poolServers = PoolsUtils.processServersList( this.poolServers );
 

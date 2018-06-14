@@ -47,6 +47,12 @@ class PoolManagement{
 
         if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
             this.poolOpened = true;
+        else {
+            console.error("Couldn't start MinerPool");
+            return false;
+        }
+
+        return answer;
 
     }
 
@@ -55,6 +61,7 @@ class PoolManagement{
         if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
             return this.poolProtocol.startPoolProtocol();
 
+        return false
     }
 
     generatePoolWork(minerInstance){

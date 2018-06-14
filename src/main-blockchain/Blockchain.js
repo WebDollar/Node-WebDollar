@@ -48,8 +48,13 @@ class Blockchain{
         this.onLoaded = new Promise((resolve)=>{
             this._onLoadedResolver = resolve;
         });
+
+        this.onPoolsInitialized = new Promise((resolve)=>{
+            this._onPoolsInitializedResolver = resolve;
+        });
         
         this._loaded = false;
+        this._poolsLoaded = false;
 
     }
 
@@ -100,7 +105,7 @@ class Blockchain{
 
         await this.loadWallet();
 
-        await this.initializeMiningPools();
+        await this.createMiningPools();
 
         if (process.env.BROWSER) { //let's make a hash first
 
@@ -219,6 +224,10 @@ class Blockchain{
         return this._loaded;
     }
 
+    get poolsLoaded(){
+        return this._poolsLoaded;
+    }
+
     set loaded(newValue){
         this._loaded = newValue;
         this._onLoadedResolver(newValue);
@@ -245,7 +254,7 @@ class Blockchain{
 
 
     //MINING POOLS SETTINGS
-    async initializeMiningPools(){
+    async createMiningPools(){
 
         if (this.PoolManagement === undefined)
             this.PoolManagement = new PoolManagement(this.blockchain, this.Wallet);
@@ -271,25 +280,29 @@ class Blockchain{
 
     async _initializeMiningPools(){
 
+        let pool = false, minerPool = false,  serverPool = false;
+
         try {
-            await this.PoolManagement.initializePoolManagement();
+             pool = await this.PoolManagement.initializePoolManagement();
         } catch (exception){
             console.error("PoolManagement raised an error", exception);
         }
 
         try {
-            await this.MinerPoolManagement.initializeMinerPoolManagement();
+            minerPool = await this.MinerPoolManagement.initializeMinerPoolManagement();
         } catch (exception){
             console.error("MinerPool raised an error", exception);
         }
 
         try {
             if (this.ServerPoolManagement !== undefined)
-                await this.ServerPoolManagement.initializeServerPoolManagement();
+                serverPool = await this.ServerPoolManagement.initializeServerPoolManagement();
         } catch (exception){
 
             console.error("ServerPool raised an error", exception)
         }
+
+        this._onPoolsInitializedResolver(pool, minerPool, serverPool);
 
     }
 

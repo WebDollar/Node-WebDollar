@@ -5,6 +5,7 @@ import ed25519 from "common/crypto/ed25519";
 import StatusEvents from "common/events/Status-Events"
 
 import Utils from "common/utils/helpers/Utils";
+import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 
 class MinerPoolSettings {
 
@@ -47,7 +48,8 @@ class MinerPoolSettings {
 
         this._poolURL = newValue;
 
-        this.extractPoolURL();
+        if (!this.extractPoolURL())
+            throw {message: ""}
 
         return this.saveMinerPoolDetails();
     }
@@ -63,26 +65,34 @@ class MinerPoolSettings {
 
         if ( this._poolURL === null || this._poolURL === "" || this._poolURL === undefined ) return this._emitPoolNotification();
 
-        let loc = new URL(this._poolURL);
 
-        let search = loc.pathname;
+        let url = this._poolURL;
 
-        this.poolName = search.substr(0, search.indexOf( "/" ));
+        let search = url;
+
+        let poolName = search.substr(0, search.indexOf( "/" ));
         search = search.substr(search.indexOf( "/" )+1);
 
-        this.poolFee = search.substr(0, search.indexOf( "/" ));
+        let poolFee = search.substr(0, search.indexOf( "/" ));
         search = search.substr(search.indexOf( "/" )+1);
 
-        this.poolPublicKey = search.substr(0, search.indexOf( "/" ));
+        let poolPublicKey = search.substr(0, search.indexOf( "/" ));
         search = search.substr(search.indexOf( "/" )+1);
 
-        this.poolPublicKey = new Buffer(this.poolPublicKey, "hex");
+        poolPublicKey = new Buffer(poolPublicKey, "hex");
 
-        this.poolWebsite = search.substr( 0, search.indexOf( "/" ));
+        let poolWebsite = search.substr( 0, search.indexOf( "/" )).replace(/@/g, '/' );
         search = search.substr(search.indexOf( "/" )+1);
 
-        let servers = search.substr( 0, search.indexOf( "/" ));
-        this.poolServers = JSON.parse( servers );
+        let poolServers = search.replace(/@/g, '/' ).split(";");
+
+        if (!PoolsUtils.validatePoolsDetails(poolName, poolFee, poolWebsite, poolPublicKey, poolServers)) throw {message: "validate pools "};
+
+        this.poolName = poolName;
+        this.poolFee = poolFee;
+        this.poolWebsite = poolWebsite;
+        this.poolServers = poolServers;
+        this.poolPublicKey = poolPublicKey
 
         this._emitPoolNotification();
     }

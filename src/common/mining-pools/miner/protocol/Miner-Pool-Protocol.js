@@ -1,14 +1,9 @@
-import consts from "consts/const_global";
 import NodesList from "node/lists/Nodes-List";
-import Serialization from "common/utils/Serialization";
-import PoolMiningWorker from "common/mining-pools/miner/mining/Pool-Mining";
-import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import Blockchain from "main-blockchain/Blockchain"
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";
-import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
-import NODE_TYPE from "node/lists/types/Node-Type"
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 
 class MinerProtocol {
@@ -47,6 +42,8 @@ class MinerProtocol {
 
     async insertServersListWaitlist(serversListArray){
 
+        //remove all p2p sockets
+        NodesWaitlist.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_PEER);
         return await PoolsUtils.insertServersListWaitlist(serversListArray, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER );
 
     }

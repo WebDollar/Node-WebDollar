@@ -4,6 +4,7 @@ import Serialization from "common/utils/Serialization";
 import PoolMining from "common/mining-pools/miner/mining/Pool-Mining";
 import MinerPoolProtocol from "common/mining-pools/miner/protocol/Miner-Pool-Protocol"
 import MinerPoolSettings from "common/mining-pools/miner/Miner-Pool-Settings"
+import StatusEvents from "common/events/Status-Events";
 
 class MinerProtocol {
 
@@ -21,12 +22,20 @@ class MinerProtocol {
         
         this._poolMining = new PoolMining();
 
+        this._minerPoolInitialized = false;
+        this._minerPoolOpened = false;
+        this._minerPoolStarted = false;
+
     }
 
     async initializeMinerPoolManagement(poolURL){
 
-        await this.minerPoolSettings.initializeMinerPoolSettings(poolURL);
+        let answer = await this.minerPoolSettings.initializeMinerPoolSettings(poolURL);
 
+        if (this.minerPoolSettings.poolURL !== '' && this.minerPoolSettings.poolURL !== undefined)
+            this.minerPoolOpened = true;
+
+        return answer;
     }
 
     async startMinerPool(poolURL){
@@ -79,6 +88,35 @@ class MinerProtocol {
         await this._mine(this._miningData.blockData, this._miningData.difficultyTarget);
         
     }
+
+
+    get minerPoolOpened(){
+        return this._minerPoolOpened;
+    }
+
+    get minerPoolInitialized(){
+        return this._minerPoolInitialized;
+    }
+
+    get minerPoolStarted(){
+        return this._minerPoolStarted;
+    }
+
+    set minerPoolInitialized(value){
+        this._minerPoolInitialized = value;
+        StatusEvents.emit("pools/status", {result: value, message: "Miner Pool was Initialized" });
+    }
+
+    set minerPoolOpened(value){
+        this._minerPoolOpened = value;
+        StatusEvents.emit("pools/status", {result: value, message: "Miner Pool was Opened" });
+    }
+
+    set minerPoolStarted(value){
+        this._minerPoolStarted = value;
+        StatusEvents.emit("pools/status", {result: value, message: "Miner Pool was Started" });
+    }
+
 
 }
 
