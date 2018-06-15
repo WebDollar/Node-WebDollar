@@ -66,7 +66,7 @@ class MinerPoolSettings {
         this._emitPoolNotification();
 
         if (!skipSaving)
-            if (false === await this._db.save("pool_name", this._poolURL)) throw {message: "PoolURL couldn't be saved"};
+            if (false === await this._db.save("minerPool_poolURL", this._poolURL)) throw {message: "PoolURL couldn't be saved"};
 
         return true;
     }

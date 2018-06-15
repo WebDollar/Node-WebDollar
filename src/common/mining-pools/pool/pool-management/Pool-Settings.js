@@ -97,7 +97,7 @@ class PoolSettings {
 
     async setPoolFee(newValue, skipSaving = false){
 
-        if (this._poolFee !== newValue) return;
+        if (this._poolFee === newValue) return;
 
         PoolsUtils.validatePoolFee(newValue);
 

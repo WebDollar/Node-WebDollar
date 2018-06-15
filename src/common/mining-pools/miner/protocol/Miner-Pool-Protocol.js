@@ -23,6 +23,11 @@ class MinerProtocol {
 
     async startMinerProtocol(){
 
+        if (Blockchain.PoolManagement.poolStarted){
+            console.error("You can not start the Pool Miner, if you have a Pool already Started. Close it before starting MinerPool");
+            return false;
+        }
+
         if (this.loaded) return;
 
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
@@ -58,6 +63,8 @@ class MinerProtocol {
     async _subscribeMiner(nodesListObject){
 
         let socket = nodesListObject.socket;
+
+        if (!this.minerPoolManagement.minerPoolStarted) return false;
 
         //if it is not a server
         try {

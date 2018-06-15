@@ -50,6 +50,7 @@ class PoolProtocol {
 
         let socket = nodesListObject.socket;
 
+        if (!this.poolManagement.poolStarted) return false;
 
         socket.node.on("mining-pool/hello-pool", (data) => {
 
