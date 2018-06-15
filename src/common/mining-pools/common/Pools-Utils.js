@@ -5,6 +5,7 @@ import NODE_TYPE from "node/lists/types/Node-Type";
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import Utils from "common/utils/helpers/Utils";
 import consts from 'consts/const_global'
+import InterfaceBlockchainAddressHelper from "../../blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 class PoolsUtils {
 
@@ -45,7 +46,7 @@ class PoolsUtils {
         if (typeof poolActivated !== "boolean") throw {message: "poolActivated is not a boolean"};
     }
 
-    validatePoolsDetails(poolName, poolFee, poolWebsite, poolPublicKey, poolServers, poolActivated = false){
+    validatePoolsDetails(poolName, poolFee, poolWebsite, poolAddress, poolPublicKey, poolServers, poolActivated = false){
 
         this.validatePoolName(poolName);
         this.validatePoolFee(poolFee);
@@ -53,6 +54,7 @@ class PoolsUtils {
         this.validatePoolPublicKey(poolPublicKey);
         this.validatePoolServers(poolServers);
         this.validatePoolActiviated(poolActivated);
+        if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(poolAddress) === null) throw {message: "poolAddress is invalid"};
 
         return true;
     }
@@ -144,6 +146,48 @@ class PoolsUtils {
         }
 
         return string;
+    }
+
+
+
+    extractPoolURL(url){
+
+        if ( url === null || url === "" || url === undefined ) return null;
+
+        let version = url.substr(0, url.indexOf( "/" ));
+        url = url.substr(url.indexOf( "/" )+1);
+
+        let poolName = url.substr(0, url.indexOf( "/" ));
+        url = url.substr(url.indexOf( "/" )+1);
+
+        let poolFee = parseFloat( url.substr(0, url.indexOf( "/" )) );
+        url = url.substr(url.indexOf( "/" )+1);
+
+        let poolAddress = url.substr(0, url.indexOf( "/" ));
+        url = url.substr(url.indexOf( "/" )+1);
+
+        let poolPublicKey = url.substr(0, url.indexOf( "/" ));
+        url = url.substr(url.indexOf( "/" )+1);
+        poolPublicKey = new Buffer(poolPublicKey, "hex");
+
+        let poolWebsite = url.substr( 0, url.indexOf( "/" )).replace(/\$/g, '/' );
+        url = url.substr(url.indexOf( "/" )+1);
+
+        let poolServers = url.replace(/\$/g, '/' ).split(";");
+
+        if (!this.validatePoolsDetails(poolName, poolFee, poolWebsite, poolAddress, poolPublicKey, poolServers)) throw {message: "validate pools "};
+
+        return {
+            poolVersion: version,
+            poolName: poolName,
+            poolFee: poolFee,
+            poolWebsite: poolWebsite,
+            poolServers: poolServers,
+            poolAddress: poolAddress,
+            poolPublicKey: poolPublicKey,
+            poolURL: url,
+        };
+
     }
 
 }

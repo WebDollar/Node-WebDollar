@@ -25,7 +25,8 @@ class PoolSettings {
         this._poolActivated = false;
 
         this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
-        this.poolPublicKey = undefined;
+        this.poolPublicKey = new Buffer(0);
+        this.poolAddress = '';
 
         this.poolURL = '';
 
@@ -34,11 +35,11 @@ class PoolSettings {
     async initializePoolSettings(poolFee){
 
         let result = await this._getPoolPrivateKey();
-
+        result = result && await this._getPoolAddress();
         result = result && await this._getPoolDetails();
 
         if (poolFee !== undefined)
-            this.setPoolFee(poolFee);
+            await this.setPoolFee(poolFee);
 
         if (result)
             this.poolManagement.poolInitialized = true;
@@ -59,7 +60,7 @@ class PoolSettings {
 
         let website = this.poolWebsite.replace(/\//g, '$' );
 
-        this.poolURL =  ( consts.DEBUG? 'http://webdollar.ddns.net:9094' : 'https://webdollar.io') +'/pool/0/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(website)+"/"+encodeURI(servers);
+        this.poolURL =  ( consts.DEBUG? 'http://webdollar.ddns.net:9094' : 'https://webdollar.io') +'/pool/0/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolAddress.toString("hex"))+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(website)+"/"+encodeURI(servers);
         StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers });
 
         return this.poolURL;
@@ -191,6 +192,13 @@ class PoolSettings {
         return result;
     }
 
+    async _getPoolAddress(){
+
+        this.poolAddress = Blockchain.Wallet.addresses[0].address;
+
+        return true;
+    }
+
     async _getPoolPrivateKey(){
 
         this._poolPrivateKey = await this._db.get("pool_privateKey", 30*1000, true);
@@ -214,7 +222,7 @@ class PoolSettings {
 
     async justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated){
 
-        return PoolsUtils.validatePoolsDetails(poolName, poolFee, poolWebsite, this.poolPublicKey, poolServers, poolActivated);
+        return PoolsUtils.validatePoolsDetails(poolName, poolFee, poolWebsite, this.poolAddress, this.poolPublicKey, poolServers, poolActivated);
 
     }
 
@@ -252,11 +260,11 @@ class PoolSettings {
         if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated))
             return false;
 
-        await this.setPoolName( poolName , false );
-        await this.setPoolFee ( poolFee , false);
-        await this.setPoolWebsite ( poolWebsite , false );
-        await this.setPoolServers ( poolServers , false );
-        await this.setPoolActivated( poolActivated , false );
+        await this.setPoolName( poolName , true );
+        await this.setPoolFee ( poolFee , true );
+        await this.setPoolWebsite ( poolWebsite , true );
+        await this.setPoolServers ( poolServers , true );
+        await this.setPoolActivated( poolActivated , true );
 
         return true;
 
