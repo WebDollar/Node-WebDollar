@@ -34,6 +34,7 @@ class MinerPoolSettings {
 
         await this._getMinerPoolDetails();
         await this._getMinerPoolPrivateKey();
+        await this._getMinerPoolList();
 
         if (poolURL !== undefined)
             this.setPoolURL(poolURL);
@@ -49,22 +50,8 @@ class MinerPoolSettings {
 
         if (newValue === this._poolURL) return;
 
-        if (!this.extractPoolURL(newValue))
-            throw {message: "MinerPool: extract pool URL didn't work"};
-
-        this._poolURL = newValue;
-
-        if (!skipSaving)
-            if (false === await this._db.save("pool_name", this._poolURL)) throw {message: "PoolURL couldn't be saved"};
-    }
-
-
-
-    extractPoolURL(url){
-
-        let data = PoolsUtils.extractPoolURL(url);
-
-        if (data === null) return null;
+        let data = PoolsUtils.extractPoolURL(newValue);
+        if (data === null) throw {message: "poolURL is invalid"};
 
         this.poolName = data.poolName;
         this.poolFee = data.poolFee;
@@ -73,7 +60,13 @@ class MinerPoolSettings {
         this.poolPublicKey = data.poolPublicKey;
         this.poolServers = data.poolServers;
 
+        this._poolURL = newValue;
+
+        await this.addPoolList(newValue, data);
         this._emitPoolNotification();
+
+        if (!skipSaving)
+            if (false === await this._db.save("pool_name", this._poolURL)) throw {message: "PoolURL couldn't be saved"};
 
         return true;
     }
@@ -87,7 +80,6 @@ class MinerPoolSettings {
     async saveMinerPoolPrivateKey(){
 
         let result = await this._db.save("minerPool_privateKey", this._minerPoolPrivateKey);
-
         return result;
     }
 
@@ -124,21 +116,27 @@ class MinerPoolSettings {
 
     }
 
-    addPoolList(url){
+    async addPoolList(url, data){
 
-        let data = PoolsUtils.extractPoolURL(url);
+        if (data === undefined)
+            data = PoolsUtils.extractPoolURL(url);
 
         let foundPool = this._findPoolList(url, data);
-        if (foundPool !== null){
+        if (foundPool === null){
             foundPool = {};
             this._poolsList.push(foundPool);
         }
 
         foundPool.poolName = data.poolName;
+        foundPool.poolFee = data.poolFee;
         foundPool.poolAddress = data.poolAddress;
         foundPool.poolPublicKey = data.poolPublicKey;
         foundPool.poolServers = data.poolServers;
+        foundPool.poolWebsite = data.poolWebsite;
+        foundPool.poolVersion = data.poolVersion;
         foundPool.poolURL = data.poolURL;
+
+        await this._saveMinerPoolList();
 
     }
 
@@ -152,6 +150,23 @@ class MinerPoolSettings {
                 return this._poolsList[i];
 
         return null;
+    }
+
+    async _saveMinerPoolList(){
+
+        let result = await this._db.save("minerPool_poolsList", JSON.stringify( this._poolsList) );
+        return result;
+
+    }
+
+    async _getMinerPoolList(){
+
+        let result = JSON.parse ( await this._db.get("minerPool_poolsList", 30*1000, true) );
+
+        if (Array.isArray(result))
+            this._poolsList = result;
+
+        return result;
     }
 
 }
