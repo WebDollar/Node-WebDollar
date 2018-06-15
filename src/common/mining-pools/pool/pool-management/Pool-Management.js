@@ -133,17 +133,17 @@ class PoolManagement{
 
     set poolInitialized(value){
         this._poolInitialized = value;
-        StatusEvents.emit("pools/status", {result: value, message: "Pool was Initialized" });
+        StatusEvents.emit("pools/status", {result: value, message: "Pool Initialization changed" });
     }
 
     set poolOpened(value){
         this._poolOpened = value;
-        StatusEvents.emit("pools/status", {result: value, message: "Pool was Opened" });
+        StatusEvents.emit("pools/status", {result: value, message: "Pool Opened changed" });
     }
 
     set poolStarted(value){
         this._poolStarted = value;
-        StatusEvents.emit("pools/status", {result: value, message: "Pool was Started" });
+        StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });
     }
 
 }

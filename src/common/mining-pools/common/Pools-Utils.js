@@ -12,23 +12,47 @@ class PoolsUtils {
         this.servers = [];
     }
 
-    validatePoolsDetails(poolName, poolFee, poolWebsite, poolPublicKey, poolServers){
+    validatePoolName(poolName){
 
         if (typeof poolName !== "string") throw {message: "pool name is not a string"};
         if (poolName !=='' && ! /^[A-Za-z\d\s]+$/.test(poolName)) throw {message: "pool name is invalid"};
 
+    }
+
+    validatePoolFee(poolFee){
         if ( typeof poolFee !== "number") throw {message: "pool fee is invalid"};
         if ( poolFee < 0 && poolFee > 1 ) throw {message: "pool fee is invalid"};
+    }
 
+    validatePoolWebsite(poolWebsite){
         if (typeof poolWebsite !== "string") throw {message: "pool website is not a string"};
         if (poolWebsite !== '' && ! Utils.validateUrl(poolWebsite)) throw {message:"pool website is invalid"};
+    }
 
+    validatePoolPublicKey(poolPublicKey){
         if (!Buffer.isBuffer(poolPublicKey) || poolPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "pool publicKey is not valid"};
+    }
 
-        this.processServersList( poolServers );
+    validatePoolServers(poolServers){
+        poolServers = this.processServersList( poolServers );
 
         if (!Array.isArray(poolServers)) throw {message: "pool servers is not an array"};
         if (poolServers.length <= 0) throw {message: "pool servers is empty"};
+
+    }
+
+    validatePoolActiviated( poolActivated = false){
+        if (typeof poolActivated !== "boolean") throw {message: "poolActivated is not a boolean"};
+    }
+
+    validatePoolsDetails(poolName, poolFee, poolWebsite, poolPublicKey, poolServers, poolActivated = false){
+
+        this.validatePoolName(poolName);
+        this.validatePoolFee(poolFee);
+        this.validatePoolWebsite(poolWebsite);
+        this.validatePoolPublicKey(poolPublicKey);
+        this.validatePoolServers(poolServers);
+        this.validatePoolActiviated(poolActivated);
 
         return true;
     }

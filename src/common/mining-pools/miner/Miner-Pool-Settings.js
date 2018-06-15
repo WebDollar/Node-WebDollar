@@ -46,10 +46,12 @@ class MinerPoolSettings {
 
     setPoolURL(newValue){
 
+        if (newValue === this._poolURL) return;
+
         this._poolURL = newValue;
 
         if (!this.extractPoolURL())
-            throw {message: ""}
+            throw {message: "MinerPool: extract pool URL didn't work"}
 
         return this.saveMinerPoolDetails();
     }
@@ -70,10 +72,13 @@ class MinerPoolSettings {
 
         let search = url;
 
+        let version = search.substr(0, search.indexOf( "/" ));
+        search = search.substr(search.indexOf( "/" )+1);
+
         let poolName = search.substr(0, search.indexOf( "/" ));
         search = search.substr(search.indexOf( "/" )+1);
 
-        let poolFee = search.substr(0, search.indexOf( "/" ));
+        let poolFee = parseFloat( search.substr(0, search.indexOf( "/" )) );
         search = search.substr(search.indexOf( "/" )+1);
 
         let poolPublicKey = search.substr(0, search.indexOf( "/" ));
@@ -81,10 +86,10 @@ class MinerPoolSettings {
 
         poolPublicKey = new Buffer(poolPublicKey, "hex");
 
-        let poolWebsite = search.substr( 0, search.indexOf( "/" )).replace(/@/g, '/' );
+        let poolWebsite = search.substr( 0, search.indexOf( "/" )).replace(/\$/g, '/' );
         search = search.substr(search.indexOf( "/" )+1);
 
-        let poolServers = search.replace(/@/g, '/' ).split(";");
+        let poolServers = search.replace(/\$/g, '/' ).split(";");
 
         if (!PoolsUtils.validatePoolsDetails(poolName, poolFee, poolWebsite, poolPublicKey, poolServers)) throw {message: "validate pools "};
 
@@ -92,9 +97,11 @@ class MinerPoolSettings {
         this.poolFee = poolFee;
         this.poolWebsite = poolWebsite;
         this.poolServers = poolServers;
-        this.poolPublicKey = poolPublicKey
+        this.poolPublicKey = poolPublicKey;
 
         this._emitPoolNotification();
+
+        return true;
     }
 
     _emitPoolNotification(){
@@ -127,14 +134,14 @@ class MinerPoolSettings {
 
     async saveMinerPoolDetails(){
 
-        let result = await this._db.save("miner_pool_url", this._poolURL);
+        let result = await this._db.save("minerPool_poolURL2", this._poolURL);
 
         return  result;
     }
 
     async _getMinerPoolDetails(){
 
-        let poolURL = await this._db.get("miner_pool_url", 30*1000, true);
+        let poolURL = await this._db.get("minerPool_poolURL2", 30*1000, true);
 
         this.setPoolURL(poolURL);
 

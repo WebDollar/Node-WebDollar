@@ -17,7 +17,10 @@ class PoolProtocol {
 
     startPoolProtocol(){
 
-        if (this.loaded) return;
+        if (!this.poolManagement.poolSettings.poolActiviated)
+            return false;
+
+        if (this.loaded) return true;
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeMiner(result)
@@ -35,6 +38,12 @@ class PoolProtocol {
         this.poolManagement.poolStarted = true;
 
         this.loaded = true;
+
+        return true;
+    }
+
+    stopPoolProtocol(){
+
     }
 
     _subscribeMiner(nodesListObject) {
