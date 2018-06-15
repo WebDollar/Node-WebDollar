@@ -1,0 +1,258 @@
+WebDollar Blockchain
+===============================
+
+### WebDollar Total Supply
+
+100% equivalent to 42,000,000,000 WEBD
+
+### WebDollar Genesis Supply
+
+9.8971455428571428571428571428571% equivalent to 4,156,801,128 WEBD
+
+How to compute the genesis supply:
+ - Genesis blocks are the first 41 blocks, starting from index 0 to index 40
+ - For each block from the genesis, there is a reward value associated to it
+ - Block 0 has reward 1 WEBD
+ - Block 1 has reward 1,867,487,789 WEBD
+ - Block 2 has reward 1,007,804,769 WEBD
+ - ... Next blocks' values decrease according to a predefined discrete reward function
+ - Block 39 has reward 6,306 WEBD
+ - Block 40 has reward 6,113 WEBD
+
+How to compute the genesis total supply with JavaScript:
+```javascript
+
+ var FIRST_BLOCK_REWARDS = [1, 1867487789, 1007804769, 552321669, 307400655, 173745886, 99728963, 58133318,
+  34413271, 20688253, 12630447, 7830882, 4930598, 3152722, 2047239, 1350046, 904119,
+  614893, 424689, 297878, 212180, 153485, 112752, 84116, 63728, 49032, 38311, 30400,
+  24497, 20047, 16660, 14061, 12051, 10490, 9272, 8323, 7588, 7025, 6604, 6306, 6113]
+
+FIRST_BLOCK_REWARDS.reduce(function(a,b) {return a + b})
+//$> 4156801128 
+ ```
+
+## WebDollar Block Reward
+
+From block 0 to block 40, the rewards follow a discrete reward function and are presented above.</br>
+After block 40, the reward starts at 6000 and will halven each 3,153,600 blocks (genesis blocks included).</br>
+
+Example:
+  - From block 40 to block 3,153,600, the reward is 6,000 WEBD.
+  - From block 3,153,601 to block 6,307,200 the reward is 3,000 WEBD.
+
+## WebDollar Block Generation Time
+
+Inter block generation time is set at 40 seconds.</br>
+The block generation difficulty compensates for the deviation.</br>
+The difficulty is recomputed every 10 blocks to allow for the mean 40 seconds window.</br>
+
+
+## WebDollar Blockchain Persistence
+
+The database of choice is PouchDB: (https://pouchdb.com).</br>
+The main reason behind it can be used both for server-side (nodejs) and web browsers.</br>
+PouchDB is API compatible with CouchDB (http://couchdb.apache.org).</br>
+
+
+## WebDollar Block
+
+We will use block `101247` as an example, which you can find it in the publicly available WebDollar blockchain.
+
+Block `101247` serialized data in hex format:
+
+000000010cbe65d1fb88cc8ad43804185a92cb3cb4414fa8aff77cc63ad019725eb403a7000100000004efa42c9343b741ef481d5e74fd9276a960c47f96a81b1b877436c99a004113a4eec15152d052fec11f361aa59d0a06e4dcc2e70d3aef07967dc7959a09710889f9557f3570672eb23d48e1aa6d7f7a6db21702c85df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456000000002ca2587004f470059cc1e6712e66dfb14e015b17ab47cf5e0a1d7aade8b25c3b14000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a4018b7e00000001709f95bc52546752339d581820740c62c35303bab8afcfe232fdab15000000018b75000000009997d1ead9de9f7e61edd6cbdd8f6e631722795223a7b92e1844e1de018b6c000000002c14a87123da8f36bbb1feda18a9d26dcbbb088bb866905bd17ed291000000018b63000000000a177b1cc75d3f79bceb9a0604bec6d5eff8c791a3f64f040752eecb000000018ab0000000000449d8798455f370671420d4a4b5bf7f9d4516df0a9738e03d06a42e018a370000000000ede97ea78d5f394fb9af0faa02df6d60b578a25e02ab8f2bc474a2000000000000000000017684000000000014636ffd74d9bb7b386147b35d3d8c89fc685360da105f9fdb716b014bd7000000000025ef1ed3c39ee8ef75733015d2a0be830a09819675bf6b93a0f7440146db000000000000a73a76d6bfa88f1fe4586194cf4ad657bb0229e3ec4a40138dcd000000000000000000000000
+
+Block `101247` data in JSON format:
+```json
+{ id: 101247,
+  block_id: 101247,
+  hash: "000000010cbe65d1fb88cc8ad43804185a92cb3cb4414fa8aff77cc63ad01972",
+  nonce: 1588855719,
+  version: 1,
+  previous_hash: "00000004efa42c9343b741ef481d5e74fd9276a960c47f96a81b1b877436c99a",
+  timestamp: "Thu, 14 Jun 2018 20:13:00 GMT",
+  hash_data: "eec15152d052fec11f361aa59d0a06e4dcc2e70d3aef07967dc7959a09710889",
+  miner_address: "WEBD$gD5VX81cGcusj1I4aptf3ptshcCyCQ1drj$",
+  trxs_hash_data: "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456",
+  trxs_number: 0,
+  trxs: []
+}
+```
+
+Now, how did we end up from the serialized data to the JSON format?</br>
+Brace yourself, the interesting part is coming :)</br>
+
+
+### WebDollar Block Structure
+```html
+
+|0|___32____|32|_____4____|36|_____2______|38|______32______|70|____4____|74|_____32_______|106|____20____|126|__32___|158|____4____|162|__??___|??|
+ | BLOCK_HASH | BLOCK_NONCE | BLOCK_VERSION | BLOCK_PREV_HASH | BLOCK_TIME | BLOCK_DATA_HASH | MINER_ADDRESS| TRXS_HASH | TRXS_NUMBER | TRXS_DATA|
+ |____________|_____________|_______________|_________________|____________|_________________|______________|___________|_____________|__________|
+```
+
+Now, let's apply this structure to the serialized hex format of block `101247`:
+```html
+[BLOCK_HASH]      000000010cbe65d1fb88cc8ad43804185a92cb3cb4414fa8aff77cc63ad01972
+[BLOCK_NONCE]     5eb403a7
+[BLOCK_VERSION]   0001
+[BLOCK_PREV_HASH] 00000004efa42c9343b741ef481d5e74fd9276a960c47f96a81b1b877436c99a
+[BLOCK_TIME]      004113a4
+[BLOCK_DATA_HASH] eec15152d052fec11f361aa59d0a06e4dcc2e70d3aef07967dc7959a09710889
+[MINER_ADDRESS]   f9557f3570672eb23d48e1aa6d7f7a6db21702c8
+[TRXS_HASH]       5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456
+[TRXS_NUMBER]     00000000
+[TRXS_DATA]       2ca2587004f470059cc1e6712e66dfb14e015b17ab47cf5e0a1d7aade8b25c3b14000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a4018b7e00000001709f95bc52546752339d581820740c62c35303bab8afcfe232fdab15000000018b75000000009997d1ead9de9f7e61edd6cbdd8f6e631722795223a7b92e1844e1de018b6c000000002c14a87123da8f36bbb1feda18a9d26dcbbb088bb866905bd17ed291000000018b63000000000a177b1cc75d3f79bceb9a0604bec6d5eff8c791a3f64f040752eecb000000018ab0000000000449d8798455f370671420d4a4b5bf7f9d4516df0a9738e03d06a42e018a370000000000ede97ea78d5f394fb9af0faa02df6d60b578a25e02ab8f2bc474a2000000000000000000017684000000000014636ffd74d9bb7b386147b35d3d8c89fc685360da105f9fdb716b014bd7000000000025ef1ed3c39ee8ef75733015d2a0be830a09819675bf6b93a0f7440146db000000000000a73a76d6bfa88f1fe4586194cf4ad657bb0229e3ec4a40138dcd000000000000000000000000
+```
+
+!!! Notice that the block length is not constant, because of the transaction data which can differ from block to block.</br>
+Also, the transaction data is ignored in this scenario, as the transaction number is 0.
+But what if we have transactions in our block?
+
+### WebDollar Transaction Structure
+
+We will use block `90010` as a transaction structure example, which you can find it in the publicly available WebDollar blockchain.</br>
+This block contains 2 transactions.</br>
+
+```html
+[BLOCK_HASH - TRXS_HASH] 0000000276784f0b40c0ab7d9f05020d233f665ef1c0ee75ce71851a04e6437f0000266d00010000000690780c947394d87f51635675c593e502ac73bbb15cb4de75d1150b390039e208bb16fca51d5a57b85bd5f59f6ce8c7ddcaa4db9971cb5f689c34a9ff8e43c047b526f062b0460108f11f4fcac97fa07ffe405d78441ee29395f49086dfeab481fc1d43d584443ef16142faa05d56062b47554005
+[TRXS_NUMBER]            00000002
+[TRXS_DATA]              010009015f9801d0eb461b96d6c38f37da332b9871d0875be9b3b92c74b30324605841eaa3d3541b27239608b88a862a0b98cde8131e4334651899739aa0c62876805d1663ec71fe3766f07626200c1e9f8ef7aeea82fcdb94809ff3263b715bcc05a4b427bd8049254bfdf20c242f072db54136c47d8a28976d0ea0453120000000010101c91896c3cb5dc6f158e2c739c2bf21fd6c44a18f00bf2f20000000010006015f98017ab213e9203f1578aca896b288ddfbba7a41782e18499b93d12652ae173cc2510d6e6ba6448bb6fd29aac27cadc4e3a72033b439d461ac286ec33d8cc30d6cd445251b213d28e47192b2c7cc2a83d812bfa4d5c5ab6b6d75b123eed97d6bfba256ede016eb5d694c6ebb11a7dfceb46655582d0ca0b07615000000010101c91896c3cb5dc6f158e2c739c2bf21fd6c44a18f002a7515000000be902e3db557d4590a2678ac10f3902fe1205afb40d49ec5070e98e05f7b465114000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a4015f99000000006ef104adfeb732721df3afaab7c5399d0862c6b81dd8d50e52e1343d000000000000000000015f5e00000000347ae8539919dd500a621872ce0678f6e8d420c3663edb0d9b90d42c015f5d000000000c685caec1fdf022711f123c662f46c101bcd1e4ee172addad7f8873000000015ef40000000004b35512916a449e11d3626d6f6add32724a60b32a6af5bab0d8fb21015edb0000000000ae951f44942643227e94d1d4e7b5eca8bce95bba1342aea6a3f31b0000000000000158a200000000008472d1f6e627471b70ab507f7522499dfd3af887a4aff6afd5c723014bd7000000000025ef1ed3c39ee8ef75733015d2a0be830a09819675bf6b93a0f7440000000146db000000000000a73a76d6bfa88f1fe4586194cf4ad657bb0229e3ec4a40138dcd000000000000000000000000
+```
+We will be interested only in TRXS_DATA. As the block itself, the TRXS_DATA does not have a predefined length.
+
+
+### Transaction Structure before block `46950`
+```html
+|0|____1______|1|____1______|2|______3______|5|_____1____|6|__TRX_LENGTH x FROM_DATA_LENGTH_____|6+FROM_LENGTH|__1 ____|1 + PV|___CL____|CL + PV|____1__|1 + PV|____TRX_TO_LENGTH x TO_DATA_LENGTH __|TO_LENGTH + PV|
+ | TRX_VERSION | TRX_NONCE   | TRX_TIME_LOCK | TRX_LENGTH |     FROM_DATA x TRX_LENGTH                 | CURRENCY_LENGTH  | CURRENCY_TOKEN | TRX_TO_LENGTH |        TO_DATA x TRX_TO_LENGTH                     |
+ |_____________|_____________|_______________|____________|____________________________________________|_______CL_________|________________|_______________|____________________________________________________|
+FROM_LENGTH = TRX_LENGTH x 123
+TO_LENGTH = TRX_TO_LENGTH x 27
+CL = CURRENCY_LENGTH
+PV = PREVIOUS VALUE
+
+```
+
+### Transaction Structure after block `46950`
+
+After block `46950`, there was a hard fork which incremented the TRX_NONCE by 1.
+```html
+|0|____1______|1|____2______|3|______3______|6|_____1____|7|__TRX_LENGTH x FROM_DATA_LENGTH_____|7+FROM_LENGTH|__1 ____|1 + PV|___CL____|CL + PV|____1__|1 + PV|____TRX_TO_LENGTH x TO_DATA_LENGTH __|TO_LENGTH + PV|
+ | TRX_VERSION | TRX_NONCE   | TRX_TIME_LOCK | TRX_LENGTH |     FROM_DATA x TRX_LENGTH                 | CURRENCY_LENGTH  | CURRENCY_TOKEN | TRX_TO_LENGTH |        TO_DATA x TRX_TO_LENGTH                     |
+ |_____________|_____________|_______________|____________|____________________________________________|_______CL_________|________________|_______________|____________________________________________________|
+```
+
+### Transaction FROM Structure
+```html
+|0|____20_____|20|_____32_____|52|_____64____|116|____7___|123|
+ | FROM_ADDRESS | FROM_PUB_KEY | FROM_SIGNATURE| FROM_AMOUNT|
+ |______________|______________|_______________|____________|
+```
+
+ ### Transaction TO Structure
+```html
+|0|____20____|20|____7__|27|
+ | TO_ADDRESS | TO_AMOUNT |
+ |____________|___________|
+```
+
+### Transaction deserialization
+
+ Let's apply the transaction structure for the first transaction in block `90010`:
+
+```html
+[TRX_VERSION]     01
+[TRX_NONCE]       0009
+[TRX_TIME_LOCK]   015f98
+[TRX_LENGTH]      01
+[FROM_ADDRESS]    d0eb461b96d6c38f37da332b9871d0875be9b3b9
+[FROM_PUB_KEY]    2c74b30324605841eaa3d3541b27239608b88a862a0b98cde8131e4334651899
+[FROM_SIGNATURE]  739aa0c62876805d1663ec71fe3766f07626200c1e9f8ef7aeea82fcdb94809ff3263b715bcc05a4b427bd8049254bfdf20c242f072db54136c47d8a28976d0e
+[FROM_AMOUNT]     a0453120000000
+[CURRENCY_LENGTH] 01
+[CURRENCY_TOKEN]  01
+
+[TRX_TO_LENGTH]   01
+[TO_ADDRESS]      c91896c3cb5dc6f158e2c739c2bf21fd6c44a18f
+[TO_AMOUNT]       00bf2f20000000
+
+```
+
+Let's apply the transaction structure for the second transaction in block `90010`:
+
+```html
+[TRX_VERSION]     01
+[TRX_NONCE]       0006
+[TRX_TIME_LOCK]   015f98
+[TRX_LENGTH]      01
+[FROM_ADDRESS]    7ab213e9203f1578aca896b288ddfbba7a41782e
+[FROM_PUB_KEY]    18499b93d12652ae173cc2510d6e6ba6448bb6fd29aac27cadc4e3a72033b439 
+[FROM_SIGNATURE]  d461ac286ec33d8cc30d6cd445251b213d28e47192b2c7cc2a83d812bfa4d5c5ab6b6d75b123eed97d6bfba256ede016eb5d694c6ebb11a7dfceb46655582d0c
+[FROM_AMOUNT]     a0b07615000000
+[CURRENCY_LENGTH] 01
+[CURRENCY_TOKEN]  01
+
+[TRX_TO_LENGTH]   01
+[TO_ADDRESS]      c91896c3cb5dc6f158e2c739c2bf21fd6c44a18f
+[TO_AMOUNT]       002a7515000000
+```
+
+### All fine and dandy, but what if TRX_LENGTH is not 1?
+
+Block Structure for block `97124`:
+
+```html
+[RAW_HEX_BLOCK]   00000005ddcec101496dad8a8b76b6e255c883c58e0088884578e79791d9800301e630e4000100000004e56a6d6c2b36cee6c31866ff78a14837c03f6ed7944603edb5d49c3b003e74d76780a31320a13153d63513592bb44ee9b461bc14768daace35a3a211e18068e6ca13dc8f7c04fb12667fa09cb9a2d2406d9c617b305651fa48567cde0a885f05830e92d3f5853387b6681dc898e91c81c5feb98a00000002010003017b61037cd7616cecba2d5db1d0bd541b0c0c97547f53aa9350e355430f684aa51ad566277dcb7dd4b451d7d4a64c98ad31dd5f45a41606aa965e3b16a0622059ce526856cdd9e6e75c6306c6efb997e523ef5686ae43afb829caf9e5376a1cae9e897b8f9f12a0d81bce8f215a659730fcf2926c6e44078096980000000039e2f0b8ad272e36760c7016abca0727f7505a05c2a68700b86484071f363f75df4b21f57c0b4e5d2e39087fd5c8fa522708f73530e9bedc2c0066396af48b93344755c9fa49bff8d7bd01a9cc16b6895d7a0b3e9e7b29ff6eb2406a967d007beda84070e2fc2b3f44b494e174236d5493ddc70a8096980000000058daddad25b11cd1fd0ba1e03c4a7717f8fe606cd1abcd904c9d29a551cc4e069043f557b54d314f5128e86bc88ee85b29ed8437b17f5aa5e710ef20a3b40cf631d6e32a9d55883888e08a318976a2285687916192f02176f07e96b4d2835b5a27b41989cbcdaba9f674bdbcef2db01b183db50d80969800000000010102f4a260b258ad2df767e04e99a880492baa7a966de00f9700000000a25c064a7a0633dee8b6330bce4c8a55d4700e7bc01f2e01000000010001017b62014519ca1ee719b2f713ffe1f8fcb3685c992a300253a4a1a4e9814d6d7963404a476cd159376523c58e6adfc6a31ca94ba3e73231b72aa9e2e45a21bbaa7d9d6fd4a68e12931cd3a1bd26374b5c9dcced0a6bfbdd19252d5bdd75086d756ae51688bc151d2b31b8a94cc7e3842c1bb487a8be380a008793030000000101011d979ff277916faba0069f0b30d9c773d8e829446000920300000046296f256e0bb9546c29483bec83654716c5b80be15718dc37eedb9d4c32c2cb14000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a4017b6400000002c8901f310ec0a064b7033d6fadee01bef57f3d69c83c791d37100bdc017b6200000001878c3b6a145c67824ff351ea0c472e21f0031a609c604d43ada7033f017b60000000001ecdc68beedc75af50be13d079af9b78acd90a37430c362f9420ed120000000000000000000179610000000007431c4455d845eef550d77ffd57f38a3ec1bd39c1e2d8c8c06682a901775300000000044ae0bbd125bb97ea6c91dcd8fbb21dae021e7e0224deb8c3127f720176bf00000000007624e96f4824a2f0ddf419292767eef53b035263172065225794b2000000000000017684000000000014636ffd74d9bb7b386147b35d3d8c89fc685360da105f9fdb716b000000014bd7000000000025ef1ed3c39ee8ef75733015d2a0be830a09819675bf6b93a0f7440146db000000000000a73a76d6bfa88f1fe4586194cf4ad657bb0229e3ec4a40138dcd000000000000000000000000
+[BLOCK_HASH]      00000005ddcec101496dad8a8b76b6e255c883c58e0088884578e79791d98003
+[BLOCK_NONCE]     01e630e4
+[BLOCK_VERSION]   0001
+[BLOCK_PREV_HASH] 00000004e56a6d6c2b36cee6c31866ff78a14837c03f6ed7944603edb5d49c3b
+[BLOCK_TIME]      003e74d7
+[BLOCK_DATA_HASH] 6780a31320a13153d63513592bb44ee9b461bc14768daace35a3a211e18068e6
+[MINER_ADDRESS]   ca13dc8f7c04fb12667fa09cb9a2d2406d9c617b
+[TRXS_HASH]       305651fa48567cde0a885f05830e92d3f5853387b6681dc898e91c81c5feb98a
+[TRXS_NUMBER]     00000002
+[TRXS_DATA]       010003017b61037cd7616cecba2d5db1d0bd541b0c0c97547f53aa9350e355430f684aa51ad566277dcb7dd4b451d7d4a64c98ad31dd5f45a41606aa965e3b16a0622059ce526856cdd9e6e75c6306c6efb997e523ef5686ae43afb829caf9e5376a1cae9e897b8f9f12a0d81bce8f215a659730fcf2926c6e44078096980000000039e2f0b8ad272e36760c7016abca0727f7505a05c2a68700b86484071f363f75df4b21f57c0b4e5d2e39087fd5c8fa522708f73530e9bedc2c0066396af48b93344755c9fa49bff8d7bd01a9cc16b6895d7a0b3e9e7b29ff6eb2406a967d007beda84070e2fc2b3f44b494e174236d5493ddc70a8096980000000058daddad25b11cd1fd0ba1e03c4a7717f8fe606cd1abcd904c9d29a551cc4e069043f557b54d314f5128e86bc88ee85b29ed8437b17f5aa5e710ef20a3b40cf631d6e32a9d55883888e08a318976a2285687916192f02176f07e96b4d2835b5a27b41989cbcdaba9f674bdbcef2db01b183db50d80969800000000010102f4a260b258ad2df767e04e99a880492baa7a966de00f9700000000a25c064a7a0633dee8b6330bce4c8a55d4700e7bc01f2e01000000010001017b62014519ca1ee719b2f713ffe1f8fcb3685c992a300253a4a1a4e9814d6d7963404a476cd159376523c58e6adfc6a31ca94ba3e73231b72aa9e2e45a21bbaa7d9d6fd4a68e12931cd3a1bd26374b5c9dcced0a6bfbdd19252d5bdd75086d756ae51688bc151d2b31b8a94cc7e3842c1bb487a8be380a008793030000000101011d979ff277916faba0069f0b30d9c773d8e829446000920300000046296f256e0bb9546c29483bec83654716c5b80be15718dc37eedb9d4c32c2cb14000001731d46c131eb6dd4667a96bdc27baf9223bec72c3468dfb6ba52c460e76423a4017b6400000002c8901f310ec0a064b7033d6fadee01bef57f3d69c83c791d37100bdc017b6200000001878c3b6a145c67824ff351ea0c472e21f0031a609c604d43ada7033f017b60000000001ecdc68beedc75af50be13d079af9b78acd90a37430c362f9420ed120000000000000000000179610000000007431c4455d845eef550d77ffd57f38a3ec1bd39c1e2d8c8c06682a901775300000000044ae0bbd125bb97ea6c91dcd8fbb21dae021e7e0224deb8c3127f720176bf00000000007624e96f4824a2f0ddf419292767eef53b035263172065225794b2000000000000017684000000000014636ffd74d9bb7b386147b35d3d8c89fc685360da105f9fdb716b000000014bd7000000000025ef1ed3c39ee8ef75733015d2a0be830a09819675bf6b93a0f7440146db000000000000a73a76d6bfa88f1fe4586194cf4ad657bb0229e3ec4a40138dcd000000000000000000000000
+```
+
+First transaction for block `97124`:
+
+```html
+
+[TRX_VERSION]     01
+[TRX_NONCE]       0003
+[TRX_TIME_LOCK]   017b61
+[TRX_LENGTH]      03
+
+[FROM_ADDRESS_1]    7cd7616cecba2d5db1d0bd541b0c0c97547f53aa
+[FROM_PUB_KEY_1]    9350e355430f684aa51ad566277dcb7dd4b451d7d4a64c98ad31dd5f45a41606 
+[FROM_SIGNATURE_1]  aa965e3b16a0622059ce526856cdd9e6e75c6306c6efb997e523ef5686ae43afb829caf9e5376a1cae9e897b8f9f12a0d81bce8f215a659730fcf2926c6e4407
+[FROM_AMOUNT_1]     80969800000000
+
+[FROM_ADDRESS_2]    39e2f0b8ad272e36760c7016abca0727f7505a05
+[FROM_PUB_KEY_2]    c2a68700b86484071f363f75df4b21f57c0b4e5d2e39087fd5c8fa522708f735 
+[FROM_SIGNATURE_2]  30e9bedc2c0066396af48b93344755c9fa49bff8d7bd01a9cc16b6895d7a0b3e9e7b29ff6eb2406a967d007beda84070e2fc2b3f44b494e174236d5493ddc70a
+[FROM_AMOUNT_2]     80969800000000
+
+[FROM_ADDRESS_3]    58daddad25b11cd1fd0ba1e03c4a7717f8fe606c
+[FROM_PUB_KEY_3]    d1abcd904c9d29a551cc4e069043f557b54d314f5128e86bc88ee85b29ed8437 
+[FROM_SIGNATURE_3]  b17f5aa5e710ef20a3b40cf631d6e32a9d55883888e08a318976a2285687916192f02176f07e96b4d2835b5a27b41989cbcdaba9f674bdbcef2db01b183db50d
+[FROM_AMOUNT_3]     80969800000000
+
+[CURRENCY_LENGTH] 01
+[CURRENCY_TOKEN]  01
+
+[TRX_TO_LENGTH]   02
+
+[TO_ADDRESS_1]      f4a260b258ad2df767e04e99a880492baa7a966d
+[TO_AMOUNT_1]       e00f9700000000
+
+[TO_ADDRESS_2]      a25c064a7a0633dee8b6330bce4c8a55d4700e7b
+[TO_AMOUNT_2]       c01f2e01000000
+
+```
+#### Transaction amount pooling
+As seen in the first transaction of block `97124`, a transaction can have x senders and y receivers, where x != 0 and y != 0.</br>
+The senders amounts are sumed up and the receivers receive from that collective amount.</br>
+The fee is the difference between the sum of the senders amount and the sum of the receivers amounts.</br>
