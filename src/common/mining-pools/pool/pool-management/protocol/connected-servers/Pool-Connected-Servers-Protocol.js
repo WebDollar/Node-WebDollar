@@ -3,12 +3,18 @@ import NodesList from 'node/lists/Nodes-List';
 import NODE_TYPE from "node/lists/types/Node-Type";
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
 
-class PoolConnectedServersProtocol{
+class PoolConnectedServersProtocol extends PoolProtocolList{
 
     constructor(poolManagement){
 
+        super();
+
         this.poolManagement = poolManagement;
+
+        this.connectedServersPool = [];
+        this.list = this.connectedServersPool;
 
     }
 
@@ -91,11 +97,7 @@ class PoolConnectedServersProtocol{
 
             if (confirmation.result === true){
 
-                socket.node.protocol.serverProol = {
-                    serverPoolFee: answer.serverPoolFee,
-                };
-
-                socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_POOL;
+                this._addConnectedServerPool(socket, answer.serverPoolFee);
 
                 return true;
 
@@ -113,6 +115,18 @@ class PoolConnectedServersProtocol{
 
         return false;
 
+
+    }
+
+    _addConnectedServerPool(socket, fee){
+
+        socket.node.protocol.serverPool = {
+            serverPoolFee: fee,
+        };
+
+        socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOLOD;
+
+        this.addElement(socket);
 
     }
 

@@ -96,28 +96,44 @@ class MinerProtocol {
 
     async _sendPoolHello(socket){
 
-        let message = WebDollarCrypto.getBufferRandomValues(32);
+        try{
 
-        // let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
-        //     message: message,
-        //     messageSignature: this.minerPoolManagement.minerPoolSettings.minerPoolDigitalSign(message),
-        //     poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
-        //     minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
-        //     minerAddress: Blockchain.blockchain.mining.minerAddress,
-        // }, "answer", 6000  );
-        //
-        // if (answer === null) throw {message: "pool : no answer from"};
-        //
-        // if (answer.result !== true) throw {message: "pool : result is not true" + answer.message} //in case there was an error message
-        //
-        // if ( !Buffer.isBuffer(answer.signature) || answer.signature.length < 10 ) throw {message: "pool: signature is invalid"};
-        //
-        // if (! ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
-        //
-        // //connection established
-        // this._connectionEstablishedWithPool(socket);
+            let message = WebDollarCrypto.getBufferRandomValues(32);
 
-        return true;
+            let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
+                message: message,
+                messageSignature: this.minerPoolManagement.minerPoolSettings.minerPoolDigitalSign(message),
+                poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
+                minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+                minerAddress: Blockchain.blockchain.mining.minerAddress,
+            }, "answer", 6000  );
+
+            if (answer === null) throw {message: "pool : no answer from"};
+
+            if (answer.result !== true) throw {message: "pool : result is not true" + answer.message} //in case there was an error message
+
+            try{
+
+                if ( !Buffer.isBuffer(answer.signature) || answer.signature.length < 10 ) throw {message: "pool: signature is invalid"};
+
+                if (! ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
+
+                socket.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
+
+                //connection established
+                this._connectionEstablishedWithPool(socket);
+
+                return true;
+
+            } catch (exception){
+                socket.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: false, message: exception.message});
+            }
+
+
+        } catch (exception){
+
+        }
+
 
     }
 

@@ -397,7 +397,7 @@ class CLI {
     
     async createMiningPool(){
         
-        console.info('Create Mining Pool.');
+        console.info('Create Mining Pool');
         console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
 
         let poolFee = await this._pickNumber('Choose a fee(0...100): ', true);
@@ -420,7 +420,7 @@ class CLI {
 
     async createServerForMiningPool(){
 
-        console.info('Create Server Pool.');
+        console.info('Create Server Pool');
         console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
 
         let serverPoolFee = await this._pickNumber('Choose a fee(0...100): ', true);
@@ -434,7 +434,7 @@ class CLI {
 
         this._callCallbackBlockchainSync(async ()=>{
 
-            await Blockchain.ServerPoolManagement.serverPoolSettings.setPoolFee(serverPoolFee / 100);
+            await Blockchain.ServerPoolManagement.serverPoolSettings.setServerPoolFee(serverPoolFee / 100);
             await Blockchain.ServerPoolManagement.startServerPool();
 
         }, true);
