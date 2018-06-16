@@ -138,10 +138,6 @@ class PoolSettings {
         if (!skipSaving)
             if (false === await this._db.save("pool_activated", this._poolActivated ? "true" : "false")) throw {message: "poolActivated couldn't be saved"};
 
-        if (!newValue)
-            await this.poolManagement.poolProtocol.stopPoolProtocol();
-        else await this.poolManagement.poolProtocol.startPoolProtocol();
-
         StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers });
     }
 
@@ -252,7 +248,7 @@ class PoolSettings {
         if (poolServers === null) poolServers = '';
 
         let poolActivated = await this._db.get("pool_activated", 30*1000, true);
-        if (poolActivated === null) poolActivated = '';
+        if (poolActivated === null) poolActivated = false;
 
         if (poolActivated === 'true') poolActivated = true;
         else poolActivated = false;

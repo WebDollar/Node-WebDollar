@@ -15,10 +15,7 @@ class PoolProtocol {
 
     }
 
-    startPoolProtocol(){
-
-        if (!this.poolManagement.poolSettings.poolActiviated)
-            return false;
+    async _startPoolProtocol(){
 
         if (this.loaded) return true;
 
@@ -33,18 +30,14 @@ class PoolProtocol {
         for (let i=0; i<NodesList.nodes.length; i++)
             this._subscribeMiner(NodesList.nodes[i]);
 
-        this.poolConnectedServersProtocol.startPoolConnectedServersProtocol();
-
-        this.poolManagement.poolStarted = true;
+        await this.poolConnectedServersProtocol.startPoolConnectedServersProtocol();
 
         this.loaded = true;
 
         return true;
     }
 
-    stopPoolProtocol(){
-
-        this.poolManagement.poolStarted = false;
+    _stopPoolProtocol(){
 
     }
 

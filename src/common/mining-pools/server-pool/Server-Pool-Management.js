@@ -3,6 +3,8 @@ import ServerPoolSettings from "./Server-Pool-Settings"
 import ServerPoolProtocol from "./protocol/Server-Pool-Protocol"
 
 import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
+import StatusEvents from "common/events/Status-Events";
+import Blockchain from "main-blockchain/Blockchain";
 
 class ServerPoolManagement{
 
@@ -16,6 +18,10 @@ class ServerPoolManagement{
 
         this.serverPoolSettings = new ServerPoolSettings(this);
 
+        this._serverPoolOpened = false;
+        this._serverPoolInitialized = false;
+        this._serverPoolStarted = false;
+
     }
 
     async initializeServerPoolManagement(serverPoolFee){
@@ -24,19 +30,65 @@ class ServerPoolManagement{
             throw {message: "loadPoolsList failed"};
 
         if ( false === await this.serverPoolSettings.initializeServerPoolSettings())
-            throw {message: "loadServer didn't work"}
+            throw {message: "loadServer didn't work"};
 
         if (serverPoolFee !== undefined && typeof serverPoolFee === "number")
             this.serverPoolSettings.setServerPoolFee(serverPoolFee);
 
     }
 
-    async startServerPoolProtocol(){
+    async startServerPool(forceServerPool=false){
 
-        this.serverPoolProtocol.startServerPoolProtocol();
+        await this.setServerPoolStarted(true, forceServerPool);
 
         console.info("The url is just your domain: "+ NodeServer.getServerHTTPAddress() );
 
+    }
+
+
+    get serverPoolOpened(){
+        return this._serverPoolOpened;
+    }
+
+    get serverPoolInitialized(){
+        return this._serverPoolInitialized;
+    }
+
+    get serverPoolStarted(){
+        return this._serverPoolStarted;
+    }
+
+    set serverPoolInitialized(value){
+        this._serverPoolInitialized = value;
+        StatusEvents.emit("server-pool/status", {result: value, message: "Server Pool Initialization changed" });
+    }
+
+    set serverPoolOpened(value){
+        this._serverPoolOpened = value;
+        StatusEvents.emit("server-pool/status", {result: value, message: "Server Pool Opened changed" });
+    }
+
+    async setServerPoolStarted(value, forceStartServerPool){
+
+        if (this._serverPoolStarted !== value){
+
+            if (value && forceStartServerPool){
+
+                await Blockchain.MinerPoolManagement.setMinerPoolStarted(false);
+                await Blockchain.PoolManagement.setPoolStarted(false);
+
+            }
+
+            this._serverPoolStarted = value;
+
+            await this.serverPoolSettings.setServerPoolActivated(value);
+
+            if (value) await this.serverPoolProtocol._startPoolProtocol();
+            else await this.serverPoolProtocol._stopPoolProtocol();
+
+            StatusEvents.emit("server-pool/status", {result: value, message: "Server Pool Started changed" });
+
+        }
     }
 
 }

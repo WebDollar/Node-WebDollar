@@ -34,8 +34,11 @@ class ServerPoolConnectedPoolsProtocol{
 
         let socket = nodesListObject.socket;
 
+        if (!this.serverPoolManagement.serverPoolStarted) return; //meanwhile it was suspended
 
         socket.node.on("server-pool/register-pool", async (data) => {
+
+            if (!this.serverPoolManagement.serverPoolStarted) return; //meanwhile it was suspended
 
             try {
 

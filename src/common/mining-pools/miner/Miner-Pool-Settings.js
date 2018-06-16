@@ -28,6 +28,8 @@ class MinerPoolSettings {
         this.poolServers = [];
         this.poolPublicKey = new Buffer(0);
 
+        this._minerPoolActivated = false;
+
     }
 
     async initializeMinerPoolSettings(poolURL){
@@ -68,8 +70,8 @@ class MinerPoolSettings {
         if (!skipSaving)
             if (false === await this._db.save("minerPool_poolURL", this._poolURL)) throw {message: "PoolURL couldn't be saved"};
 
-        StatusEvents.emit("miner-pool/newPoolURL", { poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers });
-        StatusEvents.emit("miner-pool/settings", { poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers });
+        StatusEvents.emit("miner-pool/newPoolURL", { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
+        StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
 
         return true;
     }
@@ -166,6 +168,22 @@ class MinerPoolSettings {
         this.poolsList = result;
 
         return result;
+    }
+
+    async setMinerPoolActivated(newValue, skipSaving = false){
+
+        PoolsUtils.validatePoolActiviated(newValue);
+
+        this._minerPoolActivated = newValue;
+
+        if (!skipSaving)
+            if (false === await this._db.save("minerPool_activated", this._minerPoolActivated ? "true" : "false")) throw {message: "minerPoolActivated couldn't be saved"};
+
+        StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
+    }
+
+    get minerPoolActivated(){
+        return this._minerPoolActivated;
     }
 
 }

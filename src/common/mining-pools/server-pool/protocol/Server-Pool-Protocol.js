@@ -15,7 +15,7 @@ class ServerPoolProtocol{
 
     }
 
-    startServerPoolProtocol(){
+    _startServerPoolProtocol(){
 
         if (this.loaded) return;
 
@@ -34,6 +34,10 @@ class ServerPoolProtocol{
         this.serverPoolConnectedMinersProtocol.startServerPoolConnectedPoolsProtocol();
 
         this.loaded = true;
+
+    }
+
+    _stopServerPoolProtocol(){
 
     }
 

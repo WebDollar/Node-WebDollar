@@ -1,5 +1,7 @@
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import consts from 'consts/const_global';
+import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import StatusEvents from "common/events/Status-Events";
 
 class PoolSettings {
 
@@ -9,6 +11,7 @@ class PoolSettings {
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.SERVER_POOL_DATABASE );
 
         this._serverPoolFee = 0;
+        this._serverPoolActivated = false;
 
     }
 
@@ -31,53 +34,61 @@ class PoolSettings {
 
     }
 
-    get serverPoolFee(){
+    async setServerPoolActivated(newValue, skipSaving = false){
 
+        PoolsUtils.validatePoolActiviated(newValue);
+
+        this._serverPoolActivated = newValue;
+
+        if (!skipSaving)
+            if (false === await this._db.save("serverPool_activated", this._serverPoolActivated ? "true" : "false")) throw {message: "serverPoolActivated couldn't be saved"};
+
+        StatusEvents.emit("server-pools/settings", { message: "Server Pool Settings were saved", serverPoolActivated: this._serverPoolActivated  });
+    }
+
+
+
+    get serverPoolActivated(){
+        return this._serverPoolActivated;
+    }
+
+
+
+    get serverPoolFee(){
         return this._serverPoolFee;
     }
 
-    setServerPoolFee(newValue){
+    async setServerPoolFee(newValue, skipSaving = false){
+
+        if (this._serverPoolFee === newValue) return;
+
+        PoolsUtils.validatePoolFee(newValue);
 
         this._serverPoolFee = newValue;
 
-        return this.saveServerPoolDetails();
-    }
+        if (!skipSaving)
+            if (false === await this._db.save("serverPool_fee", this._poolFee)) throw {message: "PoolFee couldn't be saved"};
 
-    async validatePoolDetails(){
-
-        if ( typeof this._serverPoolFee !== "number") throw {message: "ServerPool fee is invalid"};
-        if ( this._serverPoolFee < 0 && this._serverPoolFee > 1 ) throw {message: "ServerPool fee is invalid"};
-
-    }
-
-    async saveServerPoolDetails(){
-
-        await this.validatePoolDetails();
-
-        let result = await this._db.save("serverPool_fee", this._serverPoolFee);
-
-        return  result;
     }
 
     async _getServerPoolDetails(){
 
-        try {
+        let serverPoolFee = await this._db.get("serverPool_fee", 30 * 1000, true);
 
-            this._serverPoolFee = await this._db.get("serverPool_fee", 30 * 1000, true);
+        if (serverPoolFee === null) serverPoolFee = 0;
 
-            if (this._serverPoolFee === null)
-                this._serverPoolFee = 0;
+        serverPoolFee = parseFloat(serverPoolFee);
 
-            this._serverPoolFee = parseFloat(this._serverPoolFee);
+        let serverPoolActivated = await this._db.get("serverPool_activated", 30*1000, true);
+        if (serverPoolActivated === null) serverPoolActivated = false;
 
+        await PoolsUtils.validatePoolActiviated(serverPoolFee);
+        await PoolsUtils.validatePoolActiviated(serverPoolActivated);
 
+        await this.setServerPoolFee(serverPoolFee, true);
+        await this.setPoolActivated(serverPoolActivated, true);
 
-        } catch (exception){
-
-        }
-
-        await this.validatePoolDetails();
-
+        return true;
     }
 
 }

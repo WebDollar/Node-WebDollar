@@ -5,6 +5,7 @@ import PoolMining from "common/mining-pools/miner/mining/Pool-Mining";
 import MinerPoolProtocol from "common/mining-pools/miner/protocol/Miner-Pool-Protocol"
 import MinerPoolSettings from "common/mining-pools/miner/Miner-Pool-Settings"
 import StatusEvents from "common/events/Status-Events";
+import Blockchain from "../../../main-blockchain/Blockchain";
 
 class MinerProtocol {
 
@@ -38,26 +39,18 @@ class MinerProtocol {
         return answer;
     }
 
-    async startMinerPool(poolURL){
+    async startMinerPool(poolURL, forceStartMinerPool = false ){
 
         if (poolURL !== undefined)
-            this.minerPoolSettings.setPoolURL(poolURL);
+            await this.minerPoolSettings.setPoolURL(poolURL);
 
-        if (this.minerPoolSettings.poolURL !== undefined && this.minerPoolSettings.poolURL !== '')
-            return await this.minerPoolProtocol.startMinerProtocol(this.minerPoolSettings.poolURL);
+        if (this.minerPoolSettings.poolURL !== undefined && this.minerPoolSettings.poolURL !== '') {
+            return await this.setMinerPoolStarted(true, forceStartMinerPool);
+        }
         else {
             console.error("Couldn't start MinerPool");
             return false;
         }
-
-    }
-
-    getMiningData() {
-
-        //TODO: get data from PoolLeader and deserialize
-        //mining data should be like {blockData: , difficultyTarget: }
-        //blockData should be like this:  {height: , difficultyTargetPrev: , computedBlockPrefix: , nonce: }
-        return this._miningData;
 
     }
 
@@ -112,9 +105,27 @@ class MinerProtocol {
         StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Opened changed" });
     }
 
-    set minerPoolStarted(value){
-        this._minerPoolStarted = value;
-        StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Started changed" });
+    async setMinerPoolStarted(value, forceStartMinerPool = false){
+
+        if (this._minerPoolStarted !== value){
+
+            if (value && forceStartMinerPool){
+                await Blockchain.PoolManagement.setPoolStarted(false);
+
+                if (Blockchain.ServerPoolManagement !== undefined)
+                    await Blockchain.ServerPoolManagement.setServerPoolStarted(false);
+            }
+
+            this._minerPoolStarted = value;
+
+            await this.minerPoolSettings.setMinerPoolActivated(value);
+
+            if (value) await this.minerPoolProtocol._startMinerProtocol();
+            else await this.minerPoolProtocol._stopMinerProtocol();
+
+            StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Started changed" });
+
+        }
     }
 
 

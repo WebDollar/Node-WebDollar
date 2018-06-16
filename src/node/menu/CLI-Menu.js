@@ -390,7 +390,7 @@ class CLI {
         }
 
         this._callCallbackBlockchainSync(async ()=>{
-            await Blockchain.MinerPoolManagement.startMinerPool(miningPoolLink);
+            await Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink );
         }, false);
 
     }
@@ -411,7 +411,8 @@ class CLI {
 
         this._callCallbackBlockchainSync(async ()=>{
 
-            await Blockchain.PoolManagement.startPool(poolFee/100);
+            await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
+            await Blockchain.PoolManagement.startPool();
 
         }, true);
 
@@ -433,7 +434,8 @@ class CLI {
 
         this._callCallbackBlockchainSync(async ()=>{
 
-            await Blockchain.ServerPoolManagement.startServerPoolProtocol( serverPoolFee / 100 );
+            await Blockchain.ServerPoolManagement.serverPoolSettings.setPoolFee(serverPoolFee / 100);
+            await Blockchain.ServerPoolManagement.startServerPool();
 
         }, true);
 

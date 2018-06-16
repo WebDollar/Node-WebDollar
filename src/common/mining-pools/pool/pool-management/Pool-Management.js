@@ -4,6 +4,7 @@ import consts from 'consts/const_global';
 import PoolWorkManagement from "./Pool-Work-Management";
 import PoolProtocol from "./protocol/Pool-Protocol"
 import StatusEvents from "common/events/Status-Events";
+import Blockchain from "../../../../main-blockchain/Blockchain";
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,
@@ -27,11 +28,8 @@ class PoolManagement{
         this._poolStarted = false;
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
-        this._baseHash = new Buffer(consts.MINING_POOL.BASE_HASH_STRING, "hex");
 
         this.poolData = new PoolData(this, databaseName);
-
-        this._resetMinedBlockStatistics();
 
     }
 
@@ -56,22 +54,21 @@ class PoolManagement{
 
     }
 
-    async startPool(){
+    async startPool( forceStartMinerPool = false ){
 
         if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
-            return this.poolProtocol.startPoolProtocol();
+            return await this.setPoolStarted(true, forceStartMinerPool);
+        else
+            console.error("Couldn't start the Pool because the poolURL is empty");
 
         return false
     }
 
     generatePoolWork(minerInstance){
-
         return this.poolWorkManagement.getWork(minerInstance);
-
     }
 
     receivePoolWork(minerInstance, work){
-
        return this.poolWorkManagement.processWork(minerInstance, work)
     }
 
@@ -106,19 +103,6 @@ class PoolManagement{
             await this.sendReward(this.poolData.miners[i]);
     }
 
-    _resetMinedBlockStatistics() {
-        /**
-         * To be able to mine a block, the pool should generate ~ numBaseHashes of difficulty baseHashDifficulty
-         * In other words: The arithmetic mean of all generated hashes by pool to mine a block should be
-         * equal with numBaseHashes * baseHashDifficulty
-         * Each miner will receive a reward wighted on the number of baseHashDifficulty sent to pool leader.
-         */
-        this._currentBlockStatistics = {
-            baseHashDifficulty: Buffer.from(this._baseHash),
-            numBaseHashes: 0
-        };
-    }
-
     get poolOpened(){
         return this._poolOpened;
     }
@@ -141,9 +125,29 @@ class PoolManagement{
         StatusEvents.emit("pools/status", {result: value, message: "Pool Opened changed" });
     }
 
-    set poolStarted(value){
-        this._poolStarted = value;
-        StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });
+    async setPoolStarted(value, forceStartPool = false){
+
+        if (this._poolStarted !== value){
+
+            if (value && forceStartPool){
+
+                await Blockchain.MinerPoolManagement.setMinerPoolStarted(false);
+
+                if (Blockchain.ServerPoolManagement !== undefined)
+                    await Blockchain.ServerPoolManagement.setServerPoolStarted(false);
+
+            }
+
+            this._poolStarted = value;
+
+            await this.poolSettings.setPoolActivated(value);
+
+            if (value) await this.poolProtocol._startServerPoolProtocol();
+            else await this.poolProtocol._stopServerPoolProtocol();
+
+            StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });
+
+        }
     }
 
 }

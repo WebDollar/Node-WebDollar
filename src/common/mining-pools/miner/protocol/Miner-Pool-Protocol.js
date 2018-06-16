@@ -21,14 +21,10 @@ class MinerProtocol {
 
     }
 
-    async startMinerProtocol(){
+    async _startMinerProtocol(){
 
-        if (Blockchain.PoolManagement.poolStarted){
-            console.error("You can not start the Pool Miner, if you have a Pool already Started. Close it before starting MinerPool");
-            return false;
-        }
-
-        if (this.loaded) return;
+        if (this.loaded)
+            return true;
 
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
             await this._subscribeMiner(nodesListObject)
@@ -41,15 +37,11 @@ class MinerProtocol {
         for (let i=0; i<NodesList.nodes.length; i++)
             await this._subscribeMiner(NodesList.nodes[i]);
 
-        this.minerPoolManagement.minerPoolStarted = true;
-
         this.loaded = true;
 
     }
 
-    async stopMinerProtocol(){
-
-        this.minerPoolManagement.minerPoolStarted = false;
+    async _stopMinerProtocol(){
 
     }
 

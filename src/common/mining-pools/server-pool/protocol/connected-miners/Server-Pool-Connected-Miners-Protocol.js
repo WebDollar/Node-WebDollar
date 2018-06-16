@@ -33,8 +33,11 @@ class ServerPoolConnectedMinersProtocol{
 
         let socket = nodesListObject.socket;
 
+        if (!this.serverPoolManagement.serverPoolStarted) return; //meanwhile it was suspended
 
         socket.node.on("server-pool/register-miner", (data) => {
+
+            if (!this.serverPoolManagement.serverPoolStarted) return; //meanwhile it was suspended
 
             try {
 

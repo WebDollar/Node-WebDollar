@@ -267,14 +267,6 @@ class Blockchain{
 
         await this._initializeMiningPools();
 
-        if (this.loaded) //already opened
-            await this._startMiningPools();
-        else
-            this.onLoaded.then( async (answer)=>{
-
-                await this._startMiningPools();
-
-            });
 
     }
 
@@ -306,15 +298,6 @@ class Blockchain{
 
     }
 
-    async _startMiningPools(){
-
-        await this.PoolManagement.startPool();
-        await this.MinerPoolManagement.startMinerPool();
-
-        if (this.ServerPoolManagement !== undefined && consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_STATUS.MINING_POOL_SERVER )
-            await this.ServerPoolManagement.startServerPoolProtocol();
-
-    }
 
 }
 
