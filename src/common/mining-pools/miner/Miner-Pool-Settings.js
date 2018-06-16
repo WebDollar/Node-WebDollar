@@ -37,7 +37,7 @@ class MinerPoolSettings {
         await this._getMinerPoolList();
 
         if (poolURL !== undefined)
-            this.setPoolURL(poolURL);
+            await this.setPoolURL(poolURL);
 
     }
 
@@ -63,17 +63,30 @@ class MinerPoolSettings {
         this._poolURL = newValue;
 
         await this.addPoolList(newValue, data);
-        this._emitPoolNotification();
 
         if (!skipSaving)
             if (false === await this._db.save("minerPool_poolURL", this._poolURL)) throw {message: "PoolURL couldn't be saved"};
 
+        StatusEvents.emit("miner-pool/newPoolURL", { poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers });
+        StatusEvents.emit("miner-pool/settings", { poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers });
+
         return true;
     }
 
-    _emitPoolNotification(){
+    async setPoolServers(newValue, skipSaving = false){
 
-        StatusEvents.emit("miner-pool/newPoolURL", { poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers });
+        PoolsUtils.validatePoolServers(newValue);
+
+        if ( JSON.stringify(this._poolServers ) === JSON.stringify( newValue ) ) return;
+
+        newValue = PoolsUtils.processServersList( newValue );
+        this._poolServers = newValue;
+
+        if (!skipSaving)
+            if (false === await this._db.save("pool_servers", JSON.stringify(this._poolServers))) throw {message: "PoolServers couldn't be stored"};
+
+        await this.minerPoolManagement.minerPoolProtocol.insertServersListWaitlist( this._poolServers );
+        this._generatePoolURL();
 
     }
 

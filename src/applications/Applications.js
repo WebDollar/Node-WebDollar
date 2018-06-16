@@ -8,6 +8,7 @@ import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper";
 import BufferExtended from "common/utils/BufferExtended";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List';
+import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 
 class Applications {
 
@@ -17,6 +18,8 @@ class Applications {
         this.AddressHelper = InterfaceBlockchainAddressHelper;
         this.CoinsHelper = WebDollarCoins;
         this.VersionCheckerHelper = VersionCheckerHelper;
+        this.PoolsUtilsHelper = PoolsUtils;
+
         this.BufferExtended = BufferExtended;
 
         this.NodesList = NodesList;

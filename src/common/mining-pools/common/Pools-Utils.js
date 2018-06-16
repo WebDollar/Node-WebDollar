@@ -190,6 +190,34 @@ class PoolsUtils {
 
     }
 
+    getPoolServersStatus(poolServers){
+
+        if (typeof poolServers === "string") poolServers = this.processServersList( poolServers );
+
+        let result = {};
+
+        for (let i=0; i<poolServers.length; i++) {
+
+
+            let connected = false;
+
+            for (let j=0; j< NodesList.nodes.length; j++ )
+                if (NodesList.nodes[j].socket.node.sckAddress.matchAddress( poolServers[i] )){
+                    connected = true;
+                    break;
+                }
+
+            result[i] = {
+                name: poolServers[i],
+                connected: connected,
+            };
+
+        }
+
+        return result;
+
+    }
+
 }
 
 export default new PoolsUtils();

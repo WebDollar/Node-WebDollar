@@ -104,17 +104,17 @@ class MinerProtocol {
 
     set minerPoolInitialized(value){
         this._minerPoolInitialized = value;
-        StatusEvents.emit("miner-pools/status", {result: value, message: "Miner Pool Initialized changed" });
+        StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Initialized changed" });
     }
 
     set minerPoolOpened(value){
         this._minerPoolOpened = value;
-        StatusEvents.emit("miner-pools/status", {result: value, message: "Miner Pool Opened changed" });
+        StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Opened changed" });
     }
 
     set minerPoolStarted(value){
         this._minerPoolStarted = value;
-        StatusEvents.emit("miner-pools/status", {result: value, message: "Miner Pool Started changed" });
+        StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Started changed" });
     }
 
 
