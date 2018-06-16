@@ -198,7 +198,6 @@ consts.MINING_POOL = {
 
 };
 
-
 consts.SETTINGS = {
 
     UUID: uuid.v4(),
@@ -220,6 +219,8 @@ consts.SETTINGS = {
         WAITLIST: {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
             INTERVAL: 2 * 1000,                         //miliseconds
+
+            BLOCKED_NODES: [ ], //addresses that will be blocked example: "domain.com"
         },
 
         SIGNALING: {
