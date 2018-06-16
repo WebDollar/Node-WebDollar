@@ -4,6 +4,8 @@
 if [ -z $SERVER_PORT ]; then export SERVER_PORT=443; fi
 if [ -z $MAXIMUM_CONNECTIONS_FROM_BROWSER ]; then export MAXIMUM_CONNECTIONS_FROM_BROWSER=256; fi
 if [ -z $MAXIMUM_CONNECTIONS_FROM_TERMINAL ]; then export MAXIMUM_CONNECTIONS_FROM_TERMINAL=256; fi
+if [ -z $FEE ]; then export FEE=0.18; fi
+if [ -z $TYPE ]; then export TYPE=12; fi
 
 # Check NOSSL in case we don't need a SSL
 if [ -z $NOSSL ]; then
@@ -23,9 +25,5 @@ if [ -z $NOSSL ]; then
 
 fi
 
-# Start PM2
-pm2 start npm -- run start
-sleep 1
-pm2 restart npm --update-env
-
-pm2 logs
+# Start Pool
+(sleep 15;echo $TYPE;sleep 5;echo $FEE;) | npm run commands
