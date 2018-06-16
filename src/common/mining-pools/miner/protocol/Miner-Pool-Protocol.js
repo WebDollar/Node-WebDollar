@@ -56,7 +56,7 @@ class MinerProtocol {
     async insertServersListWaitlist(serversListArray){
 
         //remove all p2p sockets
-        NodesWaitlist.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_PEER);
+        NodesList.disconnectAllNodesByConsensusType(NODE_CONSENSUS_TYPE.NODE_CONSENSUS_PEER);
         return await PoolsUtils.insertServersListWaitlist(serversListArray, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER );
 
     }
