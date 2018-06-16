@@ -47,6 +47,12 @@ class MinerProtocol {
 
     }
 
+    async stopMinerProtocol(){
+
+        this.minerPoolManagement.minerPoolStarted = false;
+
+    }
+
     async insertServersListWaitlist(serversListArray){
 
         //remove all p2p sockets

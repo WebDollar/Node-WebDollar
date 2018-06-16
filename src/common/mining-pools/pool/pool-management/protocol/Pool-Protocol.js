@@ -44,6 +44,8 @@ class PoolProtocol {
 
     stopPoolProtocol(){
 
+        this.poolManagement.poolStarted = false;
+
     }
 
     _subscribeMiner(nodesListObject) {
