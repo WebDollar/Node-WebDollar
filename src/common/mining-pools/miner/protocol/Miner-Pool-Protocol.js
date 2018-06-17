@@ -5,8 +5,10 @@ import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
+import Serialization from "../../../utils/Serialization";
 
-class MinerProtocol {
+class MinerProtocol extends PoolProtocolList{
 
     /**
      *
@@ -14,10 +16,13 @@ class MinerProtocol {
      */
     constructor(minerPoolManagement){
 
+        super();
+
         this.minerPoolManagement = minerPoolManagement;
         this.loaded = false;
 
-        this.socketsPool = [];
+        this.connectedPools = [];
+        this.list = this.connectedPools;
 
     }
 
@@ -87,11 +92,6 @@ class MinerProtocol {
 
         let socket = nodesListObject.socket;
 
-        for (let i=this.socketsPool.length-1; i>=0; i--)
-            if (this.socketsPool[i] === socket){
-                this.socketsPool.splice(i,1);
-            }
-
     }
 
     async _sendPoolHello(socket){
@@ -134,27 +134,56 @@ class MinerProtocol {
 
         }
 
-
     }
+
 
     _connectionEstablishedWithPool(socket){
 
-        if (this._findSocketPool(socket) !== -1) return false;
+        socket.node.protocol.pool = {
+        };
 
-        this.socketsPool.push(socket);
+        socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL;
+
+        this.addElement(socket);
+
+    }
+
+
+    async requestWork(){
+
+        if (this.connectedPools.length === 0) return;
+        let poolSocket = this.connectedPools[0];
+
+        let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", { minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPublicKey }, "answer");
+
+        if (answer === null) throw {message: "get-work answered null" };
+
+        if (answer.result !== true) throw {message: "get-work answered false"};
+        if (answer.work !== "object") throw {message: "get-work invalid work"};
+
+        if ( !Buffer.isBuffer( answer.work.block) ) throw {message: "get-work invalid block"};
+        if (answer.work.noncesStart !== "number") throw {message: "get-work invalid noncesStart"};
+        if (answer.work.noncesEnd !== "number") throw {message: "get-work invalid noncesEnd"};
+
+        //verify signature
+
+        let message = Buffer.concat( [ answer.work.block, Serialization.serializeNumber4Bytes( answer.work.noncesStart ), Serialization.serializeNumber4Bytes( answer.work.noncesEnd ) ]);
+
+        if ( !Buffer.isBuffer(answer.signature) || answer.signature.length < 10 ) throw {message: "pool: signature is invalid"};
+        if ( !ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
+
+        this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.work);
 
     }
 
-    _findSocketPool(socket){
+    async pushWork(poolSocket, bestHash){
 
-        for (let i=0; i<this.socketsPool.length; i++)
-            if (this.socketsPool[i] === socket){
-                return i;
-            }
 
-        return -1;
+        poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPublicKey,
+            bestHash: bestHash})
 
     }
+
 
 }
 

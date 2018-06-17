@@ -7,6 +7,7 @@ import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
 import consts from 'consts/const_global'
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import ed25519 from "common/crypto/ed25519";
+import Serialization from 'common/utils/Serialization';
 
 class PoolConnectedMinersProtocol extends PoolProtocolList{
 
@@ -83,10 +84,26 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if ( typeof data.suffix === "string")
                     suffix = '/'+data.suffix;
 
-                socket.node.sendRequest("mining-pool/hello-pool/answer"+suffix, {
+                let confirmation = await socket.node.sendRequestWaitOnce("mining-pool/hello-pool/answer"+suffix, {
                     result: true,
                     signature: signature,
-                } );
+                }, "confirmation" );
+
+                try {
+
+                    if (confirmation === null) throw {message: "confirmation is empty"};
+
+                    if (!confirmation.result) throw {message: "confirmation is false"};
+
+                    if (confirmation.result){
+
+                        this._addConnectedMinerPool(socket, confirmation.sckAddress || socket.node.sckAddress.address );
+
+                    }
+
+                } catch (exception){
+
+                }
 
             } catch (exception){
 
@@ -94,6 +111,57 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
             }
 
         });
+
+
+
+        socket.node.on("mining-pool/get-work", (data) => {
+
+            try {
+
+                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+
+                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
+                if (minerInstance === null) throw {message: "publicKey was not found"};
+
+                let work = this.poolManagement.generatePoolWork(minerInstance);
+
+                let message = Buffer.concat( [ work.block, Serialization.serializeNumber4Bytes( work.noncesStart ), Serialization.serializeNumber4Bytes( work.noncesEnd ) ]);
+                let signature = this.poolManagement.poolSettings.poolDigitalSign(message);
+
+                socket.node.sendRequest("get-work"+"/answer", {result: true, work: work, signature: signature } )
+
+            } catch (exception){
+
+                socket.node.sendRequest("get-work"+"/answer", {result: false, message: exception.message } );
+
+            }
+
+        });
+
+
+
+        socket.node.on("mining-pool/work-done", (data) => {
+
+            try{
+
+                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+
+                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
+                if (minerInstance === null) throw {message: "publicKey was not found"};
+
+                let answer = this.poolManagement.receivePoolWork(minerInstance, data.work);
+
+                let newWork = this.poolManagement.getWork(minerInstance);
+
+                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: true, answer: answer.result, reward: answer.reward, newWork: newWork } ); //the new reward
+
+            } catch (exception){
+                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: false, message: exception.message } )
+            }
+
+        });
+
+
 
         //TODO change-wallet
         socket.node.on("mining-pool/change-wallet", (data) => {
@@ -134,107 +202,9 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
             }
         });
 
-        socket.node.on("mining-pool/work-done", (data) => {
-
-            try{
-
-                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-
-                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
-                if (minerInstance === null) throw {message: "publicKey was not found"};
-
-                let answer = this.poolManagement.receivePoolWork(minerInstance, data.work);
-
-                let newWork = this.poolManagement.getWork(minerInstance);
-
-                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: true, answer: answer.result, reward: answer.reward, newWork: newWork } ); //the new reward
-
-            } catch (exception){
-                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", {result: false, message: exception.message } )
-            }
-
-        });
-
-        socket.node.on("mining-pool/get-miner-work", (data) => {
-
-            try {
-
-                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-
-                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
-                if (minerInstance === null) throw {message: "publicKey was not found"};
-
-                let work = this.poolManagement.generatePoolWork(minerInstance);
-
-                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", {result: true, work: work } )
-
-            } catch (exception){
-
-                socket.node.sendRequest("mining-pool/get-miner-work"+"/answer", {result: false, message: exception.message } );
-
-            }
-
-        });
-
     }
 
-    async _registerPoolToServerPool(socket) {
 
-        let answer = await socket.node.sendRequestWaitOnce("server-pool/register-pool", {
-            poolName: this.poolManagement.poolSettings.poolName,
-            poolFee: this.poolManagement.poolSettings.poolFee,
-            poolWebsite: this.poolManagement.poolSettings.poolWebsite,
-            poolPublicKey: this.poolManagement.poolSettings.poolPublicKey,
-            poolServers: this.poolManagement.poolSettings.poolServers,
-        }, "answer");
-
-        try{
-
-            if ( answer === null || answer.result !== true) throw {message: "ServerPool returned false"};
-            if ( typeof answer.serverPoolFee !== "number" ) throw {message: "ServerPool returned a wrong fee"};
-            if ( answer.serverPoolFee < 0 || answer.serverPoolFee > 1) throw {message: "ServerPool returned a wrong fee"};
-            if ( !Buffer.isBuffer(answer.messageToSign) || answer.messageToSign.length !== 32) throw {message: "ServerPool message is wrong"};
-
-            if (answer.serverPoolFee > 0.2){
-
-                await socket.node.sendRequestWaitOnce("server-pool/register-pool/answer/confirmation", { result: false, message: "ServerPool fee is too high"}, "answer");
-
-                setTimeout(()=>{
-                    socket.disconnect();
-                }, 5000);
-
-                return;
-
-            }
-
-            let signature = this.poolManagement.poolSettings.poolDigitalSign(answer.messageToSign);
-
-            let confirmation = await socket.node.sendRequestWaitOnce("server-pool/register-pool/answer/confirmation", { result: true, signature: signature}, "answer");
-
-            if (confirmation === null) throw {message: "ServerPool returned a null confirmation"};
-
-            if (confirmation.result === true){
-
-                this._addConnectedServerPool(socket, answer.serverPoolFee);
-
-                return true;
-
-            } else {
-                throw {message: "ServerPool returned a wrong confirmation"};
-            }
-
-
-        } catch (exception){
-
-            console.error("Pool ConnectedServersProtocol returned an error", exception);
-            socket.disconnect();
-
-        }
-
-        return false;
-
-
-    }
 
     _addConnectedMinerPool(socket, socketAddress){
 

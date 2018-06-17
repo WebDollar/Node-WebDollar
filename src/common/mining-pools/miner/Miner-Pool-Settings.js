@@ -37,10 +37,10 @@ class MinerPoolSettings {
         await this._getMinerPoolPrivateKey();
         await this._getMinerPoolList();
 
-        await this._getMinerPoolDetails();
-
         if (poolURL !== undefined)
             await this.setPoolURL(poolURL);
+
+        await this._getMinerPoolDetails();
 
     }
 
@@ -130,7 +130,8 @@ class MinerPoolSettings {
 
 
         await this.setPoolURL(poolURL, true);
-        await this.setMinerPoolActivated(poolMinerActivated, true);
+        await this.setMinerPoolActivated(poolMinerActivated, true, false);
+
     }
 
     minerPoolDigitalSign(message){
@@ -190,7 +191,7 @@ class MinerPoolSettings {
         return result;
     }
 
-    async setMinerPoolActivated(newValue, skipSaving = false){
+    async setMinerPoolActivated(newValue, skipSaving = false, useActivation = true){
 
         PoolsUtils.validatePoolActivated(newValue);
 
@@ -201,7 +202,9 @@ class MinerPoolSettings {
 
         StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
 
-        await this.minerPoolManagement.setMinerPoolStarted(newValue, true);
+        if (useActivation)
+            await this.minerPoolManagement.setMinerPoolStarted(newValue, true);
+
     }
 
     get minerPoolActivated(){

@@ -36,10 +36,11 @@ class PoolSettings {
 
         let result = await this._getPoolPrivateKey();
         result = result && await this._getPoolAddress();
-        result = result && await this._getPoolDetails();
 
         if (poolFee !== undefined)
             await this.setPoolFee(poolFee);
+
+        result = result && await this._getPoolDetails();
 
         if (result)
             this.poolManagement.poolInitialized = true;
@@ -129,7 +130,7 @@ class PoolSettings {
         return this._poolPrivateKey;
     }
 
-    async setPoolActivated(newValue, skipSaving = false){
+    async setPoolActivated(newValue, skipSaving = false, useActivation = true){
 
         PoolsUtils.validatePoolActivated(newValue);
 
@@ -140,7 +141,8 @@ class PoolSettings {
 
         StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers });
 
-        await this.poolManagement.setPoolStarted(newValue, true);
+        if (useActivation)
+            await this.poolManagement.setPoolStarted(newValue, true);
 
     }
 
@@ -267,7 +269,7 @@ class PoolSettings {
         await this.setPoolFee ( poolFee , true );
         await this.setPoolWebsite ( poolWebsite , true );
         await this.setPoolServers ( poolServers , true );
-        await this.setPoolActivated( poolActivated , true );
+        await this.setPoolActivated( poolActivated , true , false);
 
         return true;
 

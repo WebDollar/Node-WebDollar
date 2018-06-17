@@ -35,7 +35,7 @@ class PoolSettings {
 
     }
 
-    async setServerPoolActivated(newValue, skipSaving = false){
+    async setServerPoolActivated(newValue, skipSaving = false, useActivation = true){
 
         PoolsUtils.validatePoolActivated(newValue);
 
@@ -46,7 +46,8 @@ class PoolSettings {
 
         StatusEvents.emit("server-pools/settings", { message: "Server Pool Settings were saved", serverPoolActivated: this._serverPoolActivated  });
 
-        await this.serverPoolManagement.setServerPoolStarted(newValue, true);
+        if (useActivation)
+            await this.serverPoolManagement.setServerPoolStarted(newValue, true);
     }
 
 
@@ -92,7 +93,7 @@ class PoolSettings {
         await PoolsUtils.validatePoolActivated(serverPoolActivated);
 
         await this.setServerPoolFee(serverPoolFee, true);
-        await this.setServerPoolActivated(serverPoolActivated, true);
+        await this.setServerPoolActivated(serverPoolActivated, true, false);
 
         return true;
     }

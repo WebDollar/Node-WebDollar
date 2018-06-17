@@ -35,6 +35,8 @@ class ServerPoolManagement{
         if (serverPoolFee !== undefined && typeof serverPoolFee === "number")
             await this.serverPoolSettings.setServerPoolFee(serverPoolFee);
 
+        this.serverPoolInitialized = true;
+
         return true;
 
     }

@@ -82,6 +82,10 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                     if (confirmation === null) throw {message: "confirmation is null"};
 
                     if (confirmation.result ) {
+
+                        confirmation.sckAddress = socket.node.sckAddress.address;
+                        socketPool.node.sendRequest("mining-pool/hello-pool/answer/"+data.suffix+"/confirmation", confirmation);
+
                         this._addConnectedMiner(socket, data.poolPublicKey, socketPool);
                         return true;
                     }

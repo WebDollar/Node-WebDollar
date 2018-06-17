@@ -45,12 +45,7 @@ class PoolManagement{
             return false;
         }
 
-        if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
-            this.poolOpened = true;
-        else {
-            console.error("Couldn't start MinerPool");
-            return false;
-        }
+        this.poolInitialized = true;
 
         return answer;
 
