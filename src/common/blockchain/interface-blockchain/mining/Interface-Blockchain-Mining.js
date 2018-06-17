@@ -99,7 +99,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             //mining next blocks
 
-            let nextBlock = this.getNextBlock();
+            let nextBlock = await this.getNextBlock();
 
             try {
                 await this.mineBlock(nextBlock, this.blockchain.getDifficultyTarget(), undefined, undefined, showMiningOutput);
