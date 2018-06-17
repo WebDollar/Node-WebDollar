@@ -131,7 +131,7 @@ class PoolSettings {
 
     async setPoolActivated(newValue, skipSaving = false){
 
-        PoolsUtils.validatePoolActiviated(newValue);
+        PoolsUtils.validatePoolActivated(newValue);
 
         this._poolActivated = newValue;
 
@@ -250,8 +250,9 @@ class PoolSettings {
         let poolActivated = await this._db.get("pool_activated", 30*1000, true);
         if (poolActivated === null) poolActivated = false;
 
-        if (poolActivated === 'true') poolActivated = true;
-        else poolActivated = false;
+        if (poolActivated === "true") poolActivated = true;
+        else if (poolActivated === "false") poolActivated = false;
+        else if (poolActivated === null) poolActivated = false;
 
         if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated))
             return false;

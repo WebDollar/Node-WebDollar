@@ -10,17 +10,46 @@ class AdvancedMessages{
             console.warn(param);
     }
 
+
+    async input(message){
+
+        if (process.env.BROWSER)
+            return confirm(message);
+        else
+            return await CLI.question(message);
+    }
+
     async confirm(message){
 
-        if (process.env.BROWSER) {
+        if (process.env.BROWSER)
             return confirm(message);
-        } else {
-            let answer = await CLI.question(message + " (yes/no) ? ");
+        else {
 
-            return answer === "yes";
+            while (1===1) {
+                let answer = await CLI.question(message + "  y/n").toLowerCase();
+
+                if (answer === 'y') return true;
+                else if (answer === 'n') return false;
+
+            }
+
         }
 
     }
+
+
+    async readNumber(message, isFloat = false) {
+
+        let answer = await this.input(message);
+
+        let num = isFloat ? parseFloat(answer) : parseInt(answer);
+        if (isNaN(num))
+            return NaN;
+
+        return num;
+    }
+
+
 
     log(cliMsg, browserMsg) {
 

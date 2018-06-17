@@ -36,7 +36,7 @@ class PoolSettings {
 
     async setServerPoolActivated(newValue, skipSaving = false){
 
-        PoolsUtils.validatePoolActiviated(newValue);
+        PoolsUtils.validatePoolActivated(newValue);
 
         this._serverPoolActivated = newValue;
 
@@ -80,13 +80,16 @@ class PoolSettings {
         serverPoolFee = parseFloat(serverPoolFee);
 
         let serverPoolActivated = await this._db.get("serverPool_activated", 30*1000, true);
-        if (serverPoolActivated === null) serverPoolActivated = false;
 
-        await PoolsUtils.validatePoolActiviated(serverPoolFee);
-        await PoolsUtils.validatePoolActiviated(serverPoolActivated);
+        if (serverPoolActivated === "true") serverPoolActivated = true;
+        else if (serverPoolActivated === "false") serverPoolActivated = false;
+        else if (serverPoolActivated === null) serverPoolActivated = false;
+
+        await PoolsUtils.validatePoolFee(serverPoolFee);
+        await PoolsUtils.validatePoolActivated(serverPoolActivated);
 
         await this.setServerPoolFee(serverPoolFee, true);
-        await this.setPoolActivated(serverPoolActivated, true);
+        await this.setServerPoolActivated(serverPoolActivated, true);
 
         return true;
     }

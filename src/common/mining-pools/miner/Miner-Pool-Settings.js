@@ -118,7 +118,17 @@ class MinerPoolSettings {
 
         let poolURL = await this._db.get("minerPool_poolURL", 30*1000, true);
 
+        let poolMinerActivated = await this._db.get("minerPool_activated", 30*1000, true);
+
+        if (poolMinerActivated === "true") poolMinerActivated = true;
+        else if (poolMinerActivated === "false") poolMinerActivated = false;
+        else if (poolMinerActivated === null) poolMinerActivated = false;
+
+        PoolsUtils.validatePoolActivated(poolMinerActivated);
+
+
         await this.setPoolURL(poolURL, true);
+        await this.setMinerPoolActivated(poolMinerActivated, true);
     }
 
     minerPoolDigitalSign(message){
@@ -172,7 +182,7 @@ class MinerPoolSettings {
 
     async setMinerPoolActivated(newValue, skipSaving = false){
 
-        PoolsUtils.validatePoolActiviated(newValue);
+        PoolsUtils.validatePoolActivated(newValue);
 
         this._minerPoolActivated = newValue;
 

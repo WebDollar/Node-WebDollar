@@ -33,7 +33,9 @@ class ServerPoolManagement{
             throw {message: "loadServer didn't work"};
 
         if (serverPoolFee !== undefined && typeof serverPoolFee === "number")
-            this.serverPoolSettings.setServerPoolFee(serverPoolFee);
+            await this.serverPoolSettings.setServerPoolFee(serverPoolFee);
+
+        return true;
 
     }
 
