@@ -68,18 +68,20 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
                 // save minerPublicKey
-                let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
+                let miner = this.poolManagement.poolData.getMiner(unencodedAddress);
 
                 if (miner === null )
-                    miner = await this.poolManagement.poolData.addMiner(data.minerAddress);
+                    miner = await this.poolManagement.poolData.addMiner(unencodedAddress, data.minerPublicKey);
 
                 miner.addInstance(data.minerPublicKey);
 
                 let signature = this.poolManagement.poolSettings.poolDigitalSign(data.message);
 
+
+                //in case there is an suffix in the answer
                 let suffix = "";
                 if ( typeof data.suffix === "string")
-                    suffix = data.suffix;
+                    suffix = '/'+data.suffix;
 
                 socket.node.sendRequest("mining-pool/hello-pool/answer"+suffix, {
                     result: true,

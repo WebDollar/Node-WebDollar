@@ -82,15 +82,15 @@ class PoolData {
      * @param minerReward
      * @returns true/false
      */
-    async addMiner(minerAddress, minerReward = 0){
+    async addMiner(minerAddress, minerPublicKey, minerReward = 0){
         
         if (this.getMiner(minerAddress) === null) {
 
-            if ( !Buffer.isBuffer(minerAddress) || minerAddress.length !== consts.ADDRESSES.PUBLIC_KEY )
+            if ( !Buffer.isBuffer(minerAddress) || minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
                 throw {message: "miner address is invalid" };
 
 
-            this.miners.push( new PoolDataMiner( uuid.v4(), minerAddress, minerReward, [] ) );
+            this.miners.push( new PoolDataMiner( uuid.v4(), minerAddress, minerPublicKey, minerReward, [] ) );
 
             return this.miners[this.miners.length-1]
 
@@ -211,13 +211,17 @@ class PoolData {
         try{
 
             let buffer = await this._db.get("minersList",  60000, true);
-            let response = this._deserializeMiners(buffer);
 
-            if (response !== true){
-                console.log('Unable to load miners from DB');
-                return false;
+            if (buffer !== null) {
+                let response = this._deserializeMiners(buffer);
+                if (response !== true){
+                    console.log('Unable to load miners from DB');
+                    return false;
+                }
+
             }
-            
+
+
             return true;
         }
         catch (exception){

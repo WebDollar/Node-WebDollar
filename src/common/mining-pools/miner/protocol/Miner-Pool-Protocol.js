@@ -118,7 +118,7 @@ class MinerProtocol {
 
                 if (! ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
 
-                socket.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
+                socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
 
                 //connection established
                 this._connectionEstablishedWithPool(socket);
@@ -126,7 +126,7 @@ class MinerProtocol {
                 return true;
 
             } catch (exception){
-                socket.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: false, message: exception.message});
+                socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: false, message: exception.message});
             }
 
 

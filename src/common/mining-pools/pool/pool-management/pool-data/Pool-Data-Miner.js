@@ -19,6 +19,8 @@ class PoolDataMiner{
 
     addInstance(publicKey){
 
+        if (publicKey === undefined) return;
+
         if (!Buffer.isBuffer(publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) 
             throw {message: "public key is invalid"};
 
