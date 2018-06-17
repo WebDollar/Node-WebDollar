@@ -15,20 +15,20 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
         this.undefined = undefined;
         this._workerResolve = undefined;
 
-        this.end = end;
+        this.end = 0;
     }
 
-    async mineNonces(start, end){
+    async _mineNonces(start, end){
 
-        let answer = await InterfaceBlockchainMining.prototype.mineNonces.call(this, start, Math.min(this.end, start+this.WORKER_NONCES_WORK) );
+        let answer = await InterfaceBlockchainMining.prototype._mineNonces.call(this, start, Math.min(this.end, start+this.WORKER_NONCES_WORK) );
 
-        if (!answer.result && (start + this.WORKER_NONCES_WORK+1 <= end)){
+        if (!answer.result && (start + this.WORKER_NONCES_WORK+1 <= this.end)){
 
             let answer2 = await (new Promise((resolve)=>{
 
                 setTimeout( async () => {
 
-                    let newAnswer = await InterfaceBlockchainMining.prototype.mineNonces.call(this, start + this.WORKER_NONCES_WORK+1, Math.min(this.end, start+this.WORKER_NONCES_WORK+this.WORKER_NONCES_WORK ));
+                    let newAnswer = await this._mineNonces(start + this.WORKER_NONCES_WORK+1, Math.min(this.end, start+this.WORKER_NONCES_WORK+this.WORKER_NONCES_WORK ));
                     resolve(newAnswer);
 
                 }, 5);
@@ -51,7 +51,7 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
         this.difficulty = difficulty;
         this.end = Math.min(end, 0xFFFFFFFF);
 
-        return await this.mineNonces(start, start + this.WORKER_NONCES_WORK);
+        return await this._mineNonces(start, start + this.WORKER_NONCES_WORK);
 
     }
 

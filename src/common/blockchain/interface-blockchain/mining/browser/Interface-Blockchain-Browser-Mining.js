@@ -3,7 +3,7 @@ import InterfaceBlockchainMiningWorkers from "../Interface-Blockchain-Mining-Wor
 import webWorkify from 'webworkify-webpack';
 //const webWorkify = require ('webworkify');
 
-/**3
+/**
  * WEBWORKIFY DOCUMENTATION ON https://github.com/browserify/webworkify
  */
 

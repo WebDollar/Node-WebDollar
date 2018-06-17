@@ -4,6 +4,7 @@ import InterfaceBlockchainMiningWorkersList from "./Interface-Blockchain-Mining-
 import Serialization from 'common/utils/Serialization';
 import SemaphoreProcessing from "common/utils/Semaphore-Processing";
 import StatusEvents from "common/events/Status-Events";
+import consts from 'consts/const_global'
 
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
@@ -22,8 +23,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this.workers = new InterfaceBlockchainMiningWorkersList(this);
 
-        this.bestHash = undefined;
-        this.bestHashNonce = undefined;
+        this.bestHash =  new Buffer( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET ) ;
+        this.bestHashNonce = -1;
 
     }
 
@@ -46,6 +47,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         this.end = end;
 
         this._nonce = start;
+
+        this.bestHash =  new Buffer( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET ) ;
+        this.bestHashNonce = -1;
 
         this._workerFinished = false;
 
@@ -186,7 +190,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                 let match = true;
 
                 for (let i = 0, l=this.block.length;  i < l;  i++)
-                    if (this.block[i] === event.data.block[i] ) // do not match
+                    if (this.block[i] !== event.data.block[i] ) // do not match
                         match = false;
 
                 //verify the  bestHash with  the current target
@@ -194,14 +198,15 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                     let compare = 0;
 
-                    if (this.bestHash === undefined) compare = -1;
-                    else
-                        for (let i = 0, l = event.data.hash.length; i < l; i++)
-                            if (event.data.hash[i] < this.bestHash[i]) compare = -1;
-                            else if (event.data.hash[i] > this.bestHash[i]) {
-                                compare = 1;
-                                break;
-                            }
+                    for (let i = 0, l = event.data.hash.length; i < l; i++)
+                        if (event.data.hash[i] < this.bestHash[i]) {
+                            compare = -1;
+                            break;
+                        }
+                        else if (event.data.hash[i] > this.bestHash[i]) {
+                            compare = 1;
+                            break;
+                        }
 
                     if (compare === -1){
 

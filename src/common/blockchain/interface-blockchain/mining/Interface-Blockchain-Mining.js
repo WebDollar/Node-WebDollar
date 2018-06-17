@@ -241,8 +241,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     async _mineNonces(start, end){
 
         let nonce = start;
-        let bestHash =  undefined;
-        let bestHashNonce = undefined;
+        let bestHash =  new Buffer( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET ) ;
+        let bestHashNonce = -1;
 
         while (nonce <= end && this.started && !this.reset) {
 
