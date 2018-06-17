@@ -22,6 +22,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this.workers = new InterfaceBlockchainMiningWorkersList(this);
 
+        this.bestHash = undefined;
+        this.bestHashNonce = undefined;
 
     }
 
@@ -39,8 +41,11 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this.block = block;
         this.difficulty = difficultyTarget;
+
         this.start = start;
         this.end = end;
+
+        this._nonce = start;
 
         this._workerFinished = false;
 
@@ -128,13 +133,17 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     checkFinished(){
 
-        if (this._nonce > 0xFFFFFFFF || (this.started === false) || this.reset){
+        if (this._nonce > this.end || (this.started === false) || this.reset){
 
             this.workers.suspendWorkers();
             this._suspendMiningWorking();
 
             if (this._workerResolve !== null && this._workerResolve !== undefined)
-                this._workerResolve({result:false}); //we didn't find anything
+                this._workerResolve( { //we didn't find anything
+                    result:false,
+                    hash: this.bestHash,
+                    nonce: this.bestHashNonce
+                });
 
             return true;
 
@@ -177,16 +186,31 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                 let match = true;
 
                 for (let i = 0, l=this.block.length;  i < l;  i++)
-                    if (this.block[i].equals( event.data.block[i] ) ) // do not match
+                    if (this.block[i] === event.data.block[i] ) // do not match
                         match = false;
 
                 //verify the  bestHash with  the current target
-                if (match)
-                    for (let i = 0, l=event.data.hash.length; i < l; i++)
+                if (match) {
 
-                        if (event.data.hash[i] < this.difficulty[i] ) {
+                    let compare = 0;
 
-                            console.log('processing');
+                    if (this.bestHash === undefined) compare = -1;
+                    else
+                        for (let i = 0, l = event.data.hash.length; i < l; i++)
+                            if (event.data.hash[i] < this.bestHash[i]) compare = -1;
+                            else if (event.data.hash[i] > this.bestHash[i]) {
+                                compare = 1;
+                                break;
+                            }
+
+                    if (compare === -1){
+
+                        this.bestHash = new Buffer(event.data.hash);
+                        this.bestHashNonce = event.data.nonce;
+
+                        if (this.bestHash.compare( this.difficulty ) <= 0){
+
+                            console.log('processing done');
 
                             this._suspendMiningWorking();
                             this.workers.suspendWorkers();
@@ -199,8 +223,11 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                             return;
 
-                        } else if (event.data.hash[i] > this.difficulty[i] )
-                            break;
+                        }
+
+                    }
+
+                }
             }
 
             if ( worker.suspended )

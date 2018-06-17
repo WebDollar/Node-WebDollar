@@ -10,6 +10,8 @@ class PoolBrowserMining extends InterfaceBlockchainBrowserMining{
 
     }
 
+
+
 }
 
 export default PoolBrowserMining;
