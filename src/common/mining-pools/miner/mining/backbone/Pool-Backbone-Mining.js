@@ -13,6 +13,10 @@ class PoolBackboneMining extends InterfaceBlockchainBackboneMining {
 
     }
 
+    calculateHash(nonce){
+        return InterfaceBlockchainBlock.computeHashStatic(this.block, nonce);
+    }
+
     mine(block, difficulty, start, end){
 
         this.started = true;
@@ -20,6 +24,8 @@ class PoolBackboneMining extends InterfaceBlockchainBackboneMining {
         return InterfaceBlockchainBackboneMining.prototype.mine(block, difficulty, start, end);
 
     }
+
+
 }
 
 export default PoolBackboneMining;
