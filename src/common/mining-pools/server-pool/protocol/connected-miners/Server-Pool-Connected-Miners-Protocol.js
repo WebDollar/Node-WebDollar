@@ -1,6 +1,6 @@
 import NodesList from 'node/lists/Nodes-List';
 import consts from 'consts/const_global'
-import InterfaceBlockchainAddressHelper from "../../../../blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import ed25519 from "common/crypto/ed25519";
@@ -55,8 +55,8 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                 if (!Buffer.isBuffer(data.message) || data.message.length !== 32) throw { message: "poolMessage is not correct" };
 
                 if (!Buffer.isBuffer(data.minerPublicKey) || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw { message: "poolMessage is not correct" };
-                if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
 
+                if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
                 if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
@@ -71,11 +71,14 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                     throw {message: "pool was not found in the serverPool"};
 
                 data.suffix = socket.node.sckAddress.uuid;
-                let answer = await socketPool.sendRequestWaitOnce("mining-pool/hello-pool", data, "answer"+data.suffix );
+                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/hello-pool", data, "answer/"+data.suffix );
 
-                let confirmation = await socket.sendRequestWaitOnce("mining-pool/hello-pool/answer", answer, "confirmation");
+                if (answer === null) throw {message: "Pool didn't answer"};
 
                 try {
+
+                    let confirmation = await socket.node.sendRequestWaitOnce("mining-pool/hello-pool/answer", answer, "confirmation");
+
                     if (confirmation === null) throw {message: "confirmation is null"};
 
                     if (confirmation.result ) {

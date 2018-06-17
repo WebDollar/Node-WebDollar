@@ -49,6 +49,7 @@ class MinerPoolSettings {
         return this._poolURL;
     }
 
+
     async setPoolURL(newValue, skipSaving = false){
 
         if (newValue === this._poolURL) return;
@@ -167,14 +168,22 @@ class MinerPoolSettings {
 
     async _saveMinerPoolList(){
 
-        let result = await this._db.save("minerPool_poolsList", JSON.stringify( this.poolsList) );
+        let result = await this._db.save("minerPool_poolsList", new Buffer( JSON.stringify( this.poolsList), "ascii") );
         return result;
 
     }
 
     async _getMinerPoolList(){
 
-        let result = JSON.parse ( await this._db.get("minerPool_poolsList", 30*1000, true) );
+        let result = await this._db.get("minerPool_poolsList", 30*1000, true);
+
+        if (result !== null){
+            if (Buffer.isBuffer(result))
+                result = result.toString("ascii");
+
+            result = JSON.parse ( result);
+        }
+
 
         this.poolsList = result;
 

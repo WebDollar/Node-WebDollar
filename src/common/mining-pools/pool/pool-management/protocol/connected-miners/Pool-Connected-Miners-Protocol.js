@@ -4,6 +4,9 @@ import NODE_TYPE from "node/lists/types/Node-Type";
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
+import consts from 'consts/const_global'
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import ed25519 from "common/crypto/ed25519";
 
 class PoolConnectedMinersProtocol extends PoolProtocolList{
 
@@ -43,36 +46,42 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
         }
 
 
-        socket.node.on("mining-pool/hello-pool", (data) => {
+        socket.node.on("mining-pool/hello-pool", async (data) => {
 
             try{
 
-                if (Buffer.isBuffer( data.message )  || data.message.length !== 32) throw {message: "message is invalid"};
-                if (Buffer.isBuffer( data.poolPublicKey )  || data.poolPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+                if ( !Buffer.isBuffer( data.message )  || data.message.length !== 32) throw {message: "message is invalid"};
+                if ( !Buffer.isBuffer( data.poolPublicKey )  || data.poolPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
 
                 //validate poolPublicKey
                 if ( ! data.poolPublicKey.equals( this.poolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey doesn't match"};
 
-                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-                if (Buffer.isBuffer( data.minerAddress )  || data.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "minerAddress is invalid"};
+                if ( !Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
 
+                if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
+                let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
+                if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
                 //validate minerPool signature
-                if (Buffer.isBuffer( data.messageSignature ) || data.messageSignature.length < 10) throw {message: "messageSignature is invalid"};
-                if (! ed25519.verify(data.messageSignature, data.message, data.minerPublicKey)) throw {message: "messageSignature doesn't validate message"}
+                if ( !Buffer.isBuffer( data.messageSignature ) || data.messageSignature.length < 10) throw {message: "messageSignature is invalid"};
+                if ( !ed25519.verify(data.messageSignature, data.message, data.minerPublicKey)) throw {message: "messageSignature doesn't validate message"}
 
 
                 // save minerPublicKey
                 let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
 
                 if (miner === null )
-                    miner = this.poolManagement.poolData.addMiner(data.minerAddress);
+                    miner = await this.poolManagement.poolData.addMiner(data.minerAddress);
 
-                miner.addPublic(data.minerPublicKey);
+                miner.addInstance(data.minerPublicKey);
 
                 let signature = this.poolManagement.poolSettings.poolDigitalSign(data.message);
 
-                socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {
+                let suffix = "";
+                if ( typeof data.suffix === "string")
+                    suffix = data.suffix;
+
+                socket.node.sendRequest("mining-pool/hello-pool/answer"+suffix, {
                     result: true,
                     signature: signature,
                 } );

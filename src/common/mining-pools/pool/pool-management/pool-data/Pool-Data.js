@@ -17,6 +17,18 @@ class PoolData {
         this.miners = [];
         this.blocksInfo = [];
 
+        setInterval(async ()=>{
+
+            await this.savePoolData();
+
+        }, 5000);
+
+    }
+
+    async initializePoolData(){
+
+        await this.loadPoolData();
+
     }
 
     get lastBlockInformation(){
@@ -80,7 +92,7 @@ class PoolData {
 
             this.miners.push( new PoolDataMiner( uuid.v4(), minerAddress, minerReward, [] ) );
 
-            return (await this.saveMinersList());
+            return this.miners[this.miners.length-1]
 
         }
         
@@ -114,7 +126,7 @@ class PoolData {
         this.miners[index] = this.miners[this.miners.length - 1];
         this.miners.pop();
         
-        return (await this.saveMinersList());
+        return true;
     }
 
 

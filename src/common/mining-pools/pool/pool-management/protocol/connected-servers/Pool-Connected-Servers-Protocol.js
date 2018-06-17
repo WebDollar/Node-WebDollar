@@ -124,7 +124,7 @@ class PoolConnectedServersProtocol extends PoolProtocolList{
             serverPoolFee: fee,
         };
 
-        socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOLOD;
+        socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL;
 
         this.addElement(socket);
 

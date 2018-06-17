@@ -35,6 +35,8 @@ class PoolManagement{
 
     async initializePoolManagement(poolFee){
 
+        await this.poolData.initializePoolData();
+
         let answer = await this.poolSettings.initializePoolSettings(poolFee);
         console.info("The url is just your domain: "+ this.poolSettings.poolURL);
 

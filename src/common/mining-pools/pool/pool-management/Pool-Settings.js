@@ -204,10 +204,13 @@ class PoolSettings {
 
         if (this._poolPrivateKey === null) {
 
-            let privateKey = await Blockchain.Wallet.addresses[0].getPrivateKey();
-            let finalPrivateKey = Buffer.concat( [ WebDollarCrypto.SHA256(WebDollarCrypto.MD5(privateKey)), WebDollarCrypto.SHA256( WebDollarCrypto.RIPEMD160(privateKey) )]);
+            this._poolPrivateKey = ed25519.generatePrivateKey();
+            await this.savePoolPrivateKey();
 
-            this._poolPrivateKey = ed25519.generatePrivateKey(finalPrivateKey);
+            // let privateKey = await Blockchain.Wallet.addresses[0].getPrivateKey();
+            // let finalPrivateKey = Buffer.concat( [ WebDollarCrypto.SHA256(WebDollarCrypto.MD5(privateKey)), WebDollarCrypto.SHA256( WebDollarCrypto.RIPEMD160(privateKey) )]);
+            //
+            // this._poolPrivateKey = ed25519.generatePrivateKey(finalPrivateKey);
 
         }
 
