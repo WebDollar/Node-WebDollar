@@ -26,19 +26,21 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
     }
 
 
-    mine(block, difficultyTarget){
+    mine(block, difficultyTarget, start, end){
 
-        if (typeof block === 'object' && block.computedBlockPrefix !== undefined) {
+        //serialize the block
+        if ( !Buffer.isBuffer( block ) && typeof block === 'object' && block.computedBlockPrefix !== undefined) {
             block = Buffer.concat( [
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(block.height) ),
                 Serialization.serializeBufferRemovingLeadingZeros( block.difficultyTargetPrev ),
                 block.computedBlockPrefix
             ]);
-
         }
 
         this.block = block;
         this.difficulty = difficultyTarget;
+        this.start = start;
+        this.end = end;
 
         this._workerFinished = false;
 
@@ -128,17 +130,13 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         if (this._nonce > 0xFFFFFFFF || (this.started === false) || this.reset){
 
-            //this._semaphoreProcessing.processSempahoreCallback(()=>{
+            this.workers.suspendWorkers();
+            this._suspendMiningWorking();
 
-                this.workers.suspendWorkers();
-                this._suspendMiningWorking();
+            if (this._workerResolve !== null && this._workerResolve !== undefined)
+                this._workerResolve({result:false}); //we didn't find anything
 
-                if (this._workerResolve !== null && this._workerResolve !== undefined)
-                    this._workerResolve({result:false}); //we didn't find anything
-
-                return true;
-
-            //});
+            return true;
 
         }
 
@@ -168,8 +166,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
             worker.dateLast = new Date();
 
-            //console.log("REEESULTS!!!", event.data, worker.suspended);
-
             if ( worker.suspended )
                 return; //I am no longer interested
 
@@ -180,8 +176,8 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                 //verify block with the worker block
                 let match = true;
 
-                for (let i = 0; i < this.block.length; i++)
-                    if (this.block[i] !== event.data.block[i] ) // do not match
+                for (let i = 0, l=this.block.length;  i < l;  i++)
+                    if (this.block[i].equals( event.data.block[i] ) ) // do not match
                         match = false;
 
                 //verify the  bestHash with  the current target
@@ -189,8 +185,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                     for (let i = 0, l=event.data.hash.length; i < l; i++)
 
                         if (event.data.hash[i] < this.difficulty[i] ) {
-
-                            //this._semaphoreProcessing.processSempahoreCallback( ()=>{
 
                             console.log('processing');
 
@@ -202,8 +196,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                                 hash: new Buffer(event.data.hash),
                                 nonce: event.data.nonce,
                             });
-
-                            //});
 
                             return;
 

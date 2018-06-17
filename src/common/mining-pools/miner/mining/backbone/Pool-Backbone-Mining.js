@@ -35,7 +35,7 @@ class PoolBackboneMining extends InterfaceBlockchainBackboneMining {
 
         try {
 
-            for (let i = start; i < end; i++) {
+            for (let i = start; i <= end; i++) {
 
                 if (this._nonce > 0xFFFFFFFF || !this.started ) {
                     return {

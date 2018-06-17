@@ -4,9 +4,9 @@ import consts from "consts/const_global";
 
 class PoolBrowserMining extends InterfaceBlockchainBrowserMining{
 
-    constructor(miningFeeThreshold){
+    constructor(){
 
-        super ( miningFeeThreshold );
+        super ( 0 );
 
     }
 
