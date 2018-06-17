@@ -236,11 +236,14 @@ class PoolData {
         try{
 
             let buffer = await this._db.get("blocksInformation", 60000, true);
-            let response = this._deserializeBlockInformation(buffer);
 
-            if (response !== true){
-                console.log('Unable to load miners from DB');
-                return false;
+            if (buffer !== null) {
+                let response = this._deserializeBlockInformation(buffer);
+
+                if (response !== true) {
+                    console.log('Unable to load miners from DB');
+                    return false;
+                }
             }
 
             return true;

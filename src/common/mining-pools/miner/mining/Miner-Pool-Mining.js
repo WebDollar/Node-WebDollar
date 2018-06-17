@@ -62,8 +62,14 @@ class MinerPoolMining extends InheritedPoolMining {
 
     async _checkForWork(){
 
-        if (this._miningWork.poolSocket === null)
-            await this.minerPoolManagement.minerPoolProtocol.requestWork();
+        try {
+
+            if (this._miningWork.poolSocket !== null)
+                await this.minerPoolManagement.minerPoolProtocol.requestWork();
+
+        } catch (exception){
+
+        }
 
 
         setTimeout( this._checkForWork.bind(this), 1000);

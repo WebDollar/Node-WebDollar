@@ -103,6 +103,31 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
 
         });
 
+        socket.node.on("mining-pool/get-work", (data) => {
+
+            try {
+
+                if (!Buffer.isBuffer(data.minerPublicKey) || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                if (!Buffer.isBuffer(data.poolPublicKey) || data.poolPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+
+                let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.poolPublicKey);
+
+                if (socketPool === null)
+                    throw {message: "pool was not found in the serverPool"};
+
+                data.suffix = socket.node.sckAddress.uuid;
+                let answer = socketPool.sendRequestWaitOnce("mining-pool/get-work", data, "answer/"+data.suffix );
+
+                if (answer === null) throw {message: "there is a problem with the pool"};
+
+                socket.node.sendRequest("mining-pool/get-work/answer", answer );
+
+            } catch (exception){
+                socket.node.sendRequest("mining-pool/get-work/answer", {result: false, message: exception.message } );
+            }
+
+        });
+
     }
 
     _unsubscribeSocket(nodesListObject) {
