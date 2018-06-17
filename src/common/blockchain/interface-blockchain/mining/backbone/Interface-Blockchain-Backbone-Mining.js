@@ -49,7 +49,7 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
         this.block = block;
         this.difficulty = difficulty;
-        this.end = end;
+        this.end = Math.min(end, 0xFFFFFFFF);
 
         return await this.mineNonces(start, start + this.WORKER_NONCES_WORK);
 
