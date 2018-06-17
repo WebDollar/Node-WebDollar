@@ -4,9 +4,9 @@ let InheritedPoolMining;
 
 
 if (process.env.BROWSER){
-    InheritedPoolMining = require('./browser/Interface-Pool-Browser-Mining').default;
+    InheritedPoolMining = require('./browser/Pool-Browser-Mining').default;
 }  else {
-    InheritedPoolMining = require('./backbone/Interface-Pool-Backbone-Mining').default;
+    InheritedPoolMining = require('./backbone/Pool-Backbone-Mining').default;
 }
 
 
@@ -19,9 +19,14 @@ class MinerPoolMining extends InheritedPoolMining {
         this.minerPoolManagement = minerPoolManagement;
 
         this._miningWork = {
-            block: undefined,
-            noncesStart: undefined,
-            noncesEnd: undefined,
+            block: undefined, //entire serialization
+            start: undefined,
+            end: undefined,
+            height: undefined, //number
+            difficultyTarget: undefined, //Buffer
+            serializedHeader: undefined, //Buffer not used because the block is the entire serialization
+
+            resolved: true,
             poolSocket: undefined,
         };
 
@@ -37,7 +42,18 @@ class MinerPoolMining extends InheritedPoolMining {
 
     updatePoolMiningWork(work, poolSocket){
 
-        this._miningWork = work;
+        this._miningWork.block = work.block;
+
+        this._miningWork.height = work.h;
+        this._miningWork.difficultyTarget = work.t;
+        this._miningWork.serializedHeader = work.s;
+
+
+        this._miningWork.start = work.start;
+        this._miningWork.end = work.end;
+
+        this._miningWork.resolved = false;
+
         this._miningWork.poolSocket = poolSocket;
 
     }
@@ -47,14 +63,16 @@ class MinerPoolMining extends InheritedPoolMining {
         try {
 
             if (this._miningWork.block === undefined) throw {message: "block is undefined"};
-            if (this._miningWork.noncesStart === undefined) throw {message: "noncesStart is undefined"};
-            if (this._miningWork.noncesEnd === undefined) throw {message: "noncesEnd is undefined"};
+
+            if (this._miningWork.start === undefined) throw {message: "start is undefined"};
+            if (this._miningWork.end === undefined) throw {message: "end is undefined"};
+            if (this._miningWork.difficultyTarget === undefined) throw {message: "difficultyTarget is undefined"};
 
             let answer = await this.mine(this._miningWork.blockData, this._miningWork.difficultyTarget);
             return answer;
 
         } catch (exception){
-            console.error("Couldn't mine block ", this._miningWork.blockData, exception);
+            console.error("Couldn't mine block ", this._miningWork, exception);
             return null;
         }
 
@@ -64,7 +82,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
         try {
 
-            if (this._miningWork.poolSocket !== null)
+            if (this._miningWork.poolSocket !== null && this._miningWork.resolved)
                 await this.minerPoolManagement.minerPoolProtocol.requestWork();
 
         } catch (exception){

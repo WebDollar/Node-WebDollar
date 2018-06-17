@@ -2,7 +2,7 @@ import InterfaceBlockchainBrowserMining from "common/blockchain/interface-blockc
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block';
 import consts from "consts/const_global";
 
-class InterfacePoolBrowserMining extends InterfaceBlockchainBrowserMining{
+class PoolBrowserMining extends InterfaceBlockchainBrowserMining{
 
     constructor(miningFeeThreshold){
 
@@ -12,4 +12,4 @@ class InterfacePoolBrowserMining extends InterfaceBlockchainBrowserMining{
 
 }
 
-export default InterfacePoolBrowserMining;
+export default PoolBrowserMining;

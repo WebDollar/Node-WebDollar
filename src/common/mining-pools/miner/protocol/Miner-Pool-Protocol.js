@@ -164,13 +164,24 @@ class MinerProtocol extends PoolProtocolList{
         if (answer.result !== true) throw {message: "get-work answered false"};
         if (answer.work !== "object") throw {message: "get-work invalid work"};
 
-        if ( !Buffer.isBuffer( answer.work.block) ) throw {message: "get-work invalid block"};
-        if (answer.work.noncesStart !== "number") throw {message: "get-work invalid noncesStart"};
-        if (answer.work.noncesEnd !== "number") throw {message: "get-work invalid noncesEnd"};
+        if ( typeof answer.work.h !== "number" ) throw {message: "get-work invalid block height"};
+        if ( !Buffer.isBuffer(answer.work.t) ) throw {message: "get-work invalid block difficulty target"};
+        if ( !Buffer.isBuffer( answer.work.s) ) throw {message: "get-work invalid block header"};
+
+        if (answer.work.start !== "number") throw {message: "get-work invalid noncesStart"};
+        if (answer.work.end !== "number") throw {message: "get-work invalid noncesEnd"};
+
+        let serialization = Buffer.concat([
+            answer.work.h,
+            answer.work.t,
+            answer.work.s,
+        ]);
+
+        answer.work.block = serialization;
 
         //verify signature
 
-        let message = Buffer.concat( [ answer.work.block, Serialization.serializeNumber4Bytes( answer.work.noncesStart ), Serialization.serializeNumber4Bytes( answer.work.noncesEnd ) ]);
+        let message = Buffer.concat( [ answer.work.block, Serialization.serializeNumber4Bytes( answer.work.start ), Serialization.serializeNumber4Bytes( answer.work.end ) ]);
 
         if ( !Buffer.isBuffer(answer.signature) || answer.signature.length < 10 ) throw {message: "pool: signature is invalid"};
         if ( !ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};

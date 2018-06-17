@@ -128,8 +128,10 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 let work = await this.poolManagement.generatePoolWork(minerInstance);
 
-                let message = Buffer.concat( [ work.block, Serialization.serializeNumber4Bytes( work.noncesStart ), Serialization.serializeNumber4Bytes( work.noncesEnd ) ]);
+                let message = Buffer.concat( [ work.block.serialization, Serialization.serializeNumber4Bytes( work.start ), Serialization.serializeNumber4Bytes( work.end ) ]);
                 let signature = this.poolManagement.poolSettings.poolDigitalSign(message);
+
+                work.serialization = undefined; //don't send the data 2 times
 
                 //in case there is an suffix in the answer
                 let suffix = "";
@@ -161,7 +163,12 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 let newWork = await this.poolManagement.generatePoolWork(minerInstance);
 
-                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: true, answer: answer.result, reward: answer.reward, newWork: newWork } ); //the new reward
+                let message = Buffer.concat( [ newWork.block.serialization, Serialization.serializeNumber4Bytes( newWork.start ), Serialization.serializeNumber4Bytes( newWork.end ) ]);
+                let signature = this.poolManagement.poolSettings.poolDigitalSign(message);
+
+                newWork.serialization = undefined;
+
+                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: true, answer: answer.result, reward: answer.reward, newWork: newWork, signature: signature } ); //the new reward
 
             } catch (exception){
                 socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: false, message: exception.message } )

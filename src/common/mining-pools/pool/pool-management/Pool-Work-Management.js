@@ -45,10 +45,14 @@ class PoolWorkManagement{
 
         let answer = {
 
-            block: serialization,
-            noncesStart: this._lastBlockNonce,
-            noncesEnd: this._lastBlockNonce + hashes,
+            h: this._lastBlock.height,
+            t: this._lastBlock.difficultyTargetPrev,
+            s: this._lastBlock.computedBlockPrefix,
 
+            start: this._lastBlockNonce,
+            end: this._lastBlockNonce + hashes,
+
+            serialization: serialization,
         };
 
         this._lastBlockNonce += hashes;

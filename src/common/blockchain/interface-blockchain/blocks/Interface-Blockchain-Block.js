@@ -274,16 +274,14 @@ class InterfaceBlockchainBlock {
      * @param blockNonce
      * @returns {Promise<Buffer>}
      */
-    static async computeHashStatic(newNonce, height, difficultyTargetPrev, computedBlockPrefix, blockNonce) {
+    static async computeHashStatic(blockSerialized, newNonce) {
 
         let buffer = Buffer.concat ( [
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(height) ),
-            Serialization.serializeBufferRemovingLeadingZeros( difficultyTargetPrev ),
-            computedBlockPrefix,
-            Serialization.serializeNumber4Bytes(newNonce || blockNonce ),
+            blockSerialized,
+            Serialization.serializeNumber4Bytes(newNonce),
         ] );
 
-        return await WebDollarCrypto.hashPOW(buffer)
+        return await WebDollarCrypto.hashPOW( buffer );
     }
 
     serializeBlock(requestHeader){
