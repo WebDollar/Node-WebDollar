@@ -69,9 +69,11 @@ class PoolData {
      */
     getMinerInstanceByPublicKey(minerPublicKey){
 
-        for (let i = 0; i < this.miners.length; ++i)
-            if (this.miners[i].findInstance(minerPublicKey))
-                return this.miners[i];
+        for (let i = 0; i < this.miners.length; ++i) {
+            let instance = this.miners[i].findInstance(minerPublicKey);
+            if (instance !== null)
+                return instance;
+        }
 
         return null;
     }

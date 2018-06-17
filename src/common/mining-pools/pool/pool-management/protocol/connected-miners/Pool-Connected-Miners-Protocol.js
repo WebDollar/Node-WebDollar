@@ -115,7 +115,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
 
-        socket.node.on("mining-pool/get-work", (data) => {
+        socket.node.on("mining-pool/get-work", async (data) => {
 
             try {
 
@@ -126,7 +126,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
                 if (minerInstance === null) throw {message: "publicKey was not found"};
 
-                let work = this.poolManagement.generatePoolWork(minerInstance);
+                let work = await this.poolManagement.generatePoolWork(minerInstance);
 
                 let message = Buffer.concat( [ work.block, Serialization.serializeNumber4Bytes( work.noncesStart ), Serialization.serializeNumber4Bytes( work.noncesEnd ) ]);
                 let signature = this.poolManagement.poolSettings.poolDigitalSign(message);
@@ -148,7 +148,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
 
-        socket.node.on("mining-pool/work-done", (data) => {
+        socket.node.on("mining-pool/work-done", async (data) => {
 
             try{
 
@@ -157,9 +157,9 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
                 if (minerInstance === null) throw {message: "publicKey was not found"};
 
-                let answer = this.poolManagement.receivePoolWork(minerInstance, data.work);
+                let answer = await this.poolManagement.receivePoolWork(minerInstance, data.work);
 
-                let newWork = this.poolManagement.getWork(minerInstance);
+                let newWork = await this.poolManagement.generatePoolWork(minerInstance);
 
                 socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: true, answer: answer.result, reward: answer.reward, newWork: newWork } ); //the new reward
 

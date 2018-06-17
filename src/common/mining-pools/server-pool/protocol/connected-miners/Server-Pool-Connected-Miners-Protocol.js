@@ -116,7 +116,7 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                     throw {message: "pool was not found in the serverPool"};
 
                 data.suffix = socket.node.sckAddress.uuid;
-                let answer = socketPool.sendRequestWaitOnce("mining-pool/get-work", data, "answer/"+data.suffix );
+                let answer = socketPool.node.sendRequestWaitOnce("mining-pool/get-work", data, "answer/"+data.suffix );
 
                 if (answer === null) throw {message: "there is a problem with the pool"};
 

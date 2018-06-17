@@ -20,7 +20,7 @@ class PoolManagement{
         this.blockchain = blockchain;
 
         this.poolSettings = new PoolSettings(wallet, this);
-        this.poolWorkManagement = new PoolWorkManagement( this );
+        this.poolWorkManagement = new PoolWorkManagement( this, blockchain );
         this.poolProtocol = new PoolProtocol( this );
 
         this._poolInitialized = false;

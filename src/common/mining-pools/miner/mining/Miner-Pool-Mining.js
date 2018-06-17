@@ -31,7 +31,7 @@ class MinerPoolMining extends InheritedPoolMining {
         });
 
 
-        setTimeout( this._checkForWork.bind(this), 1000);
+        setTimeout( this._checkForWork.bind(this), 5000);
 
     }
 
@@ -72,7 +72,7 @@ class MinerPoolMining extends InheritedPoolMining {
         }
 
 
-        setTimeout( this._checkForWork.bind(this), 1000);
+        setTimeout( this._checkForWork.bind(this), 5000);
     }
 
 }

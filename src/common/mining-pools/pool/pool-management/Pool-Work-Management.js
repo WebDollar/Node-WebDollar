@@ -1,8 +1,9 @@
 import Serialization from 'common/utils/Serialization';
 import BufferExtended from "common/utils/BufferExtended";
 import consts from 'consts/const_global';
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
-class PoolBlocksManagement{
+class PoolWorkManagement{
 
     constructor(poolManagement, blockchain){
 
@@ -16,34 +17,41 @@ class PoolBlocksManagement{
 
     async getNextBlock(){
 
+        if (!Blockchain.synchronized)
+            throw {message: "Blockchain is not yet synchronized"};
+
         this._lastBlock = await this.blockchain.mining.getNextBlock();
         this._lastBlockNonce = 0;
 
     }
 
 
-    getWork(minerInstance){
+    async getWork(minerInstance){
 
-        if (this._lastBlock === undefined || ( this._lastBlockNonce + minerInstance.hashesPerSecond ) > 0xFFFFFFFF )
-            this._lastBlock = this.getNextBlock();
+        let hashes = minerInstance.hashesPerSecond;
+        if (hashes === undefined ) hashes = 500;
 
-        let block = this._lastBlock;
+        if (this._lastBlock === undefined || ( this._lastBlockNonce + hashes ) > 0xFFFFFFFF )
+            await this.getNextBlock();
+
+        if (this._lastBlock.computedBlockPrefix === null )
+            this._lastBlock._computeBlockHeaderPrefix();
 
         let serialization = Buffer.concat( [
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(block.height) ),
-            Serialization.serializeBufferRemovingLeadingZeros( block.difficultyTargetPrev ),
-            block.computedBlockPrefix
+            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this._lastBlock.height) ),
+            Serialization.serializeBufferRemovingLeadingZeros( this._lastBlock.difficultyTargetPrev ),
+            this._lastBlock.computedBlockPrefix
         ]);
 
         let answer = {
 
             block: serialization,
             noncesStart: this._lastBlockNonce,
-            noncesEnd: this._lastBlockNonce + minerInstance.hashesPerSecond,
+            noncesEnd: this._lastBlockNonce + hashes,
 
         };
 
-        this._lastBlockNonce += minerInstance.hashesPerSecond;
+        this._lastBlockNonce += hashes;
 
         minerInstance.work = answer;
 
@@ -64,4 +72,4 @@ class PoolBlocksManagement{
 
 }
 
-export default PoolBlocksManagement;
+export default PoolWorkManagement;

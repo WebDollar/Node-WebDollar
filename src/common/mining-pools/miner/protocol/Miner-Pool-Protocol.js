@@ -154,7 +154,10 @@ class MinerProtocol extends PoolProtocolList{
         if (this.connectedPools.length === 0) return;
         let poolSocket = this.connectedPools[0];
 
-        let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", { minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey }, "answer");
+        let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", {
+            minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+            poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
+        }, "answer");
 
         if (answer === null) throw {message: "get-work answered null" };
 
@@ -173,6 +176,8 @@ class MinerProtocol extends PoolProtocolList{
         if ( !ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
 
         this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.work);
+
+        return true;
 
     }
 
