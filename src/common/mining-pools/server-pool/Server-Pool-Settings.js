@@ -5,9 +5,9 @@ import StatusEvents from "common/events/Status-Events";
 
 class PoolSettings {
 
-    constructor(poolManagement, databaseName){
+    constructor(serverPoolManagement, databaseName){
 
-        this.poolManagement = poolManagement;
+        this.serverPoolManagement = serverPoolManagement;
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.SERVER_POOL_DATABASE );
 
         this._serverPoolFee = 0;
@@ -20,7 +20,8 @@ class PoolSettings {
         let result;
 
         try {
-            result = await this._getServerPoolDetails();
+            result = await this._getServerPoolDetails()
+
         } catch (exception){
 
             console.error("ServerPools returned an error ",exception);
@@ -44,6 +45,8 @@ class PoolSettings {
             if (false === await this._db.save("serverPool_activated", this._serverPoolActivated ? "true" : "false")) throw {message: "serverPoolActivated couldn't be saved"};
 
         StatusEvents.emit("server-pools/settings", { message: "Server Pool Settings were saved", serverPoolActivated: this._serverPoolActivated  });
+
+        await this.serverPoolManagement.setServerPoolStarted(newValue, true);
     }
 
 

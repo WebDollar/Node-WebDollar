@@ -101,7 +101,7 @@ class ServerPoolConnectedPoolsProtocol extends PoolProtocolList{
     findPoolByPoolPublicKey(poolPublicKey){
 
         for (let i=0; i<this.connectedPools.length; i++)
-            if (this.connectedPools[i].socket.node.protocol.pool.poolPublicKey.equals(poolPublicKey)){
+            if (this.connectedPools[i].node.protocol.pool.poolPublicKey.equals(poolPublicKey)){
                 return this.connectedPools[i];
             }
 

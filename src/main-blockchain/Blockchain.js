@@ -296,7 +296,10 @@ class Blockchain{
 
         this._onPoolsInitializedResolver(pool, minerPool, serverPool);
 
+
     }
+
+
 
 
 }

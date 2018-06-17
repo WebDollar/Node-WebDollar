@@ -3,6 +3,7 @@ import consts from 'consts/const_global'
 import InterfaceBlockchainAddressHelper from "../../../../blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
+import ed25519 from "common/crypto/ed25519";
 
 class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
 
@@ -51,7 +52,7 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
             try {
 
                 if (!Buffer.isBuffer(data.poolPublicKey) || data.poolPublicKey.length < 10) throw { message: "poolPublicKey is not correct" };
-                if (!Buffer.isBuffer(data.message) || data.message !== 32) throw { message: "poolMessage is not correct" };
+                if (!Buffer.isBuffer(data.message) || data.message.length !== 32) throw { message: "poolMessage is not correct" };
 
                 if (!Buffer.isBuffer(data.minerPublicKey) || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw { message: "poolMessage is not correct" };
                 if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
@@ -59,7 +60,7 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
                 if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
-                if (Buffer.isBuffer( data.messageSignature ) || data.messageSignature.length < 10) throw {message: "messageSignature is invalid"};
+                if ( !Buffer.isBuffer( data.messageSignature ) || data.messageSignature.length < 10) throw {message: "messageSignature is invalid"};
                 if (! ed25519.verify(data.messageSignature, data.message, data.minerPublicKey)) throw {message: "messageSignature doesn't validate message"}
 
                 //find the pool by poolPublicKey

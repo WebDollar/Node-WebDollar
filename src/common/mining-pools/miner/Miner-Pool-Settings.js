@@ -34,9 +34,10 @@ class MinerPoolSettings {
 
     async initializeMinerPoolSettings(poolURL){
 
-        await this._getMinerPoolDetails();
         await this._getMinerPoolPrivateKey();
         await this._getMinerPoolList();
+
+        await this._getMinerPoolDetails();
 
         if (poolURL !== undefined)
             await this.setPoolURL(poolURL);
@@ -190,6 +191,8 @@ class MinerPoolSettings {
             if (false === await this._db.save("minerPool_activated", this._minerPoolActivated ? "true" : "false")) throw {message: "minerPoolActivated couldn't be saved"};
 
         StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
+
+        await this.minerPoolManagement.setMinerPoolStarted(newValue, true);
     }
 
     get minerPoolActivated(){

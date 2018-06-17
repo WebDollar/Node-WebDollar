@@ -139,6 +139,9 @@ class PoolSettings {
             if (false === await this._db.save("pool_activated", this._poolActivated ? "true" : "false")) throw {message: "poolActivated couldn't be saved"};
 
         StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers });
+
+        await this.poolManagement.setPoolStarted(newValue, true);
+
     }
 
 
