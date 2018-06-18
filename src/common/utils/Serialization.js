@@ -1,4 +1,5 @@
 import BufferExtended from "./BufferExtended";
+var BigNumber = require ('bignumber.js');
 
 class Serialization{
 

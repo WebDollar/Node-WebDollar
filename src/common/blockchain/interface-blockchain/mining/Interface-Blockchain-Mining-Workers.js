@@ -23,7 +23,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this.workers = new InterfaceBlockchainMiningWorkersList(this);
 
-        this.bestHash =  Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ) ;
+        this.bestHash =   consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ;
         this.bestHashNonce = -1;
 
     }
@@ -40,7 +40,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             ]);
         }
 
-        this.bestHash =  Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ) ;
+        this.bestHash =  consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ;
         this.bestHashNonce = -1;
 
         this.block = block;

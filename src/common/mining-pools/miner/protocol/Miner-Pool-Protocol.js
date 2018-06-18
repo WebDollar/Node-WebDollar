@@ -148,6 +148,33 @@ class MinerProtocol extends PoolProtocolList{
 
     }
 
+    _validateRequestWork(work, signature){
+
+        if (typeof work !== "object") throw {message: "get-work invalid work"};
+
+        if ( typeof work.h !== "number" ) throw {message: "get-work invalid block height"};
+        if ( !Buffer.isBuffer(work.t) ) throw {message: "get-work invalid block difficulty target"};
+        if ( !Buffer.isBuffer( work.s) ) throw {message: "get-work invalid block header"};
+
+        if (typeof work.start !== "number") throw {message: "get-work invalid noncesStart"};
+        if (typeof work.end !== "number") throw {message: "get-work invalid noncesEnd"};
+
+        let serialization = Buffer.concat([
+            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(work.h) ),
+            Serialization.serializeBufferRemovingLeadingZeros( work.t ),
+            work.s,
+        ]);
+
+        work.block = serialization;
+
+        //verify signature
+
+        let message = Buffer.concat( [ work.block, Serialization.serializeNumber4Bytes( work.start ), Serialization.serializeNumber4Bytes( work.end ) ]);
+
+        if ( !Buffer.isBuffer(signature) || signature.length < 10 ) throw {message: "pool: signature is invalid"};
+        if ( !ed25519.verify(signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
+
+    }
 
     async requestWork(){
 
@@ -162,31 +189,9 @@ class MinerProtocol extends PoolProtocolList{
         if (answer === null) throw {message: "get-work answered null" };
 
         if (answer.result !== true) throw {message: "get-work answered false"};
-        if (typeof answer.work !== "object") throw {message: "get-work invalid work"};
 
-        if ( typeof answer.work.h !== "number" ) throw {message: "get-work invalid block height"};
-        if ( !Buffer.isBuffer(answer.work.t) ) throw {message: "get-work invalid block difficulty target"};
-        if ( !Buffer.isBuffer( answer.work.s) ) throw {message: "get-work invalid block header"};
-
-        if (typeof answer.work.start !== "number") throw {message: "get-work invalid noncesStart"};
-        if (typeof answer.work.end !== "number") throw {message: "get-work invalid noncesEnd"};
-
-        let serialization = Buffer.concat([
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(answer.work.h) ),
-            Serialization.serializeBufferRemovingLeadingZeros( answer.work.t ),
-            answer.work.s,
-        ]);
-
-        answer.work.block = serialization;
-
-        //verify signature
-
-        let message = Buffer.concat( [ answer.work.block, Serialization.serializeNumber4Bytes( answer.work.start ), Serialization.serializeNumber4Bytes( answer.work.end ) ]);
-
-        if ( !Buffer.isBuffer(answer.signature) || answer.signature.length < 10 ) throw {message: "pool: signature is invalid"};
-        if ( !ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
-
-        this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.work);
+        this._validateRequestWork(answer.work, answer.signature);
+        this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.work, poolSocket);
 
         return true;
 
@@ -197,21 +202,31 @@ class MinerProtocol extends PoolProtocolList{
         try {
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
-                poolPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
-                minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPublicKey,
-                mining: miningAnswer,
-            });
+                poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
+                minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+                work: miningAnswer,
+            }, "answer");
 
             if (answer === null) throw {message: "WorkDone: Answer is null"};
             if (answer.result !== true) throw {message: "WorkDone: Result is not True"};
 
             if (answer.result){
 
+                this.minerPoolManagement.minerPoolReward.potentialReward = answer.potentialReward;
+                this.minerPoolManagement.minerPoolReward.confirmedReward = answer.confirmedReward;
+
+                this._validateRequestWork(answer.newWork, answer.signature);
+                this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.newWork, poolSocket);
+
+            } else {
+
+                poolSocket.disconnect(); //the pool socket is not working
+
             }
 
         } catch (exception){
 
-            console.error(exception);
+            console.error("PushWork raised an error", exception);
             return false;
 
         }

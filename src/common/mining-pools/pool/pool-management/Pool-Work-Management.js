@@ -67,8 +67,8 @@ class PoolWorkManagement{
 
         if (work === null || typeof work !== "object") throw {message: "work is undefined"};
 
-        if ( Buffer.isBuffer(work.bestHash) || work.bestHash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "bestHash is invalid"};
-        if ( typeof work.bestHashNonce !== "number" ) throw {message: "bestHashNonce is invalid"};
+        if ( !Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
+        if ( typeof work.nonce !== "number" ) throw {message: "nonce is invalid"};
 
         return await this.poolManagement.poolData.lastBlockInformation.updateWorkBlockInformationMinerInstance(minerInstance, work);
 

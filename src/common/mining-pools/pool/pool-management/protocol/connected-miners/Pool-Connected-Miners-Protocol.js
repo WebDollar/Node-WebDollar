@@ -154,7 +154,9 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             try{
 
-                if (Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                if (! Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                if (!Buffer.isBuffer( data.poolPublicKey )  || data.poolPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+                if (! data.poolPublicKey.equals(Blockchain.PoolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey is invalid"};
 
                 let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
                 if (minerInstance === null) throw {message: "publicKey was not found"};
@@ -163,15 +165,20 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 let newWork = await this.poolManagement.generatePoolWork(minerInstance);
 
-                let message = Buffer.concat( [ newWork.block.serialization, Serialization.serializeNumber4Bytes( newWork.start ), Serialization.serializeNumber4Bytes( newWork.end ) ]);
+                let message = Buffer.concat( [ newWork.serialization, Serialization.serializeNumber4Bytes( newWork.start ), Serialization.serializeNumber4Bytes( newWork.end ) ]);
                 let signature = this.poolManagement.poolSettings.poolDigitalSign(message);
 
                 newWork.serialization = undefined;
 
-                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: true, answer: answer.result, reward: answer.reward, newWork: newWork, signature: signature } ); //the new reward
+                //in case there is an suffix in the answer
+                let suffix = "";
+                if ( typeof data.suffix === "string")
+                    suffix = '/'+data.suffix;
+
+                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, reward: answer.reward, newWork: newWork, signature: signature } ); //the new reward
 
             } catch (exception){
-                socket.node.sendRequest("mining-pool/work-done"+"/answer", {result: false, message: exception.message } )
+                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: false, message: exception.message } )
             }
 
         });

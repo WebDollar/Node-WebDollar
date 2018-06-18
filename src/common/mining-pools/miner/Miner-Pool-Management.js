@@ -1,5 +1,7 @@
 import consts from "consts/const_global";
 import MinerPoolMining from "common/mining-pools/miner/mining/Miner-Pool-Mining";
+import MinerPoolReward from "common/mining-pools/miner/mining/Miner-Pool-Reward";
+
 import MinerPoolProtocol from "common/mining-pools/miner/protocol/Miner-Pool-Protocol"
 import MinerPoolSettings from "common/mining-pools/miner/Miner-Pool-Settings"
 import StatusEvents from "common/events/Status-Events";
@@ -15,6 +17,7 @@ class MinerProtocol {
         this.minerPoolProtocol = new MinerPoolProtocol(this);
         
         this.minerPoolMining = new MinerPoolMining(this);
+        this.minerPoolReward = new MinerPoolReward(this);
 
         this._minerPoolInitialized = false;
         this._minerPoolOpened = false;
