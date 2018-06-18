@@ -6,7 +6,7 @@ import NODE_TYPE from "node/lists/types/Node-Type"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import DownloadManager from "common/utils/helpers/Download-Manager"
 import consts from 'consts/const_global'
-import Blockchain from "../../../main-blockchain/Blockchain";
+import Blockchain from "main-blockchain/Blockchain";
 
 const EventEmitter = require('events');
 

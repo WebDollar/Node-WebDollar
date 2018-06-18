@@ -4,7 +4,7 @@ import consts from 'consts/const_global';
 import PoolWorkManagement from "./Pool-Work-Management";
 import PoolProtocol from "./protocol/Pool-Protocol"
 import StatusEvents from "common/events/Status-Events";
-import Blockchain from "../../../../main-blockchain/Blockchain";
+import Blockchain from "main-blockchain/Blockchain";
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,

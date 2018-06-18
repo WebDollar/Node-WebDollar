@@ -79,7 +79,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if (miner === null )
                     miner = await this.poolManagement.poolData.addMiner(unencodedAddress, data.minerPublicKey);
 
-                miner.addInstance(data.minerPublicKey);
+                let minerInstance = miner.addInstance(data.minerPublicKey);
 
                 let signature = this.poolManagement.poolSettings.poolDigitalSign(data.message);
 
@@ -89,9 +89,13 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if ( typeof data.suffix === "string")
                     suffix = '/'+data.suffix;
 
+                let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._findBlockInformationMinerInstance(minerInstance);
+
                 let confirmation = await socket.node.sendRequestWaitOnce("mining-pool/hello-pool/answer"+suffix, {
                     result: true,
                     signature: signature,
+                    potentialReward: (blockInformationMinerInstance !== null ? blockInformationMinerInstance.reward : 0 ),
+                    confirmedReward: minerInstance.miner.calculateConfirmedReward(),
                 }, "confirmation" );
 
                 try {
@@ -103,6 +107,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     if (confirmation.result){
 
                         this._addConnectedMinerPool(socket, confirmation.sckAddress || socket.node.sckAddress.address );
+                        return true;
 
                     }
 
@@ -115,6 +120,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {result: false, message: exception.message, } );
             }
 
+            return false;
+
         });
 
 
@@ -122,6 +129,11 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
         socket.node.on("mining-pool/get-work", async (data) => {
 
             if (!this.poolManagement._poolStarted) return;
+
+            //in case there is an suffix in the answer
+            let suffix = "";
+            if ( typeof data.suffix === "string")
+                suffix = '/'+data.suffix;
 
             try {
 
@@ -139,10 +151,6 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 work.serialization = undefined; //don't send the data 2 times
 
-                //in case there is an suffix in the answer
-                let suffix = "";
-                if ( typeof data.suffix === "string")
-                    suffix = '/'+data.suffix;
 
                 socket.node.sendRequest("mining-pool/get-work/answer"+suffix, {result: true, work: work, signature: signature } )
 
@@ -159,6 +167,11 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
         socket.node.on("mining-pool/work-done", async (data) => {
 
             if (!this.poolManagement._poolStarted) return;
+
+            //in case there is an suffix in the answer
+            let suffix = "";
+            if ( typeof data.suffix === "string")
+                suffix = '/'+data.suffix;
 
             try{
 
@@ -178,10 +191,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 newWork.serialization = undefined;
 
-                //in case there is an suffix in the answer
-                let suffix = "";
-                if ( typeof data.suffix === "string")
-                    suffix = '/'+data.suffix;
+
 
                 socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, potentialReward: answer.potentialReward, confirmedReward: answer.confirmedReward, newWork: newWork, signature: signature } ); //the new reward
 

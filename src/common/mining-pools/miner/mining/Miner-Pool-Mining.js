@@ -1,7 +1,7 @@
 import NodesList from 'node/lists/Nodes-List';
 import consts from 'consts/const_global'
 import global from 'consts/global';
-import Blockchain from "../../../../main-blockchain/Blockchain";
+import Blockchain from "main-blockchain/Blockchain";
 
 let InheritedPoolMining;
 

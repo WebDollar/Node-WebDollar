@@ -124,10 +124,13 @@ class MinerProtocol extends PoolProtocolList{
 
                 if (! ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
 
+                if ( typeof answer.potentialReward !== "number") throw {message: "pool: potentialReward is empty"};
+                if ( typeof answer.confirmedReward !== "number") throw {message: "pool: confirmedReward is empty"};
+
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
 
                 //connection established
-                this._connectionEstablishedWithPool(socket);
+                this._connectionEstablishedWithPool(socket, answer.potentialReward, answer.confirmedReward);
 
                 return true;
 
@@ -146,12 +149,15 @@ class MinerProtocol extends PoolProtocolList{
     }
 
 
-    _connectionEstablishedWithPool(socket){
+    _connectionEstablishedWithPool(socket, potentialReward, confirmedReward){
 
         socket.node.protocol.pool = {
         };
 
         socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL;
+
+        this.minerPoolManagement.minerPoolReward.confirmedReward = confirmedReward;
+        this.minerPoolManagement.minerPoolReward.potentialReward = potentialReward;
 
         this.addElement(socket);
 

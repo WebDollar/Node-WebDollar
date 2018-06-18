@@ -5,7 +5,7 @@ import MinerPoolReward from "common/mining-pools/miner/mining/Miner-Pool-Reward"
 import MinerPoolProtocol from "common/mining-pools/miner/protocol/Miner-Pool-Protocol"
 import MinerPoolSettings from "common/mining-pools/miner/Miner-Pool-Settings"
 import StatusEvents from "common/events/Status-Events";
-import Blockchain from "../../../main-blockchain/Blockchain";
+import Blockchain from "main-blockchain/Blockchain";
 
 class MinerProtocol {
 

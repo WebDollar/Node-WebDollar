@@ -1,7 +1,7 @@
 import Serialization from 'common/utils/Serialization';
 import BufferExtended from "common/utils/BufferExtended";
 import consts from 'consts/const_global';
-import Blockchain from "../../../../main-blockchain/Blockchain";
+import Blockchain from "main-blockchain/Blockchain";
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
@@ -26,6 +26,9 @@ class PoolWorkManagement{
         this._lastBlock = await this.blockchain.mining.getNextBlock();
         this._lastBlockNonce = 0;
 
+        if (this._lastBlock.computedBlockPrefix === null )
+            this._lastBlock._computeBlockHeaderPrefix();
+
     }
 
 
@@ -37,8 +40,8 @@ class PoolWorkManagement{
         if (this._lastBlock === undefined || ( this._lastBlockNonce + hashes ) > 0xFFFFFFFF )
             await this.getNextBlock();
 
-        if (this._lastBlock.computedBlockPrefix === null )
-            this._lastBlock._computeBlockHeaderPrefix();
+        if ( this._lastBlock.height !==  this.blockchain.blocks.length || !this._lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ) )
+            await this.getNextBlock();
 
         let serialization = Buffer.concat( [
             Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this._lastBlock.height) ),
@@ -77,7 +80,7 @@ class PoolWorkManagement{
         if ( typeof work.nonce !== "number" ) throw {message: "nonce is invalid"};
         if ( typeof work.timeDiff !== "number" ) throw {message: "timeDiff is invalid"};
 
-        let hashesFactor = Math.min(5, (1000/work.timeDiff));
+        let hashesFactor = Math.min(5, (3000/work.timeDiff));
         hashesFactor = Math.max(0.01, hashesFactor);
 
         minerInstance.hashesPerSecond *= Math.floor( hashesFactor );
@@ -94,7 +97,7 @@ class PoolWorkManagement{
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
             blockInformationMinerInstance.calculateDifficulty();
-            blockInformationMinerInstance.adjustDifficulty(blockInformationMinerInstance.minerInstanceTotalDifficulty);
+            blockInformationMinerInstance.adjustDifficulty(blockInformationMinerInstance.workDifficulty);
 
             if (work.result)
                 if (await blockInformationMinerInstance.wasBlockMined() ) {
