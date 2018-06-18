@@ -139,7 +139,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     checkFinished(){
 
-        if (this._nonce > this.end || (this.started === false) || this.reset){
+        if (this._nonce > this.end || (this.started === false) || (this.reset && this.useResetConsensus)){
 
             this.workers.suspendWorkers();
             this._suspendMiningWorking();
@@ -155,7 +155,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         }
 
-        if (this.reset) {
+        if (this.reset && this.useResetConsensus) {
             console.warn("WORKERS MINING RESTARTED", this.reset);
             this._hashesPerSecond = 0;
         }

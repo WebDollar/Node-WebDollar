@@ -75,7 +75,11 @@ class MinerPoolMining extends InheritedPoolMining {
 
                 try {
 
+                    let timeInitial = new Date().getTime();
                     let answer = await this._run();
+
+                    answer.timeDiff = new Date().getTime() - timeInitial;
+
                     this._miningWork.resolved = true;
 
                     let answerPool = await this.minerPoolManagement.minerPoolProtocol.pushWork(this._miningWork.poolSocket, answer);

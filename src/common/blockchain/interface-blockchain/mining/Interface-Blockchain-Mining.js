@@ -253,7 +253,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         let bestHash =  consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
         let bestHashNonce = -1;
 
-        while (nonce <= end && this.started && !this.reset) {
+        while (nonce <= end && this.started && !(this.reset && this.useResetConsensus)) {
 
             let hash = await this.calculateHash(nonce);
 

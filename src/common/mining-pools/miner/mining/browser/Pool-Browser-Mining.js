@@ -8,6 +8,8 @@ class PoolBrowserMining extends InterfaceBlockchainBrowserMining{
 
         super ( 0 );
 
+        this.useResetConsensus = false;
+
     }
 
 

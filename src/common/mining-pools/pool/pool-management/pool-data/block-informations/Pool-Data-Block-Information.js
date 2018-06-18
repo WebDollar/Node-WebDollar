@@ -46,7 +46,7 @@ class PoolDataBlockInformation {
             blockInformationMinerInstance.calculateDifficulty();
             blockInformationMinerInstance.adjustDifficulty(blockInformationMinerInstance.workDifficulty);
 
-            return {result: true, potentialReward: blockInformationMinerInstance.reward};
+            return {result: true, potentialReward: blockInformationMinerInstance.potentialReward, confirmedReward: 0 };
 
         } else {
 

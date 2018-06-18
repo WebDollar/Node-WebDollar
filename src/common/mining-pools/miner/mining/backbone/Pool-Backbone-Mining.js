@@ -11,18 +11,12 @@ class PoolBackboneMining extends InterfaceBlockchainBackboneMining {
 
         this.WORKER_NONCES_WORK = 0xFFFFFFFF;
 
+        this.useResetConsensus = false;
+
     }
 
     calculateHash(nonce){
         return InterfaceBlockchainBlock.computeHashStatic(this.block, nonce);
-    }
-
-    mine(block, difficulty, start, end){
-
-        this.started = true;
-
-        return InterfaceBlockchainBackboneMining.prototype.mine(block, difficulty, start, end);
-
     }
 
 

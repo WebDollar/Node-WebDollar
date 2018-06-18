@@ -175,7 +175,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if ( typeof data.suffix === "string")
                     suffix = '/'+data.suffix;
 
-                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, reward: answer.reward, newWork: newWork, signature: signature } ); //the new reward
+                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, potentialReward: answer.potentialReward, confirmedReward: answer.confirmedReward, newWork: newWork, signature: signature } ); //the new reward
 
             } catch (exception){
                 socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: false, message: exception.message } )

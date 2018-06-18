@@ -69,6 +69,14 @@ class PoolWorkManagement{
 
         if ( !Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
         if ( typeof work.nonce !== "number" ) throw {message: "nonce is invalid"};
+        if ( typeof work.timeDiff !== "number" ) throw {message: "timeDiff is invalid"};
+
+        let hashesFactor = Math.min(5, (1000/work.timeDiff));
+        hashesFactor = Math.max(0.01, hashesFactor);
+
+        minerInstance.hashesPerSecond *= Math.floor( hashesFactor );
+        minerInstance.hashesPerSecond = Math.min( minerInstance.hashesPerSecond , 5000);
+        minerInstance.hashesPerSecond = Math.max( minerInstance.hashesPerSecond , 100);
 
         return await this.poolManagement.poolData.lastBlockInformation.updateWorkBlockInformationMinerInstance(minerInstance, work);
 
