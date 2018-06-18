@@ -97,22 +97,12 @@ class CLI {
         await this._runMenu();
     }
 
-    async _pickNumber(message, isFloat = false) {
-        
-        let answer = await this.question(message);
-        
-        let num = isFloat ? parseFloat(answer) : parseInt(answer);
-        if (isNaN(num))
-            return NaN;
-
-        return num;
-    }
     
     async _chooseAddress() {
 
         await this.listAddresses();
 
-        let addressId = await this._pickNumber('Choose the address number: ');
+        let addressId = await AdvancedMessages.readNumber('Choose the address number: ');
 
         if (isNaN(addressId) || addressId < 0 || Blockchain.Wallet.addresses.length <= addressId)
             return -1;
@@ -361,7 +351,7 @@ class CLI {
 
         };
 
-        this.callCallbackBlockchainSync( callback  );
+        this._callCallbackBlockchainSync( callback  );
 
     }
     
@@ -374,10 +364,9 @@ class CLI {
 
         if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== ''){
 
-            let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool');
+            let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool: '+Blockchain.MinerPoolManagement.minerPoolSettings.poolURL);
 
             if (response === true) getNewLink = false;
-
         }
 
         let miningPoolLink = undefined;
@@ -397,21 +386,35 @@ class CLI {
     
     async createMiningPool(){
         
-        console.info('Create Mining Pool.');
+        console.info('Create Mining Pool');
         console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
 
-        let poolFee = await this._pickNumber('Choose a fee(0...100): ', true);
-        
-        if (isNaN(poolFee) || poolFee < 0 || 100 < poolFee){
-            console.log("You have entered an invalid number:", poolFee);
-            return false;
+        let poolFee, poolName, poolWebsite;
+
+        if (await AdvancedMessages.confirm("Do you want to change the current pool settings?") ){
+
+            poolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
+
+            if (isNaN(poolFee) || poolFee < 0 || 100 < poolFee){
+                console.log("You have entered an invalid number:", poolFee);
+                return false;
+            }
+            else
+                console.log("Your fee is", poolFee);
+
+            poolName = await AdvancedMessages.input('Pool Name: ');
+            poolWebsite = await AdvancedMessages.input('Pool Website: ');
+
         }
-        else
-            console.log("Your fee is", poolFee);
+
+
 
         this._callCallbackBlockchainSync(async ()=>{
 
-            await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
+            if (poolFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
+            if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
+            if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
+
             await Blockchain.PoolManagement.startPool();
 
         }, true);
@@ -420,10 +423,10 @@ class CLI {
 
     async createServerForMiningPool(){
 
-        console.info('Create Server Pool.');
+        console.info('Create Server Pool');
         console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
 
-        let serverPoolFee = await this._pickNumber('Choose a fee(0...100): ', true);
+        let serverPoolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
 
         if (isNaN(serverPoolFee) || serverPoolFee < 0 || 100 < serverPoolFee){
             console.log("You have entered an invalid number:", serverPoolFee);
@@ -434,7 +437,7 @@ class CLI {
 
         this._callCallbackBlockchainSync(async ()=>{
 
-            await Blockchain.ServerPoolManagement.serverPoolSettings.setPoolFee(serverPoolFee / 100);
+            await Blockchain.ServerPoolManagement.serverPoolSettings.setServerPoolFee(serverPoolFee / 100);
             await Blockchain.ServerPoolManagement.startServerPool();
 
         }, true);
@@ -451,6 +454,7 @@ class CLI {
         });
 
     }
+
 
     _callCallbackBlockchainSync(callback, synchronize=true ){
 

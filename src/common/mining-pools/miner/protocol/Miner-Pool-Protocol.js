@@ -5,8 +5,11 @@ import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import ed25519 from "common/crypto/ed25519";
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
+import Serialization from "../../../utils/Serialization";
+import StatusEvents from "common/events/Status-Events";
 
-class MinerProtocol {
+class MinerProtocol extends PoolProtocolList{
 
     /**
      *
@@ -14,17 +17,25 @@ class MinerProtocol {
      */
     constructor(minerPoolManagement){
 
+        super();
+
         this.minerPoolManagement = minerPoolManagement;
         this.loaded = false;
 
-        this.socketsPool = [];
+        this.connectedPools = [];
+        this.list = this.connectedPools;
 
     }
 
     async _startMinerProtocol(){
 
-        if (this.loaded)
-            return true;
+        if (this.loaded) return true;
+
+        this.loaded = true;
+
+        for (let i=0; i<NodesList.nodes.length; i++)
+            await this._subscribeMiner(NodesList.nodes[i]);
+
 
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
             await this._subscribeMiner(nodesListObject)
@@ -34,10 +45,6 @@ class MinerProtocol {
             this._unsubscribeMiner( nodesListObject )
         });
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            await this._subscribeMiner(NodesList.nodes[i]);
-
-        this.loaded = true;
 
     }
 
@@ -71,7 +78,7 @@ class MinerProtocol {
                 let answer = await this._sendPoolHello(socket);
 
                 if (!answer)
-                    socket.disconnect();
+                    throw {message: "send hello is not working"};
             }
 
         } catch (exception){
@@ -87,58 +94,156 @@ class MinerProtocol {
 
         let socket = nodesListObject.socket;
 
-        for (let i=this.socketsPool.length-1; i>=0; i--)
-            if (this.socketsPool[i] === socket){
-                this.socketsPool.splice(i,1);
-            }
+        if (socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL)
+            StatusEvents.emit("miner-pool/servers-connections", {message: "Server Removed"});
 
     }
 
     async _sendPoolHello(socket){
 
-        let message = WebDollarCrypto.getBufferRandomValues(32);
+        try{
 
-        // let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
-        //     message: message,
-        //     messageSignature: this.minerPoolManagement.minerPoolSettings.minerPoolDigitalSign(message),
-        //     poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
-        //     minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
-        //     minerAddress: Blockchain.blockchain.mining.minerAddress,
-        // }, "answer", 6000  );
-        //
-        // if (answer === null) throw {message: "pool : no answer from"};
-        //
-        // if (answer.result !== true) throw {message: "pool : result is not true" + answer.message} //in case there was an error message
-        //
-        // if ( !Buffer.isBuffer(answer.signature) || answer.signature.length < 10 ) throw {message: "pool: signature is invalid"};
-        //
-        // if (! ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
-        //
-        // //connection established
-        // this._connectionEstablishedWithPool(socket);
+            let message = WebDollarCrypto.getBufferRandomValues(32);
+            //let message = new Buffer(32);
+
+            let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
+                message: message,
+                messageSignature: this.minerPoolManagement.minerPoolSettings.minerPoolDigitalSign(message),
+                poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
+                minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+                minerAddress: Blockchain.blockchain.mining.minerAddress,
+            }, "answer", 6000  );
+
+            if (answer === null) throw {message: "pool : no answer from"};
+
+            if (answer.result !== true) throw {message: "pool : result is not true" + answer.message} //in case there was an error message
+
+            try{
+
+                if ( !Buffer.isBuffer(answer.signature) || answer.signature.length < 10 ) throw {message: "pool: signature is invalid"};
+
+                if (! ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
+
+                socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
+
+                //connection established
+                this._connectionEstablishedWithPool(socket);
+
+                return true;
+
+            } catch (exception){
+                console.error("Exception mining-pool/hello-pool/answer/confirmation", exception);
+                socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: false, message: exception.message});
+            }
+
+
+        } catch (exception){
+            console.error("Exception mining-pool/hello-pool/answer", exception);
+        }
+
+        return false;
+
+    }
+
+
+    _connectionEstablishedWithPool(socket){
+
+        socket.node.protocol.pool = {
+        };
+
+        socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL;
+
+        this.addElement(socket);
+
+        StatusEvents.emit("miner-pool/servers-connections", {message: "Server Added"});
+
+    }
+
+    _validateRequestWork(work, signature){
+
+        if (typeof work !== "object") throw {message: "get-work invalid work"};
+
+        if ( typeof work.h !== "number" ) throw {message: "get-work invalid block height"};
+        if ( !Buffer.isBuffer(work.t) ) throw {message: "get-work invalid block difficulty target"};
+        if ( !Buffer.isBuffer( work.s) ) throw {message: "get-work invalid block header"};
+
+        if (typeof work.start !== "number") throw {message: "get-work invalid noncesStart"};
+        if (typeof work.end !== "number") throw {message: "get-work invalid noncesEnd"};
+
+        let serialization = Buffer.concat([
+            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(work.h) ),
+            Serialization.serializeBufferRemovingLeadingZeros( work.t ),
+            work.s,
+        ]);
+
+        work.block = serialization;
+
+        //verify signature
+
+        let message = Buffer.concat( [ work.block, Serialization.serializeNumber4Bytes( work.start ), Serialization.serializeNumber4Bytes( work.end ) ]);
+
+        if ( !Buffer.isBuffer(signature) || signature.length < 10 ) throw {message: "pool: signature is invalid"};
+        if ( !ed25519.verify(signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
+
+    }
+
+    async requestWork(){
+
+        if (this.connectedPools.length === 0) return;
+        let poolSocket = this.connectedPools[0];
+
+        let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", {
+            minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+            poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
+        }, "answer");
+
+        if (answer === null) throw {message: "get-work answered null" };
+
+        if (answer.result !== true) throw {message: "get-work answered false"};
+
+        this._validateRequestWork(answer.work, answer.signature);
+        this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.work, poolSocket);
 
         return true;
 
     }
 
-    _connectionEstablishedWithPool(socket){
+    async pushWork(poolSocket, miningAnswer ){
 
-        if (this._findSocketPool(socket) !== -1) return false;
+        try {
 
-        this.socketsPool.push(socket);
+            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
+                poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
+                minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+                work: miningAnswer,
+            }, "answer");
 
-    }
+            if (answer === null) throw {message: "WorkDone: Answer is null"};
+            if (answer.result !== true) throw {message: "WorkDone: Result is not True"};
 
-    _findSocketPool(socket){
+            if (answer.result){
 
-        for (let i=0; i<this.socketsPool.length; i++)
-            if (this.socketsPool[i] === socket){
-                return i;
+                this.minerPoolManagement.minerPoolReward.potentialReward = answer.potentialReward;
+                this.minerPoolManagement.minerPoolReward.confirmedReward = answer.confirmedReward;
+
+                this._validateRequestWork(answer.newWork, answer.signature);
+                this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.newWork, poolSocket);
+
+            } else {
+
+                poolSocket.disconnect(); //the pool socket is not working
+
             }
 
-        return -1;
+        } catch (exception){
+
+            console.error("PushWork raised an error", exception);
+            return false;
+
+        }
 
     }
+
 
 }
 

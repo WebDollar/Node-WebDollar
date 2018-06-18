@@ -33,7 +33,11 @@ class ServerPoolManagement{
             throw {message: "loadServer didn't work"};
 
         if (serverPoolFee !== undefined && typeof serverPoolFee === "number")
-            this.serverPoolSettings.setServerPoolFee(serverPoolFee);
+            await this.serverPoolSettings.setServerPoolFee(serverPoolFee);
+
+        this.serverPoolInitialized = true;
+
+        return true;
 
     }
 
@@ -83,8 +87,13 @@ class ServerPoolManagement{
 
             await this.serverPoolSettings.setServerPoolActivated(value);
 
-            if (value) await this.serverPoolProtocol._startPoolProtocol();
-            else await this.serverPoolProtocol._stopPoolProtocol();
+            if (value){
+
+                await this.serverPoolProtocol._startServerPoolProtocol();
+            }
+            else await this.serverPoolProtocol._stopServerPoolProtocol();
+
+
 
             StatusEvents.emit("server-pool/status", {result: value, message: "Server Pool Started changed" });
 

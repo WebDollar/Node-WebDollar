@@ -5,9 +5,9 @@ import StatusEvents from "common/events/Status-Events";
 
 class PoolSettings {
 
-    constructor(poolManagement, databaseName){
+    constructor(serverPoolManagement, databaseName){
 
-        this.poolManagement = poolManagement;
+        this.serverPoolManagement = serverPoolManagement;
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.SERVER_POOL_DATABASE );
 
         this._serverPoolFee = 0;
@@ -20,7 +20,8 @@ class PoolSettings {
         let result;
 
         try {
-            result = await this._getServerPoolDetails();
+            result = await this._getServerPoolDetails()
+
         } catch (exception){
 
             console.error("ServerPools returned an error ",exception);
@@ -34,9 +35,9 @@ class PoolSettings {
 
     }
 
-    async setServerPoolActivated(newValue, skipSaving = false){
+    async setServerPoolActivated(newValue, skipSaving = false, useActivation = true){
 
-        PoolsUtils.validatePoolActiviated(newValue);
+        PoolsUtils.validatePoolActivated(newValue);
 
         this._serverPoolActivated = newValue;
 
@@ -44,6 +45,9 @@ class PoolSettings {
             if (false === await this._db.save("serverPool_activated", this._serverPoolActivated ? "true" : "false")) throw {message: "serverPoolActivated couldn't be saved"};
 
         StatusEvents.emit("server-pools/settings", { message: "Server Pool Settings were saved", serverPoolActivated: this._serverPoolActivated  });
+
+        if (useActivation)
+            await this.serverPoolManagement.setServerPoolStarted(newValue, true);
     }
 
 
@@ -80,13 +84,16 @@ class PoolSettings {
         serverPoolFee = parseFloat(serverPoolFee);
 
         let serverPoolActivated = await this._db.get("serverPool_activated", 30*1000, true);
-        if (serverPoolActivated === null) serverPoolActivated = false;
 
-        await PoolsUtils.validatePoolActiviated(serverPoolFee);
-        await PoolsUtils.validatePoolActiviated(serverPoolActivated);
+        if (serverPoolActivated === "true") serverPoolActivated = true;
+        else if (serverPoolActivated === "false") serverPoolActivated = false;
+        else if (serverPoolActivated === null) serverPoolActivated = false;
+
+        await PoolsUtils.validatePoolFee(serverPoolFee);
+        await PoolsUtils.validatePoolActivated(serverPoolActivated);
 
         await this.setServerPoolFee(serverPoolFee, true);
-        await this.setPoolActivated(serverPoolActivated, true);
+        await this.setServerPoolActivated(serverPoolActivated, true, false);
 
         return true;
     }

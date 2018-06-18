@@ -10,7 +10,7 @@ class PoolDataMinerInstance {
         this.miner = miner;
         this.publicKey = publicKey;
         this.date = new Date().getTime();
-        this.hashesPerSecond = 1000;
+        this.hashesPerSecond = 500;
 
     }
 

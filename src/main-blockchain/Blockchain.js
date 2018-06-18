@@ -37,6 +37,7 @@ class Blockchain{
         this.Wallet = new MainBlockchainWallet(this.Chain);
 
         this.Mining = new MainBlockchainMining(this.Chain, undefined);
+        this.SoloMining = this.Mining;
 
         this.Transactions = this.Chain.transactions;
         this.Transactions.setWallet(this.Wallet);
@@ -51,6 +52,10 @@ class Blockchain{
 
         this.onPoolsInitialized = new Promise((resolve)=>{
             this._onPoolsInitializedResolver = resolve;
+        });
+
+        this.onPoolsCreated = new Promise((resolve)=>{
+            this._onPoolsCreatedResolver = resolve;
         });
         
         this._loaded = false;
@@ -265,6 +270,8 @@ class Blockchain{
         if (ServerPoolManagement !== undefined && this.ServerPoolManagement === undefined)
             this.ServerPoolManagement = new ServerPoolManagement();
 
+        this._onPoolsCreatedResolver(true);
+
         await this._initializeMiningPools();
 
 
@@ -296,7 +303,28 @@ class Blockchain{
 
         this._onPoolsInitializedResolver(pool, minerPool, serverPool);
 
+        await StatusEvents.emit("main-pools/status", { message: "Pool Initialized"});
+
+        console.log("333333333");
+
+        await this._startMiningPools();
+
     }
+
+    async _startMiningPools(){
+
+        if (this.MinerPoolManagement.minerPoolSettings.minerPoolActivated)
+            await this.MinerPoolManagement.setMinerPoolStarted(this.MinerPoolManagement.minerPoolSettings.minerPoolActivated, true);
+
+        if (this.PoolManagement.poolSettings.poolActivated)
+            await this.PoolManagement.setPoolStarted(this.PoolManagement.poolSettings.poolActivated, true);
+
+        if (this.ServerPoolManagement !== undefined && this.ServerPoolManagement.serverPoolSettings.serverPoolActivated)
+            await this.ServerPoolManagement.setServerPoolStarted(this.ServerPoolManagement.serverPoolSettings.serverPoolActivated, true);
+
+    }
+
+
 
 
 }

@@ -1,12 +1,13 @@
 import Serialization from 'common/utils/Serialization';
 import BufferExtended from 'common/utils/BufferExtended';
 import consts from 'consts/const_global';
-import PoolData from "./Pool-Data";
 import PoolDataMinerInstance from "./Pool-Data-Miner-Instance";
 
 class PoolDataMiner{
 
-    constructor(index, address, publicKey){
+    constructor(poolData, index, address, publicKey){
+
+        this.poolData = poolData;
 
         this.index = index;
         this.address = address;
@@ -15,9 +16,13 @@ class PoolDataMiner{
 
         this.addInstance(publicKey);
 
+        this.confirmedReward = 0;
+
     }
 
     addInstance(publicKey){
+
+        if (publicKey === undefined) return;
 
         if (!Buffer.isBuffer(publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) 
             throw {message: "public key is invalid"};
@@ -70,6 +75,24 @@ class PoolDataMiner{
         }
 
         return offset;
+
+    }
+
+
+    calculateConfirmedReward(){
+
+        let reward = 0;
+
+        for (let i=0; i<this.instances.length; i++)
+            for (let j = 0; j < this.poolData.blocksInfo.length - 2; j++)
+                for (let q = 0; q<this.poolData.blocksInfo[j].blockInformationMinersInstances.length; q++)
+                    if (this.poolData.blocksInfo[j].blockInformationMinersInstances[q].minerInstance === this.instances[i]){
+
+                        reward += this.poolData.blocksInfo[j].blockInformationMinersInstances[q].reward;
+
+                    }
+
+        return reward;
 
     }
 

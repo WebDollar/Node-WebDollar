@@ -20,7 +20,7 @@ class PoolManagement{
         this.blockchain = blockchain;
 
         this.poolSettings = new PoolSettings(wallet, this);
-        this.poolWorkManagement = new PoolWorkManagement( this );
+        this.poolWorkManagement = new PoolWorkManagement( this, blockchain );
         this.poolProtocol = new PoolProtocol( this );
 
         this._poolInitialized = false;
@@ -35,6 +35,8 @@ class PoolManagement{
 
     async initializePoolManagement(poolFee){
 
+        await this.poolData.initializePoolData();
+
         let answer = await this.poolSettings.initializePoolSettings(poolFee);
         console.info("The url is just your domain: "+ this.poolSettings.poolURL);
 
@@ -43,12 +45,7 @@ class PoolManagement{
             return false;
         }
 
-        if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
-            this.poolOpened = true;
-        else {
-            console.error("Couldn't start MinerPool");
-            return false;
-        }
+        this.poolInitialized = true;
 
         return answer;
 
@@ -142,8 +139,11 @@ class PoolManagement{
 
             await this.poolSettings.setPoolActivated(value);
 
-            if (value) await this.poolProtocol._startServerPoolProtocol();
-            else await this.poolProtocol._stopServerPoolProtocol();
+            if (value) {
+                await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
+                await this.poolProtocol._startPoolProtocol();
+            }
+            else await this.poolProtocol._stopPoolProtocol();
 
             StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });
 

@@ -1,7 +1,7 @@
 import consts from "consts/const_global";
-import NodesList from "node/lists/Nodes-List";
-import Serialization from "common/utils/Serialization";
-import PoolMining from "common/mining-pools/miner/mining/Pool-Mining";
+import MinerPoolMining from "common/mining-pools/miner/mining/Miner-Pool-Mining";
+import MinerPoolReward from "common/mining-pools/miner/mining/Miner-Pool-Reward";
+
 import MinerPoolProtocol from "common/mining-pools/miner/protocol/Miner-Pool-Protocol"
 import MinerPoolSettings from "common/mining-pools/miner/Miner-Pool-Settings"
 import StatusEvents from "common/events/Status-Events";
@@ -15,13 +15,9 @@ class MinerProtocol {
 
         this.minerPoolSettings = new MinerPoolSettings(this);
         this.minerPoolProtocol = new MinerPoolProtocol(this);
-
-        this._miningData = {
-            blockData: undefined,
-            difficultyTarget: undefined
-        };
         
-        this._poolMining = new PoolMining();
+        this.minerPoolMining = new MinerPoolMining(this);
+        this.minerPoolReward = new MinerPoolReward(this);
 
         this._minerPoolInitialized = false;
         this._minerPoolOpened = false;
@@ -33,8 +29,7 @@ class MinerProtocol {
 
         let answer = await this.minerPoolSettings.initializeMinerPoolSettings(poolURL);
 
-        if (this.minerPoolSettings.poolURL !== '' && this.minerPoolSettings.poolURL !== undefined)
-            this.minerPoolOpened = true;
+        this.minerPoolInitialized = true;
 
         return answer;
     }
@@ -52,34 +47,6 @@ class MinerProtocol {
             return false;
         }
 
-    }
-
-    async _mine(blockData, difficultyTarget) {
-        
-        this._poolMining.mine(blockData, difficultyTarget);
-    }
-
-    async createMiningHashes(){
-
-        //TODO: create a list with best X hashes
-        let answer;
-        try {
-
-            answer = await this._mine(this._miningData.blockData, this._miningData.difficultyTarget);
-
-        } catch (exception){
-            console.error("Couldn't mine block ", this._miningData.blockData, exception);
-            answer.result = false;
-        }
-
-        return answer;
-
-    }
-    
-    async run() {
-        
-        await this._mine(this._miningData.blockData, this._miningData.difficultyTarget);
-        
     }
 
 
@@ -120,8 +87,17 @@ class MinerProtocol {
 
             await this.minerPoolSettings.setMinerPoolActivated(value);
 
-            if (value) await this.minerPoolProtocol._startMinerProtocol();
-            else await this.minerPoolProtocol._stopMinerProtocol();
+            if (value) {
+                Blockchain.blockchain.mining = this.minerPoolMining;
+                Blockchain.Mining = this.minerPoolMining;
+                await this.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
+                await this.minerPoolProtocol._startMinerProtocol();
+            }
+            else {
+                Blockchain.blockchain.mining = Blockchain.blockchain.miningSolo;
+                Blockchain.Mining = Blockchain.blockchain.miningSolo;
+                await this.minerPoolProtocol._stopMinerProtocol();
+            }
 
             StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Started changed" });
 

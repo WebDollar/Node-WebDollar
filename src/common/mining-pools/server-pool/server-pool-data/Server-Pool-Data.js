@@ -40,7 +40,7 @@ class ServerPoolData {
 
         if (this.getPool(poolAddress) === null) {
 
-            if ( !Buffer.isBuffer(poolAddress) || poolAddress.length !== consts.ADDRESSES.PUBLIC_KEY )
+            if ( !Buffer.isBuffer(poolAddress) || poolAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
                 throw {message: "pool address is invalid" };
 
 

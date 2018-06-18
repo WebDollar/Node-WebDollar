@@ -42,7 +42,7 @@ class PoolsUtils {
 
     }
 
-    validatePoolActiviated( poolActivated = false){
+    validatePoolActivated( poolActivated = false){
         if (typeof poolActivated !== "boolean") throw {message: "poolActivated is not a boolean"};
     }
 
@@ -53,7 +53,7 @@ class PoolsUtils {
         this.validatePoolWebsite(poolWebsite);
         this.validatePoolPublicKey(poolPublicKey);
         this.validatePoolServers(poolServers);
-        this.validatePoolActiviated(poolActivated);
+        this.validatePoolActivated(poolActivated);
         if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(poolAddress) === null) throw {message: "poolAddress is invalid"};
 
         return true;
@@ -199,17 +199,22 @@ class PoolsUtils {
         for (let i=0; i<poolServers.length; i++) {
 
 
-            let connected = false;
+            let connected = false, nodeConsensusType;
 
             for (let j=0; j< NodesList.nodes.length; j++ )
                 if (NodesList.nodes[j].socket.node.sckAddress.matchAddress( poolServers[i] )){
                     connected = true;
+                    nodeConsensusType = NodesList.nodes[j].socket.node.protocol.nodeConsensusType;
                     break;
                 }
 
             result[i] = {
+
                 name: poolServers[i],
                 connected: connected,
+                established: [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL ].indexOf( nodeConsensusType ) >= 0,
+                nodeConsensusType: nodeConsensusType,
+
             };
 
         }

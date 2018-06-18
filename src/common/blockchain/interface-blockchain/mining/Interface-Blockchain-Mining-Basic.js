@@ -28,6 +28,8 @@ class InterfaceBlockchainMiningBasic {
         this.walletDB = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
 
         this._intervalMiningOutput = undefined;
+
+        this.useResetConsensus = true;
     }
 
     get minerAddress(){

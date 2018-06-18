@@ -3,12 +3,19 @@ import NodesList from 'node/lists/Nodes-List';
 import NODE_TYPE from "node/lists/types/Node-Type";
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
+import StatusEvents from "common/events/Status-Events";
 
-class PoolConnectedServersProtocol{
+class PoolConnectedServersProtocol extends PoolProtocolList{
 
     constructor(poolManagement){
 
+        super();
+
         this.poolManagement = poolManagement;
+
+        this.connectedServersPool = [];
+        this.list = this.connectedServersPool;
 
     }
 
@@ -20,18 +27,25 @@ class PoolConnectedServersProtocol{
 
     async startPoolConnectedServersProtocol(){
 
+        for (let i=0; i<NodesList.nodes.length; i++)
+            await this._subscribePoolConnectedServer(NodesList.nodes[i]);
+
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
             await this._subscribePoolConnectedServer(nodesListObject)
         });
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            await this._subscribePoolConnectedServer(NodesList.nodes[i]);
+        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject) => {
+            this._unsubscribePoolConnectedServer(nodesListObject)
+        });
+
 
     }
 
     async _subscribePoolConnectedServer(nodesListObject){
 
         let socket = nodesListObject.socket;
+
+        if (!this.poolManagement._poolStarted) return;
 
         try{
 
@@ -40,7 +54,7 @@ class PoolConnectedServersProtocol{
                 let answer = await this._registerPoolToServerPool(socket);
 
                 if (!answer)
-                    socket.disconnect();
+                    throw {message: "poolConnected raised an error"};
 
             }
 
@@ -53,6 +67,17 @@ class PoolConnectedServersProtocol{
 
 
     }
+
+    _unsubscribePoolConnectedServer(nodesListObject) {
+
+        let socket = nodesListObject.socket;
+
+        if (socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL)
+            StatusEvents.emit("pools/servers-connections", {message: "Server Removed"});
+    }
+
+
+
 
     async _registerPoolToServerPool(socket) {
 
@@ -76,6 +101,7 @@ class PoolConnectedServersProtocol{
                 await socket.node.sendRequestWaitOnce("server-pool/register-pool/answer/confirmation", { result: false, message: "ServerPool fee is too high"}, "answer");
 
                 setTimeout(()=>{
+                    console.error("serverPoolFee is too big");
                     socket.disconnect();
                 }, 5000);
 
@@ -91,11 +117,7 @@ class PoolConnectedServersProtocol{
 
             if (confirmation.result === true){
 
-                socket.node.protocol.serverProol = {
-                    serverPoolFee: answer.serverPoolFee,
-                };
-
-                socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_POOL;
+                this._addConnectedServerPool(socket, answer.serverPoolFee);
 
                 return true;
 
@@ -113,6 +135,20 @@ class PoolConnectedServersProtocol{
 
         return false;
 
+
+    }
+
+    _addConnectedServerPool(socket, fee){
+
+        socket.node.protocol.serverPool = {
+            serverPoolFee: fee,
+        };
+
+        socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL;
+
+        this.addElement(socket);
+
+        StatusEvents.emit("pools/servers-connections", {message: "Server Removed"});
 
     }
 

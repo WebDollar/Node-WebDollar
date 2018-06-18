@@ -36,10 +36,11 @@ class PoolSettings {
 
         let result = await this._getPoolPrivateKey();
         result = result && await this._getPoolAddress();
-        result = result && await this._getPoolDetails();
 
         if (poolFee !== undefined)
             await this.setPoolFee(poolFee);
+
+        result = result && await this._getPoolDetails();
 
         if (result)
             this.poolManagement.poolInitialized = true;
@@ -129,9 +130,9 @@ class PoolSettings {
         return this._poolPrivateKey;
     }
 
-    async setPoolActivated(newValue, skipSaving = false){
+    async setPoolActivated(newValue, skipSaving = false, useActivation = true){
 
-        PoolsUtils.validatePoolActiviated(newValue);
+        PoolsUtils.validatePoolActivated(newValue);
 
         this._poolActivated = newValue;
 
@@ -139,6 +140,10 @@ class PoolSettings {
             if (false === await this._db.save("pool_activated", this._poolActivated ? "true" : "false")) throw {message: "poolActivated couldn't be saved"};
 
         StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers });
+
+        if (useActivation)
+            await this.poolManagement.setPoolStarted(newValue, true);
+
     }
 
 
@@ -176,7 +181,9 @@ class PoolSettings {
         if (!skipSaving)
             if (false === await this._db.save("pool_servers", JSON.stringify(this._poolServers))) throw {message: "PoolServers couldn't be stored"};
 
-        await this.poolManagement.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this._poolServers );
+        if (this.poolManagement.poolStarted)
+            await this.poolManagement.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this._poolServers );
+
         this._generatePoolURL();
 
     }
@@ -201,10 +208,13 @@ class PoolSettings {
 
         if (this._poolPrivateKey === null) {
 
-            let privateKey = await Blockchain.Wallet.addresses[0].getPrivateKey();
-            let finalPrivateKey = Buffer.concat( [ WebDollarCrypto.SHA256(WebDollarCrypto.MD5(privateKey)), WebDollarCrypto.SHA256( WebDollarCrypto.RIPEMD160(privateKey) )]);
+            this._poolPrivateKey = ed25519.generatePrivateKey();
+            await this.savePoolPrivateKey();
 
-            this._poolPrivateKey = ed25519.generatePrivateKey(finalPrivateKey);
+            // let privateKey = await Blockchain.Wallet.addresses[0].getPrivateKey();
+            // let finalPrivateKey = Buffer.concat( [ WebDollarCrypto.SHA256(WebDollarCrypto.MD5(privateKey)), WebDollarCrypto.SHA256( WebDollarCrypto.RIPEMD160(privateKey) )]);
+            //
+            // this._poolPrivateKey = ed25519.generatePrivateKey(finalPrivateKey);
 
         }
 
@@ -250,8 +260,9 @@ class PoolSettings {
         let poolActivated = await this._db.get("pool_activated", 30*1000, true);
         if (poolActivated === null) poolActivated = false;
 
-        if (poolActivated === 'true') poolActivated = true;
-        else poolActivated = false;
+        if (poolActivated === "true") poolActivated = true;
+        else if (poolActivated === "false") poolActivated = false;
+        else if (poolActivated === null) poolActivated = false;
 
         if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated))
             return false;
@@ -260,7 +271,7 @@ class PoolSettings {
         await this.setPoolFee ( poolFee , true );
         await this.setPoolWebsite ( poolWebsite , true );
         await this.setPoolServers ( poolServers , true );
-        await this.setPoolActivated( poolActivated , true );
+        await this.setPoolActivated( poolActivated , true , false);
 
         return true;
 

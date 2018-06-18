@@ -34,12 +34,13 @@ class MinerPoolSettings {
 
     async initializeMinerPoolSettings(poolURL){
 
-        await this._getMinerPoolDetails();
         await this._getMinerPoolPrivateKey();
         await this._getMinerPoolList();
 
         if (poolURL !== undefined)
             await this.setPoolURL(poolURL);
+
+        await this._getMinerPoolDetails();
 
     }
 
@@ -47,6 +48,7 @@ class MinerPoolSettings {
     get poolURL(){
         return this._poolURL;
     }
+
 
     async setPoolURL(newValue, skipSaving = false){
 
@@ -85,7 +87,8 @@ class MinerPoolSettings {
         newValue = PoolsUtils.processServersList( newValue );
         this.poolServers = newValue;
 
-        await this.minerPoolManagement.minerPoolProtocol.insertServersListWaitlist( this.poolServers );
+        if (this.minerPoolManagement.minerPoolStarted)
+            await this.minerPoolManagement.minerPoolProtocol.insertServersListWaitlist( this.poolServers );
 
     }
 
@@ -118,7 +121,18 @@ class MinerPoolSettings {
 
         let poolURL = await this._db.get("minerPool_poolURL", 30*1000, true);
 
+        let poolMinerActivated = await this._db.get("minerPool_activated", 30*1000, true);
+
+        if (poolMinerActivated === "true") poolMinerActivated = true;
+        else if (poolMinerActivated === "false") poolMinerActivated = false;
+        else if (poolMinerActivated === null) poolMinerActivated = false;
+
+        PoolsUtils.validatePoolActivated(poolMinerActivated);
+
+
         await this.setPoolURL(poolURL, true);
+        await this.setMinerPoolActivated(poolMinerActivated, true, false);
+
     }
 
     minerPoolDigitalSign(message){
@@ -136,43 +150,46 @@ class MinerPoolSettings {
         if (data === null) return;
 
         let foundPool = this.poolsList[data.poolPublicKey.toString("hex")];
-        if (foundPool === undefined){
+        if (foundPool === undefined)
             foundPool = {};
-            this.poolsList[data.poolPublicKey.toString("hex")] = foundPool;
+
+        if (JSON.stringify(this.poolsList[data.poolPublicKey.toString("hex")]) !== JSON.stringify(data)){
+            this.poolsList[data.poolPublicKey.toString("hex")] = data;
+            await this._saveMinerPoolList();
         }
 
-        foundPool.poolName = data.poolName;
-        foundPool.poolFee = data.poolFee;
-        foundPool.poolAddress = data.poolAddress;
-        foundPool.poolPublicKey = data.poolPublicKey;
-        foundPool.poolServers = data.poolServers;
-        foundPool.poolWebsite = data.poolWebsite;
-        foundPool.poolVersion = data.poolVersion;
-        foundPool.poolURL = data.poolURL;
-
-        await this._saveMinerPoolList();
 
     }
 
     async _saveMinerPoolList(){
 
-        let result = await this._db.save("minerPool_poolsList", JSON.stringify( this.poolsList) );
+        let result = await this._db.save("minerPool_poolsList", new Buffer( JSON.stringify( this.poolsList), "ascii") );
         return result;
 
     }
 
     async _getMinerPoolList(){
 
-        let result = JSON.parse ( await this._db.get("minerPool_poolsList", 30*1000, true) );
+        let result = await this._db.get("minerPool_poolsList", 30*1000, true);
 
-        this.poolsList = result;
+        if (result !== null){
+            if (Buffer.isBuffer(result))
+                result = result.toString("ascii");
+
+            result = JSON.parse ( result);
+
+            this.poolsList = result;
+        } else
+            this.poolsList = {};
 
         return result;
     }
 
-    async setMinerPoolActivated(newValue, skipSaving = false){
+    async setMinerPoolActivated(newValue, skipSaving = false, useActivation = true){
 
-        PoolsUtils.validatePoolActiviated(newValue);
+        if (newValue === this._minerPoolActivated) return ;
+
+        PoolsUtils.validatePoolActivated(newValue);
 
         this._minerPoolActivated = newValue;
 
@@ -180,6 +197,10 @@ class MinerPoolSettings {
             if (false === await this._db.save("minerPool_activated", this._minerPoolActivated ? "true" : "false")) throw {message: "minerPoolActivated couldn't be saved"};
 
         StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
+
+        if (useActivation)
+            await this.minerPoolManagement.setMinerPoolStarted(newValue, true);
+
     }
 
     get minerPoolActivated(){

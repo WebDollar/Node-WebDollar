@@ -83,9 +83,10 @@ class NodesList {
             // it is a unique connection, I should register this connection
 
             let object = new NodesListObject(socket, connectionType, nodeType, nodeConsensusType,  NodesWaitlist.isAddressFallback(socket.node.sckAddress));
-            this.nodes.push(object);
 
-            this.emitter.emit("nodes-list/connected", object);
+            await this.emitter.emit("nodes-list/connected", object);
+
+            this.nodes.push(object);
 
             if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL || socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER )) {
 

@@ -24,6 +24,8 @@ class PoolDataBlockInformationMinerInstance {
         this.workHashNonce = undefined;
         this.workBlock = undefined;
 
+        this.minerInstanceTotalDifficulty = undefined;
+
     }
 
     async validateWorkHash(workHash, workNonce){
@@ -33,7 +35,7 @@ class PoolDataBlockInformationMinerInstance {
 
             let hash = await this.workBlock.computeHash( workNonce );
 
-            if ( ! BufferExtended.safeCompare(hash, workHash ) ) throw {message: "work.hash is invalid"}
+            if ( ! BufferExtended.safeCompare(hash, workHash ) ) return false;
 
         }
 
@@ -41,13 +43,23 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    adjustDifficulty(difficulty){
+    async wasBlockMined(){
+
+        if ( (await this.workBlock.computeHash(this.workHashNonce)).compare(this.workBlock.difficultyTargetPrev) <= 0)
+            return true;
+
+        return false;
+    }
+
+    calculateDifficulty(){
 
         // target     =     maximum target / difficulty
         // difficulty =     maximum target / target
+        this.minerInstanceTotalDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
 
-        if (difficulty === undefined)
-            difficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
+    }
+
+    adjustDifficulty(difficulty){
 
         this.minerTotalDifficulty  = this.minerTotalDifficulty.plus(difficulty);
 
@@ -59,7 +71,7 @@ class PoolDataBlockInformationMinerInstance {
 
     calculateReward(){
 
-        this.reward = this.blockInformation.totalDifficulty.dividedToIntegerBy( this.minerTotalDifficulty ) * BlockchainMiningReward.getReward( Blockchain.blockchain.blocks.length-1 ) * this.poolManagement.poolSettings.poolFee / 100;
+        this.reward = this.blockInformation.totalDifficulty.dividedToIntegerBy( this.minerTotalDifficulty ) * BlockchainMiningReward.getReward( Blockchain.blockchain.blocks.length-1 ) * (1-this.poolManagement.poolSettings.poolFee);
 
     }
 

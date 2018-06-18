@@ -1,19 +1,30 @@
 import ed25519 from "common/crypto/ed25519";
 import NodesList from 'node/lists/Nodes-List';
 import WebDollarCrypto from "../../../../crypto/WebDollar-Crypto";
+import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
+import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 
-class ServerPoolConnectedPoolsProtocol{
+class ServerPoolConnectedPoolsProtocol extends PoolProtocolList{
 
 
     constructor(serverPoolManagement){
 
+        super();
+
         this.serverPoolManagement = serverPoolManagement;
         this.loaded = false;
+
+        this.connectedPools = [];
+        this.list = this.connectedPools;
     }
 
     startServerPoolConnectedPoolsProtocol(){
 
         if (this.loaded) return;
+
+        for (let i=0; i<NodesList.nodes.length; i++)
+            this._subscribeSocket(NodesList.nodes[i]);
+
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeSocket(result)
@@ -23,8 +34,6 @@ class ServerPoolConnectedPoolsProtocol{
             this._unsubscribeSocket(result)
         });
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            this._subscribeSocket(NodesList.nodes[i]);
 
 
         this.loaded = true;
@@ -62,6 +71,8 @@ class ServerPoolConnectedPoolsProtocol{
 
                     socket.node.sendRequest("server-pool/register-pool/answer/confirmation/answer", {result: true} );
 
+                    this._addConnectedPool(socket, data.poolPublicKey, data.poolName, data.poolFee, data.poolWebsite, data.poolServers )
+
                     return true;
 
                 } catch (exception){
@@ -86,6 +97,43 @@ class ServerPoolConnectedPoolsProtocol{
     _unsubscribeSocket(nodesListObject) {
 
         let socket = nodesListObject.socket;
+
+    }
+
+    findPoolByPoolPublicKey(poolPublicKey){
+
+        for (let i=0; i<this.connectedPools.length; i++)
+            if (this.connectedPools[i].node.protocol.pool.poolPublicKey.equals(poolPublicKey)){
+                return this.connectedPools[i];
+            }
+
+        return null;
+    }
+
+    _addConnectedPool(socket, poolPublicKey, poolName, poolFee, poolWebsite, poolServers){
+
+        socket.node.protocol.pool = {
+
+            poolPublicKey: poolPublicKey,
+            poolFee: poolFee,
+            poolName: poolName,
+            poolWebsite: poolWebsite,
+            poolServers: poolServers,
+
+        };
+
+        socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL;
+
+        this.addElement(socket);
+
+
+        //verify if there are any connectedMiners that are looking for that protocol
+        let connectedMiners = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedMinersProtocol.connectedMiners;
+        for (let i=0; i<connectedMiners.length; i++)
+            if (connectedMiners[i].node.protocol.minerPool.poolPublicKey.equals(poolPublicKey)){
+
+            }
+
 
     }
 

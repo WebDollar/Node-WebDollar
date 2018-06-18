@@ -18,6 +18,7 @@ class ServerPoolProtocol{
     _startServerPoolProtocol(){
 
         if (this.loaded) return;
+        this.loaded = true;
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeSocket(result)
@@ -33,7 +34,7 @@ class ServerPoolProtocol{
         this.serverPoolConnectedPoolsProtocol.startServerPoolConnectedPoolsProtocol();
         this.serverPoolConnectedMinersProtocol.startServerPoolConnectedPoolsProtocol();
 
-        this.loaded = true;
+
 
     }
 
