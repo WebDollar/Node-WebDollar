@@ -171,7 +171,7 @@ class NodeClient {
 
         //it is not unique... then I have to disconnect
 
-        if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, this.socket.node.protocol.nodeConsensusType,  validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, waitlist.nodeConsensusType,  validationDoubleConnectionsTypes) === false){
             return false;
         }
 

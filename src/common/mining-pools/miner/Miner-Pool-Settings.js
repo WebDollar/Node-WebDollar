@@ -87,7 +87,8 @@ class MinerPoolSettings {
         newValue = PoolsUtils.processServersList( newValue );
         this.poolServers = newValue;
 
-        await this.minerPoolManagement.minerPoolProtocol.insertServersListWaitlist( this.poolServers );
+        if (this.minerPoolManagement.minerPoolStarted)
+            await this.minerPoolManagement.minerPoolProtocol.insertServersListWaitlist( this.poolServers );
 
     }
 
@@ -149,21 +150,14 @@ class MinerPoolSettings {
         if (data === null) return;
 
         let foundPool = this.poolsList[data.poolPublicKey.toString("hex")];
-        if (foundPool === undefined){
+        if (foundPool === undefined)
             foundPool = {};
-            this.poolsList[data.poolPublicKey.toString("hex")] = foundPool;
+
+        if (JSON.stringify(this.poolsList[data.poolPublicKey.toString("hex")]) !== JSON.stringify(data)){
+            this.poolsList[data.poolPublicKey.toString("hex")] = data;
+            await this._saveMinerPoolList();
         }
 
-        foundPool.poolName = data.poolName;
-        foundPool.poolFee = data.poolFee;
-        foundPool.poolAddress = data.poolAddress;
-        foundPool.poolPublicKey = data.poolPublicKey;
-        foundPool.poolServers = data.poolServers;
-        foundPool.poolWebsite = data.poolWebsite;
-        foundPool.poolVersion = data.poolVersion;
-        foundPool.poolURL = data.poolURL;
-
-        await this._saveMinerPoolList();
 
     }
 
@@ -183,15 +177,17 @@ class MinerPoolSettings {
                 result = result.toString("ascii");
 
             result = JSON.parse ( result);
-        }
 
-
-        this.poolsList = result;
+            this.poolsList = result;
+        } else
+            this.poolsList = {};
 
         return result;
     }
 
     async setMinerPoolActivated(newValue, skipSaving = false, useActivation = true){
+
+        if (newValue === this._minerPoolActivated) return ;
 
         PoolsUtils.validatePoolActivated(newValue);
 

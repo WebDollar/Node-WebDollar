@@ -181,7 +181,9 @@ class PoolSettings {
         if (!skipSaving)
             if (false === await this._db.save("pool_servers", JSON.stringify(this._poolServers))) throw {message: "PoolServers couldn't be stored"};
 
-        await this.poolManagement.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this._poolServers );
+        if (this.poolManagement.poolStarted)
+            await this.poolManagement.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this._poolServers );
+
         this._generatePoolURL();
 
     }

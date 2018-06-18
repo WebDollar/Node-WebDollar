@@ -87,8 +87,13 @@ class ServerPoolManagement{
 
             await this.serverPoolSettings.setServerPoolActivated(value);
 
-            if (value) await this.serverPoolProtocol._startServerPoolProtocol();
+            if (value){
+
+                await this.serverPoolProtocol._startServerPoolProtocol();
+            }
             else await this.serverPoolProtocol._stopServerPoolProtocol();
+
+
 
             StatusEvents.emit("server-pool/status", {result: value, message: "Server Pool Started changed" });
 

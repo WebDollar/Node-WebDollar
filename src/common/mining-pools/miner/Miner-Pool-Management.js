@@ -90,6 +90,7 @@ class MinerProtocol {
             if (value) {
                 Blockchain.blockchain.mining = this.minerPoolMining;
                 Blockchain.Mining = this.minerPoolMining;
+                await this.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
                 await this.minerPoolProtocol._startMinerProtocol();
             }
             else {

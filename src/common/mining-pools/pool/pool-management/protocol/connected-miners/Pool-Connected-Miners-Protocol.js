@@ -25,12 +25,14 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
     async startPoolConnectedMinersProtocol(){
 
+        for (let i=0; i<NodesList.nodes.length; i++)
+            await this._subscribePoolConnectedMiners(NodesList.nodes[i]);
+
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
             await this._subscribePoolConnectedMiners(nodesListObject)
         });
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            await this._subscribePoolConnectedMiners(NodesList.nodes[i]);
+
 
     }
 
@@ -38,7 +40,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         let socket = nodesListObject.socket;
 
-        if (!this.poolManagement.poolStarted) return false;
+        if (!this.poolManagement._poolStarted) return;
 
         if ( !(socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL ||
              socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER )){
@@ -49,6 +51,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
         socket.node.on("mining-pool/hello-pool", async (data) => {
+
+            if (!this.poolManagement._poolStarted) return;
 
             try{
 
@@ -117,6 +121,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         socket.node.on("mining-pool/get-work", async (data) => {
 
+            if (!this.poolManagement._poolStarted) return;
+
             try {
 
                 if (!Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
@@ -151,6 +157,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
         socket.node.on("mining-pool/work-done", async (data) => {
+
+            if (!this.poolManagement._poolStarted) return;
 
             try{
 
@@ -188,6 +196,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
         //TODO change-wallet
         socket.node.on("mining-pool/change-wallet", (data) => {
 
+            if (!this.poolManagement._poolStarted) return;
+
             try{
 
                 if (Buffer.isBuffer( data.address )  || data.address.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "address is invalid"};
@@ -206,6 +216,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         //TODO request reward
         socket.node.on("mining-pool/request-reward", async (data) => {
+
+            if (!this.poolManagement._poolStarted) return;
 
             try {
 

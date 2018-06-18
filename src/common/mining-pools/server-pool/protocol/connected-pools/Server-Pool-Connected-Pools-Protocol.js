@@ -22,6 +22,10 @@ class ServerPoolConnectedPoolsProtocol extends PoolProtocolList{
 
         if (this.loaded) return;
 
+        for (let i=0; i<NodesList.nodes.length; i++)
+            this._subscribeSocket(NodesList.nodes[i]);
+
+
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeSocket(result)
         });
@@ -30,8 +34,6 @@ class ServerPoolConnectedPoolsProtocol extends PoolProtocolList{
             this._unsubscribeSocket(result)
         });
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            this._subscribeSocket(NodesList.nodes[i]);
 
 
         this.loaded = true;

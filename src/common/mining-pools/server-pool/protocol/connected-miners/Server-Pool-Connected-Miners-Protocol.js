@@ -24,6 +24,9 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
 
         if (this.loaded) return;
 
+        for (let i=0; i<NodesList.nodes.length; i++)
+            this._subscribeSocket(NodesList.nodes[i]);
+
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._subscribeSocket(result)
         });
@@ -32,8 +35,7 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
             this._unsubscribeSocket(result)
         });
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            this._subscribeSocket(NodesList.nodes[i]);
+
 
 
         this.loaded = true;
@@ -70,7 +72,7 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                 if (socketPool === null)
                     throw {message: "pool was not found in the serverPool"};
 
-                data.suffix = socket.node.sckAddress.uuid;
+                data.suffix = Math.random().toString();
                 let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/hello-pool", data, "answer/"+data.suffix );
 
                 if (answer === null) throw {message: "Pool didn't answer"};
@@ -115,7 +117,7 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                 if (socketPool === null)
                     throw {message: "pool was not found in the serverPool"};
 
-                data.suffix = socket.node.sckAddress.uuid;
+                data.suffix = Math.random().toString();
                 let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/get-work", data, "answer/"+data.suffix );
 
                 if (answer === null) throw {message: "there is a problem with the pool"};
@@ -140,7 +142,7 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                 if (socketPool === null)
                     throw {message: "pool was not found in the serverPool"};
 
-                data.suffix = socket.node.sckAddress.uuid;
+                data.suffix = Math.random().toString();
                 let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix );
 
                 if (answer === null) throw {message: "there is a problem with the pool"};

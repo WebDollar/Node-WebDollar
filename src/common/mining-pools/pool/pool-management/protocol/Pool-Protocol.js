@@ -21,21 +21,23 @@ class PoolProtocol {
 
         if (this.loaded) return true;
 
+        this.loaded = true;
+
+
+        for (let i=0; i<NodesList.nodes.length; i++)
+            this._subscribePool(NodesList.nodes[i]);
+
         NodesList.emitter.on("nodes-list/connected", (result) => {
-            this._subscribeMiner(result)
+            this._subscribePool(result)
         });
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
-            this._unsubscribeMiner(result)
+            this._unsubscribePool(result)
         });
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            this._subscribeMiner(NodesList.nodes[i]);
 
         await this.poolConnectedServersProtocol.startPoolConnectedServersProtocol();
         await this.poolConnectedMinersProtocol.startPoolConnectedMinersProtocol();
-
-        this.loaded = true;
 
         return true;
     }
@@ -44,7 +46,7 @@ class PoolProtocol {
 
     }
 
-    _subscribeMiner(nodesListObject) {
+    _subscribePool(nodesListObject) {
 
         let socket = nodesListObject.socket;
 
@@ -52,7 +54,7 @@ class PoolProtocol {
 
     }
 
-    _unsubscribeMiner(nodesListObject) {
+    _unsubscribePool(nodesListObject) {
 
         let socket = nodesListObject.socket;
 

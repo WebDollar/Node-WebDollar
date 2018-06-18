@@ -7,6 +7,7 @@ import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
 import Serialization from "../../../utils/Serialization";
+import StatusEvents from "common/events/Status-Events";
 
 class MinerProtocol extends PoolProtocolList{
 
@@ -28,8 +29,13 @@ class MinerProtocol extends PoolProtocolList{
 
     async _startMinerProtocol(){
 
-        if (this.loaded)
-            return true;
+        if (this.loaded) return true;
+
+        this.loaded = true;
+
+        for (let i=0; i<NodesList.nodes.length; i++)
+            await this._subscribeMiner(NodesList.nodes[i]);
+
 
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
             await this._subscribeMiner(nodesListObject)
@@ -39,10 +45,6 @@ class MinerProtocol extends PoolProtocolList{
             this._unsubscribeMiner( nodesListObject )
         });
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            await this._subscribeMiner(NodesList.nodes[i]);
-
-        this.loaded = true;
 
     }
 
@@ -76,7 +78,7 @@ class MinerProtocol extends PoolProtocolList{
                 let answer = await this._sendPoolHello(socket);
 
                 if (!answer)
-                    socket.disconnect();
+                    throw {message: "send hello is not working"};
             }
 
         } catch (exception){
@@ -92,6 +94,9 @@ class MinerProtocol extends PoolProtocolList{
 
         let socket = nodesListObject.socket;
 
+        if (socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL)
+            StatusEvents.emit("miner-pool/servers-connections", {message: "Server Removed"});
+
     }
 
     async _sendPoolHello(socket){
@@ -99,6 +104,7 @@ class MinerProtocol extends PoolProtocolList{
         try{
 
             let message = WebDollarCrypto.getBufferRandomValues(32);
+            //let message = new Buffer(32);
 
             let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
                 message: message,
@@ -126,13 +132,16 @@ class MinerProtocol extends PoolProtocolList{
                 return true;
 
             } catch (exception){
+                console.error("Exception mining-pool/hello-pool/answer/confirmation", exception);
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: false, message: exception.message});
             }
 
 
         } catch (exception){
-
+            console.error("Exception mining-pool/hello-pool/answer", exception);
         }
+
+        return false;
 
     }
 
@@ -145,6 +154,8 @@ class MinerProtocol extends PoolProtocolList{
         socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL;
 
         this.addElement(socket);
+
+        StatusEvents.emit("miner-pool/servers-connections", {message: "Server Added"});
 
     }
 
