@@ -2,6 +2,9 @@ import Serialization from 'common/utils/Serialization';
 import BufferExtended from "common/utils/BufferExtended";
 import consts from 'consts/const_global';
 import Blockchain from "../../../../main-blockchain/Blockchain";
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
+import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
+import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 class PoolWorkManagement{
 
@@ -59,6 +62,9 @@ class PoolWorkManagement{
 
         minerInstance.work = answer;
 
+        let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
+        blockInformationMinerInstance.workBlock = this._lastBlock;
+
         return answer;
 
     }
@@ -78,7 +84,75 @@ class PoolWorkManagement{
         minerInstance.hashesPerSecond = Math.min( minerInstance.hashesPerSecond , 5000);
         minerInstance.hashesPerSecond = Math.max( minerInstance.hashesPerSecond , 100);
 
-        return await this.poolManagement.poolData.lastBlockInformation.updateWorkBlockInformationMinerInstance(minerInstance, work);
+
+
+        let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
+
+        if ( await blockInformationMinerInstance.validateWorkHash( work.hash, work.nonce ) ){
+
+            blockInformationMinerInstance.workHash = work.hash;
+            blockInformationMinerInstance.workHashNonce = work.nonce;
+
+            blockInformationMinerInstance.calculateDifficulty();
+            blockInformationMinerInstance.adjustDifficulty(blockInformationMinerInstance.minerInstanceTotalDifficulty);
+
+            if (work.result)
+                if (await blockInformationMinerInstance.wasBlockMined() ) {
+
+                    console.warn("----------------------------------------------------------------------------");
+                    console.warn("WebDollar Block was mined in Pool ", blockInformationMinerInstance.workBlock.height, " nonce (", blockInformationMinerInstance.workHashNonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
+                    console.warn("----------------------------------------------------------------------------");
+
+
+                    try {
+
+                        let revertActions = new RevertActions(this.blockchain);
+
+                        if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
+
+                                blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
+                                blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
+
+                                //returning false, because a new fork was changed in the mean while
+                                if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
+                                    return false;
+
+                                return this.blockchain.includeBlockchainBlock(blockInformationMinerInstance.workBlock, false, ["all"], true, revertActions);
+
+                            }) === false) throw {message: "Mining2 returned false"};
+
+                        NodeBlockchainPropagation.propagateLastBlockFast(blockInformationMinerInstance.workBlock);
+
+                        revertActions.destroyRevertActions();
+
+                        //confirming transactions
+                        blockInformationMinerInstance.workBlock.data.transactions.transactions.forEach((transaction) => {
+                            transaction.confirmed = true;
+                            this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+                        });
+
+                    } catch (exception) {
+
+                        console.error("Mining processBlocksSempahoreCallback raised an error ", blockInformationMinerInstance.workBlock.height, exception);
+
+                    }
+
+                } else {
+                    //remove blockInformation
+                    this.poolManagement.poolData.lastBlockInformation._deleteBLockInformationMinerInstance(minerInstance);
+                    throw {message: "block was incorrectly mined"};
+                }
+
+            return {result: true, potentialReward: blockInformationMinerInstance.reward, confirmedReward: minerInstance.miner.calculateConfirmedReward() };
+
+        } else {
+
+            //remove blockInformation
+            this.poolManagement.poolData.lastBlockInformation._deleteBLockInformationMinerInstance(minerInstance);
+
+        }
+
+        return {result: false, potentialReward: 0 };
 
     }
 

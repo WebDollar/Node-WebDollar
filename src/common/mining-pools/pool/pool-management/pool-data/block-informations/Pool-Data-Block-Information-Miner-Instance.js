@@ -18,12 +18,13 @@ class PoolDataBlockInformationMinerInstance {
             minerTotalDifficulty = BigNumber(0);
 
         this.minerTotalDifficulty = minerTotalDifficulty;
-        this.potentialReward = 0;
+        this.reward = 0;
 
         this.workHash = undefined;
         this.workHashNonce = undefined;
-        this.workDifficulty = undefined;
         this.workBlock = undefined;
+
+        this.minerInstanceTotalDifficulty = undefined;
 
     }
 
@@ -42,11 +43,19 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
+    async wasBlockMined(){
+
+        if ( (await this.workBlock.computeHash(this.workHashNonce)).compare(this.workBlock.difficultyTargetPrev) <= 0)
+            return true;
+
+        return false;
+    }
+
     calculateDifficulty(){
 
         // target     =     maximum target / difficulty
         // difficulty =     maximum target / target
-        this.workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
+        this.minerInstanceTotalDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
 
     }
 
@@ -56,13 +65,13 @@ class PoolDataBlockInformationMinerInstance {
 
         this.blockInformation.adjustBlockInformationDifficulty(difficulty);
 
-        this.calculatePotentialReward();
+        this.calculateReward();
 
     }
 
-    calculatePotentialReward(){
+    calculateReward(){
 
-        this.potentialReward = this.blockInformation.totalDifficulty.dividedToIntegerBy( this.minerTotalDifficulty ) * BlockchainMiningReward.getReward( Blockchain.blockchain.blocks.length-1 ) * (1-this.poolManagement.poolSettings.poolFee);
+        this.reward = this.blockInformation.totalDifficulty.dividedToIntegerBy( this.minerTotalDifficulty ) * BlockchainMiningReward.getReward( Blockchain.blockchain.blocks.length-1 ) * (1-this.poolManagement.poolSettings.poolFee);
 
     }
 
@@ -73,7 +82,7 @@ class PoolDataBlockInformationMinerInstance {
         return Buffer.concat([
 
             this.minerInstance.publicKey,
-            Serialization.serializeNumber7Bytes(this.potentialReward),
+            Serialization.serializeNumber7Bytes(this.reward),
             Serialization.serializeBigNumber(this.minerTotalDifficulty),
 
         ]);
@@ -89,7 +98,7 @@ class PoolDataBlockInformationMinerInstance {
 
         this.minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(publicKey);
 
-        this.potentialReward = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
+        this.reward = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
         let answer = Serialization.deserializeBigNumber(buffer, offset);

@@ -92,7 +92,7 @@ class PoolData {
                 throw {message: "miner address is invalid" };
 
 
-            this.miners.push( new PoolDataMiner( uuid.v4(), minerAddress, minerPublicKey, minerReward, [] ) );
+            this.miners.push( new PoolDataMiner( this, uuid.v4(), minerAddress, minerPublicKey, minerReward, [] ) );
 
             return this.miners[this.miners.length-1]
 

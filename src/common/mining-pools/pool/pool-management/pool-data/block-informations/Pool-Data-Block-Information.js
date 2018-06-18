@@ -20,6 +20,8 @@ class PoolDataBlockInformation {
 
         this.blockInformationMinersInstances = [];
 
+        this.confirmations = 0;
+
     }
 
     adjustBlockInformationDifficulty(difficulty, hash){
@@ -34,30 +36,6 @@ class PoolDataBlockInformation {
 
     }
 
-    async updateWorkBlockInformationMinerInstance(minerInstance, work){
-
-        let blockInformationMinerInstance = this._addBlockInformationMinerInstance(minerInstance);
-
-        if ( await blockInformationMinerInstance.validateWorkHash( work.hash, work.nonce ) ){
-
-            blockInformationMinerInstance.workHash = work.hash;
-            blockInformationMinerInstance.workHashNonce = work.nonce;
-
-            blockInformationMinerInstance.calculateDifficulty();
-            blockInformationMinerInstance.adjustDifficulty(blockInformationMinerInstance.workDifficulty);
-
-            return {result: true, potentialReward: blockInformationMinerInstance.potentialReward, confirmedReward: 0 };
-
-        } else {
-
-            //remove blockInformation
-            this._deleteBLockInformationMinerInstance(minerInstance);
-
-        }
-
-        return {result: false, potentialReward: 0 };
-
-    }
 
     getRewardBlockInformationMinerInstance(minerInstance){
 
