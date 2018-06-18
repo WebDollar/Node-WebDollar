@@ -162,18 +162,18 @@ class MinerProtocol extends PoolProtocolList{
         if (answer === null) throw {message: "get-work answered null" };
 
         if (answer.result !== true) throw {message: "get-work answered false"};
-        if (answer.work !== "object") throw {message: "get-work invalid work"};
+        if (typeof answer.work !== "object") throw {message: "get-work invalid work"};
 
         if ( typeof answer.work.h !== "number" ) throw {message: "get-work invalid block height"};
         if ( !Buffer.isBuffer(answer.work.t) ) throw {message: "get-work invalid block difficulty target"};
         if ( !Buffer.isBuffer( answer.work.s) ) throw {message: "get-work invalid block header"};
 
-        if (answer.work.start !== "number") throw {message: "get-work invalid noncesStart"};
-        if (answer.work.end !== "number") throw {message: "get-work invalid noncesEnd"};
+        if (typeof answer.work.start !== "number") throw {message: "get-work invalid noncesStart"};
+        if (typeof answer.work.end !== "number") throw {message: "get-work invalid noncesEnd"};
 
         let serialization = Buffer.concat([
-            answer.work.h,
-            answer.work.t,
+            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(answer.work.h) ),
+            Serialization.serializeBufferRemovingLeadingZeros( answer.work.t ),
             answer.work.s,
         ]);
 
@@ -192,13 +192,14 @@ class MinerProtocol extends PoolProtocolList{
 
     }
 
-    async pushWork(poolSocket, bestHash){
+    async pushWork(poolSocket, miningAnswer ){
 
         try {
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
-                minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
-                bestHash: bestHash
+                poolPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+                minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPublicKey,
+                mining: miningAnswer,
             });
 
             if (answer === null) throw {message: "WorkDone: Answer is null"};

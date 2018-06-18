@@ -1,4 +1,7 @@
 import NodesList from 'node/lists/Nodes-List';
+import consts from 'consts/const_global'
+import global from 'consts/global';
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
 let InheritedPoolMining;
 
@@ -35,6 +38,7 @@ class MinerPoolMining extends InheritedPoolMining {
                 this._miningWork.poolSocket = null;
         });
 
+        this.minerAddress = Blockchain.blockchain.mining.minerAddress;
 
         setTimeout( this._checkForWork.bind(this), 5000);
 
@@ -58,12 +62,41 @@ class MinerPoolMining extends InheritedPoolMining {
 
     }
 
-    async run() {
+    async mineNextBlock(showMiningOutput, suspend){
+
+        while (this.started && !global.TERMINATED){
+
+            if (showMiningOutput)
+                this.setMiningHashRateInterval();
+
+            if (this._miningWork.block === undefined || this._miningWork.resolved)
+                await Blockchain.blockchain.sleep(10);
+            else {
+
+                try {
+
+                    let answer = await this._run();
+                    this._miningWork.resolved = true;
+
+                    let answerPool = await this.minerPoolManagement.minerPoolProtocol.pushWork(this._miningWork.poolSocket, answer);
+
+                } catch (exception) {
+                    console.log("Pool Mining Exception", exception);
+                    this.stopMining();
+                }
+
+            }
+
+
+        }
+
+    }
+
+    async _run() {
 
         try {
 
             if (this._miningWork.block === undefined) throw {message: "block is undefined"};
-
             if (this._miningWork.start === undefined) throw {message: "start is undefined"};
             if (this._miningWork.end === undefined) throw {message: "end is undefined"};
             if (this._miningWork.difficultyTarget === undefined) throw {message: "difficultyTarget is undefined"};

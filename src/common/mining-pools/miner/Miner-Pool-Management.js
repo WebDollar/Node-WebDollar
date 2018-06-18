@@ -84,8 +84,16 @@ class MinerProtocol {
 
             await this.minerPoolSettings.setMinerPoolActivated(value);
 
-            if (value) await this.minerPoolProtocol._startMinerProtocol();
-            else await this.minerPoolProtocol._stopMinerProtocol();
+            if (value) {
+                Blockchain.blockchain.mining = this.minerPoolMining;
+                Blockchain.Mining = this.minerPoolMining;
+                await this.minerPoolProtocol._startMinerProtocol();
+            }
+            else {
+                Blockchain.blockchain.mining = Blockchain.blockchain.miningSolo;
+                Blockchain.Mining = Blockchain.blockchain.miningSolo;
+                await this.minerPoolProtocol._stopMinerProtocol();
+            }
 
             StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Started changed" });
 

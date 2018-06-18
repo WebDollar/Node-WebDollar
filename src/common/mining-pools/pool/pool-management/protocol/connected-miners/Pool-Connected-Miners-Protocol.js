@@ -128,7 +128,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 let work = await this.poolManagement.generatePoolWork(minerInstance);
 
-                let message = Buffer.concat( [ work.block.serialization, Serialization.serializeNumber4Bytes( work.start ), Serialization.serializeNumber4Bytes( work.end ) ]);
+                let message = Buffer.concat( [ work.serialization, Serialization.serializeNumber4Bytes( work.start ), Serialization.serializeNumber4Bytes( work.end ) ]);
                 let signature = this.poolManagement.poolSettings.poolDigitalSign(message);
 
                 work.serialization = undefined; //don't send the data 2 times

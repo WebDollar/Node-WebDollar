@@ -85,7 +85,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     /**
      * mine next block
      */
-    async mineNextBlock(showMiningOutput, suspend){
+    async mineNextBlock(showMiningOutput, suspend, start, end){
 
         while (this.started && !global.TERMINATED){
 
@@ -97,12 +97,41 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 return;
             }
 
+
+            if (showMiningOutput)
+                this.setMiningHashRateInterval();
+
             //mining next blocks
 
             let nextBlock = await this.getNextBlock();
 
             try {
-                await this.mineBlock(nextBlock, this.blockchain.getDifficultyTarget(), undefined, undefined, showMiningOutput);
+
+                let difficulty = this.blockchain.getDifficultyTarget();
+
+                if (difficulty === undefined || difficulty === null)
+                    throw {message: 'difficulty not specified'};
+
+                if (difficulty instanceof BigInteger)
+                    difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
+
+                if (!Buffer.isBuffer(nextBlock)) {
+
+                    if (nextBlock === undefined || nextBlock === null)
+                        throw {message: "block is undefined"};
+
+                    nextBlock._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
+                }
+
+                if (start === undefined) //avoid mining the same nonces on every machine that is mining the same address
+                    start = Math.floor( Math.random() * 3700000000 );
+
+                if (end === undefined)
+                    end = 0xFFFFFFFF;
+
+                await this.mineBlock(nextBlock, difficulty, start, end);
+
+
             } catch (exception){
                 console.log("Mining Exception", exception);
                 this.stopMining();
@@ -118,34 +147,14 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      * @param block
      * @param difficulty
      */
-    async mineBlock( block,  difficulty, start, end, showMiningOutput ){
+    async mineBlock( block,  difficulty, start, end ){
 
         console.log("");
         console.log(" ----------- mineBlock-------------");
 
         try{
-            console.log("difficultydifficultydifficulty", difficulty === undefined || difficulty === null);
-
-            if (difficulty === undefined || difficulty === null)
-                throw {message: 'difficulty not specified'};
-
-            if (difficulty instanceof BigInteger)
-                difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
-
-            if (block === undefined || block === null)
-                throw {message: "block is undefined"};
-
-            block._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
-
-            if (start === undefined) //avoid mining the same nonces on every machine that is mining the same address
-                start = Math.floor( Math.random() * 3700000000 );
-            if (end === undefined)
-                end = 0xFFFFFFFF;
 
             //calculating the hashes per second
-
-            if (showMiningOutput)
-                this.setMiningHashRateInterval();
 
 
             let answer;
@@ -241,7 +250,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     async _mineNonces(start, end){
 
         let nonce = start;
-        let bestHash =  consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ;
+        let bestHash =  Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER );
         let bestHashNonce = -1;
 
         while (nonce <= end && this.started && !this.reset) {
