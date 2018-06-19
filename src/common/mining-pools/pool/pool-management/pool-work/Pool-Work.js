@@ -40,9 +40,12 @@ class PoolWork {
         if (!Blockchain.synchronized)
             throw {message: "Blockchain is not yet synchronized"};
 
-        let promise = new Promise( async (resolve)=>{
+        this.lastBlockPromise = Utils.MakeQuerablePromise( new Promise( async (resolve)=>{
 
+            console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
             console.log(33333);
+            let time = new Date().getTime();
+
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlockNonce = 0;
@@ -60,11 +63,11 @@ class PoolWork {
             this._blocksList.push(this.lastBlockElement);
 
             console.log(44444);
+            console.log( (new Date().getTime() - time ) /1000, "s") ;
+            console.log("**************************************************")
 
             resolve(true);
-        });
-
-        this.lastBlockPromise = Utils.MakeQuerablePromise( promise );
+        }));
 
         return this.lastBlockPromise;
 
@@ -79,7 +82,7 @@ class PoolWork {
         for (let i=0; i<this._blocksList.length; i++) {
 
             //delete block
-            if (time - this._blocksList[i].block.timeStamp > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK) {
+            if (this._blocksList[i].block !== this.lastBlock && time - this._blocksList[i].block.timeStamp > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK*1000) {
 
                 for (let key in this._blocksList.instances)
                     this._blocksList.instances[key].workBlock = undefined;
