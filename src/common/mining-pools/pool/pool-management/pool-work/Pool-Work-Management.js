@@ -107,7 +107,7 @@ class PoolWorkManagement{
 
                 //returning false, because a new fork was changed in the mean while
                 if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
-                    throw {message: "block is already too old"};
+                    throw {message: "pool: block is already too old"};
 
                 let revertActions = new RevertActions(this.blockchain);
 
@@ -116,7 +116,7 @@ class PoolWorkManagement{
 
                             //returning false, because a new fork was changed in the mean while
                             if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
-                                return false;
+                                throw {message: "pool: block is already too old for processing"};
 
                             blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
                             blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
