@@ -39,6 +39,17 @@ class RevertActions {
 
                     this.blockchain.blocks.spliceBlocks(action.height, true);
 
+                    if (this.blockchain.agent.light) {
+                        this.blockchain.lightPrevHashPrevs.spliceBlocks(action.height, true);
+                        this.blockchain.lightPrevTimeStamps.spliceBlocks(action.height, true);
+                        this.blockchain.lightPrevDifficultyTargets.spliceBlocks(action.height, true);
+
+                        this.blockchain.lightPrevHashPrevs[action.height] = this.blockchain.blocks[action.height-1].hash;
+                        this.blockchain.lightPrevTimeStamps[action.height] = this.blockchain.blocks[action.height-1].timeStamp;
+                        this.blockchain.lightPrevDifficultyTargets[action.height] = this.blockchain.blocks[action.height-1].difficultyTarget;
+
+                    }
+
                 } else if (action.name === "breakpoint" && (actionName === '' || actionName === action.name)) {
 
                     this._actions.splice(i, 1);

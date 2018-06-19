@@ -75,10 +75,18 @@ class MinerProtocol extends PoolProtocolList{
         try {
 
             if (socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
+
                 let answer = await this._sendPoolHello(socket);
+
 
                 if (!answer)
                     throw {message: "send hello is not working"};
+
+                socket.on("mining-pool/hello-pool/again",async (data)=>{
+
+                    await this._sendPoolHello(socket);
+
+                });
             }
 
         } catch (exception){

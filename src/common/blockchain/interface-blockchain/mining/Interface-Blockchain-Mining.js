@@ -54,11 +54,11 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             console.error("Error creating next block ", Exception, nextBlock);
         }
 
+
+        //simulating the new block and calculate the hashAccountantTree
+        let revertActions = new RevertActions( this.blockchain );
+
         try{
-
-
-            //simulating the new block and calculate the hashAccountantTree
-            let revertActions = new RevertActions( this.blockchain );
 
             if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
 
@@ -72,11 +72,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 }) === false) throw {message: "Mining1 returned False"};
 
-            revertActions.destroyRevertActions();
-
         } catch (Exception){
             console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);
+            revertActions.revertOperations();
         }
+
+        revertActions.destroyRevertActions();
 
         return nextBlock;
 
@@ -189,9 +190,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 }
 
-                try {
+                let revertActions = new RevertActions(this.blockchain);
 
-                    let revertActions = new RevertActions(this.blockchain);
+                try {
 
                     if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
@@ -208,8 +209,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     NodeBlockchainPropagation.propagateLastBlockFast( block );
 
-                    revertActions.destroyRevertActions();
-
                     //confirming transactions
                     block.data.transactions.transactions.forEach((transaction) => {
                         transaction.confirmed = true;
@@ -218,9 +217,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     });
 
                 } catch (exception){
-
                     console.error("Mining processBlocksSempahoreCallback raised an error ",block.height, exception);
+                    revertActions.revertOperations();
                 }
+                revertActions.destroyRevertActions();
 
             } else
             if (!answer.result)

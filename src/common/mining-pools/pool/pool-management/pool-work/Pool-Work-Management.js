@@ -5,6 +5,8 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 import PoolWork from "./Pool-Work";
+import Blockchain from "main-blockchain/Blockchain";
+import Utils from "common/utils/helpers/Utils";
 
 class PoolWorkManagement{
 
@@ -32,8 +34,11 @@ class PoolWorkManagement{
         await this.poolWork.lastBlockPromise; //it's a promise, let's wait
 
         console.log(22222);
-        if (this.poolWork.lastBlock === undefined || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  || this.poolWork.lastBlock.height !==  this.blockchain.blocks.length || !this.poolWork.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))
+
+        if ( this.poolWork.lastBlock === undefined || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  ||
+            (!this.blockchain.semaphoreProcessing.processing && ( this.poolWork.lastBlock.height !==  this.blockchain.blocks.length || !this.poolWork.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))))
             await this.poolWork.getNextBlockForWork();
+
 
         console.log(55555);
 
@@ -43,7 +48,7 @@ class PoolWorkManagement{
             this.poolWork.lastBlock.computedBlockPrefix
         ]);
 
-        this.poolWork.lastBlockElement.instances[minerInstance.publicKeyString] = true;
+        this.poolWork.lastBlockElement.instances[minerInstance.publicKeyString] = this.poolWork.lastBlock;
 
         let answer = {
 
@@ -80,7 +85,7 @@ class PoolWorkManagement{
             if (blockInformationMinerInstance.workBlock === undefined)
                 throw {message: "no block"};
 
-            let hashesFactor = Math.min(5, (3000/work.timeDiff));
+            let hashesFactor = Math.min(5, (5000/work.timeDiff));
             hashesFactor = Math.max(0.01, hashesFactor);
 
             minerInstance.hashesPerSecond *= Math.floor( hashesFactor );
@@ -98,7 +103,7 @@ class PoolWorkManagement{
             blockInformationMinerInstance.adjustDifficulty(blockInformationMinerInstance.workDifficulty);
 
             //statistics
-            this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance.workDifficulty, minerInstance.publicKey, minerInstance);
+            this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance.workDifficulty, minerInstance);
 
             if (work.result && await blockInformationMinerInstance.wasBlockMined() ) {
 
@@ -108,28 +113,34 @@ class PoolWorkManagement{
 
                 let revertActions = new RevertActions(this.blockchain);
 
-                if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
+                try {
+                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 
-                        blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
-                        blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
+                            blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
+                            blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
 
-                        //returning false, because a new fork was changed in the mean while
-                        if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
-                            return false;
+                            //returning false, because a new fork was changed in the mean while
+                            if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
+                                return false;
 
-                        return this.blockchain.includeBlockchainBlock(blockInformationMinerInstance.workBlock, false, ["all"], true, revertActions);
+                            return this.blockchain.includeBlockchainBlock(blockInformationMinerInstance.workBlock, false, ["all"], true, revertActions);
 
-                    }) === false) throw {message: "Mining2 returned false"};
+                        }) === false) throw {message: "Mining2 returned false"};
 
-                NodeBlockchainPropagation.propagateLastBlockFast(blockInformationMinerInstance.workBlock);
+                    NodeBlockchainPropagation.propagateLastBlockFast(blockInformationMinerInstance.workBlock);
+
+                    //confirming transactions
+                    blockInformationMinerInstance.workBlock.data.transactions.transactions.forEach((transaction) => {
+                        transaction.confirmed = true;
+                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+                    });
+
+                } catch (exception){
+                    revertActions.revertOperations();
+                }
 
                 revertActions.destroyRevertActions();
 
-                //confirming transactions
-                blockInformationMinerInstance.workBlock.data.transactions.transactions.forEach((transaction) => {
-                    transaction.confirmed = true;
-                    this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
-                });
             }
 
             return {result: true, potentialReward: blockInformationMinerInstance.reward, confirmedReward: minerInstance.miner.calculateConfirmedReward() };

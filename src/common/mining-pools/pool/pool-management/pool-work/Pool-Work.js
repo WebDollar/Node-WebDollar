@@ -46,9 +46,18 @@ class PoolWork {
             console.log(33333);
             let time = new Date().getTime();
 
+            if (this.lastBlockPromise !== undefined )
+                console.log("promise: ", this.lastBlockPromise.isPending(), "    isFulfilled: ", this.lastBlockPromise.isFulfilled())
+
+            console.log("this.poolWork.lastBlock", this.lastBlock);
+            console.log("this.blockchain.blocks.last", this.blockchain.blocks.last);
+            console.log("this.blockchain.blocks", this.blockchain.blocks);
+            console.log("lightPrevHashPrevs", this.blockchain.lightPrevHashPrevs);
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlockNonce = 0;
+
+            console.log("this.poolWork.lastBlock NEW", this.lastBlock);
 
             if (this.lastBlock.computedBlockPrefix === null )
                 this.lastBlock._computeBlockHeaderPrefix();
@@ -64,7 +73,10 @@ class PoolWork {
 
             console.log(44444);
             console.log( (new Date().getTime() - time ) /1000, "s") ;
-            console.log("**************************************************")
+            console.log("**************************************************");
+
+            if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash )))
+                console.error("ERRRORR!!! HASHPREV DOESN'T MATCH blocks.last.hash");
 
             resolve(true);
         }));
@@ -82,10 +94,11 @@ class PoolWork {
         for (let i=0; i<this._blocksList.length; i++) {
 
             //delete block
-            if (this._blocksList[i].block !== this.lastBlock && time - this._blocksList[i].block.timeStamp > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK*1000) {
+            if (this._blocksList[i].block !== this.lastBlock && (time - this._blocksList[i].block.timeStamp > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK*1000)) {
 
-                for (let key in this._blocksList.instances)
-                    this._blocksList.instances[key].workBlock = undefined;
+                for (let key in this._blocksList[i].instances)
+                    if (this._blocksList[i].instances.hasOwnProperty(key))
+                        this._blocksList[i].instances[key].workBlock = undefined;
 
                 this._blocksList[i].block.destroyBlock();
                 this._blocksList[i].block = undefined;
