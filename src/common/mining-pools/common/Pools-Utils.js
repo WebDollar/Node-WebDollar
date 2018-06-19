@@ -192,7 +192,11 @@ class PoolsUtils {
 
     getPoolServersStatus(poolServers){
 
-        if (typeof poolServers === "string") poolServers = this.processServersList( poolServers );
+        try {
+            if (typeof poolServers === "string") poolServers = this.processServersList(poolServers);
+        } catch (exception){
+            return {}
+        }
 
         let result = {};
 

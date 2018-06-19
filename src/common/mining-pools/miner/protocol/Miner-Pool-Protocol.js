@@ -124,10 +124,16 @@ class MinerProtocol extends PoolProtocolList{
 
                 if (! ed25519.verify(answer.signature, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
 
+                if ( typeof answer.potentialReward !== "number") throw {message: "pool: potentialReward is empty"};
+                if ( typeof answer.confirmedReward !== "number") throw {message: "pool: confirmedReward is empty"};
+
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
 
                 //connection established
-                this._connectionEstablishedWithPool(socket);
+                this._connectionEstablishedWithPool(socket, answer.potentialReward, answer.confirmedReward);
+
+                if (typeof answer.m === "number") this.minerPoolManagement.minerPoolStatistics.poolMinersOnline = answer.m;
+                if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
 
                 return true;
 
@@ -146,12 +152,15 @@ class MinerProtocol extends PoolProtocolList{
     }
 
 
-    _connectionEstablishedWithPool(socket){
+    _connectionEstablishedWithPool(socket, potentialReward, confirmedReward){
 
         socket.node.protocol.pool = {
         };
 
         socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL;
+
+        this.minerPoolManagement.minerPoolReward.confirmedReward = confirmedReward;
+        this.minerPoolManagement.minerPoolReward.potentialReward = potentialReward;
 
         this.addElement(socket);
 
@@ -195,7 +204,7 @@ class MinerProtocol extends PoolProtocolList{
         let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", {
             minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
             poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
-        }, "answer");
+        }, "answer", 6000);
 
         if (answer === null) throw {message: "get-work answered null" };
 
@@ -203,6 +212,9 @@ class MinerProtocol extends PoolProtocolList{
 
         this._validateRequestWork(answer.work, answer.signature);
         this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.work, poolSocket);
+
+        if (typeof answer.m === "number") this.minerPoolManagement.minerPoolStatistics.poolMinersOnline = answer.m;
+        if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
 
         return true;
 
@@ -216,10 +228,10 @@ class MinerProtocol extends PoolProtocolList{
                 poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
                 minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
                 work: miningAnswer,
-            }, "answer");
+            }, "answer", 6000);
 
             if (answer === null) throw {message: "WorkDone: Answer is null"};
-            if (answer.result !== true) throw {message: "WorkDone: Result is not True"};
+            if (answer.result !== true) throw {message: "WorkDone: Result is not True", reason: answer.message};
 
             if (answer.result){
 
@@ -228,6 +240,9 @@ class MinerProtocol extends PoolProtocolList{
 
                 this._validateRequestWork(answer.newWork, answer.signature);
                 this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.newWork, poolSocket);
+
+                if (typeof answer.m === "number") this.minerPoolManagement.minerPoolStatistics.poolMinersOnline = answer.m;
+                if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
 
             } else {
 

@@ -27,10 +27,13 @@ class PoolDataMiner{
         if (!Buffer.isBuffer(publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) 
             throw {message: "public key is invalid"};
 
-        if (this.findInstance(publicKey) === null) {
+        let instance = this.findInstance(publicKey);
+        if ( instance === null) {
             let instance = new PoolDataMinerInstance(this, publicKey);
             this.instances.push(instance);
         }
+
+        return instance;
 
     }
 

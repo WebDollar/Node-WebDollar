@@ -188,34 +188,35 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                 console.log("Worker Error");
             } else{
 
-                //verify block with the worker block
-                let match = true;
+                let compare = 0;
 
-                for (let i = 0, l=this.block.length;  i < l;  i++)
-                    if (this.block[i] !== event.data.block[i] ) // do not match
-                        match = false;
+                for (let i = 0, l = event.data.hash.length; i < l; i++)
+                    if (event.data.hash[i] < this.bestHash[i]) {
+                        compare = -1;
+                        break;
+                    }
+                    else if (event.data.hash[i] > this.bestHash[i]) {
+                        compare = 1;
+                        break;
+                    }
 
-                //verify the  bestHash with  the current target
-                if (match) {
+                if (compare === -1){
 
-                    let compare = 0;
+                    //verify block with the worker block
+                    let match = true;
 
-                    for (let i = 0, l = event.data.hash.length; i < l; i++)
-                        if (event.data.hash[i] < this.bestHash[i]) {
-                            compare = -1;
-                            break;
-                        }
-                        else if (event.data.hash[i] > this.bestHash[i]) {
-                            compare = 1;
-                            break;
-                        }
+                    for (let i = 0, l=this.block.length;  i < l;  i++)
+                        if (this.block[i] !== event.data.block[i] ) // do not match
+                            match = false;
 
-                    if (compare === -1){
+                    //verify the  bestHash with  the current target
+                    if (match) {
+
 
                         this.bestHash = new Buffer(event.data.hash);
                         this.bestHashNonce = event.data.nonce;
 
-                        if (this.bestHash.compare( this.difficulty ) <= 0){
+                        if (this.bestHash.compare(this.difficulty) <= 0) {
 
                             console.log('processing done');
 
@@ -233,6 +234,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                         }
 
                     }
+
 
                 }
             }

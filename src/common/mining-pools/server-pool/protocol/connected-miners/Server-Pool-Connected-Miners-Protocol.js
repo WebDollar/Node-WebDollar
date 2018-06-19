@@ -118,7 +118,7 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                     throw {message: "pool was not found in the serverPool"};
 
                 data.suffix = Math.random().toString();
-                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/get-work", data, "answer/"+data.suffix );
+                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/get-work", data, "answer/"+data.suffix, 6000 );
 
                 if (answer === null) throw {message: "there is a problem with the pool"};
 
@@ -143,7 +143,7 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
                     throw {message: "pool was not found in the serverPool"};
 
                 data.suffix = Math.random().toString();
-                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix );
+                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix, 6000 );
 
                 if (answer === null) throw {message: "there is a problem with the pool"};
 

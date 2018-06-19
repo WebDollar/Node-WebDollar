@@ -126,7 +126,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                 //couldn't load the last K blocks
                 console.error("couldn't load the last K blocks");
 
-                this.accountantTree.loadMiniAccountant(new Buffer(0));
+                await this.accountantTree.loadMiniAccountant(new Buffer(0));
                 throw "load blockchain simple"; //let's force to load a simple blockchain
             }
 

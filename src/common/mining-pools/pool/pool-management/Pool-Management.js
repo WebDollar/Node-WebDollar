@@ -1,10 +1,11 @@
 import PoolSettings from "./Pool-Settings";
 import PoolData from 'common/mining-pools/pool/pool-management/pool-data/Pool-Data';
 import consts from 'consts/const_global';
-import PoolWorkManagement from "./Pool-Work-Management";
+import PoolWorkManagement from "./pool-work/Pool-Work-Management";
 import PoolProtocol from "./protocol/Pool-Protocol"
+import PoolStatistics from "./pool-statistics/Pool-Statistics";
 import StatusEvents from "common/events/Status-Events";
-import Blockchain from "../../../../main-blockchain/Blockchain";
+import Blockchain from "main-blockchain/Blockchain";
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,
@@ -22,6 +23,7 @@ class PoolManagement{
         this.poolSettings = new PoolSettings(wallet, this);
         this.poolWorkManagement = new PoolWorkManagement( this, blockchain );
         this.poolProtocol = new PoolProtocol( this );
+        this.poolStatistics = new PoolStatistics( this );
 
         this._poolInitialized = false;
         this._poolOpened = false;
@@ -141,9 +143,13 @@ class PoolManagement{
 
             if (value) {
                 await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
+                this.poolStatistics.startInterval();
                 await this.poolProtocol._startPoolProtocol();
             }
-            else await this.poolProtocol._stopPoolProtocol();
+            else {
+                await this.poolProtocol._stopPoolProtocol();
+                this.poolStatistics.clearInterval();
+            }
 
             StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });
 
