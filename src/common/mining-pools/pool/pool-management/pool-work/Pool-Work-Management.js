@@ -107,7 +107,7 @@ class PoolWorkManagement{
 
                 //returning false, because a new fork was changed in the mean while
                 if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
-                    return false;
+                    throw {message: "block is already too old"};
 
                 let revertActions = new RevertActions(this.blockchain);
 
