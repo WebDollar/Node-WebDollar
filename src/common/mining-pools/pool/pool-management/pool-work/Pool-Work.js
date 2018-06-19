@@ -42,17 +42,8 @@ class PoolWork {
 
         this.lastBlockPromise = Utils.MakeQuerablePromise( new Promise( async (resolve)=>{
 
-            console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-            console.log(33333);
-            let time = new Date().getTime();
-
             if (this.lastBlockPromise !== undefined )
                 console.log("promise: ", this.lastBlockPromise.isPending(), "    isFulfilled: ", this.lastBlockPromise.isFulfilled())
-
-            console.log("this.poolWork.lastBlock", this.lastBlock);
-            console.log("this.blockchain.blocks.last", this.blockchain.blocks.last);
-            console.log("this.blockchain.blocks", this.blockchain.blocks);
-            console.log("lightPrevHashPrevs", this.blockchain.lightPrevHashPrevs);
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlockNonce = 0;
@@ -70,10 +61,6 @@ class PoolWork {
             };
 
             this._blocksList.push(this.lastBlockElement);
-
-            console.log(44444);
-            console.log( (new Date().getTime() - time ) /1000, "s") ;
-            console.log("**************************************************");
 
             if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash )))
                 console.error("ERRRORR!!! HASHPREV DOESN'T MATCH blocks.last.hash");

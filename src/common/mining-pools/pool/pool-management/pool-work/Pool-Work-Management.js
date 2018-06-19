@@ -29,18 +29,12 @@ class PoolWorkManagement{
 
         let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
 
-        console.log(11111);
-
         await this.poolWork.lastBlockPromise; //it's a promise, let's wait
-
-        console.log(22222);
 
         if ( this.poolWork.lastBlock === undefined || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  ||
             (!this.blockchain.semaphoreProcessing.processing && ( this.poolWork.lastBlock.height !==  this.blockchain.blocks.length || !this.poolWork.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))))
             await this.poolWork.getNextBlockForWork();
 
-
-        console.log(55555);
 
         let serialization = Buffer.concat( [
             Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.poolWork.lastBlock.height) ),
@@ -111,17 +105,21 @@ class PoolWorkManagement{
                 console.warn("WebDollar Block was mined in Pool ", blockInformationMinerInstance.workBlock.height, " nonce (", blockInformationMinerInstance.workHashNonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
                 console.warn("----------------------------------------------------------------------------");
 
+                //returning false, because a new fork was changed in the mean while
+                if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
+                    return false;
+
                 let revertActions = new RevertActions(this.blockchain);
 
                 try {
                     if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 
-                            blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
-                            blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
-
                             //returning false, because a new fork was changed in the mean while
                             if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
                                 return false;
+
+                            blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
+                            blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
 
                             return this.blockchain.includeBlockchainBlock(blockInformationMinerInstance.workBlock, false, ["all"], true, revertActions);
 
@@ -130,12 +128,10 @@ class PoolWorkManagement{
                     NodeBlockchainPropagation.propagateLastBlockFast(blockInformationMinerInstance.workBlock);
 
                     //confirming transactions
-                    blockInformationMinerInstance.workBlock.data.transactions.transactions.forEach((transaction) => {
-                        transaction.confirmed = true;
-                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
-                    });
+                    blockInformationMinerInstance.workBlock.data.transactions.confirmTransactions();
 
                 } catch (exception){
+                    console.error("PoolWork include raised an exception", exception);
                     revertActions.revertOperations();
                 }
 
