@@ -33,7 +33,7 @@ class PoolStatistics{
 
     _poolStatisticsInterval(){
 
-        this.poolHashes = this.poolHashesNow;
+        this.poolHashes = Math.floor( this.poolHashesNow / (this.POOL_STATISTICS_TIME/1000));
         this.poolHashesNow = 0;
 
         this.poolMinersOnline = this.poolMinersOnlineNow;
@@ -41,13 +41,10 @@ class PoolStatistics{
             length: 0,
         };
 
-        this.emitter.emit("pools/statistics/update", { poolHashes: this.hashes, poolMinersOnline: this.poolMinersOnline });
+        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline });
 
     }
 
-    get hashes(){
-        return Math.floor( this.poolHashes / (this.POOL_STATISTICS_TIME/1000));
-    }
 
     addStatistics(hashes, minerPoolPublicKey, minerInstance){
 

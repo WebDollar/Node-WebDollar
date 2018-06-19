@@ -132,6 +132,9 @@ class MinerProtocol extends PoolProtocolList{
                 //connection established
                 this._connectionEstablishedWithPool(socket, answer.potentialReward, answer.confirmedReward);
 
+                if (typeof answer.m === "number") this.minerPoolManagement.minerPoolStatistics.poolMinersOnline = answer.m;
+                if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
+
                 return true;
 
             } catch (exception){
@@ -210,6 +213,9 @@ class MinerProtocol extends PoolProtocolList{
         this._validateRequestWork(answer.work, answer.signature);
         this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.work, poolSocket);
 
+        if (typeof answer.m === "number") this.minerPoolManagement.minerPoolStatistics.poolMinersOnline = answer.m;
+        if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
+
         return true;
 
     }
@@ -234,6 +240,9 @@ class MinerProtocol extends PoolProtocolList{
 
                 this._validateRequestWork(answer.newWork, answer.signature);
                 this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.newWork, poolSocket);
+
+                if (typeof answer.m === "number") this.minerPoolManagement.minerPoolStatistics.poolMinersOnline = answer.m;
+                if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
 
             } else {
 

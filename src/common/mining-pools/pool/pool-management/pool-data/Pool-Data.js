@@ -308,6 +308,8 @@ class PoolData {
 
     savePoolData(){
 
+        if (!this.poolManagement.poolStarted) return true;
+
         let answer = this.saveMinersList();
         answer = answer && this.saveBlocksInformation();
 
