@@ -99,6 +99,9 @@ class PoolWorkManagement{
             blockInformationMinerInstance.calculateDifficulty();
             blockInformationMinerInstance.adjustDifficulty(blockInformationMinerInstance.workDifficulty);
 
+            //statistics
+            this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance.workDifficulty, blockInformationMinerInstance.minerPoolPublicKey, minerInstance);
+
             if (work.result)
                 if (await blockInformationMinerInstance.wasBlockMined() ) {
 

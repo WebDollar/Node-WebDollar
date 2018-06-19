@@ -3,6 +3,7 @@ import PoolData from 'common/mining-pools/pool/pool-management/pool-data/Pool-Da
 import consts from 'consts/const_global';
 import PoolWorkManagement from "./Pool-Work-Management";
 import PoolProtocol from "./protocol/Pool-Protocol"
+import PoolStatistics from "./pool-statistics/Pool-Statistics";
 import StatusEvents from "common/events/Status-Events";
 import Blockchain from "main-blockchain/Blockchain";
 /*
@@ -22,6 +23,7 @@ class PoolManagement{
         this.poolSettings = new PoolSettings(wallet, this);
         this.poolWorkManagement = new PoolWorkManagement( this, blockchain );
         this.poolProtocol = new PoolProtocol( this );
+        this.poolStatistics = new PoolStatistics( this );
 
         this._poolInitialized = false;
         this._poolOpened = false;
