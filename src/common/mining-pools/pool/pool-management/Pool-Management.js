@@ -143,9 +143,13 @@ class PoolManagement{
 
             if (value) {
                 await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
+                this.poolStatistics.startInterval();
                 await this.poolProtocol._startPoolProtocol();
             }
-            else await this.poolProtocol._stopPoolProtocol();
+            else {
+                await this.poolProtocol._stopPoolProtocol();
+                this.poolStatistics.clearInterval();
+            }
 
             StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });
 

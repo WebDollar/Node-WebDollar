@@ -9,16 +9,26 @@ class PoolStatistics{
 
         this.poolManagement = poolManagement;
 
-        this.POOL_STATISTICS_TIME = 5000;;
+        this.POOL_STATISTICS_TIME = 5000;
 
         this.poolHashes = 0;
         this.poolHashesNow = 0;
 
         this.poolMinersOnline = 0;
-        this.poolMinersOnlineNow = {};
+        this.poolMinersOnlineNow = {
+            length: 0
+        };
 
-        setInterval( this._poolStatisticsInterval.bind(this), this.POOL_STATISTICS_TIME );
 
+
+    }
+
+    startInterval(){
+        this._interval = setInterval( this._poolStatisticsInterval.bind(this), this.POOL_STATISTICS_TIME );
+    }
+
+    clearInterval(){
+        clearInterval(this._interval);
     }
 
     _poolStatisticsInterval(){
@@ -31,8 +41,12 @@ class PoolStatistics{
             length: 0,
         };
 
-        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes / this.POOL_STATISTICS_TIME, poolMinersOnline: this.poolMinersOnline });
+        this.emitter.emit("pools/statistics/update", { poolHashes: this.hashes, poolMinersOnline: this.poolMinersOnline });
 
+    }
+
+    get hashes(){
+        return Math.floor( this.poolHashes / (this.POOL_STATISTICS_TIME/1000));
     }
 
     addStatistics(hashes, minerPoolPublicKey, minerInstance){
