@@ -31,16 +31,19 @@ class PoolWorkManagement{
 
         await this.poolWork.lastBlockPromise; //it's a promise, let's wait
 
+        console.log(22222);
         if (this.poolWork.lastBlock === undefined || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  || this.poolWork.lastBlock.height !==  this.blockchain.blocks.length || !this.poolWork.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))
             await this.poolWork.getNextBlockForWork();
 
-        console.log(33333);
+        console.log(55555);
 
         let serialization = Buffer.concat( [
             Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.poolWork.lastBlock.height) ),
             Serialization.serializeBufferRemovingLeadingZeros( this.poolWork.lastBlock.difficultyTargetPrev ),
             this.poolWork.lastBlock.computedBlockPrefix
         ]);
+
+        this.poolWork.lastBlockElement.instances[minerInstance.publicKeyString] = true;
 
         let answer = {
 
@@ -56,7 +59,6 @@ class PoolWorkManagement{
 
         this.poolWork.lastBlockNonce += hashes;
 
-        minerInstance.work = answer;
         blockInformationMinerInstance.workBlock = this.poolWork.lastBlock;
 
         return answer;

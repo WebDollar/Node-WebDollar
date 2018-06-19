@@ -24,6 +24,16 @@ class PoolDataBlockInformation {
 
     }
 
+    destroyPoolDataBlockInformation(){
+
+        this.poolManagement = undefined;
+        for (let i=0; i<this.blockInformationMinersInstances.length; i++)
+            this.blockInformationMinersInstances[i].destroyBlockInformationMinerInstance();
+
+        this.blockInformationMinersInstances = [];
+
+    }
+
     adjustBlockInformationDifficulty(difficulty, hash){
 
         // target     =     maximum target / difficulty

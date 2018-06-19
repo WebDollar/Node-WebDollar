@@ -9,6 +9,8 @@ class PoolDataMinerInstance {
 
         this.miner = miner;
         this.publicKey = publicKey;
+        this.publicKeyString = publicKey.toString("hex");
+
         this.date = new Date().getTime();
         this.hashesPerSecond = 500;
 

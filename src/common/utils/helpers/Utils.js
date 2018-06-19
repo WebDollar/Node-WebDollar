@@ -53,6 +53,8 @@ class Utils{
         result.isFulfilled = function() { return isFulfilled; };
         result.isPending = function() { return isPending; };
         result.isRejected = function() { return isRejected; };
+        result.isResolved = true;
+
         return result;
     }
 
