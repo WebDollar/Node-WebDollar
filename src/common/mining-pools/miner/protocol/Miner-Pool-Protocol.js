@@ -204,7 +204,7 @@ class MinerProtocol extends PoolProtocolList{
         let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", {
             minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
             poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
-        }, "answer");
+        }, "answer", 6000);
 
         if (answer === null) throw {message: "get-work answered null" };
 
@@ -228,10 +228,10 @@ class MinerProtocol extends PoolProtocolList{
                 poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
                 minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
                 work: miningAnswer,
-            }, "answer");
+            }, "answer", 6000);
 
             if (answer === null) throw {message: "WorkDone: Answer is null"};
-            if (answer.result !== true) throw {message: "WorkDone: Result is not True"};
+            if (answer.result !== true) throw {message: "WorkDone: Result is not True", reason: answer.message};
 
             if (answer.result){
 

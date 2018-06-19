@@ -48,7 +48,7 @@ class PoolStatistics{
 
     addStatistics(hashes, minerPoolPublicKey, minerInstance){
 
-        this.poolManagement.poolStatistics.poolHashesNow += hashes;
+        this.poolManagement.poolStatistics.poolHashesNow += hashes.toNumber();
 
         let address = minerPoolPublicKey.toString("hex");
         if (this.poolMinersOnlineNow[address.toString("hex")] === undefined) {

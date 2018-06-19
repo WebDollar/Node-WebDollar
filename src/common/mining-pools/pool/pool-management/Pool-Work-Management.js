@@ -13,21 +13,31 @@ class PoolWorkManagement{
         this.poolManagement = poolManagement;
         this.blockchain = blockchain;
 
+        this._lastBlockPromise = undefined;
         this._lastBlock = undefined;
         this._lastBlockNonce = 0;
 
     }
 
-    async getNextBlock(){
+    getNextBlock(){
 
         if (!Blockchain.synchronized)
             throw {message: "Blockchain is not yet synchronized"};
 
-        this._lastBlock = await this.blockchain.mining.getNextBlock();
-        this._lastBlockNonce = 0;
 
-        if (this._lastBlock.computedBlockPrefix === null )
-            this._lastBlock._computeBlockHeaderPrefix();
+        this._lastBlockPromise = new Promise( async (resolve)=>{
+
+            this._lastBlock = await this.blockchain.mining.getNextBlock();
+            this._lastBlockNonce = 0;
+
+            if (this._lastBlock.computedBlockPrefix === null )
+                this._lastBlock._computeBlockHeaderPrefix();
+
+            resolve(true);
+        });
+
+        return this._lastBlockPromise;
+
 
     }
 
@@ -37,11 +47,14 @@ class PoolWorkManagement{
         let hashes = minerInstance.hashesPerSecond;
         if (hashes === undefined ) hashes = 500;
 
-        if (this._lastBlock === undefined || ( this._lastBlockNonce + hashes ) > 0xFFFFFFFF )
+        let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
+
+        await this._lastBlockPromise; //it's a promise, let's wait
+
+        if (this._lastBlock === undefined || ( this._lastBlockNonce + hashes ) > 0xFFFFFFFF  || this._lastBlock.height !==  this.blockchain.blocks.length || !this._lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))
             await this.getNextBlock();
 
-        if ( this._lastBlock.height !==  this.blockchain.blocks.length || !this._lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ) )
-            await this.getNextBlock();
+        await this._lastBlockPromise; //it's a promise, let's wait
 
         let serialization = Buffer.concat( [
             Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this._lastBlock.height) ),
@@ -64,8 +77,6 @@ class PoolWorkManagement{
         this._lastBlockNonce += hashes;
 
         minerInstance.work = answer;
-
-        let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
         blockInformationMinerInstance.workBlock = this._lastBlock;
 
         return answer;
