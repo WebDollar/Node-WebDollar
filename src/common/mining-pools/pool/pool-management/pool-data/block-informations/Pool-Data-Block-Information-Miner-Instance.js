@@ -32,13 +32,9 @@ class PoolDataBlockInformationMinerInstance {
     async validateWorkHash(workHash, workNonce){
 
         //validate hash
-        if ( Math.random() < this.poolManagement.poolSettings.poolPOWValidationProbability ){
+        let hash = await this.workBlock.computeHash( workNonce );
 
-            let hash = await this.workBlock.computeHash( workNonce );
-
-            if ( ! BufferExtended.safeCompare(hash, workHash ) ) return false;
-
-        }
+        if ( ! BufferExtended.safeCompare(hash, workHash ) ) return false;
 
         return true;
 
