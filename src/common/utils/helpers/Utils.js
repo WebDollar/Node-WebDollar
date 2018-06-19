@@ -29,15 +29,15 @@ class Utils{
 
     MakeQuerablePromise(promise) {
         // Don't modify any promise that has been already modified.
-        if (promise.isResolved) return promise;
+        if (promise.isQuerable) return promise;
 
         // Set initial state
-        var isPending = true;
-        var isRejected = false;
-        var isFulfilled = false;
+        let isPending = true;
+        let isRejected = false;
+        let isFulfilled = false;
 
         // Observe the promise, saving the fulfillment in a closure scope.
-        var result = promise.then(
+        let result = promise.then(
             function(v) {
                 isFulfilled = true;
                 isPending = false;
@@ -53,6 +53,9 @@ class Utils{
         result.isFulfilled = function() { return isFulfilled; };
         result.isPending = function() { return isPending; };
         result.isRejected = function() { return isRejected; };
+
+        result.isQuerable = true;
+
         return result;
     }
 

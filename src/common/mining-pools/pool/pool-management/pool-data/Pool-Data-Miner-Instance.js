@@ -9,6 +9,10 @@ class PoolDataMinerInstance {
 
         this.miner = miner;
         this.publicKey = publicKey;
+
+        if (publicKey !== undefined)
+            this.publicKeyString = publicKey.toString("hex");
+
         this.date = new Date().getTime();
         this.hashesPerSecond = 500;
 
@@ -33,6 +37,8 @@ class PoolDataMinerInstance {
 
         this.publicKey = BufferExtended.substr( buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH );
         offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
+
+        this.publicKeyString = this.publicKey.toString("hex");
 
         this.date = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;

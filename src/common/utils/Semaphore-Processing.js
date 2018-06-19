@@ -7,6 +7,7 @@ class SemaphoreProcessing{
         this._list = [];
 
         this.processingSemaphoreInterval = processingSemaphoreInterval;
+        this.processing = false;
 
         setTimeout(this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);
 
@@ -31,6 +32,8 @@ class SemaphoreProcessing{
 
         if (this._list.length > 0){
 
+            this.processing = true;
+
             let answer = false;
             try {
                 answer = await this._list[0].callback();
@@ -48,9 +51,11 @@ class SemaphoreProcessing{
                 console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
             }
 
+            this.processing = false;
+
         }
 
-        setTimeout( async ()=>{ await this._processingSemaphoreList()}, this.processingSemaphoreInterval);
+        setTimeout( this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);
 
     }
 
