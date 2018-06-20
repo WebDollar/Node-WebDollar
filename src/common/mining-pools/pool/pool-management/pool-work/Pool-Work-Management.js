@@ -130,7 +130,9 @@ class PoolWorkManagement{
                     //confirming transactions
                     blockInformationMinerInstance.workBlock.data.transactions.confirmTransactions();
 
+
                     blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
+                    this.poolManagement.poolWork.addBlockInformation();
 
                 } catch (exception){
                     console.error("PoolWork include raised an exception", exception);

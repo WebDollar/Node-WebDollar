@@ -119,6 +119,8 @@ class PoolDataBlockInformation {
         for (let i=this.blockInformationMinersInstances.length-1; i>=0; i--)
             if (this.blockInformationMinersInstances[i].minerInstance === minerInstance ){
 
+                this.blockInformationMinersInstances[i].cancelReward();
+
                 this.totalDifficulty = this.totalDifficulty.minus(this.blockInformationMinersInstances[i].minerInstanceTotalDifficulty);
                 this.blockInformationMinersInstances.splice(i,1);
 

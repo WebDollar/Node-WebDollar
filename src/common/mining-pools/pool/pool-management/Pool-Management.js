@@ -33,8 +33,6 @@ class PoolManagement{
         this._poolOpened = false;
         this._poolStarted = false;
 
-        // this.blockchainReward = BlockchainMiningReward.getReward();
-
     }
 
     async initializePoolManagement(poolFee){

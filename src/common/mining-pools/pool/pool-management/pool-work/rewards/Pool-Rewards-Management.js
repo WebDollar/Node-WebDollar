@@ -34,11 +34,16 @@ class PoolRewardsManagement{
 
         if (!this.poolManagement._poolStarted) return;
 
+        //maybe the last block was not finished
+        let start = this.poolData.blocksInfo.length-1;
+        if ( this.poolData.blocksInfo[start].block === undefined )
+            start --;
+
         //recalculate the confirmations
-        for (let i = this.poolData.blocksInfo.length-1 ; i >= 0; i--  ){
+        for (let i = start ; i >= 0; i--  ){
 
             //already confirmed
-            if (this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED)  break;
+            if (this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED) continue;
 
             let confirmationsPool = 0;
             let confirmationsOthers = 0;
@@ -113,6 +118,8 @@ class PoolRewardsManagement{
                 }
 
             }
+
+
 
         }
 
