@@ -96,10 +96,10 @@ class PoolRewardsManagement{
             
             //to mail fail trials
             if (this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS){
-                this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i]);
-                this.poolData.blocksInfo.splice(i,1);
 
+                this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i], i );
                 continue;
+
             }
 
             if (found && this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED){
@@ -239,14 +239,14 @@ class PoolRewardsManagement{
 
     }
     
-    redistributePoolDataBlockInformation(blockInformation){
+    redistributePoolDataBlockInformation(blockInformation, index){
 
-        blockInformation.work = undefined; //cancel the block
+        blockInformation.block = undefined; //cancel the block
         
         //move the blockInformationMinerInstances to the latest non solved blockInformation
         let lastBlockInformation = this.poolData.lastBlockInformation;
 
-        if (lastBlockInformation.work === undefined)
+        if (lastBlockInformation.block !== undefined)
             lastBlockInformation = this.poolData.addBlockInformation();
 
         for (let i=0; i<blockInformation.blockInformationMinersInstances.length; i++) {
@@ -258,6 +258,9 @@ class PoolRewardsManagement{
 
 
         }
+
+        //clear the blockInformation
+        this.poolData.blocksInfo.splice(index, 1);
         
     }
 
