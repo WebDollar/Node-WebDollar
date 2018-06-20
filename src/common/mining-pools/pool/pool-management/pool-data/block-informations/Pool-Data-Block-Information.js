@@ -104,18 +104,14 @@ class PoolDataBlockInformation {
     _addBlockInformationMinerInstance(minerInstance){
 
         let blockInformationMinerInstance = this._findBlockInformationMinerInstance(minerInstance);
+        if (blockInformationMinerInstance !== null) return blockInformationMinerInstance;
 
-        if (blockInformationMinerInstance === null){
 
-            blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, minerInstance);
+        blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, minerInstance);
 
+        if (blockInformationMinerInstance !== undefined)
             this.blockInformationMinersInstances.push(blockInformationMinerInstance);
 
-            //move all the money for
-
-        }
-
-        return blockInformationMinerInstance;
     }
 
     _deleteBlockInformationMinerInstance(minerInstance){

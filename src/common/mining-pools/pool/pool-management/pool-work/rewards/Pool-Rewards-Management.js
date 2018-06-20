@@ -8,6 +8,7 @@ const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
 const VALIDATION_BLOCK_CONFIRMATIONS = 20; //blocks
 
 const MAXIMUM_FAIL_CONFIRMATIONS = 10; //blocks
+const CONFIRMATIONS_REQUIRED = 10;
 
 class PoolRewardsManagement{
 
@@ -37,7 +38,7 @@ class PoolRewardsManagement{
         for (let i = this.poolData.blocksInfo.length-1 ; i >= 0; i--  ){
 
             //already confirmed
-            if (this.poolData.blocksInfo[i].confirmations > 10)  break;
+            if (this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED)  break;
 
             let confirmationsPool = 0;
             let confirmationsOthers = 0;
@@ -97,16 +98,18 @@ class PoolRewardsManagement{
             if (this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS){
                 this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i]);
                 this.poolData.blocksInfo.splice(i,1);
+
+                continue;
             }
 
-            if (found && this.poolData.blocksInfo[i].confirmations > 10){
+            if (found && this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED){
 
                 //convert reward to confirmedReward
                 for (let j=0; j < this.poolData.blocksInfo[i].blockInformationMinersInstances.length; j++) {
 
                     let reward = this.poolData.blocksInfo[i].blockInformationMinersInstances[j].calculateReward();
+                    this.poolData.blocksInfo[i].blockInformationMinersInstances[j].minerInstance.miner.rewardConfirmed += reward;
 
-                    this.poolData.blocksInfo[i].blockInformationMinersInstances[j].minerInstance.miner.confirmedReward += reward;
                 }
 
             }
@@ -236,17 +239,28 @@ class PoolRewardsManagement{
 
     }
     
-    redistributePoolDataBlockInformation(poolDataBlockInformation){
+    redistributePoolDataBlockInformation(blockInformation){
+
+        blockInformation.work = undefined; //cancel the block
         
         //move the blockInformationMinerInstances to the latest non solved blockInformation
+        let lastBlockInformation = this.poolData.lastBlockInformation;
+
+        if (lastBlockInformation.work === undefined)
+            lastBlockInformation = this.poolData.addBlockInformation();
+
+        for (let i=0; i<blockInformation.blockInformationMinersInstances.length; i++) {
+
+            let lastBlockInformationMinerInstance = lastBlockInformation._addBlockInformationMinerInstance( blockInformation.blockInformationMinersInstances[i].minerInstance );
+
+            blockInformation.blockInformationMinersInstances[i].cancelReward();
+            lastBlockInformationMinerInstance.adjustDifficulty(blockInformation.blockInformationMinersInstances[i].minerInstanceTotalDifficulty);
+
+
+        }
         
     }
 
-    processPoolDataBlockInformation(poolDataBlockInformation){
-
-
-
-    }
 
 }
 

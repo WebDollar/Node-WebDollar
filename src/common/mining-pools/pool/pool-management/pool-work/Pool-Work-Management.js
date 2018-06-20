@@ -94,10 +94,10 @@ class PoolWorkManagement{
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
             blockInformationMinerInstance.calculateDifficulty();
-            blockInformationMinerInstance.adjustDifficulty(blockInformationMinerInstance.workDifficulty);
+            blockInformationMinerInstance.adjustDifficulty();
 
             //statistics
-            this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance.workDifficulty, minerInstance);
+            this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance._workDifficulty, minerInstance);
 
             if (work.result && await blockInformationMinerInstance.wasBlockMined() && blockInformationMinerInstance.blockInformation.block === undefined ) {
 

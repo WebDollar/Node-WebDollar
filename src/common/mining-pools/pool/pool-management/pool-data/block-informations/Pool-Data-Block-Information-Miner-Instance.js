@@ -20,7 +20,7 @@ class PoolDataBlockInformationMinerInstance {
         this.workHashNonce = undefined;
         this.workBlock = undefined;
 
-        this.workDifficulty = undefined;
+        this._workDifficulty = undefined;
 
         if ( minerInstanceTotalDifficulty === undefined )
             minerInstanceTotalDifficulty = BigNumber(0);
@@ -60,11 +60,13 @@ class PoolDataBlockInformationMinerInstance {
 
         // target     =     maximum target / difficulty
         // difficulty =     maximum target / target
-        this.workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
+        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
 
     }
 
     adjustDifficulty(difficulty){
+
+        if (difficulty === undefined) difficulty = this._workDifficulty
 
         this.minerInstanceTotalDifficulty  = this.minerInstanceTotalDifficulty.plus(difficulty);
 
@@ -82,6 +84,13 @@ class PoolDataBlockInformationMinerInstance {
         this.minerInstance.miner.rewardTotal += this.reward - this.prevReward;
 
         return this.reward;
+    }
+
+    cancelReward(){
+
+        this.minerInstance.miner.rewardTotal -= this.reward;
+        this.reward = 0;
+
     }
 
     serializeBlockInformationMinerInstance() {
