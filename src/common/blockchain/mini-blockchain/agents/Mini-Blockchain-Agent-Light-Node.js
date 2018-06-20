@@ -28,8 +28,10 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
 
             if (this.blockchain.proofPi !== undefined)
                 if ( new Date().getTime() - this.blockchain.proofPi.date.getTime() >= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK *1000 * 2) {
-                    if (Math.random() < 2*WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES)
+                    if (Math.random() < 2*WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES) {
+                        console.warn("mini blockchain agent light synchronization");
                         Blockchain.synchronizeBlockchain(); //let's synchronize again
+                    }
                 }
 
         }, (consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK - 10) * 1000);

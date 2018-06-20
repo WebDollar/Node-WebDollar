@@ -16,7 +16,9 @@ class PoolDataMiner{
 
         this.addInstance(publicKey);
 
-        this.confirmedReward = 0;
+        this.rewardTotal = 0;       //pending except last
+        this.rewardConfirmed = 0;   //rewardConfirmed
+        this.rewardSent = 0;        //rewardSent
 
     }
 
@@ -52,6 +54,10 @@ class PoolDataMiner{
 
         list.push(this.address ); //20 bytes
 
+        list.push ( Serialization.serializeNumber7Bytes(this.rewardTotal) );
+        list.push ( Serialization.serializeNumber7Bytes(this.rewardConfirmed) );
+        list.push ( Serialization.serializeNumber7Bytes(this.rewardSent) );
+
         list.push ( Serialization.serializeNumber4Bytes(this.instances) );
 
         for (let i=0; i<this.instances.length; i++)
@@ -65,6 +71,16 @@ class PoolDataMiner{
 
         this.address = BufferExtended.toBase( BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH ) );
         offset += consts.ADDRESSES.ADDRESS.LENGTH;
+
+        this.rewardTotal = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
+        offset += 7;
+
+        this.rewardConfirmed = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
+        offset += 7;
+
+        this.rewardSent = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
+        offset += 7;
+
 
         let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
         offset += 4;
@@ -82,7 +98,7 @@ class PoolDataMiner{
     }
 
 
-    calculateConfirmedReward(){
+    calculateTotalReward(){
 
         let reward = 0;
 

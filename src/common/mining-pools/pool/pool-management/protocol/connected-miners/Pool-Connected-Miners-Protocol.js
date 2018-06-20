@@ -95,7 +95,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     result: true,
                     signature: signature,
                     potentialReward: (blockInformationMinerInstance !== null ? blockInformationMinerInstance.reward : 0 ),
-                    confirmedReward: minerInstance.miner.calculateConfirmedReward(),
+                    confirmedReward: minerInstance.miner.calculateTotalReward(),
 
                     h:this.poolManagement.poolStatistics.poolHashes,
                     m: this.poolManagement.poolStatistics.poolMinersOnline.length

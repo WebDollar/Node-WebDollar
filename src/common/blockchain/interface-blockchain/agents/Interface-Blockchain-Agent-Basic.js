@@ -26,6 +26,11 @@ class InterfaceBlockchainAgentBasic{
 
         this._status = AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED;
 
+        this.verifyConsensus();
+
+    }
+
+    verifyConsensus(){
 
         this._prevBlocks = 0;
         this._prevDate = 0;
@@ -34,8 +39,10 @@ class InterfaceBlockchainAgentBasic{
 
             if (this._prevDate !== undefined && this._prevBlocks === this.blockchain.blocks.length ) {
 
-                if (this.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
+                if (this.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) {
+                    console.warn("agent basic synchronization");
                     Blockchain.synchronizeBlockchain(); //let's synchronize again
+                }
 
             }
 

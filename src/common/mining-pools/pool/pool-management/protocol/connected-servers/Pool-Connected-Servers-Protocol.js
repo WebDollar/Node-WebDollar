@@ -14,8 +14,8 @@ class PoolConnectedServersProtocol extends PoolProtocolList{
 
         this.poolManagement = poolManagement;
 
-        this.connectedServersPool = [];
-        this.list = this.connectedServersPool;
+        this.connectedServersPools = [];
+        this.list = this.connectedServersPools;
 
     }
 

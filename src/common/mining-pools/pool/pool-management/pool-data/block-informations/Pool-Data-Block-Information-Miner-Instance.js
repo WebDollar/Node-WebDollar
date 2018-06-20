@@ -76,8 +76,12 @@ class PoolDataBlockInformationMinerInstance {
 
     calculateReward(){
 
+        this.prevReward = this.reward;
         this.reward = this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).toNumber()  * BlockchainMiningReward.getReward( Blockchain.blockchain.blocks.length-1 ) * (1-this.poolManagement.poolSettings.poolFee);
 
+        this.minerInstance.miner.rewardTotal += this.reward - this.prevReward;
+
+        return this.reward;
     }
 
     serializeBlockInformationMinerInstance() {

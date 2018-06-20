@@ -99,7 +99,7 @@ class PoolWorkManagement{
             //statistics
             this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance.workDifficulty, minerInstance);
 
-            if (work.result && await blockInformationMinerInstance.wasBlockMined() ) {
+            if (work.result && await blockInformationMinerInstance.wasBlockMined() && blockInformationMinerInstance.blockInformation.block === undefined ) {
 
                 console.warn("----------------------------------------------------------------------------");
                 console.warn("WebDollar Block was mined in Pool ", blockInformationMinerInstance.workBlock.height, " nonce (", blockInformationMinerInstance.workHashNonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
@@ -130,6 +130,8 @@ class PoolWorkManagement{
                     //confirming transactions
                     blockInformationMinerInstance.workBlock.data.transactions.confirmTransactions();
 
+                    blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
+
                 } catch (exception){
                     console.error("PoolWork include raised an exception", exception);
                     revertActions.revertOperations();
@@ -139,7 +141,7 @@ class PoolWorkManagement{
 
             }
 
-            return {result: true, potentialReward: blockInformationMinerInstance.reward, confirmedReward: minerInstance.miner.calculateConfirmedReward() };
+            return {result: true, potentialReward: blockInformationMinerInstance.reward, confirmedReward: minerInstance.miner.calculateTotalReward() };
 
         } catch (exception){
 

@@ -270,7 +270,10 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         }
         if (event.data.message === "log") {
-            console.log("worker", event.data.log);
+
+            if (consts.DEBUG)
+                console.log("worker", event.data.log);
+
         }
 
     }

@@ -6,6 +6,7 @@ import PoolProtocol from "./protocol/Pool-Protocol"
 import PoolStatistics from "./pool-statistics/Pool-Statistics";
 import StatusEvents from "common/events/Status-Events";
 import Blockchain from "main-blockchain/Blockchain";
+import PoolRewardsManagement from "./pool-work/rewards/Pool-Rewards-Management";
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,
@@ -24,14 +25,15 @@ class PoolManagement{
         this.poolWorkManagement = new PoolWorkManagement( this, blockchain );
         this.poolProtocol = new PoolProtocol( this );
         this.poolStatistics = new PoolStatistics( this );
+        this.poolData = new PoolData(this, databaseName);
+
+        this.poolRewardsManagement = new PoolRewardsManagement(this, this.poolData, blockchain);
 
         this._poolInitialized = false;
         this._poolOpened = false;
         this._poolStarted = false;
 
         // this.blockchainReward = BlockchainMiningReward.getReward();
-
-        this.poolData = new PoolData(this, databaseName);
 
     }
 

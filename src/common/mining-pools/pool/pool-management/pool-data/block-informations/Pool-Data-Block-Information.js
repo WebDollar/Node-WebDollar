@@ -7,7 +7,7 @@ import consts from 'consts/const_global';
 
 class PoolDataBlockInformation {
 
-    constructor(poolManagement, index, totalDifficulty){
+    constructor(poolManagement, index, totalDifficulty, block){
 
         this.poolManagement = poolManagement;
 
@@ -21,6 +21,9 @@ class PoolDataBlockInformation {
         this.blockInformationMinersInstances = [];
 
         this.confirmations = 0;
+        this.confirmationsFailsTrials = 0;
+
+        this.block = block;
 
     }
 
@@ -108,17 +111,19 @@ class PoolDataBlockInformation {
 
             this.blockInformationMinersInstances.push(blockInformationMinerInstance);
 
+            //move all the money for
+
         }
 
         return blockInformationMinerInstance;
     }
 
-    _deleteBLockInformationMinerInstance(minerInstance){
+    _deleteBlockInformationMinerInstance(minerInstance){
 
         for (let i=this.blockInformationMinersInstances.length-1; i>=0; i--)
             if (this.blockInformationMinersInstances[i].minerInstance === minerInstance ){
 
-                this.totalDifficulty = this.totalDifficulty.minus(this.blockInformationMinersInstances[i].minerTotalDifficulty);
+                this.totalDifficulty = this.totalDifficulty.minus(this.blockInformationMinersInstances[i].minerInstanceTotalDifficulty);
                 this.blockInformationMinersInstances.splice(i,1);
 
                 for (let j=0; j<this.blockInformationMinersInstances.length; j++)

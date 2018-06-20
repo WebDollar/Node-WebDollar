@@ -24,7 +24,6 @@ import BlockchainTimestamp from "common/blockchain/interface-blockchain/timestma
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import InterfaceBlockchainTipsAdministrator from "./tips/Interface-Blockchain-Tips-Administrator";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
-
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
