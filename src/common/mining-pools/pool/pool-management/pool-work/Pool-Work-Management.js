@@ -112,6 +112,7 @@ class PoolWorkManagement{
                 let revertActions = new RevertActions(this.blockchain);
 
                 try {
+
                     if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 
                             //returning false, because a new fork was changed in the mean while
@@ -132,7 +133,7 @@ class PoolWorkManagement{
 
 
                     blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
-                    this.poolManagement.poolWork.addBlockInformation();
+                    this.poolManagement.poolData.addBlockInformation();
 
                 } catch (exception){
                     console.error("PoolWork include raised an exception", exception);

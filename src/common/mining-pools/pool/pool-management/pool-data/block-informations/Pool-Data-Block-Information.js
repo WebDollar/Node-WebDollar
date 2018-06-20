@@ -64,16 +64,30 @@ class PoolDataBlockInformation {
 
         let buffers = [];
 
+        buffers.push ( Serialization.serializeNumber1Byte( 0x00 ));
         buffers.push ( Serialization.serializeNumber4Bytes(this.blockInformationMinersInstances.length));
 
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
             buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
+
+        let hasBlock = (this.block !== undefined ? 1 : 0);
+        buffers.push(Serialization.serializeNumber1Byte(hasBlock));
+
+        //serialize block
+        if (this.block !== undefined) {
+            buffers.push ( Serialization.serializeNumber4Bytes(this.block.height));
+            buffers.push ( this.block.difficultyTarget);
+            buffers.push( this.block.serializeBlock() );
+        }
 
         return Buffer.concat( buffers );
     }
 
 
     deserializeBlockInformation(buffer, offset = 0){
+
+        let version = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
+        offset += 1;
 
         let length = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
         offset +=4;
@@ -83,6 +97,21 @@ class PoolDataBlockInformation {
             let blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, undefined);
             offset = blockInformationMinerInstance.deserializeBlockInformationMinerInstance(buffer, offset);
 
+        }
+
+        let hasBlock = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
+        offset += 1;
+
+        if (hasBlock){
+            this.block = this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
+
+            let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
+            offset += 4;
+
+            let difficultyTarget = BufferExtended.substr( buffer, offset, 32 ) ;
+            offset += 32;
+
+            offset = this.block.deserializeBlock(buffer, height, undefined, difficultyTarget, offset );
         }
 
         return offset;
@@ -111,6 +140,8 @@ class PoolDataBlockInformation {
 
         if (blockInformationMinerInstance !== undefined)
             this.blockInformationMinersInstances.push(blockInformationMinerInstance);
+
+        return blockInformationMinerInstance;
 
     }
 

@@ -33,11 +33,52 @@ class PoolRewardsManagement{
     async _blockchainChanged(){
 
         if (!this.poolManagement._poolStarted) return;
+        if (this.poolData.blocksInfo.length === 0) return;
+
+
+
+        let confirmationsPool = 0;
+        let confirmationsOthers = 0;
+        let confirmationsOthersUnique = 0;
+        let found = false;
+        let uniques = [];
+
+        let confirmations = {
+        };
+
+        let blocksInfoStart = 0;
+        for (let i = 0; i< this.poolData.blocksInfo.length; i++)
+            if (this.poolData.blocksInfo[i].block !== undefined) {
+                blocksInfoStart = this.poolData.blocksInfo[i].block.height;
+                break;
+            }
+
+        for (let i = this.blockchain.blocks.length-1, n = Math.max( this.blockchain.blocks.blocksStartingPoint, blocksInfoStart ); i>= n; i-- ){
+
+            if ( this.blockchain.mining.unencodedMinerAddress.equals( this.blockchain.blocks[i].data.minerAddress ))
+                confirmationsPool++;
+            else {
+                if (uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] === undefined){
+                    uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] = true;
+                    confirmationsOthersUnique++;
+                } else
+                    confirmationsOthers++;
+            }
+
+            confirmations[i] = {
+                confirmationsPool: confirmationsPool,
+                confirmationsOthers: confirmationsOthers,
+                confirmationsOthersUnique: confirmationsOthersUnique,
+            }
+
+        }
+
 
         //maybe the last block was not finished
         let start = this.poolData.blocksInfo.length-1;
         if ( this.poolData.blocksInfo[start].block === undefined )
             start --;
+
 
         //recalculate the confirmations
         for (let i = start ; i >= 0; i--  ){
@@ -45,36 +86,15 @@ class PoolRewardsManagement{
             //already confirmed
             if (this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED) continue;
 
-            let confirmationsPool = 0;
-            let confirmationsOthers = 0;
-            let confirmationsOthersUnique = 0;
-            let found = false;
-
-            let uniques = [];
-
             //confirm using my own blockchain / light blockchain
-            if (this.blockchain.blocks.blocksStartingPoint > this.poolData.blocksInfo[i].block.height){ //i can confirm the block by myself
+            if (this.blockchain.blocks.blocksStartingPoint < this.poolData.blocksInfo[i].block.height){ //i can confirm the block by myself
 
-                if ( BufferExtended.safeCompare( this.poolData.blocksInfo[i].block.hash, this.blockchain.blocks[this.poolData.blocksInfo[i].block.height-1].hash,  ) ){
+                if ( BufferExtended.safeCompare( this.poolData.blocksInfo[i].block.hash, this.blockchain.blocks[this.poolData.blocksInfo[i].block.height].hash,  ) ){
 
                     found = true;
 
-                    //search only in the last LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS blocks
-                    for (let j = this.blockchain.blocks.length - 1, n =  Math.max( this.blockchain.blocks.blocksStartingPoint, this.poolData.blocksInfo[i].block.height ); j >= n ; j++) {
-
-                        if ( this.poolData.blocksInfo[i].block.data.minerAddress.equals( this.blockchain.blocks[j].minerAddress ))
-                            confirmationsPool++;
-                        else {
-                            if (uniques[this.blockchain.blocks[j].minerAddress.toString("hex")] === undefined){
-                                uniques[this.blockchain.blocks[j].minerAddress.toString("hex")] = true;
-                                confirmationsOthersUnique++;
-                            } else
-                                confirmationsOthers++;
-                        }
-
-                    }
-
-                    this.poolData.blocksInfo[i].confirmations = confirmationsOthersUnique + confirmationsOthers/2 + Math.min(confirmationsPool/4, 2);
+                    let confirmations = confirmations[ this.poolData.blocksInfo[i].block.height ];
+                    this.poolData.blocksInfo[i].confirmations = confirmations.confirmationsOthersUnique + confirmations.confirmationsOthers/2 + Math.min(confirmations.confirmationsPool/4, 2);
 
                 } else{
                     
@@ -137,7 +157,7 @@ class PoolRewardsManagement{
 
         //ask for LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS blocks
 
-        this._serverBlocksDifficultyCalculation = this.blockchain.forksAdministrator.forkSolver._calculateBlockRequestsForLight(connectedServerPool, {forkStartingHeight: blockInfo.block.height  });
+        this._serverBlocksDifficultyCalculation = this.blockchain.agent.protocol.forkSolver._calculateBlockRequestsForLight(connectedServerPool, {forkStartingHeight: blockInfo.block.height  });
         this._serverBlockInfo = blockInfo;
 
         try {
@@ -159,7 +179,7 @@ class PoolRewardsManagement{
 
                 let block = this.blockchain.blockCreator.createEmptyBlock(i, blockValidation);
                 block.data._onlyHeader = true; //only header
-                block.deserializeBlock(answer.block, i, BlockchainMiningReward.getReward(block.height), difficultyTarget);
+                block.deserializeBlock(answer.block, i, BlockchainMiningReward.getReward(block.height), blockInfo.block.difficultyTarget);
 
 
                 if (i >= this.poolData.blocksInfo[i].block.height) {
