@@ -72,9 +72,7 @@ class InterfaceBlockchainTransactionsWizard{
                     toAmountTotal += toAddress[i].amount;
 
                 to = {
-                    addresses:[
-                        toAddress
-                    ]
+                    addresses: toAddress
                 };
 
 

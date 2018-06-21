@@ -14,11 +14,9 @@ class MinerPoolReward{
     set potentialReward(newValue){
 
         if (this._potentialReward === newValue || typeof newValue !== "number") return;
-        this._potentialReward = newValue;
+        this._potentialReward = parseInt( newValue);
 
         StatusEvents.emit("miner-pool/potential-reward", { potentialReward: newValue });
-
-        console.info("Pool Potential Reward: ", newValue/10000);
 
     }
 
@@ -29,10 +27,9 @@ class MinerPoolReward{
     set confirmedReward(newValue){
 
         if (this._confirmedReward === newValue || typeof newValue !== "number") return;
-        this._confirmedReward = newValue;
+        this._confirmedReward = parseInt( newValue );
 
-        StatusEvents.emit("miner-pool/confirmed-reward", { confirmedReward: newValue });
-        console.info("Pool Confirmed Reward: ", newValue/10000);
+        StatusEvents.emit("miner-pool/confirmed-reward", { confirmedReward: this._confirmedReward });
 
     }
 

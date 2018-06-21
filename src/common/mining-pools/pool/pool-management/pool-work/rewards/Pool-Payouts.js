@@ -123,7 +123,7 @@ class PoolPayouts{
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
-                blocksConfirmed.blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
+                blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
 
                     blockInformationMinerInstance.miner.rewardSent += blockInformationMinerInstance.reward;
                     blockInformationMinerInstance.miner.rewardTotal -= blockInformationMinerInstance.reward;

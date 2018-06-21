@@ -438,7 +438,7 @@ class InterfaceBlockchainAddress{
 
     async signTransaction(transaction, password){
 
-        let privateKey = this.getPrivateKey(password);
+        let privateKey = await this.getPrivateKey(password);
 
         let serialization, addressIndex, addressGenerated;
         try{
