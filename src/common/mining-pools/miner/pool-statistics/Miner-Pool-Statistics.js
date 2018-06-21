@@ -11,6 +11,8 @@ class MinerPoolStatistics{
 
         this._poolHashes = 0;
         this._poolMinersOnline = 0;
+        this._poolBlocksConfirmed = 0;
+        this._poolBlocksUnconfirmed = 0;
 
     }
 
@@ -19,7 +21,7 @@ class MinerPoolStatistics{
         if (this._poolHashes === newValue) return;
 
         this._poolHashes = newValue;
-        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes, poolMinersOnline: this._poolMinersOnline });
+        this._emitNotification();
     }
 
     get poolHashes(){
@@ -31,13 +33,40 @@ class MinerPoolStatistics{
         if (this._poolMinersOnline === newValue) return;
 
         this._poolMinersOnline = newValue;
-        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes, poolMinersOnline: this._poolMinersOnline });
+        this._emitNotification();
     }
 
     get poolMinersOnline(){
         return this._poolMinersOnline;
     }
 
+    set poolBlocksConfirmed(newValue){
+
+        if (this._poolBlocksConfirmed === newValue) return;
+
+        this._poolBlocksConfirmed = newValue;
+        this._emitNotification();
+    }
+
+    get poolBlocksConfirmed(){
+        return this._poolBlocksConfirmed;
+    }
+
+    set poolBlocksUnonfirmed(newValue){
+
+        if (this._poolBlocksUnconfirmed === newValue) return;
+
+        this._poolBlocksUnonfirmed = newValue;
+        this._emitNotification();
+    }
+
+    get poolBlocksUnconfirmed(){
+        return this._poolBlocksUnconfirmed;
+    }
+
+    _emitNotification(){
+        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes, poolMinersOnline: this._poolMinersOnline });
+    }
 
 }
 

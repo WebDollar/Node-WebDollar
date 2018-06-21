@@ -65,10 +65,17 @@ class PoolDataBlockInformation {
         let buffers = [];
 
         buffers.push ( Serialization.serializeNumber1Byte( 0x00 ));
-        buffers.push ( Serialization.serializeNumber4Bytes(this.blockInformationMinersInstances.length));
+
+        let length = 0;
+        for (let i=0; i<this.blockInformationMinersInstances.length; i++)
+            if (this.blockInformationMinersInstances[i].publicKey !== undefined)
+                length ++;
+
+        buffers.push ( Serialization.serializeNumber4Bytes(length));
 
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
-            buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
+            if (this.blockInformationMinersInstances[i].publicKey !== undefined)
+                buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
 
         let hasBlock = (this.block !== undefined ? 1 : 0);
         buffers.push(Serialization.serializeNumber1Byte(hasBlock));

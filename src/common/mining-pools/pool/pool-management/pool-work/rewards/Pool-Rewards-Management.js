@@ -38,7 +38,8 @@ class PoolRewardsManagement{
         if (!this.poolManagement._poolStarted) return;
         if (this.poolData.blocksInfo.length === 0) return;
 
-
+        let poolBlocksConfirmed = 0;
+        let poolBlocksUnconfirmed = 0;
 
         let confirmationsPool = 0;
         let confirmationsOthers = 0;
@@ -89,7 +90,10 @@ class PoolRewardsManagement{
             let blockInfo = this.poolData.blocksInfo[i].block;
 
             //already confirmed
-            if (this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED) continue;
+            if (this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED){
+                poolBlocksConfirmed++;
+                continue;
+            }
 
             //confirm using my own blockchain / light blockchain
             if (this.blockchain.blocks.blocksStartingPoint < blockInfo.height){ //i can confirm the block by myself
@@ -144,11 +148,17 @@ class PoolRewardsManagement{
 
                 }
 
+                poolBlocksConfirmed++;
+
+            } else {
+                poolBlocksUnconfirmed++;
             }
 
 
 
         }
+
+        this.poolManagement.poolStatistics.addBlocksStatistics(poolBlocksConfirmed, poolBlocksUnconfirmed);
 
     }
 

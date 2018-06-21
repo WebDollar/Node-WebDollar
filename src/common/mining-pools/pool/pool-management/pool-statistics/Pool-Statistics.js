@@ -14,10 +14,17 @@ class PoolStatistics{
         this.poolHashes = 0;
         this.poolHashesNow = 0;
 
-        this.poolMinersOnline = 0;
+        this.poolMinersOnline ={
+            length: 0,
+        };
         this.poolMinersOnlineNow = {
             length: 0
         };
+
+
+
+        this.poolBlocksUnconfirmed = 0;
+        this.poolBlocksConfirmed = 0;
 
 
 
@@ -41,7 +48,7 @@ class PoolStatistics{
             length: 0,
         };
 
-        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline });
+        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed });
 
     }
 
@@ -55,6 +62,13 @@ class PoolStatistics{
             this.poolMinersOnlineNow[minerInstance.publicKeyString] = minerInstance;
             this.poolMinersOnlineNow.length ++;
         }
+
+    }
+
+    addBlocksStatistics(blocksUnconfirmed, blocksConfirmed, ){
+
+        this.poolBlocksUnconfirmed = blocksUnconfirmed;
+        this.poolBlocksConfirmed = blocksConfirmed;
 
     }
 
