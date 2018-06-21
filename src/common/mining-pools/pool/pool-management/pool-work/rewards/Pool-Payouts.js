@@ -58,8 +58,9 @@ class PoolPayouts{
             return false;
         }
 
-
         try{
+
+            this._toAddresses = [];
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 

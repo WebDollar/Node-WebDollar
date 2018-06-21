@@ -120,7 +120,7 @@ class PoolDataBlockInformationMinerInstance {
 
         let answer = Serialization.deserializeBigNumber(buffer, offset);
         this.minerInstanceTotalDifficulty = answer.number;
-        this.offset = answer.newOffset;
+        offset = answer.newOffset;
 
         return offset;
 

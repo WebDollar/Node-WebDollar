@@ -80,8 +80,9 @@ class PoolDataBlockInformation {
             if (this.blockInformationMinersInstances[i].publicKey !== undefined)
                 buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
 
-        let hasBlock = (this.block !== undefined ? 1 : 0);
-        buffers.push(Serialization.serializeNumber1Byte(hasBlock));
+        buffers.push(Serialization.serializeNumber1Byte(this.payout ? 1 : 0));
+
+        buffers.push(Serialization.serializeNumber1Byte((this.block !== undefined ? 1 : 0)));
 
         //serialize block
         if (this.block !== undefined) {
@@ -103,6 +104,7 @@ class PoolDataBlockInformation {
         offset +=4;
 
         this.blockInformationMinersInstances = [];
+
         for (let i=0; i<length; i++){
 
             let blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, undefined);
@@ -111,12 +113,19 @@ class PoolDataBlockInformation {
             this.totalDifficulty = this.totalDifficulty.plus( blockInformationMinerInstance.minerInstanceTotalDifficulty );
 
             this.blockInformationMinersInstances.push(blockInformationMinerInstance);
+
         }
+
+        let payout = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
+        offset += 1;
+
+        if (payout === 1) this.payout = true;
+        else this.payout = false;
 
         let hasBlock = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
         offset += 1;
 
-        if (hasBlock){
+        if (hasBlock === 1){
             this.block = this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
 
             let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
