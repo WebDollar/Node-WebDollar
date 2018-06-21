@@ -18,13 +18,16 @@ class PoolPayouts{
 
         this.blockchain = blockchain;
 
+        this._payoutInProgress = false;
 
         StatusEvents.on("blockchain/blocks-count-changed",async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
 
-            if (this.blockchain.blocks.length % PAYOUT_INTERVAL === 0)
+
+            if (this.blockchain.blocks.length % PAYOUT_INTERVAL === 0) {
                 await this.doPayout();
+            }
 
 
         });
@@ -35,19 +38,28 @@ class PoolPayouts{
 
     async doPayout(){
 
+        if (this._payoutInProgress) return;
+
+        this._payoutInProgress = true;
+        await this._doPayout();
+        this._payoutInProgress = false;
+    }
+
+    async _doPayout(){
+
+        let blocksConfirmed = [];
+        for (let i=0; i<this.poolData.blocksInfo.length; i++)
+            if (this.poolData.blocksInfo[i].confirmed && !this.poolData.blocksInfo[i].payout)
+                blocksConfirmed.push(this.poolData.blocksInfo[i]);
+
+
+        if (blocksConfirmed.length === 0){
+            console.warn("No payouts, because no blocks were confirmed");
+            return false;
+        }
+
+
         try{
-
-            let blocksConfirmed = [];
-            for (let i=0; i<this.poolData.blocksInfo.length; i++)
-                if (this.poolData.blocksInfo[i].confirmed && !this.poolData.blocksInfo[i].payout)
-                    blocksConfirmed.push(this.poolData.blocksInfo[i]);
-
-
-            if (blocksConfirmed.length === 0){
-                console.warn("No payouts, because no blocks were confirmed");
-                return false;
-            }
-
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
@@ -127,9 +139,10 @@ class PoolPayouts{
 
                     blockInformationMinerInstance.miner.rewardSent += blockInformationMinerInstance.reward;
                     blockInformationMinerInstance.miner.rewardTotal -= blockInformationMinerInstance.reward;
+                    blockInformationMinerInstance.miner.rewardConfirmedOther = 0;
 
                     blockInformationMinerInstance.reward = 0;
-                    blockInformationMinerInstance.miner.rewardConfirmedOther = 0;
+                    blockInformationMinerInstance.minerInstanceTotalDifficulty = undefined;
 
                 });
 
