@@ -48,6 +48,7 @@ class PoolWork {
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlockNonce = 0;
 
+
             if (this.lastBlock.computedBlockPrefix === null )
                 this.lastBlock._computeBlockHeaderPrefix();
 

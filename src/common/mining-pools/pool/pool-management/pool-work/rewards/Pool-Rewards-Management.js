@@ -158,6 +158,7 @@ class PoolRewardsManagement{
 
                     let reward = this.poolData.blocksInfo[i].blockInformationMinersInstances[j].calculateReward();
                     this.poolData.blocksInfo[i].blockInformationMinersInstances[j].minerInstance.miner.rewardConfirmed += reward;
+                    this.poolData.blocksInfo[i].blockInformationMinersInstances[j].minerInstance.miner.rewardTotal -= reward;
 
                 }
 

@@ -156,7 +156,8 @@ class PoolData {
                 let miner = new PoolDataMiner(this, 0, undefined, undefined);
                 offset = miner.deserializeMiner(buffer, offset );
 
-                this.miners.push(miner);
+                if (miner.instances.length)
+                    this.miners.push(miner);
 
             }
 
@@ -192,8 +193,13 @@ class PoolData {
                 let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined);
                 offset = blockInformation.deserializeBlockInformation(buffer, offset );
 
-                this.blocksInfo.push(blockInformation);
+                if (blockInformation.blockInformationMinersInstances.length > 0)
+                    this.blocksInfo.push(blockInformation);
 
+            }
+
+            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block !== undefined ){
+                this.addBlockInformation();
             }
 
             return true;

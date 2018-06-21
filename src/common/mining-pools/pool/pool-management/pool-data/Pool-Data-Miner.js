@@ -97,7 +97,8 @@ class PoolDataMiner{
             let instance = new PoolDataMinerInstance(this, undefined);
             offset = instance.deserializeMinerInstance(buffer, offset);
 
-            this.instances.push(instance);
+            if (instance.publicKey !== undefined)
+                this.instances.push(instance);
         }
 
         return offset;

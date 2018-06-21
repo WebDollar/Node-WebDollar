@@ -113,6 +113,8 @@ class PoolDataBlockInformation {
             let blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, undefined);
             offset = blockInformationMinerInstance.deserializeBlockInformationMinerInstance(buffer, offset);
 
+            if (blockInformationMinerInstance.minerInstance === undefined || blockInformationMinerInstance.minerInstance === null) continue;
+
             this.totalDifficulty = this.totalDifficulty.plus( blockInformationMinerInstance.minerInstanceTotalDifficulty );
 
             this.blockInformationMinersInstances.push(blockInformationMinerInstance);
