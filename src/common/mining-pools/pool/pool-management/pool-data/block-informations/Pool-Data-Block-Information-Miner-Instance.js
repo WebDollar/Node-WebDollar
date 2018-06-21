@@ -95,17 +95,13 @@ class PoolDataBlockInformationMinerInstance {
 
     serializeBlockInformationMinerInstance() {
 
-        let list = [];
-
         return Buffer.concat([
 
-            this.minerInstance.publicKey,
+            this.minerInstance.publicKey || new Buffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH),
             Serialization.serializeNumber7Bytes(this.reward),
             Serialization.serializeBigNumber(this.minerInstanceTotalDifficulty),
 
         ]);
-
-        return Buffer.concat(list);
 
     }
 

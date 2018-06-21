@@ -157,6 +157,8 @@ class PoolData {
                 let miner = new PoolDataMiner(0,undefined, []);
                 offset = miner.deserializeMiner(buffer, offset );
 
+                this.miners.push(miner);
+
             }
 
             return true;

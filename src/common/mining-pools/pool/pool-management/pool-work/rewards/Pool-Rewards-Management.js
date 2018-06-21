@@ -8,7 +8,10 @@ const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
 const VALIDATION_BLOCK_CONFIRMATIONS = 20; //blocks
 
 const MAXIMUM_FAIL_CONFIRMATIONS = 10; //blocks
-const CONFIRMATIONS_REQUIRED = 10;
+
+const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 2 : 10;
+
+const REQUIRE_OTHER_CONFIRMATIONS = consts.DEBUG ? false : true;
 
 class PoolRewardsManagement{
 
@@ -83,22 +86,26 @@ class PoolRewardsManagement{
         //recalculate the confirmations
         for (let i = start ; i >= 0; i--  ){
 
+            let blockInfo = this.poolData.blocksInfo[i].block;
+
             //already confirmed
             if (this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED) continue;
 
             //confirm using my own blockchain / light blockchain
-            if (this.blockchain.blocks.blocksStartingPoint < this.poolData.blocksInfo[i].block.height){ //i can confirm the block by myself
+            if (this.blockchain.blocks.blocksStartingPoint < blockInfo.height){ //i can confirm the block by myself
 
-                if ( BufferExtended.safeCompare( this.poolData.blocksInfo[i].block.hash, this.blockchain.blocks[this.poolData.blocksInfo[i].block.height].hash,  ) ){
+                if (this.blockchain.blocks[blockInfo.height] === undefined) continue;
+
+                if ( BufferExtended.safeCompare( blockInfo.hash, this.blockchain.blocks[blockInfo.height].hash,  ) ){
 
                     found = true;
 
-                    let confirmations = confirmations[ this.poolData.blocksInfo[i].block.height ];
-                    this.poolData.blocksInfo[i].confirmations = confirmations.confirmationsOthersUnique + confirmations.confirmationsOthers/2 + Math.min(confirmations.confirmationsPool/4, 2);
+                    let confirmation = confirmations[ blockInfo.height ];
+                    this.poolData.blocksInfo[i].confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers/2 + Math.min(confirmation.confirmationsPool/4, REQUIRE_OTHER_CONFIRMATIONS ? 2 : 10000);
 
                 } else{
                     
-                    if (this.poolData.blocksInfo[i].block.height > this.blockchain.blocks.length - VALIDATION_BLOCK_CONFIRMATIONS)
+                    if (blockInfo.height > this.blockchain.blocks.length - VALIDATION_BLOCK_CONFIRMATIONS)
                         this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
                 }
@@ -106,7 +113,7 @@ class PoolRewardsManagement{
             } else { //i can not confirm the block because I am in browser and I need to use the server
 
                 //not enough blocks
-                if (this.poolData.blocksInfo[i].block.height < this.blockchain.blocks.length - LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS)
+                if (blockInfo.height < this.blockchain.blocks.length - LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS)
                     continue;
 
                 found = await this._confirmUsingPoolServer(this.poolData.blocksInfo[i]);

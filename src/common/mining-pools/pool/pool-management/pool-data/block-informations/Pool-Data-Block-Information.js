@@ -92,11 +92,15 @@ class PoolDataBlockInformation {
         let length = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
         offset +=4;
 
+        this.blockInformationMinersInstances = [];
         for (let i=0; i<length; i++){
 
             let blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, undefined);
             offset = blockInformationMinerInstance.deserializeBlockInformationMinerInstance(buffer, offset);
 
+            this.totalDifficulty = this.totalDifficulty.plus( blockInformationMinerInstance.minerInstanceTotalDifficulty );
+
+            this.blockInformationMinersInstances.push(blockInformationMinerInstance);
         }
 
         let hasBlock = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );

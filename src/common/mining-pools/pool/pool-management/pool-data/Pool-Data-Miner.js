@@ -52,6 +52,7 @@ class PoolDataMiner{
 
         let list = [];
 
+        list.push(Serialization.serializeNumber1Byte(0x01) );
         list.push(this.address ); //20 bytes
 
         list.push ( Serialization.serializeNumber7Bytes(this.rewardTotal) );
@@ -69,7 +70,10 @@ class PoolDataMiner{
 
     deserializeMiner( buffer, offset ){
 
-        this.address = BufferExtended.toBase( BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH ) );
+        let version =  Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+        offset += 1;
+
+        this.address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH );
         offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         this.rewardTotal = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
@@ -87,6 +91,7 @@ class PoolDataMiner{
 
         this.instances = [];
         for (let i=0; i<len; i++){
+
             let instance = new PoolDataMinerInstance(this, undefined);
             offset = instance.deserializeMinerInstance(buffer, offset);
 

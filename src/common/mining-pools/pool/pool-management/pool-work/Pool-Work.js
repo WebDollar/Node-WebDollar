@@ -80,21 +80,30 @@ class PoolWork {
 
         for (let i=0; i<this._blocksList.length; i++) {
 
-            //delete block
-            if (this._blocksList[i].block !== this.lastBlock && (time - this._blocksList[i].block.timeStamp > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK*1000)) {
+            //verify if the block was a solution to a block
+            let found = false;
+            for (let j =0 ; j <this.poolManagement.poolData.blocksInfo.length; j++)
+                if (this.poolManagement.poolData.blocksInfo[j].block === this._blocksList[i].block){
+                    found = true;
+                    break;
+                }
 
-                for (let key in this._blocksList[i].instances)
-                    if (this._blocksList[i].instances.hasOwnProperty(key))
-                        this._blocksList[i].instances[key].workBlock = undefined;
+            if (!found)
+                //delete block
+                if (this._blocksList[i].block !== this.lastBlock && (time - this._blocksList[i].block.timeStamp > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK*1000)) {
 
-                this._blocksList[i].block.destroyBlock();
-                this._blocksList[i].block = undefined;
-                this._blocksList[i].instances = undefined;
+                    for (let key in this._blocksList[i].instances)
+                        if (this._blocksList[i].instances.hasOwnProperty(key))
+                            this._blocksList[i].instances[key].workBlock = undefined;
 
-                this._blocksList.splice(i, 1);
+                    this._blocksList[i].block.destroyBlock();
+                    this._blocksList[i].block = undefined;
+                    this._blocksList[i].instances = undefined;
 
-                i--;
-            }
+                    this._blocksList.splice(i, 1);
+
+                    i--;
+                }
 
         }
 
