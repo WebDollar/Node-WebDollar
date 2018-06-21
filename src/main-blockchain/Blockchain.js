@@ -305,8 +305,6 @@ class Blockchain{
 
         await StatusEvents.emit("main-pools/status", { message: "Pool Initialized"});
 
-        console.log("333333333");
-
         await this._startMiningPools();
 
     }

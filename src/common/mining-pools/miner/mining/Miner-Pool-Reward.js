@@ -6,22 +6,22 @@ class MinerPoolReward{
 
         this.minerPoolManagement = minerPoolManagement;
 
-        this._potentialReward = 0;
+        this._totalReward = 0;
         this._confirmedReward = 0;
 
     }
 
-    set potentialReward(newValue){
+    set totalReward(newValue){
 
-        if (this._potentialReward === newValue || typeof newValue !== "number") return;
-        this._potentialReward = parseInt( newValue);
+        if (this._totalReward === newValue || typeof newValue !== "number") return;
+        this._totalReward = parseInt( newValue);
 
-        StatusEvents.emit("miner-pool/potential-reward", { potentialReward: newValue });
+        StatusEvents.emit("miner-pool/total-reward", { totalReward: newValue });
 
     }
 
-    get potentialReward(){
-        return this._potentialReward;
+    get totalReward(){
+        return this._totalReward;
     }
 
     set confirmedReward(newValue){

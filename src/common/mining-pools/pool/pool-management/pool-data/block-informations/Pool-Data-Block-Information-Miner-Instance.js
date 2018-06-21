@@ -138,6 +138,7 @@ class PoolDataBlockInformationMinerInstance {
         return this.minerInstance.miner;
     }
 
+
 }
 
 export default PoolDataBlockInformationMinerInstance;

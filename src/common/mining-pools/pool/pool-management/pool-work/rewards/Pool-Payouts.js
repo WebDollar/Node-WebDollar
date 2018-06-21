@@ -119,7 +119,7 @@ class PoolPayouts{
 
 
                 let addressTo = this._findAddressTo(miner.address);
-                if ( (addressTo === null && miner.rewardConfirmedOther > PAYOUT_MINIMUM) || (miner.rewardConfirmedOther > 0) )
+                if ( (addressTo === null && miner.rewardConfirmedOther >= PAYOUT_MINIMUM) || (miner.rewardConfirmedOther > 0) )
                     this._addAddressTo(miner.address).amount += miner.rewardConfirmedOther;
 
 

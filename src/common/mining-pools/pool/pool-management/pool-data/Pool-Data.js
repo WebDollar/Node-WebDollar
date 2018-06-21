@@ -153,7 +153,7 @@ class PoolData {
             this.miners = [];
             for (let i = 0; i < numMiners; ++i) {
 
-                let miner = new PoolDataMiner(this, 0, undefined, []);
+                let miner = new PoolDataMiner(this, 0, undefined, undefined);
                 offset = miner.deserializeMiner(buffer, offset );
 
                 this.miners.push(miner);

@@ -95,6 +95,12 @@ class PoolRewardsManagement{
             let blockInfo = this.poolData.blocksInfo[i].block;
 
             //already confirmed
+            if (this.poolData.blocksInfo[i].payout){
+                poolBlocksConfirmed++;
+                continue;
+            }
+
+            //already confirmed
             if (this.poolData.blocksInfo[i].confirmed){
                 poolBlocksConfirmed++;
                 continue;

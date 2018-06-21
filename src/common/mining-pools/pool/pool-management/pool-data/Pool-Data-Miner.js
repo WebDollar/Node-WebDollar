@@ -14,7 +14,8 @@ class PoolDataMiner{
 
         this.instances = [];
 
-        this.addInstance(publicKey);
+        if (publicKey !== undefined)
+            this.addInstance(publicKey);
 
         this.rewardTotal = 0;       //pending except last
         this.rewardConfirmed = 0;   //rewardConfirmed
@@ -77,13 +78,13 @@ class PoolDataMiner{
         this.address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH );
         offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
-        this.rewardTotal = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
+        this.rewardTotal = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
-        this.rewardConfirmedOther = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
+        this.rewardConfirmedOther = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
-        this.rewardSent = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
+        this.rewardSent = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
 
@@ -104,21 +105,8 @@ class PoolDataMiner{
     }
 
 
-    calculateTotalReward(){
-
-        let reward = 0;
-
-        for (let i=0; i<this.instances.length; i++)
-            for (let j = 0; j < this.poolData.blocksInfo.length - 2; j++)
-                for (let q = 0; q<this.poolData.blocksInfo[j].blockInformationMinersInstances.length; q++)
-                    if (this.poolData.blocksInfo[j].blockInformationMinersInstances[q].minerInstance === this.instances[i]){
-
-                        reward += this.poolData.blocksInfo[j].blockInformationMinersInstances[q].reward;
-
-                    }
-
-        return reward;
-
+    get rewardConfirmedTotal(){
+        return this.rewardConfirmed + this.rewardConfirmedOther
     }
 
 }

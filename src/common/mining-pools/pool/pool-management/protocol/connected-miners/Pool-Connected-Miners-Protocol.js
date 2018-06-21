@@ -94,11 +94,12 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let confirmation = await socket.node.sendRequestWaitOnce("mining-pool/hello-pool/answer"+suffix, {
                     result: true,
                     signature: signature,
-                    potentialReward: (blockInformationMinerInstance !== null ? blockInformationMinerInstance.reward : 0 ),
-                    confirmedReward: minerInstance.miner.rewardConfirmed + minerInstance.miner.rewardConfirmedOther,
+
+                    reward: minerInstance.miner.rewardTotal,
+                    confirmed: minerInstance.miner.rewardConfirmedTotal,
 
                     h:this.poolManagement.poolStatistics.poolHashes,
-                    m: this.poolManagement.poolStatistics.poolMinersOnline.length
+                    m: this.poolManagement.poolStatistics.poolMinersOnline.length,
 
                 }, "confirmation" );
 
@@ -196,7 +197,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
                 //the new reward
-                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, potentialReward: answer.potentialReward, confirmedReward: answer.confirmedReward, newWork: newWork, signature: signature, h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed, ub: this.poolManagement.poolStatistics.blocksUnconfirmed } );
+                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, newWork: newWork, signature: signature, h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed, ub: this.poolManagement.poolStatistics.blocksUnconfirmed } );
 
             } catch (exception){
                 socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: false, message: exception.message } )

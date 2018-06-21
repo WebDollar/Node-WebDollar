@@ -144,11 +144,12 @@ class PoolWorkManagement{
 
             }
 
-            return {result: true, potentialReward: blockInformationMinerInstance.reward, confirmedReward: minerInstance.miner.rewardConfirmed + minerInstance.miner.rewardConfirmedOther };
+            return {result: true, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal };
 
         } catch (exception){
 
-            return {result: false, potentialReward: 0, message: exception.message };
+            console.error("Pool Work Management raised an error", exception);
+            return {result: false, message:exception.message, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal  };
 
         }
 

@@ -20,14 +20,11 @@ class PoolDataMinerInstance {
 
     serializeMinerInstance(){
 
-        let list = [];
-
         return Buffer.concat([
             this.publicKey,
             Serialization.serializeNumber4Bytes(this.hashesPerSecond),
         ]);
 
-        return Buffer.concat(list);
     }
 
     deserializeMinerInstance(buffer, offset){
