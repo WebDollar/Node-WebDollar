@@ -138,6 +138,10 @@ class PoolDataBlockInformationMinerInstance {
         return this.address;
     }
 
+    get miner(){
+        return this.minerInstance.miner;
+    }
+
 }
 
 export default PoolDataBlockInformationMinerInstance;

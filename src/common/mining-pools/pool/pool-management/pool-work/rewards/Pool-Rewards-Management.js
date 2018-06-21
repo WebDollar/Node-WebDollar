@@ -10,7 +10,7 @@ const VALIDATION_BLOCK_CONFIRMATIONS = 20; //blocks
 
 const MAXIMUM_FAIL_CONFIRMATIONS = 10; //blocks
 
-const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 2 : 10;
+const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : 10;
 
 const REQUIRE_OTHER_CONFIRMATIONS = consts.DEBUG ? false : true;
 

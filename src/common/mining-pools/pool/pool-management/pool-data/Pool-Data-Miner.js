@@ -18,6 +18,7 @@ class PoolDataMiner{
 
         this.rewardTotal = 0;       //pending except last
         this.rewardConfirmed = 0;   //rewardConfirmed
+        this.rewardConfirmedOther = 0;   //other money confirmed to be sent
         this.rewardSent = 0;        //rewardSent
 
     }
@@ -56,7 +57,7 @@ class PoolDataMiner{
         list.push(this.address ); //20 bytes
 
         list.push ( Serialization.serializeNumber7Bytes(this.rewardTotal) );
-        list.push ( Serialization.serializeNumber7Bytes(this.rewardConfirmed) );
+        list.push ( Serialization.serializeNumber7Bytes(this.rewardConfirmedOther) );
         list.push ( Serialization.serializeNumber7Bytes(this.rewardSent) );
 
         list.push ( Serialization.serializeNumber4Bytes(this.instances.length) );
@@ -79,7 +80,7 @@ class PoolDataMiner{
         this.rewardTotal = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
-        this.rewardConfirmed = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
+        this.rewardConfirmedOther = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
         this.rewardSent = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 7 ) );

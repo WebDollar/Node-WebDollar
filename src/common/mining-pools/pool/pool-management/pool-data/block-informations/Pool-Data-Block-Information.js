@@ -119,7 +119,7 @@ class PoolDataBlockInformation {
         if (hasBlock){
             this.block = this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
 
-            let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
+            let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
             offset += 4;
 
             let difficultyTarget = BufferExtended.substr( buffer, offset, 32 ) ;

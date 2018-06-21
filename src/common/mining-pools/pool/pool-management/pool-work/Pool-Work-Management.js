@@ -144,7 +144,7 @@ class PoolWorkManagement{
 
             }
 
-            return {result: true, potentialReward: blockInformationMinerInstance.reward, confirmedReward: minerInstance.miner.calculateTotalReward() };
+            return {result: true, potentialReward: blockInformationMinerInstance.reward, confirmedReward: minerInstance.miner.rewardConfirmed + minerInstance.miner.rewardConfirmedOther };
 
         } catch (exception){
 
