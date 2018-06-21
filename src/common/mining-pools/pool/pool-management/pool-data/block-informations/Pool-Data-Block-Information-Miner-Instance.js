@@ -105,7 +105,6 @@ class PoolDataBlockInformationMinerInstance {
         return Buffer.concat([
 
             this.minerInstance.publicKey || new Buffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH),
-            Serialization.serializeNumber7Bytes(this.reward),
             Serialization.serializeBigNumber(this.minerInstanceTotalDifficulty),
 
         ]);
@@ -118,9 +117,6 @@ class PoolDataBlockInformationMinerInstance {
         offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
 
         this.minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(publicKey);
-
-        this.reward = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
-        offset += 7;
 
         let answer = Serialization.deserializeBigNumber(buffer, offset);
         this.minerInstanceTotalDifficulty = answer.number;

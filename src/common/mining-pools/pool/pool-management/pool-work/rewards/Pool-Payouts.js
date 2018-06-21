@@ -49,8 +49,6 @@ class PoolPayouts{
             }
 
 
-            let toAddresses = [];
-
             for (let i=0; i<blocksConfirmed.length; i++) {
 
                 let totalDifficulty = new BigNumber(0);
@@ -103,19 +101,22 @@ class PoolPayouts{
 
             }
 
+            //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
-                let addressTo = this._findAddressTo(miner.address);
 
-                addressTo.
+                let addressTo = this._findAddressTo(miner.address);
+                if ( (addressTo === null && miner.rewardConfirmedOther > PAYOUT_MINIMUM) || (miner.rewardConfirmedOther > 0) )
+                    this._addAddressTo(miner.address).amount += miner.rewardConfirmedOther;
+
 
             });
 
             //verify to send to other
 
-            if (toAddresses.length === 0) throw {message: "No Addresses to send money"};
+            if (this._toAddresses.length === 0) throw {message: "No Addresses to send money"};
 
-            let transaction = await Blockchain.Transactions.wizard.createTransactionSimple( this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD, );
+            let transaction = await Blockchain.Transactions.wizard.createTransactionSimple( this.blockchain.mining.minerAddress, this._toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD, );
 
             if (!transaction.result) throw {message: "Transaction was not made"};
 
@@ -126,7 +127,9 @@ class PoolPayouts{
 
                     blockInformationMinerInstance.miner.rewardSent += blockInformationMinerInstance.reward;
                     blockInformationMinerInstance.miner.rewardTotal -= blockInformationMinerInstance.reward;
+
                     blockInformationMinerInstance.reward = 0;
+                    blockInformationMinerInstance.miner.rewardConfirmedOther = 0;
 
                 });
 
@@ -163,10 +166,14 @@ class PoolPayouts{
         if (found !== null)
             return found;
 
-        return {
+        let object = {
             address: address,
             amount: 0,
-        }
+        };
+
+        this._toAddresses.push(object);
+
+        return object;
 
     }
 
