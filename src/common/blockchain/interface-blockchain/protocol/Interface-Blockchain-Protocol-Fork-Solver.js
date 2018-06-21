@@ -375,7 +375,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
                 block.data._onlyHeader = true; //avoiding to store the transactions
 
-            block.deserializeBlock( blockData, blockHeight, BlockchainMiningReward.getReward(block.height), fork.getForkDifficultyTarget(block.height) );
+            block.deserializeBlock( blockData, blockHeight, undefined, fork.getForkDifficultyTarget(block.height) );
 
         } catch (Exception) {
             console.error("Error deserializing blocks ", Exception, blockData);

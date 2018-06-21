@@ -7,6 +7,8 @@ import StatusEvents from "common/events/Status-Events"
 import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 
+const sanitizer = require('sanitizer');
+
 class MinerPoolSettings {
 
     constructor( minerPoolManagement, databaseName ){
@@ -51,6 +53,8 @@ class MinerPoolSettings {
 
 
     async setPoolURL(newValue, skipSaving = false){
+
+        newValue = sanitizer.sanitize(newValue);
 
         if (newValue === this._poolURL) return;
 

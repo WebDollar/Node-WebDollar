@@ -203,7 +203,7 @@ class PoolRewardsManagement{
 
                 let block = this.blockchain.blockCreator.createEmptyBlock(i, blockValidation);
                 block.data._onlyHeader = true; //only header
-                block.deserializeBlock(answer.block, i, BlockchainMiningReward.getReward(block.height), blockInfo.block.difficultyTarget);
+                block.deserializeBlock(answer.block, i, undefined, blockInfo.block.difficultyTarget);
 
 
                 if (i >= this.poolData.blocksInfo[i].block.height) {

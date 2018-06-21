@@ -63,6 +63,8 @@ class InterfaceBlockchainBlock {
 
     destroyBlock(){
 
+        if (this.blockchain === undefined) return;
+
         //it is included in the blockchain
         if ( this.blockchain.blocks[ this.height ] === this)
             return;
@@ -307,7 +309,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, prevBlock, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, offset = 0){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -315,8 +317,9 @@ class InterfaceBlockchainBlock {
 
         if (height !== undefined)  this.height = height;
         if (reward !== undefined) this.reward = reward;
+        else if (this.reward === undefined) this.reward = BlockchainMiningReward.getReward(height||this.height);
+
         if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
-        if (offset === undefined) offset = 0;
 
         if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
@@ -388,7 +391,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height) );
+            this.deserializeBlock(buffer, this.height, undefined, this.blockValidation.getDifficultyCallback(this.height) );
 
             return true;
         }

@@ -1,5 +1,6 @@
 import Serialization from "common/utils/Serialization";
 
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 const BigNumber = require('bignumber.js');
 import PoolDataBlockInformationMinerInstance from "./Pool-Data-Block-Information-Miner-Instance"
 import BufferExtended from "common/utils/BufferExtended";
@@ -71,13 +72,13 @@ class PoolDataBlockInformation {
 
         let length = 0;
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
-            if (this.blockInformationMinersInstances[i].publicKey !== undefined && this.blockInformationMinersInstances[i].reward > 0)
+            if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance.publicKey !== undefined && this.blockInformationMinersInstances[i].reward > 0)
                 length ++;
 
         buffers.push ( Serialization.serializeNumber4Bytes(length));
 
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
-            if (this.blockInformationMinersInstances[i].publicKey !== undefined && this.blockInformationMinersInstances[i].reward > 0)
+            if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance.publicKey !== undefined && this.blockInformationMinersInstances[i].reward > 0)
                 buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
 
         buffers.push(Serialization.serializeNumber1Byte(this.payout ? 1 : 0));
@@ -105,6 +106,8 @@ class PoolDataBlockInformation {
 
         this.blockInformationMinersInstances = [];
 
+        this.totalDifficulty = new BigNumber(0);
+
         for (let i=0; i<length; i++){
 
             let blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, undefined);
@@ -119,8 +122,7 @@ class PoolDataBlockInformation {
         let payout = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
         offset += 1;
 
-        if (payout === 1) this.payout = true;
-        else this.payout = false;
+        this.payout = payout === 1;
 
         let hasBlock = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
         offset += 1;
@@ -134,7 +136,7 @@ class PoolDataBlockInformation {
             let difficultyTarget = BufferExtended.substr( buffer, offset, 32 ) ;
             offset += 32;
 
-            offset = this.block.deserializeBlock(buffer, height, undefined, difficultyTarget, offset );
+            offset = this.block.deserializeBlock(buffer, height, undefined, difficultyTarget,  offset );
         }
 
         return offset;
