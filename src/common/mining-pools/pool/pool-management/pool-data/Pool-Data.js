@@ -43,9 +43,8 @@ class PoolData {
 
         let blockInformation = this.lastBlockInformation;
 
-        for (let i=0; i<blockInformation.blockInformationMinersInstances.length; i++){
+        for (let i=0; i<blockInformation.blockInformationMinersInstances.length; i++)
             blockInformation.blockInformationMinersInstances[i].calculateReward();
-        }
 
         return true;
     }

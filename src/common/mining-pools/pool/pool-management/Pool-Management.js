@@ -80,27 +80,14 @@ class PoolManagement{
     }
 
     /**
-     * Do a transaction from reward wallet to miner's address
-     */
-    static sendReward(miner) {
-
-        let minerAddress = miner.address;
-        let reward = miner.reward;
-
-        //TODO: Do the transaction
-
-        //TODO: clear the poolTransaction
-
-        return true;
-    }
-
-    /**
      * Send rewards for miners and reset rewards from storage
      */
-    async sendRewardsToMiners() {
-        for (let i = 0; i < this.poolData.miners.length; ++i)
-            await this.sendReward(this.poolData.miners[i]);
+    sendRewardsToMiners() {
+        return this.poolRewardsManagement.poolPayouts.doPayout();
     }
+
+
+
 
     get poolOpened(){
         return this._poolOpened;

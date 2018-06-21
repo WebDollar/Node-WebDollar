@@ -6,6 +6,7 @@ import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import Utils from "common/utils/helpers/Utils";
 import consts from 'consts/const_global'
 import InterfaceBlockchainAddressHelper from "../../blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+const sanitizer = require('sanitizer');
 
 class PoolsUtils {
 
@@ -149,31 +150,32 @@ class PoolsUtils {
     }
 
 
-
     extractPoolURL(url){
 
         if ( url === null || url === "" || url === undefined ) return null;
 
-        let version = url.substr(0, url.indexOf( "/" ));
+        url = sanitizer.sanitize(url);
+
+        let version = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
         url = url.substr(url.indexOf( "/" )+1);
 
-        let poolName = url.substr(0, url.indexOf( "/" ));
+        let poolName = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
         url = url.substr(url.indexOf( "/" )+1);
 
-        let poolFee = parseFloat( url.substr(0, url.indexOf( "/" )) );
+        let poolFee = parseFloat( sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) ) );
         url = url.substr(url.indexOf( "/" )+1);
 
-        let poolAddress = url.substr(0, url.indexOf( "/" ));
+        let poolAddress = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
         url = url.substr(url.indexOf( "/" )+1);
 
-        let poolPublicKey = url.substr(0, url.indexOf( "/" ));
+        let poolPublicKey = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
         url = url.substr(url.indexOf( "/" )+1);
         poolPublicKey = new Buffer(poolPublicKey, "hex");
 
-        let poolWebsite = url.substr( 0, url.indexOf( "/" )).replace(/\$/g, '/' );
+        let poolWebsite = sanitizer.sanitize( url.substr( 0, url.indexOf( "/" )).replace(/\$/g, '/' ));
         url = url.substr(url.indexOf( "/" )+1);
 
-        let poolServers = url.replace(/\$/g, '/' ).split(";");
+        let poolServers = sanitizer.sanitize( url.replace(/\$/g, '/' ).split(";") );
 
         if (!this.validatePoolsDetails(poolName, poolFee, poolWebsite, poolAddress, poolPublicKey, poolServers)) throw {message: "validate pools "};
 
