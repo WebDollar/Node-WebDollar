@@ -71,13 +71,13 @@ class PoolDataBlockInformation {
 
         let length = 0;
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
-            if (this.blockInformationMinersInstances[i].publicKey !== undefined)
+            if (this.blockInformationMinersInstances[i].publicKey !== undefined && this.blockInformationMinersInstances[i].reward > 0)
                 length ++;
 
         buffers.push ( Serialization.serializeNumber4Bytes(length));
 
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
-            if (this.blockInformationMinersInstances[i].publicKey !== undefined)
+            if (this.blockInformationMinersInstances[i].publicKey !== undefined && this.blockInformationMinersInstances[i].reward > 0)
                 buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
 
         buffers.push(Serialization.serializeNumber1Byte(this.payout ? 1 : 0));

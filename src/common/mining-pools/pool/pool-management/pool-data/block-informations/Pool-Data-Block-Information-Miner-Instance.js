@@ -60,7 +60,7 @@ class PoolDataBlockInformationMinerInstance {
 
         // target     =     maximum target / difficulty
         // difficulty =     maximum target / target
-        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
+        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
 
     }
 
@@ -86,7 +86,7 @@ class PoolDataBlockInformationMinerInstance {
         else if ( this.workBlock !== undefined) height = this.workBlock.height;
         else height = Blockchain.blockchain.blocks.length-1;
 
-        this.reward = Math.floor ( this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).toNumber()  * (BlockchainMiningReward.getReward( height ) - consts.MINING_POOL.MINING.FEE_THRESHOLD) * (1-this.poolManagement.poolSettings.poolFee));
+        this.reward = Math.floor ( this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).multipliedBy( BlockchainMiningReward.getReward( height  - consts.MINING_POOL.MINING.FEE_THRESHOLD) ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber());
 
         this.minerInstance.miner.rewardTotal += this.reward - this.prevReward;
 
