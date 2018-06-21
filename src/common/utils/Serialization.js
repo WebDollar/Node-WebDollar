@@ -1,5 +1,5 @@
 import BufferExtended from "./BufferExtended";
-var BigNumber = require ('bignumber.js');
+const BigNumber = require ('bignumber.js');
 
 class Serialization{
 

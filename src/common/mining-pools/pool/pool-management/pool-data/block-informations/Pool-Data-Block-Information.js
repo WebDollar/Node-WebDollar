@@ -22,6 +22,9 @@ class PoolDataBlockInformation {
 
         this.confirmations = 0;
         this.confirmationsFailsTrials = 0;
+        this.confirmed = false;
+
+        this.payout = false;
 
         this.block = block;
 

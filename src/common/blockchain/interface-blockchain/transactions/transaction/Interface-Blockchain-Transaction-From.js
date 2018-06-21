@@ -56,10 +56,16 @@ class InterfaceBlockchainTransactionFrom{
 
         addresses.forEach ( (fromObject, index) =>{
 
-            if (typeof fromObject.unencodedAddress === "object" && fromObject.unencodedAddress.hasOwnProperty("unencodedAddress"))
-                fromObject.unencodedAddress = fromObject.unencodedAddress.unencodedAddress;
+            if (fromObject.unencodedAddress !== undefined) {
 
-            fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress);
+                if (typeof fromObject.unencodedAddress === "object" && fromObject.unencodedAddress.hasOwnProperty("unencodedAddress"))
+                    fromObject.unencodedAddress = fromObject.unencodedAddress.unencodedAddress;
+
+                fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress);
+
+            } else if (fromObject.address !== undefined) {
+                fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.address);
+            }
 
             if (typeof fromObject.publicKey === "string")
                 fromObject.publicKey = new Buffer (fromObject.publicKey, "hex");

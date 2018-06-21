@@ -3,6 +3,7 @@ import BufferExtended from 'common/utils/BufferExtended';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 import consts from 'consts/const_global'
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
+import PoolPayouts from "./Pool-Payouts"
 
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
 const VALIDATION_BLOCK_CONFIRMATIONS = 20; //blocks
@@ -21,7 +22,11 @@ class PoolRewardsManagement{
         this.poolData = poolData;
         this.blockchain = blockchain;
 
+        this.poolPayouts = new PoolPayouts(poolManagement, poolData, blockchain);
+
         StatusEvents.on("blockchain/blocks-count-changed",async (data)=>{
+
+            if (!this.poolManagement._poolStarted) return;
 
             await this._blockchainChanged();
 
@@ -35,7 +40,7 @@ class PoolRewardsManagement{
 
     async _blockchainChanged(){
 
-        if (!this.poolManagement._poolStarted) return;
+
         if (this.poolData.blocksInfo.length === 0) return;
 
         let poolBlocksConfirmed = 0;
@@ -90,7 +95,7 @@ class PoolRewardsManagement{
             let blockInfo = this.poolData.blocksInfo[i].block;
 
             //already confirmed
-            if (this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED){
+            if (this.poolData.blocksInfo[i].confirmed){
                 poolBlocksConfirmed++;
                 continue;
             }
@@ -139,6 +144,8 @@ class PoolRewardsManagement{
             }
 
             if (found && this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED){
+
+                this.poolData.blocksInfo[i].confirmed = true;
 
                 //convert reward to confirmedReward
                 for (let j=0; j < this.poolData.blocksInfo[i].blockInformationMinersInstances.length; j++) {
