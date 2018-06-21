@@ -52,11 +52,11 @@ class MinerPoolStatistics{
         return this._poolBlocksConfirmed;
     }
 
-    set poolBlocksUnonfirmed(newValue){
+    set poolBlocksUnconfirmed(newValue){
 
         if (this._poolBlocksUnconfirmed === newValue) return;
 
-        this._poolBlocksUnonfirmed = newValue;
+        this._poolBlocksUnconfirmed = newValue;
         this._emitNotification();
     }
 
@@ -65,7 +65,7 @@ class MinerPoolStatistics{
     }
 
     _emitNotification(){
-        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes, poolMinersOnline: this._poolMinersOnline });
+        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes, poolMinersOnline: this._poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed, poolBlocksUnconfirmed: this.poolBlocksUnconfirmed });
     }
 
 }

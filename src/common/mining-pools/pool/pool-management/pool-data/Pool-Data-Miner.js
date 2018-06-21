@@ -59,7 +59,7 @@ class PoolDataMiner{
         list.push ( Serialization.serializeNumber7Bytes(this.rewardConfirmed) );
         list.push ( Serialization.serializeNumber7Bytes(this.rewardSent) );
 
-        list.push ( Serialization.serializeNumber4Bytes(this.instances) );
+        list.push ( Serialization.serializeNumber4Bytes(this.instances.length) );
 
         for (let i=0; i<this.instances.length; i++)
             list.push(this.instances[i].serializeMinerInstance() );

@@ -65,7 +65,7 @@ class PoolStatistics{
 
     }
 
-    addBlocksStatistics(blocksUnconfirmed, blocksConfirmed, ){
+    addBlocksStatistics(blocksConfirmed, blocksUnconfirmed, ){
 
         this.poolBlocksUnconfirmed = blocksUnconfirmed;
         this.poolBlocksConfirmed = blocksConfirmed;
