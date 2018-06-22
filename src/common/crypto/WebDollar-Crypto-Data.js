@@ -77,7 +77,7 @@ class WebDollarCryptoData {
             }
 
             if (typeof data === 'number'){
-                this.buffer = Serialization.serializeNumber8Bytes(data);
+                this.buffer = Serialization.serializeNumber7Bytes(data);
                 return;
             }
 
@@ -195,10 +195,6 @@ class WebDollarCryptoData {
         return this.buffer.compare(data.buffer)
     }
 
-    toInt(){
-        
-        return Serialization.deserializeNumber(this.buffer);
-    }
 
 }
 

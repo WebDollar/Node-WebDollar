@@ -70,8 +70,8 @@ class Serialization{
         return  buffer;
     }
 
+    //converting number value into a buffer
     serializeNumber4Bytes(data){
-        //converting number value into a buffer
         let buffer = Buffer(4);
         buffer[3] = data & 0xff;
         buffer[2] = data>>8 & 0xff;
@@ -81,7 +81,36 @@ class Serialization{
         return  buffer;
     }
 
-    serializeNumber8Bytes(long){
+    //will show the nonce positive
+    deserializeNumber4Bytes_Positive(buffer, offset = 0){
+
+        let value = 0;
+
+        for ( let i = offset; i<=offset + 3 ; i++)
+                value = (value *256 ) + buffer[i];
+
+        return value;
+    }
+
+    deserializeNumber4Bytes(buffer, offset=0){
+        return buffer[3+offset] | (buffer[2+offset] << 8) | (buffer[1+offset] << 16) | (buffer[0+offset] << 24);
+    }
+
+    deserializeNumber3Bytes(buffer, offset=0){
+        return buffer[2+offset] | (buffer[1+offset] << 8) | (buffer[0+offset] << 16);
+    }
+
+    deserializeNumber2Bytes(buffer, offset=0){
+        return buffer[1+offset] | (buffer[0+offset] << 8);
+    }
+
+    deserializeNumber1Bytes(buffer, offset=0){
+        return buffer[0+offset];
+    }
+
+
+    serializeNumber7Bytes(long){
+
         // we want to represent the input as a 8-bytes array
         var byteArray = new Buffer(7);
 
@@ -94,17 +123,7 @@ class Serialization{
         return byteArray;
     }
 
-
-    deserializeNumber8Bytes(byteArray){
-        let value = 0;
-
-        for ( let i = byteArray.length - 1; i >= 0; i--)
-            value = (value * 256) + byteArray[i];
-
-        return value;
-    }
-
-    deserializeNumber8BytesBuffer(buffer, offset = 0){
+    deserializeNumber7Bytes(buffer, offset = 0){
 
         let value = 0;
 
@@ -114,19 +133,6 @@ class Serialization{
         return value;
     }
 
-    deserializeNumber(buffer){
-
-        if(buffer.length === 1) return buffer[0]; else
-
-        if (buffer.length === 2) return buffer[1] | (buffer[0] << 8); else
-
-        if (buffer.length === 3) return buffer[2] | (buffer[1] << 8) | (buffer[0] << 16); else
-
-        if (buffer.length === 4) return buffer[3] | (buffer[2] << 8) | (buffer[1] << 16) | (buffer[0] << 24); else
-
-        if (buffer.length === 6) return buffer[5] | (buffer[4] << 8) | (buffer[3] << 16) | (buffer[2] << 24) | (buffer[1] << 32) | (buffer[0] << 40);
-
-    }
 
     /**
      * Convers buffer to a Fixed Length buffer
@@ -199,6 +205,21 @@ class Serialization{
 
         return num;
     }
+
+
+
+    deserializeNumber(buffer){
+
+        if(buffer.length === 1) return buffer[0]; else
+
+        if (buffer.length === 2) return buffer[1] | (buffer[0] << 8); else
+
+        if (buffer.length === 3) return buffer[2] | (buffer[1] << 8) | (buffer[0] << 16); else
+
+        if (buffer.length === 4) return buffer[3] | (buffer[2] << 8) | (buffer[1] << 16) | (buffer[0] << 24);
+
+    }
+
 
 }
 

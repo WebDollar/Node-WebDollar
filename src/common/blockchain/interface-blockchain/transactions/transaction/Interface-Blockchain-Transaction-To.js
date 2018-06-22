@@ -115,7 +115,7 @@ class InterfaceBlockchainTransactionTo{
 
         for (let i = 0; i < this.addresses.length; i++){
             addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
-            addressesBuffer.push( Serialization.serializeNumber8Bytes( this.addresses[i].amount ));
+            addressesBuffer.push( Serialization.serializeNumber7Bytes( this.addresses[i].amount ));
         }
 
         return Buffer.concat (addressesBuffer);
@@ -126,7 +126,7 @@ class InterfaceBlockchainTransactionTo{
 
         this.addresses = [];
 
-        let length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+        let length = Serialization.deserializeNumber1Bytes( buffer, offset );
         offset += 1;
 
         for (let i = 0; i < length; i++){
@@ -136,7 +136,7 @@ class InterfaceBlockchainTransactionTo{
             address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
             offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
-            address.amount = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
+            address.amount = Serialization.deserializeNumber7Bytes(buffer, offset);
             offset += 7;
 
             this.addresses.push(address);

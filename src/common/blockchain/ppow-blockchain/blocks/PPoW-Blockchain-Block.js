@@ -173,13 +173,13 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         try {
 
-            let numInterlink = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+            let numInterlink = Serialization.deserializeNumber1Bytes( buffer, offset );
             offset += 1;
 
             this.interlink = [];
             for (let i = 0; i < numInterlink; ++i) {
 
-                let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 3 ) );
+                let height = Serialization.deserializeNumber3Bytes( buffer, offset );
                 offset += 3;
 
                 if (height === 0) {

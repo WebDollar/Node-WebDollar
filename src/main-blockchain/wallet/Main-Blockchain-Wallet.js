@@ -104,7 +104,7 @@ class MainBlockchainWallet{
 
         try {
 
-            let numAddresses = Serialization.deserializeNumber( BufferExtended.substr(data, offset, 4) );
+            let numAddresses = Serialization.deserializeNumber4Bytes( BufferExtended.substr(data, offset, 4) );
             offset += 4;
 
             this.addresses = [];
@@ -303,12 +303,12 @@ class MainBlockchainWallet{
                 //Deserialize public addresses and push back to addresses array
                 let offset = 0;
 
-                let numAddresses = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+                let numAddresses = Serialization.deserializeNumber1Bytes( buffer, offset );
                 offset += 1;
 
                 for (let i = 0; i < numAddresses; ++i) {
 
-                    let len = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+                    let len = Serialization.deserializeNumber1Bytes( buffer, offset, );
                     offset += 1;
 
                     let blockchainAddress = await this._justCreateNewAddress();

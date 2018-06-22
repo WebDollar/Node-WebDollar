@@ -178,7 +178,7 @@ class PoolData {
             list.push( Serialization.serializeNumber1Byte(BufferExtended.fromBase(this._minersList[i].address).length) );
             list.push( BufferExtended.fromBase(this._minersList[i].address) );
             
-            list.push ( Serialization.serializeNumber8Bytes(this._minersList[i].reward) );
+            list.push ( Serialization.serializeNumber7Bytes(this._minersList[i].reward) );
         }
 
         return Buffer.concat(list);
@@ -188,19 +188,19 @@ class PoolData {
 
         try {
             
-            let numMiners = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 2 ) );
+            let numMiners = Serialization.deserializeNumber2Bytes( buffer, offset );
             offset += 2;
 
             this._minersList = [];
             for (let i = 0; i < numMiners; ++i) {
 
-                let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+                let len = Serialization.deserializeNumber1Bytes( buffer, offset );
                 offset += 1;
 
                 let minerAddress = BufferExtended.toBase( BufferExtended.substr(buffer, offset, len) );
                 offset += len;
 
-                let minerReward = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
+                let minerReward = Serialization.deserializeNumber7Bytes(buffer, offset);
                 offset += 7;
 
                 this._minersList.push( {address: minerAddress, reward: minerReward} );

@@ -256,19 +256,19 @@ class InterfaceBlockchainTransaction{
 
         try{
 
-            this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+            this.version = Serialization.deserializeNumber1Bytes( buffer, offset );
             offset += 1;
 
             //hard fork
             if (this.version === 0x00){
-                this.nonce = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 1));
+                this.nonce = Serialization.deserializeNumber1Bytes( buffer, offset);
                 offset += 1;
             } else if (this.version === 0x01){
-                this.nonce = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 2));
+                this.nonce = Serialization.deserializeNumber2Bytes( buffer, offset);
                 offset += 2;
             }
 
-            this.timeLock =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 3) );
+            this.timeLock =  Serialization.deserializeNumber3Bytes( buffer, offset );
             offset += 3;
 
             offset = this.from.deserializeFrom(buffer, offset);

@@ -241,7 +241,7 @@ class InterfaceBlockchainTransactionFrom{
             array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
             array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[i].publicKey ));
             array.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH, this.addresses[i].signature ));
-            array.push( Serialization.serializeNumber8Bytes( this.addresses[i].amount ));
+            array.push( Serialization.serializeNumber7Bytes( this.addresses[i].amount ));
         }
 
         array.push(Serialization.serializeNumber1Byte( this.currencyTokenId.length ));
@@ -255,7 +255,7 @@ class InterfaceBlockchainTransactionFrom{
 
         this.addresses = [];
 
-        let length =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+        let length =  Serialization.deserializeNumber1Bytes( buffer, offset );
         offset += 1;
 
         for (let i = 0; i < length; i++){
@@ -271,13 +271,13 @@ class InterfaceBlockchainTransactionFrom{
             address.signature= BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
             offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
 
-            address.amount = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
+            address.amount = Serialization.deserializeNumber7Bytes(buffer, offset);
             offset += 7;
 
             this.addresses.push(address);
         }
 
-        let currencyLength =  Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+        let currencyLength =  Serialization.deserializeNumber1Bytes( buffer, offset, );
         offset += 1;
 
         this.currencyTokenId = BufferExtended.substr(buffer, offset, currencyLength );

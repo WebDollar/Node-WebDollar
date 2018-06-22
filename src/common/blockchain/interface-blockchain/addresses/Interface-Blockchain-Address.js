@@ -238,16 +238,17 @@ class InterfaceBlockchainAddress{
             readStream.on('data', async (buffer) => {
 
                 let offset = 0;
-                let len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+                let len = Serialization.deserializeNumber1Bytes( buffer, offset, );
                 offset += 1;
 
                 let privateKey = BufferExtend.substr(buffer, offset, len);
                 offset += len;
 
-                let totalMultiSig = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+                let totalMultiSig = Serialization.deserializeNumber1Bytes( buffer, offset );
                 offset += 1;
 
-                let requiredMultiSig = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+                let requiredMultiSig = Serialization.deserializeNumber1Bytes( buffer, offset);
+                offset += 1;
 
                 resolve({result: await this.savePrivateKey(privateKey), totalMultiSig: totalMultiSig, requiredMultiSig: requiredMultiSig});
             });
@@ -314,14 +315,14 @@ class InterfaceBlockchainAddress{
         try {
 
             //read Address
-            len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+            len = Serialization.deserializeNumber1Bytes( buffer, offset );
             offset += 1;
 
             this.address = BufferExtended.toBase( BufferExtend.substr(buffer, offset, len) );
             offset += len;
 
             //read unencodedAddress
-            len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+            len = Serialization.deserializeNumber1Bytes( buffer, offset );
             offset += 1;
 
             this.unencodedAddress = BufferExtend.substr(buffer, offset, len);
@@ -331,14 +332,14 @@ class InterfaceBlockchainAddress{
             if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.address).result === false)
                 throw {message: "address didn't pass the valdiateAddressChecksum "};
 
-            len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+            len = Serialization.deserializeNumber1Bytes( buffer, offset );
             offset += 1;
 
             this.publicKey = BufferExtend.substr(buffer, offset, len);
             offset += len;
 
             if (deserializePrivateKey){
-                len = Serialization.deserializeNumber( BufferExtend.substr(buffer, offset, 1) );
+                len = Serialization.deserializeNumber1Bytes( buffer, offset );
                 offset += 1;
 
                 let privateKey = BufferExtend.substr(buffer, offset, len);

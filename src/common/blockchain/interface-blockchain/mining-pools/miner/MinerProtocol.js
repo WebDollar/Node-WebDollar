@@ -92,7 +92,7 @@ class MinerProtocol {
             list.push( Serialization.serializeNumber1Byte(BufferExtended.fromBase(hashList[i].address).length) );
             list.push( BufferExtended.fromBase(hashList[i].address) );
 
-            list.push ( Serialization.serializeNumber8Bytes(hashList[i].reward) );
+            list.push ( Serialization.serializeNumber7Bytes(hashList[i].reward) );
         }
 
         return Buffer.concat(list);

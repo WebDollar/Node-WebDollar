@@ -161,14 +161,14 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         return Buffer.concat([
                 Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH),
-                Serialization.serializeNumber8Bytes(balance.amount)
+                Serialization.serializeNumber7Bytes(balance.amount)
             ]);
     }
 
     _serializeBalanceWEBDToken(balance){
         return Buffer.concat([
             Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH),
-            Serialization.serializeNumber8Bytes(balance.amount)
+            Serialization.serializeNumber7Bytes(balance.amount)
         ]);
     }
 
@@ -243,10 +243,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             if (this.isLeafBasedOnParents()){
 
-                this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 byte
+                this.nonce = Serialization.deserializeNumber2Bytes( buffer, offset ); //2 byte
                 offset += 2;
 
-                let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
+                let balancesLength = Serialization.deserializeNumber1Bytes( buffer, offset ); //1 byte
                 offset += 1;
 
                 this.balances = []; // initialization
@@ -260,7 +260,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                     if (webdId[0] !== consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE)
                         throw {message: "webd token is incorrect", token: webdId };
 
-                    let result = Serialization.deserializeNumber8BytesBuffer(buffer, offset);
+                    let result = Serialization.deserializeNumber7Bytes(buffer, offset);
                     offset += 7;
 
 
@@ -275,7 +275,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                             let tokenId = BufferExtended.substr(buffer, offset, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH);
                             offset += consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH;
 
-                            result = Serialization.deserializeNumber8BytesBuffer(buffer, offset );
+                            result = Serialization.deserializeNumber7Bytes(buffer, offset );
                             offset += 7;
 
                             this.updateBalanceToken(result, tokenId);
