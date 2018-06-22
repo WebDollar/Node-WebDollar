@@ -1,4 +1,5 @@
 import consts from "consts/const_global";
+
 import MinerPoolMining from "common/mining-pools/miner/mining/Miner-Pool-Mining";
 import MinerPoolReward from "common/mining-pools/miner/mining/Miner-Pool-Reward";
 import MinerPoolStatistics from "common/mining-pools/miner/pool-statistics/Miner-Pool-Statistics"
@@ -9,7 +10,9 @@ import Blockchain from "main-blockchain/Blockchain";
 
 class MinerProtocol {
 
-    constructor (){
+    constructor (blockchain){
+
+        this.blockchain = blockchain;
 
         //this stores the last sent hash
 
@@ -89,15 +92,22 @@ class MinerProtocol {
             await this.minerPoolSettings.setMinerPoolActivated(value);
 
             if (value) {
-                Blockchain.blockchain.mining = this.minerPoolMining;
+
+                this.blockchain.mining = this.minerPoolMining;
                 Blockchain.Mining = this.minerPoolMining;
+
                 await this.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
                 await this.minerPoolProtocol._startMinerProtocol();
+
+                this.blockchain.agent.clearVerifyConsensusInterval();
             }
             else {
-                Blockchain.blockchain.mining = Blockchain.blockchain.miningSolo;
+                this.blockchain.mining = Blockchain.blockchain.miningSolo;
                 Blockchain.Mining = Blockchain.blockchain.miningSolo;
+
                 await this.minerPoolProtocol._stopMinerProtocol();
+
+                this.blockchain.agent.startVerifyConsensusInterval();
             }
 
             StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Started changed" });

@@ -1,9 +1,9 @@
 import BufferExtended from "./BufferExtended";
+const BigNumber = require('bignumber.js');
 
 class Serialization{
 
     /**
-     *
      * @param data
      */
     serializeBigInteger(bigInteger){
@@ -26,7 +26,7 @@ class Serialization{
         return buffer;
     }
 
-    serializeBigNumber( bigNumber, length ){
+    convertBigNumber( bigNumber, length ){
         //converting number value into a buffer
 
         let buffer = new Buffer(length);
