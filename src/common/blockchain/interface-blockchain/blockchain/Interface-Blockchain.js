@@ -55,7 +55,7 @@ class InterfaceBlockchain {
     }
 
     _createBlockchainElements(){
-        this.transactions = new InterfaceBlockchainTransactions(this);
+        this.transactions = new InterfaceBlockchainTransactions( this);
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
     }
 

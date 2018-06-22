@@ -144,6 +144,7 @@ class MinerProtocol extends PoolProtocolList{
                 if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
                 if (typeof answer.b === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksConfirmed = answer.b;
                 if (typeof answer.ub === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksUnconfirmed = answer.ub;
+                if (typeof answer.t === "number") this.minerPoolManagement.minerPoolStatistics.poolTimeRemaining = answer.t;
 
                 return true;
 
@@ -227,6 +228,7 @@ class MinerProtocol extends PoolProtocolList{
         if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
         if (typeof answer.b === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksConfirmed = answer.b;
         if (typeof answer.ub === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksUnconfirmed = answer.ub;
+        if (typeof answer.t === "number") this.minerPoolManagement.minerPoolStatistics.poolTimeRemaining = answer.t;
 
         return true;
 
@@ -257,6 +259,7 @@ class MinerProtocol extends PoolProtocolList{
                 if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
                 if (typeof answer.b === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksConfirmed = answer.b;
                 if (typeof answer.ub === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksUnconfirmed = answer.ub;
+                if (typeof answer.t === "number") this.minerPoolManagement.minerPoolStatistics.poolTimeRemaining = answer.t;
 
             } else {
 

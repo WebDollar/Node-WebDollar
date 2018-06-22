@@ -16,7 +16,7 @@ class PoolDataBlockInformationMinerInstance {
 
         this.reward = 0;
 
-        this.workHash = undefined;
+        this._workHash = undefined;
         this.workHashNonce = undefined;
         this.workBlock = undefined;
 
@@ -60,7 +60,7 @@ class PoolDataBlockInformationMinerInstance {
 
         // target     =     maximum target / difficulty
         // difficulty =     maximum target / target
-        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
+        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ this._workHash.toString("hex") ) );
 
     }
 
@@ -138,6 +138,20 @@ class PoolDataBlockInformationMinerInstance {
         return this.minerInstance.miner;
     }
 
+    set workHash(newValue){
+
+        this._workHash = newValue;
+
+        if (this.blockInformation.bestHash === undefined || newValue.compare(this.blockInformation.bestHash) <= 0)
+            this.blockInformation.bestHash = newValue;
+
+    }
+
+    get workHash(){
+
+        return this._workHash;
+
+    }
 
 }
 

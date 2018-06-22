@@ -32,7 +32,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
         for (let i=0; i<this.transactions.length; i++) {
 
-            if ( !Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i]) )
+            if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i]) === -1 )
                 this.transactions[i].destroyTransaction();
 
             this.transactions[i] = undefined;

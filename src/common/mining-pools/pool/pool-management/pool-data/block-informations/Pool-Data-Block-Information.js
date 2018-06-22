@@ -31,6 +31,9 @@ class PoolDataBlockInformation {
         this.block = block;
         this.date = new Date().getTime();
 
+        this.bestHash = undefined;
+        this.timeRemaining = -1;
+
         this.calculateTargetDifficulty();
     }
 
@@ -206,11 +209,12 @@ class PoolDataBlockInformation {
         // target_difficulty ... y sec
         //
         // y = x * target_difficulty / ( sum(  difficulties ) / n);
+        if (this.poolManagement.poolData.blocksInfo.length !== 0 && this.poolManagement.poolData.lastBlockInformation !== this) return;
 
-        this.timeRemaining =  Math.floor( this.targetDifficulty.dividedBy(this.totalDifficulty.dividedBy(this.totalDifficultyLength === 0 ? 1 : this.totalDifficultyLength)).multipliedBy( (new Date().getTime() - this.date)/1000 ).toNumber());
+        if (this.bestHash === undefined) return 40;
 
-        if (this.poolManagement.poolData.lastBlockInformation === this)
-            this.poolManagement.poolStatistics.poolTimeRemaining = this.timeRemaining;
+        let dTime = (new Date().getTime() - this.date)/1000;
+        this.timeRemaining =  Math.max(0, Math.floor( new BigNumber ( "0x"+ this.bestHash.toString("hex")) .dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") )) .multipliedBy( dTime ).toNumber() - dTime));
 
     }
 
@@ -224,6 +228,15 @@ class PoolDataBlockInformation {
         this.totalDifficulty = this.totalDifficulty.minus(value);
         this.totalDifficultyLength--;
         this._calculateTimeRemaining();
+    }
+
+    set timeRemaining(newValue){
+
+        this._timeRemaining = newValue;
+
+        if (this.poolManagement.poolData.blocksInfo.length === 0 || this.poolManagement.poolData.lastBlockInformation === this)
+            this.poolManagement.poolStatistics.poolTimeRemaining = newValue;
+
     }
 
 }

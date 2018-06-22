@@ -13,6 +13,7 @@ class MinerPoolStatistics{
         this._poolMinersOnline = 0;
         this._poolBlocksConfirmed = 0;
         this._poolBlocksUnconfirmed = 0;
+        this._poolTimeRemaining = 0;
 
     }
 
@@ -64,8 +65,20 @@ class MinerPoolStatistics{
         return this._poolBlocksUnconfirmed;
     }
 
+    set poolTimeRemaining (newValue){
+
+        if (this._poolTimeRemaining === newValue) return;
+
+        this._poolTimeRemaining = newValue;
+        this._emitNotification();
+    }
+
+    get poolTimeRemaining(){
+        return this._poolTimeRemaining;
+    }
+
     _emitNotification(){
-        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes, poolMinersOnline: this._poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed, poolBlocksUnconfirmed: this.poolBlocksUnconfirmed });
+        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes, poolMinersOnline: this._poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed, poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining });
     }
 
 }

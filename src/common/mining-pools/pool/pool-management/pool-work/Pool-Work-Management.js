@@ -20,8 +20,6 @@ class PoolWorkManagement{
     }
 
 
-
-
     async getWork(minerInstance){
 
         let hashes = minerInstance.hashesPerSecond;
@@ -138,6 +136,8 @@ class PoolWorkManagement{
                 } catch (exception){
                     console.error("PoolWork include raised an exception", exception);
                     revertActions.revertOperations();
+
+                    this.poolWork.getNextBlockForWork();
                 }
 
                 revertActions.destroyRevertActions();
