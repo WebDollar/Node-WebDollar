@@ -26,19 +26,17 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
     async startPoolConnectedMinersProtocol(){
 
         for (let i=0; i<NodesList.nodes.length; i++)
-            await this._subscribePoolConnectedMiners(NodesList.nodes[i]);
+            await this._subscribePoolConnectedMiners(NodesList.nodes[i].socket);
 
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
-            await this._subscribePoolConnectedMiners(nodesListObject)
+            await this._subscribePoolConnectedMiners(nodesListObject.socket)
         });
 
 
 
     }
 
-    async _subscribePoolConnectedMiners(nodesListObject){
-
-        let socket = nodesListObject.socket;
+    async _subscribePoolConnectedMiners(socket){
 
         if (!this.poolManagement._poolStarted) return;
 

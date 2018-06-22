@@ -99,7 +99,7 @@ class MinerProtocol {
                 await this.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
                 await this.minerPoolProtocol._startMinerProtocol();
 
-                this.blockchain.agent.clearVerifyConsensusInterval();
+                this.blockchain.agent.consensus = true;
             }
             else {
                 this.blockchain.mining = Blockchain.blockchain.miningSolo;
@@ -107,7 +107,7 @@ class MinerProtocol {
 
                 await this.minerPoolProtocol._stopMinerProtocol();
 
-                this.blockchain.agent.startVerifyConsensusInterval();
+                this.blockchain.agent.consensus = false;
             }
 
             StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Started changed" });
