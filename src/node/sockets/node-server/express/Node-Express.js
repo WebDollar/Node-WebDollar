@@ -169,10 +169,49 @@ class NodeExpress{
 
         });
 
-        // respond with "hello world" when a GET request is made to the homepage
+        // Return blocks information
+        this.app.get('/blocks/:blocks', (req, res) => {
+
+          try {
+            let block_start = parseInt(decodeURIComponent(req.params.blocks))
+            if (block_start < Blockchain.blockchain.blocks.length) {
+              let blocks_to_send = []
+              for (let i=block_start; i<Blockchain.blockchain.blocks.length; i++) {
+                blocks_to_send.push(Blockchain.blockchain.blocks[i].toJSON())
+              }
+              res.send({result: true, blocks: blocks_to_send})
+              return
+            } else {
+              throw ("block start is not correct: " + block_start)
+            }
+          } catch (exception) {
+            res.send({result: false, message: exception.message});
+            return;
+          }
+        })
+
+
+        // Return block information
+        this.app.get('/block/:block', (req, res) => {
+          try {
+            let block = parseInt(decodeURIComponent(req.params.block))
+            if (block < Blockchain.blockchain.blocks.length) {
+              res.send({result: true, block: Blockchain.blockchain.blocks[block].toJSON()})
+              return
+            } else {
+              throw "Block not found."
+            }
+          } catch (exception) {
+            res.send({result: false, message: "Invalid Block"});
+            return;
+          }
+        })
+
+
+        // Return address info: balance, blocks mined and transactions
         this.app.get('/address/:address', (req, res) => {
 
-            let address = req.params.address;
+            let address = decodeURIComponent(req.params.address);
 
             try {
                 address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
@@ -181,9 +220,16 @@ class NodeExpress{
                 return;
             }
 
-            let answer = [];
-            let minedBlocks = [];
+            let answer = []
+            let minedBlocks = []
+            let balance = 0
+            let last_block = Blockchain.blockchain.blocks.length
 
+            // Get balance
+            balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
+            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+
+            // Get mined blocks and transactions
             for (let i=0; i<Blockchain.blockchain.blocks.length; i++) {
 
                 for (let j = 0; j < Blockchain.blockchain.blocks[i].data.transactions.transactions.length; j++) {
@@ -224,7 +270,10 @@ class NodeExpress{
             }
 
 
-            res.send({result: true, minedBlocks: minedBlocks, transactions: answer});
+            res.send({result: true, last_block: last_block,
+                      balance: balance, minedBlocks: minedBlocks,
+                      transactions: answer
+                     });
 
         });
 
