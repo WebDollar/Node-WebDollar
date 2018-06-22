@@ -108,6 +108,31 @@ class PoolData {
         return blockInformation;
     }
 
+    findBlockInformation(blockInformation){
+
+        for (let i=0; i<this.blocksInfo.length; i++)
+            if (blockInformation === this.blocksInfo[i])
+                return i;
+
+        return -1;
+
+    }
+
+    deleteBlockInformationByIndex(index){
+        this.blocksInfo[index].destroyPoolDataBlockInformation(  );
+        this.blocksInfo.splice(index, 1);
+    }
+
+    deleteBlockInformation(blockInformation){
+
+        let position = this.findBlockInformation(blockInformation);
+        if (position === -1) return null;
+
+        blockInformation.destroyPoolDataBlockInformation(  );
+
+        this.blocksInfo.splice(position, 1);
+    }
+
 
     
     /**

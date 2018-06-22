@@ -95,9 +95,15 @@ class PoolRewardsManagement{
             let blockInfo = this.poolData.blocksInfo[i].block;
 
             //already confirmed
-            if (this.poolData.blocksInfo[i].payout){
+            if ( this.poolData.blocksInfo[i].payout){
+
+                //let's delete old payouts
+                if (this.poolData.blocksInfo[i].block.height - this.blockchain.blocks.length > 40)
+                    this.poolData.deleteBlockInformationByIndex(i);
+
                 poolBlocksConfirmed++;
                 continue;
+
             }
 
             //already confirmed
@@ -318,7 +324,7 @@ class PoolRewardsManagement{
         }
 
         //clear the blockInformation
-        this.poolData.blocksInfo.splice(index, 1);
+        this.poolData.deleteBlockInformationByIndex(index);
         
     }
 
