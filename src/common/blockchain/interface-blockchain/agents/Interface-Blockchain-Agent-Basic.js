@@ -44,11 +44,11 @@ class InterfaceBlockchainAgentBasic{
     set consensus(newValue){
 
         this._consensus = newValue;
-        this.initializeConsensus(newValue);
+        this._initializeConsensus(newValue);
 
     }
 
-    initializeConsensus(newConsensus){
+    _initializeConsensus(newConsensus){
 
         if (newConsensus){
 

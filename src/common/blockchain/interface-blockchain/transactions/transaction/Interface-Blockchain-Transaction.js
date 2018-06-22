@@ -185,6 +185,8 @@ class InterfaceBlockchainTransaction{
 
     validateTransactionEveryTime( blockHeight , blockValidationType = {}){
 
+        if (this.blockchain === undefined) throw {message: "blockchain is empty"};
+
         if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};

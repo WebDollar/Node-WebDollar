@@ -55,14 +55,12 @@ class PoolRewardsManagement{
         let confirmations = {
         };
 
-        let blocksInfoStart = 0;
-        for (let i = 0; i< this.poolData.blocksInfo.length; i++)
-            if (this.poolData.blocksInfo[i].block !== undefined) {
-                blocksInfoStart = this.poolData.blocksInfo[i].block.height;
-                break;
-            }
+        let firstBlock;
+        for (let i=0; i < this.poolData.blocksInfo.length; i++)
+            if ( this.poolData.blocksInfo[ i ].block !== undefined )
+                if ( firstBlock === undefined || this.poolData.blocksInfo[i].block.height < firstBlock) firstBlock = this.poolData.blocksInfo[ i ].block.height;
 
-        for (let i = this.blockchain.blocks.length-1, n = Math.max( this.blockchain.blocks.blocksStartingPoint, blocksInfoStart ); i>= n; i-- ){
+        for (let i = this.blockchain.blocks.length-1, n = Math.max( this.blockchain.blocks.blocksStartingPoint, firstBlock ); i>= n; i-- ) {
 
             if ( this.blockchain.mining.unencodedMinerAddress.equals( this.blockchain.blocks[i].data.minerAddress ))
                 confirmationsPool++;
@@ -82,17 +80,8 @@ class PoolRewardsManagement{
 
         }
 
-
-        //maybe the last block was not finished
-        let start = this.poolData.blocksInfo.length-1;
-        if ( this.poolData.blocksInfo[start].block === undefined )
-            start --;
-
-
         //recalculate the confirmations
-        for (let i = start ; i >= 0; i--  ){
-
-            let blockInfo = this.poolData.blocksInfo[i].block;
+        for (let i = this.poolData.blocksInfo.length-1; i >= 0; i--  ){
 
             //already confirmed
             if ( this.poolData.blocksInfo[i].payout){
@@ -110,6 +99,18 @@ class PoolRewardsManagement{
             if (this.poolData.blocksInfo[i].confirmed){
                 poolBlocksConfirmed++;
                 continue;
+            }
+
+            let blockInfo = this.poolData.blocksInfo[i].block;
+
+            if (blockInfo === undefined){
+
+                if (i === this.poolData.blocksInfo.length-1 ) continue;
+                else { //for some reasons, maybe save/load
+                    this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i], i );
+                    continue;
+                }
+
             }
 
             //confirm using my own blockchain / light blockchain
@@ -173,8 +174,6 @@ class PoolRewardsManagement{
             } else {
                 poolBlocksUnconfirmed++;
             }
-
-
 
         }
 

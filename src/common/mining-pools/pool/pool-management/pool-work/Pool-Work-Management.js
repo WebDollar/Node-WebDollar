@@ -77,7 +77,7 @@ class PoolWorkManagement{
             let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
 
             if (blockInformationMinerInstance.workBlock === undefined)
-                throw {message: "no block"};
+                throw {message: "miner instance - no block"};
 
             let hashesFactor = Math.min(5, (5000/work.timeDiff));
             hashesFactor = Math.max(0.01, hashesFactor);

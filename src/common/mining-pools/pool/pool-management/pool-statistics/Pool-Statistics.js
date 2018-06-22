@@ -25,6 +25,7 @@ class PoolStatistics{
 
         this.poolBlocksUnconfirmed = 0;
         this.poolBlocksConfirmed = 0;
+        this.poolTimeRemaining = 0;
 
 
 
@@ -48,7 +49,7 @@ class PoolStatistics{
             length: 0,
         };
 
-        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed });
+        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
 
     }
 

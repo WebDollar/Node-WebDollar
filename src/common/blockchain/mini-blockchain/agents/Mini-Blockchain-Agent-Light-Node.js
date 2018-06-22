@@ -80,8 +80,9 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
         // });
     }
 
+    _initializeConsensus(newConsensus){
 
-    setConsensus(){
+        inheritAgentClass.prototype._initializeConsensus.call(this, newConsensus);
 
         if (newConsensus){
 

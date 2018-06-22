@@ -356,6 +356,8 @@ if ( consts.DEBUG === true ){
 
     consts.SETTINGS.NODE.PORT = 9095;
 
+    consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
+
     FallBackNodesList.nodes = [{
         "addr": ["http://webdollar.ddns.net:9095"],
     }];

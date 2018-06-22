@@ -18,6 +18,7 @@ class PoolDataBlockInformation {
             totalDifficulty = new BigNumber(0);
 
         this.totalDifficulty = totalDifficulty;
+        this.totalDifficultyLength = 0;
 
         this.blockInformationMinersInstances = [];
 
@@ -28,7 +29,9 @@ class PoolDataBlockInformation {
         this.payout = false;
 
         this.block = block;
+        this.date = new Date().getTime();
 
+        this.calculateTargetDifficulty();
     }
 
     destroyPoolDataBlockInformation(){
@@ -50,7 +53,7 @@ class PoolDataBlockInformation {
         if (difficulty === undefined)
             difficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ hash.toString("hex") ) );
 
-        this.totalDifficulty  = this.totalDifficulty.plus( difficulty );
+        this.totalDifficultyPlus( difficulty );
 
     }
 
@@ -121,6 +124,7 @@ class PoolDataBlockInformation {
             this.blockInformationMinersInstances.push(blockInformationMinerInstance);
 
         }
+        this._calculateTimeRemaining();
 
         let payout = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
         offset += 1;
@@ -180,13 +184,46 @@ class PoolDataBlockInformation {
 
                 this.blockInformationMinersInstances[i].cancelReward();
 
-                this.totalDifficulty = this.totalDifficulty.minus(this.blockInformationMinersInstances[i].minerInstanceTotalDifficulty);
+                this.totalDifficultyMinus(this.blockInformationMinersInstances[i].minerInstanceTotalDifficulty);
                 this.blockInformationMinersInstances.splice(i,1);
 
                 for (let j=0; j<this.blockInformationMinersInstances.length; j++)
                     this.blockInformationMinersInstances.adjustDifficulty(0);
 
             }
+    }
+
+
+    calculateTargetDifficulty(){
+
+        this.targetDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") ) );
+
+    }
+
+    _calculateTimeRemaining(){
+
+        // my_difficulty ... x sec
+        // target_difficulty ... y sec
+        //
+        // y = x * target_difficulty / ( sum(  difficulties ) / n);
+
+        this.timeRemaining =  Math.floor( this.targetDifficulty.dividedBy(this.totalDifficulty.dividedBy(this.totalDifficultyLength === 0 ? 1 : this.totalDifficultyLength)).multipliedBy( (new Date().getTime() - this.date)/1000 ).toNumber());
+
+        if (this.poolManagement.poolData.lastBlockInformation === this)
+            this.poolManagement.poolStatistics.poolTimeRemaining = this.timeRemaining;
+
+    }
+
+    totalDifficultyPlus(value){
+        this.totalDifficulty = this.totalDifficulty.plus(value);
+        this.totalDifficultyLength++;
+        this._calculateTimeRemaining();
+    }
+
+    totalDifficultyMinus(value){
+        this.totalDifficulty = this.totalDifficulty.minus(value);
+        this.totalDifficultyLength--;
+        this._calculateTimeRemaining();
     }
 
 }
