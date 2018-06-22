@@ -195,10 +195,6 @@ class WebDollarCryptoData {
         return this.buffer.compare(data.buffer)
     }
 
-    toInt(){
-        
-        return Serialization.deserializeNumber(this.buffer);
-    }
 
 }
 

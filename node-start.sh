@@ -48,6 +48,66 @@ function checkroot(){
 
 checkroot
 
+function start_pm2node(){
+
+if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] ]]; then
+
+	echo "$showinfo We are inside a Node-WebDollar Folder"
+
+	read -e -p "$showinput Do you want to start a pm2 instance in this $crnt_dir foler?: " startnodeyn
+
+	if [[ "$startnodeyn" =~ ^(y|yes|Y|YES|Yes)$ ]]; then
+
+		MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$readport pm2 start npm -- run start
+		sleep 1;
+		pm2 restart npm --name "$readport" --update-env
+		sleep 3;
+
+		echo "$showinfo Run ${WHITE}pm2 log $readport$STAND to check if the blockchain is loading."
+
+	elif [[ "$startnodeyn" =~ ^(n|no|N|NO|No)$ ]]; then
+
+		echo "$showinfo Ok. Bye."
+		exit 0
+
+	elif [[ "$startnodeyn" == "" ]]; then
+
+		echo "$showerror Empty space is not an option."
+		if [[ $nrofports == 1 ]]; then f_oneport; elif [[ $nrofports == 2 ]]; then f_twoports; elif [[ $nrofports == 3 ]]; then f_threeports; elif [[ $nrofports == 4 ]]; then f_fourports; elif [[ $nrofports == 5 ]]; then f_fiveports;  elif [[ $nrofports == 6 ]]; then f_sixports; fi
+
+	elif [[ "$startnodeyn" == * ]]; then
+
+		echo "$showerror Wrong option."
+		if [[ $nrofports == 1 ]]; then f_oneport; elif [[ $nrofports == 2 ]]; then f_twoports; elif [[ $nrofports == 3 ]]; then f_threeports; elif [[ $nrofports == 4 ]]; then f_fourports; elif [[ $nrofports == 5 ]]; then f_fiveports;  elif [[ $nrofports == 6 ]]; then f_sixports; fi
+	fi
+else
+	if [[ ! -n $(pwd | cut -d '/' -f4) ]]; then
+
+		echo "$showok We are outside of a Node-WebDollar Folder"
+		echo -e "---\\n${CYAN}$(ls)$STAND\\n---"
+
+		read -e -p "$showinput Enter the full location of the Node-WebDollar folder where you want to start the pm2 instance: " nodewebdloc
+
+		if [[ -d $nodewebdloc ]]; then
+
+			cd $nodewebdloc
+			echo "$showinfo Folder location changed to $nodewebdloc"
+
+			MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$readport pm2 start npm -- run start
+			sleep 1;
+			pm2 restart npm --name "$readport" --update-env
+			sleep 3;
+			echo "$showinfo Run ${WHITE}pm2 log $readport$STAND to check if the blockchain is loading."
+		else
+			if [[ ! -d $nodewebdloc ]]; then
+				echo "$showerror Folder location does not exist! Try again."
+				if [[ $nrofports == 1 ]]; then f_oneport; elif [[ $nrofports == 2 ]]; then f_twoports; elif [[ $nrofports == 3 ]]; then f_threeports; elif [[ $nrofports == 4 ]]; then f_fourports; elif [[ $nrofports == 5 ]]; then f_fiveports;  elif [[ $nrofports == 6 ]]; then f_sixports; fi
+			fi
+		fi
+	fi
+fi
+}
+
 read -e -p "$showinput How many $terminalconn do you want to offer (e.g.: 350 or $abortte): " readtermconn # this is a max_term_connections global setting that will apply for every pm2 instance.
 
 ### Catch user input before anything - readtermconn
@@ -67,7 +127,6 @@ elif [[ "$readtermconn" == * ]]; then
 	exit 1
 fi
 ###
-
 
 ### Catch user input before anything - readbrowserconn
 if [[ "$readbrowserconn" =~ ^[[:digit:]]+$ ]]; then
@@ -93,26 +152,30 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	if [[ "$nrofports" == 1 ]];then
 
-		read -e -p "$showinput We'll use $nrofports port. Enter number (e.g.: 80 or $abortte): " readnrport1
+	function f_oneport(){
 
-		if [[ $readnrport1 =~ ^[[:digit:]]+$ ]]; then
+		read -e -p "$showinput We'll use $nrofports port. Enter number (e.g.: 80 or $abortte): " readport
 
-			echo "$showinfo The system will use port $readnrport1";
+		if [[ "$readport" =~ ^[[:digit:]]+$ ]]; then
 
-			MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$readnrport1 INSTANCE_PREFIX=$readnrport1 pm2 start npm -- run start
-			sleep 1;
-			pm2 restart npm --name "$readnrport1" --update-env
-			sleep 3;
+			echo "$showinfo The system will use port $readport";
 
-			echo "$showinfo Run pm2 dash to check if the blockchain is loading."
-		elif [[ $readnrport1 == abort ]]; then
+			crnt_dir=$(pwd)
+			start_pm2node
 
-			echo "$showinfo Ok, bye." && exit 0
+		elif [[ $readport == abort ]]; then
+
+			echo "$showinfo Ok. Bye." && exit 0
 		else
 			echo "$showerror Please enter a PORT number."
+			f_oneport
 		fi
+	}
+	f_oneport # function for one port pm2 start
 
 	elif [[ "$nrofports" == 2 ]];then
+
+	function f_twoports(){
 
 		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080): " readnrport2_0 readnrport2_1
 
@@ -120,19 +183,21 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo The system will use $nrofports ports -> $readnrport2_0 and $readnrport2_1"
 
-			for port in $readnrport2_0 $readnrport2_1;
+			for readport in $readnrport2_0 $readnrport2_1;
 			do
-				MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start npm -- run start
-	                        sleep 1;
-        	                pm2 restart npm --name "$port" --update-env
-				sleep 3;
+				start_pm2node
+				cd ..
 			done
-				echo "$showinfo Run pm2 dash to check if the blockchain is loading."
 		else
 			echo "$showerror Please enter $nrofports PORT numbers."
+			f_twoports
 		fi
+	}
+	f_twoports # function for two ports pm2 start
 
 	elif [[ "$nrofports" == 3 ]];then
+
+	function f_threeports(){
 
 		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080 8081): " readnrport3_0 readnrport3_1 readnrport3_2
 
@@ -140,19 +205,21 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo The system will use three ports -> $readnrport3_0, $readnrport3_1 and $readnrport3_2"
 
-			for port in $readnrport3_0 $readnrport3_1 $readnrport3_2;
+			for readport in $readnrport3_0 $readnrport3_1 $readnrport3_2;
 			do
-				MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start npm -- run start
-	                        sleep 1;
-        	                pm2 restart npm --name "$port" --update-env
-				sleep 3;
+				start_pm2node
+				cd ..
 			done
-				echo "$showinfo Run pm2 dash to check if the blockchain is loading."
 		else
 			echo "$showerror Please enter $nrofports PORT numbers."
+			f_threeports
 		fi
+	}
+	f_threeports # function three ports pm2 start
 
 	elif [[ "$nrofports" == 4 ]];then
+
+	function f_fourports(){
 
 		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080 8081 8082): " readnrport4_0 readnrport4_1 readnrport4_2 readnrport4_3
 
@@ -160,19 +227,21 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo The system will use $nrofports ports -> $readnrport4_0, $readnrport4_1, $readnrport4_2, $readnrport4_3"
 
-			for port in $readnrport4_0 $readnrport4_1 $readnrport4_2 $readnrport4_3;
+			for readport in $readnrport4_0 $readnrport4_1 $readnrport4_2 $readnrport4_3;
 			do
-				MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start npm -- run start
-	                        sleep 1;
-        	                pm2 restart npm --name "$port" --update-env
-				sleep 3;
+				start_pm2node
+				cd ..
 			done
-				echo "$showinfo Run pm2 dash to check if the blockchain is loading."
 		else
 			echo "$showerror Please enter $nrofports PORT numbers."
+			f_fourports
 		fi
+	}
+	f_fourports # function four ports pm2 start
 
 	elif [[ "$nrofports" == 5 ]];then
+
+	function f_fiveports(){
 
 		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080 8081 8082 8083): " readnrport5_0 readnrport5_1 readnrport5_2 readnrport5_3 readnrport5_4
 
@@ -180,37 +249,39 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo The system will use $nrofports ports -> $readnrport5_0, $readnrport5_1, $readnrport5_2, $readnrport5_3 and $readnrport5_4"
 
-			for port in $readnrport5_0 $readnrport5_1 $readnrport5_2 $readnrport5_3 $readnrport5_4;
+			for readport in $readnrport5_0 $readnrport5_1 $readnrport5_2 $readnrport5_3 $readnrport5_4;
 			do
-				MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start npm -- run start
-                	        sleep 1;
-	                        pm2 restart npm --name "$port" --update-env
-				sleep 3;
+				start_pm2node
+				cd ..
 			done
-			        echo "$showinfo Run pm2 dash to check if the blockchain is loading."
 		else
 			echo "$showerror Please enter $nrofports PORT numbers."
+			f_fiveports
 		fi
+	}
+	f_fiveports # function five ports pm2 start
 
 	elif [[ "$nrofports" == 6 ]];then
+
+	function f_sixports(){
 
 		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080 8081 8082 8083 8084): " readnrport6_0 readnrport6_1 readnrport6_2 readnrport6_3 readnrport6_4 readnrport6_5
 
 		if [[ $readnrport6_0 =~ ^[[:digit:]]+$ && $readnrport6_1 =~ ^[[:digit:]]+$ && $readnrport6_2 =~ ^[[:digit:]]+$ && $readnrport6_3 =~ ^[[:digit:]]+$ && $readnrport6_4 =~ ^[[:digit:]]+$ && $readnrport6_5 =~ ^[[:digit:]]+$ ]]; then
 
-			echo "$showinfo The system will use $nrofports ports -> $readnrport6_0, $readnrport6_1, $readnrport6_2, $readnrport6_3, $readnrport6_4 and $readnrport6_5"
+			echo "$showinfo The system will use $nrofports ports -> $readnrport5_0, $readnrport5_1, $readnrport5_2, $readnrport5_3 and $readnrport5_4"
 
-			for port in $readnrport6_0 $readnrport6_1 $readnrport6_2 $readnrport6_3 $readnrport6_4 $readnrport6_5;
+			for readport in $readnrport6_0 $readnrport6_1 $readnrport6_2 $readnrport6_3 $readnrport6_4 $readnrport6_5;
 			do
-				MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$port INSTANCE_PREFIX=$port pm2 start npm -- run start
-                	        sleep 1;
-	                        pm2 restart npm --name "$port" --update-env
-				sleep 3;
+				start_pm2node
+				cd ..
 			done
-			        echo "$showinfo Run pm2 dash to check if the blockchain is loading."
 		else
 			echo "$showerror Please enter $nrofports PORT numbers."
+			f_sixports
 		fi
+	}
+	f_sixports # function six ports pm2 start
 
 	elif [[ "$nrofports" -gt 6 ]]; then
 		echo "$showerror Sorry, only 6 ports supported for now."

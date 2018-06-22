@@ -133,7 +133,7 @@ class InterfaceBlockchainTransactionTo{
 
         this.addresses = [];
 
-        let length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+        let length = Serialization.deserializeNumber1Bytes( buffer, offset );
         offset += 1;
 
         for (let i = 0; i < length; i++){

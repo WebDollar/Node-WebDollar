@@ -261,7 +261,7 @@ class InterfaceBlockchainTransactionFrom{
 
         this.addresses = [];
 
-        let length =  Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) );
+        let length =  Serialization.deserializeNumber1Bytes( buffer, offset );
         offset += 1;
 
         for (let i = 0; i < length; i++){
@@ -283,7 +283,7 @@ class InterfaceBlockchainTransactionFrom{
             this.addresses.push(address);
         }
 
-        let currencyLength =  Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+        let currencyLength =  Serialization.deserializeNumber1Bytes( buffer, offset, );
         offset += 1;
 
         this.currencyTokenId = BufferExtended.substr(buffer, offset, currencyLength );

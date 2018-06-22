@@ -1,5 +1,4 @@
 import BufferExtended from "./BufferExtended";
-const BigNumber = require ('bignumber.js');
 
 class Serialization{
 
@@ -27,7 +26,7 @@ class Serialization{
         return buffer;
     }
 
-    convertBigNumberToBuffer( bigNumber, length ){
+    serializeBigNumber( bigNumber, length ){
         //converting number value into a buffer
 
         let buffer = new Buffer(length);
@@ -71,8 +70,8 @@ class Serialization{
         return  buffer;
     }
 
+    //converting number value into a buffer
     serializeNumber4Bytes(data){
-        //converting number value into a buffer
         let buffer = Buffer(4);
         buffer[3] = data & 0xff;
         buffer[2] = data>>8 & 0xff;
@@ -82,7 +81,36 @@ class Serialization{
         return  buffer;
     }
 
+    //will show the nonce positive
+    deserializeNumber4Bytes_Positive(buffer, offset = 0){
+
+        let value = 0;
+
+        for ( let i = offset; i<=offset + 3 ; i++)
+                value = (value *256 ) + buffer[i];
+
+        return value;
+    }
+
+    deserializeNumber4Bytes(buffer, offset=0){
+        return buffer[3+offset] | (buffer[2+offset] << 8) | (buffer[1+offset] << 16) | (buffer[0+offset] << 24);
+    }
+
+    deserializeNumber3Bytes(buffer, offset=0){
+        return buffer[2+offset] | (buffer[1+offset] << 8) | (buffer[0+offset] << 16);
+    }
+
+    deserializeNumber2Bytes(buffer, offset=0){
+        return buffer[1+offset] | (buffer[0+offset] << 8);
+    }
+
+    deserializeNumber1Bytes(buffer, offset=0){
+        return buffer[0+offset];
+    }
+
+
     serializeNumber7Bytes(long){
+
         // we want to represent the input as a 8-bytes array
         var byteArray = new Buffer(7);
 
@@ -94,7 +122,6 @@ class Serialization{
 
         return byteArray;
     }
-
 
     deserializeNumber7Bytes(buffer, offset = 0){
 
@@ -291,6 +318,21 @@ class Serialization{
             number: res,
             newOffset: 2+length*6 + offset,
         }
+    }
+
+
+
+
+    deserializeNumber(buffer){
+
+        if(buffer.length === 1) return buffer[0]; else
+
+        if (buffer.length === 2) return buffer[1] | (buffer[0] << 8); else
+
+        if (buffer.length === 3) return buffer[2] | (buffer[1] << 8) | (buffer[0] << 16); else
+
+        if (buffer.length === 4) return buffer[3] | (buffer[2] << 8) | (buffer[1] << 16) | (buffer[0] << 24);
+
     }
 
 

@@ -329,12 +329,12 @@ class InterfaceBlockchainBlock {
             this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
-            this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_NONCE) );
-            offset += consts.BLOCKCHAIN.BLOCKS_NONCE;
+            this.nonce = Serialization.deserializeNumber4Bytes( BufferExtended.substr(buffer, offset, 4) );
+            offset += 4;
 
 
             //TODO 1 byte version
-            this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) );
+            this.version = Serialization.deserializeNumber2Bytes( buffer, offset );
             offset += 2;
 
             //TODO  put hashPrev into block.data
@@ -342,7 +342,7 @@ class InterfaceBlockchainBlock {
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
 
-            this.timeStamp = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 4) );
+            this.timeStamp = Serialization.deserializeNumber4Bytes( BufferExtended.substr(buffer, offset, 4) );
             offset += 4;
 
             offset = this.data.deserializeData(buffer, offset);

@@ -70,6 +70,10 @@ class NodesWaitlist {
                 let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
                 if (sckAddress.address.indexOf("192.168") === 0 && !consts.DEBUG ) continue;
 
+                //check blocked addresses
+                for (let i=0; i<consts.SETTINGS.PARAMS.WAITLIST.BLOCKED_NODES.length; i++)
+                    if (sckAddress.address.indexOf(consts.SETTINGS.PARAMS.WAITLIST.BLOCKED_NODES[i])) continue;
+
                 //it if is a fallback, maybe it requires SSL
                 if ( nodeType === NODE_TYPE.NODE_TERMINAL && process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL && !consts.DEBUG )  continue;
 
