@@ -53,10 +53,10 @@ class PoolManagement{
 
     }
 
-    async startPool( forceStartMinerPool = false ){
+    async startPool( forceStartPool = false ){
 
         if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
-            return await this.setPoolStarted(true, forceStartMinerPool);
+            return await this.setPoolStarted(true, forceStartPool);
         else
             console.error("Couldn't start the Pool because the poolURL is empty");
 

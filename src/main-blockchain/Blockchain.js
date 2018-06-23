@@ -60,6 +60,7 @@ class Blockchain{
         
         this._loaded = false;
         this._poolsLoaded = false;
+        this._blockchainLoaded = false;
 
     }
 
@@ -120,30 +121,25 @@ class Blockchain{
 
         }
 
-        let blockchainLoaded = true;
-
-        if (synchronize)
-            //loading the blockchain
-            blockchainLoaded = await this.loadBlockchain();
-
         if (typeof afterBlockchainLoadCallback === "function")
-            afterBlockchainLoadCallback();
+            await afterBlockchainLoadCallback();
+
+        //loading the blockchain
+        await this.loadBlockchain();
 
         if (synchronize){
 
             await this.Agent.initializeStartAgentOnce();
 
-            if (process.env.BROWSER || !blockchainLoaded) {
-                //it tries synchronizing multiple times
-                await this.synchronizeBlockchain(true);
-            } else {
-                this.synchronized = true;
-            }
+            if (this.Agent.consensus)
+                await this.synchronizeBlockchain(true); //it tries synchronizing multiple times
+            else
+                this.synchronized = true; //consider it as synchronized
 
         }
 
         if (typeof afterSynchronizationCallback === "function")
-            afterSynchronizationCallback();
+            await afterSynchronizationCallback();
 
         this.loaded = true;
     }
@@ -159,12 +155,16 @@ class Blockchain{
 
     async loadBlockchain(){
 
+        if (this._blockchainLoaded) return true;
+        if (!this.Agent.consensus) return true; //no consensus
+
         StatusEvents.emit('blockchain/status', {message: "Blockchain Loading"});
 
-        let chainLoaded = await this.Chain.loadBlockchain();
+        let loaded = await this.Chain.loadBlockchain();
 
         StatusEvents.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
-        return chainLoaded;
+
+        return loaded;
 
     }
 

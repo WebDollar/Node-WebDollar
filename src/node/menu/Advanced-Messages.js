@@ -11,22 +11,22 @@ class AdvancedMessages{
     }
 
 
-    async input(message){
+    input(message){
 
         if (process.env.BROWSER)
             return confirm(message);
         else
-            return await CLI.question(message);
+            return CLI.question(message);
     }
 
     async confirm(message){
 
         if (process.env.BROWSER)
-            return confirm(message);
+            return await confirm(message);
         else {
 
             while (1===1) {
-                let answer = await CLI.question(message + "  y/n").toLowerCase();
+                let answer = (await CLI.question(message + "  y/n")).toLowerCase();
 
                 if (answer === 'y') return true;
                 else if (answer === 'n') return false;

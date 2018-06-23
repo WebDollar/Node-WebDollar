@@ -7,6 +7,7 @@ import AdvancedMessages from './Advanced-Messages';
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import Blockchain from "main-blockchain/Blockchain"
+import StatusEvents from "common/events/Status-Events";
 
 class CLI {
 
@@ -35,7 +36,7 @@ class CLI {
             return;
         }
 
-        let answer = await this.question('Command: ');
+        let answer = await AdvancedMessages.input('Command: ');
 
         switch(answer.trim()) {
             case '1': //  List addresses'
@@ -65,11 +66,11 @@ class CLI {
             case '9': //  Start Mining Instantly
                 await this.startMining(true);
                 break;
-            case '10':  // Mining Pool: Create a New Pool
-                await this.createMiningPool();
-                break;
-            case '11': // Mining Pool: Start Mining in a Pool
+            case '10': // Mining Pool: Start Mining in a Pool
                 await this.startMiningInsidePool();
+                break;
+            case '11':  // Mining Pool: Create a New Pool
+                await this.createMiningPool();
                 break;
             case '12':  // Server Mining Pool: Create a new Server for Mining Pool
                 await this.createServerForMiningPool();
@@ -216,7 +217,7 @@ class CLI {
 
         return new Promise( async (resolve) => {
 
-            let addressPath = await this.question('Enter address path: ');
+            let addressPath = await AdvancedMessages.input('Enter address path: ');
 
             FileSystem.readFile(addressPath, 'utf8', async (err, content) => {
 
@@ -265,7 +266,7 @@ class CLI {
                 return;
             }
 
-            let addressPath = await this.question('Enter path for saving address: ');
+            let addressPath = await AdvancedMessages.input('Enter path for saving address: ');
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
             let fileName = "WEBD$" + Blockchain.Wallet.addresses[addressId].unencodedAddress.toString("hex") + ".webd";
@@ -351,35 +352,45 @@ class CLI {
 
         };
 
-        this._callCallbackBlockchainSync( callback  );
+        await this._callCallbackBlockchainSync( undefined, callback  );
 
     }
     
     async startMiningInsidePool(){
         
-        console.info('Mining inside a pool.');
-        console.info('Your current mining pool is: ', 'demo at the moment');
+        console.info('Mining inside a POOL');
 
-        let getNewLink = true;
+        await this._callCallbackBlockchainSync(async ()=>{
 
-        if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== ''){
+            let getNewLink = true;
 
-            let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool: '+Blockchain.MinerPoolManagement.minerPoolSettings.poolURL);
+            if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== ''){
 
-            if (response === true) getNewLink = false;
-        }
+                console.info('Your current mining pool is: ', Blockchain.MinerPoolManagement.minerPoolSettings.poolName," ", Blockchain.MinerPoolManagement.minerPoolSettings.poolWebsite );
+                let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool: '+Blockchain.MinerPoolManagement.minerPoolSettings.poolURL);
 
-        let miningPoolLink = undefined;
+                if (response === true) getNewLink = false;
 
-        if (getNewLink) {
+            }
 
-            miningPoolLink = await this.question('Enter the new mining pool link: ');
-            console.info('Your new MiningPool is : ', miningPoolLink);
+            let miningPoolLink = undefined;
 
-        }
+            if (getNewLink) {
 
-        this._callCallbackBlockchainSync(async ()=>{
-            await Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink );
+                miningPoolLink = await AdvancedMessages.input('Enter the new mining pool link: ');
+                console.info('Your new MiningPool is : ', miningPoolLink);
+
+            }
+
+            StatusEvents.on("miner-pool/connection-established",(data)=>{
+                if (data.connected)
+                    Blockchain.Mining.startMining();
+                else
+                    Blockchain.Mining.stopMining();
+            });
+
+            await Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
+
         }, false);
 
     }
@@ -409,13 +420,13 @@ class CLI {
 
 
 
-        this._callCallbackBlockchainSync(async ()=>{
+        await this._callCallbackBlockchainSync(async ()=>{
 
             if (poolFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
             if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
             if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
 
-            await Blockchain.PoolManagement.startPool();
+            await Blockchain.PoolManagement.startPool(true);
 
         }, true);
 
@@ -435,7 +446,7 @@ class CLI {
         else
             console.log("your fee is", serverPoolFee );
 
-        this._callCallbackBlockchainSync(async ()=>{
+        await this._callCallbackBlockchainSync(async ()=>{
 
             await Blockchain.ServerPoolManagement.serverPoolSettings.setServerPoolFee(serverPoolFee / 100);
             await Blockchain.ServerPoolManagement.startServerPool();
@@ -448,25 +459,42 @@ class CLI {
     question(message){
 
         return new Promise ((resolve)=> {
-            this.WEBD_CLI.question(message, (answer)=>{
+
+            console.info(message);
+            this.WEBD_CLI.question('', (answer)=>{
                 resolve(answer);
             });
+
         });
 
     }
 
 
-    _callCallbackBlockchainSync(callback, synchronize=true ){
+    async _callCallbackBlockchainSync(callbackBeforeServerInitialization, callbackAfterServerInitialization, synchronize=true ){
 
         if (!Blockchain._blockchainInitiated) {
-            Blockchain.createBlockchain("full-node", () => {
-                Node.NodeServer.startServer();
-                Node.NodeClientsService.startService();
 
-                callback();
+            await Blockchain.createBlockchain("full-node", async () => {
+
+                if (typeof callbackBeforeServerInitialization === "function")
+                    await callbackBeforeServerInitialization();
+
+                await Node.NodeServer.startServer();
+                await Node.NodeClientsService.startService();
+
+                if (typeof callbackAfterServerInitialization === "function")
+                    await callbackAfterServerInitialization();
+
             }, undefined, synchronize );
-        } else
-            callback();
+        } else {
+
+            if (typeof callbackBeforeServerInitialization === "function")
+                await callbackBeforeServerInitialization();
+
+            if (typeof callbackAfterServerInitialization === "function")
+                await callbackAfterServerInitialization();
+
+        }
 
     }
 
@@ -482,8 +510,8 @@ const commands = [
         '7. Set mining address',
         '8. Start Mining',
         '9. Start Mining Instantly Even Unsynchronized',
-        '10. Mining Pool: Create a New Pool',
-        '11. Mining Pool: Start Mining in a Pool',
+        '10. Mining Pool: Start Mining in a Pool',
+        '11. Mining Pool: Create a New Pool',
         '12. Server for Mining Pool: Create a new Server for Mining Pool',
     ];
 

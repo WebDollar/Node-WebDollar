@@ -8,6 +8,7 @@ import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
 import Serialization from "../../../utils/Serialization";
 import StatusEvents from "common/events/Status-Events";
+import StatusEvents from "common/events/Status-Events";
 
 class MinerProtocol extends PoolProtocolList{
 
@@ -176,6 +177,10 @@ class MinerProtocol extends PoolProtocolList{
         this.addElement(socket);
 
         StatusEvents.emit("miner-pool/servers-connections", {message: "Server Added"});
+
+        console.info("Miner Pool: connection established");
+
+        StatusEvents.emit("miner-pool/connection-established", {connected: true, message: "Connection Established", socket: socket});
 
     }
 

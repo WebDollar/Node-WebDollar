@@ -156,10 +156,18 @@ class PoolsUtils {
 
         url = sanitizer.sanitize(url);
 
+        let object = Utils.getLocation(url);
+        if (object !== null)
+            url = object.pathname;
+
+        if (url.indexOf("/pool/") === 0) url = url.replace("/pool/","");
+        if (url.indexOf("pool/") === 0) url = url.replace("pool/","");
+
         let version = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
         url = url.substr(url.indexOf( "/" )+1);
 
         let poolName = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
+        poolName = decodeURIComponent(poolName);
         url = url.substr(url.indexOf( "/" )+1);
 
         let poolFee = parseFloat( sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) ) );
