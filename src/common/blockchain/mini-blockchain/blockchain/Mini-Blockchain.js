@@ -179,7 +179,7 @@ class MiniBlockchain extends  inheritBlockchain{
      * Load blocks and check the Accountant Tree
      * @returns boolean
      */
-    async loadBlockchain(){
+    async _loadBlockchain(){
 
         if (process.env.BROWSER)
             return true;
@@ -195,7 +195,7 @@ class MiniBlockchain extends  inheritBlockchain{
                 console.error("accountant Tree returned an error", exception);
             }
 
-            result = await inheritBlockchain.prototype.loadBlockchain.call( this  );
+            result = await inheritBlockchain.prototype._loadBlockchain.call( this  );
 
             if ( result === false )
                 throw {message: "Problem loading the blockchain"};

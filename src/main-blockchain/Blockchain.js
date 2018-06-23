@@ -60,7 +60,6 @@ class Blockchain{
         
         this._loaded = false;
         this._poolsLoaded = false;
-        this._blockchainLoaded = false;
 
     }
 
@@ -125,7 +124,7 @@ class Blockchain{
             await afterBlockchainLoadCallback();
 
         //loading the blockchain
-        await this.loadBlockchain();
+        await this.Chain.loadBlockchain();
 
         if (synchronize){
 
@@ -153,20 +152,6 @@ class Blockchain{
         this.Mining.startMining();
     }
 
-    async loadBlockchain(){
-
-        if (this._blockchainLoaded) return true;
-        if (!this.Agent.consensus) return true; //no consensus
-
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Loading"});
-
-        let loaded = await this.Chain.loadBlockchain();
-
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
-
-        return loaded;
-
-    }
 
     /**
      * it tries synchronizing multiple times
@@ -225,13 +210,15 @@ class Blockchain{
 
     }
 
+    get poolsLoaded(){
+        return this._poolsLoaded;
+    }
+
+
     get loaded(){
         return this._loaded;
     }
 
-    get poolsLoaded(){
-        return this._poolsLoaded;
-    }
 
     set loaded(newValue){
         this._loaded = newValue;

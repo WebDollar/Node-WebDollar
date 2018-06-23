@@ -343,16 +343,18 @@ class CLI {
 
     async startMining(instantly){
 
-        let callback = async () => {
+        await this._callCallbackBlockchainSync( async ()=>{
+
+            await Blockchain.MinerPoolManagement.minerPoolSettings.setMinerPoolActivated(false);
+
+        }, async ()=>{
 
             if (instantly)
                 await Blockchain.startMiningInstantly();
             else
                 Blockchain.startMiningNextTimeSynchronized = true;
 
-        };
-
-        await this._callCallbackBlockchainSync( undefined, callback  );
+        } );
 
     }
     
@@ -508,9 +510,9 @@ const commands = [
         '5. Export address',
         '6. Encrypt address',
         '7. Set mining address',
-        '8. Start Mining',
-        '9. Start Mining Instantly Even Unsynchronized',
-        '10. Mining Pool: Start Mining in a Pool',
+        '8. Solo: Start Mining',
+        '9. Solo: Start Mining Instantly Even Unsynchronized',
+        '10. Mining Pool: Start Mining',
         '11. Mining Pool: Create a New Pool',
         '12. Server for Mining Pool: Create a new Server for Mining Pool',
     ];

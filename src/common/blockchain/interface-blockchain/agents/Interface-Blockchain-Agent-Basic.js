@@ -48,10 +48,12 @@ class InterfaceBlockchainAgentBasic{
 
     }
 
-    _initializeConsensus(newConsensus){
+    async _initializeConsensus(newConsensus){
 
         if (newConsensus){
 
+            if (Blockchain.loaded)
+                await this.blockchain.loadBlockchain();
 
             //disconnect if no blocks are received
             if (this._intervalVerifyConesnsus === undefined){
