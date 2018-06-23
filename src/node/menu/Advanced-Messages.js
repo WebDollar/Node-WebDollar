@@ -53,10 +53,10 @@ class AdvancedMessages{
 
     log(cliMsg, browserMsg) {
 
-       if (process.env.BROWSER)
-           console.info(browserMsg || cliMsg);
-       else
-           console.info(cliMsg);
+        if (process.env.BROWSER)
+            console.info(browserMsg || cliMsg);
+        else
+            console.info(cliMsg);
     }
 
 }

@@ -98,7 +98,7 @@ class CLI {
         await this._runMenu();
     }
 
-    
+
     async _chooseAddress() {
 
         await this.listAddresses();
@@ -152,14 +152,14 @@ class CLI {
         let miningAddress = Blockchain.blockchain.mining.minerAddress;
         if (miningAddress === undefined)
             miningAddress = 'not specified';
-        
+
         console.log(addressHeader);
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
 
             let address = Blockchain.Wallet.addresses[i].address;
 
             let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
-            
+
             balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
 
             if (address === miningAddress) {
@@ -168,7 +168,7 @@ class CLI {
                 console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
             }
         }
-        
+
         let balance = 0;
         if (miningAddress !== 'not specified') {
             balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
@@ -277,7 +277,7 @@ class CLI {
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
             let fileName = "WEBD$" + Blockchain.Wallet.addresses[addressId].unencodedAddress.toString("hex") + ".webd";
-            
+
             let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
 
             if (answer.result === false) {
@@ -364,7 +364,7 @@ class CLI {
         } );
 
     }
-    
+
     async startMiningInsidePool(){
         
         console.info('Mining inside a POOL');
@@ -403,9 +403,9 @@ class CLI {
         }, false);
 
     }
-    
+
     async createMiningPool(){
-        
+
         console.info('Create Mining Pool');
         console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
 
