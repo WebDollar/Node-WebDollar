@@ -172,7 +172,14 @@ class CLI {
         let balance = 0;
         if (miningAddress !== 'not specified') {
             balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
-            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+            balance = (balance === null) ? 0 : balance;
+
+            if (Blockchain.MinerPoolManagement.minerPoolStarted)
+                balance += Blockchain.MinerPoolManagement.minerPoolReward.confirmedReward + Blockchain.MinerPoolManagement.minerPoolReward.totalReward;
+
+            balance /= WebDollarCoins.WEBD;
+
+
         }
         console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
 
