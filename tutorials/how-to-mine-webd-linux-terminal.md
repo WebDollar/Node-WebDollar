@@ -1,7 +1,7 @@
 # How-to-mine-WebDollar-with-Linux-Terminal
 Mine WebDollar with Linux Terminal
 
-#### 1. Run ```git clone https://github.com/cbusuioceanu/Node-WebDollar.git Node-WebDollar1```
+#### 1. Run ```git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar1```
 #### 2. Install:
 ####  a. ```apt install npm``` -> Note: if ```apt``` doesn't work, replace it with ```apt-get```.
 ####  b. ```cd Node-WebDollar1```
