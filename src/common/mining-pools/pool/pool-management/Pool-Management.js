@@ -42,10 +42,10 @@ class PoolManagement{
         let answer = await this.poolSettings.initializePoolSettings(poolFee);
         console.info("The url is just your domain: "+ this.poolSettings.poolURL);
 
-        if (!answer ){
+        if (!answer )
             throw {message: "Pool Couldn't be started"};
-            return false;
-        }
+
+        answer = await this.poolStatistics.initializePoolStatistics();
 
         this.poolInitialized = true;
 
