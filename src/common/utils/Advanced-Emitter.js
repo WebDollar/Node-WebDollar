@@ -7,6 +7,7 @@ class AdvancedEmitter{
         this._emitter = new EventEmitter();
         this._emitter.setMaxListeners(100);
 
+        this._events = this._emitter._events;
         this.emit = this._emitter.emit.bind(this._emitter);
     }
 
@@ -16,7 +17,6 @@ class AdvancedEmitter{
 
         return ()=>{ this._emitter.removeListener(a, call); };
     }
-
 
 }
 

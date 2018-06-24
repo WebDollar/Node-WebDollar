@@ -46,9 +46,6 @@ class InterfaceBlockchainTransaction{
 
             this.from = from;
 
-            if (validateFrom)
-                this.from.validateFrom();
-
         } catch (exception){
 
             console.error("Transaction From Error", exception);
@@ -63,14 +60,36 @@ class InterfaceBlockchainTransaction{
 
             this.to = to;
 
-            if (validateTo)
-                this.to.validateTo();
-
         } catch (exception){
 
             console.error("Transaction To Error", exception);
             throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
         }
+
+
+
+        try {
+
+            if (validateFrom)
+                this.from.validateFrom();
+
+        } catch (exception){
+            console.error("Transaction From Error 2", exception);
+            throw typeof exception === "string" ? "Transaction From Error " + exception : exception;
+
+        }
+
+
+        try {
+            if (validateTo)
+                this.to.validateTo();
+        } catch (exception){
+
+            console.error("Transaction To Error2", exception);
+            throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
+
+        }
+
 
         if (nonce === undefined || nonce === null)
             nonce = this._computeNonce();

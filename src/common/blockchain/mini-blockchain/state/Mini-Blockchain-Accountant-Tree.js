@@ -26,7 +26,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
      * @param tokenId
      * @returns {*}
      */
-    updateAccount(address, value, tokenId, revertActions, showUpdate) {
+    updateAccount(address, value, tokenId, revertActions, showUpdate = true) {
 
         if (tokenId === undefined || tokenId === '' || tokenId === null) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);

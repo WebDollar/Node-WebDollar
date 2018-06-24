@@ -75,7 +75,7 @@ class NanoWalletProtocol{
                 else currentVal = data.balances["0x01"];
 
 
-                Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal );
+                Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal, undefined, undefined, true );
 
             });
 
