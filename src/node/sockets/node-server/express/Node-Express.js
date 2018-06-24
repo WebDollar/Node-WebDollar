@@ -1,8 +1,5 @@
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
-import NodeAPIPublic from "../API/Node-API-Public";
-import NodeAPIPrivate from "./../API/Node-API-Private";
-
 const https = require('https');
 const http = require('http');
 const path = require('path')
@@ -11,6 +8,8 @@ const cors = require('cors');
 const fs = require('fs')
 import consts from 'consts/const_global'
 
+import NodeAPIRouter from "../API-router/Node-API-Router"
+import NODE_API_TYPE from "../API-router/NODE_API_TYPE";
 
 class NodeExpress{
 
@@ -84,7 +83,7 @@ class NodeExpress{
 
                     this.SSL = true;
 
-                    this._initializeRouter();
+                    NodeAPIRouter.initializeRouter( this.app, this._expressMiddleware, '', NODE_API_TYPE.NODE_API_TYPE_HTTP );
 
                     console.info("========================================");
                     console.info("HTTPS Express was opened on port "+ this.port);
@@ -135,50 +134,7 @@ class NodeExpress{
         })
     }
 
-    _initializeRouter(){
 
-
-        // respond with "hello world" when a GET request is made to the homepage
-        this.app.get('/', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.info ));
-
-        // Return blocks information
-        this.app.get('/blocks/:blocks', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.blocks ));
-
-        // Return block information
-        this.app.get('/block/:block', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.block ));
-
-        //Get Address
-        //TODO: optimize or limit the number of requests
-
-        // Return address info: balance, blocks mined and transactions
-        this.app.get('/address/:address', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.addressInfo ));
-
-        this.app.get('/wallets/balance/:address', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.addressBalance) );
-
-        if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
-
-            this.app.get('/'+process.env.WALLET_SECRET_URL+'/mining/balance', (req, res) => this._expressMiddleware(req, res, NodeAPIPrivate.minerBalance) );
-
-            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/import', (req, res) => this._expressMiddleware(req, res, NodeAPIPrivate.walletImport) );
-
-            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/create-transaction', (req, res) => this._expressMiddleware(req, res, NodeAPIPrivate.walletCreateTransaction) );
-
-            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/export', (req, res) => this._expressMiddleware(req, res, NodeAPIPrivate.walletExport) );
-
-        }
-
-        // respond with "hello"
-        this.app.get('/hello', (req, res) => {
-            res.send('world');
-        });
-
-        // respond with "ping"
-        this.app.get('/ping', (req, res) => {
-            res.json( { ping: "pong" });
-        });
-
-
-    }
 
     amIFallback(){
 

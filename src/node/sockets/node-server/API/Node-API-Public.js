@@ -78,7 +78,10 @@ class NodeAPIPublic{
     }
 
 
-    addressInfo(req, ress){
+    //Get Address
+    //TODO: optimize or limit the number of requests
+
+    addressInfo(req, res){
 
         let address = req.address;
 
@@ -160,6 +163,14 @@ class NodeAPIPublic{
 
         return {result: true, balance: balance};
 
+    }
+
+    helloWorld(req, res){
+        return {hello: "world" };
+    }
+
+    ping(req, res){
+        return {ping: "pong"};
     }
 
 }
