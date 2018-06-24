@@ -11,12 +11,26 @@ class MiniBlockchainBalances{
 
     listBalances(address){
 
-        if (address === '' || address === undefined || address === null)
-            return null;
+        if (address === '' || address === undefined || address === null) return null;
 
         try{
 
             return this._blockchain.accountantTree.listBalances(address);
+
+        } catch (exception){
+            return null;
+        }
+
+    }
+
+    getNonce(address){
+
+
+        if (address === '' || address === undefined || address === null) return null;
+
+        try{
+
+            return this._blockchain.accountantTree.getAccountNonce(address);
 
         } catch (exception){
             return null;
@@ -35,14 +49,13 @@ class MiniBlockchainBalances{
 
         if (address === null) return {result:false, message: "invalid address"};
 
-        console.log("subscribeBalanceChanges",BufferExtended.toBase(addressWIF) );
-
         let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(address),callback);
 
         return {
             result: true,
             subscription: subscription,
             balances: this.listBalances(addressWIF),
+            nonce: this.getNonce(addressWIF),
         }
     }
 

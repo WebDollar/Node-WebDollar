@@ -25,7 +25,7 @@ class NodeAPICallbacks{
             //subscribe to transactions changes
             let data = Blockchain.Balances.subscribeBalancesChanges(address, (data)=>{
 
-                callback( {result: true, balances: data.balances, _suffix: address } );
+                callback( {result: true, balances: data.balances, nonce: data.nonce, _suffix: address } );
 
             });
 
@@ -33,10 +33,11 @@ class NodeAPICallbacks{
 
             let subscription = data.subscription;
             let balances = data.balances;
+            let nonce = data.nonce;
 
             this._addSubscribedEvent(subscription, "addressBalancesSubscribe"+address, res, callback, nodeApiType);
 
-            return {result: true, address: address, balances: balances, _suffix: address};
+            return {result: true, address: address, balances: balances, nonce: nonce,  _suffix: address};
 
 
         } catch (exception){

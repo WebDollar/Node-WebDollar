@@ -46,6 +46,7 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
                 let node = null;
                 let balances = null;
+                let nonce = null;
 
                 try {
 
@@ -54,21 +55,22 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
                     // in case it doesn't exist, let's create it
                     if (node !== undefined && node !== null && node.isLeaf()) {
                         balances = node.getBalances();
+                        nonce = node.nonce;
                     }
 
                 } catch (exception) {
 
                 }
 
-                this.emitBalanceChangeEvent(address, ()=>{return balances} );
+                this.emitBalanceChangeEvent(address, ()=>{ return balances }, nonce  );
             }
     }
 
-    emitBalanceChangeEvent(address, getBalanceCallback){
+    emitBalanceChangeEvent(address, getBalanceCallback, nonce){
 
         if (this._checkBalanceIsSubscribed(address)) {
             let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
-            this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {address: addressWIF, balances: getBalanceCallback() });
+            this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {address: addressWIF, balances: getBalanceCallback === null ? getBalanceCallback : getBalanceCallback(), nonce: nonce });
         }
 
     }

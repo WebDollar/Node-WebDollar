@@ -105,8 +105,6 @@ class InterfaceBlockchainTransactionsEvents{
 
         if (address === null) return {result:false, message: "invalid address"};
 
-        console.log("subscribeTransactionsChanges",BufferExtended.toBase(addressWIF) );
-
         let subscription = this.emitter.on("transactions/changes/"+BufferExtended.toBase(address), callback);
 
         return {

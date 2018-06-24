@@ -77,6 +77,14 @@ class NanoWalletProtocol{
 
                 Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal, undefined, undefined, true );
 
+                let prevNonce = Blockchain.AccountantTree.getAccountNonce(address);
+                if (prevNonce === null ) prevNonce = 0;
+
+                let currentNonce = data.nonce;
+                if (currentNonce === null) currentNonce = 0;
+
+                Blockchain.AccountantTree.updateAccountNonce(address, currentNonce - prevNonce, undefined, undefined, true );
+
             });
 
             this._sockets[i].node.sendRequest("api/subscribe/address/transactions", { address: address  });
@@ -90,17 +98,17 @@ class NanoWalletProtocol{
 
                     let transaction = data.transactions[k];
 
-                    if (data === null || !data.result) return false;
-
                     let tx = null;
-                    if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction(transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version);
+                    if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction(transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined, false, false);
 
-                    let foundTx = Blockchain.Transactions.pendingQueue.findPendingTransaction(data.txId);
+                    let foundTx = Blockchain.Transactions.pendingQueue.searchPendingTransactionByTxId(transaction.txId);
 
-                    if ( foundTx !== null)
-                        foundTx .confirmed = transaction.confirmed;
-                    else
-                        Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all", true)
+                    if ( foundTx === null) {
+                        Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all", true);
+                        foundTx = transaction;
+                    }
+
+                    foundTx .confirmed = transaction.confirmed;
 
                 }
 
