@@ -83,7 +83,11 @@ class NanoWalletProtocol{
                 let currentNonce = data.nonce;
                 if (currentNonce === null) currentNonce = 0;
 
-                Blockchain.AccountantTree.updateAccountNonce(address, currentNonce - prevNonce, undefined, undefined, true );
+                try {
+                    Blockchain.AccountantTree.updateAccountNonce(address, currentNonce - prevNonce, undefined, undefined, true);
+                } catch (exception){
+
+                }
 
             });
 

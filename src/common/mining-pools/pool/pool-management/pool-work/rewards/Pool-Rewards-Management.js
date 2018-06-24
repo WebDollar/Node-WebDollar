@@ -45,6 +45,7 @@ class PoolRewardsManagement{
 
         let poolBlocksConfirmed = 0;
         let poolBlocksUnconfirmed = 0;
+        let pooBlocksConfirmedAndPaid  = 0;
 
         let confirmationsPool = 0;
         let confirmationsOthers = 0;
@@ -92,7 +93,7 @@ class PoolRewardsManagement{
                     this.poolData.deleteBlockInformationByIndex(i);
                 }
 
-                poolBlocksConfirmed++;
+                pooBlocksConfirmedAndPaid ++;
                 continue;
 
             }
@@ -179,7 +180,7 @@ class PoolRewardsManagement{
 
         }
 
-        this.poolManagement.poolStatistics.addBlocksStatistics(poolBlocksConfirmed, poolBlocksUnconfirmed);
+        this.poolManagement.poolStatistics.addBlocksStatistics(poolBlocksConfirmed, poolBlocksUnconfirmed, pooBlocksConfirmedAndPaid );
 
     }
 
@@ -319,9 +320,7 @@ class PoolRewardsManagement{
             let lastBlockInformationMinerInstance = lastBlockInformation._addBlockInformationMinerInstance( blockInformation.blockInformationMinersInstances[i].minerInstance );
 
             blockInformation.blockInformationMinersInstances[i].cancelReward();
-            lastBlockInformationMinerInstance.adjustDifficulty(blockInformation.blockInformationMinersInstances[i].minerInstanceTotalDifficulty);
-
-
+            lastBlockInformationMinerInstance.adjustDifficulty(blockInformation.blockInformationMinersInstances[i].minerInstanceTotalDifficulty, true);
         }
 
         //clear the blockInformation

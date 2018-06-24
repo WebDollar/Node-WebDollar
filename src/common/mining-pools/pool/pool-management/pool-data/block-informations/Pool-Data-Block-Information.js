@@ -172,9 +172,7 @@ class PoolDataBlockInformation {
 
 
         blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, minerInstance);
-
-        if (blockInformationMinerInstance !== undefined)
-            this.blockInformationMinersInstances.push(blockInformationMinerInstance);
+         this.blockInformationMinersInstances.push(blockInformationMinerInstance);
 
         return blockInformationMinerInstance;
 
