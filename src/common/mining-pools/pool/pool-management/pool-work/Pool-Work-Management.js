@@ -148,7 +148,9 @@ class PoolWorkManagement{
 
         } catch (exception){
 
-            console.error("Pool Work Management raised an error", exception);
+            if (exception.message === "block was incorrectly mined" && Math.random() < 0.01 )
+                console.error("Pool Work Management raised an error", exception);
+
             return {result: false, message:exception.message, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal  };
 
         }
