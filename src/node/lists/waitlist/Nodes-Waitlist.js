@@ -7,6 +7,7 @@ import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import DownloadManager from "common/utils/helpers/Download-Manager"
 import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain";
+import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
 const EventEmitter = require('events');
 
@@ -57,6 +58,11 @@ class NodesWaitlist {
 
         //converting to array
         if ( typeof addresses === "string" || !Array.isArray(addresses) ) addresses = [addresses];
+
+
+        //avoid connecting to other nodes
+        if (!Blockchain.Agent.consensus && nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER )
+            return;
 
 
         let sckAddresses = [];

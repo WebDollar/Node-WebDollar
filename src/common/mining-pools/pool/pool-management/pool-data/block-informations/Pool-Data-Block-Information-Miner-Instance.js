@@ -92,11 +92,11 @@ class PoolDataBlockInformationMinerInstance {
 
             let diff = (new Date().getTime() - this.blockInformation.date)/1000;
 
-            if (diff > 0 && this.blockInformation.timeRemaining > 0)
-                ratio = diff / (diff + this.blockInformation.timeRemaining)
+            if (diff > 0 && this.blockInformation._timeRemaining > 0)
+                ratio = new BigNumber(diff).dividedBy( diff + this.blockInformation._timeRemaining );
         }
 
-        this.reward = Math.floor ( this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).multipliedBy(ratio * (BlockchainMiningReward.getReward( height ) - consts.MINING_POOL.MINING.FEE_THRESHOLD) ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber());
+        this.reward = Math.floor ( this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).multipliedBy(ratio).multipliedBy( BlockchainMiningReward.getReward( height ) - consts.MINING_POOL.MINING.FEE_THRESHOLD ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber());
 
         this.minerInstance.miner.rewardTotal += this.reward - this.prevReward;
 

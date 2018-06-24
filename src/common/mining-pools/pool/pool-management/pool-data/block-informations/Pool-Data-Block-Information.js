@@ -88,9 +88,9 @@ class PoolDataBlockInformation {
             if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].minerInstance.publicKey !== undefined && this.blockInformationMinersInstances[i].reward > 0)
                 buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
 
-        buffers.push(Serialization.serializeNumber1Byte(this.payout ? 1 : 0));
+        buffers.push( Serialization.serializeNumber1Byte(this.payout ? 1 : 0) );
 
-        buffers.push(Serialization.serializeNumber1Byte((this.block !== undefined ? 1 : 0)));
+        buffers.push( Serialization.serializeNumber1Byte((this.block !== undefined ? 1 : 0)) );
 
         //serialize block
         if (this.block !== undefined) {
