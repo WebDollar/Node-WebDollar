@@ -15,7 +15,7 @@ class NodeServerSocketAPI{
 
         if (socket.node.protocol.connectionType !== CONNECTION_TYPE.CONNECTION_SERVER_SOCKET) return;
 
-        socket.node.on("api/start", (data)=>{
+        socket.node.once("api/start", (data)=>{
 
             if (data.login === "true"){
 
@@ -23,13 +23,17 @@ class NodeServerSocketAPI{
 
             }
 
-            NodeAPIRouter.initializeRouter( this._socketRouteMiddleware.bind(socket), this._socketMiddleware, "api/" , socket, NODE_API_TYPE.NODE_API_TYPE_SOCKET);
+            NodeAPIRouter.initializeRouter( this._socketRouteMiddleware.bind(socket), this._socketMiddleware.bind(socket), "api/" , socket, NODE_API_TYPE.NODE_API_TYPE_SOCKET);
+
+            socket.node.sendRequest("api/start/answer", {result: true} );
 
         });
 
-        socket.node.on("api/start-subscribers", (data)=>{
+        socket.node.once("api/start-subscribers", ( data )=>{
 
-            NodeAPIRouter.initializeRouterCallbacks( this._socketRouteMiddleware.bind(socket), this._socketMiddlewareCallback, "api/" , socket, NODE_API_TYPE.NODE_API_TYPE_SOCKET);
+            NodeAPIRouter.initializeRouterCallbacks( this._socketRouteMiddleware.bind(socket), this._socketMiddlewareCallback.bind(socket), "api/" , socket, NODE_API_TYPE.NODE_API_TYPE_SOCKET);
+
+            socket.node.sendRequest("api/start-subscribers/answer",{result: true});
 
         });
 
@@ -46,22 +50,28 @@ class NodeServerSocketAPI{
         if (route.index("/:")>=0)
             route = route.substr(0, route.index("/:"));
 
-        this.node.on( route, callback);
+
+        this.node.on( route, (req, ack) => {
+            req._route = route;
+            callback(req, ack )
+        });
 
     }
 
-    async _socketMiddleware(req, send, callback){
+    async _socketMiddleware(req, res, callback){
 
         let answer = await callback(req);
 
-        return send(answer);
+        return this.node.sendRequest(req._route+"/answer"+(answer._suffix !== '' ? '/'+answer._suffix : '' ), answer,);
     }
 
-    async _socketMiddlewareCallback(req, send, socket, callback){
+    async _socketMiddlewareCallback(req, send, callback){
 
-        let answer = await callback(req, send, (data)=>{ send( data ) });
+        let answer = await callback(req, send, dataSubscriber => {
+            this.node.sendRequest( req._route+"/answer"+(answer._suffix !== '' ? '/'+answer._suffix : '' ), answer);
+        } );
 
-        return send(answer);
+        return this.node.sendRequest(req._route+"/answer"+(answer._suffix !== '' ? '/'+answer._suffix : '' ), answer);
 
     }
 

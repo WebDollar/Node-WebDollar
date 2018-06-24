@@ -25,27 +25,22 @@ class NodeAPICallbacks{
             //subscribe to transactions changes
             let data = Blockchain.Balances.subscribeBalancesChanges(address, (data)=>{
 
-                callback( {result: true, balances: data.balances } );
+                callback( {result: true, balances: data.balances, _suffix: address } );
 
             });
 
-            if (data !== null && data.result) {
+            if (data === null || data.result) throw {message: "couldn't subscribe"};
 
-                let subscription = data.subscription;
-                let balances = data.balances;
+            let subscription = data.subscription;
+            let balances = data.balances;
 
-                this._addSubscribedEvent(subscription, "addressBalancesSubscribe"+address, res, callback, nodeApiType);
+            this._addSubscribedEvent(subscription, "addressBalancesSubscribe"+address, res, callback, nodeApiType);
 
-                return {result: true, address: address, balances: balances};
-
-            } else{
-
-                return {result: false };
-            }
+            return {result: true, address: address, balances: balances, _suffix: address};
 
 
         } catch (exception){
-            return {result:false, message: exception.message};
+            return {result:false, message: exception.message, _suffix: address};
         }
 
     }
@@ -58,9 +53,9 @@ class NodeAPICallbacks{
 
             this.removeCallback("addressBalancesSubscribe" + address, res);
 
-            return {result:true};
+            return {result:true, _suffix: address};
         } catch (exception){
-            return {result:false, message: exception.message};
+            return {result:false, message: exception.message, _suffix: address};
         }
 
     }
@@ -77,25 +72,21 @@ class NodeAPICallbacks{
             //subscribe to transactions changes
             let data = Blockchain.Transactions.subscribeTransactionsChanges(address, (data)=>{
 
-                callback( {result: true, address: address, transaction: data.transaction} );
+                callback( {result: true, address: address, transaction: data.transaction, _suffix: address} );
 
             });
 
-            if (data !== null && data.result) {
+            if (data === null || data.result) throw {message: "couldn't subscribe"};
 
-                let subscription = data.subscription;
+            let subscription = data.subscription;
 
-                this._addSubscribedEvent(subscription, "addressTransactionsSubscribe"+address, res, callback, nodeApiType);
+            this._addSubscribedEvent(subscription, "addressTransactionsSubscribe"+address, res, callback, nodeApiType);
 
-                return {result: true, transactions: data.transactions}
-
-            } else {
-                return {result: false};
-            }
+            return {result: true, transactions: data.transactions, _suffix: address}
 
 
         } catch (exception){
-            return {result:false, message: exception.message};
+            return {result:false, message: exception.message, _suffix: address};
         }
 
 
@@ -109,9 +100,9 @@ class NodeAPICallbacks{
 
             this.removeCallback("addressTransactionsSubscribe" + address, res);
 
-            return {result:true};
+            return {result:true, _suffix: address};
         } catch (exception){
-            return {result:false, message: exception.message};
+            return {result:false, message: exception.message, _suffix: address};
         }
 
     }

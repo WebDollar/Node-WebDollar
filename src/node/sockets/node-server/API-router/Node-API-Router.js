@@ -42,11 +42,11 @@ class NodeAPIRouter{
         
     }
 
-    initializeRouterCallbacks(app, middleWare, prefix='', socket, nodeApiType){
+    initializeRouterCallbacks(app, middleWare, prefix='', nodeApiType){
 
-        app(prefix+'subscribe/address/balances', (req, res) => middleWare(req, res, socket, NodeAPICallbacks.addressBalancesSubscribe, nodeApiType ));
+        app(prefix+'subscribe/address/balances', (req, res) => middleWare(req, res,  NodeAPICallbacks.addressBalancesSubscribe, nodeApiType ));
 
-        app(prefix+'subscribe/address/transactions', (req, res) => middleWare(req, res, socket, NodeAPICallbacks.addressTransactionsSubscribe, nodeApiType ));
+        app(prefix+'subscribe/address/transactions', (req, res) => middleWare(req, res,  NodeAPICallbacks.addressTransactionsSubscribe, nodeApiType ));
 
     }
 

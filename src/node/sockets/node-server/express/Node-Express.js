@@ -114,8 +114,6 @@ class NodeExpress{
 
                     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL + consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER;
 
-                    this._initializeRouter();
-
                     resolve(true);
 
                 }).on('error', (err) => {
@@ -163,7 +161,7 @@ class NodeExpress{
 
     }
 
-    async _expressMiddlewareCallback(req, res, app, callback){
+    async _expressMiddlewareCallback(req, res, callback){
 
         try {
             for (let k in req)

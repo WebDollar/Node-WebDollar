@@ -61,11 +61,6 @@ class MinerProtocol extends PoolProtocolList{
 
     }
 
-    requestPoolWork(socket){
-
-
-    }
-
     async _subscribeMiner(nodesListObject){
 
         let socket = nodesListObject.socket;
@@ -139,7 +134,7 @@ class MinerProtocol extends PoolProtocolList{
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
 
                 //connection established
-                this._connectionEstablishedWithPool(socket, answer.reward, answer.confirmed);
+                await this._connectionEstablishedWithPool(socket, answer.reward, answer.confirmed);
 
                 if (typeof answer.m === "number") this.minerPoolManagement.minerPoolStatistics.poolMinersOnline = answer.m;
                 if (typeof answer.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = answer.h;
@@ -164,7 +159,7 @@ class MinerProtocol extends PoolProtocolList{
     }
 
 
-    _connectionEstablishedWithPool(socket, totalReward, confirmedReward){
+    async _connectionEstablishedWithPool(socket, totalReward, confirmedReward){
 
         socket.node.protocol.pool = {
         };
