@@ -1,7 +1,7 @@
-const EventEmitter = require('events');
 import BufferExtended from "common/utils/BufferExtended"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
@@ -9,8 +9,8 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
         super(db);
 
-        this.emitter = new EventEmitter()
-        this.emitter.setMaxListeners(100);
+        this.emitter = new AdvancedEmitter();
+
     }
 
 
@@ -72,6 +72,7 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
         }
 
     }
+
 
 }
 

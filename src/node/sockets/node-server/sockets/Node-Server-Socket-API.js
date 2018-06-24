@@ -8,7 +8,6 @@ class NodeServerSocketAPI{
     constructor(){
 
         NodesList.emitter.on("nodes-list/connected", (nodesListObject) => { this._connectAPI(nodesListObject.socket) } );
-        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject ) => { this._disconnectAPI(nodesListObject.socket, false ) });
 
     }
 
@@ -16,7 +15,7 @@ class NodeServerSocketAPI{
 
         if (socket.node.protocol.connectionType !== CONNECTION_TYPE.CONNECTION_SERVER_SOCKET) return;
 
-        socket.node.on("api/start",(data)=>{
+        socket.node.on("api/start", (data)=>{
 
             if (data.login === "true"){
 
@@ -24,7 +23,13 @@ class NodeServerSocketAPI{
 
             }
 
-            NodeAPIRouter.initializeRouter( {get: this._socketRouteMiddleware.bind(socket) }, this._socketMiddleware, "api" , NODE_API_TYPE.NODE_API_TYPE_SOCKET);
+            NodeAPIRouter.initializeRouter( this._socketRouteMiddleware.bind(socket), this._socketMiddleware, "api/" , socket, NODE_API_TYPE.NODE_API_TYPE_SOCKET);
+
+        });
+
+        socket.node.on("api/start-subscribers", (data)=>{
+
+            NodeAPIRouter.initializeRouterCallbacks( this._socketRouteMiddleware.bind(socket), this._socketMiddlewareCallback, "api/" , socket, NODE_API_TYPE.NODE_API_TYPE_SOCKET);
 
         });
 
@@ -45,11 +50,19 @@ class NodeServerSocketAPI{
 
     }
 
-    async _socketMiddleware(data, send, callback){
+    async _socketMiddleware(req, send, callback){
 
-        let answerData = await callback(data);
+        let answer = await callback(req);
 
-        return send(answerData);
+        return send(answer);
+    }
+
+    async _socketMiddlewareCallback(req, send, socket, callback){
+
+        let answer = await callback(req, send, (data)=>{ send( data ) });
+
+        return send(answer);
+
     }
 
 }

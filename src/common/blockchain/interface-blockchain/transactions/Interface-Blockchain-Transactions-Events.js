@@ -1,6 +1,6 @@
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import BufferExtended from 'common/utils/BufferExtended';
-const EventEmitter = require('events');
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 import consts from 'consts/const_global'
 
 class InterfaceBlockchainTransactionsEvents{
@@ -8,8 +8,8 @@ class InterfaceBlockchainTransactionsEvents{
     constructor(blockchain){
 
         this.blockchain = blockchain;
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(100);
+
+        this.emitter = new AdvancedEmitter();
 
     }
 

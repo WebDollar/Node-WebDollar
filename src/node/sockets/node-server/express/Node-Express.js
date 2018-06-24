@@ -83,7 +83,8 @@ class NodeExpress{
 
                     this.SSL = true;
 
-                    NodeAPIRouter.initializeRouter( this.app, this._expressMiddleware, '', NODE_API_TYPE.NODE_API_TYPE_HTTP );
+                    NodeAPIRouter.initializeRouter( this.app.get, this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
+                    NodeAPIRouter.initializeRouterCallbacks( this.app.get, this._expressMiddlewareCallback, '/', this.app, NODE_API_TYPE.NODE_API_TYPE_HTTP );
 
                     console.info("========================================");
                     console.info("HTTPS Express was opened on port "+ this.port);
@@ -149,11 +150,41 @@ class NodeExpress{
     //this will process the params
     async _expressMiddleware(req, res, callback){
 
-        for (let k in req)
-            req[k] = decodeURIComponent(req[k]);
+        try {
+            for (let k in req)
+                req[k] = decodeURIComponent(req[k]);
 
-        let answer = await callback(req,res);
-        res.json(answer);
+            let answer = await callback(req, res);
+            res.json(answer);
+
+        } catch (exception){
+            res.json({result:false, message: exception.message});
+        }
+
+    }
+
+    async _expressMiddlewareCallback(req, res, app, callback){
+
+        try {
+            for (let k in req)
+                req[k] = decodeURIComponent(req[k]);
+
+            let url = req.url;
+
+            if (typeof url !== "string") throw {message: "url not specified"};
+
+            let answer = await callback(req, res, (data)=>{ this._notifyHTTPSubscriber(url, data) });
+            res.json(answer);
+
+        } catch (exception){
+            res.json({result:false, message: exception.message});
+        }
+
+    }
+
+    _notifyHTTPSubscriber(url, data){
+
+        //TODO notify via http get/post via axios ?
 
     }
 
