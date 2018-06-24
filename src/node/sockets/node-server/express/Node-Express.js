@@ -43,6 +43,36 @@ class NodeExpress{
         return domain;
     }
 
+    _serializeBlock(raw_block) {
+      let timestamp = new Date((raw_block.timeStamp + BlockchainGenesis.timeStamp) * 1000)
+      console.log(raw_block.timeStamp)
+      console.log(BlockchainGenesis.timeStamp)
+      timestamp = timestamp.toUTCString()
+      let transactions = []
+      if (raw_block.data.transactions) {
+        for (let j = 0; j < raw_block.data.transactions.transactions.length; j++) {
+          transactions.push(raw_block.data.transactions.transactions[j].toJSON())
+        }
+      }
+
+      let block = {
+        id:            raw_block.height,
+        block_id:      raw_block.height,
+        miner_address: raw_block.data.minerAddress.toString('hex'),
+        nonce:         raw_block.nonce,
+        hash:          raw_block.hash.toString('hex'),
+        previous_hash: raw_block.hashPrev.toString('hex'),
+        timestamp:     timestamp,
+        raw_timestamp: raw_block.timeStamp,
+        reward:        raw_block.reward,
+        trxs:          transactions,
+        trxs_number:   raw_block.data.transactions.length,
+        version:       raw_block.version
+      }
+      return block
+    }
+
+
     startExpress(){
 
         if (this.loaded) //already open
@@ -176,8 +206,8 @@ class NodeExpress{
             let block_start = parseInt(decodeURIComponent(req.params.blocks))
             if (block_start < Blockchain.blockchain.blocks.length) {
               let blocks_to_send = []
-              for (let i=block_start; i<Blockchain.blockchain.blocks.length; i++) {
-                blocks_to_send.push(Blockchain.blockchain.blocks[i].toJSON())
+              for (let i=Blockchain.blockchain.blocks.length - block_start; i<Blockchain.blockchain.blocks.length; i++) {
+                blocks_to_send.push(this._serializeBlock(Blockchain.blockchain.blocks[i]))
               }
               res.send({result: true, blocks: blocks_to_send})
               return
@@ -196,13 +226,16 @@ class NodeExpress{
           try {
             let block = parseInt(decodeURIComponent(req.params.block))
             if (block < Blockchain.blockchain.blocks.length) {
-              res.send({result: true, block: Blockchain.blockchain.blocks[block].toJSON()})
-              return
+              res.send({
+                result: true,
+                block: this._serializeBlock(Blockchain.blockchain.blocks[block])
+              })
+              return;
             } else {
               throw "Block not found."
             }
           } catch (exception) {
-            res.send({result: false, message: "Invalid Block"});
+            res.send({result: false, message: "Invalid Block"})
             return;
           }
         })
