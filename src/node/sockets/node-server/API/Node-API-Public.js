@@ -1,3 +1,4 @@
+import consts from 'consts/const_global'
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NODE_TYPE from "node/lists/types/Node-Type"
 import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"

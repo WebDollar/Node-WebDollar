@@ -83,8 +83,7 @@ class NodeExpress{
 
                     this.SSL = true;
 
-                    NodeAPIRouter.initializeRouter( this.app.get, this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
-                    NodeAPIRouter.initializeRouterCallbacks( this.app.get, this._expressMiddlewareCallback, '/', this.app, NODE_API_TYPE.NODE_API_TYPE_HTTP );
+                    this._initializeRouter(this.app);
 
                     console.info("========================================");
                     console.info("HTTPS Express was opened on port "+ this.port);
@@ -114,6 +113,8 @@ class NodeExpress{
 
                     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL + consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER;
 
+                    this._initializeRouter(this.app);
+
                     resolve(true);
 
                 }).on('error', (err) => {
@@ -133,6 +134,12 @@ class NodeExpress{
         })
     }
 
+    _initializeRouter(app){
+
+        NodeAPIRouter.initializeRouter( this.app.get.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
+        NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', this.app, NODE_API_TYPE.NODE_API_TYPE_HTTP );
+
+    }
 
 
     amIFallback(){
@@ -149,10 +156,10 @@ class NodeExpress{
     async _expressMiddleware(req, res, callback){
 
         try {
-            for (let k in req)
-                req[k] = decodeURIComponent(req[k]);
+            for (let k in req.params)
+                req.params[k] = decodeURIComponent(req.params[k]);
 
-            let answer = await callback(req, res);
+            let answer = await callback(req.params, res);
             res.json(answer);
 
         } catch (exception){
