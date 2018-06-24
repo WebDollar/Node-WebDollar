@@ -112,7 +112,6 @@ class MinerProtocol extends PoolProtocolList{
 
             let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
                 message: message,
-                messageSignature: this.minerPoolManagement.minerPoolSettings.minerPoolDigitalSign(message),
                 poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
                 minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
                 minerAddress: Blockchain.blockchain.mining.minerAddress,
