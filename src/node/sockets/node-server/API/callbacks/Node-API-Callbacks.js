@@ -29,7 +29,7 @@ class NodeAPICallbacks{
 
             });
 
-            if (data === null || data.result) throw {message: "couldn't subscribe"};
+            if (data === null || !data.result) throw {message: "couldn't subscribe"};
 
             let subscription = data.subscription;
             let balances = data.balances;
@@ -55,7 +55,7 @@ class NodeAPICallbacks{
 
             return {result:true, _suffix: address};
         } catch (exception){
-            return {result:false, message: exception.message, _suffix: address};
+            return {result:false, message: exception.message, _suffix: address||''};
         }
 
     }
@@ -76,7 +76,7 @@ class NodeAPICallbacks{
 
             });
 
-            if (data === null || data.result) throw {message: "couldn't subscribe"};
+            if (data === null || !data.result) throw {message: "couldn't subscribe"};
 
             let subscription = data.subscription;
 
@@ -102,7 +102,7 @@ class NodeAPICallbacks{
 
             return {result:true, _suffix: address};
         } catch (exception){
-            return {result:false, message: exception.message, _suffix: address};
+            return {result:false, message: exception.message, _suffix: address||''};
         }
 
     }

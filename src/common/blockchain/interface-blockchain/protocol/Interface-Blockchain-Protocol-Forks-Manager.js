@@ -19,7 +19,7 @@ class InterfaceBlockchainProtocolForksManager {
 
         try {
 
-            if (!this.blockchain.agent.consenus) return;
+            if (!this.blockchain.agent.consensus) return;
 
             if (typeof newChainLength !== "number") throw "newChainLength is not a number";
             if (typeof newChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";

@@ -47,8 +47,8 @@ class NodeServerSocketAPI{
      */
     _socketRouteMiddleware(route, callback){
 
-        if (route.index("/:")>=0)
-            route = route.substr(0, route.index("/:"));
+        if (route.indexOf("/:")>=0)
+            route = route.substr(0, route.indexOf("/:"));
 
 
         this.node.on( route, (req, ack) => {
@@ -60,18 +60,25 @@ class NodeServerSocketAPI{
 
     async _socketMiddleware(req, res, callback){
 
-        let answer = await callback(req);
+        let answer = await callback(req, this);
+        let suffix = (answer._suffix !== '' ? '/'+answer._suffix : '' );
+        delete answer._suffix;
 
-        return this.node.sendRequest(req._route+"/answer"+(answer._suffix !== '' ? '/'+answer._suffix : '' ), answer,);
+        return this.node.sendRequest(req._route+"/answer"+suffix, answer,);
     }
 
     async _socketMiddlewareCallback(req, send, callback){
 
-        let answer = await callback(req, send, dataSubscriber => {
-            this.node.sendRequest( req._route+"/answer"+(answer._suffix !== '' ? '/'+answer._suffix : '' ), answer);
+        let answer = await callback(req, this, dataSubscriber => {
+
+            let suffix = (answer._suffix !== '' ? '/'+answer._suffix : '' );
+
+            this.node.sendRequest( req._route+"/answer"+suffix, dataSubscriber);
         } );
 
-        return this.node.sendRequest(req._route+"/answer"+(answer._suffix !== '' ? '/'+answer._suffix : '' ), answer);
+        let suffix = (answer._suffix !== '' ? '/'+answer._suffix : '' );
+
+        return this.node.sendRequest(req._route+"/answer"+suffix, answer);
 
     }
 

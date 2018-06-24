@@ -2,12 +2,12 @@ import Blockchain from "main-blockchain/Blockchain"
 import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import StatusEvents from "common/events/Status-Events"
 import NodesList from 'node/lists/Nodes-List';
+import NODES_CONSENSUS_TYPE from "../../../../../node/lists/types/Node-Consensus-Type";
 
 class NanoWalletProtocol{
 
-    constructor(blockchain){
+    constructor(){
 
-        this.blockchain = blockchain;
         this._sockets = [];
 
         StatusEvents.on('wallet/address-changes',(address)=>{
@@ -29,8 +29,8 @@ class NanoWalletProtocol{
 
     async _initializeSocket(socket){
 
-        if (socket.node.protocol.connectionType !== CONNECTION_TYPE.CONNECTION_SERVER_SOCKET) return;
-        if (socket.node.protocol.nano === undefined || socket.node.protocol.nano.nanoInitialized === true ) return;
+        if ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER,NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL].indexOf ( socket.node.protocol.nodeConsensusType) < 0) return;
+        if (socket.node.protocol.nano !== undefined && socket.node.protocol.nano.nanoInitialized === true ) return;
 
         socket.node.protocol.nano = {
             nanoInitialized: true,
@@ -39,15 +39,15 @@ class NanoWalletProtocol{
         let answer = await socket.node.sendRequestWaitOnce("api/start-subscribers", {}, "answer");
 
         if (answer !== null && answer.result) {
-            socket.node.protocol.pool.subscribedStarted = true;
-            this.virtualizeWallet();
+            socket.node.protocol.nano.subscribedStarted = true;
+            this.virtualizeWallet(socket);
         }
 
     }
 
     virtualizeWallet(socket){
 
-        if (this.blockchain.agent.consensus) return; //make sure the virtualization was not canceled
+        if (Blockchain.Agent.consensus) return; //make sure the virtualization was not canceled
 
         this._sockets.push(socket);
 
@@ -60,30 +60,49 @@ class NanoWalletProtocol{
 
         for (let i=0; i<this._sockets.length; i++) {
 
-            this._sockets[i].node.sendRequest("subscribe/address/balances", { address: address  });
-            this._sockets[i].node.on("subscribe/address/balances/"+address, (data)=>{
+            this._sockets[i].node.sendRequest("api/subscribe/address/balances", { address: address  });
+            this._sockets[i].node.on("api/subscribe/address/balances/answer/"+address, (data)=>{
 
-                if (this.blockchain.agent.consensus) return; //make sure the virtualization was not canceled
+                if (Blockchain.Agent.consensus) return; //make sure the virtualization was not canceled
 
-                let prevVal = this.blockchain.accountantTree.getBalance(address);
+                if (data === null || !data.result) return false;
+
+                let prevVal = Blockchain.AccountantTree.getBalance(address);
                 if (prevVal=== null ) prevVal = 0;
 
-                this.blockchain.accountantTree.updateAccount(address, data["0x01"] - prevVal );
+                let currentVal;
+                if (data.balances === null) currentVal = 0;
+                else currentVal = data.balances["0x01"];
+
+
+                Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal );
 
             });
 
-            this._sockets[i].node.sendRequest("subscribe/address/transactions", { address: address  });
-            this._sockets[i].node.on("subscribe/address/transactions/"+address, (data)=>{
+            this._sockets[i].node.sendRequest("api/subscribe/address/transactions", { address: address  });
+            this._sockets[i].node.on("api/subscribe/address/transactions/answer/"+address, (data)=>{
 
-                if (this.blockchain.agent.consensus) return; //make sure the virtualization was not canceled
+                if (Blockchain.Agent.consensus) return; //make sure the virtualization was not canceled
 
-                let transaction = null;
-                if (data.transaction !== undefined) transaction = this.blockchain.transactions._createTransaction(data.transaction.from, data.transaction.to, data.transaction.nonce, data.transaction.timeLock, data.transaction.version);
+                if (data === null || !data.result) return false;
 
-                if (this.blockchain.transactions.pendingQueue.findPendingTransaction(data.txId) === null)
-                    transaction.confirmed = data.transaction.confirmed;
-                else
-                    this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all", true)
+                for (let k in data.transactions){
+
+                    let transaction = data.transactions[k];
+
+                    if (data === null || !data.result) return false;
+
+                    let tx = null;
+                    if (transaction !== undefined) tx = Blockchain.transactions._createTransaction(transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version);
+
+                    let foundTx = Blockchain.Transactions.pendingQueue.findPendingTransaction(data.txId);
+
+                    if ( foundTx !== null)
+                        foundTx .confirmed = transaction.confirmed;
+                    else
+                        Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all", true)
+
+                }
 
 
             });

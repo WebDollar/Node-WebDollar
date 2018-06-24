@@ -44,9 +44,9 @@ class NodeAPIRouter{
 
     initializeRouterCallbacks(app, middleWare, prefix='', nodeApiType){
 
-        app(prefix+'subscribe/address/balances', (req, res) => middleWare(req, res,  NodeAPICallbacks.addressBalancesSubscribe, nodeApiType ));
+        app(prefix+'subscribe/address/balances', (req, res) => middleWare(req, res,  NodeAPICallbacks.addressBalancesSubscribe.bind(NodeAPICallbacks), nodeApiType ));
 
-        app(prefix+'subscribe/address/transactions', (req, res) => middleWare(req, res,  NodeAPICallbacks.addressTransactionsSubscribe, nodeApiType ));
+        app(prefix+'subscribe/address/transactions', (req, res) => middleWare(req, res,  NodeAPICallbacks.addressTransactionsSubscribe.bind(NodeAPICallbacks), nodeApiType ));
 
     }
 

@@ -33,7 +33,7 @@ class InterfaceBlockchainTransactionsEvents{
         return null;
     }
 
-    listTransactions(addressWIF){
+    listTransactions(addressWIF, maxBlockCount = 100){
 
         if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='')
             return [];
@@ -45,7 +45,10 @@ class InterfaceBlockchainTransactionsEvents{
 
         let result = {};
 
-        for (let i=this.blockchain.blocks.blocksStartingPoint; i<this.blockchain.blocks.endingPosition; i++){
+        let startingPoint = this.blockchain.blocks.blocksStartingPoint;
+        if (typeof maxBlockCount === "number") maxBlockCount = Math.max(startingPoint, this.blockchain.blocks.endingPosition-maxBlockCount);
+
+        for (let i=startingPoint; i<this.blockchain.blocks.endingPosition; i++){
 
             let block = this.blockchain.blocks[i];
             if (block === undefined) continue;

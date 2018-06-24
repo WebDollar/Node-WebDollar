@@ -132,8 +132,11 @@ class Blockchain{
 
             if (this.Agent.consensus)
                 await this.synchronizeBlockchain(true); //it tries synchronizing multiple times
-            else
+            else {
                 this.synchronized = true; //consider it as synchronized
+                this.startMining();
+                StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"});
+            }
 
         }
 
