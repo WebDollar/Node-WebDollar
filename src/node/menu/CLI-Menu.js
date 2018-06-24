@@ -373,7 +373,7 @@ class CLI {
                     Blockchain.Mining.stopMining();
             });
 
-             Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
+            await Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
 
         }, false);
 
@@ -434,7 +434,7 @@ class CLI {
 
             }
 
-            Blockchain.PoolManagement.startPool(true);
+            await Blockchain.PoolManagement.startPool(true);
 
 
         }, true);

@@ -3,6 +3,7 @@ import AGENT_STATUS from "./Agent-Status";
 import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain"
 import NanoWalletProtocol from "./Nano/Nano-Wallet-Protocol"
+import NodesList from 'node/lists/Nodes-List';
 
 const TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_BROWSER = consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 1000 * 4;
 const TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_TERMINAL = consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 1000 * 8;
@@ -28,6 +29,20 @@ class InterfaceBlockchainAgentBasic{
         this._status = AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED;
 
         this.consensus = true;
+
+
+        NodesList.emitter.on("nodes-list/disconnected", async (result) => {
+
+            if (!this.consensus) return;
+
+            if (NodesList.nodes.length === 0) { //no more sockets, maybe I no longer have internet
+
+                console.warn("################### RESYNCHRONIZATION STARTED ##########");
+                Blockchain.synchronizeBlockchain();
+
+            }
+
+        });
 
     }
 
@@ -56,8 +71,6 @@ class InterfaceBlockchainAgentBasic{
             if (Blockchain.loaded)
                 await this.blockchain.loadBlockchain();
 
-            NanoWalletProtocol.initializeNanoProtocol();
-
             //disconnect if no blocks are received
             if (this._intervalVerifyConsensus === undefined){
 
@@ -84,6 +97,8 @@ class InterfaceBlockchainAgentBasic{
 
 
         } else {
+
+            await NanoWalletProtocol.initializeNanoProtocol();
 
             clearInterval(this._intervalVerifyConsensus);
 
