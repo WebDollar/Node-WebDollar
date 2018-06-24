@@ -129,10 +129,12 @@ class PoolManagement{
             await this.poolSettings.setPoolActivated(value);
 
             if (value) {
-                await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
                 this.poolStatistics.startInterval();
                 this.poolWorkManagement.poolWork.startGarbageCollector();
                 await this.poolProtocol._startPoolProtocol();
+
+                await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
+
             }
             else {
                 await this.poolProtocol._stopPoolProtocol();

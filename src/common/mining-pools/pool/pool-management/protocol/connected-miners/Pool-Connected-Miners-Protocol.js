@@ -66,11 +66,6 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
                 if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
-                //validate minerPool signature
-                if ( !Buffer.isBuffer( data.messageSignature ) || data.messageSignature.length < 10) throw {message: "messageSignature is invalid"};
-                if ( !ed25519.verify(data.messageSignature, data.message, data.minerPublicKey)) throw {message: "messageSignature doesn't validate message"}
-
-
                 // save minerPublicKey
                 let miner = this.poolManagement.poolData.getMiner(unencodedAddress);
 
@@ -116,11 +111,13 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     }
 
                 } catch (exception){
-
+                    console.error("mining-pool/hello-pool/answer/confirmation", exception);
+                    console.error("exception", exception)
                 }
 
             } catch (exception){
 
+                console.log("mining-pool/hello-pool"+"/answer", exception);
                 socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {result: false, message: exception.message, } );
             }
 

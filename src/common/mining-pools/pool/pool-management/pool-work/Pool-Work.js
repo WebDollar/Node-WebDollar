@@ -42,9 +42,6 @@ class PoolWork {
 
         this.lastBlockPromise = Utils.MakeQuerablePromise( new Promise( async (resolve)=>{
 
-            if (this.lastBlockPromise !== undefined )
-                console.log("promise: ", this.lastBlockPromise.isPending(), "    isFulfilled: ", this.lastBlockPromise.isFulfilled())
-
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlockNonce = 0;
 

@@ -4,7 +4,7 @@ const BigNumber = require('bignumber.js');
 
 let consts = {
 
-    DEBUG: true,
+    DEBUG: false,
     OPEN_SERVER: true,
 
 };

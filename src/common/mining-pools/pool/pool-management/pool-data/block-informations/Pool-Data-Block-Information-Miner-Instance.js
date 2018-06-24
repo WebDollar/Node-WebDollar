@@ -64,7 +64,7 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    adjustDifficulty(difficulty){
+    adjustDifficulty(difficulty, useDeltaTime = false ){
 
         if (difficulty === undefined) difficulty = this._workDifficulty;
 
@@ -72,11 +72,11 @@ class PoolDataBlockInformationMinerInstance {
 
         this.blockInformation.adjustBlockInformationDifficulty(difficulty);
 
-        this.calculateReward();
+        this.calculateReward(useDeltaTime );
 
     }
 
-    calculateReward(){
+    calculateReward(useDeltaTime = false){
 
         this.prevReward = this.reward;
 
@@ -86,7 +86,16 @@ class PoolDataBlockInformationMinerInstance {
         else if ( this.workBlock !== undefined) height = this.workBlock.height;
         else height = Blockchain.blockchain.blocks.length-1;
 
-        this.reward = Math.floor ( this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).multipliedBy( BlockchainMiningReward.getReward( height ) - consts.MINING_POOL.MINING.FEE_THRESHOLD ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber());
+        let ratio = 1;
+
+        if (useDeltaTime) {
+            let diff = new Date().getTime() - this.blockInformation.date;
+
+            if (diff > 0 && this.blockInformation.timeRemaining > 0)
+                ratio = diff / (diff + this.blockInformation.timeRemaining)
+        }
+
+        this.reward = Math.floor ( this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).multipliedBy(ratio * (BlockchainMiningReward.getReward( height ) - consts.MINING_POOL.MINING.FEE_THRESHOLD) ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber());
 
         this.minerInstance.miner.rewardTotal += this.reward - this.prevReward;
 

@@ -36,9 +36,9 @@ class PoolStatistics{
 
     }
 
-    async initializePoolStatistics(){
+     initializePoolStatistics(){
 
-        return await this._load();
+        return  this._load();
 
     }
 

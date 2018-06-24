@@ -11,6 +11,8 @@ import consts from 'consts/const_global'
 import NodeAPIRouter from "../API-router/Node-API-Router"
 import NODE_API_TYPE from "../API-router/NODE_API_TYPE";
 
+import NodeServerSocketAPI from "../sockets/Node-Server-Socket-API"; //required because it will process the SocketAPI
+
 class NodeExpress{
 
     constructor(){

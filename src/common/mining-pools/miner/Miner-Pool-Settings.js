@@ -17,7 +17,6 @@ class MinerPoolSettings {
 
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.MINER_POOL_DATABASE );
 
-        this._minerPoolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
         this.minerPoolPublicKey = undefined;
 
         this._poolURL = '';
@@ -36,7 +35,7 @@ class MinerPoolSettings {
 
     async initializeMinerPoolSettings(poolURL){
 
-        await this._getMinerPoolPrivateKey();
+        await this._getMinerPoolPublicKey();
         await this._getMinerPoolList();
 
         if (poolURL !== undefined)
@@ -96,29 +95,17 @@ class MinerPoolSettings {
 
     }
 
-    async saveMinerPoolPrivateKey(){
+    async _getMinerPoolPublicKey(){
 
-        let result = await this._db.save("minerPool_privateKey", this._minerPoolPrivateKey);
-        return result;
-    }
+        this.minerPoolPublicKey = await this._db.get("minerPool_publicKey", 30*1000, true);
 
-    async _getMinerPoolPrivateKey(){
-
-        let savePrivateKey = false;
-        this._minerPoolPrivateKey = await this._db.get("minerPool_privateKey", 30*1000, true);
-
-        if (this._minerPoolPrivateKey === null) {
-            this._minerPoolPrivateKey = ed25519.generatePrivateKey();
-            savePrivateKey = true
+        if (this.minerPoolPublicKey === null){
+            this.minerPoolPublicKey = WebDollarCrypto.getBufferRandomValues(32);
+            let result = await this._db.save("minerPool_publicKey", this.minerPoolPublicKey);
+            return result;
         }
 
-        if ( Buffer.isBuffer(this._minerPoolPrivateKey) )
-            this.minerPoolPublicKey = ed25519.generatePublicKey(this._minerPoolPrivateKey);
-
-        if (savePrivateKey)
-            await this.saveMinerPoolPrivateKey();
-
-        return this._minerPoolPrivateKey;
+        return true;
     }
 
     async _getMinerPoolDetails(){
@@ -139,12 +126,6 @@ class MinerPoolSettings {
 
     }
 
-    minerPoolDigitalSign(message){
-
-        let signature = ed25519.sign( message, this._minerPoolPrivateKey );
-        return signature;
-
-    }
 
     async addPoolList(url, data){
 

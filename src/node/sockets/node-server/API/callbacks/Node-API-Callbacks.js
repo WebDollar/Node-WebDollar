@@ -49,12 +49,14 @@ class NodeAPICallbacks{
     addressBalanceUnsubscribe(req, res, callback, nodeApiType){
 
         try {
+
             if (typeof req.address !== "string")  throw {message: "address is invalid"};
             let address = req.address;
 
             this.removeCallback("addressBalancesSubscribe" + address, res);
 
             return {result:true, _suffix: address};
+
         } catch (exception){
             return {result:false, message: exception.message, _suffix: address||''};
         }

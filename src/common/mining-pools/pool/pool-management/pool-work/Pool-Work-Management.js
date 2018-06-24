@@ -92,7 +92,7 @@ class PoolWorkManagement{
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
             blockInformationMinerInstance.calculateDifficulty();
-            blockInformationMinerInstance.adjustDifficulty();
+            blockInformationMinerInstance.adjustDifficulty(undefined, true);
 
             //statistics
             this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance._workDifficulty, minerInstance);
