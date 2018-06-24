@@ -1,7 +1,7 @@
-import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import NODE_TYPE from "node/lists/types/Node-Type"
+
+import NodeAPIPublic from "../API/Node-API-Public";
+import NodeAPIPrivate from "./../API/Node-API-Private";
 
 const https = require('https');
 const http = require('http');
@@ -10,11 +10,7 @@ const express = require('express')
 const cors = require('cors');
 const fs = require('fs')
 import consts from 'consts/const_global'
-import Blockchain from "main-blockchain/Blockchain"
-import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
-import NodesList from 'node/lists/Nodes-List'
-import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
-var BigNumber = require ('bignumber.js');
+
 
 class NodeExpress{
 
@@ -143,231 +139,40 @@ class NodeExpress{
 
 
         // respond with "hello world" when a GET request is made to the homepage
-        this.app.get('/', (req, res) => {
-
-            let lastBlock = Blockchain.blockchain.blocks.last;
-
-            res.json({
-
-                protocol: consts.SETTINGS.NODE.PROTOCOL,
-                version: consts.SETTINGS.NODE.VERSION,
-                blocks: {
-                    length: Blockchain.blockchain.blocks.length,
-                    lastBlockHash: lastBlock !== undefined ? Blockchain.blockchain.blocks.last.hash.toString("hex") : '',
-                },
-                networkHashRate: Blockchain.blockchain.blocks.networkHashRate,
-                sockets:{
-                    clients: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET),
-                    servers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET),
-                    webpeers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_WEBRTC),
-                },
-                services:{
-                    serverPool: Blockchain.ServerPoolManagement.serverPoolProtocol.loaded,
-                    miningPool: Blockchain.PoolManagement.poolProtocol.loaded,
-                    minerPool: Blockchain.MinerPoolManagement.minerPoolProtocol.loaded,
-                },
-                waitlist:{
-                    list: NodesWaitlist.getJSONList( NODE_TYPE.NODE_TERMINAL, false ),
-                }
-
-            });
-
-        });
+        this.app.get('/', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.info ));
 
         // Return blocks information
-        this.app.get('/blocks/:blocks', (req, res) => {
-
-          try {
-            let block_start = parseInt(decodeURIComponent(req.params.blocks))
-            if (block_start < Blockchain.blockchain.blocks.length) {
-              let blocks_to_send = []
-              for (let i=block_start; i<Blockchain.blockchain.blocks.length; i++) {
-                blocks_to_send.push(Blockchain.blockchain.blocks[i].toJSON())
-              }
-              res.send({result: true, blocks: blocks_to_send})
-              return
-            } else {
-              throw ("block start is not correct: " + block_start)
-            }
-          } catch (exception) {
-            res.send({result: false, message: exception.message});
-            return;
-          }
-        })
-
+        this.app.get('/blocks/:blocks', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.blocks ));
 
         // Return block information
-        this.app.get('/block/:block', (req, res) => {
-          try {
-            let block = parseInt(decodeURIComponent(req.params.block))
-            if (block < Blockchain.blockchain.blocks.length) {
-              res.send({result: true, block: Blockchain.blockchain.blocks[block].toJSON()})
-              return
-            } else {
-              throw "Block not found."
-            }
-          } catch (exception) {
-            res.send({result: false, message: "Invalid Block"});
-            return;
-          }
-        })
-
-
-        // Return address info: balance, blocks mined and transactions
-        this.app.get('/address/:address', (req, res) => {
-
-            let address = decodeURIComponent(req.params.address);
-
-            try {
-                address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
-            } catch (exception){
-                res.send({result: false, message: "Invalid Address"});
-                return;
-            }
-
-            let answer = []
-            let minedBlocks = []
-            let balance = 0
-            let last_block = Blockchain.blockchain.blocks.length
-
-            // Get balance
-            balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
-            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
-
-            // Get mined blocks and transactions
-            for (let i=0; i<Blockchain.blockchain.blocks.length; i++) {
-
-                for (let j = 0; j < Blockchain.blockchain.blocks[i].data.transactions.transactions.length; j++) {
-
-                    let transaction = Blockchain.blockchain.blocks[i].data.transactions.transactions[j];
-
-                    let found = false;
-                    for (let q = 0; q < transaction.from.addresses.length; q++)
-                        if (transaction.from.addresses[q].unencodedAddress.equals(address)) {
-                            found = true;
-                            break;
-                        }
-
-                    for (let q = 0; q < transaction.to.addresses.length; q++)
-                        if (transaction.to.addresses[q].unencodedAddress.equals(address)) {
-                            found = true;
-                            break;
-                        }
-
-                    if (found) {
-                        answer.push({
-                                blockId: Blockchain.blockchain.blocks[i].height,
-                                timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
-                                transaction: transaction.toJSON()
-                            });
-                    }
-
-                }
-                if (Blockchain.blockchain.blocks[i].data.minerAddress.equals( address) ) {
-                    minedBlocks.push(
-                        {
-                            blockId: Blockchain.blockchain.blocks[i].height,
-                            timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
-                            transactions: Blockchain.blockchain.blocks[i].data.transactions.transactions.length
-                        });
-                }
-            }
-
-
-            res.send({result: true, last_block: last_block,
-                      balance: balance, minedBlocks: minedBlocks,
-                      transactions: answer
-                     });
-
-        });
+        this.app.get('/block/:block', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.block ));
 
         //Get Address
         //TODO: optimize or limit the number of requests
-        this.app.get('/wallets/balance/:address', (req, res) => {
 
-            let address = decodeURIComponent(req.params.address);
-            let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
+        // Return address info: balance, blocks mined and transactions
+        this.app.get('/address/:address', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.addressInfo ));
 
-            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
-
-            res.json(balance);
-
-        });
+        this.app.get('/wallets/balance/:address', (req, res) => this._expressMiddleware(req, res, NodeAPIPublic.addressBalance) );
 
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
-            this.app.get('/'+process.env.WALLET_SECRET_URL+'/mining/balance', (req, res) => {
+            this.app.get('/'+process.env.WALLET_SECRET_URL+'/mining/balance', (req, res) => this._expressMiddleware(req, res, NodeAPIPrivate.minerBalance) );
 
-                let addressString = Blockchain.blockchain.mining.minerAddress;
-                let balance = Blockchain.blockchain.accountantTree.getBalance(addressString, undefined);
+            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/import', (req, res) => this._expressMiddleware(req, res, NodeAPIPrivate.walletImport) );
 
-                balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/create-transaction', (req, res) => this._expressMiddleware(req, res, NodeAPIPrivate.walletCreateTransaction) );
 
-                res.json(balance);
-
-            });
-
-            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/import', async (req, res) => {
-
-                let content = {
-                    version: '0.1',
-                    address: decodeURIComponent(req.query.address),
-                    publicKey: req.query.publicKey,
-                    privateKey: req.query.privateKey
-                };
-
-                try {
-
-                    let answer = await Blockchain.Wallet.importAddressFromJSON(content);
-
-                    if (answer.result === true) {
-                        console.log("Address successfully imported", answer.address);
-                        await Blockchain.Wallet.saveWallet();
-                        res.json(true);
-                    } else {
-                        console.error(answer.message);
-                        res.json(false);
-                    }
-
-                } catch(err) {
-                    console.error(err.message);
-                    res.json(false);
-                }
-
-            });
-
-            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/transactions', async (req, res) => {
-
-              let from = decodeURIComponent(req.query.from);
-              let to = decodeURIComponent(req.query.to);
-              let amount = parseInt(req.query.amount) * WebDollarCoins.WEBD;
-              let fee = parseInt(req.query.fee) * WebDollarCoins.WEBD;
-
-              let result = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
-
-              res.json(result);
-
-            });
-
-          this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/export', async (req, res) => {
-              let addressString = Blockchain.blockchain.mining.minerAddress;
-              let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
-
-              if (answer.data) {
-                res.json(answer.data);
-              } else {
-                res.json({});
-              }
-          });
+            this.app.get('/'+process.env.WALLET_SECRET_URL+'/wallets/export', (req, res) => this._expressMiddleware(req, res, NodeAPIPrivate.walletExport) );
 
         }
 
-        // respond with "hello world" when a GET request is made to the homepage
+        // respond with "hello"
         this.app.get('/hello', (req, res) => {
             res.send('world');
         });
 
-        // respond with "hello world" when a GET request is made to the homepage
+        // respond with "ping"
         this.app.get('/ping', (req, res) => {
             res.json( { ping: "pong" });
         });
@@ -382,6 +187,17 @@ class NodeExpress{
                 return true;
 
         return false;
+
+    }
+
+    //this will process the params
+    async _expressMiddleware(req, res, callback){
+
+        for (let k in req)
+            req[k] = decodeURIComponent(req[k]);
+
+        let answer = await callback(req,res);
+        res.json(answer);
 
     }
 
