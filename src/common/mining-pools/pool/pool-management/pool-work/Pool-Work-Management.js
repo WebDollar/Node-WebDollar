@@ -77,11 +77,11 @@ class PoolWorkManagement{
             if (blockInformationMinerInstance.workBlock === undefined)
                 throw {message: "miner instance - no block"};
 
-            let hashesFactor = Math.min(5, (5000/work.timeDiff));
-            hashesFactor = Math.max(0.01, hashesFactor);
+            let hashesFactor = Math.min(3, (3000/work.timeDiff));
+            hashesFactor = Math.max(0.4, hashesFactor);
 
             minerInstance.hashesPerSecond *= Math.floor( hashesFactor );
-            minerInstance.hashesPerSecond = Math.min( minerInstance.hashesPerSecond , 5000);
+            minerInstance.hashesPerSecond = Math.min( minerInstance.hashesPerSecond , 10000);
             minerInstance.hashesPerSecond = Math.max( minerInstance.hashesPerSecond , 100);
 
 
