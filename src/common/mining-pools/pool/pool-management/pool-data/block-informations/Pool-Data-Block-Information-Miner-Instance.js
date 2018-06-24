@@ -89,7 +89,8 @@ class PoolDataBlockInformationMinerInstance {
         let ratio = 1;
 
         if (useDeltaTime) {
-            let diff = new Date().getTime() - this.blockInformation.date;
+
+            let diff = (new Date().getTime() - this.blockInformation.date)/1000;
 
             if (diff > 0 && this.blockInformation.timeRemaining > 0)
                 ratio = diff / (diff + this.blockInformation.timeRemaining)
