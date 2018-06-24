@@ -41,7 +41,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
         if (!this.poolManagement._poolStarted) return;
 
         if ( !(socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL ||
-             socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER )){
+             socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0 )){
 
             return false;
 

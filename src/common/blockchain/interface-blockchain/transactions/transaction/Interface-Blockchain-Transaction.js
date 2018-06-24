@@ -159,14 +159,14 @@ class InterfaceBlockchainTransaction{
         if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
         if (typeof this.timeLock !== "number") throw {message: 'timeLock is empty', timeLock:this.timeLock};
 
-        if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
-        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x01) throw {message: "version is ivnalid", version: this.version};
+        if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
+        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
 
         if (this.nonce > 0xFFFF) throw {message: "nonce is ivnalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
 
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock, blockHeight: blockHeight };
-        if (this.timeLock - blockHeight > 100) throw { message: "timelock - blockHeight < 100", timelock : this.timelock };
+        if (this.timeLock - blockHeight > 100) throw { message: "timelock - blockHeight < 100", timeLock : this.timeLock };
 
         let txId = this._computeTxId();
         if (! BufferExtended.safeCompare(txId, this.txId ) ) throw {message: "txid don't match"};

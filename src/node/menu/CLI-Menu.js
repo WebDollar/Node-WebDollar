@@ -1,5 +1,4 @@
 const FileSystem = require('fs');
-const readline = require('readline');
 
 import consts from 'consts/const_global';
 import {Node} from '../../index.js';
@@ -8,6 +7,7 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
+import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 
 class CLI {
 
@@ -15,12 +15,6 @@ class CLI {
 
         if (process.env.BROWSER)
             return;
-
-        this.WEBD_CLI = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            prompt: 'WEBD_CLI:> '
-        });
 
         this._exitMenu = undefined;
 
@@ -31,7 +25,7 @@ class CLI {
     async _runMenu() {
 
         if (this._exitMenu === true) {
-            this.WEBD_CLI.close();
+            AdvancedMessages.WEBD_CLI.close();
             process.exit();
             return;
         }
@@ -92,7 +86,7 @@ class CLI {
             await Blockchain.loadWallet();
 
         this._showCommands();
-        this.WEBD_CLI.prompt();
+        AdvancedMessages.WEBD_CLI.prompt();
 
         this._exitMenu = false;
         await this._runMenu();
@@ -379,7 +373,7 @@ class CLI {
                     Blockchain.Mining.stopMining();
             });
 
-            await Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
+             Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
 
         }, false);
 
@@ -388,35 +382,60 @@ class CLI {
     async createMiningPool(){
 
         console.info('Create Mining Pool');
-        console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
-
-        let poolFee, poolName, poolWebsite;
-
-        if (await AdvancedMessages.confirm("Do you want to change the current pool settings?") ){
-
-            poolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
-
-            if (isNaN(poolFee) || poolFee < 0 || 100 < poolFee){
-                console.log("You have entered an invalid number:", poolFee);
-                return false;
-            }
-            else
-                console.log("Your fee is", poolFee);
-
-            poolName = await AdvancedMessages.input('Pool Name: ');
-            poolWebsite = await AdvancedMessages.input('Pool Website: ');
-
-        }
-
-
 
         await this._callCallbackBlockchainSync(async ()=>{
 
-            if (poolFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
-            if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
-            if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
+            await Blockchain.PoolManagement.setPoolStarted(false);
 
-            await Blockchain.PoolManagement.startPool(true);
+            let getNewLink = true;
+
+            console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
+
+            if (typeof Blockchain.PoolManagement.poolSettings.poolURL === "string" && Blockchain.PoolManagement.poolSettings.poolURL !== ''){
+
+                console.info('You have some settings for a pool: ', Blockchain.PoolManagement.poolSettings.poolName," ", Blockchain.PoolManagement.poolSettings.poolWebsite );
+                let response = await AdvancedMessages.confirm('Do you want to continue using the settings for : '+Blockchain.PoolManagement.poolSettings.poolURL);
+
+                if (response === true) getNewLink = false;
+            }
+
+            if (getNewLink){
+
+                let poolFee, poolName, poolWebsite, poolServers;
+
+
+                poolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
+
+                if (isNaN(poolFee) || poolFee < 0 || 100 < poolFee){
+                    console.log("You have entered an invalid number:", poolFee);
+                    return false;
+                }
+                else
+                    console.log("Your fee is", poolFee);
+
+                poolName = await AdvancedMessages.input('Pool Name: ');
+                poolWebsite = await AdvancedMessages.input('Pool Website: ');
+
+                let response = await AdvancedMessages.confirm('Do you want to use external pool servers?: ');
+
+                if (response){
+                    poolServers = await AdvancedMessages.input('Pool Servers (separated by comma): ');
+                    await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( true ) ;
+                } else {
+                    poolServers = await NodeServer.getServerHTTPAddress(true);
+                    await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( false ) ;
+                }
+
+
+                if (poolFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
+                if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
+                if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
+                if (poolServers !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
+
+            }
+
+            Blockchain.PoolManagement.startPool(true);
+
 
         }, true);
 
@@ -446,30 +465,17 @@ class CLI {
 
     }
 
-    question(message){
-
-        return new Promise ((resolve)=> {
-
-            console.info(message);
-            this.WEBD_CLI.question('', (answer)=>{
-                resolve(answer);
-            });
-
-        });
-
-    }
-
-
     async _callCallbackBlockchainSync(callbackBeforeServerInitialization, callbackAfterServerInitialization, synchronize=true ){
 
         if (!Blockchain._blockchainInitiated) {
 
             await Blockchain.createBlockchain("full-node", async () => {
 
+                await Node.NodeServer.startServer();
+
                 if (typeof callbackBeforeServerInitialization === "function")
                     await callbackBeforeServerInitialization();
 
-                await Node.NodeServer.startServer();
                 await Node.NodeClientsService.startService();
 
                 if (typeof callbackAfterServerInitialization === "function")

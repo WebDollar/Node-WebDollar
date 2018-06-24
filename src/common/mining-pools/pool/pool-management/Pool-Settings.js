@@ -23,6 +23,7 @@ class PoolSettings {
         this._poolServers = [];
         this._poolPOWValidationProbability = 0.10; //from 100
         this._poolActivated = false;
+        this._poolUsePoolServers = true;
 
         this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
         this.poolPublicKey = new Buffer(0);
@@ -139,18 +140,34 @@ class PoolSettings {
         if (!skipSaving)
             if (false === await this._db.save("pool_activated", this._poolActivated ? "true" : "false")) throw {message: "poolActivated couldn't be saved"};
 
-        StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers });
+        StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers, poolUsePoolServers: this._poolUsePoolServers  });
 
         if (useActivation)
             await this.poolManagement.setPoolStarted(newValue, true);
 
     }
 
-
-
     get poolActivated(){
         return this._poolActivated;
     }
+
+
+
+    async setPoolUsePoolServers(newValue, skipSaving = false){
+
+        PoolsUtils.validatePoolActivated(newValue);
+
+        this._poolUsePoolServers = newValue;
+
+        if (!skipSaving)
+            if (false === await this._db.save("pool_use_pool_servers", this._poolUsePoolServers ? "true" : "false")) throw {message: "poolUsePoolServers couldn't be saved"};
+
+    }
+
+    get poolUsePoolServers(){
+        return this._poolUsePoolServers;
+    }
+
 
 
 
@@ -264,6 +281,11 @@ class PoolSettings {
         else if (poolActivated === "false") poolActivated = false;
         else if (poolActivated === null) poolActivated = false;
 
+        let poolUsePoolServers = await this._db.get("pool_use_pool_servers", 30*1000, true);
+        if (poolUsePoolServers === "true") poolUsePoolServers = true;
+        else if (poolUsePoolServers === "false") poolUsePoolServers = false;
+        else if (poolUsePoolServers === null) poolUsePoolServers = true;
+
         if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated))
             return false;
 
@@ -272,6 +294,7 @@ class PoolSettings {
         await this.setPoolWebsite ( poolWebsite , true );
         await this.setPoolServers ( poolServers , true );
         await this.setPoolActivated( poolActivated , true , false);
+        await this.setPoolUsePoolServers( poolUsePoolServers, true , false);
 
         return true;
 

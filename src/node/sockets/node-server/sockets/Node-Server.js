@@ -1,7 +1,8 @@
 import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 import SocketAddress from "common/sockets/protocol/extend-socket/Socket-Address";
 
-let io = require('socket.io');
+const io = require('socket.io');
+const publicIp = require('public-ip');
 
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
@@ -13,7 +14,6 @@ import NodePropagationList from 'common/sockets/protocol/Node-Propagation-List'
 import Blockchain from "main-blockchain/Blockchain"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
-import NodeServerSocketAPI from "./Node-Server-Socket-API";
 
 const TIME_DISCONNECT_TERMINAL = 5*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
@@ -63,13 +63,24 @@ class NodeServer {
 
     }
 
-    getServerHTTPAddress() {
+    getServerHTTPAddress(getIP) {
 
         if ( !this.loaded || !NodeExpress.loaded ) return '';
         if (NodeExpress.port === 0) return '';
         if (NodeExpress.domain  === '') return '';
 
+        if ( getIP ){
+
+            return new Promise(async (resolve)=>{
+
+                resolve (  'http' + ( NodeExpress.SSL ? 's' : '') + '://' + await publicIp.v4() + ":" + NodeExpress.port );
+
+            })
+
+        }
+
         return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
+
 
     }
 

@@ -69,7 +69,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         //WEBD
         if (showUpdate)
             //optimization, but it doesn't work in browser
-            this.emitBalanceChangeEvent(address, (resultUpdate !== null ? node.getBalances.bind(node) : undefined), (resultUpdate !== null ? node.nonce : null) );
+            this.emitBalanceChangeEvent(address, (resultUpdate !== null ? node.getBalances.bind(node) : null), (resultUpdate !== null ? node.nonce : null) );
 
         //purging empty addresses
         if (!node.hasBalances()) {

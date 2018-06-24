@@ -31,7 +31,7 @@ class InterfaceBlockchainMiningWorkersList {
 
         for (let i = this._workersList.length-1; i >= 0; i--){
 
-            if ( this._workersList[i].dateLast !== undefined && ( time - this._workersList[i].dateLast.getTime() > 4000)  ){
+            if ( this._workersList[i].dateLast !== undefined && ( time - this._workersList[i].dateLast.getTime() > 10000)  ){
 
                 this.terminateWorker(this._workersList[i]);
                 this._workersList.splice(i, 1);
