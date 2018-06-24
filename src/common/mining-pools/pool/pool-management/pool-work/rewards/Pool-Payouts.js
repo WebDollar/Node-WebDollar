@@ -47,6 +47,8 @@ class PoolPayouts{
 
     async _doPayout(){
 
+        if (!Blockchain.synchronized) return;
+
         let blocksConfirmed = [];
         for (let i=0; i<this.poolData.blocksInfo.length; i++)
             if (this.poolData.blocksInfo[i].confirmed && !this.poolData.blocksInfo[i].payout)
