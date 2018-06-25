@@ -17,11 +17,7 @@ class PoolData {
         this.miners = [];
         this.blocksInfo = [];
 
-        setInterval(async ()=>{
-
-            await this.savePoolData();
-
-        }, 5000);
+        setTimeout( this.savePoolData.bind(this), 10000);
 
     }
 
@@ -338,13 +334,24 @@ class PoolData {
         }
     }
 
-    savePoolData(){
+    async savePoolData(){
 
-        if (!this.poolManagement.poolStarted) return true;
+        let answer = false;
 
-        let answer = this.saveMinersList();
-        answer = answer && this.saveBlocksInformation();
+        if (this.poolManagement.poolStarted) {
+            try {
 
+                answer = await this.saveMinersList();
+                answer = answer && (await this.saveBlocksInformation());
+
+
+            } catch (exception) {
+
+                console.error("SavePoolData: ", exception.message);
+            }
+        }
+
+        setTimeout( this.savePoolData.bind(this), 10000);
         return answer;
     }
 

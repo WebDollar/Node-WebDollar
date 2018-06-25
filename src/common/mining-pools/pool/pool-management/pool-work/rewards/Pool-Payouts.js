@@ -108,9 +108,8 @@ class PoolPayouts{
                         blockInformationMinerInstance.miner.rewardConfirmedOther += blockInformationMinerInstance.reward;
                         blockInformationMinerInstance.reward = 0;
                         return;
-                    }
-
-                    this._addAddressTo(blockInformationMinerInstance.address).amount += blockInformationMinerInstance.reward;
+                    } else
+                        this._addAddressTo(blockInformationMinerInstance.address).amount += blockInformationMinerInstance.reward;
 
                 });
 
@@ -119,11 +118,18 @@ class PoolPayouts{
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
-
                 let addressTo = this._findAddressTo(miner.address);
-                if ( (addressTo === null && miner.rewardConfirmedOther >= PAYOUT_MINIMUM) || (miner.rewardConfirmedOther > 0) )
-                    this._addAddressTo(miner.address).amount += miner.rewardConfirmedOther;
+                if (addressTo === null){
 
+                    if (miner.rewardConfirmedOther >= PAYOUT_MINIMUM)
+                        this._addAddressTo(miner.address).amount += miner.rewardConfirmedOther;
+
+                } else {
+
+                    if (miner.rewardConfirmedOther > 0)
+                        this._addAddressTo(miner.address).amount += miner.rewardConfirmedOther;
+
+                }
 
             });
 
