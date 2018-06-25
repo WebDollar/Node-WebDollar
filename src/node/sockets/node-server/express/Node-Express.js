@@ -502,12 +502,12 @@ class NodeExpress{
                 timestamp_raw  : Blockchain.blockchain.getTimeStamp(oBlock.height),
                 createdAtUTC   : oBlockTimestampUTC,
                 block_id       : oBlock.height,
-                from           : {trsx: [], addresses: [], amount: nInputSum  / WebDollarCoins.WEBD, amount_raw: nInputSum},
-                to             : {trsx: [], addresses: [], amount: nOutputSum / WebDollarCoins.WEBD, amount_raw: nOutputSum},
+                from           : {trxs: [], addresses: [], amount: nInputSum  / WebDollarCoins.WEBD, amount_raw: nInputSum},
+                to             : {trxs: [], addresses: [], amount: nOutputSum / WebDollarCoins.WEBD, amount_raw: nOutputSum},
             };
 
             oTransaction.from.addresses.forEach((oAddress) => {
-                aTransaction.from.trsx.push({
+                aTransaction.from.trxs.push({
                     trx_from_address   : BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oAddress.unencodedAddress)),
                     trx_from_pub_key   : oAddress.publicKey.toString("hex"),
                     trx_from_signature : oAddress.signature.toString("hex"),
@@ -519,7 +519,7 @@ class NodeExpress{
             });
 
             oTransaction.to.addresses.forEach((oAddress) => {
-                aTransaction.to.trsx.push({
+                aTransaction.to.trxs.push({
                     trx_to_address   : BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oAddress.unencodedAddress)),
                     trx_to_amount    : oAddress.amount / WebDollarCoins.WEBD,
                     trx_to_amount_raw: oAddress.amount
@@ -532,8 +532,6 @@ class NodeExpress{
         }
 
         return {
-            _id            : oBlock.height,
-            _rev           : '',
             id             : oBlock.height,
             block_id       : oBlock.height,
             hash           : oBlock.hash.toString('hex'),
