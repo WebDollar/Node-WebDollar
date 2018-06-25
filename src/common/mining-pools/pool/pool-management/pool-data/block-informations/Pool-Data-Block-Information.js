@@ -211,19 +211,19 @@ class PoolDataBlockInformation {
 
         //formula no 1
 
-        // if (this.poolManagement.poolData.blocksInfo.length !== 0 && this.poolManagement.poolData.lastBlockInformation !== this) return;
-        //
-        // if (this.bestHash === undefined) return 40;
-        //
-        // let dTime = (new Date().getTime() - this.date)/1000;
-        // this.timeRemaining =  Math.max(0, Math.floor( new BigNumber ( "0x"+ this.bestHash.toString("hex")) .dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") )) .multipliedBy( dTime ).toNumber() - dTime));
+        if (this.poolManagement.poolData.blocksInfo.length !== 0 && this.poolManagement.poolData.lastBlockInformation !== this) return;
+
+        if (this.bestHash === undefined) return 40;
+
+        let dTime = (new Date().getTime() - this.date)/1000;
+        this.timeRemaining =  Math.max(0, Math.floor( new BigNumber ( "0x"+ this.bestHash.toString("hex")) .dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") )) .multipliedBy( dTime ).toNumber() - dTime));
 
         //formula no 2
 
-        if (this.poolManagement.poolStatistics.poolHashes <= 0) return 40;
-        if (Blockchain.blockchain.blocks.networkHashRate <= 0) return 40;
-
-        this.timeRemaining = Math.max(0, Math.floor(  new BigNumber (  Blockchain.blockchain.blocks.networkHashRate  ).dividedBy( this.poolManagement.poolStatistics.poolHashes ).multipliedBy( consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ).toNumber()  ) )
+        // if (this.poolManagement.poolStatistics.poolHashes <= 0) return 40;
+        // if (Blockchain.blockchain.blocks.networkHashRate <= 0) return 40;
+        //
+        // this.timeRemaining = Math.max(0, Math.floor(  new BigNumber (  Blockchain.blockchain.blocks.networkHashRate  ).dividedBy( this.poolManagement.poolStatistics.poolHashes ).multipliedBy( consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ).toNumber()  ) )
 
     }
 
