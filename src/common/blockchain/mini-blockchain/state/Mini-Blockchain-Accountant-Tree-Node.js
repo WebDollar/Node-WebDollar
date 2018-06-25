@@ -121,7 +121,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         // Converting balances into Hex Object fo
         for (let i = 0; i < this.balances.length; i++)
-            list[ "0x"+this.balances[i].id.toString("hex") ] = this.balances[i].amount.toString();
+            list[ "0x"+this.balances[i].id.toString("hex") ] = this.balances[i].amount;
 
 
         return list;
@@ -243,10 +243,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             if (this.isLeafBasedOnParents()){
 
-                this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 byte
+                this.nonce = Serialization.deserializeNumber2Bytes( buffer, offset ); //2 byte
                 offset += 2;
 
-                let balancesLength = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 1) ); //1 byte
+                let balancesLength = Serialization.deserializeNumber1Bytes( buffer, offset ); //1 byte
                 offset += 1;
 
                 this.balances = []; // initialization

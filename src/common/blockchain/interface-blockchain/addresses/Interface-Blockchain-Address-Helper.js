@@ -8,7 +8,6 @@ import BufferExtended from 'common/utils/BufferExtended';
 
 //video tutorial https://asecuritysite.com/encryption/base58
 
-import CLI from 'node/menu/CLI-Menu';
 import consts from 'consts/const_global';
 import AdvancedMessages from "node/menu/Advanced-Messages"
 
@@ -405,12 +404,7 @@ class InterfaceBlockchainAddressHelper{
 
         return new Promise( async (resolve) => {
 
-            let answer;
-
-            if (process.env.BROWSER)
-                answer =  prompt(message||"Please enter your last password (12 words separated by space):");
-            else
-                answer =  await CLI.question(message||"Please enter your last password (12 words separated by space):");
+            let answer = await AdvancedMessages.input("Please enter your last password (12 words separated by space):");
 
             let oldPassword = answer.trim().split(' ');
 

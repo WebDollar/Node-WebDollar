@@ -38,6 +38,7 @@ class NodesWaitlistConnecting {
         };
 
         setInterval(this._calculateNumberOfConnections.bind(this), 5000);
+
         this._calculateNumberOfConnections();
 
     }

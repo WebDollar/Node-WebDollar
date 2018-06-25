@@ -9,6 +9,7 @@ import BufferExtended from "common/utils/BufferExtended";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List';
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 
 class Applications {
 
@@ -25,6 +26,7 @@ class Applications {
         this.NodesList = NodesList;
         this.NodesWaitlist = NodesWaitlist;
 
+        this.WebDollarCrypto = WebDollarCrypto;
 
         this.CONSTS = consts;
 

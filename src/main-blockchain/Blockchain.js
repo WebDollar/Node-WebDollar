@@ -120,30 +120,28 @@ class Blockchain{
 
         }
 
-        let blockchainLoaded = true;
-
-        if (synchronize)
-            //loading the blockchain
-            blockchainLoaded = await this.loadBlockchain();
-
         if (typeof afterBlockchainLoadCallback === "function")
-            afterBlockchainLoadCallback();
+            await afterBlockchainLoadCallback();
+
+        //loading the blockchain
+        await this.Chain.loadBlockchain();
 
         if (synchronize){
 
             await this.Agent.initializeStartAgentOnce();
 
-            if (process.env.BROWSER || !blockchainLoaded) {
-                //it tries synchronizing multiple times
-                await this.synchronizeBlockchain(true);
-            } else {
-                this.synchronized = true;
+            if (this.Agent.consensus && !consts.DEBUG)
+                await this.synchronizeBlockchain(true); //it tries synchronizing multiple times
+            else {
+                this.synchronized = true; //consider it as synchronized
+                this.startMining();
+                StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"});
             }
 
         }
 
         if (typeof afterSynchronizationCallback === "function")
-            afterSynchronizationCallback();
+            await afterSynchronizationCallback();
 
         this.loaded = true;
     }
@@ -157,16 +155,6 @@ class Blockchain{
         this.Mining.startMining();
     }
 
-    async loadBlockchain(){
-
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Loading"});
-
-        let chainLoaded = await this.Chain.loadBlockchain();
-
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
-        return chainLoaded;
-
-    }
 
     /**
      * it tries synchronizing multiple times
@@ -225,13 +213,15 @@ class Blockchain{
 
     }
 
+    get poolsLoaded(){
+        return this._poolsLoaded;
+    }
+
+
     get loaded(){
         return this._loaded;
     }
 
-    get poolsLoaded(){
-        return this._poolsLoaded;
-    }
 
     set loaded(newValue){
         this._loaded = newValue;
@@ -304,8 +294,6 @@ class Blockchain{
         this._onPoolsInitializedResolver(pool, minerPool, serverPool);
 
         await StatusEvents.emit("main-pools/status", { message: "Pool Initialized"});
-
-        console.log("333333333");
 
         await this._startMiningPools();
 

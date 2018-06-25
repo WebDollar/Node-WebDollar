@@ -14,8 +14,8 @@ class PoolConnectedServersProtocol extends PoolProtocolList{
 
         this.poolManagement = poolManagement;
 
-        this.connectedServersPool = [];
-        this.list = this.connectedServersPool;
+        this.connectedServersPools = [];
+        this.list = this.connectedServersPools;
 
     }
 
@@ -27,11 +27,13 @@ class PoolConnectedServersProtocol extends PoolProtocolList{
 
     async startPoolConnectedServersProtocol(){
 
+        if (!this.poolManagement.poolSettings.poolUsePoolServers) return false;
+
         for (let i=0; i<NodesList.nodes.length; i++)
-            await this._subscribePoolConnectedServer(NodesList.nodes[i]);
+            await this._subscribePoolConnectedServer(NodesList.nodes[i].socket);
 
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
-            await this._subscribePoolConnectedServer(nodesListObject)
+            await this._subscribePoolConnectedServer(nodesListObject.socket)
         });
 
         NodesList.emitter.on("nodes-list/disconnected", (nodesListObject) => {
@@ -41,11 +43,10 @@ class PoolConnectedServersProtocol extends PoolProtocolList{
 
     }
 
-    async _subscribePoolConnectedServer(nodesListObject){
+    async _subscribePoolConnectedServer(socket){
 
-        let socket = nodesListObject.socket;
-
-        if (!this.poolManagement._poolStarted) return;
+        if (! this.poolManagement._poolStarted) return;
+        if (this.poolManagement.poolSettings.poolUsePoolServers) return
 
         try{
 
@@ -149,6 +150,8 @@ class PoolConnectedServersProtocol extends PoolProtocolList{
         this.addElement(socket);
 
         StatusEvents.emit("pools/servers-connections", {message: "Server Removed"});
+
+         this.poolManagement.poolProtocol.poolConnectedMinersProtocol._subscribePoolConnectedMiners(socket);
 
     }
 

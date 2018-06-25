@@ -43,9 +43,8 @@ class PoolData {
 
         let blockInformation = this.lastBlockInformation;
 
-        for (let i=0; i<blockInformation.blockInformationMinersInstances.length; i++){
+        for (let i=0; i<blockInformation.blockInformationMinersInstances.length; i++)
             blockInformation.blockInformationMinersInstances[i].calculateReward();
-        }
 
         return true;
     }
@@ -109,6 +108,31 @@ class PoolData {
         return blockInformation;
     }
 
+    findBlockInformation(blockInformation){
+
+        for (let i=0; i<this.blocksInfo.length; i++)
+            if (blockInformation === this.blocksInfo[i])
+                return i;
+
+        return -1;
+
+    }
+
+    deleteBlockInformationByIndex(index){
+        this.blocksInfo[index].destroyPoolDataBlockInformation(  );
+        this.blocksInfo.splice(index, 1);
+    }
+
+    deleteBlockInformation(blockInformation){
+
+        let position = this.findBlockInformation(blockInformation);
+        if (position === -1) return null;
+
+        blockInformation.destroyPoolDataBlockInformation(  );
+
+        this.blocksInfo.splice(position, 1);
+    }
+
 
     
     /**
@@ -154,8 +178,11 @@ class PoolData {
             this.miners = [];
             for (let i = 0; i < numMiners; ++i) {
 
-                let miner = new PoolDataMiner(0,undefined, []);
+                let miner = new PoolDataMiner(this, 0, undefined, undefined);
                 offset = miner.deserializeMiner(buffer, offset );
+
+                if (miner.instances.length)
+                    this.miners.push(miner);
 
             }
 
@@ -191,8 +218,13 @@ class PoolData {
                 let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined);
                 offset = blockInformation.deserializeBlockInformation(buffer, offset );
 
-                this.blocksInfo.push(blockInformation);
+                if (blockInformation.blockInformationMinersInstances.length > 0)
+                    this.blocksInfo.push(blockInformation);
 
+            }
+
+            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block !== undefined ){
+                this.addBlockInformation();
             }
 
             return true;

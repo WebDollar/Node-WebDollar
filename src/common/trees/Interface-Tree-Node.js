@@ -89,7 +89,7 @@ class InterfaceTreeNode {
         offset = offset || 0;
 
 
-        let valueLength = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 2));
+        let valueLength = Serialization.deserializeNumber2Bytes( buffer, offset );
         offset += 2;
 
         let value = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, valueLength));
@@ -111,7 +111,7 @@ class InterfaceTreeNode {
             if (includeEdges) {
 
                 //1 byte
-                let length = Serialization.deserializeNumber(buffer[offset]);
+                let length = Serialization.deserializeNumber1Bytes(buffer, offset);
 
                 for (let i = 0; i < length; i++) {
 

@@ -204,8 +204,6 @@ consts.MINING_POOL_STATUS = {
 
 consts.MINING_POOL = {
 
-    BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
-
     MINING_POOL_STATUS : (process.env.MINING_POOL_STATUS || consts.MINING_POOL_STATUS.MINING_POOL_SOLO),
 
     MINING:{
@@ -215,15 +213,14 @@ consts.MINING_POOL = {
 
 };
 
-
 consts.SETTINGS = {
 
     UUID: uuid.v4(),
 
     NODE: {
 
-        VERSION: "1.135.1",
-        VERSION_COMPATIBILITY: "1.135.1",
+        VERSION: "1.135.2",
+        VERSION_COMPATIBILITY: "1.134.0",
         PROTOCOL: "WebDollar",
         SSL: true,
 
@@ -237,6 +234,8 @@ consts.SETTINGS = {
         WAITLIST: {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
             INTERVAL: 2 * 1000,                         //miliseconds
+
+            BLOCKED_NODES: [ ], //addresses that will be blocked example: "domain.com"
         },
 
         SIGNALING: {
@@ -356,6 +355,8 @@ if ( consts.DEBUG === true ){
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
     consts.SETTINGS.NODE.PORT = 9095;
+
+    consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
         "addr": ["http://webdollar.ddns.net:9095"],

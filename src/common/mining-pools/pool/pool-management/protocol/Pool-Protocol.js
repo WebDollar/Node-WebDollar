@@ -50,8 +50,6 @@ class PoolProtocol {
 
         let socket = nodesListObject.socket;
 
-
-
     }
 
     _unsubscribePool(nodesListObject) {

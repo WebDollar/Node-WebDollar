@@ -29,7 +29,7 @@ class NodeSignalingServerProtocol {
                 let acceptWebPeers = false;
                 if (typeof data.acceptWebPeers === "boolean") acceptWebPeers = data.acceptWebPeers;
 
-                NodeSignalingServerService.registerSocketForSignaling(socket, acceptWebPeers);
+                aNodeSignalingServerService.registerSocketForSignaling(socket, acceptWebPeers);
 
             } catch (exception){
 

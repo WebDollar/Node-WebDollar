@@ -7,6 +7,7 @@ import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import DownloadManager from "common/utils/helpers/Download-Manager"
 import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain";
+import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
 const EventEmitter = require('events');
 
@@ -59,6 +60,11 @@ class NodesWaitlist {
         if ( typeof addresses === "string" || !Array.isArray(addresses) ) addresses = [addresses];
 
 
+        //avoid connecting to other nodes
+        if (!Blockchain.Agent.consensus && nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER )
+            return;
+
+
         let sckAddresses = [];
         let waitListFound = null;
 
@@ -69,6 +75,10 @@ class NodesWaitlist {
 
                 let sckAddress = SocketAddress.createSocketAddress(addresses[i], port);
                 if (sckAddress.address.indexOf("192.168") === 0 && !consts.DEBUG ) continue;
+
+                //check blocked addresses
+                for (let i=0; i<consts.SETTINGS.PARAMS.WAITLIST.BLOCKED_NODES.length; i++)
+                    if (sckAddress.address.indexOf(consts.SETTINGS.PARAMS.WAITLIST.BLOCKED_NODES[i])) continue;
 
                 //it if is a fallback, maybe it requires SSL
                 if ( nodeType === NODE_TYPE.NODE_TERMINAL && process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL && !consts.DEBUG )  continue;

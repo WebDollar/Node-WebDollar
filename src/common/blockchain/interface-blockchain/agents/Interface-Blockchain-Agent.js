@@ -76,17 +76,6 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         this._initializeProtocol();
 
-        NodesList.emitter.on("nodes-list/disconnected", async (result) => {
-
-            if (NodesList.nodes.length === 0) { //no more sockets, maybe I no longer have internet
-
-                console.warn("################### RESYNCHRONIZATION STARTED ##########");
-                Blockchain.synchronizeBlockchain();
-
-            }
-
-        });
-
 
         if (!this.light)
             NodesList.emitter.on("nodes-list/connected", async (result) => {
@@ -228,6 +217,8 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
     get status(){
         return this._status;
     }
+
+
 
 
 }

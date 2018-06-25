@@ -310,8 +310,7 @@ class InterfaceBlockchainFork {
 
             //TODO use the revertActions to revert the process
 
-            //accountant tree
-
+            //show information about Transactions Hash
             if (consts.DEBUG) {
 
                 console.log("accountant tree", this.blockchain.accountantTree.root.hash.sha256.toString("hex"));

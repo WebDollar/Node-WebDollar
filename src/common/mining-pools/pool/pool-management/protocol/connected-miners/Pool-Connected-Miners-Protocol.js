@@ -26,24 +26,22 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
     async startPoolConnectedMinersProtocol(){
 
         for (let i=0; i<NodesList.nodes.length; i++)
-            await this._subscribePoolConnectedMiners(NodesList.nodes[i]);
+            await this._subscribePoolConnectedMiners(NodesList.nodes[i].socket);
 
         NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
-            await this._subscribePoolConnectedMiners(nodesListObject)
+            await this._subscribePoolConnectedMiners(nodesListObject.socket)
         });
 
 
 
     }
 
-    async _subscribePoolConnectedMiners(nodesListObject){
-
-        let socket = nodesListObject.socket;
+    async _subscribePoolConnectedMiners(socket){
 
         if (!this.poolManagement._poolStarted) return;
 
-        if ( !(socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL ||
-             socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER && socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER )){
+        if ( !( (socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0) ||
+                (socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0 )) ){
 
             return false;
 
@@ -68,11 +66,6 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
                 if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
-                //validate minerPool signature
-                if ( !Buffer.isBuffer( data.messageSignature ) || data.messageSignature.length < 10) throw {message: "messageSignature is invalid"};
-                if ( !ed25519.verify(data.messageSignature, data.message, data.minerPublicKey)) throw {message: "messageSignature doesn't validate message"}
-
-
                 // save minerPublicKey
                 let miner = this.poolManagement.poolData.getMiner(unencodedAddress);
 
@@ -94,11 +87,13 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let confirmation = await socket.node.sendRequestWaitOnce("mining-pool/hello-pool/answer"+suffix, {
                     result: true,
                     signature: signature,
-                    potentialReward: (blockInformationMinerInstance !== null ? blockInformationMinerInstance.reward : 0 ),
-                    confirmedReward: minerInstance.miner.calculateConfirmedReward(),
+
+                    reward: minerInstance.miner.rewardTotal,
+                    confirmed: minerInstance.miner.rewardConfirmedTotal,
 
                     h:this.poolManagement.poolStatistics.poolHashes,
-                    m: this.poolManagement.poolStatistics.poolMinersOnline.length
+                    m: this.poolManagement.poolStatistics.poolMinersOnline.length,
+                    t: this.poolManagement.poolStatistics.poolTimeRemaining,
 
                 }, "confirmation" );
 
@@ -116,11 +111,13 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     }
 
                 } catch (exception){
-
+                    console.error("mining-pool/hello-pool/answer/confirmation", exception);
+                    console.error("exception", exception)
                 }
 
             } catch (exception){
 
+                console.log("mining-pool/hello-pool"+"/answer", exception);
                 socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {result: false, message: exception.message, } );
             }
 
@@ -155,7 +152,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 work.serialization = undefined; //don't send the data 2 times
 
-                socket.node.sendRequest("mining-pool/get-work/answer"+suffix, {result: true, work: work, signature: signature, h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length  } )
+                socket.node.sendRequest("mining-pool/get-work/answer"+suffix, {result: true, work: work, signature: signature,
+                    h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining,  } )
 
             } catch (exception){
 
@@ -195,8 +193,9 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 newWork.serialization = undefined;
 
 
-
-                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, potentialReward: answer.potentialReward, confirmedReward: answer.confirmedReward, newWork: newWork, signature: signature, h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length } ); //the new reward
+                //the new reward
+                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, newWork: newWork, signature: signature,
+                    h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining } );
 
             } catch (exception){
                 socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: false, message: exception.message } )
@@ -240,7 +239,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
                 if (miner === null) throw {message: "mine was not found"};
 
-                let answer = await this.poolManagement.sendReward(data.minerAddress);
+//                let answer = await this.poolManagement.sendReward(data.minerAddress);
+                let answer = false;
 
                 socket.node.sendRequest("mining-pool/request-reward"+"/answer", {result: answer } )
 

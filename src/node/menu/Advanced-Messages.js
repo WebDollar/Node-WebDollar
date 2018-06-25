@@ -1,6 +1,22 @@
-import CLI from "./CLI-Menu";
+let CLI, readline;
+
+if (!process.env.BROWSER){
+    readline = require('readline');
+}
 
 class AdvancedMessages{
+
+    constructor(){
+
+        if (!process.env.BROWSER){
+            this.WEBD_CLI = readline.createInterface({
+                input: process.stdin,
+                output: process.stdout,
+                prompt: 'WEBD_CLI:> '
+            });
+        }
+
+    }
 
     alert(param){
 
@@ -11,22 +27,22 @@ class AdvancedMessages{
     }
 
 
-    async input(message){
+    input(message){
 
         if (process.env.BROWSER)
             return confirm(message);
         else
-            return await CLI.question(message);
+            return this._questionCLI(message);
     }
 
     async confirm(message){
 
         if (process.env.BROWSER)
-            return confirm(message);
+            return await confirm(message);
         else {
 
             while (1===1) {
-                let answer = await CLI.question(message + "  y/n").toLowerCase();
+                let answer = (await this._questionCLI(message + "  y/n")).toLowerCase();
 
                 if (answer === 'y') return true;
                 else if (answer === 'n') return false;
@@ -53,11 +69,27 @@ class AdvancedMessages{
 
     log(cliMsg, browserMsg) {
 
-       if (process.env.BROWSER)
-           console.info(browserMsg || cliMsg);
-       else
-           console.info(cliMsg);
+        if (process.env.BROWSER)
+            console.info(browserMsg || cliMsg);
+        else
+            console.info(cliMsg);
     }
+
+
+    _questionCLI(message){
+
+        return new Promise ((resolve)=> {
+
+            console.info(message);
+            this.WEBD_CLI.question('', (answer)=>{
+                resolve(answer);
+            });
+
+        });
+
+    }
+
+
 
 }
 

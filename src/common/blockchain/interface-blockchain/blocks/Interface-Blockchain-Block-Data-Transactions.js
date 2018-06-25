@@ -19,11 +19,20 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
+    confirmTransactions(){
+
+        this.transactions.forEach((transaction) => {
+            transaction.confirmed = true;
+            this.blockData.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+        });
+
+    }
+
     destroyBlockDataTransactions(){
 
         for (let i=0; i<this.transactions.length; i++) {
 
-            if ( !Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i]) )
+            if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i]) === -1 )
                 this.transactions[i].destroyTransaction();
 
             this.transactions[i] = undefined;
@@ -116,6 +125,7 @@ class InterfaceBlockchainBlockDataTransactions {
         let list = [ Serialization.serializeToFixedBuffer( 32, this.hashTransactions ) ];
 
         if ( !onlyHeader  && !this.blockData._onlyHeader ) {
+
             list.push(Serialization.serializeNumber4Bytes(this.transactions.length));
 
             for (let i = 0; i < this.transactions.length; i++)
@@ -133,7 +143,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
         if (!onlyHeader && !this.blockData._onlyHeader) {
 
-            let length = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 4)); //TODO change  2 elements
+            let length = Serialization.deserializeNumber4Bytes( buffer, offset ); //TODO change  2 elements
             offset += 4 ;
 
             for (let i = 0; i < length; i++) {

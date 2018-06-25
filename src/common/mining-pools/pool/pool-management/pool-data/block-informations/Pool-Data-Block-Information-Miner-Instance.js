@@ -16,11 +16,11 @@ class PoolDataBlockInformationMinerInstance {
 
         this.reward = 0;
 
-        this.workHash = undefined;
+        this._workHash = undefined;
         this.workHashNonce = undefined;
         this.workBlock = undefined;
 
-        this.workDifficulty = undefined;
+        this._workDifficulty = undefined;
 
         if ( minerInstanceTotalDifficulty === undefined )
             minerInstanceTotalDifficulty = BigNumber(0);
@@ -60,39 +60,64 @@ class PoolDataBlockInformationMinerInstance {
 
         // target     =     maximum target / difficulty
         // difficulty =     maximum target / target
-        this.workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ this.workHash.toString("hex") ) );
+        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ this._workHash.toString("hex") ) );
 
     }
 
-    adjustDifficulty(difficulty){
+    adjustDifficulty(difficulty, useDeltaTime = false ){
+
+        if (difficulty === undefined) difficulty = this._workDifficulty;
 
         this.minerInstanceTotalDifficulty  = this.minerInstanceTotalDifficulty.plus(difficulty);
 
         this.blockInformation.adjustBlockInformationDifficulty(difficulty);
 
-        this.calculateReward();
+        this.calculateReward(useDeltaTime );
 
     }
 
-    calculateReward(){
+    calculateReward(useDeltaTime = false){
 
-        this.reward = this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).toNumber()  * BlockchainMiningReward.getReward( Blockchain.blockchain.blocks.length-1 ) * (1-this.poolManagement.poolSettings.poolFee);
+        this.prevReward = this.reward;
+
+        let height;
+
+        if ( this.blockInformation.block !== undefined ) height = this.blockInformation.block.height;
+        else if ( this.workBlock !== undefined) height = this.workBlock.height;
+        else height = Blockchain.blockchain.blocks.length-1;
+
+        let ratio = 1;
+
+        if (useDeltaTime) {
+
+            let diff = (new Date().getTime() - this.blockInformation.date)/1000;
+
+            if (diff > 0 && this.blockInformation._timeRemaining > 0)
+                ratio = new BigNumber(diff).dividedBy( diff + this.blockInformation._timeRemaining );
+        }
+
+        this.reward = Math.floor ( this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).multipliedBy(ratio).multipliedBy( BlockchainMiningReward.getReward( height ) - consts.MINING_POOL.MINING.FEE_THRESHOLD ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber());
+
+        this.minerInstance.miner.rewardTotal += this.reward - this.prevReward;
+
+        return this.reward;
+    }
+
+    cancelReward(){
+
+        this.minerInstance.miner.rewardTotal -= this.reward;
+        this.reward = 0;
 
     }
 
     serializeBlockInformationMinerInstance() {
 
-        let list = [];
-
         return Buffer.concat([
 
-            this.minerInstance.publicKey,
-            Serialization.serializeNumber7Bytes(this.reward),
+            this.minerInstance.publicKey || new Buffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH),
             Serialization.serializeBigNumber(this.minerInstanceTotalDifficulty),
 
         ]);
-
-        return Buffer.concat(list);
 
     }
 
@@ -103,14 +128,38 @@ class PoolDataBlockInformationMinerInstance {
 
         this.minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(publicKey);
 
-        this.reward = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
-        offset += 7;
-
         let answer = Serialization.deserializeBigNumber(buffer, offset);
         this.minerInstanceTotalDifficulty = answer.number;
-        this.offset = answer.newOffset;
+        offset = answer.newOffset;
 
         return offset;
+
+    }
+
+    get address(){
+        return this.minerInstance.miner.address;
+    }
+
+    get minerAddress(){
+        return this.address;
+    }
+
+    get miner(){
+        return this.minerInstance.miner;
+    }
+
+    set workHash(newValue){
+
+        this._workHash = newValue;
+
+        if (this.blockInformation.bestHash === undefined || newValue.compare(this.blockInformation.bestHash) <= 0)
+            this.blockInformation.bestHash = newValue;
+
+    }
+
+    get workHash(){
+
+        return this._workHash;
 
     }
 

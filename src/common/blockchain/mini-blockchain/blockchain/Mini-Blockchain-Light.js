@@ -272,7 +272,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
      * Load blocks and check the Accountant Tree
      * @returns boolean
      */
-    async loadBlockchain(){
+    async _loadBlockchain(){
 
         if (process.env.BROWSER)
             return true;
@@ -299,7 +299,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
             this._difficultyNotValidated = false;
 
-            if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, answer.diffIndex -1 )))
+            if (! (await this.inheritBlockchain.prototype._loadBlockchain.call(this, answer.diffIndex -1 )))
                 throw {message: "Problem loading the blockchain"};
 
             //check the accountant Tree if matches

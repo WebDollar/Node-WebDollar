@@ -6,33 +6,30 @@ class MinerPoolReward{
 
         this.minerPoolManagement = minerPoolManagement;
 
-        this._potentialReward = 0;
+        this._totalReward = 0;
         this._confirmedReward = 0;
 
     }
 
-    set potentialReward(newValue){
+    set totalReward(newValue){
 
-        if (this._potentialReward === newValue || typeof newValue !== "number") return;
-        this._potentialReward = newValue;
+        if (this._totalReward === newValue || typeof newValue !== "number") return;
+        this._totalReward = parseInt( newValue);
 
-        StatusEvents.emit("miner-pool/potential-reward", { potentialReward: newValue });
-
-        console.info("Pool Potential Reward: ", newValue/10000);
+        StatusEvents.emit("miner-pool/total-reward", { totalReward: newValue });
 
     }
 
-    get potentialReward(){
-        return this._potentialReward;
+    get totalReward(){
+        return this._totalReward;
     }
 
     set confirmedReward(newValue){
 
         if (this._confirmedReward === newValue || typeof newValue !== "number") return;
-        this._confirmedReward = newValue;
+        this._confirmedReward = parseInt( newValue );
 
-        StatusEvents.emit("miner-pool/confirmed-reward", { confirmedReward: newValue });
-        console.info("Pool Confirmed Reward: ", newValue/10000);
+        StatusEvents.emit("miner-pool/confirmed-reward", { confirmedReward: this._confirmedReward });
 
     }
 

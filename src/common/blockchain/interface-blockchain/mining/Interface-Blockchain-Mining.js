@@ -210,11 +210,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     NodeBlockchainPropagation.propagateLastBlockFast( block );
 
                     //confirming transactions
-                    block.data.transactions.transactions.forEach((transaction) => {
-                        transaction.confirmed = true;
-
-                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
-                    });
+                    block.data.transactions.confirmTransactions();
 
                 } catch (exception){
                     console.error("Mining processBlocksSempahoreCallback raised an error ",block.height, exception);

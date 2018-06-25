@@ -40,9 +40,9 @@ class RevertActions {
                     this.blockchain.blocks.spliceBlocks(action.height, true);
 
                     if (this.blockchain.agent.light) {
-                        this.blockchain.lightPrevHashPrevs.spliceBlocks(action.height, true);
-                        this.blockchain.lightPrevTimeStamps.spliceBlocks(action.height, true);
-                        this.blockchain.lightPrevDifficultyTargets.spliceBlocks(action.height, true);
+                        this.blockchain.lightPrevHashPrevs.splice(action.height);
+                        this.blockchain.lightPrevTimeStamps.splice(action.height);
+                        this.blockchain.lightPrevDifficultyTargets.splice(action.height);
 
                         this.blockchain.lightPrevHashPrevs[action.height] = this.blockchain.blocks[action.height-1].hash;
                         this.blockchain.lightPrevTimeStamps[action.height] = this.blockchain.blocks[action.height-1].timeStamp;

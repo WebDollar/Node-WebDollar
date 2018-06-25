@@ -26,7 +26,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
      * @param tokenId
      * @returns {*}
      */
-    updateAccount(address, value, tokenId, revertActions, showUpdate) {
+    updateAccount(address, value, tokenId, revertActions, showUpdate = true) {
 
         if (tokenId === undefined || tokenId === '' || tokenId === null) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
@@ -69,9 +69,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         //WEBD
         if (showUpdate)
             //optimization, but it doesn't work in browser
-            this.emitBalanceChangeEvent(address, () => {
-                return (resultUpdate !== null ? node.getBalances() : null);
-            });
+            this.emitBalanceChangeEvent(address, (resultUpdate !== null ? node.getBalances.bind(node) : null), (resultUpdate !== null ? node.nonce : null) );
 
         //purging empty addresses
         if (!node.hasBalances()) {

@@ -6,6 +6,7 @@ import PoolProtocol from "./protocol/Pool-Protocol"
 import PoolStatistics from "./pool-statistics/Pool-Statistics";
 import StatusEvents from "common/events/Status-Events";
 import Blockchain from "main-blockchain/Blockchain";
+import PoolRewardsManagement from "./pool-work/rewards/Pool-Rewards-Management";
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,
@@ -24,14 +25,13 @@ class PoolManagement{
         this.poolWorkManagement = new PoolWorkManagement( this, blockchain );
         this.poolProtocol = new PoolProtocol( this );
         this.poolStatistics = new PoolStatistics( this );
+        this.poolData = new PoolData(this, databaseName);
+
+        this.poolRewardsManagement = new PoolRewardsManagement(this, this.poolData, blockchain);
 
         this._poolInitialized = false;
         this._poolOpened = false;
         this._poolStarted = false;
-
-        // this.blockchainReward = BlockchainMiningReward.getReward();
-
-        this.poolData = new PoolData(this, databaseName);
 
     }
 
@@ -42,10 +42,10 @@ class PoolManagement{
         let answer = await this.poolSettings.initializePoolSettings(poolFee);
         console.info("The url is just your domain: "+ this.poolSettings.poolURL);
 
-        if (!answer ){
+        if (!answer )
             throw {message: "Pool Couldn't be started"};
-            return false;
-        }
+
+        answer = await this.poolStatistics.initializePoolStatistics();
 
         this.poolInitialized = true;
 
@@ -53,10 +53,10 @@ class PoolManagement{
 
     }
 
-    async startPool( forceStartMinerPool = false ){
+    async startPool( forceStartPool = false ){
 
         if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
-            return await this.setPoolStarted(true, forceStartMinerPool);
+            return await this.setPoolStarted(true, forceStartPool);
         else
             console.error("Couldn't start the Pool because the poolURL is empty");
 
@@ -80,27 +80,14 @@ class PoolManagement{
     }
 
     /**
-     * Do a transaction from reward wallet to miner's address
-     */
-    static sendReward(miner) {
-
-        let minerAddress = miner.address;
-        let reward = miner.reward;
-
-        //TODO: Do the transaction
-
-        //TODO: clear the poolTransaction
-
-        return true;
-    }
-
-    /**
      * Send rewards for miners and reset rewards from storage
      */
-    async sendRewardsToMiners() {
-        for (let i = 0; i < this.poolData.miners.length; ++i)
-            await this.sendReward(this.poolData.miners[i]);
+    sendRewardsToMiners() {
+        return this.poolRewardsManagement.poolPayouts.doPayout();
     }
+
+
+
 
     get poolOpened(){
         return this._poolOpened;
@@ -142,10 +129,12 @@ class PoolManagement{
             await this.poolSettings.setPoolActivated(value);
 
             if (value) {
-                await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
                 this.poolStatistics.startInterval();
                 this.poolWorkManagement.poolWork.startGarbageCollector();
                 await this.poolProtocol._startPoolProtocol();
+
+                await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
+
             }
             else {
                 await this.poolProtocol._stopPoolProtocol();

@@ -30,7 +30,7 @@ class InterfaceRadixTreeEdge extends InterfaceTreeEdge {
 
     deserializeEdge(buffer, offset, createNewNode){
 
-        let labelLength = Serialization.deserializeNumber(buffer[offset]);
+        let labelLength = Serialization.deserializeNumber1Bytes(buffer, offset);
         offset +=1;
 
         this.label =  BufferExtended.substr(buffer, offset, labelLength);

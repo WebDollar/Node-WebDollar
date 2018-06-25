@@ -1,64 +1,31 @@
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
-import InterfaceBlockchainBlocks from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Blocks'
-import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
-
-import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
-
-import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
-
-import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transactions'
 
 import consts from 'consts/const_global'
 import global from "consts/global"
 
 import Serialization from 'common/utils/Serialization';
-import SemaphoreProcessing from "common/utils/Semaphore-Processing"
 
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 
-import BlockchainTimestamp from "common/blockchain/interface-blockchain/timestmap/Blockchain-Timestamp"
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
-import InterfaceBlockchainTipsAdministrator from "./tips/Interface-Blockchain-Tips-Administrator";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
+import InterfaceBlockchainBasic from "./Interface-Blockchain-Basic"
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
-class InterfaceBlockchain {
+class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     constructor (agent){
 
-        this.agent = agent;
+        super(agent);
 
-        this.blocks = new InterfaceBlockchainBlocks(this);
-
-        this.mining = undefined;
-
-        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME;
-        this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER);
-
-        this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
-        this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator ( this );
-
-        this._createBlockchainElements();
-
-        this.timestamp = new BlockchainTimestamp();
-
-        this.semaphoreProcessing = new SemaphoreProcessing();
     }
 
-    _setAgent(newAgent){
-        this.agent = newAgent;
-    }
 
-    _createBlockchainElements(){
-        this.transactions = new InterfaceBlockchainTransactions(this);
-        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
-    }
 
     async validateBlockchain(){
 
@@ -183,7 +150,7 @@ class InterfaceBlockchain {
 
             block.difficultyTarget = block.blockValidation.getDifficulty( block.timeStamp, block.height );
 
-            block.difficultyTarget = Serialization.convertBigNumberToBuffer(block.difficultyTarget, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+            block.difficultyTarget = Serialization.convertBigNumber(block.difficultyTarget, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
 
         }
 
@@ -250,12 +217,6 @@ class InterfaceBlockchain {
         }
     }
 
-    toString(){
-    }
-
-    toJSON(){
-    }
-
     async saveNewBlock(block){
 
         if (process.env.BROWSER)
@@ -314,6 +275,8 @@ class InterfaceBlockchain {
         return result;
     }
 
+
+
     _getLoadBlockchainValidationType(indexStart, i, numBlocks, indexStartProcessingOffset){
 
         let validationType = {"skip-sleep": true} ;
@@ -361,7 +324,7 @@ class InterfaceBlockchain {
 
     }
 
-    async loadBlockchain( indexStartLoadingOffset = undefined, indexStartProcessingOffset = undefined ){
+    async _loadBlockchain( indexStartLoadingOffset = undefined, indexStartProcessingOffset = undefined ){
 
         if (process.env.BROWSER)
             return true;
@@ -506,9 +469,6 @@ class InterfaceBlockchain {
         return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
     }
 
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
 
 
 }

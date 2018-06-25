@@ -14,9 +14,13 @@ class PoolDataMiner{
 
         this.instances = [];
 
-        this.addInstance(publicKey);
+        if (publicKey !== undefined)
+            this.addInstance(publicKey);
 
-        this.confirmedReward = 0;
+        this.rewardTotal = 0;       //pending except last
+        this.rewardConfirmed = 0;   //rewardConfirmed
+        this.rewardConfirmedOther = 0;   //other money confirmed to be sent
+        this.rewardSent = 0;        //rewardSent
 
     }
 
@@ -50,9 +54,14 @@ class PoolDataMiner{
 
         let list = [];
 
+        list.push(Serialization.serializeNumber1Byte(0x01) );
         list.push(this.address ); //20 bytes
 
-        list.push ( Serialization.serializeNumber4Bytes(this.instances) );
+        list.push ( Serialization.serializeNumber7Bytes(this.rewardTotal) );
+        list.push ( Serialization.serializeNumber7Bytes(this.rewardConfirmedOther) );
+        list.push ( Serialization.serializeNumber7Bytes(this.rewardSent) );
+
+        list.push ( Serialization.serializeNumber4Bytes(this.instances.length) );
 
         for (let i=0; i<this.instances.length; i++)
             list.push(this.instances[i].serializeMinerInstance() );
@@ -63,18 +72,33 @@ class PoolDataMiner{
 
     deserializeMiner( buffer, offset ){
 
-        this.address = BufferExtended.toBase( BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH ) );
+        let version =  Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
+        offset += 1;
+
+        this.address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH );
         offset += consts.ADDRESSES.ADDRESS.LENGTH;
+
+        this.rewardTotal = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
+        offset += 7;
+
+        this.rewardConfirmedOther = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
+        offset += 7;
+
+        this.rewardSent = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
+        offset += 7;
+
 
         let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
         offset += 4;
 
         this.instances = [];
         for (let i=0; i<len; i++){
+
             let instance = new PoolDataMinerInstance(this, undefined);
             offset = instance.deserializeMinerInstance(buffer, offset);
 
-            this.instances.push(instance);
+            if (instance.publicKey !== undefined)
+                this.instances.push(instance);
         }
 
         return offset;
@@ -82,21 +106,8 @@ class PoolDataMiner{
     }
 
 
-    calculateConfirmedReward(){
-
-        let reward = 0;
-
-        for (let i=0; i<this.instances.length; i++)
-            for (let j = 0; j < this.poolData.blocksInfo.length - 2; j++)
-                for (let q = 0; q<this.poolData.blocksInfo[j].blockInformationMinersInstances.length; q++)
-                    if (this.poolData.blocksInfo[j].blockInformationMinersInstances[q].minerInstance === this.instances[i]){
-
-                        reward += this.poolData.blocksInfo[j].blockInformationMinersInstances[q].reward;
-
-                    }
-
-        return reward;
-
+    get rewardConfirmedTotal(){
+        return this.rewardConfirmed + this.rewardConfirmedOther
     }
 
 }

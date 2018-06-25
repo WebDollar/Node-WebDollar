@@ -63,6 +63,8 @@ class InterfaceBlockchainBlock {
 
     destroyBlock(){
 
+        if (this.blockchain === undefined) return;
+
         //it is included in the blockchain
         if ( this.blockchain.blocks[ this.height ] === this)
             return;
@@ -307,7 +309,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, prevBlock, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, offset = 0){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -315,8 +317,9 @@ class InterfaceBlockchainBlock {
 
         if (height !== undefined)  this.height = height;
         if (reward !== undefined) this.reward = reward;
+        else if (this.reward === undefined) this.reward = BlockchainMiningReward.getReward(height||this.height);
+
         if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
-        if (offset === undefined) offset = 0;
 
         if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
@@ -326,12 +329,12 @@ class InterfaceBlockchainBlock {
             this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
-            this.nonce = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_NONCE) );
-            offset += consts.BLOCKCHAIN.BLOCKS_NONCE;
+            this.nonce = Serialization.deserializeNumber4Bytes( BufferExtended.substr(buffer, offset, 4) );
+            offset += 4;
 
 
             //TODO 1 byte version
-            this.version = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) );
+            this.version = Serialization.deserializeNumber2Bytes( buffer, offset );
             offset += 2;
 
             //TODO  put hashPrev into block.data
@@ -339,7 +342,7 @@ class InterfaceBlockchainBlock {
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
 
-            this.timeStamp = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 4) );
+            this.timeStamp = Serialization.deserializeNumber4Bytes( BufferExtended.substr(buffer, offset, 4) );
             offset += 4;
 
             offset = this.data.deserializeData(buffer, offset);
@@ -388,7 +391,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height) );
+            this.deserializeBlock(buffer, this.height, undefined, this.blockValidation.getDifficultyCallback(this.height) );
 
             return true;
         }
