@@ -380,7 +380,7 @@ class NodeExpress{
             }
 
             try {
-                res.json({result: true, block: this._processBlock(oBlock), blockJson: oBlock.toJSON(), timestamp: oBlock.timeStamp});
+                res.json({result: true, block: this._processBlock(oBlock)});
             }
             catch (e) {
                 res.status(500).json({result: false, message: e.message});
