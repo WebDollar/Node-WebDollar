@@ -6,7 +6,7 @@ import StatusEvents from "common/events/Status-Events";
 import consts from 'consts/const_global'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
-const PAYOUT_INTERVAL = consts.DEBUG ? 5 : 90 + Math.floor( Math.random()*10 ); //in blocks;
+const PAYOUT_INTERVAL = consts.DEBUG ? 5 : 30 + Math.floor( Math.random()*10 ); //in blocks;
 const PAYOUT_MINIMUM  = consts.MINING_POOL.MINING.FEE_THRESHOLD;
 
 class PoolPayouts{
