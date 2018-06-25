@@ -261,7 +261,7 @@ class NodeExpress{
                     }
 
                 }
-                if (Blockchain.blockchain.blocks[i].data.minerAddress.equals( address) ) {
+                if (Blockchain.blockchain.blocks[i].data.minerAddress.equals(address)) {
                     minedBlocks.push(
                         {
                             blockId: Blockchain.blockchain.blocks[i].height,
