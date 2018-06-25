@@ -380,7 +380,7 @@ class NodeExpress{
             }
 
             try {
-                res.json({result: true, block: this._processBlock(oBlock)});
+                res.json({result: true, block: this._processBlock(oBlock), blockJson: oBlock.toJSON(), timestamp: oBlock.timeStamp});
             }
             catch (e) {
                 res.status(500).json({result: false, message: e.message});
@@ -477,7 +477,7 @@ class NodeExpress{
 
     _processBlock (oBlock) {
         let transactions       = [], i;
-        let nBlockTimestampRaw = Blockchain.blockchain.getTimeStamp(oBlock.height);
+        let nBlockTimestampRaw = oBlock.timeStamp;
         let nBlockTimestamp    = nBlockTimestampRaw + BlockchainGenesis.timeStampOffset;
         let oBlockTimestampUTC = new Date(nBlockTimestamp * 1000);
 
