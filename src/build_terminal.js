@@ -18,6 +18,22 @@ Blockchain.createBlockchain("full-node", async ()=>{
 
     Node.NodeServer.startServer();
 
+    setInterval(async function() {
+        let sAddress = Blockchain.blockchain.mining.minerAddress;
+        let balance = Blockchain.blockchain.accountantTree.getBalance(sAddress, undefined);
+        balance = (balance === null) ? 0 : (balance / 10000);
+
+        console.log('========================================');
+        console.log('=============== BALANCE ================');
+        console.log('========================================');
+        console.log('');
+        console.log(sAddress + ': ' + balance);
+        console.log('');
+        console.log('========================================');
+        console.log('========================================');
+
+    }, 10000)
+
 }, ()=>{
 });
 
