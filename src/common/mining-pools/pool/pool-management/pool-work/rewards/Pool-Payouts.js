@@ -83,7 +83,7 @@ class PoolPayouts{
 
                 let difference = maxSumReward - sumReward;
 
-                if (difference !== 0) {
+                if ( Math.abs( difference ) > 1 ) {
 
                     difference /= blocksConfirmed[i].blockInformationMinersInstances.length;
 
@@ -102,12 +102,13 @@ class PoolPayouts{
 
                 blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
 
-                    if (blockInformationMinerInstance.reward === 0) return;
+                    if (blockInformationMinerInstance.reward === 0){
 
-                    if (blockInformationMinerInstance.reward <= PAYOUT_MINIMUM ){
+                    }
+                    else
+                    if (blockInformationMinerInstance.reward < PAYOUT_MINIMUM ){
                         blockInformationMinerInstance.miner.rewardConfirmedOther += blockInformationMinerInstance.reward;
-                        blockInformationMinerInstance.reward = 0;
-                        return;
+                        blockInformationMinerInstance.cancelReward();
                     } else
                         this._addAddressTo(blockInformationMinerInstance.address).amount += blockInformationMinerInstance.reward;
 

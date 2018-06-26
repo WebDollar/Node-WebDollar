@@ -95,7 +95,7 @@ class PoolWorkManagement{
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
             if (Math.random() < 0.001){
-                console.log(work);
+                console.log("Work: ", work);
             }
 
             if ( work.result ) {
