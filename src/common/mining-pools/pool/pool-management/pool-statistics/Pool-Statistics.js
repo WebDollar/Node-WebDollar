@@ -34,8 +34,8 @@ class PoolStatistics{
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.SERVER_POOL_DATABASE );
 
         //calculate mean
-        this.poolHashesLast = [];
-        this.poolMinersOnlineLast = [];
+        this._poolHashesLast = [];
+        this._poolMinersOnlineLast = [];
 
     }
 
@@ -57,12 +57,40 @@ class PoolStatistics{
 
     _poolStatisticsInterval(){
 
-        this.poolHashes = Math.floor( this.poolHashesNow / (this.POOL_STATISTICS_TIME/1000));
-        this.poolHashesNow = 0;
+        let poolHashes = Math.floor( this.poolHashesNow / (this.POOL_STATISTICS_TIME/1000));
 
-        this.poolMinersOnline = this.poolMinersOnlineNow;
-        this.poolMinersOnlineNow = {
+        let poolMinersOnline = this.poolMinersOnlineNow;
+
+
+        if (this._poolHashesLast.length === this.POOL_STATISTICS_MEAN_VALUES ){
+
+            for (let i=0; i<this._poolHashesLast.length-1; i++) {
+                this._poolHashesLast[i] = this._poolHashesLast[ i + 1 ];
+                this._poolMinersOnlineLast[i] = this._poolMinersOnlineLast[ i + 1 ];
+            }
+
+            this._poolHashesLast[this._poolHashesLast.length-1] = poolHashes;
+            this._poolMinersOnlineLast[this._poolMinersOnlineLast.length-1] = poolMinersOnline;
+
+        } else{
+            this._poolHashesLast.push(poolHashes);
+            this._poolMinersOnlineLast.push(poolMinersOnline);
+        }
+
+        let poolHashesMean = 0;
+        let poolMinersOnlineMean = {
             length: 0,
+        };
+
+        for (let i=0; i < this._poolHashesLast.length; i++)
+            poolHashesMean += this._poolHashesLast[i];
+
+        for (let i=0; i < this._poolMinersOnlineLast.length; i++)
+            poolMinersOnlineMean.length += this._poolMinersOnlineLast[i].length;
+
+        this.poolHashes = poolHashesMean  / this._poolHashesLast.length;
+        this.poolMinersOnline = {
+            length: poolMinersOnlineMean.length /  this._poolMinersOnlineLast.length
         };
 
         this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
