@@ -9,7 +9,7 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
         super(blockchain, minerAddress, miningFeeThreshold);
 
-        this.WORKER_NONCES_WORK = 200;
+        this.WORKER_NONCES_WORK = 700;
 
         this.block = undefined;
         this.undefined = undefined;
@@ -31,7 +31,7 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
                     let newAnswer = await this._mineNonces(start + this.WORKER_NONCES_WORK+1, Math.min(this.end, start+this.WORKER_NONCES_WORK+this.WORKER_NONCES_WORK ));
                     resolve(newAnswer);
 
-                }, 5);
+                }, 2);
 
             }));
 
