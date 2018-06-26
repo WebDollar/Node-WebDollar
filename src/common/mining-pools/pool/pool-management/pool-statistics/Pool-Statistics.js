@@ -12,7 +12,7 @@ class PoolStatistics{
         this.poolManagement = poolManagement;
 
         this.POOL_STATISTICS_TIME = 5000;
-        this.POOL_STATISTICS_MEAN_VALUES = 20;
+        this.POOL_STATISTICS_MEAN_VALUES = 40;
 
         this.poolHashes = 0;
         this.poolHashesNow = 0;
@@ -80,18 +80,23 @@ class PoolStatistics{
             this._poolMinersOnlineLast.push(poolMinersOnline);
         }
 
-        let poolHashesMean = 0;
         let poolMinersOnlineMean = {
             length: 0,
         };
 
+        let array = [];
         for (let i=0; i < this._poolHashesLast.length; i++)
-            poolHashesMean += this._poolHashesLast[i];
+            array.push(this._poolHashesLast[i]);
+
+        array.sort(function(a, b) {
+            return a - b;
+        });
+
+        this.poolHashes = array[ Math.floor(array.length/2) ];
 
         for (let i=0; i < this._poolMinersOnlineLast.length; i++)
             poolMinersOnlineMean.length += this._poolMinersOnlineLast[i].length;
 
-        this.poolHashes = poolHashesMean  / this._poolHashesLast.length;
         this.poolMinersOnline = {
             length: Math.floor( poolMinersOnlineMean.length /  this._poolMinersOnlineLast.length),
         };
@@ -132,8 +137,11 @@ class PoolStatistics{
 
          let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000, true);
 
-         if (typeof confirmedAndPaid === "number")
+         if (typeof confirmedAndPaid === "number") {
              this.poolBlocksConfirmedAndPaid = confirmedAndPaid;
+
+             if (this.poolBlocksConfirmedAndPaid === 200) this.poolBlocksConfirmedAndPaid = 0;
+         }
 
          return true;
     }

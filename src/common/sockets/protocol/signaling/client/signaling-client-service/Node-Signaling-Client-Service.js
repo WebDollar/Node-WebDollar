@@ -1,6 +1,7 @@
 import consts from 'consts/const_global'
 import SignalingClientList from "../signaling-client-list/signaling-client-list"
 import NodesList from 'node/lists/Nodes-List'
+import Blockchain from "main-blockchain/Blockchain";
 
 class NodeSignalingClientService {
 
@@ -44,6 +45,10 @@ class NodeSignalingClientService {
     }
 
     _askSignalingServer(socket){
+
+        if (!Blockchain.Agent.consensus)
+            return;
+
         socket.node.sendRequest("signals/server/register/accept-web-peer-connections", {acceptWebPeers : SignalingClientList.connected.length < consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.WEBRTC.MAXIMUM_CONNECTIONS } );
     }
 

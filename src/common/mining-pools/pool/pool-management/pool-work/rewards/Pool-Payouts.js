@@ -146,7 +146,7 @@ class PoolPayouts{
 
                 blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
 
-                    blockInformationMinerInstance.miner.rewardSent += blockInformationMinerInstance.reward;
+                    blockInformationMinerInstance.miner.rewardSent += blockInformationMinerInstance.reward + blockInformationMinerInstance.miner.rewardConfirmedOther;
                     blockInformationMinerInstance.miner.rewardConfirmed -= blockInformationMinerInstance.reward;
                     blockInformationMinerInstance.miner.rewardConfirmedOther = 0;
 
@@ -156,7 +156,14 @@ class PoolPayouts{
                 });
 
                 blocksConfirmed[i].payout = true;
+            }
 
+            for (let i=0; i<this._toAddresses.length; i++){
+                let miner = this.poolData.getMiner( this._toAddresses[i].address );
+                if (miner !== null && miner.rewardConfirmedOther > 0) {
+                    miner.rewardSent += miner.rewardConfirmedOther;
+                    miner.rewardConfirmedOther = 0;
+                }
             }
 
 

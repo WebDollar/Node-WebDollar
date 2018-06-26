@@ -89,6 +89,8 @@ class PoolWorkManagement{
             if ( false === await blockInformationMinerInstance.validateWorkHash( work.hash, work.nonce )  )
                 throw {message: "block was incorrectly mined"};
 
+            let prevWork = blockInformationMinerInstance.workHash;
+
             blockInformationMinerInstance.workHash = work.hash;
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
@@ -128,10 +130,15 @@ class PoolWorkManagement{
                     blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
                     this.poolManagement.poolData.addBlockInformation();
 
-                    blockInformationMinerInstance.poolWork = new Buffer( Serialization.convertBigNumber( new BigNumber( "0x"+blockInformationMinerInstance.workBlock.difficultyTargetPrev.toString("hex")).multipliedBy(100-5), 32) );
+                    if (prevWork !== undefined)
+                        blockInformationMinerInstance.poolWork = prevWork;
+                    else {
 
-                    if (blockInformationMinerInstance.poolWork.length > consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
-                        blockInformationMinerInstance.poolWork = BufferExtended.substr(blockInformationMinerInstance.poolWork, 0, 32);
+                        blockInformationMinerInstance.poolWork = new Buffer(Serialization.convertBigNumber(new BigNumber("0x" + blockInformationMinerInstance.workBlock.difficultyTargetPrev.toString("hex")).multipliedBy(100 - 1), 32));
+
+                        if (blockInformationMinerInstance.poolWork.length > consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
+                            blockInformationMinerInstance.poolWork = BufferExtended.substr(blockInformationMinerInstance.poolWork, 0, 32);
+                    }
 
                     blockInformationMinerInstance.poolWorkNonce = -1;
 

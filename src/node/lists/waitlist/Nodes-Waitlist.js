@@ -62,7 +62,7 @@ class NodesWaitlist {
 
         //avoid connecting to other nodes
         if (!Blockchain.Agent.consensus && nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER )
-            return;
+            return {result:false, waitlist: null};
 
 
         let sckAddresses = [];
