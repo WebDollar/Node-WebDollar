@@ -1,11 +1,12 @@
-import Serialization from 'common/utils/Serialization';
 import BufferExtended from "common/utils/BufferExtended";
+
+const BigNumber = require ('bignumber.js');
+import Serialization from 'common/utils/Serialization';
 import consts from 'consts/const_global';
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 import PoolWork from "./Pool-Work";
-import Blockchain from "main-blockchain/Blockchain";
 import Utils from "common/utils/helpers/Utils";
 
 class PoolWorkManagement{
@@ -91,12 +92,6 @@ class PoolWorkManagement{
             blockInformationMinerInstance.workHash = work.hash;
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
-            blockInformationMinerInstance.calculateDifficulty();
-            blockInformationMinerInstance.adjustDifficulty(undefined, true);
-
-            //statistics
-            this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance._workDifficulty, minerInstance);
-
             if (work.result && await blockInformationMinerInstance.wasBlockMined() && blockInformationMinerInstance.blockInformation.block === undefined ) {
 
                 console.warn("----------------------------------------------------------------------------");
@@ -133,7 +128,15 @@ class PoolWorkManagement{
                     blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
                     this.poolManagement.poolData.addBlockInformation();
 
+                    blockInformationMinerInstance.poolWork = new Buffer( Serialization.convertBigNumber( new BigNumber( "0x"+blockInformationMinerInstance.workBlock.difficultyTargetPrev.toString("hex")).multipliedBy(100-5), 32) );
+
+                    if (blockInformationMinerInstance.poolWork.length > consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
+                        blockInformationMinerInstance.poolWork = BufferExtended.substr(blockInformationMinerInstance.poolWork, 0, 32);
+
+                    blockInformationMinerInstance.poolWorkNonce = -1;
+
                 } catch (exception){
+
                     console.error("PoolWork include raised an exception", exception);
                     revertActions.revertOperations();
 
@@ -143,6 +146,12 @@ class PoolWorkManagement{
                 revertActions.destroyRevertActions();
 
             }
+
+            blockInformationMinerInstance.calculateDifficulty();
+            blockInformationMinerInstance.adjustDifficulty(undefined, true);
+
+            //statistics
+            this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance._workDifficulty, minerInstance);
 
             return {result: true, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal };
 

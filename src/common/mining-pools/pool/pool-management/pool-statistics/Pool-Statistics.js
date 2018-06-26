@@ -12,6 +12,7 @@ class PoolStatistics{
         this.poolManagement = poolManagement;
 
         this.POOL_STATISTICS_TIME = 5000;
+        this.POOL_STATISTICS_MEAN_VALUES = 10;
 
         this.poolHashes = 0;
         this.poolHashesNow = 0;
@@ -24,7 +25,6 @@ class PoolStatistics{
         };
 
 
-
         this.poolBlocksUnconfirmed = 0;
         this.poolBlocksConfirmed = 0;
         this.poolTimeRemaining = 0;
@@ -33,6 +33,9 @@ class PoolStatistics{
         this.poolBlocksConfirmedAndPaid = 0;
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.SERVER_POOL_DATABASE );
 
+        //calculate mean
+        this.poolHashesLast = [];
+        this.poolMinersOnlineLast = [];
 
     }
 
@@ -83,7 +86,6 @@ class PoolStatistics{
 
         this.poolBlocksUnconfirmed = blocksUnconfirmed;
         this.poolBlocksConfirmed = blocksConfirmed;
-
         this.poolBlocksConfirmedAndPaid += blocksConfirmedAndPaid;
 
     }

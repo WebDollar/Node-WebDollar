@@ -56,11 +56,14 @@ class PoolDataBlockInformationMinerInstance {
         return false;
     }
 
-    calculateDifficulty(){
+    calculateDifficulty(workHash){
+
+        if (workHash === undefined) workHash = this._workHash;
 
         // target     =     maximum target / difficulty
         // difficulty =     maximum target / target
-        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ this._workHash.toString("hex") ) );
+
+        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ workHash.toString("hex") ) );
 
     }
 

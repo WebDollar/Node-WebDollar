@@ -134,12 +134,15 @@ class PoolManagement{
                 await this.poolProtocol._startPoolProtocol();
 
                 await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
+                consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL;
 
             }
             else {
                 await this.poolProtocol._stopPoolProtocol();
                 this.poolWorkManagement.poolWork.stopGarbageCollector();
                 this.poolStatistics.clearInterval();
+
+                consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
             }
 
             StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });

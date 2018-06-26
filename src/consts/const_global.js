@@ -192,9 +192,9 @@ consts.DATABASE_NAMES = {
 
 };
 
-consts.MINING_POOL_STATUS = {
+consts.MINING_POOL_TYPE = {
 
-    MINING_POOL_SOLO: 0,
+    MINING_POOL_DISABLED: 0,
 
     MINING_POOL_SERVER: 1,
     MINING_POOL: 2,
@@ -204,12 +204,22 @@ consts.MINING_POOL_STATUS = {
 
 consts.MINING_POOL = {
 
-    MINING_POOL_STATUS : (process.env.MINING_POOL_STATUS || consts.MINING_POOL_STATUS.MINING_POOL_SOLO),
+    MINING_POOL_STATUS : (process.env.MINING_POOL_STATUS || consts.MINING_POOL_TYPE.MINING_POOL_DISABLED),
 
     MINING:{
         FEE_THRESHOLD: 100000,
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
+
+    CONNECTIONS:{
+
+        NO_OF_IDENTICAL_IPS: 40,
+
+    },
+
+    isPoolActivated(){
+        return consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_TYPE.MINING_POOL_SERVER || consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_TYPE.MINING_POOL;
+    }
 
 };
 
@@ -256,7 +266,7 @@ consts.SETTINGS = {
 
         CONNECTIONS:{
 
-            NO_OF_IDENTICAL_IPS: 300,
+            NO_OF_IDENTICAL_IPS: 3,
 
             SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP: 50,
 
@@ -362,8 +372,8 @@ if ( consts.DEBUG === true ){
         "addr": ["http://webdollar.ddns.net:9095"],
     }];
 
-
 }
+
 
 
 export default consts
