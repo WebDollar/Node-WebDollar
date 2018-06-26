@@ -45,7 +45,6 @@ class PoolRewardsManagement{
 
         let poolBlocksConfirmed = 0;
         let poolBlocksUnconfirmed = 0;
-        let pooBlocksConfirmedAndPaid  = 0;
 
         let confirmationsPool = 0;
         let confirmationsOthers = 0;
@@ -93,7 +92,7 @@ class PoolRewardsManagement{
                     this.poolData.deleteBlockInformationByIndex(i);
                 }
 
-                pooBlocksConfirmedAndPaid ++;
+                poolBlocksConfirmed++;
                 continue;
 
             }
@@ -180,7 +179,7 @@ class PoolRewardsManagement{
 
         }
 
-        this.poolManagement.poolStatistics.addBlocksStatistics(poolBlocksConfirmed, poolBlocksUnconfirmed, pooBlocksConfirmedAndPaid );
+        this.poolManagement.poolStatistics.addBlocksStatistics(poolBlocksConfirmed, poolBlocksUnconfirmed );
 
     }
 

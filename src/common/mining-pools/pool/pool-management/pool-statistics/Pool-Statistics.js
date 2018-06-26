@@ -58,9 +58,12 @@ class PoolStatistics{
     _poolStatisticsInterval(){
 
         let poolHashes = Math.floor( this.poolHashesNow / (this.POOL_STATISTICS_TIME/1000));
+        this.poolHashesNow = 0;
 
         let poolMinersOnline = this.poolMinersOnlineNow;
-
+        this.poolMinersOnlineNow = {
+            length: 0
+        };
 
         if (this._poolHashesLast.length === this.POOL_STATISTICS_MEAN_VALUES ){
 
@@ -110,11 +113,10 @@ class PoolStatistics{
 
     }
 
-    addBlocksStatistics(blocksConfirmed, blocksUnconfirmed, blocksConfirmedAndPaid ){
+    addBlocksStatistics(blocksConfirmed, blocksUnconfirmed ){
 
         this.poolBlocksUnconfirmed = blocksUnconfirmed;
         this.poolBlocksConfirmed = blocksConfirmed;
-        this.poolBlocksConfirmedAndPaid += blocksConfirmedAndPaid;
 
     }
 
