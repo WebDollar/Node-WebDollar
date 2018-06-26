@@ -82,7 +82,7 @@ class PoolWorkManagement{
             hashesFactor = Math.max(0.4, hashesFactor);
 
             minerInstance.hashesPerSecond *= Math.floor( hashesFactor );
-            minerInstance.hashesPerSecond = Math.min( minerInstance.hashesPerSecond , 10000);
+            minerInstance.hashesPerSecond = Math.min( minerInstance.hashesPerSecond , 25000);
             minerInstance.hashesPerSecond = Math.max( minerInstance.hashesPerSecond , 100);
 
 
@@ -145,16 +145,8 @@ class PoolWorkManagement{
                         blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
                         this.poolManagement.poolData.addBlockInformation();
 
-                        if (prevWork !== undefined)
-                            blockInformationMinerInstance.poolWork = prevWork;
-                        else {
 
-                            blockInformationMinerInstance.poolWork = new Buffer(Serialization.convertBigNumber(new BigNumber("0x" + blockInformationMinerInstance.workBlock.difficultyTargetPrev.toString("hex")).multipliedBy(100 - 1), 32));
-
-                            if (blockInformationMinerInstance.poolWork.length > consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
-                                blockInformationMinerInstance.poolWork = BufferExtended.substr(blockInformationMinerInstance.poolWork, 0, 32);
-                        }
-
+                        blockInformationMinerInstance.poolWork = Buffer.from("00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF","hex");
                         blockInformationMinerInstance.poolWorkNonce = -1;
 
                     } catch (exception){

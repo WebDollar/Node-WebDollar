@@ -4,6 +4,7 @@ import BufferExtended from 'common/utils/BufferExtended';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import PoolDataMiner from "common/mining-pools/pool/pool-management/pool-data/Pool-Data-Miner";
 import PoolDataBlockInformation from "common/mining-pools/pool/pool-management/pool-data/block-informations/Pool-Data-Block-Information"
+import Blockchain from 'main-blockchain/Blockchain';
 
 const uuid = require('uuid');
 
@@ -98,7 +99,7 @@ class PoolData {
 
     addBlockInformation(){
 
-        let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined );
+        let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, Blockchain.blockchain.blocks.length );
         this.blocksInfo.push(blockInformation);
 
         return blockInformation;
@@ -209,15 +210,23 @@ class PoolData {
             offset += 4;
 
             this.blocksInfo = [];
-            for (let i = 0; i < numBlocksInformation; ++i) {
+            for (let i = 0; i < numBlocksInformation; i++) {
 
-                let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined);
+                let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, Blockchain.blockchain.blocks.length );
                 offset = blockInformation.deserializeBlockInformation(buffer, offset );
 
-                if (blockInformation.blockInformationMinersInstances.length > 0)
+                if (blockInformation.blockInformationMinersInstances.length > 0) {
                     this.blocksInfo.push(blockInformation);
 
+                    for (let j = 0; j < blockInformation.blockInformationMinersInstances.length; j++)
+                        blockInformation.totalDifficultyPlus(blockInformation.blockInformationMinersInstances[j].minerInstanceTotalDifficulty);
+
+                    for (let j = 0; j < blockInformation.blockInformationMinersInstances.length; j++)
+                        blockInformation.blockInformationMinersInstances[j].calculateReward(false, true);
+                }
+
             }
+
 
             if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block !== undefined ){
                 this.addBlockInformation();
@@ -355,10 +364,10 @@ class PoolData {
         return answer;
     }
 
-    loadPoolData(){
+    async loadPoolData(){
 
-        let answer = this.loadMinersList();
-        answer = answer && this.loadBlockInformations();
+        let answer = await this.loadMinersList();
+        answer = answer && await this.loadBlockInformations();
 
         return answer;
     }
