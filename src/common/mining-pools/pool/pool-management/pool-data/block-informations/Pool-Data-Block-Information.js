@@ -48,6 +48,7 @@ class PoolDataBlockInformation {
         this.blockInformationMinersInstances = [];
 
         this.block.destroyBlock();
+        this.block = undefined;
 
     }
 
