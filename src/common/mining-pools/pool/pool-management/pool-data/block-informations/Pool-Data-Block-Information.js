@@ -47,6 +47,8 @@ class PoolDataBlockInformation {
 
         this.blockInformationMinersInstances = [];
 
+        this.block.destroyBlock();
+
     }
 
     adjustBlockInformationDifficulty(difficulty, hash){

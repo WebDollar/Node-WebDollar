@@ -35,6 +35,9 @@ class PoolDataBlockInformationMinerInstance {
         this.blockInformation = undefined;
         this.minerInstance = undefined;
 
+        this.workBlock.destroyBlock();
+        this.workBlock = undefined;
+
     }
 
     async validateWorkHash(workHash, workNonce){
