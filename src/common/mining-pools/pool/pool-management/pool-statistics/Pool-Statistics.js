@@ -12,7 +12,7 @@ class PoolStatistics{
         this.poolManagement = poolManagement;
 
         this.POOL_STATISTICS_TIME = 5000;
-        this.POOL_STATISTICS_MEAN_VALUES = 10;
+        this.POOL_STATISTICS_MEAN_VALUES = 20;
 
         this.poolHashes = 0;
         this.poolHashesNow = 0;
@@ -93,7 +93,7 @@ class PoolStatistics{
 
         this.poolHashes = poolHashesMean  / this._poolHashesLast.length;
         this.poolMinersOnline = {
-            length: poolMinersOnlineMean.length /  this._poolMinersOnlineLast.length
+            length: Math.floor( poolMinersOnlineMean.length /  this._poolMinersOnlineLast.length),
         };
 
         this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
