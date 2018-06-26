@@ -94,63 +94,81 @@ class PoolWorkManagement{
             blockInformationMinerInstance.workHash = work.hash;
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
-            if (work.result && await blockInformationMinerInstance.wasBlockMined() && blockInformationMinerInstance.blockInformation.block === undefined ) {
+            if (Math.random() < 0.001){
+                console.log(work);
+            }
+
+            if ( work.result ) {
 
                 console.warn("----------------------------------------------------------------------------");
-                console.warn("WebDollar Block was mined in Pool ", blockInformationMinerInstance.workBlock.height, " nonce (", blockInformationMinerInstance.workHashNonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
+                console.warn("----------------------------------------------------------------------------");
+                console.warn("WebDollar Block was mined in Pool 1 ", work.hash.toString("hex"), "nonce", work.nonce );
+                console.warn("----------------------------------------------------------------------------");
                 console.warn("----------------------------------------------------------------------------");
 
-                //returning false, because a new fork was changed in the mean while
-                if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
-                    throw {message: "pool: block is already too old"};
+                if ( await blockInformationMinerInstance.wasBlockMined() ){
 
-                let revertActions = new RevertActions(this.blockchain);
-
-                try {
-
-                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
-
-                            //returning false, because a new fork was changed in the mean while
-                            if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
-                                throw {message: "pool: block is already too old for processing"};
-
-                            blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
-                            blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
-
-                            return this.blockchain.includeBlockchainBlock(blockInformationMinerInstance.workBlock, false, ["all"], true, revertActions);
-
-                        }) === false) throw {message: "Mining2 returned false"};
-
-                    NodeBlockchainPropagation.propagateLastBlockFast(blockInformationMinerInstance.workBlock);
-
-                    //confirming transactions
-                    blockInformationMinerInstance.workBlock.data.transactions.confirmTransactions();
+                    console.warn("----------------------------------------------------------------------------");
+                    console.warn("----------------------------------------------------------------------------");
+                    console.warn("WebDollar Block was mined in Pool 2 ", blockInformationMinerInstance.workBlock.height, " nonce (", blockInformationMinerInstance.workHashNonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
+                    console.warn("----------------------------------------------------------------------------");
+                    console.warn("----------------------------------------------------------------------------");
 
 
-                    blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
-                    this.poolManagement.poolData.addBlockInformation();
+                    //returning false, because a new fork was changed in the mean while
+                    if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
+                        throw {message: "pool: block is already too old"};
 
-                    if (prevWork !== undefined)
-                        blockInformationMinerInstance.poolWork = prevWork;
-                    else {
+                    let revertActions = new RevertActions(this.blockchain);
 
-                        blockInformationMinerInstance.poolWork = new Buffer(Serialization.convertBigNumber(new BigNumber("0x" + blockInformationMinerInstance.workBlock.difficultyTargetPrev.toString("hex")).multipliedBy(100 - 1), 32));
+                    try {
 
-                        if (blockInformationMinerInstance.poolWork.length > consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
-                            blockInformationMinerInstance.poolWork = BufferExtended.substr(blockInformationMinerInstance.poolWork, 0, 32);
+                        if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
+
+                                //returning false, because a new fork was changed in the mean while
+                                if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
+                                    throw {message: "pool: block is already too old for processing"};
+
+                                blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
+                                blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
+
+                                return this.blockchain.includeBlockchainBlock(blockInformationMinerInstance.workBlock, false, ["all"], true, revertActions);
+
+                            }) === false) throw {message: "Mining2 returned false"};
+
+                        NodeBlockchainPropagation.propagateLastBlockFast(blockInformationMinerInstance.workBlock);
+
+                        //confirming transactions
+                        blockInformationMinerInstance.workBlock.data.transactions.confirmTransactions();
+
+
+                        blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
+                        this.poolManagement.poolData.addBlockInformation();
+
+                        if (prevWork !== undefined)
+                            blockInformationMinerInstance.poolWork = prevWork;
+                        else {
+
+                            blockInformationMinerInstance.poolWork = new Buffer(Serialization.convertBigNumber(new BigNumber("0x" + blockInformationMinerInstance.workBlock.difficultyTargetPrev.toString("hex")).multipliedBy(100 - 1), 32));
+
+                            if (blockInformationMinerInstance.poolWork.length > consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
+                                blockInformationMinerInstance.poolWork = BufferExtended.substr(blockInformationMinerInstance.poolWork, 0, 32);
+                        }
+
+                        blockInformationMinerInstance.poolWorkNonce = -1;
+
+                    } catch (exception){
+
+                        console.error("PoolWork include raised an exception", exception);
+                        revertActions.revertOperations();
+
+                        this.poolWork.getNextBlockForWork();
                     }
 
-                    blockInformationMinerInstance.poolWorkNonce = -1;
+                    revertActions.destroyRevertActions();
 
-                } catch (exception){
-
-                    console.error("PoolWork include raised an exception", exception);
-                    revertActions.revertOperations();
-
-                    this.poolWork.getNextBlockForWork();
                 }
 
-                revertActions.destroyRevertActions();
 
             }
 

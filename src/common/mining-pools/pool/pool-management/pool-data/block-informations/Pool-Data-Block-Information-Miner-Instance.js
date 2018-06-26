@@ -26,6 +26,7 @@ class PoolDataBlockInformationMinerInstance {
             minerInstanceTotalDifficulty = BigNumber(0);
 
         this.minerInstanceTotalDifficulty = minerInstanceTotalDifficulty;
+        this.socket = undefined;
 
     }
 
