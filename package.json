@@ -58,6 +58,7 @@
     "console-info": "0.0.5",
     "console-warn": "0.0.4",
     "cors": "^2.8.4",
+    "death": "^1.1.0",
     "events": "^2.0.0",
     "fs": "0.0.1-security",
     "get-random-values": "^1.2.0",
