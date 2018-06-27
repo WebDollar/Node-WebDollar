@@ -1,5 +1,6 @@
 import {Node, Blockchain} from './index.js';
 import global from "consts/global.js";
+import termination from "./termination";
 
 console.log("BROWSER MODE");
 
@@ -11,26 +12,7 @@ Blockchain.createBlockchain("light-node", ()=>{
 
 window.onbeforeunload = async () => {
 
-    console.warn("SIGINT FIRED");
-    global.TERMINATED = true;
-
-    await Blockchain.blockchain.saveBlockchainTerminated();
-
-    setInterval(()=>{
-        if ( global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED &&
-            global.SEMAPHORE_PROCESS_DONE &&
-            global.MINIBLOCKCHAIN_LIGHT_SAVED &&
-            global.MINIBLOCKCHAIN_ADVANCED_SAVED &&
-            global.MINIBLOCKCHAIN_SAVED &&
-            global.INTERFACE_BLOCKCHAIN_SAVED) {
-
-            console.log(global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED);
-            console.log(global.SEMAPHORE_PROCESS_DONE);
-            console.log(global.MINIBLOCKCHAIN_LIGHT_SAVED);
-
-            console.warn("process.exit(0)");
-        }
-    }, 100);
+    await termination(Blockchain);
 
 };
 
