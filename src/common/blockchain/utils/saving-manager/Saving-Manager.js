@@ -1,6 +1,6 @@
 import global from "consts/global"
 
-const SAVING_MANAGER_INTERVAL = 3000;
+const SAVING_MANAGER_INTERVAL = 4000;
 
 class SavingManager{
 
@@ -96,17 +96,16 @@ class SavingManager{
             }
 
             if (done)
-                return true;
+                return key;
 
         }
 
-        return false;
+        return null;
     }
 
     async _saveManager(){
 
         await this._saveNextBlock();
-
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
 
@@ -122,10 +121,16 @@ class SavingManager{
 
         global.INTERFACE_BLOCKCHAIN_SAVED = false;
 
-        let answer = true;
-        while (answer){
+        let answer = 1;
+
+        while (answer !== null){
 
             answer = await this._saveNextBlock();
+
+            if (answer !== null && answer % 10 === 0) {
+                console.log("Saving successfully", answer);
+                await this.blockchain.sleep(10);
+            }
 
         }
 

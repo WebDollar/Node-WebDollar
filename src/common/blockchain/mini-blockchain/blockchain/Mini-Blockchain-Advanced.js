@@ -85,6 +85,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                 console.error("couldn't load the last K blocks");
 
                 await this.accountantTree.loadMiniAccountant(new Buffer(0));
+
                 throw "load blockchain simple"; //let's force to load a simple blockchain
             }
 
@@ -96,6 +97,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             }
         }
+
+        this._miniBlockchainSaveBlocks = this.blocks.length;
 
         return false;
 
@@ -110,6 +113,9 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             return true;
 
         if (this.blocks.length === 0) return false;
+
+        //avoid resaving the same blockchain
+        if (this._miniBlockchainSaveBlocks === this.blocks.length) return false;
 
         global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
 
