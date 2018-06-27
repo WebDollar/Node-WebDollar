@@ -250,7 +250,7 @@ class InterfaceSatoshminDB {
 
         for (let i = 0; i < trials; i++){
 
-            let answer = this._save(key, value, timeout);
+            let answer = await this._save(key, value, timeout);
 
             if (answer !== null)
                 return answer;
