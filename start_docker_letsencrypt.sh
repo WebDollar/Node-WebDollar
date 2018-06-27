@@ -29,8 +29,8 @@ if [ -z $NOSSL ]; then
 fi
 
 # Start Pool
-if [ $TYPE = 11]; then
-(sleep 15;echo 11;sleep 5;echo $FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo y;sleep 5;echo "$POOL_SERVERS";) | npm run commands
+if [ $TYPE -eq 11 ]; then
+	(sleep 15;echo 11;sleep 5;echo $FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo y;sleep 5;echo "$POOL_SERVERS";) | npm run commands
 else
-(sleep 15;echo $TYPE;sleep 5;echo $FEE;) | npm run commands
+	(sleep 15;echo $TYPE;sleep 5;echo $FEE;) | npm run commands
 fi
