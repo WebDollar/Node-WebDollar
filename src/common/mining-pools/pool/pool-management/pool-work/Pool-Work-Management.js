@@ -35,12 +35,6 @@ class PoolWorkManagement{
             await this.poolWork.getNextBlockForWork();
 
 
-        let serialization = Buffer.concat( [
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.poolWork.lastBlock.height) ),
-            Serialization.serializeBufferRemovingLeadingZeros( this.poolWork.lastBlock.difficultyTargetPrev ),
-            this.poolWork.lastBlock.computedBlockPrefix
-        ]);
-
         this.poolWork.lastBlockElement.instances[minerInstance.publicKeyString] = this.poolWork.lastBlock;
 
         let answer = {
@@ -52,7 +46,7 @@ class PoolWorkManagement{
             start: this.poolWork.lastBlockNonce,
             end: this.poolWork.lastBlockNonce + hashes,
 
-            serialization: serialization,
+            serialization: this.poolWork.lastBlockSerialization,
         };
 
         this.poolWork.lastBlockNonce += hashes;

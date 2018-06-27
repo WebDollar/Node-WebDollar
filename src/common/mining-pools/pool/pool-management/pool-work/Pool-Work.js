@@ -2,6 +2,8 @@ import Blockchain from "main-blockchain/Blockchain";
 import Utils from "common/utils/helpers/Utils";
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 import consts from 'consts/const_global'
+import Serialization from 'common/utils/Serialization';
+import StatusEvents from "common/events/Status-Events";
 
 class PoolWork {
 
@@ -15,6 +17,15 @@ class PoolWork {
         this.lastBlockNonce = 0;
 
         this._blocksList = []; //for gerbage collector
+
+        // StatusEvents.on("blockchain/blocks-count-changed",async (data)=> {
+        //
+        //     if (!this.poolManagement._poolStarted) return;
+        //
+        //     this._gettingNewWork =
+        //     this.getNextBlockForWork();
+        //
+        // });
 
     }
 
@@ -48,6 +59,12 @@ class PoolWork {
 
             if (this.lastBlock.computedBlockPrefix === null )
                 this.lastBlock._computeBlockHeaderPrefix();
+
+            this.lastBlockSerialization = Buffer.concat( [
+                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.lastBlock.height) ),
+                Serialization.serializeBufferRemovingLeadingZeros( this.lastBlock.difficultyTargetPrev ),
+                this.lastBlock.computedBlockPrefix
+            ]);
 
             this.lastBlockElement = {
                 block: this.lastBlock,
