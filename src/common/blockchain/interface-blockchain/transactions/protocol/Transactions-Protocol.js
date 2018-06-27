@@ -70,7 +70,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 if (transaction === undefined) throw {message: "Transaction was not specified"};
 
-                if ( transaction.fee < consts.MINING_POOL.FEE_THRESHOLD  )  //not good
+                if ( transaction.fee < consts.MINING_POOL.MINING.FEE_THRESHOLD  )  //not good
                     return false;
 
                 if (!transaction.isTransactionOK())
@@ -237,7 +237,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 try {
 
-                    if ( transaction.fee < consts.MINING_POOL.FEE_THRESHOLD  ) { //not good
+                    if ( transaction.fee < consts.MINING_POOL.MINING.FEE_THRESHOLD  ) { //not good
                         errors += 0.25;
                         continue;
                     }

@@ -203,7 +203,8 @@ class NodeServer {
 
                 let connections = NodesList.countNodeSocketByAddress( sckAddress, "all" );
 
-                if ( connections.countUUIDs === 0 && connections.countIPs < consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS ){
+                //in case it is a pool open
+                if ( connections.countUUIDs === 0 && connections.countIPs < ( consts.MINING_POOL.isPoolActivated() ? consts.MINING_POOL.CONNECTIONS.NO_OF_IDENTICAL_IPS : consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS )){
 
                     SocketExtend.extendSocket(socket, sckAddress, undefined, undefined, 1);
 

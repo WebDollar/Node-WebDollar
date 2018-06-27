@@ -9,7 +9,7 @@ import Blockchain from "main-blockchain/Blockchain"
 
 class PoolDataBlockInformation {
 
-    constructor(poolManagement, index, totalDifficulty, block){
+    constructor(poolManagement, index, totalDifficulty, block, height){
 
         this.poolManagement = poolManagement;
 
@@ -19,7 +19,6 @@ class PoolDataBlockInformation {
             totalDifficulty = new BigNumber(0);
 
         this.totalDifficulty = totalDifficulty;
-        this.totalDifficultyLength = 0;
 
         this.blockInformationMinersInstances = [];
 
@@ -28,6 +27,9 @@ class PoolDataBlockInformation {
         this.confirmed = false;
 
         this.payout = false;
+
+        if (height < 40) height = 1000;
+        this.height = height;
 
         this.block = block;
         this.date = new Date().getTime();
@@ -46,6 +48,9 @@ class PoolDataBlockInformation {
             this.blockInformationMinersInstances[i].destroyBlockInformationMinerInstance();
 
         this.blockInformationMinersInstances = [];
+
+        this.block.destroyBlock();
+        this.block = undefined;
 
     }
 
@@ -76,7 +81,9 @@ class PoolDataBlockInformation {
 
         let buffers = [];
 
-        buffers.push ( Serialization.serializeNumber1Byte( 0x00 ));
+        buffers.push ( Serialization.serializeNumber1Byte( 0x01 ));
+
+        buffers.push ( Serialization.serializeNumber4Bytes( this.height || 500 ));
 
         let length = 0;
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
@@ -108,6 +115,14 @@ class PoolDataBlockInformation {
 
         let version = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
         offset += 1;
+
+        if (version === 1){
+
+            let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
+            offset +=4;
+
+            this.height = height;
+        }
 
         let length = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
         offset +=4;
@@ -172,8 +187,8 @@ class PoolDataBlockInformation {
         if (blockInformationMinerInstance !== null) return blockInformationMinerInstance;
 
 
-        blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, minerInstance);
-         this.blockInformationMinersInstances.push(blockInformationMinerInstance);
+        blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, minerInstance, undefined, );
+        this.blockInformationMinersInstances.push(blockInformationMinerInstance);
 
         return blockInformationMinerInstance;
 
@@ -209,33 +224,32 @@ class PoolDataBlockInformation {
         //
         // y = x * target_difficulty / ( sum(  difficulties ) / n);
 
+        let dTime = (new Date().getTime() - this.date)/1000;
         //formula no 1
 
-        if (this.poolManagement.poolData.blocksInfo.length !== 0 && this.poolManagement.poolData.lastBlockInformation !== this) return;
+        // if (this.poolManagement.poolData.blocksInfo.length !== 0 && this.poolManagement.poolData.lastBlockInformation !== this) return;
+        //
+        // if (this.bestHash === undefined) return 40;
+        //
 
-        if (this.bestHash === undefined) return 40;
-
-        let dTime = (new Date().getTime() - this.date)/1000;
-        this.timeRemaining =  Math.max(0, Math.floor( new BigNumber ( "0x"+ this.bestHash.toString("hex")) .dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") )) .multipliedBy( dTime ).toNumber() - dTime));
+        // this.timeRemaining =  Math.max(0, Math.floor( new BigNumber ( "0x"+ this.bestHash.toString("hex")) .dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") )) .multipliedBy( dTime ).toNumber() - dTime));
 
         //formula no 2
 
-        // if (this.poolManagement.poolStatistics.poolHashes <= 0) return 40;
-        // if (Blockchain.blockchain.blocks.networkHashRate <= 0) return 40;
-        //
-        // this.timeRemaining = Math.max(0, Math.floor(  new BigNumber (  Blockchain.blockchain.blocks.networkHashRate  ).dividedBy( this.poolManagement.poolStatistics.poolHashes ).multipliedBy( consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ).toNumber()  ) )
+        if (this.poolManagement.poolStatistics.poolHashes <= 0) return 40;
+        if (Blockchain.blockchain.blocks.networkHashRate <= 0) return 40;
+
+        this.timeRemaining = Math.max(0, Math.floor(  new BigNumber (  Math.floor( Blockchain.blockchain.blocks.networkHashRate)  ).dividedBy( this.poolManagement.poolStatistics.poolHashes ).multipliedBy( consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ).toNumber()  ) )
 
     }
 
     totalDifficultyPlus(value){
         this.totalDifficulty = this.totalDifficulty.plus(value);
-        this.totalDifficultyLength++;
         this._calculateTimeRemaining();
     }
 
     totalDifficultyMinus(value){
         this.totalDifficulty = this.totalDifficulty.minus(value);
-        this.totalDifficultyLength--;
         this._calculateTimeRemaining();
     }
 

@@ -100,6 +100,7 @@ class MinerProtocol {
                 await this.minerPoolProtocol._startMinerProtocol();
 
                 this.blockchain.agent.consensus = false;
+                consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_MINER;
             }
             else {
                 this.blockchain.mining = Blockchain.blockchain.miningSolo;
@@ -108,6 +109,8 @@ class MinerProtocol {
                 await this.minerPoolProtocol._stopMinerProtocol();
 
                 this.blockchain.agent.consensus = true;
+
+                consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
             }
 
             StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Started changed" });

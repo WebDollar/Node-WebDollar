@@ -72,7 +72,7 @@ class MinerPoolMining extends InheritedPoolMining {
                 this.setMiningHashRateInterval();
 
             if (this._miningWork.block === undefined || this._miningWork.resolved)
-                await Blockchain.blockchain.sleep(10);
+                await Blockchain.blockchain.sleep(5);
             else {
 
                 try {

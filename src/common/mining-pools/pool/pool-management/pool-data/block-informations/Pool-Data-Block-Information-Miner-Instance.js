@@ -26,6 +26,7 @@ class PoolDataBlockInformationMinerInstance {
             minerInstanceTotalDifficulty = BigNumber(0);
 
         this.minerInstanceTotalDifficulty = minerInstanceTotalDifficulty;
+        this.socket = undefined;
 
     }
 
@@ -34,6 +35,9 @@ class PoolDataBlockInformationMinerInstance {
         this.poolManagement = undefined;
         this.blockInformation = undefined;
         this.minerInstance = undefined;
+
+        this.workBlock.destroyBlock();
+        this.workBlock = undefined;
 
     }
 
@@ -56,11 +60,14 @@ class PoolDataBlockInformationMinerInstance {
         return false;
     }
 
-    calculateDifficulty(){
+    calculateDifficulty(workHash){
+
+        if (workHash === undefined) workHash = this._workHash;
 
         // target     =     maximum target / difficulty
         // difficulty =     maximum target / target
-        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ this._workHash.toString("hex") ) );
+
+        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ workHash.toString("hex") ) );
 
     }
 
@@ -76,7 +83,7 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    calculateReward(useDeltaTime = false){
+    calculateReward(useDeltaTime = false, skipRewardTotal=false){
 
         this.prevReward = this.reward;
 
@@ -84,21 +91,23 @@ class PoolDataBlockInformationMinerInstance {
 
         if ( this.blockInformation.block !== undefined ) height = this.blockInformation.block.height;
         else if ( this.workBlock !== undefined) height = this.workBlock.height;
-        else height = Blockchain.blockchain.blocks.length-1;
+        else if (Blockchain.blockchain.blocks.length > 0) height = Blockchain.blockchain.blocks.length-1;
+        else height = 100000;
 
         let ratio = 1;
 
         if (useDeltaTime) {
 
-            let diff = (new Date().getTime() - this.blockInformation.date)/1000;
+            let diff = Math.floor( (new Date().getTime() - this.blockInformation.date)/1000);
 
             if (diff > 0 && this.blockInformation._timeRemaining > 0)
-                ratio = new BigNumber(diff).dividedBy( diff + this.blockInformation._timeRemaining );
+                ratio = new BigNumber( diff).dividedBy( diff + this.blockInformation._timeRemaining );
         }
 
         this.reward = Math.floor ( this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).multipliedBy(ratio).multipliedBy( BlockchainMiningReward.getReward( height ) - consts.MINING_POOL.MINING.FEE_THRESHOLD ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber());
 
-        this.minerInstance.miner.rewardTotal += this.reward - this.prevReward;
+        if (!skipRewardTotal)
+            this.minerInstance.miner.rewardTotal += this.reward - this.prevReward;
 
         return this.reward;
     }

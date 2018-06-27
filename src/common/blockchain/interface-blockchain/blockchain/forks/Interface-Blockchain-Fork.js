@@ -43,7 +43,7 @@ class InterfaceBlockchainFork {
             this._blocksCopy = [];
             this._forkPromiseResolver = undefined;
             this.forkPromise = undefined;
-            this.downloadAllBlocks = 0;
+            this.downloadAllBlocks = false;
 
         } catch (exception){
             console.error("destroy fork raised an exception",  exception);
@@ -263,7 +263,7 @@ class InterfaceBlockchainFork {
                 return false
             }
 
-            if (!this.downloadAllBlocks) await this.sleep(50);
+            if (!this.downloadAllBlocks) await this.sleep(30);
 
             try {
 
@@ -276,7 +276,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            if (!this.downloadAllBlocks) await this.sleep(70);
+            if (!this.downloadAllBlocks) await this.sleep(20);
 
             try {
 
@@ -299,7 +299,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            if (!this.downloadAllBlocks) await this.sleep(70);
+            if (!this.downloadAllBlocks) await this.sleep(20);
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
 
@@ -341,13 +341,13 @@ class InterfaceBlockchainFork {
                         throw({message: "fork couldn't be included in main Blockchain ", index: index});
 
                     if ( !process.env.BROWSER )
-                        await this.sleep( this.downloadAllBlocks ? 10 : 100 );
+                        await this.sleep( this.downloadAllBlocks ? 10 : 30 );
 
                 }
 
                 await this.blockchain.saveBlockchain( this.forkStartingHeight );
 
-                if (!this.downloadAllBlocks) await this.sleep(30);
+                if (!this.downloadAllBlocks) await this.sleep(2);
 
                 console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
 
@@ -381,15 +381,13 @@ class InterfaceBlockchainFork {
 
             }
 
-            if (!this.downloadAllBlocks) await this.sleep(30);
-
             await this.postForkTransactions(forkedSuccessfully);
 
-            if (!this.downloadAllBlocks) await this.sleep(30);
+            if (this.downloadAllBlocks) await this.sleep(30);
 
             this.postFork(forkedSuccessfully);
 
-            if (!this.downloadAllBlocks) await this.sleep(30);
+            if (this.downloadAllBlocks) await this.sleep(30);
 
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();

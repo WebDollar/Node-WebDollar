@@ -7,7 +7,7 @@ const atob = require('atob');
 const btoa = require('btoa');
 import MainBlockchain from 'main-blockchain/Blockchain';
 import StatusEvents from "common/events/Status-Events";
-
+import Utils from "common/utils/helpers/Utils";
 let pounchdb = (process.env.BROWSER) ? (require('pouchdb').default) : (require('pouchdb-node'));
 
 class InterfaceSatoshminDB {
@@ -216,7 +216,7 @@ class InterfaceSatoshminDB {
 
 
     //main methods
-    save(key, value, timeout=5000) {
+    _save(key, value, timeout=5000) {
 
         return new Promise(async (resolve)=>{
 
@@ -244,6 +244,22 @@ class InterfaceSatoshminDB {
             }
 
         })
+    }
+
+    async save(key, value, timeout, trials = 10){
+
+        for (let i = 0; i < trials; i++){
+
+            let answer = await this._save(key, value, timeout);
+
+            if (answer !== null)
+                return answer;
+            else
+                await Utils.sleep(100);
+
+        }
+
+        return null;
     }
 
     get(key, timeout=6000, freeze=false) {

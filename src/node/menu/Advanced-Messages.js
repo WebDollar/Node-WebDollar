@@ -1,7 +1,12 @@
+import Blockchain from "main-blockchain/Blockchain"
+
 let CLI, readline;
+let termination;
+
 
 if (!process.env.BROWSER){
     readline = require('readline');
+    termination = require('./../../termination').default;
 }
 
 class AdvancedMessages{
@@ -14,6 +19,13 @@ class AdvancedMessages{
                 output: process.stdout,
                 prompt: 'WEBD_CLI:> '
             });
+
+            this.WEBD_CLI.on("SIGINT", function () {
+
+                termination(Blockchain);
+
+            });
+
         }
 
     }

@@ -5,6 +5,7 @@ import ServerPoolProtocol from "./protocol/Server-Pool-Protocol"
 import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import StatusEvents from "common/events/Status-Events";
 import Blockchain from "main-blockchain/Blockchain";
+import consts from 'consts/const_global'
 
 class ServerPoolManagement{
 
@@ -88,12 +89,13 @@ class ServerPoolManagement{
             await this.serverPoolSettings.setServerPoolActivated(value);
 
             if (value){
-
                 await this.serverPoolProtocol._startServerPoolProtocol();
+                consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_SERVER;
             }
-            else await this.serverPoolProtocol._stopServerPoolProtocol();
-
-
+            else {
+                await this.serverPoolProtocol._stopServerPoolProtocol();
+                consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
+            }
 
             StatusEvents.emit("server-pool/status", {result: value, message: "Server Pool Started changed" });
 
