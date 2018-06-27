@@ -32,7 +32,7 @@ if [ $TYPE -eq 11 ]; then
 	if [ -z $POOL_WEBSITE ]; then echo 'You need to input a pool website using POOL_WEBSITE ENV variable'; exit; fi
 	if [ -z $POOL_SERVERS ]; then export POOL_SERVERS='https://p1.webdollar.fun'; fi
 
-	if [ $POOL_EXTERNAL -eq "n" ] then
+	if [ $POOL_EXTERNAL -eq "n" ]; then
 		(sleep 15;echo 11;sleep 5;echo $FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo $POOL_EXTERNAL;) | npm run commands
 	else
 		(sleep 15;echo 11;sleep 5;echo $FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo $POOL_EXTERNAL;sleep 5;echo "$POOL_SERVERS";) | npm run commands
