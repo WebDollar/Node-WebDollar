@@ -52,7 +52,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         this._nonce = start;
 
 
-
         this._workerFinished = false;
 
         let promiseResolve = new Promise ((resolve)=>{ this._workerResolve = resolve });

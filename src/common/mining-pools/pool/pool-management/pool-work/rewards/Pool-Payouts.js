@@ -81,19 +81,19 @@ class PoolPayouts{
                 for (let j = 0; j < blocksConfirmed[i].blockInformationMinersInstances.length; j++)
                     sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].calculateReward();
 
-                let difference = maxSumReward - sumReward;
+                let difference = sumReward - maxSumReward ;
 
                 if ( Math.abs( difference ) > 1 ) {
 
-                    difference /= blocksConfirmed[i].blockInformationMinersInstances.length;
-
+                    difference /= Math.floor( blocksConfirmed[i].blockInformationMinersInstances.length );
 
                     blocksConfirmed[i].blockInformationMinersInstances.forEach( (blockInformationMinerInstance)=>{
 
-                        let newReward = Math.floor(blockInformationMinerInstance.reward - difference);
+                        if (blockInformationMinerInstance.reward - difference > 0) {
+                            blockInformationMinerInstance.miner.rewardTotal -= difference;
+                            blockInformationMinerInstance.reward -= difference;
+                        }
 
-                        if (newReward > 0)
-                            blockInformationMinerInstance.reward = newReward;
 
                     })
 

@@ -12,7 +12,7 @@ class PoolStatistics{
         this.poolManagement = poolManagement;
 
         this.POOL_STATISTICS_TIME = 5000;
-        this.POOL_STATISTICS_MEAN_VALUES = 40;
+        this.POOL_STATISTICS_MEAN_VALUES = 100;
 
         this.poolHashes = 0;
         this.poolHashesNow = 0;
@@ -84,15 +84,17 @@ class PoolStatistics{
             length: 0,
         };
 
-        let array = [];
-        for (let i=0; i < this._poolHashesLast.length; i++)
-            array.push(this._poolHashesLast[i]);
+        if (Math.random() <= 0.1) {
+            let array = [];
+            for (let i = 0; i < this._poolHashesLast.length; i++)
+                array.push(this._poolHashesLast[i]);
 
-        array.sort(function(a, b) {
-            return a - b;
-        });
+            array.sort(function (a, b) {
+                return a - b;
+            });
 
-        this.poolHashes = array[ Math.floor(array.length/2) ];
+            this.poolHashes = array[Math.floor(array.length / 2)];
+        }
 
         for (let i=0; i < this._poolMinersOnlineLast.length; i++)
             poolMinersOnlineMean.length += this._poolMinersOnlineLast[i].length;

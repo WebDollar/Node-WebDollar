@@ -61,7 +61,7 @@ class NodeExpress{
 
             let options = {};
 
-            this.port = process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
+            this.port = process.env.PORT || process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
 
             this.loaded = true;
 

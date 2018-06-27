@@ -226,6 +226,9 @@ export default function (self) {
         return global.performance ? performance.now() : Date.now();
     }
 
+
+
+
     /**
      * This will load scripts/WASM files in a web worker
      * @param script

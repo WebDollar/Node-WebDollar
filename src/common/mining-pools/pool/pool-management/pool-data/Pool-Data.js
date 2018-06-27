@@ -225,9 +225,6 @@ class PoolData {
                     this.blocksInfo.push(blockInformation);
 
                     for (let j = 0; j < blockInformation.blockInformationMinersInstances.length; j++)
-                        blockInformation.totalDifficultyPlus(blockInformation.blockInformationMinersInstances[j].minerInstanceTotalDifficulty);
-
-                    for (let j = 0; j < blockInformation.blockInformationMinersInstances.length; j++)
                         blockInformation.blockInformationMinersInstances[j].calculateReward(false, true);
                 }
 

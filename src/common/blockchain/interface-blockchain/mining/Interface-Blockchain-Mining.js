@@ -212,6 +212,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     //confirming transactions
                     block.data.transactions.confirmTransactions();
 
+                    StatusEvents.emit("blockchain/new-blocks", { });
+
                 } catch (exception){
                     console.error("Mining processBlocksSempahoreCallback raised an error ",block.height, exception);
                     revertActions.revertOperations();

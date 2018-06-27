@@ -216,15 +216,9 @@ class InterfaceSatoshminDB {
 
 
     //main methods
-    _save(key, value, timeout=5000) {
+    _save(key, value) {
 
         return new Promise(async (resolve)=>{
-
-            //timeout, max 10 seconds to load the database
-            let timeoutInterval = setTimeout(()=>{
-                console.error("save failed !!"+ key, value);
-                resolve(null);
-            }, timeout);
 
             try {
                 if (Buffer.isBuffer(value))
@@ -232,14 +226,12 @@ class InterfaceSatoshminDB {
                 else
                     resolve(await this._createDocument(key, value));
 
-                clearTimeout(timeoutInterval);
             } catch (exception) {
                 console.error("db.save error " + key, exception);
 
                 if (exception.status === 500)
                     StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
-                clearTimeout(timeoutInterval);
                 resolve(null);
             }
 
