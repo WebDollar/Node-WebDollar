@@ -127,7 +127,7 @@ class SavingManager{
 
             answer = await this._saveNextBlock();
 
-            if (answer !== null && answer % 10 === 0) {
+            if (answer !== null && answer % 100 === 0) {
                 console.log("Saving successfully", answer);
                 await this.blockchain.sleep(10);
             }
