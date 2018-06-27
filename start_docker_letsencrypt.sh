@@ -28,9 +28,15 @@ fi
 # Start Pool
 if [ $TYPE -eq 11 ]; then
 	if [ -z $POOL_NAME ]; then echo 'You need to input a pool name using POOL_NAME ENV variable'; exit; fi
+	if [ -z $POOL_EXTERNAL ]; then echo 'You need to input a pool website using POOL_EXTERNAL ENV variable'; exit; fi
 	if [ -z $POOL_WEBSITE ]; then echo 'You need to input a pool website using POOL_WEBSITE ENV variable'; exit; fi
 	if [ -z $POOL_SERVERS ]; then export POOL_SERVERS='https://p1.webdollar.fun'; fi
-	(sleep 15;echo 11;sleep 5;echo $FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo y;sleep 5;echo "$POOL_SERVERS";) | npm run commands
+
+	if [ $POOL_EXTERNAL -eq "n" ] then
+		(sleep 15;echo 11;sleep 5;echo $FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo $POOL_EXTERNAL;) | npm run commands
+	else
+		(sleep 15;echo 11;sleep 5;echo $FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo $POOL_EXTERNAL;sleep 5;echo "$POOL_SERVERS";) | npm run commands
+	fi
 else
 	(sleep 15;echo $TYPE;sleep 5;echo $FEE;) | npm run commands
 fi
