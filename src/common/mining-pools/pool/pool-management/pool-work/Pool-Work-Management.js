@@ -17,7 +17,7 @@ class PoolWorkManagement{
         this.blockchain = blockchain;
 
         this.poolWork = new PoolWork(poolManagement, blockchain);
-
+        this.hashBest = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
     }
 
 
@@ -87,16 +87,13 @@ class PoolWorkManagement{
 
 
             if ( false === await blockInformationMinerInstance.validateWorkHash( work.hash, work.nonce )  )
-                throw {message: "block was incorrectly mined"};
-
-            let prevWork = blockInformationMinerInstance.workHash;
+                throw {message: "block was incorrectly mined", work: work };
 
             blockInformationMinerInstance.workHash = work.hash;
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
-            if (Math.random() < 0.001){
+            if (Math.random() < 0.001)
                 console.log("Work: ", work);
-            }
 
             if ( work.result ) {
 

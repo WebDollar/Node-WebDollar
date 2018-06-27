@@ -5,6 +5,7 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import PoolDataMiner from "common/mining-pools/pool/pool-management/pool-data/Pool-Data-Miner";
 import PoolDataBlockInformation from "common/mining-pools/pool/pool-management/pool-data/block-informations/Pool-Data-Block-Information"
 import Blockchain from 'main-blockchain/Blockchain';
+import Utils from "common/utils/helpers/Utils";
 
 const uuid = require('uuid');
 
@@ -18,7 +19,7 @@ class PoolData {
         this.miners = [];
         this.blocksInfo = [];
 
-        setTimeout( this.savePoolData.bind(this), 10000);
+        setTimeout( this.savePoolData.bind(this), 30000);
 
     }
 
@@ -155,12 +156,17 @@ class PoolData {
 
 
 
-    _serializeMiners() {
+    async _serializeMiners() {
 
         let list = [Serialization.serializeNumber4Bytes(this.miners.length)];
 
-        for (let i = 0; i < this.miners.length; ++i)
+        for (let i = 0; i < this.miners.length; ++i) {
             list.push(this.miners[i].serializeMiner());
+
+            if (this.miners.length % 10 === 0)
+                await Utils.sleep(10)
+
+        }
 
         return Buffer.concat(list);
     }
@@ -301,7 +307,7 @@ class PoolData {
 
         try{
 
-            let buffer = this._serializeMiners();
+            let buffer = await this._serializeMiners();
 
             let response = await this._db.save("minersList", buffer);
             if (response !== true) {
@@ -351,6 +357,7 @@ class PoolData {
             try {
 
                 answer = await this.saveMinersList();
+                await Utils.sleep(1000);
                 answer = answer && (await this.saveBlocksInformation());
 
 
