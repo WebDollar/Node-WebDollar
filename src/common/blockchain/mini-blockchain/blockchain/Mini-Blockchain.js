@@ -7,6 +7,7 @@ import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import MiniBlockchainTransactions from "../transactions/Mini-Blockchain-Transactions"
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions"
+import global from "consts/global"
 
 let inheritBlockchain;
 
@@ -129,51 +130,13 @@ class MiniBlockchain extends  inheritBlockchain{
     }
 
 
-    async _onBlockCreated(block, saveBlock){
-
-        await inheritBlockchain.prototype._onBlockCreated.call(this, block, saveBlock);
-
-        if (saveBlock) {
-
-            if (process.env.BROWSER)
-                return false;
-
-            if (!(await this.accountantTree.saveMiniAccountant(true)))
-                console.error("Error Saving Mini Accountant Tree");
-        }
-    }
 
     getBalances(address){
         return this.accountantTree.getBalances(address);
     }
 
 
-    async saveBlockchain( startingHeight, endingHeight ){
 
-        if (process.env.BROWSER)
-            return true;
-
-        if (this.blocks.length === 0) return false;
-
-        try {
-
-            global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
-
-            if (! (await inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
-                throw {message: "couldn't sae the blockchain"};
-
-            if (! (await this.accountantTree.saveMiniAccountant( true, undefined, undefined, 10*1000 )))
-                throw {message: "Couldn't save the Account Tree"};
-
-        } catch (exception){
-            console.error("Couldn't save MiniBlockchain", exception);
-            global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
-            return false;
-        }
-
-        global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
-        return true;
-    }
 
     /**
      * Load blocks and check the Accountant Tree
@@ -186,14 +149,8 @@ class MiniBlockchain extends  inheritBlockchain{
 
         try {
 
-            let finalAccountantTree = new MiniBlockchainAccountantTree(this.db);
             let result;
 
-            try {
-                result = await finalAccountantTree.loadMiniAccountant(undefined, undefined, true);
-            } catch (exception){
-                console.error("accountant Tree returned an error", exception);
-            }
 
             result = await inheritBlockchain.prototype._loadBlockchain.call( this  );
 
@@ -202,11 +159,8 @@ class MiniBlockchain extends  inheritBlockchain{
 
             //check the accountant Tree if matches
             console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
-            console.log("finalAccountantTree final", finalAccountantTree.root.hash.sha256);
 
-            if (this.accountantTree.root.hash.sha256.compare(finalAccountantTree.root.hash.sha256) !== 0){
-                throw {message: "Accountant Trees are different"};
-            }
+            //TODO verify accountantTree
 
             return result;
 

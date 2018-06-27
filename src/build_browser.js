@@ -9,9 +9,12 @@ Blockchain.createBlockchain("light-node", ()=>{
     Node.NodeWebPeersService.startService();
 });
 
-window.onbeforeunload = () => {
-    console.warn("SIGINT FIRED")
+window.onbeforeunload = async () => {
+
+    console.warn("SIGINT FIRED");
     global.TERMINATED = true;
+
+    await Blockchain.blockchain.saveBlockchainTerminated();
 
     setInterval(()=>{
         if ( global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED &&
@@ -27,6 +30,7 @@ window.onbeforeunload = () => {
 
             console.warn("process.exit(0)");
         }
-    }, 100)
-}
+    }, 100);
+
+};
 

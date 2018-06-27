@@ -22,10 +22,12 @@ Blockchain.createBlockchain("full-node", async ()=>{
 });
 
 
-process.on('SIGINT', function() {
+process.on('SIGINT', async () => {
 
     console.warn("SIGINT FIRED");
     global.TERMINATED = true;
+
+    await Blockchain.blockchain.saveBlockchainTerminated();
 
     setInterval(()=>{
         if ( global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED &&

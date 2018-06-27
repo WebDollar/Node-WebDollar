@@ -3,6 +3,7 @@ import global from "consts/global"
 import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
+import MiniBlockchain from "./Mini-Blockchain";
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -241,7 +242,9 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
     }
 
 
-    async saveBlockchain(){
+    async saveBlockchainTerminated(){
+
+        await MiniBlockchainAdvanced.prototype.saveBlockchainTerminated.call(this);
 
         if (process.env.BROWSER)
             return true;

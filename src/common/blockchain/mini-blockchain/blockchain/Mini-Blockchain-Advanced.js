@@ -58,48 +58,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
     }
 
 
-    async saveBlockchain(startingHeight, endingHeight){
-
-        if (process.env.BROWSER)
-            return true;
-
-        if (this.blocks.length === 0) return false;
-
-        try {
-
-            global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
-
-            console.log("saving started");
-
-            if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
-                throw {message: "couldn't sae the blockchain"};
-
-
-            if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) {
-
-                if (! (await this.db.save("lightAccountantTreeAdvanced_offset", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES )))
-                    throw {message: "Couldn't be saved _lightAccountantTreeAdvanced_offset", index: this._blockchainFileName + consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES};
-
-                await this.sleep(70);
-
-                if (!(await this.accountantTree.saveMiniAccountant( true, "lightAccountantTreeAdvanced", this.lightAccountantTreeSerializations[this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1])))
-                    throw {message: "saveMiniAccountant couldn't be saved"};
-
-                await this.sleep(80);
-            }
-
-            console.log("saving ended");
-
-        } catch (exception){
-            console.error("Couldn't save MiniBlockchain", exception);
-            global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
-            return false;
-        }
-
-        global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
-        return true;
-
-    }
 
     async _loadBlockchain(){
 
@@ -133,15 +91,53 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         } catch (exception){
 
             if (exception === "load blockchain simple") {
-                let answer = await this.inheritBlockchain.prototype._loadBlockchain.call(this);
 
-                if (answer)
-                    await this.saveBlockchain(this.blocks.length, this.blocks.length);
+                await this.inheritBlockchain.prototype._loadBlockchain.call(this);
 
             }
         }
 
         return false;
+
+    }
+
+
+    async saveBlockchainTerminated(){
+
+        await MiniBlockchain.prototype.saveBlockchainTerminated.call(this);
+
+        if (process.env.BROWSER)
+            return true;
+
+        if (this.blocks.length === 0) return false;
+
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
+
+        try {
+
+            if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) {
+
+                if (! (await this.db.save("lightAccountantTreeAdvanced_offset", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES )))
+                    throw {message: "Couldn't be saved _lightAccountantTreeAdvanced_offset", index: this._blockchainFileName + consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES};
+
+                await this.sleep(70);
+
+                if (!(await this.accountantTree.saveMiniAccountant( true, "lightAccountantTreeAdvanced", this.lightAccountantTreeSerializations[this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1])))
+                    throw {message: "saveMiniAccountant couldn't be saved"};
+
+                await this.sleep(80);
+            }
+
+            console.log("saving ended");
+
+        } catch (exception){
+            console.error("Couldn't save MiniBlockchain", exception);
+            global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
+            return false;
+        }
+
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
+        return true;
 
     }
 

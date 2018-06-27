@@ -91,7 +91,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (saveBlock) {
 
-            await this.saveNewBlock(block);
+            this.savingManager.addBlockToSave(block);
 
             // propagating a new block in the network
             NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
@@ -238,41 +238,22 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             return true;
 
         //save the number of blocks
-        let result = true;
 
         global.INTERFACE_BLOCKCHAIN_SAVED = false;
 
-        if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true)
-            console.error("Error saving the blocks.length");
-        else {
+        if (startingHeight === undefined) startingHeight = this.blocks.blocksStartingPoint;
+        if (endingHeight === undefined) endingHeight = this.blocks.length;
 
-            if (startingHeight === undefined) startingHeight = this.blocks.blocksStartingPoint;
-            if (endingHeight === undefined) endingHeight = this.blocks.length;
+        for (let i = startingHeight; i < endingHeight; i++ )
+            if (this.blocks[i] !== undefined && this.blocks[i] !== null)
+                this.savingManager.addBlockToSave(this.blocks[i]);
 
-            console.warn("Saving Blockchain. Starting from ", startingHeight, endingHeight);
-
-            for (let i = startingHeight; i < endingHeight; i++ )
-
-                if (this.blocks[i] !== undefined && this.blocks[i] !== null)
-
-                    try {
-
-                        if (!( await this.blocks[i].saveBlock()))
-                            throw {message: "couldn't save block", block: i};
-
-                        await this.sleep(20);
-
-                    } catch (exception){
-                        console.error(exception);
-                    }
-
-
-            console.warn("Successfully saving blocks ", startingHeight, endingHeight);
-        }
+        console.warn("Saving Blockchain. Starting from ", startingHeight, endingHeight);
+        console.warn("Successfully saving blocks ", startingHeight, endingHeight);
 
         global.INTERFACE_BLOCKCHAIN_SAVED = true;
 
-        return result;
+        return true;
     }
 
 
@@ -469,6 +450,15 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
     }
 
+
+    async saveBlockchainTerminated(){
+
+        if (process.env.BROWSER)
+            return true;
+
+        await this.savingManager.saveAllBlocks();
+
+    }
 
 
 }
