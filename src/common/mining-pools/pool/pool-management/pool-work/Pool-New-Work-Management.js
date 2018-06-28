@@ -52,7 +52,7 @@ class PoolNewWorkManagement{
                 if (answer !== false){
 
                     await this.poolManagement.poolWorkManagement.processWork(minerInstance, answer);
-
+P
                 }
             }
 
