@@ -149,9 +149,15 @@ class PoolPayouts{
 
             if (this._toAddresses.length === 0) throw {message: "No Addresses to send money"};
 
-            let transaction = await Blockchain.Transactions.wizard.createTransactionSimple( this.blockchain.mining.minerAddress, this._toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD, );
+            let index = 0;
+            while (index * 256 < this._toAddresses.length) {
 
-            if (!transaction.result) throw {message: "Transaction was not made"};
+                let toAddresses = this._toAddresses.splice(index*256, 255);
+
+                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
+                if (!transaction.result) throw {message: "Transaction was not made"};
+
+            }
 
 
             for (let i=0; i<blocksConfirmed.length; i++) {
