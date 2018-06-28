@@ -237,6 +237,8 @@ class MinerProtocol extends PoolProtocolList{
 
         try {
 
+            if (poolSocket === null) throw {message: "poolSocket is null"};
+
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
                 poolPublicKey: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
                 minerPublicKey: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,

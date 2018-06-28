@@ -24,6 +24,8 @@ class PoolWorkManagement{
 
     async getWork(minerInstance, includeSignature = true, blockInformationMinerInstance){
 
+        if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
+
         let hashes = minerInstance.hashesPerSecond;
         if (hashes === undefined ) hashes = 500;
 
@@ -69,6 +71,7 @@ class PoolWorkManagement{
 
         try{
 
+            if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
             if (work === null || typeof work !== "object") throw {message: "work is undefined"};
 
             if ( !Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};

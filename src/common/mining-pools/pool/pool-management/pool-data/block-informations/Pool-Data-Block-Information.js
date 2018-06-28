@@ -183,6 +183,8 @@ class PoolDataBlockInformation {
 
     _addBlockInformationMinerInstance(minerInstance){
 
+        if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
+
         let blockInformationMinerInstance = this._findBlockInformationMinerInstance(minerInstance);
         if (blockInformationMinerInstance !== null) return blockInformationMinerInstance;
 
