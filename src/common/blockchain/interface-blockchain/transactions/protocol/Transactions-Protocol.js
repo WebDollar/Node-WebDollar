@@ -73,7 +73,7 @@ class InterfaceBlockchainTransactionsProtocol {
                 if ( transaction.fee < consts.MINING_POOL.MINING.FEE_THRESHOLD  )  //not good
                     return false;
 
-                if (!transaction.isTransactionOK())
+                if (!transaction.isTransactionOK(undefined, false))
                     return false;
 
                 await this.blockchain.sleep(25);
@@ -242,7 +242,7 @@ class InterfaceBlockchainTransactionsProtocol {
                         continue;
                     }
 
-                    if ( !transaction.isTransactionOK(true) ) { //not good
+                    if ( !transaction.isTransactionOK(true, false) ) { //not good
                         errors++;
                         continue;
                     }
