@@ -62,6 +62,12 @@ class PoolPayouts{
 
         try{
 
+            console.info("--------------------------------------------------");
+            console.info("--------------------------------------------------");
+            console.info("--------------------PAYOUT------------------------");
+            console.info("--------------------------------------------------");
+            console.info("--------------------------------------------------");
+
             this.poolData.miners.forEach((miner)=>{
 
                 miner._tempRewardConfirmedOtherTemporary = 0 ;

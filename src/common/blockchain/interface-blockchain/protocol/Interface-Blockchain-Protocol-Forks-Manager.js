@@ -78,7 +78,10 @@ class InterfaceBlockchainProtocolForksManager {
             return false;
 
         } catch (exception){
-            console.warn(exception);
+
+            if (exception.message === "Your blockchain is smaller than mine" && Math.random() < 0.2)
+                console.warn(exception);
+
             return false;
         }
 
