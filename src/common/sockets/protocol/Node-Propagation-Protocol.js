@@ -1,3 +1,5 @@
+import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
+
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List'
 import NODE_TYPE from "node/lists/types/Node-Type";
@@ -72,7 +74,13 @@ class NodePropagationProtocol {
 
     initializeSocketForPropagation(socket){
 
+        //avoiding download the list from
+        if ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL].indexOf( socket.node.protocol.nodeConsensusType ) <=0 )
+            return;
+
+
         this.initializeNodesPropagation(socket);
+
 
         setTimeout( ()=>{
 

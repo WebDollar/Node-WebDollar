@@ -201,39 +201,27 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                 if (compare === -1){
 
-                    //verify block with the worker block
-                    let match = true;
-
-                    for (let i = 0, l=this.block.length;  i < l;  i++)
-                        if (this.block[i] !== event.data.block[i] ) // do not match
-                            match = false;
-
-                    //verify the  bestHash with  the current target
-                    if (match) {
 
 
-                        this.bestHash = new Buffer(event.data.hash);
-                        this.bestHashNonce = event.data.nonce;
+                    this.bestHash = new Buffer(event.data.hash);
+                    this.bestHashNonce = event.data.nonce;
 
-                        if (this.bestHash.compare(this.difficulty) <= 0) {
+                    if (this.bestHash.compare(this.difficulty) <= 0) {
 
-                            console.log('processing done');
+                        console.log('processing done');
 
-                            this._suspendMiningWorking();
-                            this.workers.suspendWorkers();
+                        this._suspendMiningWorking();
+                        this.workers.suspendWorkers();
 
-                            this._workerResolve({
-                                result: true,
-                                hash: new Buffer(event.data.hash),
-                                nonce: event.data.nonce,
-                            });
+                        this._workerResolve({
+                            result: true,
+                            hash: new Buffer(event.data.hash),
+                            nonce: event.data.nonce,
+                        });
 
-                            return;
-
-                        }
+                        return;
 
                     }
-
 
                 }
             }
