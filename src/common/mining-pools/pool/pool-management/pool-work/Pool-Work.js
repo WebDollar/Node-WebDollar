@@ -103,7 +103,9 @@ class PoolWork {
                         if (this._blocksList[i].instances.hasOwnProperty(key))
                             this._blocksList[i].instances[key].workBlock = undefined;
 
-                    this._blocksList[i].block.destroyBlock();
+                    if (this._blocksList[i].block !== undefined)
+                        this._blocksList[i].block.destroyBlock();
+
                     this._blocksList[i].block = undefined;
                     this._blocksList[i].instances = undefined;
 

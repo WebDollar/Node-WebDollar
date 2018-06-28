@@ -36,7 +36,9 @@ class PoolDataBlockInformationMinerInstance {
         this.blockInformation = undefined;
         this.minerInstance = undefined;
 
-        this.workBlock.destroyBlock();
+        if (this.workBlock !== undefined)
+            this.workBlock.destroyBlock();
+
         this.workBlock = undefined;
 
     }
