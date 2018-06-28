@@ -221,7 +221,7 @@ class InterfaceBlockchainTransaction{
     }
 
 
-    isTransactionOK(avoidValidatingSignature = false){
+    isTransactionOK(avoidValidatingSignature = false, showDebug=true){
 
         if (!avoidValidatingSignature)
             this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
@@ -235,7 +235,10 @@ class InterfaceBlockchainTransaction{
             this.validateTransactionEveryTime(undefined, blockValidationType );
 
         } catch (exception){
-            console.warn ("Transaction had not enough money, so I am skipping it", exception);
+
+            if (showDebug)
+                console.warn ("Transaction Problem", exception);
+
             return false;
         }
 

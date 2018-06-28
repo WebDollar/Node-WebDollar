@@ -8,6 +8,11 @@ let algorithm = undefined;
 
 let nonceArray = new Uint8Array(4);
 
+let bestHash, bestNonce;
+let nonce, noncePrevious, nonceEnd;
+let WorkerInitialized = false;
+let WorkerChanged = false;
+
 export default function (self) {
 
     var _librayLoaded = false;
@@ -226,6 +231,9 @@ export default function (self) {
         return global.performance ? performance.now() : Date.now();
     }
 
+
+
+
     /**
      * This will load scripts/WASM files in a web worker
      * @param script
@@ -282,13 +290,14 @@ export default function (self) {
                 self.postMessage({message: "algorithm", answer:"WebAssembly supported", });
             }
 
+            processWorker();
 
         } else
         if (ev.data.message === "new-nonces" || ev.data.message === "initialize" ) {
 
-            if (ev.data.message === "initialize") {
+            jobTerminated = false;
 
-                jobTerminated = false;
+            if (ev.data.message === "initialize") {
 
                 if (ev.data.block !== undefined && ev.data.block !== null) {
                     block = ev.data.block;
@@ -309,63 +318,88 @@ export default function (self) {
                 return;
             }
 
-            let bestHash, bestNonce;
+            nonce = ev.data.nonce;
+            noncePrevious = nonce;
+            nonceEnd = nonce + ev.data.count;
+            bestHash = undefined;
+            bestNonce = 0;
 
-            let nonce = ev.data.nonce;
-            let noncePrevious = nonce;
-
-            while (ev.data.count > 0 && !jobTerminated){
-
-                nonceArray [3] = nonce & 0xff;
-                nonceArray [2] = nonce>>8 & 0xff;
-                nonceArray [1] = nonce>>16 & 0xff;
-                nonceArray [0] = nonce>>24 & 0xff;
-
-                ARGON2_PARAM.pass.set(nonceArray, block.length);
-
-                let hash = await algorithm ();
-
-                // compare lengths - can save a lot of time
-
-                let change = false;
-
-                if (bestHash === undefined) change = true;
-                else
-                    for (let i = 0, l = bestHash.length; i < l; i++)
-                        if (hash[i] < bestHash[i]) {
-                            change = true;
-                            break;
-                        }
-                        else if (hash[i] > bestHash[i])
-                            break;
-
-
-                if ( change ) {
-                    bestHash = hash;
-                    bestNonce = nonce;
-                }
-
-                nonce ++ ;
-                ev.data.count --;
-
-                if (nonce % 3 === 0) {
-                    self.postMessage({message: "worker nonce worked", nonce: nonce, nonceWork: nonce - noncePrevious});
-                    noncePrevious = nonce;
-                }
-
-
-            }
-
-
-
-            if (jobTerminated === false) //not terminated
-                self.postMessage({message: "results", hash:bestHash, nonce: bestNonce, block: block, });
-            else
-                log("job terminated");
-
+            WorkerChanged = true;
 
         }
 
+
     });
+
+
+    async function processWorker(){
+
+        if ( WorkerInitialized ) return;
+        WorkerInitialized = true;
+
+        while ( 1 === 1){
+
+            if (nonce === nonceEnd || jobTerminated) {
+                await sleep(1);
+                continue;
+            }
+
+            WorkerChanged = false;
+
+            nonceArray [3] = nonce & 0xff;
+            nonceArray [2] = nonce>>8 & 0xff;
+            nonceArray [1] = nonce>>16 & 0xff;
+            nonceArray [0] = nonce>>24 & 0xff;
+
+            ARGON2_PARAM.pass.set(nonceArray, block.length);
+
+            let hash = await algorithm ();
+
+            if (WorkerChanged) continue; //it was changed in the meanwhile
+
+            let change = false;
+
+            if (bestHash === undefined) change = true;
+            else
+                for (let i = 0, l = bestHash.length; i < l; i++)
+                    if (hash[i] < bestHash[i]) {
+                        change = true;
+                        break;
+                    }
+                    else if (hash[i] > bestHash[i])
+                        break;
+
+
+            if ( change ) {
+                bestHash = hash;
+                bestNonce = nonce;
+            }
+
+            nonce ++ ;
+
+            if (nonce % 3 === 0) {
+                self.postMessage({message: "worker nonce worked", nonce: nonce, nonceWork: nonce - noncePrevious});
+                noncePrevious = nonce;
+            }
+
+            if ( nonce === nonceEnd){
+
+                if (!jobTerminated ) //not terminated
+                    self.postMessage({message: "results", hash:bestHash, nonce: bestNonce });
+                else
+                    log("job terminated");
+
+            }
+
+        }
+
+
+
+
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
 };

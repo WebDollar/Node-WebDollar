@@ -399,6 +399,9 @@ class InterfaceBlockchainFork {
 
         this.forkIsSaving = false;
 
+        if (success)
+            StatusEvents.emit("blockchain/new-blocks", {});
+
         // it was done successfully
         console.log("FORK SOLVER SUCCESS", success);
 
@@ -419,9 +422,9 @@ class InterfaceBlockchainFork {
 
                     this.blockchain.agent.protocol.askBlockchain(this.getSocket());
 
-                    await this.sleep(10);
+                    await this.sleep(100);
 
-                } else await this.sleep(100);
+                } else await this.sleep(20);
 
             }
         } catch (exception){

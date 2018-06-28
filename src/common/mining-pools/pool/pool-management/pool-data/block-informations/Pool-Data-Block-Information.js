@@ -49,7 +49,9 @@ class PoolDataBlockInformation {
 
         this.blockInformationMinersInstances = [];
 
-        this.block.destroyBlock();
+        if (this.block !== undefined)
+            this.block.destroyBlock();
+
         this.block = undefined;
 
     }
@@ -182,6 +184,8 @@ class PoolDataBlockInformation {
     }
 
     _addBlockInformationMinerInstance(minerInstance){
+
+        if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
 
         let blockInformationMinerInstance = this._findBlockInformationMinerInstance(minerInstance);
         if (blockInformationMinerInstance !== null) return blockInformationMinerInstance;

@@ -18,15 +18,6 @@ class PoolWork {
 
         this._blocksList = []; //for gerbage collector
 
-        // StatusEvents.on("blockchain/blocks-count-changed",async (data)=> {
-        //
-        //     if (!this.poolManagement._poolStarted) return;
-        //
-        //     this._gettingNewWork =
-        //     this.getNextBlockForWork();
-        //
-        // });
-
     }
 
     startGarbageCollector(){
@@ -75,8 +66,11 @@ class PoolWork {
 
             this._blocksList.push(this.lastBlockElement);
 
-            if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash )))
+            if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) {
                 console.error("ERRRORR!!! HASHPREV DOESN'T MATCH blocks.last.hash");
+                resolve(false);
+                return;
+            }
 
             resolve(true);
         }));
@@ -109,7 +103,9 @@ class PoolWork {
                         if (this._blocksList[i].instances.hasOwnProperty(key))
                             this._blocksList[i].instances[key].workBlock = undefined;
 
-                    this._blocksList[i].block.destroyBlock();
+                    if (this._blocksList[i].block !== undefined)
+                        this._blocksList[i].block.destroyBlock();
+
                     this._blocksList[i].block = undefined;
                     this._blocksList[i].instances = undefined;
 

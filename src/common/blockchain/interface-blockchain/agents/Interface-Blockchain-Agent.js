@@ -185,6 +185,9 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
     set status(newValue){
 
+        if (this._status === newValue)
+            return;
+
         this._status = newValue;
 
         if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES].indexOf(newValue) >= 0){

@@ -143,18 +143,13 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if (! data.poolPublicKey.equals(Blockchain.PoolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey is invalid"};
 
                 let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
-                if (minerInstance === null) throw {message: "publicKey was not found"};
+                if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
-                let work = await this.poolManagement.generatePoolWork(minerInstance);
-
-                let message = Buffer.concat( [ work.serialization, Serialization.serializeNumber4Bytes( work.start ), Serialization.serializeNumber4Bytes( work.end ) ]);
-                let signature = this.poolManagement.poolSettings.poolDigitalSign(message);
-
-                work.serialization = undefined; //don't send the data 2 times
+                let work = await this.poolManagement.generatePoolWork(minerInstance, true);
 
                 minerInstance.socket = socket;
 
-                socket.node.sendRequest("mining-pool/get-work/answer"+suffix, {result: true, work: work, signature: signature,
+                socket.node.sendRequest("mining-pool/get-work/answer"+suffix, {result: true, work: work,
                     h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed + this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining,  } )
 
             } catch (exception){
@@ -183,20 +178,14 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if (! data.poolPublicKey.equals(Blockchain.PoolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey is invalid"};
 
                 let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
-                if (minerInstance === null) throw {message: "publicKey was not found"};
+                if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
                 let answer = await this.poolManagement.receivePoolWork(minerInstance, data.work);
 
-                let newWork = await this.poolManagement.generatePoolWork(minerInstance);
-
-                let message = Buffer.concat( [ newWork.serialization, Serialization.serializeNumber4Bytes( newWork.start ), Serialization.serializeNumber4Bytes( newWork.end ) ]);
-                let signature = this.poolManagement.poolSettings.poolDigitalSign(message);
-
-                newWork.serialization = undefined;
-
+                let newWork = await this.poolManagement.generatePoolWork(minerInstance, true);
 
                 //the new reward
-                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, newWork: newWork, signature: signature,
+                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, newWork: newWork,
                     h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed + this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining } );
 
             } catch (exception){

@@ -15,7 +15,7 @@ class PoolData {
 
         this.poolManagement = poolManagement;
         this._db = new InterfaceSatoshminDB(databaseName ? databaseName : consts.DATABASE_NAMES.POOL_DATABASE);
-        
+
         this.miners = [];
         this.blocksInfo = [];
 
@@ -46,17 +46,17 @@ class PoolData {
 
         return true;
     }
-    
+
     /**
      * @param minerAddress
      * @returns miner or null if it doesn't exist
      */
     getMiner(minerAddress){
-        
+
         for (let i = 0; i < this.miners.length; ++i)
             if (this.miners[i].address.equals( minerAddress) )
                 return this.miners[i];
-                
+
         return null;
     }
 
@@ -74,7 +74,7 @@ class PoolData {
 
         return null;
     }
-    
+
     /**
      * Insert a new miner if not exists. Synchronizes with DB.
      * @param minerAddress
@@ -82,7 +82,7 @@ class PoolData {
      * @returns true/false
      */
     async addMiner(minerAddress, minerPublicKey, minerReward = 0){
-        
+
         if (this.getMiner(minerAddress) === null) {
 
             if ( !Buffer.isBuffer(minerAddress) || minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
@@ -94,7 +94,7 @@ class PoolData {
             return this.miners[this.miners.length-1]
 
         }
-        
+
         return false; //miner already exists
     }
 
@@ -132,11 +132,11 @@ class PoolData {
     }
 
 
-    
+
     /**
      * Remove a miner if exists. Synchronizes with DB.
      * @param minerAddress
-     * @returns true/false 
+     * @returns true/false
      */
     async removeMiner(minerAddress){
 
@@ -144,12 +144,12 @@ class PoolData {
 
         if (response === null)
             return false; //miner doesn't exists
-        
+
         let index = response.index;
-        
+
         this.miners[index] = this.miners[this.miners.length - 1];
         this.miners.pop();
-        
+
         return true;
     }
 
@@ -170,11 +170,11 @@ class PoolData {
 
         return Buffer.concat(list);
     }
-    
+
     _deserializeMiners(buffer, offset = 0) {
 
         try {
-            
+
             let numMiners = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
             offset += 4;
 
@@ -225,10 +225,7 @@ class PoolData {
                     this.blocksInfo.push(blockInformation);
 
                     for (let j = 0; j < blockInformation.blockInformationMinersInstances.length; j++)
-                        blockInformation.totalDifficultyPlus(blockInformation.blockInformationMinersInstances[j].minerInstanceTotalDifficulty);
-
-                    for (let j = 0; j < blockInformation.blockInformationMinersInstances.length; j++)
-                        blockInformation.blockInformationMinersInstances[j].calculateReward(false, true);
+                        blockInformation.blockInformationMinersInstances[j].calculateReward(false);
                 }
 
             }
@@ -246,13 +243,13 @@ class PoolData {
         }
 
     }
-    
+
     /**
      * Load miners from database
      * @returns {boolean} true is success, otherwise false
      */
     async loadMinersList() {
-        
+
         try{
 
             let buffer = await this._db.get("minersList",  60000, true);
@@ -314,7 +311,7 @@ class PoolData {
                 console.log('Unable to save miners to DB');
                 return false;
             }
-            
+
             return true;
         }
         catch (exception){

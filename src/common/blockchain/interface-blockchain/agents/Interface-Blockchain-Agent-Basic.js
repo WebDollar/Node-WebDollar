@@ -33,7 +33,7 @@ class InterfaceBlockchainAgentBasic{
 
         NodesList.emitter.on("nodes-list/disconnected", async (result) => {
 
-            if (!this.consensus) return;
+            if (!this.consensus || consts.DEBUG) return;
 
             if (NodesList.nodes.length === 0) { //no more sockets, maybe I no longer have internet
 

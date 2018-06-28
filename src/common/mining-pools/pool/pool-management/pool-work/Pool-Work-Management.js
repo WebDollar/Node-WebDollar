@@ -8,6 +8,7 @@ import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 import PoolWork from "./Pool-Work";
 import Utils from "common/utils/helpers/Utils";
+import StatusEvents from "common/events/Status-Events";
 
 class PoolWorkManagement{
 
@@ -21,17 +22,20 @@ class PoolWorkManagement{
     }
 
 
-    async getWork(minerInstance){
+    async getWork(minerInstance, includeSignature = true, blockInformationMinerInstance){
+
+        if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
 
         let hashes = minerInstance.hashesPerSecond;
         if (hashes === undefined ) hashes = 500;
 
-        let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
+        if (blockInformationMinerInstance === undefined)
+            blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
 
         await this.poolWork.lastBlockPromise; //it's a promise, let's wait
 
         if ( this.poolWork.lastBlock === undefined || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  ||
-            (!this.blockchain.semaphoreProcessing.processing && ( this.poolWork.lastBlock.height !==  this.blockchain.blocks.length || !this.poolWork.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))))
+            (!this.blockchain.semaphoreProcessing.processing && ( this.poolWork.lastBlock.height !==  this.blockchain.blocks.length || !this.poolWork.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) )
             await this.poolWork.getNextBlockForWork();
 
 
@@ -46,12 +50,18 @@ class PoolWorkManagement{
             start: this.poolWork.lastBlockNonce,
             end: this.poolWork.lastBlockNonce + hashes,
 
-            serialization: this.poolWork.lastBlockSerialization,
         };
 
         this.poolWork.lastBlockNonce += hashes;
 
         blockInformationMinerInstance.workBlock = this.poolWork.lastBlock;
+
+        if (includeSignature) {
+
+            let message = Buffer.concat([this.poolWork.lastBlockSerialization, Serialization.serializeNumber4Bytes(answer.start), Serialization.serializeNumber4Bytes(answer.end)]);
+            answer.sig = this.poolManagement.poolSettings.poolDigitalSign(message);
+
+        }
 
         return answer;
 
@@ -61,6 +71,7 @@ class PoolWorkManagement{
 
         try{
 
+            if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
             if (work === null || typeof work !== "object") throw {message: "work is undefined"};
 
             if ( !Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
@@ -139,6 +150,8 @@ class PoolWorkManagement{
 
                         blockInformationMinerInstance.poolWork = Buffer.from("00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF","hex");
                         blockInformationMinerInstance.poolWorkNonce = -1;
+
+                        StatusEvents.emit("blockchain/new-blocks", { });
 
                     } catch (exception){
 

@@ -37,7 +37,7 @@ class Argon2BrowserWebAssemblyCalc{
 
         let promise = new Promise( async (resolve) => {
 
-           // this.log('Testing Argon2 using asm.js...');
+            // this.log('Testing Argon2 using asm.js...');
 
             if (global.Module && !global.Module.wasmJSMethod) {
 
@@ -159,6 +159,7 @@ class Argon2BrowserWebAssemblyCalc{
                 global.Module.postRun = () => resolve(this.calcHash(arg));
                 var ts = this.now();
                 this.log('Wasm loaded, loading script...');
+
                 this.loadScript(root + 'dist/argon2.min.js', () => {
                     this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                     this.log('Calculating hash....');
@@ -271,41 +272,42 @@ class Argon2BrowserWebAssemblyCalc{
     }
 
 
-    // leftPad(str, len) {
-    //
-    //     str = str.toString();
-    //     while (str.length < len) {
-    //         str = '0' + str;
-    //     }
-    //     return str;
-    // }
     log(msg){
-        // if (!msg) {
-        //     return;
-        // }
-        //
-        // var txtRes = document.getElementById('txtRes');
-        // var elapsedMs = Math.round(performance.now() - this.logTs);
-        // var elapsedSec = (elapsedMs / 1000).toFixed(3);
-        // var elapsed = this.leftPad(elapsedSec, 6);
-        //
-        // if (txtRes !== null)
-        //     txtRes.value += (txtRes.value ? '\n' : '') + '[' + elapsed + '] ' + msg;
+
     }
     clearLog(){
-        // this.logTs = performance.now();
-        //
-        // let txtRes  = document.getElementById('txtRes')
-        //
-        // if (txtRes !== null)
-        //     txtRes.value = '';
+
     }
+
     loadScript(src, onload, onerror) {
-        var el = document.createElement("script");
-        el.src = src;
-        el.onload = onload;
-        el.onerror = onerror;
-        document.body.appendChild(el);
+
+        return new Promise( async (resolve)=>{
+
+            for (let i=0; i < 20; i++){
+
+                if ( document !== undefined && document.body !== undefined)
+                    break;
+
+                await this.sleep(10);
+
+            }
+
+            if (document !== undefined && document.body !== undefined){
+
+                let el = document.createElement("script");
+                el.src = src;
+                el.onload = onload;
+                el.onerror = onerror;
+                document.body.appendChild(el);
+
+                resolve(true);
+
+            } else {
+                onerror("error");
+                resolve(false);
+            }
+
+        });
     }
 
     allocateArray(strOrArr) {
@@ -314,7 +316,9 @@ class Argon2BrowserWebAssemblyCalc{
         return Module.allocate(arr, 'i8', Module.ALLOC_NORMAL);
     }
 
-
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
 }
 

@@ -27,7 +27,7 @@ class PPoWBlockchainProofBasic{
             if (!found) {
 
                 // avoid destroying real blocks
-                if (typeof this.blocks[i].destroyBlock === "function")
+                if (this.blocks[i] !== undefined && typeof this.blocks[i].destroyBlock === "function")
                     this.blocks[i].destroyBlock();
 
             }
