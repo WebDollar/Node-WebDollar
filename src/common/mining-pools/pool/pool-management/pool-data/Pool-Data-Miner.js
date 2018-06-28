@@ -17,10 +17,10 @@ class PoolDataMiner{
         if (publicKey !== undefined)
             this.addInstance(publicKey);
 
-        this.rewardTotal = 0;       //pending except last
-        this.rewardConfirmed = 0;   //rewardConfirmed
+        this.rewardTotal = 0;            //pending except last
+        this.rewardConfirmed = 0;        //rewardConfirmed
         this.rewardConfirmedOther = 0;   //other money confirmed to be sent
-        this.rewardSent = 0;        //rewardSent
+        this.rewardSent = 0;             //rewardSent
 
     }
 
@@ -28,7 +28,7 @@ class PoolDataMiner{
 
         if (publicKey === undefined) return;
 
-        if (!Buffer.isBuffer(publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) 
+        if (!Buffer.isBuffer(publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH)
             throw {message: "public key is invalid"};
 
         let instance = this.findInstance(publicKey);
@@ -54,12 +54,11 @@ class PoolDataMiner{
 
         let list = [];
 
-        list.push(Serialization.serializeNumber1Byte(0x01) );
+        list.push(Serialization.serializeNumber1Byte(0x02) );
         list.push(this.address ); //20 bytes
 
-        list.push ( Serialization.serializeNumber7Bytes(this.rewardTotal) );
-        list.push ( Serialization.serializeNumber7Bytes(this.rewardConfirmedOther) );
-        list.push ( Serialization.serializeNumber7Bytes(this.rewardSent) );
+        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this.rewardConfirmedOther) )));
+        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this.rewardSent) )));
 
         list.push ( Serialization.serializeNumber4Bytes(this.instances.length) );
 
@@ -78,15 +77,20 @@ class PoolDataMiner{
         this.address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH );
         offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
-        this.rewardTotal = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
-        offset += 7;
+        if (version === 0x01) {
+            this.rewardTotal = 0;
+            offset += 7;
+        }
 
         this.rewardConfirmedOther = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
+        if (this.rewardConfirmedOther > 100000000) this.rewardConfirmedOther = 0;
+
         this.rewardSent = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
+        if (this.rewardTotal > 100000000) this.rewardTotal = 0;
 
         let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
         offset += 4;
