@@ -328,6 +328,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         this.blocks.clear();
 
+        global.INTERFACE_BLOCKCHAIN_LOADING = true;
+
+        let answer = true;
+
         try {
 
             let indexStart = 0;
@@ -367,11 +371,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 console.error("Error loading block", index);
 
                 if ( this.blocks.length < 10)
-                    return false;
-
-                if (indexStartProcessingOffset !== undefined){
-                    return false;
-                }
+                    answer = false;
+                else
+                if (indexStartProcessingOffset !== undefined)
+                    answer = false;
 
             }
 
@@ -383,10 +386,13 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             console.log("serializeMiniAccountantTreeERRROR", this.blocks.length-1);
             console.error("blockchain.load raised an exception", exception);
 
-            return false;
+
+            answer = false;
         }
 
-        return true;
+        global.INTERFACE_BLOCKCHAIN_LOADING = false;
+
+        return answer;
     }
 
 

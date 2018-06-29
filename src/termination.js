@@ -1,12 +1,17 @@
 import global from "consts/global";
 
+let alreadySaved = false;
 
 export default async (Blockchain) => {
 
     console.warn("SIGINT FIRED");
     global.TERMINATED = true;
 
-    await Blockchain.blockchain.saveBlockchainTerminated();
+    if (alreadySaved) return;
+    alreadySaved = true;
+
+    if (!global.INTERFACE_BLOCKCHAIN_LOADING)
+        await Blockchain.blockchain.saveBlockchainTerminated();
 
     let interval = setInterval(()=>{
         if ( global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED &&

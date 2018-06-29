@@ -114,6 +114,8 @@ class InterfaceBlockchainTransactionFrom{
         if (this.addresses.length === 0)
             throw {message: "From.addresses is empty", addresses: this.addresses};
 
+        if (this.addresses.length  >= 256) throw {message:"Too many inputs. Max 256"};
+
         if (!this.currencyTokenId || this.currencyTokenId === null) throw {message: 'From.currency is not specified', currencyTokenId: this.currencyTokenId};
 
         if (!Buffer.isBuffer(this.currencyTokenId))
@@ -123,7 +125,6 @@ class InterfaceBlockchainTransactionFrom{
             throw { message: "To.currencyTokenId is not valid", currencyTokenId: this.currencyTokenId };
 
         //TODO validate currency
-
 
         this.addresses.forEach ( (fromObject, index) =>{
 

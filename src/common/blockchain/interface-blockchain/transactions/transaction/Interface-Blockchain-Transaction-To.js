@@ -77,6 +77,8 @@ class InterfaceBlockchainTransactionTo{
 
         if (this.addresses.length === 0) throw {message: 'To is empty Array'};
 
+        if (this.addresses.length  >= 256) throw {message:"Too many inputs. Max 256"};
+
         this.addresses.forEach ( (toObject, index) =>{
 
             if (!toObject.unencodedAddress || toObject.unencodedAddress === null || !Buffer.isBuffer(toObject.unencodedAddress))
