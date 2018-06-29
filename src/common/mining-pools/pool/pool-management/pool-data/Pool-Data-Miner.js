@@ -90,8 +90,6 @@ class PoolDataMiner{
         this.rewardSent = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
-        if (this.rewardTotal > 100000000) this.rewardTotal = 0;
-
         let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
         offset += 4;
 

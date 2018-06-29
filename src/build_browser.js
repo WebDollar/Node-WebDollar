@@ -10,9 +10,9 @@ Blockchain.createBlockchain("light-node", ()=>{
     Node.NodeWebPeersService.startService();
 });
 
-window.onbeforeunload = async () => {
+window.onbeforeunload =  () => {
 
-    await termination(Blockchain);
+     termination(Blockchain);
 
 };
 

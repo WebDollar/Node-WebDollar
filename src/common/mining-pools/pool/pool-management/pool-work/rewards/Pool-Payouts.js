@@ -152,11 +152,12 @@ class PoolPayouts{
             let index = 0;
             while (index * 256 < this._toAddresses.length) {
 
-                let toAddresses = this._toAddresses.splice(index*256, 255);
+                let toAddresses = this._toAddresses.slice(index*256, (index+1)*256);
 
                 let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
                 if (!transaction.result) throw {message: "Transaction was not made"};
 
+                index++;
             }
 
 
@@ -166,16 +167,23 @@ class PoolPayouts{
 
                     let paid = this._findAddressTo(blockInformationMinerInstance.miner.address);
 
-                    //not paid
-                    //move funds to confirmedOther
-                    if (paid === null){
-                        blockInformationMinerInstance.miner.rewardConfirmedOther += blockInformationMinerInstance.miner._tempRewardConfirmedOtherTemporary;
+
+                    try{
+
+                        //not paid
+                        //move funds to confirmedOther
+                        if (paid === null){
+                            blockInformationMinerInstance.miner.rewardConfirmedOther += blockInformationMinerInstance.miner._tempRewardConfirmedOtherTemporary;
+                        }
+
+                        blockInformationMinerInstance.miner._tempRewardConfirmedOtherTemporary = 0;
+
+                        blockInformationMinerInstance.minerInstanceTotalDifficulty = new BigNumber(0);
+                        blockInformationMinerInstance.reward = 0; //i already paid
+
+                    } catch (exception){
+
                     }
-
-                    blockInformationMinerInstance.miner._tempRewardConfirmedOtherTemporary = 0;
-
-                    blockInformationMinerInstance.minerInstanceTotalDifficulty = new BigNumber(0);
-                    blockInformationMinerInstance.reward = 0; //i already paid
 
                 });
 
@@ -187,14 +195,12 @@ class PoolPayouts{
 
                 let miner = this.poolData.getMiner( this._toAddresses[i].address );
 
-                if (miner !== null) {
+                if (miner === null) console.error("ERROR! Miner was not found at the payout");
 
-                    miner.rewardSent += this._toAddresses[i].amount; //i paid totally
-                    miner.rewardConfirmed -= (this._toAddresses[i].amount - miner.rewardConfirmedOther - miner._tempRewardConfirmedOtherTemporary); //paid this
-                    miner.rewardConfirmedOther = 0; //paid this
-                    miner._tempRewardConfirmedOtherTemporary = 0; //paid this
-
-                }
+                miner.rewardSent += this._toAddresses[i].amount; //i paid totally
+                miner.rewardConfirmed = 0; //paid this
+                miner.rewardConfirmedOther = 0; //paid this
+                miner._tempRewardConfirmedOtherTemporary = 0; //paid this
 
             }
 
