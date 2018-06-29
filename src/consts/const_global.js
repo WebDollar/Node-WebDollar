@@ -179,7 +179,7 @@ consts.DATABASE_NAMES = {
 
     BLOCKCHAIN_DATABASE:{
         FOLDER:"blockchainDB3"+(process.env.INSTANCE_PREFIX||""),
-        FILE_NAME : 'blockchain4.bin'+(process.env.INSTANCE_PREFIX||""),
+        FILE_NAME : 'blockchain4.bin',
     },
 
     POOL_DATABASE: "poolDB"+(process.env.INSTANCE_PREFIX||""),
