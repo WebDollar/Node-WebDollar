@@ -152,7 +152,7 @@ class PoolPayouts{
             let index = 0;
             while (index * 256 < this._toAddresses.length) {
 
-                let toAddresses = this._toAddresses.slice(index*256, (index+1)*256);
+                let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
                 let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
                 if (!transaction.result) throw {message: "Transaction was not made"};
