@@ -117,6 +117,7 @@ class MinerProtocol extends PoolProtocolList{
             }, "answer", 6000  );
 
 
+            if (answer === null ) throw {message: "pool : didn't respond"}; //in case there was an error message
             if (answer.result !== true) throw {message: "pool : result is not true" + answer.message} //in case there was an error message
 
             try{
