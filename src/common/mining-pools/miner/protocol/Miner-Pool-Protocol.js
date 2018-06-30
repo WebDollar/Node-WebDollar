@@ -114,7 +114,7 @@ class MinerProtocol extends PoolProtocolList{
                 pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
                 miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
                 minerAddress: Blockchain.blockchain.mining.minerAddress,
-            }, "answer", 6000  );
+            }, "answer", 16000  );
 
 
             if (answer === null ) throw {message: "pool : didn't respond"}; //in case there was an error message

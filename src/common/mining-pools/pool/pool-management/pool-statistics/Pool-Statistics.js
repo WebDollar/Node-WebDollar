@@ -17,13 +17,7 @@ class PoolStatistics{
         this.poolHashes = 0;
         this.poolHashesNow = 0;
 
-        this.poolMinersOnline ={
-            length: 0,
-        };
-        this.poolMinersOnlineNow = {
-            length: 0
-        };
-
+        this.poolMinersOnline = this.poolManagement.poolData.connectedMinerInstances.list;
 
         this.poolBlocksUnconfirmed = 0;
         this.poolBlocksConfirmed = 0;
@@ -35,7 +29,6 @@ class PoolStatistics{
 
         //calculate mean
         this._poolHashesLast = [];
-        this._poolMinersOnlineLast = [];
 
     }
 
@@ -47,7 +40,6 @@ class PoolStatistics{
 
     startInterval(){
         this._interval = setInterval( this._poolStatisticsInterval.bind(this), this.POOL_STATISTICS_TIME );
-        this._intervalMinersOnline = setInterval( this._poolStatisticsInterval.bind(this), this.POOL_STATISTICS_TIME );
         this._saveInterval = setInterval( this._save.bind(this), 5*this.POOL_STATISTICS_TIME);
     }
 
@@ -70,15 +62,12 @@ class PoolStatistics{
 
             for (let i=0; i<this._poolHashesLast.length-1; i++) {
                 this._poolHashesLast[i] = this._poolHashesLast[ i + 1 ];
-                this._poolMinersOnlineLast[i] = this._poolMinersOnlineLast[ i + 1 ];
             }
 
             this._poolHashesLast[this._poolHashesLast.length-1] = poolHashes;
-            this._poolMinersOnlineLast[this._poolMinersOnlineLast.length-1] = poolMinersOnline;
 
         } else{
             this._poolHashesLast.push(poolHashes);
-            this._poolMinersOnlineLast.push(poolMinersOnline);
         }
 
 
@@ -92,34 +81,14 @@ class PoolStatistics{
 
         this.poolHashes = array[Math.floor(array.length / 2)];
 
-        this.poolMinersOnline = {
-            length: 0,
-        };
-
-        let count = 0;
-        for (let key in this._poolMinersOnlineLast ){
-            if (key !== "length" && this._poolMinersOnlineLast[key] !== undefined ) {
-                this.poolMinersOnline[key] = this._poolMinersOnlineLast[key];
-                count++;
-            }
-        }
-
-        this.poolMinersOnline.length = count;
-
         this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
 
     }
 
 
-    addStatistics(hashes, minerInstance){
+    addStatistics(hashes){
 
         this.poolManagement.poolStatistics.poolHashesNow += hashes.toNumber();
-
-
-        if (this.poolMinersOnlineNow[minerInstance.publicKeyString] === undefined) {
-            this.poolMinersOnlineNow[minerInstance.publicKeyString] = minerInstance;
-            this.poolMinersOnlineNow.length ++;
-        }
 
     }
 

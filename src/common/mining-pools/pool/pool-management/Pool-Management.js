@@ -24,8 +24,8 @@ class PoolManagement{
         this.poolSettings = new PoolSettings(wallet, this);
         this.poolWorkManagement = new PoolWorkManagement( this, blockchain );
         this.poolProtocol = new PoolProtocol( this );
-        this.poolStatistics = new PoolStatistics( this );
         this.poolData = new PoolData(this, databaseName);
+        this.poolStatistics = new PoolStatistics( this );
 
         this.poolRewardsManagement = new PoolRewardsManagement(this, this.poolData, blockchain);
 
