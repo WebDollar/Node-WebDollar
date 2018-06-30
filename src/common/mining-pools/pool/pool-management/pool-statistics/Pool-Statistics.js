@@ -82,27 +82,29 @@ class PoolStatistics{
         }
 
 
-        if (Math.random() <= 0.1) {
-            let array = [];
-            for (let i = 0; i < this._poolHashesLast.length; i++)
-                array.push(this._poolHashesLast[i]);
+        let array = [];
+        for (let i = 0; i < this._poolHashesLast.length; i++)
+            array.push(this._poolHashesLast[i]);
 
-            array.sort(function (a, b) {
-                return a - b;
-            });
+        array.sort(function (a, b) {
+            return a - b;
+        });
 
-            this.poolHashes = array[Math.floor(array.length / 2)];
-        }
+        this.poolHashes = array[Math.floor(array.length / 2)];
 
         this.poolMinersOnline = {
             length: 0,
         };
 
+        let count = 0;
         for (let key in this._poolMinersOnlineLast ){
             if (key !== "length" && this._poolMinersOnlineLast[key] !== undefined ) {
                 this.poolMinersOnline[key] = this._poolMinersOnlineLast[key];
+                count++;
             }
         }
+
+        this.poolMinersOnline.length = count;
 
         this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
 

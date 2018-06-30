@@ -216,7 +216,7 @@ class MinerProtocol extends PoolProtocolList{
 
                 let answer = await confirmation;
 
-                if (answer === null) throw {message: "new-work: confirmation reaised an error"};
+                if (answer === null) throw {message: "new-work: confirmation was never received"};
 
                 this._updateStatistics( answer );
 
