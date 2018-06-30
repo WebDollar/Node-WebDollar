@@ -1,77 +1,84 @@
 import StatusEvents from "common/events/Status-Events";
 import NodesList from 'node/lists/Nodes-List'
+import Blockchain from "main-blockchain/Blockchain"
+
 
 class PoolNewWorkManagement{
 
-    constructor(poolManagement){
+    constructor(poolManagement, poolWorkManagement, blockchain){
 
         this.poolManagement = poolManagement;
+        this.poolWorkManagement = poolWorkManagement;
 
+        this.blockchain = blockchain;
 
         this._payoutInProgress = false;
+        this._payoutInProgressIndex = 0;
 
-        this.isBeingPropagating = false;
 
         StatusEvents.on("blockchain/new-blocks",async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
+            if (!Blockchain.synchronized) return;
 
-            if (this.isBeingPropagating ) return;
-
-            this.isBeingPropagating = true;
+            this._payoutInProgressIndex++;
 
             try {
-                await this.propagateNewWork();
+                await this.propagateNewWork(this._payoutInProgressIndex);
             } catch (exception){
 
             }
-            this.isBeingPropagating = false;
 
         });
-
 
     }
 
 
-    async propagateNewWork(){
+    async propagateNewWork(payoutInProgressIndex){
 
-        let lastBlockInformation = this.poolManagement.poolData.lastBlockInformation;
 
-        for (let i=0; i<lastBlockInformation.blockInformationMinersInstances.length; i++){
+        for (let i=0; i < this.poolManagement.poolData.connectedMinerInstances.list.length; i++ ) {
 
-            let blockInformationMinerInstance = lastBlockInformation.blockInformationMinersInstances[i];
-            let minerInstance = blockInformationMinerInstance.minerInstance;
-
-            let prevBlock = blockInformationMinerInstance.workBlock;
-
-            let newWork = await this.poolManagement.getWork( minerInstance, true, blockInformationMinerInstance);
-
-            if ( minerInstance.socket !== undefined ) {
-
-                let answer = await this._sendNewWork(minerInstance, newWork);
-                if (answer !== false){
-
-                    await this.poolManagement.poolWorkManagement.processWork(minerInstance, answer);
-P
-                }
-            }
+            this._sendNewWork( this.poolManagement.poolData.connectedMinerInstances.list[i], undefined, payoutInProgressIndex);
 
         }
 
     }
 
-    async _sendNewWork(minerInstance, work, ){
+    async _sendNewWork( minerInstance, blockInformationMinerInstance, payoutInProgressIndex){
 
-        let answer = await minerInstance.socket.sendRequestWaitOnce("mining-pool/new-work", { result: true, newWork: work, minerPublicKey: minerInstance.publicKey, } );
+        try{
 
-        if ( answer === null || answer.result !== true) return false;
+            if (blockInformationMinerInstance === undefined ) blockInformationMinerInstance = minerInstance.lastBlockInformation;
+            if (blockInformationMinerInstance === undefined) return false;
 
-        if (!Buffer.isBuffer(answer.hash ) ) return false;
-        if ( typeof answer.nonce !== "number" ) return false;
+            let prevBlock = blockInformationMinerInstance.workBlock;
+
+            let newWork = await this.poolWorkManagement.getWork( minerInstance, blockInformationMinerInstance );
+
+            if (payoutInProgressIndex !== this._payoutInProgressIndex) return false;
+
+            // i have sent it already in the last - no new work
+            if (this.poolWorkManagement.poolWork.lastBlock === prevBlock  ) return true;
 
 
-        return answer;
+            let answer = await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork, miner: minerInstance.publicKey, } ,"answer" );
 
+            if ( answer === null ) throw {message: "answer is not null"};
+
+            if ( !Buffer.isBuffer(answer.hash ) ) throw {message: "hash is not specified"};
+            if ( typeof answer.nonce !== "number" ) throw {message: "nonce is not specified"};
+
+
+            let processedWork = await this.poolWorkManagement.processWork( minerInstance, answer, prevBlock );
+
+            minerInstance.socket.node.sendRequest("mining-pool/new-work/answer/confirm", {  result: processedWork.result,  reward: processedWork.reward, confirmed: processedWork.confirmed, miner: minerInstance.publicKey,
+                h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed + this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining
+            } ,"answer" );
+
+        } catch (exception){
+            console.error("_sendNewWork", exception);
+        }
     }
 
 

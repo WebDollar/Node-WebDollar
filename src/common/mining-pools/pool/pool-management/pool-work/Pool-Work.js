@@ -97,7 +97,7 @@ class PoolWork {
 
             if (!found)
                 //delete block
-                if (this._blocksList[i].block !== this.lastBlock && (time - this._blocksList[i].block.timeStamp > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK*1000)) {
+                if (this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp) > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK*1000)) {
 
                     for (let key in this._blocksList[i].instances)
                         if (this._blocksList[i].instances.hasOwnProperty(key))

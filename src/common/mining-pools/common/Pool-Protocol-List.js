@@ -6,9 +6,15 @@ class PoolProtocolList{
 
         this.list = [];
 
+
+        this._checkDisconnection();
+    }
+
+    _checkDisconnection(){
+
         NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
 
-            this.deleteElement(nodesListObject.socket);
+            this.deleteElementBySocket(nodesListObject.socket);
 
         });
 
@@ -42,6 +48,11 @@ class PoolProtocolList{
         if (pos !== -1)
             this.list.splice(pos, 1);
 
+    }
+
+
+    deleteElementBySocket(socket){
+        return this.deleteElement(socket);
     }
 
 }

@@ -40,7 +40,9 @@ class MinerPoolMining extends InheritedPoolMining {
 
         this.minerAddress = Blockchain.blockchain.mining.minerAddress;
 
-        setTimeout( this._checkForWork.bind(this), 5000);
+        this._isBeingMining = false;
+
+        setTimeout( this._checkForWorkInterval.bind(this), 5000);
 
     }
 
@@ -54,7 +56,6 @@ class MinerPoolMining extends InheritedPoolMining {
 
         Blockchain.blockchain.blocks.length = work.h;
 
-
         this._miningWork.start = work.start;
         this._miningWork.end = work.end;
 
@@ -62,7 +63,12 @@ class MinerPoolMining extends InheritedPoolMining {
 
         this._miningWork.poolSocket = poolSocket;
 
+        if (this._isBeingMining){
+            this.resetForced = true;
+        }
+
     }
+
 
     async mineNextBlock(showMiningOutput, suspend){
 
@@ -78,13 +84,19 @@ class MinerPoolMining extends InheritedPoolMining {
                 try {
 
                     let timeInitial = new Date().getTime();
+
+                    this._isBeingMining = true;
                     let answer = await this._run();
+                    this._isBeingMining = false;
 
                     answer.timeDiff = new Date().getTime() - timeInitial;
 
-                    this._miningWork.resolved = true;
-
-                    let answerPool = await this.minerPoolManagement.minerPoolProtocol.pushWork(this._miningWork.poolSocket, answer);
+                    if (!this.resetForced ) {
+                        this._miningWork.resolved = true;
+                        await this.minerPoolManagement.minerPoolProtocol.pushWork(this._miningWork.poolSocket, answer);
+                    } else {
+                        this.resetForced = false;
+                    }
 
                 } catch (exception) {
                     console.log("Pool Mining Exception", exception);
@@ -118,7 +130,8 @@ class MinerPoolMining extends InheritedPoolMining {
 
     }
 
-    async _checkForWork(){
+
+    async _checkForWorkInterval(){
 
         try {
 
@@ -130,7 +143,7 @@ class MinerPoolMining extends InheritedPoolMining {
         }
 
 
-        setTimeout( this._checkForWork.bind(this), 5000);
+        setTimeout( this._checkForWorkInterval.bind(this), 5000);
     }
 
 }

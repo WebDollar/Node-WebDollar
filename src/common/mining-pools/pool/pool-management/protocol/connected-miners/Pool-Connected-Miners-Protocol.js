@@ -33,8 +33,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
         });
 
 
-
     }
+
 
     async _subscribePoolConnectedMiners(socket){
 
@@ -55,12 +55,12 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
             try{
 
                 if ( !Buffer.isBuffer( data.message )  || data.message.length !== 32) throw {message: "message is invalid"};
-                if ( !Buffer.isBuffer( data.poolPublicKey )  || data.poolPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+                if ( !Buffer.isBuffer( data.pool )  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
 
                 //validate poolPublicKey
-                if ( ! data.poolPublicKey.equals( this.poolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey doesn't match"};
+                if ( ! data.pool.equals( this.poolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey doesn't match"};
 
-                if ( !Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                if ( !Buffer.isBuffer( data.miner )  || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
 
                 if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
@@ -70,11 +70,21 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let miner = this.poolManagement.poolData.getMiner(unencodedAddress);
 
                 if (miner === null )
-                    miner = await this.poolManagement.poolData.addMiner(unencodedAddress, data.minerPublicKey);
+                    miner = await this.poolManagement.poolData.addMiner(unencodedAddress, data.miner);
 
-                let minerInstance = miner.addInstance(data.minerPublicKey);
+                let minerInstance = miner.addInstance(data.miner);
+                minerInstance.socket = socket;
 
-                let signature = this.poolManagement.poolSettings.poolDigitalSign(data.message);
+                let newMessage = Buffer.concat( [
+                    data.message,
+                    Buffer.from( this.poolManagement.poolSettings.poolName, "ascii"),
+                    Buffer.from( this.poolManagement.poolSettings.poolFee.toString(), "ascii"),
+                    Buffer.from( this.poolManagement.poolSettings.poolWebsite, "ascii"),
+                    Buffer.from( JSON.stringify(this.poolManagement.poolSettings.poolServers), "ascii"),
+                    Buffer.from( this.poolManagement.poolSettings.poolUseSignatures.toString(), "ascii"),
+                ]);
+
+                let signature = this.poolManagement.poolSettings.poolDigitalSign( newMessage );
 
 
                 //in case there is an suffix in the answer
@@ -82,11 +92,19 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if ( typeof data.suffix === "string")
                     suffix = '/'+data.suffix;
 
-                let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._findBlockInformationMinerInstance(minerInstance);
+                this.poolManagement.poolData.lastBlockInformation._findBlockInformationMinerInstance(minerInstance);
 
                 let confirmation = await socket.node.sendRequestWaitOnce("mining-pool/hello-pool/answer"+suffix, {
+
                     result: true,
                     signature: signature,
+                    v: 0x00,
+
+                    name: this.poolManagement.poolSettings.poolName,
+                    fee: this.poolManagement.poolSettings.poolFee,
+                    website: this.poolManagement.poolSettings.poolWebsite,
+                    useSig: this.poolManagement.poolSettings.poolUseSignatures,
+                    servers: this.poolManagement.poolSettings.poolServers,
 
                     reward: minerInstance.miner.rewardTotal,
                     confirmed: minerInstance.miner.rewardConfirmedTotal,
@@ -105,7 +123,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                     if (confirmation.result){
 
-                        this._addConnectedMinerPool(socket, confirmation.sckAddress || socket.node.sckAddress.address );
+                        this._addConnectedMinerPool(socket, confirmation.sckAddress || socket.node.sckAddress.address, minerInstance);
+
                         return true;
 
                     }
@@ -138,19 +157,21 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             try {
 
-                if (!Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-                if (!Buffer.isBuffer( data.poolPublicKey )  || data.poolPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
-                if (! data.poolPublicKey.equals(Blockchain.PoolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey is invalid"};
+                if (!Buffer.isBuffer( data.miner )  || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                if (!Buffer.isBuffer( data.pool )  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
 
-                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
+                if (! data.pool.equals(Blockchain.PoolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey is invalid"};
+
+                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.miner);
                 if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
                 let work = await this.poolManagement.generatePoolWork(minerInstance, true);
 
                 minerInstance.socket = socket;
 
-                socket.node.sendRequest("mining-pool/get-work/answer"+suffix, {result: true, work: work,
+                socket.node.sendRequest("mining-pool/get-work/answer"+suffix, {result: true, work: work, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal,
                     h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed + this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining,  } )
+
 
             } catch (exception){
 
@@ -173,11 +194,11 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             try{
 
-                if (! Buffer.isBuffer( data.minerPublicKey )  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-                if (!Buffer.isBuffer( data.poolPublicKey )  || data.poolPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
-                if (! data.poolPublicKey.equals(Blockchain.PoolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey is invalid"};
+                if (! Buffer.isBuffer( data.miner )  || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                if (!Buffer.isBuffer( data.pool )  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+                if (! data.pool.equals(Blockchain.PoolManagement.poolSettings.poolPublicKey )) throw {message: "poolPublicKey is invalid"};
 
-                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.minerPublicKey);
+                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.miner);
                 if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
                 let answer = await this.poolManagement.receivePoolWork(minerInstance, data.work);
@@ -187,6 +208,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 //the new reward
                 socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, newWork: newWork,
                     h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed + this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining } );
+
 
             } catch (exception){
                 socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: false, message: exception.message } )
@@ -204,7 +226,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
             try{
 
                 if (Buffer.isBuffer( data.address )  || data.address.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "address is invalid"};
-                if (Buffer.isBuffer( data.publicKey)  || data.publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "publicKey is invalid"};
+                if (Buffer.isBuffer( data.miner)  || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "publicKey is invalid"};
 
                 let miner = this.poolManagement.poolData.getMiner(data.address);
                 if (miner === null) throw {message: "mine was not found"};
@@ -244,7 +266,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
 
-    _addConnectedMinerPool(socket, socketAddress){
+    _addConnectedMinerPool(socket, socketAddress, minerInstance){
 
         socket.node.protocol.minerPool = {
             socketAddress: socketAddress,
@@ -254,7 +276,11 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         this.addElement(socket);
 
+        minerInstance.dateActivity = new Date().getTime();
+        this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
+
     }
+
 
 }
 

@@ -11,8 +11,8 @@ class PoolStatistics{
 
         this.poolManagement = poolManagement;
 
-        this.POOL_STATISTICS_TIME = 5000;
-        this.POOL_STATISTICS_MEAN_VALUES = 100;
+        this.POOL_STATISTICS_TIME = 120000;
+        this.POOL_STATISTICS_MEAN_VALUES = 10;
 
         this.poolHashes = 0;
         this.poolHashesNow = 0;
@@ -47,6 +47,7 @@ class PoolStatistics{
 
     startInterval(){
         this._interval = setInterval( this._poolStatisticsInterval.bind(this), this.POOL_STATISTICS_TIME );
+        this._intervalMinersOnline = setInterval( this._poolStatisticsInterval.bind(this), this.POOL_STATISTICS_TIME );
         this._saveInterval = setInterval( this._save.bind(this), 5*this.POOL_STATISTICS_TIME);
     }
 
@@ -80,9 +81,6 @@ class PoolStatistics{
             this._poolMinersOnlineLast.push(poolMinersOnline);
         }
 
-        let poolMinersOnlineMean = {
-            length: 0,
-        };
 
         if (Math.random() <= 0.1) {
             let array = [];
@@ -96,12 +94,15 @@ class PoolStatistics{
             this.poolHashes = array[Math.floor(array.length / 2)];
         }
 
-        for (let i=0; i < this._poolMinersOnlineLast.length; i++)
-            poolMinersOnlineMean.length += this._poolMinersOnlineLast[i].length;
-
         this.poolMinersOnline = {
-            length: Math.floor( poolMinersOnlineMean.length /  this._poolMinersOnlineLast.length),
+            length: 0,
         };
+
+        for (let key in this._poolMinersOnlineLast ){
+            if (key !== "length" && this._poolMinersOnlineLast[key] !== undefined ) {
+                this.poolMinersOnline[key] = this._poolMinersOnlineLast[key];
+            }
+        }
 
         this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
 

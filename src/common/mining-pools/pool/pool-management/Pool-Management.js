@@ -136,6 +136,8 @@ class PoolManagement{
                 await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL;
 
+                this.poolData.connectedMinerInstances.startPoolDataConnectedMinerInstances();
+
             }
             else {
                 await this.poolProtocol._stopPoolProtocol();
@@ -143,6 +145,8 @@ class PoolManagement{
                 this.poolStatistics.clearInterval();
 
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
+
+                this.poolData.connectedMinerInstances.stopPoolDataConnectedMinerInstances();
             }
 
             StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });

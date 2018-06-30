@@ -28,6 +28,7 @@ class MinerPoolSettings {
         this.poolDescription = "";
         this.poolServers = [];
         this.poolPublicKey = new Buffer(0);
+        this.poolUseSignatures = false;
 
         this._minerPoolActivated = false;
 
