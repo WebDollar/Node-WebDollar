@@ -49,6 +49,27 @@ class PoolSettings {
         return result;
 
     }
+    
+  printPoolSettings(){
+  
+      console.log("_poolFee: ", this._poolFee);
+      console.log("_poolName: ", this._poolName);
+      console.log("_poolWebsite: ", this._poolWebsite);
+
+      let poolServersStr = "";
+      for (let i = 0; i < this._poolServers.length; i++){
+       poolServersStr += this._poolServers[i] + ", ";
+      }
+      console.log("_poolServers: {" + poolServersStr + "}");
+
+      console.log("_poolPOWValidationProbability: ", this._poolPOWValidationProbability);
+      console.log("_poolActivated: ", this._poolActivated);
+      console.log("_poolUsePoolServers: ", this._poolUsePoolServers);
+      console.log("_poolPrivateKey: ", this._poolPrivateKey.toString("hex"));
+      console.log("poolPublicKey: ", this.poolPublicKey.toString("hex"));
+      console.log("poolAddress: ", this.poolAddress.toString("hex"));
+      console.log("poolURL: ", this.poolURL);
+ }
 
     _generatePoolURL(){
 
