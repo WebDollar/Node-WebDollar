@@ -46,7 +46,7 @@ class PoolConnectedServersProtocol extends PoolProtocolList{
     async _subscribePoolConnectedServer(socket){
 
         if (! this.poolManagement._poolStarted) return;
-        if (this.poolManagement.poolSettings.poolUsePoolServers) return
+        if (!this.poolManagement.poolSettings.poolUsePoolServers) return;
 
         try{
 
