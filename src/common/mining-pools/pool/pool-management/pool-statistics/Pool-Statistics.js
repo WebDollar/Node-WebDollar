@@ -32,7 +32,7 @@ class PoolStatistics{
 
     }
 
-     initializePoolStatistics(){
+    initializePoolStatistics(){
 
         return  this._load();
 
@@ -109,15 +109,26 @@ class PoolStatistics{
 
     async _load(){
 
-         let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000, true);
+        let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000, true);
 
-         if (typeof confirmedAndPaid === "number") {
-             this.poolBlocksConfirmedAndPaid = confirmedAndPaid;
+        if (typeof confirmedAndPaid === "number") {
+            this.poolBlocksConfirmedAndPaid = confirmedAndPaid;
 
-             if (this.poolBlocksConfirmedAndPaid === 200) this.poolBlocksConfirmedAndPaid = 0;
-         }
+            if (this.poolBlocksConfirmedAndPaid === 200) this.poolBlocksConfirmedAndPaid = 0;
+        }
 
-         return true;
+        return true;
+    }
+
+    async _clear(){
+
+        try {
+            return (await this._db.remove("serverPool_statistics_confirmedAndPaid"));
+        }
+        catch(exception) {
+            console.log('Exception on clear serverPool_statistics_confirmedAndPaid: ', exception);
+            return false;
+        }
     }
 
 }
