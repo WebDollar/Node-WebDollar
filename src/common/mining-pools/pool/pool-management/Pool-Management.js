@@ -39,13 +39,18 @@ class PoolManagement{
 
         await this.poolData.initializePoolData();
 
-        let answer = await this.poolSettings.initializePoolSettings(poolFee);
-        console.info("The url is just your domain: "+ this.poolSettings.poolURL);
+        let answer;
+        try {
+            answer = await this.poolSettings.initializePoolSettings(poolFee);
+            console.info("The url is just your domain: " + this.poolSettings.poolURL);
 
-        if (!answer )
-            throw {message: "Pool Couldn't be started"};
+            if (!answer)
+                throw {message: "Pool Couldn't be started"};
 
-        answer = await this.poolStatistics.initializePoolStatistics();
+            answer = await this.poolStatistics.initializePoolStatistics();
+        } catch (exception){
+            console.error("initializePoolManagement raised an error", exception);
+        }
 
         this.poolInitialized = true;
 

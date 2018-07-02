@@ -328,6 +328,14 @@ class MinerProtocol extends PoolProtocolList{
     }
 
 
+    async changeWallet(){
+
+    }
+
+    async askMiningWallet(){
+
+    }
+
 }
 
 export default MinerProtocol;
