@@ -23,9 +23,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this.workers = new InterfaceBlockchainMiningWorkersList(this);
 
-        this.bestHash =   consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ;
-        this.bestHashNonce = -1;
-
     }
 
 
@@ -138,7 +135,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     checkFinished(){
 
-        if (this._nonce > this.end || (this.started === false) || (this.reset && this.useResetConsensus)){
+        if (this._nonce > this.end || (this.started === false) || this.resetForced || (this.reset && this.useResetConsensus)){
 
             this.workers.suspendWorkers();
             this._suspendMiningWorking();
@@ -207,8 +204,6 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
                     this.bestHashNonce = event.data.nonce;
 
                     if (this.bestHash.compare(this.difficulty) <= 0) {
-
-                        console.log('processing done');
 
                         this._suspendMiningWorking();
                         this.workers.suspendWorkers();

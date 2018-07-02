@@ -130,11 +130,8 @@ class ServerPoolConnectedPoolsProtocol extends PoolProtocolList{
         //verify if there are any connectedMiners that are looking for that protocol
         let connectedMiners = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedMinersProtocol.connectedMiners;
         for (let i=0; i<connectedMiners.length; i++)
-            if (connectedMiners[i].node.protocol.minerPool.poolPublicKey.equals(poolPublicKey)){
-
+            if (connectedMiners[i].node.protocol.minerPool.poolPublicKey.equals(poolPublicKey))
                 connectedMiners[i].node.sendRequest("mining-pool/hello-pool/again", {});
-
-            }
 
 
     }

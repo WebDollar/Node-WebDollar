@@ -30,6 +30,8 @@ class InterfaceBlockchainMiningBasic {
         this._intervalMiningOutput = undefined;
 
         this.useResetConsensus = true;
+
+        this.resetForced = false;
     }
 
     get minerAddress(){

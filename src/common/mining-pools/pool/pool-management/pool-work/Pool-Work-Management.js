@@ -1,14 +1,13 @@
 import BufferExtended from "common/utils/BufferExtended";
 
-const BigNumber = require ('bignumber.js');
 import Serialization from 'common/utils/Serialization';
 import consts from 'consts/const_global';
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 import PoolWork from "./Pool-Work";
-import Utils from "common/utils/helpers/Utils";
 import StatusEvents from "common/events/Status-Events";
+import PoolNewWorkManagement from "./Pool-New-Work-Management"
 
 class PoolWorkManagement{
 
@@ -17,12 +16,13 @@ class PoolWorkManagement{
         this.poolManagement = poolManagement;
         this.blockchain = blockchain;
 
+        this.poolNewWorkManagement = new PoolNewWorkManagement(poolManagement, this, blockchain);
+
         this.poolWork = new PoolWork(poolManagement, blockchain);
-        this.hashBest = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
     }
 
 
-    async getWork(minerInstance, includeSignature = true, blockInformationMinerInstance){
+    async getWork(minerInstance,  blockInformationMinerInstance){
 
         if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
 
@@ -52,11 +52,15 @@ class PoolWorkManagement{
 
         };
 
+        minerInstance.lastBlockInformation =  blockInformationMinerInstance;
+        minerInstance.workBlock =  this.poolWork.lastBlock;
+        minerInstance.dateActivity = new Date().getTime();
+
         this.poolWork.lastBlockNonce += hashes;
 
         blockInformationMinerInstance.workBlock = this.poolWork.lastBlock;
 
-        if (includeSignature) {
+        if (this.poolManagement.poolSettings.poolUseSignatures) {
 
             let message = Buffer.concat([this.poolWork.lastBlockSerialization, Serialization.serializeNumber4Bytes(answer.start), Serialization.serializeNumber4Bytes(answer.end)]);
             answer.sig = this.poolManagement.poolSettings.poolDigitalSign(message);
@@ -67,7 +71,7 @@ class PoolWorkManagement{
 
     }
 
-    async processWork(minerInstance, work){
+    async processWork(minerInstance, work, prevBlock){
 
         try{
 
@@ -76,22 +80,25 @@ class PoolWorkManagement{
 
             if ( !Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
             if ( typeof work.nonce !== "number" ) throw {message: "nonce is invalid"};
-            if ( typeof work.timeDiff !== "number" ) throw {message: "timeDiff is invalid"};
 
             let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
 
-            if (blockInformationMinerInstance.workBlock === undefined)
+            if ( (prevBlock  || blockInformationMinerInstance.workBlock) === undefined)
                 throw {message: "miner instance - no block"};
 
-            let hashesFactor = Math.min(3, (3000/work.timeDiff));
-            hashesFactor = Math.max(0.4, hashesFactor);
+            if (work.timeDiff !== undefined) {
+                if (typeof work.timeDiff !== "number") throw {message: "timeDiff is invalid"};
 
-            minerInstance.hashesPerSecond *= Math.floor( hashesFactor );
-            minerInstance.hashesPerSecond = Math.min( minerInstance.hashesPerSecond , 25000);
-            minerInstance.hashesPerSecond = Math.max( minerInstance.hashesPerSecond , 100);
+                let hashesFactor = Math.min(10, ( 80000 / work.timeDiff )); //80 sec
+                hashesFactor = Math.max(0.2, hashesFactor);
+
+                minerInstance.hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
+                minerInstance.hashesPerSecond = Math.min(minerInstance.hashesPerSecond, 400000);
+                minerInstance.hashesPerSecond = Math.max(minerInstance.hashesPerSecond, 100);
+            }
 
 
-            if ( false === await blockInformationMinerInstance.validateWorkHash( work.hash, work.nonce )  )
+            if ( false === await blockInformationMinerInstance.validateWorkHash( work.hash, work.nonce, prevBlock )  )
                 throw {message: "block was incorrectly mined", work: work };
 
             blockInformationMinerInstance.workHash = work.hash;
@@ -100,7 +107,7 @@ class PoolWorkManagement{
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
 
-            if ( work.result ) {
+            if ( work.result && prevBlock === undefined ) { //it is a solution and prevBlock is undefined
 
                 console.warn("----------------------------------------------------------------------------");
                 console.warn("----------------------------------------------------------------------------");

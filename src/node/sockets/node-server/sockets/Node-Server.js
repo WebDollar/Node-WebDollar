@@ -320,17 +320,20 @@ class NodeServer {
                 }
 
 
+        if (Blockchain.PoolManagement.poolStarted || Blockchain.ServerPoolManagement.serverPoolStarted) {
+
+            if (NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL / 2) {
+
+                for (let i = 0; i < NodesList.nodes.length; i++)
+                    if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
+                        if (!NodesList.nodes[i].isFallback && NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL)
+                            NodesList.nodes[i].socket.disconnect();
+
+            }
+
+        }
 
 
-        let count = NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL );
-        if ( count < consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL / 2 )
-            return; //nothing to do
-
-
-        for (let i=0; i<NodesList.nodes.length; i++)
-            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
-                if ( !NodesList.nodes[i].isFallback && NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL )
-                        NodesList.nodes[i].socket.disconnect();
 
     }
 

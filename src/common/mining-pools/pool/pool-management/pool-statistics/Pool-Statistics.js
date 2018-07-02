@@ -11,19 +11,13 @@ class PoolStatistics{
 
         this.poolManagement = poolManagement;
 
-        this.POOL_STATISTICS_TIME = 5000;
-        this.POOL_STATISTICS_MEAN_VALUES = 100;
+        this.POOL_STATISTICS_TIME = 120000;
+        this.POOL_STATISTICS_MEAN_VALUES = 10;
 
         this.poolHashes = 0;
         this.poolHashesNow = 0;
 
-        this.poolMinersOnline ={
-            length: 0,
-        };
-        this.poolMinersOnlineNow = {
-            length: 0
-        };
-
+        this.poolMinersOnline = this.poolManagement.poolData.connectedMinerInstances.list;
 
         this.poolBlocksUnconfirmed = 0;
         this.poolBlocksConfirmed = 0;
@@ -35,11 +29,10 @@ class PoolStatistics{
 
         //calculate mean
         this._poolHashesLast = [];
-        this._poolMinersOnlineLast = [];
 
     }
 
-     initializePoolStatistics(){
+    initializePoolStatistics(){
 
         return  this._load();
 
@@ -69,54 +62,33 @@ class PoolStatistics{
 
             for (let i=0; i<this._poolHashesLast.length-1; i++) {
                 this._poolHashesLast[i] = this._poolHashesLast[ i + 1 ];
-                this._poolMinersOnlineLast[i] = this._poolMinersOnlineLast[ i + 1 ];
             }
 
             this._poolHashesLast[this._poolHashesLast.length-1] = poolHashes;
-            this._poolMinersOnlineLast[this._poolMinersOnlineLast.length-1] = poolMinersOnline;
 
         } else{
             this._poolHashesLast.push(poolHashes);
-            this._poolMinersOnlineLast.push(poolMinersOnline);
         }
 
-        let poolMinersOnlineMean = {
-            length: 0,
-        };
 
-        if (Math.random() <= 0.1) {
-            let array = [];
-            for (let i = 0; i < this._poolHashesLast.length; i++)
-                array.push(this._poolHashesLast[i]);
+        let array = [];
+        for (let i = 0; i < this._poolHashesLast.length; i++)
+            array.push(this._poolHashesLast[i]);
 
-            array.sort(function (a, b) {
-                return a - b;
-            });
+        array.sort(function (a, b) {
+            return a - b;
+        });
 
-            this.poolHashes = array[Math.floor(array.length / 2)];
-        }
-
-        for (let i=0; i < this._poolMinersOnlineLast.length; i++)
-            poolMinersOnlineMean.length += this._poolMinersOnlineLast[i].length;
-
-        this.poolMinersOnline = {
-            length: Math.floor( poolMinersOnlineMean.length /  this._poolMinersOnlineLast.length),
-        };
+        this.poolHashes = array[Math.floor(array.length / 2)];
 
         this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
 
     }
 
 
-    addStatistics(hashes, minerInstance){
+    addStatistics(hashes){
 
         this.poolManagement.poolStatistics.poolHashesNow += hashes.toNumber();
-
-
-        if (this.poolMinersOnlineNow[minerInstance.publicKeyString] === undefined) {
-            this.poolMinersOnlineNow[minerInstance.publicKeyString] = minerInstance;
-            this.poolMinersOnlineNow.length ++;
-        }
 
     }
 
@@ -137,15 +109,26 @@ class PoolStatistics{
 
     async _load(){
 
-         let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000, true);
+        let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000, true);
 
-         if (typeof confirmedAndPaid === "number") {
-             this.poolBlocksConfirmedAndPaid = confirmedAndPaid;
+        if (typeof confirmedAndPaid === "number") {
+            this.poolBlocksConfirmedAndPaid = confirmedAndPaid;
 
-             if (this.poolBlocksConfirmedAndPaid === 200) this.poolBlocksConfirmedAndPaid = 0;
-         }
+            if (this.poolBlocksConfirmedAndPaid === 200) this.poolBlocksConfirmedAndPaid = 0;
+        }
 
-         return true;
+        return true;
+    }
+
+    async _clear(){
+
+        try {
+            return (await this._db.remove("serverPool_statistics_confirmedAndPaid"));
+        }
+        catch(exception) {
+            console.log('Exception on clear serverPool_statistics_confirmedAndPaid: ', exception);
+            return false;
+        }
     }
 
 }

@@ -43,10 +43,10 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    async validateWorkHash(workHash, workNonce){
+    async validateWorkHash(workHash, workNonce, prevBlock){
 
         //validate hash
-        let hash = await this.workBlock.computeHash( workNonce );
+        let hash = await  (prevBlock || this.workBlock).computeHash( workNonce );
 
         if ( ! BufferExtended.safeCompare(hash, workHash ) ) return false;
 

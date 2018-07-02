@@ -5,7 +5,7 @@ import BufferExtended from "common/utils/BufferExtended";
 
 class PoolDataMinerInstance {
 
-    constructor(miner, publicKey){
+    constructor(miner, publicKey, socket){
 
         this.miner = miner;
         this.publicKey = publicKey;
@@ -14,6 +14,11 @@ class PoolDataMinerInstance {
             this.publicKeyString = publicKey.toString("hex");
 
         this.hashesPerSecond = 500;
+        this.socket = socket;
+
+        this.work = undefined;
+        this.dateActivity = new Date().getTime();
+        this.lastBlockInformation = undefined;
 
     }
 

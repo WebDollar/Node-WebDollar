@@ -23,6 +23,7 @@ class PoolSettings {
         this._poolServers = [];
         this._poolPOWValidationProbability = 0.10; //from 100
         this._poolActivated = false;
+        this._poolUseSignatures = false;
         this._poolUsePoolServers = true;
 
         this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
@@ -49,6 +50,27 @@ class PoolSettings {
         return result;
 
     }
+    
+  printPoolSettings(){
+  
+      console.log("_poolFee: ", this._poolFee);
+      console.log("_poolName: ", this._poolName);
+      console.log("_poolWebsite: ", this._poolWebsite);
+
+      let poolServersStr = "";
+      for (let i = 0; i < this._poolServers.length; i++){
+       poolServersStr += this._poolServers[i] + ", ";
+      }
+      console.log("_poolServers: {" + poolServersStr + "}");
+
+      console.log("_poolPOWValidationProbability: ", this._poolPOWValidationProbability);
+      console.log("_poolActivated: ", this._poolActivated);
+      console.log("_poolUsePoolServers: ", this._poolUsePoolServers);
+      console.log("_poolPrivateKey: ", this._poolPrivateKey.toString("hex"));
+      console.log("poolPublicKey: ", this.poolPublicKey.toString("hex"));
+      console.log("poolAddress: ", this.poolAddress.toString("hex"));
+      console.log("poolURL: ", this.poolURL);
+ }
 
     _generatePoolURL(){
 
@@ -149,6 +171,22 @@ class PoolSettings {
 
     get poolActivated(){
         return this._poolActivated;
+    }
+
+
+    async setPoolUseSignatures(newValue, skipSaving = false){
+
+        PoolsUtils.validatePoolActivated(newValue);
+
+        this._poolUseSignatures = newValue;
+
+        if (!skipSaving)
+            if (false === await this._db.save("pool_use_signatures", this._poolUseSignatures ? "true" : "false")) throw {message: "poolUseSignatures couldn't be saved"};
+
+    }
+
+    get poolUseSignatures(){
+        return this._poolUseSignatures;
     }
 
 
@@ -286,6 +324,11 @@ class PoolSettings {
         else if (poolUsePoolServers === "false") poolUsePoolServers = false;
         else if (poolUsePoolServers === null) poolUsePoolServers = true;
 
+        let poolUseSignatures = await this._db.get("pool_use_signatures",  30*1000, true);
+        if (poolUseSignatures === "true") poolUseSignatures = true;
+        else if (poolUseSignatures === "false") poolUseSignatures = false;
+        else if (poolUseSignatures === null) poolUseSignatures = true;
+
         if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated))
             return false;
 
@@ -293,8 +336,10 @@ class PoolSettings {
         await this.setPoolFee ( poolFee , true );
         await this.setPoolWebsite ( poolWebsite , true );
         await this.setPoolServers ( poolServers , true );
-        await this.setPoolActivated( poolActivated , true , false);
-        await this.setPoolUsePoolServers( poolUsePoolServers, true , false);
+        await this.setPoolActivated( poolActivated , true , true);
+
+        await this.setPoolUsePoolServers( poolUsePoolServers, true, true);
+        await this.setPoolUseSignatures( poolUseSignatures, true , true);
 
         return true;
 

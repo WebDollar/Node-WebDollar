@@ -6,6 +6,7 @@ import PoolDataMiner from "common/mining-pools/pool/pool-management/pool-data/Po
 import PoolDataBlockInformation from "common/mining-pools/pool/pool-management/pool-data/block-informations/Pool-Data-Block-Information"
 import Blockchain from 'main-blockchain/Blockchain';
 import Utils from "common/utils/helpers/Utils";
+import PoolDataConnectedMinerInstances from "./Pool-Data-Connected-Miner-Instances";
 
 const uuid = require('uuid');
 
@@ -21,6 +22,7 @@ class PoolData {
 
         setTimeout( this.savePoolData.bind(this), 30000);
 
+        this.connectedMinerInstances = new PoolDataConnectedMinerInstances(poolManagement);
     }
 
     async initializePoolData(){
@@ -115,6 +117,7 @@ class PoolData {
         return -1;
 
     }
+
 
     deleteBlockInformationByIndex(index){
         this.blocksInfo[index].destroyPoolDataBlockInformation(  );

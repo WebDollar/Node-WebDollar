@@ -115,6 +115,11 @@ class PoolRewardsManagement{
 
             }
 
+
+            //not ready at the moment
+            if (blockInfo.height > this.blockchain.blocks.length)
+                continue;
+
             //confirm using my own blockchain / light blockchain
             if (this.blockchain.blocks.blocksStartingPoint < blockInfo.height){ //i can confirm the block by myself
 

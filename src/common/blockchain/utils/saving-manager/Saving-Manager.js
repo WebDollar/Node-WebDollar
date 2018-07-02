@@ -71,7 +71,7 @@ class SavingManager{
                 let block = blocks[i];
 
                 //already deleted
-                if (block.block.blockchain === undefined){
+                if (block.block === undefined || block.block.blockchain === undefined){
                     blocks.splice(i,1);
                     i--;
                     continue;
@@ -82,6 +82,7 @@ class SavingManager{
                     block.saving = true;
 
                     await this.blockchain.saveNewBlock(block.block);
+
                 } catch (exception){
                     console.error("Saving raised an error: ", exception);
                 }

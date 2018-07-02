@@ -42,7 +42,7 @@ class AdvancedMessages{
     input(message){
 
         if (process.env.BROWSER)
-            return confirm(message);
+            return prompt(message);
         else
             return this._questionCLI(message);
     }

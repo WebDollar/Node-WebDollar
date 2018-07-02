@@ -24,8 +24,8 @@ class PoolManagement{
         this.poolSettings = new PoolSettings(wallet, this);
         this.poolWorkManagement = new PoolWorkManagement( this, blockchain );
         this.poolProtocol = new PoolProtocol( this );
-        this.poolStatistics = new PoolStatistics( this );
         this.poolData = new PoolData(this, databaseName);
+        this.poolStatistics = new PoolStatistics( this );
 
         this.poolRewardsManagement = new PoolRewardsManagement(this, this.poolData, blockchain);
 
@@ -136,6 +136,8 @@ class PoolManagement{
                 await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL;
 
+                this.poolData.connectedMinerInstances.startPoolDataConnectedMinerInstances();
+
             }
             else {
                 await this.poolProtocol._stopPoolProtocol();
@@ -143,6 +145,8 @@ class PoolManagement{
                 this.poolStatistics.clearInterval();
 
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
+
+                this.poolData.connectedMinerInstances.stopPoolDataConnectedMinerInstances();
             }
 
             StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });

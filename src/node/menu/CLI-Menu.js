@@ -424,6 +424,7 @@ class CLI {
                 } else {
                     poolServers = await NodeServer.getServerHTTPAddress(true);
                     await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( false ) ;
+                    await Blockchain.PoolManagement.poolSettings.setPoolUseSignatures( false ) ;
                 }
 
 

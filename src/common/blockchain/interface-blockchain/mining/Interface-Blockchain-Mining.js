@@ -27,6 +27,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         this.miningTransactionSelector = new MiningTransactionsSelector(blockchain);
 
+        this.bestHash =   consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ;
+        this.bestHashNonce = -1;
+
     }
 
 
@@ -248,24 +251,22 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     async _mineNonces(start, end){
 
         let nonce = start;
-        let bestHash =  consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
-        let bestHashNonce = -1;
 
-        while (nonce <= end && this.started && !(this.reset && this.useResetConsensus)) {
+        while (nonce <= end && this.started && !this.resetForced && !(this.reset && this.useResetConsensus)) {
 
             let hash = await this.calculateHash(nonce);
 
-            if (bestHash === undefined || hash.compare(bestHash) < 0){
+            if (hash.compare(this.bestHash) < 0){
 
-                bestHash = hash;
-                bestHashNonce = nonce;
+                this.bestHash = hash;
+                this.bestHashNonce = nonce;
 
-                if (bestHash.compare(this.difficulty) <= 0) {
+                if (this.bestHash.compare(this.difficulty) <= 0) {
 
                     return {
                         result: true,
-                        nonce: bestHashNonce,
-                        hash: bestHash,
+                        nonce: this.bestHashNonce,
+                        hash: this.bestHash,
                     };
 
                 }
@@ -278,8 +279,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         return {
             result:false,
-            hash: bestHash,
-            nonce: bestHashNonce
+            hash: this.bestHash,
+            nonce: this.bestHashNonce
         }
     }
 
@@ -296,6 +297,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         this.block = block;
         this.difficulty = difficulty;
+
+        this.bestHash = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
+        this.bestHashNonce = -1;
 
         try {
 
