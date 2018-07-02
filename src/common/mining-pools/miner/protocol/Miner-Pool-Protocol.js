@@ -294,11 +294,14 @@ class MinerProtocol extends PoolProtocolList{
         return true;
     }
 
-    async pushWork(poolSocket, miningAnswer ){
+    async pushWork( miningAnswer, poolSocket){
 
         try {
 
-            if (poolSocket === null) throw {message: "poolSocket is null"};
+            if (poolSocket === undefined)
+                poolSocket = this.connectedPools[0];
+
+            if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
                 pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
@@ -328,11 +331,44 @@ class MinerProtocol extends PoolProtocolList{
     }
 
 
-    async changeWallet(){
+    async changeWalletMining( poolSocket ){
+
+        if (!this.poolManagement._poolStarted) return;
+
+        try {
+            if (poolSocket === undefined)
+                poolSocket = this.connectedPools[0];
+
+            if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
+
+            poolSocket.sendRequestWaitOnce("mining-pool/change-wallet-mining", {
+                miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+            }, "answer");
+
+        } catch (exception){
+
+        }
 
     }
 
-    async askMiningWallet(){
+    async askWalletMining(poolSocket){
+
+        if (!this.poolManagement._poolStarted) return;
+
+        try{
+
+            if (poolSocket === undefined)
+                poolSocket = this.connectedPools[0];
+
+            if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
+
+            poolSocket.sendRequestWaitOnce("mining-pool/request-wallet-mining", {
+                miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+            }, "answer");
+
+        }catch (exception){
+
+        }
 
     }
 

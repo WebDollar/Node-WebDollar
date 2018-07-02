@@ -43,11 +43,32 @@ class PoolDataMiner{
 
     findInstance(publicKey){
 
-        for (let i = 0; i < this.instances.length; i++)
-            if (this.instances[i].publicKey.equals( publicKey) )
-                return this.instances[i];
+        let pos = this._searchInstance(publicKey);
+
+        if (pos !== -1) return this.instances[pos];
 
         return null;
+    }
+
+    _searchInstance(publicKey){
+
+        for (let i = 0; i < this.instances.length; i++)
+            if (this.instances[i].publicKey.equals( publicKey) )
+                return i;
+
+        return -1;
+
+    }
+
+    removeInstance(publicKey){
+
+        let pos = this._searchInstance(publicKey);
+        if (pos !== -1) {
+            this.instances.splice( pos ,1);
+            return true;
+        }
+
+        return false;
     }
 
     serializeMiner(){

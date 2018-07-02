@@ -218,7 +218,6 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
 
-        //TODO change-wallet
         socket.node.on("mining-pool/change-wallet-mining", (data) => {
 
             if (!this.poolManagement._poolStarted) return;
@@ -241,7 +240,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if (unencodedNewAddress === null) throw { message: "newMinerAddress is not correct" };
 
                 let miner = this.poolManagement.poolData.getMiner(data.address);
-                if (miner === null) throw {message: "mine was not found"};
+                if (miner === null) throw {message: "miner was not found"};
 
                 let message = Buffer.concat([
 
@@ -250,12 +249,28 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 ]);
 
+                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.miner);
+                if (minerInstance === null) throw {message: "minerInstance was not found"};
+
                 if ( !Buffer.isBuffer(data.signature) || data.signature.length < 10 ) throw {message: "pool: signature is invalid"};
 
                 if (! ed25519.verify(data.signature, message, minerAddressPublicKey)) throw {message: "pool: signature doesn't validate message"};
 
+                if ( data.type === "only instance" ){
 
-                miner.address = unencodedNewAddress;
+                    let newMiner = this.poolManagement.poolData.addMiner(unencodedNewAddress, minerInstance, );
+                    minerInstance.miner = newMiner;
+
+                    newMiner.instances.push(minerInstance);
+
+                    miner.removeInstance(data.miner);
+
+                } else if (data.type === "all instances"){
+
+                    miner.address = unencodedNewAddress;
+
+                } else throw {message: "data.type is invalid"};
+
 
                 socket.node.sendRequest("mining-pool/change-wallet-mining/answer", {result: true, address: InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address) } )
 
