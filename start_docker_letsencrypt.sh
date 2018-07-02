@@ -28,6 +28,16 @@ fi
 
 if [ -z $TYPE ]; then
 
+	# Start Full Node with PM2
+	pm2 start npm -- run start
+	sleep 1
+	pm2 restart npm --update-env
+
+	pm2 logs
+
+else
+	# Start in Pool or Poll Server Mode
+
 	if [ $TYPE -eq "11" ]; then
 		# Start Pool
 		if [ -z $POOL_NAME ]; then echo 'You need to input a pool name using POOL_NAME ENV variable'; exit; fi
@@ -45,11 +55,5 @@ if [ -z $TYPE ]; then
 		# Start PoolServer
 		(sleep 15;echo $TYPE;sleep 5;echo $FEE;) | npm run commands
 	fi
-else
-	# Start Full Node with PM2
-	pm2 start npm -- run start
-	sleep 1
-	pm2 restart npm --update-env
 
-	pm2 logs
 fi
