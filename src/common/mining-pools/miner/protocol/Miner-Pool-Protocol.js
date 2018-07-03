@@ -8,6 +8,8 @@ import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
 import Serialization from "../../../utils/Serialization";
 import StatusEvents from "common/events/Status-Events";
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
+import AdvancedMessages from "node/menu/Advanced-Messages";
 
 class MinerProtocol extends PoolProtocolList{
 
@@ -113,6 +115,7 @@ class MinerProtocol extends PoolProtocolList{
                 message: message,
                 pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
                 miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
+
                 minerAddress: Blockchain.blockchain.mining.minerAddress,
             }, "answer", 16000  );
 
@@ -331,21 +334,65 @@ class MinerProtocol extends PoolProtocolList{
     }
 
 
-    async changeWalletMining( poolSocket ){
+    async changeWalletMining( poolSocket, newAddress,  ){
 
         if (!this.poolManagement._poolStarted) return;
 
         try {
+
             if (poolSocket === undefined)
                 poolSocket = this.connectedPools[0];
 
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
-            poolSocket.sendRequestWaitOnce("mining-pool/change-wallet-mining", {
+            let oldAddress = Blockchain.Wallet.getAddress( this.blockchain.mining.minerAddress );
+
+            if (oldAddress === null || oldAddress === undefined){
+
+                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.blockchain.mining.minerAddress );
+                return;
+
+            }
+
+            let minerAddressPublicKey = oldAddress.publicKey;
+
+            let unencodedAddress =  InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.blockchain.mining.minerAddress);
+            let newUnencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(minerPublicKey) ;
+
+            let message = Buffer.concat([
+
+                unencodedAddress,
+                newUnencodedAddress,
+
+            ]);
+
+            let signature = oldAddress.signMessage ( message, undefined );
+
+            let answer = poolSocket.sendRequestWaitOnce("mining-pool/change-wallet-mining", {
+
                 miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
-            }, "answer");
+                minerAddress: this.blockchain.mining.minerAddress,
+                minerAddressPublicKey: minerAddressPublicKey,
+
+                newMinerAddress: newAddress,
+
+                signature: signature,
+                type: "only instance",
+
+            }, "answer", 6000);
+
+            if (answer === null) throw {message: "pool didn't respond"};
+            if (answer.result !== true) throw answer;
+            else {
+
+                return true;
+
+            }
 
         } catch (exception){
+
+            console.error("Couldn't change the wallet", exception.message);
+            return false;
 
         }
 
@@ -355,19 +402,32 @@ class MinerProtocol extends PoolProtocolList{
 
         if (!this.poolManagement._poolStarted) return;
 
-        try{
+        try {
 
             if (poolSocket === undefined)
                 poolSocket = this.connectedPools[0];
 
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
-            poolSocket.sendRequestWaitOnce("mining-pool/request-wallet-mining", {
+            let answer = await poolSocket.sendRequestWaitOnce("mining-pool/request-wallet-mining", {
                 miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
-            }, "answer");
+            }, "answer", 6000);
 
-        }catch (exception){
+            if (answer === null) throw {message: "pool didn't respond"};
 
+            if (answer.result !== true) throw answer;
+            else {
+
+                return {result: true, address: answer.address};
+
+            }
+
+        }
+         catch (exception){
+
+            console.error("Couldn't change the wallet", exception.message);
+            return {result:false, message: exception.message}
+            
         }
 
     }

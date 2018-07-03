@@ -2,6 +2,7 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import consts from 'consts/const_global';
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import StatusEvents from "common/events/Status-Events";
+import AdvancedMessages from "node/menu/Advanced-Messages";
 
 class PoolSettings {
 
@@ -24,9 +25,8 @@ class PoolSettings {
 
         } catch (exception){
 
-            console.error("ServerPools returned an error ",exception);
-            if (process.env.BROWSER)
-                alert("ServerPools returned an error "+ exception.message);
+            AdvancedMessages.alert( "ServerPools returned an error "+ exception.message );
+
 
             return false;
         }
