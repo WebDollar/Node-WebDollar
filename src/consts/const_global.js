@@ -217,9 +217,7 @@ consts.MINING_POOL = {
 
     },
 
-    isPoolActivated(){
-        return consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_TYPE.MINING_POOL_SERVER || consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_TYPE.MINING_POOL;
-    }
+
 
 };
 
@@ -234,7 +232,7 @@ consts.SETTINGS = {
         PROTOCOL: "WebDollar",
         SSL: true,
 
-        PORT: 80, //port
+        PORT: 8080, //port
     },
 
     PARAMS: {

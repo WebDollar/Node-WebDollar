@@ -313,7 +313,9 @@ class Blockchain{
     }
 
 
-
+    isPoolActivated(){
+        return this.PoolManagement.poolStarted || this.ServerPoolManagement.serverPoolStarted;
+    }
 
 }
 

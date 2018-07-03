@@ -122,29 +122,35 @@ class InterfaceBlockchainAddressHelper{
         return ed25519.sign(msg, privateKey);
     }
 
-    static _generateAddressFromPublicKey(publicKey, showDebug){
+    static _generateUnencodedAddressFromPublicKey(publicKey, showDebug){
 
         if (!Buffer.isBuffer(publicKey))
             throw {message: 'publicKey must be a Buffer', publicKey: publicKey};
 
-        //could use publicKeyBytesCompressed as well
-
         //bitcoin original
-        let hash160 =  WebDollarCrypto.RIPEMD160(WebDollarCrypto.SHA256(publicKey));
+        let unencodedAddress =  WebDollarCrypto.RIPEMD160(WebDollarCrypto.SHA256(publicKey));
 
         if (showDebug)
-            console.log("hash160 hex", hash160.toString('hex') ); //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
+            console.log("hash160 hex", unencodedAddress.toString('hex') ); //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
 
-        let unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
+        return unencodedAddress;
+    }
+
+    static _generateAddressFromPublicKey(publicKey, showDebug){
+
+        let unencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(publicKey, showDebug);
+
+        let adddressWIF = InterfaceBlockchainAddressHelper.generateAddressWIF(unencodedAddress);
 
         if (showDebug)
-            console.log("unencodedAddress", unencodedAddress.toString("hex")); //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
+            console.log("addressWIF", addressWIF.toString("hex")); //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
 
         //if (showDebug)
             //console.log("address",BufferExtended.toBase(unencodedAddress).length); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
 
         return  {
             unencodedAddress: unencodedAddress,
+            addressWIF: adddressWIF,
             address: BufferExtended.toBase(unencodedAddress),
         };
     }
@@ -199,7 +205,8 @@ class InterfaceBlockchainAddressHelper{
 
         return {
             address: address.address,
-            unencodedAddress: address.unencodedAddress,
+            addressWIF: address.addressWIF,
+
             publicKey: publicKey,
             privateKey: privateKey,
         };

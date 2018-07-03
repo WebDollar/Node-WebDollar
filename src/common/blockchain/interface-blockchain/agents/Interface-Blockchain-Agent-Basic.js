@@ -8,7 +8,11 @@ import NodesList from 'node/lists/Nodes-List';
 const TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_BROWSER = consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 1000 * 4;
 const TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_TERMINAL = consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 1000 * 8;
 
-class InterfaceBlockchainAgentBasic{
+/**
+ * Agent controls the Synchronization
+ */
+
+class InterfaceBlockchainAgentBasic {
 
     constructor(blockchain){
 
@@ -53,6 +57,10 @@ class InterfaceBlockchainAgentBasic{
     }
 
 
+    /**
+     * Consensus Status - if needs consensus or not
+     * @returns {*}
+     */
     get consensus(){
         return this._consensus;
     }

@@ -224,50 +224,58 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             try {
 
-                if (Buffer.isBuffer( data.miner)  || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "publicKey is invalid"};
 
                 if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
                 if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
-                if (Buffer.isBuffer( data.minerAddressPublicKey)  || data.minerAddressPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerAddressPublicKey is invalid"};
-                let minerAddressPublicKey = data.minerAddressPublicKey;
+                if (Buffer.isBuffer( data.minerPublicKey)  || data.minerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                let minerPublicKey = data.minerPublicKey;
 
                 //new address
 
                 if ( typeof data.newMinerAddress !== "string" ) throw { message: "newMinerAddress is not correct" };
-                let unencodedNewAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.newMinerAddress );
-                if (unencodedNewAddress === null) throw { message: "newMinerAddress is not correct" };
+                let newUnencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.newMinerAddress );
+                if (newUnencodedAddress === null) throw { message: "newMinerAddress is not correct" };
 
-                let miner = this.poolManagement.poolData.getMiner(data.address);
+                if (Buffer.isBuffer( data.newMinerPublicKey)  || data.newMinerPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerAddressPublicKey is invalid"};
+                let newMinerPublicKey = data.newMinerPublicKey;
+
+
+                let miner = this.poolManagement.poolData.getMiner(unencodedAddress);
                 if (miner === null) throw {message: "miner was not found"};
 
                 let message = Buffer.concat([
 
                     unencodedAddress,
-                    unencodedNewAddress,
+                    newUnencodedAddress,
 
                 ]);
 
-                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(data.miner);
+
+                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey( minerPublicKey );
                 if (minerInstance === null) throw {message: "minerInstance was not found"};
 
-                if ( !Buffer.isBuffer(data.signature) || data.signature.length < 10 ) throw {message: "pool: signature is invalid"};
 
-                if (! ed25519.verify(data.signature, message, minerAddressPublicKey)) throw {message: "pool: signature doesn't validate message"};
+                if ( !Buffer.isBuffer(data.signature) || data.signature.length < 10 ) throw {message: "pool: signature is invalid"};
+                if (! ed25519.verify(data.signature, message, minerPublicKey)) throw {message: "pool: signature doesn't validate message"};
+
+                if ( ! InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(minerPublicKey).equals(unencodedAddress)) throw {message: "pool: unencodedAddress doesn't work minerPublicKey"};
+                if ( ! InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(newMinerPublicKey).equals(newUnencodedAddress)) throw {message: "pool: newUnencodedAddress doesn't work newMinerPublicKey"};
 
                 if ( data.type === "only instance" ){
 
-                    let newMiner = this.poolManagement.poolData.addMiner(unencodedNewAddress, minerInstance, );
+                    let newMiner = this.poolManagement.poolData.addMiner(newUnencodedAddress, newMinerPublicKey, );
                     minerInstance.miner = newMiner;
-
                     newMiner.instances.push(minerInstance);
 
-                    miner.removeInstance(data.miner);
+                    miner.removeInstance(minerInstance);
+
+                    miner = newMiner;
 
                 } else if (data.type === "all instances"){
 
-                    miner.address = unencodedNewAddress;
+                    miner.address = newUnencodedAddress;
 
                 } else throw {message: "data.type is invalid"};
 

@@ -69,7 +69,10 @@ describe('testAddressGenerator', () => {
         address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, true);
 
         console.log("should return address", address);
+
         assert(Buffer.isBuffer(address.unencodedAddress), 'Address is not an object');
+        assert(address.unencodedAddress === consts.ADDRESSES.ADDRESS.LENGTH, 'Address must have '+consts.ADDRESSES.ADDRESS.LENGTH);
+
         assert(typeof address.address === "string", 'Address is not an object');
     });
 
