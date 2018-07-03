@@ -2,6 +2,7 @@ import NodesList from 'node/lists/Nodes-List';
 import consts from 'consts/const_global'
 import global from 'consts/global';
 import Blockchain from "main-blockchain/Blockchain";
+import AdvancedMessages from "node/menu/Advanced-Messages"
 
 let InheritedPoolMining;
 
@@ -43,6 +44,21 @@ class MinerPoolMining extends InheritedPoolMining {
         this._isBeingMining = false;
 
         setTimeout( this._checkForWorkInterval.bind(this), 5000);
+
+    }
+
+    async _setAddress(newAddress, save = true){
+
+        await InheritedPoolMining.prototype._setAddress.call(this, newAddress, false);
+
+        if ( Blockchain.Wallet.getAddress( this._minerAddress )  === null ){
+
+            //the address is not right, let's ask if he wants to change the mining address
+            if (await AdvancedMessages.confirm("You are mining on a different address in this pool. Do you want to change the pool mining address"))
+                await this.minerPoolManagement.minerPoolProtocol.changeWalletMining();
+
+        }
+
 
     }
 

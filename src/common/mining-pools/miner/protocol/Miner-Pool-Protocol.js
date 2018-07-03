@@ -171,7 +171,7 @@ class MinerProtocol extends PoolProtocolList{
                 this.minerPoolManagement.minerPoolSettings.poolUseSignatures = poolUseSignatures;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolServers;
 
-                this.minerPoolManagement.minerPoolSettings.poolMinerAddress = miningAddress;
+                this.minerPoolManagement.minerPoolMining.minerAddress = miningAddress;
 
                 //connection established
                 await this._connectionEstablishedWithPool(socket);
@@ -358,17 +358,17 @@ class MinerProtocol extends PoolProtocolList{
 
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
-            let oldAddress = Blockchain.Wallet.getAddress( this.minerPoolProtocol.minerPoolSettings.poolMinerAddress );
+            let oldAddress = Blockchain.Wallet.getAddress( this.minerPoolProtocol.minerPoolMining.minerAddress );
 
             if (oldAddress === null || oldAddress === undefined){
 
-                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolProtocol.minerPoolSettings.poolMinerAddress );
+                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolProtocol.minerPoolMining.minerAddress );
                 return;
 
             }
 
-            let unencodedAddress =  InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.minerPoolProtocol.minerPoolSettings.poolMinerAddress);
-            let newUnencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(minerAddressPublicKey) ;
+            let unencodedAddress =  InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.minerPoolProtocol.minerPoolMining.minerAddress);
+            let newUnencodedAddress =  InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( newAddress );
 
             let message = Buffer.concat([
 
@@ -397,7 +397,7 @@ class MinerProtocol extends PoolProtocolList{
             if (answer.result !== true) throw answer;
             else {
 
-                this.minerPoolManagement.minerPoolSettings.poolMinerAddress = newAddress;
+                this.minerPoolManagement.minerPoolMining.minerAddress = newAddress;
 
                 return true;
 

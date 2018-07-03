@@ -68,7 +68,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         try {
 
-            throw "load blockchain simple" ;
             if (process.env.FORCE_LOAD !== undefined) throw "load blockchain simple" ;
 
             let offset = await this.db.get("lightAccountantTreeAdvanced_offset");
