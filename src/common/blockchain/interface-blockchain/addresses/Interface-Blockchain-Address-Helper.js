@@ -155,7 +155,7 @@ class InterfaceBlockchainAddressHelper{
         };
     }
 
-    static generateAddressWIF(address, showDebug){
+    static generateAddressWIF(address, showDebug, toBase = false){
 
         if (!Buffer.isBuffer(address))
             address = BufferExtended.fromBase(address);
@@ -177,6 +177,9 @@ class InterfaceBlockchainAddressHelper{
             checksum,
             Buffer.from( suffix, "hex")
         ]);
+
+        if (toBase)
+            addressWIF = BufferExtended.toBase(addressWIF);
 
         return addressWIF;
     }

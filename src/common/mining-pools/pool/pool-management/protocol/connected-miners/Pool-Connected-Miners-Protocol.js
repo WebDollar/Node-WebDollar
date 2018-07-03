@@ -113,6 +113,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     m: this.poolManagement.poolStatistics.poolMinersOnline.length,
                     t: this.poolManagement.poolStatistics.poolTimeRemaining,
 
+                    minerAddress: minerInstance.miner.address,
+
                 }, "confirmation", 16000 );
 
                 try {

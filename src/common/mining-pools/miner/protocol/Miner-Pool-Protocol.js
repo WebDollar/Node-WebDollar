@@ -6,10 +6,11 @@ import ed25519 from "common/crypto/ed25519";
 import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
-import Serialization from "../../../utils/Serialization";
+import Serialization from "common/utils/Serialization";
 import StatusEvents from "common/events/Status-Events";
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 import AdvancedMessages from "node/menu/Advanced-Messages";
+import consts from "consts/const_global"
 
 class MinerProtocol extends PoolProtocolList{
 
@@ -112,11 +113,13 @@ class MinerProtocol extends PoolProtocolList{
             //let message = new Buffer(32);
 
             let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
+
                 message: message,
                 pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
                 miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
 
                 minerAddress: Blockchain.blockchain.mining.minerAddress,
+
             }, "answer", 16000  );
 
 
@@ -130,6 +133,10 @@ class MinerProtocol extends PoolProtocolList{
                 if (typeof answer.website !== 'string') throw {message: "pool:  website is invalid"};
                 if (typeof answer.useSig !== 'boolean') throw {message: "pool:  useSignatures is invalid"};
                 if ( !Array.isArray(answer.servers) ) throw {message: "pool:  servers is invalid"};
+
+                if (!Buffer.isBuffer(answer.minerAddress) && answer.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "pool: address is invalid"};
+
+                let miningAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(answer.minerAddress, false, true);
 
                 let poolName = answer.name;
                 let poolFee = answer.fee;
@@ -164,10 +171,13 @@ class MinerProtocol extends PoolProtocolList{
                 this.minerPoolManagement.minerPoolSettings.poolUseSignatures = poolUseSignatures;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolServers;
 
+                this.minerPoolManagement.minerPoolSettings.poolMinerAddress = miningAddress;
+
                 //connection established
                 await this._connectionEstablishedWithPool(socket);
 
                 this._updateStatistics(answer);
+
 
                 return true;
 
@@ -343,21 +353,22 @@ class MinerProtocol extends PoolProtocolList{
             if (poolSocket === undefined)
                 poolSocket = this.connectedPools[0];
 
+            if (newAddress === undefined)
+                newAddress = Blockchain.Wallet.addresses[0];
+
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
-            let oldAddress = Blockchain.Wallet.getAddress( this.blockchain.mining.minerAddress );
+            let oldAddress = Blockchain.Wallet.getAddress( this.minerPoolProtocol.minerPoolSettings.poolMinerAddress );
 
             if (oldAddress === null || oldAddress === undefined){
 
-                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.blockchain.mining.minerAddress );
+                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolProtocol.minerPoolSettings.poolMinerAddress );
                 return;
 
             }
 
-            let minerAddressPublicKey = oldAddress.publicKey;
-
-            let unencodedAddress =  InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.blockchain.mining.minerAddress);
-            let newUnencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(minerPublicKey) ;
+            let unencodedAddress =  InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.minerPoolProtocol.minerPoolSettings.poolMinerAddress);
+            let newUnencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(minerAddressPublicKey) ;
 
             let message = Buffer.concat([
 
@@ -371,8 +382,9 @@ class MinerProtocol extends PoolProtocolList{
             let answer = poolSocket.sendRequestWaitOnce("mining-pool/change-wallet-mining", {
 
                 miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
-                minerAddress: this.blockchain.mining.minerAddress,
-                minerAddressPublicKey: minerAddressPublicKey,
+
+                minerAddress: oldAddress.address,
+                minerAddressPublicKey: oldAddress.publicKey,
 
                 newMinerAddress: newAddress,
 
@@ -384,6 +396,8 @@ class MinerProtocol extends PoolProtocolList{
             if (answer === null) throw {message: "pool didn't respond"};
             if (answer.result !== true) throw answer;
             else {
+
+                this.minerPoolManagement.minerPoolSettings.poolMinerAddress = newAddress;
 
                 return true;
 
@@ -427,7 +441,7 @@ class MinerProtocol extends PoolProtocolList{
 
             console.error("Couldn't change the wallet", exception.message);
             return {result:false, message: exception.message}
-            
+
         }
 
     }

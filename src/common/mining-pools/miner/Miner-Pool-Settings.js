@@ -6,6 +6,7 @@ import StatusEvents from "common/events/Status-Events"
 
 import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import AdvancedMessages from "node/menu/Advanced-Messages"
 
 const sanitizer = require('sanitizer');
 
@@ -29,6 +30,8 @@ class MinerPoolSettings {
         this.poolServers = [];
         this.poolPublicKey = new Buffer(0);
         this.poolUseSignatures = false;
+
+        this._poolMinerAddress = '';
 
         this._minerPoolActivated = false;
 
@@ -191,6 +194,35 @@ class MinerPoolSettings {
 
     get minerPoolActivated(){
         return this._minerPoolActivated;
+    }
+
+
+    get poolMinerAddress(){
+        return this._poolMinerAddress
+    }
+
+    set poolMinerAddress(newValue){
+
+        if (newValue === this._poolMinerAddress) return;
+
+        this._poolMinerAddress = newValue;
+
+        if (this._poolMinerAddress !== this.minerPoolManagement.blockchain.mining.minerAddress){
+
+            //the address is not right, let's ask if he wants to change the mining address
+            AdvancedMessages.confirm("You are mining on a different address in this pool. Do you want to change the pool mining address").then((answer)=>{
+
+                if (answer){
+
+                    this.minerPoolManagement.minerPoolProtocol.changeWalletMining();
+
+                }
+
+
+            })
+
+        }
+
     }
 
 }
