@@ -177,7 +177,7 @@ class NodeServer {
 
                     if (new Date().getTime() - this._rooms.terminals.timeLastConnected >= ROOMS.TERMINALS.TIME_TO_PASS_TO_CONNECT_NEW_CLIENT){
 
-                        this._rooms.terminals.serverSits = ROOMS.TERMINALS.SERVER_FREE_ROOM;
+                        this._rooms.terminals.serverSits = (Blockchain.isPoolActivated() ? 10 : 1 ) * ROOMS.TERMINALS.SERVER_FREE_ROOM;
                         this._rooms.terminals.timeLastConnected = new Date().getTime();
 
                     }else {
@@ -192,7 +192,7 @@ class NodeServer {
                 else if (NODE_TYPE.NODE_WEB_PEER === nodeType && this._rooms.browsers.serverSits <= 0)
                         if (new Date().getTime() - this._rooms.browsers.timeLastConnected >= ROOMS.BROWSERS.TIME_TO_PASS_TO_CONNECT_NEW_CLIENT) {
 
-                            this._rooms.browsers.serverSits = ROOMS.BROWSERS.SERVER_FREE_ROOM;
+                            this._rooms.browsers.serverSits = (Blockchain.isPoolActivated() ? 10 : 1 )  * ROOMS.BROWSERS.SERVER_FREE_ROOM;
                             this._rooms.browsers.timeLastConnected = new Date().getTime();
 
                         } else return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
