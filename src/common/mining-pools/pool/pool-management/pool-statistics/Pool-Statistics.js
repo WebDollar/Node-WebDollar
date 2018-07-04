@@ -79,7 +79,7 @@ class PoolStatistics{
             return a - b;
         });
 
-        this.poolHashes = array[Math.floor(array.length / 2)];
+        this.poolHashes = array[Math.floor(array.length / 4)];
 
         this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
 
