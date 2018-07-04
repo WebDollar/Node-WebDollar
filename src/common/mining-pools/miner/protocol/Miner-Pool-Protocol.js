@@ -134,9 +134,11 @@ class MinerProtocol extends PoolProtocolList{
                 if (typeof answer.useSig !== 'boolean') throw {message: "pool:  useSignatures is invalid"};
                 if ( !Array.isArray(answer.servers) ) throw {message: "pool:  servers is invalid"};
 
-                if (!Buffer.isBuffer(answer.minerAddress) && answer.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "pool: address is invalid"};
-
-                let miningAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(answer.minerAddress, false, true);
+                let miningAddress;
+                if (answer.minerAddress !== undefined) {
+                    if (!Buffer.isBuffer(answer.minerAddress) && answer.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "pool: address is invalid"};
+                    miningAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(answer.minerAddress, false, true);
+                }
 
                 let poolName = answer.name;
                 let poolFee = answer.fee;
@@ -171,7 +173,8 @@ class MinerProtocol extends PoolProtocolList{
                 this.minerPoolManagement.minerPoolSettings.poolUseSignatures = poolUseSignatures;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolServers;
 
-                await this.minerPoolManagement.minerPoolMining._setAddress(  miningAddress, false, true);
+                if (miningAddress !== undefined)
+                    await this.minerPoolManagement.minerPoolMining._setAddress(  miningAddress, false, true);
 
                 //connection established
                 await this._connectionEstablishedWithPool(socket);

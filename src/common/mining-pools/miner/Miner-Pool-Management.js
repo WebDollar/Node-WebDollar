@@ -93,6 +93,8 @@ class MinerProtocol {
 
             if (value) {
 
+                Blockchain.blockchain.miningSolo.stopMining();
+
                 this.blockchain.mining = this.minerPoolMining;
                 Blockchain.Mining = this.minerPoolMining;
 
@@ -105,6 +107,8 @@ class MinerProtocol {
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_MINER;
             }
             else {
+
+                Blockchain.blockchain.miningSolo.stopMining();
 
                 this.blockchain.mining = Blockchain.blockchain.miningSolo;
                 Blockchain.Mining = Blockchain.blockchain.miningSolo;
