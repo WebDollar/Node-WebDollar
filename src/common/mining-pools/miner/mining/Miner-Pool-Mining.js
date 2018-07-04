@@ -47,9 +47,15 @@ class MinerPoolMining extends InheritedPoolMining {
 
     }
 
-    async _setAddress(newAddress, save = true){
+    async _setAddress(newAddress, save, skipChangingAddress=false ){
 
+        if (this._minerAddress === newAddress)
+            return;
+
+        let oldMinerAddress = this._minerAddress;
         await InheritedPoolMining.prototype._setAddress.call(this, newAddress, false);
+
+        if (skipChangingAddress) return;
 
         if ( Blockchain.Wallet.getAddress( this._minerAddress )  === null ){
 
@@ -57,7 +63,8 @@ class MinerPoolMining extends InheritedPoolMining {
             if (await AdvancedMessages.confirm("You are mining on a different address in this pool. Do you want to change the pool mining address"))
                 await this.minerPoolManagement.minerPoolProtocol.changeWalletMining();
 
-        }
+        } else
+            await this.minerPoolManagement.minerPoolProtocol.changeWalletMining(undefined, this._minerAddress, oldMinerAddress);
 
 
     }

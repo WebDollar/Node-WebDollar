@@ -226,13 +226,14 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             try {
 
+                if (!Buffer.isBuffer( data.miner )  || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
 
                 if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
                 if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
-                if (Buffer.isBuffer( data.minerAddressPublicKey)  || data.minerAddressPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-                let minerPublicKey = data.minerAddressPublicKey;
+                if (!Buffer.isBuffer( data.minerAddressPublicKey)  || data.minerAddressPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                let minerAddressPublicKey = data.minerAddressPublicKey;
 
                 //new address
 
@@ -251,14 +252,14 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 ]);
 
 
-                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey( minerPublicKey );
+                let minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey( data.miner );
                 if (minerInstance === null) throw {message: "minerInstance was not found"};
 
 
                 if ( !Buffer.isBuffer(data.signature) || data.signature.length < 10 ) throw {message: "pool: signature is invalid"};
-                if (! ed25519.verify(data.signature, message, minerPublicKey)) throw {message: "pool: signature doesn't validate message"};
+                if (! ed25519.verify(data.signature, message, minerAddressPublicKey)) throw {message: "pool: signature doesn't validate message"};
 
-                if ( ! InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(minerPublicKey).equals(unencodedAddress)) throw {message: "pool: unencodedAddress doesn't work minerPublicKey"};
+                if ( ! InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(minerAddressPublicKey).equals(unencodedAddress)) throw {message: "pool: unencodedAddress doesn't work minerPublicKey"};
 
                 if ( data.type === "only instance" ){
 

@@ -171,7 +171,7 @@ class MinerProtocol extends PoolProtocolList{
                 this.minerPoolManagement.minerPoolSettings.poolUseSignatures = poolUseSignatures;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolServers;
 
-                this.minerPoolManagement.minerPoolMining.minerAddress = miningAddress;
+                await this.minerPoolManagement.minerPoolMining._setAddress(  miningAddress, false, true);
 
                 //connection established
                 await this._connectionEstablishedWithPool(socket);
@@ -344,9 +344,9 @@ class MinerProtocol extends PoolProtocolList{
     }
 
 
-    async changeWalletMining( poolSocket, newAddress,  ){
+    async changeWalletMining( poolSocket, newAddress, oldAddress ){
 
-        if (!this.poolManagement._poolStarted) return;
+        if (!this.minerPoolManagement._minerPoolStarted) return;
 
         try {
 
@@ -354,20 +354,20 @@ class MinerProtocol extends PoolProtocolList{
                 poolSocket = this.connectedPools[0];
 
             if (newAddress === undefined)
-                newAddress = Blockchain.Wallet.addresses[0];
+                newAddress = Blockchain.Wallet.addresses[0].address;
 
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
-            let oldAddress = Blockchain.Wallet.getAddress( this.minerPoolProtocol.minerPoolMining.minerAddress );
+            oldAddress = Blockchain.Wallet.getAddress(oldAddress||this.minerPoolManagement.minerPoolMining.minerAddress);
 
             if (oldAddress === null || oldAddress === undefined){
 
-                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolProtocol.minerPoolMining.minerAddress );
+                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolManagement.minerPoolMining.minerAddress );
                 return;
 
             }
 
-            let unencodedAddress =  InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.minerPoolProtocol.minerPoolMining.minerAddress);
+            let unencodedAddress =  InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( oldAddress.address );
             let newUnencodedAddress =  InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( newAddress );
 
             let message = Buffer.concat([
@@ -377,9 +377,9 @@ class MinerProtocol extends PoolProtocolList{
 
             ]);
 
-            let signature = oldAddress.signMessage ( message, undefined );
+            let signature = await oldAddress.signMessage ( message, undefined );
 
-            let answer = poolSocket.sendRequestWaitOnce("mining-pool/change-wallet-mining", {
+            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/change-wallet-mining", {
 
                 miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
 
@@ -397,10 +397,9 @@ class MinerProtocol extends PoolProtocolList{
             if (answer.result !== true) throw answer;
             else {
 
-                this.minerPoolManagement.minerPoolMining.minerAddress = newAddress;
+                await this.minerPoolManagement.minerPoolMining._setAddress(  newAddress , false, true);
 
                 return true;
-
             }
 
         } catch (exception){
@@ -414,7 +413,7 @@ class MinerProtocol extends PoolProtocolList{
 
     async askWalletMining(poolSocket){
 
-        if (!this.poolManagement._poolStarted) return;
+        if (!this.minerPoolManagement._minerPoolStarted) return;
 
         try {
 
@@ -423,7 +422,7 @@ class MinerProtocol extends PoolProtocolList{
 
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
-            let answer = await poolSocket.sendRequestWaitOnce("mining-pool/request-wallet-mining", {
+            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/request-wallet-mining", {
                 miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
             }, "answer", 6000);
 

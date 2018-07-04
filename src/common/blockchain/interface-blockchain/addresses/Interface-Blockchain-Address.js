@@ -38,7 +38,7 @@ class InterfaceBlockchainAddress{
 
         let result = InterfaceBlockchainAddressHelper.generateAddress(salt, privateKeyWIF);
 
-        this.address = result.address;
+        this.address = result.addressWIF;
         this.unencodedAddress = result.unencodedAddress;
         this.publicKey = result.publicKey;
 
@@ -353,16 +353,23 @@ class InterfaceBlockchainAddress{
             this.address = BufferExtended.toBase( BufferExtend.substr(buffer, offset, len) );
             offset += len;
 
+            if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.address) === null)
+                throw {message: "address didn't pass the validateAddressChecksum "};
+
+            this.address = InterfaceBlockchainAddressHelper.generateAddressWIF(this.address, false, true);
+
             //read unencodedAddress
             len = Serialization.deserializeNumber1Bytes( buffer, offset );
             offset += 1;
 
-            this.unencodedAddress = BufferExtend.substr(buffer, offset, len);
+            let unencodedAddress = BufferExtend.substr(buffer, offset, len);
             offset += len;
 
-            //calcuating the address from the unencodedAddress
-            if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.address).result === false)
-                throw {message: "address didn't pass the valdiateAddressChecksum "};
+            //calculating the address from the unencodedAddress
+            let answer = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(unencodedAddress);
+            if ( answer === null) throw {message: "unencodedAddress didn't pass the validateAddressChecksum"};
+
+            this.unencodedAddress = answer;
 
             len = Serialization.deserializeNumber1Bytes( buffer, offset );
             offset += 1;

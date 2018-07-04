@@ -320,7 +320,7 @@ class NodeServer {
                 }
 
 
-        if (Blockchain.PoolManagement.poolStarted || Blockchain.ServerPoolManagement.serverPoolStarted) {
+        if (!Blockchain.isPoolActivated()) {
 
             if (NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL / 2) {
 
