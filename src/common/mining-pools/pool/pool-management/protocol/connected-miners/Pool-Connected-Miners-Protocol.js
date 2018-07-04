@@ -62,18 +62,27 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 if ( !Buffer.isBuffer( data.miner )  || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
 
-                if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
-                let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
-                if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
+                let minerInstance = this.poolManagement.poolData.findMinerInstance(data.miner);
+                let miner;
+                if (minerInstance !== null) {
+                    miner = minerInstance.miner;
+                } else {
 
-                // save minerPublicKey
-                let miner = this.poolManagement.poolData.getMiner(unencodedAddress);
+                    if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
+                    let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
+                    if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
-                if (miner === null )
-                    miner = await this.poolManagement.poolData.addMiner(unencodedAddress, data.miner);
+                    // save minerPublicKey
+                    miner = this.poolManagement.poolData.getMiner(unencodedAddress);
 
-                let minerInstance = miner.addInstance(data.miner);
+                    if (miner === null )
+                        miner = await this.poolManagement.poolData.addMiner(unencodedAddress, data.miner);
+
+                    minerInstance = miner.addInstance(data.miner);
+                }
+
                 minerInstance.socket = socket;
+
 
                 let newMessage = Buffer.concat( [
                     data.message,
@@ -263,11 +272,11 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 if ( data.type === "only instance" ){
 
+                    miner.removeInstance(minerInstance);
+
                     let newMiner = this.poolManagement.poolData.addMiner(newUnencodedAddress );
                     minerInstance.miner = newMiner;
-                    newMiner.instances.push(minerInstance);
-
-                    miner.removeInstance(minerInstance);
+                    newMiner.addInstance(minerInstance);
 
                     miner = newMiner;
 
@@ -278,7 +287,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 } else throw {message: "data.type is invalid"};
 
 
-                socket.node.sendRequest("mining-pool/change-wallet-mining/answer", {result: true, address: InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address) } )
+                socket.node.sendRequest("mining-pool/change-wallet-mining/answer", {result: true, address: InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address), reward: minerInstance.miner.rewardTotal,  confirmed: minerInstance.miner.rewardConfirmedTotal, } )
 
             } catch (exception){
                 socket.node.sendRequest("mining-pool/change-wallet-mining/answer", {result: false, message: exception.message } )
@@ -304,7 +313,6 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         });
 
-        //TODO request reward
         socket.node.on("mining-pool/request-reward", async (data) => {
 
             if (!this.poolManagement._poolStarted) return;

@@ -62,6 +62,16 @@ class PoolData {
         return null;
     }
 
+    findMinerInstance(minerPublicKey){
+
+        for (let i = 0; i < this.miners.length; ++i)
+            for (let j=0; j< this.miners[i].instances.length; j++)
+                if (this.miners[i].instances[j].publicKey.equals(minerPublicKey))
+                    return this.miners[i].instances[j];
+
+        return null;
+    }
+
     /**
      * @param minerAddress
      * @returns miner or null if it doesn't exist
@@ -83,9 +93,10 @@ class PoolData {
      * @param minerReward
      * @returns true/false
      */
-    async addMiner(minerAddress, minerPublicKey, minerReward = 0){
+    addMiner(minerAddress, minerPublicKey, minerReward = 0){
 
-        if (this.getMiner(minerAddress) === null) {
+        let miner = this.getMiner(minerAddress);
+        if ( miner === null) {
 
             if ( !Buffer.isBuffer(minerAddress) || minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
                 throw {message: "miner address is invalid" };
@@ -93,11 +104,11 @@ class PoolData {
 
             this.miners.push( new PoolDataMiner( this, uuid.v4(), minerAddress, minerPublicKey, minerReward, [] ) );
 
-            return this.miners[this.miners.length-1]
+            miner = this.miners[this.miners.length-1]
 
         }
 
-        return false; //miner already exists
+        return miner; //miner already exists
     }
 
     addBlockInformation(){

@@ -399,12 +399,18 @@ class MinerProtocol extends PoolProtocolList{
 
                 await this.minerPoolManagement.minerPoolMining._setAddress(  newAddress , false, true);
 
+                this.minerPoolManagement.minerPoolReward.confirmedReward = answer.confirmed;
+                this.minerPoolManagement.minerPoolReward.totalReward = answer.reward;
+
                 return true;
             }
 
         } catch (exception){
 
             console.error("Couldn't change the wallet", exception.message);
+
+            await this.minerPoolManagement.minerPoolMining._setAddress(  oldAddress.address , false, true);
+
             return false;
 
         }

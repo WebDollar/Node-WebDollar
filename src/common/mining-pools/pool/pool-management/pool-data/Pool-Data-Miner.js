@@ -26,14 +26,17 @@ class PoolDataMiner{
 
     addInstance(publicKey){
 
+        if (typeof publicKey === "object" && publicKey.hasOwnProperty("publicKey")) publicKey = publicKey.publicKey;
+
         if (publicKey === undefined) return;
 
         if (!Buffer.isBuffer(publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH)
             throw {message: "public key is invalid"};
 
         let instance = this.findInstance(publicKey);
+
         if ( instance === null) {
-            let instance = new PoolDataMinerInstance(this, publicKey);
+            instance = new PoolDataMinerInstance(this, publicKey);
             this.instances.push(instance);
         }
 
@@ -42,6 +45,8 @@ class PoolDataMiner{
     }
 
     findInstance(publicKey){
+
+        if (typeof publicKey === "object" && publicKey.hasOwnProperty("publicKey")) publicKey = publicKey.publicKey;
 
         let pos = this._searchInstance(publicKey);
 
@@ -52,6 +57,8 @@ class PoolDataMiner{
 
     _searchInstance(publicKey){
 
+        if (typeof publicKey === "object" && publicKey.hasOwnProperty("publicKey")) publicKey = publicKey.publicKey;
+
         for (let i = 0; i < this.instances.length; i++)
             if (this.instances[i].publicKey.equals( publicKey) )
                 return i;
@@ -61,6 +68,8 @@ class PoolDataMiner{
     }
 
     removeInstance(publicKey){
+
+        if (typeof publicKey === "object" && publicKey.hasOwnProperty("publicKey")) publicKey = publicKey.publicKey;
 
         let pos = this._searchInstance(publicKey);
         if (pos !== -1) {
