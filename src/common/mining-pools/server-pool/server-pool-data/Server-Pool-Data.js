@@ -17,17 +17,14 @@ class ServerPoolData {
 
     }
 
-    /**
-     * @param minerAddress
-     * @returns miner or null if it doesn't exist
-     */
-    getPool(poolAddress){
+
+    getPool(poolAddress, returnPos = false){
 
         for (let i = 0; i < this.pools.length; ++i)
             if (this.pools[i].address.equals( poolAddress ))
-                return this.pools[i];
+                return returnPos ? i : this.pools[i];
 
-        return null;
+        return returnPos  ? -1 : null;
     }
 
     /**
@@ -62,17 +59,13 @@ class ServerPoolData {
      */
     async removePool(poolAddress){
 
-        let response = this.getMiner(poolAddress);
+        let pos = this.getPool(poolAddress, true);
 
-        if (response === null)
-            return false; //miner doesn't exists
+        if (pos === -1) return false; //miner doesn't exists
 
-        let index = response.index;
-
-        this.pools[index] = this.pools[this.pools.length - 1];
+        this.pools[pos] = this.pools[this.pools.length - 1];
         this.pools.pop();
 
-        return (await this.savePoolsList());
     }
 
 

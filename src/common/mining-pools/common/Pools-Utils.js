@@ -47,7 +47,7 @@ class PoolsUtils {
         if (typeof poolActivated !== "boolean") throw {message: "poolActivated is not a boolean"};
     }
 
-    validatePoolsDetails(poolName, poolFee, poolWebsite, poolAddress, poolPublicKey, poolServers, poolActivated = false){
+    validatePoolsDetails(poolName, poolFee, poolWebsite, poolAddress, poolPublicKey, poolServers, poolActivated = false, poolReferralFee = 0){
 
         this.validatePoolName(poolName);
         this.validatePoolFee(poolFee);
@@ -55,6 +55,8 @@ class PoolsUtils {
         this.validatePoolPublicKey(poolPublicKey);
         this.validatePoolServers(poolServers);
         this.validatePoolActivated(poolActivated);
+        this.validatePoolFee(poolReferralFee);
+
         if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(poolAddress) === null) throw {message: "poolAddress is invalid"};
 
         return true;

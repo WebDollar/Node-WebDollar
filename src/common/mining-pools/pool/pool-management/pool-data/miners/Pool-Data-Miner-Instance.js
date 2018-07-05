@@ -22,6 +22,13 @@ class PoolDataMinerInstance {
 
     }
 
+    destroyPoolDataMinerInstance(){
+        this.miner = undefined;
+        this.lastBlockInformation = undefined;
+        this.work = undefined;
+        this.socket = undefined;
+    }
+
 
     serializeMinerInstance(){
 
@@ -37,6 +44,7 @@ class PoolDataMinerInstance {
         this.publicKey = BufferExtended.substr( buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH );
         offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
 
+        //calculate the publicKeyString
         this.publicKeyString = this.publicKey.toString("hex");
 
         this.hashesPerSecond = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );

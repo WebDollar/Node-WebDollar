@@ -2,6 +2,7 @@ import Serialization from 'common/utils/Serialization';
 import BufferExtended from 'common/utils/BufferExtended';
 import consts from 'consts/const_global';
 import PoolDataMinerInstance from "./Pool-Data-Miner-Instance";
+import PoolDataMinerReferrals from "./Pool-Data-Miner-Referrals";
 
 class PoolDataMiner{
 
@@ -17,11 +18,24 @@ class PoolDataMiner{
         if (publicKey !== undefined)
             this.addInstance(publicKey);
 
-        this.rewardTotal = 0;            //pending except last
-        this.rewardConfirmed = 0;        //rewardConfirmed
-        this.rewardConfirmedOther = 0;   //other money confirmed to be sent
-        this.rewardSent = 0;             //rewardSent
+        this._rewardTotal = 0;            //pending except last
+        this._rewardConfirmed = 0;        //rewardConfirmed
+        this._rewardConfirmedOther = 0;   //other money confirmed to be sent
+        this._rewardSent = 0;             //rewardSent
 
+
+        this.referrals = new PoolDataMinerReferrals( this, poolData );
+
+    }
+
+    destroyPoolDataMiner(){
+
+        this.poolData = undefined;
+
+        for (let i=0; i<this.instances.length; i++)
+            this.instances[i].destroyPoolDataMinerInstance();
+
+        this.instances = [];
     }
 
     addInstance(publicKey){
@@ -141,6 +155,37 @@ class PoolDataMiner{
     get rewardConfirmedTotal(){
         return this.rewardConfirmed + this.rewardConfirmedOther
     }
+
+
+
+
+    set rewardTotal(newValue){
+        this._rewardTotal = Math.max( 0 , Math.floor( newValue ));
+    }
+    set rewardConfirmed(newValue){
+        this._rewardConfirmedOther = Math.max( 0 , Math.floor( newValue ));
+    }
+    set rewardConfirmedOther(newValue){
+        this._rewardConfirmedOther = Math.max( 0 , Math.floor( newValue ));
+    }
+    set rewardSent(newValue){
+        this._rewardSent = Math.max( 0 , Math.floor( newValue ));
+    }
+
+
+    get rewardTotal(){
+        return this._rewardTotal;
+    }
+    get rewardConfirmed(){
+        return this._rewardConfirmed;
+    }
+    get rewardConfirmedOther(){
+        return this._rewardConfirmedOther;
+    }
+    get rewardSent(){
+        return this._rewardSent;
+    }
+
 
 }
 

@@ -89,7 +89,7 @@ class PoolRewardsManagement{
                 //let's delete old payouts
                 if ( this.blockchain.blocks.length - this.poolData.blocksInfo[i].block.height > 40) {
                     this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid++;
-                    this.poolData.deleteBlockInformationByIndex(i);
+                    this.poolData.deleteBlockInformation(i);
                 }
 
                 poolBlocksConfirmed++;
@@ -328,7 +328,7 @@ class PoolRewardsManagement{
         }
 
         //clear the blockInformation
-        this.poolData.deleteBlockInformationByIndex(index);
+        this.poolData.deleteBlockInformation(index);
         
     }
 

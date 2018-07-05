@@ -73,7 +73,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
                     // save minerPublicKey
-                    miner = this.poolManagement.poolData.getMiner(unencodedAddress);
+                    miner = this.poolManagement.poolData.findMiner(unencodedAddress);
 
                     if (miner === null )
                         miner = await this.poolManagement.poolData.addMiner(unencodedAddress, data.miner);
@@ -250,7 +250,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let newUnencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.newMinerAddress );
                 if (newUnencodedAddress === null) throw { message: "newMinerAddress is not correct" };
 
-                let miner = this.poolManagement.poolData.getMiner(unencodedAddress);
+                let miner = this.poolManagement.poolData.findMiner(unencodedAddress);
                 if (miner === null) throw {message: "miner was not found"};
 
                 let message = Buffer.concat([
@@ -322,7 +322,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if (Buffer.isBuffer( data.minerAddress )  || data.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "minerAddress is invalid"};
 
                 // load minerPublicKey
-                let miner = this.poolManagement.poolData.getMiner(data.minerAddress);
+                let miner = this.poolManagement.poolData.findMiner(data.minerAddress);
                 if (miner === null) throw {message: "mine was not found"};
 
                 //let answer = await this.poolManagement.sendReward(data.minerAddress);

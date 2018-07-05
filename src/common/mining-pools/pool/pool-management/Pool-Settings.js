@@ -26,6 +26,8 @@ class PoolSettings {
         this._poolUseSignatures = false;
         this._poolUsePoolServers = true;
 
+        this._poolReferralFee = 0;
+
         this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
         this.poolPublicKey = new Buffer(0);
         this.poolAddress = '';
@@ -190,6 +192,22 @@ class PoolSettings {
     }
 
 
+    async setPoolReferralFee(newValue, skipSaving = false){
+
+        PoolsUtils.validatePoolFee(newValue);
+
+        this._poolReferralFee = newValue;
+
+        if (!skipSaving)
+            if (false === await this._db.save("pool_referral_fee", this._poolReferralFee )) throw {message: "poolReferralFee couldn't be saved"};
+
+    }
+
+    get poolReferralFee(){
+        return this._poolReferralFee;
+    }
+
+
 
     async setPoolUsePoolServers(newValue, skipSaving = false){
 
@@ -281,9 +299,9 @@ class PoolSettings {
         return true;
     }
 
-    async justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated){
+    async justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated, poolReferralFee){
 
-        return PoolsUtils.validatePoolsDetails(poolName, poolFee, poolWebsite, this.poolAddress, this.poolPublicKey, poolServers, poolActivated);
+        return PoolsUtils.validatePoolsDetails(poolName, poolFee, poolWebsite, this.poolAddress, this.poolPublicKey, poolServers, poolActivated, poolReferralFee);
 
     }
 
@@ -329,7 +347,10 @@ class PoolSettings {
         else if (poolUseSignatures === "false") poolUseSignatures = false;
         else if (poolUseSignatures === null) poolUseSignatures = true;
 
-        if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated))
+        let poolReferralFee = await this._db.get("pool_referral_fee",  30*1000, true);
+        if (poolReferralFee === null) poolReferralFee = 0;
+
+        if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated, poolReferralFee))
             return false;
 
         await this.setPoolName( poolName , true );
@@ -340,6 +361,8 @@ class PoolSettings {
 
         await this.setPoolUsePoolServers( poolUsePoolServers, true, true);
         await this.setPoolUseSignatures( poolUseSignatures, true , true);
+
+        await this.setPoolReferralFee( poolReferralFee, true);
 
         return true;
 
