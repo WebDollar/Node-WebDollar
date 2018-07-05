@@ -24,7 +24,7 @@ class PoolDataMiner{
         this._rewardSent = 0;             //rewardSent
 
 
-        this.referrals = new PoolDataMinerReferrals( this, poolData );
+        this.referrals = new PoolDataMinerReferrals( poolData, this  );
 
     }
 
@@ -101,8 +101,8 @@ class PoolDataMiner{
         list.push(Serialization.serializeNumber1Byte(0x02) );
         list.push(this.address ); //20 bytes
 
-        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this.rewardConfirmedOther) )));
-        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this.rewardSent) )));
+        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this._rewardConfirmedOther) )));
+        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this._rewardSent) )));
 
         list.push ( Serialization.serializeNumber4Bytes(this.instances.length) );
 
@@ -152,12 +152,10 @@ class PoolDataMiner{
     }
 
 
+
     get rewardConfirmedTotal(){
-        return this.rewardConfirmed + this.rewardConfirmedOther
+        return this._rewardConfirmed + this._rewardConfirmedOther
     }
-
-
-
 
     set rewardTotal(newValue){
         this._rewardTotal = Math.max( 0 , Math.floor( newValue ));

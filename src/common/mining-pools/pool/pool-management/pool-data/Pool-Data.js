@@ -192,6 +192,11 @@ class PoolData {
 
             }
 
+            for (let i=0; i< this.miners.length; i++) {
+                this.miners[i].referrals.findReferralLinkAddress();
+                this.miners[i].referrals.refreshRefereeAddresses();
+            }
+
             return true;
 
         } catch (exception){

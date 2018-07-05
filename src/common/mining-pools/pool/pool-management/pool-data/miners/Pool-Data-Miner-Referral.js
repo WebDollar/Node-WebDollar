@@ -4,9 +4,15 @@ import consts from "consts/const_global"
 
 class PoolDataMinerReferral{
 
-    constructor(address){
+    constructor(poolData, miner, refereeAddress, refereeMiner){
 
-        this.address = address;
+        this.poolData = poolData;
+        this.miner = miner;
+
+        this.refereeAddress = refereeAddress; //the referee
+        this.refereeMiner = refereeMiner; //the referee
+
+        this.findRefereeAddress();
 
         this._rewardReferralTotal = 0; // total - no confirmed
         this._rewardReferralConfirmed = 0; //confirmed but not sent
@@ -18,7 +24,7 @@ class PoolDataMinerReferral{
 
         return Buffer.concat([
 
-                this.address,
+                this.refereeAddress,
                 Serialization.serializeNumber4Bytes( this.rewardReferralConfirmed ),
                 Serialization.serializeNumber4Bytes( this.rewardReferralSent ),
 
@@ -28,7 +34,7 @@ class PoolDataMinerReferral{
 
     deserializeMinerReferral ( buffer, offset ){
 
-        this.address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+        this.refereeAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
 
         this.rewardReferralTotal = 0;
 
@@ -40,6 +46,21 @@ class PoolDataMinerReferral{
 
         return offset;
     }
+
+
+    findRefereeAddress(){
+
+        if (this.refereeMiner !== null && this.refereeMiner !== undefined)
+            return this.refereeMiner;
+
+        if (this.refereeAddress === undefined) return null;
+
+        this.refereeMiner = this.poolData.findMiner( this.refereeAddress );
+
+        return this.refereeMiner;
+    }
+
+
 
     set rewardReferralTotal(newValue){
         this._rewardReferralTotal = Math.max( 0, Math.floor( newValue ));
@@ -64,6 +85,8 @@ class PoolDataMinerReferral{
     get rewardReferralSent(){
         return this._rewardReferralSent;
     }
+
+
 
 }
 
