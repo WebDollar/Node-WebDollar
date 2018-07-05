@@ -36,6 +36,7 @@ class PoolDataMiner{
             this.instances[i].destroyPoolDataMinerInstance();
 
         this.instances = [];
+        this.referrals.destroyPoolDataMinerReferrals();
     }
 
     addInstance(publicKey){
@@ -98,16 +99,18 @@ class PoolDataMiner{
 
         let list = [];
 
-        list.push(Serialization.serializeNumber1Byte(0x02) );
+        list.push(Serialization.serializeNumber1Byte(0x03) );
         list.push(this.address ); //20 bytes
 
-        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this._rewardConfirmedOther) )));
-        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this._rewardSent) )));
+        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this._rewardConfirmedOther) )) );
+        list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this._rewardSent) )) );
 
         list.push ( Serialization.serializeNumber4Bytes(this.instances.length) );
 
         for (let i=0; i<this.instances.length; i++)
-            list.push(this.instances[i].serializeMinerInstance() );
+            list.push( this.instances[i].serializeMinerInstance() );
+
+        list.push( this.referrals.serializeReferrals() );
 
         return Buffer.concat(list);
 
@@ -118,7 +121,7 @@ class PoolDataMiner{
         let version =  Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 ) );
         offset += 1;
 
-        this.address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH );
+        this.address = BufferExtended.substr( buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH );
         offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         if (version === 0x01) {
@@ -146,6 +149,9 @@ class PoolDataMiner{
             if (instance.publicKey !== undefined)
                 this.instances.push(instance);
         }
+
+        if (version >= 0x02)
+            offset = this.referrals.deserializeReferrals(buffer, offset);
 
         return offset;
 

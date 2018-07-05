@@ -16,11 +16,25 @@ class PoolDataMinerReferrals {
         this.array = [];
     }
 
+    destroyPoolDataMinerReferrals(){
+
+        this.poolData = undefined;
+        this.miner = undefined;
+        this.referralLinkMiner = undefined;
+
+        for (let i=0; i<this.array.length; i++)
+            this.array[i].destroyPoolDataMinerReferral();
+
+        this.array = [];
+
+    }
 
     refreshRefereeAddresses() {
 
         for (let i = 0; i < this.array.length; i++)
             this.array[i].findRefereeAddress();
+
+        this.findReferralLinkAddress();
 
     }
 
@@ -31,7 +45,9 @@ class PoolDataMinerReferrals {
 
         if (this.referralLinkAddress === undefined) return null;
 
-        this.referralLinkMiner = this.poolData.findMiner( this.referralLinkAddress );
+        let linkMiner = this.poolData.findMiner( this.referralLinkAddress );
+        this.referralLinkMiner = linkMiner.referrals.addReferral(this.miner.address);
+
         return this.referralLinkMiner;
 
     }
@@ -40,7 +56,7 @@ class PoolDataMinerReferrals {
 
         let list = [];
 
-        /referral Link Address
+        //referral Link Address
         list.push( Serialization.serializeNumber1Byte( this.referralLinkAddress !== undefined ? 1 : 0 ) );
 
         if ( this.referralLinkAddress !== undefined ){
@@ -95,6 +111,37 @@ class PoolDataMinerReferrals {
     }
 
 
+    addReferral(refereeAddress){
+
+        let referee = this.findReferral(refereeAddress);
+        if (referee === null){
+            let referee = new PoolDataMinerReferral(this.poolData, this.miner, refereeAddress );
+            this.array.push(referee);
+        }
+
+        return referee;
+    }
+
+    findReferral(refereeAddress, returnPos = false ){
+
+        for (let i=0; i<this.array.length; i++)
+            if (this.array[i].refereeAddress.equals(refereeAddress))
+                return returnPos ? i : this.array[i];
+
+        return returnPos ? -1 : null;
+
+    }
+
+    deleteReferral(refereeAddress){
+
+        let pos = this.findReferral(refereeAddress, true);
+        if (pos === -1) return false;
+
+        this.array[pos].destroyPoolDataMinerReferral();
+        this.array.splice(pos, 1);
+
+        return true;
+    }
 
 }
 

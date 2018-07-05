@@ -90,8 +90,11 @@ class PoolPayouts{
                 let maxSumReward = BlockchainMiningReward.getReward( blocksConfirmed[i].block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
 
                 let sumReward = 0;
-                for (let j = 0; j < blocksConfirmed[i].blockInformationMinersInstances.length; j++)
-                    sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].calculateReward(false);
+                for (let j = 0; j < blocksConfirmed[i].blockInformationMinersInstances.length; j++) {
+                    blocksConfirmed[i].blockInformationMinersInstances[j].calculateReward(false);
+                    sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].reward;
+                    sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].rewardForReferral;
+                }
 
                 let difference = sumReward - maxSumReward ;
 
@@ -197,6 +200,7 @@ class PoolPayouts{
                 if (miner === null) console.error("ERROR! Miner was not found at the payout");
 
                 miner.rewardSent += this._toAddresses[i].amount; //i paid totally
+                miner.rewardConfirmedReferrals = 0; //paid this
                 miner.rewardConfirmed = 0; //paid this
                 miner.rewardConfirmedOther = 0; //paid this
                 miner._tempRewardConfirmedOtherTemporary = 0; //paid this

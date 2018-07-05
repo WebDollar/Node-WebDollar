@@ -168,13 +168,20 @@ class PoolRewardsManagement{
                 this.poolData.blocksInfo[i].confirmed = true;
 
                 //convert reward to confirmedReward
-                for (let j=0; j < this.poolData.blocksInfo[i].blockInformationMinersInstances.length; j++) {
+                this.poolData.blocksInfo[i].blockInformationMinersInstances.forEach((minerInstance)=>{
 
-                    let reward = this.poolData.blocksInfo[i].blockInformationMinersInstances[j].calculateReward(false);
-                    this.poolData.blocksInfo[i].blockInformationMinersInstances[j].minerInstance.miner.rewardConfirmed += reward;
-                    this.poolData.blocksInfo[i].blockInformationMinersInstances[j].minerInstance.miner.rewardTotal -= reward;
+                    let reward = minerInstance.calculateReward(false);
 
-                }
+                    minerInstance.miner.rewardConfirmed += reward;
+                    minerInstance.miner.rewardTotal -= reward;
+
+
+                    if ( minerInstance.miner.referrals.referralLinkMiner !== undefined && this.poolManagement.poolSettings.poolReferralFee > 0) {
+                        minerInstance.miner.referrals.referralLinkMiner.rewardReferralConfirmed += minerInstance.rewardForReferral;
+                        minerInstance.miner.referrals.referralLinkMiner.rewardReferralTotal -= minerInstance.rewardForReferral;
+                    }
+
+                });
 
                 poolBlocksConfirmed++;
 

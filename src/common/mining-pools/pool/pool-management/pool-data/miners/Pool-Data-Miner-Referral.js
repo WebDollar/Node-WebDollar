@@ -16,8 +16,13 @@ class PoolDataMinerReferral{
 
         this._rewardReferralTotal = 0; // total - no confirmed
         this._rewardReferralConfirmed = 0; //confirmed but not sent
-        this._rewardReferralSent = 0; //sent
 
+    }
+
+    destroyPoolDataMinerReferral(){
+        this.poolData = undefined;
+        this.miner = undefined;
+        this.refereeMiner = undefined;
     }
 
     serializeMinerReferral(){
@@ -25,8 +30,7 @@ class PoolDataMinerReferral{
         return Buffer.concat([
 
                 this.refereeAddress,
-                Serialization.serializeNumber4Bytes( this.rewardReferralConfirmed ),
-                Serialization.serializeNumber4Bytes( this.rewardReferralSent ),
+                Serialization.serializeNumber7Bytes( this.rewardReferralConfirmed ),
 
         ]);
 
@@ -36,13 +40,10 @@ class PoolDataMinerReferral{
 
         this.refereeAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
 
-        this.rewardReferralTotal = 0;
+        this._rewardReferralTotal = 0;
 
-        this.rewardReferralConfirmed = Serialization.deserializeNumber4Bytes( buffer, offset);
-        offset += 4;
-
-        this.rewardReferralSent = Serialization.deserializeNumber4Bytes(buffer, offset);
-        offset += 4;
+        this._rewardReferralConfirmed = Serialization.deserializeNumber7Bytes(buffer, offset);
+        offset += 7;
 
         return offset;
     }
@@ -71,19 +72,15 @@ class PoolDataMinerReferral{
     }
 
     set rewardReferralConfirmed(newValue){
+
+        let prevVal = this._rewardReferralConfirmed;
         this._rewardReferralConfirmed = Math.max( 0, Math.floor( newValue ));
+        this.miner.rewardConfirmedOther += newValue - prevVal;
+
     }
 
     get rewardReferralConfirmed(){
         return this._rewardReferralConfirmed;
-    }
-
-    set rewardReferralSent(newValue){
-        this._rewardReferralSent = Math.max( 0, Math.floor( newValue ));
-    }
-
-    get rewardReferralSent(){
-        return this._rewardReferralSent;
     }
 
 
