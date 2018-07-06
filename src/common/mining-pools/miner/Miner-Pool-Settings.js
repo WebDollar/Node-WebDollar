@@ -19,8 +19,6 @@ class MinerPoolSettings {
 
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.MINER_POOL_DATABASE );
 
-        this.minerPoolPublicKey = undefined;
-
         this._poolURL = '';
         this.poolsList = {};
 
@@ -50,7 +48,6 @@ class MinerPoolSettings {
 
     async initializeMinerPoolSettings(poolURL){
 
-        await this._getMinerPoolPublicKey();
         await this._getMinerPoolList();
 
         if (poolURL !== undefined)
@@ -63,10 +60,11 @@ class MinerPoolSettings {
     generatePoolURLReferral(){
 
         let url = this._poolURL;
-        if (url.indexOf("/ref/", url) >= 0)
-            url = url.substr(0, url.indexOf("/ref/", url));
+        if (url.indexOf("/r/", url) >= 0)
+            url = url.substr(0, url.indexOf("/r/", url));
 
         this.poolURLReferral =  ( process.env.BROWSER ? window.location.origin : "https://webdollar.ddns.net:9094"  ) + "/pool/"+url +"/r/"+encodeURI(Blockchain.Mining.minerAddress.replace("#", "%23"));
+
         StatusEvents.emit("miner-pool/referral-url",   { poolURLReferral: this.poolURLReferral });
     }
 
@@ -122,18 +120,6 @@ class MinerPoolSettings {
 
     }
 
-    async _getMinerPoolPublicKey(){
-
-        this.minerPoolPublicKey = await this._db.get("minerPool_publicKey", 30*1000, true);
-
-        if (this.minerPoolPublicKey === null){
-            this.minerPoolPublicKey = WebDollarCrypto.getBufferRandomValues(32);
-            let result = await this._db.save("minerPool_publicKey", this.minerPoolPublicKey);
-            return result;
-        }
-
-        return true;
-    }
 
     async _getMinerPoolDetails(){
 

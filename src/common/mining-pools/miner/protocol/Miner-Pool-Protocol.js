@@ -116,7 +116,6 @@ class MinerProtocol extends PoolProtocolList{
 
                 message: message,
                 pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
-                miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
 
                 minerAddress: Blockchain.blockchain.mining.minerAddress,
 
@@ -135,12 +134,6 @@ class MinerProtocol extends PoolProtocolList{
                 if (typeof answer.website !== 'string') throw {message: "pool:  website is invalid"};
                 if (typeof answer.useSig !== 'boolean') throw {message: "pool:  useSignatures is invalid"};
                 if ( !Array.isArray(answer.servers) ) throw {message: "pool:  servers is invalid"};
-
-                let miningAddress;
-                if (answer.minerAddress !== undefined) {
-                    if (!Buffer.isBuffer(answer.minerAddress) && answer.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "pool: address is invalid"};
-                    miningAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(answer.minerAddress, false, true);
-                }
 
                 let poolName = answer.name;
                 let poolFee = answer.fee;
@@ -174,9 +167,6 @@ class MinerProtocol extends PoolProtocolList{
                 this.minerPoolManagement.minerPoolSettings.poolWebsite = poolWebsite;
                 this.minerPoolManagement.minerPoolSettings.poolUseSignatures = poolUseSignatures;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolServers;
-
-                if (miningAddress !== undefined)
-                    await this.minerPoolManagement.minerPoolMining._setAddress(  miningAddress, false, true);
 
                 //connection established
                 await this._connectionEstablishedWithPool(socket);
@@ -293,7 +283,6 @@ class MinerProtocol extends PoolProtocolList{
         let poolSocket = this.connectedPools[0];
 
         let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", {
-            miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
             pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
         }, "answer", 6000);
 
@@ -323,7 +312,6 @@ class MinerProtocol extends PoolProtocolList{
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
                 pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
-                miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
                 work: miningAnswer,
             }, "answer", 6000);
 
@@ -386,7 +374,6 @@ class MinerProtocol extends PoolProtocolList{
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/change-wallet-mining", {
 
-                miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
 
                 minerAddress: oldAddress.address,
                 minerAddressPublicKey: oldAddress.publicKey,
@@ -434,7 +421,6 @@ class MinerProtocol extends PoolProtocolList{
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/request-wallet-mining", {
-                miner: this.minerPoolManagement.minerPoolSettings.minerPoolPublicKey,
             }, "answer", 6000);
 
             if (answer === null) throw {message: "pool didn't respond"};

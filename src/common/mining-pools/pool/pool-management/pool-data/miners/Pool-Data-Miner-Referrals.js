@@ -2,6 +2,7 @@ import Serialization from "common/utils/Serialization";
 import PoolDataMinerReferral from "./Pool-Data-Miner-Referral"
 import BufferExtended from "common/utils/BufferExtended"
 import consts from "consts/const_global"
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 class PoolDataMinerReferrals {
 
@@ -29,6 +30,20 @@ class PoolDataMinerReferrals {
 
     }
 
+    setReferralLink(address){
+
+        if (typeof address === "string")
+            address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( address );
+
+        if ( address === null || address === undefined || !Buffer.isBuffer(address) || address.length !== consts.ADDRESSES.ADDRESS.LENGTH )
+            return false;
+
+        this.referralLinkAddress = address;
+        this.findReferralLinkAddress();
+
+        return true;
+    }
+
     refreshRefereeAddresses() {
 
         for (let i = 0; i < this.array.length; i++)
@@ -46,6 +61,8 @@ class PoolDataMinerReferrals {
         if (this.referralLinkAddress === undefined) return null;
 
         let linkMiner = this.poolData.findMiner( this.referralLinkAddress );
+        if (linkMiner === undefined || linkMiner === null) return;
+
         this.referralLinkMiner = linkMiner.referrals.addReferral(this.miner.address);
 
         return this.referralLinkMiner;
@@ -115,7 +132,7 @@ class PoolDataMinerReferrals {
 
         let referee = this.findReferral(refereeAddress);
         if (referee === null){
-            let referee = new PoolDataMinerReferral(this.poolData, this.miner, refereeAddress );
+            referee = new PoolDataMinerReferral(this.poolData, this.miner, refereeAddress );
             this.array.push(referee);
         }
 

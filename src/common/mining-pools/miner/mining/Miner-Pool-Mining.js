@@ -39,7 +39,7 @@ class MinerPoolMining extends InheritedPoolMining {
                 this._miningWork.poolSocket = null;
         });
 
-        this.minerAddress = Blockchain.blockchain.mining.minerAddress;
+        this._minerAddress = Blockchain.blockchain.mining.minerAddress;
 
         this._isBeingMining = false;
 
@@ -53,7 +53,7 @@ class MinerPoolMining extends InheritedPoolMining {
             return;
 
         let oldMinerAddress = this._minerAddress;
-        await InheritedPoolMining.prototype._setAddress.call(this, newAddress, false);
+        await InheritedPoolMining.prototype._setAddress.call( this, newAddress, true );
 
         if (skipChangingAddress) return;
 

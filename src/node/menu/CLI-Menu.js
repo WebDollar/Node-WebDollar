@@ -412,7 +412,7 @@ class CLI {
 
             if (getNewLink){
 
-                let poolFee, poolName, poolWebsite, poolServers;
+                let poolFee, poolReferralFee, poolName, poolWebsite, poolServers;
 
 
                 poolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
@@ -426,6 +426,14 @@ class CLI {
 
                 poolName = await AdvancedMessages.input('Pool Name: ');
                 poolWebsite = await AdvancedMessages.input('Pool Website: ');
+
+                poolReferralFee = await AdvancedMessages.readNumber("Choose a Referral fee (0...100): ", true);
+                if (isNaN(poolReferralFee) || poolReferralFee < 0 || 100 < poolReferralFee){
+                    console.log("You have entered an invalid number:", poolReferralFee);
+                    return false;
+                }
+                else
+                    console.log("Your Referral fee is", poolFee);
 
                 let response = await AdvancedMessages.confirm('Do you want to use external pool servers?: ');
 
@@ -443,6 +451,7 @@ class CLI {
                 if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
                 if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
                 if (poolServers !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
+                if (poolReferralFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolReferralFee(poolReferralFee / 100);
 
             }
 
@@ -494,6 +503,7 @@ class CLI {
                     await callbackAfterServerInitialization();
 
             }, undefined, synchronize );
+
         } else {
 
             if (typeof callbackBeforeServerInitialization === "function")

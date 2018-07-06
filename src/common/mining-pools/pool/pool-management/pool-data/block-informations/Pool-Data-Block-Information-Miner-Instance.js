@@ -16,7 +16,6 @@ class PoolDataBlockInformationMinerInstance {
 
         this._reward = 0;
         this.rewardForReferral = 0;
-        this._prevReward = 0;
         this._prevRewardInitial = 0;
 
         this._workHash = undefined;
@@ -118,7 +117,7 @@ class PoolDataBlockInformationMinerInstance {
         this.reward = Math.max( 0 , Math.floor ( reward * ( 1 - this.poolManagement.poolSettings.poolReferralFee) ) );
         this.minerInstance.miner.rewardTotal += this._reward - this._prevRewardInitial;
 
-        this._prevRewardInitial = reward;
+        this._prevRewardInitial = Math.max( 0 , Math.floor( reward ));
         
         return this._reward;
     }
@@ -139,19 +138,55 @@ class PoolDataBlockInformationMinerInstance {
 
         return Buffer.concat([
 
-            this.minerInstance.publicKey || new Buffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH),
+            this.minerInstance.address,
             Serialization.serializeBigNumber(this.minerInstanceTotalDifficulty),
 
         ]);
 
     }
 
-    deserializeBlockInformationMinerInstance(buffer, offset=0){
+    deserializeBlockInformationMinerInstance(buffer, offset=0, version){
 
-        let publicKey = BufferExtended.substr( buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH );
-        offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
+        //TODO: to be removed
+        if (version === 0x01) {
 
-        this.minerInstance = this.poolManagement.poolData.getMinerInstanceByPublicKey(publicKey);
+            let address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
+            offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
+
+            for (let i=0; i< this.poolManagement.poolData.miners.length; i++)
+                for (let j=0; j<this.poolManagement.poolData.miners[i].publicKeys; j++)
+                    if (this.poolManagement.poolData.miners[i].publicKeys[j].equals(address)){
+
+                        let miner = this.poolManagement.poolData.miners[i];
+                        this.minerInstance = miner.addInstance({
+                            node:{
+                                protocol:{
+
+                                }
+                            }
+                        });
+
+                        break;
+
+                    }
+
+            let answer = Serialization.deserializeBigNumber(buffer, offset);
+            offset = answer.newOffset;
+            return offset;
+        }
+
+
+        let address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+        offset += consts.ADDRESSES.ADDRESS.LENGTH;
+
+        let miner = this.poolManagement.poolData.findMiner(address);
+        this.minerInstance = miner.addInstance({
+            node:{
+                protocol:{
+
+                }
+            }
+        });
 
         let answer = Serialization.deserializeBigNumber(buffer, offset);
         this.minerInstanceTotalDifficulty = answer.number;
@@ -190,7 +225,6 @@ class PoolDataBlockInformationMinerInstance {
 
 
     set reward(newValue){
-        this._prevReward = newValue;
         this._reward = newValue;
     }
 

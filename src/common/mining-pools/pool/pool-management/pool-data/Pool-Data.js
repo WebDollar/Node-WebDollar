@@ -59,24 +59,12 @@ class PoolData {
         return returnPos ? -1 : null;
     }
 
-    findMinerInstance(minerPublicKey, returnPos = false){
-
-        for (let i = 0; i < this.miners.length; ++i)
-            for (let j=0; j< this.miners[i].instances.length; j++)
-                if (this.miners[i].instances[j].publicKey.equals(minerPublicKey))
-                    return returnPos ? j : this.miners[i].instances[j];
-
-        return returnPos ? -1 : null;
-    }
-
     /**
      * @param minerAddress
      * @returns miner or null if it doesn't exist
      */
-    getMinerInstanceByPublicKey(minerPublicKey, returnPos = false ){
-
-        return this.findMinerInstance(minerPublicKey, returnPos);
-
+    getMinerInstance(socket){
+        return socket.node.protocol.minerPool.minerInstance;
     }
 
     /**
@@ -85,7 +73,7 @@ class PoolData {
      * @param minerReward
      * @returns true/false
      */
-    addMiner(minerAddress, minerPublicKey, minerReward = 0){
+    addMiner(minerAddress, minerReward = 0){
 
         let miner = this.findMiner(minerAddress);
         if ( miner === null) {
@@ -94,7 +82,7 @@ class PoolData {
                 throw {message: "miner address is invalid" };
 
 
-            this.miners.push( new PoolDataMiner( this, uuid.v4(), minerAddress, minerPublicKey, minerReward, [] ) );
+            this.miners.push( new PoolDataMiner( this, uuid.v4(), minerAddress, minerReward, [] ) );
 
             miner = this.miners[this.miners.length-1]
 
@@ -187,8 +175,7 @@ class PoolData {
                 let miner = new PoolDataMiner(this, 0, undefined, undefined);
                 offset = miner.deserializeMiner(buffer, offset );
 
-                if (miner.instances.length)
-                    this.miners.push(miner);
+                this.miners.push(miner);
 
             }
 

@@ -6,7 +6,7 @@ import PoolDataMinerReferrals from "./Pool-Data-Miner-Referrals";
 
 class PoolDataMiner{
 
-    constructor(poolData, index, address, publicKey){
+    constructor(poolData, index, address){
 
         this.poolData = poolData;
 
@@ -15,14 +15,12 @@ class PoolDataMiner{
 
         this.instances = [];
 
-        if (publicKey !== undefined)
-            this.addInstance(publicKey);
-
         this._rewardTotal = 0;            //pending except last
         this._rewardConfirmed = 0;        //rewardConfirmed
         this._rewardConfirmedOther = 0;   //other money confirmed to be sent
         this._rewardSent = 0;             //rewardSent
 
+        this.dateActivity = new Date().getTime();
 
         this.referrals = new PoolDataMinerReferrals( poolData, this  );
 
@@ -39,19 +37,12 @@ class PoolDataMiner{
         this.referrals.destroyPoolDataMinerReferrals();
     }
 
-    addInstance(publicKey){
+    addInstance(socket){
 
-        if (typeof publicKey === "object" && publicKey.hasOwnProperty("publicKey")) publicKey = publicKey.publicKey;
-
-        if (publicKey === undefined) return;
-
-        if (!Buffer.isBuffer(publicKey) || publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH)
-            throw {message: "public key is invalid"};
-
-        let instance = this.findInstance(publicKey);
+        let instance = this.findInstance(socket);
 
         if ( instance === null) {
-            instance = new PoolDataMinerInstance(this, publicKey);
+            instance = new PoolDataMinerInstance(this, socket);
             this.instances.push(instance);
         }
 
@@ -59,34 +50,18 @@ class PoolDataMiner{
 
     }
 
-    findInstance(publicKey){
-
-        if (typeof publicKey === "object" && publicKey.hasOwnProperty("publicKey")) publicKey = publicKey.publicKey;
-
-        let pos = this._searchInstance(publicKey);
-
-        if (pos !== -1) return this.instances[pos];
-
-        return null;
-    }
-
-    _searchInstance(publicKey){
-
-        if (typeof publicKey === "object" && publicKey.hasOwnProperty("publicKey")) publicKey = publicKey.publicKey;
+    findInstance(socket, returnPos = false){
 
         for (let i = 0; i < this.instances.length; i++)
-            if (this.instances[i].publicKey.equals( publicKey) )
-                return i;
+            if (this.instances[i].socket === socket )
+                return returnPos ? i : this.instances[i];
 
-        return -1;
-
+        return returnPos ? -1 : null;
     }
 
-    removeInstance(publicKey){
+    removeInstance(socket){
 
-        if (typeof publicKey === "object" && publicKey.hasOwnProperty("publicKey")) publicKey = publicKey.publicKey;
-
-        let pos = this._searchInstance(publicKey);
+        let pos = this.findInstance(socket, true);
         if (pos !== -1) {
             this.instances.splice( pos ,1);
             return true;
@@ -106,11 +81,6 @@ class PoolDataMiner{
 
         list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this._rewardConfirmedOther) )) );
         list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this._rewardSent) )) );
-
-        list.push ( Serialization.serializeNumber4Bytes(this.instances.length) );
-
-        for (let i=0; i<this.instances.length; i++)
-            list.push( this.instances[i].serializeMinerInstance(version) );
 
         if (version >= 0x03)
             list.push( this.referrals.serializeReferrals() );
@@ -140,19 +110,23 @@ class PoolDataMiner{
         this.rewardSent = Serialization.deserializeNumber7Bytes( BufferExtended.substr( buffer, offset, 7 ) );
         offset += 7;
 
-        let len = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
-        offset += 4;
-
         this.instances = [];
-        for (let i=0; i<len; i++){
 
-            let instance = new PoolDataMinerInstance(this, undefined);
-            offset = instance.deserializeMinerInstance(buffer, offset, version);
+        //TODO: to be removed
+        if (version === 0x02) {
 
-            if (instance.publicKey !== undefined)
-                this.instances.push(instance);
+            let len = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 4));
+            offset += 4;
+
+            this.publicKeys = [];
+            for (let i = 0; i < len; i++) {
+
+                this.publicKeys.push( BufferExtended.substr( buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH ) );
+                offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH + 4;
+
+            }
+
         }
-
         if (version >= 0x03)
             offset = this.referrals.deserializeReferrals(buffer, offset);
 
