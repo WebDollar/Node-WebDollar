@@ -120,6 +120,8 @@ class MinerProtocol extends PoolProtocolList{
 
                 minerAddress: Blockchain.blockchain.mining.minerAddress,
 
+                ref: this.minerPoolManagement.minerPoolSettings.poolReferral !== '' ? this.minerPoolManagement.minerPoolSettings.poolReferral : undefined,
+
             }, "answer", 16000  );
 
 

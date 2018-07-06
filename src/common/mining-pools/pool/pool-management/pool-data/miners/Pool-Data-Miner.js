@@ -99,7 +99,9 @@ class PoolDataMiner{
 
         let list = [];
 
-        list.push(Serialization.serializeNumber1Byte(0x03) );
+        let version = 0x03;
+
+        list.push(Serialization.serializeNumber1Byte( version ) );
         list.push(this.address ); //20 bytes
 
         list.push ( Serialization.serializeNumber7Bytes( Math.max(0, Math.floor( this._rewardConfirmedOther) )) );
@@ -110,7 +112,8 @@ class PoolDataMiner{
         for (let i=0; i<this.instances.length; i++)
             list.push( this.instances[i].serializeMinerInstance() );
 
-        list.push( this.referrals.serializeReferrals() );
+        if (version >= 0x03)
+            list.push( this.referrals.serializeReferrals() );
 
         return Buffer.concat(list);
 
@@ -150,7 +153,7 @@ class PoolDataMiner{
                 this.instances.push(instance);
         }
 
-        if (version >= 0x02)
+        if (version >= 0x03)
             offset = this.referrals.deserializeReferrals(buffer, offset);
 
         return offset;

@@ -1,5 +1,13 @@
 const FileSystem = require('fs');
 
+let NodeExpress, NodeServer;
+
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+}
+
+
 import consts from 'consts/const_global';
 import {Node} from '../../index.js';
 import AdvancedMessages from './Advanced-Messages';
@@ -68,6 +76,9 @@ class CLI {
                 break;
             case '12':  // Server Mining Pool: Create a new Server for Mining Pool
                 await this.createServerForMiningPool();
+                break;
+            case '20':  // Server Mining Pool: Create a new Server for Mining Pool
+                NodeExpress.startExpress();
                 break;
             case 'exit':
                 this._exitMenu = true;
@@ -510,6 +521,7 @@ const commands = [
         '10. Mining Pool: Start Mining',
         '11. Mining Pool: Create a New Pool',
         '12. Server for Mining Pool: Create a new Server for Mining Pool',
+        '20. HTTPS Express Start',
     ];
 
 const lineSeparator =

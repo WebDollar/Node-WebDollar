@@ -69,10 +69,11 @@ class NodeExpress{
 
                 if (!consts.SETTINGS.NODE.SSL) throw {message: "no ssl"};
 
-                this.domain = process.env.DOMAIN || this._extractDomain('./certificates/certificate.crt');
+                this.domain = process.env.DOMAIN;
+                if (this.domain === undefined || this.domain === "undefined") this.domain = this._extractDomain('./certificates/certificate.crt');
 
                 console.info("========================================");
-                console.info("SSL certificate found for ", this.domain);
+                console.info("SSL certificate found for ", this.domain||'domain.com');
 
                 if (this.domain === '')
                     console.error("Your domain from certificate was not recognized");
