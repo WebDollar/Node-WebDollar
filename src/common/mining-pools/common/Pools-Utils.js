@@ -57,7 +57,8 @@ class PoolsUtils {
         this.validatePoolActivated(poolActivated);
         this.validatePoolFee(poolReferralFee);
 
-        if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(poolAddress) === null) throw {message: "poolAddress is invalid"};
+        if (poolAddress !== undefined)
+            if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(poolAddress) === null) throw {message: "poolAddress is invalid"};
 
         return true;
     }
@@ -165,8 +166,12 @@ class PoolsUtils {
         if (url.indexOf("/pool/") === 0) url = url.replace("/pool/","");
         if (url.indexOf("pool/") === 0) url = url.replace("pool/","");
 
+        let poolURL = url;
+
         let version = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
         url = url.substr(url.indexOf( "/" )+1);
+
+        if (version !== "") version = parseInt(version);
 
         let poolName = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
         poolName = decodeURIComponent(poolName);
@@ -175,17 +180,41 @@ class PoolsUtils {
         let poolFee = parseFloat( sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) ) );
         url = url.substr(url.indexOf( "/" )+1);
 
-        let poolAddress = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
-        url = url.substr(url.indexOf( "/" )+1);
+        let poolAddress;
+
+        if (version === 0) {
+            poolAddress = sanitizer.sanitize(url.substr(0, url.indexOf("/")));
+            poolAddress = poolAddress.replace("%23","#");
+
+            url = url.substr(url.indexOf("/") + 1);
+        }
 
         let poolPublicKey = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
         url = url.substr(url.indexOf( "/" )+1);
         poolPublicKey = new Buffer(poolPublicKey, "hex");
 
-        let poolWebsite = sanitizer.sanitize( url.substr( 0, url.indexOf( "/" )).replace(/\$/g, '/' ));
-        url = url.substr(url.indexOf( "/" )+1);
+        let poolWebsite;
 
-        let poolServers = sanitizer.sanitize( url.replace(/\$/g, '/' ).split(";") );
+        if (version === 0) {
+            poolWebsite = sanitizer.sanitize(url.substr(0, url.indexOf("/")).replace(/\$/g, '/'));
+            url = url.substr(url.indexOf("/") + 1);
+        }
+
+        let poolServers = sanitizer.sanitize( url.substr(0, url.indexOf("/")).replace(/\$/g, '/' ).split(";") );
+        url = url.substr(url.indexOf("/") + 1);
+
+        let poolReferral = '';
+        let ref = url.substr(0, url.indexOf("/"));
+        if (ref === "r"){
+
+            url = url.substr(url.indexOf("/") + 1);
+
+            poolReferral  = url.substr(0, url.indexOf("/") !== -1 ? url.indexOf("/") : undefined);
+            poolReferral  = poolReferral.replace("%23","#");
+
+            url = url.substr(url.indexOf("/") + 1);
+        }
+
 
         if (!this.validatePoolsDetails(poolName, poolFee, poolWebsite, poolAddress, poolPublicKey, poolServers)) throw {message: "validate pools "};
 
@@ -197,7 +226,8 @@ class PoolsUtils {
             poolServers: poolServers,
             poolAddress: poolAddress,
             poolPublicKey: poolPublicKey,
-            poolURL: url,
+            poolURL: poolURL,
+            poolReferral: poolReferral,
         };
 
     }

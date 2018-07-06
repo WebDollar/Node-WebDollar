@@ -6,6 +6,7 @@ import StatusEvents from "common/events/Status-Events"
 
 import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import Blockchain from "main-blockchain/Blockchain";
 
 
 const sanitizer = require('sanitizer');
@@ -30,10 +31,20 @@ class MinerPoolSettings {
         this.poolServers = [];
         this.poolPublicKey = new Buffer(0);
         this.poolUseSignatures = false;
+        this.poolURLReferral = '';
 
         this._poolMinerAddress = '';
 
         this._minerPoolActivated = false;
+
+        StatusEvents.on("blockchain/mining/address",async (data)=>{
+
+            if (!this.minerPoolManagement.minerPoolStarted)
+                return;
+
+            this.generatePoolURLReferral();
+
+        });
 
     }
 
@@ -49,6 +60,15 @@ class MinerPoolSettings {
 
     }
 
+    generatePoolURLReferral(){
+
+        let url = this._poolURL;
+        if (url.indexOf("/ref/", url) >= 0)
+            url = url.substr(0, url.indexOf("/ref/", url));
+
+        this.poolURLReferral =  ( process.env.BROWSER ? window.location.origin : "https://webdollar.ddns.net:9094"  ) + "/pool/"+url +"/r/"+encodeURI(Blockchain.Mining.minerAddress.replace("#", "%23"));
+        StatusEvents.emit("miner-pool/referral-url",   { poolURLReferral: this.poolURLReferral });
+    }
 
     get poolURL(){
         return this._poolURL;
@@ -69,15 +89,18 @@ class MinerPoolSettings {
         this.poolWebsite = data.poolWebsite;
         this.poolDescription = data.poolDescription;
         this.poolPublicKey = data.poolPublicKey;
+        this.poolReferral = data.poolReferral;
 
         await this.setPoolServers(data.poolServers);
 
-        this._poolURL = newValue;
+        this._poolURL = data.poolURL;
 
         await this.addPoolList(newValue, data);
 
         if (!skipSaving)
             if (false === await this._db.save("minerPool_poolURL", this._poolURL)) throw {message: "PoolURL couldn't be saved"};
+
+        this.generatePoolURLReferral();
 
         StatusEvents.emit("miner-pool/newPoolURL", { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
         StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
