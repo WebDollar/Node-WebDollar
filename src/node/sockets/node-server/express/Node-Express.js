@@ -70,19 +70,22 @@ class NodeExpress{
                 if (!consts.SETTINGS.NODE.SSL) throw {message: "no ssl"};
 
                 this.domain = process.env.DOMAIN;
-                if (this.domain === undefined || this.domain === "undefined") this.domain = this._extractDomain('./certificates/certificate.crt');
-
-                console.info("========================================");
-                console.info("SSL certificate found for ", this.domain||'domain.com');
-
-                if (this.domain === '')
-                    console.error("Your domain from certificate was not recognized");
 
                 options.key = fs.readFileSync('./certificates/private.key', 'utf8');
                 options.cert = fs.readFileSync('./certificates/certificate.crt', 'utf8');
                 options.ca = fs.readFileSync('./certificates/ca_bundle.crt', 'utf8');
 
                 this.server = https.createServer(options, this.app).listen( this.port, ()=>{
+
+                    if (this.domain === undefined || this.domain === "undefined") this.domain = this._extractDomain('./certificates/certificate.crt');
+
+                    console.info("========================================");
+                    console.info("SSL certificate found for ", this.domain||'domain.com');
+
+                    if (this.domain === '')
+                        console.error("Your domain from certificate was not recognized");
+
+
 
                     this.SSL = true;
 

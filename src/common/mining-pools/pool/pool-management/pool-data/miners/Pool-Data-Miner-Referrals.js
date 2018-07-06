@@ -15,6 +15,12 @@ class PoolDataMinerReferrals {
         this.referralLinkMiner = undefined; //link to the referral
 
         this.array = [];
+
+
+        this._rewardReferralsTotal = 0; // total - no confirmed
+        this._rewardReferralsConfirmed = 0; //confirmed but not sent
+        this._rewardReferralsSent = 0;
+
     }
 
     destroyPoolDataMinerReferrals(){
@@ -80,7 +86,6 @@ class PoolDataMinerReferrals {
             list.push ( this.referralLinkAddress );
         }
 
-
         list.push( Serialization.serializeNumber1Byte(this.array.length > 0 ? 1 : 0 ) );
 
         if (this.array.length > 0){
@@ -89,6 +94,8 @@ class PoolDataMinerReferrals {
 
             for (let i=0; i < this.array.length; i++ )
                 list.push(this.array[i].serializeMinerReferral());
+
+            list.push(Serialization.serializeNumber7Bytes( this.rewardReferralsSent ))
 
         }
 
@@ -108,6 +115,9 @@ class PoolDataMinerReferrals {
         let hasReferrals = buffer[offset];
         offset += 1;
 
+        this._rewardReferralsConfirmed = 0;
+        this._rewardReferralsTotal = 0;
+
         if (hasReferrals === 1){
 
             let length = Serialization.deserializeNumber4Bytes( buffer, offset );
@@ -115,13 +125,21 @@ class PoolDataMinerReferrals {
 
             for (let i=0; i<length; i++){
 
-                let referral = new PoolDataMinerReferral(this.poolData, this);
+                let referral = new PoolDataMinerReferral(this.poolData, this, this.miner);
                 offset = referral.deserializeMinerReferral(buffer, offset);
 
                 this.array.push( referral );
             }
 
+
+
+            this._rewardReferralsSent =   Serialization.deserializeNumber7Bytes(buffer, offset);
+            offset += 7;
+
+        } else {
+            this._rewardReferralsSent = 0;
         }
+        
         offset +=1;
 
         return offset;
@@ -132,7 +150,7 @@ class PoolDataMinerReferrals {
 
         let referee = this.findReferral(refereeAddress);
         if (referee === null){
-            referee = new PoolDataMinerReferral(this.poolData, this.miner, refereeAddress );
+            referee = new PoolDataMinerReferral(this.poolData, this, this.miner, refereeAddress );
             this.array.push(referee);
         }
 
@@ -159,6 +177,34 @@ class PoolDataMinerReferrals {
 
         return true;
     }
+
+
+
+
+    set rewardReferralsTotal(newValue){
+        this._rewardReferralsTotal = Math.max( 0, Math.floor( newValue ));
+    }
+
+    get rewardReferralsTotal(){
+        return this._rewardReferralsTotal;
+    }
+
+    set rewardReferralsConfirmed(newValue){
+        this._rewardReferralsConfirmed = Math.max( 0, Math.floor( newValue ));
+    }
+
+    get rewardReferralsConfirmed(){
+        return this._rewardReferralsConfirmed;
+    }
+
+    set rewardReferralsSent(newValue){
+        this._rewardReferralsSent = Math.max( 0, Math.floor( newValue ));
+    }
+
+    get rewardReferralsSent(){
+        return this._rewardReferralsSent;
+    }
+
 
 }
 

@@ -161,7 +161,7 @@ class CLI {
                 balance = (balance === null) ? 0 : balance;
 
                 if (Blockchain.MinerPoolManagement.minerPoolStarted)
-                    balance += Blockchain.MinerPoolManagement.minerPoolReward.confirmedReward + Blockchain.MinerPoolManagement.minerPoolReward.totalReward;
+                    balance += Blockchain.MinerPoolManagement.minerPoolReward.total;
 
                 balance /= WebDollarCoins.WEBD;
 

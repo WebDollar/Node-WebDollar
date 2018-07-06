@@ -160,7 +160,7 @@ class MinerProtocol extends PoolProtocolList{
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
 
                 this.minerPoolManagement.minerPoolReward.confirmedReward = answer.confirmed;
-                this.minerPoolManagement.minerPoolReward.totalReward = answer.reward;
+                this.minerPoolManagement.minerPoolReward.se = answer.reward;
 
                 this.minerPoolManagement.minerPoolSettings.poolName = poolName;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolFee;
@@ -228,8 +228,7 @@ class MinerProtocol extends PoolProtocolList{
 
                 this._updateStatistics( answer );
 
-                this.minerPoolManagement.minerPoolReward.totalReward = answer.reward;
-                this.minerPoolManagement.minerPoolReward.confirmedReward = answer.confirmed;
+                this.minerPoolManagement.minerPoolReward.setReward(answer);
 
             } catch (exception){
                 console.error("new work raised an exception", exception);
@@ -290,8 +289,7 @@ class MinerProtocol extends PoolProtocolList{
 
         if (answer.result !== true) throw {message: "get-work answered false"};
 
-        this.minerPoolManagement.minerPoolReward.totalReward = answer.reward;
-        this.minerPoolManagement.minerPoolReward.confirmedReward = answer.confirmed;
+        this.minerPoolManagement.minerPoolReward.setReward(answer);
 
         this._validateRequestWork( answer.work);
         this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.work, poolSocket);
@@ -319,8 +317,7 @@ class MinerProtocol extends PoolProtocolList{
             if (answer.result !== true) throw {message: "WorkDone: Result is not True", reason: answer.message};
 
 
-            this.minerPoolManagement.minerPoolReward.totalReward = answer.reward;
-            this.minerPoolManagement.minerPoolReward.confirmedReward = answer.confirmed;
+            this.minerPoolManagement.minerPoolReward.setReward(answer);
 
             this._validateRequestWork( answer.newWork);
             this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.newWork, poolSocket);
@@ -391,8 +388,7 @@ class MinerProtocol extends PoolProtocolList{
 
                 await this.minerPoolManagement.minerPoolMining._setAddress(  newAddress , false, true);
 
-                this.minerPoolManagement.minerPoolReward.confirmedReward = answer.confirmed;
-                this.minerPoolManagement.minerPoolReward.totalReward = answer.reward;
+                this.minerPoolManagement.minerPoolReward.setReward(answer);
 
                 return true;
             }

@@ -4,8 +4,9 @@ import consts from "consts/const_global"
 
 class PoolDataMinerReferral{
 
-    constructor(poolData, miner, refereeAddress, refereeMiner){
+    constructor(poolData, referrals, miner, refereeAddress, refereeMiner){
 
+        this.referrals = referrals;
         this.poolData = poolData;
         this.miner = miner;
 
@@ -16,6 +17,7 @@ class PoolDataMinerReferral{
 
         this._rewardReferralTotal = 0; // total - no confirmed
         this._rewardReferralConfirmed = 0; //confirmed but not sent
+        this._rewardReferralSent = 0;
 
     }
 
@@ -29,8 +31,8 @@ class PoolDataMinerReferral{
 
         return Buffer.concat([
 
-                this.refereeAddress,
-                Serialization.serializeNumber7Bytes( this.rewardReferralConfirmed ),
+            this.refereeAddress,
+            Serialization.serializeNumber7Bytes( this.rewardReferralSent ),
 
         ]);
 
@@ -41,8 +43,9 @@ class PoolDataMinerReferral{
         this.refereeAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
 
         this._rewardReferralTotal = 0;
+        this._rewardReferralConfirmed = 0;
 
-        this._rewardReferralConfirmed = Serialization.deserializeNumber7Bytes(buffer, offset);
+        this._rewardReferralSent = Serialization.deserializeNumber7Bytes(buffer, offset);
         offset += 7;
 
         return offset;
@@ -64,7 +67,10 @@ class PoolDataMinerReferral{
 
 
     set rewardReferralTotal(newValue){
+
+        let prevVal = this._rewardReferralTotal;
         this._rewardReferralTotal = Math.max( 0, Math.floor( newValue ));
+        this.referrals.rewardReferralsTotal += newValue - prevVal;
     }
 
     get rewardReferralTotal(){
@@ -75,7 +81,7 @@ class PoolDataMinerReferral{
 
         let prevVal = this._rewardReferralConfirmed;
         this._rewardReferralConfirmed = Math.max( 0, Math.floor( newValue ));
-        this.miner.rewardConfirmedOther += newValue - prevVal;
+        this.referrals.rewardReferralsConfirmed += newValue - prevVal;
 
     }
 
@@ -83,6 +89,17 @@ class PoolDataMinerReferral{
         return this._rewardReferralConfirmed;
     }
 
+    set rewardReferralSent(newValue){
+
+        let prevVal = this._rewardReferralSent;
+        this._rewardReferralSent = Math.max( 0, Math.floor( newValue ));
+        this.referrals.rewardReferralsSent += newValue - prevVal;
+
+    }
+
+    get rewardReferralSent(){
+        return this._rewardReferralSent;
+    }
 
 
 }

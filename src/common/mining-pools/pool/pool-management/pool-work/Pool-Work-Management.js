@@ -73,6 +73,8 @@ class PoolWorkManagement{
 
     async processWork(minerInstance, work, prevBlock){
 
+        let result = false;
+
         try{
 
             if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
@@ -181,16 +183,16 @@ class PoolWorkManagement{
             //statistics
             this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance._workDifficulty, minerInstance);
 
-            return {result: true, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal };
+            result = true;
 
         } catch (exception){
 
             if (exception.message === "block was incorrectly mined" && Math.random() < 0.01 )
                 console.error("Pool Work Management raised an error", exception);
 
-            return {result: false, message:exception.message, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal  };
-
         }
+
+        return {result: result, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, refReward: minerInstance.miner.referrals.rewardReferralsTotal, refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed  }
 
     }
 
