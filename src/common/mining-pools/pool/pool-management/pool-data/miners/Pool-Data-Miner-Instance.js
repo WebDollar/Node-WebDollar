@@ -30,16 +30,21 @@ class PoolDataMinerInstance {
     }
 
 
-    serializeMinerInstance(){
+    serializeMinerInstance(version){
 
-        return Buffer.concat([
-            this.publicKey,
-            Serialization.serializeNumber4Bytes(this.hashesPerSecond),
-        ]);
+        let list = [];
+
+        list.push(this.publicKey);
+        list.push(Serialization.serializeNumber4Bytes(this.hashesPerSecond) );
+
+        if (version >= 0x03)
+            list.push ( Serialization.serializeNumber4Bytes(this.dateActivity / 1000) );
+
+        return Buffer.concat(list);
 
     }
 
-    deserializeMinerInstance(buffer, offset){
+    deserializeMinerInstance(buffer, offset, version){
 
         this.publicKey = BufferExtended.substr( buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH );
         offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
@@ -49,6 +54,11 @@ class PoolDataMinerInstance {
 
         this.hashesPerSecond = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
         offset += 4;
+
+        if (version >= 0x03){
+            this.dateActivity = Serialization.deserializeNumber4Bytes( buffer, offset ) * 1000;
+            offset += 4;
+        }
 
         return offset;
 

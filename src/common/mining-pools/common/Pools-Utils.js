@@ -153,6 +153,14 @@ class PoolsUtils {
     }
 
 
+    substr(url){
+        return sanitizer.sanitize( url.substr(0, url.indexOf("/") !== -1 ? url.indexOf("/") : undefined) );
+    }
+
+    substrNext(url){
+        return url.indexOf( "/" ) >= 0 ? url.substr(url.indexOf( "/" )+1) : '';
+    }
+
     extractPoolURL(url){
 
         if ( url === null || url === "" || url === undefined ) return null;
@@ -168,51 +176,52 @@ class PoolsUtils {
 
         let poolURL = url;
 
-        let version = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
-        url = url.substr(url.indexOf( "/" )+1);
+        let version = this.substr(url);
+        url = this.substrNext(url);
 
         if (version !== "") version = parseInt(version);
 
-        let poolName = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
+        let poolName = this.substr(url) ;
         poolName = decodeURIComponent(poolName);
-        url = url.substr(url.indexOf( "/" )+1);
+        url = this.substrNext(url);
 
-        let poolFee = parseFloat( sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) ) );
-        url = url.substr(url.indexOf( "/" )+1);
+        let poolFee = parseFloat( this.substr(url) );
+        url = this.substrNext(url);
 
         let poolAddress;
 
         if (version === 0) {
-            poolAddress = sanitizer.sanitize(url.substr(0, url.indexOf("/")));
+            poolAddress = this.substr(url);
             poolAddress = poolAddress.replace("%23","#");
 
-            url = url.substr(url.indexOf("/") + 1);
+            url = this.substrNext(url);
         }
 
-        let poolPublicKey = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
-        url = url.substr(url.indexOf( "/" )+1);
+        let poolPublicKey = this.substr(url);
+        url = this.substrNext(url);
+
         poolPublicKey = new Buffer(poolPublicKey, "hex");
 
         let poolWebsite;
 
         if (version === 0) {
-            poolWebsite = sanitizer.sanitize(url.substr(0, url.indexOf("/")).replace(/\$/g, '/'));
+            poolWebsite = this.substr(url).replace(/\$/g, '/');
             url = url.substr(url.indexOf("/") + 1);
         }
 
-        let poolServers = sanitizer.sanitize( url.substr(0, url.indexOf("/")).replace(/\$/g, '/' ).split(";") );
-        url = url.substr(url.indexOf("/") + 1);
+        let poolServers = this.substr(url).replace(/\$/g, '/' ).split(";") ;
+        url = this.substrNext(url);
 
         let poolReferral = '';
-        let ref = url.substr(0, url.indexOf("/"));
+        let ref = this.substr(url);
         if (ref === "r"){
 
-            url = url.substr(url.indexOf("/") + 1);
+            url = this.substrNext(url);
 
-            poolReferral  = url.substr(0, url.indexOf("/") !== -1 ? url.indexOf("/") : undefined);
+            poolReferral  = this.substr(url);
             poolReferral  = poolReferral.replace("%23","#");
 
-            url = url.substr(url.indexOf("/") + 1);
+            url = this.substrNext(url);
         }
 
 

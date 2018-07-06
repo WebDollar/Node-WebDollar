@@ -110,7 +110,7 @@ class PoolDataMiner{
         list.push ( Serialization.serializeNumber4Bytes(this.instances.length) );
 
         for (let i=0; i<this.instances.length; i++)
-            list.push( this.instances[i].serializeMinerInstance() );
+            list.push( this.instances[i].serializeMinerInstance(version) );
 
         if (version >= 0x03)
             list.push( this.referrals.serializeReferrals() );
@@ -147,7 +147,7 @@ class PoolDataMiner{
         for (let i=0; i<len; i++){
 
             let instance = new PoolDataMinerInstance(this, undefined);
-            offset = instance.deserializeMinerInstance(buffer, offset);
+            offset = instance.deserializeMinerInstance(buffer, offset, version);
 
             if (instance.publicKey !== undefined)
                 this.instances.push(instance);
