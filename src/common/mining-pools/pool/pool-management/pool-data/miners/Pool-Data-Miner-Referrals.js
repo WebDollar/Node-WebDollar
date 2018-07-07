@@ -109,6 +109,8 @@ class PoolDataMinerReferrals {
 
         if (hasReferralLink === 1){
             this.referralLinkAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+            offset += consts.ADDRESSES.ADDRESS.LENGTH;
+
             this.findReferralLinkAddress();
         }
 
@@ -140,8 +142,6 @@ class PoolDataMinerReferrals {
             this._rewardReferralsSent = 0;
         }
         
-        offset +=1;
-
         return offset;
     }
 

@@ -61,7 +61,7 @@ class MinerPoolReward{
         if (this._confirmedReferralReward === newValue || typeof newValue !== "number") return;
         this._confirmedReferralReward = parseInt( newValue );
 
-        StatusEvents.emit("miner-pool/referral-confirmed-reward", { referralTotalReward: this._confirmedReferralReward });
+        StatusEvents.emit("miner-pool/referral-confirmed-reward", { referralConfirmedReward: this._confirmedReferralReward });
 
     }
 

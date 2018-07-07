@@ -103,6 +103,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                     name: this.poolManagement.poolSettings.poolName,
                     fee: this.poolManagement.poolSettings.poolFee,
+                    referralFee: this.poolManagement.poolSettings.poolReferralFee,
                     website: this.poolManagement.poolSettings.poolWebsite,
                     useSig: this.poolManagement.poolSettings.poolUseSignatures,
                     servers: this.poolManagement.poolSettings.poolServers,

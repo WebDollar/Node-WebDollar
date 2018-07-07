@@ -147,37 +147,29 @@ class PoolDataBlockInformationMinerInstance {
 
     deserializeBlockInformationMinerInstance(buffer, offset=0, version){
 
+        let address;
+
         //TODO: to be removed
         if (version === 0x01) {
 
-            let address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
+            let adr = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
             offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
 
             for (let i=0; i< this.poolManagement.poolData.miners.length; i++)
-                for (let j=0; j<this.poolManagement.poolData.miners[i].publicKeys; j++)
-                    if (this.poolManagement.poolData.miners[i].publicKeys[j].equals(address)){
+                for (let j=0; j<this.poolManagement.poolData.miners[i].publicKeys.length; j++)
+                    if (this.poolManagement.poolData.miners[i].publicKeys[j].equals(adr)){
 
-                        let miner = this.poolManagement.poolData.miners[i];
-                        this.minerInstance = miner.addInstance({
-                            node:{
-                                protocol:{
-
-                                }
-                            }
-                        });
-
+                        address = this.poolManagement.poolData.miners[i].address;
                         break;
-
                     }
 
-            let answer = Serialization.deserializeBigNumber(buffer, offset);
-            offset = answer.newOffset;
-            return offset;
+        } else {
+
+            address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+            offset += consts.ADDRESSES.ADDRESS.LENGTH;
+
         }
 
-
-        let address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
-        offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         let miner = this.poolManagement.poolData.findMiner(address);
         this.minerInstance = miner.addInstance({

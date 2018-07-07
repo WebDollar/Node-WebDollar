@@ -131,12 +131,14 @@ class MinerProtocol extends PoolProtocolList{
 
                 if (typeof answer.name !== 'string') throw {message: "pool: name is invalid"};
                 if (typeof answer.fee !== 'number') throw {message: "pool:  fee is invalid"};
+                if (typeof answer.referralFee !== 'number') throw {message: "pool:  referralFee is invalid"};
                 if (typeof answer.website !== 'string') throw {message: "pool:  website is invalid"};
                 if (typeof answer.useSig !== 'boolean') throw {message: "pool:  useSignatures is invalid"};
                 if ( !Array.isArray(answer.servers) ) throw {message: "pool:  servers is invalid"};
 
                 let poolName = answer.name;
                 let poolFee = answer.fee;
+                let poolReferralFee = answer.referralFee;
                 let poolWebsite = answer.website;
                 let poolUseSignatures = answer.useSig;
                 let poolServers = answer.servers;
@@ -159,11 +161,9 @@ class MinerProtocol extends PoolProtocolList{
 
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
 
-                this.minerPoolManagement.minerPoolReward.confirmedReward = answer.confirmed;
-                this.minerPoolManagement.minerPoolReward.se = answer.reward;
-
                 this.minerPoolManagement.minerPoolSettings.poolName = poolName;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolFee;
+                this.minerPoolManagement.minerPoolSettings.poolReferralFee = poolReferralFee;
                 this.minerPoolManagement.minerPoolSettings.poolWebsite = poolWebsite;
                 this.minerPoolManagement.minerPoolSettings.poolUseSignatures = poolUseSignatures;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolServers;
@@ -172,7 +172,7 @@ class MinerProtocol extends PoolProtocolList{
                 await this._connectionEstablishedWithPool(socket);
 
                 this._updateStatistics(answer);
-
+                this.minerPoolManagement.minerPoolReward.setReward(answer);
 
                 return true;
 
