@@ -37,12 +37,15 @@ class PoolManagement{
 
     async initializePoolManagement(poolFee){
 
-        await this.poolData.initializePoolData();
-
         let answer;
+
         try {
+
             answer = await this.poolSettings.initializePoolSettings(poolFee);
+
             console.info("The url is just your domain: " + this.poolSettings.poolURL);
+
+            answer = await this.poolData.initializePoolData();
 
             if (!answer)
                 throw {message: "Pool Couldn't be started"};
@@ -73,7 +76,7 @@ class PoolManagement{
     }
 
     receivePoolWork(minerInstance, work){
-       return this.poolWorkManagement.processWork(minerInstance, work)
+        return this.poolWorkManagement.processWork(minerInstance, work)
     }
 
     /**

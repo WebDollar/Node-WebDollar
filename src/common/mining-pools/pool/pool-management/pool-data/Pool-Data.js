@@ -407,25 +407,26 @@ class PoolData {
 
     _clearEmptyMiners(){
 
-        for (let i=this.miners.length-1; i>=0; i--)
-            if ( (this.miners[i].rewardTotal + this.miners[i].rewardConfirmed + this.miners[i].rewardConfirmedOther + this.miners[i].rewardSent + this.miners[i].referrals.rewardReferralsSent + this.miners[i].referrals.rewardReferralsConfirmed + this.miners[i].referrals.rewardReferralsTotal ) === 0) {
-
-
-                //delete blockInformationMinerInstances
-                this.blocksInfo.forEach((blockInfo)=>{
-
-                    blockInfo.blockInformationMinersInstances.forEach((minerInstance, index)=>{
-
-                        if (minerInstance.address.equals(this.miners[i].address))
-                            blockInfo._deleteBlockInformationMinerInstance(index);
-
-                    });
-
-                });
-
-                this.miners[i].destroyPoolDataMiner();
-                this.miners.splice(i, 1);
-            }
+        // for (let i=this.miners.length-1; i>=0; i--)
+        //     if ( this.miners[i].referrals.array.length === 0 && this.miners[i].referrals.referralLinkMiner !== undefined &&
+        //         (this.miners[i].rewardTotal + this.miners[i].rewardConfirmed + this.miners[i].rewardConfirmedOther + this.miners[i].rewardSent + this.miners[i].referrals.rewardReferralsSent + this.miners[i].referrals.rewardReferralsConfirmed + this.miners[i].referrals.rewardReferralsTotal ) === 0) {
+        //
+        //
+        //         //delete blockInformationMinerInstances
+        //         this.blocksInfo.forEach((blockInfo)=>{
+        //
+        //             blockInfo.blockInformationMinersInstances.forEach((minerInstance, index)=>{
+        //
+        //                 if (minerInstance.address.equals(this.miners[i].address))
+        //                     blockInfo._deleteBlockInformationMinerInstance(index);
+        //
+        //             });
+        //
+        //         });
+        //
+        //         this.miners[i].destroyPoolDataMiner();
+        //         this.miners.splice(i, 1);
+        //     }
 
 
     }

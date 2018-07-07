@@ -2,7 +2,7 @@ import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
 import consts from "consts/const_global"
 
-class PoolDataMinerReferral{
+class PoolDataMinerReferral {
 
     constructor(poolData, referrals, miner, refereeAddress, refereeMiner){
 
@@ -13,7 +13,8 @@ class PoolDataMinerReferral{
         this.refereeAddress = refereeAddress; //the referee
         this.refereeMiner = refereeMiner; //the referee
 
-        this.findRefereeAddress();
+        if (this.refereeAddress !== undefined)
+            this.findRefereeAddress();
 
         this._rewardReferralTotal = 0; // total - no confirmed
         this._rewardReferralConfirmed = 0; //confirmed but not sent
@@ -62,7 +63,7 @@ class PoolDataMinerReferral{
 
         let refereeMiner = this.poolData.findMiner( this.refereeAddress );
         if (refereeMiner === null || refereeMiner === undefined) throw {message: "couldn't find refereeAddress", refereeAddress: this.refereeAddress}
-        else this.refereeAddress = refereeMiner;
+        else this.refereeMiner = refereeMiner;
 
         return this.refereeMiner;
     }

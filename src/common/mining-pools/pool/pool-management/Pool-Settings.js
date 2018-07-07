@@ -53,7 +53,7 @@ class PoolSettings {
 
     }
     
-  printPoolSettings(){
+  printPoolSettings(showPoolPrivateKey=false){
   
       console.log("Fee: ", this._poolFee);
       console.log("Referral Fee: ", this._poolReferralFee);
@@ -69,7 +69,10 @@ class PoolSettings {
 
       console.log("POWValidationProbability: ", this._poolPOWValidationProbability);
       console.log("UsePoolServers: ", this._poolUsePoolServers);
-      //console.log("PrivateKey: ", this._poolPrivateKey.toString("hex"));
+
+      if (showPoolPrivateKey)
+        console.log("PrivateKey: ", this._poolPrivateKey.toString("hex"));
+
       console.log("PublicKey: ", this.poolPublicKey.toString("hex"));
       console.log("Address: ", this.poolAddress.toString("hex"));
       console.log("URL: ", this.poolURL);
@@ -85,8 +88,6 @@ class PoolSettings {
 
         let servers = this.poolServers.join(";");
         servers = servers.replace(/\//g, '$' );
-
-        let website = this.poolWebsite.replace(/\//g, '$' );
 
         let poolName = this.poolName.replace(" ","_");
 
