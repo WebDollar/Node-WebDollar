@@ -143,6 +143,10 @@ class PoolPayouts{
 
             if (this._toAddresses.length === 0) throw {message: "No Addresses to send money"};
 
+            //let's floor the data
+            for (let i=0; i < this._toAddresses.length; i++)
+                this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount );
+
             let index = 0;
             while (index * 256 < this._toAddresses.length) {
 
@@ -162,7 +166,6 @@ class PoolPayouts{
                     let miner = blockInformationMinerInstance.miner;
                     let paid = this._findAddressTo(miner.address);
 
-
                     try{
 
                         //not paid
@@ -175,11 +178,11 @@ class PoolPayouts{
                         blockInformationMinerInstance.minerInstanceTotalDifficulty = new BigNumber(0);
                         blockInformationMinerInstance.reward = 0; //i already paid
 
-                        if (miner.referrals.referralLinkMiner !== undefined && miner.referrals.referralLinkMiner !== null) {
+
+                        if ( miner.referrals.referralLinkMiner !== undefined ) {
                             miner.referrals.referralLinkMiner.rewardReferralSent += miner.referrals.referralLinkMiner.rewardReferralConfirmed;
                             miner.referrals.referralLinkMiner._rewardReferralConfirmed = 0;
                         }
-
 
                     } catch (exception){
 
@@ -201,6 +204,9 @@ class PoolPayouts{
                 miner.rewardConfirmedOther = 0; //paid this
 
                 miner.__tempRewardConfirmedOther = 0; //paid this
+
+                miner.referrals.rewardReferralsConfirmed = 0;
+
 
             }
 

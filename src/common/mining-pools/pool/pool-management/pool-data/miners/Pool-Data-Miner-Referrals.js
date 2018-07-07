@@ -69,7 +69,10 @@ class PoolDataMinerReferrals {
         let linkMiner = this.poolData.findMiner( this.referralLinkAddress );
         if (linkMiner === undefined || linkMiner === null) return;
 
-        this.referralLinkMiner = linkMiner.referrals.addReferral(this.miner.address);
+        let referralLinkMiner = linkMiner.referrals.addReferral(this.miner.address);
+
+        if (referralLinkMiner === undefined || referralLinkMiner === null) this.referralLinkMiner = undefined;
+        else this.referralLinkMiner = referralLinkMiner;
 
         return this.referralLinkMiner;
 
@@ -182,7 +185,7 @@ class PoolDataMinerReferrals {
 
 
     set rewardReferralsTotal(newValue){
-        this._rewardReferralsTotal = Math.max( 0, Math.floor( newValue ));
+        this._rewardReferralsTotal = newValue;
     }
 
     get rewardReferralsTotal(){
@@ -190,7 +193,7 @@ class PoolDataMinerReferrals {
     }
 
     set rewardReferralsConfirmed(newValue){
-        this._rewardReferralsConfirmed = Math.max( 0, Math.floor( newValue ));
+        this._rewardReferralsConfirmed = newValue;
     }
 
     get rewardReferralsConfirmed(){

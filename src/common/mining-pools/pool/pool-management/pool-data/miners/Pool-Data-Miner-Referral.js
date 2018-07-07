@@ -70,8 +70,9 @@ class PoolDataMinerReferral{
     set rewardReferralTotal(newValue){
 
         let prevVal = this._rewardReferralTotal;
-        this._rewardReferralTotal = Math.max( 0, Math.floor( newValue ));
+        this._rewardReferralTotal = newValue;
         this.referrals.rewardReferralsTotal += newValue - prevVal;
+
     }
 
     get rewardReferralTotal(){
@@ -81,7 +82,7 @@ class PoolDataMinerReferral{
     set rewardReferralConfirmed(newValue){
 
         let prevVal = this._rewardReferralConfirmed;
-        this._rewardReferralConfirmed = Math.max( 0, Math.floor( newValue ));
+        this._rewardReferralConfirmed = newValue;
         this.referrals.rewardReferralsConfirmed += newValue - prevVal;
 
     }

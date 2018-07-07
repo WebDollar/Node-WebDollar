@@ -141,11 +141,13 @@ class PoolDataMiner{
     }
 
     set rewardTotal(newValue){
-        this._rewardTotal = Math.max( 0 , Math.floor( newValue ));
+        this._rewardTotal = newValue;
     }
     set rewardConfirmed(newValue){
-        this._rewardConfirmedOther = Math.max( 0 , Math.floor( newValue ));
+        this._rewardConfirmed = newValue;
     }
+
+
     set rewardConfirmedOther(newValue){
         this._rewardConfirmedOther = Math.max( 0 , Math.floor( newValue ));
     }

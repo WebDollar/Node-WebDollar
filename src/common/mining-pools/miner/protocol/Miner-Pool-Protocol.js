@@ -166,7 +166,7 @@ class MinerProtocol extends PoolProtocolList{
                 this.minerPoolManagement.minerPoolSettings.poolReferralFee = poolReferralFee;
                 this.minerPoolManagement.minerPoolSettings.poolWebsite = poolWebsite;
                 this.minerPoolManagement.minerPoolSettings.poolUseSignatures = poolUseSignatures;
-                this.minerPoolManagement.minerPoolSettings.poolFee = poolServers;
+                this.minerPoolManagement.minerPoolSettings.poolServers = poolServers;
 
                 this.minerPoolManagement.minerPoolSettings.notifyNewChanges();
 
