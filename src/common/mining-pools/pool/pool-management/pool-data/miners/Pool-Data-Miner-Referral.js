@@ -60,7 +60,9 @@ class PoolDataMinerReferral{
 
         if (this.refereeAddress === undefined) return null;
 
-        this.refereeMiner = this.poolData.findMiner( this.refereeAddress );
+        let refereeMiner = this.poolData.findMiner( this.refereeAddress );
+        if (refereeMiner === null || refereeMiner === undefined) throw {message: "couldn't find refereeAddress", refereeAddress: this.refereeAddress}
+        else this.refereeAddress = refereeMiner;
 
         return this.refereeMiner;
     }

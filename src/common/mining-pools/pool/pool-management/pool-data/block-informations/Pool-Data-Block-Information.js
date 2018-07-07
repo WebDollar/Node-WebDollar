@@ -200,18 +200,23 @@ class PoolDataBlockInformation {
 
     _deleteBlockInformationMinerInstance(minerInstance){
 
-        for (let i=this.blockInformationMinersInstances.length-1; i>=0; i--)
-            if (this.blockInformationMinersInstances[i].minerInstance === minerInstance ){
+        let pos = minerInstance;
+        if (typeof pos !== "number")
+            for (let i=this.blockInformationMinersInstances.length-1; i>=0; i--)
+                if (this.blockInformationMinersInstances[i].minerInstance === minerInstance ) {
+                    pos = i;
+                    break;
+                }
 
-                this.blockInformationMinersInstances[i].cancelReward();
+        this.blockInformationMinersInstances[pos].cancelReward();
 
-                this.totalDifficultyMinus(this.blockInformationMinersInstances[i].minerInstanceTotalDifficulty);
-                this.blockInformationMinersInstances.splice(i,1);
+        this.totalDifficultyMinus(this.blockInformationMinersInstances[pos].minerInstanceTotalDifficulty);
+        this.blockInformationMinersInstances.splice(pos,1);
 
-                for (let j=0; j<this.blockInformationMinersInstances.length; j++)
-                    this.blockInformationMinersInstances.adjustDifficulty(0);
+        for (let j=0; j<this.blockInformationMinersInstances.length; j++)
+            this.blockInformationMinersInstances.adjustDifficulty(0);
 
-            }
+
     }
 
 

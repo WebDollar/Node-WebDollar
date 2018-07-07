@@ -175,8 +175,9 @@ class PoolDataBlockInformationMinerInstance {
         }
 
 
-        let miner = this.poolManagement.poolData.findMiner(address);
+        let miner = this.poolManagement.poolData.findMiner( address );
         this.minerInstance = miner.addInstance({
+            _diff: Math.random(),
             node:{
                 protocol:{
 

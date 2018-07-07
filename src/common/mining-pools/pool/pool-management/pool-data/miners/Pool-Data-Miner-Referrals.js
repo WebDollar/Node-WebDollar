@@ -69,7 +69,7 @@ class PoolDataMinerReferrals {
         let linkMiner = this.poolData.findMiner( this.referralLinkAddress );
         if (linkMiner === undefined || linkMiner === null) return;
 
-        let referralLinkMiner = linkMiner.referrals.addReferral(this.miner.address);
+        let referralLinkMiner = linkMiner.referrals.addReferral(this.miner.address, this.miner);
 
         if (referralLinkMiner === undefined || referralLinkMiner === null) this.referralLinkMiner = undefined;
         else this.referralLinkMiner = referralLinkMiner;
@@ -85,9 +85,8 @@ class PoolDataMinerReferrals {
         //referral Link Address
         list.push( Serialization.serializeNumber1Byte( this.referralLinkAddress !== undefined ? 1 : 0 ) );
 
-        if ( this.referralLinkAddress !== undefined ){
+        if ( this.referralLinkAddress !== undefined )
             list.push ( this.referralLinkAddress );
-        }
 
         list.push( Serialization.serializeNumber1Byte(this.array.length > 0 ? 1 : 0 ) );
 
@@ -110,7 +109,7 @@ class PoolDataMinerReferrals {
         let hasReferralLink = buffer[offset];
         offset +=1;
 
-        if (hasReferralLink === 1){
+        if (hasReferralLink === 0x01){
             this.referralLinkAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
             offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
@@ -149,11 +148,11 @@ class PoolDataMinerReferrals {
     }
 
 
-    addReferral(refereeAddress){
+    addReferral(refereeAddress, refereeMiner){
 
         let referee = this.findReferral(refereeAddress);
         if (referee === null){
-            referee = new PoolDataMinerReferral(this.poolData, this, this.miner, refereeAddress );
+            referee = new PoolDataMinerReferral( this.poolData, this, this.miner, refereeAddress, refereeMiner );
             this.array.push(referee);
         }
 
