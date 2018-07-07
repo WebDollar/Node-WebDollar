@@ -55,23 +55,25 @@ class PoolSettings {
     
   printPoolSettings(){
   
-      console.log("_poolFee: ", this._poolFee);
-      console.log("_poolName: ", this._poolName);
-      console.log("_poolWebsite: ", this._poolWebsite);
+      console.log("Fee: ", this._poolFee);
+      console.log("Referral Fee: ", this._poolReferralFee);
+
+      console.log("Name: ", this._poolName);
+      console.log("Website: ", this._poolWebsite);
 
       let poolServersStr = "";
       for (let i = 0; i < this._poolServers.length; i++){
-       poolServersStr += this._poolServers[i] + ", ";
+          poolServersStr += this._poolServers[i] + ", ";
       }
-      console.log("_poolServers: {" + poolServersStr + "}");
+      console.log("Servers: {" + poolServersStr + "}");
 
-      console.log("_poolPOWValidationProbability: ", this._poolPOWValidationProbability);
-      console.log("_poolActivated: ", this._poolActivated);
-      console.log("_poolUsePoolServers: ", this._poolUsePoolServers);
-      console.log("_poolPrivateKey: ", this._poolPrivateKey.toString("hex"));
-      console.log("poolPublicKey: ", this.poolPublicKey.toString("hex"));
-      console.log("poolAddress: ", this.poolAddress.toString("hex"));
-      console.log("poolURL: ", this.poolURL);
+      console.log("POWValidationProbability: ", this._poolPOWValidationProbability);
+      console.log("UsePoolServers: ", this._poolUsePoolServers);
+      //console.log("PrivateKey: ", this._poolPrivateKey.toString("hex"));
+      console.log("PublicKey: ", this.poolPublicKey.toString("hex"));
+      console.log("Address: ", this.poolAddress.toString("hex"));
+      console.log("URL: ", this.poolURL);
+      console.log("Activated: ", this._poolActivated);
  }
 
     _generatePoolURL(){

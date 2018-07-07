@@ -168,6 +168,8 @@ class MinerProtocol extends PoolProtocolList{
                 this.minerPoolManagement.minerPoolSettings.poolUseSignatures = poolUseSignatures;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolServers;
 
+                this.minerPoolManagement.minerPoolSettings.notifyNewChanges();
+
                 //connection established
                 await this._connectionEstablishedWithPool(socket);
 

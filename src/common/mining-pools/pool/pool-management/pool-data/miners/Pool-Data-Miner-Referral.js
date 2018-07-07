@@ -41,6 +41,7 @@ class PoolDataMinerReferral{
     deserializeMinerReferral ( buffer, offset ){
 
         this.refereeAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+        offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         this._rewardReferralTotal = 0;
         this._rewardReferralConfirmed = 0;

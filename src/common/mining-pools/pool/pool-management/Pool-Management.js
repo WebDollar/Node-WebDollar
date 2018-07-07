@@ -134,6 +134,7 @@ class PoolManagement{
             await this.poolSettings.setPoolActivated(value);
 
             if (value) {
+
                 this.poolStatistics.startInterval();
                 this.poolWorkManagement.poolWork.startGarbageCollector();
                 await this.poolProtocol._startPoolProtocol();
@@ -142,6 +143,8 @@ class PoolManagement{
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL;
 
                 this.poolData.connectedMinerInstances.startPoolDataConnectedMinerInstances();
+
+                Blockchain.PoolManagement.poolSettings.printPoolSettings();
 
             }
             else {

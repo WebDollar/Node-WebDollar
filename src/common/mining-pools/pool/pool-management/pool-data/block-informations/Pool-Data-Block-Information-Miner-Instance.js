@@ -150,6 +150,7 @@ class PoolDataBlockInformationMinerInstance {
         let address;
 
         //TODO: to be removed
+
         if (version === 0x01) {
 
             let adr = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
