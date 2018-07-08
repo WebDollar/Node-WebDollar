@@ -44,6 +44,10 @@ class PoolDataMinerReferrals {
         if ( address === null || address === undefined || !Buffer.isBuffer(address) || address.length !== consts.ADDRESSES.ADDRESS.LENGTH )
             return false;
 
+        //avoid to be the same person
+        if (address.equals(this.miner.address))
+            return false;
+
         this.referralLinkAddress = address;
         this.findReferralLinkAddress();
 
