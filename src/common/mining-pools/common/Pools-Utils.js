@@ -6,6 +6,7 @@ import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import Utils from "common/utils/helpers/Utils";
 import consts from 'consts/const_global'
 import InterfaceBlockchainAddressHelper from "../../blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import SocketAddress from "../../sockets/protocol/extend-socket/Socket-Address";
 const sanitizer = require('sanitizer');
 
 class PoolsUtils {
@@ -17,7 +18,7 @@ class PoolsUtils {
     validatePoolName(poolName){
 
         if (typeof poolName !== "string") throw {message: "pool name is not a string"};
-        if (poolName !=='' && ! /^[A-Za-z\d\s]+$/.test(poolName)) throw {message: "pool name is invalid"};
+        if (poolName !=='' && ! /^[_\-A-Za-z\d\s]+$/.test(poolName)) throw {message: "pool name is invalid"};
 
     }
 
@@ -253,11 +254,12 @@ class PoolsUtils {
 
         for (let i=0; i<poolServers.length; i++) {
 
+            let address = SocketAddress.createSocketAddress(poolServers[i]);
 
             let connected = false, nodeConsensusType;
 
             for (let j=0; j< NodesList.nodes.length; j++ )
-                if (NodesList.nodes[j].socket.node.sckAddress.matchAddress( poolServers[i] )){
+                if (address.matchAddress ( NodesList.nodes[j].socket.node.sckAddress ) || address.matchAddress(NodesList.nodes[j].socket.node.protocol.nodeDomain)){
                     connected = true;
                     nodeConsensusType = NodesList.nodes[j].socket.node.protocol.nodeConsensusType;
                     break;

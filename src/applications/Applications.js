@@ -10,6 +10,7 @@ import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List';
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+import AdvancedMessages from "node/menu/Advanced-Messages";
 
 class Applications {
 
@@ -32,6 +33,8 @@ class Applications {
 
         this.NODE_TYPE = NODE_TYPE;
         this.CONNECTIONS_TYPE = CONNECTIONS_TYPE;
+
+        this.AdvancedMessages = AdvancedMessages;
     }
 
 }

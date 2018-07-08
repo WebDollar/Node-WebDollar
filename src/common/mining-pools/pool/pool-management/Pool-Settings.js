@@ -62,9 +62,9 @@ class PoolSettings {
       console.log("Website: ", this._poolWebsite);
 
       let poolServersStr = "";
-      for (let i = 0; i < this._poolServers.length; i++){
+      for (let i = 0; i < this._poolServers.length; i++)
           poolServersStr += this._poolServers[i] + ", ";
-      }
+
       console.log("Servers: {" + poolServersStr + "}");
 
       console.log("POWValidationProbability: ", this._poolPOWValidationProbability);

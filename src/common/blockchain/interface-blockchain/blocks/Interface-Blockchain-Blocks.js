@@ -14,7 +14,7 @@ class InterfaceBlockchainBlocks{
         this.blocksStartingPoint = 0;
         this.length = 0;
 
-        this.networkHashRate = 0 ;
+        this._networkHashRate = 0 ;
     }
 
     addBlock(block){
@@ -107,10 +107,16 @@ class InterfaceBlockchainBlocks{
 
         let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toNumber();
 
-        StatusEvents.emit("blockchain/new-network-hash-rate", answer);
         this.networkHashRate = answer;
         
         return answer;
+
+    }
+
+    networkHashRate(newValue){
+
+        this._networkHashRate = newValue;
+        StatusEvents.emit("blockchain/new-network-hash-rate", this._networkHashRate );
 
     }
 
