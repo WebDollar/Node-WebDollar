@@ -30,12 +30,18 @@ class AdvancedMessages{
 
     }
 
-    alert(param){
+    alert(param,title,type,timeout){
 
         if (process.env.BROWSER)
             alert(param);
-        else
-            console.warn(param);
+        else{
+
+            if (type==='error')  console.error(param);
+            if (type==='warn')  console.warn(param);
+            if (type==='info')  console.log(param);
+
+        }
+
     }
 
 

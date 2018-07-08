@@ -353,7 +353,7 @@ class MinerProtocol extends PoolProtocolList{
 
             if (oldAddress === null || oldAddress === undefined){
 
-                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolManagement.minerPoolMining.minerAddress );
+                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolManagement.minerPoolMining.minerAddress, "Wallet Error", "error", 5000 );
                 return;
 
             }
