@@ -212,9 +212,8 @@ class MinerProtocol extends PoolProtocolList{
         socket.node.on("mining-pool/new-work", async (data)=>{
 
             try {
+
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
-                if (!Buffer.isBuffer(data.miner)) throw {message: "new-work invalid minerPublicKey"};
-                if (!Buffer.isBuffer(data.miner)) throw {message: "new-work invalid minerPublicKey"};
 
                 let confirmation = socket.node.sendRequestWaitOnce("mining-pool/new-work/answer", {
                     hash: this.minerPoolManagement.minerPoolMining.bestHash,
