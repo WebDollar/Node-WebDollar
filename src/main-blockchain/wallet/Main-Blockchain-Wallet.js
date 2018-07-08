@@ -158,7 +158,7 @@ class MainBlockchainWallet {
             await this.deserialize(buffer);
 
         } catch (exception){
-            AdvancedMessages.alert('Wallet was not imported successfully');
+            AdvancedMessages.alert('Wallet was not imported successfully', "Wallet Error", "error", 5000);
             this.addresses = [];
         }
 
@@ -506,7 +506,7 @@ class MainBlockchainWallet {
 
         } catch (exception) {
 
-            AdvancedMessages.alert('Your old password is incorrect!!!');
+            AdvancedMessages.alert('Your old password is incorrect!', "Password Error", "error", 5000);
             return false;
         }
 
@@ -543,7 +543,7 @@ class MainBlockchainWallet {
                         break;
                 } catch (exception) {
                     
-                    AdvancedMessages.alert('Your old password is incorrect!!!');
+                    AdvancedMessages.alert('Your old password is incorrect!', "Password Error", "error", 5000);
 
                     if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};

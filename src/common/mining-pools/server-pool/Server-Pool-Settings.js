@@ -25,7 +25,7 @@ class PoolSettings {
 
         } catch (exception){
 
-            AdvancedMessages.alert( "ServerPools returned an error "+ exception.message );
+            AdvancedMessages.alert( "ServerPools returned an error "+ exception.message , "Pools Error", "error", 5000 );
 
 
             return false;

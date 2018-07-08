@@ -95,7 +95,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             if (this.minerAddress === undefined){
 
-                AdvancedMessages.alert("Mining suspended. No Mining Address");
+                AdvancedMessages.alert("Mining suspended. No Mining Address", "Mining Error", "error", 5000);
                 this.stopMining();
 
                 return;

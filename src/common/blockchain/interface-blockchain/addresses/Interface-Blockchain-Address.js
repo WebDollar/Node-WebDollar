@@ -176,7 +176,7 @@ class InterfaceBlockchainAddress{
 
         } catch (exception) {
 
-            AdvancedMessages.alert('Your password is incorrect!!!');
+            AdvancedMessages.alert('Your password is incorrect!', "Password Error", "error", 5000);
 
             return null;
         }
