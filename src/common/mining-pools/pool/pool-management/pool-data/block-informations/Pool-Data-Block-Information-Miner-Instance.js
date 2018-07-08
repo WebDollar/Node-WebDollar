@@ -176,14 +176,14 @@ class PoolDataBlockInformationMinerInstance {
 
 
         let miner = this.poolManagement.poolData.findMiner( address );
-        this.minerInstance = miner.addInstance({
-            _diff: Math.random(),
-            node:{
-                protocol:{
-
+        if (miner !== undefined && miner !== null) {
+            this.minerInstance = miner.addInstance({
+                _diff: Math.random(),
+                node: {
+                    protocol: {}
                 }
-            }
-        });
+            });
+        }
 
         let answer = Serialization.deserializeBigNumber(buffer, offset);
         this.minerInstanceTotalDifficulty = answer.number;
