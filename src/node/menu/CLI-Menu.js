@@ -16,6 +16,7 @@ import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockc
 import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
+import Log from 'common/utils/logging/Log';
 
 class CLI {
 
@@ -92,6 +93,8 @@ class CLI {
     };
 
     async _start() {
+
+        Log.info('CLI menu started', consts.LOG_INSTANCE.CLI_MENU);
 
         if (Blockchain !== undefined)
             await Blockchain.loadWallet();
