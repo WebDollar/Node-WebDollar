@@ -50,11 +50,11 @@ checkroot
 
 function start_pm2node(){
 
-if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] ]]; then
+if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] || $(pwd | cut -d '/' -f3) =~ Node-WebDollar[0-9] ]]; then
 
 	echo "$showinfo We are inside a Node-WebDollar Folder"
 
-	read -e -p "$showinput Do you want to start a pm2 instance in this $crnt_dir foler?: " startnodeyn
+	read -e -p "$showinput Do you want to start a pm2 instance in this $crnt_dir foler? (y or n): " startnodeyn
 
 	if [[ "$startnodeyn" =~ ^(y|yes|Y|YES|Yes)$ ]]; then
 
@@ -154,9 +154,12 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_oneport(){
 
-		read -e -p "$showinput We'll use $nrofports port. Enter number (e.g.: 80 or $abortte): " readport
+		read -e -p "$showinput We'll use $nrofports port. Enter PORT number (e.g.: 8080 or $abortte): " readport
 
 		if [[ "$readport" =~ ^[[:digit:]]+$ ]]; then
+
+			echo "$showinfo Setting IP Table rule for PORT $readport"
+			if [[ $(iptables -nL | grep -w $readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $readport ]]; then echo "$showok Port $readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $readport ]]; then echo "$showdone Setting Firewall rule for PORT $readport."; iptables -A INPUT -p tcp --dport $readport -j ACCEPT; fi fi # set port firewall rule
 
 			echo "$showinfo The system will use port $readport";
 
@@ -177,11 +180,16 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_twoports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080): " readnrport2_0 readnrport2_1
+		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081): " readnrport2_0 readnrport2_1
 
 		if [[ $readnrport2_0 =~ ^[[:digit:]]+$ && $readnrport2_1 =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo The system will use $nrofports ports -> $readnrport2_0 and $readnrport2_1"
+
+			for fw_readport in $readnrport2_0 $readnrport2_1;
+			do
+				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+			done
 
 			for readport in $readnrport2_0 $readnrport2_1;
 			do
@@ -199,11 +207,16 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_threeports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080 8081): " readnrport3_0 readnrport3_1 readnrport3_2
+		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082): " readnrport3_0 readnrport3_1 readnrport3_2
 
 		if [[ $readnrport3_0 =~ ^[[:digit:]]+$ && $readnrport3_1 =~ ^[[:digit:]]+$ && $readnrport3_2 =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo The system will use three ports -> $readnrport3_0, $readnrport3_1 and $readnrport3_2"
+
+			for fw_readport in $readnrport3_0 $readnrport3_1 $readnrport3_2;
+			do
+				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+			done
 
 			for readport in $readnrport3_0 $readnrport3_1 $readnrport3_2;
 			do
@@ -221,11 +234,16 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_fourports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080 8081 8082): " readnrport4_0 readnrport4_1 readnrport4_2 readnrport4_3
+		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083): " readnrport4_0 readnrport4_1 readnrport4_2 readnrport4_3
 
 		if [[ $readnrport4_0 =~ ^[[:digit:]]+$ && $readnrport4_1 =~ ^[[:digit:]]+$ && $readnrport4_2 =~ ^[[:digit:]]+$ && $readnrport4_3 =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo The system will use $nrofports ports -> $readnrport4_0, $readnrport4_1, $readnrport4_2, $readnrport4_3"
+
+			for fw_readport in $readnrport4_0 $readnrport4_1 $readnrport4_2 $readnrport4_3;
+			do
+				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+			done
 
 			for readport in $readnrport4_0 $readnrport4_1 $readnrport4_2 $readnrport4_3;
 			do
@@ -243,11 +261,16 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_fiveports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080 8081 8082 8083): " readnrport5_0 readnrport5_1 readnrport5_2 readnrport5_3 readnrport5_4
+		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083 8084): " readnrport5_0 readnrport5_1 readnrport5_2 readnrport5_3 readnrport5_4
 
 		if [[ $readnrport5_0 =~ ^[[:digit:]]+$ && $readnrport5_1 =~ ^[[:digit:]]+$ && $readnrport5_2 =~ ^[[:digit:]]+$ && $readnrport5_3 =~ ^[[:digit:]]+$ && $readnrport5_4 =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo The system will use $nrofports ports -> $readnrport5_0, $readnrport5_1, $readnrport5_2, $readnrport5_3 and $readnrport5_4"
+
+			for fw_readport in $readnrport5_0 $readnrport5_1 $readnrport5_2 $readnrport5_3 $readnrport5_4;
+			do
+				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+			done
 
 			for readport in $readnrport5_0 $readnrport5_1 $readnrport5_2 $readnrport5_3 $readnrport5_4;
 			do
@@ -265,11 +288,16 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_sixports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter number (e.g.: 80 8080 8081 8082 8083 8084): " readnrport6_0 readnrport6_1 readnrport6_2 readnrport6_3 readnrport6_4 readnrport6_5
+		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083 8084 8085): " readnrport6_0 readnrport6_1 readnrport6_2 readnrport6_3 readnrport6_4 readnrport6_5
 
 		if [[ $readnrport6_0 =~ ^[[:digit:]]+$ && $readnrport6_1 =~ ^[[:digit:]]+$ && $readnrport6_2 =~ ^[[:digit:]]+$ && $readnrport6_3 =~ ^[[:digit:]]+$ && $readnrport6_4 =~ ^[[:digit:]]+$ && $readnrport6_5 =~ ^[[:digit:]]+$ ]]; then
 
-			echo "$showinfo The system will use $nrofports ports -> $readnrport5_0, $readnrport5_1, $readnrport5_2, $readnrport5_3 and $readnrport5_4"
+			echo "$showinfo The system will use $nrofports ports -> $readnrport6_0, $readnrport6_1, $readnrport6_2, $readnrport6_3 and $readnrport6_4 $readnrport6_5"
+
+			for fw_readport in $readnrport6_0 $readnrport6_1 $readnrport6_2 $readnrport6_3 $readnrport6_4 $readnrport6_5;
+			do
+				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+			done
 
 			for readport in $readnrport6_0 $readnrport6_1 $readnrport6_2 $readnrport6_3 $readnrport6_4 $readnrport6_5;
 			do
@@ -301,3 +329,5 @@ elif [[ "$nrofports" == * ]]; then
 	echo "$showerror Please enter a number from 1 to 6."
 	exit 1
 fi
+
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then iptables-save; fi
