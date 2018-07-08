@@ -11,6 +11,7 @@ import StatusEvents from "common/events/Status-Events";
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 
 import AdvancedMessages from "node/menu/Advanced-Messages";
+import Blockchain from "../Blockchain";
 
 const EventEmitter = require('events');
 const FileSystem = require('fs');
@@ -525,6 +526,8 @@ class MainBlockchainWallet {
 
             for (let tries = 3; tries >= 1; --tries) {
 
+                await Blockchain.blockchain.sleep(100);
+
                 let oldPassword = await InterfaceBlockchainAddressHelper.askForPassword("Please enter your last password (12 words separated by space).  " +  tries + " tries left:");
 
                 if (oldPassword === null){
@@ -548,6 +551,7 @@ class MainBlockchainWallet {
                     if (tries === 1)
                         return {result: false, message: "Your old password is incorrect!"};
                 }
+
 
             }
         }
