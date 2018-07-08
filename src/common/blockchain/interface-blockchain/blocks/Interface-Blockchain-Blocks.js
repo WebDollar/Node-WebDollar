@@ -12,9 +12,10 @@ class InterfaceBlockchainBlocks{
         this.blockchain = blockchain;
 
         this.blocksStartingPoint = 0;
-        this.length = 0;
+        this._length = 0;
 
         this._networkHashRate = 0 ;
+
     }
 
     addBlock(block){
@@ -22,8 +23,6 @@ class InterfaceBlockchainBlocks{
         this[this.length] =  block;
 
         this.length += 1;
-
-        StatusEvents.emit("blockchain/blocks-count-changed", this.length);
         StatusEvents.emit("blockchain/block-inserted", block);
 
         //delete old blocks when I am in light node
@@ -59,8 +58,6 @@ class InterfaceBlockchainBlocks{
             }
 
         this.length = after;
-
-        StatusEvents.emit("blockchain/blocks-count-changed", this.length);
     }
 
     clear(){
@@ -113,11 +110,24 @@ class InterfaceBlockchainBlocks{
 
     }
 
-    networkHashRate(newValue){
+    set networkHashRate(newValue){
 
         this._networkHashRate = newValue;
         StatusEvents.emit("blockchain/new-network-hash-rate", this._networkHashRate );
 
+    }
+
+    get networkHashRate(){
+        return this._networkHashRate;
+    }
+
+    set length(newValue){
+        this._length = newValue;
+        StatusEvents.emit("blockchain/blocks-count-changed", this.length);
+    }
+
+    get length(){
+        return this._length;
     }
 
 }

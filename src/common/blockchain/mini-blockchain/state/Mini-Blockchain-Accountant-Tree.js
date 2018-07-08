@@ -1,3 +1,5 @@
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
+
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
 
@@ -7,6 +9,7 @@ import consts from 'consts/const_global'
 
 import MiniBlockchainAccountantTreeEvents from "./Mini-Blockchain-Accountant-Tree-Events"
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
+import Blockchain from "main-blockchain/Blockchain";
 
 class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
@@ -235,6 +238,10 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         }
 
         if (node === undefined) node = this.root;
+
+        if (node === this.root && !Blockchain.blockchain.agent.consensus){
+            return BlockchainMiningReward.getSumReward(Blockchain.blockchain.blocks.length-1);
+        }
 
         let sum = node.getBalance(tokenId);
 
