@@ -93,8 +93,12 @@ class MinerProtocol {
 
             if (value) {
 
+                Blockchain.blockchain.miningSolo.stopMining();
+
                 this.blockchain.mining = this.minerPoolMining;
                 Blockchain.Mining = this.minerPoolMining;
+
+
 
                 await this.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
                 await this.minerPoolProtocol._startMinerProtocol();
@@ -103,8 +107,12 @@ class MinerProtocol {
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_MINER;
             }
             else {
+
+                Blockchain.blockchain.miningSolo.stopMining();
+
                 this.blockchain.mining = Blockchain.blockchain.miningSolo;
                 Blockchain.Mining = Blockchain.blockchain.miningSolo;
+
 
                 await this.minerPoolProtocol._stopMinerProtocol();
 

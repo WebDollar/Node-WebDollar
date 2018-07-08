@@ -2,7 +2,11 @@ import Blockchain from "main-blockchain/Blockchain"
 import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import StatusEvents from "common/events/Status-Events"
 import NodesList from 'node/lists/Nodes-List';
-import NODES_CONSENSUS_TYPE from "../../../../../node/lists/types/Node-Consensus-Type";
+import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
+
+/**
+ * Nano Wallet which virtualize the consensus using SPV on the Accountant Tree
+ */
 
 class NanoWalletProtocol{
 

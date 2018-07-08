@@ -26,6 +26,8 @@ class PoolSettings {
         this._poolUseSignatures = false;
         this._poolUsePoolServers = true;
 
+        this._poolReferralFee = 0;
+
         this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
         this.poolPublicKey = new Buffer(0);
         this.poolAddress = '';
@@ -51,25 +53,30 @@ class PoolSettings {
 
     }
     
-  printPoolSettings(){
+  printPoolSettings(showPoolPrivateKey=false){
   
-      console.log("_poolFee: ", this._poolFee);
-      console.log("_poolName: ", this._poolName);
-      console.log("_poolWebsite: ", this._poolWebsite);
+      console.log("Fee: ", this._poolFee);
+      console.log("Referral Fee: ", this._poolReferralFee);
+
+      console.log("Name: ", this._poolName);
+      console.log("Website: ", this._poolWebsite);
 
       let poolServersStr = "";
       for (let i = 0; i < this._poolServers.length; i++){
-       poolServersStr += this._poolServers[i] + ", ";
+          poolServersStr += this._poolServers[i] + ", ";
       }
-      console.log("_poolServers: {" + poolServersStr + "}");
+      console.log("Servers: {" + poolServersStr + "}");
 
-      console.log("_poolPOWValidationProbability: ", this._poolPOWValidationProbability);
-      console.log("_poolActivated: ", this._poolActivated);
-      console.log("_poolUsePoolServers: ", this._poolUsePoolServers);
-      console.log("_poolPrivateKey: ", this._poolPrivateKey.toString("hex"));
-      console.log("poolPublicKey: ", this.poolPublicKey.toString("hex"));
-      console.log("poolAddress: ", this.poolAddress.toString("hex"));
-      console.log("poolURL: ", this.poolURL);
+      console.log("POWValidationProbability: ", this._poolPOWValidationProbability);
+      console.log("UsePoolServers: ", this._poolUsePoolServers);
+
+      if (showPoolPrivateKey)
+        console.log("PrivateKey: ", this._poolPrivateKey.toString("hex"));
+
+      console.log("PublicKey: ", this.poolPublicKey.toString("hex"));
+      console.log("Address: ", this.poolAddress.toString("hex"));
+      console.log("URL: ", this.poolURL);
+      console.log("Activated: ", this._poolActivated);
  }
 
     _generatePoolURL(){
@@ -82,9 +89,9 @@ class PoolSettings {
         let servers = this.poolServers.join(";");
         servers = servers.replace(/\//g, '$' );
 
-        let website = this.poolWebsite.replace(/\//g, '$' );
+        let poolName = this.poolName.replace(" ","_");
 
-        this.poolURL =  ( consts.DEBUG? 'http://webdollar.ddns.net:9094' : 'https://webdollar.io') +'/pool/0/'+encodeURI(this._poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolAddress.toString("hex"))+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(website)+"/"+encodeURI(servers);
+        this.poolURL =  ( process.env.BROWSER ? window.location.origin : 'http://webdollar.ddns.net:9094' ) +'/pool/1/'+encodeURI(poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(servers);
         StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers });
 
         return this.poolURL;
@@ -190,6 +197,22 @@ class PoolSettings {
     }
 
 
+    async setPoolReferralFee(newValue, skipSaving = false){
+
+        PoolsUtils.validatePoolFee(newValue);
+
+        this._poolReferralFee = newValue;
+
+        if (!skipSaving)
+            if (false === await this._db.save("pool_referral_fee", this._poolReferralFee )) throw {message: "poolReferralFee couldn't be saved"};
+
+    }
+
+    get poolReferralFee(){
+        return this._poolReferralFee;
+    }
+
+
 
     async setPoolUsePoolServers(newValue, skipSaving = false){
 
@@ -281,9 +304,9 @@ class PoolSettings {
         return true;
     }
 
-    async justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated){
+    async justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated, poolReferralFee){
 
-        return PoolsUtils.validatePoolsDetails(poolName, poolFee, poolWebsite, this.poolAddress, this.poolPublicKey, poolServers, poolActivated);
+        return PoolsUtils.validatePoolsDetails(poolName, poolFee, poolWebsite, this.poolAddress, this.poolPublicKey, poolServers, poolActivated, poolReferralFee);
 
     }
 
@@ -329,7 +352,10 @@ class PoolSettings {
         else if (poolUseSignatures === "false") poolUseSignatures = false;
         else if (poolUseSignatures === null) poolUseSignatures = true;
 
-        if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated))
+        let poolReferralFee = await this._db.get("pool_referral_fee",  30*1000, true);
+        if (poolReferralFee === null) poolReferralFee = 0.05; // 5%
+
+        if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated, poolReferralFee))
             return false;
 
         await this.setPoolName( poolName , true );
@@ -340,6 +366,8 @@ class PoolSettings {
 
         await this.setPoolUsePoolServers( poolUsePoolServers, true, true);
         await this.setPoolUseSignatures( poolUseSignatures, true , true);
+
+        await this.setPoolReferralFee( poolReferralFee, true);
 
         return true;
 

@@ -217,9 +217,7 @@ consts.MINING_POOL = {
 
     },
 
-    isPoolActivated(){
-        return consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_TYPE.MINING_POOL_SERVER || consts.MINING_POOL.MINING_POOL_STATUS === consts.MINING_POOL_TYPE.MINING_POOL;
-    }
+
 
 };
 
@@ -229,7 +227,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.135.2",
+        VERSION: "1.135.3",
         VERSION_COMPATIBILITY: "1.134.0",
         PROTOCOL: "WebDollar",
         SSL: true,
@@ -292,8 +290,8 @@ consts.SETTINGS = {
                 },
 
                 SERVER: {
-                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 100,
-                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 700,
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 400,
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 1000,
 
                     TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
                 },

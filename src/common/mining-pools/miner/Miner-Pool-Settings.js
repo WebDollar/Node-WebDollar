@@ -6,6 +6,8 @@ import StatusEvents from "common/events/Status-Events"
 
 import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
+import Blockchain from "main-blockchain/Blockchain";
+
 
 const sanitizer = require('sanitizer');
 
@@ -17,26 +19,36 @@ class MinerPoolSettings {
 
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.MINER_POOL_DATABASE );
 
-        this.minerPoolPublicKey = undefined;
-
         this._poolURL = '';
         this.poolsList = {};
 
         this.poolName = "";
         this.poolFee = 0;
+        this.poolReferralFee = 0;
         this.poolWebsite = "";
         this.poolDescription = "";
         this.poolServers = [];
         this.poolPublicKey = new Buffer(0);
         this.poolUseSignatures = false;
+        this.poolURLReferral = '';
+
+        this._poolMinerAddress = '';
 
         this._minerPoolActivated = false;
+
+        StatusEvents.on("blockchain/mining/address",async (data)=>{
+
+            if (!this.minerPoolManagement.minerPoolStarted)
+                return;
+
+            this.generatePoolURLReferral();
+
+        });
 
     }
 
     async initializeMinerPoolSettings(poolURL){
 
-        await this._getMinerPoolPublicKey();
         await this._getMinerPoolList();
 
         if (poolURL !== undefined)
@@ -46,6 +58,16 @@ class MinerPoolSettings {
 
     }
 
+    generatePoolURLReferral(){
+
+        let url = this._poolURL;
+        if (url.indexOf("/r/", url) >= 0)
+            url = url.substr(0, url.indexOf("/r/", url));
+
+        this.poolURLReferral =  ( process.env.BROWSER ? window.location.origin : "https://webdollar.ddns.net:9094"  ) + "/pool/"+url +"/r/"+encodeURI(Blockchain.Mining.minerAddress.replace("#", "%23"));
+
+        StatusEvents.emit("miner-pool/referral-url",   { poolURLReferral: this.poolURLReferral });
+    }
 
     get poolURL(){
         return this._poolURL;
@@ -66,20 +88,27 @@ class MinerPoolSettings {
         this.poolWebsite = data.poolWebsite;
         this.poolDescription = data.poolDescription;
         this.poolPublicKey = data.poolPublicKey;
+        this.poolReferral = data.poolReferral;
 
         await this.setPoolServers(data.poolServers);
 
-        this._poolURL = newValue;
+        this._poolURL = data.poolURL;
 
         await this.addPoolList(newValue, data);
 
         if (!skipSaving)
             if (false === await this._db.save("minerPool_poolURL", this._poolURL)) throw {message: "PoolURL couldn't be saved"};
 
-        StatusEvents.emit("miner-pool/newPoolURL", { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
-        StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
+        this.generatePoolURLReferral();
+
+        StatusEvents.emit("miner-pool/newPoolURL", { poolURL: this._poolURL });
+        this.notifyNewChanges();
 
         return true;
+    }
+
+    notifyNewChanges(){
+        StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolReferralFee: this.poolReferralFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
     }
 
     async setPoolServers(newValue){
@@ -96,18 +125,6 @@ class MinerPoolSettings {
 
     }
 
-    async _getMinerPoolPublicKey(){
-
-        this.minerPoolPublicKey = await this._db.get("minerPool_publicKey", 30*1000, true);
-
-        if (this.minerPoolPublicKey === null){
-            this.minerPoolPublicKey = WebDollarCrypto.getBufferRandomValues(32);
-            let result = await this._db.save("minerPool_publicKey", this.minerPoolPublicKey);
-            return result;
-        }
-
-        return true;
-    }
 
     async _getMinerPoolDetails(){
 
@@ -192,6 +209,8 @@ class MinerPoolSettings {
     get minerPoolActivated(){
         return this._minerPoolActivated;
     }
+
+
 
 }
 

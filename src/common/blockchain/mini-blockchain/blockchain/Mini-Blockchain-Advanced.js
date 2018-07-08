@@ -91,6 +91,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         } catch (exception){
 
+            console.error("Loading Blockchain Exception", exception);
+
             if (exception === "load blockchain simple") {
 
                 await this.inheritBlockchain.prototype._loadBlockchain.call(this);

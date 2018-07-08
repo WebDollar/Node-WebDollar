@@ -83,19 +83,19 @@ class PoolDataBlockInformation {
 
         let buffers = [];
 
-        buffers.push ( Serialization.serializeNumber1Byte( 0x01 ));
+        buffers.push ( Serialization.serializeNumber1Byte( 0x02 ));
 
         buffers.push ( Serialization.serializeNumber4Bytes( this.height || 500 ));
 
         let length = 0;
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
-            if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].minerInstance.publicKey !== undefined && this.blockInformationMinersInstances[i].reward > 0)
+            if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].reward > 0)
                 length ++;
 
         buffers.push ( Serialization.serializeNumber4Bytes(length));
 
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
-            if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].minerInstance.publicKey !== undefined && this.blockInformationMinersInstances[i].reward > 0)
+            if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].reward > 0)
                 buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
 
         buffers.push( Serialization.serializeNumber1Byte(this.payout ? 1 : 0) );
@@ -118,7 +118,7 @@ class PoolDataBlockInformation {
         let version = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
         offset += 1;
 
-        if (version === 1){
+        if (version >= 0x01){
 
             let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
             offset +=4;
@@ -136,7 +136,7 @@ class PoolDataBlockInformation {
         for (let i=0; i<length; i++){
 
             let blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, undefined);
-            offset = blockInformationMinerInstance.deserializeBlockInformationMinerInstance(buffer, offset);
+            offset = blockInformationMinerInstance.deserializeBlockInformationMinerInstance(buffer, offset, version);
 
             if (blockInformationMinerInstance.minerInstance === undefined || blockInformationMinerInstance.minerInstance === null) continue;
 
@@ -200,18 +200,23 @@ class PoolDataBlockInformation {
 
     _deleteBlockInformationMinerInstance(minerInstance){
 
-        for (let i=this.blockInformationMinersInstances.length-1; i>=0; i--)
-            if (this.blockInformationMinersInstances[i].minerInstance === minerInstance ){
+        let pos = minerInstance;
+        if (typeof pos !== "number")
+            for (let i=this.blockInformationMinersInstances.length-1; i>=0; i--)
+                if (this.blockInformationMinersInstances[i].minerInstance === minerInstance ) {
+                    pos = i;
+                    break;
+                }
 
-                this.blockInformationMinersInstances[i].cancelReward();
+        this.blockInformationMinersInstances[pos].cancelReward();
 
-                this.totalDifficultyMinus(this.blockInformationMinersInstances[i].minerInstanceTotalDifficulty);
-                this.blockInformationMinersInstances.splice(i,1);
+        this.totalDifficultyMinus(this.blockInformationMinersInstances[pos].minerInstanceTotalDifficulty);
+        this.blockInformationMinersInstances.splice(pos,1);
 
-                for (let j=0; j<this.blockInformationMinersInstances.length; j++)
-                    this.blockInformationMinersInstances.adjustDifficulty(0);
+        for (let j=0; j<this.blockInformationMinersInstances.length; j++)
+            this.blockInformationMinersInstances.adjustDifficulty(0);
 
-            }
+
     }
 
 

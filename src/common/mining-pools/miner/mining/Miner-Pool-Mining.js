@@ -2,6 +2,7 @@ import NodesList from 'node/lists/Nodes-List';
 import consts from 'consts/const_global'
 import global from 'consts/global';
 import Blockchain from "main-blockchain/Blockchain";
+import AdvancedMessages from "node/menu/Advanced-Messages"
 
 let InheritedPoolMining;
 
@@ -38,11 +39,33 @@ class MinerPoolMining extends InheritedPoolMining {
                 this._miningWork.poolSocket = null;
         });
 
-        this.minerAddress = Blockchain.blockchain.mining.minerAddress;
+        this._minerAddress = Blockchain.blockchain.mining.minerAddress;
 
         this._isBeingMining = false;
 
         setTimeout( this._checkForWorkInterval.bind(this), 5000);
+
+    }
+
+    async _setAddress(newAddress, save, skipChangingAddress=false ){
+
+        if (this._minerAddress === newAddress)
+            return;
+
+        let oldMinerAddress = this._minerAddress;
+        await InheritedPoolMining.prototype._setAddress.call( this, newAddress, true );
+
+        if (skipChangingAddress) return;
+
+        if ( Blockchain.Wallet.getAddress( this._minerAddress )  === null ){
+
+            //the address is not right, let's ask if he wants to change the mining address
+            if (await AdvancedMessages.confirm("You are mining on a different address in this pool. Do you want to change the pool mining address"))
+                await this.minerPoolManagement.minerPoolProtocol.changeWalletMining();
+
+        } else
+            await this.minerPoolManagement.minerPoolProtocol.changeWalletMining(undefined, this._minerAddress, oldMinerAddress);
+
 
     }
 
@@ -93,7 +116,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
                     if (!this.resetForced ) {
                         this._miningWork.resolved = true;
-                        await this.minerPoolManagement.minerPoolProtocol.pushWork(this._miningWork.poolSocket, answer);
+                        await this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket);
                     } else {
                         this.resetForced = false;
                     }

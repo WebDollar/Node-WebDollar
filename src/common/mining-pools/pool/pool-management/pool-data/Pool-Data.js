@@ -2,11 +2,12 @@ import consts from 'consts/const_global';
 import Serialization from "common/utils/Serialization";
 import BufferExtended from 'common/utils/BufferExtended';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
-import PoolDataMiner from "common/mining-pools/pool/pool-management/pool-data/Pool-Data-Miner";
+import PoolDataMiner from "common/mining-pools/pool/pool-management/pool-data/miners/Pool-Data-Miner";
 import PoolDataBlockInformation from "common/mining-pools/pool/pool-management/pool-data/block-informations/Pool-Data-Block-Information"
 import Blockchain from 'main-blockchain/Blockchain';
 import Utils from "common/utils/helpers/Utils";
 import PoolDataConnectedMinerInstances from "./Pool-Data-Connected-Miner-Instances";
+import global from "consts/global"
 
 const uuid = require('uuid');
 
@@ -20,14 +21,14 @@ class PoolData {
         this.miners = [];
         this.blocksInfo = [];
 
-        setTimeout( this.savePoolData.bind(this), 30000);
+        setTimeout( this._savePoolData.bind(this), 30000);
 
         this.connectedMinerInstances = new PoolDataConnectedMinerInstances(poolManagement);
     }
 
     async initializePoolData(){
 
-        await this.loadPoolData();
+        await this._loadPoolData();
 
     }
 
@@ -49,32 +50,21 @@ class PoolData {
         return true;
     }
 
-    /**
-     * @param minerAddress
-     * @returns miner or null if it doesn't exist
-     */
-    getMiner(minerAddress){
+    findMiner(minerAddress, returnPos = false){
 
         for (let i = 0; i < this.miners.length; ++i)
             if (this.miners[i].address.equals( minerAddress) )
-                return this.miners[i];
+                return (returnPos ? i : this.miners[i]);
 
-        return null;
+        return returnPos ? -1 : null;
     }
 
     /**
      * @param minerAddress
      * @returns miner or null if it doesn't exist
      */
-    getMinerInstanceByPublicKey(minerPublicKey){
-
-        for (let i = 0; i < this.miners.length; ++i) {
-            let instance = this.miners[i].findInstance(minerPublicKey);
-            if (instance !== null)
-                return instance;
-        }
-
-        return null;
+    getMinerInstance(socket){
+        return socket.node.protocol.minerPool.minerInstance;
     }
 
     /**
@@ -83,21 +73,22 @@ class PoolData {
      * @param minerReward
      * @returns true/false
      */
-    async addMiner(minerAddress, minerPublicKey, minerReward = 0){
+    addMiner(minerAddress, minerReward = 0){
 
-        if (this.getMiner(minerAddress) === null) {
+        let miner = this.findMiner(minerAddress);
+        if ( miner === null) {
 
             if ( !Buffer.isBuffer(minerAddress) || minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
                 throw {message: "miner address is invalid" };
 
 
-            this.miners.push( new PoolDataMiner( this, uuid.v4(), minerAddress, minerPublicKey, minerReward, [] ) );
+            this.miners.push( new PoolDataMiner( this, uuid.v4(), minerAddress, minerReward, [] ) );
 
-            return this.miners[this.miners.length-1]
+            miner = this.miners[this.miners.length-1]
 
         }
 
-        return false; //miner already exists
+        return miner; //miner already exists
     }
 
     addBlockInformation(){
@@ -108,32 +99,29 @@ class PoolData {
         return blockInformation;
     }
 
-    findBlockInformation(blockInformation){
+    findBlockInformation(blockInformation, returnPos = false){
 
         for (let i=0; i<this.blocksInfo.length; i++)
             if (blockInformation === this.blocksInfo[i])
-                return i;
+                return returnPos ? i : this.blocksInfo[i];
 
-        return -1;
+        return returnPos ? -1 : null;
 
     }
 
 
-    deleteBlockInformationByIndex(index){
+    deleteBlockInformation(index){
+
+        if (typeof index !== "number") index = this.findBlockInformation(index, true);
+
+        if (index === -1) return false; //miner doesn't exists
+
         this.blocksInfo[index].destroyPoolDataBlockInformation(  );
-        this.blocksInfo.splice(index, 1);
+        this.blocksInfo[index] = this.blocksInfo[this.blocksInfo.length-1];
+        this.blocksInfo.pop();
+
+        return true;
     }
-
-    deleteBlockInformation(blockInformation){
-
-        let position = this.findBlockInformation(blockInformation);
-        if (position === -1) return null;
-
-        blockInformation.destroyPoolDataBlockInformation(  );
-
-        this.blocksInfo.splice(position, 1);
-    }
-
 
 
     /**
@@ -143,14 +131,14 @@ class PoolData {
      */
     async removeMiner(minerAddress){
 
-        let response = this.getMiner(minerAddress);
+        let pos;
+        if (typeof minerAddress !== "number")  pos = this.findMiner(minerAddress, true);
+        else pos = minerAddress;
 
-        if (response === null)
-            return false; //miner doesn't exists
+        if (pos === -1) return false; //miner doesn't exists
 
-        let index = response.index;
-
-        this.miners[index] = this.miners[this.miners.length - 1];
+        this.miners[pos].destroyPoolDataMiner();
+        this.miners[pos] = this.miners[this.miners.length - 1];
         this.miners.pop();
 
         return true;
@@ -184,12 +172,16 @@ class PoolData {
             this.miners = [];
             for (let i = 0; i < numMiners; ++i) {
 
-                let miner = new PoolDataMiner(this, 0, undefined, undefined);
+                let miner = new PoolDataMiner(this, i );
                 offset = miner.deserializeMiner(buffer, offset );
 
-                if (miner.instances.length)
-                    this.miners.push(miner);
+                this.miners.push(miner);
 
+            }
+
+            for (let i=0; i< this.miners.length; i++) {
+                this.miners[i].referrals.findReferralLinkAddress();
+                this.miners[i].referrals.refreshRefereeAddresses();
             }
 
             return true;
@@ -238,6 +230,7 @@ class PoolData {
                 this.addBlockInformation();
             }
 
+
             return true;
 
         } catch (exception){
@@ -251,7 +244,7 @@ class PoolData {
      * Load miners from database
      * @returns {boolean} true is success, otherwise false
      */
-    async loadMinersList() {
+    async _loadMinersList() {
 
         try{
 
@@ -276,7 +269,7 @@ class PoolData {
         }
     }
 
-    async loadBlockInformations(){
+    async _loadBlockInformations(){
 
         try{
 
@@ -349,11 +342,14 @@ class PoolData {
         }
     }
 
-    async savePoolData(){
+    async _savePoolData(){
 
         let answer = false;
 
         if (this.poolManagement.poolStarted) {
+
+            global.POOL_SAVED = false;
+
             try {
 
                 answer = await this.saveMinersList();
@@ -365,16 +361,20 @@ class PoolData {
 
                 console.error("SavePoolData: ", exception.message);
             }
+
+            global.POOL_SAVED = true;
         }
 
-        setTimeout( this.savePoolData.bind(this), 10000);
+        setTimeout( this._savePoolData.bind(this), 10000);
         return answer;
     }
 
-    async loadPoolData(){
+    async _loadPoolData(){
 
-        let answer = await this.loadMinersList();
-        answer = answer && await this.loadBlockInformations();
+        let answer = await this._loadMinersList();
+        answer = answer && await this._loadBlockInformations();
+
+        this._clearEmptyMiners();
 
         return answer;
     }
@@ -383,7 +383,7 @@ class PoolData {
      * @param minersList
      * @returns {boolean} true if this.miners === minersList
      */
-    compareMinersList(minersList) {
+    _compareMinersList(minersList) {
 
         if (minersList.length !== this.miners.length)
             return true;
@@ -402,8 +402,32 @@ class PoolData {
      * @returns {boolean} true if miners are equal
      */
     static compareMiners(miner1, miner2) {
-
         return miner1 === miner2 || miner1.address === miner2.address;
+    }
+
+    _clearEmptyMiners(){
+
+        // for (let i=this.miners.length-1; i>=0; i--)
+        //     if ( this.miners[i].referrals.array.length === 0 && this.miners[i].referrals.referralLinkMiner !== undefined &&
+        //         (this.miners[i].rewardTotal + this.miners[i].rewardConfirmed + this.miners[i].rewardConfirmedOther + this.miners[i].rewardSent + this.miners[i].referrals.rewardReferralsSent + this.miners[i].referrals.rewardReferralsConfirmed + this.miners[i].referrals.rewardReferralsTotal ) === 0) {
+        //
+        //
+        //         //delete blockInformationMinerInstances
+        //         this.blocksInfo.forEach((blockInfo)=>{
+        //
+        //             blockInfo.blockInformationMinersInstances.forEach((minerInstance, index)=>{
+        //
+        //                 if (minerInstance.address.equals(this.miners[i].address))
+        //                     blockInfo._deleteBlockInformationMinerInstance(index);
+        //
+        //             });
+        //
+        //         });
+        //
+        //         this.miners[i].destroyPoolDataMiner();
+        //         this.miners.splice(i, 1);
+        //     }
+
 
     }
 

@@ -47,7 +47,7 @@ class PoolsUtils {
         if (typeof poolActivated !== "boolean") throw {message: "poolActivated is not a boolean"};
     }
 
-    validatePoolsDetails(poolName, poolFee, poolWebsite, poolAddress, poolPublicKey, poolServers, poolActivated = false){
+    validatePoolsDetails(poolName, poolFee, poolWebsite, poolAddress, poolPublicKey, poolServers, poolActivated = false, poolReferralFee = 0){
 
         this.validatePoolName(poolName);
         this.validatePoolFee(poolFee);
@@ -55,7 +55,10 @@ class PoolsUtils {
         this.validatePoolPublicKey(poolPublicKey);
         this.validatePoolServers(poolServers);
         this.validatePoolActivated(poolActivated);
-        if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(poolAddress) === null) throw {message: "poolAddress is invalid"};
+        this.validatePoolFee(poolReferralFee);
+
+        if (poolAddress !== undefined)
+            if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(poolAddress) === null) throw {message: "poolAddress is invalid"};
 
         return true;
     }
@@ -150,6 +153,14 @@ class PoolsUtils {
     }
 
 
+    substr(url){
+        return sanitizer.sanitize( url.substr(0, url.indexOf("/") !== -1 ? url.indexOf("/") : undefined) );
+    }
+
+    substrNext(url){
+        return url.indexOf( "/" ) >= 0 ? url.substr(url.indexOf( "/" )+1) : '';
+    }
+
     extractPoolURL(url){
 
         if ( url === null || url === "" || url === undefined ) return null;
@@ -163,27 +174,56 @@ class PoolsUtils {
         if (url.indexOf("/pool/") === 0) url = url.replace("/pool/","");
         if (url.indexOf("pool/") === 0) url = url.replace("pool/","");
 
-        let version = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
-        url = url.substr(url.indexOf( "/" )+1);
+        let poolURL = url;
 
-        let poolName = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
+        let version = this.substr(url);
+        url = this.substrNext(url);
+
+        if (version !== "") version = parseInt(version);
+
+        let poolName = this.substr(url) ;
         poolName = decodeURIComponent(poolName);
-        url = url.substr(url.indexOf( "/" )+1);
+        url = this.substrNext(url);
 
-        let poolFee = parseFloat( sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) ) );
-        url = url.substr(url.indexOf( "/" )+1);
+        let poolFee = parseFloat( this.substr(url) );
+        url = this.substrNext(url);
 
-        let poolAddress = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
-        url = url.substr(url.indexOf( "/" )+1);
+        let poolAddress;
 
-        let poolPublicKey = sanitizer.sanitize( url.substr(0, url.indexOf( "/" )) );
-        url = url.substr(url.indexOf( "/" )+1);
+        if (version === 0) {
+            poolAddress = this.substr(url);
+            poolAddress = poolAddress.replace("%23","#");
+
+            url = this.substrNext(url);
+        }
+
+        let poolPublicKey = this.substr(url);
+        url = this.substrNext(url);
+
         poolPublicKey = new Buffer(poolPublicKey, "hex");
 
-        let poolWebsite = sanitizer.sanitize( url.substr( 0, url.indexOf( "/" )).replace(/\$/g, '/' ));
-        url = url.substr(url.indexOf( "/" )+1);
+        let poolWebsite;
 
-        let poolServers = sanitizer.sanitize( url.replace(/\$/g, '/' ).split(";") );
+        if (version === 0) {
+            poolWebsite = this.substr(url).replace(/\$/g, '/');
+            url = url.substr(url.indexOf("/") + 1);
+        }
+
+        let poolServers = this.substr(url).replace(/\$/g, '/' ).split(";") ;
+        url = this.substrNext(url);
+
+        let poolReferral = '';
+        let ref = this.substr(url);
+        if (ref === "r"){
+
+            url = this.substrNext(url);
+
+            poolReferral  = this.substr(url);
+            poolReferral  = poolReferral.replace("%23","#");
+
+            url = this.substrNext(url);
+        }
+
 
         if (!this.validatePoolsDetails(poolName, poolFee, poolWebsite, poolAddress, poolPublicKey, poolServers)) throw {message: "validate pools "};
 
@@ -195,7 +235,8 @@ class PoolsUtils {
             poolServers: poolServers,
             poolAddress: poolAddress,
             poolPublicKey: poolPublicKey,
-            poolURL: url,
+            poolURL: poolURL,
+            poolReferral: poolReferral,
         };
 
     }

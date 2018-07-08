@@ -70,7 +70,8 @@ class PoolPayouts{
 
             this.poolData.miners.forEach((miner)=>{
 
-                miner._tempRewardConfirmedOtherTemporary = 0 ;
+                miner.__tempRewardConfirmedOther = 0;
+                miner.referrals.__tempRewardReferralsConfirmedToBeSent = 0;
 
             });
 
@@ -90,8 +91,11 @@ class PoolPayouts{
                 let maxSumReward = BlockchainMiningReward.getReward( blocksConfirmed[i].block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
 
                 let sumReward = 0;
-                for (let j = 0; j < blocksConfirmed[i].blockInformationMinersInstances.length; j++)
-                    sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].calculateReward(false);
+                for (let j = 0; j < blocksConfirmed[i].blockInformationMinersInstances.length; j++) {
+                    blocksConfirmed[i].blockInformationMinersInstances[j].calculateReward(false);
+                    sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].reward;
+                    sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].rewardForReferral;
+                }
 
                 let difference = sumReward - maxSumReward ;
 
@@ -114,11 +118,7 @@ class PoolPayouts{
 
                 blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
 
-
-                    if (blockInformationMinerInstance.reward < PAYOUT_MINIMUM )
-                        blockInformationMinerInstance.miner._tempRewardConfirmedOtherTemporary += blockInformationMinerInstance.reward;
-                    else if (blockInformationMinerInstance.reward > 0)
-                        this._addAddressTo(blockInformationMinerInstance.address).amount += blockInformationMinerInstance.reward;
+                    blockInformationMinerInstance.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.reward;
 
                 });
 
@@ -127,27 +127,25 @@ class PoolPayouts{
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
-                let addressTo = this._findAddressTo(miner.address);
+                miner.__tempRewardConfirmedOther += miner.referrals.rewardReferralsConfirmed;
 
-                if (addressTo !== null){
+            });
 
-                    if ( miner.rewardConfirmedOther + miner._tempRewardConfirmedOtherTemporary > 0)
-                        this._addAddressTo(miner.address).amount += miner.rewardConfirmedOther + miner._tempRewardConfirmedOtherTemporary;
+            //add rewardConfirmedOther
+            this.poolData.miners.forEach((miner)=>{
 
-                } else {
-
-                    //payment solely to new address
-                    if (miner.rewardConfirmedOther + miner._tempRewardConfirmedOtherTemporary >= PAYOUT_MINIMUM)
-                        this._addAddressTo(miner.address).amount += miner.rewardConfirmedOther + miner._tempRewardConfirmedOtherTemporary;
-
-
-                }
+                if (miner.__tempRewardConfirmedOther >= PAYOUT_MINIMUM)
+                    this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther ;
 
             });
 
             //verify to send to other
 
             if (this._toAddresses.length === 0) throw {message: "No Addresses to send money"};
+
+            //let's floor the data
+            for (let i=0; i < this._toAddresses.length; i++)
+                this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount );
 
             let index = 0;
             while (index * 256 < this._toAddresses.length) {
@@ -165,21 +163,26 @@ class PoolPayouts{
 
                 blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
 
-                    let paid = this._findAddressTo(blockInformationMinerInstance.miner.address);
-
+                    let miner = blockInformationMinerInstance.miner;
+                    let paid = this._findAddressTo(miner.address);
 
                     try{
 
                         //not paid
                         //move funds to confirmedOther
-                        if (paid === null){
-                            blockInformationMinerInstance.miner.rewardConfirmedOther += blockInformationMinerInstance.miner._tempRewardConfirmedOtherTemporary;
-                        }
+                        if (paid === null)
+                            miner.rewardConfirmedOther += miner.__tempRewardConfirmedOther;
 
-                        blockInformationMinerInstance.miner._tempRewardConfirmedOtherTemporary = 0;
+                        miner.__tempRewardConfirmedOther = 0;
 
                         blockInformationMinerInstance.minerInstanceTotalDifficulty = new BigNumber(0);
                         blockInformationMinerInstance.reward = 0; //i already paid
+
+
+                        if ( miner.referrals.referralLinkMiner !== undefined ) {
+                            miner.referrals.referralLinkMiner.rewardReferralSent += miner.referrals.referralLinkMiner.rewardReferralConfirmed;
+                            miner.referrals.referralLinkMiner._rewardReferralConfirmed = 0;
+                        }
 
                     } catch (exception){
 
@@ -193,14 +196,17 @@ class PoolPayouts{
 
             for (let i=0; i<this._toAddresses.length; i++){
 
-                let miner = this.poolData.getMiner( this._toAddresses[i].address );
-
+                let miner = this.poolData.findMiner( this._toAddresses[i].address );
                 if (miner === null) console.error("ERROR! Miner was not found at the payout");
 
                 miner.rewardSent += this._toAddresses[i].amount; //i paid totally
                 miner.rewardConfirmed = 0; //paid this
                 miner.rewardConfirmedOther = 0; //paid this
-                miner._tempRewardConfirmedOtherTemporary = 0; //paid this
+
+                miner.__tempRewardConfirmedOther = 0; //paid this
+
+                miner.referrals.rewardReferralsConfirmed = 0;
+
 
             }
 

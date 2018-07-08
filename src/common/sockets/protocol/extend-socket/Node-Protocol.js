@@ -70,7 +70,7 @@ class NodeProtocol {
 
             if (validationDoubleConnectionsTypes[i] === "uuid" && connections.countUUIDs !== 0 )
                 return false;
-            else if (validationDoubleConnectionsTypes[i] === "ip" && connections.countIPs > ( consts.MINING_POOL.isPoolActivated() ? consts.MINING_POOL.CONNECTIONS.NO_OF_IDENTICAL_IPS : consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS   ))
+            else if (validationDoubleConnectionsTypes[i] === "ip" && connections.countIPs > ( Blockchain.isPoolActivated ? consts.MINING_POOL.CONNECTIONS.NO_OF_IDENTICAL_IPS : consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS   ))
                 return false;
 
         }

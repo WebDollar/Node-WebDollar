@@ -28,7 +28,7 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
         let time = new Date().getTime();
 
         for (let i=this.connectedMinerInstances.length-1; i>=0; i--)
-            if (time - this.connectedMinerInstances[i].dateActivity > 480000){ //8 minutes
+            if (time - this.connectedMinerInstances[i].miner.dateActivity > 480000){ //8 minutes
 
                 if ( !this.poolManagement.poolSettings.poolUsePoolServers )
                     this.connectedMinerInstances[i].socket.disconnect();

@@ -1,5 +1,13 @@
 const FileSystem = require('fs');
 
+let NodeExpress, NodeServer;
+
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+}
+
+
 import consts from 'consts/const_global';
 import {Node} from '../../index.js';
 import AdvancedMessages from './Advanced-Messages';
@@ -68,6 +76,9 @@ class CLI {
                 break;
             case '12':  // Server Mining Pool: Create a new Server for Mining Pool
                 await this.createServerForMiningPool();
+                break;
+            case '20':  // Server Mining Pool: Create a new Server for Mining Pool
+                NodeExpress.startExpress();
                 break;
             case 'exit':
                 this._exitMenu = true;
@@ -150,7 +161,7 @@ class CLI {
                 balance = (balance === null) ? 0 : balance;
 
                 if (Blockchain.MinerPoolManagement.minerPoolStarted)
-                    balance += Blockchain.MinerPoolManagement.minerPoolReward.confirmedReward + Blockchain.MinerPoolManagement.minerPoolReward.totalReward;
+                    balance += Blockchain.MinerPoolManagement.minerPoolReward.total;
 
                 balance /= WebDollarCoins.WEBD;
 
@@ -401,7 +412,7 @@ class CLI {
 
             if (getNewLink){
 
-                let poolFee, poolName, poolWebsite, poolServers;
+                let poolFee, poolReferralFee, poolName, poolWebsite, poolServers;
 
 
                 poolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
@@ -415,6 +426,14 @@ class CLI {
 
                 poolName = await AdvancedMessages.input('Pool Name: ');
                 poolWebsite = await AdvancedMessages.input('Pool Website: ');
+
+                poolReferralFee = await AdvancedMessages.readNumber("Choose a Referral fee (0...100): ", true);
+                if (isNaN(poolReferralFee) || poolReferralFee < 0 || 100 < poolReferralFee){
+                    console.log("You have entered an invalid number:", poolReferralFee);
+                    return false;
+                }
+                else
+                    console.log("Your Referral fee is", poolFee);
 
                 let response = await AdvancedMessages.confirm('Do you want to use external pool servers?: ');
 
@@ -432,6 +451,7 @@ class CLI {
                 if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
                 if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
                 if (poolServers !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
+                if (poolReferralFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolReferralFee(poolReferralFee / 100);
 
             }
 
@@ -483,6 +503,7 @@ class CLI {
                     await callbackAfterServerInitialization();
 
             }, undefined, synchronize );
+
         } else {
 
             if (typeof callbackBeforeServerInitialization === "function")
@@ -510,6 +531,7 @@ const commands = [
         '10. Mining Pool: Start Mining',
         '11. Mining Pool: Create a New Pool',
         '12. Server for Mining Pool: Create a new Server for Mining Pool',
+        '20. HTTPS Express Start',
     ];
 
 const lineSeparator =

@@ -36,17 +36,17 @@ describe('test pool leader DB', () => {
         response = await pd.saveMinersList();
         assert(response === true, "Error saving empty minersList: " + response);
 
-        response = await pd.loadMinersList();
+        response = await pd._loadMinersList();
         assert(response === true, "Error loading empty minersList: " + response);
 
         pd.setMinersList(minersList);
         response = await  pd.saveMinersList();
         assert(response === true, "Error saving minersList: " + response);
 
-        response = await  pd.loadMinersList();
+        response = await  pd._loadMinersList();
         assert(response === true, "Error loading minersList: " + response);
 
-        assert(!pd.compareMinersList(minersList), "minersList differ!");
+        assert(!pd._compareMinersList(minersList), "minersList differ!");
     });
 
 
@@ -59,7 +59,7 @@ describe('test pool leader DB', () => {
         response = await pd.addMiner(minersList[0].address, minersList[0].reward);
         assert(response === false, "Miner inserted twice");
         
-        let miner = pd.getMinersList()[0];
+        let miner = pd.miners[0];
         
         assert(!PoolData.compareMiners(miner, minersList[0]), "Miners differ");
 
@@ -69,7 +69,7 @@ describe('test pool leader DB', () => {
         response = await pd.removeMiner(miner.address);
         assert(response === false, "Miner found after delete!!!");
         
-        response = pd.getMinersList();
+        response = pd.miners;
         assert(response.length === 0, "minersList is not empty after removing the only one existing item:" + response.length);
     });
     

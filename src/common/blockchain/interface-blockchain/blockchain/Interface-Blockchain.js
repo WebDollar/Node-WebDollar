@@ -14,9 +14,11 @@ import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 import InterfaceBlockchainBasic from "./Interface-Blockchain-Basic"
+
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
+
 class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     constructor (agent){
@@ -104,6 +106,13 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         return true;
     }
+
+    /**
+     * Event fired when a new Block has been inserted in the blockchain
+     * @param block
+     * @param saveBlock
+     * @private
+     */
 
     _onBlockCreated(block, saveBlock){
 
@@ -203,8 +212,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     getHashPrev(height){
         
-        if (height === undefined)
-            height = this.blocks.length;
+        if (height === undefined) height = this.blocks.length;
 
         if (height <= 0)
             return BlockchainGenesis.hashPrev;
@@ -453,9 +461,16 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
     }
 
     createBlockValidation(){
+
         return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
+
     }
 
+
+    /**
+     * Save Blockchain when the application was terminated
+     * @returns {Promise.<boolean>}
+     */
 
     async saveBlockchainTerminated(){
 
