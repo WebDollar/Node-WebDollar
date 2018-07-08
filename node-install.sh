@@ -47,51 +47,53 @@ function checkroot(){
 checkroot
 
 ### GENERAL VARS
-getport80=$(iptables -L -n | grep -w 80 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getport443=$(iptables -L -n | grep -w 443 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getport8080=$(iptables -L -n | grep -w 8080 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getport8081=$(iptables -L -n | grep -w 8081 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getport8082=$(iptables -L -n | grep -w 8082 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getport8083=$(iptables -L -n | grep -w 8083 | awk 'NR==1{print$7}' | cut -d ':' -f2)
-getiptpersist=$(apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}')
-getgit=$(apt-cache policy git | grep Installed | grep none | awk '{print$2}')
+getiptpersist=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "1"; fi fi)
+getgit=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy git | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "$(yum list git | grep -o Installed)"; fi fi)
 ###
 
-#### Dependencies check
+#### Dependencies START
 function deps(){
 if [[ "$getiptpersist" == "(none)" ]]; then
 	echo "$showinfo We need to install IPtables Persistent"
 	echo "$showinfo When asked, press YES to save your current IPtables settings."
 	echo "$showinfo IPtables Persistent keeps your IPT rules after a REBOOT."
-	apt install -y iptables-persistent
+	if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y iptables-persistent; fi
 else
-	if [[ "$getiptpersist" == * ]]; then
-		echo "$showok IPtables Persistent is already installed!"
+	if [[ "$getiptpersist" == 1 ]]; then
+		echo "$showok IPtables Persistent is not available for CentOS"
+	else
+		if [[ "$getiptpersist" == * ]]; then
+			echo "$showok IPtables Persistent is already installed!"
+		fi
+	fi
+fi
 
-		if [[ "$getgit" == "(none)" ]]; then
-			echo "$showinfo We need to install Git"
-			apt install -y git
-		else
-			if [[ "$getgit" == * ]]; then
-				echo "$showok Git is already installed!"
-			fi
+if [[ "$getgit" == "(none)" ]]; then
+	echo "$showinfo We need to install Git"
+	if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y git; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum install -y git; fi fi
+else
+
+	if [[ "$getgit" == Installed ]]; then
+		echo "$showok Git is already installed!"
+	else
+		if [[ "$getgit" == * ]]; then
+			echo "$showok Git is already installed!"
 		fi
 	fi
 fi
 }
-####
+#### Dependencies check END
 
-deps
+deps # call deps function
 
-sudo apt update
-sudo apt upgrade
-sudo apt dist-upgrade
-sudo apt install -y linuxbrew-wrapper
-sudo apt install -y clang
-sudo apt install -y npm
-sudo apt install -y nodejs
-sudo npm install -g node-gyp
-sudo npm install pm2 -g --unsafe-perm
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt update; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum update; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt upgrade; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum upgrade; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo sudo apt install -y linuxbrew-wrapper; fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo sudo apt install -y build-essential; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum group install -y "Development Tools"; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y clang; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum install -y clang; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && apt install -y nodejs; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash - && sudo yum -y install nodejs; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo npm install -g node-gyp; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then npm install -g node-gyp; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo npm install pm2 -g --unsafe-perm; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then sudo npm install pm2 -g --unsafe-perm ; fi fi
 
 function ftconfig()
 {
@@ -134,28 +136,8 @@ else
 	fi
 fi
 
-#sleep 2;
-#sudo env CXX=g++-5 npm install
-#sudo env CXX=g++-5 npm install argon2
-#sudo npm install
-
-echo "$showinfo Setting IP Tables rules..."
-
-if [[ "$getport80" == 80 ]]; then echo "$showwarning Port 80 is already accepted in Firewall!"; else if [[ ! "$getport80" == 80 ]]; then echo "$showdone Setting Firewall rule for PORT 80."; iptables -A INPUT -p tcp --dport 80 -j ACCEPT; fi fi # set port 80 firewall rule
-if [[ "$getport443" == 443 ]]; then echo "$showwarning Port 443 is already accepted in Firewall!"; else if [[ ! "$getport443" == 443 ]]; then echo "$showdone Setting Firewall rule for PORT 443."; iptables -A INPUT -p tcp --dport 443 -j ACCEPT; fi fi # set port 443 firewall rule
-if [[ "$getport8080" == 8080 ]]; then echo "$showwarning Port 8080 is already accepted in Firewall!"; else if [[ ! "$getport8080" == 8080 ]]; then echo "$showdone Setting Firewall rule for PORT 8080."; iptables -A INPUT -p tcp --dport 8080 -j ACCEPT; fi fi # set port 8080 firewall rule
-if [[ "$getport8081" == 8081 ]]; then echo "$showwarning Port 8081 is already accepted in Firewall!"; else if [[ ! "$getport8081" == 8081 ]]; then echo "$showdone Setting Firewall rule for PORT 8081."; iptables -A INPUT -p tcp --dport 8081 -j ACCEPT; fi fi # set port 8081 firewall rule
-if [[ "$getport8082" == 8082 ]]; then echo "$showwarning Port 8082 is already accepted in Firewall!"; else if [[ ! "$getport8082" == 8082 ]]; then echo "$showdone Setting Firewall rule for PORT 8082."; iptables -A INPUT -p tcp --dport 8082 -j ACCEPT; fi fi # set port 8082 firewall rule
-if [[ "$getport8083" == 8083 ]]; then echo "$showwarning Port 8083 is already accepted in Firewall!"; else if [[ ! "$getport8083" == 8083 ]]; then echo "$showdone Setting Firewall rule for PORT 8083."; iptables -A INPUT -p tcp --dport 8083 -j ACCEPT; fi fi # set port 8083 firewall rule
-
-iptables-save
-
 echo "$showinfo Don't forget to FORWARD PORTS on your router!"
-
 echo "$showinfo Now you may run sudo bash node-start.sh"
-echo "$showinfo If you don't have node-start.sh script, run: "
-echo "git clone https://github.com/cbusuioceanu/WebDollar-Node-Custom-Start.git"
-echo "$showinfo sudo bash node-start.sh"
 
 elif [[ "$readft" == 2 ]]; then
 
