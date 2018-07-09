@@ -159,6 +159,8 @@ class PoolDataBlockInformationMinerInstance {
             let adr = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
             offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
 
+            address = new Buffer(0);
+
             for (let i=0; i< this.poolManagement.poolData.miners.length; i++)
                 if (this.poolManagement.poolData.miners[i].publicKeys !== undefined)
                     for (let j=0; j<this.poolManagement.poolData.miners[i].publicKeys.length; j++)
