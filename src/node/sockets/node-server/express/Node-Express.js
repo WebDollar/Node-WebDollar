@@ -14,6 +14,8 @@ import Blockchain from "main-blockchain/Blockchain"
 import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
 import NodesList from 'node/lists/Nodes-List'
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import BufferExtended from "common/utils/BufferExtended";
+import Serialization from "common/utils/Serialization";
 var BigNumber = require ('bignumber.js');
 
 class NodeExpress{
@@ -401,7 +403,99 @@ class NodeExpress{
             res.json( { ping: "pong" });
         });
 
+        this.app.get('/blockHeight/:blockHeight', (req, res) => {
+            let nBlockHeight = parseInt(decodeURIComponent(req.params.blockHeight));
+            let oBlock       = Blockchain.blockchain.blocks[nBlockHeight];
 
+            if (typeof oBlock === "undefined") {
+                res.status(404).json({result: false, message: "Block not found or invalid block number"});
+                return;
+            }
+
+            try {
+                res.json({result: true, block: this._processBlock(oBlock)});
+            }
+            catch (e) {
+                res.status(500).json({result: false, message: e.message});
+            }
+        })
+
+        this.app.get('/blockHeights/:blockHeights', (req, res) => {
+            let aBlockHeights = decodeURIComponent(req.params.blockHeights).split(',');
+
+            // unique heights
+            aBlockHeights = Array.from(new Set(aBlockHeights));
+
+            if (aBlockHeights.length > 50) {
+                res.status(500).json({result: false, message: 'Limit exceeded'});
+                return;
+            }
+
+            let aBlocks = [], nBlockHeight, oBlock, i;
+
+            for (i in aBlockHeights)
+            {
+                nBlockHeight = parseInt(aBlockHeights[i]);
+
+                if (nBlockHeight > Blockchain.blockchain.blocks.length)
+                {
+                    continue;
+                }
+
+                oBlock = Blockchain.blockchain.blocks[nBlockHeight];
+
+                if (typeof oBlock === "undefined") {
+                    continue;
+                }
+
+                try {
+                    aBlocks.push(this._processBlock(oBlock));
+                }
+                catch (e) {
+                    res.status(500).json({result: false, message: e.message});
+                    return;
+                }
+            }
+
+            res.json({result: true, blocks: aBlocks});
+        })
+
+        this.app.get('/blocksStartingWithHeight/:startBlockHeight', (req, res) => {
+            let aBlocks           = [], nBlockHeight, oBlock;
+            let nStartBlockHeight = parseInt(decodeURIComponent(req.params.startBlockHeight));
+            let nEndBlockHeight   = nStartBlockHeight + 50;
+
+            for (nBlockHeight=nStartBlockHeight; nBlockHeight<=nEndBlockHeight; nBlockHeight++)
+            {
+                // break if currentBlockHeight is smaller than our desired height
+                // or if the block cannot be retrieved at the desired height
+                // so we can return consecutive blocks each time (even if the returned number is smaller than 50)
+
+                if (nBlockHeight > Blockchain.blockchain.blocks.length)
+                {
+                    break;
+                }
+
+                oBlock = Blockchain.blockchain.blocks[nBlockHeight];
+
+                if (typeof oBlock === "undefined")
+                {
+                    break;
+                }
+
+                try
+                {
+                    aBlocks.push(this._processBlock(oBlock));
+                }
+                catch (e)
+                {
+                    res.status(500).json({result: false, message: e.message});
+                    return;
+                }
+            }
+
+            res.json({result: true, blocks: aBlocks});
+        })
     }
 
     amIFallback(){
@@ -414,6 +508,84 @@ class NodeExpress{
 
     }
 
+    _processBlock (oBlock) {
+        let transactions       = [], i;
+        let nBlockTimestampRaw = oBlock.timeStamp;
+        let nBlockTimestamp    = nBlockTimestampRaw + BlockchainGenesis.timeStampOffset;
+        let oBlockTimestampUTC = new Date(nBlockTimestamp * 1000);
+
+        for (i=0; i < oBlock.data.transactions.transactions.length; i++)
+        {
+            let oTransaction = oBlock.data.transactions.transactions[i];
+            let nInputSum    = oTransaction.from.calculateInputSum();
+            let nOutputSum   = oTransaction.to.calculateOutputSum();
+
+            let aTransaction = {
+                trx_id         : oTransaction.txId.toString('hex'),
+                version        : oTransaction.version,
+                nonce          : oTransaction.nonce,
+                time_lock      : oTransaction.timeLock,
+                from_length    : oTransaction.from.addresses.length,
+                to_length      : oTransaction.to.addresses.length,
+                fee            : oTransaction.fee / WebDollarCoins.WEBD,
+                fee_raw        : oTransaction.fee,
+                timestamp      : oBlockTimestampUTC.toUTCString(),
+                timestamp_UTC  : nBlockTimestamp,
+                timestamp_block: nBlockTimestampRaw,
+                timestamp_raw  : Blockchain.blockchain.getTimeStamp(oBlock.height),
+                createdAtUTC   : oBlockTimestampUTC,
+                block_id       : oBlock.height,
+                from           : {trxs: [], addresses: [], amount: nInputSum  / WebDollarCoins.WEBD, amount_raw: nInputSum},
+                to             : {trxs: [], addresses: [], amount: nOutputSum / WebDollarCoins.WEBD, amount_raw: nOutputSum},
+            };
+
+            oTransaction.from.addresses.forEach((oAddress) => {
+                aTransaction.from.trxs.push({
+                    trx_from_address   : BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oAddress.unencodedAddress)),
+                    trx_from_pub_key   : oAddress.publicKey.toString("hex"),
+                    trx_from_signature : oAddress.signature.toString("hex"),
+                    trx_from_amount    : oAddress.amount / WebDollarCoins.WEBD,
+                    trx_from_amount_raw: oAddress.amount
+                });
+
+                aTransaction.from.addresses.push(BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oAddress.unencodedAddress)));
+            });
+
+            oTransaction.to.addresses.forEach((oAddress) => {
+                aTransaction.to.trxs.push({
+                    trx_to_address   : BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oAddress.unencodedAddress)),
+                    trx_to_amount    : oAddress.amount / WebDollarCoins.WEBD,
+                    trx_to_amount_raw: oAddress.amount
+                });
+
+                aTransaction.to.addresses.push(BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oAddress.unencodedAddress)));
+            });
+
+            transactions.push(aTransaction);
+        }
+
+        return {
+            id             : oBlock.height,
+            block_id       : oBlock.height,
+            hash           : oBlock.hash.toString('hex'),
+            nonce          : Serialization.deserializeNumber4Bytes_Positive(Serialization.serializeNumber4Bytes(oBlock.nonce)),
+            nonce_raw      : oBlock.nonce,
+            version        : oBlock.version,
+            previous_hash  : oBlock.hashPrev.toString('hex'),
+            timestamp      : oBlockTimestampUTC.toUTCString(),
+            timestamp_UTC  : nBlockTimestamp,
+            timestamp_block: nBlockTimestampRaw,
+            hash_data      : oBlock.data.hashData.toString('hex'),
+            miner_address  : BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oBlock.data._minerAddress)),
+            trxs_hash_data : oBlock.data.transactions.hashTransactions.toString('hex'),
+            trxs_number    : oBlock.data.transactions.transactions.length,
+            trxs           : transactions,
+            block_raw      : BufferExtended.toBase(oBlock.serializeBlock().toString('hex')),
+            reward         : oBlock.reward === null ? 0 : oBlock.reward / WebDollarCoins.WEBD,
+            reward_raw     : oBlock.reward === null ? 0 : oBlock.reward,
+            createdAtUTC   : oBlockTimestampUTC
+        };
+    }
 }
 
 export default new NodeExpress();
