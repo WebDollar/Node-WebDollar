@@ -96,7 +96,11 @@ class NodeExpress{
                 if (cert === '') throw {message: "certificate.crt was not found"};
                 if (caBundle === '') throw {message: "ca_bundle.crt was not found"};
 
-                if (this.domain === undefined || this.domain === "undefined") this.domain = this._extractDomain(cert);
+                try {
+                    if (this.domain === undefined || this.domain === "undefined") this.domain = this._extractDomain(cert);
+                } catch (exception){
+                    console.error("Couldn't determine the SSL Certificate Host Name");
+                }
 
                 options.key = fs.readFileSync(privateKey, 'utf8');
                 options.cert = fs.readFileSync(cert, 'utf8');
