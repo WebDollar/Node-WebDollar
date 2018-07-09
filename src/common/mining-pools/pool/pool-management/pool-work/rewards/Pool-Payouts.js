@@ -120,8 +120,8 @@ class PoolPayouts{
 
                     blockInformationMinerInstance.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.reward;
 
-                    if (blockInformationMinerInstance.referrals.referralLinkMiner !== undefined)
-                        blockInformationMinerInstance.referrals.referralLinkMiner.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.rewardForReferral;
+                    if (blockInformationMinerInstance.miner.referrals.referralLinkMiner !== undefined)
+                        blockInformationMinerInstance.miner.referrals.referralLinkMiner.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.rewardForReferral;
 
                 });
 

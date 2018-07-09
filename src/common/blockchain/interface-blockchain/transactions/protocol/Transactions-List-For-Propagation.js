@@ -32,12 +32,12 @@ class TransactionsListForPropagation{
 
     }
 
-    addTransactionForPropagationList(transaction){
+    addTransactionForPropagationList(transaction, avoidValidation = false){
 
-        if (!transaction.isTransactionOK(true)) return;
+        if (!avoidValidation && !transaction.isTransactionOK(true)) return;
 
-        if (!this.findTransactionForPropagationList(transaction))
-            this.list.transactions.push(transaction);
+        if (this.findTransactionForPropagationList(transaction) === -1)
+            this.list.push(transaction);
 
     }
 
