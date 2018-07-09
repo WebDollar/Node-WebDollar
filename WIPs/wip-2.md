@@ -23,7 +23,7 @@ It will require:
 2. Check the Transactions of an address
 3. Check a specific Transaction
 
-Everything will return how many confirmations had those
+Everything will return how many confirmations had those.
 
 ### Motivation
 
@@ -35,7 +35,7 @@ TBA.
 
 ### Backwards Compatibility
 
-The endpoint should all be new, so there are no backwards compatibility issues.
+The endpoints should all be new, so there are no backwards compatibility issues.
 
 ### Implementation
 

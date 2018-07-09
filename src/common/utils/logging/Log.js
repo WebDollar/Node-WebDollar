@@ -7,6 +7,12 @@ if (!process.env.BROWSER){
     config = require("./config.json");
     logging = require("node-logger-winston");
     logging.init(config);
+}  else {
+    logging = {
+        getLogger(type){
+            return console;
+        }
+    };
 }
 
 /*
