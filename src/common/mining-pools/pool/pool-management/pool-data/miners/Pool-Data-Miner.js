@@ -135,7 +135,6 @@ class PoolDataMiner{
     }
 
 
-
     get rewardConfirmedTotal(){
         return this._rewardConfirmed + this._rewardConfirmedOther
     }

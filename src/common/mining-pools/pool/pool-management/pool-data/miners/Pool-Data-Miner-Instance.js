@@ -9,7 +9,7 @@ class PoolDataMinerInstance {
 
         this.miner = miner;
 
-        this.hashesPerSecond = 500;
+        this._hashesPerSecond = 500;
         this.socket = socket;
 
         this.work = undefined;
@@ -26,6 +26,14 @@ class PoolDataMinerInstance {
 
     get address(){
         return this.miner.address;
+    }
+
+    set hashesPerSecond(newValue){
+        this._hashesPerSecond = newValue;
+    }
+
+    get hashesPerSecond(){
+        return this._hashesPerSecond;
     }
 
 }
