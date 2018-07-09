@@ -8,7 +8,7 @@ import PoolPayouts from "./Pool-Payouts"
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
 const VALIDATION_BLOCK_CONFIRMATIONS = 20; //blocks
 
-const MAXIMUM_FAIL_CONFIRMATIONS = 10; //blocks
+const MAXIMUM_FAIL_CONFIRMATIONS = 20; //blocks
 
 const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : 10;
 
@@ -170,10 +170,10 @@ class PoolRewardsManagement{
                 //convert reward to confirmedReward
                 this.poolData.blocksInfo[i].blockInformationMinersInstances.forEach((minerInstance)=>{
 
-                    let reward = minerInstance.calculateReward(false);
+                    minerInstance.calculateReward(false);
 
-                    minerInstance.miner.rewardConfirmed += reward;
-                    minerInstance.miner.rewardTotal -= reward;
+                    minerInstance.miner.rewardConfirmed += minerInstance.reward;
+                    minerInstance.miner.rewardTotal -= minerInstance.reward;
 
 
                     if ( minerInstance.miner.referrals.referralLinkMiner !== undefined && this.poolManagement.poolSettings.poolReferralFee > 0) {
