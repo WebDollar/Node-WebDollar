@@ -372,6 +372,11 @@ if ( consts.DEBUG === true ){
 
 }
 
-
+consts.LOG_INSTANCE = {
+    DEFAULT: 0,
+    POOLS: 1,
+    BLOCKCHAIN: 2,
+    CLI_MENU: 3,
+};
 
 export default consts
