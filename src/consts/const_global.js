@@ -232,7 +232,7 @@ consts.SETTINGS = {
         PROTOCOL: "WebDollar",
         SSL: true,
 
-        PORT: 2024, //port
+        PORT: 80, //port
     },
 
     PARAMS: {
