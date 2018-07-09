@@ -132,6 +132,8 @@ class NodeExpress{
 
             } catch (exception){
 
+                console.error("HTTP Express raised an error", exception);
+
                 //cloudflare generates its own SSL certificate
                 this.server = http.createServer(this.app).listen(this.port, () => {
 
