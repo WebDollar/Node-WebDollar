@@ -287,9 +287,7 @@ class MinerProtocol extends PoolProtocolList{
         if (this.connectedPools.length === 0) return;
         let poolSocket = this.connectedPools[0];
 
-        let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", {
-            pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
-        }, "answer", 6000);
+        let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", {}, "answer", 6000);
 
         if (answer === null) throw {message: "get-work answered null" };
 
@@ -314,7 +312,6 @@ class MinerProtocol extends PoolProtocolList{
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
-                pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
                 work: miningAnswer,
             }, "answer", 6000);
 
@@ -324,7 +321,7 @@ class MinerProtocol extends PoolProtocolList{
 
             this.minerPoolManagement.minerPoolReward.setReward(answer);
 
-            this._validateRequestWork( answer.newWork, poolSocket);
+            this._validateRequestWork( answer.newWork||answer.work, poolSocket);
 
             this._updateStatistics(answer);
 
@@ -420,8 +417,7 @@ class MinerProtocol extends PoolProtocolList{
 
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
-            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/request-wallet-mining", {
-            }, "answer", 6000);
+            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/request-wallet-mining", {}, "answer", 6000);
 
             if (answer === null) throw {message: "pool didn't respond"};
 
@@ -435,10 +431,36 @@ class MinerProtocol extends PoolProtocolList{
         }
          catch (exception){
 
-            console.error("Couldn't change the wallet", exception.message);
+            console.error("Couldn't change the wallet", exception);
             return {result:false, message: exception.message}
 
         }
+
+    }
+
+    async getReferralData(poolSocket){
+
+        try {
+
+            if (poolSocket === undefined)
+                poolSocket = this.connectedPools[0];
+
+            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-referrals", undefined, "answer", 6000);
+
+            if (answer.result){
+
+
+
+            }
+
+        } catch (exception){
+
+
+            console.error("Get Referral Data raised an error", exception);
+            return { result: false };
+
+        }
+
 
     }
 

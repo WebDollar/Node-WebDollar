@@ -1,6 +1,7 @@
 import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
 var BigNumber = require ('bignumber.js');
+
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
  **/
@@ -18,7 +19,7 @@ class InterfaceBlockchainBlocks{
 
     }
 
-    addBlock(block){
+    addBlock(block, revertActions){
 
         this[this.length] =  block;
 
@@ -42,6 +43,9 @@ class InterfaceBlockchainBlocks{
             }
 
         }
+
+        if ( revertActions !== undefined )
+            revertActions.push( {name: "block-added", height: this.length-1 } );
 
     }
 

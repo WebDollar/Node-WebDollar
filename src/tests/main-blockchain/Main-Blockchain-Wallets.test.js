@@ -216,7 +216,7 @@ describe('test save wallet to local storage', () => {
         let passwordOne = ['ak', 'bv', 'co', 'dy', 're', 'ff', 'sg', 'rh', 'ti','sj', 'ck', 'ul'];
         let blockchainAddress = await Blockchain.Wallet.createNewAddress();
         let hexAddress = blockchainAddress.address.toString("hex");
-        let index = Blockchain.Wallet.getAddressIndex(hexAddress);
+        let index = Blockchain.Wallet.getAddress(hexAddress, true);
 
         assert(0 <= index, "Address index < 0: index = " + index);
 

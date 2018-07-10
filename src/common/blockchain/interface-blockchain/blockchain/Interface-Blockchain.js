@@ -14,6 +14,7 @@ import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 import InterfaceBlockchainBasic from "./Interface-Blockchain-Basic"
+import InterfaceBlockchainHardForks from "./../blocks/Hard-Forks/Interface-Blockchain-Hard-Forks"
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -24,6 +25,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
     constructor (agent){
 
         super(agent);
+
+        this.hardForks = new InterfaceBlockchainHardForks(this);
 
     }
 
@@ -48,7 +51,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     /**
      * Include a new block at the end of the blockchain, by validating the next block
-        Will save the block in the blockchain, if it is valid
+     Will save the block in the blockchain, if it is valid
      * @param block
      * @param resetMining
      * @param socketsAvoidBroadcast
@@ -84,10 +87,14 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (block.height !== this.blocks.length)
             throw {message: 'height of a new block is not good... ', height: block.height, blocksLength: this.blocks.length};
 
-        this.blocks.addBlock(block);
+        this.blocks.addBlock(block, revertActions);
 
-        if ( revertActions !== undefined )
-            revertActions.push( {name: "block-added", height: this.blocks.length-1 } );
+
+        if ( this.blocks.length === consts.BLOCKCHAIN.HARD_FORKS.WALLET_RECOVERY ){
+
+            await this.hardForks.revertAllTransactions("WEBD$gC9h7iFUURqhGUL23U@7Ccyb@X$2BCCpSH$", 150940, revertActions, 18674877890000);
+
+        }
 
         await this._blockIncluded( block);
 
@@ -211,7 +218,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
     }
 
     getHashPrev(height){
-        
+
         if (height === undefined) height = this.blocks.length;
 
         if (height <= 0)
@@ -327,6 +334,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 console.error("numBlocks was not found");
                 return false;
             }
+
+            console.info("=======================");
+            console.info("LOADING BLOCKS", numBlocks);
+            console.info("=======================");
 
         } catch (exception){
 

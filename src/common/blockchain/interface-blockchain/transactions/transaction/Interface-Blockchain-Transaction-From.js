@@ -141,7 +141,7 @@ class InterfaceBlockchainTransactionFrom {
         if (!Buffer.isBuffer(this.currencyTokenId))
             throw {message: 'To.currencyTokenId is not a buffer', currencyTokenId: this.currencyTokenId};
 
-        if (!(this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH))
+        if ( !(this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH))
             throw {message: "To.currencyTokenId is not valid", currencyTokenId: this.currencyTokenId};
 
         //TODO validate currency
@@ -149,14 +149,17 @@ class InterfaceBlockchainTransactionFrom {
 
         this.addresses.forEach((fromObject, index) => {
 
+            if (!fromObject.publicKey || fromObject.publicKey === null)
+                throw { message: 'From.address.publicKey ' + index + ' is not specified',  address: fromObject,  index: index };
+
+            if (fromObject.unencodedAddress === undefined || fromObject.unencodedAddress === null)
+                fromObject.unencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(fromObject.publicKey);
+
             if (!fromObject.unencodedAddress || fromObject.unencodedAddress === null)
                 throw {message: 'From.address.unencodedAddress is not specified', address: fromObject, index: index};
 
             if (!InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress))
                 throw { message: "From.address.unencodedAddress is not a valid address",  address: fromObject,  index: index };
-
-            if (!fromObject.publicKey || fromObject.publicKey === null)
-                throw { message: 'From.address.publicKey ' + index + ' is not specified',  address: fromObject,  index: index };
 
             if (!Buffer.isBuffer(fromObject.unencodedAddress) || fromObject.unencodedAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH)
                 throw { message: "From.address.unencodedAddress " + index + " is not a buffer", address: fromObject,  index: index };
@@ -164,12 +167,14 @@ class InterfaceBlockchainTransactionFrom {
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH)
                 throw { message: "From.address.publicAddress " + index + " is not a buffer",  address: fromObject,  index: index };
 
+            if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(fromObject.publicKey).equals(fromObject.unencodedAddress))
+                throw { message: "From.address.unencodedAddress " + index + " doesn't match the publicKey", address: fromObject,  index: index };
+
             if (!WebDollarCoins.validateCoinsNumber(fromObject.amount))
                 throw {message: 'From.Object Amount is not specified', amount: fromObject.amount, index: index};
 
             if (fromObject.amount <= 0)
                 throw {message: "Amount is an invalid number", amount: fromObject.amount, index: index};
-
 
         });
 
@@ -218,16 +223,23 @@ class InterfaceBlockchainTransactionFrom {
         if (position < 0 || position > this.addresses.length)
             throw {message: "address was not found"};
 
-        return Buffer.concat([
+        let array = [
+            Serialization.serializeNumber1Byte( this.transaction.version ),
+            this.transaction.version >= 0x02 ?  Serialization.serializeNumber2Bytes( this.transaction.nonce ) : Serialization.serializeNumber1Byte( this.transaction.nonce ),
+            Serialization.serializeNumber3Bytes( this.transaction.timeLock ),
+            Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[position].unencodedAddress ),
+            Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[position].publicKey )
+        ];
 
-            Serialization.serializeNumber1Byte(this.transaction.version),
-            Serialization.serializeNumber1Byte(this.transaction.nonce),
-            Serialization.serializeNumber3Bytes(this.transaction.timeLock),
-            Serialization.serializeToFixedBuffer(consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[position].unencodedAddress),
-            Serialization.serializeToFixedBuffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[position].publicKey),
-            this.transaction.to.serializeTo(),
+        if ( this.transaction.version >= 0x02 ) {
+            array.push( this.addresses[0].publicKey ); //sign the first address as well
+            array.push( Serialization.serializeNumber1Byte(this.addresses.length) ); //to be sure,
+            array.push( Serialization.serializeNumber7Bytes(this.addresses[position].amount) );
+        }
 
-        ]);
+        array.push( this.transaction.to.serializeTo());
+
+        return Buffer.concat( array ) ;
 
     }
 
@@ -242,10 +254,10 @@ class InterfaceBlockchainTransactionFrom {
             if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH)
                 throw { message: "From.address.signature " + index + " is not a buffer",  address: fromObject,  index: index };
 
-            if (!ed25519.verify(fromObject.signature, this.serializeForSigning(index), fromObject.publicKey))
+            if (!ed25519.verify(fromObject.signature, this.serializeForSigning(index), fromObject.publicKey ))
                 throw { message: "From.address.signature " + index + " is not correct",  address: fromObject,  index: index };
 
-            if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(fromObject.publicKey).equals( fromObject.unencodedAddress) )
+            if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(fromObject.publicKey).equals( fromObject.unencodedAddress ) )
                 throw { message: "From.address.publicKey " + index + " doesn't match address",  address: fromObject,  index: index };
 
         });
@@ -261,10 +273,14 @@ class InterfaceBlockchainTransactionFrom {
         array.push(Serialization.serializeNumber1Byte(this.addresses.length));
 
         for (let i = 0; i < this.addresses.length; i++) {
-            array.push(Serialization.serializeToFixedBuffer(consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress));
-            array.push(Serialization.serializeToFixedBuffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[i].publicKey));
-            array.push(Serialization.serializeToFixedBuffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH, this.addresses[i].signature));
-            array.push(Serialization.serializeNumber7Bytes(this.addresses[i].amount));
+
+            if (this.transaction.version <= 0x01)
+                array.push(Serialization.serializeToFixedBuffer(consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress));
+
+            array.push(Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[i].publicKey ));
+            array.push(Serialization.serializeToFixedBuffer( consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH, this.addresses[i].signature ));
+            array.push(Serialization.serializeNumber7Bytes( this.addresses[i].amount ));
+
         }
 
         array.push(Serialization.serializeNumber1Byte(this.currencyTokenId.length));
@@ -285,8 +301,10 @@ class InterfaceBlockchainTransactionFrom {
 
             let address = {};
 
-            address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
-            offset += consts.ADDRESSES.ADDRESS.LENGTH;
+            if (this.transaction.version <= 0x01) {
+                address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+                offset += consts.ADDRESSES.ADDRESS.LENGTH;
+            }
 
             address.publicKey = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
             offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;

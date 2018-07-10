@@ -67,8 +67,8 @@ class MainBlockchainWallet {
 
     async _insertAddress(blockchainAddress){
 
-        let index = this.getAddressIndex(blockchainAddress);
-        if (index >= 0)
+        let answer = this.getAddress(blockchainAddress);
+        if (answer !== null)
             return false;
 
         this.addresses.push(blockchainAddress);
@@ -179,39 +179,26 @@ class MainBlockchainWallet {
 
         return answer;
     }
-    
+
     /**
      * Finding stringAddress or address
      * @param address
      * @returns {*}
      */
-    getAddress(address){
+    getAddress(address, returnPos = false ){
 
         if (typeof address === "object" && address.hasOwnProperty("address"))
             address = address.address;
 
-        let index = this.getAddressIndex(address);
-        if (index === -1)
-            return null;
-        else
-            return this.addresses[index];
-    }
-
-    /**
-     * Finding stringAddress or address
-     * @param address
-     * @returns {*}
-     */
-    getAddressIndex(address){
-
         for (let i = 0; i < this.addresses.length; i++)
             if (address === this.addresses[i].address || address === this.addresses[i])
-                return i;
+                return returnPos ? i : this.addresses[i];
             else
             if (typeof address ==="object" && (this.addresses[i].address === address.address || this.addresses[i].unencodedAddress === address.unencodedAddress))
-                return i;
+                return returnPos ? i : this.addresses[i];
 
-        return -1;
+        return returnPos ? -1 : null;
+
     }
 
     getAddressPic(address){
@@ -223,7 +210,7 @@ class MainBlockchainWallet {
 
         return `https://www.gravatar.com/avatar/${address.toString("hex")}?d=retro&f=y`;
     }
-    
+
     /**
      * @returns the mining address which will receive rewards
      */
@@ -449,11 +436,11 @@ class MainBlockchainWallet {
         this.addresses.push(blockchainAddress);
 
         return blockchainAddress;
-    }  
-    
+    }
+
 
     /**
-     * 
+     *
      * @param address
      * @param password
      * @returns {Promise<*>} true if address's password is @param password
@@ -464,9 +451,9 @@ class MainBlockchainWallet {
             address = address.address;
 
         address = this.getAddress(address);
-        
+
         let privateKey = await address._getPrivateKey(password);
-        
+
         try {
             if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
                 return true;
@@ -474,10 +461,10 @@ class MainBlockchainWallet {
         } catch (exception) {
             return false;
         }
-        
+
         return false;
     }
-    
+
     /**
      * @param addressString
      * @param newPassword
@@ -486,7 +473,7 @@ class MainBlockchainWallet {
      */
     async encryptAddress(address, newPassword, oldPassword = undefined){
 
-	    if (typeof address === "object" && address.hasOwnProperty("address"))
+        if (typeof address === "object" && address.hasOwnProperty("address"))
             address = address.address;
 
         address = this.getAddress(address);
@@ -518,8 +505,8 @@ class MainBlockchainWallet {
         if (typeof address === "object" && address.hasOwnProperty("address"))
             address = address.address;
 
-        let index = this.getAddressIndex(address);
-        if (index < 0)
+        let index = this.getAddress(address, true);
+        if ( index === -1 )
             return {result: false, message: "Address was not found ", address: address};
 
         if (await this.isAddressEncrypted(address)) {
@@ -545,7 +532,7 @@ class MainBlockchainWallet {
                     if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
                         break;
                 } catch (exception) {
-                    
+
                     AdvancedMessages.alert('Your old password is incorrect!', "Password Error", "error", 5000);
 
                     if (tries === 1)
@@ -555,7 +542,7 @@ class MainBlockchainWallet {
 
             }
         }
-        
+
         let ask = await AdvancedMessages.confirm("Are you sure you want to delete " + address);
 
         if ( ask ){

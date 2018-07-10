@@ -29,11 +29,15 @@ class InterfaceBlockchainTransaction{
 
         if (timeLock === undefined)
             this.timeLock = blockchain.blocks.length-1;
+        else
+            this.timeLock = timeLock;
 
         if (version === undefined){
 
             if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
-            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x01;
+            else
+            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION ) version = 0x01;
+            else version = 0x02;
 
         }
 
@@ -95,7 +99,7 @@ class InterfaceBlockchainTransaction{
             nonce = this._computeNonce();
 
         if (version === 0x00) nonce = nonce % 0x100;
-        else if (version === 0x01) nonce = nonce % 0X10000;
+        else if (version >= 0x01) nonce = nonce % 0X10000;
 
         this.nonce = nonce; //1 bytes
 
@@ -160,7 +164,8 @@ class InterfaceBlockchainTransaction{
         if (typeof this.timeLock !== "number") throw {message: 'timeLock is empty', timeLock:this.timeLock};
 
         if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
-        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
+        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
+        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
 
         if (this.nonce > 0xFFFF) throw {message: "nonce is ivnalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
@@ -289,7 +294,7 @@ class InterfaceBlockchainTransaction{
             if (this.version === 0x00){
                 this.nonce = Serialization.deserializeNumber1Bytes( buffer, offset);
                 offset += 1;
-            } else if (this.version === 0x01){
+            } else if (this.version >= 0x01){
                 this.nonce = Serialization.deserializeNumber2Bytes( buffer, offset);
                 offset += 2;
             }
