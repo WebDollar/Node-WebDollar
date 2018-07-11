@@ -46,7 +46,7 @@ class NodeBlockchainPropagation{
                 socketsAvoidBroadcast = [socketsAvoidBroadcast];
 
             for (let i=0; i < NodesList.nodes.length; i++)
-                if ( NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL && NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER )
+                if ( !Blockchain.isPoolActivated  || (NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL && NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER ))
                     socketsAvoidBroadcast.push(NodesList.nodes[i].socket);
 
             this._socketsAlreadyBroadcast = socketsAvoidBroadcast;
