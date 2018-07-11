@@ -41,6 +41,12 @@ class BlockchainDifficulty{
         //              blockNumber === 9
         // it should recalcule using [0...9]
 
+
+        let diff = blockTimestamp - getTimeStampCallback(blockNumber);
+        if (blockNumber > consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER && ( Math.abs(diff) <= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK / 2 ))
+            throw {message: "Blocks generated too fast"};
+
+
         if ( (blockNumber+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS !== 0)
             return  prevBlockDifficulty;
         else {
@@ -54,17 +60,10 @@ class BlockchainDifficulty{
 
             //adding blocks 0..8
             for (let i = firstBlock; i < blockNumber; i++) {
-
                 //the difference between Ti-(Ti-1) is actually the time for Ti
-
-                let diff = getTimeStampCallback(i+1) - getTimeStampCallback(i);
-
-                how_much_it_took_to_mine_X_Blocks += diff;
-
-                if (blockNumber > consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER && (diff < consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK / 2 ))
-                    throw {message: "Blocks generated too fast"};
-
+                how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i + 1) - getTimeStampCallback(i);
             }
+
 
             //adding block 9
             how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
