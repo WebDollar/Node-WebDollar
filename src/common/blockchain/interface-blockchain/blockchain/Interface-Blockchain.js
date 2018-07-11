@@ -89,12 +89,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         this.blocks.addBlock(block, revertActions);
 
-
-        if ( this.blocks.length === consts.BLOCKCHAIN.HARD_FORKS.WALLET_RECOVERY ){
-
+        //hard fork
+        if ( !block.blockValidation.blockValidationType['skip-accountant-tree-validation'] && this.blocks.length === consts.BLOCKCHAIN.HARD_FORKS.WALLET_RECOVERY )
             await this.hardForks.revertAllTransactions("WEBD$gC9h7iFUURqhGUL23U@7Ccyb@X$2BCCpSH$", 150940, revertActions, 18674877890000);
 
-        }
 
         await this._blockIncluded( block);
 
@@ -375,6 +373,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             try {
 
                 for (index = indexStart; index < numBlocks; ++index ) {
+
+                    if (index === 153092)
+                        break;
 
                     let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
 
