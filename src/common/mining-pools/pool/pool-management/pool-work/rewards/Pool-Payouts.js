@@ -71,7 +71,6 @@ class PoolPayouts{
             this.poolData.miners.forEach((miner)=>{
 
                 miner.__tempRewardConfirmedOther = 0;
-                miner.referrals.__tempRewardReferralsConfirmedToBeSent = 0;
 
             });
 
@@ -99,6 +98,7 @@ class PoolPayouts{
 
                 let difference = sumReward - maxSumReward ;
 
+                //reducing the price
                 if ( Math.abs( difference ) > 1 ) {
 
                     difference = Math.floor( difference  / blocksConfirmed[i].blockInformationMinersInstances.length );
@@ -120,6 +120,9 @@ class PoolPayouts{
 
                     blockInformationMinerInstance.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.reward;
 
+                    if (blockInformationMinerInstance.miner.referrals.referralLinkMiner !== undefined)
+                        blockInformationMinerInstance.miner.referrals.referralLinkMiner.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.rewardForReferral;
+
                 });
 
             }
@@ -127,15 +130,8 @@ class PoolPayouts{
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
-                miner.__tempRewardConfirmedOther += miner.referrals.rewardReferralsConfirmed;
-
-            });
-
-            //add rewardConfirmedOther
-            this.poolData.miners.forEach((miner)=>{
-
-                if (miner.__tempRewardConfirmedOther >= PAYOUT_MINIMUM)
-                    this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther ;
+                if ( miner.__tempRewardConfirmedOther + miner.rewardConfirmedOther >= PAYOUT_MINIMUM )
+                    this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther +miner.rewardConfirmedOther ;
 
             });
 
@@ -180,8 +176,11 @@ class PoolPayouts{
 
 
                         if ( miner.referrals.referralLinkMiner !== undefined ) {
-                            miner.referrals.referralLinkMiner.rewardReferralSent += miner.referrals.referralLinkMiner.rewardReferralConfirmed;
-                            miner.referrals.referralLinkMiner._rewardReferralConfirmed = 0;
+
+                            miner.referrals.referralLinkMiner.rewardReferralSent += blockInformationMinerInstance.rewardForReferral;
+                            miner.referrals.referralLinkMiner.rewardReferralConfirmed -= blockInformationMinerInstance.rewardForReferral;
+
+                            blockInformationMinerInstance.rewardForReferral = 0;
                         }
 
                     } catch (exception){
@@ -204,9 +203,6 @@ class PoolPayouts{
                 miner.rewardConfirmedOther = 0; //paid this
 
                 miner.__tempRewardConfirmedOther = 0; //paid this
-
-                miner.referrals.rewardReferralsConfirmed = 0;
-
 
             }
 

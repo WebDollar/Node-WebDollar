@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 import consts from 'consts/const_global'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
+import Log from 'common/utils/logging/Log';
 
 class PoolStatistics{
 
@@ -103,12 +104,14 @@ class PoolStatistics{
 
     async _save(){
 
+        Log.info('Saving pool statistics...', consts.LOG_INSTANCE.POOLS);
         await this._db.save("serverPool_statistics_confirmedAndPaid", this.poolBlocksConfirmedAndPaid )
 
     }
 
     async _load(){
 
+        Log.info('Loading pool statistics...', consts.LOG_INSTANCE.POOLS);
         let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000, true);
 
         if (typeof confirmedAndPaid === "number") {
@@ -122,6 +125,7 @@ class PoolStatistics{
 
     async _clear(){
 
+        Log.info('Clearing pool statistics...', consts.LOG_INSTANCE.POOLS);
         try {
             return (await this._db.remove("serverPool_statistics_confirmedAndPaid"));
         }

@@ -90,7 +90,7 @@ class MinerPoolSettings {
         this.poolPublicKey = data.poolPublicKey;
         this.poolReferral = data.poolReferral;
 
-        await this.setPoolServers(data.poolServers);
+        await this._setPoolServers(data.poolServers);
 
         this._poolURL = data.poolURL;
 
@@ -111,7 +111,7 @@ class MinerPoolSettings {
         StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolReferralFee: this.poolReferralFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
     }
 
-    async setPoolServers(newValue){
+    async _setPoolServers(newValue){
 
         PoolsUtils.validatePoolServers(newValue);
 

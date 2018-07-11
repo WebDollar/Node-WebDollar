@@ -73,7 +73,7 @@ class PoolNewWorkManagement{
             let processedWork = await this.poolWorkManagement.processWork( minerInstance, answer, prevBlock );
 
             minerInstance.socket.node.sendRequest("mining-pool/new-work/answer/confirm", {  result: processedWork.result,  reward: processedWork.reward, confirmed: processedWork.confirmed, miner: minerInstance.publicKey,
-                h: this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed + this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining
+                h: this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed + this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining, n: Blockchain.blockchain.blocks.networkHashRate,
             } ,"answer" );
 
         } catch (exception){

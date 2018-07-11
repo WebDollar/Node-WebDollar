@@ -134,6 +134,14 @@ class PoolDataMiner{
 
     }
 
+    get minerHashesPerSecond(){
+
+        let hashesPerSecond = 0;
+        for (let i=0; i<this.instances.length; i++)
+            hashesPerSecond += this.instances[i].hashesPerSecond;
+
+        return hashesPerSecond;
+    }
 
 
     get rewardConfirmedTotal(){

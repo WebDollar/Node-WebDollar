@@ -161,12 +161,15 @@ class MinerProtocol extends PoolProtocolList{
 
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
 
+                if (answer.work !== undefined)
+                    this._validateRequestWork(answer.work, socket);
+
                 this.minerPoolManagement.minerPoolSettings.poolName = poolName;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolFee;
                 this.minerPoolManagement.minerPoolSettings.poolReferralFee = poolReferralFee;
                 this.minerPoolManagement.minerPoolSettings.poolWebsite = poolWebsite;
                 this.minerPoolManagement.minerPoolSettings.poolUseSignatures = poolUseSignatures;
-                this.minerPoolManagement.minerPoolSettings.poolServers = poolServers;
+                //this.minerPoolManagement.minerPoolSettings.poolServers = poolServers;
 
                 this.minerPoolManagement.minerPoolSettings.notifyNewChanges();
 
@@ -220,8 +223,7 @@ class MinerProtocol extends PoolProtocolList{
                     nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce
                 }, "confirm");
 
-                this._validateRequestWork(data.work);
-                this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(data.work, socket);
+                this._validateRequestWork(data.work, socket);
 
                 let answer = await confirmation;
 
@@ -240,7 +242,7 @@ class MinerProtocol extends PoolProtocolList{
 
     }
 
-    _validateRequestWork(work){
+    _validateRequestWork(work, socket){
 
         if (typeof work !== "object") throw {message: "get-work invalid work"};
 
@@ -267,6 +269,8 @@ class MinerProtocol extends PoolProtocolList{
             if (!ed25519.verify(work.sig, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
         }
 
+        this.minerPoolManagement.minerPoolMining.updatePoolMiningWork( work, socket );
+
     }
 
     _updateStatistics(data){
@@ -275,6 +279,7 @@ class MinerProtocol extends PoolProtocolList{
         if (typeof data.b === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksConfirmed = data.b;
         if (typeof data.ub === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksUnconfirmed = data.ub;
         if (typeof data.t === "number") this.minerPoolManagement.minerPoolStatistics.poolTimeRemaining = data.t;
+        if (typeof data.n === "number") Blockchain.blockchain.blocks.networkHashRate = data.n; //network hash rate
     }
 
     async requestWork(){
@@ -282,9 +287,7 @@ class MinerProtocol extends PoolProtocolList{
         if (this.connectedPools.length === 0) return;
         let poolSocket = this.connectedPools[0];
 
-        let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", {
-            pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
-        }, "answer", 6000);
+        let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-work", {}, "answer", 6000);
 
         if (answer === null) throw {message: "get-work answered null" };
 
@@ -292,8 +295,7 @@ class MinerProtocol extends PoolProtocolList{
 
         this.minerPoolManagement.minerPoolReward.setReward(answer);
 
-        this._validateRequestWork( answer.work);
-        this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.work, poolSocket);
+        this._validateRequestWork( answer.work, poolSocket);
 
         this._updateStatistics(answer);
 
@@ -310,7 +312,6 @@ class MinerProtocol extends PoolProtocolList{
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
-                pool: this.minerPoolManagement.minerPoolSettings.poolPublicKey,
                 work: miningAnswer,
             }, "answer", 6000);
 
@@ -320,8 +321,7 @@ class MinerProtocol extends PoolProtocolList{
 
             this.minerPoolManagement.minerPoolReward.setReward(answer);
 
-            this._validateRequestWork( answer.newWork);
-            this.minerPoolManagement.minerPoolMining.updatePoolMiningWork(answer.newWork, poolSocket);
+            this._validateRequestWork( answer.newWork||answer.work, poolSocket);
 
             this._updateStatistics(answer);
 
@@ -353,7 +353,7 @@ class MinerProtocol extends PoolProtocolList{
 
             if (oldAddress === null || oldAddress === undefined){
 
-                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolManagement.minerPoolMining.minerAddress );
+                AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolManagement.minerPoolMining.minerAddress, "Wallet Error", "error", 5000 );
                 return;
 
             }
@@ -417,8 +417,7 @@ class MinerProtocol extends PoolProtocolList{
 
             if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
 
-            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/request-wallet-mining", {
-            }, "answer", 6000);
+            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/request-wallet-mining", {}, "answer", 6000);
 
             if (answer === null) throw {message: "pool didn't respond"};
 
@@ -432,10 +431,36 @@ class MinerProtocol extends PoolProtocolList{
         }
          catch (exception){
 
-            console.error("Couldn't change the wallet", exception.message);
+            console.error("Couldn't change the wallet", exception);
             return {result:false, message: exception.message}
 
         }
+
+    }
+
+    async getReferralData(poolSocket){
+
+        try {
+
+            if (poolSocket === undefined)
+                poolSocket = this.connectedPools[0];
+
+            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-referrals", undefined, "answer", 6000);
+
+            if (answer.result){
+
+
+
+            }
+
+        } catch (exception){
+
+
+            console.error("Get Referral Data raised an error", exception);
+            return { result: false };
+
+        }
+
 
     }
 

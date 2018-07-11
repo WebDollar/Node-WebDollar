@@ -159,13 +159,16 @@ class PoolDataBlockInformationMinerInstance {
             let adr = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
             offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
 
-            for (let i=0; i< this.poolManagement.poolData.miners.length; i++)
-                for (let j=0; j<this.poolManagement.poolData.miners[i].publicKeys.length; j++)
-                    if (this.poolManagement.poolData.miners[i].publicKeys[j].equals(adr)){
+            address = new Buffer(1);
 
-                        address = this.poolManagement.poolData.miners[i].address;
-                        break;
-                    }
+            for (let i=0; i< this.poolManagement.poolData.miners.length; i++)
+                if (this.poolManagement.poolData.miners[i].publicKeys !== undefined)
+                    for (let j=0; j<this.poolManagement.poolData.miners[i].publicKeys.length; j++)
+                        if (this.poolManagement.poolData.miners[i].publicKeys[j].equals(adr)){
+
+                            address = this.poolManagement.poolData.miners[i].address;
+                            break;
+                        }
 
         } else {
 

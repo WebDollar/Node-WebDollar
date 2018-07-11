@@ -15,6 +15,7 @@ class NodeAPIPublic{
     }
 
     info(){
+
         let lastBlock = Blockchain.blockchain.blocks.last;
 
         return {
@@ -65,12 +66,14 @@ class NodeAPIPublic{
 
     block(req, res){
 
-        let block = req.block;
+        let index = req.block;
 
         try {
-            if (block < Blockchain.blockchain.blocks.length) throw {message: "Block not found."};
 
-            return {result: true, block: Blockchain.blockchain.blocks[block].toJSON()}
+            if (index < Blockchain.blockchain.blocksStartingPoint) throw {message: "Invalid index."};
+            if (index > Blockchain.blockchain.blocks.length)       throw {message: "Block not found."};
+
+            return {result: true, block: Blockchain.blockchain.blocks[index].toJSON()}
 
         } catch (exception) {
             return {result: false, message: "Invalid Block"};

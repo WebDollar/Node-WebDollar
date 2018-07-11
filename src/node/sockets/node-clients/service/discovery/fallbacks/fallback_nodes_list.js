@@ -5,7 +5,7 @@ export default {
 
     "nodes": [
 
-        //---------------------------------------------------------
+    /*    //---------------------------------------------------------
         //--------------Community FallBack Nodes-------------------
         //---------------------------------------------------------
 
@@ -67,18 +67,20 @@ export default {
         {"addr": ["https://angrybirds.webdollarvpn.io:4666"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://angrybirds.webdollarvpn.io:5666"]}, // Thanks to @cbusuioceanu
         
-        {"addr": ["https://webdollarinfinitypool.io:443"]}, //Thanks to @Tibi Popescu
-        {"addr": ["https://webdollarinfinitypool.io:80"]}, //Thanks to @Tibi Popescu
-        {"addr": ["https://webdollarinfinitypool.io:8080"]}, //Thanks to @Tibi Popescu
-        {"addr": ["https://webdollarinfinitypool.io:8081"]}, //Thanks to @Tibi Popescu
-        {"addr": ["https://webdollarinfinitypool.io:8082"]}, //Thanks to @Tibi Popescu
+        {"addr": ["https://webdollarinfinitypool.space:8085"]}, //Thanks to @Tibi Popescu
+        {"addr": ["https://webdollarinfinitypool.space:8086"]}, //Thanks to @Tibi Popescu
+        {"addr": ["https://webdollarinfinitypool.space:8087"]}, //Thanks to @Tibi Popescu
+        {"addr": ["https://webdollarinfinitypool.space:8088"]}, //Thanks to @Tibi Popescu        
+        {"addr": ["https://webdollarinfinitypool.space:8089"]}, //Thanks to @Tibi Popescu        
         
         {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:8080"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:8081"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:8082"]}, //Thanks to @jigodia
-        
+
+        */
+
         //---------------------------------------------------------
         //--------------WebDollar FallBack Nodes-------------------
         //---------------------------------------------------------
@@ -86,11 +88,13 @@ export default {
         {"addr": ["https://skyhub.me:80"]},
         {"addr": ["https://presa7.ro:80"]},
 
+
         {"addr": ["https://webdollar-vps1.ddns.net:80"]},
         {"addr": ["https://webdollar-vps2.ddns.net:80"]},
         {"addr": ["https://webdollar-vps3.ddns.net:80"]},
         {"addr": ["https://webdollar-vps4.zapto.org:80"]},
         {"addr": ["https://webdollar-vps5.hopto.org:80"]},
+
 
 
     ]

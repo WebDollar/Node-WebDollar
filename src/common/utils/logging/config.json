@@ -1,0 +1,32 @@
+{
+  "logging": {
+    "default": {
+      "console": {
+        "level": "info",
+        "colorize": true,
+        "timestamp": true
+      }
+    },
+    "pools": {
+      "console": {
+        "level": "debug",
+        "colorize":true,
+        "timestamp": true
+      }
+    },
+    "blockchain": {
+      "console": {
+        "level": "info",
+        "colorize":false,
+        "timestamp": true
+      }
+    },
+    "cli_menu": {
+      "console": {
+        "level": "info",
+        "colorize":true,
+        "timestamp": false
+      }
+    }
+  }
+}

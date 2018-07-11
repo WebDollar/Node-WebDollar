@@ -34,7 +34,7 @@ class InterfaceTransactionsPendingQueue {
 
         this._insertPendingTransaction(transaction);
 
-        this.transactionsProtocol.transactionsForPropagation.addTransactionForPropagationList(transaction);
+        this.transactionsProtocol.transactionsForPropagation.addTransactionForPropagationList(transaction, avoidValidation);
         this.propagateTransaction(transaction, exceptSockets);
 
         return true;

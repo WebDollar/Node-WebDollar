@@ -416,7 +416,7 @@ class InterfaceBlockchainAddressHelper{
             let oldPassword = answer.trim().split(' ');
 
             if (oldPassword.length !== 12) {
-                AdvancedMessages.alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                AdvancedMessages.alert('Your old password has ' + oldPassword.length + ' words. It must have 12!', "Password Error", "error", 5000);
                 resolve(null);
                 return;
             }

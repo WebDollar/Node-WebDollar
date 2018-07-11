@@ -1,6 +1,7 @@
 import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
 var BigNumber = require ('bignumber.js');
+
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
  **/
@@ -12,18 +13,17 @@ class InterfaceBlockchainBlocks{
         this.blockchain = blockchain;
 
         this.blocksStartingPoint = 0;
-        this.length = 0;
+        this._length = 0;
 
-        this.networkHashRate = 0 ;
+        this._networkHashRate = 0 ;
+
     }
 
-    addBlock(block){
+    addBlock(block, revertActions){
 
         this[this.length] =  block;
 
         this.length += 1;
-
-        StatusEvents.emit("blockchain/blocks-count-changed", this.length);
         StatusEvents.emit("blockchain/block-inserted", block);
 
         //delete old blocks when I am in light node
@@ -44,6 +44,9 @@ class InterfaceBlockchainBlocks{
 
         }
 
+        if ( revertActions !== undefined )
+            revertActions.push( {name: "block-added", height: this.length-1 } );
+
     }
 
     spliceBlocks(after, freeMemory = false){
@@ -59,8 +62,6 @@ class InterfaceBlockchainBlocks{
             }
 
         this.length = after;
-
-        StatusEvents.emit("blockchain/blocks-count-changed", this.length);
     }
 
     clear(){
@@ -107,11 +108,30 @@ class InterfaceBlockchainBlocks{
 
         let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toNumber();
 
-        StatusEvents.emit("blockchain/new-network-hash-rate", answer);
         this.networkHashRate = answer;
         
         return answer;
 
+    }
+
+    set networkHashRate(newValue){
+
+        this._networkHashRate = newValue;
+        StatusEvents.emit("blockchain/new-network-hash-rate", this._networkHashRate );
+
+    }
+
+    get networkHashRate(){
+        return this._networkHashRate;
+    }
+
+    set length(newValue){
+        this._length = newValue;
+        StatusEvents.emit("blockchain/blocks-count-changed", this.length);
+    }
+
+    get length(){
+        return this._length;
     }
 
 }

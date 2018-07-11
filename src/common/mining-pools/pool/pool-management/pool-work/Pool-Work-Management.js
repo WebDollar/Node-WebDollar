@@ -39,7 +39,7 @@ class PoolWorkManagement{
             await this.poolWork.getNextBlockForWork();
 
 
-        this.poolWork.lastBlockElement.instances[minerInstance.publicKeyString] = this.poolWork.lastBlock;
+        this.poolWork.lastBlockElement.instances[minerInstance.socket.node.sckAddress.uuid] = this.poolWork.lastBlock;
 
         let answer = {
 
@@ -94,9 +94,9 @@ class PoolWorkManagement{
                 let hashesFactor = Math.min(10, ( 80000 / work.timeDiff )); //80 sec
                 hashesFactor = Math.max(0.2, hashesFactor);
 
-                minerInstance.hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
-                minerInstance.hashesPerSecond = Math.min(minerInstance.hashesPerSecond, 400000);
-                minerInstance.hashesPerSecond = Math.max(minerInstance.hashesPerSecond, 100);
+                let hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
+                minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 400000 ));
+
             }
 
 

@@ -50,7 +50,6 @@ class NodeExpress{
             this.app = express();
             this.app.use(cors({ credentials: true }));
 
-
             try {
                 this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
             } catch (exception){
@@ -71,20 +70,48 @@ class NodeExpress{
 
                 this.domain = process.env.DOMAIN;
 
-                options.key = fs.readFileSync('./certificates/private.key', 'utf8');
-                options.cert = fs.readFileSync('./certificates/certificate.crt', 'utf8');
-                options.ca = fs.readFileSync('./certificates/ca_bundle.crt', 'utf8');
+                let privateKey='', privateKeys = ["private.key","privateKey","private.crt"];
+                for (let i=0; i<privateKeys.length; i++)
+                    if (fs.existsSync(`./certificates/${privateKeys[i]}`)){
+                        privateKey = `./certificates/${privateKeys[i]}`;
+                        break;
+                    }
+
+                let cert = '', certificates = ["certificate.crt", "crt.crt", "certificate"];
+                for (let i=0; i<certificates.length; i++)
+                    if (fs.existsSync(`./certificates/${certificates[i]}`)){
+                        cert = `./certificates/${certificates[i]}`;
+                        break;
+                    }
+
+                let caBundle = '', certificateBundles = ["ca_bundle.crt", "bundle.crt", "ca_bundle"];
+                for (let i=0; i<certificateBundles.length; i++)
+                    if (fs.existsSync(`./certificates/${certificateBundles[i]}`)){
+                        caBundle = `./certificates/${certificateBundles[i]}`;
+                        break;
+                    }
+
+                if (privateKey === '') throw {message: "private.key was not found"};
+                if (cert === '') throw {message: "certificate.crt was not found"};
+                if (caBundle === '') throw {message: "ca_bundle.crt was not found"};
+
+                try {
+                    if (this.domain === undefined || this.domain === "undefined") this.domain = this._extractDomain(cert);
+                } catch (exception){
+                    console.error("Couldn't determine the SSL Certificate Host Name");
+                }
+
+                options.key = fs.readFileSync(privateKey, 'utf8');
+                options.cert = fs.readFileSync(cert, 'utf8');
+                options.caBundle = fs.readFileSync(caBundle, 'utf8');
 
                 this.server = https.createServer(options, this.app).listen( this.port, ()=>{
-
-                    if (this.domain === undefined || this.domain === "undefined") this.domain = this._extractDomain('./certificates/certificate.crt');
 
                     console.info("========================================");
                     console.info("SSL certificate found for ", this.domain||'domain.com');
 
                     if (this.domain === '')
                         console.error("Your domain from certificate was not recognized");
-
 
 
                     this.SSL = true;
@@ -107,6 +134,8 @@ class NodeExpress{
                 });
 
             } catch (exception){
+
+                console.error("HTTP Express raised an error", exception);
 
                 //cloudflare generates its own SSL certificate
                 this.server = http.createServer(this.app).listen(this.port, () => {
