@@ -233,7 +233,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.140.1",
+        VERSION: "1.140.2",
         VERSION_COMPATIBILITY: "1.140.0",
         PROTOCOL: "WebDollar",
         SSL: true,
@@ -278,20 +278,20 @@ consts.SETTINGS = {
 
                 CLIENT: {
 
-                    MAX_SOCKET_CLIENTS_WAITLIST: 3,
+                    MAX_SOCKET_CLIENTS_WAITLIST: 30,
                     MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
 
                     MIN_SOCKET_CLIENTS_WAITLIST: 0,
                     MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
 
                     SERVER_OPEN:{
-                        MAX_SOCKET_CLIENTS_WAITLIST: 5,
-                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 3,
+                        MAX_SOCKET_CLIENTS_WAITLIST: 30,
+                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 30,
                     },
 
                     SSL:{
                         MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL: 30,
-                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL: 8,
+                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL: 30,
                     },
                 },
 
