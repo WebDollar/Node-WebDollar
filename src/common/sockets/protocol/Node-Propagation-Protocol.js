@@ -75,7 +75,7 @@ class NodePropagationProtocol {
     initializeSocketForPropagation(socket){
 
         //avoiding download the list from
-        if ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL].indexOf( socket.node.protocol.nodeConsensusType ) <=0 )
+        if ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL].indexOf( socket.node.protocol.nodeConsensusType ) === 0 )
             return;
 
 
