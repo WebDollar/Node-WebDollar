@@ -34,9 +34,6 @@ class NodeClient {
 
     connectTo(address, port, level, SSL, waitlist){
 
-        if (!process.env.BROWSER)
-            address = address.replace("https","wss");
-
         let sckAddress = SocketAddress.createSocketAddress(address, port);
 
         if (sckAddress.isLocalHost() ){ //localhost, quite useless to connect to the localhost
@@ -47,6 +44,11 @@ class NodeClient {
 
         address = sckAddress.getAddress(true, true);
         port = sckAddress.port;
+
+
+        if (!process.env.BROWSER) {
+            address = address.replace("https", "wss");
+        }
 
         return new Promise( (resolve) => {
 
