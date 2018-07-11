@@ -77,7 +77,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
         this._initializeProtocol();
 
 
-        if (!this.light)
+        if (this.light)
             NodesList.emitter.on("nodes-list/connected", async (result) => {
 
                 if (!NodeExpress.amIFallback() && !Blockchain.isPoolActivated )
