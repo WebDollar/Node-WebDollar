@@ -69,9 +69,9 @@ class NodesWaitlistObject {
         if (this.isFallback === true) {
 
             if (process.env.BROWSER)
-                this.errorTrials = Math.min(this.errorTrials, 4 + Math.floor( Math.random() * 2) );
+                this.errorTrials = Math.min(this.errorTrials, 3 + Math.floor( Math.random() * 2) );
             else
-                this.errorTrials = Math.min(this.errorTrials, 7 + Math.floor( Math.random() * 5) );
+                this.errorTrials = Math.min(this.errorTrials, 4 + Math.floor( Math.random() * 5) );
 
         }
 

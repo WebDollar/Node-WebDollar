@@ -44,7 +44,11 @@ class NodeClient {
 
         address = sckAddress.getAddress(true, true);
         port = sckAddress.port;
-        
+
+
+        if (!process.env.BROWSER) {
+            address = address.replace("https", "wss");
+        }
 
         return new Promise( (resolve) => {
 
