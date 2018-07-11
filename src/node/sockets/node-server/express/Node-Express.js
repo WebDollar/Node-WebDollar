@@ -50,7 +50,6 @@ class NodeExpress{
             this.app = express();
             this.app.use(cors({ credentials: true }));
 
-
             try {
                 this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
             } catch (exception){
