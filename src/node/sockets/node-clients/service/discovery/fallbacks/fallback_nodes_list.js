@@ -38,46 +38,46 @@ export default {
         {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
 
-        /*{"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
+        // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
         {"addr": ["https://robitza.ddns.net:80"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
-        {"addr": ["https://wd1.hoste.ro:51261"]}, // Thanks to @morion4000
-        {"addr": ["https://wd1.hoste.ro:60260"]}, // Thanks to @morion4000
-        {"addr": ["https://wd1.hoste.ro:61099"]}, // Thanks to @morion4000
-        {"addr": ["https://wd2.hoste.ro:55974"]}, // Thanks to @morion4000
-        {"addr": ["https://wd2.hoste.ro:63980"]}, // Thanks to @morion4000
-        {"addr": ["https://wd2.hoste.ro:65279"]}, // Thanks to @morion4000
-
-        {"addr": ["https://chucknorris.webdollarvpn.io:80"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:443"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://wd1.hoste.ro:51261"]}, // Thanks to @morion4000
+        // {"addr": ["https://wd1.hoste.ro:60260"]}, // Thanks to @morion4000
+        // {"addr": ["https://wd1.hoste.ro:61099"]}, // Thanks to @morion4000
+        // {"addr": ["https://wd2.hoste.ro:55974"]}, // Thanks to @morion4000
+        // {"addr": ["https://wd2.hoste.ro:63980"]}, // Thanks to @morion4000
+        // {"addr": ["https://wd2.hoste.ro:65279"]}, // Thanks to @morion4000
+        //
+        // {"addr": ["https://chucknorris.webdollarvpn.io:80"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://chucknorris.webdollarvpn.io:443"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://chucknorris.webdollarvpn.io:8080"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://chucknorris.webdollarvpn.io:8081"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8082"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8083"]}, // Thanks to @cbusuioceanu     
-        {"addr": ["https://chucknorris.webdollarvpn.io:8084"]}, // Thanks to @cbusuioceanu     
-        {"addr": ["https://chucknorris.webdollarvpn.io:8085"]}, // Thanks to @cbusuioceanu     
-        {"addr": ["https://chucknorris.webdollarvpn.io:8086"]}, // Thanks to @cbusuioceanu     
-        {"addr": ["https://chucknorris.webdollarvpn.io:8087"]}, // Thanks to @cbusuioceanu     
-        {"addr": ["https://angrybirds.webdollarvpn.io:1666"]}, // Thanks to @cbusuioceanu        
-        {"addr": ["https://angrybirds.webdollarvpn.io:2666"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://angrybirds.webdollarvpn.io:3666"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://angrybirds.webdollarvpn.io:4666"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://angrybirds.webdollarvpn.io:5666"]}, // Thanks to @cbusuioceanu
-        
-        {"addr": ["https://webdollarinfinitypool.space:8085"]}, //Thanks to @Tibi Popescu
-        {"addr": ["https://webdollarinfinitypool.space:8086"]}, //Thanks to @Tibi Popescu
-        {"addr": ["https://webdollarinfinitypool.space:8087"]}, //Thanks to @Tibi Popescu
-        {"addr": ["https://webdollarinfinitypool.space:8088"]}, //Thanks to @Tibi Popescu        
-        {"addr": ["https://webdollarinfinitypool.space:8089"]}, //Thanks to @Tibi Popescu        
-        
-        {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
-        {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
-        {"addr": ["https://bacm.ro:8080"]}, //Thanks to @jigodia
-        {"addr": ["https://bacm.ro:8081"]}, //Thanks to @jigodia
-        {"addr": ["https://bacm.ro:8082"]}, //Thanks to @jigodia*/
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8082"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8083"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8084"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8085"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8086"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8087"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://angrybirds.webdollarvpn.io:1666"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://angrybirds.webdollarvpn.io:2666"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://angrybirds.webdollarvpn.io:3666"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://angrybirds.webdollarvpn.io:4666"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://angrybirds.webdollarvpn.io:5666"]}, // Thanks to @cbusuioceanu
+        //
+        // {"addr": ["https://webdollarinfinitypool.space:8085"]}, //Thanks to @Tibi Popescu
+        // {"addr": ["https://webdollarinfinitypool.space:8086"]}, //Thanks to @Tibi Popescu
+        // {"addr": ["https://webdollarinfinitypool.space:8087"]}, //Thanks to @Tibi Popescu
+        // {"addr": ["https://webdollarinfinitypool.space:8088"]}, //Thanks to @Tibi Popescu
+        // {"addr": ["https://webdollarinfinitypool.space:8089"]}, //Thanks to @Tibi Popescu
+        //
+        // {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
+        // {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
+        // {"addr": ["https://bacm.ro:8080"]}, //Thanks to @jigodia
+        // {"addr": ["https://bacm.ro:8081"]}, //Thanks to @jigodia
+        // {"addr": ["https://bacm.ro:8082"]}, //Thanks to @jigodia*/
 
 
         //---------------------------------------------------------
