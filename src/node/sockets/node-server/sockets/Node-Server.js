@@ -104,7 +104,6 @@ class NodeServer {
 
                 server = io({
                     maxHttpBufferSize:consts.SOCKET_MAX_SIZE_BYRES,
-                    transports: ['websocket', 'xhr-polling', 'polling', 'htmlfile', 'flashsocket'],
                 });
 
             } catch(Exception){
