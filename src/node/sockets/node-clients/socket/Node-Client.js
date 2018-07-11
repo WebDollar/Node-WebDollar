@@ -46,10 +46,6 @@ class NodeClient {
         port = sckAddress.port;
 
 
-        if (!process.env.BROWSER) {
-            address = address.replace("https", "wss");
-        }
-
         return new Promise( (resolve) => {
 
             let timeoutConnection = 7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 );
