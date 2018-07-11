@@ -67,7 +67,7 @@ class NodeBlockchainPropagation{
 
         //sending the block, except poolMiners
         for (let i=0; i < NodesList.nodes.length; i++)
-            if ( NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL && NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER )
+            if ( !Blockchain.isPoolActivated  || (NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL && NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER ))
                 NodesList.nodes[i].socket.node.protocol.sendLastBlock();
 
     }
