@@ -2,11 +2,11 @@ import NodesWaitlist from "./Nodes-Waitlist";
 import NodeClient from 'node/sockets/node-clients/socket/Node-Client'
 import consts from 'consts/const_global'
 import NodesList from 'node/lists/Nodes-List'
-import CONNECTION_TYPE from "../types/Connections-Type";
+import CONNECTION_TYPE from "../types/Connection-Type";
 import Blockchain from "main-blockchain/Blockchain";
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
-import NODES_TYPE from "node/lists/types/Nodes-Type"
+import NODE_TYPE from "node/lists/types/Node-Type"
 
 let NodeExpress;
 
@@ -38,6 +38,7 @@ class NodesWaitlistConnecting {
         };
 
         setInterval(this._calculateNumberOfConnections.bind(this), 5000);
+
         this._calculateNumberOfConnections();
 
     }
@@ -97,7 +98,7 @@ class NodesWaitlistConnecting {
             return;
 
         //connect only to TERMINAL NODES
-        if ( nextWaitListObject.type === NODES_TYPE.NODE_TERMINAL) {
+        if ( nextWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) {
 
             if (nextWaitListObject.checkLastTimeChecked(consts.SETTINGS.PARAMS.WAITLIST.TRY_RECONNECT_AGAIN) && nextWaitListObject.blocked === false &&
                 nextWaitListObject.connecting === false && nextWaitListObject.checkIsConnected() === null) {

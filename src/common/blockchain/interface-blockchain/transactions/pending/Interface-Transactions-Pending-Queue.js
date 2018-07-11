@@ -17,7 +17,7 @@ class InterfaceTransactionsPendingQueue {
         this.db = db;
     }
 
-    includePendingTransaction (transaction, exceptSockets){
+    includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
 
         if (this.findPendingTransaction(transaction) !== -1)
             return false;
@@ -28,12 +28,13 @@ class InterfaceTransactionsPendingQueue {
             }
         };
 
-        if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidationType ))
-            return false;
+        if (!avoidValidation)
+            if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidationType ))
+                return false;
 
         this._insertPendingTransaction(transaction);
 
-        this.transactionsProtocol.transactionsForPropagation.addTransactionForPropagationList(transaction);
+        this.transactionsProtocol.transactionsForPropagation.addTransactionForPropagationList(transaction, avoidValidation);
         this.propagateTransaction(transaction, exceptSockets);
 
         return true;

@@ -7,7 +7,12 @@ class DownloadHelper{
 
         try{
 
-            return await axios.post(request, data);
+            let axiosInstance = axios.create({
+                timeout: timeout,
+                responseType: 'json',
+            });
+
+            return await axiosInstance.post( request, data );
 
         } catch (exception){
             return null;
@@ -20,6 +25,7 @@ class DownloadHelper{
         try{
             let axiosInstance = axios.create({
                 timeout: timeout,
+                responseType: 'json',
             });
 
             let response = await axiosInstance.get(address);

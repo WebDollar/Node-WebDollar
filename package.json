@@ -6,7 +6,7 @@
   "scripts": {
     "build_terminal": "webpack --config build_webpack/webpack.terminal.config.js",
     "build_terminal_test": "webpack --config build_webpack/tests/webpack.terminal.test.config.js",
-    "build_terminal_menu": "cross-env SERVER_PORT=3333 webpack --config build_webpack/webpack.terminal.menu.config.js",
+    "build_terminal_menu": "webpack --config build_webpack/webpack.terminal.menu.config.js",
     "build_browser": "webpack --config build_webpack/webpack.browser.config.js",
     "build_browser_user_interface": "cross-env WEBPACK_TYPE=user_interface webpack --config build_webpack/webpack.browser.config.js ",
     "show_browser_test": "node src/tests/browser/show-browser.test.js",
@@ -19,7 +19,7 @@
     "show_mocha_report": "node src/tests/browser/show-mocha.test.js",
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
     "show_coverage": "node src/tests/browser/show-coverage.test.js",
-    "commands": "npm run build_terminal_menu && node dist_bundle/terminal-menu-bundle.js"
+    "commands": "npm run build_terminal_menu && node --max_old_space_size=4096 dist_bundle/terminal-menu-bundle.js"
   },
   "repository": {
     "type": "git",
@@ -67,13 +67,16 @@
     "md5": "^2.2.1",
     "my-ip": "^1.1.1",
     "node-gyp": "^3.6.2",
+    "node-logger-winston": ">=0.1.6",
     "opn": "^5.2.0",
     "path": "^0.12.7",
     "pem": "^1.12.4",
     "pouchdb": "^6.4.3",
     "pouchdb-node": "^6.4.3",
+    "public-ip": "^2.4.0",
     "readline": "^1.3.0",
     "safe-compare": "^1.1.2",
+    "sanitizer": "^0.1.3",
     "save": "^2.3.2",
     "socket.io": "^2.0.4",
     "socket.io-client": "^2.0.4",

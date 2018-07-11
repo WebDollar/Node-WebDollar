@@ -1,5 +1,6 @@
 import NodesList from 'node/lists/Nodes-List'
-import NODES_TYPE from "node/lists/types/Nodes-Type"
+import NODE_TYPE from "node/lists/types/Node-Type"
+import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain"
 
@@ -8,7 +9,7 @@ const MAX_NUMBER_OF_BACKED_BY_LIGHT_NODE = 3;
 
 class NodesWaitlistObject {
 
-    constructor ( sckAddresses, type, level, backedBy, connected = false, socket = null ){
+    constructor ( sckAddresses, nodeType, nodeConsensusType,  level, backedBy, connected = false, socket = null ){
 
         this.sckAddresses = sckAddresses;
         this.socket = socket;
@@ -34,8 +35,10 @@ class NodesWaitlistObject {
 
         this.level = level||0;
 
-        if (type === undefined) type = NODES_TYPE.NODE_TERMINAL;
-        this.type = type;
+        if (nodeType === undefined) nodeType = NODE_TYPE.NODE_TERMINAL;
+        this.nodeType = nodeType;
+
+        this.nodeConsensusType = nodeConsensusType || NODE_CONSENSUS_TYPE.NODE_CONSENSUS_PEER;
     }
 
     refreshLastTimeChecked(){
@@ -111,7 +114,7 @@ class NodesWaitlistObject {
         let obj = {
 
             a: this.sckAddresses[0].getAddress(true, true), // address
-            t: this.type, // type
+            t: this.nodeType, // type
 
         };
 
@@ -141,9 +144,9 @@ class NodesWaitlistObject {
 
         let max;
 
-        if (this.type === NODES_TYPE.NODE_WEB_PEER)
+        if (this.nodeType === NODE_TYPE.NODE_WEB_PEER)
             max = MAX_NUMBER_OF_BACKED_BY_LIGHT_NODE;
-        else if (this.type === NODES_TYPE.NODE_TERMINAL)
+        else if (this.nodeType === NODE_TYPE.NODE_TERMINAL)
             max  = MAX_NUMBER_OF_BACKED_BY_FULL_NODE;
 
         if ( this.backedBy.length < max ){

@@ -1,3 +1,5 @@
+import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
+
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 import MiniBlockchainAccountantTreeNode from './Mini-Blockchain-Accountant-Tree-Node'
 
@@ -7,6 +9,7 @@ import consts from 'consts/const_global'
 
 import MiniBlockchainAccountantTreeEvents from "./Mini-Blockchain-Accountant-Tree-Events"
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
+import Blockchain from "main-blockchain/Blockchain";
 
 class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
@@ -26,7 +29,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
      * @param tokenId
      * @returns {*}
      */
-    updateAccount(address, value, tokenId, revertActions, showUpdate) {
+    updateAccount(address, value, tokenId, revertActions, showUpdate = true) {
 
         if (tokenId === undefined || tokenId === '' || tokenId === null) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
@@ -69,9 +72,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         //WEBD
         if (showUpdate)
             //optimization, but it doesn't work in browser
-            this.emitBalanceChangeEvent(address, () => {
-                return (resultUpdate !== null ? node.getBalances() : null);
-            });
+            this.emitBalanceChangeEvent(address, (resultUpdate !== null ? node.getBalances.bind(node) : null), (resultUpdate !== null ? node.nonce : null) );
 
         //purging empty addresses
         if (!node.hasBalances()) {
@@ -238,6 +239,10 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         if (node === undefined) node = this.root;
 
+        if (node === this.root && !Blockchain.blockchain.agent.consensus){
+            return BlockchainMiningReward.getSumReward(Blockchain.blockchain.blocks.length-1);
+        }
+
         let sum = node.getBalance(tokenId);
 
         for (let i = 0; i < node.edges.length; i++)
@@ -254,6 +259,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         let obj = {};
         for (let i=0; i<list.length; i++) {
+
             console.info( i, list[i].address, list[i].balance / WebDollarCoins.WEBD );
 
             obj[list[i].address] = list[i].balance / WebDollarCoins.WEBD;
@@ -262,6 +268,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         console.log(JSON.stringify(obj));
 
         return list;
+
     }
 
     getAccountantTreeList(){

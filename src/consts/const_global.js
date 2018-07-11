@@ -1,5 +1,6 @@
 const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
+const BigNumber = require('bignumber.js');
 
 let consts = {
 
@@ -16,13 +17,15 @@ consts.BLOCKCHAIN = {
         TIME_PER_BLOCK : 40, //in s, timestamp in UNIX format
     },
 
-    TIMESTAMP:{
+    TIMESTAMP: {
         VALIDATION_NO_BLOCKS: 10,
         NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: 10*60,
         NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE: 10*60,
     },
 
     BLOCKS_POW_LENGTH: 32,
+    BLOCKS_MAX_TARGET: new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
+    BLOCKS_MAX_TARGET_BUFFER: Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex"),
     BLOCKS_NONCE : 4,
 
     LIGHT:{
@@ -39,9 +42,16 @@ consts.BLOCKCHAIN = {
 
     },
 
+
     HARD_FORKS : {
 
         TRANSACTIONS_BUG_2_BYTES: 46950,
+
+
+
+        TRANSACTIONS_OPTIMIZATION: 153065,
+        DIFFICULTY_TIME_BIGGER: 153065,
+        WALLET_RECOVERY: 153065,
 
     }
 
@@ -176,25 +186,45 @@ consts.DATABASE_NAMES = {
 
     BLOCKCHAIN_DATABASE:{
         FOLDER:"blockchainDB3"+(process.env.INSTANCE_PREFIX||""),
-        FILE_NAME : 'blockchain4.bin'+(process.env.INSTANCE_PREFIX||""),
+        FILE_NAME : 'blockchain4.bin',
     },
 
     POOL_DATABASE: "poolDB"+(process.env.INSTANCE_PREFIX||""),
+    SERVER_POOL_DATABASE: "serverPoolDB"+(process.env.INSTANCE_PREFIX||""),
+    MINER_POOL_DATABASE: "minerPoolDB"+(process.env.INSTANCE_PREFIX||""),
+
     VALIDATE_DATABASE: "validateDB"+(process.env.INSTANCE_PREFIX||""),
     TESTS_DATABASE: "testDB"+(process.env.INSTANCE_PREFIX||""),
     TRANSACTIONS_DATABASE: "transactionsDB"+(process.env.INSTANCE_PREFIX||"")
 
 };
 
+consts.MINING_POOL_TYPE = {
+
+    MINING_POOL_DISABLED: 0,
+
+    MINING_POOL_SERVER: 1,
+    MINING_POOL: 2,
+    MINING_POOL_MINER: 3,
+
+};
+
 consts.MINING_POOL = {
 
-    WINDOW_SIZE: 16,
-    BASE_HASH_STRING: "00978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb",
+    MINING_POOL_STATUS : (process.env.MINING_POOL_STATUS || consts.MINING_POOL_TYPE.MINING_POOL_DISABLED),
 
     MINING:{
         FEE_THRESHOLD: 100000,
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
+
+    CONNECTIONS:{
+
+        NO_OF_IDENTICAL_IPS: 40,
+
+    },
+
+
 
 };
 
@@ -204,8 +234,8 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.134.0",
-        VERSION_COMPATIBILITY: "1.13",
+        VERSION: "1.140.0",
+        VERSION_COMPATIBILITY: "1.140.0",
         PROTOCOL: "WebDollar",
         SSL: true,
 
@@ -267,8 +297,8 @@ consts.SETTINGS = {
                 },
 
                 SERVER: {
-                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 100,
-                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 700,
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL: 400,
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER: 1000,
 
                     TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
                 },
@@ -336,17 +366,24 @@ if ( consts.DEBUG === true ){
 
     consts.SETTINGS.NODE.VERSION += "3";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "3";
-    consts.SETTINGS.NODE.SSL = false;
+    //consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 9095;
+    consts.SETTINGS.NODE.PORT = 8085;
+
+    //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://192.168.2.8:9095"],
+        "addr": ["http://webdollar.ddns.net:9095"],
     }];
-
 
 }
 
+consts.LOG_INSTANCE = {
+    DEFAULT: 0,
+    POOLS: 1,
+    BLOCKCHAIN: 2,
+    CLI_MENU: 3,
+};
 
 export default consts

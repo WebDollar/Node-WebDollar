@@ -17,33 +17,9 @@ class InterfaceBlockchainMiningWorkersList {
 
         this._id = 0;
 
-        setInterval(this._makeUnworkingWorkersToWork.bind(this), 2000);
 
     }
 
-
-    _makeUnworkingWorkersToWork() {
-
-        //TODO avoid terminating workers
-
-        let time = new Date().getTime();
-        let terminated = false;
-
-        for (let i = this._workersList.length-1; i >= 0; i--){
-
-            if ( this._workersList[i].dateLast !== undefined && ( time - this._workersList[i].dateLast.getTime() > 4000)  ){
-
-                this.terminateWorker(this._workersList[i]);
-                this._workersList.splice(i, 1);
-
-                terminated = true;
-            }
-        }
-
-        if (terminated)
-            this.createWorkers();
-
-    }
 
     addWorkers(number){
 
@@ -73,7 +49,6 @@ class InterfaceBlockchainMiningWorkersList {
         worker.postMessage({message: "initialize", block: this.block, nonce: this.mining._nonce , count: this.mining.WORKER_NONCES_WORK });
 
         this.mining._nonce += this.mining.WORKER_NONCES_WORK;
-        this.mining._hashesPerSecond += this.mining.WORKER_NONCES_WORK;
 
         worker.dateLast = new Date();
     }

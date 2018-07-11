@@ -2,12 +2,12 @@ import NodesList from 'node/lists/Nodes-List'
 import InterfaceBlockchainProtocol from "./../protocol/Interface-Blockchain-Protocol"
 import InterfaceBlockchainFork from 'common/blockchain/interface-blockchain/blockchain/forks/Interface-Blockchain-Fork'
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
-import CONNECTION_TYPE from "node/lists/types/Connections-Type";
+import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import Blockchain from "main-blockchain/Blockchain"
 import AGENT_STATUS from "./Agent-Status";
 import consts from 'consts/const_global'
 import InterfaceBlockchainAgentBasic from "./Interface-Blockchain-Agent-Basic"
-import NODES_TYPE from "node/lists/types/Nodes-Type";
+import NODE_TYPE from "node/lists/types/Node-Type";
 import NodesWaitlistConnecting from 'node/lists/waitlist/Nodes-Waitlist-Connecting'
 
 let NodeExpress;
@@ -76,23 +76,12 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         this._initializeProtocol();
 
-        NodesList.emitter.on("nodes-list/disconnected", async (result) => {
-
-            if (NodesList.nodes.length === 0) { //no more sockets, maybe I no longer have internet
-
-                console.warn("################### RESYNCHRONIZATION STARTED ##########");
-                Blockchain.synchronizeBlockchain();
-
-            }
-
-        });
-
 
         if (!this.light)
             NodesList.emitter.on("nodes-list/connected", async (result) => {
 
-                if (!NodeExpress.amIFallback() )
-                    if ( NodesList.countNodesByType(NODES_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK){
+                if (!NodeExpress.amIFallback() && !Blockchain.isPoolActivated )
+                    if ( NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK){
 
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
                         NodesList.disconnectFromFallbacks();
@@ -196,6 +185,9 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
     set status(newValue){
 
+        if (this._status === newValue)
+            return;
+
         this._status = newValue;
 
         if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES].indexOf(newValue) >= 0){
@@ -228,6 +220,8 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
     get status(){
         return this._status;
     }
+
+
 
 
 }

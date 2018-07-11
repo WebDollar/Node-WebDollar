@@ -49,7 +49,10 @@ class BufferExtended {
     
     safeCompare(buffer1, buffer2){
 
+        if (!buffer1.equals(buffer2)) return false; //optimization
+
         return safeCompare(buffer1, buffer2);
+
     }
 
     toBase(buffer){

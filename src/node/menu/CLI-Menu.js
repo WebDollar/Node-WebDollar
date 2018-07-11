@@ -1,12 +1,22 @@
 const FileSystem = require('fs');
-const readline = require('readline');
+
+let NodeExpress, NodeServer;
+
+if (!process.env.BROWSER) {
+    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+}
+
 
 import consts from 'consts/const_global';
-import {Node, Blockchain} from '../../index.js';
+import {Node} from '../../index.js';
 import AdvancedMessages from './Advanced-Messages';
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-import PoolLeaderProtocol from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolLeaderProtocol';
+import Blockchain from "main-blockchain/Blockchain"
+import StatusEvents from "common/events/Status-Events";
+import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
+import Log from 'common/utils/logging/Log';
 
 class CLI {
 
@@ -14,12 +24,6 @@ class CLI {
 
         if (process.env.BROWSER)
             return;
-
-        this.WEBD_CLI = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            prompt: 'WEBD_CLI:> '
-        });
 
         this._exitMenu = undefined;
 
@@ -30,46 +34,52 @@ class CLI {
     async _runMenu() {
 
         if (this._exitMenu === true) {
-            this.WEBD_CLI.close();
+            AdvancedMessages.WEBD_CLI.close();
             process.exit();
             return;
         }
 
-        let answer = await this.question('Command: ');
+        let answer = await AdvancedMessages.input('Command: ');
 
         switch(answer.trim()) {
-            case '1':
+            case '1': //  List addresses'
                 await this.listAddresses();
                 break;
-            case '2':
+            case '2': //  Create new address',
                 await this.createNewAddress();
                 break;
-            case '3':
+            case '3': //  Delete Address
                 await this.deleteAddress();
                 break;
-            case '4':
+            case '4': //  Import Address
                 await this.importAddress();
                 break;
-            case '5':
+            case '5': //  Export Address
                 await this.exportAddress();
                 break;
-            case '6':
+            case '6': //  Encrypt Address
                 await this.encryptAddress();
                 break;
-            case '7':
+            case '7': //  Set Mining Address
                 await this.setMiningAddress();
                 break;
-            case '8':
+            case '8': //  Start Mining
                 await this.startMining();
                 break;
-            case '9':
+            case '9': //  Start Mining Instantly
                 await this.startMining(true);
                 break;
-            case 'p':
+            case '10': // Mining Pool: Start Mining in a Pool
                 await this.startMiningInsidePool();
                 break;
-            case 'c':
+            case '11':  // Mining Pool: Create a New Pool
                 await this.createMiningPool();
+                break;
+            case '12':  // Server Mining Pool: Create a new Server for Mining Pool
+                await this.createServerForMiningPool();
+                break;
+            case '20':  // Server Mining Pool: Create a new Server for Mining Pool
+                NodeExpress.startExpress();
                 break;
             case 'exit':
                 this._exitMenu = true;
@@ -84,32 +94,24 @@ class CLI {
 
     async _start() {
 
+        Log.info('CLI menu started', consts.LOG_INSTANCE.CLI_MENU);
+
         if (Blockchain !== undefined)
             await Blockchain.loadWallet();
 
         this._showCommands();
-        this.WEBD_CLI.prompt();
+        AdvancedMessages.WEBD_CLI.prompt();
 
         this._exitMenu = false;
         await this._runMenu();
     }
 
-    async _pickNumber(message, isFloat = false) {
-        
-        let answer = await this.question(message);
-        
-        let num = isFloat ? parseFloat(answer) : parseInt(answer);
-        if (isNaN(num))
-            return NaN;
 
-        return num;
-    }
-    
     async _chooseAddress() {
 
         await this.listAddresses();
 
-        let addressId = await this._pickNumber('Choose the address number: ');
+        let addressId = await AdvancedMessages.readNumber('Choose the address number: ');
 
         if (isNaN(addressId) || addressId < 0 || Blockchain.Wallet.addresses.length <= addressId)
             return -1;
@@ -129,62 +131,50 @@ class CLI {
         return true;
     }
 
-    _sync(sync = true) {
-
-        /*let callback = () => {
-
-            Blockchain.startMiningNextTimeSynchronized = true;
-        };
-
-        if (!Blockchain._blockchainInitiated) {
-            Blockchain.createBlockchain("full-node", () => {
-                Node.NodeServer.startServer();
-                Node.NodeClientsService.startService();
-                Blockchain.Mining.stopMining();
-                callback();
-            });
-        } else {
-            Blockchain.Mining.stopMining();
-            callback();
-        }*/
-    }
-
     async listAddresses() {
 
-        console.info('\nWallet addresses:');
 
-        this._sync(true);
+        await this._callCallbackBlockchainSync(async ()=>{
 
-        let miningAddress = Blockchain.blockchain.mining.minerAddress;
-        if (miningAddress === undefined)
-            miningAddress = 'not specified';
-        
-        console.log(addressHeader);
-        for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
+            console.info('\nWallet addresses:');
 
-            let address = Blockchain.Wallet.addresses[i].address;
+            let miningAddress = Blockchain.blockchain.mining.minerAddress;
+            if (miningAddress === undefined)
+                miningAddress = 'not specified';
 
-            let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
-            
-            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+            console.log(addressHeader);
+            for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
 
-            if (address === miningAddress) {
-                console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
-            } else {
-                console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
+                let address = Blockchain.Wallet.addresses[i].address;
+
+                let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
+
+                balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+
+                if (address === miningAddress) {
+                    console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
+                } else {
+                    console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
+                }
             }
-        }
-        
-        let balance = 0;
-        if (miningAddress !== 'not specified') {
-            balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
-            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
-        }
-        console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
 
-        this._sync(false);
+            let balance = 0;
+            if (miningAddress !== 'not specified') {
+                balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
+                balance = (balance === null) ? 0 : balance;
 
-        return true;
+                if (Blockchain.MinerPoolManagement.minerPoolStarted)
+                    balance += Blockchain.MinerPoolManagement.minerPoolReward.total;
+
+                balance /= WebDollarCoins.WEBD;
+
+
+            }
+            console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
+
+            return true;
+
+        }, true);
     }
 
     async createNewAddress() {
@@ -223,7 +213,7 @@ class CLI {
 
         return new Promise( async (resolve) => {
 
-            let addressPath = await this.question('Enter address path: ');
+            let addressPath = await AdvancedMessages.input('Enter address path: ');
 
             FileSystem.readFile(addressPath, 'utf8', async (err, content) => {
 
@@ -272,11 +262,11 @@ class CLI {
                 return;
             }
 
-            let addressPath = await this.question('Enter path for saving address: ');
+            let addressPath = await AdvancedMessages.input('Enter path for saving address: ');
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
             let fileName = "WEBD$" + Blockchain.Wallet.addresses[addressId].unencodedAddress.toString("hex") + ".webd";
-            
+
             let answer = await Blockchain.Wallet.exportAddressToJSON(addressString);
 
             if (answer.result === false) {
@@ -349,71 +339,183 @@ class CLI {
 
     async startMining(instantly){
 
-        let callback = () => {
+        await this._callCallbackBlockchainSync( async ()=>{
+
+            await Blockchain.MinerPoolManagement.minerPoolSettings.setMinerPoolActivated(false);
+
+        }, async ()=>{
 
             if (instantly)
-                Blockchain.startMiningInstantly();
+                await Blockchain.startMiningInstantly();
             else
                 Blockchain.startMiningNextTimeSynchronized = true;
 
-        };
-
-        if (!Blockchain._blockchainInitiated) {
-            Blockchain.createBlockchain("full-node", () => {
-                Node.NodeServer.startServer();
-                Node.NodeClientsService.startService();
-
-                callback();
-            });
-        } else {
-            callback();
-        }
+        } );
 
     }
-    
+
     async startMiningInsidePool(){
         
-        console.info('Mining inside a pool.');
-        console.info('Your current mining pool is: ', 'demo at the moment');
-        
-        return new Promise ( async (resolve)=> {
-            let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool');
-            
-            if (response == false) {
-                let miningPoolLink = await this.question('Enter the new mining pool link: ');
-                console.info('Your new mining pool is: ', miningPoolLink);
-                //TODO: Save the mining pool link
+        console.info('Mining inside a POOL');
+
+        await this._callCallbackBlockchainSync(async ()=>{
+
+            let getNewLink = true;
+
+            if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== ''){
+
+                console.info('Your current mining pool is: ', Blockchain.MinerPoolManagement.minerPoolSettings.poolName," ", Blockchain.MinerPoolManagement.minerPoolSettings.poolWebsite );
+                let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool: '+Blockchain.MinerPoolManagement.minerPoolSettings.poolURL);
+
+                if (response === true) getNewLink = false;
+
             }
-            
-            //TODO: Code for start mining inside a pool
-            
-            resolve(true);
-        });
+
+            let miningPoolLink = undefined;
+
+            if (getNewLink) {
+
+                miningPoolLink = await AdvancedMessages.input('Enter the new mining pool link: ');
+                console.info('Your new MiningPool is : ', miningPoolLink);
+
+            }
+
+            StatusEvents.on("miner-pool/connection-established",(data)=>{
+                if (data.connected)
+                    Blockchain.Mining.startMining();
+                else
+                    Blockchain.Mining.stopMining();
+            });
+
+            await Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
+
+        }, false);
+
     }
-    
+
     async createMiningPool(){
-        
-        console.info('Create Mining Pool.');
-        
-        let poolLeaderFee = await this._pickNumber('Choose a fee(0...100): ', true);
-        
-        if (isNaN(poolLeaderFee) || poolLeaderFee < 0 || 100 < poolLeaderFee){
-            console.log("You have entered an invalid number:", poolLeaderFee);
+
+        console.info('Create Mining Pool');
+
+        await this._callCallbackBlockchainSync(async ()=>{
+
+            await Blockchain.PoolManagement.setPoolStarted(false);
+
+            let getNewLink = true;
+
+            console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
+
+            if (typeof Blockchain.PoolManagement.poolSettings.poolURL === "string" && Blockchain.PoolManagement.poolSettings.poolURL !== ''){
+
+                console.info('You have some settings for a pool: ', Blockchain.PoolManagement.poolSettings.poolName," ", Blockchain.PoolManagement.poolSettings.poolWebsite );
+                let response = await AdvancedMessages.confirm('Do you want to continue using the settings for : '+Blockchain.PoolManagement.poolSettings.poolURL);
+
+                if (response === true) getNewLink = false;
+            }
+
+            if (getNewLink){
+
+                let poolFee, poolReferralFee, poolName, poolWebsite, poolServers;
+
+
+                poolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
+
+                if (isNaN(poolFee) || poolFee < 0 || 100 < poolFee){
+                    console.log("You have entered an invalid number:", poolFee);
+                    return false;
+                }
+                else
+                    console.log("Your fee is", poolFee);
+
+                poolName = await AdvancedMessages.input('Pool Name: ');
+                poolWebsite = await AdvancedMessages.input('Pool Website: ');
+
+                poolReferralFee = await AdvancedMessages.readNumber("Choose a Referral fee (0...100): ", true);
+                if (isNaN(poolReferralFee) || poolReferralFee < 0 || 100 < poolReferralFee){
+                    console.log("You have entered an invalid number:", poolReferralFee);
+                    return false;
+                }
+                else
+                    console.log("Your Referral fee is", poolFee);
+
+                let response = await AdvancedMessages.confirm('Do you want to use external pool servers?: ');
+
+                if (response){
+                    poolServers = await AdvancedMessages.input('Pool Servers (separated by comma): ');
+                    await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( true ) ;
+                } else {
+                    poolServers = await NodeServer.getServerHTTPAddress(true);
+                    await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( false ) ;
+                    await Blockchain.PoolManagement.poolSettings.setPoolUseSignatures( false ) ;
+                }
+
+
+                if (poolFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
+                if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
+                if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
+                if (poolServers !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
+                if (poolReferralFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolReferralFee(poolReferralFee / 100);
+
+            }
+
+            await Blockchain.PoolManagement.startPool(true);
+
+
+        }, true);
+
+    }
+
+    async createServerForMiningPool(){
+
+        console.info('Create Server Pool');
+        console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
+
+        let serverPoolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
+
+        if (isNaN(serverPoolFee) || serverPoolFee < 0 || 100 < serverPoolFee){
+            console.log("You have entered an invalid number:", serverPoolFee);
             return false;
         }
         else
-            console.log("your fee is", poolLeaderFee);
+            console.log("your fee is", serverPoolFee );
 
-        let poolLeader = new PoolLeaderProtocol(poolLeaderFee);
+        await this._callCallbackBlockchainSync(async ()=>{
+
+            await Blockchain.ServerPoolManagement.serverPoolSettings.setServerPoolFee(serverPoolFee / 100);
+            await Blockchain.ServerPoolManagement.startServerPool();
+
+        }, true);
+
+
     }
 
-    question(message){
+    async _callCallbackBlockchainSync(callbackBeforeServerInitialization, callbackAfterServerInitialization, synchronize=true ){
 
-        return new Promise ((resolve)=> {
-            this.WEBD_CLI.question(message, (answer)=>{
-                resolve(answer);
-            });
-        });
+        if (!Blockchain._blockchainInitiated) {
+
+            await Blockchain.createBlockchain("full-node", async () => {
+
+                await Node.NodeServer.startServer();
+
+                if (typeof callbackBeforeServerInitialization === "function")
+                    await callbackBeforeServerInitialization();
+
+                await Node.NodeClientsService.startService();
+
+                if (typeof callbackAfterServerInitialization === "function")
+                    await callbackAfterServerInitialization();
+
+            }, undefined, synchronize );
+
+        } else {
+
+            if (typeof callbackBeforeServerInitialization === "function")
+                await callbackBeforeServerInitialization();
+
+            if (typeof callbackAfterServerInitialization === "function")
+                await callbackAfterServerInitialization();
+
+        }
 
     }
 
@@ -427,10 +529,12 @@ const commands = [
         '5. Export address',
         '6. Encrypt address',
         '7. Set mining address',
-        '8. Start Mining',
-        '9. Start Mining Instantly Even Unsynchronized',
-        'p. Start Mining Inside a Pool',
-        'c. Create a New Mining Pool',
+        '8. Solo: Start Mining',
+        '9. Solo: Start Mining Instantly Even Unsynchronized',
+        '10. Mining Pool: Start Mining',
+        '11. Mining Pool: Create a New Pool',
+        '12. Server for Mining Pool: Create a new Server for Mining Pool',
+        '20. HTTPS Express Start',
     ];
 
 const lineSeparator =

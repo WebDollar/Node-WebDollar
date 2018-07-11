@@ -5,7 +5,7 @@ export default {
 
     "nodes": [
 
-        //---------------------------------------------------------
+    /*    //---------------------------------------------------------
         //--------------Community FallBack Nodes-------------------
         //---------------------------------------------------------
 
@@ -78,7 +78,9 @@ export default {
         {"addr": ["https://bacm.ro:8080"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:8081"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:8082"]}, //Thanks to @jigodia
-        
+
+        */
+
         //---------------------------------------------------------
         //--------------WebDollar FallBack Nodes-------------------
         //---------------------------------------------------------
@@ -86,9 +88,7 @@ export default {
         {"addr": ["https://skyhub.me:80"]},
         {"addr": ["https://presa7.ro:80"]},
 
-        {"addr": ["https://webdollar-vps1.ddns.net:80"]},
-        {"addr": ["https://webdollar-vps2.ddns.net:80"]},
-        {"addr": ["https://webdollar-vps3.ddns.net:80"]},
+
         {"addr": ["https://webdollar-vps4.zapto.org:80"]},
         {"addr": ["https://webdollar-vps5.hopto.org:80"]},
 

@@ -32,10 +32,17 @@ class InterfaceBlockchainTransactionTo{
 
         for (let i = 0; i < addresses.length; i++) {
 
-            if (typeof addresses[i].unencodedAddress === "object" && addresses[i].unencodedAddress.hasOwnProperty("unencodedAddress"))
-                addresses[i].unencodedAddress = addresses[i].unencodedAddress.unencodedAddress;
+            if (addresses[i].unencodedAddress !== undefined) {
 
-            addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addresses[i].unencodedAddress);
+                if (typeof addresses[i].unencodedAddress === "object" && addresses[i].unencodedAddress.hasOwnProperty("unencodedAddress"))
+                    addresses[i].unencodedAddress = addresses[i].unencodedAddress.unencodedAddress;
+
+                addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addresses[i].unencodedAddress);
+
+            } else
+            if (addresses[i].address !== undefined){ //maybe address
+                addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addresses[i].address);
+            }
 
             if (typeof addresses[i].amount === "string")
                 addresses[i].amount = parseInt(addresses[i].amount);
@@ -69,6 +76,8 @@ class InterfaceBlockchainTransactionTo{
     validateTo(){
 
         if (this.addresses.length === 0) throw {message: 'To is empty Array'};
+
+        if (this.addresses.length  >= 256) throw {message:"Too many inputs. Max 256"};
 
         this.addresses.forEach ( (toObject, index) =>{
 

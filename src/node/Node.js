@@ -3,7 +3,7 @@ var NodeServer, NodeExpress;
 
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List'
-import NodeClientsService from 'node/sockets/node-clients/service/node-clients-service'
+import NodeClientsService from 'node/sockets/node-clients/service/Node-Clients-Service'
 import NodeWebPeersService from 'node/webrtc/service/node-web-peers-service'
 import NodesStats from 'node/lists/stats/Nodes-Stats'
 import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'

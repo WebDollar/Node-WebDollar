@@ -58,22 +58,70 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
     }
 
 
-    async saveBlockchain(startingHeight, endingHeight){
+
+    async _loadBlockchain(){
+
+        if (process.env.BROWSER)
+            return true;
+
+        //AccountantTree[:-BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS]
+
+        try {
+
+            if (process.env.FORCE_LOAD !== undefined) throw "load blockchain simple" ;
+
+            let offset = await this.db.get("lightAccountantTreeAdvanced_offset");
+
+            if (offset === null || offset < consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES)
+                throw "load blockchain simple";
+
+            if (!(await this.accountantTree.loadMiniAccountant(undefined, undefined, true,  "lightAccountantTreeAdvanced")))
+                throw "load blockchain simple";
+
+            let answer = await this.inheritBlockchain.prototype._loadBlockchain.call(this, undefined, offset);
+
+            if (!answer) {
+                //couldn't load the last K blocks
+                console.error("couldn't load the last K blocks");
+
+                await this.accountantTree.loadMiniAccountant(new Buffer(0));
+
+                throw "load blockchain simple"; //let's force to load a simple blockchain
+            }
+
+        } catch (exception){
+
+            console.error("Loading Blockchain Exception", exception);
+
+            if (exception === "load blockchain simple") {
+
+                await this.inheritBlockchain.prototype._loadBlockchain.call(this);
+
+            }
+        }
+
+        this._miniBlockchainSaveBlocks = this.blocks.length;
+
+        return false;
+
+    }
+
+
+    async saveBlockchainTerminated(){
+
+        await MiniBlockchain.prototype.saveBlockchainTerminated.call(this);
 
         if (process.env.BROWSER)
             return true;
 
         if (this.blocks.length === 0) return false;
 
+        //avoid resaving the same blockchain
+        if (this._miniBlockchainSaveBlocks === this.blocks.length) return false;
+
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
+
         try {
-
-            global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
-
-            console.log("saving started");
-
-            if (! (await this.inheritBlockchain.prototype.saveBlockchain.call(this, startingHeight, endingHeight)))
-                throw {message: "couldn't sae the blockchain"};
-
 
             if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) {
 
@@ -98,50 +146,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
         return true;
-
-    }
-
-    async loadBlockchain(){
-
-        if (process.env.BROWSER)
-            return true;
-
-        //AccountantTree[:-BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS]
-
-        try {
-
-            if (process.env.FORCE_LOAD !== undefined) throw "load blockchain simple" ;
-
-            let offset = await this.db.get("lightAccountantTreeAdvanced_offset");
-
-            if (offset === null || offset < consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES)
-                throw "load blockchain simple";
-
-            if (!(await this.accountantTree.loadMiniAccountant(undefined, undefined, true,  "lightAccountantTreeAdvanced")))
-                throw "load blockchain simple";
-
-            let answer = await this.inheritBlockchain.prototype.loadBlockchain.call(this, undefined, offset);
-
-            if (!answer) {
-                //couldn't load the last K blocks
-                console.error("couldn't load the last K blocks");
-
-                this.accountantTree.loadMiniAccountant(new Buffer(0));
-                throw "load blockchain simple"; //let's force to load a simple blockchain
-            }
-
-        } catch (exception){
-
-            if (exception === "load blockchain simple") {
-                let answer = await this.inheritBlockchain.prototype.loadBlockchain.call(this);
-
-                if (answer)
-                    await this.saveBlockchain(this.blocks.length, this.blocks.length);
-
-            }
-        }
-
-        return false;
 
     }
 

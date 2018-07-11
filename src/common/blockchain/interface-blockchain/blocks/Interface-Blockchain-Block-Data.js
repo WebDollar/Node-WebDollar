@@ -131,7 +131,7 @@ class InterfaceBlockchainBlockData {
 
     toJSON(){
         return {
-            minerAddress: this.minerAddress,
+            minerAddress: this.minerAddress.toString("hex"),
             hashData: this.hashData.toString("hex"),
         };
     }

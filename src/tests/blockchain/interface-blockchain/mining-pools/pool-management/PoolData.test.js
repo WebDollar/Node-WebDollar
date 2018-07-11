@@ -1,7 +1,7 @@
 const assert = require('assert');
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
-import PoolData from 'common/blockchain/interface-blockchain/mining-pools/pool-management/PoolData';
+import PoolData from 'common/mining-pools/pool/pool-management/pool-data/Pool-Data';
 import TestsHelper from 'tests/Tests.helper';
 
 describe('test pool leader DB', () => {
@@ -36,17 +36,17 @@ describe('test pool leader DB', () => {
         response = await pd.saveMinersList();
         assert(response === true, "Error saving empty minersList: " + response);
 
-        response = await pd.loadMinersList();
+        response = await pd._loadMinersList();
         assert(response === true, "Error loading empty minersList: " + response);
 
         pd.setMinersList(minersList);
         response = await  pd.saveMinersList();
         assert(response === true, "Error saving minersList: " + response);
 
-        response = await  pd.loadMinersList();
+        response = await  pd._loadMinersList();
         assert(response === true, "Error loading minersList: " + response);
 
-        assert(!pd.compareMinersList(minersList), "minersList differ!");
+        assert(!pd._compareMinersList(minersList), "minersList differ!");
     });
 
 
@@ -54,12 +54,12 @@ describe('test pool leader DB', () => {
 
         let pd = new PoolData();
 
-        await pd.setMiner(minersList[0].address, minersList[0].reward);
+        await pd.addMiner(minersList[0].address, minersList[0].reward);
         
-        response = await pd.setMiner(minersList[0].address, minersList[0].reward);
+        response = await pd.addMiner(minersList[0].address, minersList[0].reward);
         assert(response === false, "Miner inserted twice");
         
-        let miner = pd.getMinersList()[0];
+        let miner = pd.miners[0];
         
         assert(!PoolData.compareMiners(miner, minersList[0]), "Miners differ");
 
@@ -69,7 +69,7 @@ describe('test pool leader DB', () => {
         response = await pd.removeMiner(miner.address);
         assert(response === false, "Miner found after delete!!!");
         
-        response = pd.getMinersList();
+        response = pd.miners;
         assert(response.length === 0, "minersList is not empty after removing the only one existing item:" + response.length);
     });
     
@@ -79,7 +79,7 @@ describe('test pool leader DB', () => {
         
         for (let i = 0; i < minersList.length; ++i){
 
-            await pd.setMiner(minersList[i].address, minersList[i].reward);
+            await pd.addMiner(minersList[i].address, minersList[i].reward);
             pd.increaseMinerReward(minersList[i].address, 10133333);
         }
 

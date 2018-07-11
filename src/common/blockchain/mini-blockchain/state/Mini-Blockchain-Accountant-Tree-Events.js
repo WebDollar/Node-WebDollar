@@ -1,7 +1,7 @@
-const EventEmitter = require('events');
 import BufferExtended from "common/utils/BufferExtended"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 import InterfaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
@@ -9,8 +9,8 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
         super(db);
 
-        this.emitter = new EventEmitter()
-        this.emitter.setMaxListeners(100);
+        this.emitter = new AdvancedEmitter();
+
     }
 
 
@@ -46,6 +46,7 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
                 let node = null;
                 let balances = null;
+                let nonce = null;
 
                 try {
 
@@ -54,24 +55,26 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
                     // in case it doesn't exist, let's create it
                     if (node !== undefined && node !== null && node.isLeaf()) {
                         balances = node.getBalances();
+                        nonce = node.nonce;
                     }
 
                 } catch (exception) {
 
                 }
 
-                this.emitBalanceChangeEvent(address, ()=>{return balances} );
+                this.emitBalanceChangeEvent(address, ()=>{ return balances }, nonce  );
             }
     }
 
-    emitBalanceChangeEvent(address, getBalanceCallback){
+    emitBalanceChangeEvent(address, getBalanceCallback, nonce){
 
         if (this._checkBalanceIsSubscribed(address)) {
             let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address));
-            this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {address: addressWIF, balances: getBalanceCallback() });
+            this.emitter.emit("balances/changes/" + BufferExtended.toBase(address), {address: addressWIF, balances: getBalanceCallback === null ? getBalanceCallback : getBalanceCallback(), nonce: nonce });
         }
 
     }
+
 
 }
 

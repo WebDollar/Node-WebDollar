@@ -8,7 +8,6 @@ import BufferExtended from 'common/utils/BufferExtended';
 
 //video tutorial https://asecuritysite.com/encryption/base58
 
-import CLI from 'node/menu/CLI-Menu';
 import consts from 'consts/const_global';
 import AdvancedMessages from "node/menu/Advanced-Messages"
 
@@ -123,65 +122,39 @@ class InterfaceBlockchainAddressHelper{
         return ed25519.sign(msg, privateKey);
     }
 
-    static _generateAddressFromPublicKey(publicKey, showDebug){
+    static _generateUnencodedAddressFromPublicKey(publicKey, showDebug){
 
         if (!Buffer.isBuffer(publicKey))
             throw {message: 'publicKey must be a Buffer', publicKey: publicKey};
 
-        //could use publicKeyBytesCompressed as well
-
         //bitcoin original
-        let hash160 =  WebDollarCrypto.RIPEMD160(WebDollarCrypto.SHA256(publicKey));
+        let unencodedAddress =  WebDollarCrypto.RIPEMD160(WebDollarCrypto.SHA256(publicKey));
 
         if (showDebug)
-            console.log("hash160 hex", hash160.toString('hex') ); //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
+            console.log("hash160 hex", unencodedAddress.toString('hex') ); //"3c176e659bea0f29a3e9bf7880c112b1b31b4dc8"
 
-        let unencodedAddress;
-       /* if (consts.ADDRESSES.ADDRESS.USE_BASE64 === false){
-            for (let i=220; i>0; i--) {
-                for (let j = 255; j > 0; j--) {
-                    for (let q = 255; q > 0; q--){
-                        /!*for (let w = 255; w > 0; w--) *!/{
+        return unencodedAddress;
+    }
 
-                            consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58 = i.toString(16) + j.toString(16) + q.toString(16) /!*+ w.toString(16)*!/;
-                            unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
+    static _generateAddressFromPublicKey(publicKey, showDebug){
 
-                            if (BufferExtended.toBase(unencodedAddress).indexOf("WEBD") === 0)
-                                console.log(i, j, q, /!*w,*!/ BufferExtended.toBase(unencodedAddress));
+        let unencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(publicKey, showDebug);
 
-
-                            if (BufferExtended.toBase(unencodedAddress).indexOf("WEB") === 0)
-                                console.log(i, j, q, BufferExtended.toBase(unencodedAddress));
-
-                            if (BufferExtended.toBase(unencodedAddress).indexOf("WBD") === 0)
-                                console.log(i, j, q, BufferExtended.toBase(unencodedAddress));
-
-                        }
-                    }
-
-                }
-                console.log(i, BufferExtended.toBase(unencodedAddress));
-
-            }
-        }
-*/
-         unencodedAddress = InterfaceBlockchainAddressHelper.generateAddressWIF(hash160);
+        let addressWIF = InterfaceBlockchainAddressHelper.generateAddressWIF(unencodedAddress);
 
         if (showDebug)
-            console.log("unencodedAddress", unencodedAddress.toString("hex")); //003c176e659bea0f29a3e9bf7880c112b1b31b4dc826268187
-
-        //if (showDebug)
-            //console.log("address",BufferExtended.toBase(unencodedAddress).length); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
+            console.log("addressWIF", BufferExtended.toBase(addressWIF)); //16UjcYNBG9GTK4uq2f7yYEbuifqCzoLMGS
 
         return  {
             unencodedAddress: unencodedAddress,
+            addressWIF: BufferExtended.toBase(addressWIF),
             address: BufferExtended.toBase(unencodedAddress),
         };
     }
 
-    static generateAddressWIF(address, showDebug){
+    static generateAddressWIF(address, showDebug, toBase = false){
 
-        if (!Buffer.isBuffer(address))
+        if (!Buffer.isBuffer(address) && typeof address === "string")
             address = BufferExtended.fromBase(address);
 
         let prefix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
@@ -189,7 +162,7 @@ class InterfaceBlockchainAddressHelper{
 
         //maybe address is already a
         if (address.length === consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH  + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2)
-            return address;
+            return (toBase ? BufferExtended.toBase(address) : address);
 
         address = Buffer.concat ( [ Buffer.from(consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX,"hex"), address ]) ; //if using testnet, would use 0x6F or 111.
 
@@ -202,7 +175,8 @@ class InterfaceBlockchainAddressHelper{
             Buffer.from( suffix, "hex")
         ]);
 
-        return addressWIF;
+
+        return (toBase ? BufferExtended.toBase(addressWIF) : addressWIF);
     }
 
     static generateAddress(salt, privateKeyWIF){
@@ -229,7 +203,10 @@ class InterfaceBlockchainAddressHelper{
 
         return {
             address: address.address,
+            addressWIF: address.addressWIF,
+
             unencodedAddress: address.unencodedAddress,
+
             publicKey: publicKey,
             privateKey: privateKey,
         };
@@ -434,17 +411,12 @@ class InterfaceBlockchainAddressHelper{
 
         return new Promise( async (resolve) => {
 
-            let answer;
-
-            if (process.env.BROWSER)
-                answer =  prompt(message||"Please enter your last password (12 words separated by space):");
-            else
-                answer =  await CLI.question(message||"Please enter your last password (12 words separated by space):");
+            let answer = await AdvancedMessages.input("Please enter your last password (12 words separated by space):");
 
             let oldPassword = answer.trim().split(' ');
 
             if (oldPassword.length !== 12) {
-                AdvancedMessages.alert('Your old password has ' + oldPassword.length + ' words. It must have 12!');
+                AdvancedMessages.alert('Your old password has ' + oldPassword.length + ' words. It must have 12!', "Password Error", "error", 5000);
                 resolve(null);
                 return;
             }

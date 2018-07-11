@@ -63,6 +63,8 @@ class InterfaceBlockchainBlock {
 
     destroyBlock(){
 
+        if (this.blockchain === undefined) return;
+
         //it is included in the blockchain
         if ( this.blockchain.blocks[ this.height ] === this)
             return;
@@ -214,10 +216,11 @@ class InterfaceBlockchainBlock {
 
         return {
             version: this.version,
-            hashPrev: this.hashPrev,
+            hashPrev: this.hashPrev.toString("hex"),
             data: this.data.toJSON(),
             nonce: this.nonce,
             timeStamp: this.timeStamp,
+            difficulty: this.difficultyTarget.toString("hex"),
         }
 
     }
@@ -274,16 +277,14 @@ class InterfaceBlockchainBlock {
      * @param blockNonce
      * @returns {Promise<Buffer>}
      */
-    static async computeHashStatic(newNonce, height, difficultyTargetPrev, computedBlockPrefix, blockNonce) {
+    static async computeHashStatic(blockSerialized, newNonce) {
 
         let buffer = Buffer.concat ( [
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(height) ),
-            Serialization.serializeBufferRemovingLeadingZeros( difficultyTargetPrev ),
-            computedBlockPrefix,
-            Serialization.serializeNumber4Bytes(newNonce || blockNonce ),
+            blockSerialized,
+            Serialization.serializeNumber4Bytes(newNonce),
         ] );
 
-        return await WebDollarCrypto.hashPOW(buffer)
+        return await WebDollarCrypto.hashPOW( buffer );
     }
 
     serializeBlock(requestHeader){
@@ -309,7 +310,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, prevBlock, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, offset = 0){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -317,8 +318,9 @@ class InterfaceBlockchainBlock {
 
         if (height !== undefined)  this.height = height;
         if (reward !== undefined) this.reward = reward;
+        else if (this.reward === undefined) this.reward = BlockchainMiningReward.getReward(height||this.height);
+
         if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
-        if (offset === undefined) offset = 0;
 
         if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
@@ -390,7 +392,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height) );
+            this.deserializeBlock(buffer, this.height, undefined, this.blockValidation.getDifficultyCallback(this.height) );
 
             return true;
         }

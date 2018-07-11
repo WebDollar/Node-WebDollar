@@ -38,7 +38,7 @@ class InterfaceBlockchainAddress{
 
         let result = InterfaceBlockchainAddressHelper.generateAddress(salt, privateKeyWIF);
 
-        this.address = result.address;
+        this.address = result.addressWIF;
         this.unencodedAddress = result.unencodedAddress;
         this.publicKey = result.publicKey;
 
@@ -95,7 +95,7 @@ class InterfaceBlockchainAddress{
      */
     async isPrivateKeyEncrypted() {
 
-        let privateKey = await this.getPrivateKey();
+        let privateKey = await this._getPrivateKey();
 
         try {
             if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey)) {
@@ -134,7 +134,7 @@ class InterfaceBlockchainAddress{
      * @param password is used to decrypt privateKey from database
      * @returns privateKey's value decrypted
      */
-    async getPrivateKey(password) {
+    async _getPrivateKey(password) {
 
         let key = this.address + '_privateKey';
 
@@ -149,6 +149,38 @@ class InterfaceBlockchainAddress{
         catch(err) {
             return 'ERROR on LOAD privateKey: ' + err;
         }
+    }
+
+    async getPrivateKey(password) {
+
+        if (password === undefined && await this.isPrivateKeyEncrypted()) {
+
+            if (password === undefined)
+                password = await InterfaceBlockchainAddressHelper.askForPassword();
+
+            if (password === null)
+                return null;
+
+        } else password = undefined;
+
+        let privateKey = await this._getPrivateKey(password);
+
+        try {
+
+            let answer = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey);
+
+            if (!answer.result)
+                throw { message: "private key is invalid" };
+
+            return answer.privateKey;
+
+        } catch (exception) {
+
+            AdvancedMessages.alert('Your password is incorrect!', "Password Error", "error", 5000);
+
+            return null;
+        }
+
     }
 
     /**
@@ -168,7 +200,7 @@ class InterfaceBlockchainAddress{
     }
 
     async exportAddressPrivateKeyToHex(){
-        return (await this.getPrivateKey()).toString("hex");
+        return (await this._getPrivateKey()).toString("hex");
     }
 
     /**
@@ -196,7 +228,7 @@ class InterfaceBlockchainAddress{
                 }
 
                 let list = [];
-                let privateKey = await this.getPrivateKey();
+                let privateKey = await this._getPrivateKey();
 
                 list.push( Serialization.serializeNumber1Byte(privateKey.length) );
                 list.push( privateKey );
@@ -269,7 +301,7 @@ class InterfaceBlockchainAddress{
      */
     exportPrivateKeyToString(){
 
-        return this.getPrivateKey().then( (response) => {
+        return this._getPrivateKey().then( (response) => {
             return response.toString("hex");
         }).catch((err)=> {
             console.error("Cannot export privateKey as string: " + err);
@@ -289,7 +321,7 @@ class InterfaceBlockchainAddress{
         let privateKeyArray = [];
 
         if (serializePrivateKey) {
-            let privateKey = await this.getPrivateKey();
+            let privateKey = await this._getPrivateKey();
             privateKeyArray = [Serialization.serializeNumber1Byte(privateKey.length), privateKey];
         }
 
@@ -321,16 +353,23 @@ class InterfaceBlockchainAddress{
             this.address = BufferExtended.toBase( BufferExtend.substr(buffer, offset, len) );
             offset += len;
 
+            if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.address) === null)
+                throw {message: "address didn't pass the validateAddressChecksum "};
+
+            this.address = InterfaceBlockchainAddressHelper.generateAddressWIF(this.address, false, true);
+
             //read unencodedAddress
             len = Serialization.deserializeNumber1Bytes( buffer, offset );
             offset += 1;
 
-            this.unencodedAddress = BufferExtend.substr(buffer, offset, len);
+            let unencodedAddress = BufferExtend.substr(buffer, offset, len);
             offset += len;
 
-            //calcuating the address from the unencodedAddress
-            if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(this.address).result === false)
-                throw {message: "address didn't pass the valdiateAddressChecksum "};
+            //calculating the address from the unencodedAddress
+            let answer = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(unencodedAddress);
+            if ( answer === null) throw {message: "unencodedAddress didn't pass the validateAddressChecksum"};
+
+            this.unencodedAddress = answer;
 
             len = Serialization.deserializeNumber1Bytes( buffer, offset );
             offset += 1;
@@ -405,40 +444,42 @@ class InterfaceBlockchainAddress{
         }
     }
 
-    async signTransaction(transaction, password){
+    async signMessage(serialization, password){
 
-        let privateKey;
+        let addressGenerated;
 
-        if (await this.isPrivateKeyEncrypted()) {
+        try{
 
-            if (password === undefined)
-                password = await InterfaceBlockchainAddressHelper.askForPassword();
+            let privateKey = await this.getPrivateKey(password);
 
-            if (password === null)
-                return null;
-
-        } else password = undefined;
-
-        privateKey = await this.getPrivateKey(password);
-
-        try {
-
-            let answer = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey);
-
-            if (!answer.result)
-                throw { message: "private key is invalid" };
-
-            privateKey = answer.privateKey;
+            addressGenerated = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
 
         } catch (exception) {
-
-            AdvancedMessages.alert('Your password is incorrect!!!');
-
-            return null;
+            console.error("Error Serializing the Transaction", exception);
+            throw exception;
         }
 
+        try{
+
+            let signature = ed25519.sign( serialization, addressGenerated.privateKey.privateKey );
+
+            return signature;
+
+        } catch (exception){
+            console.error("Error Signing the message ", exception);
+            throw exception;
+        }
+
+        return null;
+
+    }
+
+    async signTransaction(transaction, password){
+
+        let privateKey = await this.getPrivateKey(password);
 
         let serialization, addressIndex, addressGenerated;
+
         try{
             addressGenerated = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
 
@@ -457,11 +498,7 @@ class InterfaceBlockchainAddress{
         }
 
         try{
-            //let signatureObj = schnorr.sign( serialization, answer.privateKey.privateKey );
-            //let signature = new Buffer( signatureObj.s.toString(16), 16 );
 
-
-            //addressGenerated.privateKey.privateKey = new Buffer(64);
             let signature = ed25519.sign( serialization, addressGenerated.privateKey.privateKey );
 
             transaction.from.addresses[addressIndex].signature = signature;
@@ -474,11 +511,13 @@ class InterfaceBlockchainAddress{
             throw exception;
         }
 
+        return null;
+
     }
 
     async _toStringDebug(){
 
-        let privateKey = await this.getPrivateKey();
+        let privateKey = await this._getPrivateKey();
         if (privateKey !== null || (privateKey.status !== undefined && privateKey.status === 404))
             privateKey = null;
 

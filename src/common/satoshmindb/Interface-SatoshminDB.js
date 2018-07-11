@@ -7,7 +7,7 @@ const atob = require('atob');
 const btoa = require('btoa');
 import MainBlockchain from 'main-blockchain/Blockchain';
 import StatusEvents from "common/events/Status-Events";
-
+import Utils from "common/utils/helpers/Utils";
 let pounchdb = (process.env.BROWSER) ? (require('pouchdb').default) : (require('pouchdb-node'));
 
 class InterfaceSatoshminDB {
@@ -216,15 +216,9 @@ class InterfaceSatoshminDB {
 
 
     //main methods
-    save(key, value, timeout=5000) {
+    _save(key, value) {
 
         return new Promise(async (resolve)=>{
-
-            //timeout, max 10 seconds to load the database
-            let timeoutInterval = setTimeout(()=>{
-                console.error("save failed !!"+ key, value);
-                resolve(null);
-            }, timeout);
 
             try {
                 if (Buffer.isBuffer(value))
@@ -232,18 +226,32 @@ class InterfaceSatoshminDB {
                 else
                     resolve(await this._createDocument(key, value));
 
-                clearTimeout(timeoutInterval);
             } catch (exception) {
                 console.error("db.save error " + key, exception);
 
                 if (exception.status === 500)
                     StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
-                clearTimeout(timeoutInterval);
                 resolve(null);
             }
 
         })
+    }
+
+    async save(key, value, timeout, trials = 10){
+
+        for (let i = 0; i < trials; i++){
+
+            let answer = await this._save(key, value, timeout);
+
+            if (answer !== null)
+                return answer;
+            else
+                await Utils.sleep(100);
+
+        }
+
+        return null;
     }
 
     get(key, timeout=6000, freeze=false) {

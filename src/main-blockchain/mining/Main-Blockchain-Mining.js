@@ -9,6 +9,8 @@ class MainBlockchainMining extends MiniBlockchainMining{
         super(blockchain, minerAddress);
 
         this.blockchain.mining = this;
+        this.blockchain.miningSolo = this;
+
     }
 
     startMining(){
