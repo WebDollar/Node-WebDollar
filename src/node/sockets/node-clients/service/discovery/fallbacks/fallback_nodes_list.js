@@ -21,7 +21,7 @@ export default {
         {"addr": ["https://nodecstl.ddns.net:80"]},
         {"addr": ["https://webd.5q.ro:3333"]},
         {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte */
-        {"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
+
         // {"addr": ["https://titan.serg.at:80/"]}, // Thanks to @SergiuWX
         // {"addr": ["https://titan.serg.at:8080/"]}, // Thanks to @SergiuWX
         // {"addr": ["https://titan.serg.at:8081/"]}, // Thanks to @SergiuWX
@@ -39,7 +39,6 @@ export default {
         {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
 
         // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
-        {"addr": ["https://robitza.ddns.net:80"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
@@ -50,6 +49,8 @@ export default {
         // {"addr": ["https://wd2.hoste.ro:55974"]}, // Thanks to @morion4000
         // {"addr": ["https://wd2.hoste.ro:63980"]}, // Thanks to @morion4000
         // {"addr": ["https://wd2.hoste.ro:65279"]}, // Thanks to @morion4000
+
+        {"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
         //
         // {"addr": ["https://chucknorris.webdollarvpn.io:80"]}, // Thanks to @cbusuioceanu
         // {"addr": ["https://chucknorris.webdollarvpn.io:443"]}, // Thanks to @cbusuioceanu
