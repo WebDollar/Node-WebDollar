@@ -22,7 +22,7 @@ class PPoWBlockchainProver{
      * create prover
      */
 
-    _createProofPi(chain){
+    async _createProofPi(chain){
 
         //B ← C[0]
         let B = chain.blocks[0];
@@ -38,6 +38,7 @@ class PPoWBlockchainProver{
         try {
 
             console.info("_createProofPi ProofPi CREATOR");
+            let count = 0;
 
             //for µ = |C[−k].interlink| down to 0 do
 
@@ -73,6 +74,10 @@ class PPoWBlockchainProver{
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
                         B = superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m];
+
+                    count ++;
+                    if (count % 20 === 0)
+                        await this.blockchain.sleep(5);
 
                 }
 
@@ -111,7 +116,7 @@ class PPoWBlockchainProver{
         return proofXi;
     }
 
-    createProofs() {
+    async createProofs() {
 
         if ( !this.proofActivated )
             return false;
@@ -120,7 +125,7 @@ class PPoWBlockchainProver{
             this.proofPi.destroyProof();
         }
 
-        this.proofPi = this._createProofPi(this.blockchain);
+        this.proofPi = await this._createProofPi(this.blockchain);
 
         //this.proofXi = this._createProofXi(this.blockchain);
 
