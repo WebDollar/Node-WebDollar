@@ -203,7 +203,7 @@ class PoolsUtils {
 
         poolPublicKey = new Buffer(poolPublicKey, "hex");
 
-        let poolWebsite;
+        let poolWebsite = '';
 
         if (version === 0) {
             poolWebsite = this.substr(url).replace(/\$/g, '/');
