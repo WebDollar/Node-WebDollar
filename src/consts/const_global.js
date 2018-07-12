@@ -233,7 +233,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.140.1",
+        VERSION: "1.140.3",
         VERSION_COMPATIBILITY: "1.140.0",
         PROTOCOL: "WebDollar",
         SSL: true,
@@ -294,6 +294,7 @@ consts.SETTINGS = {
                         MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL: 8,
                     },
                 },
+
 
                 SERVER: {
                     MAXIMUM_CONNECTIONS_FROM_TERMINAL: 400,

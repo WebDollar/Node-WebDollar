@@ -29,7 +29,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
             if (!block.blockValidation.blockValidationType["skip-calculating-proofs"]){
 
-                this.prover.createProofs();
+                await this.prover.createProofs();
 
             }
 
@@ -51,7 +51,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         }
 
         this.prover.proofActivated = true;
-        this.prover.createProofs();
+        await this.prover.createProofs();
 
         return true;
 

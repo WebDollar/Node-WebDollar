@@ -374,8 +374,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                 for (index = indexStart; index < numBlocks; ++index ) {
 
-                    if (index === 153092)
-                        break;
 
                     let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
 

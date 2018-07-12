@@ -77,10 +77,10 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
         this._initializeProtocol();
 
 
-        if (this.light)
+        if (!this.light )
             NodesList.emitter.on("nodes-list/connected", async (result) => {
 
-                if (!NodeExpress.amIFallback() && !Blockchain.isPoolActivated )
+                if (!NodeExpress.SSL && !NodeExpress.amIFallback() && !Blockchain.isPoolActivated )
                     if ( NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK){
 
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
@@ -113,11 +113,14 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
         else { //terminal
 
             //let's check if we downloaded blocks in the last 2 minutes
+
             let set = true;
 
             if (this.lastTimeChecked !== undefined ){
 
-                if ( new Date().getTime() -  this.lastTimeChecked.date > 4*60*1000 ){
+                if (Math.random() < 0.1) console.log("Diff Time for syncing", (new Date().getTime() -  this.lastTimeChecked.date)/1000 );
+
+                if ( new Date().getTime() -  this.lastTimeChecked.date > 2*60*1000 ){
 
                     let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
 

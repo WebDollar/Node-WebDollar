@@ -45,8 +45,9 @@ class NodeBlockchainPropagation{
             if (! Array.isArray(socketsAvoidBroadcast) )
                 socketsAvoidBroadcast = [socketsAvoidBroadcast];
 
+            //avoid sending to those sockets
             for (let i=0; i < NodesList.nodes.length; i++)
-                if ( NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL && NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER )
+                if ( Blockchain.isPoolActivated  && ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER].indexOf(NodesList.nodes[i].socket.node.protocol.nodeConsensusType) >= 0  ))
                     socketsAvoidBroadcast.push(NodesList.nodes[i].socket);
 
             this._socketsAlreadyBroadcast = socketsAvoidBroadcast;
@@ -67,7 +68,7 @@ class NodeBlockchainPropagation{
 
         //sending the block, except poolMiners
         for (let i=0; i < NodesList.nodes.length; i++)
-            if ( !Blockchain.isPoolActivated  || (NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL && NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER ))
+            if ( !Blockchain.isPoolActivated  || ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER].indexOf(NodesList.nodes[i].socket.node.protocol.nodeConsensusType) < 0  ))
                 NodesList.nodes[i].socket.node.protocol.sendLastBlock();
 
     }

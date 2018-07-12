@@ -103,7 +103,7 @@ class PoolDataBlockInformation {
         buffers.push( Serialization.serializeNumber1Byte((this.block !== undefined ? 1 : 0)) );
 
         //serialize block
-        if (this.block !== undefined) {
+        if (this.block !== undefined && this.block.blockchain !== undefined) {
             buffers.push ( Serialization.serializeNumber4Bytes(this.block.height));
             buffers.push ( this.block.difficultyTarget);
             buffers.push( this.block.serializeBlock() );
