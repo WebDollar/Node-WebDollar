@@ -15,7 +15,7 @@ if [ -z $NOSSL ]; then
 
 	echo "Generate $DOMAIN certificate"
 	certbot certonly --text --non-interactive --rsa-key-size 4096 --agree-tos \
-					 --standalone --expand --reinstall --email $EMAIL -d $DOMAIN
+					 --standalone --expand --email $EMAIL -d $DOMAIN
 
 	# Symbolic links
 
@@ -42,19 +42,19 @@ else
 		if [ -z $POOL_NAME ]; then echo 'You need to input a pool name using POOL_NAME ENV variable'; exit; fi
 		if [ -z $POOL_EXTERNAL ]; then echo 'You need to input a pool website using POOL_EXTERNAL ENV variable'; exit; fi
 		if [ -z $POOL_WEBSITE ]; then echo 'You need to input a pool website using POOL_WEBSITE ENV variable'; exit; fi
-		if [ -z $POOL_FEE ]; then export FEE=0.18; fi
-		if [ -z $POOL_REFFERAL_FEE ]; then export FEE=0.18; fi
+		if [ -z $POOL_FEE ]; then export POOL_FEE=0.18; fi
+		if [ -z $POOL_REFFERAL_FEE ]; then export POOL_REFFERAL_FEE=0.18; fi
 
 		#Check if we want pool be also a pool server
 		if [ $POOL_EXTERNAL -eq "n" ]; then
-			(sleep 15;echo 11;sleep 5;echo $FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo "$POOL_REFFERAL_FEE";sleep 5;echo "$POOL_EXTERNAL";) | npm run commands
+			(sleep 15;echo 11;sleep 5;echo $POOL_FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo "$POOL_REFFERAL_FEE";sleep 5;echo "$POOL_EXTERNAL";) | npm run commands
 		else
 			if [ -z $POOL_SERVERS ]; then export POOL_SERVERS='https://p1.webdollar.fun:443'; fi
-			(sleep 15;echo 11;sleep 5;echo $FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo "$POOL_REFFERAL_FEE";sleep 5;echo "$POOL_EXTERNAL";sleep 5;echo "$POOL_SERVERS";) | npm run commands
+			(sleep 15;echo 11;sleep 5;echo $POOL_FEE;sleep 5;echo "$POOL_NAME";sleep 5;echo "$POOL_WEBSITE";sleep 5;echo "$POOL_REFFERAL_FEE";sleep 5;echo "$POOL_EXTERNAL";sleep 5;echo "$POOL_SERVERS";) | npm run commands
 		fi
 	elif [ $TYPE -eq "12" ]; then
 		# Start PoolServer
-		(sleep 15;echo $TYPE;sleep 5;echo $FEE;) | npm run commands
+		(sleep 15;echo $TYPE;sleep 5;echo $POOL_FEE;) | npm run commands
 	fi
 
 fi
