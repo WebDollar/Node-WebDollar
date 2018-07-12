@@ -492,52 +492,62 @@ class InterfaceBlockchainFork {
 
             // remove transactions and place them in the queue
             this._blocksCopy.forEach((block) => {
-                block.data.transactions.transactions.forEach((transaction) => {
 
-                    transaction.confirmed = false;
+                if (block.data !==  undefined && block.data.transactions !== undefined)
+                    block.data.transactions.transactions.forEach((transaction) => {
 
-                    try {
-                        this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
-                    }
-                    catch (exception) {
-                        console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
-                    }
+                        transaction.confirmed = false;
 
-                });
+                        try {
+                            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
+                        }
+                        catch (exception) {
+                            console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
+                        }
+
+                    });
             });
 
             this.forkBlocks.forEach((block)=> {
-                block.data.transactions.transactions.forEach((transaction) => {
-                    transaction.confirmed = true;
 
-                    this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+                if (block.data !==  undefined && block.data.transactions !== undefined)
+                    block.data.transactions.transactions.forEach((transaction) => {
+                        transaction.confirmed = true;
 
-                });
+                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+
+                    });
+
             });
 
         } else {
 
             this._blocksCopy.forEach( (block) => {
-                block.data.transactions.transactions.forEach((transaction) => {
-                    transaction.confirmed = true;
 
-                    this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+                if (block.data !==  undefined && block.data.transactions !== undefined)
+                    block.data.transactions.transactions.forEach((transaction) => {
+                        transaction.confirmed = true;
 
-                });
+                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+
+                    });
+
             });
 
             this.forkBlocks.forEach((block)=>{
-                block.data.transactions.transactions.forEach((transaction)=>{
-                    transaction.confirmed = false;
 
-                    try {
-                        this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
-                    }
-                    catch (exception) {
-                        console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
-                    }
+                if (block.data !==  undefined && block.data.transactions !== undefined)
+                    block.data.transactions.transactions.forEach((transaction)=>{
+                        transaction.confirmed = false;
 
-                });
+                        try {
+                            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
+                        }
+                        catch (exception) {
+                            console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
+                        }
+
+                    });
             })
         }
 
