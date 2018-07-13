@@ -174,7 +174,7 @@ class InterfaceBlockchainProtocolForksManager {
         } catch (exception){
 
             console.error("_getBestFork returned an exception", exception );
-            throw {message: exception, fork: fork}
+            throw {message: exception, fork: fork.toJSON() }
         }
 
         return bestFork;

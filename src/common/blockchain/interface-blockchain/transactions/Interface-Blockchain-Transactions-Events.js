@@ -170,7 +170,12 @@ class InterfaceBlockchainTransactionsEvents{
             if (this._checkTransactionIsSubscribed(address.unencodedAddress)) {
 
                 let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address.unencodedAddress));
-                this.emitter.emit("transactions/changes/" + BufferExtended.toBase(address.unencodedAddress), { txId: transaction.txId.toString("hex"), address: addressWIF, transaction: deleted ? undefined : transaction.toJSON()});
+
+                try{
+                    this.emitter.emit("transactions/changes/" + BufferExtended.toBase(address.unencodedAddress), { txId: transaction.txId.toString("hex"), address: addressWIF, transaction: deleted ? undefined : transaction.toJSON()});
+                }catch (ex){
+                    console.error("Transaction From/Changes raised an error", transaction.toJSON()) ;
+                }
             }
         });
 
@@ -178,7 +183,12 @@ class InterfaceBlockchainTransactionsEvents{
             if (this._checkTransactionIsSubscribed(address.unencodedAddress)) {
 
                 let addressWIF = BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address.unencodedAddress));
-                this.emitter.emit("transactions/changes/" + BufferExtended.toBase(address.unencodedAddress), { txId: transaction.txId.toString("hex"), address: addressWIF, transaction: deleted ? undefined : transaction.toJSON()});
+
+                try{
+                    this.emitter.emit("transactions/changes/" + BufferExtended.toBase(address.unencodedAddress), { txId: transaction.txId.toString("hex"), address: addressWIF, transaction: deleted ? undefined : transaction.toJSON()});
+                }catch (ex){
+                    console.error("Transaction To/Changes raised an error", transaction.toJSON()) ;
+                }
             }
         });
 

@@ -385,7 +385,7 @@ class InterfaceBlockchainBlock {
 
         try{
 
-            let buffer = await this.db.get(key);
+            let buffer = await this.db.get(key, 12000);
 
             if (buffer === null) {
                 console.error("block "+this.height+" was not found "+ key);

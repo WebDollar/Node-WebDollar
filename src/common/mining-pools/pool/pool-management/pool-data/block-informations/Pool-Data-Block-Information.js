@@ -156,15 +156,27 @@ class PoolDataBlockInformation {
         offset += 1;
 
         if (hasBlock === 1){
+
             this.block = this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
 
-            let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
+            let height = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 4));
             offset += 4;
 
-            let difficultyTarget = BufferExtended.substr( buffer, offset, 32 ) ;
+            let difficultyTarget = BufferExtended.substr(buffer, offset, 32);
             offset += 32;
 
-            offset = this.block.deserializeBlock(buffer, height, undefined, difficultyTarget,  offset );
+
+            try {
+
+                offset = this.block.deserializeBlock(buffer, height, undefined, difficultyTarget, offset);
+
+            } catch (exception){
+
+                this.block = undefined;
+                console.error("Error Deserializing block");
+                offset = buffer.length;
+
+            }
         }
 
         return offset;

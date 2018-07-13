@@ -652,6 +652,20 @@ class InterfaceBlockchainFork {
 
     }
 
+
+    toJSON(){
+
+        return {
+            forkReady: this.forkReady,
+            forkStartingHeightDownloading: this.forkStartingHeightDownloading,
+            forkChainStartingPoint: this.forkChainStartingPoint,
+            forkChainLength: this.forkChainLength,
+            forkBlocks: this.forkBlocks.length,
+            forkHeaders: this.forkHeaders,
+        }
+
+    }
+
 }
 
 export default InterfaceBlockchainFork;

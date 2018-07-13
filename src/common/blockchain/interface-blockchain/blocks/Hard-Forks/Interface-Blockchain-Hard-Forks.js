@@ -1,5 +1,6 @@
 import NodeAPIPublic from "node/sockets/node-server/API/Node-API-Public";
 import InterfaceBlockchainAddressHelper from "../../addresses/Interface-Blockchain-Address-Helper";
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class InterfaceBlockchainHardForks{
 
@@ -13,10 +14,6 @@ class InterfaceBlockchainHardForks{
         this._txs = {};
     }
 
-    minimumNonZero(a,b){
-        if (a !== 0) return Math.min(a,b);
-        return b;
-    }
 
     async process (address, height) {
 
@@ -47,7 +44,7 @@ class InterfaceBlockchainHardForks{
                     let from = InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true);
                     let to = InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.to.addresses[0].unencodedAddress, false, true);
 
-                    console.log("from ",from," => ", to, transaction.to.addresses[0].amount/10000, " :: ", transaction.from.addresses[0].amount/10000);
+                    console.log("from ",from," => ", to, transaction.to.addresses[0].amount/WebDollarCoins.WEBD, " :: ", transaction.from.addresses[0].amount/WebDollarCoins.WEBD);
 
                     if (this._output[to] === undefined) this._output[to] = 0;
                     if (this._output[from] === undefined) this._output[from] = 0;
@@ -67,7 +64,7 @@ class InterfaceBlockchainHardForks{
 
 
 
-                    console.log("miner  ", miner, "  ==== ", fee / 10000);
+                    console.log("miner  ", miner, "  ", fee / WebDollarCoins.WEBD);
 
                     list.push(transaction.to.addresses[0].unencodedAddress);
                     list.push(this.blockchain.blocks[i].data.minerAddress);
@@ -83,7 +80,7 @@ class InterfaceBlockchainHardForks{
     }
 
 
-    async revertAllTransactions(address, height, revertActions, totalAmount){
+    async revertAllTransactions(address, height, revertActions, totalAmount, finalAddress){
 
         this._output = {};
         this._processed = [];
@@ -109,25 +106,36 @@ class InterfaceBlockchainHardForks{
         }
         console.log("TOTAL:", sum / 10000);
 
+        let json = {};
         sum = 0;
         for (let key in this._output) {
 
-            //if (key === 0)
             console.log( "key", key, this.blockchain.accountantTree.getBalance(key), -this._output[key] );
 
-            if (key !== undefined)
+            if (key !== undefined && this._output[key] > 0) {
                 this.blockchain.accountantTree.updateAccount(key, -this._output[key], undefined, revertActions, false);
+                sum += this._output[key];
 
-            sum += this._output[key];
+                json[key] = - this._output[key];
+            }
         }
 
         for (let key in this._output)
-            console.log(key, this.blockchain.accountantTree.getBalance(key)/10000, "WEBD");
+            console.log(key, this.blockchain.accountantTree.getBalance(key) / WebDollarCoins.WEBD, "WEBD");
 
-        this.blockchain.accountantTree.updateAccount( "WEBD$gDZwjjD7ZE5+AE+44ITr8yo5E2aXYT3mEH$", sum  );
+        this.blockchain.accountantTree.updateAccount( finalAddress, sum  );
 
-        console.log("DONE", this.blockchain.accountantTree.getBalance("WEBD$gDZwjjD7ZE5+AE+44ITr8yo5E2aXYT3mEH$")/10000, "WEBD");
+        json[finalAddress] = sum;
 
+        console.log("");
+        console.log("");
+        console.log("JSON", JSON.stringify(json));
+        console.log("");
+        console.log("");
+
+        console.log("DONE", this.blockchain.accountantTree.getBalance( finalAddress )/WebDollarCoins.WEBD, "WEBD");
+
+        return json;
     }
 
 }
