@@ -62,9 +62,9 @@ class PoolNewWorkManagement{
             if (this.poolWorkManagement.poolWork.lastBlock === prevBlock  ) return true;
 
 
-            let answer = await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork,  } ,"answer" );
+            let answer = await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork,  } ,"answer", 6000 );
 
-            if ( answer === null ) throw {message: "answer is not null"};
+            if ( answer === null ) throw {message: "answer is null"};
 
             if ( !Buffer.isBuffer(answer.hash ) ) throw {message: "hash is not specified"};
             if ( typeof answer.nonce !== "number" ) throw {message: "nonce is not specified"};
