@@ -350,9 +350,13 @@ consts.SETTINGS = {
             TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
         }
 
-    },
+    }
+};
 
-
+consts.TERMINAL_WORKERS = {
+    DEBUG: false, // make if false to see their output (console.log's, errors, ..)
+    PATH: './dist_bundle/terminal_worker.js',
+    MAX: 0, // if 0 then it defaults to Math.floor(OS.cpus().length / 2) || 1
 };
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
