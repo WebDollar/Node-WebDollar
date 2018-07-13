@@ -40,6 +40,7 @@ class MinerPoolMining extends InheritedPoolMining {
         });
 
         this._minerAddress = Blockchain.blockchain.mining.minerAddress;
+        this._unencodedMinerAddress = Blockchain.blockchain.mining.unencodedMinerAddress;
 
         this._isBeingMining = false;
 
