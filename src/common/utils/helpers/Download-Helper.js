@@ -3,7 +3,7 @@ import consts from 'consts/const_global'
 
 class DownloadHelper{
 
-    async post (request, data ){
+    async post (request, data, timeout = 20000 ){
 
         try{
 
