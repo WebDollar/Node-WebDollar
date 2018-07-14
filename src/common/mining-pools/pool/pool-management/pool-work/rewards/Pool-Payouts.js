@@ -23,7 +23,7 @@ class PoolPayouts{
         StatusEvents.on("blockchain/blocks-count-changed",async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
-
+            if (!Blockchain.loaded) return;
 
             if (this.blockchain.blocks.length % PAYOUT_INTERVAL === 0) {
                 await this.doPayout();
@@ -49,24 +49,30 @@ class PoolPayouts{
 
         if (!Blockchain.synchronized) return;
 
+        console.info("--------------------------------------------------");
+        console.info("--------------------------------------------------");
+        console.info("--------------------------------------------------");
+        console.info("--------------------------------------------------");
+        console.info("--------------------PAYOUT------------------------");
+        console.info("--------------------------------------------------");
+        console.info("--------------------------------------------------");
+        console.info("--------------------------------------------------");
+        console.info("--------------------------------------------------");
+
         let blocksConfirmed = [];
         for (let i=0; i<this.poolData.blocksInfo.length; i++)
             if (this.poolData.blocksInfo[i].confirmed && !this.poolData.blocksInfo[i].payout)
                 blocksConfirmed.push(this.poolData.blocksInfo[i]);
 
+        console.info("Payout: Blocks confirmed: ", blocksConfirmed.length);
+
 
         if (blocksConfirmed.length === 0){
-            console.warn("No payouts, because no blocks were confirmed");
+            console.warn("Payout: No payouts, because no blocks were confirmed");
             return false;
         }
 
         try{
-
-            console.info("--------------------------------------------------");
-            console.info("--------------------------------------------------");
-            console.info("--------------------PAYOUT------------------------");
-            console.info("--------------------------------------------------");
-            console.info("--------------------------------------------------");
 
             this.poolData.miners.forEach((miner)=>{
 
@@ -75,6 +81,8 @@ class PoolPayouts{
             });
 
             this._toAddresses = [];
+
+            console.info("Payout: Initialized ");
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
@@ -127,6 +135,8 @@ class PoolPayouts{
 
             }
 
+            console.info("Payout: Blocks Confirmed Processed");
+
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
@@ -134,6 +144,8 @@ class PoolPayouts{
                     this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther +miner.rewardConfirmedOther ;
 
             });
+
+            console.info("Payout: Adding rewardConfirmedOther");
 
             //verify to send to other
 
@@ -148,12 +160,17 @@ class PoolPayouts{
 
                 let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
-                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
-                if (!transaction.result) throw {message: "Transaction was not made"};
+                try {
+                    let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
+                    if (!transaction.result) throw {message: "Transaction was not made"};
+                } catch (exception){
+                    console.error("Payout: ERROR CREATING TRANSACTION");
+                }
 
                 index++;
             }
 
+            console.info("Payout: Transaction Created");
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
@@ -209,7 +226,10 @@ class PoolPayouts{
 
         } catch (exception){
 
+            console.error("----------------------------------------");
             console.error("Pool Payouts raised an error", exception);
+            console.error("----------------------------------------");
+
             return false;
 
         }

@@ -15,9 +15,6 @@ class NodeAPIRouter{
         // Return block information
         app(prefix+'block/:block', (req, res) => middleWare(req, res, NodeAPIPublic.block ));
 
-        // Return address info: balance, blocks mined and transactions
-        app(prefix+'address/:address', (req, res) => middleWare(req, res, NodeAPIPublic.addressInfo ));
-
         app(prefix+'address/balance/:address', (req, res) => middleWare(req, res, NodeAPIPublic.addressBalance ) );
 
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
@@ -31,6 +28,12 @@ class NodeAPIRouter{
             app(prefix+''+process.env.WALLET_SECRET_URL+'wallets/export', (req, res) => middleWare(req, res, NodeAPIPrivate.walletExport) );
 
         }
+
+        // Return address info: balance, blocks mined and transactions
+        app(prefix+'address/:address', (req, res) => middleWare(req, res, NodeAPIPublic.addressInfo ));
+
+        // Return address info: balance, blocks mined and transactions
+        app(prefix+'server/nodes/list', (req, res) => middleWare(req, res, NodeAPIPublic.getNodesList ));
 
         // respond with "hello"
         app(prefix+'hello', (req, res) => middleWare(req, res, NodeAPIPublic.helloWorld));

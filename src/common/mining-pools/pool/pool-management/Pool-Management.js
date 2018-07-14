@@ -51,6 +51,7 @@ class PoolManagement{
                 throw {message: "Pool Couldn't be started"};
 
             answer = await this.poolStatistics.initializePoolStatistics();
+
         } catch (exception){
             console.error("initializePoolManagement raised an error", exception);
         }
@@ -151,6 +152,7 @@ class PoolManagement{
 
             }
             else {
+
                 await this.poolProtocol._stopPoolProtocol();
                 this.poolWorkManagement.poolWork.stopGarbageCollector();
                 this.poolStatistics.clearInterval();
@@ -158,9 +160,10 @@ class PoolManagement{
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
 
                 this.poolData.connectedMinerInstances.stopPoolDataConnectedMinerInstances();
+
             }
 
-            StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });
+            StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" } );
 
         }
     }

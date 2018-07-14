@@ -441,7 +441,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 throw {message: "blockchain is invalid at index ", height: i};
             }
 
-
         } catch (exception){
             console.error("blockchain LOADING stopped at " + i, exception);
             revertActions.revertOperations();

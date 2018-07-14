@@ -19,25 +19,67 @@ class GeoLocationLists {
         this.geoLocationLists = [];
 
         this.countGeoLocationContinentsLists = 0;
+
+
+        this._pendingLocationLists = [];
+
+        setTimeout(this._processGeoLocationPendingList.bind(this), 5000);
     }
 
-    async includeAddress(sckAddress, port){
+    async _processGeoLocationPendingList(){
+
+        if (this._pendingLocationLists.length > 0) {
+
+            let data = this._pendingLocationLists[0];
+            this._pendingLocationLists.splice(0,1);
+
+            let location = await GeoHelper.getLocationFromAddress(data.address);
+
+            if (location === null || location === undefined){
+                //console.warn("LOCATION was not been able to get");
+                return null;
+            }
+
+            location.continent = location.continent || '--';
+
+            this._addGeoLocationContinentByAddress( data.address, location );
+
+            try {
+                data.resolver(location);
+            } catch (exception){
+            }
+
+        }
+
+
+
+
+        setTimeout(this._processGeoLocationPendingList.bind(this), 5000);
+
+    }
+
+    async _includeAddress(sckAddress, port){
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress, port);
 
-        let location = await GeoHelper.getLocationFromAddress(sckAddress);
+        for (let i=0; i<this._pendingLocationLists.length; i++)
+            if (this._pendingLocationLists[i].address.matchAddress(sckAddress))
+                return this._pendingLocationLists[i].promise;
 
-        if (location === null || location === undefined){
-            //console.warn("LOCATION was not been able to get");
-            return null;
-        }
+        let resolver;
+        let promise = new Promise((resolve)=>{
+            resolver = resolve;
+        });
 
-        location.continent = location.continent || '--';
+        let data = {
+            address: sckAddress,
+            promise: promise,
+            resolver: resolver,
+        };
 
-        this._addGeoLocationContinentByAddress(sckAddress, location);
+        this._pendingLocationLists.push(data);
 
-        return location;
-
+        return data;
     }
 
     async includeSocket(socket){
@@ -47,10 +89,11 @@ class GeoLocationLists {
         //in case the location has been set before  (avoiding double insertion)
         if ( socket.node !== undefined &&  socket.node.location !== undefined && socket.node.location !== null) return socket.node.location;
 
-        let location = await this.includeAddress(socket.node.sckAddress);
-        socket.node.location = location;
+        let data = await this._includeAddress(socket.node.sckAddress);
+        socket.node.location = data.promise;
 
-        return location;
+        return data.promise;
+
     }
 
     _addGeoLocationContinentByAddress(sckAddress, location){

@@ -14,6 +14,8 @@ const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : 10;
 
 const REQUIRE_OTHER_CONFIRMATIONS = consts.DEBUG ? false : true;
 
+import Blockchain from 'main-blockchain/Blockchain';
+
 class PoolRewardsManagement{
 
     constructor(poolManagement, poolData, blockchain){
@@ -27,6 +29,7 @@ class PoolRewardsManagement{
         StatusEvents.on("blockchain/blocks-count-changed",async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
+            if (!Blockchain.loaded) return;
 
             await this._blockchainChanged();
 

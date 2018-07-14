@@ -43,7 +43,7 @@ class Utils{
     }
 
 
-    MakeQuerablePromise(promise) {
+    makeQuerablePromise(promise) {
         // Don't modify any promise that has been already modified.
         if (promise.isQuerable) return promise;
 

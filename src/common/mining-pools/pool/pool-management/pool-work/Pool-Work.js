@@ -42,7 +42,7 @@ class PoolWork {
         if (!Blockchain.synchronized)
             throw {message: "Blockchain is not yet synchronized"};
 
-        this.lastBlockPromise = Utils.MakeQuerablePromise( new Promise( async (resolve)=>{
+        this.lastBlockPromise = Utils.makeQuerablePromise( new Promise( async (resolve)=>{
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlockNonce = 0;

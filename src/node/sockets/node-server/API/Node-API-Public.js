@@ -7,6 +7,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
+import Utils from "common/utils/helpers/Utils";
 
 class NodeAPIPublic{
 
@@ -42,6 +43,38 @@ class NodeAPIPublic{
             }
 
         };
+    }
+
+
+    async getNodesList(req, res){
+
+        try{
+
+            let clients = [], servers=[];
+            for (let i=0; i<NodesList.nodes.length; i++ ) {
+
+                let geoLocation = NodesList.nodes[i].socket.node.sckAddress._geoLocation;
+
+                let obj = {
+
+                    adr: NodesList.nodes[i].socket.node.sckAddress.address,
+                    geo: geoLocation.isFulfilled() ? await geoLocation : 'not ready',
+
+                };
+
+                if ( NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET) clients.push(obj);
+                else if ( NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET) servers.push(obj);
+
+
+            }
+
+            return {result: true, clients: clients, servers: servers,};
+
+        } catch (exception){
+            return {result: false, message: exception.message};
+        }
+
+
     }
 
     blocks(req, res){
