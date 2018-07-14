@@ -113,7 +113,6 @@ class MinerProtocol {
                 this.blockchain.mining = Blockchain.blockchain.miningSolo;
                 Blockchain.Mining = Blockchain.blockchain.miningSolo;
 
-
                 await this.minerPoolProtocol._stopMinerProtocol();
                 await this.minerPoolMining._stopMinerPoolMining();
 

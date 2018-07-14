@@ -409,7 +409,7 @@ class CLI {
 
         console.info('Create Mining Pool');
 
-        await this._callCallbackBlockchainSync(async ()=>{
+        await this._callCallbackBlockchainSync( async ()=>{
 
             await Blockchain.PoolManagement.setPoolStarted(false);
 
