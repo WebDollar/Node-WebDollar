@@ -35,7 +35,7 @@ class InterfaceBlockchainBlock {
             if (height === 0)
                 timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
             else
-                timeStamp = this.blockchain.blocks.last.timeStamp + 20;
+                timeStamp = this.blockchain.blocks.last.timeStamp + 21;
         }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
