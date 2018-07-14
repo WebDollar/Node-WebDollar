@@ -32,7 +32,7 @@ class InterfaceBlockchainBlock {
         
         if ( timeStamp === undefined ) {
 
-            if (height === 0)
+            if ( this.blockchain.blocks.last === undefined)
                 timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
             else
                 timeStamp = this.blockchain.blocks.last.timeStamp + 21;
