@@ -102,6 +102,7 @@ class MinerProtocol {
 
                 await this.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
                 await this.minerPoolProtocol._startMinerProtocol();
+                await this.minerPoolMining._startMinerPoolMining();
 
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_MINER;
             }
@@ -114,6 +115,7 @@ class MinerProtocol {
 
 
                 await this.minerPoolProtocol._stopMinerProtocol();
+                await this.minerPoolMining._stopMinerPoolMining();
 
                 this.blockchain.agent.consensus = true;
 

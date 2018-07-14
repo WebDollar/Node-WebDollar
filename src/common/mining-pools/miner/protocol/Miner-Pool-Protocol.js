@@ -221,7 +221,7 @@ class MinerProtocol extends PoolProtocolList{
                 let confirmation = socket.node.sendRequestWaitOnce("mining-pool/new-work/answer", {
                     hash: this.minerPoolManagement.minerPoolMining.bestHash,
                     nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce
-                }, "confirm");
+                }, "confirm", 6000);
 
                 this._validateRequestWork(data.work, socket);
 

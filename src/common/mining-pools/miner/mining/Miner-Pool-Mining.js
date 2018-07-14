@@ -3,6 +3,7 @@ import consts from 'consts/const_global'
 import global from 'consts/global';
 import Blockchain from "main-blockchain/Blockchain";
 import AdvancedMessages from "node/menu/Advanced-Messages"
+import Log from 'common/utils/logging/Log';
 
 let InheritedPoolMining;
 
@@ -44,7 +45,21 @@ class MinerPoolMining extends InheritedPoolMining {
 
         this._isBeingMining = false;
 
-        setTimeout( this._checkForWorkInterval.bind(this), 5000);
+    }
+
+    _startMinerPoolMining(){
+
+        if (this._checkForWorkInterval === undefined)
+            this._checkForWorkInterval = this._checkForWorkIntervalCallback();
+
+        this._poolFailTrials = 0;
+
+    }
+
+    _stopMinerPoolMining(){
+
+        clearTimeout(this._checkForWorkInterval);
+        this._checkForWorkInterval = undefined;
 
     }
 
@@ -155,19 +170,31 @@ class MinerPoolMining extends InheritedPoolMining {
     }
 
 
-    async _checkForWorkInterval(){
+    async _checkForWorkIntervalCallback(){
 
         try {
 
             if (this._miningWork.poolSocket !== null && this._miningWork.resolved)
                 await this.minerPoolManagement.minerPoolProtocol.requestWork();
 
+            if (!this.started) this._poolFailTrials = 0;
+            if (this.started && this._hashesPerSecond === 0 ){
+                this._poolFailTrials ++;
+
+                //in case I can not mine from this pool, show an error and disconnect
+                if (this._poolFailTrials > 8) {
+                    NodesList.disconnectAllNodes();
+                    Log.error("Mining Pool is not working. Trying to reconnect", Log.LOG_TYPE.POOLS);
+                }
+
+            }
+
         } catch (exception){
 
         }
 
+        this._checkForWorkInterval = setTimeout( this._checkForWorkIntervalCallback.bind(this), 5000);
 
-        setTimeout( this._checkForWorkInterval.bind(this), 5000);
     }
 
 }
