@@ -17,6 +17,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import Log from 'common/utils/logging/Log';
+import PoolRewardsManagement from "common/mining-pools/pool/pool-management/pool-work/rewards/Pool-ProcessRemainingPayment"
 
 class CLI {
 
@@ -75,6 +76,9 @@ class CLI {
             case '11':  // Mining Pool: Create a New Pool
                 await this.createMiningPool();
                 break;
+            case '11-1':  // Mining Pool: Create a New Pool
+                await this.processRemainingPayment();
+                break;
             case '12':  // Server Mining Pool: Create a new Server for Mining Pool
                 await this.createServerForMiningPool();
                 break;
@@ -106,6 +110,15 @@ class CLI {
         await this._runMenu();
     }
 
+    async processRemainingPayment(){
+
+        await this._callCallbackBlockchainSync(async ()=>{
+
+            await Blockchain.PoolManagement.poolRemainingRewards.doPayout();
+
+        }, true);
+
+    }
 
     async _chooseAddress() {
 
@@ -132,7 +145,6 @@ class CLI {
     }
 
     async listAddresses() {
-
 
         await this._callCallbackBlockchainSync(async ()=>{
 
@@ -533,6 +545,7 @@ const commands = [
         '9. Solo: Start Mining Instantly Even Unsynchronized',
         '10. Mining Pool: Start Mining',
         '11. Mining Pool: Create a New Pool',
+        '11-1. Mining Pool: Process Remaining Payment',
         '12. Server for Mining Pool: Create a new Server for Mining Pool',
         '20. HTTPS Express Start',
     ];

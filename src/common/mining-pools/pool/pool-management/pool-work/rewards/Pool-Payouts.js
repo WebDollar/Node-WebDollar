@@ -17,7 +17,6 @@ class PoolPayouts{
         this.poolData = poolData;
 
         this.blockchain = blockchain;
-
         this._payoutInProgress = false;
 
         StatusEvents.on("blockchain/blocks-count-changed",async (data)=>{
@@ -28,7 +27,6 @@ class PoolPayouts{
             if (this.blockchain.blocks.length % PAYOUT_INTERVAL === 0) {
                 await this.doPayout();
             }
-
 
         });
 
@@ -43,6 +41,7 @@ class PoolPayouts{
         this._payoutInProgress = true;
         await this._doPayout();
         this._payoutInProgress = false;
+
     }
 
     async _doPayout(){
