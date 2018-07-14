@@ -30,8 +30,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-
-
     async validateBlockchain(){
 
         for (let i = this.blocks.blocksStartingPoint; i < this.blocks.length; i++)
@@ -41,9 +39,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return true;
     }
 
+
     async simulateNewBlock(block, revertAutomatically, revertActions, callback, showUpdate = true ){
         return await callback();
     }
+
 
     async _blockIncluded(block){
 
@@ -230,15 +230,17 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         }
     }
 
-    async saveNewBlock(block){
+    async saveNewBlock(block, saveLength = false){
 
         if (process.env.BROWSER)
             return true;
 
-        if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
-            console.error("Error saving the blocks.length");
-            return false;
-        }
+
+        if (saveLength)
+            if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
+                console.error("Error saving the blocks.length");
+                return false;
+            }
 
         await block.saveBlock();
 

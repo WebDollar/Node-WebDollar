@@ -94,7 +94,7 @@ class CLI {
 
     async _start() {
 
-        Log.info('CLI menu started', consts.LOG_INSTANCE.CLI_MENU);
+        Log.info('CLI menu started', Log.LOG_TYPE.CLI_MENU);
 
         if (Blockchain !== undefined)
             await Blockchain.loadWallet();

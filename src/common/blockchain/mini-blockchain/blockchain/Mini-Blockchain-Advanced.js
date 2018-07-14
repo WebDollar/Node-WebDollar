@@ -2,6 +2,7 @@ import consts from "consts/const_global";
 import MiniBlockchain from "./Mini-Blockchain";
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import global from "consts/global"
+import Log from 'common/utils/logging/Log';
 
 class MiniBlockchainAdvanced extends  MiniBlockchain{
 
@@ -24,11 +25,10 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             //delete old lightAccountantTreeSerializations
 
-            let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES - 2;
+            let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE - 2;
 
             while (this.lightAccountantTreeSerializations[index] !== undefined){
                 delete this.lightAccountantTreeSerializations[index];
-                this.lightAccountantTreeSerializations[index] = undefined;
                 index--;
             }
 
@@ -82,7 +82,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             if (!answer) {
                 //couldn't load the last K blocks
-                console.error("couldn't load the last K blocks");
+
+                Log.error("Couldn't load the last K blocks", Log.LOG_TYPE.SAVING_MANAGER);
 
                 await this.accountantTree.loadMiniAccountant(new Buffer(0));
 
@@ -91,7 +92,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         } catch (exception){
 
-            console.error("Loading Blockchain Exception", exception);
+            Log.error("Loading Blockchain Exception Couldn't load the last K blocks", Log.LOG_TYPE.SAVING_MANAGER, exception);
 
             if (exception === "load blockchain simple") {
 
@@ -106,6 +107,52 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
     }
 
+    async saveAccountantTree(serialization, length){
+
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
+
+        try {
+
+            if (length === undefined) length = this.blocks.length;
+
+            if (length === 0) throw {message: "length is 0"};
+
+            //avoid resaving the same blockchain
+            if (this._miniBlockchainSaveBlocks === length) throw {message: "already saved"};
+
+            Log.info('Accountant Tree Saving ', Log.LOG_TYPE.SAVING_MANAGER);
+
+            if (await this.db.save(this._blockchainFileName, length) !== true)
+                throw {message: "Error saving the blocks.length"};
+
+            if (length < consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) throw {message: "Couldn't save blockchain"};
+
+            if (!(await this.db.save("lightAccountantTreeAdvanced_offset", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES)))
+                throw { message: "Couldn't be saved _lightAccountantTreeAdvanced_offset",  index: this._blockchainFileName + consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES };
+
+            await this.sleep(70);
+
+            if (serialization === undefined)
+                serialization = this.lightAccountantTreeSerializations[length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1];
+
+            if (!(await this.accountantTree.saveMiniAccountant(true, "lightAccountantTreeAdvanced", serialization)))
+                throw {message: "saveMiniAccountant couldn't be saved"};
+
+            await this.sleep(70);
+
+            this._miniBlockchainSaveBlocks = length;
+
+            Log.info('Accountant Tree Saved Successfully ' + length, Log.LOG_TYPE.SAVING_MANAGER);
+
+        } catch (exception){
+
+            Log.error('Accountant Tree Saving raised an error ', Log.LOG_TYPE.SAVING_MANAGER, exception);
+
+        }
+
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
+
+    }
 
     async saveBlockchainTerminated(){
 
@@ -116,36 +163,22 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         if (this.blocks.length === 0) return false;
 
-        //avoid resaving the same blockchain
-        if (this._miniBlockchainSaveBlocks === this.blocks.length) return false;
 
-        global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
+        let answer = false;
 
         try {
 
-            if (this.blocks.length > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) {
+            await this.saveAccountantTree();
 
-                if (! (await this.db.save("lightAccountantTreeAdvanced_offset", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES )))
-                    throw {message: "Couldn't be saved _lightAccountantTreeAdvanced_offset", index: this._blockchainFileName + consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES};
+            Log.info('Saving Ended', Log.LOG_TYPE.SAVING_MANAGER);
 
-                await this.sleep(70);
-
-                if (!(await this.accountantTree.saveMiniAccountant( true, "lightAccountantTreeAdvanced", this.lightAccountantTreeSerializations[this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1])))
-                    throw {message: "saveMiniAccountant couldn't be saved"};
-
-                await this.sleep(80);
-            }
-
-            console.log("saving ended");
-
+            answer = true;
         } catch (exception){
-            console.error("Couldn't save MiniBlockchain", exception);
-            global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
-            return false;
+            Log.error("Couldn't save MiniBlockchain", Log.LOG_TYPE.SAVING_MANAGER, exception);
+
         }
 
-        global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
-        return true;
+        return answer;
 
     }
 
