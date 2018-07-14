@@ -17,7 +17,7 @@ class NodeAPIPublicNodes{
                 let obj = {
 
                     adr: NodesList.nodes[i].socket.node.sckAddress.address,
-                    geo: geoLocation.isFulfilled() ? await geoLocation : 'not ready',
+                    geo: geoLocation.isFulfilled() ? this._getCity ( await geoLocation ) : 'not ready',
 
                 };
 
@@ -41,7 +41,7 @@ class NodeAPIPublicNodes{
         try{
 
             let list = [];
-            for (let i = Math.max(Blockchain.blockchain.blocks.blocksStartingPoint, Blockchain.blockchain.blocks.length-200); i<Blockchain.blockchain.blocks.length-1; i++){
+            for (let i = Blockchain.blockchain.blocks.length-1; i>Math.max(Blockchain.blockchain.blocks.blocksStartingPoint, Blockchain.blockchain.blocks.length-200); i--){
 
                 let block = Blockchain.blockchain.blocks[i];
 
@@ -49,7 +49,7 @@ class NodeAPIPublicNodes{
                     height: block.height,
                     hash: block.hash.toString("hex"),
                     address: block._socketPropagatedBy !== undefined ? block._socketPropagatedBy.node.sckAddress.address: '',
-                    geoLocation: block._socketPropagatedBy !== undefined ? (block._socketPropagatedBy.node.sckAddress.geoLocation.isFulfilled() ? block._socketPropagatedBy.node.sckAddress.geoLocation : "not ready" ) : 'na',
+                    geoLocation: block._socketPropagatedBy !== undefined ? (block._socketPropagatedBy.node.sckAddress.geoLocation.isFulfilled() ? this._getCity ( await block._socketPropagatedBy.node.sckAddress.geoLocation) : "not ready" ) : 'na',
                 });
 
             }
@@ -62,6 +62,11 @@ class NodeAPIPublicNodes{
 
     }
 
+
+
+    _getCity(geoLocation){
+        return geoLocation.city || geoLocation.country;
+    }
 
 }
 
