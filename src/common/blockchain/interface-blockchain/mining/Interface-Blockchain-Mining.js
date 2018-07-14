@@ -236,7 +236,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (Exception){
 
-            console.error( "Error mining block ", Exception, block);
+            console.error( "Error mining block ", Exception, block.toJSON() );
             this._destroyMiningInterval();
 
             throw Exception;
