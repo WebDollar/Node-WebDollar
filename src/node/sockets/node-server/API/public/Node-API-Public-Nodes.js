@@ -41,13 +41,14 @@ class NodeAPIPublicNodes{
         try{
 
             let list = [];
-            for (let i = Blockchain.blockchain.blocks.length-1; i>Math.max(Blockchain.blockchain.blocks.blocksStartingPoint, Blockchain.blockchain.blocks.length-200); i--){
+            for (let i = Blockchain.blockchain.blocks.length-1; i>Math.max(Blockchain.blockchain.blocks.blocksStartingPoint, Blockchain.blockchain.blocks.length-500); i--){
 
                 let block = Blockchain.blockchain.blocks[i];
 
                 list.push({
                     height: block.height,
-                    hash: block.hash.toString("hex"),
+                    hash: block.hash.toString("hex").substr(0, 20),
+                    minerAddress: block.data.minerAddress.toString("hex"),
                     address: block._socketPropagatedBy !== undefined ? block._socketPropagatedBy.node.sckAddress.address: '',
                     geoLocation: block._socketPropagatedBy !== undefined ? (block._socketPropagatedBy.node.sckAddress.geoLocation.isFulfilled() ? this._getCity ( await block._socketPropagatedBy.node.sckAddress.geoLocation) : "not ready" ) : 'na',
                 });

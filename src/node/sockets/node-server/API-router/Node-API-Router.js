@@ -38,10 +38,10 @@ class NodeAPIRouter{
         app(prefix+'address/:address', (req, res) => middleWare(req, res, NodeAPIPublicAddresses.addressInfo ));
 
         // Return address info: balance, blocks mined and transactions
-        app(prefix+'server/nodes/list', (req, res) => middleWare(req, res, NodeAPIPublicNodes.nodesList ));
+        app(prefix+'server/nodes/list', (req, res) => middleWare(req, res, NodeAPIPublicNodes.nodesList.bind(NodeAPIPublicNodes) ));
 
         // Return blocks information
-        app(prefix+'server/nodes/blocks-propagated', (req, res) => middleWare(req, res, NodeAPIPublicNodes.lastBlocksMined ));
+        app(prefix+'server/nodes/blocks-propagated', (req, res) => middleWare(req, res, NodeAPIPublicNodes.lastBlocksMined.bind(this) ));
 
         // respond with "hello"
         app(prefix+'hello', (req, res) => middleWare(req, res, NodeAPIPublic.helloWorld));
