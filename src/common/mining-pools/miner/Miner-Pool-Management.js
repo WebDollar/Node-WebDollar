@@ -98,12 +98,12 @@ class MinerProtocol {
                 this.blockchain.mining = this.minerPoolMining;
                 Blockchain.Mining = this.minerPoolMining;
 
-
+                this.blockchain.agent.consensus = false;
 
                 await this.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
                 await this.minerPoolProtocol._startMinerProtocol();
+                await this.minerPoolMining._startMinerPoolMining();
 
-                this.blockchain.agent.consensus = false;
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_MINER;
             }
             else {
@@ -115,6 +115,7 @@ class MinerProtocol {
 
 
                 await this.minerPoolProtocol._stopMinerProtocol();
+                await this.minerPoolMining._stopMinerPoolMining();
 
                 this.blockchain.agent.consensus = true;
 

@@ -82,7 +82,6 @@ class NodesWaitlistConnecting {
 
     _tryToConnectNextNode( nextWaitListObject){
 
-
         if (nextWaitListObject.isFallback) {
 
             let fallbacks = this._countConnectingToFallbacks() + NodesList.countFallbacks();

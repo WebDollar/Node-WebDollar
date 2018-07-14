@@ -115,6 +115,7 @@ class NodesWaitlistObject {
 
             a: this.sckAddresses[0].getAddress(true, true), // address
             t: this.nodeType, // type
+            ct: this.nodeConsensusType, // type
 
         };
 
