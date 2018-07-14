@@ -43,7 +43,6 @@ class PoolRewardsManagement{
 
     async _blockchainChanged(){
 
-
         if (this.poolData.blocksInfo.length === 0) return;
 
         let poolBlocksConfirmed = 0;
@@ -55,8 +54,7 @@ class PoolRewardsManagement{
         let found = false;
         let uniques = [];
 
-        let confirmations = {
-        };
+        let confirmations = {};
 
         let firstBlock;
         for (let i=0; i < this.poolData.blocksInfo.length; i++)
@@ -262,7 +260,6 @@ class PoolRewardsManagement{
 
     _createServerBlockValidation(height, blockInfoHeight){
 
-
         let validationType = {
             "skip-accountant-tree-validation": true,
             "skip-validation-transactions-from-values": true,
@@ -281,6 +278,7 @@ class PoolRewardsManagement{
         validationType["skip-validation-interlinks"] = true;
 
         return new InterfaceBlockchainBlockValidation(  this._getServerBlock.bind(this), this._getServerDifficultyTarget.bind(this), this._getServerTimeStamp.bind(this), this._getServerPrevHash.bind(this), validationType );
+
     }
 
     _getServerBlock(height){
