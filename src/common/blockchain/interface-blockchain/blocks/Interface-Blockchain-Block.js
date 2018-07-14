@@ -30,8 +30,13 @@ class InterfaceBlockchainBlock {
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
-        if ( timeStamp === undefined)
-            timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+        if ( timeStamp === undefined ) {
+
+            if (height === 0)
+                timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+            else
+                timeStamp = this.blockchain.blocks.last.timeStamp + 20;
+        }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
@@ -204,6 +209,7 @@ class InterfaceBlockchainBlock {
 
             if (this.timeStamp > this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET)
                 throw { message: "Timestamp of block is less than the network-adjusted time", timeStamp: this.timeStamp, " > ": this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET, networkAdjustedTime: this.blockchain.timestamp.networkAdjustedTime, NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET }
+
         }
 
     }

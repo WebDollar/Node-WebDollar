@@ -69,7 +69,7 @@ class BlockchainDifficulty{
             how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
 
 
-            if ( how_much_it_took_to_mine_X_Blocks <= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER ? 1 : 5  ) )
+            if ( how_much_it_took_to_mine_X_Blocks <= (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER ? consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK : 5 * consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ) )
                 throw { message: "how_much_it_took_to_mine_X_Blocks less than consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK", how_much_it_took_to_mine_X_Blocks: how_much_it_took_to_mine_X_Blocks };
 
 
