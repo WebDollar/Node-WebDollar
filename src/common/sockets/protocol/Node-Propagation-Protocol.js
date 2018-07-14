@@ -32,7 +32,7 @@ class NodePropagationProtocol {
             if (key === "length") continue;
             if (!list.hasOwnProperty(key)) continue;
 
-            let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t, list[key].ct,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
+            let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t, list[key].ct||NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
 
             //downloading the next elements
             if (list[key].next !== undefined && list[key].next > 0)
