@@ -1,7 +1,8 @@
 import NODE_TYPE from "node/lists/types/Node-Type"
 import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import NodesList from 'node/lists/Nodes-List'
-import Blockchain from "../../../../../main-blockchain/Blockchain";
+import Blockchain from "main-blockchain/Blockchain";
+import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 
 class NodeAPIPublicNodes{
 
@@ -48,7 +49,7 @@ class NodeAPIPublicNodes{
                 list.push({
                     height: block.height,
                     hash: block.hash.toString("hex").substr(0, 20),
-                    minerAddress: block.data.minerAddress.toString("hex"),
+                    minerAddress:  InterfaceBlockchainAddressHelper.generateAddressWIF( block.data.minerAddress, false, true),
                     address: block._socketPropagatedBy !== undefined ? block._socketPropagatedBy.node.sckAddress.address: '',
                     geoLocation: block._socketPropagatedBy !== undefined ? (block._socketPropagatedBy.node.sckAddress.geoLocation.isFulfilled() ? this._getCity ( await block._socketPropagatedBy.node.sckAddress.geoLocation) : "not ready" ) : 'na',
                 });

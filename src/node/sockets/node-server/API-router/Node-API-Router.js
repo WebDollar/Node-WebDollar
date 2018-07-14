@@ -41,7 +41,7 @@ class NodeAPIRouter{
         app(prefix+'server/nodes/list', (req, res) => middleWare(req, res, NodeAPIPublicNodes.nodesList.bind(NodeAPIPublicNodes) ));
 
         // Return blocks information
-        app(prefix+'server/nodes/blocks-propagated', (req, res) => middleWare(req, res, NodeAPIPublicNodes.lastBlocksMined.bind(this) ));
+        app(prefix+'server/nodes/blocks-propagated', (req, res) => middleWare(req, res, NodeAPIPublicNodes.lastBlocksMined.bind(NodeAPIPublicNodes) ));
 
         // respond with "hello"
         app(prefix+'hello', (req, res) => middleWare(req, res, NodeAPIPublic.helloWorld));
