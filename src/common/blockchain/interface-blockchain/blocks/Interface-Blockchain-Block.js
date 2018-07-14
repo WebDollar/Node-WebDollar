@@ -36,7 +36,7 @@ class InterfaceBlockchainBlock {
             else timeStamp = 0;
 
             if (timeStamp < networkTimestamp )
-                timeStamp = networkTimestamp;
+                timeStamp = networkTimestamp + 20;
 
         }
 
