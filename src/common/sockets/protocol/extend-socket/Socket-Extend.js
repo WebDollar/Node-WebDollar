@@ -77,6 +77,8 @@ class SocketExtend{
         socket.node.protocol.agent = {};
         socket.node.protocol.agent.startedAgentDone = false;
 
+
+
         NodePropagationProtocol.initializeNodesPropagation(socket);
     }
 

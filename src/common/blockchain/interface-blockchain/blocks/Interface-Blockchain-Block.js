@@ -16,8 +16,6 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-
-
     constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db){
 
         this.blockchain = blockchain;
@@ -32,10 +30,14 @@ class InterfaceBlockchainBlock {
         
         if ( timeStamp === undefined ) {
 
-            if (this.blockchain.blocks.last === undefined)
-                timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
-            else
-                timeStamp = this.blockchain.blocks.last.timeStamp + 20;
+            let networkTimestamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+
+            if (this.blockchain.blocks.last !== undefined)  timeStamp = this.blockchain.blocks.last.timeStamp + 20;
+            else timeStamp = 0;
+
+            if (timeStamp < networkTimestamp )
+                timeStamp = networkTimestamp;
+
         }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
@@ -63,6 +65,8 @@ class InterfaceBlockchainBlock {
         this.blockValidation = blockValidation;
 
         this.db = db;
+
+        this._socketPropagatedBy = undefined;
 
     }
 
@@ -476,6 +480,19 @@ class InterfaceBlockchainBlock {
         await this.computeHash();
     }
 
+    get socketPropagatedBy(){
+        return this._socketPropagatedBy;
+    }
+
+    set socketPropagatedBy(socket){
+
+        this._socketPropagatedBy = socket;
+
+        socket.on("disconnect",()=>{
+           this._socketPropagatedBy = undefined;
+        });
+
+    }
 
 }
 
