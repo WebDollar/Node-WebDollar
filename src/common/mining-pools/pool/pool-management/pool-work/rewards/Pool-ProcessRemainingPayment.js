@@ -84,7 +84,7 @@ class PoolRewardsManagement{
         });
 
         let poolRewardSCO = this.totalRewardSent + this.totalRewardConfirmOther;
-        let poolCurrentBalance = 28000000000;
+        let poolCurrentBalance = Blockchain.blockchain.accountantTree.getBalance(this.blockchain.mining.minerAddress, undefined);
 
         let restantAmount = poolCurrentBalance - (poolCurrentBalance + poolRewardSCO) * this.poolFeePercent;
 
