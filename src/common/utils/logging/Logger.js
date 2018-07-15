@@ -25,9 +25,9 @@ class Logger{
         let s=  '';
         for (let i=0; i<arguments.length; i++) {
 
-            if (arguments[i] === undefined) continue;
+            if (i === 1 ) continue;
 
-            s += arguments[i];
+            if (arguments[i] === undefined) continue;
 
             if (typeof arguments[i] === "string") s += arguments[i];
             else console.log(arguments[i]);

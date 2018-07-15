@@ -183,8 +183,9 @@ class MinerPoolMining extends InheritedPoolMining {
 
                 //in case I can not mine from this pool, show an error and disconnect
                 if (this._poolFailTrials > 8) {
-                    NodesList.disconnectAllNodes();
                     Log.error("Mining Pool is not working. Trying to reconnect", Log.LOG_TYPE.POOLS);
+                    NodesList.disconnectAllNodes();
+                    this._poolFailTrials = 0;
                 }
 
             }

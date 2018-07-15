@@ -53,7 +53,7 @@ class PoolRewardsManagement{
 
             this.createRemainPayouts();
 
-            if(!this.prepareRewards()) throw {message: "No Addresses to send money"};
+            if (!this.prepareRewards()) throw {message: "No Addresses to send money"};
 
             await this.createTransactions();
 
