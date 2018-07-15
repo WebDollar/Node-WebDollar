@@ -24,13 +24,13 @@ class NodeAPIRouter{
 
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
-            app(prefix+''+process.env.WALLET_SECRET_URL+'mining/balance', (req, res) => middleWare(req, res, NodeAPIPrivate.minerBalance ) );
+            app(prefix+''+process.env.WALLET_SECRET_URL+'/mining/balance', (req, res) => middleWare(req, res, NodeAPIPrivate.minerBalance ) );
 
-            app(prefix+''+process.env.WALLET_SECRET_URL+'wallets/import', (req, res) => middleWare(req, res, NodeAPIPrivate.walletImport ) );
+            app(prefix+''+process.env.WALLET_SECRET_URL+'/wallets/import', (req, res) => middleWare(req, res, NodeAPIPrivate.walletImport ) );
 
-            app(prefix+''+process.env.WALLET_SECRET_URL+'wallets/create-transaction', (req, res) => middleWare(req, res, NodeAPIPrivate.walletCreateTransaction) );
+            app(prefix+''+process.env.WALLET_SECRET_URL+'/wallets/create-transaction', (req, res) => middleWare(req, res, NodeAPIPrivate.walletCreateTransaction) );
 
-            app(prefix+''+process.env.WALLET_SECRET_URL+'wallets/export', (req, res) => middleWare(req, res, NodeAPIPrivate.walletExport) );
+            app(prefix+''+process.env.WALLET_SECRET_URL+'/wallets/export', (req, res) => middleWare(req, res, NodeAPIPrivate.walletExport) );
 
         }
 
