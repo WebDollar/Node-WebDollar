@@ -7,7 +7,7 @@ let outputPath;
 if (process.env.WEBPACK_TYPE === 'browser_test')
     outputPath = 'browser/browser-bundle.js';
 else if (process.env.WEBPACK_TYPE === undefined)
-    outputPath = './../../vue-Frontend2/public/WebDollar-dist/WebDollar-Protocol-bundle.js';
+    outputPath = './../../vue-Frontend/public/WebDollar-dist/WebDollar-Protocol-bundle.js';
 else if (process.env.WEBPACK_TYPE === 'user_interface')
     outputPath = ' ./../../../User-Interface-WebDollar/dist_bundle/WebDollar-Protocol-bundle.js';
 

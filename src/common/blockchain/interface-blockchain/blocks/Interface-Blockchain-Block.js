@@ -28,17 +28,8 @@ class InterfaceBlockchainBlock {
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
-        if ( timeStamp === undefined ) {
-
-            let networkTimestamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
-
-            if (this.blockchain.blocks.last !== undefined)  timeStamp = this.blockchain.blocks.last.timeStamp + 20;
-            else timeStamp = 0;
-
-            if (timeStamp < networkTimestamp )
-                timeStamp = networkTimestamp + 20;
-
-        }
+        if ( timeStamp === undefined )
+            this.timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
