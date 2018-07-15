@@ -3,10 +3,13 @@ import PPoWHelper from '../helpers/PPoW-Helper'
 import PPowBlockchainProofPi from './proofs/PPoW-Blockchain-Proof-Pi'
 import PPowBlockchainProofXi from './proofs/PPoW-Blockchain-Proof-Xi'
 
+import PPoWBlockchainProvesCalculated from "./PPoW-Blockchain-Proves-Calculated"
+
 class PPoWBlockchainProver{
 
     constructor(blockchain){
 
+        this.provesCalculated = new PPoWBlockchainProvesCalculated(blockchain);
         this.proofActivated = true;
 
         this.blockchain = blockchain;
@@ -49,31 +52,53 @@ class PPoWBlockchainProver{
                     //  α is superChain
                     let superChain = new PPowBlockchainProofPi(this.blockchain, []);
 
-                    for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
-                        if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
-                            chain.blocks[i].getLevel() >= miu) {
+                    // //C[: −k]{B :}
+                    for (let level = miu; level <=32; level++){
 
-                            superChain.blocks.push(chain.blocks[i]);
-                        }
+                        //C[: −k] ↑µ
+                        let chainBlocks = this.provesCalculated.levels[level];
 
-                    // π ← π ∪ α
-                    for (let i = 0; i < superChain.blocks.length; ++i) {
+                        // {B :}
+                        let index = this.provesCalculated._binarySearch( chainBlocks, B.height );
 
-                        //avoiding to be included multiple times
-                        let found = false;
-                        for (let j=0; j<underlyingChain.blocks.length; j++)
-                            if (underlyingChain.blocks[j].height === superChain.blocks[i].height ){
-                                found = true;
-                                break;
+                        for (let i=index; i<chainBlocks.length; i++)
+                            if ( chainBlocks[i].height < ( chainLength - consts.POPOW_PARAMS.k) && chainBlocks[i].height >= B.height ){
+
+                                superChain.push(chainBlocks[i]);
+
+                                // π ← π ∪ α
+                                if ( underlyingChain.blocksIndex[ chainBlocks[i].height ] === undefined )
+                                    underlyingChain.push(chainBlocks[i]);
+
                             }
 
-                        if (!found)
-                            underlyingChain.blocks.push(superChain.blocks[i]);
                     }
+
+                    underlyingChain.blocks.sort(function(a, b) {
+                        return a.height - b.height;
+                    });
+
+                    superChain.blocks.sort(function(a,b){
+                        return a.height - b.height;
+                    });
+
+                    //slow version
+                    // for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
+                    //     if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
+                    //         chain.blocks[i].getLevel() >= miu) {
+                    //
+                    //         superChain.push(chain.blocks[i]);
+                    //
+                    //         // π ← π ∪ α
+                    //         if ( underlyingChain.blocksIndex[ chain.blocks[i].height ] === undefined )
+                    //             underlyingChain.push(chain.blocks[i]);
+                    //
+                    //     }
 
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
                         B = superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m];
+
 
                     count ++;
                     if (count % 20 === 0)
@@ -98,6 +123,12 @@ class PPoWBlockchainProver{
 
             underlyingChain.calculateProofHash();
         }
+
+        // let s = "";
+        // for (let i=0; i<underlyingChain.blocks.length; i++)
+        //     s += underlyingChain.blocks[i].height + " ";
+        //
+        // console.log("underlyingChain", s);
 
         return underlyingChain;
 

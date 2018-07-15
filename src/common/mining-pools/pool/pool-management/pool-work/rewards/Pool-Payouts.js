@@ -1,4 +1,5 @@
 import Blockchain from "main-blockchain/Blockchain";
+import Log from 'common/utils/logging/Log';
 
 const BigNumber = require ('bignumber.js');
 
@@ -48,15 +49,15 @@ class PoolPayouts{
 
         if (!Blockchain.synchronized) return;
 
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------PAYOUT------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------PAYOUT------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
 
         let blocksConfirmed = [];
         for (let i=0; i<this.poolData.blocksInfo.length; i++)
@@ -81,7 +82,7 @@ class PoolPayouts{
 
             this._toAddresses = [];
 
-            console.info("Payout: Initialized ");
+            Log.info("Payout: Initialized ", Log.LOG_TYPE.POOLS);
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
@@ -134,7 +135,7 @@ class PoolPayouts{
 
             }
 
-            console.info("Payout: Blocks Confirmed Processed");
+            Log.info("Payout: Blocks Confirmed Processed", Log.LOG_TYPE.POOLS);
 
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
@@ -144,7 +145,7 @@ class PoolPayouts{
 
             });
 
-            console.info("Payout: Adding rewardConfirmedOther");
+            Log.info("Payout: Adding rewardConfirmedOther", Log.LOG_TYPE.POOLS);
 
             //verify to send to other
 
@@ -163,13 +164,13 @@ class PoolPayouts{
                     let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
                     if (!transaction.result) throw {message: "Transaction was not made"};
                 } catch (exception){
-                    console.error("Payout: ERROR CREATING TRANSACTION");
+                    Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);
                 }
 
                 index++;
             }
 
-            console.info("Payout: Transaction Created");
+            Log.info("Payout: Transaction Created", Log.LOG_TYPE.POOLS);
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
@@ -209,10 +210,11 @@ class PoolPayouts{
             }
 
 
+            let total = 0;
             for (let i=0; i<this._toAddresses.length; i++){
 
                 let miner = this.poolData.findMiner( this._toAddresses[i].address );
-                if (miner === null) console.error("ERROR! Miner was not found at the payout");
+                if (miner === null) Log.error("ERROR! Miner was not found at the payout", Log.LOG_TYPE.POOLS);
 
                 miner.rewardSent += this._toAddresses[i].amount; //i paid totally
                 miner.rewardConfirmed = 0; //paid this
@@ -220,14 +222,18 @@ class PoolPayouts{
 
                 miner.__tempRewardConfirmedOther = 0; //paid this
 
+                total += this._toAddresses[i].amount;
+
             }
+
+            Log.info("Payout Total Paid "+total, Log.LOG_TYPE.POOLS)
 
 
         } catch (exception){
 
-            console.error("----------------------------------------");
-            console.error("Pool Payouts raised an error", exception);
-            console.error("----------------------------------------");
+            Log.error("----------------------------------------", Log.LOG_TYPE.POOLS);
+            Log.error("Pool Payouts raised an error", Log.LOG_TYPE.POOLS, exception);
+            Log.error("----------------------------------------", Log.LOG_TYPE.POOLS);
 
             return false;
 

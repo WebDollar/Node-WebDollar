@@ -295,7 +295,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 validationType["skip-interlinks-update"] = true;
                 validationType["skip-target-difficulty-validation"] = true;
                 validationType["skip-calculating-proofs"] = true;
-                validationType["skip-calculating-block-nipopow-level"] = true;
+                //validationType["skip-calculating-block-nipopow-level"] = true;
                 validationType["skip-saving-light-accountant-tree-serializations"] = true;
                 validationType["skip-recalculating-hash-rate"] = true;
 

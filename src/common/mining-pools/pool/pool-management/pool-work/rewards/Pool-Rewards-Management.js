@@ -59,7 +59,8 @@ class PoolRewardsManagement{
         let firstBlock;
         for (let i=0; i < this.poolData.blocksInfo.length; i++)
             if ( this.poolData.blocksInfo[ i ].block !== undefined )
-                if ( firstBlock === undefined || this.poolData.blocksInfo[i].block.height < firstBlock) firstBlock = this.poolData.blocksInfo[ i ].block.height;
+                if ( firstBlock === undefined || this.poolData.blocksInfo[i].block.height < firstBlock)
+                    firstBlock = this.poolData.blocksInfo[ i ].block.height;
 
         for (let i = this.blockchain.blocks.length-1, n = Math.max( this.blockchain.blocks.blocksStartingPoint, firstBlock ); i>= n; i-- ) {
 

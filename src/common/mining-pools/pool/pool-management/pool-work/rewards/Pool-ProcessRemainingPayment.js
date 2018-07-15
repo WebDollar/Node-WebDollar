@@ -3,6 +3,7 @@ import Blockchain from "main-blockchain/Blockchain";
 import consts from 'consts/const_global'
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import Log from 'common/utils/logging/Log';
 
 class PoolRewardsManagement{
 
@@ -38,15 +39,15 @@ class PoolRewardsManagement{
 
         if (!Blockchain.synchronized) return;
 
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("------------------Remained PAYOUT-----------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
-        console.info("--------------------------------------------------");
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("------------------Remained PAYOUT-----------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
 
         try{
 
@@ -56,15 +57,15 @@ class PoolRewardsManagement{
 
             await this.createTransactions();
 
-            console.info("Payout: Transaction Created");
+            Log.info("Payout: Transaction Created", Log.LOG_TYPE.POOLS);
 
             this.updateMinersReward();
 
         } catch (exception){
 
-            console.error("----------------------------------------");
-            console.error("Pool Payouts raised an error", exception);
-            console.error("----------------------------------------");
+            Log.error("----------------------------------------", Log.LOG_TYPE.POOLS);
+            Log.error("Pool Payouts raised an error", exception, Log.LOG_TYPE.POOLS);
+            Log.error("----------------------------------------", Log.LOG_TYPE.POOLS);
 
             return false;
 
@@ -86,21 +87,28 @@ class PoolRewardsManagement{
         let poolRewardSCO = this.totalRewardSent + this.totalRewardConfirmOther;
         let poolCurrentBalance = Blockchain.blockchain.accountantTree.getBalance(this.blockchain.mining.minerAddress, undefined);
 
-        let restantAmount = poolCurrentBalance - (poolCurrentBalance + poolRewardSCO) * this.poolFeePercent;
+        let remainingAmount = Math.floor( poolCurrentBalance - (poolCurrentBalance + poolRewardSCO) * this.poolFeePercent - this.totalRewardConfirmOther );
 
-        console.log("I have to pay "+restantAmount/WebDollarCoins.WEBD+" WEBD from " + poolCurrentBalance/WebDollarCoins.WEBD);
+        Log.info("I have to pay "+remainingAmount/WebDollarCoins.WEBD+" WEBD from " + poolCurrentBalance/WebDollarCoins.WEBD, Log.LOG_TYPE.POOLS);
+
+        let sumTotal = 0;
 
         this.poolData.miners.forEach((miner)=>{
 
-            let percentAlreadyPaid = (miner._rewardSent + miner._rewardConfirmedOther) / (this.totalRewardSent + this.totalRewardConfirmOther);
+            let percentAlreadyPaid = miner._rewardSent / this.totalRewardSent;
+            let reward = Math.floor( percentAlreadyPaid * remainingAmount + miner._rewardConfirmedOther );
 
-            if(percentAlreadyPaid * restantAmount >= 10*WebDollarCoins.WEBD){
+            if ( reward >= 10*WebDollarCoins.WEBD){
 
-                this._addAddressTo(miner.address).amount = percentAlreadyPaid * restantAmount;
-                console.log("Will pay " + (percentAlreadyPaid * restantAmount)/WebDollarCoins.WEBD.toFixed(0) + " WEBD to " + InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address,false,true));
+                this._addAddressTo(miner.address).amount = reward;
+                Log.info("Will pay " + reward/WebDollarCoins.WEBD.toFixed(0) + " WEBD to " + InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address,false,true), Log.LOG_TYPE.POOLS);
+
+                sumTotal+= reward
             }
 
         });
+
+        Log.info("Total to pay " + sumTotal/WebDollarCoins.WEBD.toFixed(0), Log.LOG_TYPE.POOLS );
 
     }
 
@@ -119,20 +127,40 @@ class PoolRewardsManagement{
 
     async createTransactions(){
 
+        let total = consts.MINING_POOL.MINING.FEE_THRESHOLD * this._toAddresses.length/255;
+        let fee = total / this._toAddresses.length;
+
+        //let's reduce the amounts with the fees
+        for (let i=0; i<this._toAddresses.length; i++){
+            this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount - fee );
+
+            if (this._toAddresses[i].amount < 10*WebDollarCoins.WEBD){
+
+                let miner = this.poolData.findMiner( this._toAddresses[i].address );
+                miner.rewardConfirmedOther += Math.max(0, this._toAddresses[i].amount);
+
+                delete this._toAddresses[i];
+            }
+
+        }
+
+
         let index = 0;
         while (index * 256 < this._toAddresses.length) {
 
             let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
             try {
-                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
+                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD, );
                 if (!transaction.result) throw {message: "Transaction was not made"};
             } catch (exception){
-                console.error("Payout: ERROR CREATING TRANSACTION");
+                Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);
             }
 
             index++;
         }
+
+        Log.info("Payout: Transactions made  "+ index, Log.LOG_TYPE.POOLS);
 
     }
 
@@ -141,13 +169,12 @@ class PoolRewardsManagement{
         for (let i=0; i<this._toAddresses.length; i++){
 
             let miner = this.poolData.findMiner( this._toAddresses[i].address );
-            if (miner === null) console.error("ERROR! Miner was not found at the payout");
+            if (miner === null) Log.error("ERROR! Miner was not found at the payout", Log.LOG_TYPE.POOLS);
 
             miner.rewardSent += this._toAddresses[i].amount; //i paid totally
             miner.rewardConfirmed = 0; //paid this
             miner.rewardConfirmedOther = 0; //paid this
 
-            miner.__tempRewardConfirmedOther = 0; //paid this
 
         }
 

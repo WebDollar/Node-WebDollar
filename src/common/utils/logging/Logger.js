@@ -4,20 +4,39 @@ class Logger{
         this.name = name;
     }
 
-    error(msg, msg2, msg3){
-        console.log('\x1b[31m%s\x1b[0m', this.name, "\x1b[0m", msg, msg2, msg3);
+    error(){
+        console.log('\x1b[31m%s\x1b[0m', this.name, "\x1b[0m", this.convertArguments.apply(this, arguments) );
     }
 
-    info(msg, msg2, msg3){
-        console.log('\x1b[34m%s\x1b[0m', this.name, "\x1b[0m", msg, msg2, msg3);
+    info(){
+        console.log('\x1b[34m%s\x1b[0m', this.name, "\x1b[0m", this.convertArguments.apply(this, arguments) );
     }
 
-    debug(msg, msg2, msg3){
-        console.log('\x1b[32m%s\x1b[0m', this.name, "\x1b[0m", msg, msg2, msg3);
+    debug(){
+        console.log('\x1b[32m%s\x1b[0m', this.name, "\x1b[0m", this.convertArguments.apply(this, arguments) );
     }
 
-    warn(msg, msg2, msg3){
-        console.log('\x1b[33m%s\x1b[0m', this.name, "\x1b[0m", msg, msg2, msg3);
+    warn(){
+        console.log('\x1b[33m%s\x1b[0m', this.name, "\x1b[0m", this.convertArguments.apply(this, arguments) );
+    }
+
+    convertArguments(){
+
+        let s=  '';
+        for (let i=0; i<arguments.length; i++) {
+
+            if (arguments[i] === undefined) continue;
+
+            s += arguments[i];
+
+            if (typeof arguments[i] === "string") s += arguments[i];
+            else s += JSON.stringify(arguments[i]);
+
+            s += "   ";
+        }
+
+        return s;
+
     }
 
 }

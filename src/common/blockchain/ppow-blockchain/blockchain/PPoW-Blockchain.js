@@ -21,20 +21,18 @@ class PPoWBlockchain extends InterfaceBlockchain {
         block.updateInterlink();
 
 
-        if ( !block.blockValidation.blockValidationType["skip-calculating-block-nipopow-level"])
+        if ( !block.blockValidation.blockValidationType["skip-calculating-block-nipopow-level"]) {
             block.level = block.getLevel(); //computing the level
+            this.prover.provesCalculated.updateBlock(block);
+        }
 
         //TODO generate proofs as a LightNode
-        if (!this.agent.light) {
-
+        if (!this.agent.light)
             if (!block.blockValidation.blockValidationType["skip-calculating-proofs"]){
 
                 await this.prover.createProofs();
 
             }
-
-
-        }
 
     }
 

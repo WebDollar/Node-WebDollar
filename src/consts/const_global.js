@@ -234,7 +234,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.140.3",
+        VERSION: "1.140.4",
         VERSION_COMPATIBILITY: "1.140.0",
         PROTOCOL: "WebDollar",
         SSL: true,
@@ -365,8 +365,8 @@ if (process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL !== undefined)
 
 if ( consts.DEBUG === true ){
 
-    consts.SETTINGS.NODE.VERSION += "3";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "3";
+    consts.SETTINGS.NODE.VERSION = "3"+consts.SETTINGS.NODE.VERSION;
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "3"+consts.SETTINGS.NODE.VERSION_COMPATIBILITY;
     //consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
