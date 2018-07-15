@@ -136,7 +136,7 @@ class PoolRewardsManagement{
 
                 } else{
                     
-                    if (blockInfo.height > this.blockchain.blocks.length - VALIDATION_BLOCK_CONFIRMATIONS)
+                    if ( blockInfo.height > this.blockchain.blocks.length - VALIDATION_BLOCK_CONFIRMATIONS )
                         this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
                 }
