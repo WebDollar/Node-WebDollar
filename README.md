@@ -13,12 +13,12 @@ https://docs.docker.com/install/
 
 ## 2. Run prebuilt Container (automated build https://hub.docker.com/r/webdollar/node/)
 AutoSSL
-```
+```shell
 docker run -d --restart=always -v /webdollar/ssl:/etc/letsencrypt/live -v /webdollar/data:/blockchainDB3 -e DOMAIN=<ENTER DOMAIN HERE> -e EMAIL=<ENTER EMAIL HERE> --name webdollar -p 80:80 -p 443:443 webdollar/node
 ```
 
 NoSSL
-```
+```shell
 docker run -d --restart=always -v /webdollar/data:/blockchainDB3 -e NOSSL=true -e SERVER_PORT=80 --name webdollar -p 80:80 webdollar/node
 ```
 
@@ -33,9 +33,9 @@ docker run -d --restart=always -v /webdollar/data:/blockchainDB3 -e NOSSL=true -
 **Required: v8.x**
 It doesn't work with the new version 9.x
 
-Windows: just download and install from URL: https://nodejs.org/en/download/
+**Windows**: just download and install from URL: https://nodejs.org/en/download/
 
-Linux: tutorial how to install Node.js using NVM (recommended) [Install Node.js using NVM](/docs/Install-Debian.md)
+**Linux**: tutorial how to install Node.js using NVM (recommended) [Install Node.js using NVM](/docs/Install-Debian.md)
 
 ## 1. Cloning Repository
 ```
@@ -43,7 +43,7 @@ git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
 ```
 ## 2. Installing modules
 `cd Node-WebDollar` to enter in the downloaded folder of the repository
-```
+```shell
 npm install
 ```
 
@@ -55,7 +55,7 @@ In case your will get errors from **node-gyp** especially for **Argon2** or **we
 #### 3.1 node-gyp on Windows
 open a Command Prompt with **Administrator rights**
 
-```
+```shell
 cd C:\Path\To\Node-WebDollar\
 npm install --global --production windows-build-tools
 npm install
@@ -64,7 +64,7 @@ npm install
 #### 3.2 node-gyp on Linux
 
 Installing Argon2 node.js
-```
+```shell
 sudo apt install linuxbrew-wrapper
 ```
 In case your receive some errors, try ```sudo apt-get -f install```
@@ -72,7 +72,7 @@ In case your receive some errors, try ```sudo apt-get -f install```
 To check the version `gcc --version`
 In case the GCC is not installed, install gcc `brew install gcc`
 
-```
+```shell
 sudo apt-get install clang
 npm install -g node-gyp
 ```
@@ -82,7 +82,7 @@ npm install -g node-gyp
 Replace `g++-5` with your version
 Verify if you can access `g++-5` or whatever version you have.
 then install
-```
+```shell
 env CXX=g++-5 npm install
 env CXX=g++-5 npm install argon2
 ```
@@ -93,7 +93,7 @@ Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 
 ### Install x509 on Windows
 Open a powershell terminal
-```
+```shell
 npm install --python=python2.7
 git clone https://github.com/ReadyTalk/win32.git
 mkdir C:\OpenSSL-Win64\lib\
@@ -101,7 +101,7 @@ cp .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
 rm -r -fo .\win32\
 ```
 or cmd
-```
+```shell
 npm install --python=python2.7
 git clone https://github.com/ReadyTalk/win32.git
 md C:\OpenSSL-Win64\lib\
@@ -114,47 +114,57 @@ rd /s /q .\win32\
 WebDollar uses SSL (Secured Socket Layer) and in order to generate your SSL Certificate you need a Domain or to generate your own SSL Certificate for your IP
 
 ### 4.1 No-IP solution for Free Domain
-
+###### This is required to get a SSL certificate. If you already have a domain, skip this step.
 Follow the Tutorial [Install No-Ip using ddns.net ](/docs/Install-No-Ip.md)
 
 
 ### 4.2 Generate your SSL certificate
+###### Port 80 must not be in use prior to running LetsEncrypt SSL generator!
 
-
-Follow the Tutorial [Get SSL Certificates ](/docs/Get-SSL-Certificates.md)
+Inside Node-WebDollar folder, run: 
+```shell 
+sudo bash start-node-letsencrypt.sh
+```
 
 
 #### Firewall acceptable
 
 Unix
-`sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT`
+```shell
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
 
-If you are under a **router/firewall**, you need to port forward the port used by the Nodes **80** or whatever port they use
+````
+
+If you are under a **router/firewall**, you need to port forward the port used by the Nodes: **80**,**443** or whatever port they use.
 
 
 ## 5. **Console commands**
 
 #### 5.1 Run terminal interactive menu
-```
+```shell
 npm run commands
 ```
 
 #### 5.2 Running Full Node
 
 install pm2
-```
+```shell
 npm install pm2 -g --unsafe-perm
 ```
 
 ##### Linux
 
-run pm2
+Run pm2:
 
-```
+```shell
 chmod +x start.sh
 ./start.sh
 ```
-to kill
+or 
+```bash node-start.sh```
+
+To kill pm2 process, use ```pm2 stop id```- get id by running ```pm2 list```
 
 ##### Windows
 start.sh ???
@@ -167,23 +177,23 @@ npm run test
 #### 5.3 Missing Packages or Errors
 Obs. In case there you get an error message about some missing packages like the following one:
 
-``` Error: Cannot find module 'name_missing_package' ```
+```Error: Cannot find module 'name_missing_package'```
 
 just, run ```npm install name_missing_package```
 
 
 #### 5.4 Building Dist for Browser (webpack)
-```
+```shell
 npm run build_browser
 ```
 
 #### 5.5 Building Dist for Browser TEST (dist_bundle/browser/browser.html)
-```
+```shell
 npm run test_browser
 ```
 
 #### 5.6 Building Dist for User-Interface
-```
+```shell
 npm run build_browser_user_interface
 ```
 
@@ -191,7 +201,7 @@ open web page `dist_bundle/browser/browser.html`
 
 #### 5.7 Running Server in Node.js
 
-```
+```shell
 npm run commands
 npm run start
 ```
