@@ -4,11 +4,10 @@ const BigNumber = require('bignumber.js');
 
 let consts = {
 
-    DEBUG: false,
+    DEBUG: true,
     OPEN_SERVER: true,
 
 };
-
 
 consts.BLOCKCHAIN = {
 

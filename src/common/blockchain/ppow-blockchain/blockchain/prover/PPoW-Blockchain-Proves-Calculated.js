@@ -1,4 +1,7 @@
 import Log from 'common/utils/logging/Log';
+import consts from 'consts/const_global';
+import Serialization from "common/utils/Serialization";
+import BufferExtended from "common/utils/BufferExtended";
 
 class PPoWBlockchainProvesCalculated{
 
@@ -16,6 +19,8 @@ class PPoWBlockchainProvesCalculated{
 
         this.allBlocks = {};
 
+        this.db = this.blockchain.db;
+
     }
 
     deleteBlock(block, level){
@@ -24,14 +29,15 @@ class PPoWBlockchainProvesCalculated{
             return;
 
         try {
-            if (level === undefined)
-                level = block.getLevel();
-        } catch (exception){
+
+            if (level === undefined) level = block.getLevel();
+
+        }catch (exception){
+
             console.error("couldn't get level", exception);
             return;
+
         }
-
-
 
         //deleting old ones if they have a different level
         if (this.allBlocks[block.height] !== undefined && this.allBlocks[block.height] !== level) {
@@ -44,6 +50,7 @@ class PPoWBlockchainProvesCalculated{
             let oldPos = this._binarySearch(this.levels[oldlevel], block);
             if (this.levels[oldlevel][oldPos] === block)
                 this.levels[oldlevel].splice(oldPos, 1);
+
         }
 
     }
@@ -62,9 +69,7 @@ class PPoWBlockchainProvesCalculated{
             level = block.getLevel();
             pos = this._binarySearch(this.levels[level], block);
 
-
             this.deleteBlock(block);
-
 
             if (this.levels[level][pos] !== undefined && this.levels[level][pos].height === block.height) {
                 this.levels[level][pos] = block;
@@ -98,8 +103,6 @@ class PPoWBlockchainProvesCalculated{
 
     }
 
-
-
     /**
      * Return 0 <= i <= array.length such that !pred(array[i - 1]) && pred(array[i]).
      */
@@ -112,6 +115,7 @@ class PPoWBlockchainProvesCalculated{
             max = array.length - 1;
 
         while(min <= max){
+
             guess = Math.floor((min + max) /2);
             if(array[guess].height === value.height)
                 return guess;
@@ -119,17 +123,92 @@ class PPoWBlockchainProvesCalculated{
                 min = guess + 1;
             else
                 max = guess - 1;
+
         }
 
         return min;
-    }
-
-
-    saveProvesCalculated(){
 
     }
 
-    loadProvesCalculated(){
+    async _SerializationProves(){
+
+        let array = [];
+
+        array.push( Serialization.serializeNumber4Bytes(this.levels.length) );
+        for (let i=0; i < this.levels.length; i++ ){
+
+            array.push( Serialization.serializeNumber7Bytes(this.levels[i].length) );
+            for (let j=0; j< this.levels[i].length; j++){
+
+                array.push( Serialization.serializeBufferCountingLeadingZeros(this.levels[j].hash) ); //1 bytes
+                array.push( Serialization.serializeBufferRemovingLeadingZeros(this.levels[j].hash) ); //32-zero count bytes
+
+            }
+
+        }
+
+        return Buffer.concat(array);
+
+    }
+
+    async _DeserializationProves(Buffer, offset = 0) {
+
+        let levelsLength = Serialization.deserializeNumber4Bytes(Buffer, offset);
+        offset += 4;
+
+        for (let i=0; i< levelsLength; i++){
+
+            this.levels[i].length = Serialization.deserializeNumber7Bytes(Buffer, offset);
+            offset += 7;
+
+            for (let j=0; j<this.levels[i].length; j++){
+
+                let zeroCount = this.levels[j].hash = BufferExtended.substr(Buffer, offset, 1);
+                offset += 1;
+
+                let hashPrefix = [];
+
+                for(let z=0; z<zeroCount; z++) hashPrefix.push(0);
+
+                this.levels[j].hash = Buffer.concat([
+                    hashPrefix,
+                    this.levels[j].hash = BufferExtended.substr(Buffer, offset, 32-zeroCount)
+                ]);
+
+                offset += 32-zeroCount;
+
+            }
+
+        }
+
+    }
+
+    async _saveProvesCalculated(key){
+
+        return (await this.db.save( key, this._SerializationProves() ));
+
+    }
+
+    async _loadProvesCalculated(key){
+
+        try{
+
+            let buffer = await this.db.get(key, 12000);
+
+            if (buffer === null) {
+                console.error("Proof for key "+key+" was not found");
+                return false;
+            }
+
+            await this._DeserializationProves(buffer);
+
+            return true;
+
+        }
+        catch(exception) {
+            console.error( 'ERROR on LOAD block: ', exception);
+            return false;
+        }
 
     }
 

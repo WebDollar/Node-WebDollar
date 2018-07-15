@@ -131,6 +131,7 @@ class Serialization{
             value = (value * 256) + buffer[i];
 
         return value;
+
     }
 
     deserializeNumber(buffer){
@@ -167,6 +168,23 @@ class Serialization{
         }
 
         return result;
+
+    }
+
+    serializeBufferCountingLeadingZeros(buffer){
+
+        let count=0;
+        let stop=false;
+
+        while(!stop){
+
+            if( buffer[count] === 0 ) count++;
+                else stop = true;
+
+        }
+
+        return this.serializeNumber1Byte(count);
+
     }
 
     serializeBufferRemovingLeadingZeros(buffer){
@@ -180,7 +198,6 @@ class Serialization{
 
         for (let i = count; i < buffer.length; i++)
             result[i-count+1] = buffer[i];
-
 
         return result;
 
