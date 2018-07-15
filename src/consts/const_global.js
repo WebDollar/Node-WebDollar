@@ -244,7 +244,7 @@ consts.SETTINGS = {
 
     PARAMS: {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
-        STATUS_INTERVAL: 20 * 1000,                      //miliseconds
+        STATUS_INTERVAL: 40 * 1000,                      //miliseconds
 
         WAITLIST: {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
@@ -378,6 +378,9 @@ if ( consts.DEBUG === true ){
         "addr": ["http://webdollar.ddns.net:9095"],
     }];
 
+
 }
+
+
 
 export default consts

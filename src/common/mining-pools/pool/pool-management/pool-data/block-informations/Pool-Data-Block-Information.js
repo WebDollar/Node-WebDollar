@@ -110,6 +110,7 @@ class PoolDataBlockInformation {
         if (this.block !== undefined && this.block !== null && this.block.blockchain !== undefined) {
 
             try {
+
                 array.push(Serialization.serializeNumber4Bytes(this.block.height));
                 array.push(this.block.difficultyTargetPrev);
                 array.push(this.block.serializeBlock());
@@ -176,13 +177,14 @@ class PoolDataBlockInformation {
             let height = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 4));
             offset += 4;
 
-            let difficultyTarget = BufferExtended.substr(buffer, offset, 32);
+            let difficultyTargetPrev = BufferExtended.substr(buffer, offset, 32);
             offset += 32;
 
 
             try {
 
-                offset = this.block.deserializeBlock(buffer, height, undefined, difficultyTarget, offset);
+                offset = this.block.deserializeBlock(buffer, height, undefined, undefined, offset);
+                this.block.difficultyTargetPrev = difficultyTargetPrev;
 
             } catch (exception){
 
