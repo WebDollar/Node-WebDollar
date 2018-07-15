@@ -94,6 +94,12 @@ class BlockchainDifficulty{
             let newBlockDifficulty = prevBlockDifficulty.multipliedBy(ratio);
             newBlockDifficulty = newBlockDifficulty.decimalPlaces(0);
 
+            if (newBlockDifficulty.isGreaterThan(consts.BLOCKCHAIN.BLOCKS_MAX_TARGET))
+                newBlockDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET;
+
+            if (newBlockDifficulty.isLessThan(1) )
+                newBlockDifficulty = new BigNumber(1);
+
             return newBlockDifficulty;
         }
 
