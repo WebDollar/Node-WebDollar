@@ -19,6 +19,7 @@ class NodeAPIPublic{
 
             protocol: consts.SETTINGS.NODE.PROTOCOL,
             version: consts.SETTINGS.NODE.VERSION,
+            poolURL: Blockchain.PoolManagement.poolSettings.poolURL,
             blocks: {
                 length: Blockchain.blockchain.blocks.length,
                 lastBlockHash: lastBlock !== undefined ? Blockchain.blockchain.blocks.last.hash.toString("hex") : '',
