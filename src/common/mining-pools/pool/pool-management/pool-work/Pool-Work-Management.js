@@ -139,7 +139,7 @@ class PoolWorkManagement{
 
                         let serialization = blockInformationMinerInstance.workBlock.serializeBlock();
                         let block = this.blockchain.blockCreator.createEmptyBlock(blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.blockValidation);
-                        block.deserializeBlock(serialization, block.height, block.reward, block.difficultyTarget );
+                        block.deserializeBlock(serialization, blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.reward, blockInformationMinerInstance.workBlock.difficultyTarget );
 
                         if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 

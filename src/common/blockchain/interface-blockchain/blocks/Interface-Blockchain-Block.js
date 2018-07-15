@@ -226,11 +226,11 @@ class InterfaceBlockchainBlock {
 
         return {
             version: this.version,
-            hashPrev: this.hashPrev.toString("hex"),
-            data: this.data.toJSON(),
+            hashPrev: (this.hashPrev !== null ? this.hashPrev.toString("hex") : ''),
+            data: (this.data !== null ? this.data.toJSON() : ''),
             nonce: this.nonce,
             timeStamp: this.timeStamp,
-            difficulty: this.difficultyTarget.toString("hex"),
+            difficulty: (this.difficultyTarget !== null ? this.difficultyTarget.toString("hex") : ''),
         }
 
     }

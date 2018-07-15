@@ -89,14 +89,14 @@ class PoolDataBlockInformation {
 
         let length = 0;
 
-        if (this.blockInformationMinersInstances !== null)
+        if (this.blockInformationMinersInstances !== null && Array.isArray(this.blockInformationMinersInstances))
             for (let i=0; i<this.blockInformationMinersInstances.length; i++)
                 if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].reward > 0)
                     length ++;
 
         buffers.push ( Serialization.serializeNumber4Bytes(length));
 
-        if (length > 0)
+        if (length > 0 && this.blockInformationMinersInstances !== null && Array.isArray(this.blockInformationMinersInstances))
             for (let i=0; i<this.blockInformationMinersInstances.length; i++)
                 if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].reward > 0)
                     buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
@@ -106,7 +106,7 @@ class PoolDataBlockInformation {
         buffers.push( Serialization.serializeNumber1Byte((this.block !== undefined ? 1 : 0)) );
 
         //serialize block
-        if (this.block !== undefined && this.block.blockchain !== undefined) {
+        if (this.block !== undefined && this.block !== null && this.block.blockchain !== undefined) {
             buffers.push ( Serialization.serializeNumber4Bytes(this.block.height));
             buffers.push ( this.block.difficultyTarget);
             buffers.push( this.block.serializeBlock() );
