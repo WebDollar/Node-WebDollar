@@ -98,7 +98,6 @@ class PoolRewardsManagement{
 
                 this._addAddressTo(miner.address).amount = percentAlreadyPaid * restantAmount;
                 console.log("Will pay " + (percentAlreadyPaid * restantAmount)/WebDollarCoins.WEBD.toFixed(0) + " WEBD to " + InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address,false,true));
-                total+=percentAlreadyPaid * restantAmount;
             }
 
         });
