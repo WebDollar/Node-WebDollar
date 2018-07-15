@@ -220,7 +220,7 @@ consts.MINING_POOL = {
 
     CONNECTIONS:{
 
-        NO_OF_IDENTICAL_IPS: 40,
+        NO_OF_IDENTICAL_IPS: 80,
 
     },
 
@@ -275,7 +275,7 @@ consts.SETTINGS = {
 
         CONNECTIONS:{
 
-            NO_OF_IDENTICAL_IPS: 3,
+            NO_OF_IDENTICAL_IPS: 20,
 
             SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP: 50,
 

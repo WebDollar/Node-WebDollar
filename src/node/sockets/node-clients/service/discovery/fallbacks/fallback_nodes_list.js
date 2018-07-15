@@ -35,14 +35,14 @@ export default {
         {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic*/
-        {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
-        {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
-
-        // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
-        {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
-        {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
-        {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
-        {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
+        // {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
+        //
+        // // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
+        // {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
         // {"addr": ["https://wd1.hoste.ro:51261"]}, // Thanks to @morion4000
         // {"addr": ["https://wd1.hoste.ro:60260"]}, // Thanks to @morion4000
         // {"addr": ["https://wd1.hoste.ro:61099"]}, // Thanks to @morion4000
@@ -91,10 +91,16 @@ export default {
         // {"addr": ["https://webdollar-vps1.ddns.net:80"]},
         // {"addr": ["https://webdollar-vps2.ddns.net:80"]},
         // {"addr": ["https://webdollar-vps3.ddns.net:80"]},
-        // {"addr": ["https://webdollar-vps4.zapto.org:80"]},
-        // {"addr": ["https://webdollar-vps5.hopto.org:80"]},
-        //
-        //
+        {"addr": ["https://webdollar-vps4.zapto.org:80"]},
+
+        {"addr": ["https://webdollar-vps5.hopto.org:8080"]},
+        {"addr": ["https://webdollar-vps5.hopto.org:8081"]},
+        {"addr": ["https://webdollar-vps5.hopto.org:8082"]},
+        {"addr": ["https://webdollar-vps5.hopto.org:8083"]},
+        {"addr": ["https://webdollar-vps5.hopto.org:8084"]},
+
+
+
         // {"addr": ["https://chucknorris.webdollarvpn.io:8084"]}, // Thanks to @cbusuioceanu
         // {"addr": ["https://chucknorris.webdollarvpn.io:8085"]}, // Thanks to @cbusuioceanu
         // {"addr": ["https://chucknorris.webdollarvpn.io:8086"]}, // Thanks to @cbusuioceanu
