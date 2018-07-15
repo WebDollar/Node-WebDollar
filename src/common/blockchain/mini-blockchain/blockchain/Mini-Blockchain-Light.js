@@ -3,7 +3,7 @@ import global from "consts/global"
 import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
-import MiniBlockchain from "./Mini-Blockchain";
+import PPoWBlockchainProvesCalculated from "common/blockchain/ppow-blockchain/blockchain/prover/PPoW-Blockchain-Proves-Calculated"
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -28,6 +28,8 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         this.lightPrevHashPrevs = {};
 
         this._lightLoadingDifficultyNextDifficulty = null;
+
+        this.proofCalculated = new PPoWBlockchainProvesCalculated(this)
 
     }
 
@@ -166,6 +168,9 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex])))
                 throw {message: "Couldn't be saved _LightSettings_prevHashPrev ", diffIndex:diffIndex};
+
+            if(!await this.proofCalculated._saveProvesCalculated(diffIndex))
+                throw {message: "Couldn't be saved PPOW Proves Calculated ", diffIndex:diffIndex};
 
         } catch (exception){
             console.error("Error saving LIGHT SETTINGS", exception);
@@ -436,8 +441,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         return MiniBlockchainAdvanced.prototype.getHashPrev.call(this, height);
     }
-
-
 
 }
 
