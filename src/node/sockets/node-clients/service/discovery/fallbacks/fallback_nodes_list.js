@@ -20,7 +20,7 @@ export default {
         {"addr": ["https://wb.ciuc.ro:443"]}, // Thanks to Adi Clar
         {"addr": ["https://nodecstl.ddns.net:80"]},
         {"addr": ["https://webd.5q.ro:3333"]},
-        {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte */
+        {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
 
         // {"addr": ["https://titan.serg.at:80/"]}, // Thanks to @SergiuWX
         // {"addr": ["https://titan.serg.at:8080/"]}, // Thanks to @SergiuWX
@@ -38,7 +38,7 @@ export default {
         {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
 
-        // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
+        // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel*/
         {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
@@ -50,6 +50,7 @@ export default {
         // {"addr": ["https://wd2.hoste.ro:63980"]}, // Thanks to @morion4000
         // {"addr": ["https://wd2.hoste.ro:65279"]}, // Thanks to @morion4000
 
+        /*
         {"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
         //
         {"addr": ["https://chucknorris.webdollarvpn.io:80"]}, // Thanks to @cbusuioceanu
@@ -82,21 +83,22 @@ export default {
         //--------------WebDollar FallBack Nodes-------------------
         //---------------------------------------------------------
 
-        {"addr": ["https://skyhub.me:80"]},
-        {"addr": ["https://presa7.ro:80"]},
-
-
-        {"addr": ["https://webdollar-vps1.ddns.net:80"]},
-        {"addr": ["https://webdollar-vps2.ddns.net:80"]},
-        {"addr": ["https://webdollar-vps3.ddns.net:80"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:80"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:80"]},
-
-
-        {"addr": ["https://chucknorris.webdollarvpn.io:8084"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8085"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8086"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8087"]}, // Thanks to @cbusuioceanu
+        //
+        // {"addr": ["https://skyhub.me:80"]},
+        // {"addr": ["https://presa7.ro:80"]},
+        //
+        //
+        // {"addr": ["https://webdollar-vps1.ddns.net:80"]},
+        // {"addr": ["https://webdollar-vps2.ddns.net:80"]},
+        // {"addr": ["https://webdollar-vps3.ddns.net:80"]},
+        // {"addr": ["https://webdollar-vps4.zapto.org:80"]},
+        // {"addr": ["https://webdollar-vps5.hopto.org:80"]},
+        //
+        //
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8084"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8085"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8086"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://chucknorris.webdollarvpn.io:8087"]}, // Thanks to @cbusuioceanu
 
     ]
 }
