@@ -53,7 +53,7 @@ class PoolRewardsManagement{
 
             this.createRemainPayouts();
 
-            if(!this.prepareRewards()) throw {message: "No Addresses to send money"};
+            if (!this.prepareRewards()) throw {message: "No Addresses to send money"};
 
             await this.createTransactions();
 
@@ -98,7 +98,7 @@ class PoolRewardsManagement{
             let percentAlreadyPaid = miner._rewardSent / this.totalRewardSent;
             let reward = Math.floor( percentAlreadyPaid * remainingAmount + miner._rewardConfirmedOther );
 
-            if ( reward >= 10*WebDollarCoins.WEBD){
+            if ( reward >= 20*WebDollarCoins.WEBD){
 
                 this._addAddressTo(miner.address).amount = reward;
                 Log.info("Will pay " + reward/WebDollarCoins.WEBD.toFixed(0) + " WEBD to " + InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address,false,true), Log.LOG_TYPE.POOLS);
@@ -131,10 +131,10 @@ class PoolRewardsManagement{
         let fee = total / this._toAddresses.length;
 
         //let's reduce the amounts with the fees
-        for (let i=0; i<this._toAddresses.length; i++){
+        for (let i=this._toAddresses.length-1; i>=0; i--){
             this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount - fee );
 
-            if (this._toAddresses[i].amount < 10*WebDollarCoins.WEBD){
+            if (this._toAddresses[i].amount < 20*WebDollarCoins.WEBD){
 
                 let miner = this.poolData.findMiner( this._toAddresses[i].address );
                 miner.rewardConfirmedOther += Math.max(0, this._toAddresses[i].amount);

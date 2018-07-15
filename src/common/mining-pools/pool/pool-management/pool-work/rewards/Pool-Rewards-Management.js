@@ -3,7 +3,7 @@ import BufferExtended from 'common/utils/BufferExtended';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 import consts from 'consts/const_global'
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
-import PoolPayouts from "./Pool-Payouts"
+import PoolPayouts from "./Payout/Pool-Payouts"
 
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
 const VALIDATION_BLOCK_CONFIRMATIONS = 20; //blocks
@@ -136,7 +136,7 @@ class PoolRewardsManagement{
 
                 } else{
                     
-                    if (blockInfo.height > this.blockchain.blocks.length - VALIDATION_BLOCK_CONFIRMATIONS)
+                    if ( blockInfo.height > this.blockchain.blocks.length - VALIDATION_BLOCK_CONFIRMATIONS )
                         this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
                 }

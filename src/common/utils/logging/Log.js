@@ -54,7 +54,7 @@ class Log{
             return;
 
         if (this.loggers[ config ] !== undefined)
-            this.loggers[ config ].info(msg, msg2, msg3);
+            this.loggers[ config ].info.apply(this.loggers[ config ], arguments);
 
     }
 
@@ -67,20 +67,20 @@ class Log{
             return;
 
         if (this.loggers[ config ] !== undefined)
-            this.loggers[ config ].debug(msg, msg2, msg3 );
+            this.loggers[ config ].debug.apply(this.loggers[ config ], arguments);
 
     }
 
     /*
      * Logs an error message
      */
-    error(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
+    error(){
 
         if(process.env.BROWSER)
             return;
 
-        if (this.loggers[ config ] !== undefined)
-            this.loggers[ config ].error(msg, msg2, msg3);
+        if (this.loggers[ arguments[1] ] !== undefined)
+            this.loggers[ arguments[1] ].error.apply(this.loggers[ arguments[1] ], arguments);
 
 
     }
@@ -93,8 +93,8 @@ class Log{
         if(process.env.BROWSER)
             return;
 
-        if (this.loggers[ config ] !== undefined)
-            this.loggers[ config ].error(msg, msg2, msg3);
+        if (this.loggers[ arguments[1] ] !== undefined)
+            this.loggers[ arguments[1] ].warn.apply(this.loggers[ config ], arguments);
 
     }
 
