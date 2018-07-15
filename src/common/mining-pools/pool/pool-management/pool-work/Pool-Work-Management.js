@@ -132,14 +132,16 @@ class PoolWorkManagement{
 
                     let revertActions = new RevertActions(this.blockchain);
 
+                    let block;
                     try {
 
                         blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
                         blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
 
                         let serialization = blockInformationMinerInstance.workBlock.serializeBlock();
-                        let block = this.blockchain.blockCreator.createEmptyBlock(blockInformationMinerInstance.workBlock.height, undefined );
-                        block.deserializeBlock(serialization, blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.reward, Buffer.from( blockInformationMinerInstance.workBlock.difficultyTargetPrev ) );
+                        block = this.blockchain.blockCreator.createEmptyBlock(blockInformationMinerInstance.workBlock.height, undefined );
+                        block.deserializeBlock(serialization, blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.reward,  );
+
 
                         if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 
@@ -170,6 +172,9 @@ class PoolWorkManagement{
 
                         console.error("PoolWork include raised an exception", exception);
                         revertActions.revertOperations();
+
+                        if (block !== undefined)
+                            block.destroyBlock();
 
                         this.poolWork.getNextBlockForWork();
                     }

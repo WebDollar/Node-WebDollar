@@ -9,7 +9,7 @@ class PPoWBlockchainProvesCalculated{
         this.levelsLengths = [];
         this.levels = [];
 
-        for (let i=0; i<=32; i++) {
+        for (let i=-1; i<=32; i++) {
             this.levelsLengths[i] = 0;
             this.levels[i] = [];
         }
@@ -19,6 +19,9 @@ class PPoWBlockchainProvesCalculated{
     }
 
     deleteBlock(block, level){
+
+        if (level === undefined && (block.difficultyTarget === undefined || block.difficultyTarget === null))
+            return;
 
         try {
             if (level === undefined)
@@ -53,8 +56,11 @@ class PPoWBlockchainProvesCalculated{
 
         try {
 
+            if (level === undefined && (block.difficultyTarget === undefined || block.difficultyTarget === null))
+                return;
+
             level = block.getLevel();
-            pos = this._binarySearch(this.levels[level], block, level);
+            pos = this._binarySearch(this.levels[level], block);
 
 
             this.deleteBlock(block);
@@ -109,7 +115,7 @@ class PPoWBlockchainProvesCalculated{
             guess = Math.floor((min + max) /2);
             if(array[guess].height === value.height)
                 return guess;
-            else if(array[guess] < value)
+            else if(array[guess].height < value.height)
                 min = guess + 1;
             else
                 max = guess - 1;

@@ -104,19 +104,24 @@ class PoolDataBlockInformation {
 
         buffers.push( Serialization.serializeNumber1Byte(this.payout ? 1 : 0) );
 
-        buffers.push( Serialization.serializeNumber1Byte((this.block !== undefined ? 1 : 0)) );
 
+        let array=[];
         //serialize block
         if (this.block !== undefined && this.block !== null && this.block.blockchain !== undefined) {
 
             try {
-                buffers.push(Serialization.serializeNumber4Bytes(this.block.height));
-                buffers.push(this.block.difficultyTarget);
-                buffers.push(this.block.serializeBlock());
+                array.push(Serialization.serializeNumber4Bytes(this.block.height));
+                array.push(this.block.difficultyTargetPrev);
+                array.push(this.block.serializeBlock());
+
             } catch (exception){
-                Log.error("Error saving block", Log.LOG_TYPE.POOL, this.block !== null ? this.block.toJSON() : '');
+                Log.error("Error saving block", Log.LOG_TYPE.POOLS, this.block !== null ? this.block.toJSON() : '');
             }
         }
+
+        buffers.push( Serialization.serializeNumber1Byte( array.length > 0 ? 1 : 0 ));
+        for (let i=0; i<array.length; i++)
+            buffers.push(array[i]);
 
         return Buffer.concat( buffers );
     }
