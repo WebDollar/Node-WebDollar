@@ -1,3 +1,5 @@
+import Log from 'common/utils/logging/Log';
+
 class PPoWBlockchainProvesCalculated{
 
     constructor(blockchain){
@@ -18,45 +20,56 @@ class PPoWBlockchainProvesCalculated{
 
     updateBlock(block){
 
+        if (block === undefined || block === null) return false;
 
-        let level = block.getLevel();
-        let pos = this._binarySearch(this.levels[level], block);
+        let level, pos;
 
+        try {
 
-        //deleting old ones if they have a different level
-        if (this.allBlocks[block.height] !== undefined && this.allBlocks[block.height] !== level){
-
-            let oldlevel = this.allBlocks[block.height];
-            this.levelsLengths[oldlevel] -- ;
-
-            this.allBlocks[block.height] = undefined;
-            delete this.allBlocks[block.height];
-            this.levels[oldlevel].splice(pos,1);
-        }
+            level = block.getLevel();
+            pos = this._binarySearch(this.levels[level], block);
 
 
+            //deleting old ones if they have a different level
+            if (this.allBlocks[block.height] !== undefined && this.allBlocks[block.height] !== level) {
 
-        if (this.levels[level][pos] !== undefined && this.levels[level][pos].height === block.height  ){
-            this.levels[level] = block;
-            return;
-        }
+                let oldlevel = this.allBlocks[block.height];
+                this.levelsLengths[oldlevel]--;
 
-        this.levelsLengths[level]++;
-        this.allBlocks[block.height] = level;
+                this.allBlocks[block.height] = undefined;
 
-        if (this.levels[level].length === 0)
-            this.levels[level] = [block];
-        else {
+                let oldPos = this._binarySearch(this.levels[oldlevel], block);
+                this.levels[oldlevel].splice(oldPos, 1);
+            }
 
-            if (block.height > this.levels[level][this.levels[level].length-1].height)
-                this.levels[level].push(block);
+
+            if (this.levels[level][pos] !== undefined && this.levels[level][pos].height === block.height) {
+                this.levels[level] = block;
+                return;
+            }
+
+            this.levelsLengths[level]++;
+            this.allBlocks[block.height] = level;
+
+            if (this.levels[level].length === 0)
+                this.levels[level] = [block];
             else {
 
-                if (pos === 0)
-                    this.levels[level].unshift(block);
-                else
-                    this.levels[level].splice(pos, 0, block);
+                if (block.height > this.levels[level][this.levels[level].length - 1].height)
+                    this.levels[level].push(block);
+                else {
+
+                    if (pos === 0)
+                        this.levels[level].unshift(block);
+                    else
+                        this.levels[level].splice(pos, 0, block);
+                }
+
             }
+
+        } catch (exception){
+
+            Log.error( "Error Proves Updating Block", Log.LOG_TYPE.BLOCKCHAIN, level, pos,  )
 
         }
 

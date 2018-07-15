@@ -225,6 +225,7 @@ class InterfaceBlockchainBlock {
     toJSON(){
 
         return {
+            height: this.height,
             version: this.version,
             hashPrev: (this.hashPrev !== null ? this.hashPrev.toString("hex") : ''),
             data: (this.data !== null ? this.data.toJSON() : ''),

@@ -17,7 +17,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import Log from 'common/utils/logging/Log';
-import PoolRewardsManagement from "common/mining-pools/pool/pool-management/pool-work/rewards/Pool-ProcessRemainingPayment"
+import PoolRewardsManagement from "common/mining-pools/pool/pool-management/pool-work/rewards/Pool-Process-Remaining-Payment"
 
 class CLI {
 

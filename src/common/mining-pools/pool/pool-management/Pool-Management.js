@@ -7,7 +7,7 @@ import PoolStatistics from "./pool-statistics/Pool-Statistics";
 import StatusEvents from "common/events/Status-Events";
 import Blockchain from "main-blockchain/Blockchain";
 import PoolRewardsManagement from "./pool-work/rewards/Pool-Rewards-Management";
-import PoolRemainingRewards from "./pool-work/rewards/Pool-ProcessRemainingPayment"
+import PoolRemainingRewards from "./pool-work/rewards/Pool-Process-Remaining-Payment"
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,
