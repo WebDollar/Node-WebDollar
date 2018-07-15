@@ -23,7 +23,7 @@ class GeoLocationLists {
 
         this._pendingLocationLists = [];
 
-        setTimeout(this._processGeoLocationPendingList.bind(this), 5000);
+        setTimeout(this._processGeoLocationPendingList.bind(this), 15000);
     }
 
     async _processGeoLocationPendingList(){
@@ -143,7 +143,6 @@ class GeoLocationLists {
                     listString += this.geoLocationContinentsLists[continent][i].toString()+ "   ,   ";
                 }
 
-                console.log("continent", continent, " : ",listString);
             }
     }
 

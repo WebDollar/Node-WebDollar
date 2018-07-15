@@ -138,8 +138,8 @@ class PoolWorkManagement{
                         blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
 
                         let serialization = blockInformationMinerInstance.workBlock.serializeBlock();
-                        let block = this.blockchain.blockCreator.createEmptyBlock(blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.blockValidation);
-                        block.deserializeBlock(serialization, blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.reward, blockInformationMinerInstance.workBlock.difficultyTarget );
+                        let block = this.blockchain.blockCreator.createEmptyBlock(blockInformationMinerInstance.workBlock.height, undefined );
+                        block.deserializeBlock(serialization, blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.reward, Buffer.from( blockInformationMinerInstance.workBlock.difficultyTargetPrev ) );
 
                         if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 

@@ -6,6 +6,7 @@ import PoolDataBlockInformationMinerInstance from "./Pool-Data-Block-Information
 import BufferExtended from "common/utils/BufferExtended";
 import consts from 'consts/const_global';
 import Blockchain from "main-blockchain/Blockchain"
+import Log from 'common/utils/logging/Log';
 
 class PoolDataBlockInformation {
 
@@ -107,9 +108,14 @@ class PoolDataBlockInformation {
 
         //serialize block
         if (this.block !== undefined && this.block !== null && this.block.blockchain !== undefined) {
-            buffers.push ( Serialization.serializeNumber4Bytes(this.block.height));
-            buffers.push ( this.block.difficultyTarget);
-            buffers.push( this.block.serializeBlock() );
+
+            try {
+                buffers.push(Serialization.serializeNumber4Bytes(this.block.height));
+                buffers.push(this.block.difficultyTarget);
+                buffers.push(this.block.serializeBlock());
+            } catch (exception){
+                Log.error("Error saving block", Log.LOG_TYPE.POOL, this.block !== null ? this.block.toJSON() : '');
+            }
         }
 
         return Buffer.concat( buffers );
@@ -176,7 +182,7 @@ class PoolDataBlockInformation {
             } catch (exception){
 
                 this.block = undefined;
-                console.error("Error Deserializing block");
+                Log.error("Error Deserializing block", Log.LOG_TYPE.POOLS);
                 offset = buffer.length;
 
             }

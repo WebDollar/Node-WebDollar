@@ -30,7 +30,7 @@ class Logger{
             s += arguments[i];
 
             if (typeof arguments[i] === "string") s += arguments[i];
-            else s += JSON.stringify(arguments[i]);
+            else console.log(arguments[i]);
 
             s += "   ";
         }

@@ -44,7 +44,7 @@ class PPoWBlockchainProvesCalculated{
 
 
             if (this.levels[level][pos] !== undefined && this.levels[level][pos].height === block.height) {
-                this.levels[level] = block;
+                this.levels[level][pos] = block;
                 return;
             }
 
@@ -69,7 +69,7 @@ class PPoWBlockchainProvesCalculated{
 
         } catch (exception){
 
-            Log.error( "Error Proves Updating Block", Log.LOG_TYPE.BLOCKCHAIN, level, pos,  )
+            Log.error( "Error Proves Updating Block", Log.LOG_TYPE.BLOCKCHAIN, {level: level, pos:pos}, exception,  )
 
         }
 
@@ -100,6 +100,16 @@ class PPoWBlockchainProvesCalculated{
 
         return min;
     }
+
+
+    saveProvesCalculated(){
+
+    }
+
+    loadProvesCalculated(){
+        
+    }
+
 }
 
 export  default PPoWBlockchainProvesCalculated;
