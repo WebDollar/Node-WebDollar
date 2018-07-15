@@ -8,7 +8,6 @@ let consts = {
 
 };
 
-
 consts.BLOCKCHAIN = {
 
     DIFFICULTY:{
@@ -147,7 +146,6 @@ consts.ADDRESSES = {
 let prefix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
 let suffix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
 consts.ADDRESSES.ADDRESS.WIF.LENGTH = consts.ADDRESSES.ADDRESS.LENGTH + consts.ADDRESSES.ADDRESS.WIF.CHECK_SUM_LENGTH + consts.ADDRESSES.ADDRESS.WIF.VERSION_PREFIX.length/2 + prefix.length/2 + suffix.length/2;
-
 
 consts.HASH_ARGON2_PARAMS = {
     salt: 'Satoshi_is_Finney',
@@ -347,6 +345,5 @@ if ( consts.DEBUG === true ){
 
 
 }
-
 
 export default consts
