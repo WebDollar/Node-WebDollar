@@ -25,9 +25,11 @@ class PoolPayouts{
             if (!this.poolManagement._poolStarted) return;
             if (!Blockchain.loaded) return;
 
-            if (this.blockchain.blocks.length % PAYOUT_INTERVAL === 0) {
+            Log.info("Next Payout in " + ( PAYOUT_INTERVAL - (this.blockchain.blocks.length % PAYOUT_INTERVAL))+"  blocks", Log.LOG_TYPE.POOLS );
+
+            if (this.blockchain.blocks.length % PAYOUT_INTERVAL === 0)
                 await this.doPayout();
-            }
+
 
         });
 
