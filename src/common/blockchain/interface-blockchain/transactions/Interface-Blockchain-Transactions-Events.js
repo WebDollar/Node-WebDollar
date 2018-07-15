@@ -174,7 +174,7 @@ class InterfaceBlockchainTransactionsEvents{
                 try{
                     this.emitter.emit("transactions/changes/" + BufferExtended.toBase(address.unencodedAddress), { txId: transaction.txId.toString("hex"), address: addressWIF, transaction: deleted ? undefined : transaction.toJSON()});
                 }catch (ex){
-                    console.error("Transaction From/Changes raised an error", transaction.toJSON()) ;
+                    console.error("Transaction From/Changes raised an error", ex, transaction.toJSON()) ;
                 }
             }
         });
@@ -187,7 +187,7 @@ class InterfaceBlockchainTransactionsEvents{
                 try{
                     this.emitter.emit("transactions/changes/" + BufferExtended.toBase(address.unencodedAddress), { txId: transaction.txId.toString("hex"), address: addressWIF, transaction: deleted ? undefined : transaction.toJSON()});
                 }catch (ex){
-                    console.error("Transaction To/Changes raised an error", transaction.toJSON()) ;
+                    console.error("Transaction To/Changes raised an error", ex, transaction.toJSON()) ;
                 }
             }
         });

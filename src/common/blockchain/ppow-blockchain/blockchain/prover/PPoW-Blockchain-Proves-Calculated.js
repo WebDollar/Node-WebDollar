@@ -18,6 +18,33 @@ class PPoWBlockchainProvesCalculated{
 
     }
 
+    deleteBlock(block, level){
+
+        try {
+            if (level === undefined)
+                level = block.getLevel();
+        } catch (exception){
+            console.error("couldn't get level", exception);
+            return;
+        }
+
+
+
+        //deleting old ones if they have a different level
+        if (this.allBlocks[block.height] !== undefined && this.allBlocks[block.height] !== level) {
+
+            let oldlevel = this.allBlocks[block.height];
+            this.levelsLengths[oldlevel]--;
+
+            this.allBlocks[block.height] = undefined;
+
+            let oldPos = this._binarySearch(this.levels[oldlevel], block);
+            if (this.levels[oldlevel][oldPos] === block)
+                this.levels[oldlevel].splice(oldPos, 1);
+        }
+
+    }
+
     updateBlock(block){
 
         if (block === undefined || block === null) return false;
@@ -27,20 +54,10 @@ class PPoWBlockchainProvesCalculated{
         try {
 
             level = block.getLevel();
-            pos = this._binarySearch(this.levels[level], block);
+            pos = this._binarySearch(this.levels[level], block, level);
 
 
-            //deleting old ones if they have a different level
-            if (this.allBlocks[block.height] !== undefined && this.allBlocks[block.height] !== level) {
-
-                let oldlevel = this.allBlocks[block.height];
-                this.levelsLengths[oldlevel]--;
-
-                this.allBlocks[block.height] = undefined;
-
-                let oldPos = this._binarySearch(this.levels[oldlevel], block);
-                this.levels[oldlevel].splice(oldPos, 1);
-            }
+            this.deleteBlock(block);
 
 
             if (this.levels[level][pos] !== undefined && this.levels[level][pos].height === block.height) {
@@ -107,7 +124,7 @@ class PPoWBlockchainProvesCalculated{
     }
 
     loadProvesCalculated(){
-        
+
     }
 
 }
