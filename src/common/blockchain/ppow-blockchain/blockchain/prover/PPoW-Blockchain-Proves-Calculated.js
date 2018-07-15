@@ -135,7 +135,7 @@ class PPoWBlockchainProvesCalculated{
         let array = [];
 
         array.push( Serialization.serializeNumber4Bytes(this.levels.length) );
-        for (let i=0; i < this.levels.length; i++ ){
+        for (let i=-1; i < this.levels.length; i++ ){
 
             array.push( Serialization.serializeNumber7Bytes(this.levels[i].length) );
             for (let j=0; j< this.levels[i].length; j++){
@@ -156,7 +156,7 @@ class PPoWBlockchainProvesCalculated{
         let levelsLength = Serialization.deserializeNumber4Bytes(Buffer, offset);
         offset += 4;
 
-        for (let i=0; i< levelsLength; i++){
+        for (let i=-1; i< levelsLength; i++){
 
             this.levels[i].length = Serialization.deserializeNumber7Bytes(Buffer, offset);
             offset += 7;
@@ -185,11 +185,22 @@ class PPoWBlockchainProvesCalculated{
 
     async _saveProvesCalculated(key){
 
+        if (key === undefined)
+            key = this.blockchain._blockchainFileName+"_proves_calculated";
+
+        console.log("Save proof creator "+key);
+        console.log(this._SerializationProves());
+
         return (await this.db.save( key, this._SerializationProves() ));
 
     }
 
     async _loadProvesCalculated(key){
+
+        if (key === undefined)
+            key = this.blockchain._blockchainFileName+"_proves_calculated";
+
+        console.log("Load proof creator "+key);
 
         try{
 
@@ -199,6 +210,8 @@ class PPoWBlockchainProvesCalculated{
                 console.error("Proof for key "+key+" was not found");
                 return false;
             }
+
+            console.log("bufffffr ",buffer)
 
             await this._DeserializationProves(buffer);
 

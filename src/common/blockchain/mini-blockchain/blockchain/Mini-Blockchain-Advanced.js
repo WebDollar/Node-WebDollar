@@ -59,7 +59,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
 
 
-    async _loadBlockchain(){
+    async _loadBlockchain(loadBlocks = true){
 
         if (process.env.BROWSER)
             return true;
@@ -67,6 +67,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         //AccountantTree[:-BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS]
 
         try {
+
+            let answer;
 
             if (process.env.FORCE_LOAD !== undefined) throw "load blockchain simple" ;
 
@@ -78,7 +80,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             if (!(await this.accountantTree.loadMiniAccountant(undefined, undefined, true,  "lightAccountantTreeAdvanced")))
                 throw "load blockchain simple";
 
-            let answer = await this.inheritBlockchain.prototype._loadBlockchain.call(this, undefined, offset);
+            if(loadBlocks)
+                answer = await this.inheritBlockchain.prototype._loadBlockchain.call(this, undefined, offset);
 
             if (!answer) {
                 //couldn't load the last K blocks
@@ -96,7 +99,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             if (exception === "load blockchain simple") {
 
-                await this.inheritBlockchain.prototype._loadBlockchain.call(this);
+                if(loadBlocks)
+                    await this.inheritBlockchain.prototype._loadBlockchain.call(this);
 
             }
         }

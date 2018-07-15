@@ -3,7 +3,6 @@ import global from "consts/global"
 import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
-import PPoWBlockchainProvesCalculated from "common/blockchain/ppow-blockchain/blockchain/prover/PPoW-Blockchain-Proves-Calculated"
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -29,8 +28,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         this.lightProofCalculated = {};
 
         this._lightLoadingDifficultyNextDifficulty = null;
-
-        this.proofCalculated = new PPoWBlockchainProvesCalculated(this)
 
     }
 
@@ -170,9 +167,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex])))
                 throw {message: "Couldn't be saved _LightSettings_prevHashPrev ", diffIndex:diffIndex};
 
-            if(!await this.proofCalculated._saveProvesCalculated(this._blockchainFileName + "_LightSettings_proofCalculated", lightProofCalculated[diffIndex]))
-                throw {message: "Couldn't be saved PPOW Proves Calculated ", diffIndex:diffIndex};
-
         } catch (exception){
             console.error("Error saving LIGHT SETTINGS", exception);
             console.error("Error saving LIGHT SETTINGS", exception);
@@ -199,11 +193,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         let diffIndex = await this.db.get(this._blockchainFileName + "_LightSettings_diffIndex");
 
         if ( diffIndex === null || diffIndex === undefined)
-
-            if (diffIndex < consts.BLOCKCHAIN.HARD_FORKS.TEST_NET_3)
-                diffIndex = numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS -1 ;
-            else
-                diffIndex = this.getSavingSafePosition(numBlocks-1);
+            diffIndex = this.getSavingSafePosition(numBlocks-1);
 
         console.log("DIFFFINDEXAFTER", diffIndex);
 
@@ -229,10 +219,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
                 console.error("_LightSettings_prevHashPrev was not found");
                 return {result:false};
             }
-
-            this.lightProofCalculated[diffIndex] = await this.proofCalculated._saveProvesCalculated(this._blockchainFileName + "_LightSettings_proofCalculated");
-            if(this.lightProofCalculated[diffIndex] === null)
-                throw {message: "_LightSettings_proofCalculated was not found "};
 
         } else throw {message:"Error Loading Light Settings"};
 
