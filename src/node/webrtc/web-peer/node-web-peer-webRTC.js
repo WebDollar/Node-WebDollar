@@ -9,7 +9,7 @@ const EventEmitter = require('events');
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
 import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
-import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
+import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import consts from 'consts/const_global'
 
 let RTCPeerConnection;
@@ -474,7 +474,7 @@ class NodeWebPeerRTC {
     async initializePeer(validationDoubleConnectionsTypes){
 
         //it is not unique... then I have to disconnect
-        if (await NodesList.registerUniqueSocket(this.peer, CONNECTIONS_TYPE.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.peer, CONNECTIONS_TYPE.CONNECTION_WEBRTC, this.peer.node.protocol.nodeType, this.peer.node.protocol.nodeConsensusType, validationDoubleConnectionsTypes) === false){
             return false;
         }
 

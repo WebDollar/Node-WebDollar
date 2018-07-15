@@ -19,6 +19,8 @@ class InterfaceBlockchainProtocolForksManager {
 
         try {
 
+            if (!this.blockchain.agent.consensus) return;
+
             if (typeof newChainLength !== "number") throw "newChainLength is not a number";
             if (typeof newChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";
 
@@ -76,7 +78,10 @@ class InterfaceBlockchainProtocolForksManager {
             return false;
 
         } catch (exception){
-            console.warn(exception);
+
+            if (exception.message === "Your blockchain is smaller than mine" && Math.random() < 0.2)
+                console.warn(exception);
+
             return false;
         }
 
@@ -169,7 +174,7 @@ class InterfaceBlockchainProtocolForksManager {
         } catch (exception){
 
             console.error("_getBestFork returned an exception", exception );
-            throw {message: exception, fork: fork}
+            throw {message: exception, fork: fork.toJSON() }
         }
 
         return bestFork;

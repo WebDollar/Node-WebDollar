@@ -1,9 +1,9 @@
 import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NodesListObject from './Mode-List-Object.js';
-import CONNECTION_TYPE from "node/lists/types/Connections-Type";
+import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import NODES_TYPE from "node/lists/types/Nodes-Type"
+import NODE_TYPE from "node/lists/types/Node-Type"
 
 const EventEmitter = require('events');
 
@@ -64,30 +64,31 @@ class NodesList {
 
     }
 
-    async registerUniqueSocket(socket, connectionType, type, validationDoubleConnectionsTypes){
+    async registerUniqueSocket(socket, connectionType, nodeType, nodeConsensusType, validationDoubleConnectionsTypes){
 
-        if (type === undefined) throw {message: "type is necessary"};
+        if (nodeType === undefined) throw {message: "type is necessary"};
 
         if (!socket.node || !socket.node.protocol || !socket.node.protocol.helloValidated ) {
             socket.disconnect();
             return false;
         }
 
-        socket.node.connectionType = connectionType;
         socket.node.protocol.connectionType = connectionType;
-        socket.node.type = type;
+        socket.node.protocol.nodeType = nodeType;
+        socket.node.protocol.nodeConsensusType = nodeConsensusType;
 
         // avoiding double connections                              unless it is allowed to double connections
         if ( this.searchNodeSocketByAddress(socket, undefined, validationDoubleConnectionsTypes ) === null ) {
 
             // it is a unique connection, I should register this connection
 
-            let object = new NodesListObject(socket, connectionType, type, NodesWaitlist.isAddressFallback(socket.node.sckAddress));
+            let object = new NodesListObject(socket, connectionType, nodeType, nodeConsensusType,  NodesWaitlist.isAddressFallback(socket.node.sckAddress));
+
+            await this.emitter.emit("nodes-list/connected", object);
+
             this.nodes.push(object);
 
-            this.emitter.emit("nodes-list/connected", object);
-
-            if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && ( socket.node.type === NODES_TYPE.NODE_TERMINAL || socket.node.type === NODES_TYPE.NODE_WEB_PEER )) {
+            if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL || socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER )) {
 
                 if (socket.node.protocol.nodeDomain.indexOf("my-ip:")>=0)
                     socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("my-ip", socket.node.sckAddress.address);
@@ -95,12 +96,12 @@ class NodesList {
                 if (socket.node.protocol.nodeDomain.indexOf("browser")===0)
                     socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("browser", socket.node.sckAddress.address);
 
-                await NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.type, true, socket.node.level, socket, socket);
+                await NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.protocol.nodeType, socket.node.protocol.nodeConsensusType, true, socket.node.level, socket, socket);
 
             }
 
-            if (socket.node.type === NODES_TYPE.NODE_WEB_PEER ){ //add light waitlist
-                await NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.type, true, socket.node.level, socket, socket);
+            if (socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER ){ //add light waitlist
+                await NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.protocol.nodeType, socket.node.protocol.nodeConsensusType, true, socket.node.level, socket, socket);
             }
 
 
@@ -181,11 +182,11 @@ class NodesList {
         for (let i=0; i<this.nodes.length; i++)
 
             if (Array.isArray(type)) { //in case type is an Array
-                if ( type.indexOf( this.nodes[i].socket.node.protocol.type) >= 0)
+                if ( type.indexOf( this.nodes[i].socket.node.protocol.nodeType) >= 0)
                     list.push(this.nodes[i]);
             } else
             // in case type is just a simple string
-            if (type === this.nodes[i].socket.node.protocol.type || type === "all")
+            if (type === this.nodes[i].socket.node.protocol.nodeType || type === "all")
                 list.push( this.nodes[i] );
 
         return list;
@@ -245,6 +246,14 @@ class NodesList {
 
         for (let i=this.nodes.length-1; i>=0; i--)
             if ( this.nodes[i].socket.node.protocol.connectionType === connectionType )
+                this.nodes[i].socket.disconnect();
+
+    }
+
+    disconnectAllNodesByConsensusType(nodeConsensusType){
+
+        for (let i=this.nodes.length-1; i>=0; i--)
+            if ( this.nodes[i].socket.node.protocol.nodeConsensusType === nodeConsensusType )
                 this.nodes[i].socket.disconnect();
 
     }

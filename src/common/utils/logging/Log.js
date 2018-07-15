@@ -1,19 +1,14 @@
 import consts from 'consts/const_global';
+import Logger from "./Logger"
 
-let config;
-let logging;
+const LOG_TYPE = {
+    DEFAULT: 0,
+    POOLS: 1,
+    BLOCKCHAIN: 2,
+    CLI_MENU: 3,
+    SAVING_MANAGER: 4,
+};
 
-if (!process.env.BROWSER){
-    config = require("./config.json");
-    logging = require("node-logger-winston");
-    logging.init(config);
-}  else {
-    logging = {
-        getLogger(type){
-            return console;
-        }
-    };
-}
 
 /*
  * Logging class which provides a logging helper to work with multiple 
@@ -22,10 +17,13 @@ if (!process.env.BROWSER){
  * group logging output into topics or categories for different parts of 
  * the code.
  */
+
 class Log{
 
     constructor(){
-
+        
+        this.LOG_TYPE = LOG_TYPE;
+        
         /*
          * Create 4 different loggers with specific settings which can be
          * set in the config.json file.
@@ -34,84 +32,72 @@ class Log{
          * You can create new "settings" in the config.json file and 
          * instantiate another logger below
          */
-        this.defaultLogger = logging.getLogger("default");
-        this.poolsLogger = logging.getLogger("pools");
-        this.blockchainLogger = logging.getLogger("blockchain");
-        this.menuLogger = logging.getLogger("cli_menu");
+        this.defaultLogger = new Logger("default", LOG_TYPE.DEFAULT);
+        this.poolsLogger = new Logger("pools", LOG_TYPE.POOLS);
+        this.blockchainLogger = new Logger("blockchain", LOG_TYPE.BLOCKCHAIN);
+        this.menuLogger = new Logger("cli_menu", LOG_TYPE.CLI_MENU);
+
+        this.loggers = {};
+        this.loggers[LOG_TYPE.DEFAULT] = this.defaultLogger;
+        this.loggers[LOG_TYPE.POOLS] = this.poolsLogger;
+        this.loggers[LOG_TYPE.BLOCKCHAIN] = this.blockchainLogger;
+        this.loggers[LOG_TYPE.CLI_MENU] = this.menuLogger;
 
     }
     
     /*
      * Logs an info message
      */
-    info(msg, config = consts.LOG_INSTANCE.DEFAULT){
+    info(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
 
-        if(process.env.BROWSER)
+        if (process.env.BROWSER)
             return;
 
-        switch (config) {
-            case consts.LOG_INSTANCE.POOLS:
-                this.poolsLogger.info(msg);
-                break;
-            case consts.LOG_INSTANCE.BLOCKCHAIN:
-                this.blockchainLogger.info(msg);
-                break;
-            case consts.LOG_INSTANCE.CLI_MENU:
-                this.menuLogger.info(msg);
-                break;
-            default:
-                this.defaultLogger.info(msg);
-        }
+        if (this.loggers[ config ] !== undefined)
+            this.loggers[ config ].info(msg, msg2, msg3);
 
     }
 
     /*
      * Logs an debug message
      */
-    debug(msg, config = consts.LOG_INSTANCE.DEFAULT){
+    debug(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
 
         if(process.env.BROWSER)
             return;
 
-        switch (config) {
-            case consts.LOG_INSTANCE.POOLS:
-                this.poolsLogger.debug(msg);
-                break;
-            case consts.LOG_INSTANCE.BLOCKCHAIN:
-                this.blockchainLogger.debug(msg);
-                break;
-            case consts.LOG_INSTANCE.CLI_MENU:
-                this.menuLogger.debug(msg);
-                break;
-            default:
-                this.defaultLogger.debug(msg);
-        }
+        if (this.loggers[ config ] !== undefined)
+            this.loggers[ config ].debug(msg, msg2, msg3 );
 
     }
 
     /*
      * Logs an error message
      */
-    error(msg, config = consts.LOG_INSTANCE.DEFAULT){
+    error(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
 
         if(process.env.BROWSER)
             return;
 
-        switch (config) {
-            case consts.LOG_INSTANCE.POOLS:
-                this.poolsLogger.error(msg);
-                break;
-            case consts.LOG_INSTANCE.BLOCKCHAIN:
-                this.blockchainLogger.error(msg);
-                break;
-            case consts.LOG_INSTANCE.CLI_MENU:
-                this.menuLogger.error(msg);
-                break;
-            default:
-                this.defaultLogger.error(msg);
-        }
+        if (this.loggers[ config ] !== undefined)
+            this.loggers[ config ].error(msg, msg2, msg3);
+
 
     }
+
+    /*
+        * Logs an error message
+    */
+    warn(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
+
+        if(process.env.BROWSER)
+            return;
+
+        if (this.loggers[ config ] !== undefined)
+            this.loggers[ config ].error(msg, msg2, msg3);
+
+    }
+
 
 }
 

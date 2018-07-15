@@ -208,7 +208,8 @@ class InterfaceBlockchainProtocol {
 
             });
 
-        this.askBlockchain(socket);
+        if (this.blockchain.agent.consensus)
+            this.askBlockchain(socket);
 
     }
 

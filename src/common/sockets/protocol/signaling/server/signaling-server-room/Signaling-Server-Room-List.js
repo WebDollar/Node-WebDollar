@@ -1,8 +1,8 @@
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import SignalingServerRoomConnectionObject from './Signaling-Server-Room-Connection-Object';
 import NodesList from 'node/lists/Nodes-List'
-import CONNECTIONS_TYPE from "node/lists/types/Connections-Type"
-import NODES_TYPE from "node/lists/types/Nodes-Type"
+import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
+import NODE_TYPE from "node/lists/types/Node-Type"
 
 /*
     The List is populated with Node Sockets who are available for WebRTC

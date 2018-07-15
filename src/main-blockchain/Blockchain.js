@@ -1,3 +1,4 @@
+import consts from 'consts/const_global'
 import MainBlockchainWallet from 'main-blockchain/wallet/Main-Blockchain-Wallet';
 import MainBlockchain from 'main-blockchain/chain/Main-Blockchain';
 import MainBlockchainMining from 'main-blockchain/mining/Main-Blockchain-Mining';
@@ -8,7 +9,16 @@ import NodesList from 'node/lists/Nodes-List';
 import StatusEvents from "common/events/Status-Events";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist';
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
-import NODES_TYPE from "../node/lists/types/Nodes-Type";
+import NODE_TYPE from "../node/lists/types/Node-Type";
+
+import PoolManagement from "common/mining-pools/pool/pool-management/Pool-Management"
+import MinerPoolManagement from "common/mining-pools/miner/Miner-Pool-Management"
+
+let ServerPoolManagement = undefined;
+
+if (!process.env.BROWSER)
+    ServerPoolManagement = require("common/mining-pools/server-pool/Server-Pool-Management").default;
+
 
 class Blockchain{
 
@@ -27,6 +37,7 @@ class Blockchain{
         this.Wallet = new MainBlockchainWallet(this.Chain);
 
         this.Mining = new MainBlockchainMining(this.Chain, undefined);
+        this.SoloMining = this.Mining;
 
         this.Transactions = this.Chain.transactions;
         this.Transactions.setWallet(this.Wallet);
@@ -38,12 +49,21 @@ class Blockchain{
         this.onLoaded = new Promise((resolve)=>{
             this._onLoadedResolver = resolve;
         });
+
+        this.onPoolsInitialized = new Promise((resolve)=>{
+            this._onPoolsInitializedResolver = resolve;
+        });
+
+        this.onPoolsCreated = new Promise((resolve)=>{
+            this._onPoolsCreatedResolver = resolve;
+        });
         
         this._loaded = false;
+        this._poolsLoaded = false;
 
     }
 
-    async createBlockchain(agentName, afterBlockchainLoadCallback, afterSynchronizationCallback){
+    async createBlockchain(agentName, afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true ){
 
         this._blockchainInitiated = true;
 
@@ -70,7 +90,7 @@ class Blockchain{
         StatusEvents.emit('blockchain/status', {message: "Single Window"});
 
 
-        await this.initializeBlockchain( afterBlockchainLoadCallback, afterSynchronizationCallback );
+        await this.initializeBlockchain( afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize );
 
     }
 
@@ -86,9 +106,11 @@ class Blockchain{
         }
     }
 
-    async initializeBlockchain(afterBlockchainLoadCallback, afterSynchronizationCallback){
+    async initializeBlockchain(afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true){
 
         await this.loadWallet();
+
+        await this.createMiningPools();
 
         if (process.env.BROWSER) { //let's make a hash first
 
@@ -98,23 +120,28 @@ class Blockchain{
 
         }
 
-        //loading the blockchain
-        let blockchainLoaded = await this.loadBlockchain();
-
         if (typeof afterBlockchainLoadCallback === "function")
-            afterBlockchainLoadCallback();
+            await afterBlockchainLoadCallback();
 
-        await this.Agent.initializeStartAgentOnce();
+        //loading the blockchain
+        await this.Chain.loadBlockchain();
 
-        if (process.env.BROWSER || !blockchainLoaded) {
-            //it tries synchronizing multiple times
-            await this.synchronizeBlockchain(true);
-        } else {
-            this.synchronized = true;
+        if (synchronize){
+
+            await this.Agent.initializeStartAgentOnce();
+
+            if (this.Agent.consensus && !consts.DEBUG)
+                await this.synchronizeBlockchain(true); //it tries synchronizing multiple times
+            else {
+                this.synchronized = true; //consider it as synchronized
+                this.startMining();
+                StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"});
+            }
+
         }
 
         if (typeof afterSynchronizationCallback === "function")
-            afterSynchronizationCallback();
+            await afterSynchronizationCallback();
 
         this.loaded = true;
     }
@@ -128,16 +155,6 @@ class Blockchain{
         this.Mining.startMining();
     }
 
-    async loadBlockchain(){
-
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Loading"});
-
-        let chainLoaded = await this.Chain.loadBlockchain();
-
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
-        return chainLoaded;
-
-    }
 
     /**
      * it tries synchronizing multiple times
@@ -179,7 +196,7 @@ class Blockchain{
                     StatusEvents.emit('blockchain/status', {message: "No Internet Access"});
 
                 if (NodesList.nodes.length === 0)
-                    NodesWaitlist.resetWaitlist(NODES_TYPE.NODE_WEB_PEER);
+                    NodesWaitlist.resetWaitlist(NODE_TYPE.NODE_WEB_PEER);
 
                 this.Agent.initializeAgentPromise();
             }
@@ -196,9 +213,15 @@ class Blockchain{
 
     }
 
+    get poolsLoaded(){
+        return this._poolsLoaded;
+    }
+
+
     get loaded(){
         return this._loaded;
     }
+
 
     set loaded(newValue){
         this._loaded = newValue;
@@ -222,6 +245,76 @@ class Blockchain{
         StatusEvents.emit('blockchain/synchronizing', !newValue );
         StatusEvents.emit('blockchain/synchronized', newValue );
 
+    }
+
+
+    //MINING POOLS SETTINGS
+    async createMiningPools(){
+
+        if (this.PoolManagement === undefined)
+            this.PoolManagement = new PoolManagement(this.blockchain, this.Wallet);
+
+        if (this.MinerPoolManagement === undefined)
+            this.MinerPoolManagement = new MinerPoolManagement(this.blockchain);
+
+        if (ServerPoolManagement !== undefined && this.ServerPoolManagement === undefined)
+            this.ServerPoolManagement = new ServerPoolManagement();
+
+        this._onPoolsCreatedResolver(true);
+
+        await this._initializeMiningPools();
+
+
+    }
+
+    async _initializeMiningPools(){
+
+        let pool = false, minerPool = false,  serverPool = false;
+
+        try {
+             pool = await this.PoolManagement.initializePoolManagement();
+        } catch (exception){
+            console.error("PoolManagement raised an error", exception);
+        }
+
+        try {
+            minerPool = await this.MinerPoolManagement.initializeMinerPoolManagement();
+        } catch (exception){
+            console.error("MinerPool raised an error", exception);
+        }
+
+        try {
+            if (this.ServerPoolManagement !== undefined)
+                serverPool = await this.ServerPoolManagement.initializeServerPoolManagement();
+        } catch (exception){
+
+            console.error("ServerPool raised an error", exception)
+        }
+
+        this._onPoolsInitializedResolver(pool, minerPool, serverPool);
+
+        await StatusEvents.emit("main-pools/status", { message: "Pool Initialized"});
+
+        await this._startMiningPools();
+
+    }
+
+    async _startMiningPools(){
+
+        if (this.MinerPoolManagement.minerPoolSettings.minerPoolActivated)
+            await this.MinerPoolManagement.setMinerPoolStarted(this.MinerPoolManagement.minerPoolSettings.minerPoolActivated, true);
+
+        if (this.PoolManagement.poolSettings.poolActivated)
+            await this.PoolManagement.setPoolStarted(this.PoolManagement.poolSettings.poolActivated, true);
+
+        if (this.ServerPoolManagement !== undefined && this.ServerPoolManagement.serverPoolSettings.serverPoolActivated)
+            await this.ServerPoolManagement.setServerPoolStarted(this.ServerPoolManagement.serverPoolSettings.serverPoolActivated, true);
+
+    }
+
+
+    get isPoolActivated(){
+        return (this.PoolManagement !== undefined && this.PoolManagement._poolStarted) || (this.ServerPoolManagement !== undefined && this.ServerPoolManagement._serverPoolStarted);
     }
 
 }

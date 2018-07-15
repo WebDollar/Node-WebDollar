@@ -239,8 +239,8 @@ class PPoWBlockchainVerifier{
 
                     // C∗ ← C'↓ ↑µ−1    //not C↓↑
 
-                    let CStar = proofs.downSuperChainGetUnderlyingChain(C1);
-                    Cstar = Cstar.blocksGreaterLevel(miu-1);
+                    let CPrim = proofs.downSuperChainGetUnderlyingChain(C1);
+                    Cstar = CPrim.blocksGreaterLevel(miu-1);
 
                     if ( new BigInteger( 2 * C1.length ).lesser( new BigInteger(1-consts.POPOW_PARAMS.d).pow(p) * Cstar.length  ) )
                         throw {message: "badness failed because of Cstar badness ", Cstar: Cstar}

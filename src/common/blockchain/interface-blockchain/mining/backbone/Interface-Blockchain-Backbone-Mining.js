@@ -1,4 +1,5 @@
 import InterfaceBlockchainMining from "../Interface-Blockchain-Mining";
+import consts from 'consts/const_global'
 
 class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
@@ -9,68 +10,52 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
         super(blockchain, minerAddress, miningFeeThreshold);
 
-        this.WORKER_NONCES_WORK = 200;
+        this.WORKER_NONCES_WORK = 700;
 
         this.block = undefined;
         this.undefined = undefined;
         this._workerResolve = undefined;
+
+        this.end = 0;
     }
 
-    async mineNonces(){
+    async _mineNonces(start, end){
 
-        try {
-            for (let i = 0; i < this.WORKER_NONCES_WORK; i++) {
+        let answer = await InterfaceBlockchainMining.prototype._mineNonces.call(this, start, Math.min(this.end, start+this.WORKER_NONCES_WORK) );
 
-                if (this._nonce > 0xFFFFFFFF || !this.started || this.reset) {
-                    this._workerResolve({result: false});
-                    return false;
-                }
+        if (!answer.result && (start + this.WORKER_NONCES_WORK+1 <= this.end)){
 
-                let hash = await this.block.computeHash(this._nonce);
+            let answer2 = await (new Promise((resolve)=>{
 
-                //console.log('Mining WebDollar Argon2 - this._nonce', this._nonce, hash.toString("hex") );
+                setTimeout( async () => {
 
-                if (hash.compare(this.difficulty) <= 0) {
+                    let newAnswer = await this._mineNonces(start + this.WORKER_NONCES_WORK+1, Math.min(this.end, start+this.WORKER_NONCES_WORK+this.WORKER_NONCES_WORK ));
+                    resolve(newAnswer);
 
-                    this._workerResolve({
-                        result: true,
-                        nonce: this._nonce,
-                        hash: hash,
-                    });
+                }, 2);
 
-                    return;
-                }
+            }));
 
-                this._nonce++;
-                this._hashesPerSecond++;
+            if (answer2.hash.compare(answer.hash) < 0) answer = answer2;
 
-            }
-
-        } catch (exception){
-            console.log("mineNonces returned error", exception);
-            return false;
         }
 
 
-        setTimeout( async () => { return await this.mineNonces() }, 10);
+
+        return answer;
 
     }
 
-    mine(block, difficultyTarget){
+    async mine(block, difficulty, start, end){
 
         this.block = block;
-        this.difficulty = difficultyTarget;
+        this.difficulty = difficulty;
+        this.end = Math.min(end, 0xFFFFFFFF);
 
-        let promiseResolve = new Promise ( (resolve)=>{
+        this.bestHash = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
+        this.bestHashNonce = -1;
 
-
-            this._workerResolve = resolve;
-            setTimeout(async () => {return await this.mineNonces() }, 10);
-
-
-        } );
-
-        return promiseResolve;
+        return await this._mineNonces(start, start + this.WORKER_NONCES_WORK);
 
     }
 

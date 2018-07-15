@@ -8,44 +8,47 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 //TODO MULTISIG TUTORIAL https://www.youtube.com/watch?v=oTsjMz3DaLs
 
-class InterfaceBlockchainTransactionFrom{
+class InterfaceBlockchainTransactionFrom {
 
+    /**
+     *
+     * It Supports multiple from addresses - useful for compressing tx and allow mixers
+     *
+     *   addresses [
+     *      {
+     *          unencodedAddress1,
+     *          publicKey1,
+     *          signature1,
+     *          amount1
+     *      },
+     *      {
+     *          unencodedAddress2,
+     *          publicKey2,
+     *          signature2,
+     *          amount2
+     *      },
+     *      {
+     *          unencodedAddress3,
+     *          publicKey3,
+     *          signature3,
+     *          amount3,
+     *      },
+     *   ]
+     *
+     **/
 
-    /*
-
-        addresses [
-            {
-                unencodedAddress1,
-                publicKey1,
-                signature
-                amount
-            },
-
-            {
-                unencodedAddress2,
-                publicKey2
-                signature
-                amount
-            }
-
-        ]
-
-        currencyTokenId: TokenObject,
-
-     */
-
-    constructor (transaction, addresses, currencyTokenId){
+    constructor(transaction, addresses, currencyTokenId) {
 
         this.transaction = transaction;
 
         this.setFrom(addresses, currencyTokenId);
     }
 
-    setFrom(addresses, currencyTokenId){
+    setFrom(addresses, currencyTokenId) {
 
         if (addresses === undefined) return false;
 
-        if (typeof addresses === "object" && currencyTokenId === undefined && addresses.hasOwnProperty('addresses') && addresses.hasOwnProperty('currencyTokenId') ){
+        if (typeof addresses === "object" && currencyTokenId === undefined && addresses.hasOwnProperty('addresses') && addresses.hasOwnProperty('currencyTokenId')) {
             addresses = addresses.addresses;
             currencyTokenId = addresses.currencyTokenId;
         }
@@ -54,25 +57,39 @@ class InterfaceBlockchainTransactionFrom{
         if (!Array.isArray(addresses))
             addresses = [addresses];
 
-        addresses.forEach ( (fromObject, index) =>{
+        addresses.forEach((fromObject, index) => {
 
-            if (typeof fromObject.unencodedAddress === "object" && fromObject.unencodedAddress.hasOwnProperty("unencodedAddress"))
-                fromObject.unencodedAddress = fromObject.unencodedAddress.unencodedAddress;
+            if (fromObject.unencodedAddress !== undefined) {
 
-            fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress);
+                if (typeof fromObject.unencodedAddress === "object" && fromObject.unencodedAddress.hasOwnProperty("unencodedAddress"))
+                    fromObject.unencodedAddress = fromObject.unencodedAddress.unencodedAddress;
+
+                fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress);
+
+            } else if (fromObject.address !== undefined) {
+                fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.address);
+            }
 
             if (typeof fromObject.publicKey === "string")
-                fromObject.publicKey = new Buffer (fromObject.publicKey, "hex");
+                fromObject.publicKey = new Buffer(fromObject.publicKey, "hex");
 
             if (typeof fromObject.signature === "string")
-                fromObject.signature = new Buffer (fromObject.signature, "hex");
+                fromObject.signature = new Buffer(fromObject.signature, "hex");
 
             if (typeof fromObject.amount === "string")
                 fromObject.amount = parseInt(fromObject.amount);
 
         });
 
-        if (currencyTokenId === undefined){
+        addresses.forEach((fromObject, index) => {
+
+            //optional
+            if (fromObject.unencodedAddress === undefined)
+                fromObject.unencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(publicKey, false);
+
+        });
+
+        if (currencyTokenId === undefined) {
             currencyTokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             currencyTokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
@@ -81,10 +98,15 @@ class InterfaceBlockchainTransactionFrom{
         this.currencyTokenId = currencyTokenId;
     }
 
-    toJSON(){
+    /**
+     * Convert the To to JSON array
+     * @returns {{addresses: Array, currencyTokenId: string}}
+     */
+    toJSON() {
+
         let addresses = [];
 
-        this.addresses.forEach((address)=>{
+        this.addresses.forEach((address) => {
             addresses.push({
                 address: BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address.unencodedAddress)),
                 publicKey: address.publicKey.toString("hex"),
@@ -97,90 +119,99 @@ class InterfaceBlockchainTransactionFrom{
             addresses: addresses,
             currencyTokenId: this.currencyTokenId.toString("hex"),
         }
+
     }
 
     /**
-     * valdiateFrom object
+     * valdiateFrom object of a given Transaction
      * @returns from
      */
-    validateFrom(){
+    validateFrom() {
 
         if (this.addresses.length === 0)
             throw {message: "From.addresses is empty", addresses: this.addresses};
 
-        if (!this.currencyTokenId || this.currencyTokenId === null) throw {message: 'From.currency is not specified', currencyTokenId: this.currencyTokenId};
+        if (this.addresses.length >= 256) throw {message: "Too many inputs. Max 256"};
+
+        if (!this.currencyTokenId || this.currencyTokenId === null) throw {
+            message: 'From.currency is not specified',
+            currencyTokenId: this.currencyTokenId
+        };
 
         if (!Buffer.isBuffer(this.currencyTokenId))
             throw {message: 'To.currencyTokenId is not a buffer', currencyTokenId: this.currencyTokenId};
 
-        if (! (this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH) )
-            throw { message: "To.currencyTokenId is not valid", currencyTokenId: this.currencyTokenId };
+        if ( !(this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH || this.currencyTokenId.length === consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH))
+            throw {message: "To.currencyTokenId is not valid", currencyTokenId: this.currencyTokenId};
 
         //TODO validate currency
 
 
-        this.addresses.forEach ( (fromObject, index) =>{
+        this.addresses.forEach((fromObject, index) => {
 
-            if (! fromObject.unencodedAddress || fromObject.unencodedAddress === null)
-                throw { message: 'From.address.unencodedAddress is not specified', address: fromObject, index: index };
+            if (!fromObject.publicKey || fromObject.publicKey === null)
+                throw { message: 'From.address.publicKey ' + index + ' is not specified',  address: fromObject,  index: index };
 
-            if (! InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress) )
-                throw { message: "From.address.unencodedAddress is not a valid address", address: fromObject, index: index };
+            if (fromObject.unencodedAddress === undefined || fromObject.unencodedAddress === null)
+                fromObject.unencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(fromObject.publicKey);
 
-            if (! fromObject.publicKey || fromObject.publicKey === null)
-                throw { message: 'From.address.publicKey '+index+' is not specified', address: fromObject, index: index };
+            if (!fromObject.unencodedAddress || fromObject.unencodedAddress === null)
+                throw {message: 'From.address.unencodedAddress is not specified', address: fromObject, index: index};
 
-            if (!Buffer.isBuffer(fromObject.unencodedAddress) || fromObject.unencodedAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
-                throw { message: "From.address.unencodedAddress "+index+" is not a buffer", address: fromObject, index: index };
+            if (!InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress))
+                throw { message: "From.address.unencodedAddress is not a valid address",  address: fromObject,  index: index };
+
+            if (!Buffer.isBuffer(fromObject.unencodedAddress) || fromObject.unencodedAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH)
+                throw { message: "From.address.unencodedAddress " + index + " is not a buffer", address: fromObject,  index: index };
 
             if (!Buffer.isBuffer(fromObject.publicKey) || fromObject.publicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH)
-                throw { message: "From.address.publicAddress "+index+" is not a buffer", address: fromObject, index: index };
+                throw { message: "From.address.publicAddress " + index + " is not a buffer",  address: fromObject,  index: index };
+
+            if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(fromObject.publicKey).equals(fromObject.unencodedAddress))
+                throw { message: "From.address.unencodedAddress " + index + " doesn't match the publicKey", address: fromObject,  index: index };
 
             if (!WebDollarCoins.validateCoinsNumber(fromObject.amount))
-                throw {message: 'From.Object Amount is not specified', amount: fromObject.amount, index:index} ;
+                throw {message: 'From.Object Amount is not specified', amount: fromObject.amount, index: index};
 
-            if ( fromObject.amount <= 0 )
-                throw {message: "Amount is an invalid number", amount: fromObject.amount, index: index };
-
+            if (fromObject.amount <= 0)
+                throw {message: "Amount is an invalid number", amount: fromObject.amount, index: index};
 
         });
 
 
         //validate of the value is done in the Mini Blockchain Transaction From
 
-
         this.validateSignatures();
-
 
         return true;
     }
 
-    calculateInputSum(){
+    calculateInputSum() {
 
         //validate amount
         let inputValues = [], inputSum = 0;
 
-        for (let i=0; i<this.addresses.length; i++ ){
-            inputValues.push( this.addresses[i].amount );
+        for (let i = 0; i < this.addresses.length; i++) {
+            inputValues.push(this.addresses[i].amount);
             inputSum += this.addresses[i].amount;
         }
 
         return inputSum;
     }
 
-    findAddressIndex( unencodedAddress ){
+    findAddressIndex(unencodedAddress) {
 
         //in case it is a WIF address
         unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(unencodedAddress);
 
-        for (let i = 0; i<this.addresses.length; i++)
-            if ( BufferExtended.safeCompare(this.addresses[i].unencodedAddress, unencodedAddress ) )
+        for (let i = 0; i < this.addresses.length; i++)
+            if (BufferExtended.safeCompare(this.addresses[i].unencodedAddress, unencodedAddress))
                 return i;
 
         return -1;
     }
 
-    serializeForSigning( unencodedAddress){
+    serializeForSigning(unencodedAddress) {
 
         let position;
 
@@ -192,38 +223,42 @@ class InterfaceBlockchainTransactionFrom{
         if (position < 0 || position > this.addresses.length)
             throw {message: "address was not found"};
 
-        return Buffer.concat ([
-
+        let array = [
             Serialization.serializeNumber1Byte( this.transaction.version ),
-            Serialization.serializeNumber1Byte( this.transaction.nonce ),
+            this.transaction.version >= 0x02 ?  Serialization.serializeNumber2Bytes( this.transaction.nonce ) : Serialization.serializeNumber1Byte( this.transaction.nonce ),
             Serialization.serializeNumber3Bytes( this.transaction.timeLock ),
             Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[position].unencodedAddress ),
-            Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[position].publicKey ),
-            this.transaction.to.serializeTo(),
+            Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[position].publicKey )
+        ];
 
-        ]) ;
+        if ( this.transaction.version >= 0x02 ) {
+            array.push( this.addresses[0].publicKey ); //sign the first address as well
+            array.push( Serialization.serializeNumber1Byte(this.addresses.length) ); //to be sure,
+            array.push( Serialization.serializeNumber7Bytes(this.addresses[position].amount) );
+        }
+
+        array.push( this.transaction.to.serializeTo());
+
+        return Buffer.concat( array ) ;
 
     }
 
-    validateSignatures(){
+    validateSignatures() {
 
-        this.addresses.forEach( (fromObject, index) =>{
+        this.addresses.forEach((fromObject, index) => {
 
-            if (! fromObject.signature || fromObject.signature === null)
-                throw {message: 'From.address.signature is not specified' , address: fromObject, index: index };
+            if (!fromObject.signature || fromObject.signature === null)
+                throw {message: 'From.address.signature is not specified', address: fromObject, index: index};
 
 
-            if (! Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH)
-                throw {message: "From.address.signature "+index+" is not a buffer", address: fromObject, index: index };
+            if (!Buffer.isBuffer(fromObject.signature) || fromObject.signature.length !== consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH)
+                throw { message: "From.address.signature " + index + " is not a buffer",  address: fromObject,  index: index };
 
-            let verification =  ed25519.verify(fromObject.signature, this.serializeForSigning(index), fromObject.publicKey );
+            if (!ed25519.verify(fromObject.signature, this.serializeForSigning(index), fromObject.publicKey ))
+                throw { message: "From.address.signature " + index + " is not correct",  address: fromObject,  index: index };
 
-            // let signature = schnorr.recover(fromObject.signature, this.serializeForSigning(index) );
-            // let verification = schnorr.verify( this.serializeForSigning(index) , signature, fromObject.publicKey );
-
-            if (!verification){
-                throw {message: "From.address.signature "+index+" is not correct", address: fromObject, index: index };
-            }
+            if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(fromObject.publicKey).equals( fromObject.unencodedAddress ) )
+                throw { message: "From.address.publicKey " + index + " doesn't match address",  address: fromObject,  index: index };
 
         });
 
@@ -231,63 +266,80 @@ class InterfaceBlockchainTransactionFrom{
 
     }
 
-    serializeFrom(){
+    serializeFrom() {
 
         let array = [];
 
-        array.push( Serialization.serializeNumber1Byte( this.addresses.length ));
+        array.push(Serialization.serializeNumber1Byte(this.addresses.length));
 
-        for (let i = 0; i < this.addresses.length; i++){
-            array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
-            array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[i].publicKey ));
-            array.push( Serialization.serializeToFixedBuffer( consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH, this.addresses[i].signature ));
-            array.push( Serialization.serializeNumber7Bytes( this.addresses[i].amount ));
+        for (let i = 0; i < this.addresses.length; i++) {
+
+            if (this.transaction.version <= 0x01)
+                array.push(Serialization.serializeToFixedBuffer(consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress));
+
+            array.push(Serialization.serializeToFixedBuffer( consts.ADDRESSES.PUBLIC_KEY.LENGTH, this.addresses[i].publicKey ));
+            array.push(Serialization.serializeToFixedBuffer( consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH, this.addresses[i].signature ));
+            array.push(Serialization.serializeNumber7Bytes( this.addresses[i].amount ));
+
         }
 
-        array.push(Serialization.serializeNumber1Byte( this.currencyTokenId.length ));
-        array.push( this.currencyTokenId );
+        array.push(Serialization.serializeNumber1Byte(this.currencyTokenId.length));
+        array.push(this.currencyTokenId);
 
-        return Buffer.concat (array);
+        return Buffer.concat(array);
 
     }
 
-    deserializeFrom(buffer, offset){
+    deserializeFrom(buffer, offset) {
 
         this.addresses = [];
 
-        let length =  Serialization.deserializeNumber1Bytes( buffer, offset );
-        offset += 1;
 
-        for (let i = 0; i < length; i++){
+        try {
 
-            let address = {};
+            let length = Serialization.deserializeNumber1Bytes(buffer, offset);
+            offset += 1;
 
-            address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
-            offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
-            address.publicKey= BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
-            offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
+            for (let i = 0; i < length; i++) {
 
-            address.signature= BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
-            offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
+                let address = {};
 
-            address.amount = Serialization.deserializeNumber7Bytes(buffer, offset);
-            offset += 7;
+                if (this.transaction.version <= 0x01) {
+                    address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+                    offset += consts.ADDRESSES.ADDRESS.LENGTH;
+                }
 
-            this.addresses.push(address);
+                address.publicKey = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
+                offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
+
+                address.signature = BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
+                offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
+
+                address.amount = Serialization.deserializeNumber7Bytes(buffer, offset);
+                offset += 7;
+
+                this.addresses.push(address);
+            }
+
+            let currencyLength = Serialization.deserializeNumber1Bytes(buffer, offset,);
+            offset += 1;
+
+            this.currencyTokenId = BufferExtended.substr(buffer, offset, currencyLength);
+            offset += currencyLength;
+
+        } catch (exception){
+
+            console.error("error deserializing a transaction FROM ", exception);
+            throw exception;
+
         }
-
-        let currencyLength =  Serialization.deserializeNumber1Bytes( buffer, offset, );
-        offset += 1;
-
-        this.currencyTokenId = BufferExtended.substr(buffer, offset, currencyLength );
-        offset += currencyLength;
 
         return offset;
 
     }
 
-    processTransactionFrom(multiplicationFactor = 1, revertActions ){
+    processTransactionFrom(multiplicationFactor = 1, revertActions) {
         // overwritten in Mini Blockchain
     }
 

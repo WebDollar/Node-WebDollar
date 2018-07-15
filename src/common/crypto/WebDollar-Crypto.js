@@ -136,6 +136,22 @@ class WebDollarCrypto {
         return ripemd160.digest();
     }
 
+    static MD5(bytes){
+
+        let md5 = crypto.createHash('md5'); // RIPEMD160
+        md5.update(bytes);
+
+        return md5.digest();
+    }
+
+    static MD512(bytes){
+
+        let md512 = crypto.createHash('md512'); // RIPEMD160
+        md512.update(bytes);
+
+        return md512.digest();
+    }
+
     /**
      * Hashing using Argon2
      * @param data

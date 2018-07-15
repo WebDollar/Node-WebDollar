@@ -50,24 +50,47 @@ class InterfaceBlockchainTransactionsWizard{
 
         try {
 
+            let to;
+            let toAmountTotal;
+
+            if (toAddress !== undefined && typeof toAmount === "number"){
+
+                toAmountTotal = toAmount;
+
+                to = {
+                        addresses: [{
+                            unencodedAddress: toAddress,
+                            amount: toAmount
+                        },
+                    ]};
+
+            } else if (Array.isArray(toAddress)) {
+
+                toAmountTotal = 0;
+
+                for (let i=0; i<toAddress.length; i++)
+                    toAmountTotal += toAddress[i].amount;
+
+                to = {
+                    addresses: toAddress
+                };
+
+
+            }
+
+
+
             let from = {
                 addresses: [
                     {
                         unencodedAddress: address,
                         publicKey: undefined,
-                        amount: toAmount +fee
+                        amount: toAmountTotal + fee
                     }
                 ],
                 currencyTokenId: currencyTokenId
             };
 
-            let to = {
-                addresses: [
-                    {
-                        unencodedAddress: toAddress,
-                        amount: toAmount
-                    },
-                ]};
 
             transaction = this.transactions._createTransaction(
 

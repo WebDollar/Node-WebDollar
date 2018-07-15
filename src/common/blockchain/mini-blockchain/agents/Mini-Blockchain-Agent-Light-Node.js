@@ -4,7 +4,7 @@ import MiniBlockchainLightProtocol from "common/blockchain/mini-blockchain/proto
 import MiniBlockchainForkLight from '../protocol/light/Mini-Blockchain-Light-Fork'
 import consts from "consts/const_global";
 import NodesList from 'node/lists/Nodes-List';
-import CONNECTION_TYPE from "node/lists/types/Connections-Type";
+import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import Blockchain from "main-blockchain/Blockchain"
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 
@@ -23,31 +23,6 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
         super(blockchain);
 
         this.light = true;
-
-        setInterval( () => {
-
-            if (this.blockchain.proofPi !== undefined)
-                if ( new Date().getTime() - this.blockchain.proofPi.date.getTime() >= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK *1000 * 2) {
-                    if (Math.random() < 2*WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES)
-                        Blockchain.synchronizeBlockchain(); //let's synchronize again
-                }
-
-        }, (consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK - 10) * 1000);
-
-        this._lastBlocks = undefined;
-        setInterval(()=>{
-
-            if (this.blockchain.blocks.length > 0){
-
-                if (this._lastBlocks !== undefined)
-                    if (this._lastBlocks === this.blockchain.blocks.length){
-                        location.reload();
-                    }
-
-                this._lastBlocks = this.blockchain.blocks.length;
-            }
-
-        }, consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 10 * 1000)
 
     }
 
@@ -105,6 +80,46 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
         // });
     }
 
+    _initializeConsensus(newConsensus){
+
+        inheritAgentClass.prototype._initializeConsensus.call(this, newConsensus);
+
+        if (newConsensus){
+
+
+            this._intervalWebRTC =  setInterval( () => {
+
+                if (this.blockchain.proofPi !== undefined)
+                    if ( new Date().getTime() - this.blockchain.proofPi.date.getTime() >= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK *1000 * 2) {
+                        if (Math.random() < 2*WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES) {
+                            console.warn("mini blockchain agent light synchronization");
+                            Blockchain.synchronizeBlockchain(); //let's synchronize again
+                        }
+                    }
+
+            }, (consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK - 10) * 1000);
+
+            this._lastBlocks = undefined;
+            this._intervalBlocksSame = setInterval(()=>{
+
+                if (this.blockchain.blocks.length <= 10) return;
+
+                if (this._lastBlocks !== undefined)
+                    if (this._lastBlocks === this.blockchain.blocks.length)
+                        location.reload();
+
+                this._lastBlocks = this.blockchain.blocks.length;
+
+            }, consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 10 * 1000)
+
+        } else {
+
+            clearInterval(this._intervalWebRTC);
+            clearInterval(this._intervalBlocksSame);
+
+        }
+
+    }
 
 
 }

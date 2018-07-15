@@ -38,6 +38,7 @@ class InterfaceBlockchainBlockCreator{
         let data = new this.blockDataClass(...args);
 
         return new this.blockClass( this.blockchain, blockValidation, 1, undefined, this.blockchain.getHashPrev(), undefined, 0, data, height, this.db);
+
     }
 
     createBlockNew(minerAddress, blockValidation, transactions){
@@ -80,6 +81,7 @@ class InterfaceBlockchainBlockCreator{
     createEmptyBlockData(){
 
         return new this.blockDataClass(this.blockchain);
+
     }
 
 

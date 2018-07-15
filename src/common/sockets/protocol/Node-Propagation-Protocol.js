@@ -1,6 +1,8 @@
+import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
+
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List'
-import NODES_TYPE from "node/lists/types/Nodes-Type";
+import NODE_TYPE from "node/lists/types/Node-Type";
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import Blockchain from "main-blockchain/Blockchain"
 import NodePropagationList from 'common/sockets/protocol/Node-Propagation-List'
@@ -30,16 +32,16 @@ class NodePropagationProtocol {
             if (key === "length") continue;
             if (!list.hasOwnProperty(key)) continue;
 
-            let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
+            let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t, list[key].ct||NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
 
             //downloading the next elements
             if (list[key].next !== undefined && list[key].next > 0)
-                list[key].sock.node.sendRequest( (nodeType === NODES_TYPE.NODE_TERMINAL ? "propagation/request-all-wait-list/full-nodes" : "propagation/request-all-wait-list/light-nodes"), { index: list[key].next, count: DOWNLOAD_WAITLIST_COUNT });
+                list[key].sock.node.sendRequest( (nodeType === NODE_TYPE.NODE_TERMINAL ? "propagation/request-all-wait-list/full-nodes" : "propagation/request-all-wait-list/light-nodes"), { index: list[key].next, count: DOWNLOAD_WAITLIST_COUNT });
 
             delete list[key];
             list.length--;
 
-            if (answer !== null ){
+            if (answer.result ){
                 this._waitlistProccessed[key] = true;
                 return;
             }
@@ -51,8 +53,8 @@ class NodePropagationProtocol {
 
     async _processNewWaitlistInterval(){
 
-        await this._processList(this._newFullNodesWaitList, NODES_TYPE.NODE_TERMINAL);
-        await this._processList(this._newLightNodesWaitList, NODES_TYPE.NODE_WEB_PEER);
+        await this._processList(this._newFullNodesWaitList, NODE_TYPE.NODE_TERMINAL);
+        await this._processList(this._newLightNodesWaitList, NODE_TYPE.NODE_WEB_PEER);
 
 
         setTimeout( async ()=>{ await this._processNewWaitlistInterval() } , 1500 + Math.floor( Math.random() * 200 ) );
@@ -72,7 +74,13 @@ class NodePropagationProtocol {
 
     initializeSocketForPropagation(socket){
 
+        //avoiding download the list from
+        if ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL].indexOf( socket.node.protocol.nodeConsensusType ) === 0 )
+            return;
+
+
         this.initializeNodesPropagation(socket);
+
 
         setTimeout( ()=>{
 
@@ -121,10 +129,10 @@ class NodePropagationProtocol {
 
                     if (op === "new-full-nodes") {
                         list = this._newFullNodesWaitList;
-                        type = NODES_TYPE.NODE_TERMINAL
+                        type = NODE_TYPE.NODE_TERMINAL
                     } else {
                         list = this._newLightNodesWaitList;
-                        type = NODES_TYPE.NODE_WEB_PEER;
+                        type = NODE_TYPE.NODE_WEB_PEER;
                     }
 
                     if (list.length > MAX_WAITLIST_QUEUE_LENGTH)
@@ -162,13 +170,13 @@ class NodePropagationProtocol {
                     //TODO remove addresses from list
 
                     case "disconnected-light-nodes":
-                    case "disconnected-full-nodes":
+                case "disconnected-full-nodes":
 
                     //     for (let i = 0; i < addresses.length; i++) {
                     //
-                    //         let answer = NodesWaitlist._searchNodesWaitlist(addresses[i].addr, undefined, addresses[i].type);
+                    //         let answer = NodesWaitlist._searchNodesWaitlist(addresses[i].addr, undefined, addresses[i].nodeType);
                     //         if (answer.waitlist !== null)
-                    //             answer.removeBackedBy(socket.sckAddress);
+                    //             answer.removeBackedBy(socket.node.sckAddress);
                     //
                     //         if (i%20 === 0)
                     //             await Blockchain.blockchain.sleep(50);
@@ -238,15 +246,15 @@ class NodePropagationProtocol {
 
     _newNodeConnected( nodeWaitListObject ){
 
-        // if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        // else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        // if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        // else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
 
     }
 
     _nodeDisconnected(nodeWaitListObject){
 
-        // if (nodeWaitListObject.type === NODES_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        // else if(nodeWaitListObject.type === NODES_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
+        // if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        // else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
 
     }
 

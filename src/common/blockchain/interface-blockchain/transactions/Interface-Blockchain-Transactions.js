@@ -33,8 +33,6 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         return {transaction: transaction, offset: offset};
     }
 
-
-
     setWallet(newWallet){
         this.wallet = newWallet;
         this.wizard.wallet = newWallet;

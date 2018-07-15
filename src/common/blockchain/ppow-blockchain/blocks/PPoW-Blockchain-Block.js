@@ -19,6 +19,16 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         this.interlink = undefined;
     }
 
+    destroyBlock(){
+
+        //in case it was already included
+        if (this.blockchain === undefined) return;
+        
+        this.blockchain.prover.provesCalculated.deleteBlock(this);
+
+        InterfaceBlockchainBlock.prototype.destroyBlock.call(this);
+    }
+
     updateInterlink(){
         this.interlink = this.calculateInterlink();
     }
@@ -26,13 +36,15 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     getLevel(){
 
         if (this._level !== undefined) return this._level;
-
+        
         //we use difficultyTargetPrev instead of current difficultyTarget
         let T = this.difficultyTargetPrev;
 
         if (this.height === 0)
             T = BlockchainGenesis.difficultyTarget;
-
+        
+        if (T === undefined || T === null) throw {message: "Target is not defined"};
+        
         if (Buffer.isBuffer(T))
             T = Convert.bufferToBigIntegerHex(T);
 
@@ -200,10 +212,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget,  offset){
 
 
-        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTarget, offset);
+        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTarget,  offset);
 
         try {
 
@@ -257,7 +269,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 data.push({
                     height: interlinks[i].h||interlinks[i].height,
                     blockId: interlinks[i].bId||interlinks[i].blockId,
-                })
+                });
 
                 prevInterlink = interlinks[i];
             }

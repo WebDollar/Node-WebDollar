@@ -87,11 +87,17 @@ class BansList{
     _listBans(){
 
         console.info("BANNNNNNNNNNNNNNS");
-        for (let i=0; i<this.bans.length; i++)
-            console.warn( "Address", this.bans[i].sckAddress.toString(),
-                          "banTime", this.bans[i].banTime,
-                          "timeLeft", new Date().getTime() -  (this.bans[i].banTimestamp + this.bans[i].banTime) ,
-                          "messages", this.bans[i].banReasons );
+        for (let i=0; i<this.bans.length; i++) {
+
+
+            let timeLeft  = (this.bans[i].banTimestamp + this.bans[i].banTime) - new Date().getTime() ;
+
+            if (timeLeft > 0)
+                console.warn("Address", this.bans[i].sckAddress.toString(),
+                    "banTime", this.bans[i].banTime,
+                    "timeLeft", timeLeft ,
+                    "messages", this.bans[i].banReasons);
+        }
 
     }
 

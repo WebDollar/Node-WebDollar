@@ -17,7 +17,7 @@ describe('test save wallet to local storage', () => {
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
-        let privateKey = await blockchainAddress.getPrivateKey();
+        let privateKey = await blockchainAddress._getPrivateKey();
 
         assert(typeof address === "string", "address is not a string");
         assert(Buffer.isBuffer(unencodedAddress), "unencodedAddress is not not buffer");
@@ -33,7 +33,7 @@ describe('test save wallet to local storage', () => {
         let address2 = blockchainAddress.address;
         let unencodedAddress2 = blockchainAddress.unencodedAddress;
         let publicKey2 = blockchainAddress.publicKey;
-        let privateKey2 = await blockchainAddress.getPrivateKey();
+        let privateKey2 = await blockchainAddress._getPrivateKey();
 
         assert(address2 === address, 'address differ after load: ' + address2 + '!==' + address);
         assert(unencodedAddress2.equals(unencodedAddress), 'unencodedAddress differ after load: ' + unencodedAddress2.toString('hex') + '!==' + unencodedAddress.toString('hex'));
@@ -53,7 +53,7 @@ describe('test save wallet to local storage', () => {
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
-        let privateKey = await blockchainAddress.getPrivateKey();
+        let privateKey = await blockchainAddress._getPrivateKey();
 
         response = await blockchainAddress.saveAddress();
         assert(response === true, 'save: ' + response);
@@ -75,7 +75,7 @@ describe('test save wallet to local storage', () => {
         let address = blockchainAddress.address;
         let unencodedAddress = blockchainAddress.unencodedAddress;
         let publicKey = blockchainAddress.publicKey;
-        let privateKey = await blockchainAddress.getPrivateKey();
+        let privateKey = await blockchainAddress._getPrivateKey();
         let password = 'password';
 
         //blockchainAddress.encrypt(password);
@@ -89,7 +89,7 @@ describe('test save wallet to local storage', () => {
         let address2 = blockchainAddress.address;
         let unencodedAddress2 = blockchainAddress.unencodedAddress;
         let publicKey2 = blockchainAddress.publicKey;
-        let privateKey2 = await blockchainAddress.getPrivateKey();
+        let privateKey2 = await blockchainAddress._getPrivateKey();
 
         assert(address2 === address, 'address differ after load: ' + address2 + '!==' + address);
         assert(unencodedAddress2.equals(unencodedAddress), 'unencodedAddress differ after load: ' + unencodedAddress2.toString('hex') + '!==' + address.toString('hex'));
@@ -113,7 +113,7 @@ describe('test save wallet to local storage', () => {
     it('test export/import wallet privateKeys', async () => {
 
         for (let i = 0; i < Blockchain.Wallet.addresses.length; i++) {
-            let privateKey = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            let privateKey = await Blockchain.Wallet.addresses[i]._getPrivateKey();
             let totalMultiSig = 3;
             let requiredMultiSig = 2;
             let fileName = "privateKey" + i + ".bin";
@@ -126,7 +126,7 @@ describe('test save wallet to local storage', () => {
             assert(response.totalMultiSig === totalMultiSig, "Total multiSig differ: " + response.totalMultiSig);
             assert(response.requiredMultiSig === requiredMultiSig, "Total multiSig differ: " + response.requiredMultiSig);
 
-            let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            let privateKey2 = await Blockchain.Wallet.addresses[i]._getPrivateKey();
             assert(privateKey2.equals(privateKey), "PrivateKey differ after import: " + privateKey2.toString("hex") + "!==" + privateKey.toString("hex"));
             
             FileSystem.unlinkSync(fileName);
@@ -136,13 +136,13 @@ describe('test save wallet to local storage', () => {
     it('test export/import wallet privateKeys from string', async () => {
 
         for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
-            let privateKey = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            let privateKey = await Blockchain.Wallet.addresses[i]._getPrivateKey();
             let privateKeyString = await Blockchain.Wallet.addresses[i].exportPrivateKeyToString();
 
             response = await Blockchain.Wallet.addresses[i].importPrivateKeyFromString(privateKeyString);
             assert(response === true, "Error loading privateKey from string: " + response);
 
-            let privateKey2 = await Blockchain.Wallet.addresses[i].getPrivateKey();
+            let privateKey2 = await Blockchain.Wallet.addresses[i]._getPrivateKey();
             assert(privateKey2.equals(privateKey), "PrivateKey differ after importing from string: " + privateKey.toString("hex") + "!==" + privateKey2.toString("hex"));
         }
     });
@@ -216,7 +216,7 @@ describe('test save wallet to local storage', () => {
         let passwordOne = ['ak', 'bv', 'co', 'dy', 're', 'ff', 'sg', 'rh', 'ti','sj', 'ck', 'ul'];
         let blockchainAddress = await Blockchain.Wallet.createNewAddress();
         let hexAddress = blockchainAddress.address.toString("hex");
-        let index = Blockchain.Wallet.getAddressIndex(hexAddress);
+        let index = Blockchain.Wallet.getAddress(hexAddress, true);
 
         assert(0 <= index, "Address index < 0: index = " + index);
 

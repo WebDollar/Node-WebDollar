@@ -1,5 +1,5 @@
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import NODES_TYPE from "node/lists/types/Nodes-Type"
+import NODE_TYPE from "node/lists/types/Node-Type"
 import Blockchain from "main-blockchain/Blockchain"
 
 class NodePropagationList{
@@ -93,7 +93,7 @@ class NodePropagationList{
 
         let list;
 
-        if (nodeType === NODES_TYPE.NODE_WEB_PEER) //let's send only SSL
+        if (nodeType === NODE_TYPE.NODE_WEB_PEER) //let's send only SSL
             list = this._waitlistSimpleSSL;
         else
             list = this._waitlistSimple;

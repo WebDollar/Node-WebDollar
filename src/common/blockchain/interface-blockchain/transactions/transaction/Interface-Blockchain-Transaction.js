@@ -29,11 +29,15 @@ class InterfaceBlockchainTransaction{
 
         if (timeLock === undefined)
             this.timeLock = blockchain.blocks.length-1;
+        else
+            this.timeLock = timeLock;
 
         if (version === undefined){
 
             if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
-            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x01;
+            else
+            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION ) version = 0x01;
+            else version = 0x02;
 
         }
 
@@ -45,9 +49,6 @@ class InterfaceBlockchainTransaction{
                 from = this._createTransactionFrom(from);
 
             this.from = from;
-
-            if (validateFrom)
-                this.from.validateFrom();
 
         } catch (exception){
 
@@ -63,20 +64,42 @@ class InterfaceBlockchainTransaction{
 
             this.to = to;
 
-            if (validateTo)
-                this.to.validateTo();
-
         } catch (exception){
 
             console.error("Transaction To Error", exception);
             throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
         }
 
+
+
+        try {
+
+            if (validateFrom)
+                this.from.validateFrom();
+
+        } catch (exception){
+            console.error("Transaction From Error 2", exception);
+            throw typeof exception === "string" ? "Transaction From Error " + exception : exception;
+
+        }
+
+
+        try {
+            if (validateTo)
+                this.to.validateTo();
+        } catch (exception){
+
+            console.error("Transaction To Error2", exception);
+            throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
+
+        }
+
+
         if (nonce === undefined || nonce === null)
             nonce = this._computeNonce();
 
         if (version === 0x00) nonce = nonce % 0x100;
-        else if (version === 0x01) nonce = nonce % 0X10000;
+        else if (version >= 0x01) nonce = nonce % 0X10000;
 
         this.nonce = nonce; //1 bytes
 
@@ -140,14 +163,17 @@ class InterfaceBlockchainTransaction{
         if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
         if (typeof this.timeLock !== "number") throw {message: 'timeLock is empty', timeLock:this.timeLock};
 
-        if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is ivnalid", version: this.version};
-        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x01) throw {message: "version is ivnalid", version: this.version};
+        if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
+        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
+        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
 
-        if (this.nonce > 0xFFFF) throw {message: "nonce is ivnalid", nonce : this.nonce};
+        if (this.nonce > 0xFFFF) throw {message: "nonce is invalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
 
-        if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock:this.timeLock, blockHeight: blockHeight };
-        if (this.timeLock - blockHeight > 100) throw { message: "timelock - blockHeight < 100", timelock : this.timelock };
+        if ( blockHeight !== -1){
+            if (this.timeLock !== 0 && blockHeight < this.timeLock ) throw {message: "blockHeight < timeLock", timeLock:this.timeLock, blockHeight: blockHeight };
+            if (this.timeLock - blockHeight > 100) throw { message: "timelock - blockHeight < 100", timeLock : this.timeLock };
+        }
 
         let txId = this._computeTxId();
         if (! BufferExtended.safeCompare(txId, this.txId ) ) throw {message: "txid don't match"};
@@ -185,6 +211,8 @@ class InterfaceBlockchainTransaction{
 
     validateTransactionEveryTime( blockHeight , blockValidationType = {}){
 
+        if (this.blockchain === undefined) throw {message: "blockchain is empty"};
+
         if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
         if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
@@ -200,7 +228,7 @@ class InterfaceBlockchainTransaction{
     }
 
 
-    isTransactionOK(avoidValidatingSignature = false){
+    isTransactionOK(avoidValidatingSignature = false, showDebug=true){
 
         if (!avoidValidatingSignature)
             this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
@@ -214,7 +242,10 @@ class InterfaceBlockchainTransaction{
             this.validateTransactionEveryTime(undefined, blockValidationType );
 
         } catch (exception){
-            console.warn ("Transaction had not enough money, so I am skipping it", exception);
+
+            if (showDebug)
+                console.warn ("Transaction Problem", exception);
+
             return false;
         }
 
@@ -263,7 +294,7 @@ class InterfaceBlockchainTransaction{
             if (this.version === 0x00){
                 this.nonce = Serialization.deserializeNumber1Bytes( buffer, offset);
                 offset += 1;
-            } else if (this.version === 0x01){
+            } else if (this.version >= 0x01){
                 this.nonce = Serialization.deserializeNumber2Bytes( buffer, offset);
                 offset += 2;
             }

@@ -4,13 +4,12 @@ import {getContinentFromCountry} from './data/continents.js';
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 
 import DownloadHelper from "common/utils/helpers/Download-Helper"
+import Utils from "common/utils/helpers/Utils";
 
 class GeoHelper {
 
     async getLocationFromAddress(address, skipSocketAddress){
 
-        if (!process.env.BROWSER)
-            return null;
 
         if ( skipSocketAddress === undefined) skipSocketAddress = false;
 
@@ -21,7 +20,7 @@ class GeoHelper {
             sckAddress = SocketAddress.createSocketAddress(address);
             address = sckAddress.getAddress(false);
 
-            if ( sckAddress._geoLocation !== undefined && sckAddress._geoLocation !== null)
+            if ( sckAddress._geoLocation.isFulfilled() )
                 return sckAddress._geoLocation;
         }
 
@@ -34,7 +33,7 @@ class GeoHelper {
             }
 
             let list = [];
-            list.push("https://freegeoip.net/json/"+address);
+            list.push("https://geoip.tools/v1/json/?q="+address);
             // list.push ( ["https://geoip-db.com/json/"+address,  ]); //don't support domains
 
             let data = await DownloadHelper.downloadMultipleFiles(list, 30000);
@@ -51,7 +50,7 @@ class GeoHelper {
                 if (data.country_name !== undefined) country = data.country_name;
 
                 if (data.countryCode !== undefined) countryCode = data.countryCode;
-                if (data.country_code !== undefined) countryCode = data.countryCode;
+                if (data.country_code !== undefined) countryCode = data.country_code;
 
                 if (address === '')
                     if (data.query !== undefined) address = address || data.query;
@@ -77,7 +76,8 @@ class GeoHelper {
                 };
 
                 if (!skipSocketAddress)
-                    sckAddress._geoLocation = geoLocation;
+                    sckAddress._geoLocationResolver( geoLocation );
+
 
                 return geoLocation;
             }

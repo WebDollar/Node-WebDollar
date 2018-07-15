@@ -19,11 +19,20 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
+    confirmTransactions(){
+
+        this.transactions.forEach((transaction) => {
+            transaction.confirmed = true;
+            this.blockData.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+        });
+
+    }
+
     destroyBlockDataTransactions(){
 
         for (let i=0; i<this.transactions.length; i++) {
 
-            if ( !Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i]) )
+            if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i]) === -1 )
                 this.transactions[i].destroyTransaction();
 
             this.transactions[i] = undefined;

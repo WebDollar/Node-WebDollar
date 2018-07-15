@@ -3,11 +3,16 @@ import consts from 'consts/const_global'
 
 class DownloadHelper{
 
-    async post (request, data ){
+    async post (request, data, timeout = 20000 ){
 
         try{
 
-            return await axios.post(request, data);
+            let axiosInstance = axios.create({
+                timeout: timeout,
+                responseType: 'json',
+            });
+
+            return await axiosInstance.post( request, data );
 
         } catch (exception){
             return null;
@@ -20,6 +25,7 @@ class DownloadHelper{
         try{
             let axiosInstance = axios.create({
                 timeout: timeout,
+                responseType: 'json',
             });
 
             let response = await axiosInstance.get(address);

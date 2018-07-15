@@ -2,6 +2,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import consts from 'consts/const_global'
 import NodesList from 'node/lists/Nodes-List';
 import NodeProtocol from "../extend-socket/Node-Protocol";
+import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 
 class NodeBlockchainPropagation{
 
@@ -44,6 +45,11 @@ class NodeBlockchainPropagation{
             if (! Array.isArray(socketsAvoidBroadcast) )
                 socketsAvoidBroadcast = [socketsAvoidBroadcast];
 
+            //avoid sending to those sockets
+            for (let i=0; i < NodesList.nodes.length; i++)
+                if ( Blockchain.isPoolActivated  && ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER].indexOf(NodesList.nodes[i].socket.node.protocol.nodeConsensusType) >= 0  ))
+                    socketsAvoidBroadcast.push(NodesList.nodes[i].socket);
+
             this._socketsAlreadyBroadcast = socketsAvoidBroadcast;
 
         }
@@ -60,8 +66,10 @@ class NodeBlockchainPropagation{
             this._socketsAlreadyBroadcast = [];
         }
 
+        //sending the block, except poolMiners
         for (let i=0; i < NodesList.nodes.length; i++)
-            NodesList.nodes[i].socket.node.protocol.sendLastBlock();
+            if ( !Blockchain.isPoolActivated  || ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER].indexOf(NodesList.nodes[i].socket.node.protocol.nodeConsensusType) < 0  ))
+                NodesList.nodes[i].socket.node.protocol.sendLastBlock();
 
     }
 

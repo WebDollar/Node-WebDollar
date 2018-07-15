@@ -16,8 +16,6 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-
-
     constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db){
 
         this.blockchain = blockchain;
@@ -30,8 +28,17 @@ class InterfaceBlockchainBlock {
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
-        if ( timeStamp === undefined)
-            timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+        if ( timeStamp === undefined ) {
+
+            let networkTimestamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+
+            if (this.blockchain.blocks.last !== undefined)  timeStamp = this.blockchain.blocks.last.timeStamp + 20;
+            else timeStamp = 0;
+
+            if (timeStamp < networkTimestamp )
+                timeStamp = networkTimestamp + 20;
+
+        }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
@@ -59,9 +66,13 @@ class InterfaceBlockchainBlock {
 
         this.db = db;
 
+        this._socketPropagatedBy = undefined;
+
     }
 
     destroyBlock(){
+
+        if (this.blockchain === undefined) return;
 
         //it is included in the blockchain
         if ( this.blockchain.blocks[ this.height ] === this)
@@ -202,6 +213,7 @@ class InterfaceBlockchainBlock {
 
             if (this.timeStamp > this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET)
                 throw { message: "Timestamp of block is less than the network-adjusted time", timeStamp: this.timeStamp, " > ": this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET, networkAdjustedTime: this.blockchain.timestamp.networkAdjustedTime, NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET }
+
         }
 
     }
@@ -213,11 +225,13 @@ class InterfaceBlockchainBlock {
     toJSON(){
 
         return {
+            height: this.height,
             version: this.version,
-            hashPrev: this.hashPrev,
-            data: this.data.toJSON(),
+            hashPrev: (this.hashPrev !== null ? this.hashPrev.toString("hex") : ''),
+            data: (this.data !== null ? this.data.toJSON() : ''),
             nonce: this.nonce,
             timeStamp: this.timeStamp,
+            difficulty: (this.difficultyTarget !== null ? this.difficultyTarget.toString("hex") : ''),
         }
 
     }
@@ -274,16 +288,14 @@ class InterfaceBlockchainBlock {
      * @param blockNonce
      * @returns {Promise<Buffer>}
      */
-    static async computeHashStatic(newNonce, height, difficultyTargetPrev, computedBlockPrefix, blockNonce) {
+    static async computeHashStatic(blockSerialized, newNonce) {
 
         let buffer = Buffer.concat ( [
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(height) ),
-            Serialization.serializeBufferRemovingLeadingZeros( difficultyTargetPrev ),
-            computedBlockPrefix,
-            Serialization.serializeNumber4Bytes(newNonce || blockNonce ),
+            blockSerialized,
+            Serialization.serializeNumber4Bytes(newNonce),
         ] );
 
-        return await WebDollarCrypto.hashPOW(buffer)
+        return await WebDollarCrypto.hashPOW( buffer );
     }
 
     serializeBlock(requestHeader){
@@ -309,7 +321,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, prevBlock, offset){
+    deserializeBlock(buffer, height, reward, difficultyTarget, offset = 0){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -317,8 +329,9 @@ class InterfaceBlockchainBlock {
 
         if (height !== undefined)  this.height = height;
         if (reward !== undefined) this.reward = reward;
+        else if (this.reward === undefined) this.reward = BlockchainMiningReward.getReward(height||this.height);
+
         if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
-        if (offset === undefined) offset = 0;
 
         if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
@@ -383,14 +396,14 @@ class InterfaceBlockchainBlock {
 
         try{
 
-            let buffer = await this.db.get(key);
+            let buffer = await this.db.get(key, 12000);
 
             if (buffer === null) {
                 console.error("block "+this.height+" was not found "+ key);
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, BlockchainMiningReward.getReward(this.height), this.blockValidation.getDifficultyCallback(this.height) );
+            this.deserializeBlock(buffer, this.height, undefined, this.blockValidation.getDifficultyCallback(this.height) );
 
             return true;
         }
@@ -468,6 +481,19 @@ class InterfaceBlockchainBlock {
         await this.computeHash();
     }
 
+    get socketPropagatedBy(){
+        return this._socketPropagatedBy;
+    }
+
+    set socketPropagatedBy(socket){
+
+        this._socketPropagatedBy = socket;
+
+        socket.on("disconnect",()=>{
+           this._socketPropagatedBy = undefined;
+        });
+
+    }
 
 }
 

@@ -2,11 +2,12 @@
 import NodesList from 'node/lists/Nodes-List'
 import NodesWaitlistObject from './Nodes-Waitlist-Object';
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
-import NODES_TYPE from "node/lists/types/Nodes-Type"
+import NODE_TYPE from "node/lists/types/Node-Type"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import DownloadManager from "common/utils/helpers/Download-Manager"
 import consts from 'consts/const_global'
-import Blockchain from "../../../main-blockchain/Blockchain";
+import Blockchain from "main-blockchain/Blockchain";
+import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
 const EventEmitter = require('events');
 
@@ -51,15 +52,22 @@ class NodesWaitlist {
     }
 
 
-    async addNewNodeToWaitlist (addresses, port, type,  connected, level, backedBy, socket){
+    async addNewNodeToWaitlist (addresses, port, nodeType, nodeConsensusType,  connected, level, backedBy, socket, forceInsertingWaitlist=false){
 
-        if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[])) ) return false;
+        if ( (typeof addresses === "string" && addresses === '') || (typeof addresses === "object" && (addresses === null || addresses===[])) ) return {result:false, waitlist: null};
 
         //converting to array
         if ( typeof addresses === "string" || !Array.isArray(addresses) ) addresses = [addresses];
 
 
+        //avoid connecting to other nodes
+        if ( (!Blockchain.Agent.consensus ) && nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER )
+            return {result:false, waitlist: null};
+
+
+
         let sckAddresses = [];
+        let waitListFound = null;
 
         //let's determine the sckAddresses
         for (let i=0; i<addresses.length; i++){
@@ -74,9 +82,9 @@ class NodesWaitlist {
                     if (sckAddress.address.indexOf(consts.SETTINGS.PARAMS.WAITLIST.BLOCKED_NODES[i])) continue;
 
                 //it if is a fallback, maybe it requires SSL
-                if ( type === NODES_TYPE.NODE_TERMINAL && process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL && !consts.DEBUG )  continue;
+                if ( nodeType === NODE_TYPE.NODE_TERMINAL && process.env.BROWSER && !sckAddress.SSL && consts.SETTINGS.NODE.SSL && !consts.DEBUG )  continue;
 
-                let answer = this._searchNodesWaitlist(sckAddress, port, type);
+                let answer = this._searchNodesWaitlist(sckAddress, port, nodeType);
 
                 if (answer.waitlist === null){
                     if (backedBy === "fallback")
@@ -85,16 +93,18 @@ class NodesWaitlist {
 
                         let response;
 
-                        if ( type === NODES_TYPE.NODE_TERMINAL)
+                        if ( !forceInsertingWaitlist && nodeType === NODE_TYPE.NODE_TERMINAL)
                             response = await DownloadManager.downloadFile(sckAddress.getAddress(true, true), 5000);
 
-                        if (type === NODES_TYPE.NODE_WEB_PEER || (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY)) {
+                        if ( forceInsertingWaitlist || nodeType === NODE_TYPE.NODE_WEB_PEER || (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY)) {
 
                             //search again because i have waited for a promise
-                            let answer = this._searchNodesWaitlist(sckAddress, port, type);
+                            let answer = this._searchNodesWaitlist(sckAddress, port, nodeType);
 
                             if (answer.waitlist === null)
                                 sckAddresses.push(sckAddress);
+                            else
+                                waitListFound = answer.waitlist;
                         }
 
 
@@ -108,6 +118,8 @@ class NodesWaitlist {
 
                     if (socket !== undefined)
                         answer.waitlist.socketConnected(socket);
+
+                    waitListFound = answer.waitlist;
 
                 }
                 else{
@@ -125,12 +137,12 @@ class NodesWaitlist {
         // incase this new waitlist is new
         if (sckAddresses.length > 0){
 
-            let waitListObject = new NodesWaitlistObject( sckAddresses, type, level, backedBy , connected, socket );
+            let waitListObject = new NodesWaitlistObject( sckAddresses, nodeType, nodeConsensusType, level, backedBy , connected, socket );
 
             let list;
 
-            if (waitListObject.type === NODES_TYPE.NODE_TERMINAL)  list = this.waitListFullNodes;
-            else  if (waitListObject.type === NODES_TYPE.NODE_WEB_PEER) list = this.waitListLightNodes;
+            if (waitListObject.nodeType === NODE_TYPE.NODE_TERMINAL)  list = this.waitListFullNodes;
+            else  if (waitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) list = this.waitListLightNodes;
 
             if ( socket !== undefined){
                 waitListObject.socket = socket;
@@ -141,11 +153,10 @@ class NodesWaitlist {
             list.push(waitListObject);
 
             this.emitter.emit( "waitlist/new-node", waitListObject );
-            return waitListObject;
+            return {result: true, waitlist: waitListObject};
 
-        }
-        
-        return null;
+        } else
+            return {result:false, waitlist: waitListFound};
     }
 
     _findNodesWaitlist(address, port, listType){
@@ -154,8 +165,8 @@ class NodesWaitlist {
 
         let sckAddress = SocketAddress.createSocketAddress( address, port );
 
-        if (listType === NODES_TYPE.NODE_TERMINAL )  list = this.waitListFullNodes;
-        else if( listType === NODES_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
+        if (listType === NODE_TYPE.NODE_TERMINAL )  list = this.waitListFullNodes;
+        else if( listType === NODE_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
 
         for (let i=0; i<list.length; i++)
             for (let j=0; j<list[i].sckAddresses.length; j++)
@@ -170,8 +181,8 @@ class NodesWaitlist {
 
         let list = [];
 
-        if (listType === NODES_TYPE.NODE_TERMINAL ) list = this.waitListFullNodes;
-        else if ( listType === NODES_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
+        if (listType === NODE_TYPE.NODE_TERMINAL ) list = this.waitListFullNodes;
+        else if ( listType === NODE_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
 
         let index = this._findNodesWaitlist( address, port, listType );
 
@@ -181,7 +192,13 @@ class NodesWaitlist {
 
     }
 
+    deleteWaitlistByConsensusNode(nodeConsensusType){
 
+        for (let i=this.waitListFullNodes.length-1; i>=0; i--)
+            if (this.waitListFullNodes[i].nodeConsensusType === nodeConsensusType)
+                this.waitListFullNodes.splice(i,1);
+
+    }
     async _deleteObsoleteFullNodesWaitlist(){
 
         for (let i=this.waitListFullNodes.length-1; i>=0; i--)
@@ -214,12 +231,12 @@ class NodesWaitlist {
         let list, max;
 
 
-        if (listType === NODES_TYPE.NODE_TERMINAL ) {
+        if (listType === NODE_TYPE.NODE_TERMINAL ) {
             list = this.waitListFullNodes;
             max = this.MAX_FULLNODE_WAITLIST_CONNECTIONS;
         }
 
-        if (listType === NODES_TYPE.NODE_WEB_PEER ) {
+        if (listType === NODE_TYPE.NODE_WEB_PEER ) {
             list = this.waitListFullNodes;
             max = this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS;
         }
@@ -264,8 +281,8 @@ class NodesWaitlist {
 
     _deleteUselessWaitlists(){
 
-        this._deleteUselessWaitlist( NODES_TYPE.NODE_TERMINAL );
-        this._deleteUselessWaitlist( NODES_TYPE.NODE_WEB_PEER );
+        this._deleteUselessWaitlist( NODE_TYPE.NODE_TERMINAL );
+        this._deleteUselessWaitlist( NODE_TYPE.NODE_WEB_PEER );
 
         setTimeout( this._deleteUselessWaitlists.bind(this), 30*1000 + Math.random()*3000 );
     }
@@ -274,8 +291,8 @@ class NodesWaitlist {
 
         let list = [];
 
-        if( listType === NODES_TYPE.NODE_TERMINAL)  list = this.waitListFullNodes;
-        else if ( listType === NODES_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
+        if( listType === NODE_TYPE.NODE_TERMINAL)  list = this.waitListFullNodes;
+        else if ( listType === NODE_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
 
         for (let i=0; i<list.length; i++)
             list[i].resetWaitlistNode();
@@ -286,7 +303,7 @@ class NodesWaitlist {
 
         if (socket.node.protocol === undefined) return;
 
-        let answer = this._searchNodesWaitlist(socket.node.sckAddress, undefined, socket.node.protocol.type);
+        let answer = this._searchNodesWaitlist(socket.node.sckAddress, undefined, socket.node.protocol.nodeType);
 
         if ( answer.waitlist !== null ){
 
@@ -318,7 +335,7 @@ class NodesWaitlist {
 
     isAddressFallback(address){
 
-        let answer = this._searchNodesWaitlist(address, undefined, NODES_TYPE.NODE_TERMINAL);
+        let answer = this._searchNodesWaitlist(address, undefined, NODE_TYPE.NODE_TERMINAL);
         if ( answer.waitlist !== null) return answer.waitlist.isFallback;
 
         return false;
@@ -328,8 +345,8 @@ class NodesWaitlist {
 
         let list = [];
 
-        if (listType === NODES_TYPE.NODE_TERMINAL ) list = this.waitListFullNodes;
-        else if ( listType === NODES_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
+        if (listType === NODE_TYPE.NODE_TERMINAL ) list = this.waitListFullNodes;
+        else if ( listType === NODE_TYPE.NODE_WEB_PEER ) list = this.waitListLightNodes;
 
         let answer = [];
 

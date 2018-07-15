@@ -3,6 +3,7 @@ import global from "consts/global"
 import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
+import MiniBlockchain from "./Mini-Blockchain";
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -156,10 +157,13 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTarget", this.lightPrevDifficultyTargets[diffIndex])))
                 throw {message: "Couldn't be saved _LightSettings_prevDifficultyTarget", diffIndex: diffIndex};
+
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart", this.lightPrevDifficultyTargets[diffIndex+1])))
                 throw {message: "Couldn't be saved _LightSettings_prevDifficultyTargetStart", diffIndex: diffIndex};
+
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevTimestamp", this.lightPrevTimeStamps[diffIndex])))
                 throw {message: "Couldn't be saved _LightSettings_prevTimestamp ", diffIndex: diffIndex};
+
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex])))
                 throw {message: "Couldn't be saved _LightSettings_prevHashPrev ", diffIndex:diffIndex};
 
@@ -241,7 +245,9 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
     }
 
 
-    async saveBlockchain(){
+    async saveBlockchainTerminated(){
+
+        await MiniBlockchainAdvanced.prototype.saveBlockchainTerminated.call(this);
 
         if (process.env.BROWSER)
             return true;
@@ -272,7 +278,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
      * Load blocks and check the Accountant Tree
      * @returns boolean
      */
-    async loadBlockchain(){
+    async _loadBlockchain(){
 
         if (process.env.BROWSER)
             return true;
@@ -299,7 +305,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
             this._difficultyNotValidated = false;
 
-            if (! (await this.inheritBlockchain.prototype.loadBlockchain.call(this, answer.diffIndex -1 )))
+            if (! (await this.inheritBlockchain.prototype._loadBlockchain.call(this, answer.diffIndex -1 )))
                 throw {message: "Problem loading the blockchain"};
 
             //check the accountant Tree if matches
