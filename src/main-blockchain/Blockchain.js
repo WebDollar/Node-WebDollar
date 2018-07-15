@@ -319,7 +319,7 @@ class Blockchain{
 
     get versionCompatibility() {
 
-        if (consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE !== '' && this.blockchain.blocks.length > consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT)
+        if (consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE !== '' && consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT !== 0 && this.blockchain.blocks.length > consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT)
             return consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE;
         else
             return consts.SETTINGS.NODE.VERSION_COMPATIBILITY;
