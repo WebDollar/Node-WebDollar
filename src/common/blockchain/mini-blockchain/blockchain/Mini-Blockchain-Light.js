@@ -26,6 +26,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         this.lightPrevDifficultyTargets = {};
         this.lightPrevTimeStamps = {};
         this.lightPrevHashPrevs = {};
+        this.lightProofCalculated = {};
 
         this._lightLoadingDifficultyNextDifficulty = null;
 
@@ -169,7 +170,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             if (! (await this.db.save(this._blockchainFileName + "_LightSettings_prevHashPrev", this.lightPrevHashPrevs[diffIndex])))
                 throw {message: "Couldn't be saved _LightSettings_prevHashPrev ", diffIndex:diffIndex};
 
-            if(!await this.proofCalculated._saveProvesCalculated(diffIndex))
+            if(!await this.proofCalculated._saveProvesCalculated(this._blockchainFileName + "_LightSettings_proofCalculated", lightProofCalculated[diffIndex]))
                 throw {message: "Couldn't be saved PPOW Proves Calculated ", diffIndex:diffIndex};
 
         } catch (exception){
@@ -217,7 +218,6 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             }
 
             this._lightLoadingDifficultyNextDifficulty = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTargetStart");
-
             this.lightPrevTimeStamps[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevTimestamp");
             if (this.lightPrevTimeStamps[diffIndex] === null) {
                 console.error("_LightSettings_prevTimestamp was not found");
@@ -230,8 +230,11 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
                 return {result:false};
             }
 
-        } else throw {message:"Error Loading Light Settings"};
+            this.lightProofCalculated[diffIndex] = await this.proofCalculated._saveProvesCalculated(this._blockchainFileName + "_LightSettings_proofCalculated");
+            if(this.lightProofCalculated[diffIndex] === null)
+                throw {message: "_LightSettings_proofCalculated was not found "};
 
+        } else throw {message:"Error Loading Light Settings"};
 
         this.blocks.blocksStartingPoint = diffIndex  ;
 
