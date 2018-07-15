@@ -257,7 +257,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 data.push({
                     height: interlinks[i].h||interlinks[i].height,
                     blockId: interlinks[i].bId||interlinks[i].blockId,
-                })
+                });
 
                 prevInterlink = interlinks[i];
             }
