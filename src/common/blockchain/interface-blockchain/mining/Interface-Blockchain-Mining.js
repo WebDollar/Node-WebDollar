@@ -155,6 +155,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         console.log("");
         console.log(" ----------- mineBlock-------------");
+        console.log(block);
 
         try{
 

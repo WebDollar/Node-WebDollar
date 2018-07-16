@@ -28,11 +28,12 @@ class InterfaceBlockchainBlock {
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
-        if ( timeStamp === undefined ) {
-            this.timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+        if ( timeStamp === undefined  || timeStamp === null) {
 
-            if (this.timeStamp === undefined)
-                this.timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
+            timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+
+            if (timeStamp === undefined || timeStamp === null)
+                timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
 
         }
 
