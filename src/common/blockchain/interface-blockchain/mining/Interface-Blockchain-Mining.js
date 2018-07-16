@@ -48,7 +48,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
-            nextBlock.difficultyTargetPrev = this.blockchain.getDifficultyTarget();
+            nextBlock.difficultyTargetPrev = Buffer.from( this.blockchain.getDifficultyTarget() );
             nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
             nextBlock.updateInterlink();
 
@@ -236,7 +236,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (Exception){
 
-            console.error( "Error mining block ", Exception, block);
+            console.error( "Error mining block ", Exception, block.toJSON() );
             this._destroyMiningInterval();
 
             throw Exception;

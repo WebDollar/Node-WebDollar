@@ -78,7 +78,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         } catch (ex){
             revertException = true;
-            console.error("MiniBlockchain simulateNewBlock 1 raised an exception at blockHeight", block.height, ex, block);
+            console.error("MiniBlockchain simulateNewBlock 1 raised an exception at blockHeight", block.height, ex, block !== null ? block.toJSON() : '' );
         }
 
         try{

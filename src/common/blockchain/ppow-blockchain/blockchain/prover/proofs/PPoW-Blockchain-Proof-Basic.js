@@ -4,6 +4,19 @@ import consts from 'consts/const_global'
 
 class PPoWBlockchainProofBasic{
 
+    constructor(blockchain, blocks){
+
+        this.date = new Date();
+
+        this.blockchain = blockchain;
+
+        this.blocks = blocks;
+        this.blocksIndex = {};
+
+        this.hash = undefined;
+
+    }
+
     destroyProof(){
 
         if (!this.blockchain.agent.light) {
@@ -40,16 +53,7 @@ class PPoWBlockchainProofBasic{
 
     }
 
-    constructor(blockchain, blocks){
 
-        this.date = new Date();
-
-        this.blockchain = blockchain;
-        this.blocks = blocks;
-
-        this.hash = undefined;
-
-    }
 
     getProofHeaders(starting, length){
 
@@ -144,6 +148,17 @@ class PPoWBlockchainProofBasic{
             }
 
         return null;
+    }
+
+
+    push(block){
+
+        if (this.blocksIndex[block.height] === block)
+            return;
+
+        this.blocks.push(block);
+        this.blocksIndex[block.height] = block;
+
     }
 
 }

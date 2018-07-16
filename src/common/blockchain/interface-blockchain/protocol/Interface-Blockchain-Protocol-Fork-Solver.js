@@ -33,8 +33,6 @@ class InterfaceBlockchainProtocolForkSolver{
             if (left < 0 || answer === null  || !Buffer.isBuffer(answer.hash) ) // timeout
                 return {position: null, header: answer };
 
-            await this.blockchain.sleep(7);
-
             //i have finished the binary search
             if (left >= right) {
 
@@ -114,8 +112,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if (!this.blockchain.agent.light  && currentBlockchainLength > forkChainLength)
                 throw {message: "discoverAndProcessFork - fork is smaller fork than mine"};
-
-            await this.blockchain.sleep(10);
 
             let answer = this.blockchain.forksAdministrator.findFork(socket, forkLastBlockHash, forkProof);
             if (answer !== null) return answer;
@@ -233,8 +229,6 @@ class InterfaceBlockchainProtocolForkSolver{
                 console.log("fork is something new");
                 throw {message: "fork is something new", binarySearchResult:binarySearchResult, forkChainStartingPoint:forkChainStartingPoint, forkChainLength:forkChainLength} ;
             }
-
-            await this.blockchain.sleep(30);
 
 
             return {result: true, fork:fork };

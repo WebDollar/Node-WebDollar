@@ -1,6 +1,7 @@
 const ipaddr = require('ipaddr.js');
 import consts from 'consts/const_global'
 import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper'
+import Utils from "common/utils/helpers/Utils"
 
 class SocketAddress {
 
@@ -86,7 +87,11 @@ class SocketAddress {
         this.address = address; //always ipv6
 
         this.port = port;
-        this._geoLocation = null;
+        this._geoLocation = Utils.makeQuerablePromise(new Promise( async (resolve)=>{
+
+            this._geoLocationResolver = resolve;
+
+        }));
 
         this.uuid = uuid;
     }
@@ -153,24 +158,22 @@ class SocketAddress {
     }
 
     get geoLocation(){
+        return this._geoLocation;
+    }
 
-        if (this._geoLocation !== null) //already computed
+    async getLocationNow(){
+
+        if (this._geoLocation.isFulfilled())
             return this._geoLocation;
 
-        this._geoLocation = new Promise( async (resolve)=>{
+        let answer = await GeoHelper.getLocationFromAddress(this);
 
-            let answer = await GeoHelper.getLocationFromAddress(this);
-
-            if (answer === null) resolve(null);
-            else {
-                this._geoLocation = answer;
-                resolve(answer);
-            }
-
-        });
+        if (answer === null) this._geoLocationResolver(null);
+        else {
+            this._geoLocationResolver(answer);
+        }
 
         return this._geoLocation;
-
     }
 
     isLocalHost(){

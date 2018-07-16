@@ -17,6 +17,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import Log from 'common/utils/logging/Log';
+import PoolRewardsManagement from "common/mining-pools/pool/pool-management/pool-work/rewards/Payout/Pool-Process-Remaining-Payment"
 
 class CLI {
 
@@ -72,6 +73,9 @@ class CLI {
             case '10': // Mining Pool: Start Mining in a Pool
                 await this.startMiningInsidePool();
                 break;
+            case '11-1':  // Mining Pool: Create a New Pool
+                await this.processRemainingPayment();
+                break;
             case '11':  // Mining Pool: Create a New Pool
                 await this.createMiningPool();
                 break;
@@ -94,7 +98,7 @@ class CLI {
 
     async _start() {
 
-        Log.info('CLI menu started', consts.LOG_INSTANCE.CLI_MENU);
+        Log.info('CLI menu started', Log.LOG_TYPE.CLI_MENU);
 
         if (Blockchain !== undefined)
             await Blockchain.loadWallet();
@@ -106,6 +110,13 @@ class CLI {
         await this._runMenu();
     }
 
+    async processRemainingPayment(){
+
+        await this._callCallbackBlockchainSync( undefined, undefined, async ()=>{
+            await Blockchain.PoolManagement.poolRemainingRewards.doPayout();
+        }, true);
+
+    }
 
     async _chooseAddress() {
 
@@ -132,7 +143,6 @@ class CLI {
     }
 
     async listAddresses() {
-
 
         await this._callCallbackBlockchainSync(async ()=>{
 
@@ -174,7 +184,7 @@ class CLI {
 
             return true;
 
-        }, true);
+        }, undefined, undefined, true);
     }
 
     async createNewAddress() {
@@ -350,7 +360,7 @@ class CLI {
             else
                 Blockchain.startMiningNextTimeSynchronized = true;
 
-        } );
+        }, undefined, undefined );
 
     }
 
@@ -389,7 +399,7 @@ class CLI {
 
             await Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
 
-        }, false);
+        }, undefined, undefined, false);
 
     }
 
@@ -397,7 +407,7 @@ class CLI {
 
         console.info('Create Mining Pool');
 
-        await this._callCallbackBlockchainSync(async ()=>{
+        await this._callCallbackBlockchainSync( async ()=>{
 
             await Blockchain.PoolManagement.setPoolStarted(false);
 
@@ -461,7 +471,7 @@ class CLI {
             await Blockchain.PoolManagement.startPool(true);
 
 
-        }, true);
+        }, undefined, undefined, true);
 
     }
 
@@ -484,12 +494,12 @@ class CLI {
             await Blockchain.ServerPoolManagement.serverPoolSettings.setServerPoolFee(serverPoolFee / 100);
             await Blockchain.ServerPoolManagement.startServerPool();
 
-        }, true);
+        }, undefined, undefined, true);
 
 
     }
 
-    async _callCallbackBlockchainSync(callbackBeforeServerInitialization, callbackAfterServerInitialization, synchronize=true ){
+    async _callCallbackBlockchainSync(callbackBeforeServerInitialization, callbackAfterServerInitialization, afterSynchronizationCallback, synchronize=true ){
 
         if (!Blockchain._blockchainInitiated) {
 
@@ -505,7 +515,7 @@ class CLI {
                 if (typeof callbackAfterServerInitialization === "function")
                     await callbackAfterServerInitialization();
 
-            }, undefined, synchronize );
+            }, afterSynchronizationCallback, synchronize );
 
         } else {
 
@@ -533,6 +543,7 @@ const commands = [
         '9. Solo: Start Mining Instantly Even Unsynchronized',
         '10. Mining Pool: Start Mining',
         '11. Mining Pool: Create a New Pool',
+        '11-1. Mining Pool: Process Remaining Payment',
         '12. Server for Mining Pool: Create a new Server for Mining Pool',
         '20. HTTPS Express Start',
     ];

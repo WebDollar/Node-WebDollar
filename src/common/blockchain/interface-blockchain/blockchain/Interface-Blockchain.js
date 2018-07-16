@@ -14,7 +14,8 @@ import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 import InterfaceBlockchainBasic from "./Interface-Blockchain-Basic"
-import InterfaceBlockchainHardForks from "./../blocks/Hard-Forks/Interface-Blockchain-Hard-Forks"
+import InterfaceBlockchainHardForks from "./../blocks/hard-forks/Interface-Blockchain-Hard-Forks"
+import Log from 'common/utils/logging/Log';
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -30,8 +31,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-
-
     async validateBlockchain(){
 
         for (let i = this.blocks.blocksStartingPoint; i < this.blocks.length; i++)
@@ -41,9 +40,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return true;
     }
 
+
     async simulateNewBlock(block, revertAutomatically, revertActions, callback, showUpdate = true ){
         return await callback();
     }
+
 
     async _blockIncluded(block){
 
@@ -91,7 +92,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         //hard fork
         if ( !block.blockValidation.blockValidationType['skip-accountant-tree-validation'] && block.height === consts.BLOCKCHAIN.HARD_FORKS.WALLET_RECOVERY-1 )
-            await this.hardForks.revertAllTransactions("WEBD$gC9h7iFUURqhGUL23U@7Ccyb@X$2BCCpSH$", 150940, revertActions, 18674877890000);
+            await this.hardForks.revertAllTransactions("WEBD$gC9h7iFUURqhGUL23U@7Ccyb@X$2BCCpSH$", 150940, revertActions, 18674877890000, "WEBD$gDZwjjD7ZE5+AE+44ITr8yo5E2aXYT3mEH$");
 
 
         await this._blockIncluded( block);
@@ -230,15 +231,17 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         }
     }
 
-    async saveNewBlock(block){
+    async saveNewBlock(block, saveLength = false){
 
         if (process.env.BROWSER)
             return true;
 
-        if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
-            console.error("Error saving the blocks.length");
-            return false;
-        }
+
+        if (saveLength)
+            if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
+                Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
+                return false;
+            }
 
         await block.saveBlock();
 
@@ -293,7 +296,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 validationType["skip-interlinks-update"] = true;
                 validationType["skip-target-difficulty-validation"] = true;
                 validationType["skip-calculating-proofs"] = true;
-                validationType["skip-calculating-block-nipopow-level"] = true;
+                //validationType["skip-calculating-block-nipopow-level"] = true;
                 validationType["skip-saving-light-accountant-tree-serializations"] = true;
                 validationType["skip-recalculating-hash-rate"] = true;
 
@@ -329,13 +332,13 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             //load the number of blocks
             numBlocks = await this.db.get(this._blockchainFileName);
             if (numBlocks === null) {
-                console.error("numBlocks was not found");
+                Log.error("numBlocks was not found", Log.LOG_TYPE.SAVING_MANAGER);
                 return false;
             }
 
-            console.info("=======================");
-            console.info("LOADING BLOCKS", numBlocks);
-            console.info("=======================");
+            Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
+            Log.info("LOADING BLOCKS", numBlocks, Log.LOG_TYPE.SAVING_MANAGER);
+            Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
 
         } catch (exception){
 
@@ -399,10 +402,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         } catch (exception){
 
             if (this.accountantTree !== undefined)
-                console.log("serializeMiniAccountantTreeERRROR", this.accountantTree.serializeMiniAccountant().toString("hex"));
+                Log.error("serializeMiniAccountantTreeERRROR", Log.LOG_TYPE.SAVING_MANAGER, this.accountantTree.serializeMiniAccountant().toString("hex"));
 
-            console.log("serializeMiniAccountantTreeERRROR", this.blocks.length-1);
-            console.error("blockchain.load raised an exception", exception);
+            Log.error("serializeMiniAccountantTreeERRROR", Log.LOG_TYPE.SAVING_MANAGER, this.blocks.length-1);
+            Log.error("blockchain.load raised an exception", Log.LOG_TYPE.SAVING_MANAGER,exception);
 
 
             answer = false;
@@ -440,7 +443,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 console.error("blockchain is invalid at index " + i);
                 throw {message: "blockchain is invalid at index ", height: i};
             }
-
 
         } catch (exception){
             console.error("blockchain LOADING stopped at " + i, exception);

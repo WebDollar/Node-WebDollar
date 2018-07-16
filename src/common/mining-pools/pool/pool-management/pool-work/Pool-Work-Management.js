@@ -132,25 +132,31 @@ class PoolWorkManagement{
 
                     let revertActions = new RevertActions(this.blockchain);
 
+                    let block;
                     try {
+
+                        blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
+                        blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
+
+                        let serialization = blockInformationMinerInstance.workBlock.serializeBlock();
+                        block = this.blockchain.blockCreator.createEmptyBlock(blockInformationMinerInstance.workBlock.height, undefined );
+                        block.deserializeBlock(serialization, blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.reward,  );
+
 
                         if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 
                                 //returning false, because a new fork was changed in the mean while
-                                if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
+                                if (this.blockchain.blocks.length !== block.height)
                                     throw {message: "pool: block is already too old for processing"};
 
-                                blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
-                                blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
-
-                                return this.blockchain.includeBlockchainBlock(blockInformationMinerInstance.workBlock, false, ["all"], true, revertActions);
+                                return this.blockchain.includeBlockchainBlock(block, false, ["all"], true, revertActions);
 
                             }) === false) throw {message: "Mining2 returned false"};
 
-                        NodeBlockchainPropagation.propagateLastBlockFast(blockInformationMinerInstance.workBlock);
+                        NodeBlockchainPropagation.propagateLastBlockFast(block);
 
                         //confirming transactions
-                        blockInformationMinerInstance.workBlock.data.transactions.confirmTransactions();
+                        block.data.transactions.confirmTransactions();
 
 
                         blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
@@ -166,6 +172,9 @@ class PoolWorkManagement{
 
                         console.error("PoolWork include raised an exception", exception);
                         revertActions.revertOperations();
+
+                        if (block !== undefined)
+                            block.destroyBlock();
 
                         this.poolWork.getNextBlockForWork();
                     }

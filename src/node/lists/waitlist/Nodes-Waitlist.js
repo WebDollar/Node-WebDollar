@@ -61,8 +61,9 @@ class NodesWaitlist {
 
 
         //avoid connecting to other nodes
-        if (!Blockchain.Agent.consensus && nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER )
+        if ( (!Blockchain.Agent.consensus ) && nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER )
             return {result:false, waitlist: null};
+
 
 
         let sckAddresses = [];
@@ -95,7 +96,7 @@ class NodesWaitlist {
                         if ( !forceInsertingWaitlist && nodeType === NODE_TYPE.NODE_TERMINAL)
                             response = await DownloadManager.downloadFile(sckAddress.getAddress(true, true), 5000);
 
-                        if ( forceInsertingWaitlist || nodeType === NODE_TYPE.NODE_WEB_PEER || (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY)) {
+                        if ( forceInsertingWaitlist || nodeType === NODE_TYPE.NODE_WEB_PEER || (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility)) {
 
                             //search again because i have waited for a promise
                             let answer = this._searchNodesWaitlist(sckAddress, port, nodeType);
@@ -206,7 +207,7 @@ class NodesWaitlist {
                 try {
                     let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 5000);
 
-                    if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= consts.SETTINGS.NODE.VERSION_COMPATIBILITY)
+                    if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility)
                         continue;
                     else
                         this.waitListFullNodes.splice(i, 1);

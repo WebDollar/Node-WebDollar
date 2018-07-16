@@ -6,6 +6,7 @@ import PoolDataBlockInformationMinerInstance from "./Pool-Data-Block-Information
 import BufferExtended from "common/utils/BufferExtended";
 import consts from 'consts/const_global';
 import Blockchain from "main-blockchain/Blockchain"
+import Log from 'common/utils/logging/Log';
 
 class PoolDataBlockInformation {
 
@@ -88,26 +89,40 @@ class PoolDataBlockInformation {
         buffers.push ( Serialization.serializeNumber4Bytes( this.height || 500 ));
 
         let length = 0;
-        for (let i=0; i<this.blockInformationMinersInstances.length; i++)
-            if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].reward > 0)
-                length ++;
+
+        if (this.blockInformationMinersInstances !== null && Array.isArray(this.blockInformationMinersInstances))
+            for (let i=0; i<this.blockInformationMinersInstances.length; i++)
+                if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].reward > 0)
+                    length ++;
 
         buffers.push ( Serialization.serializeNumber4Bytes(length));
 
-        for (let i=0; i<this.blockInformationMinersInstances.length; i++)
-            if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].reward > 0)
-                buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
+        if (length > 0 && this.blockInformationMinersInstances !== null && Array.isArray(this.blockInformationMinersInstances))
+            for (let i=0; i<this.blockInformationMinersInstances.length; i++)
+                if (this.blockInformationMinersInstances[i].minerInstance !== undefined && this.blockInformationMinersInstances[i].minerInstance !== null && this.blockInformationMinersInstances[i].reward > 0)
+                    buffers.push( this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance() );
 
         buffers.push( Serialization.serializeNumber1Byte(this.payout ? 1 : 0) );
 
-        buffers.push( Serialization.serializeNumber1Byte((this.block !== undefined ? 1 : 0)) );
 
+        let array=[];
         //serialize block
-        if (this.block !== undefined && this.block.blockchain !== undefined) {
-            buffers.push ( Serialization.serializeNumber4Bytes(this.block.height));
-            buffers.push ( this.block.difficultyTarget);
-            buffers.push( this.block.serializeBlock() );
+        if (this.block !== undefined && this.block !== null && this.block.blockchain !== undefined) {
+
+            try {
+
+                array.push(Serialization.serializeNumber4Bytes(this.block.height));
+                array.push(this.block.difficultyTargetPrev);
+                array.push(this.block.serializeBlock());
+
+            } catch (exception){
+                Log.error("Error saving block", Log.LOG_TYPE.POOLS, this.block !== null ? this.block.toJSON() : '');
+            }
         }
+
+        buffers.push( Serialization.serializeNumber1Byte( array.length > 0 ? 1 : 0 ));
+        for (let i=0; i<array.length; i++)
+            buffers.push(array[i]);
 
         return Buffer.concat( buffers );
     }
@@ -156,15 +171,28 @@ class PoolDataBlockInformation {
         offset += 1;
 
         if (hasBlock === 1){
+
             this.block = this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
 
-            let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
+            let height = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 4));
             offset += 4;
 
-            let difficultyTarget = BufferExtended.substr( buffer, offset, 32 ) ;
+            let difficultyTargetPrev = BufferExtended.substr(buffer, offset, 32);
             offset += 32;
 
-            offset = this.block.deserializeBlock(buffer, height, undefined, difficultyTarget,  offset );
+
+            try {
+
+                offset = this.block.deserializeBlock(buffer, height, undefined, undefined, offset);
+                this.block.difficultyTargetPrev = difficultyTargetPrev;
+
+            } catch (exception){
+
+                this.block = undefined;
+                Log.error("Error Deserializing block", Log.LOG_TYPE.POOLS);
+                offset = buffer.length;
+
+            }
         }
 
         return offset;

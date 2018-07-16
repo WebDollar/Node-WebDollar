@@ -294,35 +294,46 @@ class InterfaceBlockchainTransactionFrom {
 
         this.addresses = [];
 
-        let length = Serialization.deserializeNumber1Bytes(buffer, offset);
-        offset += 1;
 
-        for (let i = 0; i < length; i++) {
+        try {
 
-            let address = {};
+            let length = Serialization.deserializeNumber1Bytes(buffer, offset);
+            offset += 1;
 
-            if (this.transaction.version <= 0x01) {
-                address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
-                offset += consts.ADDRESSES.ADDRESS.LENGTH;
+
+            for (let i = 0; i < length; i++) {
+
+                let address = {};
+
+                if (this.transaction.version <= 0x01) {
+                    address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+                    offset += consts.ADDRESSES.ADDRESS.LENGTH;
+                }
+
+                address.publicKey = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
+                offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
+
+                address.signature = BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
+                offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
+
+                address.amount = Serialization.deserializeNumber7Bytes(buffer, offset);
+                offset += 7;
+
+                this.addresses.push(address);
             }
 
-            address.publicKey = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
-            offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
+            let currencyLength = Serialization.deserializeNumber1Bytes(buffer, offset,);
+            offset += 1;
 
-            address.signature = BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
-            offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;
+            this.currencyTokenId = BufferExtended.substr(buffer, offset, currencyLength);
+            offset += currencyLength;
 
-            address.amount = Serialization.deserializeNumber7Bytes(buffer, offset);
-            offset += 7;
+        } catch (exception){
 
-            this.addresses.push(address);
+            console.error("error deserializing a transaction FROM ", exception);
+            throw exception;
+
         }
-
-        let currencyLength = Serialization.deserializeNumber1Bytes(buffer, offset,);
-        offset += 1;
-
-        this.currencyTokenId = BufferExtended.substr(buffer, offset, currencyLength);
-        offset += currencyLength;
 
         return offset;
 

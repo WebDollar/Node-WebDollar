@@ -317,6 +317,15 @@ class Blockchain{
         return (this.PoolManagement !== undefined && this.PoolManagement._poolStarted) || (this.ServerPoolManagement !== undefined && this.ServerPoolManagement._serverPoolStarted);
     }
 
+    get versionCompatibility() {
+
+        if (consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE !== '' && this.blockchain.blocks.length > consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT)
+            return consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE;
+        else
+            return consts.SETTINGS.NODE.VERSION_COMPATIBILITY;
+    }
+
+
 }
 
 export default new Blockchain()

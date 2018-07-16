@@ -1,4 +1,5 @@
 import Blockchain from "main-blockchain/Blockchain";
+import Log from 'common/utils/logging/Log';
 
 const BigNumber = require ('bignumber.js');
 
@@ -17,17 +18,24 @@ class PoolPayouts{
         this.poolData = poolData;
 
         this.blockchain = blockchain;
-
         this._payoutInProgress = false;
 
-        StatusEvents.on("blockchain/blocks-count-changed",async (data)=>{
+        StatusEvents.on("blockchain/blocks-count-changed", async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
+            if (!Blockchain.loaded) return;
 
+            Log.info("Next Payout in " + ( PAYOUT_INTERVAL - (this.blockchain.blocks.length % PAYOUT_INTERVAL))+"  blocks", Log.LOG_TYPE.POOLS );
 
-            if (this.blockchain.blocks.length % PAYOUT_INTERVAL === 0) {
+            let blocksConfirmed = [];
+            for (let i=0; i<this.poolData.blocksInfo.length; i++)
+                if (this.poolData.blocksInfo[i].confirmed && !this.poolData.blocksInfo[i].payout)
+                    blocksConfirmed.push(this.poolData.blocksInfo[i]);
+
+            Log.info("Next Payout - Blocks confirmed: " + blocksConfirmed.length, Log.LOG_TYPE.POOLS );
+
+            if (this.blockchain.blocks.length % PAYOUT_INTERVAL === 0)
                 await this.doPayout();
-            }
 
 
         });
@@ -43,30 +51,37 @@ class PoolPayouts{
         this._payoutInProgress = true;
         await this._doPayout();
         this._payoutInProgress = false;
+
     }
 
     async _doPayout(){
 
         if (!Blockchain.synchronized) return;
 
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------PAYOUT------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+        Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
+
         let blocksConfirmed = [];
         for (let i=0; i<this.poolData.blocksInfo.length; i++)
             if (this.poolData.blocksInfo[i].confirmed && !this.poolData.blocksInfo[i].payout)
                 blocksConfirmed.push(this.poolData.blocksInfo[i]);
 
+        console.info("Payout: Blocks confirmed: ", blocksConfirmed.length);
+
 
         if (blocksConfirmed.length === 0){
-            console.warn("No payouts, because no blocks were confirmed");
+            console.warn("Payout: No payouts, because no blocks were confirmed");
             return false;
         }
 
         try{
-
-            console.info("--------------------------------------------------");
-            console.info("--------------------------------------------------");
-            console.info("--------------------PAYOUT------------------------");
-            console.info("--------------------------------------------------");
-            console.info("--------------------------------------------------");
 
             this.poolData.miners.forEach((miner)=>{
 
@@ -75,6 +90,8 @@ class PoolPayouts{
             });
 
             this._toAddresses = [];
+
+            Log.info("Payout: Initialized ", Log.LOG_TYPE.POOLS);
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
@@ -127,6 +144,8 @@ class PoolPayouts{
 
             }
 
+            Log.info("Payout: Blocks Confirmed Processed", Log.LOG_TYPE.POOLS);
+
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
@@ -134,6 +153,8 @@ class PoolPayouts{
                     this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther +miner.rewardConfirmedOther ;
 
             });
+
+            Log.info("Payout: Adding rewardConfirmedOther", Log.LOG_TYPE.POOLS);
 
             //verify to send to other
 
@@ -148,12 +169,17 @@ class PoolPayouts{
 
                 let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
-                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
-                if (!transaction.result) throw {message: "Transaction was not made"};
+                try {
+                    let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
+                    if (!transaction.result) throw {message: "Transaction was not made"};
+                } catch (exception){
+                    Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);
+                }
 
                 index++;
             }
 
+            Log.info("Payout: Transaction Created", Log.LOG_TYPE.POOLS);
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
@@ -193,10 +219,11 @@ class PoolPayouts{
             }
 
 
+            let total = 0;
             for (let i=0; i<this._toAddresses.length; i++){
 
                 let miner = this.poolData.findMiner( this._toAddresses[i].address );
-                if (miner === null) console.error("ERROR! Miner was not found at the payout");
+                if (miner === null) Log.error("ERROR! Miner was not found at the payout", Log.LOG_TYPE.POOLS);
 
                 miner.rewardSent += this._toAddresses[i].amount; //i paid totally
                 miner.rewardConfirmed = 0; //paid this
@@ -204,12 +231,19 @@ class PoolPayouts{
 
                 miner.__tempRewardConfirmedOther = 0; //paid this
 
+                total += this._toAddresses[i].amount;
+
             }
+
+            Log.info("Payout Total Paid "+total, Log.LOG_TYPE.POOLS)
 
 
         } catch (exception){
 
-            console.error("Pool Payouts raised an error", exception);
+            Log.error("----------------------------------------", Log.LOG_TYPE.POOLS);
+            Log.error("Pool Payouts raised an error", Log.LOG_TYPE.POOLS, exception);
+            Log.error("----------------------------------------", Log.LOG_TYPE.POOLS);
+
             return false;
 
         }

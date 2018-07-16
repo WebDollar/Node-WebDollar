@@ -133,25 +133,35 @@ class InterfaceBlockchainTransactionTo{
 
     deserializeTo(buffer, offset){
 
-        this.addresses = [];
+        try{
 
-        let length = Serialization.deserializeNumber1Bytes( buffer, offset );
-        offset += 1;
+            this.addresses = [];
 
-        for (let i = 0; i < length; i++){
+            let length = Serialization.deserializeNumber1Bytes( buffer, offset );
+            offset += 1;
 
-            let address = {};
+            for (let i = 0; i < length; i++){
 
-            address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
-            offset += consts.ADDRESSES.ADDRESS.LENGTH;
+                let address = {};
 
-            address.amount = Serialization.deserializeNumber7Bytes(buffer, offset);
-            offset += 7;
+                address.unencodedAddress = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
+                offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
-            this.addresses.push(address);
+                address.amount = Serialization.deserializeNumber7Bytes(buffer, offset);
+                offset += 7;
+
+                this.addresses.push(address);
+            }
+
+            return offset;
+
+        } catch (exception){
+
+            console.error("error deserializing a transaction TO ", exception);
+            throw exception;
+
         }
 
-        return offset;
     }
 
     processTransactionTo(multiplicationFactor = 1, revertActions){

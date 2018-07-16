@@ -37,6 +37,7 @@ consts.BLOCKCHAIN = {
         SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
 
         SAFETY_LAST_ACCOUNTANT_TREES: 50, //overwrite below
+        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 150, //overwrite below
 
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
@@ -51,6 +52,8 @@ consts.BLOCKCHAIN = {
         TRANSACTIONS_OPTIMIZATION: 153060,
         DIFFICULTY_TIME_BIGGER: 153060,
         WALLET_RECOVERY: 153060,
+
+        DIFFICULTY_REMOVED_CONDITION: 163000,
 
     }
 
@@ -233,8 +236,12 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.140.3",
+        VERSION: "1.150.0",
         VERSION_COMPATIBILITY: "1.140.0",
+
+        VERSION_COMPATIBILITY_UPDATE: "1.150.0",
+        VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION,
+
         PROTOCOL: "WebDollar",
         SSL: true,
 
@@ -243,7 +250,7 @@ consts.SETTINGS = {
 
     PARAMS: {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
-        STATUS_INTERVAL: 20 * 1000,                      //miliseconds
+        STATUS_INTERVAL: 40 * 1000,                      //miliseconds
 
         WAITLIST: {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
@@ -364,8 +371,8 @@ if (process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL !== undefined)
 
 if ( consts.DEBUG === true ){
 
-    consts.SETTINGS.NODE.VERSION += "3";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY += "3";
+    consts.SETTINGS.NODE.VERSION = "3"+consts.SETTINGS.NODE.VERSION;
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "3"+consts.SETTINGS.NODE.VERSION_COMPATIBILITY;
     //consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
@@ -377,13 +384,9 @@ if ( consts.DEBUG === true ){
         "addr": ["http://webdollar.ddns.net:9095"],
     }];
 
+
 }
 
-consts.LOG_INSTANCE = {
-    DEFAULT: 0,
-    POOLS: 1,
-    BLOCKCHAIN: 2,
-    CLI_MENU: 3,
-};
+
 
 export default consts

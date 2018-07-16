@@ -16,11 +16,13 @@ class NodeAPICallbacks{
 
     addressBalancesSubscribe(req, res, callback, nodeApiType){
 
+        let address;
+
         try {
 
             if (typeof req.address !== "string")  throw {message: "address is invalid"};
 
-            let address = req.address;
+            address = req.address;
 
             //subscribe to transactions changes
             let data = Blockchain.Balances.subscribeBalancesChanges(address, (data)=>{
@@ -66,11 +68,12 @@ class NodeAPICallbacks{
 
     addressTransactionsSubscribe(req, res, callback, nodeApiType){
 
+        let address;
 
         try{
 
             if (typeof req.address !== "string")  throw {message: "address is invalid"};
-            let address = req.address;
+            address = req.address;
 
             //subscribe to transactions changes
             let data = Blockchain.Transactions.subscribeTransactionsChanges(address, (data)=>{

@@ -43,8 +43,8 @@ class NodeProtocol {
         }
 
 
-        if (response.version < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
-            console.log("hello received, VERSION is not right", response.version, consts.SETTINGS.NODE.VERSION_COMPATIBILITY);
+        if (response.version < Blockchain.versionCompatibility){
+            console.log("hello received, VERSION is not right", response.version, Blockchain.versionCompatibility);
             return false;
         }
 

@@ -104,14 +104,14 @@ class PoolStatistics{
 
     async _save(){
 
-        Log.info('Saving pool statistics...', consts.LOG_INSTANCE.POOLS);
+        Log.info('Saving pool statistics...', Log.LOG_TYPE.POOLS);
         await this._db.save("serverPool_statistics_confirmedAndPaid", this.poolBlocksConfirmedAndPaid )
 
     }
 
     async _load(){
 
-        Log.info('Loading pool statistics...', consts.LOG_INSTANCE.POOLS);
+        Log.info('Loading pool statistics...', Log.LOG_TYPE.POOLS);
         let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000, true);
 
         if (typeof confirmedAndPaid === "number") {
@@ -125,7 +125,7 @@ class PoolStatistics{
 
     async _clear(){
 
-        Log.info('Clearing pool statistics...', consts.LOG_INSTANCE.POOLS);
+        Log.info('Clearing pool statistics...', Log.LOG_TYPE.POOLS);
         try {
             return (await this._db.remove("serverPool_statistics_confirmedAndPaid"));
         }

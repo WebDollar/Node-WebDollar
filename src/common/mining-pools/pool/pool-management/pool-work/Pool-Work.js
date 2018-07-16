@@ -33,16 +33,16 @@ class PoolWork {
 
     getNextBlockForWork(){
 
+        if (!Blockchain.synchronized)
+            throw {message: "Blockchain is not yet synchronized"};
+
         //still pending
         if (this.lastBlockPromise !== undefined && this.lastBlockPromise.isPending() )
             return this.lastBlockPromise;
 
         //new work
 
-        if (!Blockchain.synchronized)
-            throw {message: "Blockchain is not yet synchronized"};
-
-        this.lastBlockPromise = Utils.MakeQuerablePromise( new Promise( async (resolve)=>{
+        this.lastBlockPromise = Utils.makeQuerablePromise( new Promise( async (resolve)=>{
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlockNonce = 0;
@@ -100,8 +100,10 @@ class PoolWork {
                 if (this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp) > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK*1000)) {
 
                     for (let key in this._blocksList[i].instances)
-                        if (this._blocksList[i].instances.hasOwnProperty(key))
+                        if (this._blocksList[i].instances.hasOwnProperty(key)) {
                             this._blocksList[i].instances[key].workBlock = undefined;
+
+                        }
 
                     if (this._blocksList[i].block !== undefined)
                         this._blocksList[i].block.destroyBlock();

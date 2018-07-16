@@ -7,6 +7,7 @@ import PoolStatistics from "./pool-statistics/Pool-Statistics";
 import StatusEvents from "common/events/Status-Events";
 import Blockchain from "main-blockchain/Blockchain";
 import PoolRewardsManagement from "./pool-work/rewards/Pool-Rewards-Management";
+import PoolRemainingRewards from "./pool-work/rewards/Payout/Pool-Process-Remaining-Payment"
 /*
  * Miners earn shares until the pool finds a block (the end of the mining round).
  * After that each user gets reward R = B * n / N,
@@ -28,6 +29,7 @@ class PoolManagement{
         this.poolStatistics = new PoolStatistics( this );
 
         this.poolRewardsManagement = new PoolRewardsManagement(this, this.poolData, blockchain);
+        this.poolRemainingRewards = new PoolRemainingRewards(this, this.poolData, blockchain);
 
         this._poolInitialized = false;
         this._poolOpened = false;
@@ -51,6 +53,7 @@ class PoolManagement{
                 throw {message: "Pool Couldn't be started"};
 
             answer = await this.poolStatistics.initializePoolStatistics();
+
         } catch (exception){
             console.error("initializePoolManagement raised an error", exception);
         }
@@ -151,6 +154,7 @@ class PoolManagement{
 
             }
             else {
+
                 await this.poolProtocol._stopPoolProtocol();
                 this.poolWorkManagement.poolWork.stopGarbageCollector();
                 this.poolStatistics.clearInterval();
@@ -158,9 +162,10 @@ class PoolManagement{
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
 
                 this.poolData.connectedMinerInstances.stopPoolDataConnectedMinerInstances();
+
             }
 
-            StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" });
+            StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" } );
 
         }
     }

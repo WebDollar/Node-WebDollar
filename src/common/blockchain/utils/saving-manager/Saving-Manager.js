@@ -1,6 +1,9 @@
 import global from "consts/global"
+import consts from 'consts/const_global'
+import Blockchain from "main-blockchain/Blockchain";
+import Log from 'common/utils/logging/Log';
 
-const SAVING_MANAGER_INTERVAL = 4000;
+const SAVING_MANAGER_INTERVAL = 3000;
 
 class SavingManager{
 
@@ -9,8 +12,20 @@ class SavingManager{
         this.blockchain = blockchain;
 
         this._pendingBlocksList = {};
+        this._pendingAccountantTrees = {};
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
+
+    }
+
+    _addAccountantTreeToSave(block, height){
+
+        if (height % 100 === 0) {
+
+            Log.info('Accountant Tree Saved Pending', Log.LOG_TYPE.SAVING_MANAGER);
+            this._pendingAccountantTrees[height] = this.blockchain.lightAccountantTreeSerializations[height + 1 - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1];
+
+        }
 
     }
 
@@ -28,21 +43,26 @@ class SavingManager{
                 block: block,
             }];
 
-            return true;
+        } else {
+
+
+            for (let i=0; i<this._pendingBlocksList[height].length; i++)
+                if (!this._pendingBlocksList[height][i].saving){       //not saved
+                    this._pendingBlocksList[height][i].saving = false;
+                    this._pendingBlocksList[height][i].block = block;
+                    return true;
+                }
+
+            this._pendingBlocksList[height].push({
+                saving: false,
+                block: block,
+            });
+
         }
 
 
-        for (let i=0; i<this._pendingBlocksList[height].length; i++)
-            if (!this._pendingBlocksList[height][i].saving){       //not saved
-                this._pendingBlocksList[height][i].saving = false;
-                this._pendingBlocksList[height][i].block = block;
-                return true;
-            }
 
-        this._pendingBlocksList[height].push({
-            saving: false,
-            block: block,
-        });
+        this._addAccountantTreeToSave(block, height);
 
     }
 
@@ -84,7 +104,15 @@ class SavingManager{
                     await this.blockchain.saveNewBlock(block.block);
 
                 } catch (exception){
-                    console.error("Saving raised an error: ", exception);
+
+                    Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);
+
+                }
+
+                //saving Accountant Tree
+                if (this._pendingAccountantTrees[block.block.height] !== undefined) {
+                    await this.blockchain.saveAccountantTree(this._pendingAccountantTrees[block.block.height], block.block.height + 1);
+                    delete this._pendingAccountantTrees[block.block.height];
                 }
 
                 block.saving = false;
@@ -129,7 +157,8 @@ class SavingManager{
             answer = await this._saveNextBlock();
 
             if (answer !== null && answer % 100 === 0) {
-                console.log("Saving successfully", answer);
+
+                Log.info("Saving successfully", Log.LOG_TYPE.SAVING_MANAGER, answer);
                 await this.blockchain.sleep(10);
             }
 

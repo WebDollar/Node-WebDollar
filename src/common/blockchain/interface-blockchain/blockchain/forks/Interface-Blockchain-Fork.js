@@ -64,6 +64,7 @@ class InterfaceBlockchainFork {
         if (!Array.isArray(sockets))
             sockets = [sockets];
 
+        this.socketsFirst = sockets[0];
         this.sockets = sockets;
 
         this.forkReady = false;
@@ -338,10 +339,12 @@ class InterfaceBlockchainFork {
                     if (process.env.BROWSER || this.downloadAllBlocks) this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
 
                     if (! (await this.saveIncludeBlock(index, revertActions)) )
-                        throw({message: "fork couldn't be included in main Blockchain ", index: index});
+                        throw( { message: "fork couldn't be included in main Blockchain ", index: index });
 
                     if ( !process.env.BROWSER )
                         await this.sleep( this.downloadAllBlocks ? 10 : 30 );
+
+                    this.forkBlocks[index].socketPropagatedBy = this.socketsFirst;
 
                 }
 
@@ -649,6 +652,20 @@ class InterfaceBlockchainFork {
                 return;
 
         this.forkHeaders.push(hash);
+
+    }
+
+
+    toJSON(){
+
+        return {
+            forkReady: this.forkReady,
+            forkStartingHeightDownloading: this.forkStartingHeightDownloading,
+            forkChainStartingPoint: this.forkChainStartingPoint,
+            forkChainLength: this.forkChainLength,
+            forkBlocks: this.forkBlocks.length,
+            forkHeaders: this.forkHeaders,
+        }
 
     }
 

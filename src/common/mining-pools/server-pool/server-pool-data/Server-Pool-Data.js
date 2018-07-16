@@ -153,7 +153,7 @@ class ServerPoolData {
         }
         catch (exception){
 
-            console.log('ERROR saving pools in DB: ',  exception);
+            Log.log('ERROR saving pools in DB: ',  exception);
             return false;
         }
     }
