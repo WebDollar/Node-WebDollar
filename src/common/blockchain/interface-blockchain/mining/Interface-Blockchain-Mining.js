@@ -89,7 +89,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     /**
      * mine next block
      */
-    async mineNextBlock(showMiningOutput, suspend, start, end){
+    async mineNextBlock(showMiningOutput, suspend){
 
         while (this.started && !global.TERMINATED){
 
@@ -127,11 +127,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     nextBlock._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
                 }
 
-                if (start === undefined) //avoid mining the same nonces on every machine that is mining the same address
-                    start = Math.floor( Math.random() * 3700000000 );
-
-                if (end === undefined)
-                    end = 0xFFFFFFFF;
+                //avoid mining the same nonces on every machine that is mining the same address
+                let start = Math.floor( Math.random() * 3700000000 );
+                let end = 0xFFFFFFFF;
 
                 await this.mineBlock(nextBlock, difficulty, start, end);
 

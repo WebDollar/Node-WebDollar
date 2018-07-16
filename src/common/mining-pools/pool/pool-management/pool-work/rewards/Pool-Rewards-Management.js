@@ -12,7 +12,9 @@ const MAXIMUM_FAIL_CONFIRMATIONS = 20; //blocks
 
 const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : 10;
 
-const REQUIRE_OTHER_CONFIRMATIONS = consts.DEBUG ? false : true;
+const CONFIRMATIONS_REQUIRE_OTHER_MINERS = consts.DEBUG ? false : true;
+
+const CONFIRMATION_METHOD = 2; //1 is not working properly
 
 import Blockchain from 'main-blockchain/Blockchain';
 
@@ -56,31 +58,38 @@ class PoolRewardsManagement{
 
         let confirmations = {};
 
-        let firstBlock;
-        for (let i=0; i < this.poolData.blocksInfo.length; i++)
-            if ( this.poolData.blocksInfo[ i ].block !== undefined )
-                if ( firstBlock === undefined || this.poolData.blocksInfo[i].block.height < firstBlock)
-                    firstBlock = this.poolData.blocksInfo[ i ].block.height;
+        //calcualte confirmations
 
-        for (let i = this.blockchain.blocks.length-1, n = Math.max( this.blockchain.blocks.blocksStartingPoint, firstBlock ); i>= n; i-- ) {
+        if (CONFIRMATION_METHOD === 1)
+            try {
+                let firstBlock;
+                for (let i = 0; i < this.poolData.blocksInfo.length; i++)
+                    if (this.poolData.blocksInfo[i].block !== undefined)
+                        if (firstBlock === undefined || this.poolData.blocksInfo[i].block.height < firstBlock)
+                            firstBlock = this.poolData.blocksInfo[i].block.height;
 
-            if ( this.blockchain.mining.unencodedMinerAddress.equals( this.blockchain.blocks[i].data.minerAddress ))
-                confirmationsPool++;
-            else {
-                if (uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] === undefined){
-                    uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] = true;
-                    confirmationsOthersUnique++;
-                } else
-                    confirmationsOthers++;
+                for (let i = this.blockchain.blocks.length - 1, n = Math.max(this.blockchain.blocks.blocksStartingPoint, firstBlock); i >= n; i--) {
+
+                    if (this.blockchain.mining.unencodedMinerAddress.equals(this.blockchain.blocks[i].data.minerAddress))
+                        confirmationsPool++;
+                    else {
+                        if (uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] === undefined) {
+                            uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] = true;
+                            confirmationsOthersUnique++;
+                        } else
+                            confirmationsOthers++;
+                    }
+
+                    confirmations[i] = {
+                        confirmationsPool: confirmationsPool,
+                        confirmationsOthers: confirmationsOthers,
+                        confirmationsOthersUnique: confirmationsOthersUnique,
+                    }
+
+                }
+            } catch (exception){
+
             }
-
-            confirmations[i] = {
-                confirmationsPool: confirmationsPool,
-                confirmationsOthers: confirmationsOthers,
-                confirmationsOthersUnique: confirmationsOthersUnique,
-            }
-
-        }
 
         //recalculate the confirmations
         for (let i = this.poolData.blocksInfo.length-1; i >= 0; i--  ){
@@ -131,8 +140,17 @@ class PoolRewardsManagement{
 
                     found = true;
 
-                    let confirmation = confirmations[ blockInfo.height ];
-                    this.poolData.blocksInfo[i].confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers/2 + Math.min(confirmation.confirmationsPool/4, REQUIRE_OTHER_CONFIRMATIONS ? 2 : 10000);
+                    if (CONFIRMATION_METHOD === 1) {
+                        //Method 1
+                        //using confirmations as a confirmation system
+                        let confirmation = confirmations[blockInfo.height];
+                        this.poolData.blocksInfo[i].confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers / 2 + Math.min(confirmation.confirmationsPool / 4, CONFIRMATIONS_REQUIRE_OTHER_MINERS ? 2 : 10000);
+                    } else if (CONFIRMATION_METHOD === 2){
+
+                        this.poolData.blocksInfo[i].confirmations = (this.blockchain.blocks.length - blockInfo.height) / 2;
+
+                    }
+
 
                 } else{
                     
