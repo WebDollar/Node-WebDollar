@@ -64,8 +64,12 @@ class PPoWBlockchainProofBasic{
                 list.push(this.blocks[i].getBlockHeader())
             } catch (exception){
 
-                console.error("Failed to retrieve block " , i);
-                console.error("Failed to retrieve block " , this.blocks[i] !== null ? this.blocks[i].toJSON() : 'block is null');
+                console.error("Failed to retrieve block " , i, exception );
+                try {
+                    console.error("Failed to retrieve block ", this.blocks[i] !== null ? this.blocks[i].toJSON() : 'block is null');
+                } catch (exception){
+
+                }
 
             }
         }

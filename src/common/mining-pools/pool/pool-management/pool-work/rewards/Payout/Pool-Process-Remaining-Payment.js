@@ -139,7 +139,7 @@ class PoolRewardsManagement{
                 let miner = this.poolData.findMiner( this._toAddresses[i].address );
                 miner.rewardConfirmedOther += Math.max(0, this._toAddresses[i].amount);
 
-                delete this._toAddresses[i];
+                this._toAddresses.splice(i, 1);
             }
 
         }
