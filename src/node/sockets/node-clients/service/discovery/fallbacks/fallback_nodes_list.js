@@ -35,14 +35,15 @@ export default {
         {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic*/
-        // {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
-        // {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
-        //
+
+        {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
+        {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
+
         // // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
-        // {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
-        // {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
-        // {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
-        // {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
+        {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
+        {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
+        {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
+        {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
         // {"addr": ["https://wd1.hoste.ro:51261"]}, // Thanks to @morion4000
         // {"addr": ["https://wd1.hoste.ro:60260"]}, // Thanks to @morion4000
         // {"addr": ["https://wd1.hoste.ro:61099"]}, // Thanks to @morion4000
