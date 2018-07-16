@@ -5,40 +5,41 @@ export default {
 
     "nodes": [
 
-    /*    //---------------------------------------------------------
+        //---------------------------------------------------------
         //--------------Community FallBack Nodes-------------------
         //---------------------------------------------------------
 
-        //{"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
-        //{"addr": ["https://amsterdam.wdpool.io:443"]},
-        //{"addr": ["https://strasbourg.wdpool.io:443"]},
-        //{"addr": ["https://paris.wdpool.io:443"]},
-        {"addr": ["https://webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
-        {"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
-        {"addr": ["https://webdollar.csland.ro:8442"]}, // Thanks to @mariotheodor
-        {"addr": ["https://webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
-        {"addr": ["https://wb.ciuc.ro:443"]}, // Thanks to Adi Clar
-        {"addr": ["https://nodecstl.ddns.net:80"]},
+        // //{"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
+        // //{"addr": ["https://amsterdam.wdpool.io:443"]},
+        // //{"addr": ["https://strasbourg.wdpool.io:443"]},
+        // //{"addr": ["https://paris.wdpool.io:443"]},
+        // {"addr": ["https://webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
+        // {"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
+        // {"addr": ["https://webdollar.csland.ro:8442"]}, // Thanks to @mariotheodor
+        // {"addr": ["https://webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
+        // {"addr": ["https://wb.ciuc.ro:443"]}, // Thanks to Adi Clar
+        // {"addr": ["https://nodecstl.ddns.net:80"]},
         {"addr": ["https://webd.5q.ro:3333"]},
-        {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
+        // {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
 
         // {"addr": ["https://titan.serg.at:80/"]}, // Thanks to @SergiuWX
         // {"addr": ["https://titan.serg.at:8080/"]}, // Thanks to @SergiuWX
         // {"addr": ["https://titan.serg.at:8081/"]}, // Thanks to @SergiuWX
         // {"addr": ["https://titan.serg.at:8082/"]}, // Thanks to @SergiuWX
-        {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node4.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node5.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node6.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus*/
 
-        {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic
-        {"addr": ["https://pool2.webd.club:80/"]}, // Thanks to @ermethic
-        {"addr": ["https://pool3.webd.club:80/"]}, // Thanks to @ermethic
-        {"addr": ["https://pool4.webd.club:80/"]}, // Thanks to @ermethic
+        // {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
+        // {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
+        // {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
+        // {"addr": ["https://node4.petreus.ro:443"]}, // Thanks to Dani Petreus
+        // {"addr": ["https://node5.petreus.ro:443"]}, // Thanks to Dani Petreus
+        // {"addr": ["https://node6.petreus.ro:443"]}, // Thanks to Dani Petreus
+        // {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
+        // {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
+
+        // {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic
+        // {"addr": ["https://pool2.webd.club:80/"]}, // Thanks to @ermethic
+         {"addr": ["https://pool3.webd.club:80/"]}, // Thanks to @ermethic
+        // {"addr": ["https://pool4.webd.club:80/"]}, // Thanks to @ermethic
 
         {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
@@ -115,10 +116,10 @@ export default {
         {"addr": ["https://webdollar-vps4.zapto.org:8084"]},
 
 
-        // {"addr": ["https://chucknorris.webdollarvpn.io:8084"]}, // Thanks to @cbusuioceanu
-        // {"addr": ["https://chucknorris.webdollarvpn.io:8085"]}, // Thanks to @cbusuioceanu
-        // {"addr": ["https://chucknorris.webdollarvpn.io:8086"]}, // Thanks to @cbusuioceanu
-        // {"addr": ["https://chucknorris.webdollarvpn.io:8087"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://chucknorris.webdollarvpn.io:8084"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://chucknorris.webdollarvpn.io:8085"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://chucknorris.webdollarvpn.io:8086"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://chucknorris.webdollarvpn.io:8087"]}, // Thanks to @cbusuioceanu
 
     ]
 }
