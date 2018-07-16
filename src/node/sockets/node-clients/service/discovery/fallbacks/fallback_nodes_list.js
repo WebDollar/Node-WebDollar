@@ -33,8 +33,12 @@ export default {
         {"addr": ["https://node5.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node6.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic*/
+        {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus*/
+
+        {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic
+        {"addr": ["https://pool2.webd.club:80/"]}, // Thanks to @ermethic
+        {"addr": ["https://pool3.webd.club:80/"]}, // Thanks to @ermethic
+        {"addr": ["https://pool4.webd.club:80/"]}, // Thanks to @ermethic
 
         {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet

@@ -119,25 +119,27 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
             if (this.lastTimeChecked !== undefined ){
 
+                let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
+                let shouldItStart = false;
+                if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
+                    NodesList.nodes.length >= NodesWaitlistConnecting.connectingMaximum.minimum_fallbacks + NodesWaitlistConnecting.connectingMaximum.minimum_waitlist) {
+                    shouldItStart = true;
+                }
+
+                let difference = Math.max(0, Math.floor( ( 1*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 ));
+
                 if (Math.random() < 0.1){
 
                     Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
-                    Log.warn("Synchronization probably starts in: " + Math.floor( ( 1*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 ) + ' seconds ', Log.LOG_TYPE.BLOCKCHAIN);
+                    Log.warn(shouldItStart ? ("Synchronization probably starts in: " + difference + ' seconds ') : 'Synchronizing', Log.LOG_TYPE.BLOCKCHAIN);
                     Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
 
                 }
 
-                if ( new Date().getTime() -  this.lastTimeChecked.date > 3*60*1000 ){
+                if ( difference <= 0) {
 
-                    let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
-
-                    if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
-                          NodesList.nodes.length >= NodesWaitlistConnecting.connectingMaximum.minimum_fallbacks + NodesWaitlistConnecting.connectingMaximum.minimum_waitlist) {
-
+                    if (shouldItStart)
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
-
-                    }
-
 
                 } else set = false;
 
