@@ -118,7 +118,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
             if (this.lastTimeChecked !== undefined ){
 
-                if (Math.random() < 0.1) console.log("Diff Time for syncing", (new Date().getTime() -  this.lastTimeChecked.date)/1000 );
+                if (Math.random() < 0.1) console.log("Synchronization probably starts in: ", ( 3*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 );
 
                 if ( new Date().getTime() -  this.lastTimeChecked.date > 3*60*1000 ){
 
