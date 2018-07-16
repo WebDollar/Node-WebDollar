@@ -28,11 +28,14 @@ class InterfaceBlockchainBlock {
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
-        if ( timeStamp === undefined ) {
-            this.timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+        if ( timeStamp === undefined  || timeStamp === null) {
 
-            if (this.timeStamp === undefined)
-                this.timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
+            timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+
+            if (timeStamp === undefined || timeStamp === null)
+                timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
+
+            timeStamp += Math.floor( Math.random()*5  * (Math.random() < 0.5 ?  -1 : 1  ));
 
         }
 
@@ -84,7 +87,6 @@ class InterfaceBlockchainBlock {
             this.blockValidation.destroyBlockValidation();
 
         this.blockValidation = undefined;
-
     }
 
     async _supplementaryValidation() {
@@ -124,7 +126,6 @@ class InterfaceBlockchainBlock {
             throw {message: "supplementaryValidation failed"};
 
         return true;
-
     }
 
     /**
@@ -136,13 +137,11 @@ class InterfaceBlockchainBlock {
 
             //validate hashPrev
             let previousHash = this.blockValidation.getHashPrevCallback(this.height);
-
             if ( previousHash === null || !Buffer.isBuffer(previousHash))
                 throw {message: 'previous hash is not given'};
 
             if (! BufferExtended.safeCompare(previousHash, this.hashPrev))
                 throw {message: "block prevHash doesn't match ", prevHash: previousHash.toString("hex"), hashPrev: this.hashPrev.toString("hex")};
-
         }
 
         //validate hash
@@ -261,19 +260,25 @@ class InterfaceBlockchainBlock {
      */
     async computeHash(newNonce){
 
-        // hash is hashPow ( block header + nonce )
-        if (this.computedBlockPrefix === null )
-            return this._computeBlockHeaderPrefix();
+        try {
 
-        let buffer = Buffer.concat ( [
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
-            Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
-            this.computedBlockPrefix,
-            Serialization.serializeNumber4Bytes(newNonce || this.nonce),
-        ] );
+            // hash is hashPow ( block header + nonce )
+            if (this.computedBlockPrefix === null)
+                return this._computeBlockHeaderPrefix();
 
-        return  await WebDollarCrypto.hashPOW(buffer);
+            let buffer = Buffer.concat([
+                Serialization.serializeBufferRemovingLeadingZeros(Serialization.serializeNumber4Bytes(this.height)),
+                Serialization.serializeBufferRemovingLeadingZeros(this.difficultyTargetPrev),
+                this.computedBlockPrefix,
+                Serialization.serializeNumber4Bytes(newNonce || this.nonce),
+            ]);
 
+            return await WebDollarCrypto.hashPOW(buffer);
+
+        } catch (exception){
+            console.error("Error computeHash", exception);
+            return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
+        }
     }
 
     /**

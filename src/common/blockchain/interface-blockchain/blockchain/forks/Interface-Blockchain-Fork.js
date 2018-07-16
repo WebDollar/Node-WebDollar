@@ -8,6 +8,7 @@ import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-
 import consts from 'consts/const_global'
 import MiniBlockchainAccountantTree from "../../../mini-blockchain/state/Mini-Blockchain-Accountant-Tree";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
+import Blockchain from "main-blockchain/Blockchain"
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -390,7 +391,10 @@ class InterfaceBlockchainFork {
 
             this.postFork(forkedSuccessfully);
 
-            if (this.downloadAllBlocks) await this.sleep(30);
+            if (this.downloadAllBlocks){
+                await this.sleep(30);
+                Blockchain.synchronizeBlockchain();
+            }
 
             if (forkedSuccessfully) {
                 this.blockchain.mining.resetMining();

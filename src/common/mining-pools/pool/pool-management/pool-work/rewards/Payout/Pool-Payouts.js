@@ -27,10 +27,7 @@ class PoolPayouts{
 
             Log.info("Next Payout in " + ( PAYOUT_INTERVAL - (this.blockchain.blocks.length % PAYOUT_INTERVAL))+"  blocks", Log.LOG_TYPE.POOLS );
 
-            let blocksConfirmed = [];
-            for (let i=0; i<this.poolData.blocksInfo.length; i++)
-                if (this.poolData.blocksInfo[i].confirmed && !this.poolData.blocksInfo[i].payout)
-                    blocksConfirmed.push(this.poolData.blocksInfo[i]);
+            let blocksConfirmed = this.poolData.confirmedBlockInformations;
 
             Log.info("Next Payout - Blocks confirmed: " + blocksConfirmed.length, Log.LOG_TYPE.POOLS );
 

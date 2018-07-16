@@ -118,30 +118,25 @@ class InterfaceBlockchainProtocolForkSolver{
 
             fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [ forkLastBlockHash ], false );
 
-            //only for light node when there is a new proof
-            if ( currentBlockchainLength === forkChainLength && currentBlockchainLength  >= 1 && this.blockchain.agent.light && forkProof){
-                if (  this.blockchain.blocks.last.hash.equals( forkLastBlockHash ) ) {
-                    binarySearchResult = {
-                        position: currentBlockchainLength,
-                        header: forkLastBlockHash,
-                    };
-                }
-            }
+            //veify last n elements
+            const count = 6;
 
-            //optimization
-            //check if n-2 was ok, but I need at least 1 block
-            if ( currentBlockchainLength === forkChainLength-1 && currentBlockchainLength-2  >= 0 && binarySearchResult.position === -1 ){
+            if ( currentBlockchainLength >= count && ( forkChainLength >= currentBlockchainLength ||  (this.blockchain.agent.light && forkProof) )  )
+                for (let i = currentBlockchainLength-1; i >= currentBlockchainLength-1-count; i--){
 
-                let answer = await socket.node.sendRequestWaitOnce( "head/hash", currentBlockchainLength-1, currentBlockchainLength-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
-                if (answer === null || answer.hash === undefined) throw {message: "connection dropped headers-info", height: currentBlockchainLength-1 };
+                    if (i === currentBlockchainLength-1)
+                        answer = {hash: forkLastBlockHash};
+                    else {
+                        answer = await socket.node.sendRequestWaitOnce( "head/hash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                        if (answer === null || answer.hash === undefined)
+                            continue;
+                    }
 
-                if (  this.blockchain.blocks.last.hash.equals( answer.hash ) ) {
-                    binarySearchResult = {
-                        position: currentBlockchainLength,
-                        header: answer.hash,
-                    };
 
-                    forkFound = this.blockchain.forksAdministrator._findForkyByHeader(answer.hash);
+                    console.log("_forkSolver_checking", i, currentBlockchainLength);
+
+
+                    forkFound = this.blockchain.forksAdministrator._findForkyByHeader( answer.hash );
 
                     if (forkFound !== null && forkFound !== fork) {
                         if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
@@ -154,11 +149,26 @@ class InterfaceBlockchainProtocolForkSolver{
                         return {result: true, fork: forkFound};
                     }
 
-                    fork.pushHeader(binarySearchResult.header);
+
+
+                    if (this.blockchain.blocks[i].hash.equals(answer.hash)){
+
+                        binarySearchResult = {
+                            position: i,
+                            header: answer.hash,
+                        };
+
+                        fork.pushHeader(binarySearchResult.header);
+                        break;
+
+                    } else {
+
+                        fork.pushHeader(answer.hash);
+
+                    }
 
                 }
 
-            }
 
             // in case it was you solved previously && there is something in the blockchain
 
@@ -229,6 +239,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 console.log("fork is something new");
                 throw {message: "fork is something new", binarySearchResult:binarySearchResult, forkChainStartingPoint:forkChainStartingPoint, forkChainLength:forkChainLength} ;
             }
+
 
 
             return {result: true, fork:fork };

@@ -89,7 +89,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     /**
      * mine next block
      */
-    async mineNextBlock(showMiningOutput, suspend, start, end){
+    async mineNextBlock(showMiningOutput, suspend){
 
         while (this.started && !global.TERMINATED){
 
@@ -127,11 +127,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     nextBlock._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
                 }
 
-                if (start === undefined) //avoid mining the same nonces on every machine that is mining the same address
-                    start = Math.floor( Math.random() * 3700000000 );
-
-                if (end === undefined)
-                    end = 0xFFFFFFFF;
+                //avoid mining the same nonces on every machine that is mining the same address
+                let start = Math.floor( Math.random() * 3700000000 );
+                let end = 0xFFFFFFFF;
 
                 await this.mineBlock(nextBlock, difficulty, start, end);
 
@@ -252,36 +250,51 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         let nonce = start;
 
-        while (nonce <= end && this.started && !this.resetForced && !(this.reset && this.useResetConsensus)) {
+        if (start < 0 || end < 0 || start > end)
+            return {
+                result: false,
+                hash: new Buffer(consts.BLOCKCHAIN.BLOCKS_MAX_TARGET),
+                nonce: -1,
+            };
 
-            let hash = await this.calculateHash(nonce);
+        try {
 
-            if (hash.compare(this.bestHash) < 0){
+            while (nonce <= end && this.started && !this.resetForced && !(this.reset && this.useResetConsensus)) {
 
-                this.bestHash = hash;
-                this.bestHashNonce = nonce;
+                let hash = await this.calculateHash(nonce);
 
-                if (this.bestHash.compare(this.difficulty) <= 0) {
+                if (hash.compare(this.bestHash) < 0) {
 
-                    return {
-                        result: true,
-                        nonce: this.bestHashNonce,
-                        hash: this.bestHash,
-                    };
+                    this.bestHash = hash;
+                    this.bestHashNonce = nonce;
+
+                    if (this.bestHash.compare(this.difficulty) <= 0) {
+
+                        return {
+                            result: true,
+                            nonce: this.bestHashNonce,
+                            hash: this.bestHash,
+                        };
+
+                    }
 
                 }
 
+                nonce++;
+                this._hashesPerSecond++;
             }
 
-            nonce++;
-            this._hashesPerSecond++;
+
+        } catch (exception){
+            console.error("Error _mineNonces", "nonce", nonce, start, end );
         }
 
         return {
-            result:false,
+            result: false,
             hash: this.bestHash,
             nonce: this.bestHashNonce
         }
+
     }
 
     /**

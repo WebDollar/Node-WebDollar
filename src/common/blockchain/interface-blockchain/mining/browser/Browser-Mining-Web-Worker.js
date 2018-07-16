@@ -357,52 +357,63 @@ export default function (self) {
                 continue;
             }
 
-            WorkerChanged = false;
+            try{
 
-            nonceArray [3] = nonce & 0xff;
-            nonceArray [2] = nonce>>8 & 0xff;
-            nonceArray [1] = nonce>>16 & 0xff;
-            nonceArray [0] = nonce>>24 & 0xff;
+                WorkerChanged = false;
 
-            ARGON2_PARAM.pass.set(nonceArray, block.length);
+                nonceArray [3] = nonce & 0xff;
+                nonceArray [2] = nonce>>8 & 0xff;
+                nonceArray [1] = nonce>>16 & 0xff;
+                nonceArray [0] = nonce>>24 & 0xff;
 
-            let hash = await algorithm ();
+                ARGON2_PARAM.pass.set(nonceArray, block.length);
 
-            if (WorkerChanged) continue; //it was changed in the meanwhile
+                let hash = await algorithm ();
 
-            let change = false;
+                if (WorkerChanged) continue; //it was changed in the meanwhile
 
-            if (bestHash === undefined) change = true;
-            else
-                for (let i = 0, l = bestHash.length; i < l; i++)
-                    if (hash[i] < bestHash[i]) {
-                        change = true;
-                        break;
-                    }
-                    else if (hash[i] > bestHash[i])
-                        break;
+                let change = false;
 
-
-            if ( change ) {
-
-
-                bestHash = hash;
-                bestNonce = nonce;
-            }
-
-            nonce ++ ;
-
-            if (nonce % 3 === 0) {
-                self.postMessage({message: "worker nonce worked", nonce: nonce, nonceWork: nonce - noncePrevious});
-                noncePrevious = nonce;
-            }
-
-            if ( nonce === nonceEnd){
-
-                if (!jobTerminated ) //not terminated
-                    self.postMessage({message: "results", hash:bestHash, nonce: bestNonce });
+                if (bestHash === undefined) change = true;
                 else
-                    log("job terminated");
+                    for (let i = 0, l = bestHash.length; i < l; i++)
+                        if (hash[i] < bestHash[i]) {
+                            change = true;
+                            break;
+                        }
+                        else if (hash[i] > bestHash[i])
+                            break;
+
+
+                if ( change ) {
+                    bestHash = hash;
+                    bestNonce = nonce;
+                }
+
+            } catch (exception){
+
+            }
+
+            nonce++;
+
+            try {
+
+
+                if (nonce % 3 === 0) {
+                    self.postMessage({message: "worker nonce worked", nonce: nonce, nonceWork: nonce - noncePrevious});
+                    noncePrevious = nonce;
+                }
+
+                if (nonce === nonceEnd) {
+
+                    if (!jobTerminated) //not terminated
+                        self.postMessage({message: "results", hash: bestHash, nonce: bestNonce});
+                    else
+                        log("job terminated");
+
+                }
+
+            } catch (exception){
 
             }
 

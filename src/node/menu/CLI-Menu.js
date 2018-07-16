@@ -397,7 +397,7 @@ class CLI {
                     Blockchain.Mining.stopMining();
             });
 
-            await Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
+            Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
 
         }, undefined, undefined, false);
 
@@ -524,6 +524,9 @@ class CLI {
 
             if (typeof callbackAfterServerInitialization === "function")
                 await callbackAfterServerInitialization();
+
+            if (typeof afterSynchronizationCallback === "function")
+                await afterSynchronizationCallback();
 
         }
 

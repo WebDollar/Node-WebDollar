@@ -40,7 +40,7 @@ class PPoWBlockchainProvesCalculated{
         }
 
         //deleting old ones if they have a different level
-        if (this.allBlocks[block.height] !== undefined && this.allBlocks[block.height] !== level) {
+        if (this.allBlocks[block.height] !== undefined && this.allBlocks[block.height] === block && this.allBlocks[block.height] !== level) {
 
             let oldlevel = this.allBlocks[block.height];
             this.levelsLengths[oldlevel]--;
