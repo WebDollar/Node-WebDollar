@@ -140,21 +140,19 @@ class PoolRewardsManagement{
 
                     found = true;
 
+                    //Method 1
+                    //using confirmations as a confirmation system
                     if (CONFIRMATION_METHOD === 1) {
-                        //Method 1
-                        //using confirmations as a confirmation system
+
                         let confirmation = confirmations[blockInfo.height];
                         this.poolData.blocksInfo[i].confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers / 2 + Math.min(confirmation.confirmationsPool / 4, CONFIRMATIONS_REQUIRE_OTHER_MINERS ? 2 : 10000);
-                    } else if (CONFIRMATION_METHOD === 2){
-
+                    } else if (CONFIRMATION_METHOD === 2)
                         this.poolData.blocksInfo[i].confirmations = (this.blockchain.blocks.length - blockInfo.height) / 2;
-
-                    }
 
 
                 } else{
                     
-                    if ( blockInfo.height > this.blockchain.blocks.length - VALIDATION_BLOCK_CONFIRMATIONS )
+                    if ( blockInfo.height > this.blockchain.blocks.length + VALIDATION_BLOCK_CONFIRMATIONS )
                         this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
                 }
@@ -162,7 +160,7 @@ class PoolRewardsManagement{
             } else { //i can not confirm the block because I am in browser and I need to use the server
 
                 //not enough blocks
-                if (blockInfo.height < this.blockchain.blocks.length - LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS)
+                if (blockInfo.height < this.blockchain.blocks.length + LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS)
                     continue;
 
                 found = await this._confirmUsingPoolServer(this.poolData.blocksInfo[i]);

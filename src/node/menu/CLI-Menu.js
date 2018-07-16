@@ -525,6 +525,9 @@ class CLI {
             if (typeof callbackAfterServerInitialization === "function")
                 await callbackAfterServerInitialization();
 
+            if (typeof afterSynchronizationCallback === "function")
+                await afterSynchronizationCallback();
+
         }
 
     }
