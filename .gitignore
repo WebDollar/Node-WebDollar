@@ -42,6 +42,8 @@ dist_bundle/terminal-bundle\.js\.map
 
 dist_bundle/terminal-mocha-bundle\.js\.map
 
+dist_bundle/terminal_worker.js
+
 addresses\.bin
 
 dist_bundle/WebDollar-Protocol-bundle\.js\.map
