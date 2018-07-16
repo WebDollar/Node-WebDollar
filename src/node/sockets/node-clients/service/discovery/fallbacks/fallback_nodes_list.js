@@ -91,8 +91,8 @@ export default {
         // {"addr": ["https://webdollar-vps1.ddns.net:80"]},
         // {"addr": ["https://webdollar-vps2.ddns.net:80"]},
         // {"addr": ["https://webdollar-vps3.ddns.net:80"]},
-        // {"addr": ["https://webdollar-vps4.zapto.org:80"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:80"]},
+        {"addr": ["https://webdollar-vps4.zapto.org:80"]},
+        {"addr": ["https://webdollar-vps5.hopto.org:443"]},
         //
         //
         // {"addr": ["https://chucknorris.webdollarvpn.io:8084"]}, // Thanks to @cbusuioceanu
