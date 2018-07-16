@@ -94,6 +94,11 @@ class PoolRewardsManagement{
 
         let remainingAmount = Math.floor( poolCurrentBalance - (poolCurrentBalance + poolRewardSCO) * this.poolFeePercent - this.totalRewardConfirmOther );
 
+        if (remainingAmount <= 0){
+            Log.error("Can not Pay the Remaning money because you don't have enough funds or you already paid all the users", Log.LOG_TYPE.POOLS);
+            return;
+        }
+
         Log.info("I have to pay "+remainingAmount/WebDollarCoins.WEBD+" WEBD from " + poolCurrentBalance/WebDollarCoins.WEBD, Log.LOG_TYPE.POOLS);
 
         let sumTotal = 0;
