@@ -183,7 +183,6 @@ class PoolRewardsManagement{
             if (miner === null) Log.error("ERROR! Miner was not found at the payout", Log.LOG_TYPE.POOLS);
 
             miner.rewardSent += this._toAddresses[i].amount; //i paid totally
-            miner.rewardConfirmed = 0; //paid this
             miner.rewardConfirmedOther = 0; //paid this
 
 
