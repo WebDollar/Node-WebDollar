@@ -9,6 +9,7 @@ import consts from 'consts/const_global'
 import InterfaceBlockchainAgentBasic from "./Interface-Blockchain-Agent-Basic"
 import NODE_TYPE from "node/lists/types/Node-Type";
 import NodesWaitlistConnecting from 'node/lists/waitlist/Nodes-Waitlist-Connecting'
+import Log from 'common/utils/logging/Log';
 
 let NodeExpress;
 
@@ -118,7 +119,13 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
             if (this.lastTimeChecked !== undefined ){
 
-                if (Math.random() < 0.1) console.log("Synchronization probably starts in: ", ( 3*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 );
+                if (Math.random() < 0.1){
+
+                    Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
+                    Log.warn("Synchronization probably starts in: " + Math.floor( ( 1*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 ) + ' seconds ', Log.LOG_TYPE.BLOCKCHAIN);
+                    Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
+
+                }
 
                 if ( new Date().getTime() -  this.lastTimeChecked.date > 3*60*1000 ){
 
