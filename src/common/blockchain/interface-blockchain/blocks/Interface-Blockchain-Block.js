@@ -28,15 +28,14 @@ class InterfaceBlockchainBlock {
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
         
-        if ( timeStamp === undefined ) {
+        if ( timeStamp === undefined  || timeStamp === null) {
 
-            let networkTimestamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+            timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
 
-            if (this.blockchain.blocks.last !== undefined)  timeStamp = this.blockchain.blocks.last.timeStamp + 20;
-            else timeStamp = 0;
+            if (timeStamp === undefined || timeStamp === null)
+                timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
 
-            if (timeStamp < networkTimestamp )
-                timeStamp = networkTimestamp + 20;
+            timeStamp += Math.floor( Math.random()*5  * (Math.random() < 0.5 ?  -1 : 1  ));
 
         }
 
@@ -265,18 +264,25 @@ class InterfaceBlockchainBlock {
      */
     async computeHash(newNonce){
 
-        // hash is hashPow ( block header + nonce )
-        if (this.computedBlockPrefix === null )
-            return this._computeBlockHeaderPrefix();
+        try {
 
-        let buffer = Buffer.concat ( [
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
-            Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
-            this.computedBlockPrefix,
-            Serialization.serializeNumber4Bytes(newNonce || this.nonce),
-        ] );
+            // hash is hashPow ( block header + nonce )
+            if (this.computedBlockPrefix === null)
+                return this._computeBlockHeaderPrefix();
 
-        return  await WebDollarCrypto.hashPOW(buffer);
+            let buffer = Buffer.concat([
+                Serialization.serializeBufferRemovingLeadingZeros(Serialization.serializeNumber4Bytes(this.height)),
+                Serialization.serializeBufferRemovingLeadingZeros(this.difficultyTargetPrev),
+                this.computedBlockPrefix,
+                Serialization.serializeNumber4Bytes(newNonce || this.nonce),
+            ]);
+
+            return await WebDollarCrypto.hashPOW(buffer);
+
+        } catch (exception){
+            console.error("Error computeHash", exception);
+            return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
+        }
     }
 
     /**

@@ -9,6 +9,7 @@ import consts from 'consts/const_global'
 import InterfaceBlockchainAgentBasic from "./Interface-Blockchain-Agent-Basic"
 import NODE_TYPE from "node/lists/types/Node-Type";
 import NodesWaitlistConnecting from 'node/lists/waitlist/Nodes-Waitlist-Connecting'
+import Log from 'common/utils/logging/Log';
 
 let NodeExpress;
 
@@ -118,19 +119,27 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
             if (this.lastTimeChecked !== undefined ){
 
-                if (Math.random() < 0.1) console.log("Diff Time for syncing", (new Date().getTime() -  this.lastTimeChecked.date)/1000 );
+                let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
+                let shouldItStart = false;
+                if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
+                    NodesList.nodes.length >= NodesWaitlistConnecting.connectingMaximum.minimum_fallbacks + NodesWaitlistConnecting.connectingMaximum.minimum_waitlist) {
+                    shouldItStart = true;
+                }
 
-                if ( new Date().getTime() -  this.lastTimeChecked.date > 3*60*1000 ){
+                let difference = Math.max(0, Math.floor( ( 1*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 ));
 
-                    let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
+                if (Math.random() < 0.1){
 
-                    if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
-                          NodesList.nodes.length >= NodesWaitlistConnecting.connectingMaximum.minimum_fallbacks + NodesWaitlistConnecting.connectingMaximum.minimum_waitlist) {
+                    Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
+                    Log.warn(shouldItStart ? ("Synchronization probably starts in: " + difference + ' seconds ') : 'Synchronizing', Log.LOG_TYPE.BLOCKCHAIN);
+                    Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
 
+                }
+
+                if ( difference <= 0) {
+
+                    if (shouldItStart)
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
-
-                    }
-
 
                 } else set = false;
 

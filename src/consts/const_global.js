@@ -52,7 +52,7 @@ consts.BLOCKCHAIN = {
         DIFFICULTY_TIME_BIGGER: 153060,
         WALLET_RECOVERY: 153060,
 
-        DIFFICULTY_REMOVED_CONDITION: 163000,
+        DIFFICULTY_REMOVED_CONDITION: 161990,
 
     }
 
@@ -220,7 +220,7 @@ consts.MINING_POOL = {
 
     CONNECTIONS:{
 
-        NO_OF_IDENTICAL_IPS: 40,
+        NO_OF_IDENTICAL_IPS: 80,
 
     },
 
@@ -234,11 +234,11 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.150.0",
-        VERSION_COMPATIBILITY: "1.140.0",
+        VERSION: "1.160.1",
+        VERSION_COMPATIBILITY: "1.160.0",
 
-        VERSION_COMPATIBILITY_UPDATE: "1.150.0",
-        VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION,
+        VERSION_COMPATIBILITY_UPDATE: "",
+        VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
 
         PROTOCOL: "WebDollar",
         SSL: true,
@@ -275,7 +275,7 @@ consts.SETTINGS = {
 
         CONNECTIONS:{
 
-            NO_OF_IDENTICAL_IPS: 3,
+            NO_OF_IDENTICAL_IPS: 20,
 
             SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP: 50,
 
@@ -355,9 +355,13 @@ consts.SETTINGS = {
             TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
         }
 
-    },
+    }
+};
 
-
+consts.TERMINAL_WORKERS = {
+    DEBUG: false, // make if false to see their output (console.log's, errors, ..)
+    PATH: './dist_bundle/terminal_worker.js',
+    MAX: 0, // if 0 then it defaults to Math.floor(OS.cpus().length / 2) || 1
 };
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)

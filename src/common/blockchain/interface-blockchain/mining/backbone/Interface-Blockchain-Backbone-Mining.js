@@ -1,4 +1,5 @@
 import InterfaceBlockchainMining from "../Interface-Blockchain-Mining";
+import Workers from './Workers';
 import consts from 'consts/const_global'
 
 class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
@@ -17,33 +18,52 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
         this._workerResolve = undefined;
 
         this.end = 0;
+
+        this._workers = new Workers(this);
     }
 
     async _mineNonces(start, end){
 
-        let answer = await InterfaceBlockchainMining.prototype._mineNonces.call(this, start, Math.min(this.end, start+this.WORKER_NONCES_WORK) );
+        try {
 
-        if (!answer.result && (start + this.WORKER_NONCES_WORK+1 <= this.end)){
+            if (start > end ) return {
+                result: false,
+                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET),
+                nonce:1,
+            };
 
-            let answer2 = await (new Promise((resolve)=>{
+            let answer = await InterfaceBlockchainMining.prototype._mineNonces.call(this, start, Math.min(this.end, start + this.WORKER_NONCES_WORK));
 
-                setTimeout( async () => {
+            if (!answer.result && (start + this.WORKER_NONCES_WORK + 1 <= this.end) && this.started && !this.resetForced && !(this.reset && this.useResetConsensus)) { // in case I still have work to do
 
-                    let newAnswer = await this._mineNonces(start + this.WORKER_NONCES_WORK+1, Math.min(this.end, start+this.WORKER_NONCES_WORK+this.WORKER_NONCES_WORK ));
-                    resolve(newAnswer);
+                let answer2 = await this._mineNonces(start + this.WORKER_NONCES_WORK + 1, Math.min(this.end, start + this.WORKER_NONCES_WORK + this.WORKER_NONCES_WORK));
 
-                }, 2);
+                if (answer2.hash !== undefined && answer2.hash.compare(answer.hash) < 0)
+                    answer = answer2;
 
-            }));
+            }
 
-            if (answer2.hash.compare(answer.hash) < 0) answer = answer2;
+            return answer;
 
+        } catch (exception){
+            console.error("error _mince _nonces Backbone mining error");
+            return {
+                result:false,
+                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET),
+                nonce:1,
+            };
         }
 
+    }
 
+    async _mineNoncesWithWorkers(start, end) {
+        let promiseResolve = new Promise((resolve) => {
+            this._workerResolve = resolve;
 
-        return answer;
+            this._workers.run(start, end);
+        });
 
+        return promiseResolve;
     }
 
     async mine(block, difficulty, start, end){
@@ -54,6 +74,10 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
         this.bestHash = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
         this.bestHashNonce = -1;
+
+        if (this._workers.haveSupport()) {
+            return await this._mineNoncesWithWorkers(start, end);
+        }
 
         return await this._mineNonces(start, start + this.WORKER_NONCES_WORK);
 

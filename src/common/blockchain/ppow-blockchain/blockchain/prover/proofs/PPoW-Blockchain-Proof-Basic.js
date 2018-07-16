@@ -58,8 +58,21 @@ class PPoWBlockchainProofBasic{
     getProofHeaders(starting, length){
 
         let list = [];
-        for (let i=starting; i<Math.min( starting+length, this.blocks.length); i++)
-            list.push( this.blocks[i].getBlockHeader() )
+        for (let i=starting; i<Math.min( starting+length, this.blocks.length); i++) {
+
+            try {
+                list.push(this.blocks[i].getBlockHeader())
+            } catch (exception){
+
+                console.error("Failed to retrieve block " , i, exception );
+                try {
+                    console.error("Failed to retrieve block ", this.blocks[i] !== null ? this.blocks[i].toJSON() : 'block is null');
+                } catch (exception){
+
+                }
+
+            }
+        }
 
         return list
     }

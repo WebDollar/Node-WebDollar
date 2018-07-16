@@ -113,7 +113,7 @@ class PoolWorkManagement{
 
                 console.warn("----------------------------------------------------------------------------");
                 console.warn("----------------------------------------------------------------------------");
-                console.warn("WebDollar Block was mined in Pool 1 ", work.hash.toString("hex"), "nonce", work.nonce );
+                console.warn("WebDollar Block was mined in Pool 1 ", blockInformationMinerInstance.workBlock.height, work.hash.toString("hex"), "nonce", work.nonce );
                 console.warn("----------------------------------------------------------------------------");
                 console.warn("----------------------------------------------------------------------------");
 
@@ -176,8 +176,9 @@ class PoolWorkManagement{
                         if (block !== undefined)
                             block.destroyBlock();
 
-                        this.poolWork.getNextBlockForWork();
                     }
+
+                    this.poolWork.getNextBlockForWork();
 
                     revertActions.destroyRevertActions();
 

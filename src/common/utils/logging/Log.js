@@ -74,7 +74,7 @@ class Log{
     /*
      * Logs an error message
      */
-    error(){
+    error(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
 
         if(process.env.BROWSER)
             return;
@@ -94,7 +94,7 @@ class Log{
             return;
 
         if (this.loggers[ arguments[1] ] !== undefined)
-            this.loggers[ arguments[1] ].warn.apply(this.loggers[ config ], arguments);
+            this.loggers[ arguments[1] ].warn.apply(this.loggers[ arguments[1] ], arguments);
 
     }
 

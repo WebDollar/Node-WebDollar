@@ -65,6 +65,8 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
             } catch (exception){
 
+                console.error("Error getting proofs headers", exception);
+
             }
 
         });
