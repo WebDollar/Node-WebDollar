@@ -55,12 +55,10 @@ export default {
         // {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
         // {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
         //
-        // {"addr": ["https://wd1.hoste.ro:51261"]}, // Thanks to @morion4000
-        // {"addr": ["https://wd1.hoste.ro:60260"]}, // Thanks to @morion4000
-        // {"addr": ["https://wd1.hoste.ro:61099"]}, // Thanks to @morion4000
-        // {"addr": ["https://wd2.hoste.ro:55974"]}, // Thanks to @morion4000
-        // {"addr": ["https://wd2.hoste.ro:63980"]}, // Thanks to @morion4000
-        // {"addr": ["https://wd2.hoste.ro:65279"]}, // Thanks to @morion4000
+        {"addr": ["https://wd.hoste.ro:40000"]}, // Thanks to @morion4000
+        {"addr": ["https://wd.hoste.ro:40001"]}, // Thanks to @morion4000
+        {"addr": ["https://wd.hoste.ro:40002"]}, // Thanks to @morion4000
+        {"addr": ["https://wd.hoste.ro:40003"]}, // Thanks to @morion4000
 
 
         //{"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
