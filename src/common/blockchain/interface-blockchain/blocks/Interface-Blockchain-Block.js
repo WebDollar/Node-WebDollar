@@ -35,7 +35,7 @@ class InterfaceBlockchainBlock {
             if (timeStamp === undefined || timeStamp === null)
                 timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
 
-            timeStamp += Math.floor( Math.random()*5 * Math.random() < 0.5 ?  -1 : 1  );
+            timeStamp += Math.floor( Math.random()*5  * (Math.random() < 0.5 ?  -1 : 1  ));
 
         }
 
