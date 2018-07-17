@@ -6,6 +6,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 
 import TransactionsListForPropagation from "./Transactions-List-For-Propagation";
+import MiningTransactionsSelector from "../../mining/transactions-selector/Mining-Transactions-Selector";
 
 class InterfaceBlockchainTransactionsProtocol {
 
@@ -69,6 +70,9 @@ class InterfaceBlockchainTransactionsProtocol {
 
 
                 if (transaction === undefined) throw {message: "Transaction was not specified"};
+
+                if (!MiningTransactionsSelector.validateTransactions(transaction))
+                    return false;
 
                 if ( transaction.fee < consts.MINING_POOL.MINING.FEE_THRESHOLD  )  //not good
                     return false;
@@ -240,6 +244,15 @@ class InterfaceBlockchainTransactionsProtocol {
                     if ( transaction.fee < consts.MINING_POOL.MINING.FEE_THRESHOLD  ) { //not good
                         errors += 0.25;
                         continue;
+                    }
+
+                    try {
+
+                        if (!MiningTransactionsSelector.validateTransactions(transaction)) {
+                            errors += 0.25;
+                        }
+                    } catch (exception){
+
                     }
 
                     if ( !transaction.isTransactionOK(true, false) ) { //not good
