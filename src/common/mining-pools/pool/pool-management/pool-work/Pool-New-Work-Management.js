@@ -63,7 +63,7 @@ class PoolNewWorkManagement{
             if (this.poolWorkManagement.poolWork.lastBlock === prevBlock  ) return true;
 
 
-            let answer = await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork,  } ,"answer", 6000 );
+            let answer = await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork,  } ,"answer", 10000 );
 
             if ( answer === null ) throw {message: "answer is null"};
 
