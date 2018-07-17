@@ -337,7 +337,7 @@ class InterfaceBlockchainFork {
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
                     this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
 
-                    if (!this.downloadAllBlocks && index > 0 && index % 10 === 0)
+                    if (!this.downloadAllBlocks || (index > 0 && index % 10 === 0))
                         this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
 
                     if (! (await this.saveIncludeBlock(index, revertActions, false)) )
