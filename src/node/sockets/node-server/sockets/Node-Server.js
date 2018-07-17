@@ -152,7 +152,7 @@ class NodeServer {
                     return;
                 }
 
-                if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL ) {
+                if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
 
                     //be sure it is not a fallback node
                     let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
@@ -166,7 +166,7 @@ class NodeServer {
 
                 } else
 
-                if (NODE_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODE_TYPE.NODE_WEB_PEER) > Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
+                if (NODE_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODE_TYPE.NODE_WEB_PEER) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER)) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
 
                     if (Math.random() < 0.05) console.warn("too many browser connections");
                     return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
