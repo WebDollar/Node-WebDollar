@@ -78,7 +78,10 @@ class PoolNewWorkManagement{
             } ,"answer" );
 
         } catch (exception){
-            console.error("_sendNewWork", exception);
+
+            if (exception.message !== "answer is null" || Math.random() < 0.2)
+                console.error("_sendNewWork", exception);
+            
         }
     }
 
