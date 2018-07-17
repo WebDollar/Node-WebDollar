@@ -69,6 +69,9 @@ export default {
         {"addr": ["https://angrybirds.webdollarvpn.io:3666"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://angrybirds.webdollarvpn.io:4666"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://angrybirds.webdollarvpn.io:5666"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://angrybirds.webdollarvpn.io:7666"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://angrybirds.webdollarvpn.io:8666"]}, // Thanks to @cbusuioceanu   
+        {"addr": ["https://angrybirds.webdollarvpn.io:9666"]}, // Thanks to @cbusuioceanu         
         /*
         {"addr": ["https://webdollarinfinitypool.space:8085"]}, //Thanks to @Tibi Popescu
         {"addr": ["https://webdollarinfinitypool.space:8086"]}, //Thanks to @Tibi Popescu
