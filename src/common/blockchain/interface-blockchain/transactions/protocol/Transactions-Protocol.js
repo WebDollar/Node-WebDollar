@@ -22,7 +22,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         StatusEvents.on('blockchain/status', async (data)=>{
 
-            if (Blockchain.MinerPoolManagement.minerPoolStarted)
+            if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
                 return false;
 
             if (data.message === "Blockchain Ready to Mine"){
