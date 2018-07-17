@@ -25,6 +25,10 @@ class InterfaceBlockchainTransactionsProtocol {
 
         let socket = nodesListObject.socket;
 
+        if (Blockchain.MinerPoolManagement.minerPoolStarted){
+            return false;
+        }
+
         this.initializeTransactionsPropagation(socket);
 
         if (Blockchain.loaded){
@@ -74,7 +78,7 @@ class InterfaceBlockchainTransactionsProtocol {
                     if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
                         return false;
                 } catch (exception){
-                    
+
                 }
 
                 if ( transaction.fee < consts.MINING_POOL.MINING.FEE_THRESHOLD  )  //not good
