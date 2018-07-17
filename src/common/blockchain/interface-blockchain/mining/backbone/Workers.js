@@ -96,6 +96,8 @@ class Workers {
         worker._is_batching = false;
 
         worker.on('message', (msg) => {
+
+            console.log("message", msg)
             // hashing
             if (msg.type == 'h') {
                 this.ibb._hashesPerSecond++;

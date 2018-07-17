@@ -1,4 +1,26 @@
-import WebDollarCrypto from './common/crypto/WebDollar-Crypto';
+const argon2 = require('argon2');
+
+let hash = async (data) => {
+
+    try{
+
+        return await argon2.hash(data, {
+            salt: Buffer.from("Satoshi_is_Finney"),
+            timeCost: Buffer.from("Satoshi_is_Finney"),
+            memoryCost: 8,
+            parallelism: 2,
+            type: 0,
+            hashLength: 32,
+            raw: true,
+        })
+
+    } catch (Exception){
+        console.log("Argon2 exception Argon2-Node.hash", Exception.message, Exception.code)
+
+        throw Exception
+    }
+
+};
 
 
 var send = (msg) => {
@@ -7,9 +29,14 @@ var send = (msg) => {
     } catch (e) {
         // console.log(e);
     }
-}
+};
 
 var hashit = async(data) => {
+
+
+    // batched
+    send({ type: 'b' });
+    return false;
 
     var { block, height, difficultyTargetPrev, computedBlockPrefix, difficulty, start, batch } = data;
 
@@ -37,9 +64,6 @@ var hashit = async(data) => {
     if (!Buffer.isBuffer(difficulty))
         difficulty = new Buffer(difficulty);
 
-    // batched
-    send({ type: 'b' });
-    return false;
 
     for (let nonce = parseInt(start); nonce < parseInt(start) + parseInt(batch); nonce++) {
         if (nonce > 0xFFFFFFFF) {
@@ -54,7 +78,7 @@ var hashit = async(data) => {
 
             let buffer = Buffer.concat(constant_prefix);
 
-            let hash = await WebDollarCrypto.hashPOW(buffer);
+            let hash = await hash(buffer);
 
             // console.log(nonce, hash);
 
@@ -83,6 +107,7 @@ var hashit = async(data) => {
 }
 
 process.on('message', (msg) => {
+    send({ type: 'b' })
     if (msg.command === 'start') {
         try {
             hashit(msg.data);
