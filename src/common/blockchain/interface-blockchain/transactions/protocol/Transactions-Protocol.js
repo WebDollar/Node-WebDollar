@@ -6,6 +6,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 
 import TransactionsListForPropagation from "./Transactions-List-For-Propagation";
+import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 
 class InterfaceBlockchainTransactionsProtocol {
 
@@ -19,33 +20,42 @@ class InterfaceBlockchainTransactionsProtocol {
 
         this.transactionsForPropagation = new TransactionsListForPropagation(this.blockchain);
 
+        StatusEvents.on('blockchain/status', async (data)=>{
+
+            if (Blockchain.MinerPoolManagement.minerPoolStarted)
+                return false;
+
+            if (data.message === "Blockchain Ready to Mine"){
+
+                for (let i=0; i < NodesList.nodes.length; i++)
+                    if (NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET){
+
+                        setTimeout(()=> {
+
+                            this.downloadTransactions(NodesList.nodes[i].socket, 0, 30);
+
+                        }, 5000 + Math.random()*15000 );
+
+                    }
+
+            }
+
+        } );
+
     }
 
     _newSocketCreateProtocol(nodesListObject){
 
         let socket = nodesListObject.socket;
 
-        if (Blockchain.MinerPoolManagement.minerPoolStarted){
+        if (Blockchain.MinerPoolManagement.minerPoolStarted)
             return false;
-        }
 
         this.initializeTransactionsPropagation(socket);
 
         if (Blockchain.loaded){
             this.downloadTransactions(socket, 0, 30);
         }
-
-        //after
-        Blockchain.onLoaded.then((answer)=>{
-            // in case the Blockchain was not loaded, I will not be interested in transactions
-
-            setTimeout(()=>{
-
-                this.downloadTransactions(socket, 0, 30);
-
-            }, 5000 + Math.random()*5000 );
-
-        });
 
     }
 
