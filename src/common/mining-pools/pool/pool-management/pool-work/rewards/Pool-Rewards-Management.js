@@ -156,12 +156,12 @@ class PoolRewardsManagement{
                         this.poolData.blocksInfo[i].confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers / 2 + Math.min(confirmation.confirmationsPool / 4, CONFIRMATIONS_REQUIRE_OTHER_MINERS ? 2 : 10000);
 
                     } else if (CONFIRMATION_METHOD === 2)
-                        this.poolData.blocksInfo[i].confirmations = (this.blockchain.blocks.length - blockInfo.height) / 2;
+                        this.poolData.blocksInfo[i].confirmations = (this.blockchain.blocks.length - blockInfo.height);
 
 
                 } else{
                     
-                    if ( this.blockchain.blocks.length + VALIDATION_BLOCK_CONFIRMATIONS > blockInfo.height  )
+                    if ( this.blockchain.blocks.length  > blockInfo.height + VALIDATION_BLOCK_CONFIRMATIONS )
                         this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
                 }

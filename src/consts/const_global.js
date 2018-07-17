@@ -234,7 +234,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.160.2",
+        VERSION: "1.160.5",
         VERSION_COMPATIBILITY: "1.160.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
@@ -305,6 +305,9 @@ consts.SETTINGS = {
                     MAXIMUM_CONNECTIONS_FROM_TERMINAL: 400,
                     MAXIMUM_CONNECTIONS_FROM_BROWSER: 1000,
 
+                    MAXIMUM_CONNECTIONS_FROM_BROWSER_POOL: 2000,
+                    MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL: 2000,
+
                     TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK: 10,
                 },
 
@@ -355,9 +358,13 @@ consts.SETTINGS = {
             TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
         }
 
-    },
+    }
+};
 
-
+consts.TERMINAL_WORKERS = {
+    SILENT: true, // make it false to see their output (console.log's, errors, ..)
+    PATH: './dist_bundle/terminal_worker.js',
+    MAX: 0, // if 0 then it defaults to Math.floor(OS.cpus().length / 2) || 1
 };
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)

@@ -154,11 +154,11 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (this.blockchain.blocks[i].hash.equals(answer.hash)){
 
                         binarySearchResult = {
-                            position: i,
+                            position: i+1,
                             header: answer.hash,
                         };
 
-                        fork.pushHeader(binarySearchResult.header);
+                        fork.pushHeader(answer.hash);
                         break;
 
                     } else {

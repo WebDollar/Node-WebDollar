@@ -41,6 +41,7 @@ showport="$YELLOW[PORT]$STAND"
 which_certbot=$(which certbot)
 get_certbot=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy certbot | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "$(yum list certbot | grep -o Available)"; fi fi)
 is_port_80_used=$(netstat -tanp | grep -w ":80" | awk '{print $4}' | cut -d ':' -f4)
+get_user=$(whoami)
 ###
 
 ### Check if certbot is installed
@@ -86,11 +87,12 @@ if [[ $is_port_80_used == "" ]]; then
 
                         echo "$showinfo PORT 80 not in use $showok"
                         echo "$showexecute Starting CERTBOT"
-			$which_certbot certonly --text --non-interactive --rsa-key-size 4096 --agree-tos --expand --standalone --reinstall --email $EMAIL -d $DOMAIN
+			sudo $which_certbot certonly --text --non-interactive --rsa-key-size 4096 --agree-tos --expand --standalone --reinstall --email $EMAIL -d $DOMAIN
 
-			rm -f certificates/private.key && ln -s /etc/letsencrypt/live/$DOMAIN/privkey.pem certificates/private.key
-			rm -f certificates/certificate.crt && ln -s /etc/letsencrypt/live/$DOMAIN/cert.pem certificates/certificate.crt
-			rm -f certificates/ca_bundle.crt && ln -s /etc/letsencrypt/live/$DOMAIN/chain.pem certificates/ca_bundle.crt
+
+			rm -f certificates/private.key && sudo cp /etc/letsencrypt/live/$DOMAIN/privkey.pem certificates/private.key && sudo chown $get_user:$get_user certificates/private.key
+			rm -f certificates/certificate.crt && sudo cp /etc/letsencrypt/live/$DOMAIN/cert.pem certificates/certificate.crt && sudo chown $get_user:$get_user certificates/certificate.crt
+			rm -f certificates/ca_bundle.crt && sudo cp /etc/letsencrypt/live/$DOMAIN/chain.pem certificates/ca_bundle.crt && sudo chown $get_user:$get_user certificates/ca_bundle.crt
 		fi
 	fi
 else
