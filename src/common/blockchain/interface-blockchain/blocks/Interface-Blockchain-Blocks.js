@@ -19,12 +19,14 @@ class InterfaceBlockchainBlocks{
 
     }
 
-    addBlock(block, revertActions){
+    addBlock(block, revertActions, saveBlock){
 
         this[this.length] =  block;
 
         this.length += 1;
-        StatusEvents.emit("blockchain/block-inserted", block);
+
+        if (saveBlock)
+            this.emitBlockInserted(block);
 
         //delete old blocks when I am in light node
         if (this.blockchain.agent !== undefined && this.blockchain.agent.light){
@@ -47,6 +49,10 @@ class InterfaceBlockchainBlocks{
         if ( revertActions !== undefined )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
+    }
+
+    emitBlockInserted(block){
+        StatusEvents.emit("blockchain/block-inserted", block !== undefined ? block : this[this._length-1]);
     }
 
     spliceBlocks(after, freeMemory = false){

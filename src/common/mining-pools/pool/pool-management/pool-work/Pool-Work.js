@@ -16,7 +16,7 @@ class PoolWork {
         this.lastBlock = undefined;
         this.lastBlockNonce = 0;
 
-        this._blocksList = []; //for gerbage collector
+        this._blocksList = []; //for garbage collector
 
     }
 

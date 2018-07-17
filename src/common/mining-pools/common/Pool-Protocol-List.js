@@ -23,12 +23,10 @@ class PoolProtocolList{
 
     addElement(socket){
 
-        if (this.findElement(socket) === -1) {
-            this.list.push(socket);
-            return true;
-        }
+        if (this.findElement(socket) !== -1) return false;
 
-        return false;
+        this.list.push(socket);
+        return true;
 
     }
 

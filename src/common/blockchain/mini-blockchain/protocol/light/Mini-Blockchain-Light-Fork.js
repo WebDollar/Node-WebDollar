@@ -186,9 +186,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         return MiniBlockchainFork.prototype.revertFork.call(this);
     }
 
-    async saveIncludeBlock(index, revertActions){
+    async saveIncludeBlock(index, revertActions, saveBlock = false){
 
-        let answer = await MiniBlockchainFork.prototype.saveIncludeBlock.call(this, index, revertActions);
+        let answer = await MiniBlockchainFork.prototype.saveIncludeBlock.call(this, index, revertActions, saveBlock = false);
 
         if (answer){
 

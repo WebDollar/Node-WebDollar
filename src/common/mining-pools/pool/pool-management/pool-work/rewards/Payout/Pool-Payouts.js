@@ -20,7 +20,7 @@ class PoolPayouts{
         this.blockchain = blockchain;
         this._payoutInProgress = false;
 
-        StatusEvents.on("blockchain/blocks-count-changed", async (data)=>{
+        StatusEvents.on("blockchain/block-inserted", async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
             if (!Blockchain.loaded) return;

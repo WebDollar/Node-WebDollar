@@ -234,7 +234,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.160.1",
+        VERSION: "1.160.2",
         VERSION_COMPATIBILITY: "1.160.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
@@ -277,7 +277,7 @@ consts.SETTINGS = {
 
             NO_OF_IDENTICAL_IPS: 20,
 
-            SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP: 50,
+            SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP: 100,
 
             TERMINAL:{
 
