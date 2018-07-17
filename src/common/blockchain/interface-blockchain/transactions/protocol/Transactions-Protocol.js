@@ -250,6 +250,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                         if (!MiningTransactionsSelector.validateTransactions(transaction)) {
                             errors += 0.25;
+                            continue;
                         }
                     } catch (exception){
 
