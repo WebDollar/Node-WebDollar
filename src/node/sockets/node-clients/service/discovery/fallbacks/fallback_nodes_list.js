@@ -16,7 +16,7 @@ export default {
 
         // {"addr": ["https://wb.ciuc.ro:443"]}, // Thanks to Adi Clar
         // {"addr": ["https://nodecstl.ddns.net:80"]},
-        {"addr": ["https://webd.5q.ro:3333"]},
+        {"addr": ["https://webd.5q.ro:3333"]}, // Thanks to Sorin M
         // {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
 
         // {"addr": ["https://titan.serg.at:80/"]}, // Thanks to @SergiuWX

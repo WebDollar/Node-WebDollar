@@ -67,6 +67,9 @@ class PoolWorkManagement{
 
         }
 
+        //marking him as online
+        this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
+
         return answer;
 
     }
