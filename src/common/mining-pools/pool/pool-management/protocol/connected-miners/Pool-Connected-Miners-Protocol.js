@@ -377,7 +377,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         this.addElement(socket);
 
-        minerInstance.miner.dateActivity = new Date().getTime();
+        minerInstance.miner.dateActivity = new Date().getTime()/1000;
         this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
 
     }

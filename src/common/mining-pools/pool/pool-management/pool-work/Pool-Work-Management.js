@@ -54,7 +54,7 @@ class PoolWorkManagement{
 
         minerInstance.lastBlockInformation =  blockInformationMinerInstance;
         minerInstance.workBlock =  this.poolWork.lastBlock;
-        minerInstance.miner.dateActivity = new Date().getTime();
+        minerInstance.miner.dateActivity = new Date().getTime()/1000;
 
         this.poolWork.lastBlockNonce += hashes;
 
