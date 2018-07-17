@@ -46,7 +46,7 @@ function checkroot(){
         fi
 }
 
-checkroot
+#checkroot
 
 function start_pm2node(){
 
@@ -84,7 +84,7 @@ else
 	if [[ ! -n $(pwd | cut -d '/' -f4) ]]; then
 
 		echo "$showok We are outside of a Node-WebDollar Folder"
-		echo -e "---\\n${CYAN}$(ls)$STAND\\n---"
+		echo -e "---Choose where to run PM2 instance\\n${CYAN}$(ls -d -1 $PWD/** | grep 'Node-WebDollar')$STAND\\n---"
 
 		read -e -p "$showinput Enter the full location of the Node-WebDollar folder where you want to start the pm2 instance: " nodewebdloc
 
@@ -159,7 +159,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 		if [[ "$readport" =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo Setting IP Table rule for PORT $readport"
-			if [[ $(iptables -nL | grep -w $readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $readport ]]; then echo "$showok Port $readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $readport ]]; then echo "$showdone Setting Firewall rule for PORT $readport."; iptables -A INPUT -p tcp --dport $readport -j ACCEPT; fi fi # set port firewall rule
+			if [[ $(sudo iptables -nL | grep -w $readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $readport ]]; then echo "$showok Port $readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $readport ]]; then echo "$showdone Setting Firewall rule for PORT $readport."; sudo iptables -A INPUT -p tcp --dport $readport -j ACCEPT; fi fi # set port firewall rule
 
 			echo "$showinfo The system will use port $readport";
 
@@ -188,7 +188,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport2_0 $readnrport2_1;
 			do
-				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
 			done
 
 			for readport in $readnrport2_0 $readnrport2_1;
@@ -215,7 +215,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport3_0 $readnrport3_1 $readnrport3_2;
 			do
-				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
 			done
 
 			for readport in $readnrport3_0 $readnrport3_1 $readnrport3_2;
@@ -242,7 +242,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport4_0 $readnrport4_1 $readnrport4_2 $readnrport4_3;
 			do
-				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
 			done
 
 			for readport in $readnrport4_0 $readnrport4_1 $readnrport4_2 $readnrport4_3;
@@ -269,7 +269,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport5_0 $readnrport5_1 $readnrport5_2 $readnrport5_3 $readnrport5_4;
 			do
-				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
 			done
 
 			for readport in $readnrport5_0 $readnrport5_1 $readnrport5_2 $readnrport5_3 $readnrport5_4;
@@ -296,7 +296,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport6_0 $readnrport6_1 $readnrport6_2 $readnrport6_3 $readnrport6_4 $readnrport6_5;
 			do
-				if [[ $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
 			done
 
 			for readport in $readnrport6_0 $readnrport6_1 $readnrport6_2 $readnrport6_3 $readnrport6_4 $readnrport6_5;
@@ -330,4 +330,4 @@ elif [[ "$nrofports" == * ]]; then
 	exit 1
 fi
 
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then iptables-save; fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo iptables-save; fi
