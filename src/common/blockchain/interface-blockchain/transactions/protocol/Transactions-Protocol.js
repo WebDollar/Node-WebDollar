@@ -70,8 +70,12 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 if (transaction === undefined) throw {message: "Transaction was not specified"};
 
-                if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
-                    return false;
+                try {
+                    if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
+                        return false;
+                } catch (exception){
+                    
+                }
 
                 if ( transaction.fee < consts.MINING_POOL.MINING.FEE_THRESHOLD  )  //not good
                     return false;
