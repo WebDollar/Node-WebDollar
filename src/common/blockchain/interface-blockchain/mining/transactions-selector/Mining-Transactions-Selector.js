@@ -32,6 +32,8 @@ class MiningTransactionsSelector{
 
         }
 
+        return true;
+
 
     }
 

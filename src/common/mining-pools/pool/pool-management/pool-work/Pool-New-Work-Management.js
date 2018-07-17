@@ -81,7 +81,7 @@ class PoolNewWorkManagement{
 
             if (exception.message !== "answer is null" || Math.random() < 0.2)
                 console.error("_sendNewWork", exception);
-            
+
         }
     }
 
