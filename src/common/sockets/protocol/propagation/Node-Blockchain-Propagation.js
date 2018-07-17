@@ -4,6 +4,8 @@ import NodesList from 'node/lists/Nodes-List';
 import NodeProtocol from "../extend-socket/Node-Protocol";
 import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 
+const INTERVAL_PROPAGATION = 300;
+
 class NodeBlockchainPropagation{
 
     constructor(){
@@ -25,7 +27,7 @@ class NodeBlockchainPropagation{
 
         });
 
-        setTimeout( this.processPropagation.bind(this), 400);
+        setTimeout( this.processPropagation.bind(this), INTERVAL_PROPAGATION);
 
         //remove disconnected sockets
         setInterval( this._deleteDisconenctedSockets.bind(this), 20000)
@@ -78,7 +80,7 @@ class NodeBlockchainPropagation{
         let block = this._blockPropagating;
 
         if (block === undefined){
-            setTimeout( this.processPropagation.bind(this), 300 );
+            setTimeout( this.processPropagation.bind(this), INTERVAL_PROPAGATION );
             return true;
         }
 
@@ -117,14 +119,14 @@ class NodeBlockchainPropagation{
                         if (this._socketsPropagating[i] === socket)
                             this._socketsPropagating.splice(i,1);
 
-                }, 200 + Math.random()*200 );
+                }, 100 + Math.random()*200 );
 
             }
 
 
         }
 
-        setTimeout( this.processPropagation.bind(this), 300 );
+        setTimeout( this.processPropagation.bind(this), INTERVAL_PROPAGATION );
 
     }
 
