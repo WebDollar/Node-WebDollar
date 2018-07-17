@@ -93,7 +93,7 @@ class MiningTransactionsSelector{
             }
 
 
-            if (this.blockchain.transactions.pendingQueue.list.length > 20){
+            if (this._transactions.length > 20){
                 break;
             }
 
