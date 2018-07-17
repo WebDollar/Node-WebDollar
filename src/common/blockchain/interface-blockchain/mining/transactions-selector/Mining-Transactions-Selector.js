@@ -50,7 +50,7 @@ class MiningTransactionsSelector{
                 
                 console.log(transaction.txId.toString("hex"));
 
-                this.validateTransaction(transaction);
+                this.validateTransaction(transaction, miningFeeThreshold);
 
                 let bRemoveTransaction = false;
 
