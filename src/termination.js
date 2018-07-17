@@ -3,13 +3,6 @@ import global from "consts/global";
 let alreadySaved = false;
 
 
-let NodeExpress, NodeServer;
-if (!process.env.BROWSER) {
-    NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
-    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
-}
-
-
 export default async (Blockchain) => {
 
     console.warn("SIGINT FIRED");
@@ -41,6 +34,13 @@ export default async (Blockchain) => {
 
                 console.log("Closing Express");
                 try {
+
+                    let NodeExpress, NodeServer;
+                    if (!process.env.BROWSER) {
+                        NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+                        NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+                    }
+
                     NodeExpress.app.close();
                 } catch (exception){
 
