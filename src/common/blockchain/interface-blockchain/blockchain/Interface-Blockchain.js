@@ -88,7 +88,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (block.height !== this.blocks.length)
             throw {message: 'height of a new block is not good... ', height: block.height, blocksLength: this.blocks.length};
 
-        this.blocks.addBlock(block, revertActions);
+        this.blocks.addBlock(block, revertActions, saveBlock);
 
         //hard fork
         if ( !block.blockValidation.blockValidationType['skip-accountant-tree-validation'] && block.height === consts.BLOCKCHAIN.HARD_FORKS.WALLET_RECOVERY-1 )

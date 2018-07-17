@@ -6,7 +6,7 @@ import InterfaceBlockchainBlockValidation from "common/blockchain/interface-bloc
 import PoolPayouts from "./Payout/Pool-Payouts"
 
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
-const VALIDATION_BLOCK_CONFIRMATIONS = 20; //blocks
+const VALIDATION_BLOCK_CONFIRMATIONS = 40; //blocks
 
 const MAXIMUM_FAIL_CONFIRMATIONS = 20; //blocks
 
@@ -28,7 +28,7 @@ class PoolRewardsManagement{
 
         this.poolPayouts = new PoolPayouts(poolManagement, poolData, blockchain);
 
-        StatusEvents.on("blockchain/blocks-count-changed",async (data)=>{
+        StatusEvents.on("blockchain/block-inserted",async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
             if (!Blockchain.loaded) return;
@@ -41,11 +41,19 @@ class PoolRewardsManagement{
         this._serverBlocksDifficultyCalculation = {};
         this._serverBlocks = [];
         this._serverBlockInfo = undefined;
+
+        this._lastTimeCheckHeight = 0;
     }
 
     async _blockchainChanged(){
 
         if (this.poolData.blocksInfo.length === 0) return;
+
+        //already checked, or maybe it is a fork
+        if (this._lastTimeCheckHeight > this.blockchain.blocks.length-1)
+            return;
+
+        this._lastTimeCheckHeight = this.blockchain.blocks.length-1;
 
         let poolBlocksConfirmed = 0;
         let poolBlocksUnconfirmed = 0;
@@ -136,7 +144,7 @@ class PoolRewardsManagement{
 
                 if (this.blockchain.blocks[blockInfo.height] === undefined) continue;
 
-                if ( BufferExtended.safeCompare( blockInfo.hash, this.blockchain.blocks[blockInfo.height].hash,  ) ){
+                if ( BufferExtended.safeCompare( blockInfo.hash, this.blockchain.blocks[blockInfo.height].hash  ) ){
 
                     found = true;
 
@@ -146,13 +154,14 @@ class PoolRewardsManagement{
 
                         let confirmation = confirmations[blockInfo.height];
                         this.poolData.blocksInfo[i].confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers / 2 + Math.min(confirmation.confirmationsPool / 4, CONFIRMATIONS_REQUIRE_OTHER_MINERS ? 2 : 10000);
+
                     } else if (CONFIRMATION_METHOD === 2)
                         this.poolData.blocksInfo[i].confirmations = (this.blockchain.blocks.length - blockInfo.height) / 2;
 
 
                 } else{
                     
-                    if ( blockInfo.height > this.blockchain.blocks.length + VALIDATION_BLOCK_CONFIRMATIONS )
+                    if ( this.blockchain.blocks.length + VALIDATION_BLOCK_CONFIRMATIONS > blockInfo.height  )
                         this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
                 }
