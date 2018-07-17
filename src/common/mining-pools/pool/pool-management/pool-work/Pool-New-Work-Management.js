@@ -1,7 +1,7 @@
 import StatusEvents from "common/events/Status-Events";
 import NodesList from 'node/lists/Nodes-List'
 import Blockchain from "main-blockchain/Blockchain"
-
+import Log from 'common/utils/logging/Log';
 
 class PoolNewWorkManagement{
 
@@ -36,6 +36,7 @@ class PoolNewWorkManagement{
 
     async propagateNewWork(payoutInProgressIndex){
 
+        Log.info("   Connected Miners: "+this.poolManagement.poolData.connectedMinerInstances.list.length, Log.LOG_TYPE.POOLS);
 
         for (let i=0; i < this.poolManagement.poolData.connectedMinerInstances.list.length; i++ ) {
 
