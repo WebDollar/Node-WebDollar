@@ -12,6 +12,8 @@ class Workers {
     constructor(ibb) {
         this.ibb = ibb;
 
+        this._in_pool = false;
+
         this._abs_end = 0xFFFFFFFF;
         this._default_resolve = {
             result: false,
@@ -36,7 +38,6 @@ class Workers {
         // target
         this.block = undefined;
         this.difficulty = undefined;
-        this._in_pool = undefined;
 
         // current work
         this._current = undefined;
@@ -45,7 +46,6 @@ class Workers {
         this._final_batch = false;
         this._run_timeout = false;
 
-        this._initiateWorkers();
     }
 
     haveSupport() {
@@ -63,14 +63,14 @@ class Workers {
         this.block = this.ibb.block;
         this.difficulty = this.ibb.difficulty;
 
-        this._in_pool = false;
-        if (!this.block.height) {
-            this._in_pool = true;
-        }
+        if (this._in_pool)
+            this.height = this.ibb._miningWork.height;
 
         // resets
         this._finished = false;
         this._final_batch = false;
+
+        this._initiateWorkers();
 
         this._loop(loop_delay);
     }
@@ -80,9 +80,9 @@ class Workers {
     }
 
     _initiateWorkers() {
-        for (let index = 0; index < this.workers_max; index++) {
+
+        for (let index = this.workers_list.length-1; index < this.workers_max; index++)
             this._createWorker(index);
-        }
 
         return this;
     }
@@ -149,6 +149,8 @@ class Workers {
     }
 
     _loop(_delay) {
+
+
         const ibb_halt = !this.ibb.started || this.ibb.resetForced || (this.ibb.reset && this.ibb.useResetConsensus);
         if (ibb_halt) {
             this._stopAndResolve();
@@ -157,17 +159,17 @@ class Workers {
         }
 
         this.workers_list.forEach((worker, index) => {
-            if (this._finished) {
-                return false;
-            }
 
-            if (worker._is_batching) {
+            if (this._finished)
                 return false;
-            }
 
-            if (this._final_batch) {
+
+            if (worker._is_batching)
                 return false;
-            }
+
+
+            if (this._final_batch)
+                return false;
 
             worker._is_batching = true;
 

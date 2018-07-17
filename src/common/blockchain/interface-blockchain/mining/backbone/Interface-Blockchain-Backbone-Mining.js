@@ -66,7 +66,7 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
         return promiseResolve;
     }
 
-    async mine(block, difficulty, start, end){
+    async mine(block, difficulty, start, end,){
 
         this.block = block;
         this.difficulty = difficulty;
@@ -75,10 +75,11 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
         this.bestHash = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
         this.bestHashNonce = -1;
 
-        if (this._workers.haveSupport()) {
+        // multi threading
+        if (this._workers.haveSupport())
             return await this._mineNoncesWithWorkers(start, end);
-        }
 
+        // solo
         return await this._mineNonces(start, start + this.WORKER_NONCES_WORK);
 
     }

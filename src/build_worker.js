@@ -1,5 +1,5 @@
-import Serialization from './common/utils/Serialization';
 import WebDollarCrypto from './common/crypto/WebDollar-Crypto';
+
 
 var send = (msg) => {
     try {
@@ -10,6 +10,7 @@ var send = (msg) => {
 }
 
 var hashit = async(data) => {
+
     var { block, height, difficultyTargetPrev, computedBlockPrefix, difficulty, start, batch } = data;
 
     // pool mining
@@ -18,8 +19,8 @@ var hashit = async(data) => {
 
     // solo mining
     if (!block) {
-        height = Serialization.serializeBufferRemovingLeadingZeros(Serialization.serializeNumber4Bytes(parseInt(height)));
-        difficultyTargetPrev = Serialization.serializeBufferRemovingLeadingZeros(new Buffer(difficultyTargetPrev));
+        height = serializeBufferRemovingLeadingZeros(serializeNumber4Bytes(parseInt(height)));
+        difficultyTargetPrev = serializeBufferRemovingLeadingZeros(new Buffer(difficultyTargetPrev));
         computedBlockPrefix = new Buffer(computedBlockPrefix);
 
         // first part
@@ -33,7 +34,12 @@ var hashit = async(data) => {
     }
 
     // difficulty
-    difficulty = new Buffer(difficulty);
+    if (!Buffer.isBuffer(difficulty))
+        difficulty = new Buffer(difficulty);
+
+    // batched
+    send({ type: 'b' });
+    return false;
 
     for (let nonce = parseInt(start); nonce < parseInt(start) + parseInt(batch); nonce++) {
         if (nonce > 0xFFFFFFFF) {
@@ -44,7 +50,7 @@ var hashit = async(data) => {
         }
 
         try {
-            constant_prefix[constant_prefix_length] = Serialization.serializeNumber4Bytes(nonce);
+            constant_prefix[constant_prefix_length] = serializeNumber4Bytes(nonce);
 
             let buffer = Buffer.concat(constant_prefix);
 
@@ -85,3 +91,38 @@ process.on('message', (msg) => {
         }
     }
 });
+
+
+
+
+
+
+
+
+
+var serializeBufferRemovingLeadingZeros = (buffer) => {
+
+    let count = 0;
+    while (count < buffer.length && buffer[count] === 0)
+        count++;
+
+    let result = new Buffer(1 + buffer.length - count );
+    result [0] = buffer.length - count;
+
+    for (let i = count; i < buffer.length; i++)
+        result[i-count+1] = buffer[i];
+
+
+    return result;
+
+}
+
+var serializeNumber4Bytes = (data) => {
+    let buffer = Buffer(4);
+    buffer[3] = data & 0xff;
+    buffer[2] = data>>8 & 0xff;
+    buffer[1] = data>>16 & 0xff;
+    buffer[0] = data>>24 & 0xff;
+
+    return  buffer;
+}
