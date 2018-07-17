@@ -51,7 +51,7 @@ class PPoWBlockchainProver{
                     // //  α ← C[: −k]{B :}↑µ
                     // //  α is superChain
                     let superChain = new PPowBlockchainProofPi(this.blockchain, []);
-                    
+
                     //
                     // // // //C[: −k]{B :}
                     // for (let level = miu; level <=32; level++){
