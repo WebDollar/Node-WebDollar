@@ -5,14 +5,12 @@ import consts from 'consts/const_global'
 
 class Workers {
     /**
-     * @param {InterfaceBlockchainMining} ibb
+     * @param {InterfaceBlockchainBackboneMining} ibb
      *
      * @return {Workers}
      */
     constructor(ibb) {
         this.ibb = ibb;
-
-        this._in_pool = false;
 
         this._abs_end = 0xFFFFFFFF;
         this._default_resolve = {
@@ -20,6 +18,8 @@ class Workers {
             nonce: -1,
             hash: consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER
         };
+
+        this._from_pool = undefined;
 
         // workers setup
         this._worker_path = consts.TERMINAL_WORKERS.PATH;
@@ -49,7 +49,17 @@ class Workers {
     }
 
     haveSupport() {
-        return this._maxWorkersDefault() !== 0; // ignore if it returns 0
+        // disabled by miner
+        if (consts.TERMINAL_WORKERS.MAX == -1) {
+            return false;
+        }
+
+        // it needs at least 2
+        if (this.workers_max <= 1) {
+            return false;
+        }
+
+        return true;
     }
 
     max() {
@@ -63,8 +73,11 @@ class Workers {
         this.block = this.ibb.block;
         this.difficulty = this.ibb.difficulty;
 
-        if (this._in_pool)
-            this.height = this.ibb._miningWork.height;
+        this._from_pool = true;
+        if (this.block.height) {
+            // if the given block has a height, it means it's mining solo.
+            this._from_pool = false;
+        }
 
         // resets
         this._finished = false;
@@ -81,7 +94,7 @@ class Workers {
 
     _initiateWorkers() {
 
-        for (let index = this.workers_list.length-1; index < this.workers_max; index++)
+        for (let index = this.workers_list.length - 1; index < this.workers_max; index++)
             this._createWorker(index);
 
         return this;
@@ -96,16 +109,14 @@ class Workers {
         worker._is_batching = false;
 
         worker.on('message', (msg) => {
-
-            console.log("message", msg)
-            // hashing
+            // hashing: hashed one time, so we are incrementing hashes per second
             if (msg.type == 'h') {
                 this.ibb._hashesPerSecond++;
 
                 return false;
             }
 
-            // solved
+            // solved: stop and resolve but with a solution
             if (msg.type == 's') {
                 this._finished = true;
 
@@ -118,13 +129,14 @@ class Workers {
                 return false;
             }
 
-            // batching
+            // batching: finished a batch of nonces
             if (msg.type == 'b') {
                 worker._is_batching = false;
 
                 // keep track of the ones that are working
                 this._working--;
 
+                // if none of the threads are working and we finished the range, then we should stop and resolve
                 if (!this._working && this._current >= this._current_max) {
                     this._stopAndResolve();
                 }
@@ -151,8 +163,6 @@ class Workers {
     }
 
     _loop(_delay) {
-
-
         const ibb_halt = !this.ibb.started || this.ibb.resetForced || (this.ibb.reset && this.ibb.useResetConsensus);
         if (ibb_halt) {
             this._stopAndResolve();
@@ -186,10 +196,10 @@ class Workers {
             worker.send({
                 command: 'start',
                 data: {
-                    block: (!this._in_pool) ? false : this.block,
-                    height: (this._in_pool) ? false : this.block.height,
-                    difficultyTargetPrev: (this._in_pool) ? false : this.block.difficultyTargetPrev,
-                    computedBlockPrefix: (this._in_pool) ? false : this.block.computedBlockPrefix,
+                    block: (!this._from_pool) ? false : this.block,
+                    height: (this._from_pool) ? false : this.block.height,
+                    difficultyTargetPrev: (this._from_pool) ? false : this.block.difficultyTargetPrev,
+                    computedBlockPrefix: (this._from_pool) ? false : this.block.computedBlockPrefix,
                     difficulty: this.difficulty,
                     start: this._current,
                     batch: this._final_batch ? this._final_batch : this.worker_batch,

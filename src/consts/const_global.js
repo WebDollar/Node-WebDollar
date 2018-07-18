@@ -362,9 +362,19 @@ consts.SETTINGS = {
 };
 
 consts.TERMINAL_WORKERS = {
-    SILENT: true, // make it false to see their output (console.log's, errors, ..)
+    // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
-    MAX: 0, // if 0 then it defaults to Math.floor(OS.cpus().length / 2) || 1
+
+    // make it false to see their output (console.log's, errors, ..)
+    SILENT: true,
+
+    // -1 disables multi-threading.
+    //  0 defaults to number of cpus / 2.
+    //
+    //  Threading isn't used:
+    //  - if it detects only 1 cpu.
+    //  - if you use 0 and u got only 2 cpus.
+    MAX: 0,
 };
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
