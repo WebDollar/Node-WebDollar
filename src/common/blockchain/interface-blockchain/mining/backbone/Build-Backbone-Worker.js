@@ -60,8 +60,7 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
 
         if (nonce > 0xFFFFFFFF) {
             // batched: signal main process that it finished this batch
-            sendMessage({ type: 'b' });
-
+            sendMessage({ type: 'b', bestHash:bestHash, bestNone: bestNonce  });
             return false;
         }
 
@@ -116,7 +115,7 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
     }
 
     // batched: signal main process that it finished this batch
-    sendMessage({ type: 'b', bestHash:bestHash, bestNone: bestNonce });
+    sendMessage({ type: 'b', bestHash:bestHash, bestNonce: bestNonce });
 
     return false;
 };
@@ -131,7 +130,6 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
 process.on('message', (msg) => {
     if (msg.command === 'start') {
         try {
-            sendMessage('0')
             mineNoncesBatch(msg.data.block, msg.data.difficulty, msg.data.start, msg.data.batch);
         } catch (error) {
             console.log(error);

@@ -94,8 +94,8 @@ class Workers {
         this._finished = false;
         this._final_batch = false;
 
-        this.bestHash = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
-        this.bestNonce = 0;
+        this.ibb.bestHash = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
+        this.ibb.bestHashNonce = 0;
 
         this._initiateWorkers();
 
@@ -150,23 +150,24 @@ class Workers {
 
             // batching: finished a batch of nonces
             if (msg.type == 'b') {
+
                 worker._is_batching = false;
 
                 let bestHash = new Buffer(msg.bestHash);
 
                 let change = false;
-                for (let i = 0, l = this.bestHash.length; i < l; i++)
-                    if (bestHash[i] < this.bestHash[i]) {
+                for (let i = 0, l = this.ibb.bestHash.length; i < l; i++)
+                    if (bestHash[i] < this.ibb.bestHash[i]) {
                         change = true;
                         break;
                     }
-                    else if (bestHash[i] > this.bestHash[i])
+                    else if (bestHash[i] > this.ibb.bestHash[i])
                         break;
 
 
                 if ( change ) {
-                    this.bestHash = bestHash;
-                    this.bestNonce = parseInt(msg.bestNonce)
+                    this.ibb.bestHash = bestHash;
+                    this.ibb.bestHashNonce = parseInt(msg.bestNonce)
                 }
 
                 // if (Math.random() < 0.10)
@@ -197,8 +198,8 @@ class Workers {
 
         this.ibb._workerResolve({
             result: false,
-            hash: this.bestHash,
-            nonce: this.bestNonce
+            hash: this.ibb.bestHash,
+            nonce: this.ibb.bestHashNonce
         });
 
         return this;
@@ -207,7 +208,9 @@ class Workers {
     _loop(_delay) {
         const ibb_halt = !this.ibb.started || this.ibb.resetForced || (this.ibb.reset && this.ibb.useResetConsensus);
         if (ibb_halt) {
-            this._stopAndResolve();
+
+            if (!this._finished)
+                this._stopAndResolve();
 
             return false;
         }
