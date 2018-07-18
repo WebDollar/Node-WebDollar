@@ -1,29 +1,55 @@
 const argon2 = require('argon2');
 
-let hash = async (data) => {
-
-    try{
-
+var computeHash = async(data) => {
+    try {
         return await argon2.hash(data, {
             salt: Buffer.from("Satoshi_is_Finney"),
-            timeCost: Buffer.from("Satoshi_is_Finney"),
+            timeCost: 2,
             memoryCost: 8,
             parallelism: 2,
             type: 0,
             hashLength: 32,
             raw: true,
-        })
+        });
 
-    } catch (Exception){
+    } catch (Exception) {
         console.log("Argon2 exception Argon2-Node.hash", Exception.message, Exception.code)
 
         throw Exception
     }
-
 };
 
+var serializeBufferRemovingLeadingZeros = (buffer) => {
+    let count = 0;
+    while (count < buffer.length && buffer[count] === 0)
+        count++;
 
-var send = (msg) => {
+    let result = new Buffer(1 + buffer.length - count);
+    result[0] = buffer.length - count;
+
+    for (let i = count; i < buffer.length; i++)
+        result[i - count + 1] = buffer[i];
+
+    return result;
+
+}
+
+var serializeNumber4Bytes = (data) => {
+    let buffer = Buffer(4);
+    buffer[3] = data & 0xff;
+    buffer[2] = data >> 8 & 0xff;
+    buffer[1] = data >> 16 & 0xff;
+    buffer[0] = data >> 24 & 0xff;
+
+    return buffer;
+}
+
+/**
+ * Send message to main process.
+ *
+ * @param {Object} msg
+ */
+var sendMessage = (msg) => {
     try {
         process.send(msg);
     } catch (e) {
@@ -31,13 +57,25 @@ var send = (msg) => {
     }
 };
 
-var hashit = async(data) => {
-
-
-    // batched
-    send({ type: 'b' });
-    return false;
-
+/**
+ * Loops through a batch of nonces.
+ *
+ * Notes on data:
+ * - All data gets serialised in an object or an array while pased through
+ *   messages from main process to this child process.
+ *   So all data needs to be adjusted to it's original state.
+ *
+ * Notes on workflow:
+ * - If data.block is false, then it means it mines solo
+ *   and it reconstructs the block with all it's (Buffer) parts.
+ * - If it has a data.block it means it mines in a pool.
+ *
+ *
+ * @param {Object} data
+ *
+ * @return {Boolean}
+ */
+var mineNoncesBatch = async(data) => {
     var { block, height, difficultyTargetPrev, computedBlockPrefix, difficulty, start, batch } = data;
 
     // pool mining
@@ -64,11 +102,10 @@ var hashit = async(data) => {
     if (!Buffer.isBuffer(difficulty))
         difficulty = new Buffer(difficulty);
 
-
     for (let nonce = parseInt(start); nonce < parseInt(start) + parseInt(batch); nonce++) {
         if (nonce > 0xFFFFFFFF) {
-            // batched
-            send({ type: 'b' });
+            // batched: signal main process that it finished this batch
+            sendMessage({ type: 'b' });
 
             return false;
         }
@@ -78,13 +115,13 @@ var hashit = async(data) => {
 
             let buffer = Buffer.concat(constant_prefix);
 
-            let hash = await hash(buffer);
+            let hash = await computeHash(buffer);
 
             // console.log(nonce, hash);
 
             if (hash.compare(difficulty) <= 0) {
-                // solved
-                send({
+                // solved: signal main process that we got a solution
+                sendMessage({
                     type: 's',
                     solution: { nonce, hash }
                 });
@@ -92,62 +129,33 @@ var hashit = async(data) => {
                 return false;
             }
 
-            // hashing
-            send({ type: 'h' });
+            // hashing: signal main process that we hashed one time
+            sendMessage({ type: 'h' });
 
         } catch (error) {
             console.log(error);
         }
     }
 
-    // batched
-    send({ type: 'b' });
+    // batched: signal main process that it finished this batch
+    sendMessage({ type: 'b' });
 
     return false;
 }
 
+/**
+ * Gets called by main process
+ *
+ * @param {String} 'message'
+ * @param {Object} (msg
+ *
+ */
 process.on('message', (msg) => {
-    send({ type: 'b' })
     if (msg.command === 'start') {
         try {
-            hashit(msg.data);
+            mineNoncesBatch(msg.data);
         } catch (error) {
             console.log(error);
         }
     }
 });
-
-
-
-
-
-
-
-
-
-var serializeBufferRemovingLeadingZeros = (buffer) => {
-
-    let count = 0;
-    while (count < buffer.length && buffer[count] === 0)
-        count++;
-
-    let result = new Buffer(1 + buffer.length - count );
-    result [0] = buffer.length - count;
-
-    for (let i = count; i < buffer.length; i++)
-        result[i-count+1] = buffer[i];
-
-
-    return result;
-
-}
-
-var serializeNumber4Bytes = (data) => {
-    let buffer = Buffer(4);
-    buffer[3] = data & 0xff;
-    buffer[2] = data>>8 & 0xff;
-    buffer[1] = data>>16 & 0xff;
-    buffer[0] = data>>24 & 0xff;
-
-    return  buffer;
-}
