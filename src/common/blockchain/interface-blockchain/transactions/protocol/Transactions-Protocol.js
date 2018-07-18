@@ -25,14 +25,15 @@ class InterfaceBlockchainTransactionsProtocol {
             if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
                 return false;
 
-            if (data.message === "Blockchain Ready to Mine"){
+            if (data.message === "Blockchain Ready to Mine" && NodesList !== undefined){
 
                 for (let i=0; i < NodesList.nodes.length; i++)
-                    if (NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET){
+                    if (NodesList.nodes[i] !== undefined && NodesList.nodes[i].socket !== undefined && NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET){
 
                         setTimeout(()=> {
 
-                            this.downloadTransactions(NodesList.nodes[i].socket, 0, 30);
+                            if (NodesList.nodes[i].socket !== undefined)
+                                this.downloadTransactions(NodesList.nodes[i].socket, 0, 30);
 
                         }, 5000 + Math.random()*15000 );
 
