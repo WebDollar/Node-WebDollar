@@ -337,6 +337,7 @@ class PoolSettings {
 
         let poolActivated = await this._db.get("pool_activated", 30*1000, true);
         if (poolActivated === null) poolActivated = false;
+        poolActivated = false;
 
         if (poolActivated === "true") poolActivated = true;
         else if (poolActivated === "false") poolActivated = false;

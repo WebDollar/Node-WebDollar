@@ -7,6 +7,7 @@ import Blockchain from "main-blockchain/Blockchain";
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 import NODE_TYPE from "node/lists/types/Node-Type"
+import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
 let NodeExpress;
 
@@ -81,6 +82,8 @@ class NodesWaitlistConnecting {
     }
 
     _tryToConnectNextNode( nextWaitListObject){
+
+        if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf(nextWaitListObject.nodeConsensusType) < 0 ) return;
 
         if (nextWaitListObject.isFallback) {
 
