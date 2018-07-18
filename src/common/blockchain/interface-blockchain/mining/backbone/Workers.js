@@ -1,3 +1,7 @@
+// Contributor: Adelin
+
+import Serialization from "../../../../utils/Serialization";
+
 const FS = require('fs');
 const OS = require('os');
 const { fork } = require('child_process');
@@ -72,6 +76,7 @@ class Workers {
 
         this.block = this.ibb.block;
         this.difficulty = this.ibb.difficulty;
+        this.height = this.ibb.block.height;
 
         this._from_pool = true;
         if (this.block.height) {
@@ -79,9 +84,23 @@ class Workers {
             this._from_pool = false;
         }
 
+        if ( !Buffer.isBuffer(this.block) ){
+
+            // solo mining
+            this.block = Buffer.concat([
+                Serialization.serializeBufferRemovingLeadingZeros(Serialization.serializeNumber4Bytes(this.block.height)),
+                Serialization.serializeBufferRemovingLeadingZeros(this.block.difficultyTargetPrev),
+                this.block.computedBlockPrefix,
+            ]) ;
+
+        }
+
         // resets
         this._finished = false;
         this._final_batch = false;
+
+        this.bestHash = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
+        this.bestNonce = 0;
 
         this._initiateWorkers();
 
@@ -109,9 +128,10 @@ class Workers {
         worker._is_batching = false;
 
         worker.on('message', (msg) => {
+
             // hashing: hashed one time, so we are incrementing hashes per second
             if (msg.type == 'h') {
-                this.ibb._hashesPerSecond++;
+                this.ibb._hashesPerSecond += 3;
 
                 return false;
             }
@@ -122,8 +142,8 @@ class Workers {
 
                 this.ibb._workerResolve({
                     result: true,
-                    nonce: parseInt(msg.solution.nonce),
-                    hash: new Buffer(msg.solution.hash),
+                    nonce: parseInt(msg.nonce),
+                    hash: new Buffer(msg.hash),
                 });
 
                 return false;
@@ -133,13 +153,30 @@ class Workers {
             if (msg.type == 'b') {
                 worker._is_batching = false;
 
+                let bestHash = new Buffer(msg.bestHash);
+
+                let change = false;
+                for (let i = 0, l = this.bestHash.length; i < l; i++)
+                    if (bestHash[i] < this.bestHash[i]) {
+                        change = true;
+                        break;
+                    }
+                    else if (bestHash[i] > this.bestHash[i])
+                        break;
+
+
+                if ( change ) {
+                    this.bestHash = bestHash;
+                    this.bestHash = parseInt(msg.bestNonce)
+                }
+
+
                 // keep track of the ones that are working
                 this._working--;
 
                 // if none of the threads are working and we finished the range, then we should stop and resolve
-                if (!this._working && this._current >= this._current_max) {
+                if (!this._working && this._current >= this._current_max)
                     this._stopAndResolve();
-                }
 
                 return false;
             }
@@ -196,10 +233,7 @@ class Workers {
             worker.send({
                 command: 'start',
                 data: {
-                    block: (!this._from_pool) ? false : this.block,
-                    height: (this._from_pool) ? false : this.block.height,
-                    difficultyTargetPrev: (this._from_pool) ? false : this.block.difficultyTargetPrev,
-                    computedBlockPrefix: (this._from_pool) ? false : this.block.computedBlockPrefix,
+                    block: this.block,
                     difficulty: this.difficulty,
                     start: this._current,
                     batch: this._final_batch ? this._final_batch : this.worker_batch,
@@ -207,6 +241,7 @@ class Workers {
             });
 
             this._current += this.worker_batch;
+
         });
 
         // healthy loop delay

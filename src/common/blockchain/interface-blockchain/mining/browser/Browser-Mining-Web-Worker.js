@@ -175,10 +175,8 @@ function calcHash() {
 
     var hashArr = new Uint8Array(32);
 
-
     if (!Module._argon2_hash)
         return hashArr;
-
 
     //var dt = now();
     var pwd = allocateArray( ARGON2_PARAM.pass);
@@ -186,6 +184,7 @@ function calcHash() {
     var hash = Module.allocate(new Array( ARGON2_PARAM.hashLen ), 'i8', Module.ALLOC_NORMAL);
     var encoded = Module.allocate(new Array(512), 'i8', Module.ALLOC_NORMAL);
     var err;
+
     try {
 
         var res = Module._argon2_hash(ARGON2_PARAM.time, ARGON2_PARAM.mem, ARGON2_PARAM.parallelism, pwd, ARGON2_PARAM.pass.length, salt, ARGON2_PARAM.salt.length,
@@ -264,7 +263,7 @@ function sleep(ms) {
 
 export default function (self) {
 
-
+    let blockLen;
 
     log = (msg) => {
         if (!msg )
@@ -317,7 +316,9 @@ export default function (self) {
 
                     //solution using Uint8Array
                     ARGON2_PARAM.pass = new Uint8Array(block.length + 4 );
-                    ARGON2_PARAM.pass.set(block);
+                    ARGON2_PARAM.pass.set (block);
+
+                    blockLen = block.length;
 
                 }
 
@@ -334,7 +335,7 @@ export default function (self) {
             nonce = ev.data.nonce;
             noncePrevious = nonce;
             nonceEnd = nonce + ev.data.count;
-            bestHash = undefined;
+            bestHash = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
             bestNonce = 0;
 
             WorkerChanged = true;
@@ -361,28 +362,23 @@ export default function (self) {
 
                 WorkerChanged = false;
 
-                nonceArray [3] = nonce & 0xff;
-                nonceArray [2] = nonce>>8 & 0xff;
-                nonceArray [1] = nonce>>16 & 0xff;
-                nonceArray [0] = nonce>>24 & 0xff;
-
-                ARGON2_PARAM.pass.set(nonceArray, block.length);
+                ARGON2_PARAM.pass [blockLen + 3] = nonce & 0xff;
+                ARGON2_PARAM.pass [blockLen + 2] = nonce>>8 & 0xff;
+                ARGON2_PARAM.pass [blockLen + 1] = nonce>>16 & 0xff;
+                ARGON2_PARAM.pass [blockLen    ] = nonce>>24 & 0xff;
 
                 let hash = await algorithm ();
 
                 if (WorkerChanged) continue; //it was changed in the meanwhile
 
                 let change = false;
-
-                if (bestHash === undefined) change = true;
-                else
-                    for (let i = 0, l = bestHash.length; i < l; i++)
-                        if (hash[i] < bestHash[i]) {
-                            change = true;
-                            break;
-                        }
-                        else if (hash[i] > bestHash[i])
-                            break;
+                for (let i = 0, l = bestHash.length; i < l; i++)
+                    if (hash[i] < bestHash[i]) {
+                        change = true;
+                        break;
+                    }
+                    else if (hash[i] > bestHash[i])
+                        break;
 
 
                 if ( change ) {
