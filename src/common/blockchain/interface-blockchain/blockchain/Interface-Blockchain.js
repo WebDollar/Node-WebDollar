@@ -272,7 +272,48 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return true;
     }
 
+    setFastLoadingValidationType(validationType){
 
+        if(validationType===undefined) validationType = {"skip-sleep": true};
+
+        validationType["skip-prev-hash-validation"] = true;
+        validationType["skip-accountant-tree-validation"] = true;
+        validationType["skip-mini-blockchain-simulation"] = true;
+        validationType["skip-validation-transactions-from-values"] = true;
+        validationType["skip-validation-timestamp"] = true;
+        validationType["validation-timestamp-adjusted-time"] = false;
+        validationType["skip-block-data-validation"] = true;
+        validationType["skip-block-data-transactions-validation"] = true;
+        validationType["skip-validation-interlinks"] = true;
+        validationType["skip-validation"] = true;
+        validationType["skip-interlinks-update"] = true;
+        validationType["skip-target-difficulty-validation"] = true;
+        validationType["skip-calculating-proofs"] = true;
+        //validationType["skip-calculating-block-nipopow-level"] = true;
+        validationType["skip-saving-light-accountant-tree-serializations"] = true;
+        validationType["skip-recalculating-hash-rate"] = true;
+
+        if (Math.random() > 0.0001)
+            validationType["skip-validation-PoW-hash"] = true;
+
+        return validationType;
+
+    }
+
+    async readNumberSavedBlocks(){
+
+        let numBlocks = await this.db.get(this._blockchainFileName);
+
+        if (numBlocks === null ) {
+
+            console.error("NumBlocks was not found");
+            return false;
+
+        }
+
+        return numBlocks;
+
+    }
 
     _getLoadBlockchainValidationType(indexStart, i, numBlocks, indexStartProcessingOffset){
 
@@ -283,31 +324,14 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             //fast loading Blockchain
             if ( i <= indexStartProcessingOffset ){
 
-                validationType["skip-prev-hash-validation"] = true;
-                validationType["skip-accountant-tree-validation"] = true;
-                validationType["skip-mini-blockchain-simulation"] = true;
-                validationType["skip-validation-transactions-from-values"] = true;
-                validationType["skip-validation-timestamp"] = true;
-                validationType["validation-timestamp-adjusted-time"] = false;
-                validationType["skip-block-data-validation"] = true;
-                validationType["skip-block-data-transactions-validation"] = true;
-                validationType["skip-validation-interlinks"] = true;
-                validationType["skip-validation"] = true;
-                validationType["skip-interlinks-update"] = true;
-                validationType["skip-target-difficulty-validation"] = true;
-                validationType["skip-calculating-proofs"] = true;
-                //validationType["skip-calculating-block-nipopow-level"] = true;
-                validationType["skip-saving-light-accountant-tree-serializations"] = true;
-                validationType["skip-recalculating-hash-rate"] = true;
-
-                if (Math.random() > 0.0001)
-                    validationType["skip-validation-PoW-hash"] = true;
+               this.setFastLoadingValidationType(validationType);
 
             }
 
         } else {
 
             if ( indexStart < numBlocks ){
+
                 validationType["skip-recalculating-hash-rate"] = true;
                 validationType["skip-saving-light-accountant-tree-serializations"] = true;
                 validationType["skip-calculating-proofs"] = true;
@@ -315,7 +339,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             }
 
         }
-
 
         return validationType;
 
@@ -376,7 +399,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             try {
 
                 for (index = indexStart; index < numBlocks; ++index ) {
-
 
                     let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
 

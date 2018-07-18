@@ -11,6 +11,7 @@ import InterfaceBlockchainTipsAdministrator from "./tips/Interface-Blockchain-Ti
 import StatusEvents from "common/events/Status-Events";
 import consts from 'consts/const_global'
 import SavingManager from "common/blockchain/utils/saving-manager/Saving-Manager"
+import LoadingManager from "common/blockchain/utils/saving-manager/Loading-Manager"
 
 class InterfaceBlockchainBasic{
 
@@ -37,6 +38,7 @@ class InterfaceBlockchainBasic{
 
         this.semaphoreProcessing = new SemaphoreProcessing();
         this.savingManager = new SavingManager(this);
+        this.loadingManager = new LoadingManager(this);
 
     }
 

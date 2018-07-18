@@ -4,15 +4,9 @@ import MiniBlockchainLight from 'common/blockchain/mini-blockchain/blockchain/Mi
 
 let inheritedBlockchain;
 
-const lightFullNodes = true;
-
 if (process.env.BROWSER) inheritedBlockchain = MiniBlockchainLight;
-else {
-
-    if (lightFullNodes) inheritedBlockchain = MiniBlockchainAdvancedVirtualized;
-        else inheritedBlockchain = MiniBlockchainAdvanced;
-
-}
+else
+    inheritedBlockchain = MiniBlockchainAdvancedVirtualized;
 
 //inheritedBlockchain = MiniBlockchainLight;
 

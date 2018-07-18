@@ -183,11 +183,8 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         console.log("_loadLightSettings load" );
 
-        let numBlocks = await this.db.get(this._blockchainFileName);
-        if (numBlocks === null ) {
-            console.error("numBlocks was not found");
-            return {result:false};
-        }
+        let numBlocks = this.readNumberSavedBlocks();
+        if( numBlocks === false ) return { result:false };
 
         // trying to read the diffIndex
         let diffIndex = await this.db.get(this._blockchainFileName + "_LightSettings_diffIndex");

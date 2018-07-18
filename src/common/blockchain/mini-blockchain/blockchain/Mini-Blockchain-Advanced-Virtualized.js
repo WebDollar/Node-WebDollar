@@ -6,13 +6,27 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
 
         if (process.env.BROWSER) return;
 
-        MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, false);
+        let numBlocks = await this.readNumberSavedBlocks();
+        if( numBlocks === false ) return { result:false };
+
+        await MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, false);
+
+        this.blocks.length = numBlocks;
 
         try {
+
             let answer = await this.prover.provesCalculated._loadProvesCalculated();
+
+            if (answer === false)
+                throw {message : "NiPoPoW Proves Calculated raised an error"};
+
         } catch (exception){
+
             console.error("Loading BLocks raised an error");
             MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, true);
+
+            await this.prover.provesCalculated._saveProvesCalculated();
+
         }
 
     }
@@ -23,8 +37,11 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
 
         MiniBlockchainAdvanced.prototype.saveAccountantTree.call(this, serialization.length);
 
+        console.log("intraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+
         //save proofs
         let answer = await this.prover.provesCalculated._saveProvesCalculated();
+        console.log("SAVEEEEEEEEED "+answer)
 
     }
 

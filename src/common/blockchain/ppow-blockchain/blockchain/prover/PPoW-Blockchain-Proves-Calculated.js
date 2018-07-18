@@ -153,29 +153,43 @@ class PPoWBlockchainProvesCalculated{
 
     async _DeserializationProves(Buffer, offset = 0) {
 
-        let levelsLength = Serialization.deserializeNumber4Bytes(Buffer, offset);
-        offset += 4;
+        if ( Object.keys(Buffer).length !== 0 ){
 
-        for (let i=-1; i< levelsLength; i++){
+            let levelsLength = Serialization.deserializeNumber4Bytes(Buffer, offset);
+            offset += 4;
 
-            this.levels[i].length = Serialization.deserializeNumber7Bytes(Buffer, offset);
-            offset += 7;
+            console.log(levelsLength);
 
-            for (let j=0; j<this.levels[i].length; j++){
+            if( levelsLength !== 0 ) {
 
-                let zeroCount = this.levels[j].hash = BufferExtended.substr(Buffer, offset, 1);
-                offset += 1;
+                for (let i = -1; i < levelsLength; i++) {
 
-                let hashPrefix = [];
+                    if (this.levels[i].length !== 0) {
 
-                for(let z=0; z<zeroCount; z++) hashPrefix.push(0);
+                        this.levels[i].length = Serialization.deserializeNumber7Bytes(Buffer, offset);
+                        offset += 7;
 
-                this.levels[j].hash = Buffer.concat([
-                    hashPrefix,
-                    this.levels[j].hash = BufferExtended.substr(Buffer, offset, 32-zeroCount)
-                ]);
+                        for (let j = 0; j < this.levels[i].length; j++) {
 
-                offset += 32-zeroCount;
+                            let zeroCount = this.levels[j].hash = BufferExtended.substr(Buffer, offset, 1);
+                            offset += 1;
+
+                            let hashPrefix = [];
+
+                            for (let z = 0; z < zeroCount; z++) hashPrefix.push(0);
+
+                            this.levels[j].hash = Buffer.concat([
+                                hashPrefix,
+                                this.levels[j].hash = BufferExtended.substr(Buffer, offset, 32 - zeroCount)
+                            ]);
+
+                            offset += 32 - zeroCount;
+
+                        }
+
+                    }
+
+                }
 
             }
 
@@ -188,10 +202,12 @@ class PPoWBlockchainProvesCalculated{
         if (key === undefined)
             key = this.blockchain._blockchainFileName+"_proves_calculated";
 
-        console.log("Save proof creator "+key);
-        console.log(this._SerializationProves());
+        let buffer = this._SerializationProves();
 
-        return (await this.db.save( key, this._SerializationProves() ));
+        console.log("Save proof creator "+key);
+        console.log(buffer);
+
+        return (await this.db.save( key, buffer ));
 
     }
 
@@ -206,12 +222,12 @@ class PPoWBlockchainProvesCalculated{
 
             let buffer = await this.db.get(key, 12000);
 
-            if (buffer === null) {
+            if (buffer === null && !Buffer.isBuffer(buffer)) {
                 console.error("Proof for key "+key+" was not found");
                 return false;
             }
 
-            console.log("bufffffr ",buffer)
+            console.log("bufffffr ",buffer);
 
             await this._DeserializationProves(buffer);
 
