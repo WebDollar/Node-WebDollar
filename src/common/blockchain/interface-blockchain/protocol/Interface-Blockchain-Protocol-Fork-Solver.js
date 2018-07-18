@@ -154,7 +154,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (this.blockchain.blocks[i].hash.equals(answer.hash)){
 
                         binarySearchResult = {
-                            position: i+2,
+                            position: i+1,
                             header: answer.hash,
                         };
 
