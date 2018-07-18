@@ -6,8 +6,6 @@ let ARGON2_PARAM = { salt: 'Satoshi_is_Finney', time: 2, mem: 256, parallelism: 
 
 let algorithm = undefined;
 
-let nonceArray = new Uint8Array(4);
-
 let bestHash, bestNonce;
 let nonce, noncePrevious, nonceEnd;
 let WorkerInitialized = false;
@@ -263,7 +261,7 @@ function sleep(ms) {
 
 export default function (self) {
 
-    let blockLen;
+    let blockLen, difficulty;
 
     log = (msg) => {
         if (!msg )
@@ -311,8 +309,10 @@ export default function (self) {
 
             if (ev.data.message === "initialize") {
 
-                if (ev.data.block !== undefined && ev.data.block !== null) {
+                if (ev.data.block !== undefined && ev.data.block !== null && ev.data.difficulty !== undefined && ev.data.difficulty !== null) {
+
                     block = ev.data.block;
+                    difficulty = ev.data.difficulty;
 
                     //solution using Uint8Array
                     ARGON2_PARAM.pass = new Uint8Array(block.length + 4 );
@@ -351,6 +351,8 @@ export default function (self) {
         if ( WorkerInitialized ) return;
         WorkerInitialized = true;
 
+        let change, found;
+
         while ( 1 === 1){
 
             if (nonce === nonceEnd || jobTerminated) {
@@ -371,7 +373,7 @@ export default function (self) {
 
                 if (WorkerChanged) continue; //it was changed in the meanwhile
 
-                let change = false;
+                change = false;
                 for (let i = 0, l = bestHash.length; i < l; i++)
                     if (hash[i] < bestHash[i]) {
                         change = true;
@@ -384,6 +386,19 @@ export default function (self) {
                 if ( change ) {
                     bestHash = hash;
                     bestNonce = nonce;
+
+                    found = false;
+                    for (let i = 0, l = difficulty.length; i < l; i++)
+                        if (hash[i] < difficulty[i]) {
+                            found = true;
+                            break;
+                        }
+                        else if (hash[i] > difficulty[i])
+                            break;
+
+                    if (found)
+                        nonce = nonceEnd - 1;
+
                 }
 
             } catch (exception){

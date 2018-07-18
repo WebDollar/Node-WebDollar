@@ -49,7 +49,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         let socket = nodesListObject.socket;
 
-        if (Blockchain.MinerPoolManagement.minerPoolStarted)
+        if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
             return false;
 
         this.initializeTransactionsPropagation(socket);

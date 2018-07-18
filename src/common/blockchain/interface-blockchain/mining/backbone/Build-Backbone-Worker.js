@@ -55,6 +55,7 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
     // difficulty
     let bestHash = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
     let bestNonce = 0;
+    let change, found;
 
     for (let nonce = parseInt(start), n=(parseInt(start) + parseInt(batch)); nonce < n; nonce++) {
 
@@ -74,7 +75,7 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
 
             // console.log(nonce, hash);
 
-            let change = false;
+            change = false;
 
             for (let i = 0, l = bestHash.length; i < l; i++)
                 if (hash[i] < bestHash[i]) {
@@ -89,7 +90,16 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
                 bestHash = hash;
                 bestNonce = nonce;
 
-                if (hash.compare(difficulty) <= 0) {
+                found = false;
+                for (let i = 0, l = difficulty.length; i < l; i++)
+                    if (hash[i] < difficulty[i]) {
+                        found = true;
+                        break;
+                    }
+                    else if (hash[i] > bestHash[i])
+                        break;
+
+                if (found) {
 
                     // solved: signal main process that we got a solution
                     sendMessage({

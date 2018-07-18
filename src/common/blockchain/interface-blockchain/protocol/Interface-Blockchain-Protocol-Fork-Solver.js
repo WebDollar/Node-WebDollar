@@ -133,7 +133,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     }
 
 
-                    console.log("_forkSolver_checking", i, currentBlockchainLength);
+                    console.log("_forkSolver_checking", i, currentBlockchainLength-1);
 
 
                     forkFound = this.blockchain.forksAdministrator._findForkyByHeader( answer.hash );
@@ -154,7 +154,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (this.blockchain.blocks[i].hash.equals(answer.hash)){
 
                         binarySearchResult = {
-                            position: i+1,
+                            position: i+2,
                             header: answer.hash,
                         };
 
