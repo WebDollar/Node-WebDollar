@@ -106,7 +106,6 @@ class InterfaceBlockchainProtocolForkSolver{
         let currentBlockchainLength = this.blockchain.blocks.length;
 
         let fork, forkFound;
-        let headers = [forkLastBlockHash];
 
         try{
 
@@ -121,8 +120,13 @@ class InterfaceBlockchainProtocolForkSolver{
             //veify last n elements
             const count = 6;
 
+            let nextHash;
+
+            answer = {hash: undefined};
             if ( currentBlockchainLength >= count && ( forkChainLength >= currentBlockchainLength ||  (this.blockchain.agent.light && forkProof) )  )
                 for (let i = currentBlockchainLength-1; i >= currentBlockchainLength-1-count; i--){
+
+                    nextHash= answer.hash;
 
                     if (i === currentBlockchainLength-1)
                         answer = {hash: forkLastBlockHash};
@@ -141,7 +145,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (forkFound !== null && forkFound !== fork) {
                         if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
 
-                        forkFound.pushHeader( forkLastBlockHash ); //this lead to a new fork
+                        forkFound.pushHeaders( fork.forkHeaders ); //this lead to a new fork
                         forkFound.pushSocket(socket, forkProof);
 
                         this.blockchain.forksAdministrator.deleteFork(fork); //destroy fork
@@ -150,20 +154,19 @@ class InterfaceBlockchainProtocolForkSolver{
                     }
 
 
+                    fork.pushHeader(answer.hash);
 
                     if (this.blockchain.blocks[i].hash.equals(answer.hash)){
 
                         binarySearchResult = {
-                            position: i+1,
-                            header: answer.hash,
+                            position: i+2,
+                            header: nextHash,
                         };
 
-                        fork.pushHeader(answer.hash);
+
                         break;
 
                     } else {
-
-                        fork.pushHeader(answer.hash);
 
                     }
 
