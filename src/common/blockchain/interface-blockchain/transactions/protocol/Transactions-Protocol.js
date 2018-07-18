@@ -32,7 +32,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                         setTimeout(()=> {
 
-                            if (NodesList.nodes[i].socket !== undefined)
+                            if (NodesList.nodes[i] !== undefined && NodesList.nodes[i].socket !== undefined)
                                 this.downloadTransactions(NodesList.nodes[i].socket, 0, 30);
 
                         }, 5000 + Math.random()*15000 );

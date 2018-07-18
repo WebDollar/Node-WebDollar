@@ -508,7 +508,7 @@ class InterfaceBlockchainFork {
                             this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
                         }
                         catch (exception) {
-                            console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
+                            //console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
                         }
 
                     });
@@ -550,7 +550,7 @@ class InterfaceBlockchainFork {
                             this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
                         }
                         catch (exception) {
-                            console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
+                            //console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
                         }
 
                     });
