@@ -132,7 +132,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         nextPos = i;
                     }
 
-                    if (i !== currentBlockchainLength-1){
+                    if (i !== forkChainLength-1){
                         answer = await socket.node.sendRequestWaitOnce( "head/hash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                         if (answer === null || answer.hash === undefined)
                             continue;
