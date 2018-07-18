@@ -114,12 +114,6 @@ class PoolWorkManagement{
 
             if ( work.result && prevBlock === undefined ) { //it is a solution and prevBlock is undefined
 
-                console.warn("----------------------------------------------------------------------------");
-                console.warn("----------------------------------------------------------------------------");
-                console.warn("WebDollar Block was mined in Pool 1 ", blockInformationMinerInstance.workBlock.height, work.hash.toString("hex"), "nonce", work.nonce );
-                console.warn("----------------------------------------------------------------------------");
-                console.warn("----------------------------------------------------------------------------");
-
                 if ( await blockInformationMinerInstance.wasBlockMined() ){
 
                     console.warn("----------------------------------------------------------------------------");
