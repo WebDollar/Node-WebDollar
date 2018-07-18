@@ -129,7 +129,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     if (answer !== null) {
                         nextHash = answer.hash;
-                        nextPos = i+1;
+                        nextPos = i;
                     }
 
                     if (i !== currentBlockchainLength-1){

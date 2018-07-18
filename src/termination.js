@@ -1,4 +1,6 @@
 import global from "consts/global";
+import NodesList from 'node/lists/Nodes-List'
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
 let alreadySaved = false;
 
@@ -10,6 +12,10 @@ export default async (Blockchain) => {
 
     if (alreadySaved) return;
     alreadySaved = true;
+
+    NodesList.disconnectAllNodes();
+    NodesWaitlist.waitListFullNodes = [];
+    NodesWaitlist.waitListLightNodes = [];
 
     if (!global.INTERFACE_BLOCKCHAIN_LOADING)
         await Blockchain.blockchain.saveBlockchainTerminated();
