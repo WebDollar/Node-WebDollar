@@ -120,20 +120,19 @@ class InterfaceBlockchainProtocolForkSolver{
             //veify last n elements
             const count = 6;
 
-            let nextHash, nestPos;
+            let nextHash, nextPos;
 
             answer = {hash: forkLastBlockHash};
+
             if ( currentBlockchainLength >= count && ( forkChainLength >= currentBlockchainLength ||  (this.blockchain.agent.light && forkProof) )  )
                 for (let i = currentBlockchainLength-1; i >= currentBlockchainLength-1-count; i--){
 
                     if (answer !== null) {
                         nextHash = answer.hash;
-                        nestPos = i+1;
+                        nextPos = i+1;
                     }
 
-                    if (i === currentBlockchainLength-1)
-                        answer = {hash: forkLastBlockHash};
-                    else {
+                    if (i !== currentBlockchainLength-1){
                         answer = await socket.node.sendRequestWaitOnce( "head/hash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                         if (answer === null || answer.hash === undefined)
                             continue;
@@ -162,7 +161,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (this.blockchain.blocks[i].hash.equals(answer.hash)){
 
                         binarySearchResult = {
-                            position: nestPos+1,
+                            position: nextPos+1,
                             header: nextHash,
                         };
 
