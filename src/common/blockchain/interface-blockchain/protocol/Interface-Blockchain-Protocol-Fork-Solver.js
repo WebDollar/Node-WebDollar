@@ -120,21 +120,20 @@ class InterfaceBlockchainProtocolForkSolver{
             //veify last n elements
             const count = 6;
 
-            let nextHash, nextPos;
-
-            answer = {hash: forkLastBlockHash};
+            let nextHash;
+            answer = null;
 
             if ( currentBlockchainLength >= count && ( forkChainLength >= currentBlockchainLength ||  (this.blockchain.agent.light && forkProof) )  )
                 for (let i = currentBlockchainLength-1; i >= currentBlockchainLength-1-count; i--){
 
-                    if (answer !== null) {
-                        nextHash = answer.hash;
-                        nextPos = i;
-                    }
+                    if (answer !== null)
+                        nextHash = answer ;
 
-                    if (i !== forkChainLength-1){
+                    if (i === forkChainLength-1 && forkLastBlockHash !== undefined && forkLastBlockHash !== undefined) {
+                        answer = {hash: forkLastBlockHash};
+                    } else {
                         answer = await socket.node.sendRequestWaitOnce( "head/hash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
-                        if (answer === null || answer.hash === undefined)
+                        if (answer === null || answer === undefined || answer.hash === undefined)
                             continue;
                     }
 
@@ -161,14 +160,12 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (this.blockchain.blocks[i].hash.equals(answer.hash)){
 
                         binarySearchResult = {
-                            position: nextPos+1,
-                            header: nextHash,
+                            position: (i === currentBlockchainLength-1) + 1 ? currentBlockchainLength :  i+2,
+                            header: answer.hash,
                         };
 
 
                         break;
-
-                    } else {
 
                     }
 
@@ -332,6 +329,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
             let block = this._deserializeForkBlock(fork, answer.block, nextBlockHeight, blockValidation );
+
+            //console.log("block.hash", block.hash.toString("hex"));
 
             if (fork.downloadAllBlocks && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
 
