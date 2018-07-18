@@ -17,11 +17,6 @@ class Workers {
         this.ibb = ibb;
 
         this._abs_end = 0xFFFFFFFF;
-        this._default_resolve = {
-            result: false,
-            nonce: -1,
-            hash: consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER
-        };
 
         this._from_pool = undefined;
 
@@ -200,7 +195,11 @@ class Workers {
             clearTimeout(this._run_timeout);
         }
 
-        this.ibb._workerResolve(this._default_resolve);
+        this.ibb._workerResolve({
+            result: false,
+            hash: this.bestHash,
+            nonce: this.bestNonce
+        });
 
         return this;
     }
