@@ -138,13 +138,17 @@ class Workers {
 
             // solved: stop and resolve but with a solution
             if (msg.type == 's') {
+
                 this._finished = true;
+
 
                 this.ibb._workerResolve({
                     result: true,
                     nonce: parseInt(msg.nonce),
                     hash: new Buffer(msg.hash),
                 });
+
+                // console.log("sol",new Buffer(msg.hash).toString("hex"));
 
                 return false;
             }
@@ -167,9 +171,11 @@ class Workers {
 
                 if ( change ) {
                     this.bestHash = bestHash;
-                    this.bestHash = parseInt(msg.bestNonce)
+                    this.bestNonce = parseInt(msg.bestNonce)
                 }
 
+                // if (Math.random() < 0.10)
+                //     console.log("best",this.bestHash.toString("hex"));
 
                 // keep track of the ones that are working
                 this._working--;

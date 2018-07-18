@@ -66,28 +66,27 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
         }
 
         try {
-            buffer[length    ] = nonce & 0xff;
+            buffer[length + 3] = nonce & 0xff;
             buffer[length + 2] = nonce >> 8 & 0xff;
-            buffer[length + 3] = nonce >> 16 & 0xff;
-            buffer[length + 0] = nonce >> 24 & 0xff;
+            buffer[length + 1] = nonce >> 16 & 0xff;
+            buffer[length    ] = nonce >> 24 & 0xff;
 
             let hash = await argon2.hash(buffer, opt );
 
             // console.log(nonce, hash);
 
             let change = false;
-            if (bestHash === undefined) change = true;
-            else
-                for (let i = 0, l = bestHash.length; i < l; i++)
-                    if (hash[i] < bestHash[i]) {
-                        change = true;
-                        break;
-                    }
-                    else if (hash[i] > bestHash[i])
-                        break;
 
+            for (let i = 0, l = bestHash.length; i < l; i++)
+                if (hash[i] < bestHash[i]) {
+                    change = true;
+                    break;
+                }
+                else if (hash[i] > bestHash[i])
+                    break;
 
             if ( change ) {
+
                 bestHash = hash;
                 bestNonce = nonce;
 
