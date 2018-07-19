@@ -15,6 +15,9 @@ class InterfaceTransactionsPendingQueue {
         this.list = [];
 
         this.db = db;
+
+        setTimeout( this._removeOldTransactions.bind(this), 20000 );
+
     }
 
     includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
@@ -118,7 +121,7 @@ class InterfaceTransactionsPendingQueue {
         this.transactions.emitTransactionChangeEvent(transaction, true);
     }
 
-    removeOldTransactions (){
+    _removeOldTransactions (){
 
         let blockValidationType = {
             "take-transactions-list-in-consideration": {
@@ -144,6 +147,8 @@ class InterfaceTransactionsPendingQueue {
             }
 
         }
+
+        setTimeout( this._removeOldTransactions.bind(this), 20000 );
 
     }
 

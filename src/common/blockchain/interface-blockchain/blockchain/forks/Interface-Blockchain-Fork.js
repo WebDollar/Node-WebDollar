@@ -557,7 +557,7 @@ class InterfaceBlockchainFork {
             })
         }
 
-        this.blockchain.transactions.pendingQueue.removeOldTransactions();
+
 
     }
 
