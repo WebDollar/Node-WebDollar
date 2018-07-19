@@ -7,8 +7,8 @@ import StatusEvents from "common/events/Status-Events";
 import consts from 'consts/const_global'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
-const PAYOUT_INTERVAL = consts.DEBUG ? 5 : 30 + Math.floor( Math.random()*10 ); //in blocks;
-const PAYOUT_MINIMUM  = 10000;
+const PAYOUT_INTERVAL = consts.DEBUG ? 5 : 40 + Math.floor( Math.random()*10 ); //in blocks;
+
 
 class PoolPayouts{
 
@@ -146,7 +146,7 @@ class PoolPayouts{
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
-                if ( miner.__tempRewardConfirmedOther + miner.rewardConfirmedOther >= PAYOUT_MINIMUM )
+                if ( miner.__tempRewardConfirmedOther + miner.rewardConfirmedOther >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT )
                     this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther +miner.rewardConfirmedOther ;
 
             });
@@ -167,7 +167,7 @@ class PoolPayouts{
                 let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
                 try {
-                    let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, 0,);
+                    let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, 0, );
                     if (!transaction.result) throw {message: "Transaction was not made"};
                 } catch (exception){
                     Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);

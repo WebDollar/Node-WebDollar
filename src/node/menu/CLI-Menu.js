@@ -561,7 +561,7 @@ const commands = [
         '10. Mining Pool: Start Mining',
         '11. Mining Pool: Create a New Pool',
         '11-1. Mining Pool: Process Remaining Payment',
-        '12. Server for Mining Pool: Create a new Server for Mining Pool',
+        '12. Server for Mining Pool: Create a new Server for Mining Pool (Optional and Advanced)',
         '20. HTTPS Express Start',
     ];
 

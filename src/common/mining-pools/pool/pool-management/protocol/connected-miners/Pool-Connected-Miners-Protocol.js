@@ -129,7 +129,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                     msg: messageAddressConfirmation,
 
-                }, "confirmation", 16000 );
+                }, "confirmation", 30000 );
 
                 try {
 

@@ -122,7 +122,7 @@ class MinerProtocol extends PoolProtocolList{
 
                 ref: this.minerPoolManagement.minerPoolSettings.poolReferral !== '' ? this.minerPoolManagement.minerPoolSettings.poolReferral : undefined,
 
-            }, "answer", 16000  );
+            }, "answer", 30000  );
 
 
             if (answer === null ) throw {message: "pool : didn't respond"}; //in case there was an error message

@@ -108,7 +108,7 @@ class PoolRewardsManagement{
             let percentAlreadyPaid = miner._rewardSent / this.totalRewardSent;
             let reward = Math.floor( percentAlreadyPaid * remainingAmount + miner._rewardConfirmedOther );
 
-            if ( reward >= 20*WebDollarCoins.WEBD){
+            if ( reward >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT){
 
                 this._addAddressTo(miner.address).amount = reward;
                 //Log.info("Will pay " + reward/WebDollarCoins.WEBD.toFixed(0) + " WEBD to " + InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address,false,true), Log.LOG_TYPE.POOLS);
@@ -145,7 +145,7 @@ class PoolRewardsManagement{
         // for (let i=this._toAddresses.length-1; i>=0; i--){
         //     this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount - fee );
         //
-        //     if (this._toAddresses[i].amount < 20*WebDollarCoins.WEBD){
+        //     if (this._toAddresses[i].amount < consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT){
         //
         //         let miner = this.poolData.findMiner( this._toAddresses[i].address );
         //         miner.rewardConfirmedOther += Math.max(0, this._toAddresses[i].amount);
