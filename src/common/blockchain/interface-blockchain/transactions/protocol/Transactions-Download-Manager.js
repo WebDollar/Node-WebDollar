@@ -79,7 +79,7 @@ class TransactionsDownloadManager{
         }
 
         if (socket !== undefined)
-            await this.transactionsProtocol.downloadTransactions(socket, 0, 40, consts.SETTINGS.MEM_POOL.TRANSACTIONS_MAXIMUM_DOWNLOADS );
+            await this.transactionsProtocol.downloadTransactions(socket, 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
 
         setTimeout( this._processSockets.bind(this), 3000 );
 

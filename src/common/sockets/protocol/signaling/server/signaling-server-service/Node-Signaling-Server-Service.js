@@ -2,6 +2,7 @@ import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingServerWaitlistObject from "./Node-Signaling-Server-Waitlist-Object"
 import NodeSignalingServerProtocol from "./../Node-Signaling-Server-Protocol"
 import SignalingServerRoomList from '../signaling-server-room/Signaling-Server-Room-List'
+import Utils from "common/utils/helpers/Utils"
 
 class NodeSignalingServerService{
 
@@ -63,8 +64,9 @@ class NodeSignalingServerService{
         return null;
     }
 
-    _connectWebPeers(){
+    async _connectWebPeers(){
 
+        let count = 0;
 
         //mixing users
         for (let i = 0; i < this.waitlist.length; i++)
@@ -91,6 +93,9 @@ class NodeSignalingServerService{
                         }
 
                         NodeSignalingServerProtocol.connectWebPeer( client1.socket, client2.socket );
+
+                        if (count % 100 === 0)
+                            await Utils.sleep(20);
 
                     }
 
