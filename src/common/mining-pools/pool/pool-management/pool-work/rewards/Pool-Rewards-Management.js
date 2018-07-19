@@ -15,7 +15,7 @@ const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : 10;
 
 const CONFIRMATIONS_REQUIRE_OTHER_MINERS = consts.DEBUG ? false : true;
 
-const CONFIRMATION_METHOD = 2; //1 is not working properly
+const CONFIRMATION_METHOD = 1; //1 is not working properly
 
 import Blockchain from 'main-blockchain/Blockchain';
 
