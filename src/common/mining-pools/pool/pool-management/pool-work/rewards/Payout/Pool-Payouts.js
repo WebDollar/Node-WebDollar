@@ -8,7 +8,7 @@ import consts from 'consts/const_global'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
 const PAYOUT_INTERVAL = consts.DEBUG ? 5 : 30 + Math.floor( Math.random()*10 ); //in blocks;
-const PAYOUT_MINIMUM  = consts.MINING_POOL.MINING.FEE_THRESHOLD;
+const PAYOUT_MINIMUM  = 10000;
 
 class PoolPayouts{
 
@@ -167,7 +167,7 @@ class PoolPayouts{
                 let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
                 try {
-                    let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD,);
+                    let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, 0,);
                     if (!transaction.result) throw {message: "Transaction was not made"};
                 } catch (exception){
                     Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);

@@ -214,7 +214,7 @@ consts.MINING_POOL = {
     MINING_POOL_STATUS : (process.env.MINING_POOL_STATUS || consts.MINING_POOL_TYPE.MINING_POOL_DISABLED),
 
     MINING:{
-        FEE_THRESHOLD: 100000,
+        FEE_PER_BYTE: 600,
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
 
@@ -355,7 +355,7 @@ consts.SETTINGS = {
     MEM_POOL : {
 
         TIME_LOCK : {
-            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
+            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: 2 * consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
         }
 
     }
@@ -396,7 +396,7 @@ if ( consts.DEBUG === true ){
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://webdollar.ddns.net:9095"],
+        "addr": ["http://127.0.0.1:8085"],
     }];
 
 

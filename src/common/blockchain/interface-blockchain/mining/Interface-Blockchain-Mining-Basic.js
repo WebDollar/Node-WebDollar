@@ -8,7 +8,7 @@ import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-
 
 class InterfaceBlockchainMiningBasic {
 
-    constructor(blockchain, minerAddress, miningFeeThreshold){
+    constructor(blockchain, minerAddress, miningFeePerByte){
 
         this._minerAddress = undefined;
         this._unencodedMinerAddress = undefined;
@@ -18,8 +18,8 @@ class InterfaceBlockchainMiningBasic {
         if (minerAddress !== undefined)
             this.minerAddress = minerAddress;
 
-        if (miningFeeThreshold === undefined) miningFeeThreshold = consts.MINING_POOL.MINING.FEE_THRESHOLD;
-        this.miningFeeThreshold = miningFeeThreshold;
+        if (miningFeePerByte === undefined) miningFeePerByte = consts.MINING_POOL.MINING.FEE_PER_BYTE;
+        this.miningFeePerByte = miningFeePerByte;
 
         this._nonce = 0;
         this.started = false;
@@ -46,12 +46,12 @@ class InterfaceBlockchainMiningBasic {
         return this._setAddress(newAddress, true)
     }
 
-    set miningFeeThreshold(newFee){
-        this._miningFeeThreshold = newFee;
+    set miningFeePerByte(newFee){
+        this._miningFeePerByte = newFee;
     }
 
-    get miningFeeThreshold(){
-        return this._miningFeeThreshold;
+    get miningFeePerByte(){
+        return this._miningFeePerByte;
     }
 
     _setAddress(newAddress, save = true){

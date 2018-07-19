@@ -8,6 +8,8 @@ import BufferExtended from "common/utils/BufferExtended"
 import consts from "consts/const_global";
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
+import InterfaceBlockchainTransactionsWizzard from "./../wizard/Interface-Blockchain-Transactions-Wizard";
+
 class InterfaceBlockchainTransaction{
 
 
@@ -107,6 +109,8 @@ class InterfaceBlockchainTransaction{
             txId = this._computeTxId();
 
         this.txId = txId;
+
+        this._serializated = undefined;
     }
 
     destroyTransaction(){
@@ -256,7 +260,16 @@ class InterfaceBlockchainTransaction{
         return this.from.serializeForSigning( unencodedAddress );
     }
 
-    serializeTransaction(){
+    serializeTransaction(rewrite = false){
+
+        if ( !this._serializated || rewrite )
+            this._serializated = this._serializeTransaction();
+
+        return this._serializated;
+
+    }
+
+    _serializeTransaction(){
 
         let array = [
 
@@ -426,6 +439,7 @@ class InterfaceBlockchainTransaction{
 
         return true;
     }
+
 
 
 }

@@ -137,26 +137,26 @@ class PoolRewardsManagement{
 
     async createTransactions(){
 
-        let total = consts.MINING_POOL.MINING.FEE_THRESHOLD * this._toAddresses.length/255;
-        let fee = total / this._toAddresses.length;
-
-        //let's reduce the amounts with the fees
-        let sumTotal = 0;
-        for (let i=this._toAddresses.length-1; i>=0; i--){
-            this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount - fee );
-
-            if (this._toAddresses[i].amount < 20*WebDollarCoins.WEBD){
-
-                let miner = this.poolData.findMiner( this._toAddresses[i].address );
-                miner.rewardConfirmedOther += Math.max(0, this._toAddresses[i].amount);
-
-                this._toAddresses.splice(i, 1);
-            } else {
-                Log.info("Will pay " + this._toAddresses[i].amount / WebDollarCoins.WEBD + " WEBD to " + InterfaceBlockchainAddressHelper.generateAddressWIF(this._toAddresses[i].address, false, true), Log.LOG_TYPE.POOLS);
-                sumTotal += this._toAddresses[i].amount;
-            }
-
-        }
+        // let total = consts.MINING_POOL.MINING.FEE_THRESHOLD * this._toAddresses.length/255;
+        // let fee = total / this._toAddresses.length;
+        //
+        // //let's reduce the amounts with the fees
+        // let sumTotal = 0;
+        // for (let i=this._toAddresses.length-1; i>=0; i--){
+        //     this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount - fee );
+        //
+        //     if (this._toAddresses[i].amount < 20*WebDollarCoins.WEBD){
+        //
+        //         let miner = this.poolData.findMiner( this._toAddresses[i].address );
+        //         miner.rewardConfirmedOther += Math.max(0, this._toAddresses[i].amount);
+        //
+        //         this._toAddresses.splice(i, 1);
+        //     } else {
+        //         Log.info("Will pay " + this._toAddresses[i].amount / WebDollarCoins.WEBD + " WEBD to " + InterfaceBlockchainAddressHelper.generateAddressWIF(this._toAddresses[i].address, false, true), Log.LOG_TYPE.POOLS);
+        //         sumTotal += this._toAddresses[i].amount;
+        //     }
+        //
+        // }
 
         Log.info("Total to pay " + sumTotal/WebDollarCoins.WEBD.toFixed(0), Log.LOG_TYPE.POOLS );
 
@@ -167,7 +167,7 @@ class PoolRewardsManagement{
             let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
             try {
-                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD, );
+                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, 0, );
                 if (!transaction.result) throw {message: "Transaction was not made"};
             } catch (exception){
                 Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);

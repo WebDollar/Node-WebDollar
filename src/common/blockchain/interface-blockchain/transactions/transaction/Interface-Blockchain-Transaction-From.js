@@ -76,6 +76,9 @@ class InterfaceBlockchainTransactionFrom {
             if (typeof fromObject.signature === "string")
                 fromObject.signature = new Buffer(fromObject.signature, "hex");
 
+            if (fromObject.signature === undefined)
+                fromObject.signature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
+
             if (typeof fromObject.amount === "string")
                 fromObject.amount = parseInt(fromObject.amount);
 

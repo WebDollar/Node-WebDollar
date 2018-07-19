@@ -92,9 +92,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 }
 
-                if ( transaction.fee < consts.MINING_POOL.MINING.FEE_THRESHOLD  )  //not good
-                    return false;
-
                 if (!transaction.isTransactionOK(undefined, false))
                     return false;
 
@@ -198,7 +195,7 @@ class InterfaceBlockchainTransactionsProtocol {
         //             if (! Blockchain.blockchain.transactions.pendingQueue.list[i].isTransactionOK(true)) continue;
         //
         //             if (response.format === "json") list.push(Blockchain.blockchain.transactions.pendingQueue.list[i].toJSON()); else
-        //             if (response.format === "buffer") list.push(Blockchain.blockchain.transactions.pendingQueue.list[i].serializeTransaction());
+        //             if (response.format === "buffer") list.push(Blockchain.blockchain.transactions.pendingQueue.list[i].serializeTransaction);
         //
         //             if (i % 10 === 0){
         //
@@ -258,11 +255,6 @@ class InterfaceBlockchainTransactionsProtocol {
                 let transaction = this.blockchain.transactions._createTransactionFromBuffer(answerTransactions.transactions[i]).transaction;
 
                 try {
-
-                    if ( transaction.fee < consts.MINING_POOL.MINING.FEE_THRESHOLD  ) { //not good
-                        errors += 0.25;
-                        continue;
-                    }
 
                     try {
 

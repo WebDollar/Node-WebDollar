@@ -7,9 +7,9 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
     //backbone mining is the same with InterfaceBlockchainMining
 
-    constructor(blockchain, minerAddress, miningFeeThreshold){
+    constructor(blockchain, minerAddress, miningFeePerByte){
 
-        super(blockchain, minerAddress, miningFeeThreshold);
+        super(blockchain, minerAddress, miningFeePerByte);
 
         this.WORKER_NONCES_WORK = 700;
 
