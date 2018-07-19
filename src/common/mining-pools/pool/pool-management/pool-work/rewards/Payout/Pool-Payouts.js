@@ -7,6 +7,8 @@ import StatusEvents from "common/events/Status-Events";
 import consts from 'consts/const_global'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+
 const PAYOUT_INTERVAL = consts.DEBUG ? 5 : 40 + Math.floor( Math.random()*10 ); //in blocks;
 
 
@@ -161,6 +163,12 @@ class PoolPayouts{
             for (let i=0; i < this._toAddresses.length; i++)
                 this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount );
 
+            let totalToPay = 0;
+            for (let i=0; i< this._toAddresses.length; i++ ){
+                totalToPay += this._toAddresses[i].amount;
+            }
+            Log.info("Payout Total To Pay: " + (totalToPay / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
+
             let index = 0;
             while (index * 256 < this._toAddresses.length) {
 
@@ -232,7 +240,7 @@ class PoolPayouts{
 
             }
 
-            Log.info("Payout Total Paid "+total, Log.LOG_TYPE.POOLS)
+            Log.info("Payout Total Paid "+ (total / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS)
 
 
         } catch (exception){
