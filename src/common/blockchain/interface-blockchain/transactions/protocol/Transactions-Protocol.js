@@ -95,7 +95,7 @@ class InterfaceBlockchainTransactionsProtocol {
                 if (!transaction.isTransactionOK(undefined, false))
                     return false;
 
-                await this.blockchain.sleep(25);
+                await this.blockchain.sleep(25 + transaction.from.addresses.length + transaction.to.addresses.length );
 
                 if (!this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket))
                     throw {message: "I already have this transaction"};
@@ -281,6 +281,8 @@ class InterfaceBlockchainTransactionsProtocol {
                 if (errors >= 4)
                     return;
 
+
+                await this.blockchain.sleep(25 + transaction.from.addresses.length + transaction.to.addresses.length );
 
             }
 
