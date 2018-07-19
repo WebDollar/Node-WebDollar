@@ -163,6 +163,8 @@ class PoolPayouts{
             for (let i=0; i < this._toAddresses.length; i++)
                 this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount );
 
+            this._removeAddressTo(this.blockchain.mining.unencodedMinerAddress);
+
             let totalToPay = 0;
             for (let i=0; i< this._toAddresses.length; i++ ){
                 totalToPay += this._toAddresses[i].amount;
@@ -257,13 +259,13 @@ class PoolPayouts{
 
     }
 
-    _findAddressTo(address){
+    _findAddressTo(address, returnPos = false){
 
         for (let q=0; q<this._toAddresses.length; q++)
             if (this._toAddresses[q].address.equals( address ))
-                return this._toAddresses[q];
+                return returnPos ? q : this._toAddresses[q];
 
-        return null;
+        return returnPos ? -1 : null;
 
     }
 
@@ -282,6 +284,14 @@ class PoolPayouts{
         this._toAddresses.push(object);
 
         return object;
+
+    }
+
+    _removeAddressTo(address){
+
+        let index = this._findAddressTo(address, true);
+        if (index !== -1)
+            this._toAddresses.splice(index);
 
     }
 
