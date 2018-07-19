@@ -23,6 +23,10 @@ class MiningTransactionsSelector{
 
         }
 
+        //validating its own transaction
+        if (transaction.from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress ) )
+            return true;
+
         //verify fee
         if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard(transaction.serializeTransaction(), miningFeePerByte ) )
             throw {message: "fee is too small"};

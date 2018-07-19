@@ -74,7 +74,7 @@ class PoolsUtils {
         //disconnect all nodes
 
         for (let i=0; i<NodesList.nodes.length; i++)
-            if (NodesList.nodes[i].socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER || NodesList.nodes[i].socket.node.protocol.nodeConsensusType === nodeConsensusType )
+            if ( NodesList.nodes[i].socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER || NodesList.nodes[i].socket.node.protocol.nodeConsensusType === nodeConsensusType )
                 NodesList.nodes[i].socket.node.protocol._checked = false;
 
 
@@ -93,7 +93,7 @@ class PoolsUtils {
             //check the nodes that matches the waitlists
 
             for (let j=0; j<NodesList.nodes.length; j++)
-                if (NodesList.nodes[j].socket.node.sckAddress.matchAddress( waitlistObject.sckAddresses[0] )) {
+                if ( NodesList.nodes[j].socket.node.sckAddress.matchAddress( waitlistObject.sckAddresses[0] )) {
 
                     if (NodesList.nodes[j].socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_PEER)
                         NodesList.nodes[j].socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER;
@@ -106,12 +106,11 @@ class PoolsUtils {
         //remove the nodes that don't match the waitlists
 
         for (let j=NodesList.nodes.length-1; j>=0; j--) {
-            if (NodesList.nodes[j].socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER || NodesList.nodes[j].socket.node.protocol.nodeConsensusType === nodeConsensusType)
-                if (!NodesList.nodes[j].socket.node.protocol._checked) {
-                    NodesList.nodes[j].socket.disconnect();
-                    NodesList.nodes.splice(j, 1);
-                }
 
+            if (NodesList.nodes[j].socket.node.protocol.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER || NodesList.nodes[j].socket.node.protocol.nodeConsensusType === nodeConsensusType && !NodesList.nodes[j].socket.node.protocol._checked) {
+                NodesList.nodes[j].socket.disconnect();
+                NodesList.nodes.splice(j, 1);
+            } else
             delete NodesList.nodes[j].socket.node.protocol._checked;
         }
 

@@ -135,11 +135,13 @@ class PoolWorkManagement{
                         blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
                         blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
 
-                        let serialization = blockInformationMinerInstance.workBlock.serializeBlock();
-                        block = this.blockchain.blockCreator.createEmptyBlock(blockInformationMinerInstance.workBlock.height, undefined );
-                        block.deserializeBlock(serialization, blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.reward,  );
+                        let workBlock = blockInformationMinerInstance.workBlock;
 
-                        let blockInformation = blockInformationMinerInstance;
+                        let serialization = blockInformationMinerInstance.workBlock.serializeBlock();
+                        block = this.blockchain.blockCreator.createEmptyBlock(workBlock.height, undefined );
+                        block.deserializeBlock(serialization, workBlock.height, workBlock.reward,  );
+
+                        let blockInformation = blockInformationMinerInstance.blockInformation;
 
                         if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 
@@ -158,7 +160,7 @@ class PoolWorkManagement{
 
 
                         try {
-                            blockInformation.block = blockInformationMinerInstance.workBlock;
+                            blockInformation.block = workBlock;
                         } catch (exception){
 
                         }
