@@ -235,7 +235,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.161.1",
+        VERSION: "1.161.2",
         VERSION_COMPATIBILITY: "1.160.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
@@ -357,7 +357,9 @@ consts.SETTINGS = {
 
         TIME_LOCK : {
             TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: 2 * consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
-        }
+        },
+
+        MAXIMUM_TRANSACTIONS_TO_DOWNLOAD: 100,
 
     }
 };
