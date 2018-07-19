@@ -96,7 +96,7 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
                         found = true;
                         break;
                     }
-                    else if (hash[i] > bestHash[i])
+                    else if (hash[i] > difficulty[i])
                         break;
 
                 if (found) {

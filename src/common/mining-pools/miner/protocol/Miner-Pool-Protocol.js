@@ -11,6 +11,7 @@ import StatusEvents from "common/events/Status-Events";
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 import AdvancedMessages from "node/menu/Advanced-Messages";
 import consts from "consts/const_global"
+import Log from 'common/utils/logging/Log';
 
 class MinerProtocol extends PoolProtocolList{
 
@@ -305,6 +306,8 @@ class MinerProtocol extends PoolProtocolList{
     async pushWork( miningAnswer, poolSocket){
 
         try {
+
+            Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") , Log.LOG_TYPE.POOLS);
 
             if (poolSocket === undefined)
                 poolSocket = this.connectedPools[0];
