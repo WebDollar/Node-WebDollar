@@ -171,7 +171,8 @@ class InterfaceBlockchainTransactionsWizard{
         if (webdPerByte === undefined)
             webdPerByte = consts.MINING_POOL.MINING.FEE_PER_BYTE;
 
-        webdPerByte = Math.trunc( serialization.length / 141) + 1;
+        let factor = Math.trunc( serialization.length / 141) + 1;
+        webdPerByte = factor * webdPerByte;
 
         return serialization.length * webdPerByte;
 
