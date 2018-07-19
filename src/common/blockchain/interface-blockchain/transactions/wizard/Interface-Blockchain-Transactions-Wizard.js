@@ -176,7 +176,7 @@ class InterfaceBlockchainTransactionsWizard{
     }
 
     calculateFeeSimple(){
-        return this.calculateFeeWizzard( new Buffer(160) );
+        return this.calculateFeeWizzard( new Buffer(141) );
     }
 
 }
