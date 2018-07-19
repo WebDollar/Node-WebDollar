@@ -80,7 +80,7 @@ class TransactionsDownloadManager{
         if (socket !== undefined)
             await this.transactionsProtocol.downloadTransactions(socket, 0, 40, consts.SETTINGS.MEM_POOL.TRANSACTIONS_MAXIMUM_DOWNLOADS );
 
-        setTimeout( this._processSockets.bind(this), 5000 );
+        setTimeout( this._processSockets.bind(this), 3000 );
 
     }
 
@@ -106,7 +106,7 @@ class TransactionsDownloadManager{
         }
 
 
-        setTimeout( this._processTransactions.bind(this), 5000 );
+        setTimeout( this._processTransactions.bind(this), 3000 );
 
     }
 
