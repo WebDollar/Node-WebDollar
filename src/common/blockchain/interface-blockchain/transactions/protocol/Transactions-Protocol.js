@@ -55,7 +55,7 @@ class InterfaceBlockchainTransactionsProtocol {
         this.initializeTransactionsPropagation(socket);
 
         if (Blockchain.loaded){
-            this.downloadTransactions(socket, 0, 20, consts.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD);
+            this.downloadTransactions(socket, 0, 20, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD);
         }
 
     }
