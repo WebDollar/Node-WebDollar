@@ -109,6 +109,7 @@ class PoolRewardsManagement{
 
                 //let's delete old payouts
                 if ( this.blockchain.blocks.length - this.poolData.blocksInfo[i].block.height > 40) {
+
                     this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid++;
                     this.poolManagement.poolStatistics.poolBlocksConfirmed--;
 
@@ -137,8 +138,10 @@ class PoolRewardsManagement{
 
 
             //not ready at the moment
-            if (blockInfo.height > this.blockchain.blocks.length)
+            if (blockInfo.height > this.blockchain.blocks.length) {
+                poolBlocksBeingConfirmed++;
                 continue;
+            }
 
             //confirm using my own blockchain / light blockchain
             if (this.blockchain.blocks.blocksStartingPoint < blockInfo.height){ //i can confirm the block by myself
@@ -186,7 +189,7 @@ class PoolRewardsManagement{
             //to mail fail trials
             if (this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS){
 
-                this.poolManagement.poolStatistics.poolBlocksUnconfirmed--;
+                this.poolManagement.poolStatistics.poolBlocksUnconfirmed++;
 
                 this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i], i );
                 continue;
