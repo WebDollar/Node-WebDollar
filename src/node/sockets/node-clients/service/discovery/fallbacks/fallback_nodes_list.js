@@ -113,7 +113,7 @@ export default {
         {"addr": ["https://webdollar-vps4.zapto.org:8082"]},
         {"addr": ["https://webdollar-vps4.zapto.org:8083"]},
         {"addr": ["https://webdollar-vps4.zapto.org:8084"]},
-        
+
         {"addr": ["https://webdollarinfinitypool.space:8085"]}, //Thanks to @Tibi Popescu
         {"addr": ["https://webdollarinfinitypool.space:8086"]}, //Thanks to @Tibi Popescu
         {"addr": ["https://webdollarinfinitypool.space:8087"]}, //Thanks to @Tibi Popescu
