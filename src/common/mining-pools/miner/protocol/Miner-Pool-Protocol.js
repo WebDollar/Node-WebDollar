@@ -279,6 +279,7 @@ class MinerProtocol extends PoolProtocolList{
         if (typeof data.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = data.h;
         if (typeof data.b === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksConfirmed = data.b;
         if (typeof data.ub === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksUnconfirmed = data.ub;
+        if (typeof data.bc === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksBeingConfirmed = data.bc;
         if (typeof data.t === "number") this.minerPoolManagement.minerPoolStatistics.poolTimeRemaining = data.t;
         if (typeof data.n === "number") Blockchain.blockchain.blocks.networkHashRate = data.n; //network hash rate
     }

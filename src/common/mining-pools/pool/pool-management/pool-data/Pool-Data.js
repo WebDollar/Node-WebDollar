@@ -28,7 +28,7 @@ class PoolData {
 
     async initializePoolData(){
 
-        await this._loadPoolData();
+        return await this._loadPoolData();
 
     }
 

@@ -49,10 +49,10 @@ class PoolManagement{
 
             answer = await this.poolData.initializePoolData();
 
+            answer = await this.poolStatistics.initializePoolStatistics();
+
             if (!answer)
                 throw {message: "Pool Couldn't be started"};
-
-            answer = await this.poolStatistics.initializePoolStatistics();
 
         } catch (exception){
             console.error("initializePoolManagement raised an error", exception);
