@@ -61,7 +61,8 @@ class TransactionsDownloadManager{
             this._transactionsQueue.push({
                 txId: txId,
                 buffer: buffer,
-                socket: socket
+                socket: socket,
+                dateInitial: new Date().getTime(),
             });
             return true;
         }
@@ -87,11 +88,11 @@ class TransactionsDownloadManager{
 
     async _processTransactions(){
 
+        let pos = Math.floor(Math.random()*this._transactionsQueue.length);
+
         let tx;
-        if (this._transactionsQueue.length > 0){
-            tx = this._transactionsQueue[0];
-            this._transactionsQueue.splice(0,1);
-        }
+        if (this._transactionsQueue.length > 0)
+            tx = this._transactionsQueue[pos];
 
         if (tx !== undefined) {
 
@@ -102,6 +103,14 @@ class TransactionsDownloadManager{
             if (Buffer.isBuffer(tx.buffer))
                 transaction = this._createTransaction(tx.buffer, tx.socket);
 
+            if (transaction !== null)
+                this._transactionsQueue.splice(pos,1);
+            else {
+
+                if (new Date().getTime() - this._transactionsQueue[pos].dateInitial  > 4*60*1000)
+                    this._transactionsQueue.splice(pos,1);
+
+            }
 
         }
 
