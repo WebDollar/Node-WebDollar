@@ -105,7 +105,8 @@ class InterfaceBlockchainTransactionsProtocol {
                 if (typeof exception === "object" && exception.message === "I already have this transaction" )
                     return false;
 
-                console.error("Transaction is wrong. It should ban the user", exception);
+                if (consts.DEBUG)
+                    console.error("Transaction is wrong. It should ban the user", exception);
             }
 
         });
@@ -247,7 +248,8 @@ class InterfaceBlockchainTransactionsProtocol {
                     }
 
                     if (!this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket))
-                        ; //console.warn("I already have this transaction", transaction.txId.toString("hex"))
+                        if (consts.DEBUG)
+                            console.warn("I already have this transaction", transaction.txId.toString("hex"))
 
                 } catch (exception){
                     errors++;
@@ -269,7 +271,10 @@ class InterfaceBlockchainTransactionsProtocol {
 
 
         } catch (exception){
-            console.error("Error Getting All Pending Transactions", exception);
+
+            if (consts.DEBUG)
+                console.error("Error Getting All Pending Transactions", exception);
+
         }
 
     }
