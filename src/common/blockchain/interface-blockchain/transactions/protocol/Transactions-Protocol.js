@@ -17,7 +17,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         this.blockchain = blockchain;
 
-        this.transactionsDownloadingManager = new TransactionsDownloadManager(blockchain);
+        this.transactionsDownloadingManager = new TransactionsDownloadManager(blockchain, this);
 
         //if a new client || or || web peer is established then, I should register for accepting WebPeer connections
 
@@ -30,16 +30,11 @@ class InterfaceBlockchainTransactionsProtocol {
             if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
                 return false;
 
-            if (data.message === "Blockchain Ready to Mine" && NodesList !== undefined){
-
+            if (data.message === "Blockchain Ready to Mine" && NodesList !== undefined)
                 for (let i=0; i < NodesList.nodes.length; i++)
-                    if (NodesList.nodes[i] !== undefined && NodesList.nodes[i].socket !== undefined && NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET){
-
+                    if (NodesList.nodes[i] !== undefined && NodesList.nodes[i].socket !== undefined && NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)
                         this.transactionsDownloadingManager.addSocket(NodesList.nodes[i].socket);
 
-                    }
-
-            }
 
         } );
 
@@ -55,7 +50,7 @@ class InterfaceBlockchainTransactionsProtocol {
         this.initializeTransactionsPropagation(socket);
 
         if (Blockchain.loaded)
-            this.transactionsDownloadingManager.addSocket(NodesList.nodes[i].socket);
+            this.transactionsDownloadingManager.addSocket(socket);
 
     }
 
@@ -76,7 +71,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 } else
                 if (response.format === 'buffer'){
-                    txId = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( response.buffer );
+                    txId = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( response.buffer ));
                     buffer = response.buffer;
                 }
 
@@ -186,10 +181,72 @@ class InterfaceBlockchainTransactionsProtocol {
 
 
 
+    async downloadTransactions(socket, start, count, max){
+
+        if (start >= max) return;
+
+        if (socket === undefined) return;
+
+        try{
+
+            let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 5000);
+
+            if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
+
+            let ids = answer.transactions;
+
+
+            for (let i=0; i<ids.length; i++) {
+
+                if (this.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId( ids[i]) !== null) continue;
+
+                let foundTx = this.transactionsDownloadingManager.findTransactionById( ids[i] );
+
+                if ( foundTx === null )
+                    this.transactionsDownloadingManager.addTransaction( socket, ids[ i ] );
+
+            }
+
+            if (start + count < answer.length)
+                await this.downloadTransactions(socket, start+count, count, max);
+
+
+        } catch (exception){
+
+            if (consts.DEBUG)
+                console.error("Error Getting All Pending Transactions", exception);
+
+        }
+
+    }
+
+    async downloadTransaction(socket, txId){
+
+        try {
+
+            let answerTransactions = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-by-ids", {
+                format: "buffer",
+                ids: [txId],
+            }, "answer", 5000);
+
+            if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) return false;
+
+            return answerTransactions.transactions[0];
+
+
+        } catch (exception){
+
+        }
+
+        return null;
+
+    }
+
 
     propagateNewPendingTransaction(transaction, exceptSockets){
 
-        NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );
+        NodeProtocol.broadcastRequest( "transactions/new-pending-transaction", { format: "buffer", buffer: transaction.serializeTransaction() }, undefined, exceptSockets );
+        //NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );
 
     }
 
