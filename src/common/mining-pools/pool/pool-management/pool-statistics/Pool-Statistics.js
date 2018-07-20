@@ -20,13 +20,12 @@ class PoolStatistics{
 
         this.poolMinersOnline = this.poolManagement.poolData.connectedMinerInstances.list;
 
+        this.poolBlocksConfirmedAndPaid = 0;
         this.poolBlocksUnconfirmed = 0;
         this.poolBlocksConfirmed = 0;
         this.poolBlocksBeingConfirmed = 0;
         this.poolTimeRemaining = 0;
 
-
-        this.poolBlocksConfirmedAndPaid = 0;
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.SERVER_POOL_DATABASE );
 
         //calculate mean
@@ -83,7 +82,14 @@ class PoolStatistics{
 
         this.poolHashes = array[Math.floor(array.length / 4)];
 
-        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, beingConfirmed: this.poolManagement.poolData.blocksInfo.length-1, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
+        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes,
+            poolMinersOnline: this.poolMinersOnline,
+            poolBeingConfirmed: this.poolBlocksBeingConfirmed,
+            poolBlocksConfirmed: this.poolBlocksConfirmed,
+            poolBlocksConfirmedAndPaid: this.poolBlocksConfirmedAndPaid,
+            poolBlocksUnconfirmed: this.poolBlocksUnconfirmed,
+            poolTimeRemaining: this.poolTimeRemaining,
+        });
 
     }
 

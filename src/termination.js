@@ -13,7 +13,7 @@ export default async (Blockchain) => {
     if (alreadySaved) return;
     alreadySaved = true;
 
-    NodesList.disconnectAllNodes();
+    NodesList.disconnectAllNodes("all");
     NodesWaitlist.waitListFullNodes = [];
     NodesWaitlist.waitListLightNodes = [];
 

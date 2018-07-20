@@ -278,6 +278,7 @@ class MinerProtocol extends PoolProtocolList{
         if (typeof data.m === "number") this.minerPoolManagement.minerPoolStatistics.poolMinersOnline = data.m;
         if (typeof data.h === "number") this.minerPoolManagement.minerPoolStatistics.poolHashes = data.h;
         if (typeof data.b === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksConfirmed = data.b;
+        if (typeof data.bp === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksConfirmedAndPaid = data.bp;
         if (typeof data.ub === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksUnconfirmed = data.ub;
         if (typeof data.bc === "number") this.minerPoolManagement.minerPoolStatistics.poolBlocksBeingConfirmed = data.bc;
         if (typeof data.t === "number") this.minerPoolManagement.minerPoolStatistics.poolTimeRemaining = data.t;
