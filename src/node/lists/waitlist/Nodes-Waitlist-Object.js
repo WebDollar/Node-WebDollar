@@ -64,9 +64,14 @@ class NodesWaitlistObject {
 
     socketErrorConnected(){
 
+        if (Blockchain.MinerPoolManagement.minerPoolStarted){
+            this.errorTrials = 0;
+            return;
+        }
+
         this.errorTrials++;
 
-        if (this.isFallback === true) {
+        if (this.isFallback === true ) {
 
             if (process.env.BROWSER)
                 this.errorTrials = Math.min(this.errorTrials, 3 + Math.floor( Math.random() * 2) );

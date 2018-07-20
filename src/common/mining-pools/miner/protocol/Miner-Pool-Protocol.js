@@ -315,7 +315,7 @@ class MinerProtocol extends PoolProtocolList{
             if (poolSocket === undefined)
                 poolSocket = this.connectedPools[0];
 
-            if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
+            if (poolSocket === null || poolSocket === undefined) throw {message: "You are disconnected"};
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
                 work: miningAnswer,
@@ -353,7 +353,7 @@ class MinerProtocol extends PoolProtocolList{
             if (newAddress === undefined)
                 newAddress = Blockchain.Wallet.addresses[0].address;
 
-            if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
+            if (poolSocket === null || poolSocket === undefined) throw {message: "You are disconnected"};
 
             oldAddress = Blockchain.Wallet.getAddress(oldAddress||this.minerPoolManagement.minerPoolMining.minerAddress);
 
@@ -421,7 +421,7 @@ class MinerProtocol extends PoolProtocolList{
             if (poolSocket === undefined)
                 poolSocket = this.connectedPools[0];
 
-            if (poolSocket === null || poolSocket === undefined) throw {message: "poolSocket is null"};
+            if (poolSocket === null || poolSocket === undefined) throw {message: "You are disconnected"};
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/request-wallet-mining", {}, "answer", 6000);
 

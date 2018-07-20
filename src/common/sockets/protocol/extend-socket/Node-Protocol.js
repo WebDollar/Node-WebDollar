@@ -26,7 +26,7 @@ class NodeProtocol {
             nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
             domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
-        }, undefined, 4000);
+        }, undefined, 5000);
 
     }
 
