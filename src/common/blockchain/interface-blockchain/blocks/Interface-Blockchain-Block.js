@@ -347,7 +347,7 @@ class InterfaceBlockchainBlock {
             this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
-            this.nonce = Serialization.deserializeNumber4Bytes( BufferExtended.substr(buffer, offset, 4) );
+            this.nonce = Serialization.deserializeNumber4Bytes( buffer, offset, );
             offset += 4;
 
 
@@ -360,7 +360,7 @@ class InterfaceBlockchainBlock {
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
 
-            this.timeStamp = Serialization.deserializeNumber4Bytes( BufferExtended.substr(buffer, offset, 4) );
+            this.timeStamp = Serialization.deserializeNumber4Bytes( buffer, offset);
             offset += 4;
 
             offset = this.data.deserializeData(buffer, offset);

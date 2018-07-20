@@ -105,7 +105,7 @@ class MainBlockchainWallet {
 
         try {
 
-            let numAddresses = Serialization.deserializeNumber4Bytes( BufferExtended.substr(data, offset, 4) );
+            let numAddresses = Serialization.deserializeNumber4Bytes( data, offset, );
             offset += 4;
 
             this.addresses = [];

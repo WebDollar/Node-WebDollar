@@ -28,7 +28,7 @@ class PoolData {
 
     async initializePoolData(){
 
-        await this._loadPoolData();
+        return await this._loadPoolData();
 
     }
 
@@ -176,7 +176,7 @@ class PoolData {
 
         try {
 
-            let numMiners = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
+            let numMiners = Serialization.deserializeNumber4Bytes( buffer, offset );
             offset += 4;
 
             this.miners = [];
@@ -217,7 +217,7 @@ class PoolData {
 
         try {
 
-            let numBlocksInformation = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
+            let numBlocksInformation = Serialization.deserializeNumber4Bytes( buffer, offset, );
             offset += 4;
 
             this.blocksInfo = [];
