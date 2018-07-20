@@ -22,6 +22,7 @@ class PoolStatistics{
 
         this.poolBlocksUnconfirmed = 0;
         this.poolBlocksConfirmed = 0;
+        this.poolBlocksBeingConfirmed = 0;
         this.poolTimeRemaining = 0;
 
 
@@ -82,7 +83,7 @@ class PoolStatistics{
 
         this.poolHashes = array[Math.floor(array.length / 4)];
 
-        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
+        this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes, poolMinersOnline: this.poolMinersOnline, beingConfirmed: this.poolManagement.poolData.blocksInfo.length-1, poolBlocksConfirmed: this.poolBlocksConfirmed,  poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining, });
 
     }
 
@@ -93,19 +94,13 @@ class PoolStatistics{
 
     }
 
-    addBlocksStatistics(blocksConfirmed, blocksUnconfirmed ){
-
-        this.poolBlocksUnconfirmed = blocksUnconfirmed;
-        this.poolBlocksConfirmed = blocksConfirmed;
-
-    }
-
 
 
     async _save(){
 
         Log.info('Saving pool statistics...', Log.LOG_TYPE.POOLS);
-        await this._db.save("serverPool_statistics_confirmedAndPaid", this.poolBlocksConfirmedAndPaid )
+        await this._db.save("serverPool_statistics_confirmedAndPaid", this.poolBlocksConfirmedAndPaid );
+        await this._db.save("serverPool_statistics_unconfirmed", this.poolBlocksUnconfirmed);
 
     }
 
@@ -113,12 +108,13 @@ class PoolStatistics{
 
         Log.info('Loading pool statistics...', Log.LOG_TYPE.POOLS);
         let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000, true);
+        let unconfirmed = await this._db.get("serverPool_statistics_unconfirmed", 30*1000, true);
 
-        if (typeof confirmedAndPaid === "number") {
-            this.poolBlocksConfirmedAndPaid = confirmedAndPaid;
+        if (typeof confirmedAndPaid !== "number") confirmedAndPaid = 0;
+        if (typeof unconfirmed !== "number") unconfirmed = 0;
 
-            if (this.poolBlocksConfirmedAndPaid === 200) this.poolBlocksConfirmedAndPaid = 0;
-        }
+        this.poolBlocksConfirmedAndPaid = confirmedAndPaid;
+        this.poolBlocksUnconfirmed = unconfirmed;
 
         return true;
     }
