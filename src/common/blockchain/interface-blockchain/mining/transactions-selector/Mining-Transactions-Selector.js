@@ -49,7 +49,7 @@ class MiningTransactionsSelector{
 
             try {
                 
-                console.log(transaction.txId.toString("hex"));
+                console.log(transaction.txId.toString("hex"), transaction.from.addresses[0].address );
 
                 this.validateTransaction(transaction, miningFeePerByte);
 

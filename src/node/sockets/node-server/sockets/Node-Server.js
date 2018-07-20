@@ -152,6 +152,12 @@ class NodeServer {
                     return;
                 }
 
+                if (Blockchain.isPoolActivated && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER){
+                    console.error("disconnecting user for being simple node");
+                    socket.disconnect();
+                    return;
+                }
+
                 if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
 
                     //be sure it is not a fallback node

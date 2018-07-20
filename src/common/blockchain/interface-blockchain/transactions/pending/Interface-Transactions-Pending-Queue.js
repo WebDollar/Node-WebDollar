@@ -48,7 +48,7 @@ class InterfaceTransactionsPendingQueue {
 
         let inserted = false;
 
-        for (let i=0; i<this.list.length; i++ ) {
+        for (let i=0; i<this.list.length && inserted === false; i++ ) {
             let compare = transaction.from.addresses[0].unencodedAddress.compare(this.list[i].from.addresses[0].unencodedAddress);
 
             if (compare < 0) // next
@@ -58,18 +58,20 @@ class InterfaceTransactionsPendingQueue {
 
 
                 if (transaction.nonce === this.list[i].nonce){
-                    this.list[i] = transaction;
-                    inserted = true;break;
+                    inserted = true;
+                    break;
                 } else if (transaction.nonce < this.list[i].nonce){
                     this.list.splice(i, 0, transaction);
-                    inserted = true;break;
+                    inserted = true;
+                    break;
                 }
 
             }
             else
             if (compare > 0) { // i will add it
                 this.list.splice(i, 0, transaction);
-                inserted = true;break;
+                inserted = true;
+                break;
             }
 
         }
@@ -116,6 +118,7 @@ class InterfaceTransactionsPendingQueue {
         if (index === -1)
             return true;
 
+        this.list[index].destroyTransaction();
         this.list.splice(index, 1);
 
         this.transactions.emitTransactionChangeEvent(transaction, true);
@@ -143,7 +146,7 @@ class InterfaceTransactionsPendingQueue {
 
             } catch (exception){
                 console.warn("Old Transaction removed because of exception ", exception);
-                this.list.splice(i, 1);
+                this._removePendingTransaction(i)
             }
 
         }
