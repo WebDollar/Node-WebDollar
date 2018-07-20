@@ -11,11 +11,11 @@ const VALIDATION_BLOCK_CONFIRMATIONS = 40; //blocks
 
 const MAXIMUM_FAIL_CONFIRMATIONS = 20; //blocks
 
-const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : 10;
-
 const CONFIRMATIONS_REQUIRE_OTHER_MINERS = consts.DEBUG ? false : true;
 
-const CONFIRMATION_METHOD = 1; //1 is not working properly
+const CONFIRMATION_METHOD = 2; //1 is not working properly
+
+const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : (CONFIRMATION_METHOD === 2 ? 15 : 10);
 
 import Blockchain from 'main-blockchain/Blockchain';
 
