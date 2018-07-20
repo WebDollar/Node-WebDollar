@@ -50,6 +50,7 @@ class MinerProtocol {
             await this.minerPoolSettings.setPoolURL(poolURL);
 
         if (this.minerPoolSettings.poolURL !== undefined && this.minerPoolSettings.poolURL !== '') {
+            this._minerPoolStarted = false;
             return await this.setMinerPoolStarted(true, forceStartMinerPool);
         }
         else {

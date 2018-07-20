@@ -165,17 +165,12 @@ class NodeServer {
 
                 }
 
-                if (Blockchain.ServerPoolManagement !== undefined && Blockchain.ServerPoolManagement._serverPoolStarted){
-
-                }
-
-                if ( Blockchain.isPoolActivated && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER ){
-                    if (Math.random() < 0.1)
-                        console.error("disconnecting user for being simple node", nodeConsensusType);
-
+                //avoid allowing
+                if (!Blockchain.blockchain.agent.consensus){
                     socket.disconnect();
                     return;
                 }
+
 
                 if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
 
