@@ -85,7 +85,7 @@ class NodesWaitlistConnecting {
 
         if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER ].indexOf(nextWaitListObject.nodeConsensusType) < 0 ) return;
 
-        if (Blockchain.agent.consensus) {
+        if (Blockchain.blockchain.agent.consensus) {
 
             if (nextWaitListObject.isFallback) {
 
