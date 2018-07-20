@@ -178,6 +178,7 @@ class MinerProtocol extends PoolProtocolList{
                 await this._connectionEstablishedWithPool(socket);
 
                 this._updateStatistics(answer);
+
                 this.minerPoolManagement.minerPoolReward.setReward(answer);
 
                 return true;

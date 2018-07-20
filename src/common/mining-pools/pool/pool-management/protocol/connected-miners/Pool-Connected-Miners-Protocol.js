@@ -125,6 +125,11 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     t: this.poolManagement.poolStatistics.poolTimeRemaining,
                     n: Blockchain.blockchain.blocks.networkHashRate,
 
+                    b: this.poolManagement.poolStatistics.poolBlocksConfirmed,
+                    bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,
+                    ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,
+                    bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed,
+
                     work: work,
 
                     msg: messageAddressConfirmation,

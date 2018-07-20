@@ -192,7 +192,7 @@ class PoolsUtils {
 
         if (version === 0) {
             poolAddress = this.substr(url);
-            poolAddress = poolAddress.replace("%23","#");
+            poolAddress = poolAddress.replace(/%23/g,"#");
 
             url = this.substrNext(url);
         }
@@ -219,7 +219,7 @@ class PoolsUtils {
             url = this.substrNext(url);
 
             poolReferral  = this.substr(url);
-            poolReferral  = poolReferral.replace("%23","#");
+            poolReferral  = poolReferral.replace(/%23/g,"#");
 
             url = this.substrNext(url);
         }
