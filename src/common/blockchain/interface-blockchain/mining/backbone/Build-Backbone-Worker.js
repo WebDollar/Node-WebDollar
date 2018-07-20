@@ -3,13 +3,14 @@ const argon2 = require('argon2');
 const opt = {
     salt: Buffer.from("Satoshi_is_Finney"),
     timeCost: 2,
-    memoryCost: 8,
+    memoryCost: 256,
     parallelism: 2,
     type: 0,
     hashLength: 32,
     raw: true,
 };
 
+const MAX_TARGET = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
 
 
 /**
@@ -52,8 +53,10 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
     let length = block.length;
     let buffer = Buffer.concat([block, new Buffer(4) ]);
 
+    delete block;
+
     // difficulty
-    let bestHash = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
+    let bestHash = MAX_TARGET;
     let bestNonce = 0;
     let change, found;
 
@@ -62,6 +65,8 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
         if (nonce > 0xFFFFFFFF) {
             // batched: signal main process that it finished this batch
             sendMessage({ type: 'b', bestHash:bestHash, bestNone: bestNonce  });
+
+            delete buffer; delete difficulty;
             return false;
         }
 
@@ -108,6 +113,8 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
                         hash: hash,
                     });
 
+                    delete buffer; delete difficulty;
+
                     return false;
                 }
 
@@ -126,6 +133,8 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
 
     // batched: signal main process that it finished this batch
     sendMessage({ type: 'b', bestHash:bestHash, bestNonce: bestNonce });
+
+    delete buffer; delete difficulty;
 
     return false;
 };

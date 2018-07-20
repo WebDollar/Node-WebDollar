@@ -65,7 +65,7 @@ class Workers {
         return this.workers_max;
     }
 
-    run(start, end, loop_delay = 5) {
+    run(start, end, loop_delay = 2) {
         this._current = start || 0;
         this._current_max = (end) ? end : this._abs_end;
 
