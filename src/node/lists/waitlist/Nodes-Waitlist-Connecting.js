@@ -83,17 +83,21 @@ class NodesWaitlistConnecting {
 
     _tryToConnectNextNode( nextWaitListObject){
 
-        if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf(nextWaitListObject.nodeConsensusType) < 0 ) return;
+        if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER ].indexOf(nextWaitListObject.nodeConsensusType) < 0 ) return;
 
-        if (nextWaitListObject.isFallback) {
+        if (Blockchain.agent.consensus) {
 
-            let fallbacks = this._countConnectingToFallbacks() + NodesList.countFallbacks();
-            if (fallbacks >= this.connectingMaximum.maximum_fallbacks) return true;
+            if (nextWaitListObject.isFallback) {
 
-        } else {
+                let fallbacks = this._countConnectingToFallbacks() + NodesList.countFallbacks();
+                if (fallbacks >= this.connectingMaximum.maximum_fallbacks) return true;
 
-            let simple = (this._connectingQueue.length - this._countConnectingToFallbacks()) + ( NodesList.nodes.length - NodesList.countFallbacks() );
-            if (simple >= this.connectingMaximum.maximum_waitlist) return true;
+            } else {
+
+                let simple = (this._connectingQueue.length - this._countConnectingToFallbacks()) + ( NodesList.nodes.length - NodesList.countFallbacks() );
+                if (simple >= this.connectingMaximum.maximum_waitlist) return true;
+
+            }
 
         }
 
