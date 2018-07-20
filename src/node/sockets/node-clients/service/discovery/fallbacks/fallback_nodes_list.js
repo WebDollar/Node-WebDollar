@@ -9,10 +9,10 @@ export default {
         //--------------Community FallBack Nodes-------------------
         //---------------------------------------------------------
 
-        // //{"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
-        // //{"addr": ["https://amsterdam.wdpool.io:443"]},
-        // //{"addr": ["https://strasbourg.wdpool.io:443"]},
-        // //{"addr": ["https://paris.wdpool.io:443"]},
+        // {"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
+        // {"addr": ["https://amsterdam.wdpool.io:443"]},
+        // {"addr": ["https://strasbourg.wdpool.io:443"]},
+        // {"addr": ["https://paris.wdpool.io:443"]},
 
         // {"addr": ["https://wb.ciuc.ro:443"]}, // Thanks to Adi Clar
         // {"addr": ["https://nodecstl.ddns.net:80"]},
@@ -33,8 +33,6 @@ export default {
         {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
 
-
-
         {"addr": ["https://webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
 
         {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic
@@ -45,7 +43,7 @@ export default {
         {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
 
-        // // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
+        // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
 
         {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
         {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
@@ -79,6 +77,22 @@ export default {
         {"addr": ["https://angrybirds.webdollarvpn.io:8666"]}, // Thanks to @cbusuioceanu   
         {"addr": ["https://angrybirds.webdollarvpn.io:9666"]}, // Thanks to @cbusuioceanu         
 
+        {"addr": ["https://int-webd.com:5001"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5002"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5003"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5004"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5005"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5006"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5007"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5008"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5009"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5010"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5011"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5012"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5013"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5014"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5015"]}, // Thanks to @int_webd
+        {"addr": ["https://int-webd.com:5016"]}, // Thanks to @int_webd
 
         // {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
         // {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
@@ -106,8 +120,6 @@ export default {
         {"addr": ["https://webdollar-vps5.hopto.org:8081"]},
         {"addr": ["https://webdollar-vps5.hopto.org:8082"]},
         {"addr": ["https://webdollar-vps5.hopto.org:8083"]},
-
-
 
         {"addr": ["https://webdollar-vps4.zapto.org:8081"]},
         {"addr": ["https://webdollar-vps4.zapto.org:8082"]},
