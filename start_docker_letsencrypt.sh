@@ -9,6 +9,8 @@ if [ -z $MAXIMUM_CONNECTIONS_FROM_TERMINAL ]; then export MAXIMUM_CONNECTIONS_FR
 # Check NOSSL in case we don't need a SSL
 if [ -z $NOSSL ]; then
 
+	get_user=$(whoami);
+
 	# Check requirements
 	if [ -z $EMAIL ]; then echo "Please fill environment variable EMAIL"; exit; fi
 	if [ -z $DOMAIN ]; then echo "Please fill environment variable DOMAIN"; exit; fi
@@ -19,9 +21,9 @@ if [ -z $NOSSL ]; then
 
 	# Symbolic links
 
-	rm -f certificates/private.key && ln -s /etc/letsencrypt/live/$DOMAIN/privkey.pem certificates/private.key
-	rm -f certificates/certificate.crt && ln -s /etc/letsencrypt/live/$DOMAIN/cert.pem certificates/certificate.crt
-	rm -f certificates/certificates/ca_bundle.crt && ln -s /etc/letsencrypt/live/$DOMAIN/chain.pem certificates/ca_bundle.crt
+	rm -f certificates/private.key && sudo cp /etc/letsencrypt/live/$DOMAIN/privkey.pem certificates/private.key && sudo chown $get_user:$get_user certificates/private.key
+	rm -f certificates/certificate.crt && sudo cp /etc/letsencrypt/live/$DOMAIN/cert.pem certificates/certificate.crt && sudo chown $get_user:$get_user certificates/certificate.crt
+	rm -f certificates/ca_bundle.crt && sudo cp /etc/letsencrypt/live/$DOMAIN/chain.pem certificates/ca_bundle.crt && sudo chown $get_user:$get_user certificates/ca_bundle.crt
 
 fi
 
