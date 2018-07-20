@@ -528,18 +528,6 @@ class InterfaceBlockchainFork {
 
         } else {
 
-            this._blocksCopy.forEach( (block) => {
-
-                if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction) => {
-                        transaction.confirmed = true;
-
-                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
-
-                    });
-
-            });
-
             this.forkBlocks.forEach((block)=>{
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
@@ -554,7 +542,21 @@ class InterfaceBlockchainFork {
                         }
 
                     });
-            })
+            });
+
+
+            this._blocksCopy.forEach( (block) => {
+
+                if (block.data !==  undefined && block.data.transactions !== undefined)
+                    block.data.transactions.transactions.forEach((transaction) => {
+                        transaction.confirmed = true;
+
+                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+
+                    });
+
+            });
+
         }
 
 
