@@ -1,6 +1,7 @@
 import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended";
 import InterfaceBlockchainTransactionsWizard from "./../../transactions/wizard/Interface-Blockchain-Transactions-Wizard"
+import InterfaceBlockchainAddressHelper from "../../addresses/Interface-Blockchain-Address-Helper";
 
 class MiningTransactionsSelector{
 
@@ -49,7 +50,7 @@ class MiningTransactionsSelector{
 
             try {
                 
-                console.log(transaction.txId.toString("hex"), transaction.from.addresses[0].address );
+                console.log(transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true) );
 
                 this.validateTransaction(transaction, miningFeePerByte);
 

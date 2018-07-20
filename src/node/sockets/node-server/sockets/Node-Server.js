@@ -152,8 +152,27 @@ class NodeServer {
                     return;
                 }
 
-                if (Blockchain.isPoolActivated && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER){
-                    console.error("disconnecting user for being simple node");
+
+                if ( (Blockchain.PoolManagement !== undefined && Blockchain.PoolManagement._poolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) ||
+                     (Blockchain.ServerPoolManagement !== undefined && Blockchain.ServerPoolManagement._serverPoolStarted  && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)){
+
+
+                    if (Math.random() < 0.1)
+                        console.error("disconnecting user for being simple node", nodeConsensusType);
+
+                    socket.disconnect();
+                    return;
+
+                }
+
+                if (Blockchain.ServerPoolManagement !== undefined && Blockchain.ServerPoolManagement._serverPoolStarted){
+
+                }
+
+                if ( Blockchain.isPoolActivated && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER ){
+                    if (Math.random() < 0.1)
+                        console.error("disconnecting user for being simple node", nodeConsensusType);
+
                     socket.disconnect();
                     return;
                 }
