@@ -108,7 +108,7 @@ class Workers {
 
     _initiateWorkers() {
 
-        for (let index = this.workers_list.length - 1; index < this.workers_max; index++) {
+        for (let index = 0; index < this.workers_max; index++) {
 
             if (this.workers_list[index] && typeof this.workers_list[index].kill === "function")
                 this.workers_list[index].kill();
