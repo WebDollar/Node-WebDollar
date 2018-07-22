@@ -52,14 +52,14 @@ class Workers {
     _makeUnresponsiveThreads(){
 
         let date = new Date().getTime();
+        //
+        // for (let i=0; i< this.workers_list.length; i++)
+        //     if ( (date  - this.workers_list[i].date ) > 7000 ){
+        //         //this.workers_list[i]._is_batching = false;
+        //         this._initializeWorker(i);
+        //     }
 
-        for (let i=0; i< this.workers_list.length; i++)
-            if ( (date  - this.workers_list[i].date ) > 7000 ){
-                //this.workers_list[i]._is_batching = false;
-                this._initializeWorker(i);
-            }
-
-        if (!this._working && this._current >= this._current_max)
+        if ( this._current >= this._current_max )
             this._stopAndResolve();
 
     }

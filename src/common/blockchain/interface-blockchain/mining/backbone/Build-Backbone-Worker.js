@@ -53,7 +53,7 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
     let length = block.length;
     let buffer = Buffer.concat([block, new Buffer(4) ]);
 
-    delete block;
+
 
     // difficulty
     let bestHash = MAX_TARGET;
@@ -66,7 +66,7 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
             // batched: signal main process that it finished this batch
             sendMessage({ type: 'b', bestHash:bestHash, bestNone: bestNonce  });
 
-            delete buffer; delete difficulty;
+
             return false;
         }
 
@@ -113,7 +113,6 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
                         hash: hash,
                     });
 
-                    delete buffer; delete difficulty;
 
                     return false;
                 }
@@ -134,7 +133,6 @@ var mineNoncesBatch = async (block, difficulty, start, batch) => {
     // batched: signal main process that it finished this batch
     sendMessage({ type: 'b', bestHash:bestHash, bestNonce: bestNonce });
 
-    delete buffer; delete difficulty;
 
     return false;
 };
