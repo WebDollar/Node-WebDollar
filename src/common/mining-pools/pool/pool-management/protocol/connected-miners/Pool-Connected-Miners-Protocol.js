@@ -115,10 +115,10 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     useSig: this.poolManagement.poolSettings.poolUseSignatures,
                     servers: this.poolManagement.poolSettings.poolServers,
 
-                    reward: minerInstance.miner.rewardTotal,
-                    confirmed: minerInstance.miner.rewardConfirmedTotal,
-                    refReward: minerInstance.miner.referrals.rewardReferralsTotal,
-                    refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed,
+                    reward: minerInstance.miner.rewardTotal||0,
+                    confirmed: minerInstance.miner.rewardConfirmedTotal||0,
+                    refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,
+                    refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
 
                     h:this.poolManagement.poolStatistics.poolHashes,
                     m: this.poolManagement.poolStatistics.poolMinersOnline.length,
@@ -176,7 +176,23 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         });
 
+        //Already sent the new work, receiving the work for the past one
+        socket.node.on("mining-pool/new-work/answer", async (answer)=>{
 
+
+            if ( !Buffer.isBuffer(answer.hash ) ) throw {message: "hash is not specified"};
+            if ( typeof answer.nonce !== "number" ) throw {message: "nonce is not specified"};
+
+            let minerInstance = socket.node.protocol.minerPool.minerInstance;
+            if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
+
+            let processedWork = await this.poolWorkManagement.processWork( minerInstance, answer, this.poolManagement.poolWorkManagement.poolNewWorkManagement.prevBlock );
+
+            minerInstance.socket.node.sendRequest("mining-pool/new-work/answer/confirm", {  result: processedWork.result,  reward: processedWork.reward, confirmed: processedWork.confirmed, miner: minerInstance.publicKey,
+                h: this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed, bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining, n: Blockchain.blockchain.blocks.networkHashRate,
+            } ,"answer" );
+
+        });
 
         socket.node.on("mining-pool/get-work", async (data) => {
 
