@@ -55,10 +55,11 @@ class Workers {
 
         for (let i=0; i< this.workers_list.length; i++)
             if ( (date  - this.workers_list[i].date ) > 7000 ){
-                this.workers_list[i]._is_batching = false;
+                //this.workers_list[i]._is_batching = false;
+                this._initializeWorker(i);
             }
 
-        if ( (this._current_max - this._current) === 0)
+        if (!this._working && this._current >= this._current_max)
             this._stopAndResolve();
 
     }
@@ -124,16 +125,19 @@ class Workers {
 
     _initiateWorkers() {
 
-        for (let index = 0; index < this.workers_max; index++) {
+        for (let index = this.workers_list.length-1 ; index < this.workers_max; index++)
+            this._initializeWorker(index);
 
-            if (this.workers_list[index] && typeof this.workers_list[index].kill === "function")
-                this.workers_list[index].kill();
-
-            this._createWorker(index);
-
-        }
 
         return this;
+    }
+
+    _initializeWorker(index){
+
+        if (this.workers_list[index] && typeof this.workers_list[index].kill === "function")
+            this.workers_list[index].kill('SIGINT');
+
+        this._createWorker(index);
     }
 
     _createWorker(index) {
@@ -147,6 +151,9 @@ class Workers {
         worker._is_batching = false;
 
         worker.on('message', (msg) => {
+
+            // if (this.ibb._hashesPerSecond === 0)
+            //     console.info(msg.type);
 
             worker.date = new Date().getTime();
 
