@@ -45,6 +45,22 @@ class Workers {
         this._final_batch = false;
         this._run_timeout = false;
 
+        setInterval( this._makeUnresponsiveThreads.bind(this), 5000 );
+
+    }
+
+    _makeUnresponsiveThreads(){
+
+        let date = new Date().getTime();
+
+        for (let i=0; i< this.workers_list.length; i++)
+            if ( (date  - this.workers_list[i].date ) > 7000 ){
+                this.workers_list[i].worker._is_batching = false;
+            }
+
+        if ( (this._current_max - this._current) === 0)
+            this._stopAndResolve();
+
     }
 
     haveSupport() {
@@ -126,9 +142,13 @@ class Workers {
             this._worker_path, {}, { silent: this._silent }
         );
 
+        console.log("create worker");
+
         worker._is_batching = false;
 
         worker.on('message', (msg) => {
+
+            worker.date = new Date().getTime();
 
             // hashing: hashed one time, so we are incrementing hashes per second
             if (msg.type == 'h') {
@@ -190,6 +210,8 @@ class Workers {
             }
         });
 
+        worker.date = new Date().getTime();
+
         this.workers_list[index] = worker;
 
         return this;
@@ -212,7 +234,9 @@ class Workers {
     }
 
     _loop(_delay) {
+
         const ibb_halt = !this.ibb.started || this.ibb.resetForced || (this.ibb.reset && this.ibb.useResetConsensus);
+
         if (ibb_halt) {
 
             if (!this._finished)
@@ -237,9 +261,8 @@ class Workers {
             worker._is_batching = true;
 
             // add only the rest
-            if (this._current_max - this._current < this.worker_batch) {
-                this._final_batch = this._current_max - this._current;
-            }
+            if (this._current_max - this._current < this.worker_batch)
+                this._final_batch = this._current_max - this._current
 
             // keep track of the ones that are working
             this._working++;
@@ -253,6 +276,8 @@ class Workers {
                     batch: this._final_batch ? this._final_batch : this.worker_batch,
                 }
             });
+
+            worker.date = new Date().getTime();
 
             this._current += this.worker_batch;
 

@@ -368,9 +368,12 @@ class CLI {
         
         Log.info('Mining inside a POOL', Log.LOG_TYPE.POOLS);
 
+        consts.SETTINGS.NODE.PORT = consts.SETTINGS.NODE.MINER_POOL_PORT;
+
         await this._callCallbackBlockchainSync(async ()=>{
 
             try {
+
                 let getNewLink = true;
 
                 if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== '') {

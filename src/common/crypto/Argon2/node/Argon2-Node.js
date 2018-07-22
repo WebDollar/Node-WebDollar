@@ -9,7 +9,7 @@ const HASH_ARGON2_OPTIONS = {
     parallelism: consts.HASH_ARGON2_PARAMS.parallelism,
     type: consts.HASH_ARGON2_PARAMS.algoNode,
     hashLength: consts.HASH_ARGON2_PARAMS.hashLen
-}
+};
 
 class Argon2Node {
 
