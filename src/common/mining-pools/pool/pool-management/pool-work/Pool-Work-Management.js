@@ -98,7 +98,7 @@ class PoolWorkManagement{
                 hashesFactor = Math.max(0.2, hashesFactor);
 
                 let hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
-                minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 400000 ));
+                minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 3000000 ));
 
             }
 
