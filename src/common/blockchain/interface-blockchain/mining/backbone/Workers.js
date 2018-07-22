@@ -44,7 +44,7 @@ class Workers {
         this._finished = false;
         this._final_batch = false;
         this._run_timeout = false;
-
+        this._initiateWorkers();
     }
 
     haveSupport() {
@@ -97,7 +97,7 @@ class Workers {
         this.ibb.bestHash = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
         this.ibb.bestHashNonce = 0;
 
-        this._initiateWorkers();
+        
 
         this._loop(loop_delay);
     }
