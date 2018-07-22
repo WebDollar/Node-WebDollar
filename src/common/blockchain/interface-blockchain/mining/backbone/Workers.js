@@ -125,7 +125,7 @@ class Workers {
 
     _initiateWorkers() {
 
-        for (let index = this.workers_list.length-1 ; index < this.workers_max; index++)
+        for (let index = this.workers_list.length ; index < this.workers_max; index++)
             this._initializeWorker(index);
 
 
