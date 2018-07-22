@@ -157,8 +157,8 @@ class MinerProtocol extends PoolProtocolList{
 
                 if (! ed25519.verify(answer.signature, newMessage, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
 
-                if ( typeof answer.reward !== "number") throw {message: "pool: Reward is empty"};
-                if ( typeof answer.confirmed !== "number") throw {message: "pool: confirmedReward is empty"};
+                //if ( typeof answer.reward !== "number") throw {message: "pool: Reward is empty"};
+                //if ( typeof answer.confirmed !== "number") throw {message: "pool: confirmedReward is empty"};
 
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
 
