@@ -55,7 +55,7 @@ class Workers {
 
         for (let i=0; i< this.workers_list.length; i++)
             if ( (date  - this.workers_list[i].date ) > 7000 ){
-                this.workers_list[i].worker._is_batching = false;
+                this.workers_list[i]._is_batching = false;
             }
 
         if ( (this._current_max - this._current) === 0)
@@ -65,7 +65,7 @@ class Workers {
 
     haveSupport() {
         // disabled by miner
-        if (consts.TERMINAL_WORKERS.MAX == -1) {
+        if (consts.TERMINAL_WORKERS.MAX === -1) {
             return false;
         }
 
