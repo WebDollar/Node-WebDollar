@@ -81,7 +81,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
         if (!this.light )
             NodesList.emitter.on("nodes-list/connected", async (result) => {
 
-                if (!NodeExpress.SSL && !NodeExpress.amIFallback() && !Blockchain.isPoolActivated )
+                if (!NodeExpress.SSL && !NodeExpress.amIFallback() && !Blockchain.isPoolActivated && !Blockchain.MinerPoolManagement.minerPoolStarted )
                     if ( NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK){
 
                         this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;

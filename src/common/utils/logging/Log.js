@@ -5,8 +5,9 @@ const LOG_TYPE = {
     DEFAULT: 0,
     POOLS: 1,
     BLOCKCHAIN: 2,
-    CLI_MENU: 3,
-    SAVING_MANAGER: 4,
+    BLOCKCHAIN_FORKS: 3,
+    CLI_MENU: 4,
+    SAVING_MANAGER: 5,
 };
 
 
@@ -35,12 +36,14 @@ class Log{
         this.defaultLogger = new Logger("default", LOG_TYPE.DEFAULT);
         this.poolsLogger = new Logger("pools", LOG_TYPE.POOLS);
         this.blockchainLogger = new Logger("blockchain", LOG_TYPE.BLOCKCHAIN);
+        this.blockchainForksLogger = new Logger("blockchainForks", LOG_TYPE.BLOCKCHAIN_FORKS);
         this.menuLogger = new Logger("cli_menu", LOG_TYPE.CLI_MENU);
 
         this.loggers = {};
         this.loggers[LOG_TYPE.DEFAULT] = this.defaultLogger;
         this.loggers[LOG_TYPE.POOLS] = this.poolsLogger;
         this.loggers[LOG_TYPE.BLOCKCHAIN] = this.blockchainLogger;
+        this.loggers[LOG_TYPE.BLOCKCHAIN_FORKS] = this.blockchainForksLogger;
         this.loggers[LOG_TYPE.CLI_MENU] = this.menuLogger;
 
     }
@@ -57,6 +60,20 @@ class Log{
             this.loggers[ config ].info.apply(this.loggers[ config ], arguments);
 
     }
+
+    /*
+     * Logs an info message
+    */
+    log(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
+
+        if (process.env.BROWSER)
+            return;
+
+        if (this.loggers[ config ] !== undefined)
+            this.loggers[ config ].log.apply(this.loggers[ config ], arguments);
+
+    }
+
 
     /*
      * Logs an debug message

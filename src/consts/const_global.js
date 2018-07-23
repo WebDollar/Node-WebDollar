@@ -1,6 +1,7 @@
 const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 const BigNumber = require('bignumber.js');
+const BigInteger = require('big-integer');
 
 let consts = {
 
@@ -24,6 +25,7 @@ consts.BLOCKCHAIN = {
 
     BLOCKS_POW_LENGTH: 32,
     BLOCKS_MAX_TARGET: new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
+    BLOCKS_MAX_TARGET_BIG_INTEGER: new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16),
     BLOCKS_MAX_TARGET_BUFFER: Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex"),
     BLOCKS_NONCE : 4,
 
@@ -235,7 +237,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.161.2",
+        VERSION: "1.162.0",
         VERSION_COMPATIBILITY: "1.160.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
@@ -244,7 +246,7 @@ consts.SETTINGS = {
         PROTOCOL: "WebDollar",
         SSL: true,
 
-        PORT: 80, //port
+        PORT: 8084, //port
         MINER_POOL_PORT: 8086, //port
 
     },
