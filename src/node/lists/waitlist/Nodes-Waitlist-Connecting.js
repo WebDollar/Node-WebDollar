@@ -221,6 +221,12 @@ class NodesWaitlistConnecting {
             }
 
         }
+
+        if (Blockchain.isPoolActivated){
+            this.connectingMaximum.maximum_fallbacks += 10;
+            this.connectingMaximum.maximum_waitlist += 20;
+        }
+
     }
 
 }
