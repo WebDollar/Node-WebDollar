@@ -9,7 +9,7 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
         super(db);
 
-        this.emitter = new AdvancedEmitter();
+        this.emitter = new AdvancedEmitter(1000);
 
     }
 
