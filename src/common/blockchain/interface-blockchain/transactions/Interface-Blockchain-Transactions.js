@@ -1,5 +1,5 @@
 import consts from 'consts/const_global'
-import TransactionsPendingQueue from './pending/TransactionsPendingQueue'
+import TransactionsPendingQueue from './pending/Transactions-Pending-Queue'
 import InterfaceTransaction from "./transaction/Interface-Blockchain-Transaction"
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainTransactionsWizard from "./wizard/Interface-Blockchain-Transactions-Wizard";
