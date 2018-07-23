@@ -118,7 +118,6 @@ class NodesWaitlistConnecting {
                     for (let i=this._connectingQueue.length-1; i>=0; i--)
                         if (this._connectingQueue[i] === nextWaitListObject){
                             this._connectingQueue.splice(i,1);
-                            break;
                         }
 
                     nextWaitListObject.checked = true;

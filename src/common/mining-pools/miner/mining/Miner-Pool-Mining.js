@@ -186,6 +186,7 @@ class MinerPoolMining extends InheritedPoolMining {
                 await this.minerPoolManagement.minerPoolProtocol.requestWork();
 
             if (!this.started) this._poolFailTrials = 0;
+
             if (this.started && this._hashesPerSecond === 0 ){
                 this._poolFailTrials ++;
 
@@ -196,7 +197,8 @@ class MinerPoolMining extends InheritedPoolMining {
                     this._poolFailTrials = 0;
                 }
 
-            }
+            } else
+                this._poolFailTrials = 0;
 
         } catch (exception){
 
