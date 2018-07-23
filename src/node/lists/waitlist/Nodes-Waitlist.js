@@ -205,12 +205,22 @@ class NodesWaitlist {
             if (!this.waitListFullNodes.isFallback) {
 
                 try {
+
+                    if ( (Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted ) && this.waitListFullNodes[i].nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL) continue;
+
                     let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 5000);
 
-                    if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility)
+                    if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility) {
+                        this.waitListFullNodes[i].failsChecking = 0;
                         continue;
-                    else
-                        this.waitListFullNodes.splice(i, 1);
+                    }
+                    else {
+                        this.waitListFullNodes[i].failsChecking++;
+
+                        if (this.waitListFullNodes[i].failsChecking >= 5)
+                            this.waitListFullNodes.splice(i, 1);
+
+                    }
 
                 } catch (exception){
 
