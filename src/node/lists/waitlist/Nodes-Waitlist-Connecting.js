@@ -105,8 +105,6 @@ class NodesWaitlistConnecting {
         if (Blockchain.Agent.light && Blockchain.Agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES)
             return;
 
-        console.log("44444");
-
         //connect only to TERMINAL NODES
         if ( nextWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) {
 
