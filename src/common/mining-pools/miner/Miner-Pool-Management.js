@@ -109,6 +109,9 @@ class MinerProtocol {
 
                 this.blockchain.agent.consensus = false;
 
+                if (this.blockchain.prover !== undefined)
+                    this.blockchain.prover.proofActivated = false;
+
                 await this.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
                 await this.minerPoolProtocol._startMinerProtocol();
                 await this.minerPoolMining._startMinerPoolMining();
@@ -127,6 +130,10 @@ class MinerProtocol {
 
                 this.blockchain.blocks.length  = 0;
                 this.blockchain.agent.consensus = true;
+
+
+                if (this.blockchain.prover !== undefined)
+                    this.blockchain.prover.proofActivated = true;
 
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
 
