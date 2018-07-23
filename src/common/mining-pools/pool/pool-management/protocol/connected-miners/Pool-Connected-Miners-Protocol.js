@@ -183,6 +183,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
             if ( !Buffer.isBuffer(answer.hash ) ) throw {message: "hash is not specified"};
             if ( typeof answer.nonce !== "number" ) throw {message: "nonce is not specified"};
 
+            if (socket.node.protocol.minerPool === undefined) return;
+
             let minerInstance = socket.node.protocol.minerPool.minerInstance;
             if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
@@ -204,6 +206,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 suffix = '/'+data.suffix;
 
             try {
+
+                if (socket.node.protocol.minerPool === undefined) return;
 
                 let minerInstance = socket.node.protocol.minerPool.minerInstance;
                 if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
@@ -233,6 +237,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             try {
 
+                if (socket.node.protocol.minerPool === undefined) return;
+
 
                 let minerInstance = socket.node.protocol.minerPool.minerInstance;
                 if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
@@ -260,6 +266,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             try{
 
+                if (socket.node.protocol.minerPool === undefined) return;
+
                 let minerInstance = socket.node.protocol.minerPool.minerInstance;
                 if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
@@ -285,6 +293,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
             if (!this.poolManagement._poolStarted) return;
 
             try {
+
+                if (socket.node.protocol.minerPool === undefined) return;
 
 
                 if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
@@ -350,6 +360,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             try{
 
+                if (socket.node.protocol.minerPool === undefined) return;
+
                 let minerInstance = socket.node.protocol.minerPool.minerInstance;
                 if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
@@ -366,6 +378,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
             if (!this.poolManagement._poolStarted) return;
 
             try {
+
+                if (socket.node.protocol.minerPool === undefined) return;
 
                 if (Buffer.isBuffer( data.minerAddress )  || data.minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "minerAddress is invalid"};
 
