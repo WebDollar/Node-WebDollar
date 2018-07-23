@@ -110,8 +110,6 @@ class Blockchain{
 
         await this.loadWallet();
 
-        await this.blockchain.transactions.pendingQueue.pendingQueueSavingManager.loadPendingTransactions();
-
         await this.createMiningPools();
 
         if (process.env.BROWSER) { //let's make a hash first
@@ -129,6 +127,8 @@ class Blockchain{
         if (synchronize){
 
             await this.Chain.loadBlockchain();
+
+            await this.blockchain.transactions.pendingQueue.pendingQueueSavingManager.loadPendingTransactions();
 
             await this.Agent.initializeStartAgentOnce();
 
