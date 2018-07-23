@@ -39,6 +39,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     async _loadBlockchain( indexStartLoadingOffset , indexStartProcessingOffset ){
 
+        let oldProofActivated = this.prover.proofActivated;
         this.prover.proofActivated = false;
 
         try {
@@ -48,7 +49,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
             console.error("loadBlockchain raised an error", exception);
         }
 
-        this.prover.proofActivated = true;
+        this.prover.proofActivated = oldProofActivated;
         await this.prover.createProofs();
 
         return true;

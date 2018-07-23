@@ -146,7 +146,7 @@ class PoolManagement{
                 await this.poolProtocol._startPoolProtocol();
 
                 if (this.blockchain.prover !== undefined)
-                    this.blockchain.prover.proofActivated = false;;
+                    this.blockchain.prover.proofActivated = false;
 
                 await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL;
