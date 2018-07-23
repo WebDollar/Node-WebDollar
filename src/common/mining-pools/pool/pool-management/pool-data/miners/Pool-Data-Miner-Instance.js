@@ -15,6 +15,10 @@ class PoolDataMinerInstance {
         this.work = undefined;
         this.lastBlockInformation = undefined;
 
+
+        this.dateActivity = new Date().getTime()/1000;
+
+
     }
 
     destroyPoolDataMinerInstance(){

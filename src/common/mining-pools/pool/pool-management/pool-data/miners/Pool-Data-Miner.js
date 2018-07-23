@@ -20,8 +20,6 @@ class PoolDataMiner{
         this._rewardConfirmedOther = 0;   //other money confirmed to be sent
         this._rewardSent = 0;             //rewardSent
 
-        this.dateActivity = new Date().getTime()/1000;
-
         this.referrals = new PoolDataMinerReferrals( poolData, this  );
 
     }

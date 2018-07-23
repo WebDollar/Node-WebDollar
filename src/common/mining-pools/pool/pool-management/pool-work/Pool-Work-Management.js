@@ -54,7 +54,7 @@ class PoolWorkManagement{
 
         minerInstance.lastBlockInformation =  blockInformationMinerInstance;
         minerInstance.workBlock =  this.poolWork.lastBlock;
-        minerInstance.miner.dateActivity = new Date().getTime()/1000;
+        minerInstance.dateActivity = new Date().getTime()/1000;
 
         this.poolWork.lastBlockNonce += hashes;
 
@@ -67,8 +67,6 @@ class PoolWorkManagement{
 
         }
 
-        //marking him as online
-        this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
 
         return answer;
 
