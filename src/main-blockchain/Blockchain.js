@@ -110,6 +110,8 @@ class Blockchain{
 
         await this.loadWallet();
 
+        await this.blockchain.transactions.pendingQueue.pendingQueueSavingManager.loadPendingTransactions();
+
         await this.createMiningPools();
 
         if (process.env.BROWSER) { //let's make a hash first

@@ -1,7 +1,7 @@
 import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended"
 import TransactionsProtocol from "../protocol/Transactions-Protocol"
-import TransactionsProtocolQueueSavingManager from "./Transactions-Pending-Queue-Saving-Manager";
+import TransactionsPendingQueueSavingManager from "./Transactions-Pending-Queue-Saving-Manager";
 
 class TransactionsPendingQueue {
 
@@ -10,6 +10,7 @@ class TransactionsPendingQueue {
         this.transactionsProtocol = new TransactionsProtocol(blockchain);
 
         this.transactions = transactions;
+        this.pendingQueueSavingManager = new TransactionsPendingQueueSavingManager(blockchain, this, db);
 
         this.blockchain = blockchain;
         this.list = [];
@@ -17,9 +18,7 @@ class TransactionsPendingQueue {
         this.db = db;
 
 
-
         setTimeout( this._removeOldTransactions.bind(this), 20000 );
-
 
     }
 

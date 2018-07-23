@@ -53,6 +53,11 @@ class NodesWaitlistConnecting {
 
     }
 
+    stopConnecting(){
+        if (this._connectingTimeout  !== undefined)
+            clearTimeout( this._connectingTimeout );
+    }
+
     /*
         Connect to all nodes
     */
@@ -78,7 +83,7 @@ class NodesWaitlistConnecting {
 
         this._connectNewNodesWaitlist();
 
-        setTimeout( this._connectNewNodesWaitlistInterval.bind(this), consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
+        this._connectingTimeout = setTimeout( this._connectNewNodesWaitlistInterval.bind(this), consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
     }
 
     _tryToConnectNextNode( nextWaitListObject){
