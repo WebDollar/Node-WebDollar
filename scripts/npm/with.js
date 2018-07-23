@@ -20,12 +20,14 @@ const parser = new Parser();
 const storage = new Storage();
 
 // Add custom expressions here. Order matters!
-// ...
+parser.addOptions({
+    dev: false,
+});
 
 // default expressions
-parser.addNamespaceExpression();
-parser.addKeyValueExpression();
-parser.addOptionExpression();
+parser.addNamespace(); // finds: namespace:key=value
+parser.addKeyValue(); // finds: key=value
+parser.addOption('overwrite', false); // finds: key
 
 // parse
 parser.parse();

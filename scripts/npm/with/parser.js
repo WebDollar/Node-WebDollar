@@ -1,8 +1,11 @@
 class Expression {
-    constructor(name, regExp, validation) {
+    constructor(name, condition, validation) {
         this._name = name;
-        this._regExp = regExp;
+        this._condition = condition;
         this._validation = validation;
+
+        // holds option's state
+        this.option = false;
     }
 
     name() {
@@ -10,9 +13,24 @@ class Expression {
     }
 
     match(arg) {
-        const match = arg.match(this._regExp);
+        let match = false;
+        if (this._condition instanceof RegExp) {
+            match = arg.match(this._condition);
+        }
 
-        return this._validation(match, arg, this);
+        if (this._condition instanceof Function) {
+            match = this._condition(arg);
+        }
+
+        if (typeof this._condition === 'string') {
+            match = arg.toLowerCase() === this._condition.toLowerCase();
+        }
+
+        if (match) {
+            return this._validation(match, arg, this);
+        }
+
+        return false;
     }
 }
 
@@ -31,10 +49,10 @@ class Parser {
 
         this._expressions[expr.name()] = expr;
 
-        return this;
+        return this._expressions[expr.name()];
     }
 
-    addKeyValueExpression() {
+    addKeyValue() {
         this.addExpression('default_key_value', new RegExp(/^(.*?)=(.*?)$/), (match, arg, self) => {
             if (!match) {
                 return false;
@@ -55,7 +73,7 @@ class Parser {
         return this;
     }
 
-    addNamespaceExpression() {
+    addNamespace() {
         this.addExpression('default_namespace', new RegExp(/^(.*?):(.*?)=(.*?)$/), (match, arg, self) => {
             if (!match) {
                 return false;
@@ -77,11 +95,39 @@ class Parser {
         return this;
     }
 
-    addOptionExpression() {
-        this.addExpression('default_option', new RegExp(/^is-(.*)$/i), (match) => {
+    addOption(name, default_value, condition) {
+        if (!condition) {
+            condition = name;
+        }
+
+        const expr = this.addExpression(`option_${name}`, condition, (match, arg, self) => {
             if (match) {
-                return { key: match[1].toUpperCase(), value: true };
+                self.option.found = true;
+
+                return {
+                    key: name.toUpperCase(),
+                    value: true
+                };
             }
+
+            return false;
+        });
+
+        // state
+        expr.option = {
+            default_value: {
+                key: name.toUpperCase(),
+                value: default_value,
+            },
+            found: false,
+        };
+
+        return this;
+    }
+
+    addOptions(names, condition) {
+        Object.keys(names).forEach((key) => {
+            this.addOption(key, names[key], condition);
         });
 
         return this;
@@ -128,6 +174,15 @@ class Parser {
 
                 this._arguments[result.key] = result.value;
             });
+        });
+
+        // add default values to options
+        Object.keys(this._expressions).forEach((key) => {
+            const expr = this._expressions[key];
+
+            if (expr.option && !expr.option.found) {
+                this._arguments[expr.option.default_value.key] = expr.option.default_value.value;
+            }
         });
 
         return this._arguments;

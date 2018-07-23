@@ -6,6 +6,32 @@ class Storage {
     }
 
     save(data = {}) {
+        const current = this._current();
+        if (data.OVERWRITE && current) {
+            Object.keys(current).forEach((key) => {
+                if (typeof current[key] == 'object') {
+                    if (!current[key]) {
+                        current[key] = {};
+                    }
+
+                    // add new data
+                    current[key] = Object.assign(current[key], data[key]);
+
+                    return false;
+                }
+
+                current[key] = data[key];
+            });
+
+            // flip
+            data = current;
+        }
+
+        // remove it
+        if (data.OVERWRITE) {
+            delete data.OVERWRITE;
+        }
+
         FS.writeFileSync(this.source, JSON.stringify(data, null, 4), () => {});
 
         return this;
@@ -29,29 +55,36 @@ class Storage {
             return target;
         };
 
-        if (FS.existsSync(this.source)) {
-            const content = FS.readFileSync(this.source, 'utf8');
-
-            const json = JSON.parse(content.trim());
-
-            Object.keys(json).forEach((key) => {
-                if (typeof json[key] == 'object') {
+        const current = this._current();
+        if (current) {
+            Object.keys(current).forEach((key) => {
+                if (typeof current[key] == 'object') {
                     if (!data[key]) {
                         data[key] = {};
                     }
 
-                    data[key] = Object.assign(data[key], wrap_string_value(json[key]));
+                    data[key] = Object.assign(data[key], wrap_string_value(current[key]));
 
                     return false;
                 }
 
-                data[key] = wrap_string_value(json[key]);
+                data[key] = wrap_string_value(current[key]);
             });
 
             return data;
         }
 
         return data;
+    }
+
+    _current() {
+        if (FS.existsSync(this.source)) {
+            const content = FS.readFileSync(this.source, 'utf8');
+
+            return JSON.parse(content.trim());
+        }
+
+        return false;
     }
 }
 
