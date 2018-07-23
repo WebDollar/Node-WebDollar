@@ -31,7 +31,7 @@ class NodesWaitlist {
         this.MAX_ERROR_TRIALS_FALLBACK = 1000;
         this.MAX_ERROR_TRIALS_SIMPLE = 50;
 
-        setInterval( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
+        setTimeout( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
 
     }
 
@@ -228,6 +228,8 @@ class NodesWaitlist {
 
                 await Blockchain.blockchain.sleep( 500 + Math.floor( Math.random()*2000) );
             }
+
+        setTimeout( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
 
     }
 

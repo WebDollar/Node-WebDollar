@@ -353,6 +353,9 @@ class PoolSettings {
         else if (poolUseSignatures === "false") poolUseSignatures = false;
         else if (poolUseSignatures === null) poolUseSignatures = true;
 
+        if (poolUsePoolServers)
+            poolUseSignatures = false;
+
         let poolReferralFee = await this._db.get("pool_referral_fee",  30*1000, true);
         if (poolReferralFee === null) poolReferralFee = 0.05; // 5%
 

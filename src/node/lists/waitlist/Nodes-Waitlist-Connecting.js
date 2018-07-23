@@ -38,7 +38,7 @@ class NodesWaitlistConnecting {
             minimum_waitlist:0,
         };
 
-        setInterval(this._calculateNumberOfConnections.bind(this), 5000);
+        setInterval(this._calculateNumberOfConnections.bind(this), 10000);
 
         this._calculateNumberOfConnections();
 

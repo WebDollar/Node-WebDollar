@@ -1,9 +1,9 @@
 import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended"
 import TransactionsProtocol from "../protocol/Transactions-Protocol"
+import TransactionsProtocolQueueSavingManager from "./Transactions-Pending-Queue-Saving-Manager";
 
-
-class InterfaceTransactionsPendingQueue {
+class TransactionsPendingQueue {
 
     constructor(transactions, blockchain, db){
 
@@ -16,7 +16,10 @@ class InterfaceTransactionsPendingQueue {
 
         this.db = db;
 
+
+
         setTimeout( this._removeOldTransactions.bind(this), 20000 );
+
 
     }
 
@@ -161,4 +164,4 @@ class InterfaceTransactionsPendingQueue {
 
 }
 
-export default InterfaceTransactionsPendingQueue
+export default TransactionsPendingQueue
