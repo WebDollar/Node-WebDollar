@@ -90,7 +90,7 @@ class ServerPoolManagement{
 
             if (value){
 
-                if (this.blockchain.prover !== undefined)
+                if (this.blockchain !== undefined &&  this.blockchain.prover !== undefined)
                     this.blockchain.prover.proofActivated = false;
 
                 await this.serverPoolProtocol._startServerPoolProtocol();
@@ -98,7 +98,7 @@ class ServerPoolManagement{
             }
             else {
 
-                if (this.blockchain.prover !== undefined)
+                if (this.blockchain !== undefined && this.blockchain.prover !== undefined)
                     this.blockchain.prover.proofActivated = true;
 
                 await this.serverPoolProtocol._stopServerPoolProtocol();
