@@ -108,7 +108,7 @@ class PoolRewardsManagement{
             if ( this.poolData.blocksInfo[i].payout){
 
                 //let's delete old payouts
-                if ( this.blockchain.blocks.length - this.poolData.blocksInfo[i].block.height > 40) {
+                if ( this.poolData.blocksInfo[i].block === undefined || this.blockchain.blocks.length - this.poolData.blocksInfo[i].block.height > 40) {
 
                     this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid++;
                     this.poolManagement.poolStatistics.poolBlocksConfirmed--;
