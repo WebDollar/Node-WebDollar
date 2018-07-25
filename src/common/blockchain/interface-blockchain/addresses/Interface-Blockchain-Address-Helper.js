@@ -224,12 +224,16 @@ class InterfaceBlockchainAddressHelper{
         if (typeof address === "object" && address.hasOwnProperty("unencodedAddress"))
             address = address.unencodedAddress;
 
-        let result = this._validateAddressWIF(address);
 
-        if (result.result === true)
-            return result.unencodedAddress;
-        else
+        try {
+            let result = this._validateAddressWIF(address);
+
+            if (result.result === true) return result.unencodedAddress;
+            else  return null;
+
+        } catch (exception){
             return null;
+        }
     }
 
     static _calculateChecksum(privateKeyAndVersion, showDebug){

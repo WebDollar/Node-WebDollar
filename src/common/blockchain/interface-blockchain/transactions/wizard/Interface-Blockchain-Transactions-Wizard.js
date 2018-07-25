@@ -84,7 +84,7 @@ class InterfaceBlockchainTransactionsWizard{
                     {
                         unencodedAddress: address,
                         publicKey: undefined,
-                        amount: toAmountTotal + fee
+                        amount: toAmountTotal + (fee||0)
                     }
                 ],
                 currencyTokenId: currencyTokenId
@@ -172,7 +172,7 @@ class InterfaceBlockchainTransactionsWizard{
             webdPerByte = consts.MINING_POOL.MINING.FEE_PER_BYTE;
 
         let factor = Math.trunc( serialization.length / 200) + 1;
-        webdPerByte = factor * webdPerByte;
+        webdPerByte = factor * Math.max(1, Math.floor( Math.log2( webdPerByte) ));
 
         return serialization.length * webdPerByte;
 

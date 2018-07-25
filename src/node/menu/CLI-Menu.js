@@ -144,47 +144,46 @@ class CLI {
 
     async listAddresses() {
 
-        await this._callCallbackBlockchainSync(async ()=>{
 
-            console.info('\nWallet addresses:');
+        console.warn("INFO: YOU NEED TO BE SYNC TO SEE THE VALUE OF YOUR WALLET!!!");
+        console.info('\nWallet addresses:');
 
-            let miningAddress = Blockchain.blockchain.mining.minerAddress;
-            if (miningAddress === undefined)
-                miningAddress = 'not specified';
+        let miningAddress = Blockchain.blockchain.mining.minerAddress;
+        if (miningAddress === undefined)
+            miningAddress = 'not specified';
 
-            console.log(addressHeader);
-            for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
+        console.log(addressHeader);
+        for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
 
-                let address = Blockchain.Wallet.addresses[i].address;
+            let address = Blockchain.Wallet.addresses[i].address;
 
-                let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
+            let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
 
-                balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
 
-                if (address === miningAddress) {
-                    console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
-                } else {
-                    console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
-                }
+            if (address === miningAddress) {
+                console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
+            } else {
+                console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
             }
+        }
 
-            let balance = 0;
-            if (miningAddress !== 'not specified') {
-                balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
-                balance = (balance === null) ? 0 : balance;
+        let balance = 0;
+        if (miningAddress !== 'not specified') {
+            balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
+            balance = (balance === null) ? 0 : balance;
 
-                if (Blockchain.MinerPoolManagement.minerPoolStarted)
-                    balance += Blockchain.MinerPoolManagement.minerPoolReward.total;
+            if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
+                balance += Blockchain.MinerPoolManagement.minerPoolReward.total;
 
-                balance /= WebDollarCoins.WEBD;
+            balance /= WebDollarCoins.WEBD;
 
 
-            }
-            console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
+        }
+        console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
 
-            return true;
+        return true;
 
-        }, undefined, undefined, true);
     }
 
     async createNewAddress() {
@@ -295,7 +294,7 @@ class CLI {
                     return;
                 }
 
-                console.log("Address successfully exported", addressString);
+                console.log("Address successfully exported", addressString, '   to ', addressPath+fileNam);
                 resolve(true);
                 return;
 

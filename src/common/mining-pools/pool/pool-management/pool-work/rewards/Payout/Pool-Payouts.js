@@ -172,7 +172,7 @@ class PoolPayouts{
             Log.info("Payout Total To Pay: " + (totalToPay / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
 
             let index = 0;
-            while (index * 256 < this._toAddresses.length) {
+            while (index * 255 < this._toAddresses.length) {
 
                 let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 

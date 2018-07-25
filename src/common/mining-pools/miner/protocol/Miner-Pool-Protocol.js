@@ -453,11 +453,7 @@ class MinerProtocol extends PoolProtocolList{
 
             let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-referrals", undefined, "answer", 6000);
 
-            if (answer.result){
-
-
-
-            }
+            return answer;
 
         } catch (exception){
 

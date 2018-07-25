@@ -1,10 +1,11 @@
 import consts from "consts/const_global";
 
-import MinerPoolMining from "common/mining-pools/miner/mining/Miner-Pool-Mining";
-import MinerPoolReward from "common/mining-pools/miner/mining/Miner-Pool-Reward";
-import MinerPoolStatistics from "common/mining-pools/miner/pool-statistics/Miner-Pool-Statistics"
-import MinerPoolProtocol from "common/mining-pools/miner/protocol/Miner-Pool-Protocol"
-import MinerPoolSettings from "common/mining-pools/miner/Miner-Pool-Settings"
+import MinerPoolMining from "./mining/Miner-Pool-Mining";
+import MinerPoolReward from "./mining/Miner-Pool-Reward";
+import MinerPoolStatistics from "./pool-statistics/Miner-Pool-Statistics"
+import MinerPoolProtocol from "./protocol/Miner-Pool-Protocol"
+import MinerPoolReferrals from "./Miner-Pool-Referrals"
+import MinerPoolSettings from "./Miner-Pool-Settings"
 import StatusEvents from "common/events/Status-Events";
 import Blockchain from "main-blockchain/Blockchain";
 import NodesList from 'node/lists/Nodes-List'
@@ -20,6 +21,7 @@ class MinerProtocol {
         this.minerPoolSettings = new MinerPoolSettings(this);
         this.minerPoolProtocol = new MinerPoolProtocol(this);
         this.minerPoolStatistics = new MinerPoolStatistics(this);
+        this.minerPoolReferrals = new MinerPoolReferrals(this);
         
         this.minerPoolMining = new MinerPoolMining(this);
         this.minerPoolReward = new MinerPoolReward(this);
@@ -114,7 +116,8 @@ class MinerProtocol {
 
                 await this.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
                 await this.minerPoolProtocol._startMinerProtocol();
-                await this.minerPoolMining._startMinerPoolMining();
+
+                await this.minerPoolReferrals.startLoadMinerPoolReferrals();
 
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_MINER;
             }
@@ -127,6 +130,8 @@ class MinerProtocol {
 
                 await this.minerPoolProtocol._stopMinerProtocol();
                 await this.minerPoolMining._stopMinerPoolMining();
+
+                await this.minerPoolReferrals.stopLoadMinerPoolReferrals();
 
                 this.blockchain.blocks.length  = 0;
                 this.blockchain.agent.consensus = true;
