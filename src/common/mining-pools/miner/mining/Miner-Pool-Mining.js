@@ -191,7 +191,7 @@ class MinerPoolMining extends InheritedPoolMining {
                 this._poolFailTrials ++;
 
                 //in case I can not mine from this pool, show an error and disconnect
-                if (this._poolFailTrials > 8) {
+                if (this._poolFailTrials > 20) {
                     Log.error("Mining Pool is not working. Trying to reconnect", Log.LOG_TYPE.POOLS);
                     NodesList.disconnectAllNodes();
                     await this.minerPoolManagement.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
