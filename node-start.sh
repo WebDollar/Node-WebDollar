@@ -36,6 +36,10 @@ browserconn="$YELLOW[BROWSER_CONNECTIONS]$STAND"
 ports="$YELLOW[PORTS]$STAND"
 ##
 
+### General VARS
+fullnode_conf=".fullnodeconf"
+###
+
 #### ROOT User Check
 function checkroot(){
         if [[ $(id -u) = 0 ]]; then
@@ -58,7 +62,7 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] || $(pwd | cut -d '/' -f3) 
 
 	if [[ "$startnodeyn" =~ ^(y|yes|Y|YES|Yes)$ ]]; then
 
-		MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$readport pm2 start npm -- run start
+		MAXIMUM_CONNECTIONS_FROM_BROWSER=$get_browser_conn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$get_term_conn SERVER_PORT=$readport pm2 start npm -- run start
 		sleep 1;
 		pm2 restart npm --name "$readport" --update-env
 		sleep 3;
@@ -93,7 +97,7 @@ else
 			cd $nodewebdloc
 			echo "$showinfo Folder location changed to $nodewebdloc"
 
-			MAXIMUM_CONNECTIONS_FROM_BROWSER=$readbrowserconn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$readtermconn SERVER_PORT=$readport pm2 start npm -- run start
+			MAXIMUM_CONNECTIONS_FROM_BROWSER=$get_browser_conn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$get_term_conn SERVER_PORT=$readport pm2 start npm -- run start
 			sleep 1;
 			pm2 restart npm --name "$readport" --update-env
 			sleep 3;
@@ -108,43 +112,62 @@ else
 fi
 }
 
-read -e -p "$showinput How many $terminalconn do you want to offer (e.g.: 350 or $abortte): " readtermconn # this is a max_term_connections global setting that will apply for every pm2 instance.
+	if [[ -s $fullnode_conf ]]; then
+	### VARS
+	get_term_conn=$(cat .fullnodeconf | grep TERM_CONN | cut -d '=' -f2)
+	get_browser_conn=$(cat .fullnodeconf | grep BROWSER_CONN | cut -d '=' -f2)
+	###
 
-### Catch user input before anything - readtermconn
-if [[ "$readtermconn" =~ ^[[:digit:]]+$ ]]; then
-	read -e -p "$showinput How many $browserconn do you want to offer (e.g.: 250 or $abortte): " readbrowserconn # if termconn is set ok, proceed to nr of browser_conn input # this is a max_browser_connections global setting that will apply for every pm2 instance.
+		echo "$showok FULLNODE_CONF found! TERM_CONN=$GREEN$get_term_conn$STAND | BROWSER_CONN=$GREEN$get_browser_conn$STAND"
 
-elif [[ "$readtermconn" == "" ]]; then
-	echo "$showerror No empty space allowed."
-	exit 1
+		read -e -p "$showinput How many $ports to you want to use for the full node (from 1 to 6 or $abortte): " nrofports
+	else
+		if [[ ! -s $fullnode_conf ]]; then
 
-elif [[ "$readtermconn" == abort ]]; then
-	echo "$showinfo Okay. Bye."
-	exit 0
+			echo "$showerror FULLNODE_CONF not found! Starting config..."
 
-elif [[ "$readtermconn" == * ]]; then
-	echo "$showerror Please enter how many connections you'll give for $terminalconn"
-	exit 1
-fi
-###
+			read -e -p "$showinput How many $terminalconn do you want to offer (e.g.: 350 or $abortte): " readtermconn # this is a max_term_connections global setting that will apply for every pm2 instance.
 
-### Catch user input before anything - readbrowserconn
-if [[ "$readbrowserconn" =~ ^[[:digit:]]+$ ]]; then
-	read -e -p "$showinput How many $ports to you want to use for the full node (from 1 to 6 or $abortte): " nrofports # if browser_conn is set ok, proceed to nr of ports input
+			### Catch user input before anything - readtermconn
+			if [[ "$readtermconn" =~ ^[[:digit:]]+$ ]]; then
+				read -e -p "$showinput How many $browserconn do you want to offer (e.g.: 250 or $abortte): " readbrowserconn # if termconn is set ok, proceed to nr of browser_conn input # this is a max_browser_connections global setting that will apply for every pm2 instance.
 
-elif [[ "$readbrowserconn" == "" ]]; then
-	echo "$showerror No empty space allowed."
-	exit 1
+				### Catch user input before anything - readbrowserconn
+				if [[ "$readbrowserconn" =~ ^[[:digit:]]+$ ]]; then
 
-elif [[ "$readbrowserconn" == abort ]]; then
-	echo "$showinfo Okay. Bye."
-	exit 0
+					echo -e "TERM_CONN=$readtermconn\\nBROWSER_CONN=$readbrowserconn" > $fullnode_conf
+					echo "$showok FULLNODE_CONF saved to $(pwd)/$fullnode_conf"
 
-elif [[ "$readbrowserconn" == * ]]; then
-	echo "$showerror Please enter how many connections you'll give for $browserconn"
-	exit 1
-fi
-###
+					read -e -p "$showinput How many $ports to you want to use for the full node (from 1 to 6 or $abortte): " nrofports # if browser_conn is set ok, proceed to number of ports to be used
+
+				elif [[ "$readbrowserconn" == "" ]]; then
+					echo "$showerror No empty space allowed."
+					exit 1
+
+				elif [[ "$readbrowserconn" == abort ]]; then
+					echo "$showinfo Okay. Bye."
+					exit 0
+
+				elif [[ "$readbrowserconn" == * ]]; then
+					echo "$showerror Please enter how many connections you'll give for $browserconn"
+					exit 1
+				fi
+
+
+			elif [[ "$readtermconn" == "" ]]; then
+				echo "$showerror No empty space allowed."
+				exit 1
+
+			elif [[ "$readtermconn" == abort ]]; then
+				echo "$showinfo Okay. Bye."
+				exit 0
+
+			elif [[ "$readtermconn" == * ]]; then
+				echo "$showerror Please enter how many connections you'll give for $terminalconn"
+				exit 1
+			fi
+		fi
+	fi
 
 ### Start process
 ### Catch user input before anything - nrofports
@@ -284,35 +307,35 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 	}
 	f_fiveports # function five ports pm2 start
 
-	elif [[ "$nrofports" == 6 ]];then
+	elif [[ "$nrofports" == 10 ]];then
 
-	function f_sixports(){
+	function f_tenports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083 8084 8085): " readnrport6_0 readnrport6_1 readnrport6_2 readnrport6_3 readnrport6_4 readnrport6_5
+		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083 8084 8085 etc): " readnrport10_0 readnrport10_1 readnrport10_2 readnrport10_3 readnrport10_4 readnrport10_5 readnrport10_6 readnrport10_7 readnrport10_8 readnrport10_9
 
-		if [[ $readnrport6_0 =~ ^[[:digit:]]+$ && $readnrport6_1 =~ ^[[:digit:]]+$ && $readnrport6_2 =~ ^[[:digit:]]+$ && $readnrport6_3 =~ ^[[:digit:]]+$ && $readnrport6_4 =~ ^[[:digit:]]+$ && $readnrport6_5 =~ ^[[:digit:]]+$ ]]; then
+		if [[ $readnrport10_0 =~ ^[[:digit:]]+$ && $readnrport10_1 =~ ^[[:digit:]]+$ && $readnrport10_2 =~ ^[[:digit:]]+$ && $readnrport10_3 =~ ^[[:digit:]]+$ && $readnrport10_4 =~ ^[[:digit:]]+$ && $readnrport10_5 =~ ^[[:digit:]]+$ && $readnrport10_6 =~ ^[[:digit:]]+$ && $readnrport10_7 =~ ^[[:digit:]]+$ && $readnrport10_8 =~ ^[[:digit:]]+$ && $readnrport10_9 =~ ^[[:digit:]]+$ ]]; then
 
-			echo "$showinfo The system will use $nrofports ports -> $readnrport6_0, $readnrport6_1, $readnrport6_2, $readnrport6_3 and $readnrport6_4 $readnrport6_5"
+			echo "$showinfo The system will use $nrofports ports -> $readnrport10_0, $readnrport10_1, $readnrport10_2, $readnrport10_3,$readnrport10_4, $readnrport10_5, $readnrport10_6, $readnrport10_7, $readnrport10_8 and $readnrport10_9"
 
-			for fw_readport in $readnrport6_0 $readnrport6_1 $readnrport6_2 $readnrport6_3 $readnrport6_4 $readnrport6_5;
+			for fw_readport in $readnrport10_0 $readnrport10_1 $readnrport10_2 $readnrport10_3 $readnrport10_4 $readnrport10_5 $readnrport10_6 $readnrport10_7 $readnrport10_8 $readnrport10_9;
 			do
 				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
 			done
 
-			for readport in $readnrport6_0 $readnrport6_1 $readnrport6_2 $readnrport6_3 $readnrport6_4 $readnrport6_5;
+			for readport in $readnrport10_0 $readnrport10_1 $readnrport10_2 $readnrport10_3 $readnrport10_4 $readnrport10_5 $readnrport10_6 $readnrport10_7 $readnrport10_8 $readnrport10_9;
 			do
 				start_pm2node
 				cd ..
 			done
 		else
 			echo "$showerror Please enter $nrofports PORT numbers."
-			f_sixports
+			f_tenports
 		fi
 	}
-	f_sixports # function six ports pm2 start
+	f_tenports # function ten ports pm2 start
 
-	elif [[ "$nrofports" -gt 6 ]]; then
-		echo "$showerror Sorry, only 6 ports supported for now."
+	elif [[ "$nrofports" -gt 5 ]]; then
+		echo "$showerror Sorry, max ports can be: 1,2,3,4,5 and 10."
 		echo "$showinfo You can always run the script again with a new set of ports."
 		exit 1
 	fi
@@ -330,4 +353,4 @@ elif [[ "$nrofports" == * ]]; then
 	exit 1
 fi
 
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo iptables-save; fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo iptables-save; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo iptables-save; fi fi
