@@ -214,6 +214,25 @@ class PoolDataMinerReferrals {
         return this._rewardReferralsSent;
     }
 
+    toJSON(){
+
+        let referees = [];
+        for (let i=0; i<this.array.length; i++)
+            referees.push( this.array[i].toJSON() )
+
+        return {
+
+            referees: referees,
+
+            referralLinkAddress: InterfaceBlockchainAddressHelper.generateAddressWIF(this.referralLinkAddress, false, true),
+
+            rewardReferralsTotal: this._rewardReferralsTotal,
+            rewardReferralsConfirmed: this._rewardReferralsConfirmed,
+            rewardReferralsSent: this._rewardReferralsSent,
+
+        }
+
+    }
 
 }
 
