@@ -37,7 +37,7 @@ ports="$YELLOW[PORTS]$STAND"
 ##
 
 ### General VARS
-fullnode_conf=".fullnodeconf"
+fullnode_conf="../.fullnodeconf"
 ###
 
 #### ROOT User Check
@@ -114,8 +114,8 @@ fi
 
 	if [[ -s $fullnode_conf ]]; then
 	### VARS
-	get_term_conn=$(cat .fullnodeconf | grep TERM_CONN | cut -d '=' -f2)
-	get_browser_conn=$(cat .fullnodeconf | grep BROWSER_CONN | cut -d '=' -f2)
+	get_term_conn=$(cat $fullnode_conf | grep TERM_CONN | cut -d '=' -f2)
+	get_browser_conn=$(cat $fullnode_conf | grep BROWSER_CONN | cut -d '=' -f2)
 	###
 
 		echo "$showok FULLNODE_CONF found! TERM_CONN=$GREEN$get_term_conn$STAND | BROWSER_CONN=$GREEN$get_browser_conn$STAND"
@@ -136,7 +136,7 @@ fi
 				if [[ "$readbrowserconn" =~ ^[[:digit:]]+$ ]]; then
 
 					echo -e "TERM_CONN=$readtermconn\\nBROWSER_CONN=$readbrowserconn" > $fullnode_conf
-					echo "$showok FULLNODE_CONF saved to $(pwd)/$fullnode_conf"
+					echo "$showok FULLNODE_CONF saved to $fullnode_conf"
 
 					read -e -p "$showinput How many $ports to you want to use for the full node (from 1 to 6 or $abortte): " nrofports # if browser_conn is set ok, proceed to number of ports to be used
 
