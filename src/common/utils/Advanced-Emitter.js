@@ -11,6 +11,8 @@ class AdvancedEmitter{
 
         this.emit = this._emitter.emit.bind(this._emitter);
 
+        this.emitter = this._emitter;
+
     }
 
     on(a, call){
