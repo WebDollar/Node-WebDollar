@@ -139,6 +139,7 @@ class MinerProtocol extends PoolProtocolList{
 
                 let poolName = answer.name;
                 let poolFee = answer.fee;
+                let poolAddress = answer.address;
                 let poolReferralFee = answer.referralFee;
                 let poolWebsite = answer.website;
                 let poolUseSignatures = answer.useSig;
@@ -166,6 +167,7 @@ class MinerProtocol extends PoolProtocolList{
                     this._validateRequestWork(answer.work, socket);
 
                 this.minerPoolManagement.minerPoolSettings.poolName = poolName;
+                this.minerPoolManagement.minerPoolSettings.poolAddress = poolAddress;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolFee;
                 this.minerPoolManagement.minerPoolSettings.poolReferralFee = poolReferralFee;
                 this.minerPoolManagement.minerPoolSettings.poolWebsite = poolWebsite;

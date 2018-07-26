@@ -23,6 +23,7 @@ class MinerPoolSettings {
         this.poolsList = {};
 
         this.poolName = "";
+        this.poolAddress = "";
         this.poolFee = 0;
         this.poolReferralFee = 0;
         this.poolWebsite = "";
@@ -201,7 +202,7 @@ class MinerPoolSettings {
         if (!skipSaving)
             if (false === await this._db.save("minerPool_activated", this._minerPoolActivated ? "true" : "false")) throw {message: "minerPoolActivated couldn't be saved"};
 
-        StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
+        StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolAddress: this.poolAddress, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
 
         if (useActivation)
             await this.minerPoolManagement.setMinerPoolStarted(newValue, true);

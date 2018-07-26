@@ -108,6 +108,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     signature: signature,
                     v: 0x00,
 
+                    address: this.poolManagement.poolSettings.poolAddress,
                     name: this.poolManagement.poolSettings.poolName,
                     fee: this.poolManagement.poolSettings.poolFee,
                     referralFee: this.poolManagement.poolSettings.poolReferralFee,

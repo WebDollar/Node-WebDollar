@@ -14,8 +14,7 @@ class PoolDataMinerReferrals {
         this.referralLinkAddress = undefined; //link to the referral
         this.referralLinkMiner = undefined; //link to the referral
 
-        this.array = [];
-
+        this.referees = [];
 
         this._rewardReferralsTotal = 0; // total - no confirmed
         this._rewardReferralsConfirmed = 0; //confirmed but not sent
@@ -29,10 +28,10 @@ class PoolDataMinerReferrals {
         this.miner = undefined;
         this.referralLinkMiner = undefined;
 
-        for (let i=0; i<this.array.length; i++)
-            this.array[i].destroyPoolDataMinerReferral();
+        for (let i=0; i<this.referees.length; i++)
+            this.referees[i].destroyPoolDataMinerReferral();
 
-        this.array = [];
+        this.referees = [];
 
     }
 
@@ -56,8 +55,8 @@ class PoolDataMinerReferrals {
 
     refreshRefereeAddresses() {
 
-        for (let i = 0; i < this.array.length; i++)
-            this.array[i].findRefereeAddress();
+        for (let i = 0; i < this.referees.length; i++)
+            this.referees[i].findRefereeAddress();
 
         this.findReferralLinkAddress();
 
@@ -92,14 +91,14 @@ class PoolDataMinerReferrals {
         if ( this.referralLinkAddress !== undefined )
             list.push ( this.referralLinkAddress );
 
-        list.push( Serialization.serializeNumber1Byte(this.array.length > 0 ? 1 : 0 ) );
+        list.push( Serialization.serializeNumber1Byte(this.referees.length > 0 ? 1 : 0 ) );
 
-        if (this.array.length > 0){
+        if (this.referees.length > 0){
 
-            list.push(Serialization.serializeNumber4Bytes(this.array.length));
+            list.push(Serialization.serializeNumber4Bytes(this.referees.length));
 
-            for (let i=0; i < this.array.length; i++ )
-                list.push(this.array[i].serializeMinerReferral());
+            for (let i=0; i < this.referees.length; i++ )
+                list.push(this.referees[i].serializeMinerReferral());
 
             list.push(Serialization.serializeNumber7Bytes( this.rewardReferralsSent ))
 
@@ -139,7 +138,7 @@ class PoolDataMinerReferrals {
                 offset = referral.deserializeMinerReferral(buffer, offset);
 
                 if (!referral.refereeAddress.equals(this.miner.address))
-                    this.array.push( referral );
+                    this.referees.push( referral );
             }
 
 
@@ -160,7 +159,7 @@ class PoolDataMinerReferrals {
         let referee = this.findReferral(refereeAddress);
         if (referee === null){
             referee = new PoolDataMinerReferral( this.poolData, this, this.miner, refereeAddress, refereeMiner );
-            this.array.push(referee);
+            this.referees.push(referee);
         }
 
         return referee;
@@ -168,9 +167,9 @@ class PoolDataMinerReferrals {
 
     findReferral(refereeAddress, returnPos = false ){
 
-        for (let i=0; i<this.array.length; i++)
-            if (this.array[i].refereeAddress.equals(refereeAddress))
-                return returnPos ? i : this.array[i];
+        for (let i=0; i<this.referees.length; i++)
+            if (this.referees[i].refereeAddress.equals(refereeAddress))
+                return returnPos ? i : this.referees[i];
 
         return returnPos ? -1 : null;
 
@@ -181,8 +180,8 @@ class PoolDataMinerReferrals {
         let pos = this.findReferral(refereeAddress, true);
         if (pos === -1) return false;
 
-        this.array[pos].destroyPoolDataMinerReferral();
-        this.array.splice(pos, 1);
+        this.referees[pos].destroyPoolDataMinerReferral();
+        this.referees.splice(pos, 1);
 
         return true;
     }
@@ -217,8 +216,8 @@ class PoolDataMinerReferrals {
     toJSON(){
 
         let referees = [];
-        for (let i=0; i<this.array.length; i++)
-            referees.push( this.array[i].toJSON() )
+        for (let i=0; i<this.referees.length; i++)
+            referees.push( this.referees[i].toJSON() )
 
         return {
 
