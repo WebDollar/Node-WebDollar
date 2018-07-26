@@ -22,6 +22,7 @@ class MinerPoolReferrals{
     }
 
     startLoadMinerPoolReferrals(){
+        if (this._referralTimeout !== undefined) return;
         this._referralTimeout = setTimeout( this._loadReferrals.bind(this), 60*1000 );
     }
 
@@ -33,8 +34,10 @@ class MinerPoolReferrals{
 
         if (!this.minerPoolManagement._minerPoolStarted) return;
 
-        if (!this.requireReferrals)
-            this._referralTimeout = setTimeout( this._loadReferrals.bind(this), 10*1000 );
+        if (!this.requireReferrals) {
+            this._referralTimeout = setTimeout(this._loadReferrals.bind(this), 10 * 1000);
+            return;
+        }
 
         try {
 
@@ -45,7 +48,7 @@ class MinerPoolReferrals{
             StatusEvents.emit("mining-pool/pool-referral-data-changed", { data: this.data } );
 
         } catch (exception){
-            Log.error("Error loading Referrals", Log.LOG_TYPE.POOLS, exception);
+            //Log.error("Error loading Referrals", Log.LOG_TYPE.POOLS, exception);
         }
 
         this._referralTimeout = setTimeout( this._loadReferrals.bind(this), 60*1000 );
