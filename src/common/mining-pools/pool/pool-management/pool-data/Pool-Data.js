@@ -127,8 +127,7 @@ class PoolData {
         if (index === -1) return false; //miner doesn't exists
 
         this.blocksInfo[index].destroyPoolDataBlockInformation(  );
-        this.blocksInfo[index] = this.blocksInfo[this.blocksInfo.length-1];
-        this.blocksInfo.pop();
+        this.blocksInfo.splice(index, 1);
 
         return true;
     }

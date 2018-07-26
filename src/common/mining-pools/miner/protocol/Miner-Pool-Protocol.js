@@ -455,7 +455,7 @@ class MinerProtocol extends PoolProtocolList{
 
             if (poolSocket === undefined || poolSocket === null) throw {message: "No Pool Socket"};
 
-            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-referrals", undefined, "answer", 6000);
+            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-referrals", "get", "answer", 6000);
 
             return answer;
 

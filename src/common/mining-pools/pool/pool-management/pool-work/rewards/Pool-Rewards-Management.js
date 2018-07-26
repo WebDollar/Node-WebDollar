@@ -187,7 +187,7 @@ class PoolRewardsManagement{
                 this.poolData.blocksInfo[i].confirmations = 0;
 
             //to mail fail trials
-            if (this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS){
+            if ( this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS ){
 
                 this.poolManagement.poolStatistics.poolBlocksUnconfirmed++;
 

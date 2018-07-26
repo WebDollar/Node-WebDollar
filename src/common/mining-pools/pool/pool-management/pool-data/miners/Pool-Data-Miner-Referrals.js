@@ -223,7 +223,7 @@ class PoolDataMinerReferrals {
 
             referees: referees,
 
-            linkAddress: InterfaceBlockchainAddressHelper.generateAddressWIF(this.referralLinkAddress, false, true),
+            linkAddress: this.referralLinkAddress !== undefined ? InterfaceBlockchainAddressHelper.generateAddressWIF(this.referralLinkAddress, false, true) : '',
 
             total: this._rewardReferralsTotal,
             confirmed: this._rewardReferralsConfirmed,
