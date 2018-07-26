@@ -235,11 +235,10 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             if (!this.poolManagement._poolStarted) return;
 
-            if ( data === null || data === undefined ) return;
-
             //in case there is an suffix in the answer
             let suffix = "";
-            if ( typeof data.suffix === "string")
+
+            if ( data !== null && data !== undefined && typeof data.suffix === "string")
                 suffix = '/'+data.suffix;
 
             try {
