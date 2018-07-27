@@ -20,6 +20,8 @@ class PoolDataMiner{
         this._rewardConfirmedOther = 0;   //other money confirmed to be sent
         this._rewardSent = 0;             //rewardSent
 
+        this.dateActivity = 0;
+
         this.referrals = new PoolDataMinerReferrals( poolData, this  );
 
     }
@@ -173,6 +175,13 @@ class PoolDataMiner{
     }
     get rewardSent(){
         return this._rewardSent;
+    }
+
+
+    get isOnline(){
+
+        return Math.abs(new Date().getTime()/1000 - this.dateActivity) <= 180;
+
     }
 
 

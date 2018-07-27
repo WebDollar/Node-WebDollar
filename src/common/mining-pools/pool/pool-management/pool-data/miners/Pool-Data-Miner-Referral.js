@@ -110,10 +110,12 @@ class PoolDataMinerReferral {
     toJSON(){
 
         return {
-            total: this._rewardReferralTotal,
-            confirmed: this._rewardReferralConfirmed,
-            sent: this._rewardReferralSent ,
+            total: Math.floor( this._rewardReferralTotal ),
+            confirmed: Math.floor( this._rewardReferralConfirmed ),
+            sent: Math.floor( this._rewardReferralSent  ),
+
             address: this.refereeAddress !== undefined ? InterfaceBlockchainAddressHelper.generateAddressWIF(this.refereeAddress, false, true) : '',
+            online: this.refereeMiner !== undefined  ? this.refereeMiner.isOnline : undefined,
         }
 
     }

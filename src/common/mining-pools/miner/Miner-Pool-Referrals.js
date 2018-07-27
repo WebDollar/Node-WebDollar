@@ -9,12 +9,14 @@ class MinerPoolReferrals{
 
         this.requireReferrals = false;
 
-        this.data = {
+        this.referralData = {
 
             referralLinkAddress: undefined,
-            rewardReferralsTotal: 0,//link to the referral
-            rewardReferralsConfirmed: 0, // total - no confirmed
-            rewardReferralsSent: 0,//confirmed but not sent
+            referralLinkAddressOnline: undefined,
+
+            referralsTotal: 0,//link to the referral
+            referralsConfirmed: 0, // total - no confirmed
+            referralsSent: 0,//confirmed but not sent
 
             referees: [],
         };
@@ -38,6 +40,14 @@ class MinerPoolReferrals{
             this._referralTimeout = setTimeout(this._loadReferrals.bind(this), 10 * 1000);
             return;
         }
+        
+        await this.requestReferrals();
+
+        this._referralTimeout = setTimeout( this._loadReferrals.bind(this), 60*1000 );
+        
+    }
+    
+    async requestReferrals(){
 
         try {
 
@@ -45,14 +55,27 @@ class MinerPoolReferrals{
 
             if (data === undefined || data === null) throw {message: "get-referrals didn't work"};
 
-            StatusEvents.emit("mining-pool/pool-referral-data-changed", { data: this.data } );
+            for (let i=0; i < data.referrals.referees.length; i++)
+                data.referrals.referees[i].referralAddress = this.minerPoolManagement.minerPoolMining.minerAddress;
+
+            this.referralData = {
+
+                referralLinkAddress: data.referrals.linkAddress,
+                referralLinkAddressOnline: data.referrals.linkAddressOnline,
+
+                referralsTotal: data.referrals.total,//link to the referral
+                referralsConfirmed: data.referrals.confirmed, // total - no confirmed
+                referralsSent: data.referrals.sent,//confirmed but not sent
+
+                referees: data.referrals.referees,
+            };
+
+            StatusEvents.emit("mining-pool/pool-referral-data-changed", { data: this.referralData } );
 
         } catch (exception){
             //Log.error("Error loading Referrals", Log.LOG_TYPE.POOLS, exception);
         }
-
-        this._referralTimeout = setTimeout( this._loadReferrals.bind(this), 60*1000 );
-
+        
     }
 
 

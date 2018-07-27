@@ -224,10 +224,11 @@ class PoolDataMinerReferrals {
             referees: referees,
 
             linkAddress: this.referralLinkAddress !== undefined ? InterfaceBlockchainAddressHelper.generateAddressWIF(this.referralLinkAddress, false, true) : '',
+            linkAddressOnline: this.referralLinkAddress !== undefined  ? this.referralLinkMiner.isOnline : undefined,
 
-            total: this._rewardReferralsTotal,
-            confirmed: this._rewardReferralsConfirmed,
-            sent: this._rewardReferralsSent,
+            total: Math.floor( this._rewardReferralsTotal),
+            confirmed: Math.floor( this._rewardReferralsConfirmed),
+            sent: Math.floor( this._rewardReferralsSent),
 
         }
 
