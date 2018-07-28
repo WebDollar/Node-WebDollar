@@ -14,6 +14,7 @@ class TransactionsPendingQueueSavingManager{
 
         this.db = db;
 
+
     }
 
 
@@ -64,12 +65,9 @@ class TransactionsPendingQueueSavingManager{
 
         }
 
-        return Buffer.concat([
+        data.splice(0,0, Serialization.serializeNumber4Bytes(data.length) );
 
-            Serialization.serializeNumber4Bytes(data.length),
-            data,
-
-        ]);
+        return Buffer.concat( data );
 
 
     }
