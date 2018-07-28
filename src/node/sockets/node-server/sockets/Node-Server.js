@@ -115,6 +115,8 @@ class NodeServer {
 
             server.on("connection", async (socket) => {
 
+                if (!this.loaded) return;
+
                 if (socket.request._query["msg"] !== "HelloNode"){
                     console.error("No Hello Msg");
                     socket.disconnect();
