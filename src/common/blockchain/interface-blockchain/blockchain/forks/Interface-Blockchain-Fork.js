@@ -122,7 +122,7 @@ class InterfaceBlockchainFork {
 
             //fork with more than 3 blocks
             if (this.forkStartingHeight < this.blockchain.blocks.length - 3 )
-                factor = Math.max( 2, Math.trunc( (this.blockchain.blocks.length - this.forkStartingHeight) / 2));
+                factor = Math.max( 2, Math.min( 3, Math.trunc( (this.blockchain.blocks.length - this.forkStartingHeight) / 2 )));
 
 
             if ( forkWork.lesser( chainWork.multiply(factor) ) )
