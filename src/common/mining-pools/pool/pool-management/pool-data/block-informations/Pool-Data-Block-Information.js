@@ -128,7 +128,7 @@ class PoolDataBlockInformation {
     }
 
 
-    deserializeBlockInformation(buffer, offset = 0){
+    async deserializeBlockInformation(buffer, offset = 0){
 
         let version = Serialization.deserializeNumber1Bytes( buffer, offset, );
         offset += 1;
@@ -185,6 +185,8 @@ class PoolDataBlockInformation {
 
                 offset = this.block.deserializeBlock(buffer, height, undefined, undefined, offset);
                 this.block.difficultyTargetPrev = difficultyTargetPrev;
+
+                await this.block.computeHash();
 
             } catch (exception){
 

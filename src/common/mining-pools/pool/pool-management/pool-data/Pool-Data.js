@@ -212,7 +212,7 @@ class PoolData {
         return Buffer.concat(list);
     }
 
-    _deserializeBlockInformation(buffer, offset = 0){
+    async _deserializeBlockInformation(buffer, offset = 0){
 
         try {
 
@@ -223,7 +223,7 @@ class PoolData {
             for (let i = 0; i < numBlocksInformation && offset < buffer.length; i++) {
 
                 let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, Blockchain.blockchain.blocks.length );
-                offset = blockInformation.deserializeBlockInformation(buffer, offset );
+                offset = await blockInformation.deserializeBlockInformation(buffer, offset );
 
                 if (blockInformation.blockInformationMinersInstances.length > 0) {
                     this.blocksInfo.push(blockInformation);
@@ -285,7 +285,7 @@ class PoolData {
             let buffer = await this._db.get("blocksInformation", 60000, true);
 
             if (buffer !== null) {
-                let response = this._deserializeBlockInformation(buffer);
+                let response = await this._deserializeBlockInformation(buffer);
 
                 if (response !== true) {
                     console.log('Unable to load miners from DB');

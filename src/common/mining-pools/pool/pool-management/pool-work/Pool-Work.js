@@ -92,7 +92,7 @@ class PoolWork {
             let found = false;
             for (let j =0 ; j < this.poolManagement.poolData.blocksInfo.length; j++)
                 if ( this.poolManagement.poolData.blocksInfo[j].block !== undefined && this._blocksList[i].block !== undefined &&
-                     (this.poolManagement.poolData.blocksInfo[j].block === this._blocksList[i].block || this.poolManagement.poolData.blocksInfo[j].block.hash.equals(this._blocksList[i].block.hash) ) ){
+                     (this.poolManagement.poolData.blocksInfo[j].block === this._blocksList[i].block || ( this._blocksList[i].block.hash !== null && this.poolManagement.poolData.blocksInfo[j].block.hash.equals(this._blocksList[i].block.hash) )) ){
                     found = true;
                     break;
                 }
