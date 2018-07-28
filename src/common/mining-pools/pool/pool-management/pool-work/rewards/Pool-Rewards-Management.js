@@ -7,7 +7,7 @@ import PoolPayouts from "./Payout/Pool-Payouts"
 import Log from 'common/utils/logging/Log';
 
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
-const VALIDATION_BLOCK_CONFIRMATIONS = 40; //blocks
+const VALIDATION_BLOCK_CONFIRMATIONS_FAILS_START = 40; //blocks
 
 const MAXIMUM_FAIL_CONFIRMATIONS = 20; //blocks
 
@@ -173,7 +173,7 @@ class PoolRewardsManagement{
 
                 } else{
 
-                    if ( this.blockchain.blocks.length  > blockInfo.height + VALIDATION_BLOCK_CONFIRMATIONS )
+                    if ( this.blockchain.blocks.length  > blockInfo.height + VALIDATION_BLOCK_CONFIRMATIONS_FAILS_START )
                         this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
                 }

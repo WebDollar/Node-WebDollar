@@ -118,7 +118,14 @@ class InterfaceBlockchainFork {
             for (let i=0; i< this.forkBlocks.length; i++ )
                 forkWork = forkWork.plus( this.forkBlocks[i].workDone );
 
-            if (forkWork.lesser( chainWork ))
+            let factor = 1;
+
+            //fork with more than 3 blocks
+            if (this.forkStartingHeight < this.blockchain.blocks.length - 3 )
+                factor = Math.max( 2, Math.trunc( (this.blockchain.blocks.length - this.forkStartingHeight) / 2));
+
+
+            if ( forkWork.lesser( chainWork.multiply(factor) ) )
                 throw {message: "forkWork is less than chainWork", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
 
         }
