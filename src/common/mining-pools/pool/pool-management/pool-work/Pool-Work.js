@@ -4,6 +4,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 import consts from 'consts/const_global'
 import Serialization from 'common/utils/Serialization';
 import StatusEvents from "common/events/Status-Events";
+import Log from 'common/utils/logging/Log';
 
 class PoolWork {
 
@@ -83,27 +84,31 @@ class PoolWork {
 
     _garbageCollector(){
 
-        let time = new Date().getTime() - BlockchainGenesis.timeStampOffset;
+        let time = (new Date().getTime()/1000) - BlockchainGenesis.timeStampOffset;
 
         for (let i=0; i<this._blocksList.length; i++) {
 
             //verify if the block was a solution to a block
             let found = false;
-            for (let j =0 ; j <this.poolManagement.poolData.blocksInfo.length; j++)
-                if (this.poolManagement.poolData.blocksInfo[j].block === this._blocksList[i].block){
+            for (let j =0 ; j < this.poolManagement.poolData.blocksInfo.length; j++)
+                if ( this.poolManagement.poolData.blocksInfo[j].block !== undefined && this._blocksList[i].block !== undefined &&
+                     (this.poolManagement.poolData.blocksInfo[j].block === this._blocksList[i].block || this.poolManagement.poolData.blocksInfo[j].block.hash.equals(this._blocksList[i].block.hash) ) ){
                     found = true;
                     break;
                 }
 
             if (!found)
                 //delete block
-                if (this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp) > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK*1000)) {
+                if ( this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp ) > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK)) {
+
+                    Log.warn("==========================================", Log.LOG_TYPE.POOLS);
+                    Log.warn("GARBAGE COLLECTOR DELETE BLOCK "+i, Log.LOG_TYPE.POOLS);
+                    Log.warn("==========================================", Log.LOG_TYPE.POOLS);
 
                     for (let key in this._blocksList[i].instances)
-                        if (this._blocksList[i].instances.hasOwnProperty(key)) {
+                        if (this._blocksList[i].instances.hasOwnProperty(key))
                             this._blocksList[i].instances[key].workBlock = undefined;
 
-                        }
 
                     if (this._blocksList[i].block !== undefined)
                         this._blocksList[i].block.destroyBlock();

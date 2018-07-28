@@ -9,6 +9,7 @@ import consts from "consts/const_global";
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 import InterfaceBlockchainTransactionsWizzard from "./../wizard/Interface-Blockchain-Transactions-Wizard";
+import InterfaceBlockchainAddressHelper from "../../addresses/Interface-Blockchain-Address-Helper";
 
 class InterfaceBlockchainTransaction{
 
@@ -435,7 +436,7 @@ class InterfaceBlockchainTransaction{
         for (let i=0; i<addresses.length; i++)
             for (let j=i+1; j<addresses.length; j++)
                 if (BufferExtended.safeCompare ( addresses[i].unencodedAddress, addresses[j].unencodedAddress))
-                    throw {message: "address has identical inputs"};
+                    throw {message: "address has identical inputs", address: InterfaceBlockchainAddressHelper.generateAddressWIF(addresses[i].unencodedAddress, false, true)};
 
         return true;
     }

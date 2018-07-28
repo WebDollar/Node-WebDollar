@@ -108,10 +108,12 @@ class PoolRewardsManagement{
             if ( this.poolData.blocksInfo[i].payout){
 
                 //let's delete old payouts
-                if ( this.poolData.blocksInfo[i].block === undefined || this.blockchain.blocks.length - this.poolData.blocksInfo[i].block.height > 40) {
+                if ( this.poolData.blocksInfo[i].block === undefined || (this.blockchain.blocks.length - this.poolData.blocksInfo[i].block.height > 40)) {
 
                     this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid++;
                     this.poolManagement.poolStatistics.poolBlocksConfirmed--;
+                    
+                    Log.warn("BLOCK ALREADY PAID "+i, Log.LOG_TYPE.POOLS);
 
                     this.poolData.deleteBlockInformation(i);
                 }
@@ -130,6 +132,11 @@ class PoolRewardsManagement{
 
                 if (i === this.poolData.blocksInfo.length-1 ) continue;
                 else { //for some reasons, maybe save/load
+                    
+                    Log.warn("==========================================", Log.LOG_TYPE.POOLS);
+                    Log.warn("REDISTRIBUTION1 DONE 1 "+i, Log.LOG_TYPE.POOLS);
+                    Log.warn("==========================================", Log.LOG_TYPE.POOLS);
+                    
                     this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i], i );
                     continue;
                 }
@@ -162,6 +169,7 @@ class PoolRewardsManagement{
                     } else if (CONFIRMATION_METHOD === 2)
                         this.poolData.blocksInfo[i].confirmations = (this.blockchain.blocks.length - blockInfo.height);
 
+                    this.poolData.blocksInfo[i].confirmationsFailsTrials = 0;
 
                 } else{
 
@@ -190,6 +198,10 @@ class PoolRewardsManagement{
             if ( this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS ){
 
                 this.poolManagement.poolStatistics.poolBlocksUnconfirmed++;
+
+                Log.warn("==========================================", Log.LOG_TYPE.POOLS);
+                Log.warn("REDISTRIBUTION1 DONE 2 "+ i, Log.LOG_TYPE.POOLS);
+                Log.warn("==========================================", Log.LOG_TYPE.POOLS);
 
                 this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i], i );
                 continue;
