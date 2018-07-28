@@ -91,9 +91,9 @@ class NodeExpress{
                         break;
                     }
 
-                if (privateKey === '') throw {message: "private.key was not found"};
-                if (cert === '') throw {message: "certificate.crt was not found"};
-                if (caBundle === '') throw {message: "ca_bundle.crt was not found"};
+                if (privateKey === '') throw {message: "HTTPS server couldn't be started because certificate private.key was not found"};
+                if (cert === '') throw {message: "HTTPS server couldn't be started because certificate certificate.crt was not found"};
+                if (caBundle === '') throw {message: "HTTPS server couldn't be started because certificate ca_bundle.crt was not found"};
 
                 try {
                     if (this.domain === undefined || this.domain === "undefined") this.domain = this._extractDomain(cert);

@@ -206,7 +206,7 @@ class NodesWaitlist {
 
                 try {
 
-                    if ( (Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted ) && this.waitListFullNodes[i].nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL) continue;
+                    if ( (Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted ) && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL].indexOf( this.waitListFullNodes[i].nodeConsensusType ) >= 0) continue;
 
                     let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 5000);
 

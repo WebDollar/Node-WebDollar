@@ -139,6 +139,7 @@ class MinerProtocol extends PoolProtocolList{
 
                 let poolName = answer.name;
                 let poolFee = answer.fee;
+                let poolAddress = answer.address;
                 let poolReferralFee = answer.referralFee;
                 let poolWebsite = answer.website;
                 let poolUseSignatures = answer.useSig;
@@ -166,6 +167,7 @@ class MinerProtocol extends PoolProtocolList{
                     this._validateRequestWork(answer.work, socket);
 
                 this.minerPoolManagement.minerPoolSettings.poolName = poolName;
+                this.minerPoolManagement.minerPoolSettings.poolAddress = poolAddress;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolFee;
                 this.minerPoolManagement.minerPoolSettings.poolReferralFee = poolReferralFee;
                 this.minerPoolManagement.minerPoolSettings.poolWebsite = poolWebsite;
@@ -451,7 +453,9 @@ class MinerProtocol extends PoolProtocolList{
             if (poolSocket === undefined)
                 poolSocket = this.connectedPools[0];
 
-            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-referrals", undefined, "answer", 6000);
+            if (poolSocket === undefined || poolSocket === null) throw {message: "No Pool Socket"};
+
+            let answer = await poolSocket.node.sendRequestWaitOnce("mining-pool/get-referrals", "get", "answer", 6000);
 
             return answer;
 

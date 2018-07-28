@@ -54,6 +54,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             try{
 
+                if (data === null || data === undefined) throw {message: "invalid hello"};
+
                 if ( !Buffer.isBuffer( data.message )  || data.message.length !== 32) throw {message: "message is invalid"};
                 if ( !Buffer.isBuffer( data.pool )  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
 
@@ -108,6 +110,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     signature: signature,
                     v: 0x00,
 
+                    address: this.poolManagement.poolSettings.poolAddress,
                     name: this.poolManagement.poolSettings.poolName,
                     fee: this.poolManagement.poolSettings.poolFee,
                     referralFee: this.poolManagement.poolSettings.poolReferralFee,
@@ -200,6 +203,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             if (!this.poolManagement._poolStarted) return;
 
+            if ( data === null || data === undefined ) return;
+
             //in case there is an suffix in the answer
             let suffix = "";
             if ( data !== null && data !== undefined && typeof data.suffix === "string")
@@ -232,7 +237,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             //in case there is an suffix in the answer
             let suffix = "";
-            if ( typeof data.suffix === "string")
+
+            if ( data !== null && data !== undefined && typeof data.suffix === "string")
                 suffix = '/'+data.suffix;
 
             try {
@@ -257,6 +263,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
         socket.node.on("mining-pool/work-done", async (data) => {
 
             if (!this.poolManagement._poolStarted) return;
+
+            if ( data === null || data === undefined ) return;
 
             //in case there is an suffix in the answer
             let suffix = "";
@@ -290,6 +298,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
         socket.node.on("mining-pool/change-wallet-mining", (data) => {
 
             if (!this.poolManagement._poolStarted) return;
+
+            if ( data === null || data === undefined ) return;
 
             try {
 
@@ -357,6 +367,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         socket.node.on("mining-pool/request-wallet-mining", (data) => {
 
+            if ( data === null || data === undefined ) return;
+
             try{
 
                 if (socket.node.protocol.minerPool === undefined) return;
@@ -375,6 +387,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
         socket.node.on("mining-pool/request-reward", async (data) => {
 
             if (!this.poolManagement._poolStarted) return;
+
+            if ( data === null || data === undefined ) return;
 
             try {
 

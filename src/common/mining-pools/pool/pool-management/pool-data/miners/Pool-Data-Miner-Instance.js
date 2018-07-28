@@ -16,7 +16,7 @@ class PoolDataMinerInstance {
         this.lastBlockInformation = undefined;
 
 
-        this.dateActivity = new Date().getTime()/1000;
+        this._dateActivity = 0;
 
 
     }
@@ -38,6 +38,14 @@ class PoolDataMinerInstance {
 
     get hashesPerSecond(){
         return this._hashesPerSecond;
+    }
+
+    set dateActivity(newValue){
+        this._dateActivity = newValue;
+    }
+
+    get dateActivity(){
+        return this._dateActivity;
     }
 
 }
