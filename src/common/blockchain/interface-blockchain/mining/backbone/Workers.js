@@ -29,7 +29,7 @@ class Workers {
         if (consts.TERMINAL_WORKERS.TYPE === "cpu") {
 
             this._worker_path = consts.TERMINAL_WORKERS.PATH;
-            this.workers_max = this._maxWorkersDefault() || 1;
+            this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || this._maxWorkersDefault() || 1;
             this.worker_batch = consts.TERMINAL_WORKERS.CPU_WORKER_NONCES_WORK || 500;
             this.worker_batch_thread = this.worker_batch;
             this.ibb._avoidShowingZeroHashesPerSecond = false;
