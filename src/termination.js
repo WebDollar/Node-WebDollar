@@ -34,6 +34,8 @@ export default async (Blockchain) => {
 
     }
 
+    Blockchain.Mining.stopMining();
+
     try{
         await Blockchain.blockchain.transactions.pendinQueue.pendingQueueSavingManager.savePendingTransactions();
     } catch (exception){

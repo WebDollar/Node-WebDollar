@@ -143,7 +143,8 @@ class MinerPoolMining extends InheritedPoolMining {
                     if (!this.resetForced ) {
                         this._miningWork.resolved = true;
                         answer.height = workHeight;
-                        await this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket);
+                        answer.hashes = this._miningWork.end - this._miningWork.start;
+                        await this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket );
                     } else {
                         this.resetForced = false;
                     }

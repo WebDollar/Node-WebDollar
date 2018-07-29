@@ -7,6 +7,8 @@ import Log from 'common/utils/logging/Log';
 const FS = require('fs');
 const OS = require('os');
 const { fork } = require('child_process');
+//const fkill = require('fkill');
+
 import consts from 'consts/const_global'
 import ProcessWorkerCPP from "./Process-Worker-CPP";
 
@@ -91,16 +93,26 @@ class Workers {
 
     haveSupport() {
         // disabled by miner
-        if (consts.TERMINAL_WORKERS.MAX === -1) {
+        if (consts.TERMINAL_WORKERS.MAX === -1)
             return false;
-        }
 
         // it needs at least 2
-        if (this.workers_max <= 1) {
+        if (this.workers_max <= 1)
             return false;
-        }
 
         return true;
+    }
+
+    stopMining(){
+
+        try {
+            // Log.info("Killing process");
+            // for (let i = 0; i < this.workers_max; i++)
+            //     fkill('argon2-bench2');
+        } catch (exception){
+
+        }
+
     }
 
     max() {
@@ -152,9 +164,8 @@ class Workers {
 
         let count = this.workers_max;
 
-        if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
+        if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" )
             count = 1;
-        }
 
         for (let index = this.workers_list.length ; index < count; index++)
             await this._initializeWorker(index);
@@ -283,7 +294,7 @@ class Workers {
 
                     let hash = await Argon2.hash(block);
                     if (false === hash.equals(bestHash))
-                        console.error("HASH is INVALID!!!");
+                        console.error("HASH MAY BE TO OLD!!!");
                     else
                         console.info("HASH is OK!!!");
                 }

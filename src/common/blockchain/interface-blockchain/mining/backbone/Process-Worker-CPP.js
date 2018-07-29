@@ -13,7 +13,7 @@ class ProcessWorkerCPP extends ProcessWorker{
 
     _getProcessParams(){
 
-        return this._path+ ' -c '+this.cores+ ' -b '+ this.noncesWorkBatch + ' -f ' + this._filename + this.suffix;
+        return this._path+ ' -d 0 -c '+this.cores+ ' -b '+ this.noncesWorkBatch + ' -f ' + this._filename + this.suffix;
 
     }
 
