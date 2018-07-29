@@ -32,6 +32,7 @@ class InterfaceBlockchainMiningBasic {
         this.useResetConsensus = true;
 
         this.resetForced = false;
+        this._avoidShowingZeroHashesPerSecond = false;
     }
 
     get minerAddress(){
@@ -174,8 +175,11 @@ class InterfaceBlockchainMiningBasic {
 
         this._intervalMiningOutput = setInterval(() => {
 
-            if (typeof this._hashesPerSecond === "number")
-                console.log( this._hashesPerSecond+ " hashes/s");
+            if (typeof this._hashesPerSecond === "number") {
+
+                if (! this._avoidShowingZeroHashesPerSecond || this._hashesPerSecond !== 0 )
+                    console.log(this._hashesPerSecond + " hashes/s");
+            }
 
             StatusEvents.emit("mining/hash-rate", this._hashesPerSecond );
 

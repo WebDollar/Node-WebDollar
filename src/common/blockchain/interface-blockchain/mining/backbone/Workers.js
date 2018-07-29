@@ -29,18 +29,21 @@ class Workers {
             this.workers_max = this._maxWorkersDefault() || 1;
             this.worker_batch = consts.TERMINAL_WORKERS.CPU_WORKER_NONCES_WORK || 500;
             this.worker_batch_thread = this.worker_batch;
+            this.ibb._avoidShowingZeroHashesPerSecond = false;
 
         } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
             this._worker_path = consts.TERMINAL_WORKERS.PATH_CPP;
             this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || 1;
             this.worker_batch = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK || 500;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK_BATCH || 500;
+            this.ibb._avoidShowingZeroHashesPerSecond = true;
         }
         else if (consts.TERMINAL_WORKERS.TYPE === "gpu") {
             this._worker_path = consts.TERMINAL_WORKERS.PATH_GPU;
             this.workers_max = consts.TERMINAL_WORKERS.GPU_INSTANCES||1;
             this.worker_batch = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK_BATCH;
+            this.ibb._avoidShowingZeroHashesPerSecond = true;
         }
 
 
