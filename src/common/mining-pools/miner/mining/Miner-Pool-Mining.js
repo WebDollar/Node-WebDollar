@@ -110,7 +110,7 @@ class MinerPoolMining extends InheritedPoolMining {
             this.resetForced = true;
         }
 
-        Log.info("New Work: "+ work.start + " : " + work.end, Log.LOG_TYPE.POOLS );
+        Log.info("New Work: "+ (work.end - work.start), Log.LOG_TYPE.POOLS );
 
     }
 

@@ -369,8 +369,35 @@ consts.SETTINGS = {
 };
 
 consts.TERMINAL_WORKERS = {
+
+    // file gets created on build
+    CPU_WORKER_NONCES_WORK: 700,  //per seconds
+
+    CPU_CPP_WORKER_NONCES_WORK: 30000,  //per second
+    CPU_CPP_WORKER_NONCES_WORK_BATCH: 2000,  //per second
+
+    //NONCES_WORK should be way bigger than WORK_BATCHES
+
+
+    //TODO
+    GPU_WORKER_NONCES_WORK: 20000, //per blocks, should be batches x 10 seconds
+    GPU_WORKER_NONCES_WORK_BATCH: 200, //per blocks
+
+    /**
+     * cpu
+     * cpu-cpp
+     * gpu
+     */
+    TYPE: "cpu", //cpu-cpp
+
     // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
+    PATH_CPP: './dist_bundle/CPU/argon2-bench2',
+    PATH_GPU: './dist_bundle/GPU/argon2-gpu-test',
+
+    GPU_MODE: "opencl", //opencl
+    GPU_MAX: 1,
+    GPU_INSTANCES: 1,
 
     // make it false to see their output (console.log's, errors, ..)
     SILENT: true,
@@ -381,7 +408,7 @@ consts.TERMINAL_WORKERS = {
     //  Threading isn't used:
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
-    MAX: 0,
+    CPU_MAX: 0, //for CPU-CPP use, 2x or even 3x threads
 };
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
