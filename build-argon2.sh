@@ -54,7 +54,7 @@ fi
 
 deps # call deps function
 
-if [[ $(pwd) =~ Node-WebDollar[[:alnum:]]+ ]]; then
+if [[ $(pwd) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
 
 	if [[ $(find . -type d -name argon2 | grep -x './argon2') == ./argon2 ]]; then
 
@@ -67,6 +67,19 @@ if [[ $(pwd) =~ Node-WebDollar[[:alnum:]]+ ]]; then
 		elif [[ $yn_compile == [yY] ]]; then
 			echo "$showexecute Changing dir to ${YELLOW}argon2$STAND" && cd argon2
 			echo "$showexecute Compiling argon2..." && make
+			echo "$showexecute Going back to Node-WebDollar folder..." && cd ..
+
+			if [[ -d dist_bundle/CPU  ]]; then
+
+				echo "$showok CPU folder inside dist_bundle exists!"
+				echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/CPU/
+			else
+				if [[ ! -d dist_bundle/CPU ]]; then
+					echo "$showerror CPU folder inside dist_bundle not found!"
+					echo "$showexecute Creating one now..." && mkdir dist_bundle/CPU
+					echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/CPU/
+				fi
+			fi
 
 		elif [[ $yn_compile == * ]]; then
 			echo -e "$showerror Possible options are: yY or nN."
@@ -85,6 +98,18 @@ if [[ $(pwd) =~ Node-WebDollar[[:alnum:]]+ ]]; then
 				echo "$showexecute ${GREEN}./configure$STAND" && ./configure
 				echo "$showexecute ${GREEN}make$STAND" && make
 				echo "$showexecute ${GREEN}make check$STAND" && make check # check if reponse PASSES
+
+				if [[ -d ../dist_bundle/CPU  ]]; then
+
+					echo "$showok CPU folder inside dist_bundle exists!"
+					echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a * ../dist_bundle/CPU/
+				else
+					if [[ ! -d ../dist_bundle/CPU ]]; then
+						echo "$showerror CPU folder inside dist_bundle not found!"
+						echo "$showexecute Creating one now..." && mkdir ../dist_bundle/CPU
+						echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a * ../dist_bundle/CPU/
+					fi
+				fi
 			else
 			        if [[ ! $(pwd) =~ argon[[:alnum:]]+ ]]; then
 			                echo "$showerror You are not inside the ${YELLOW}argon2$STAND folder."
