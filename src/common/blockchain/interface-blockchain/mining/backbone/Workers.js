@@ -2,6 +2,7 @@
 
 import Serialization from "common/utils/Serialization";
 import Argon2 from 'common/crypto/Argon2/Argon2'
+import Log from 'common/utils/logging/Log';
 
 const FS = require('fs');
 const OS = require('os');
@@ -178,20 +179,23 @@ class Workers {
             worker = fork(
                 this._worker_path, {}, {silent: this._silent}
             );
+            Log.info("CPU worker created", Log.LOG_TYPE.defaultLogger );
         } else
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
 
             worker = new ProcessWorkerCPP( index,  this.worker_batch, this.workers_max );
             worker.start(this._worker_path);
 
+            Log.info("CPU CPP worker created", Log.LOG_TYPE.defaultLogger );
+
         } else if (consts.TERMINAL_WORKERS.TYPE === "gpu") {
 
             worker = new GPUWorker( index );
             worker.start(this._worker_path);
 
-        }
+            Log.info("GPU worker created", Log.LOG_TYPE.defaultLogger );
 
-        console.log("create worker");
+        }
 
         worker._is_batching = false;
 
