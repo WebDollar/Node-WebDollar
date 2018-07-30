@@ -47,6 +47,10 @@ class Workers {
             this.worker_batch = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK_BATCH;
             this.ibb._avoidShowingZeroHashesPerSecond = true;
+        } else {
+
+            Log.error('NO WORKER SPECIFIED. Specify "cpu", "cpu-cpp", "gpu" ', Log.LOG_TYPE.default);
+            
         }
 
 
