@@ -2,6 +2,10 @@ const Commands = require('./with/commands.js');
 
 const commands = new Commands();
 
+/**
+ * EXPRESS SERVER
+ */
+
 // Server
 commands.add({
     name: 'server:domain',
@@ -14,6 +18,10 @@ commands.add({
     help: 'Sets the port of your express server',
     default: 443,
 });
+
+/**
+ * MAX CONNECTIONS
+ */
 
 // Max
 commands.add({
@@ -36,6 +44,10 @@ commands.add({
         using 0 will create cpus/2 workers',
     default: -1,
 });
+
+/**
+ * MINER ADDRESS
+ */
 
 // Miner
 commands.add({
@@ -62,6 +74,23 @@ commands.add({
     help: 'Starts mining',
     options: ['single', 'pool'],
 });
+
+commands.add({
+    name: 'miner:type',
+    help: 'Selecting Mining Type',
+    options: ['cpu', 'cpu-cpp', "gpu"],
+    default: 'cpu',
+});
+
+commands.add({
+    name: 'miner:threads',
+    help: 'Selecting Number of Threads',
+    default: 0,
+});
+
+/**
+ * SETTING POOL
+ */
 
 // Pool
 commands.add({
