@@ -36,7 +36,7 @@ showport="$YELLOW[PORT]$STAND"
 
 ### GENERAL_VARS
 get_libtool=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "$(yum list libtool | grep -o Installed)"; fi fi fi)
-
+get_autoconf=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}')"; \else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "$(yum list autoconf | grep -o Installed)"; fi fi fi)
 ###
 
 #### Dependencies START
@@ -48,6 +48,14 @@ else
 	if [[ "$get_libtool" == * ]]; then
 		echo "$showok libtool is already installed!"
 	fi
+fi
+if [[ "$get_autoconf" == "(none)" ]]; then
+        echo "$showinfo We need to install autoconf"
+        if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y autoconf; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get install -y autoconf; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then sudo yum install -y autoconf;  fi fi fi
+else
+        if [[ "$get_autoconf" == * ]]; then
+                echo "$showok autoconf is already installed!"
+        fi
 fi
 }
 #### Dependencies check END
