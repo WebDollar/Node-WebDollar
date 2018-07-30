@@ -8,6 +8,7 @@ import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-
 import PoolWork from "./Pool-Work";
 import StatusEvents from "common/events/Status-Events";
 import PoolNewWorkManagement from "./Pool-New-Work-Management"
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 class PoolWorkManagement{
 
@@ -34,7 +35,7 @@ class PoolWorkManagement{
 
         await this.poolWork.lastBlockPromise; //it's a promise, let's wait
 
-        if ( this.poolWork.lastBlock === undefined || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  ||
+        if ( this.poolWork.lastBlock === undefined || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  || ( this.poolWork.lastBlock.timeStamp + BlockchainGenesis.timeStampOffset < (new Date().getTime()/1000 - 300) ) ||
             (!this.blockchain.semaphoreProcessing.processing && ( this.poolWork.lastBlock.height !==  this.blockchain.blocks.length || !this.poolWork.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) )
             await this.poolWork.getNextBlockForWork();
 

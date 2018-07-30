@@ -80,6 +80,9 @@ class ProcessWorker{
     }
 
 
+    kill(param){
+        return this._child.kill(param);
+    }
 
     async send(length, block, difficulty, start, end, batch){
 

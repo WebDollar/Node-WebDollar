@@ -107,15 +107,16 @@ class Workers {
 
     stopMining(){
 
-        // try {
-        //     Log.info("Killing process");
-        //     for (let i = 0; i < this.workers_max; i++)
-        //         fkill('argon2-bench2', ()=>{
-        //
-        //         });
-        // } catch (exception){
-        //
-        // }
+        try {
+
+            for (let i = 0; i < this.workers_list.length; i++){
+                if (this.workers_list[i] && typeof this.workers_list[i].kill === "function")
+                    this.workers_list[i].kill('SIGINT');
+            }
+
+        } catch (exception){
+
+        }
 
     }
 
