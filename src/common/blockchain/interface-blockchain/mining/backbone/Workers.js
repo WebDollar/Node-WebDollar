@@ -50,6 +50,13 @@ class Workers {
         }
 
 
+        if (!FS.existsSync(this._worker_path)) {
+            Log.error('Worker build is missing.', Log.LOG_TYPE.default);
+
+            return false;
+        }
+
+
         this.workers_list = [];
         this._working = 0;
         this._silent = consts.TERMINAL_WORKERS.SILENT;
@@ -65,11 +72,6 @@ class Workers {
         this._final_batch = false;
         this._run_timeout = false;
 
-        if (!FS.existsSync(this._worker_path)) {
-            console.log('Worker build is missing.');
-
-            return false;
-        }
 
         setInterval( this._makeUnresponsiveThreads.bind(this), 5000 );
 
@@ -86,14 +88,14 @@ class Workers {
                     this.workers_list[i].date = new Date().getTime();
                 }
 
-        // if ( this._current >= this._current_max )
-        //     this._stopAndResolve();
+        if ( this._current >= this._current_max )
+            this._stopAndResolve();
 
     }
 
     haveSupport() {
         // disabled by miner
-        if (consts.TERMINAL_WORKERS.MAX === -1)
+        if (consts.TERMINAL_WORKERS.CPU_MAX === -1)
             return false;
 
         // it needs at least 2
@@ -105,13 +107,15 @@ class Workers {
 
     stopMining(){
 
-        try {
-            // Log.info("Killing process");
-            // for (let i = 0; i < this.workers_max; i++)
-            //     fkill('argon2-bench2');
-        } catch (exception){
-
-        }
+        // try {
+        //     Log.info("Killing process");
+        //     for (let i = 0; i < this.workers_max; i++)
+        //         fkill('argon2-bench2', ()=>{
+        //
+        //         });
+        // } catch (exception){
+        //
+        // }
 
     }
 
@@ -312,6 +316,7 @@ class Workers {
     }
 
     _stopAndResolve() {
+
         this._finished = true;
 
         if (this._run_timeout) {
