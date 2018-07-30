@@ -105,7 +105,7 @@ class PoolDataMiner{
         this.rewardConfirmedOther = Serialization.deserializeNumber7Bytes( buffer, offset, );
         offset += 7;
 
-        if (this.rewardConfirmedOther > 100000000) this.rewardConfirmedOther = 0;
+        if (this.rewardConfirmedOther > 10000000000) this.rewardConfirmedOther = 0;
 
         this.rewardSent = Serialization.deserializeNumber7Bytes( buffer, offset, );
         offset += 7;

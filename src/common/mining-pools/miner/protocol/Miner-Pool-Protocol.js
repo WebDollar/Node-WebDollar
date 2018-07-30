@@ -325,7 +325,7 @@ class MinerProtocol extends PoolProtocolList{
 
             if (!miningAnswer.result){
                 try {
-                    Log.warn("Statistics: Real h/s " + Math.floor( miningAnswer.hashes / miningAnswer.timeDiff * 1000 ), Log.LOG_TYPE.POOLS);
+                    Log.warn("Statistics: Real " + Math.floor( miningAnswer.hashes / miningAnswer.timeDiff * 1000 )+ " h/s ", Log.LOG_TYPE.POOLS);
                 } catch (exception){
 
                 }

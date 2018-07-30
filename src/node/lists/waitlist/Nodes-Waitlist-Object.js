@@ -66,7 +66,7 @@ class NodesWaitlistObject {
 
     socketErrorConnected(){
 
-        if (Blockchain.MinerPoolManagement.minerPoolStarted && this.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL){
+        if (Blockchain.MinerPoolManagement.minerPoolStarted && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_POOL].indexOf(this.nodeConsensusType) >= 0){
             this.errorTrials = 0;
             return;
         }
