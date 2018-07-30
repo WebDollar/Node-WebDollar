@@ -71,11 +71,11 @@ fi
 
 deps # call deps function
 
-if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
+if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar ]]; then
 
-	if [[ $(find . -type d -name argon2 | grep -x './argon2') == ./argon2 ]]; then
+	if [[ $(ls -d argon2) == argon2 ]]; then
 
-		echo "$showinfo argon2 is already inside Node-WebDollar."
+		echo "$showinfo argon2 is already present."
 		read -e -p "$showinput Do you want to compile argon2 again? (y or n): " yn_compile
 
 		if [[ $yn_compile == [nN] ]]; then
@@ -102,14 +102,14 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]
 			echo -e "$showerror Possible options are: yY or nN."
 		fi
 	else
-		if [[ ! $(find . -type d -name argon2 | grep -x './argon2') == ./argon2 ]]; then
+		if [[ ! $(ls -d argon2) == argon2 ]]; then
 
 			echo "$showerror argon2 not found inside Node-WebDollar!"
 			echo "$showinfo Cloning argon2 from WebDollar repository..."
 			git clone https://github.com/WebDollar/argon2.git
-			cd argon2
+			echo "$showexecute Changing DIR to ${GREEN}argon2$STAND" && cd argon2
 
-			if [[ $(pwd) =~ argon[[:alnum:]]+ ]]; then
+			if [[ $(pwd | cut -d '/' -f5) == argon2 ]]; then
 			        echo "$showinfo Current dir is $(pwd)"
 			        echo "$showexecute ${GREEN}autoreconf -i$STAND" && autoreconf -i
 				echo "$showexecute ${GREEN}./configure$STAND" && ./configure
@@ -137,8 +137,9 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]
 		fi
 	fi
 else
-#	if [[ ! $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
+	if [[ $(ls -d argon2) == argon2 ]]; then
 
+		echo "$showinfo argon2 folder found.."
 		read -e -p "$showinput Do you want to compile argon2 again? (y or n): " yn_compile
 
 		if [[ $yn_compile == [nN] ]]; then
@@ -150,11 +151,11 @@ else
 		elif [[ $yn_compile == * ]]; then
 			echo -e "$showerror Possible options are: yY or nN."
 		fi
-#	else
-#	        if [[ ! $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
-#	                echo "$showerror You are not inside the ${YELLOW}argon2$STAND folder."
-#	                echo "$showinfo Run this script inside argon2 folder."
-#	        fi
+	else
+	        if [[ ! $(pwd | cut -d '/' -f4) == argon2 ]]; then
+	                echo "$showerror You are not inside the ${YELLOW}argon2$STAND folder."
+	                echo "$showinfo Run this script inside argon2 folder."
+	        fi
 
-#	fi
+	fi
 fi
