@@ -297,10 +297,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
         console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
-        let trials = 1;
-        if (fork.forkChainLength - fork.forkStartingHeight > 5 )  trials = 2; else
-        if (fork.forkChainLength - fork.forkStartingHeight > 10 )  trials = 3; else
-        if (fork.forkChainLength - fork.forkStartingHeight > 30 )  trials = 5;
+        let trials = 2;
+        if (fork.forkChainLength - fork.forkStartingHeight > 5 )  trials = 3; else
+        if (fork.forkChainLength - fork.forkStartingHeight > 10 )  trials = 4;
 
         while ( (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED ) {
 
