@@ -8,6 +8,7 @@ import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-
 import PoolWork from "./Pool-Work";
 import StatusEvents from "common/events/Status-Events";
 import PoolNewWorkManagement from "./Pool-New-Work-Management"
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 class PoolWorkManagement{
 
@@ -34,7 +35,7 @@ class PoolWorkManagement{
 
         await this.poolWork.lastBlockPromise; //it's a promise, let's wait
 
-        if ( this.poolWork.lastBlock === undefined || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  ||
+        if ( this.poolWork.lastBlock === undefined || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  || ( this.poolWork.lastBlock.timeStamp + BlockchainGenesis.timeStampOffset < (new Date().getTime()/1000 - 300) ) ||
             (!this.blockchain.semaphoreProcessing.processing && ( this.poolWork.lastBlock.height !==  this.blockchain.blocks.length || !this.poolWork.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) )
             await this.poolWork.getNextBlockForWork();
 
@@ -54,7 +55,7 @@ class PoolWorkManagement{
 
         minerInstance.lastBlockInformation =  blockInformationMinerInstance;
         minerInstance.workBlock =  this.poolWork.lastBlock;
-        minerInstance.miner.dateActivity = new Date().getTime()/1000;
+        minerInstance.dateActivity = new Date().getTime()/1000;
 
         this.poolWork.lastBlockNonce += hashes;
 
@@ -67,8 +68,6 @@ class PoolWorkManagement{
 
         }
 
-        //marking him as online
-        this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
 
         return answer;
 
@@ -98,7 +97,7 @@ class PoolWorkManagement{
                 hashesFactor = Math.max(0.2, hashesFactor);
 
                 let hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
-                minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 400000 ));
+                minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 3000000 ));
 
             }
 

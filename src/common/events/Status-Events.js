@@ -1,26 +1,7 @@
-const EventEmitter = require('events');
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
+class StatusEvents extends AdvancedEmitter{
 
-class StatusEvents{
-
-    constructor(){
-
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(100);
-
-    }
-
-    emit(a,b){
-        return this.emitter.emit(a,b)
-    }
-
-    on(a,b){
-        return this.emitter.on(a,b);
-    }
-
-    once(a,b){
-        return this.emitter.once(a,b);
-    }
 
 }
 

@@ -1,6 +1,7 @@
 const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 const BigNumber = require('bignumber.js');
+const BigInteger = require('big-integer');
 
 let consts = {
 
@@ -24,6 +25,7 @@ consts.BLOCKCHAIN = {
 
     BLOCKS_POW_LENGTH: 32,
     BLOCKS_MAX_TARGET: new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
+    BLOCKS_MAX_TARGET_BIG_INTEGER: new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16),
     BLOCKS_MAX_TARGET_BUFFER: Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex"),
     BLOCKS_NONCE : 4,
 
@@ -235,8 +237,8 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.161.2",
-        VERSION_COMPATIBILITY: "1.160.0",
+        VERSION: "1.165.0",
+        VERSION_COMPATIBILITY: "1.162.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -245,6 +247,8 @@ consts.SETTINGS = {
         SSL: true,
 
         PORT: 80, //port
+        MINER_POOL_PORT: 8086, //port
+
     },
 
     PARAMS: {
@@ -365,8 +369,35 @@ consts.SETTINGS = {
 };
 
 consts.TERMINAL_WORKERS = {
+
+    // file gets created on build
+    CPU_WORKER_NONCES_WORK: 700,  //per seconds
+
+    CPU_CPP_WORKER_NONCES_WORK: 20000,  //per second
+    CPU_CPP_WORKER_NONCES_WORK_BATCH: 500,  //per second
+
+    //NONCES_WORK should be way bigger than WORK_BATCHES
+
+
+    //TODO
+    GPU_WORKER_NONCES_WORK: 20000, //per blocks, should be batches x 10 seconds
+    GPU_WORKER_NONCES_WORK_BATCH: 200, //per blocks
+
+    /**
+     * cpu
+     * cpu-cpp
+     * gpu
+     */
+    TYPE: "cpu", //cpu-cpp
+
     // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
+    PATH_CPP: './dist_bundle/CPU/argon2-bench2',
+    PATH_GPU: './dist_bundle/GPU/argon2-gpu-test',
+
+    GPU_MODE: "opencl", //opencl
+    GPU_MAX: 1,
+    GPU_INSTANCES: 1,
 
     // make it false to see their output (console.log's, errors, ..)
     SILENT: true,
@@ -377,7 +408,7 @@ consts.TERMINAL_WORKERS = {
     //  Threading isn't used:
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
-    MAX: 0,
+    CPU_MAX: 0, //for CPU-CPP use, 2x or even 3x threads
 };
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)

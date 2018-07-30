@@ -84,6 +84,13 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
     }
 
+    stopMining(){
+
+        InterfaceBlockchainMining.prototype.stopMining.call(this);
+
+        this._workers.stopMining();
+
+    }
 
 }
 

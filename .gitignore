@@ -8,7 +8,9 @@ yarn.lock
 coverage/
 mochawesome-report/
 
-
+dist_bundle/CPU/
+dist_bundle/GPU/
+argon2/
 
 dist_bundle/bundle_terminal\.js
 

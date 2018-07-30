@@ -3,7 +3,7 @@ import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain";
 import Log from 'common/utils/logging/Log';
 
-const SAVING_MANAGER_INTERVAL = 3000;
+const SAVING_MANAGER_INTERVAL = 5000;
 
 class SavingManager{
 

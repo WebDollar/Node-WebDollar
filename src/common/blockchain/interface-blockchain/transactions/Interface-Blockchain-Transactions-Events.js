@@ -9,7 +9,7 @@ class InterfaceBlockchainTransactionsEvents{
 
         this.blockchain = blockchain;
 
-        this.emitter = new AdvancedEmitter();
+        this.emitter = new AdvancedEmitter(1000);
 
     }
 
@@ -104,11 +104,11 @@ class InterfaceBlockchainTransactionsEvents{
 
         if (address === null) return {result:false, message: "invalid address"};
 
-        let subscription = this.emitter.on("transactions/changes/"+BufferExtended.toBase(address), callback);
+        let unsubcribe = this.emitter.on("transactions/changes/"+BufferExtended.toBase(address), callback);
 
         return {
             result: true,
-            subscription: subscription,
+            subscription: unsubcribe,
             transactions: this.listTransactions(addressWIF),
         }
 

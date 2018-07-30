@@ -128,6 +128,8 @@ class Blockchain{
 
             await this.Chain.loadBlockchain();
 
+            await this.blockchain.transactions.pendingQueue.pendingQueueSavingManager.loadPendingTransactions();
+
             await this.Agent.initializeStartAgentOnce();
 
             if (this.Agent.consensus && !consts.DEBUG)

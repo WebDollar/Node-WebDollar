@@ -33,6 +33,8 @@ class NodesWaitlistObject {
         this.errorTrials = 0;
         this.lastTimeChecked = 0;
 
+        this.failsChecking = 0; //checking by downloading http request
+
         this.level = level||0;
 
         if (nodeType === undefined) nodeType = NODE_TYPE.NODE_TERMINAL;
@@ -64,7 +66,7 @@ class NodesWaitlistObject {
 
     socketErrorConnected(){
 
-        if (Blockchain.MinerPoolManagement.minerPoolStarted){
+        if (Blockchain.MinerPoolManagement.minerPoolStarted && this.nodeConsensusType === NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL){
             this.errorTrials = 0;
             return;
         }

@@ -1,20 +1,22 @@
 import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended"
 import TransactionsProtocol from "../protocol/Transactions-Protocol"
+import TransactionsPendingQueueSavingManager from "./Transactions-Pending-Queue-Saving-Manager";
 
-
-class InterfaceTransactionsPendingQueue {
+class TransactionsPendingQueue {
 
     constructor(transactions, blockchain, db){
 
         this.transactionsProtocol = new TransactionsProtocol(blockchain);
 
         this.transactions = transactions;
+        this.pendingQueueSavingManager = new TransactionsPendingQueueSavingManager(blockchain, this, db);
 
         this.blockchain = blockchain;
         this.list = [];
 
         this.db = db;
+
 
         setTimeout( this._removeOldTransactions.bind(this), 20000 );
 
@@ -134,12 +136,12 @@ class InterfaceTransactionsPendingQueue {
 
         for (let i=this.list.length-1; i >= 0; i--) {
 
+            if (this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
+
             try{
 
                 if ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION ||  !this.list[i].validateTransactionEveryTime(undefined, blockValidationType )) &&
-                     (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length ) &&
-                     !this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )
-                ) {
+                     (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length )) {
                     this._removePendingTransaction(i);
                 }
 
@@ -161,4 +163,4 @@ class InterfaceTransactionsPendingQueue {
 
 }
 
-export default InterfaceTransactionsPendingQueue
+export default TransactionsPendingQueue

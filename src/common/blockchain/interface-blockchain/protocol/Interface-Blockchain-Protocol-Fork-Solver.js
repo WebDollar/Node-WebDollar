@@ -297,6 +297,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
         console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
+        let trials = 2;
+        if (fork.forkChainLength - fork.forkStartingHeight > 5 )  trials = 3; else
+        if (fork.forkChainLength - fork.forkStartingHeight > 10 )  trials = 4;
+
         while ( (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED ) {
 
 
@@ -313,7 +317,13 @@ class InterfaceBlockchainProtocolForkSolver{
             if (this.protocol.acceptBlockHeaders) onlyHeader = true;
 
 
-            let answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: nextBlockHeight }, nextBlockHeight);
+            let answer;
+
+            for (let i=0; i<trials; i++) {
+                answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
+                if (answer !== null && answer !== undefined)
+                    break;
+            }
 
             if (answer === null || answer === undefined)
                 throw {message: "block never received "+ nextBlockHeight};
