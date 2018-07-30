@@ -37,6 +37,7 @@ showport="$YELLOW[PORT]$STAND"
 ### GENERAL_VARS
 get_libtool=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "$(yum list libtool | grep -o Installed)"; fi fi fi)
 get_autoconf=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "$(yum list autoconf | grep -o Installed)"; fi fi fi)
+get_cmake=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy cmake | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then echo "$(apt-cache policy cmake | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "$(yum list cmake | grep -o Installed)"; fi fi fi)
 ###
 
 #### Dependencies START
@@ -57,12 +58,20 @@ else
                 echo "$showok autoconf is already installed!"
         fi
 fi
+if [[ "$get_cmake" == "(none)" ]]; then
+        echo "$showinfo We need to install cmake"
+        if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y cmake; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get install -y cmake; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then sudo yum install -y cmake;  fi fi fi
+else
+        if [[ "$get_cmake" == * ]]; then
+                echo "$showok cmake is already installed!"
+        fi
+fi
 }
 #### Dependencies check END
 
 deps # call deps function
 
-if [[ $(pwd) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
+if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
 
 	if [[ $(find . -type d -name argon2 | grep -x './argon2') == ./argon2 ]]; then
 
@@ -74,7 +83,7 @@ if [[ $(pwd) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
 
 		elif [[ $yn_compile == [yY] ]]; then
 			echo "$showexecute Changing dir to ${YELLOW}argon2$STAND" && cd argon2
-			echo "$showexecute Compiling argon2..." && make
+			echo "$showexecute Compiling argon2..." && cmake -DCMAKE_BUILD_TYPE=Release . && make
 			echo "$showexecute Going back to Node-WebDollar folder..." && cd ..
 
 			if [[ -d dist_bundle/CPU  ]]; then
@@ -104,6 +113,7 @@ if [[ $(pwd) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
 			        echo "$showinfo Current dir is $(pwd)"
 			        echo "$showexecute ${GREEN}autoreconf -i$STAND" && autoreconf -i
 				echo "$showexecute ${GREEN}./configure$STAND" && ./configure
+				echo "$showexecute ${GREEN}cmake -DCMAKE_BUILD_TYPE=Release .$STAND" && cmake -DCMAKE_BUILD_TYPE=Release .
 				echo "$showexecute ${GREEN}make$STAND" && make
 				echo "$showexecute ${GREEN}make check$STAND" && make check # check if reponse PASSES
 
@@ -127,7 +137,7 @@ if [[ $(pwd) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
 		fi
 	fi
 else
-	if [[ $(pwd) =~ argon[[:alnum:]]+ ]]; then
+#	if [[ ! $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
 
 		read -e -p "$showinput Do you want to compile argon2 again? (y or n): " yn_compile
 
@@ -135,16 +145,16 @@ else
 			echo -e "$showinfo OK..."
 
 		elif [[ $yn_compile == [yY] ]]; then
-			echo "$showexecute Compiling argon2..." && make
+			echo "$showexecute Compiling argon2..." && cmake -DCMAKE_BUILD_TYPE=Release . && make
 
 		elif [[ $yn_compile == * ]]; then
 			echo -e "$showerror Possible options are: yY or nN."
 		fi
-	else
-	        if [[ ! $(pwd) =~ argon[[:alnum:]]+ ]]; then
-	                echo "$showerror You are not inside the ${YELLOW}argon2$STAND folder."
-	                echo "$showinfo Run this script inside argon2 folder."
-	        fi
+#	else
+#	        if [[ ! $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || Node-WebDollar ]]; then
+#	                echo "$showerror You are not inside the ${YELLOW}argon2$STAND folder."
+#	                echo "$showinfo Run this script inside argon2 folder."
+#	        fi
 
-	fi
+#	fi
 fi
