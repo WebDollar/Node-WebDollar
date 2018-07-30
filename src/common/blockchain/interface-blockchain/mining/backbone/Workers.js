@@ -50,7 +50,7 @@ class Workers {
         } else {
 
             Log.error('NO WORKER SPECIFIED. Specify "cpu", "cpu-cpp", "gpu" ', Log.LOG_TYPE.default);
-            
+
         }
 
 
