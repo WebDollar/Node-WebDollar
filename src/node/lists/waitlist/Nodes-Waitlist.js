@@ -61,7 +61,7 @@ class NodesWaitlist {
 
 
         //avoid connecting to other nodes
-        if ( Blockchain.MinerPoolManagement.minerPoolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER )
+        if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER )
             return {result:false, waitlist: null};
 
 

@@ -206,7 +206,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         else
             validateChainWork = false;
 
-        MiniBlockchainFork.prototype._validateFork.call(this, validateHashesAgain, firstValidation, validateChainWork);
+        return MiniBlockchainFork.prototype._validateFork.call(this, validateHashesAgain, firstValidation, validateChainWork);
 
     }
 
