@@ -323,6 +323,13 @@ class MinerProtocol extends PoolProtocolList{
 
             Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") , Log.LOG_TYPE.POOLS);
 
+            if (!miningAnswer.result){
+                try {
+                    Log.warn("Statistics: Real h/s " + Math.floor( miningAnswer.hashes / miningAnswer.timeDiff * 1000 ), Log.LOG_TYPE.POOLS);
+                } catch (exception){
+
+                }
+            }
 
             answer = await answer;
 

@@ -149,7 +149,7 @@ class PoolPayouts{
             this.poolData.miners.forEach((miner)=>{
 
                 if ( miner.__tempRewardConfirmedOther + miner.rewardConfirmedOther >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT )
-                    this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther +miner.rewardConfirmedOther ;
+                    this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther + miner.rewardConfirmedOther ;
 
             });
 
@@ -166,9 +166,9 @@ class PoolPayouts{
             this._removeAddressTo(this.blockchain.mining.unencodedMinerAddress);
 
             let totalToPay = 0;
-            for (let i=0; i< this._toAddresses.length; i++ ){
+            for (let i=0; i< this._toAddresses.length; i++ )
                 totalToPay += this._toAddresses[i].amount;
-            }
+
             Log.info("Payout Total To Pay: " + (totalToPay / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
 
             let index = 0;
