@@ -70,7 +70,7 @@ fi
 
 if [[ "$getgit" == "(none)" ]]; then
 	echo "$showinfo We need to install Git"
-	if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y git; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get install -y git; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum install -y git; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y git; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get install -y git; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum install -y git; fi fi fi
 else
 
 	if [[ "$getgit" == Installed ]]; then
