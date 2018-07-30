@@ -109,7 +109,7 @@ class ProcessWorker{
     async _writeWork(data){
 
         try {
-            await fs.writeFileSync( this._filename + this.suffix, data, {flag: 'w'});
+            await fs.writeFileSync( this._filename + this.suffix, data, "binary");
         } catch (exception){
             console.error("Error sending the data to GPU", exception);
             this._sendDataTimeout = setTimeout( this._writeWork.bind(this,data), 10 );

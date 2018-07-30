@@ -164,7 +164,7 @@ class Workers {
 
         let count = this.workers_max;
 
-        if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" )
+        if ( consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" )
             count = 1;
 
         for (let index = this.workers_list.length ; index < count; index++)
