@@ -6,13 +6,15 @@ import InterfaceBlockchainBlockValidation from "common/blockchain/interface-bloc
 import PoolPayouts from "./Payout/Pool-Payouts"
 
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
-const VALIDATION_BLOCK_CONFIRMATIONS = 20; //blocks
+const VALIDATION_BLOCK_CONFIRMATIONS = 40; //blocks
 
 const MAXIMUM_FAIL_CONFIRMATIONS = 20; //blocks
 
 const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : 10;
 
-const REQUIRE_OTHER_CONFIRMATIONS = consts.DEBUG ? false : true;
+const CONFIRMATIONS_REQUIRE_OTHER_MINERS = consts.DEBUG ? false : true;
+
+const CONFIRMATION_METHOD = 2; //1 is not working properly
 
 import Blockchain from 'main-blockchain/Blockchain';
 
@@ -26,7 +28,7 @@ class PoolRewardsManagement{
 
         this.poolPayouts = new PoolPayouts(poolManagement, poolData, blockchain);
 
-        StatusEvents.on("blockchain/blocks-count-changed",async (data)=>{
+        StatusEvents.on("blockchain/block-inserted",async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
             if (!Blockchain.loaded) return;
@@ -39,11 +41,19 @@ class PoolRewardsManagement{
         this._serverBlocksDifficultyCalculation = {};
         this._serverBlocks = [];
         this._serverBlockInfo = undefined;
+
+        this._lastTimeCheckHeight = 0;
     }
 
     async _blockchainChanged(){
 
         if (this.poolData.blocksInfo.length === 0) return;
+
+        //already checked, or maybe it is a fork
+        if (this._lastTimeCheckHeight > this.blockchain.blocks.length-1)
+            return;
+
+        this._lastTimeCheckHeight = this.blockchain.blocks.length-1;
 
         let poolBlocksConfirmed = 0;
         let poolBlocksUnconfirmed = 0;
@@ -56,31 +66,38 @@ class PoolRewardsManagement{
 
         let confirmations = {};
 
-        let firstBlock;
-        for (let i=0; i < this.poolData.blocksInfo.length; i++)
-            if ( this.poolData.blocksInfo[ i ].block !== undefined )
-                if ( firstBlock === undefined || this.poolData.blocksInfo[i].block.height < firstBlock)
-                    firstBlock = this.poolData.blocksInfo[ i ].block.height;
+        //calcualte confirmations
 
-        for (let i = this.blockchain.blocks.length-1, n = Math.max( this.blockchain.blocks.blocksStartingPoint, firstBlock ); i>= n; i-- ) {
+        if (CONFIRMATION_METHOD === 1)
+            try {
+                let firstBlock;
+                for (let i = 0; i < this.poolData.blocksInfo.length; i++)
+                    if (this.poolData.blocksInfo[i].block !== undefined)
+                        if (firstBlock === undefined || this.poolData.blocksInfo[i].block.height < firstBlock)
+                            firstBlock = this.poolData.blocksInfo[i].block.height;
 
-            if ( this.blockchain.mining.unencodedMinerAddress.equals( this.blockchain.blocks[i].data.minerAddress ))
-                confirmationsPool++;
-            else {
-                if (uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] === undefined){
-                    uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] = true;
-                    confirmationsOthersUnique++;
-                } else
-                    confirmationsOthers++;
+                for (let i = this.blockchain.blocks.length - 1, n = Math.max(this.blockchain.blocks.blocksStartingPoint, firstBlock); i >= n; i--) {
+
+                    if (this.blockchain.mining.unencodedMinerAddress.equals(this.blockchain.blocks[i].data.minerAddress))
+                        confirmationsPool++;
+                    else {
+                        if (uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] === undefined) {
+                            uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] = true;
+                            confirmationsOthersUnique++;
+                        } else
+                            confirmationsOthers++;
+                    }
+
+                    confirmations[i] = {
+                        confirmationsPool: confirmationsPool,
+                        confirmationsOthers: confirmationsOthers,
+                        confirmationsOthersUnique: confirmationsOthersUnique,
+                    }
+
+                }
+            } catch (exception){
+
             }
-
-            confirmations[i] = {
-                confirmationsPool: confirmationsPool,
-                confirmationsOthers: confirmationsOthers,
-                confirmationsOthersUnique: confirmationsOthersUnique,
-            }
-
-        }
 
         //recalculate the confirmations
         for (let i = this.poolData.blocksInfo.length-1; i >= 0; i--  ){
@@ -127,16 +144,24 @@ class PoolRewardsManagement{
 
                 if (this.blockchain.blocks[blockInfo.height] === undefined) continue;
 
-                if ( BufferExtended.safeCompare( blockInfo.hash, this.blockchain.blocks[blockInfo.height].hash,  ) ){
+                if ( BufferExtended.safeCompare( blockInfo.hash, this.blockchain.blocks[blockInfo.height].hash  ) ){
 
                     found = true;
 
-                    let confirmation = confirmations[ blockInfo.height ];
-                    this.poolData.blocksInfo[i].confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers/2 + Math.min(confirmation.confirmationsPool/4, REQUIRE_OTHER_CONFIRMATIONS ? 2 : 10000);
+                    //Method 1
+                    //using confirmations as a confirmation system
+                    if (CONFIRMATION_METHOD === 1) {
+
+                        let confirmation = confirmations[blockInfo.height];
+                        this.poolData.blocksInfo[i].confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers / 2 + Math.min(confirmation.confirmationsPool / 4, CONFIRMATIONS_REQUIRE_OTHER_MINERS ? 2 : 10000);
+
+                    } else if (CONFIRMATION_METHOD === 2)
+                        this.poolData.blocksInfo[i].confirmations = (this.blockchain.blocks.length - blockInfo.height);
+
 
                 } else{
                     
-                    if ( blockInfo.height > this.blockchain.blocks.length - VALIDATION_BLOCK_CONFIRMATIONS )
+                    if ( this.blockchain.blocks.length  > blockInfo.height + VALIDATION_BLOCK_CONFIRMATIONS )
                         this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
                 }
@@ -144,7 +169,7 @@ class PoolRewardsManagement{
             } else { //i can not confirm the block because I am in browser and I need to use the server
 
                 //not enough blocks
-                if (blockInfo.height < this.blockchain.blocks.length - LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS)
+                if (blockInfo.height < this.blockchain.blocks.length + LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS)
                     continue;
 
                 found = await this._confirmUsingPoolServer(this.poolData.blocksInfo[i]);

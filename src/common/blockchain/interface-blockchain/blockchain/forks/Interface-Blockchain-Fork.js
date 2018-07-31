@@ -265,7 +265,7 @@ class InterfaceBlockchainFork {
                 return false
             }
 
-            if (!this.downloadAllBlocks) await this.sleep(30);
+            if (this.downloadAllBlocks) await this.sleep(30);
 
             try {
 
@@ -278,7 +278,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            if (!this.downloadAllBlocks) await this.sleep(20);
+            if (this.downloadAllBlocks) await this.sleep(20);
 
             try {
 
@@ -301,7 +301,7 @@ class InterfaceBlockchainFork {
                 return false;
             }
 
-            if (!this.downloadAllBlocks) await this.sleep(20);
+            if (this.downloadAllBlocks) await this.sleep(20);
 
             this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
 
@@ -337,13 +337,11 @@ class InterfaceBlockchainFork {
                     this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
                     this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
 
-                    if (process.env.BROWSER || this.downloadAllBlocks) this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
+                    if (!this.downloadAllBlocks || (index > 0 && index % 10 !== 0))
+                        this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
 
-                    if (! (await this.saveIncludeBlock(index, revertActions)) )
+                    if (! (await this.saveIncludeBlock(index, revertActions, false)) )
                         throw( { message: "fork couldn't be included in main Blockchain ", index: index });
-
-                    if ( !process.env.BROWSER )
-                        await this.sleep( this.downloadAllBlocks ? 10 : 30 );
 
                     this.forkBlocks[index].socketPropagatedBy = this.socketsFirst;
 
@@ -406,8 +404,10 @@ class InterfaceBlockchainFork {
 
         this.forkIsSaving = false;
 
-        if (success)
+        if (success) {
             StatusEvents.emit("blockchain/new-blocks", {});
+            this.blockchain.blocks.emitBlockInserted(  ) ;
+        }
 
         // it was done successfully
         console.log("FORK SOLVER SUCCESS", success);
@@ -415,23 +415,22 @@ class InterfaceBlockchainFork {
         revertActions.destroyRevertActions();
 
         try {
+
             if (success) {
 
                 //successfully, let's delete the backup blocks
                 this._deleteBackupBlocks();
-
-                await this.sleep(this.downloadAllBlocks ? 10 : 100);
 
                 //propagate last block
                 NodeBlockchainPropagation.propagateBlock(this.blockchain.blocks[this.blockchain.blocks.length - 1], this.sockets);
 
                 if (this.downloadAllBlocks) {
 
-                    this.blockchain.agent.protocol.askBlockchain(this.getSocket());
-
                     await this.sleep(100);
 
-                } else await this.sleep(20);
+                    this.blockchain.agent.protocol.askBlockchain(this.getSocket());
+
+                }
 
             }
         } catch (exception){
@@ -566,9 +565,9 @@ class InterfaceBlockchainFork {
 
     }
 
-    async saveIncludeBlock(index, revertActions){
+    async saveIncludeBlock(index, revertActions, saveBlock = false){
 
-        if (! (await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", false, revertActions))) {
+        if (! (await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", saveBlock, revertActions))) {
             console.error("fork couldn't be included in main Blockchain ", index);
             return false;
         }

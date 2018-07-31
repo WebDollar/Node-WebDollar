@@ -8,47 +8,68 @@ import NodeAPICallbacks from "../API/callbacks/Node-API-Callbacks"
 
 class NodeAPIRouter{
 
+    constructor(){
+
+
+    }
+
     initializeRouter(app, middleWare, prefix='', nodeApiType){
 
+        let routes = [];
+
+        let addRoute = (route, callback ) => {
+
+            app(prefix+''+route, (req,res) => middleWare(req, res, callback));
+            routes.push(route);
+
+        };
+
+        let showRoutes = ()=>{
+
+            return routes;
+
+        };
+
         // respond with "hello world" when a GET request is made to the homepage
-        app(prefix, (req, res) => middleWare(req, res, NodeAPIPublic.info ));
+        addRoute(prefix, NodeAPIPublic.info );
 
         // Return blocks information
-        app(prefix+'blocks/between/:blocks', (req, res) => middleWare(req, res, NodeAPIPublicBlocks.blocks ));
+        addRoute('blocks/between/:blocks', NodeAPIPublicBlocks.blocks );
 
 
         // Return block information
-        app(prefix+'blocks/at/:block', (req, res) => middleWare(req, res, NodeAPIPublicBlocks.block ));
+        addRoute('blocks/at/:block', NodeAPIPublicBlocks.block );
 
-        app(prefix+'address/balance/:address', (req, res) => middleWare(req, res, NodeAPIPublicAddresses.addressBalance ) );
+        addRoute('address/balance/:address', NodeAPIPublicAddresses.addressBalance ) ;
 
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
-            app(prefix+''+process.env.WALLET_SECRET_URL+'/mining/balance', (req, res) => middleWare(req, res, NodeAPIPrivate.minerBalance ) );
+            addRoute(process.env.WALLET_SECRET_URL+'/mining/balance', NodeAPIPrivate.minerBalance );
 
-            app(prefix+''+process.env.WALLET_SECRET_URL+'/wallets/import', (req, res) => middleWare(req, res, NodeAPIPrivate.walletImport ) );
+            addRoute(process.env.WALLET_SECRET_URL+'/wallets/import', NodeAPIPrivate.walletImport ) ;
 
-            app(prefix+''+process.env.WALLET_SECRET_URL+'/wallets/create-transaction', (req, res) => middleWare(req, res, NodeAPIPrivate.walletCreateTransaction) );
+            addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-transaction', NodeAPIPrivate.walletCreateTransaction) ;
 
-            app(prefix+''+process.env.WALLET_SECRET_URL+'/wallets/export', (req, res) => middleWare(req, res, NodeAPIPrivate.walletExport) );
+            addRoute(process.env.WALLET_SECRET_URL+'/wallets/export', NodeAPIPrivate.walletExport);
 
         }
 
         // Return address info: balance, blocks mined and transactions
-        app(prefix+'address/:address', (req, res) => middleWare(req, res, NodeAPIPublicAddresses.addressInfo ));
+        addRoute('address/:address', NodeAPIPublicAddresses.addressInfo );
 
         // Return address info: balance, blocks mined and transactions
-        app(prefix+'server/nodes/list', (req, res) => middleWare(req, res, NodeAPIPublicNodes.nodesList.bind(NodeAPIPublicNodes) ));
+        addRoute('server/nodes/list', NodeAPIPublicNodes.nodesList.bind(NodeAPIPublicNodes) );
 
         // Return blocks information
-        app(prefix+'server/nodes/blocks-propagated', (req, res) => middleWare(req, res, NodeAPIPublicNodes.lastBlocksMined.bind(NodeAPIPublicNodes) ));
+        addRoute('server/nodes/blocks-propagated', NodeAPIPublicNodes.lastBlocksMined.bind(NodeAPIPublicNodes) );
 
         // respond with "hello"
-        app(prefix+'hello', (req, res) => middleWare(req, res, NodeAPIPublic.helloWorld));
+        addRoute('hello', NodeAPIPublic.helloWorld);
 
         // respond with "ping"
-        app(prefix+'ping', (req, res) => middleWare(req, res, NodeAPIPublic.ping));
+        addRoute('ping', NodeAPIPublic.ping);
 
+        addRoute('list', showRoutes )
 
         
     }
@@ -60,6 +81,7 @@ class NodeAPIRouter{
         app(prefix+'subscribe/address/transactions', (req, res) => middleWare(req, res,  NodeAPICallbacks.addressTransactionsSubscribe.bind(NodeAPICallbacks), nodeApiType ));
 
     }
+
 
     
 }

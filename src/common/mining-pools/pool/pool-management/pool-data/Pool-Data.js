@@ -40,6 +40,16 @@ class PoolData {
         return this.blocksInfo[this.blocksInfo.length-1];
     }
 
+    get confirmedBlockInformations(){
+
+        let blocksConfirmed = [];
+        for (let i=0; i<this.blocksInfo.length; i++)
+            if (this.blocksInfo[i].confirmed && !this.blocksInfo[i].payout)
+                blocksConfirmed.push(this.blocksInfo[i]);
+
+        return blocksConfirmed;
+    }
+
     updateRewards(){
 
         let blockInformation = this.lastBlockInformation;

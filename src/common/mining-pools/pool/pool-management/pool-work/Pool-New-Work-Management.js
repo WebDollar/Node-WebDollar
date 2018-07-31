@@ -1,7 +1,7 @@
 import StatusEvents from "common/events/Status-Events";
 import NodesList from 'node/lists/Nodes-List'
 import Blockchain from "main-blockchain/Blockchain"
-
+import Log from 'common/utils/logging/Log';
 
 class PoolNewWorkManagement{
 
@@ -36,6 +36,7 @@ class PoolNewWorkManagement{
 
     async propagateNewWork(payoutInProgressIndex){
 
+        Log.info("   Connected Miners: "+this.poolManagement.poolData.connectedMinerInstances.list.length, Log.LOG_TYPE.POOLS);
 
         for (let i=0; i < this.poolManagement.poolData.connectedMinerInstances.list.length; i++ ) {
 
@@ -62,7 +63,7 @@ class PoolNewWorkManagement{
             if (this.poolWorkManagement.poolWork.lastBlock === prevBlock  ) return true;
 
 
-            let answer = await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork,  } ,"answer", 6000 );
+            let answer = await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork,  } ,"answer", 10000 );
 
             if ( answer === null ) throw {message: "answer is null"};
 
@@ -77,7 +78,10 @@ class PoolNewWorkManagement{
             } ,"answer" );
 
         } catch (exception){
-            console.error("_sendNewWork", exception);
+
+            if (exception.message !== "answer is null" || Math.random() < 0.2)
+                console.error("_sendNewWork", exception);
+
         }
     }
 

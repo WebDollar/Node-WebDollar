@@ -154,11 +154,11 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (this.blockchain.blocks[i].hash.equals(answer.hash)){
 
                         binarySearchResult = {
-                            position: i,
+                            position: i+1,
                             header: answer.hash,
                         };
 
-                        fork.pushHeader(binarySearchResult.header);
+                        fork.pushHeader(answer.hash);
                         break;
 
                     } else {
@@ -241,6 +241,7 @@ class InterfaceBlockchainProtocolForkSolver{
             }
 
 
+
             return {result: true, fork:fork };
 
         } catch ( exception ){
@@ -302,7 +303,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             // TODO you can paralyze the downloading code from multiple sockets
 
-            console.log("nextBlockHeight", nextBlockHeight);
+            console.log("downloading block", nextBlockHeight);
 
             StatusEvents.emit( "agent/status", {message: "Synchronizing - Downloading Block", blockHeight: nextBlockHeight, blockHeightMax: fork.forkChainLength } );
 
@@ -327,7 +328,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
             let block = this._deserializeForkBlock(fork, answer.block, nextBlockHeight, blockValidation );
 
-            if (!fork.downloadAllBlocks) await this.blockchain.sleep(15);
+            if (fork.downloadAllBlocks && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
 
             let result;
 
@@ -352,7 +353,7 @@ class InterfaceBlockchainProtocolForkSolver{
             else
                 throw {message: "Fork didn't work at height ", nextBlockHeight};
 
-            if (!fork.downloadAllBlocks) await this.blockchain.sleep(30);
+            if (fork.downloadAllBlocks && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
 
         }
 

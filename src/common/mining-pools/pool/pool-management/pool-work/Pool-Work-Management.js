@@ -54,7 +54,7 @@ class PoolWorkManagement{
 
         minerInstance.lastBlockInformation =  blockInformationMinerInstance;
         minerInstance.workBlock =  this.poolWork.lastBlock;
-        minerInstance.miner.dateActivity = new Date().getTime();
+        minerInstance.miner.dateActivity = new Date().getTime()/1000;
 
         this.poolWork.lastBlockNonce += hashes;
 
@@ -66,6 +66,9 @@ class PoolWorkManagement{
             answer.sig = this.poolManagement.poolSettings.poolDigitalSign(message);
 
         }
+
+        //marking him as online
+        this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
 
         return answer;
 
@@ -142,6 +145,7 @@ class PoolWorkManagement{
                         block = this.blockchain.blockCreator.createEmptyBlock(blockInformationMinerInstance.workBlock.height, undefined );
                         block.deserializeBlock(serialization, blockInformationMinerInstance.workBlock.height, blockInformationMinerInstance.workBlock.reward,  );
 
+                        let blockInformation = blockInformationMinerInstance;
 
                         if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 
@@ -159,7 +163,12 @@ class PoolWorkManagement{
                         block.data.transactions.confirmTransactions();
 
 
-                        blockInformationMinerInstance.blockInformation.block = blockInformationMinerInstance.workBlock;
+                        try {
+                            blockInformation.block = blockInformationMinerInstance.workBlock;
+                        } catch (exception){
+
+                        }
+
                         this.poolManagement.poolData.addBlockInformation();
 
 

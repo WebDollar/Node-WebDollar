@@ -8,6 +8,35 @@ class MiningTransactionsSelector{
         this._transactions = [];
     }
 
+    validateTransaction(transaction, miningFeeThreshold){
+
+        if (miningFeeThreshold === undefined)
+            miningFeeThreshold = consts.MINING_POOL.MINING.FEE_THRESHOLD;
+
+        //don't upset the SPAM_GUARDIAN
+        for (let j = 0; j < transaction.from.addresses.length; j++) {
+            if (this._countAddresses(transaction.from.addresses[j].unencodedAddress, true, false) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS)
+                throw {message: "too many inputs", from: transaction.from.addresses[j]};
+
+            if (transaction.from.addresses[j].amount <= miningFeeThreshold / 2)
+                throw {message: "transaction would not be included because the input is too small", from: transaction.from.addresses[j]};
+
+        }
+
+        for (let j = 0; j < transaction.to.addresses.length; j++) {
+            if (this._countAddresses(transaction.to.addresses[j].unencodedAddress, false, true) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS)
+                throw {message: "too many outputs", from: transaction.to.addresses[j]};
+
+            if (transaction.to.addresses[j].amount <= miningFeeThreshold / 2)
+                throw {message: "transaction would not be included because the input is too small", from: transaction.to.addresses[j]};
+
+        }
+
+        return true;
+
+
+    }
+
     selectNextTransactions(miningFeeThreshold){
 
         this._transactions = [];
@@ -23,15 +52,7 @@ class MiningTransactionsSelector{
                 
                 console.log(transaction.txId.toString("hex"));
 
-                //don't upset the SPAM_GUARDIAN
-                for (let j = 0; j < transaction.from.addresses.length; j++)
-                    if (this._countAddresses(transaction.from.addresses[j].unencodedAddress, true, false) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS)
-                        throw {message: "too many inputs"};
-
-                for (let j = 0; j < transaction.to.addresses.length; j++)
-                    if (this._countAddresses(transaction.to.addresses[j].unencodedAddress, false, true) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS)
-                        throw {message: "too many outputs"};
-
+                this.validateTransaction(transaction, miningFeeThreshold);
 
                 let bRemoveTransaction = false;
 
@@ -72,6 +93,9 @@ class MiningTransactionsSelector{
             }
 
 
+            if (this._transactions.length > 20){
+                break;
+            }
 
             i++;
         }

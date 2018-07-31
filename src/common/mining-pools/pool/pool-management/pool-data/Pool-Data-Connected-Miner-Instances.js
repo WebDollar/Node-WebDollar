@@ -25,10 +25,10 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
     _deleteUnresponsiveMiners(){
 
-        let time = new Date().getTime();
+        let time = new Date().getTime()/1000;
 
         for (let i=this.connectedMinerInstances.length-1; i>=0; i--)
-            if (time - this.connectedMinerInstances[i].miner.dateActivity > 480000){ //8 minutes
+            if (time - this.connectedMinerInstances[i].miner.dateActivity > 240){ //4 minutes
 
                 if ( !this.poolManagement.poolSettings.poolUsePoolServers )
                     this.connectedMinerInstances[i].socket.disconnect();

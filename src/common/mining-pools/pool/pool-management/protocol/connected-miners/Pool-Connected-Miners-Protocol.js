@@ -192,7 +192,6 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 socket.node.sendRequest("mining-pool/get-work/answer"+suffix, {result: true, work: work, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, refReward: minerInstance.miner.referrals.rewardReferralsTotal, refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed,
                     h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed + this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining, n: Blockchain.blockchain.blocks.networkHashRate, } )
 
-
             } catch (exception){
 
                 socket.node.sendRequest("mining-pool/get-work/answer", {result: false, message: exception.message } );
@@ -378,7 +377,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         this.addElement(socket);
 
-        minerInstance.miner.dateActivity = new Date().getTime();
+        minerInstance.miner.dateActivity = new Date().getTime()/1000;
         this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
 
     }
