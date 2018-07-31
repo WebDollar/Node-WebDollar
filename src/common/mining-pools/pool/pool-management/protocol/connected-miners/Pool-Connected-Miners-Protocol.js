@@ -219,8 +219,9 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 let work = await this.poolManagement.generatePoolWork(minerInstance, true);
 
-                socket.node.sendRequest("mining-pool/get-work/answer"+suffix, {result: true, work: work, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, refReward: minerInstance.miner.referrals.rewardReferralsTotal, refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed,
-                    h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed, bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining, n: Blockchain.blockchain.blocks.networkHashRate, } )
+                this.poolManagement.receivePoolWork(minerInstance, data.work);
+
+                socket.node.sendRequest("mining-pool/get-work/answer"+suffix, { result: true, work: work } )
 
             } catch (exception){
 
@@ -278,13 +279,10 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let minerInstance = socket.node.protocol.minerPool.minerInstance;
                 if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
-                let answer = await this.poolManagement.receivePoolWork(minerInstance, data.work);
-
                 let newWork = await this.poolManagement.generatePoolWork(minerInstance, true);
 
                 //the new reward
-                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, refReward: minerInstance.miner.referrals.rewardReferralsTotal, refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed,
-                    newWork: newWork, h:this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed, bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining, n: Blockchain.blockchain.blocks.networkHashRate, } );
+                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, newWork: newWork, } );
 
 
             } catch (exception){

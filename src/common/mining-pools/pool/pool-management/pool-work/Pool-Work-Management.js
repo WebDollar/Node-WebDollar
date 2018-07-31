@@ -10,6 +10,8 @@ import StatusEvents from "common/events/Status-Events";
 import PoolNewWorkManagement from "./Pool-New-Work-Management"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
+import PoolWorkValidation from "./Pool-Work-Validation";
+
 class PoolWorkManagement{
 
     constructor(poolManagement, blockchain){
@@ -18,8 +20,19 @@ class PoolWorkManagement{
         this.blockchain = blockchain;
 
         this.poolNewWorkManagement = new PoolNewWorkManagement(poolManagement, this, blockchain);
+        this.poolWorkValidation = new PoolWorkValidation(poolManagement, this);
 
         this.poolWork = new PoolWork(poolManagement, blockchain);
+    }
+
+    startPoolWorkManagement(){
+        this.poolWork.startGarbageCollector();
+        this.poolWorkValidation.startPoolWorkValidation();
+    }
+
+    stopPoolWorkManagement(){
+        this.poolWorkValidation.stopPoolWorkValidation();
+        this.poolWork.stopGarbageCollector();
     }
 
 

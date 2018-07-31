@@ -15,8 +15,6 @@ class PoolNewWorkManagement{
         this._payoutInProgress = false;
         this._payoutInProgressIndex = 0;
 
-        this.prevBlock = undefined;
-
         StatusEvents.on("blockchain/new-blocks",async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
@@ -54,14 +52,12 @@ class PoolNewWorkManagement{
             if (blockInformationMinerInstance === undefined ) blockInformationMinerInstance = minerInstance.lastBlockInformation;
             if (blockInformationMinerInstance === undefined) return false;
 
-            this.prevBlock = blockInformationMinerInstance.workBlock;
-
             let newWork = await this.poolWorkManagement.getWork( minerInstance, blockInformationMinerInstance );
 
             if (payoutInProgressIndex !== this._payoutInProgressIndex) return false;
 
             // i have sent it already in the last - no new work
-            if (this.poolWorkManagement.poolWork.lastBlock === this.prevBlock  ) return true; //already sent
+            if (this.poolWorkManagement.poolWork.lastBlock === blockInformationMinerInstance.workBlock ) return true; //already sent
 
             await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork,  } );
 

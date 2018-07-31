@@ -79,7 +79,7 @@ class PoolManagement{
     }
 
     receivePoolWork(minerInstance, work){
-        return this.poolWorkManagement.processWork(minerInstance, work)
+        return this.poolWorkManagement.poolWorkValidation.pushWorkForValidation(minerInstance, work)
     }
 
     /**
@@ -142,7 +142,6 @@ class PoolManagement{
             if (value) {
 
                 this.poolStatistics.startInterval();
-                this.poolWorkManagement.poolWork.startGarbageCollector();
                 await this.poolProtocol._startPoolProtocol();
 
                 if (this.blockchain!== undefined && this.blockchain.prover !== undefined)
@@ -155,11 +154,11 @@ class PoolManagement{
 
                 Blockchain.PoolManagement.poolSettings.printPoolSettings();
 
+                this.poolWorkManagement.startPoolWorkManagement();
             }
             else {
 
                 await this.poolProtocol._stopPoolProtocol();
-                this.poolWorkManagement.poolWork.stopGarbageCollector();
                 this.poolStatistics.clearInterval();
 
                 if (this.blockchain !== undefined && this.blockchain.prover !== undefined)
@@ -169,6 +168,7 @@ class PoolManagement{
 
                 this.poolData.connectedMinerInstances.stopPoolDataConnectedMinerInstances();
 
+                this.poolWorkManagement.stopPoolWorkManagement();
             }
 
             StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" } );
