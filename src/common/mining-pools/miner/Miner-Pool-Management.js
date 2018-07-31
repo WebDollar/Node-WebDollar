@@ -123,6 +123,7 @@ class MinerProtocol {
                         this.blockchain.prover.proofActivated = false;
 
                     await this.minerPoolProtocol.insertServersListWaitlist(this.minerPoolSettings.poolServers);
+                    await this.minerPoolMining._startMinerPoolMining();
                     await this.minerPoolProtocol._startMinerProtocol();
 
                     await this.minerPoolReferrals.startLoadMinerPoolReferrals();
