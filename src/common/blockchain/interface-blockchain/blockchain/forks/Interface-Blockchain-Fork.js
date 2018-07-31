@@ -1,3 +1,4 @@
+var BigInteger = require('big-integer');
 import InterfaceBlockchainBlockValidation from "../../blocks/validation/Interface-Blockchain-Block-Validation";
 
 import global from "consts/global"
@@ -9,6 +10,7 @@ import consts from 'consts/const_global'
 import MiniBlockchainAccountantTree from "../../../mini-blockchain/state/Mini-Blockchain-Accountant-Tree";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import Blockchain from "main-blockchain/Blockchain"
+import Log from 'common/utils/logging/Log';
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -47,7 +49,7 @@ class InterfaceBlockchainFork {
             this.downloadAllBlocks = false;
 
         } catch (exception){
-            console.error("destroy fork raised an exception",  exception);
+            Log.error("destroy fork raised an exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS,  exception);
         }
 
     }
@@ -87,7 +89,7 @@ class InterfaceBlockchainFork {
         this._blocksCopy = [];
     }
 
-    async _validateFork(validateHashesAgain, firstValidation ){
+    async _validateFork(validateHashesAgain, firstValidation, validateChainWork = true ){
 
         //forkStartingHeight is offseted by 1
 
@@ -105,6 +107,23 @@ class InterfaceBlockchainFork {
                     throw {message:"validateForkBlock failed for ", index:i};
 
             }
+
+        if (validateChainWork){
+
+            let chainWork = new BigInteger(0);
+            for (let i = this.forkStartingHeight; i<this.blockchain.blocks.length; i++)
+                chainWork = chainWork.plus( this.blockchain.blocks[i].workDone );
+
+            let forkWork = new BigInteger(0);
+            for (let i=0; i< this.forkBlocks.length; i++ )
+                forkWork = forkWork.plus( this.forkBlocks[i].workDone );
+
+            let factor = 1;
+
+            if ( forkWork.lesser( chainWork.multiply(factor) ) )
+                throw {message: "forkWork is less than chainWork", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
+
+        }
 
         return true;
     }
@@ -166,7 +185,7 @@ class InterfaceBlockchainFork {
         else if ( forkHeight > 0) {
 
             if ( forkHeight-1 >= this.forkBlocks.length )
-                console.warn("getForkDifficultyTarget FAILED", forkHeight);
+                Log.warn("getForkDifficultyTarget FAILED: "+  forkHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
             return this.forkBlocks[forkHeight - 1].difficultyTarget; // just the fork
         }
@@ -243,12 +262,12 @@ class InterfaceBlockchainFork {
         this.forkIsSaving = true; //marking it saved because we want to avoid the forksAdministrator to delete it
         if (this.blockchain === undefined) return false; //fork was already destroyed
 
-        if (! (await this._validateFork(false, true))) {
-            console.error("validateFork was not passed");
+        if (! (await this._validateFork(false, true, true))) {
+            Log.error("validateFork was not passed", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
             return false
         }
 
-        console.log("save Fork after validateFork");
+        Log.log("Save Fork after validateFork", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
 
         let revertActions = new RevertActions(this.blockchain);
@@ -258,149 +277,150 @@ class InterfaceBlockchainFork {
 
         if (this.blockchain === undefined) success = false ; //fork was already destroyed
         else
-        success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+            success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
-            if (! (await this._validateFork(false, false))) {
-                console.error("validateFork was not passed");
-                return false
-            }
+                if (! (await this._validateFork(false, false))) {
+                    Log.error("validateFork was not passed", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    return false
+                }
 
-            if (this.downloadAllBlocks) await this.sleep(30);
-
-            try {
-
-                //making a copy of the current blockchain
-                this.preForkClone();
-
-            } catch (exception){
-                console.error("preForkBefore raised an error", exception);
-                this.forkIsSaving = false;
-                return false;
-            }
-
-            if (this.downloadAllBlocks) await this.sleep(20);
-
-            try {
-
-                this.preFork(revertActions);
-
-            } catch (exception){
-
-                console.error("preFork raised an error", exception);
-
-                revertActions.revertOperations('', "all");
-                this._blocksCopy = []; //We didn't use them so far
+                if (this.downloadAllBlocks) await this.sleep(30);
 
                 try {
-                    await this.revertFork();
+
+                    //making a copy of the current blockchain
+                    this.preForkClone();
+
                 } catch (exception){
-                    console.log("revertFork rasied an error", exception );
+                    Log.error("preForkBefore raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    this.forkIsSaving = false;
+                    return false;
                 }
 
-                this.forkIsSaving = false;
-                return false;
-            }
-
-            if (this.downloadAllBlocks) await this.sleep(20);
-
-            this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
-
-            let forkedSuccessfully = true;
-
-            console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-            console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-
-            //TODO use the revertActions to revert the process
-
-            //show information about Transactions Hash
-            if (consts.DEBUG) {
-
-                console.log("accountant tree", this.blockchain.accountantTree.root.hash.sha256.toString("hex"));
-
-                for (let i = 0; i < this.forkBlocks.length; i++) {
-
-                    for (let j = 0; j < this.forkBlocks[i].data.transactions.transactions.length; j++)
-                        console.log("transaction", this.forkBlocks[i].data.transactions.transactions[j].toJSON());
-
-                    console.log("transactions hash", this.forkBlocks[i].data.transactions.hashTransactions.toString("hex"));
-                }
-
-            }
-
-            let index;
-            try {
-
-                for (index = 0; index < this.forkBlocks.length; index++) {
-
-                    StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
-
-                    this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
-                    this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
-
-                    if (!this.downloadAllBlocks || (index > 0 && index % 10 !== 0))
-                        this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
-
-                    if (! (await this.saveIncludeBlock(index, revertActions, false)) )
-                        throw( { message: "fork couldn't be included in main Blockchain ", index: index });
-
-                    this.forkBlocks[index].socketPropagatedBy = this.socketsFirst;
-
-                }
-
-                await this.blockchain.saveBlockchain( this.forkStartingHeight );
-
-                if (!this.downloadAllBlocks) await this.sleep(2);
-
-                console.log("FORK STATUS SUCCESS5: ", forkedSuccessfully, "position", this.forkStartingHeight);
-
-            } catch (exception){
-
-                console.error('-----------------------------------------');
-                console.error("saveFork includeBlockchainBlock1 raised exception");
-                this.printException( exception );
-                console.error("index", index, "forkStartingHeight", this.forkStartingHeight, "fork");
-                console.error('-----------------------------------------');
-                forkedSuccessfully = false;
-
-                //revert the accountant tree
-                //revert the last K block
+                if (this.downloadAllBlocks) await this.sleep(20);
 
                 try {
+
+                    this.preFork(revertActions);
+
+                } catch (exception){
+
+                    Log.error("preFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+
                     revertActions.revertOperations('', "all");
-                } catch (exception){
-                    console.error("revertOptions rasied an error", exception );
-                }
-                await this.sleep(30);
+                    this._blocksCopy = []; //We didn't use them so far
 
+                    try {
+                        await this.revertFork();
+                    } catch (exception){
+                        Log.error("revertFork rasied an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception );
+                    }
+
+                    this.forkIsSaving = false;
+                    return false;
+                }
+
+                if (this.downloadAllBlocks) await this.sleep(20);
+
+                this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
+
+                let forkedSuccessfully = true;
+
+                Log.log("===========================", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                Log.log("===========================", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+
+                //TODO use the revertActions to revert the process
+
+                //show information about Transactions Hash
+                if (consts.DEBUG) {
+
+                    Log.log("Accountant Tree", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.blockchain.accountantTree.root.hash.sha256.toString("hex"));
+
+                    for (let i = 0; i < this.forkBlocks.length; i++) {
+
+                        for (let j = 0; j < this.forkBlocks[i].data.transactions.transactions.length; j++)
+                            Log.log("Transaction", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.forkBlocks[i].data.transactions.transactions[j].toJSON());
+
+                        Log.log("Transaction hash", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.forkBlocks[i].data.transactions.hashTransactions.toString("hex"));
+                    }
+
+                }
+
+                let index;
                 try {
-                    //reverting back to the clones, especially light settings
-                    await this.revertFork();
+
+                    for (index = 0; index < this.forkBlocks.length; index++) {
+
+                        StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
+
+                        this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
+                        this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
+
+                        if (!this.downloadAllBlocks || (index > 0 && index % 10 !== 0))
+                            this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
+
+                        if (! (await this.saveIncludeBlock(index, revertActions, false)) )
+                            throw( { message: "fork couldn't be included in main Blockchain ", index: index });
+
+                        this.forkBlocks[index].socketPropagatedBy = this.socketsFirst;
+
+                    }
+
+                    await this.blockchain.saveBlockchain( this.forkStartingHeight );
+
+                    if (!this.downloadAllBlocks) await this.sleep(2);
+
+                    Log.log("FORK STATUS SUCCESS5: "+forkedSuccessfully+ " position "+this.forkStartingHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
+
                 } catch (exception){
-                    console.error("revertFork rasied an error", exception );
+
+                    Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
+                    Log.error("saveFork includeBlockchainBlock1 raised exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
+                    this.printException( exception );
+                    Log.error("index: "+ index + "forkStartingHeight"+this.forkStartingHeight + "fork", Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
+                    Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
+
+                    forkedSuccessfully = false;
+
+                    //revert the accountant tree
+                    //revert the last K block
+
+                    try {
+                        revertActions.revertOperations('', "all");
+                    } catch (exception){
+                        Log.error("revertOptions raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception );
+                    }
+                    await this.sleep(30);
+
+                    try {
+                        //reverting back to the clones, especially light settings
+                        await this.revertFork();
+                    } catch (exception){
+                        Log.error("revertFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception );
+                    }
+
+                    await this.sleep(30);
+
                 }
 
-                await this.sleep(30);
+                await this.postForkTransactions(forkedSuccessfully);
 
-            }
+                if (this.downloadAllBlocks) await this.sleep(30);
 
-            await this.postForkTransactions(forkedSuccessfully);
+                this.postFork(forkedSuccessfully);
 
-            if (this.downloadAllBlocks) await this.sleep(30);
+                if (this.downloadAllBlocks){
+                    await this.sleep(30);
+                    Blockchain.synchronizeBlockchain();
+                }
 
-            this.postFork(forkedSuccessfully);
+                if (forkedSuccessfully) {
+                    this.blockchain.mining.resetMining();
+                    this._forkPromiseResolver(true) //making it async
+                }
 
-            if (this.downloadAllBlocks){
-                await this.sleep(30);
-                Blockchain.synchronizeBlockchain();
-            }
-
-            if (forkedSuccessfully) {
-                this.blockchain.mining.resetMining();
-                this._forkPromiseResolver(true) //making it async
-            }
-
-            return forkedSuccessfully;
-        });
+                return forkedSuccessfully;
+            });
 
         this.forkIsSaving = false;
 
@@ -410,7 +430,7 @@ class InterfaceBlockchainFork {
         }
 
         // it was done successfully
-        console.log("FORK SOLVER SUCCESS", success);
+        Log.info("FORK SOLVER SUCCESS: " + success, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
         revertActions.destroyRevertActions();
 
@@ -434,7 +454,7 @@ class InterfaceBlockchainFork {
 
             }
         } catch (exception){
-            console.error("saveFork - saving the fork returned an exception", exception);
+            Log.error("saveFork - saving the fork returned an exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
         }
 
         return success;
@@ -453,7 +473,7 @@ class InterfaceBlockchainFork {
                 this._blocksCopy.push(this.blockchain.blocks[i]);
 
         } catch (exception){
-            console.error("_blockCopy raised an error", exception);
+            Log.error("_blockCopy raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
             throw exception;
         }
 
@@ -476,18 +496,18 @@ class InterfaceBlockchainFork {
             for (let i=0; i<this._blocksCopy.length; i++)
                 if (! (await this.blockchain.includeBlockchainBlock( this._blocksCopy[i], false, "all", false, revertActions ))) {
 
-                    console.error("----------------------------------------------------------");
-                    console.error("----------------------------------------------------------");
-                    console.error("----------------------------------------------------------");
-                    console.error("blockchain couldn't restored after fork included in main Blockchain ", i);
-                    console.error("----------------------------------------------------------");
-                    console.error("----------------------------------------------------------");
-                    console.error("----------------------------------------------------------");
+                    Log.error("----------------------------------------------------------", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    Log.error("----------------------------------------------------------", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    Log.error("----------------------------------------------------------", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    Log.error("blockchain couldn't restored after fork included in main Blockchain " + i, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    Log.error("----------------------------------------------------------", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    Log.error("----------------------------------------------------------", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    Log.error("----------------------------------------------------------", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
                 }
 
         } catch (exception){
-            console.error("saveFork includeBlockchainBlock2 raised exception", index, exception);
+            Log.error("SaveFork includeBlockchainBlock2 raised exception: " + index, Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
         }
     }
 
@@ -508,7 +528,7 @@ class InterfaceBlockchainFork {
                             this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
                         }
                         catch (exception) {
-                            console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
+                            Log.warn("Transaction Was Rejected to be Added to the Pending Queue ", Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON() );
                         }
 
                     });
@@ -528,6 +548,23 @@ class InterfaceBlockchainFork {
 
         } else {
 
+            this.forkBlocks.forEach((block)=>{
+
+                if (block.data !==  undefined && block.data.transactions !== undefined)
+                    block.data.transactions.transactions.forEach((transaction)=>{
+                        transaction.confirmed = false;
+
+                        try {
+                            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
+                        }
+                        catch (exception) {
+                            Log.warn("Transaction Was Rejected to be Added to the Pending Queue ", Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON() );
+                        }
+
+                    });
+            });
+
+
             this._blocksCopy.forEach( (block) => {
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
@@ -540,24 +577,9 @@ class InterfaceBlockchainFork {
 
             });
 
-            this.forkBlocks.forEach((block)=>{
-
-                if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction)=>{
-                        transaction.confirmed = false;
-
-                        try {
-                            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
-                        }
-                        catch (exception) {
-                            console.warn("Transaction Was Rejected to be Added to the Pending Queue ", transaction.toJSON() );
-                        }
-
-                    });
-            })
         }
 
-        this.blockchain.transactions.pendingQueue.removeOldTransactions();
+
 
     }
 
@@ -568,7 +590,7 @@ class InterfaceBlockchainFork {
     async saveIncludeBlock(index, revertActions, saveBlock = false){
 
         if (! (await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", saveBlock, revertActions))) {
-            console.error("fork couldn't be included in main Blockchain ", index);
+            Log.error("fork couldn't be included in main Blockchain " + index, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
             return false;
         }
 
@@ -604,18 +626,18 @@ class InterfaceBlockchainFork {
             if (depth <= 0) return;
 
             if (isIterable(obj) || Array.isArray(obj) )
-            for (let key in obj)
-                if (obj.hasOwnProperty(key)){
-                    if (key === "blocks")
-                        obj[key] = '';
+                for (let key in obj)
+                    if (obj.hasOwnProperty(key)){
+                        if (key === "blocks")
+                            obj[key] = '';
 
-                    removeBlocks(obj[key], depth-1);
-                }
+                        removeBlocks(obj[key], depth-1);
+                    }
 
         };
 
         removeBlocks(exception);
-        console.error(exception);
+        Log.error("fork save error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
 
     }
 
@@ -644,6 +666,13 @@ class InterfaceBlockchainFork {
             else
                 this.sockets.push(socket)
         }
+    }
+
+    pushHeaders(hashes){
+
+        for (let i=0; i<hashes.length; i++)
+            this.pushHeader(hashes[i]);
+
     }
 
     pushHeader(hash){

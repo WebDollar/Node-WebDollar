@@ -7,6 +7,7 @@ import Blockchain from "main-blockchain/Blockchain";
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 import NODE_TYPE from "node/lists/types/Node-Type"
+import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
 let NodeExpress;
 
@@ -37,7 +38,7 @@ class NodesWaitlistConnecting {
             minimum_waitlist:0,
         };
 
-        setInterval(this._calculateNumberOfConnections.bind(this), 5000);
+        setInterval(this._calculateNumberOfConnections.bind(this), 10000);
 
         this._calculateNumberOfConnections();
 
@@ -50,6 +51,11 @@ class NodesWaitlistConnecting {
         this.started = true;
         this._connectNewNodesWaitlistInterval();
 
+    }
+
+    stopConnecting(){
+        if (this._connectingTimeout  !== undefined)
+            clearTimeout( this._connectingTimeout );
     }
 
     /*
@@ -77,22 +83,29 @@ class NodesWaitlistConnecting {
 
         this._connectNewNodesWaitlist();
 
-        setTimeout( this._connectNewNodesWaitlistInterval.bind(this), consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
+        this._connectingTimeout = setTimeout( this._connectNewNodesWaitlistInterval.bind(this), consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
     }
 
     _tryToConnectNextNode( nextWaitListObject){
 
-        if (nextWaitListObject.isFallback) {
+        if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER ].indexOf(nextWaitListObject.nodeConsensusType) < 0 ) return;
 
-            let fallbacks = this._countConnectingToFallbacks() + NodesList.countFallbacks();
-            if (fallbacks >= this.connectingMaximum.maximum_fallbacks) return true;
+        if (Blockchain.blockchain.agent.consensus) {
 
-        } else {
+            if (nextWaitListObject.isFallback) {
 
-            let simple = (this._connectingQueue.length - this._countConnectingToFallbacks()) + ( NodesList.nodes.length - NodesList.countFallbacks() );
-            if (simple >= this.connectingMaximum.maximum_waitlist) return true;
+                let fallbacks = this._countConnectingToFallbacks() + NodesList.countFallbacks();
+                if (fallbacks >= this.connectingMaximum.maximum_fallbacks) return true;
+
+            } else {
+
+                let simple = (this._connectingQueue.length - this._countConnectingToFallbacks()) + ( NodesList.nodes.length - NodesList.countFallbacks() );
+                if (simple >= this.connectingMaximum.maximum_waitlist) return true;
+
+            }
 
         }
+
 
         if (Blockchain.Agent.light && Blockchain.Agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES)
             return;
@@ -111,7 +124,6 @@ class NodesWaitlistConnecting {
                     for (let i=this._connectingQueue.length-1; i>=0; i--)
                         if (this._connectingQueue[i] === nextWaitListObject){
                             this._connectingQueue.splice(i,1);
-                            break;
                         }
 
                     nextWaitListObject.checked = true;
@@ -209,6 +221,12 @@ class NodesWaitlistConnecting {
             }
 
         }
+
+        if (Blockchain !== undefined && Blockchain.isPoolActivated){
+            this.connectingMaximum.maximum_fallbacks += 10;
+            this.connectingMaximum.maximum_waitlist += 20;
+        }
+
     }
 
 }

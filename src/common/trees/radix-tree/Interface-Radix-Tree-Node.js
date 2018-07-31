@@ -52,7 +52,7 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
 
                 let length ; //1 byte
 
-                length = Serialization.deserializeNumber( BufferExtended.substr(buffer, offset, 2) ); //2 bytes
+                length = Serialization.deserializeNumber2Bytes( buffer, offset ); //2 bytes
                 offset += 2;
 
 

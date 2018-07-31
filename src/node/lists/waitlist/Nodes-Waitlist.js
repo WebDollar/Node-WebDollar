@@ -31,7 +31,7 @@ class NodesWaitlist {
         this.MAX_ERROR_TRIALS_FALLBACK = 1000;
         this.MAX_ERROR_TRIALS_SIMPLE = 50;
 
-        setInterval( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
+        setTimeout( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
 
     }
 
@@ -61,7 +61,7 @@ class NodesWaitlist {
 
 
         //avoid connecting to other nodes
-        if ( (!Blockchain.Agent.consensus ) && nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER )
+        if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER )
             return {result:false, waitlist: null};
 
 
@@ -205,12 +205,22 @@ class NodesWaitlist {
             if (!this.waitListFullNodes.isFallback) {
 
                 try {
+
+                    if ( (Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted ) && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL].indexOf( this.waitListFullNodes[i].nodeConsensusType ) >= 0) continue;
+
                     let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 5000);
 
-                    if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility)
+                    if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility) {
+                        this.waitListFullNodes[i].failsChecking = 0;
                         continue;
-                    else
-                        this.waitListFullNodes.splice(i, 1);
+                    }
+                    else {
+                        this.waitListFullNodes[i].failsChecking++;
+
+                        if (this.waitListFullNodes[i].failsChecking >= 5)
+                            this.waitListFullNodes.splice(i, 1);
+
+                    }
 
                 } catch (exception){
 
@@ -218,6 +228,8 @@ class NodesWaitlist {
 
                 await Blockchain.blockchain.sleep( 500 + Math.floor( Math.random()*2000) );
             }
+
+        setTimeout( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
 
     }
 

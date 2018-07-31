@@ -6,8 +6,6 @@ let ARGON2_PARAM = { salt: 'Satoshi_is_Finney', time: 2, mem: 256, parallelism: 
 
 let algorithm = undefined;
 
-let nonceArray = new Uint8Array(4);
-
 let bestHash, bestNonce;
 let nonce, noncePrevious, nonceEnd;
 let WorkerInitialized = false;
@@ -175,10 +173,8 @@ function calcHash() {
 
     var hashArr = new Uint8Array(32);
 
-
     if (!Module._argon2_hash)
         return hashArr;
-
 
     //var dt = now();
     var pwd = allocateArray( ARGON2_PARAM.pass);
@@ -186,6 +182,7 @@ function calcHash() {
     var hash = Module.allocate(new Array( ARGON2_PARAM.hashLen ), 'i8', Module.ALLOC_NORMAL);
     var encoded = Module.allocate(new Array(512), 'i8', Module.ALLOC_NORMAL);
     var err;
+
     try {
 
         var res = Module._argon2_hash(ARGON2_PARAM.time, ARGON2_PARAM.mem, ARGON2_PARAM.parallelism, pwd, ARGON2_PARAM.pass.length, salt, ARGON2_PARAM.salt.length,
@@ -264,7 +261,7 @@ function sleep(ms) {
 
 export default function (self) {
 
-
+    let blockLen, difficulty;
 
     log = (msg) => {
         if (!msg )
@@ -312,12 +309,16 @@ export default function (self) {
 
             if (ev.data.message === "initialize") {
 
-                if (ev.data.block !== undefined && ev.data.block !== null) {
+                if (ev.data.block !== undefined && ev.data.block !== null && ev.data.difficulty !== undefined && ev.data.difficulty !== null) {
+
                     block = ev.data.block;
+                    difficulty = ev.data.difficulty;
 
                     //solution using Uint8Array
                     ARGON2_PARAM.pass = new Uint8Array(block.length + 4 );
-                    ARGON2_PARAM.pass.set(block);
+                    ARGON2_PARAM.pass.set (block);
+
+                    blockLen = block.length;
 
                 }
 
@@ -334,7 +335,7 @@ export default function (self) {
             nonce = ev.data.nonce;
             noncePrevious = nonce;
             nonceEnd = nonce + ev.data.count;
-            bestHash = undefined;
+            bestHash = Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
             bestNonce = 0;
 
             WorkerChanged = true;
@@ -350,6 +351,8 @@ export default function (self) {
         if ( WorkerInitialized ) return;
         WorkerInitialized = true;
 
+        let change, found;
+
         while ( 1 === 1){
 
             if (nonce === nonceEnd || jobTerminated) {
@@ -361,33 +364,41 @@ export default function (self) {
 
                 WorkerChanged = false;
 
-                nonceArray [3] = nonce & 0xff;
-                nonceArray [2] = nonce>>8 & 0xff;
-                nonceArray [1] = nonce>>16 & 0xff;
-                nonceArray [0] = nonce>>24 & 0xff;
-
-                ARGON2_PARAM.pass.set(nonceArray, block.length);
+                ARGON2_PARAM.pass [blockLen + 3] = nonce & 0xff;
+                ARGON2_PARAM.pass [blockLen + 2] = nonce>>8 & 0xff;
+                ARGON2_PARAM.pass [blockLen + 1] = nonce>>16 & 0xff;
+                ARGON2_PARAM.pass [blockLen    ] = nonce>>24 & 0xff;
 
                 let hash = await algorithm ();
 
                 if (WorkerChanged) continue; //it was changed in the meanwhile
 
-                let change = false;
-
-                if (bestHash === undefined) change = true;
-                else
-                    for (let i = 0, l = bestHash.length; i < l; i++)
-                        if (hash[i] < bestHash[i]) {
-                            change = true;
-                            break;
-                        }
-                        else if (hash[i] > bestHash[i])
-                            break;
+                change = false;
+                for (let i = 0, l = bestHash.length; i < l; i++)
+                    if (hash[i] < bestHash[i]) {
+                        change = true;
+                        break;
+                    }
+                    else if (hash[i] > bestHash[i])
+                        break;
 
 
                 if ( change ) {
                     bestHash = hash;
                     bestNonce = nonce;
+
+                    found = false;
+                    for (let i = 0, l = difficulty.length; i < l; i++)
+                        if (hash[i] < difficulty[i]) {
+                            found = true;
+                            break;
+                        }
+                        else if (hash[i] > difficulty[i])
+                            break;
+
+                    if (found)
+                        nonce = nonceEnd - 1;
+
                 }
 
             } catch (exception){

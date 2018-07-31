@@ -76,6 +76,9 @@ class InterfaceBlockchainTransactionFrom {
             if (typeof fromObject.signature === "string")
                 fromObject.signature = new Buffer(fromObject.signature, "hex");
 
+            if (fromObject.signature === undefined)
+                fromObject.signature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
+
             if (typeof fromObject.amount === "string")
                 fromObject.amount = parseInt(fromObject.amount);
 
@@ -312,6 +315,9 @@ class InterfaceBlockchainTransactionFrom {
 
                 address.publicKey = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
                 offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
+
+                if (this.transaction.version > 0x01)
+                    address.unencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(address.publicKey, false);
 
                 address.signature = BufferExtended.substr(buffer, offset, consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
                 offset += consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH;

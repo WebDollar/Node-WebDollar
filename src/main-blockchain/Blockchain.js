@@ -124,9 +124,11 @@ class Blockchain{
             await afterBlockchainLoadCallback();
 
         //loading the blockchain
-        await this.Chain.loadBlockchain();
-
         if (synchronize){
+
+            await this.Chain.loadBlockchain();
+
+            await this.blockchain.transactions.pendingQueue.pendingQueueSavingManager.loadPendingTransactions();
 
             await this.Agent.initializeStartAgentOnce();
 

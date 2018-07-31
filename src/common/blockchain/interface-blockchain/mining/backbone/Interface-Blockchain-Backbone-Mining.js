@@ -7,9 +7,9 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
     //backbone mining is the same with InterfaceBlockchainMining
 
-    constructor(blockchain, minerAddress, miningFeeThreshold){
+    constructor(blockchain, minerAddress, miningFeePerByte){
 
-        super(blockchain, minerAddress, miningFeeThreshold);
+        super(blockchain, minerAddress, miningFeePerByte);
 
         this.WORKER_NONCES_WORK = 700;
 
@@ -66,7 +66,7 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
         return promiseResolve;
     }
 
-    async mine(block, difficulty, start, end){
+    async mine(block, difficulty, start, end,){
 
         this.block = block;
         this.difficulty = difficulty;
@@ -75,14 +75,22 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
         this.bestHash = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
         this.bestHashNonce = -1;
 
-        if (this._workers.haveSupport()) {
+        // multi threading
+        if (this._workers.haveSupport())
             return await this._mineNoncesWithWorkers(start, end);
-        }
 
+        // solo
         return await this._mineNonces(start, start + this.WORKER_NONCES_WORK);
 
     }
 
+    stopMining(){
+
+        InterfaceBlockchainMining.prototype.stopMining.call(this);
+
+        this._workers.stopMining();
+
+    }
 
 }
 

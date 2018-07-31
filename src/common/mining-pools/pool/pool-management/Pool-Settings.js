@@ -8,6 +8,7 @@ import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import Blockchain from "main-blockchain/Blockchain";
 import ed25519 from "common/crypto/ed25519";
 import StatusEvents from "common/events/Status-Events";
+import Log from 'common/utils/logging/Log';
 
 class PoolSettings {
 
@@ -55,28 +56,29 @@ class PoolSettings {
     
   printPoolSettings(showPoolPrivateKey=false){
   
-      console.log("Fee: ", this._poolFee);
-      console.log("Referral Fee: ", this._poolReferralFee);
+      Log.info("Fee: " + this._poolFee, Log.LOG_TYPE.POOLS);
+      Log.info("Referral Fee: " + this._poolReferralFee, Log.LOG_TYPE.POOLS);
 
-      console.log("Name: ", this._poolName);
-      console.log("Website: ", this._poolWebsite);
+      Log.info("Name: " + this._poolName, Log.LOG_TYPE.POOLS);
+      Log.info("Website: " + this._poolWebsite, Log.LOG_TYPE.POOLS);
 
       let poolServersStr = "";
       for (let i = 0; i < this._poolServers.length; i++)
           poolServersStr += this._poolServers[i] + ", ";
 
-      console.log("Servers: {" + poolServersStr + "}");
+      Log.info("Servers: {" + poolServersStr + "}");
 
-      console.log("POWValidationProbability: ", this._poolPOWValidationProbability);
-      console.log("UsePoolServers: ", this._poolUsePoolServers);
+      Log.info("POWValidationProbability: " + this._poolPOWValidationProbability, Log.LOG_TYPE.POOLS );
+      Log.info("UsePoolServers: " + this._poolUsePoolServers, Log.LOG_TYPE.POOLS );
+      Log.info("UsePoolSignatures: " + this._poolUseSignatures, Log.LOG_TYPE.POOLS );
 
       if (showPoolPrivateKey)
-        console.log("PrivateKey: ", this._poolPrivateKey.toString("hex"));
+          Log.info("PrivateKey: " + this._poolPrivateKey.toString("hex"), Log.LOG_TYPE.POOLS );
 
-      console.log("PublicKey: ", this.poolPublicKey.toString("hex"));
-      console.log("Address: ", this.poolAddress.toString("hex"));
-      console.log("URL: ", this.poolURL);
-      console.log("Activated: ", this._poolActivated);
+      Log.info("PublicKey: " + this.poolPublicKey.toString("hex"), Log.LOG_TYPE.POOLS );
+      Log.info("Address: " + this.poolAddress.toString("hex"), Log.LOG_TYPE.POOLS );
+      Log.info("URL: " +this.poolURL, Log.LOG_TYPE.POOLS );
+      Log.info("Activated: " + this._poolActivated, Log.LOG_TYPE.POOLS );
  }
 
     _generatePoolURL(){
@@ -89,7 +91,7 @@ class PoolSettings {
         let servers = this.poolServers.join(";");
         servers = servers.replace(/\//g, '$' );
 
-        let poolName = this.poolName.replace(" ","_");
+        let poolName = this.poolName.replace(/ /g,"_");
 
         this.poolURL =  ( process.env.BROWSER ? window.location.origin : 'http://webdollar.ddns.net:9094' ) +'/pool/1/'+encodeURI(poolName)+"/"+encodeURI(this.poolFee)+"/"+encodeURI(this.poolPublicKey.toString("hex"))+"/"+encodeURI(servers);
         StatusEvents.emit("pools/settings", { message: "Pool Settings were saved", poolName: this._poolName, poolServer: this._poolServers, poolFee: this._poolFee, poolWebsite: this._poolServers });
@@ -337,6 +339,7 @@ class PoolSettings {
 
         let poolActivated = await this._db.get("pool_activated", 30*1000, true);
         if (poolActivated === null) poolActivated = false;
+        poolActivated = false;
 
         if (poolActivated === "true") poolActivated = true;
         else if (poolActivated === "false") poolActivated = false;
@@ -351,6 +354,9 @@ class PoolSettings {
         if (poolUseSignatures === "true") poolUseSignatures = true;
         else if (poolUseSignatures === "false") poolUseSignatures = false;
         else if (poolUseSignatures === null) poolUseSignatures = true;
+
+        if (!poolUsePoolServers)
+            poolUseSignatures = false;
 
         let poolReferralFee = await this._db.get("pool_referral_fee",  30*1000, true);
         if (poolReferralFee === null) poolReferralFee = 0.05; // 5%

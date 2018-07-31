@@ -89,10 +89,18 @@ class ServerPoolManagement{
             await this.serverPoolSettings.setServerPoolActivated(value);
 
             if (value){
+
+                if (this.blockchain !== undefined &&  this.blockchain.prover !== undefined)
+                    this.blockchain.prover.proofActivated = false;
+
                 await this.serverPoolProtocol._startServerPoolProtocol();
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_SERVER;
             }
             else {
+
+                if (this.blockchain !== undefined && this.blockchain.prover !== undefined)
+                    this.blockchain.prover.proofActivated = true;
+
                 await this.serverPoolProtocol._stopServerPoolProtocol();
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
             }

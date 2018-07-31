@@ -11,9 +11,8 @@ class InterfaceBlockchainTransactionsWizard{
 
     }
 
-    async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
 
-        if (fee === undefined) fee = this.calculateFeeSimple(toAmount);
+    async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
 
         try {
 
@@ -58,10 +57,10 @@ class InterfaceBlockchainTransactionsWizard{
                 toAmountTotal = toAmount;
 
                 to = {
-                        addresses: [{
-                            unencodedAddress: toAddress,
-                            amount: toAmount
-                        },
+                    addresses: [{
+                        unencodedAddress: toAddress,
+                        amount: toAmount
+                    },
                     ]};
 
             } else if (Array.isArray(toAddress)) {
@@ -85,7 +84,7 @@ class InterfaceBlockchainTransactionsWizard{
                     {
                         unencodedAddress: address,
                         publicKey: undefined,
-                        amount: toAmountTotal + fee
+                        amount: toAmountTotal + (fee||0)
                     }
                 ],
                 currencyTokenId: currencyTokenId
@@ -110,9 +109,15 @@ class InterfaceBlockchainTransactionsWizard{
             console.error("Creating a new transaction raised an exception - Failed Creating a transaction", exception);
 
             if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
+
             return { result:false,  message: "Failed Creating a transaction", reason: exception }
         }
 
+
+        if (fee === undefined) {
+            fee = this.calculateFeeWizzard( transaction.serializeTransaction(true)) ;
+            transaction.from.addresses[0].amount += fee;
+        }
 
         let signature;
         try{
@@ -155,17 +160,26 @@ class InterfaceBlockchainTransactionsWizard{
         return {
             result: true,
             message: "Your transaction is pending...",
-            signature: signature
+            signature: signature,
+            transaction: transaction,
         }
+
     }
 
-    calculateFeeSimple(toAmount){
+    calculateFeeWizzard(serialization, webdPerByte){
 
-        if (toAmount < 0)
-            return 0;
+        if (webdPerByte === undefined)
+            webdPerByte = consts.MINING_POOL.MINING.FEE_PER_BYTE;
 
-        return  consts.MINING_POOL.MINING.FEE_THRESHOLD;
+        let factor = Math.trunc( serialization.length / 200) + 1;
+        webdPerByte = factor * Math.max(1, Math.floor( Math.log2( webdPerByte) ));
 
+        return serialization.length * webdPerByte;
+
+    }
+
+    calculateFeeSimple(){
+        return this.calculateFeeWizzard( new Buffer(141) );
     }
 
 }

@@ -1,5 +1,6 @@
 import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
 import NodesList from 'node/lists/Nodes-List'
+import PoolProtocolList from "../../../common/Pool-Protocol-List";
 
 class PoolDataConnectedMinerInstances extends PoolProtocolList{
     
@@ -15,11 +16,11 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
     startPoolDataConnectedMinerInstances(){
         if (this._deleteUnresponsiveMinersInterval === undefined)
-            this._deleteUnresponsiveMinersInterval = setInterval( this._deleteUnresponsiveMiners.bind(this), 20000 );
+            this._deleteUnresponsiveMinersInterval = setTimeout( this._deleteUnresponsiveMiners.bind(this), 20000 );
     }
 
     stopPoolDataConnectedMinerInstances(){
-        clearInterval(this._deleteUnresponsiveMinersInterval);
+        clearTimeout(this._deleteUnresponsiveMinersInterval);
         this._deleteUnresponsiveMinersInterval = undefined;
     }
 
@@ -27,18 +28,22 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
         let time = new Date().getTime()/1000;
 
-        for (let i=this.connectedMinerInstances.length-1; i>=0; i--)
-            if (time - this.connectedMinerInstances[i].miner.dateActivity > 240){ //4 minutes
+        for (let i = this.connectedMinerInstances.length - 1; i >= 0; i--)
+            if (time - this.connectedMinerInstances[i].dateActivity > 480) { //8 minutes
 
-                if ( !this.poolManagement.poolSettings.poolUsePoolServers )
-                    this.connectedMinerInstances[i].socket.disconnect();
+                try {
+                    if (!this.poolManagement.poolSettings.poolUsePoolServers)
+                        this.connectedMinerInstances[i].socket.disconnect();
+                } catch (exception){
+
+                }
 
                 this.connectedMinerInstances.splice(i, 1);
             }
 
+
+        setTimeout( this._deleteUnresponsiveMiners.bind(this), 20000 );
     }
-
-
 
     findElementBySocket(socket){
 

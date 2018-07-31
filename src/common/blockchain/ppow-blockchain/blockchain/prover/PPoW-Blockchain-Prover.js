@@ -153,9 +153,8 @@ class PPoWBlockchainProver{
         if ( !this.proofActivated )
             return false;
 
-        if (this.proofPi !== undefined){
+        if (this.proofPi !== undefined)
             this.proofPi.destroyProof();
-        }
 
         this.proofPi = await this._createProofPi(this.blockchain);
 

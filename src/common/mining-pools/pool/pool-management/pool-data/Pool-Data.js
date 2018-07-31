@@ -28,7 +28,7 @@ class PoolData {
 
     async initializePoolData(){
 
-        await this._loadPoolData();
+        return await this._loadPoolData();
 
     }
 
@@ -127,8 +127,7 @@ class PoolData {
         if (index === -1) return false; //miner doesn't exists
 
         this.blocksInfo[index].destroyPoolDataBlockInformation(  );
-        this.blocksInfo[index] = this.blocksInfo[this.blocksInfo.length-1];
-        this.blocksInfo.pop();
+        this.blocksInfo.splice(index, 1);
 
         return true;
     }
@@ -176,7 +175,7 @@ class PoolData {
 
         try {
 
-            let numMiners = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
+            let numMiners = Serialization.deserializeNumber4Bytes( buffer, offset );
             offset += 4;
 
             this.miners = [];
@@ -213,18 +212,18 @@ class PoolData {
         return Buffer.concat(list);
     }
 
-    _deserializeBlockInformation(buffer, offset = 0){
+    async _deserializeBlockInformation(buffer, offset = 0){
 
         try {
 
-            let numBlocksInformation = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
+            let numBlocksInformation = Serialization.deserializeNumber4Bytes( buffer, offset, );
             offset += 4;
 
             this.blocksInfo = [];
             for (let i = 0; i < numBlocksInformation && offset < buffer.length; i++) {
 
                 let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, Blockchain.blockchain.blocks.length );
-                offset = blockInformation.deserializeBlockInformation(buffer, offset );
+                offset = await blockInformation.deserializeBlockInformation(buffer, offset );
 
                 if (blockInformation.blockInformationMinersInstances.length > 0) {
                     this.blocksInfo.push(blockInformation);
@@ -286,7 +285,7 @@ class PoolData {
             let buffer = await this._db.get("blocksInformation", 60000, true);
 
             if (buffer !== null) {
-                let response = this._deserializeBlockInformation(buffer);
+                let response = await this._deserializeBlockInformation(buffer);
 
                 if (response !== true) {
                     console.log('Unable to load miners from DB');
@@ -418,7 +417,7 @@ class PoolData {
     _clearEmptyMiners(){
 
         // for (let i=this.miners.length-1; i>=0; i--)
-        //     if ( this.miners[i].referrals.array.length === 0 && this.miners[i].referrals.referralLinkMiner !== undefined &&
+        //     if ( this.miners[i].referrals.referees.length === 0 && this.miners[i].referrals.referralLinkMiner !== undefined &&
         //         (this.miners[i].rewardTotal + this.miners[i].rewardConfirmed + this.miners[i].rewardConfirmedOther + this.miners[i].rewardSent + this.miners[i].referrals.rewardReferralsSent + this.miners[i].referrals.rewardReferralsConfirmed + this.miners[i].referrals.rewardReferralsTotal ) === 0) {
         //
         //

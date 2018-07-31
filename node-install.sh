@@ -44,11 +44,11 @@ function checkroot(){
 	fi
 }
 ####
-checkroot
+#checkroot
 
 ### GENERAL VARS
-getiptpersist=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "1"; fi fi)
-getgit=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(apt-cache policy git | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "$(yum list git | grep -o Installed)"; fi fi)
+getiptpersist=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then echo "$(sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "1"; fi fi fi)
+getgit=$(if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then echo "$(sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then echo "$(sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}')"; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then echo "$(yum list git | grep -o Installed)"; fi fi fi)
 ###
 
 #### Dependencies START
@@ -57,7 +57,7 @@ if [[ "$getiptpersist" == "(none)" ]]; then
 	echo "$showinfo We need to install IPtables Persistent"
 	echo "$showinfo When asked, press YES to save your current IPtables settings."
 	echo "$showinfo IPtables Persistent keeps your IPT rules after a REBOOT."
-	if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y iptables-persistent; fi
+	if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y iptables-persistent; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get install -y iptables-persistent; fi fi
 else
 	if [[ "$getiptpersist" == 1 ]]; then
 		echo "$showok IPtables Persistent is not available for CentOS"
@@ -70,7 +70,7 @@ fi
 
 if [[ "$getgit" == "(none)" ]]; then
 	echo "$showinfo We need to install Git"
-	if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y git; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum install -y git; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y git; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get install -y git; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum install -y git; fi fi fi
 else
 
 	if [[ "$getgit" == Installed ]]; then
@@ -86,14 +86,14 @@ fi
 
 deps # call deps function
 
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt update; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum update; fi fi
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt upgrade; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum upgrade; fi fi
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo sudo apt install -y linuxbrew-wrapper; fi
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo sudo apt install -y build-essential; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum group install -y "Development Tools"; fi fi
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y clang; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then yum install -y clang; fi fi
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && apt install -y nodejs; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash - && sudo yum -y install nodejs; fi fi
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo npm install -g node-gyp; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then npm install -g node-gyp; fi fi
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo npm install pm2 -g --unsafe-perm; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then sudo npm install pm2 -g --unsafe-perm ; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt update; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get update; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then sudo yum update; fi fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt upgrade; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get upgrade; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then sudo yum upgrade; fi fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y linuxbrew-wrapper; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get install -y linuxbrew-wrapper; fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y build-essential; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get install -y build-essential; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then sudo yum group install -y "Development Tools"; fi fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo apt install -y clang; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo apt-get install -y clang; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then sudo yum install -y clang; fi fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then if [[ ! $(node -v) ]]; then curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && sudo apt install -y nodejs; else if [[ $(node -v) ]]; then echo "$showok node is already installed!"; fi fi else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then if [[ ! $(node -v) ]]; then curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && sudo apt install -y nodejs; else if [[ $(node -v) ]]; then echo "$showok node is already installed!"; fi fi else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash - && sudo yum -y install nodejs; fi fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo npm install -g node-gyp; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo npm install -g node-gyp; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then npm install -g node-gyp; fi fi fi
+if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo npm install pm2 -g --unsafe-perm; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo npm install pm2 -g --unsafe-perm; else if [[ $(cat /etc/*release | grep -o -m 1 centos) ]]; then sudo npm install pm2 -g --unsafe-perm ; fi fi fi
 
 function ftconfig()
 {
@@ -119,21 +119,24 @@ read -e -p "$showinput How many nodes do you want to deploy? " readnrofnodes ###
 		echo "$showerror Empty space is not a number."
 		ftconfig
 
+	elif [[ "$readnrofnodes" =~ ^[[:digit:]]+$ ]]; then
+
+		for ((nodes=1; nodes<=$readnrofnodes; nodes++));
+		do
+			if [[ ! -d Node-WebDollar1 ]]; then
+				git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar$nodes
+				cd Node-WebDollar$nodes && npm install && cd ..
+				echo "$showok Node-WebDollar$nodes Deployed successfully!"
+			else
+				echo "$showwarn Node-WebDollar1 is already deployed!"
+			fi
+		done
+
 	elif [[ "$readnrofnodes" == * ]]; then
 
 		echo "$showerror Only numbers are accepted."
 		ftconfig
-else
-	if [[ "$readnrofnodes" =~ ^[[:digit:]]+$ ]]; then
 
-		for ((nodes=1; nodes<=$readnrofnodes; nodes++));
-		do
-			git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar$nodes
-			cd Node-WebDollar$nodes && npm install && cd ..
-			echo "$showok Node-WebDollar$nodes Deployed successfully!"
-
-		done
-	fi
 fi
 
 echo "$showinfo Don't forget to FORWARD PORTS on your router!"

@@ -9,9 +9,9 @@ import consts from 'consts/const_global'
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
 
-    constructor(blockchain, minerAddress, miningFeeThreshold){
+    constructor(blockchain, minerAddress, miningFeePerByte){
 
-        super(blockchain, minerAddress, miningFeeThreshold);
+        super(blockchain, minerAddress, miningFeePerByte);
 
         this._workerFinished = false;
 

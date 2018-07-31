@@ -1,6 +1,7 @@
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
 import consts from "consts/const_global"
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 class PoolDataMinerReferral {
 
@@ -106,6 +107,18 @@ class PoolDataMinerReferral {
         return this._rewardReferralSent;
     }
 
+    toJSON(){
+
+        return {
+            total: Math.floor( this._rewardReferralTotal ),
+            confirmed: Math.floor( this._rewardReferralConfirmed ),
+            sent: Math.floor( this._rewardReferralSent  ),
+
+            address: this.refereeAddress !== undefined ? InterfaceBlockchainAddressHelper.generateAddressWIF(this.refereeAddress, false, true) : '',
+            online: this.refereeMiner !== undefined  ? this.refereeMiner.isOnline : undefined,
+        }
+
+    }
 
 }
 

@@ -245,7 +245,7 @@ class NodesList {
     disconnectAllNodes(connectionType = CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET){
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if ( this.nodes[i].socket.node.protocol.connectionType === connectionType )
+            if ( this.nodes[i].socket.node.protocol.connectionType === connectionType || connectionType === "all" )
                 this.nodes[i].socket.disconnect();
 
     }

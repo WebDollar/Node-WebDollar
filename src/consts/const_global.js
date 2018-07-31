@@ -1,6 +1,7 @@
 const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 const BigNumber = require('bignumber.js');
+const BigInteger = require('big-integer');
 
 let consts = {
 
@@ -24,6 +25,7 @@ consts.BLOCKCHAIN = {
 
     BLOCKS_POW_LENGTH: 32,
     BLOCKS_MAX_TARGET: new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
+    BLOCKS_MAX_TARGET_BIG_INTEGER: new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16),
     BLOCKS_MAX_TARGET_BUFFER: Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex"),
     BLOCKS_NONCE : 4,
 
@@ -109,7 +111,7 @@ consts.SPAM_GUARDIAN = {
 
     TRANSACTIONS:{
         MAXIMUM_IDENTICAL_INPUTS: 10,
-        MAXIMUM_IDENTICAL_OUTPUTS: 500,
+        MAXIMUM_IDENTICAL_OUTPUTS: 255,
     }
 
 };
@@ -214,7 +216,8 @@ consts.MINING_POOL = {
     MINING_POOL_STATUS : (process.env.MINING_POOL_STATUS || consts.MINING_POOL_TYPE.MINING_POOL_DISABLED),
 
     MINING:{
-        FEE_THRESHOLD: 100000,
+        MINING_POOL_MINIMUM_PAYOUT: 200000,
+        FEE_PER_BYTE: 600, // in WEBD
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
 
@@ -234,8 +237,8 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.160.5",
-        VERSION_COMPATIBILITY: "1.160.0",
+        VERSION: "1.165.0",
+        VERSION_COMPATIBILITY: "1.162.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -244,6 +247,8 @@ consts.SETTINGS = {
         SSL: true,
 
         PORT: 80, //port
+        MINER_POOL_PORT: 8086, //port
+
     },
 
     PARAMS: {
@@ -355,16 +360,55 @@ consts.SETTINGS = {
     MEM_POOL : {
 
         TIME_LOCK : {
-            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
-        }
+            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: 2 * consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
+        },
+
+        MAXIMUM_TRANSACTIONS_TO_DOWNLOAD: 100,
 
     }
 };
 
 consts.TERMINAL_WORKERS = {
-    SILENT: true, // make it false to see their output (console.log's, errors, ..)
+
+    // file gets created on build
+    CPU_WORKER_NONCES_WORK: 700,  //per seconds
+
+    CPU_CPP_WORKER_NONCES_WORK: 20000,  //per second
+    CPU_CPP_WORKER_NONCES_WORK_BATCH: 500,  //per second
+
+    //NONCES_WORK should be way bigger than WORK_BATCHES
+
+
+    //TODO
+    GPU_WORKER_NONCES_WORK: 20000, //per blocks, should be batches x 10 seconds
+    GPU_WORKER_NONCES_WORK_BATCH: 200, //per blocks
+
+    /**
+     * cpu
+     * cpu-cpp
+     * gpu
+     */
+    TYPE: "cpu", //cpu-cpp
+
+    // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
-    MAX: 0, // if 0 then it defaults to Math.floor(OS.cpus().length / 2) || 1
+    PATH_CPP: './dist_bundle/CPU/argon2-bench2',
+    PATH_GPU: './dist_bundle/GPU/argon2-gpu-test',
+
+    GPU_MODE: "opencl", //opencl
+    GPU_MAX: 1,
+    GPU_INSTANCES: 1,
+
+    // make it false to see their output (console.log's, errors, ..)
+    SILENT: true,
+
+    // -1 disables multi-threading.
+    //  0 defaults to number of cpus / 2.
+    //
+    //  Threading isn't used:
+    //  - if it detects only 1 cpu.
+    //  - if you use 0 and u got only 2 cpus.
+    CPU_MAX: 0, //for CPU-CPP use, 2x or even 3x threads
 };
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
@@ -378,15 +422,15 @@ if ( consts.DEBUG === true ){
 
     consts.SETTINGS.NODE.VERSION = "3"+consts.SETTINGS.NODE.VERSION;
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "3"+consts.SETTINGS.NODE.VERSION_COMPATIBILITY;
-    //consts.SETTINGS.NODE.SSL = false;
+    consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 8085;
+    consts.SETTINGS.NODE.PORT = 8082;
 
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://webdollar.ddns.net:9095"],
+        "addr": ["http://127.0.0.1:8085"],
     }];
 
 

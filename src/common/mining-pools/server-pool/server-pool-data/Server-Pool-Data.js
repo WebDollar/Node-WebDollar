@@ -85,7 +85,7 @@ class ServerPoolData {
 
         try {
 
-            let numPools = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 ) );
+            let numPools = Serialization.deserializeNumber4Bytes( buffer, offset, );
             offset += 4;
 
             this.miners = [];

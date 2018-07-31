@@ -199,6 +199,17 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         return answer;
     }
 
+    async _validateFork(validateHashesAgain, firstValidation, validateChainWork = true ){
+
+        if (this.blockchain.blocks.blocksStartingPoint >= this.forkStartingHeight)
+            validateChainWork = true;
+        else
+            validateChainWork = false;
+
+        return MiniBlockchainFork.prototype._validateFork.call(this, validateHashesAgain, firstValidation, validateChainWork);
+
+    }
+
 }
 
 export default MiniBlockchainLightFork

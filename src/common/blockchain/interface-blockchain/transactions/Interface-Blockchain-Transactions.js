@@ -1,5 +1,5 @@
 import consts from 'consts/const_global'
-import InterfaceTransactionsPendingQueue from './pending/Interface-Transactions-Pending-Queue'
+import TransactionsPendingQueue from './pending/Transactions-Pending-Queue'
 import InterfaceTransaction from "./transaction/Interface-Blockchain-Transaction"
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainTransactionsWizard from "./wizard/Interface-Blockchain-Transactions-Wizard";
@@ -16,7 +16,7 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         let db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.TRANSACTIONS_DATABASE);
 
         //the Queue is an inverted Queue, because elements are added at the end of the List (queue)
-        this.pendingQueue = new InterfaceTransactionsPendingQueue(this, blockchain, db);
+        this.pendingQueue = new TransactionsPendingQueue(this, blockchain, db);
 
         this.wizard = new InterfaceBlockchainTransactionsWizard(this, blockchain, wallet);
     }

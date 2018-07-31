@@ -8,7 +8,7 @@ import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-
 
 class InterfaceBlockchainMiningBasic {
 
-    constructor(blockchain, minerAddress, miningFeeThreshold){
+    constructor(blockchain, minerAddress, miningFeePerByte){
 
         this._minerAddress = undefined;
         this._unencodedMinerAddress = undefined;
@@ -18,8 +18,8 @@ class InterfaceBlockchainMiningBasic {
         if (minerAddress !== undefined)
             this.minerAddress = minerAddress;
 
-        if (miningFeeThreshold === undefined) miningFeeThreshold = consts.MINING_POOL.MINING.FEE_THRESHOLD;
-        this.miningFeeThreshold = miningFeeThreshold;
+        if (miningFeePerByte === undefined) miningFeePerByte = consts.MINING_POOL.MINING.FEE_PER_BYTE;
+        this.miningFeePerByte = miningFeePerByte;
 
         this._nonce = 0;
         this.started = false;
@@ -32,6 +32,7 @@ class InterfaceBlockchainMiningBasic {
         this.useResetConsensus = true;
 
         this.resetForced = false;
+        this._avoidShowingZeroHashesPerSecond = false;
     }
 
     get minerAddress(){
@@ -46,12 +47,12 @@ class InterfaceBlockchainMiningBasic {
         return this._setAddress(newAddress, true)
     }
 
-    set miningFeeThreshold(newFee){
-        this._miningFeeThreshold = newFee;
+    set miningFeePerByte(newFee){
+        this._miningFeePerByte = newFee;
     }
 
-    get miningFeeThreshold(){
-        return this._miningFeeThreshold;
+    get miningFeePerByte(){
+        return this._miningFeePerByte;
     }
 
     _setAddress(newAddress, save = true){
@@ -174,8 +175,11 @@ class InterfaceBlockchainMiningBasic {
 
         this._intervalMiningOutput = setInterval(() => {
 
-            if (typeof this._hashesPerSecond === "number")
-                console.log( this._hashesPerSecond+ " hashes/s");
+            if (typeof this._hashesPerSecond === "number") {
+
+                if (! this._avoidShowingZeroHashesPerSecond || this._hashesPerSecond !== 0 )
+                    console.log(this._hashesPerSecond + " hashes/s");
+            }
 
             StatusEvents.emit("mining/hash-rate", this._hashesPerSecond );
 

@@ -23,6 +23,7 @@ class MinerPoolSettings {
         this.poolsList = {};
 
         this.poolName = "";
+        this.poolAddress = "";
         this.poolFee = 0;
         this.poolReferralFee = 0;
         this.poolWebsite = "";
@@ -64,7 +65,7 @@ class MinerPoolSettings {
         if (url.indexOf("/r/", url) >= 0)
             url = url.substr(0, url.indexOf("/r/", url));
 
-        this.poolURLReferral =  ( process.env.BROWSER ? window.location.origin : "https://webdollar.ddns.net:9094"  ) + "/pool/"+url +"/r/"+encodeURI(Blockchain.Mining.minerAddress.replace("#", "%23"));
+        this.poolURLReferral =  ( process.env.BROWSER ? window.location.origin : "https://webdollar.ddns.net:9094"  ) + "/pool/"+url +"/r/"+encodeURI(Blockchain.Mining.minerAddress.replace(/#/g, "%23"));
 
         StatusEvents.emit("miner-pool/referral-url",   { poolURLReferral: this.poolURLReferral });
     }
@@ -136,6 +137,8 @@ class MinerPoolSettings {
         else if (poolMinerActivated === "false") poolMinerActivated = false;
         else if (poolMinerActivated === null) poolMinerActivated = false;
 
+        poolMinerActivated = false;
+
         PoolsUtils.validatePoolActivated(poolMinerActivated);
 
 
@@ -199,7 +202,7 @@ class MinerPoolSettings {
         if (!skipSaving)
             if (false === await this._db.save("minerPool_activated", this._minerPoolActivated ? "true" : "false")) throw {message: "minerPoolActivated couldn't be saved"};
 
-        StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
+        StatusEvents.emit("miner-pool/settings",   { poolURL: this._poolURL, poolAddress: this.poolAddress, poolName: this.poolName, poolFee: this.poolFee, poolWebsite: this.poolWebsite, poolServers: this.poolServers, minerPoolActivated: this._minerPoolActivated });
 
         if (useActivation)
             await this.minerPoolManagement.setMinerPoolStarted(newValue, true);

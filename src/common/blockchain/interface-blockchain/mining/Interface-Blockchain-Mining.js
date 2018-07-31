@@ -21,9 +21,9 @@ import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
-    constructor (blockchain, minerAddress, miningFeeThreshold){
+    constructor (blockchain, minerAddress, miningFeePerByte){
 
-        super(blockchain, minerAddress, miningFeeThreshold);
+        super(blockchain, minerAddress, miningFeePerByte);
 
         this.miningTransactionSelector = new MiningTransactionsSelector(blockchain);
 
@@ -44,7 +44,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         try {
 
-            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeeThreshold);
+            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte);
 
             nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 

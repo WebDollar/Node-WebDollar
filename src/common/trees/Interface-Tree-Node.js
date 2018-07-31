@@ -112,6 +112,7 @@ class InterfaceTreeNode {
 
                 //1 byte
                 let length = Serialization.deserializeNumber1Bytes(buffer, offset);
+                offset += 1;
 
                 for (let i = 0; i < length; i++) {
 

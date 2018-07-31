@@ -144,47 +144,46 @@ class CLI {
 
     async listAddresses() {
 
-        await this._callCallbackBlockchainSync(async ()=>{
 
-            console.info('\nWallet addresses:');
+        console.warn("INFO: YOU NEED TO BE SYNC TO SEE THE VALUE OF YOUR WALLET!!!");
+        console.info('\nWallet addresses:');
 
-            let miningAddress = Blockchain.blockchain.mining.minerAddress;
-            if (miningAddress === undefined)
-                miningAddress = 'not specified';
+        let miningAddress = Blockchain.blockchain.mining.minerAddress;
+        if (miningAddress === undefined)
+            miningAddress = 'not specified';
 
-            console.log(addressHeader);
-            for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
+        console.log(addressHeader);
+        for (let i = 0; i < Blockchain.Wallet.addresses.length; ++i) {
 
-                let address = Blockchain.Wallet.addresses[i].address;
+            let address = Blockchain.Wallet.addresses[i].address;
 
-                let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
+            let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
 
-                balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+            balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
 
-                if (address === miningAddress) {
-                    console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
-                } else {
-                    console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
-                }
+            if (address === miningAddress) {
+                console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
+            } else {
+                console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
             }
+        }
 
-            let balance = 0;
-            if (miningAddress !== 'not specified') {
-                balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
-                balance = (balance === null) ? 0 : balance;
+        let balance = 0;
+        if (miningAddress !== 'not specified') {
+            balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
+            balance = (balance === null) ? 0 : balance;
 
-                if (Blockchain.MinerPoolManagement.minerPoolStarted)
-                    balance += Blockchain.MinerPoolManagement.minerPoolReward.total;
+            if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
+                balance += Blockchain.MinerPoolManagement.minerPoolReward.total;
 
-                balance /= WebDollarCoins.WEBD;
+            balance /= WebDollarCoins.WEBD;
 
 
-            }
-            console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
+        }
+        console.log( "| MINING|  " + miningAddress + "  | " + balance + lineSeparator);
 
-            return true;
+        return true;
 
-        }, undefined, undefined, true);
     }
 
     async createNewAddress() {
@@ -295,7 +294,7 @@ class CLI {
                     return;
                 }
 
-                console.log("Address successfully exported", addressString);
+                console.log("Address successfully exported", addressString, '   to ', addressPath+fileNam);
                 resolve(true);
                 return;
 
@@ -366,38 +365,48 @@ class CLI {
 
     async startMiningInsidePool(){
         
-        console.info('Mining inside a POOL');
+        Log.info('Mining inside a POOL', Log.LOG_TYPE.POOLS);
+
+        consts.SETTINGS.NODE.PORT = consts.SETTINGS.NODE.MINER_POOL_PORT;
 
         await this._callCallbackBlockchainSync(async ()=>{
 
-            let getNewLink = true;
+            try {
 
-            if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== ''){
+                let getNewLink = true;
 
-                console.info('Your current mining pool is: ', Blockchain.MinerPoolManagement.minerPoolSettings.poolName," ", Blockchain.MinerPoolManagement.minerPoolSettings.poolWebsite );
-                let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool: '+Blockchain.MinerPoolManagement.minerPoolSettings.poolURL);
+                if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== '') {
 
-                if (response === true) getNewLink = false;
+                    Log.info('Your current mining pool is: ' + Blockchain.MinerPoolManagement.minerPoolSettings.poolName +" " +Blockchain.MinerPoolManagement.minerPoolSettings.poolWebsite, Log.LOG_TYPE.error);
+                    let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool: ' + Blockchain.MinerPoolManagement.minerPoolSettings.poolURL);
+
+                    if (response === true) getNewLink = false;
+
+                }
+
+                let miningPoolLink = undefined;
+
+                if (getNewLink) {
+
+                    miningPoolLink = await AdvancedMessages.input('Enter the new mining pool link: ');
+                    Log.info('Your new MiningPool is : ' + miningPoolLink, Log.LOG_TYPE.info);
+
+                }
+
+                StatusEvents.on("miner-pool/connection-established", (data) => {
+                    if (data.connected)
+                        Blockchain.Mining.startMining();
+                    else
+                        Blockchain.Mining.stopMining();
+                });
+
+                Blockchain.MinerPoolManagement.startMinerPool(miningPoolLink, true);
+
+            } catch (exception){
+
+                Log.error("There is a problem starting to mine in this pool", Log.LOG_TYPE.POOLS, exception);
 
             }
-
-            let miningPoolLink = undefined;
-
-            if (getNewLink) {
-
-                miningPoolLink = await AdvancedMessages.input('Enter the new mining pool link: ');
-                console.info('Your new MiningPool is : ', miningPoolLink);
-
-            }
-
-            StatusEvents.on("miner-pool/connection-established",(data)=>{
-                if (data.connected)
-                    Blockchain.Mining.startMining();
-                else
-                    Blockchain.Mining.stopMining();
-            });
-
-            Blockchain.MinerPoolManagement.startMinerPool( miningPoolLink, true );
 
         }, undefined, undefined, false);
 
@@ -405,71 +414,78 @@ class CLI {
 
     async createMiningPool(){
 
-        console.info('Create Mining Pool');
+        Log.info('Create Mining Pool', Log.LOG_TYPE.info );
 
         await this._callCallbackBlockchainSync( async ()=>{
 
-            await Blockchain.PoolManagement.setPoolStarted(false);
+            try{
 
-            let getNewLink = true;
+                await Blockchain.PoolManagement.setPoolStarted(false);
 
-            console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
+                let getNewLink = true;
 
-            if (typeof Blockchain.PoolManagement.poolSettings.poolURL === "string" && Blockchain.PoolManagement.poolSettings.poolURL !== ''){
+                Log.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.', Log.LOG_TYPE.info);
 
-                console.info('You have some settings for a pool: ', Blockchain.PoolManagement.poolSettings.poolName," ", Blockchain.PoolManagement.poolSettings.poolWebsite );
-                let response = await AdvancedMessages.confirm('Do you want to continue using the settings for : '+Blockchain.PoolManagement.poolSettings.poolURL);
+                if (typeof Blockchain.PoolManagement.poolSettings.poolURL === "string" && Blockchain.PoolManagement.poolSettings.poolURL !== ''){
 
-                if (response === true) getNewLink = false;
+                    console.info('You have some settings for a pool: ', Blockchain.PoolManagement.poolSettings.poolName," ", Blockchain.PoolManagement.poolSettings.poolWebsite );
+                    let response = await AdvancedMessages.confirm('Do you want to continue using the settings for : '+Blockchain.PoolManagement.poolSettings.poolURL);
+
+                    if (response === true) getNewLink = false;
+                }
+
+                if (getNewLink){
+
+                    let poolFee, poolReferralFee, poolName, poolWebsite, poolServers;
+
+
+                    poolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
+
+                    if (isNaN(poolFee) || poolFee < 0 || 100 < poolFee){
+                        Log.error("You have entered an invalid number: " + poolFee, Log.LOG_TYPE.POOLS);
+                        return false;
+                    }
+                    else
+                        Log.info("Your fee is "+poolFee, Log.LOG_TYPE.POOLS);
+
+                    poolName = await AdvancedMessages.input('Pool Name: ');
+                    poolWebsite = await AdvancedMessages.input('Pool Website: ');
+
+                    poolReferralFee = await AdvancedMessages.readNumber("Choose a Referral fee (0...100): ", true);
+                    if (isNaN(poolReferralFee) || poolReferralFee < 0 || 100 < poolReferralFee){
+                        Log.error("You have entered an invalid number:" + poolReferralFee, Log.LOG_TYPE.POOLS);
+                        return false;
+                    }
+                    else
+                        Log.warn("Your Referral fee is: " + poolReferralFee, Log.LOG_TYPE.POOLS );
+
+                    let response = await AdvancedMessages.confirm('Do you want to use external pool servers?: ');
+
+                    if (response){
+                        poolServers = await AdvancedMessages.input('Pool Servers (separated by comma): ');
+                        await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( true ) ;
+                    } else {
+                        poolServers = await NodeServer.getServerHTTPAddress(true);
+                        await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( false ) ;
+                        await Blockchain.PoolManagement.poolSettings.setPoolUseSignatures( false ) ;
+                    }
+
+
+                    if (poolFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
+                    if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
+                    if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
+                    if (poolServers !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
+                    if (poolReferralFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolReferralFee(poolReferralFee / 100);
+
+                }
+
+                await Blockchain.PoolManagement.startPool(true);
+
+            } catch (exception){
+
+                Log.error("Error starting your pool", Log.LOG_TYPE.POOLS, exception);
+
             }
-
-            if (getNewLink){
-
-                let poolFee, poolReferralFee, poolName, poolWebsite, poolServers;
-
-
-                poolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
-
-                if (isNaN(poolFee) || poolFee < 0 || 100 < poolFee){
-                    console.log("You have entered an invalid number:", poolFee);
-                    return false;
-                }
-                else
-                    console.log("Your fee is", poolFee);
-
-                poolName = await AdvancedMessages.input('Pool Name: ');
-                poolWebsite = await AdvancedMessages.input('Pool Website: ');
-
-                poolReferralFee = await AdvancedMessages.readNumber("Choose a Referral fee (0...100): ", true);
-                if (isNaN(poolReferralFee) || poolReferralFee < 0 || 100 < poolReferralFee){
-                    console.log("You have entered an invalid number:", poolReferralFee);
-                    return false;
-                }
-                else
-                    console.log("Your Referral fee is", poolFee);
-
-                let response = await AdvancedMessages.confirm('Do you want to use external pool servers?: ');
-
-                if (response){
-                    poolServers = await AdvancedMessages.input('Pool Servers (separated by comma): ');
-                    await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( true ) ;
-                } else {
-                    poolServers = await NodeServer.getServerHTTPAddress(true);
-                    await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( false ) ;
-                    await Blockchain.PoolManagement.poolSettings.setPoolUseSignatures( false ) ;
-                }
-
-
-                if (poolFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
-                if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
-                if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
-                if (poolServers !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
-                if (poolReferralFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolReferralFee(poolReferralFee / 100);
-
-            }
-
-            await Blockchain.PoolManagement.startPool(true);
-
 
         }, undefined, undefined, true);
 
@@ -547,7 +563,7 @@ const commands = [
         '10. Mining Pool: Start Mining',
         '11. Mining Pool: Create a New Pool',
         '11-1. Mining Pool: Process Remaining Payment',
-        '12. Server for Mining Pool: Create a new Server for Mining Pool',
+        '12. Server for Mining Pool: Create a new Server for Mining Pool (Optional and Advanced)',
         '20. HTTPS Express Start',
     ];
 

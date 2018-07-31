@@ -5,11 +5,11 @@ import consts from 'consts/const_global'
 const HASH_ARGON2_OPTIONS = {
     salt: consts.HASH_ARGON2_PARAMS.saltBuffer,
     timeCost: consts.HASH_ARGON2_PARAMS.time,
-    memoryCost: consts.HASH_ARGON2_PARAMS.memPower,
+    memoryCost: consts.HASH_ARGON2_PARAMS.memBytes,
     parallelism: consts.HASH_ARGON2_PARAMS.parallelism,
     type: consts.HASH_ARGON2_PARAMS.algoNode,
     hashLength: consts.HASH_ARGON2_PARAMS.hashLen
-}
+};
 
 class Argon2Node {
 

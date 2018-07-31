@@ -108,7 +108,7 @@ class PoolRewardsManagement{
             let percentAlreadyPaid = miner._rewardSent / this.totalRewardSent;
             let reward = Math.floor( percentAlreadyPaid * remainingAmount + miner._rewardConfirmedOther );
 
-            if ( reward >= 20*WebDollarCoins.WEBD){
+            if ( reward >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT){
 
                 this._addAddressTo(miner.address).amount = reward;
                 //Log.info("Will pay " + reward/WebDollarCoins.WEBD.toFixed(0) + " WEBD to " + InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address,false,true), Log.LOG_TYPE.POOLS);
@@ -137,15 +137,13 @@ class PoolRewardsManagement{
 
     async createTransactions(){
 
-        let total = consts.MINING_POOL.MINING.FEE_THRESHOLD * this._toAddresses.length/255;
-        let fee = total / this._toAddresses.length;
-
         //let's reduce the amounts with the fees
         let sumTotal = 0;
-        for (let i=this._toAddresses.length-1; i>=0; i--){
-            this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount - fee );
 
-            if (this._toAddresses[i].amount < 20*WebDollarCoins.WEBD){
+        for (let i=this._toAddresses.length-1; i>=0; i--){
+            this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount);
+
+            if (this._toAddresses[i].amount < consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT){
 
                 let miner = this.poolData.findMiner( this._toAddresses[i].address );
                 miner.rewardConfirmedOther += Math.max(0, this._toAddresses[i].amount);
@@ -158,6 +156,8 @@ class PoolRewardsManagement{
 
         }
 
+        this._removeAddressTo(this.blockchain.mining.unencodedMinerAddress);
+
         Log.info("Total to pay " + sumTotal/WebDollarCoins.WEBD.toFixed(0), Log.LOG_TYPE.POOLS );
 
 
@@ -167,7 +167,7 @@ class PoolRewardsManagement{
             let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
             try {
-                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, consts.MINING_POOL.MINING.FEE_THRESHOLD, );
+                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, 0, );
                 if (!transaction.result) throw {message: "Transaction was not made"};
             } catch (exception){
                 Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);
@@ -197,13 +197,13 @@ class PoolRewardsManagement{
 
     }
 
-    _findAddressTo(address){
+    _findAddressTo(address, returnPos = false){
 
         for (let q=0; q<this._toAddresses.length; q++)
             if (this._toAddresses[q].address.equals( address ))
-                return this._toAddresses[q];
+                return returnPos ? q : this._toAddresses[q];
 
-        return null;
+        return returnPos ? -1 : null;
 
     }
 
@@ -222,6 +222,14 @@ class PoolRewardsManagement{
         this._toAddresses.push(object);
 
         return object;
+
+    }
+
+    _removeAddressTo(address){
+
+        let index = this._findAddressTo(address, true);
+        if (index !== -1)
+            this._toAddresses.splice(index);
 
     }
 
