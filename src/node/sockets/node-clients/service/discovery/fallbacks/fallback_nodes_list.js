@@ -75,8 +75,8 @@ export default {
         {"addr": ["https://int-webd.com:5010"]}, // Thanks to @int_webd
         {"addr": ["https://int-webd.com:5011"]}, // Thanks to @int_webd
         {"addr": ["https://int-webd.com:5012"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5013"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5014"]}, // Thanks to @int_webd
+        //{"addr": ["https://int-webd.com:5013"]}, // Thanks to @int_webd
+        //{"addr": ["https://int-webd.com:5014"]}, // Thanks to @int_webd
         //{"addr": ["https://int-webd.com:5015"]}, // Thanks to @int_webd
         //{"addr": ["https://int-webd.com:5016"]}, // Thanks to @int_webd
 
