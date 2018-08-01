@@ -15,7 +15,6 @@ class NodeAPIPublic{
     info(){
 
         let lastBlock = Blockchain.blockchain.blocks.last;
-        let lastBlock = Blockchain.blockchain.blocks.last;
 
         let is_synchronized    = false;
         let currentTimestamp   = new Date().getTime();
