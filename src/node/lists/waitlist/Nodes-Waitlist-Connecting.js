@@ -232,12 +232,16 @@ class NodesWaitlistConnecting {
             this.connectingMaximum.maximum_waitlist += 20;
         }
 
-        let date = new Date().getTime();
-        for (let i=this._connectingQueue.length-1; i>=0; i--)
-            if (date - this._connectingQueue[i].blockedLastTime > 2*60*1000){
-                this._connectingQueue.splice(i, 1);
-                Log.warn("Deleting OLD connectingQueue element "+i+" "+this._connectingQueue[i].sckAddresses[0].getAddress(), Log.LOG_TYPE.default );
-            }
+        try {
+            let date = new Date().getTime();
+            for (let i = this._connectingQueue.length - 1; i >= 0; i--)
+                if (date - this._connectingQueue[i].blockedLastTime > 2 * 60 * 1000) {
+                    this._connectingQueue.splice(i, 1);
+                    Log.warn("Deleting OLD connectingQueue element " + i + " " + this._connectingQueue[i].sckAddresses[0].getAddress(), Log.LOG_TYPE.default);
+                }
+        } catch (exception){
+            
+        }
 
         this._timeoutCalculateNumberOfConnections = setTimeout( this._calculateNumberOfConnections.bind(this), 10000);
 
