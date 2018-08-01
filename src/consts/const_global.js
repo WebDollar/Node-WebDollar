@@ -300,7 +300,7 @@ consts.SETTINGS = {
                     },
 
                     SSL:{
-                        MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL: 30,
+                        MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL: 20,
                         MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL: 8,
                     },
                 },
