@@ -320,7 +320,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let answer;
 
             for (let i=0; i<trials; i++) {
-                answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight);
+                answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight, 6000);
                 if (answer !== null && answer !== undefined)
                     break;
             }

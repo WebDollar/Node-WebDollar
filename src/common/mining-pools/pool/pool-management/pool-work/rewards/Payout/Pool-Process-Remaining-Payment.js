@@ -229,7 +229,7 @@ class PoolRewardsManagement{
 
         let index = this._findAddressTo(address, true);
         if (index !== -1)
-            this._toAddresses.splice(index);
+            this._toAddresses.splice(index, 1);
 
     }
 
