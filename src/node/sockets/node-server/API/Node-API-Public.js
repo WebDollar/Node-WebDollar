@@ -4,6 +4,7 @@ import NODE_TYPE from "node/lists/types/Node-Type"
 import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import NodesList from 'node/lists/Nodes-List'
 import Blockchain from "main-blockchain/Blockchain"
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class NodeAPIPublic{
 
@@ -14,6 +15,18 @@ class NodeAPIPublic{
     info(){
 
         let lastBlock = Blockchain.blockchain.blocks.last;
+
+        let is_synchronized    = false;
+        let currentTimestamp   = new Date().getTime();
+        let oDate              = new Date((lastBlock.timeStamp + BlockchainGenesis.timeStampOffset) * 1000);
+        let blockTimestamp     = oDate.getTime();
+        let nSecondsBehind     = currentTimestamp - blockTimestamp;
+        const UNSYNC_THRESHOLD = 600 * 1000; // ~ 15 blocks
+
+        if (nSecondsBehind < UNSYNC_THRESHOLD)
+        {
+            is_synchronized = true;
+        }
 
         return {
 
@@ -37,7 +50,10 @@ class NodeAPIPublic{
             },
             waitlist:{
                 list: NodesWaitlist.getJSONList( NODE_TYPE.NODE_TERMINAL, false ),
-            }
+            },
+            
+            is_synchronized: is_synchronized,
+            secondsBehind  : nSecondsBehind / 1000
 
         };
     }

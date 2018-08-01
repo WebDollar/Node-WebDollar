@@ -507,7 +507,7 @@ class InterfaceBlockchainBlock {
      */
     get workDone(){
 
-        if (this._workDone) return this._workDone;
+        if (this._workDone !== undefined) return this._workDone;
 
         this._workDone = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.hash.toString("hex"), 16 ) );
         return this._workDone;

@@ -15,7 +15,10 @@ class NodesWaitlistObject {
         this.socket = socket;
 
         this.connected = false;
+
         this.blocked = false;
+        this.blockedLastTime = 0;
+
         this.checked = false;
 
         if (backedBy === "fallback")

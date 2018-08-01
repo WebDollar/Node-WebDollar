@@ -237,7 +237,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.165.0",
+        VERSION: "1.166.0",
         VERSION_COMPATIBILITY: "1.162.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
@@ -300,7 +300,7 @@ consts.SETTINGS = {
                     },
 
                     SSL:{
-                        MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL: 30,
+                        MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL: 20,
                         MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL: 8,
                     },
                 },
