@@ -240,7 +240,7 @@ class NodesWaitlistConnecting {
                     Log.warn("Deleting OLD connectingQueue element " + i + " " + this._connectingQueue[i].sckAddresses[0].getAddress(), Log.LOG_TYPE.default);
                 }
         } catch (exception){
-            
+            console.error(exception)
         }
 
         this._timeoutCalculateNumberOfConnections = setTimeout( this._calculateNumberOfConnections.bind(this), 10000);
