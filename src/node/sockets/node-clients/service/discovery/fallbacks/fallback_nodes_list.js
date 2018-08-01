@@ -77,8 +77,8 @@ export default {
         {"addr": ["https://int-webd.com:5012"]}, // Thanks to @int_webd
         {"addr": ["https://int-webd.com:5013"]}, // Thanks to @int_webd
         {"addr": ["https://int-webd.com:5014"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5015"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5016"]}, // Thanks to @int_webd
+        //{"addr": ["https://int-webd.com:5015"]}, // Thanks to @int_webd
+        //{"addr": ["https://int-webd.com:5016"]}, // Thanks to @int_webd
 
         // {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
         // {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
