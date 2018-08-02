@@ -217,15 +217,15 @@ class InterfaceBlockchainProtocolForkSolver{
                     forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
                 }
 
-                if ( fork.forkStartingHeight > fork.forkChainLength-1 ){
-                    throw {message: "FORK is empty"};
-                }
-
                 fork.forkStartingHeight = binarySearchResult.position;
                 fork.forkStartingHeightDownloading  = binarySearchResult.position;
                 fork.forkChainStartingPoint = forkChainStartingPoint;
                 fork.forkChainLength = forkChainLength;
                 fork.forkChainWork = forkChainWork;
+
+                if ( fork.forkStartingHeight > fork.forkChainLength-1 ){
+                    throw {message: "FORK is empty"};
+                }
 
                 await fork.initializeFork(); //download the requirements and make it ready
 
