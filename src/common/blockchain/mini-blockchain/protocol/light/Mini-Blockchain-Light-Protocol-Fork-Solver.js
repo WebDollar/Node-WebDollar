@@ -3,6 +3,7 @@ import PPowBlockchainProtocolForkSolver from 'common/blockchain/ppow-blockchain/
 import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
 import Serialization from "common/utils/Serialization";
+const BigInteger = require('big-integer');
 
 let inheritForkSolver;
 
@@ -183,7 +184,11 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;
             fork.forkPrevHashPrev = answer.hashPrev;
-            fork.forkPrevChainWork = Serialization.deserializeBigInteger(answer.chainWork);
+
+            if (answer.chainWork !== undefined)
+                fork.forkPrevChainWork = Serialization.deserializeBigInteger(answer.chainWork);
+            else
+                fork.forkPrevChainWork = new BigInteger(0);
 
             //let's download the requested blocks for proving the difficulty
             for (let i = 0; i < fork.forkDifficultyCalculation.difficultyAdditionalBlocks.length; i++ ){

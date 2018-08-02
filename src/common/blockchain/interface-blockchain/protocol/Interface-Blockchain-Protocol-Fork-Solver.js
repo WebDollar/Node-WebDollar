@@ -254,7 +254,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if (bIncludeBan) {
                 console.warn("BANNNNNNNNNNNNNNNNN", socket.node.sckAddress.toString(), exception.message);
-                BansList.addBan(socket, 2000, exception.message);
+                BansList.addBan(socket, 60000, exception.message);
             }
 
             await this.blockchain.sleep(10);

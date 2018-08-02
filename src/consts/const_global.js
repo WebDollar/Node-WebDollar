@@ -238,7 +238,7 @@ consts.SETTINGS = {
     NODE: {
 
         VERSION: "1.167.0",
-        VERSION_COMPATIBILITY: "1.162.0",
+        VERSION_COMPATIBILITY: "1.167.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -259,6 +259,7 @@ consts.SETTINGS = {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
             INTERVAL: 2 * 1000,                         //miliseconds
 
+            //banned nodes
             BLOCKED_NODES: [ ], //addresses that will be blocked example: "domain.com"
         },
 

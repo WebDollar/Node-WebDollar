@@ -113,6 +113,7 @@ class NodesWaitlistConnecting {
         if ( Blockchain.Agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES )
             return;
 
+
         //connect only to TERMINAL NODES
         if ( nextWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) {
 
