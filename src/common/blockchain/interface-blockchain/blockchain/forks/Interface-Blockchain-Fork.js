@@ -94,6 +94,8 @@ class InterfaceBlockchainFork {
 
         //forkStartingHeight is offseted by 1
 
+        if (this.forkBlocks.length === 0) throw {message: "Fork doesn't have any block"};
+
         if (this.blockchain.blocks.length > this.forkStartingHeight + this.forkBlocks.length )
             throw {message: "my blockchain is larger than yours", position: this.forkStartingHeight + this.forkBlocks.length, blockchain: this.blockchain.blocks.length};
         else

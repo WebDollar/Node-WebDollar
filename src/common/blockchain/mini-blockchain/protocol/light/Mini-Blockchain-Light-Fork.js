@@ -221,11 +221,14 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             let chainWork = this.forkPrevChainWork;
 
             let forkWork = new BigInteger(0);
+
             for (let i=0; i< this.forkBlocks.length; i++ )
                 forkWork = forkWork.plus( this.forkBlocks[i].workDone );
 
-            if (!chainWork.plus(forkWork).equals(this.forkChainWork))
-                throw {message: "chainWork doesn't match forkChain", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
+            //TODO just enable it
+            // TEMPORARY DISABLED for avoiding issues with the consensus by having a new way how to calculate the chainWork
+            // if (!chainWork.plus(forkWork).equals(this.forkChainWork))
+            //     throw {message: "chainWork doesn't match forkChain", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
 
         }
 
