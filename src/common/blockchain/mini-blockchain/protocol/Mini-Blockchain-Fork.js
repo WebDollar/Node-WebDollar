@@ -10,9 +10,9 @@ else inheritFork = InterfaceBlockchainFork;
 class MiniBlockchainFork extends inheritFork{
 
 
-    constructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header){
+    constructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header){
 
-        super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header)
+        super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header)
 
         this._accountantTreeClone = null;
 

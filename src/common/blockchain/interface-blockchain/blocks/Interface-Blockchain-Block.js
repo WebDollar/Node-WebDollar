@@ -1,4 +1,4 @@
-var BigInteger = require('big-integer');
+const BigInteger = require('big-integer');
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'

@@ -1,6 +1,10 @@
 import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
-var BigNumber = require ('bignumber.js');
+
+const BigInteger = require('big-integer');
+const BigNumber = require('bignumber.js');
+
+import Serialization from "common/utils/Serialization";
 
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
@@ -16,6 +20,9 @@ class InterfaceBlockchainBlocks{
         this._length = 0;
 
         this._networkHashRate = 0 ;
+
+        this._chainWork =  new BigInteger(0);
+        this.chainWorkSerialized = new Buffer(0);
 
     }
 
@@ -49,6 +56,9 @@ class InterfaceBlockchainBlocks{
         if ( revertActions !== undefined )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
+        this.chainWork = this.chainWork.plus( block.workDone );
+
+
     }
 
     emitBlockInserted(block){
@@ -59,6 +69,9 @@ class InterfaceBlockchainBlocks{
 
         for (let i = this.length - 1; i >= after; i--)
             if (this[i] !== undefined){
+
+                this.chainWork = this.chainWork.minus( this[i].workDone );
+
                 if (freeMemory) {
                     this[i].destroyBlock();
                     delete this[i];
@@ -138,6 +151,15 @@ class InterfaceBlockchainBlocks{
 
     get length(){
         return this._length;
+    }
+
+    set chainWork(newValue){
+        this._chainWork = newValue;
+        this.chainWorkSerialized = Serialization.serializeBigInteger( newValue );
+    }
+
+    get chainWork(){
+        return this._chainWork;
     }
 
 }

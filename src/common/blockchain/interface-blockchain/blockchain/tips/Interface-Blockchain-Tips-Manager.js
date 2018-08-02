@@ -81,35 +81,35 @@ class InterfaceBlockchainProtocolTipsManager {
     /*
         may the fork be with you Otto
      */
-    async discoverNewForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader){
+    async discoverNewForkTip(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHeader){
 
-        if (typeof newChainLength !== "number") throw {message: "newChainLength is not a number"};
-        if (typeof newChainStartingPoint !== "number") throw {message: "newChainStartingPoint is not a number"};
+        if (typeof forkChainLength !== "number") throw {message: "forkChainLength is not a number"};
+        if (typeof forkChainStartingPoint !== "number") throw {message: "newChainStartingPoint is not a number"};
 
-        if (newChainLength < this.blockchain.blocks.length){
+        if (forkChainLength < this.blockchain.blocks.length){
 
             if (Math.random() < 0.5)
                 socket.node.protocol.sendLastBlock();
 
-            if (newChainLength < this.blockchain.blocks.length - 50)
-                BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+newChainLength+" / "+this.blockchain.blocks.length );
+            if (forkChainLength < this.blockchain.blocks.length - 50)
+                BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+forkChainLength+" / "+this.blockchain.blocks.length );
 
             throw "Your blockchain is smaller than mine";
 
         }
 
-        if (newChainStartingPoint > newChainLength) throw {message: "Incorrect newChainStartingPoint"};
-        if (newChainStartingPoint < 0 ) throw {message: "Incorrect2 newChainStartingPoint"};
-        if (newChainStartingPoint > forkLastBlockHeader.height ) throw {message: "Incorrect3 newChainStartingPoint"};
+        if (forkChainStartingPoint > forkChainLength) throw {message: "Incorrect newChainStartingPoint"};
+        if (forkChainStartingPoint < 0 ) throw {message: "Incorrect2 newChainStartingPoint"};
+        if (forkChainStartingPoint > forkLastBlockHeader.height ) throw {message: "Incorrect3 newChainStartingPoint"};
 
         let tip = this.blockchain.tipsAdministrator.getTip(socket);
 
         if (tip !== null) {
-            this.blockchain.tipsAdministrator.updateTipNewForkLength(tip, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+            this.blockchain.tipsAdministrator.updateTipNewForkLength(tip, forkChainLength, forkChainStartingPoint, forkLastBlockHeader);
             return tip.forkToDoPromise;
         }
 
-        tip = this.blockchain.tipsAdministrator.addTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHeader);
+        tip = this.blockchain.tipsAdministrator.addTip(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHeader);
 
         if (tip === null)
             return false; // the tip is not valid

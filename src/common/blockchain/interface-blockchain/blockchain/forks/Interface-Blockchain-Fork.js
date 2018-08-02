@@ -58,7 +58,7 @@ class InterfaceBlockchainFork {
      * initializeConstructor is used to initialize the constructor dynamically using .apply method externally passing the arguments
      */
 
-    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, forkReady = false){
+    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, headers, forkReady = false){
 
         this.blockchain = blockchain;
 
@@ -76,8 +76,9 @@ class InterfaceBlockchainFork {
         this.forkStartingHeightDownloading = forkStartingHeight||0;
 
         this.forkChainStartingPoint = forkChainStartingPoint;
-        this.forkChainLength = newChainLength||0;
+        this.forkChainLength = forkChainLength||0;
         this.forkBlocks = [];
+        this.forkChainWork = forkChainWork;
 
         if (!Array.isArray(headers)) headers = [headers];
         this.forkHeaders = headers;
@@ -89,7 +90,7 @@ class InterfaceBlockchainFork {
         this._blocksCopy = [];
     }
 
-    async _validateFork(validateHashesAgain, firstValidation, validateChainWork = true ){
+    async _validateFork(validateHashesAgain, firstValidation){
 
         //forkStartingHeight is offseted by 1
 
@@ -108,24 +109,26 @@ class InterfaceBlockchainFork {
 
             }
 
-        if (validateChainWork){
-
-            let chainWork = new BigInteger(0);
-            for (let i = this.forkStartingHeight; i<this.blockchain.blocks.length; i++)
-                chainWork = chainWork.plus( this.blockchain.blocks[i].workDone );
-
-            let forkWork = new BigInteger(0);
-            for (let i=0; i< this.forkBlocks.length; i++ )
-                forkWork = forkWork.plus( this.forkBlocks[i].workDone );
-
-            let factor = 1;
-
-            if ( forkWork.lesser( chainWork.multiply(factor) ) )
-                throw {message: "forkWork is less than chainWork", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
-
-        }
+        this._validateChainWork();
 
         return true;
+    }
+
+    _validateChainWork(){
+
+        let chainWork = new BigInteger(0);
+        for (let i = this.forkStartingHeight; i<this.blockchain.blocks.length; i++)
+            chainWork = chainWork.plus( this.blockchain.blocks[i].workDone );
+
+        let forkWork = new BigInteger(0);
+        for (let i=0; i< this.forkBlocks.length; i++ )
+            forkWork = forkWork.plus( this.forkBlocks[i].workDone );
+
+        let factor = 1;
+
+        if ( forkWork.lesser( chainWork.multiply(factor) ) )
+            throw {message: "forkWork is less than chainWork", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
+
     }
 
     async includeForkBlock(block, ){
@@ -262,7 +265,7 @@ class InterfaceBlockchainFork {
         this.forkIsSaving = true; //marking it saved because we want to avoid the forksAdministrator to delete it
         if (this.blockchain === undefined) return false; //fork was already destroyed
 
-        if (! (await this._validateFork(false, true, true))) {
+        if (! (await this._validateFork(false, true))) {
             Log.error("validateFork was not passed", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
             return false
         }

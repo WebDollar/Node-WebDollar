@@ -1,5 +1,6 @@
 import BansList from "common/utils/bans/BansList"
-import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
+import Serialization from "common/utils/Serialization";
+const BigInteger = require('big-integer');
 
 class InterfaceBlockchainProtocolForksManager {
 
@@ -15,61 +16,93 @@ class InterfaceBlockchainProtocolForksManager {
     /*
         may the fork2 be with you Otto
     */
-    async newForkTip(socket, newChainLength, newChainStartingPoint, forkLastBlockHash, forkProof){
+    async newForkTip(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof, forkChainWork){
 
         try {
 
             if (!this.blockchain.agent.consensus) return;
 
-            if (typeof newChainLength !== "number") throw "newChainLength is not a number";
-            if (typeof newChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";
+            if (typeof forkChainLength !== "number") throw "forkChainLength is not a number";
+            if (typeof forkChainStartingPoint !== "number") throw "newChainStartingPoint is not a number";
 
-            if (newChainStartingPoint > newChainLength) throw "Incorrect newChainStartingPoint";
-            if (newChainStartingPoint < 0) throw "Incorrect2 newChainStartingPoint";
-            if (newChainStartingPoint > this.blockchain.blocks.length) throw {message: "Incorrect3 newChainStartingPoint", newChainStartingPoint:newChainStartingPoint, blocks: this.blockchain.blocks.length};
+            if (forkChainLength < 0 ) throw "Incorrect new Chain";
+            if (forkChainStartingPoint > forkChainLength) throw "Incorrect newChainStartingPoint";
+            if (forkChainStartingPoint < 0) throw "Incorrect2 newChainStartingPoint";
+            if (forkChainStartingPoint > this.blockchain.blocks.length) throw {message: "Incorrect3 newChainStartingPoint", newChainStartingPoint:forkChainStartingPoint, blocks: this.blockchain.blocks.length};
+
+            if (forkChainWork !== undefined)
+                forkChainWork = Serialization.deserializeBigInteger(forkChainWork);
+            else
+                forkChainWork = new BigInteger(0);
 
             //for Light Nodes, I am also processing the smaller blocks
-
             //in case the hashes are the same, and I have already the block
 
-            //todo should compare the proof because maybe it is the same with mine
-            if ( newChainLength > 0 && this.blockchain.blocks.length === newChainLength && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
+            // todo should compare the proof because maybe it is the same with mine
+
+            if ( (forkChainWork.greater(0) && forkChainWork.equals( this.blockchain.blocks.chainWork )
+                 && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) )) {
+
+                socket.node.protocol.blocks = forkChainLength;
+                return false;
+            }
+
+            if ( (forkChainWork.greater(0) && forkChainWork.lesser( this.blockchain.blocks.chainWork ))
+                && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
+                socket.node.protocol.blocks = forkChainLength;
+                socket.node.protocol.sendLastBlock();
+                return false;
+            }
+
+            //I have a better chainWork
+            if ( (forkChainWork.greater(0) && forkChainWork.lesser( this.blockchain.blocks.chainWork ))
+                  && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
+                socket.node.protocol.blocks = forkChainLength;
+                socket.node.protocol.sendLastBlock();
+                return false;
+            }
+
+            if (  ( forkChainWork.equals(0) && this.blockchain.blocks.length === forkChainLength )
+                  && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
 
                 //in case the hashes are exactly the same, there is no reason why we should download it
                 let comparison = this.blockchain.blocks[this.blockchain.blocks.length - 1].hash.compare( forkLastBlockHash );
 
                 if ( comparison < 0) {
+                    socket.node.protocol.blocks = forkChainLength;
                     socket.node.protocol.sendLastBlock();
                     return false;
                 }
 
                 if ( comparison === 0) {
-                    socket.node.protocol.blocks = newChainLength;
+                    socket.node.protocol.blocks = forkChainLength;
                     return true;
                 }
 
             }
 
-            if ( newChainLength < this.blockchain.blocks.length && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() )))) {
+            if (  ( forkChainWork.equals(0) && forkChainLength < this.blockchain.blocks.length )
+                  && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
 
-                if (this.blockchain.blocks[newChainLength] !== undefined && this.blockchain.blocks[newChainLength].hash.equals( forkLastBlockHash ))
-                    socket.node.protocol.blocks = newChainLength;
+                //updating the status of his blocks
+                if ( this.blockchain.blocks[ forkChainLength ] !== undefined && this.blockchain.blocks[forkChainLength].hash.equals( forkLastBlockHash ) )
+                    socket.node.protocol.blocks = forkChainLength;
 
                 if (Math.random() < 0.5)
                     socket.node.protocol.sendLastBlock();
 
-                if (newChainLength < this.blockchain.blocks.length - 50)
-                    BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+newChainLength+" / "+this.blockchain.blocks.length );
+                if (forkChainLength < this.blockchain.blocks.length - 50)
+                    BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+forkChainLength+" / "+this.blockchain.blocks.length );
 
                 throw "Your blockchain is smaller than mine";
 
             }
 
-            let answer = await this.protocol.forkSolver.discoverFork(socket, newChainLength, newChainStartingPoint, forkLastBlockHash, forkProof);
+            let answer = await this.protocol.forkSolver.discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof, forkChainWork );
 
             if (answer.result){
 
-                socket.node.protocol.blocks = newChainLength;
+                socket.node.protocol.blocks = forkChainLength;
 
                 if (answer.fork !== undefined)
                     return answer.fork.forkPromise;

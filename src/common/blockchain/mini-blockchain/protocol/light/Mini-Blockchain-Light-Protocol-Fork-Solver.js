@@ -2,6 +2,7 @@ import InterfaceBlockchainProtocolForkSolver from 'common/blockchain/interface-b
 import PPowBlockchainProtocolForkSolver from 'common/blockchain/ppow-blockchain/protocol/PPoW-Blockchain-Protocol-Fork-Solver'
 import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
+import Serialization from "common/utils/Serialization";
 
 let inheritForkSolver;
 
@@ -23,24 +24,24 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
     }
 
-    async _calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength){
+    async _calculateForkBinarySearch(socket, forkChainStartingPoint, forkChainLength, currentBlockchainLength){
 
-        console.log("newChainStartingPoint", newChainStartingPoint, "newChainLength", newChainLength, "currentBlockchainLength", currentBlockchainLength)
+        console.log("newChainStartingPoint", forkChainStartingPoint, "forkChainLength", forkChainLength, "currentBlockchainLength", currentBlockchainLength)
 
-        if (newChainStartingPoint > currentBlockchainLength-1) {
+        if (forkChainStartingPoint > currentBlockchainLength-1) {
 
-            return await this._getLastBlocks(socket, newChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS-1);
+            return await this._getLastBlocks(socket, forkChainLength - consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS-1);
 
         } else {
 
-            let result = await inheritForkSolver.prototype._calculateForkBinarySearch.call(this, socket, newChainStartingPoint, newChainLength, currentBlockchainLength);
+            let result = await inheritForkSolver.prototype._calculateForkBinarySearch.call(this, socket, forkChainStartingPoint, forkChainLength, currentBlockchainLength);
 
             console.warn("_calculateForkBinarySearch", result);
 
             if (this.blockchain.agent.light){
 
                 if (result.position === -1)
-                    return await this._getLastBlocks(socket, newChainStartingPoint);
+                    return await this._getLastBlocks(socket, forkChainStartingPoint);
             }
 
             return result;
@@ -182,6 +183,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;
             fork.forkPrevHashPrev = answer.hashPrev;
+            fork.forkPrevChainWork = Serialization.deserializeBigInteger(answer.chainWork);
 
             //let's download the requested blocks for proving the difficulty
             for (let i = 0; i < fork.forkDifficultyCalculation.difficultyAdditionalBlocks.length; i++ ){

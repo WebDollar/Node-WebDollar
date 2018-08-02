@@ -76,15 +76,15 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    async _calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength){
+    async _calculateForkBinarySearch(socket, forkChainStartingPoint, forkChainLength, currentBlockchainLength){
 
-        if (newChainStartingPoint > currentBlockchainLength-1 || currentBlockchainLength === 0)
+        if (forkChainStartingPoint > currentBlockchainLength-1 || currentBlockchainLength === 0)
             return {position: -1, header: null};
         else {
-            let binarySearchResult = await this._discoverForkBinarySearch(socket, newChainStartingPoint, newChainStartingPoint, currentBlockchainLength - 1);
+            let binarySearchResult = await this._discoverForkBinarySearch(socket, forkChainStartingPoint, forkChainStartingPoint, currentBlockchainLength - 1);
 
             //forcing the binary search for download the next unmatching element
-            if (binarySearchResult.position !== -1 && binarySearchResult.position+1 < newChainLength)
+            if (binarySearchResult.position !== -1 && binarySearchResult.position+1 < forkChainLength)
                 binarySearchResult.position++;
 
             return binarySearchResult;
@@ -99,10 +99,7 @@ class InterfaceBlockchainProtocolForkSolver{
         may the fork be with you Otto
      */
 
-
-
-    //TODO it will not update positions
-    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof ){
+    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof, forkChainWork ){
 
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.blocks.length;
@@ -117,7 +114,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let answer = this.blockchain.forksAdministrator.findFork(socket, forkLastBlockHash, forkProof);
             if (answer !== null) return answer;
 
-            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [ forkLastBlockHash ], false );
+            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, undefined, [ forkLastBlockHash ], false );
 
             //veify last n elements
             const count = 6;
@@ -127,15 +124,12 @@ class InterfaceBlockchainProtocolForkSolver{
 
 
                     if (i === forkChainLength-1 && forkLastBlockHash !== undefined && forkLastBlockHash !== undefined) {
-                        answer = {hash: forkLastBlockHash};
+                        answer = { hash: forkLastBlockHash };
                     } else {
                         answer = await socket.node.sendRequestWaitOnce( "head/hash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                         if (answer === null || answer === undefined || answer.hash === undefined)
                             continue;
                     }
-
-
-                    console.log("_forkSolver_checking", i, currentBlockchainLength-1);
 
 
                     forkFound = this.blockchain.forksAdministrator._findForkyByHeader( answer.hash );
@@ -186,7 +180,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 binarySearchResult = await this._calculateForkBinarySearch(socket, forkChainStartingPoint, forkChainLength, currentBlockchainLength );
 
                 if (binarySearchResult.position === null)
-                    throw {message: "connection dropped discoverForkBinarySearch"}
+                    throw {message: "connection dropped discoverForkBinarySearch"};
 
                 forkFound = this.blockchain.forksAdministrator._findForkyByHeader(binarySearchResult.header);
 
@@ -227,6 +221,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 fork.forkStartingHeightDownloading  = binarySearchResult.position;
                 fork.forkChainStartingPoint = forkChainStartingPoint;
                 fork.forkChainLength = forkChainLength;
+                fork.forkChainWork = forkChainWork;
 
                 await fork.initializeFork(); //download the requirements and make it ready
 
