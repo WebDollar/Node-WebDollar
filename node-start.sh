@@ -1,39 +1,39 @@
 #!/bin/bash
 
 #### COLOR SETTINGS ####
-BLACK=$(tput setaf 0 && tput bold)
-RED=$(tput setaf 1 && tput bold)
-GREEN=$(tput setaf 2 && tput bold)
-YELLOW=$(tput setaf 3 && tput bold)
-BLUE=$(tput setaf 4 && tput bold)
-MAGENTA=$(tput setaf 5 && tput bold)
-CYAN=$(tput setaf 6 && tput bold)
-WHITE=$(tput setaf 7 && tput bold)
-BLACKbg=$(tput setab 0 && tput bold)
-REDbg=$(tput setab 1 && tput bold)
-GREENbg=$(tput setab 2 && tput bold)
-YELLOWbg=$(tput setab 3 && tput bold)
-BLUEbg=$(tput setab 4 && tput dim)
-MAGENTAbg=$(tput setab 5 && tput bold)
-CYANbg=$(tput setab 6 && tput bold)
-WHITEbg=$(tput setab 7 && tput bold)
-STAND=$(tput sgr0)
+black=$(tput setaf 0 && tput bold)
+red=$(tput setaf 1 && tput bold)
+green=$(tput setaf 2 && tput bold)
+yellow=$(tput setaf 3 && tput bold)
+blue=$(tput setaf 4 && tput bold)
+magenta=$(tput setaf 5 && tput bold)
+cyan=$(tput setaf 6 && tput bold)
+white=$(tput setaf 7 && tput bold)
+blackbg=$(tput setab 0 && tput bold)
+redbg=$(tput setab 1 && tput bold)
+greenbg=$(tput setab 2 && tput bold)
+yellowbg=$(tput setab 3 && tput bold)
+bluebg=$(tput setab 4 && tput dim)
+magentabg=$(tput setab 5 && tput bold)
+cyanbg=$(tput setab 6 && tput bold)
+whitebg=$(tput setab 7 && tput bold)
+stand=$(tput sgr0)
 
 ### System dialog VARS
-showinfo="$GREEN[info]$STAND"
-showerror="$RED[error]$STAND"
-showexecute="$YELLOW[running]$STAND"
-showok="$MAGENTA[OK]$STAND"
-showdone="$BLUE[DONE]$STAND"
-showinput="$CYAN[input]$STAND"
-showwarning="$RED[warning]$STAND"
-showremove="$GREEN[removing]$STAND"
-shownone="$MAGENTA[none]$STAND"
-redhashtag="$REDbg$WHITE#$STAND"
-abortte="$CYAN[abort to Exit]$STAND"
-terminalconn="$YELLOW[TERMINAL_CONNECTIONS]$STAND"
-browserconn="$YELLOW[BROWSER_CONNECTIONS]$STAND"
-ports="$YELLOW[PORTS]$STAND"
+showinfo="$green[info]$stand"
+showerror="$red[error]$stand"
+showexecute="$yellow[running]$stand"
+showok="$magenta[OK]$stand"
+showdone="$blue[DONE]$stand"
+showinput="$cyan[input]$stand"
+showwarning="$red[warning]$stand"
+showremove="$green[removing]$stand"
+shownone="$magenta[none]$stand"
+redhashtag="$redbg$white#$stand"
+abortte="$cyan[abort to Exit]$stand"
+terminalconn="$yellow[TERMINAL_CONNECTIONS]$stand"
+browserconn="$yellow[BROWSER_CONNECTIONS]$stand"
+ports="$yellow[PORTS]$stand"
 ##
 
 ### General VARS
@@ -43,9 +43,9 @@ fullnode_conf="../.fullnodeconf"
 #### ROOT User Check
 function checkroot(){
         if [[ $(id -u) = 0 ]]; then
-                echo -e "$showinfo Checking for ROOT: ${GREEN}PASSED${STAND}"
+                echo -e "$showinfo Checking for ROOT: ${green}PASSED${stand}"
         else
-                echo -e "$showinfo Checking for ROOT: $showerror\\n${RED}This Script Needs To Run Under ROOT user!${STAND}"
+                echo -e "$showinfo Checking for ROOT: $showerror\\n${red}This Script Needs To Run Under ROOT user!${stand}"
                 exit 0
         fi
 }
@@ -54,11 +54,11 @@ function checkroot(){
 
 function start_pm2node(){
 
-if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] || $(pwd | cut -d '/' -f3) =~ Node-WebDollar[0-9] ]]; then
+if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] || $(pwd | cut -d '/' -f3) =~ Node-WebDollar[0-9] || $(pwd | cut -d '/' -f4) =~ Node-WebDollar || $(pwd | cut -d '/' -f3) =~ Node-WebDollar ]]; then
 
 	echo "$showinfo We are inside a Node-WebDollar Folder"
 
-	read -e -p "$showinput Do you want to start a pm2 instance in this $crnt_dir foler? (y or n): " startnodeyn
+	read -r -e -p "$showinput Do you want to start a pm2 instance in this $crnt_dir foler? (y or n): " startnodeyn
 
 	if [[ "$startnodeyn" =~ ^(y|yes|Y|YES|Yes)$ ]]; then
 
@@ -67,7 +67,7 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] || $(pwd | cut -d '/' -f3) 
 		pm2 restart npm --name "$readport" --update-env
 		sleep 3;
 
-		echo "$showinfo Run ${WHITE}pm2 log $readport$STAND to check if the blockchain is loading."
+		echo "$showinfo Run ${white}pm2 log $readport$stand to check if the blockchain is loading."
 
 	elif [[ "$startnodeyn" =~ ^(n|no|N|NO|No)$ ]]; then
 
@@ -88,20 +88,20 @@ else
 	if [[ ! -n $(pwd | cut -d '/' -f4) ]]; then
 
 		echo "$showok We are outside of a Node-WebDollar Folder"
-		echo -e "---Choose where to run PM2 instance\\n${CYAN}$(ls -d -1 $PWD/** | grep 'Node-WebDollar')$STAND\\n---"
+		echo -e "---Choose where to run PM2 instance\\n${cyan}$(ls -d -1 "$PWD"/** | grep 'Node-WebDollar')$stand\\n---"
 
-		read -e -p "$showinput Enter the full location of the Node-WebDollar folder where you want to start the pm2 instance: " nodewebdloc
+		read -r -e -p "$showinput Enter the full location of the Node-WebDollar folder where you want to start the pm2 instance: " nodewebdloc
 
 		if [[ -d $nodewebdloc ]]; then
 
-			cd $nodewebdloc
+			if cd "$nodewebdloc"; then echo "$showinfo Changing DIR to $yellow$(pwd)$stand"; else echo "$showerror Couldn't change DIR to $nodewebdloc"; fi
 			echo "$showinfo Folder location changed to $nodewebdloc"
 
 			MAXIMUM_CONNECTIONS_FROM_BROWSER=$get_browser_conn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$get_term_conn SERVER_PORT=$readport pm2 start npm -- run start
 			sleep 1;
 			pm2 restart npm --name "$readport" --update-env
 			sleep 3;
-			echo "$showinfo Run ${WHITE}pm2 log $readport$STAND to check if the blockchain is loading."
+			echo "$showinfo Run ${white}pm2 log $readport$stand to check if the blockchain is loading."
 		else
 			if [[ ! -d $nodewebdloc ]]; then
 				echo "$showerror Folder location does not exist! Try again."
@@ -114,23 +114,23 @@ fi
 
 	if [[ -s $fullnode_conf ]]; then
 	### VARS
-	get_term_conn=$(cat $fullnode_conf | grep TERM_CONN | cut -d '=' -f2)
-	get_browser_conn=$(cat $fullnode_conf | grep BROWSER_CONN | cut -d '=' -f2)
+	get_term_conn=$(grep TERM_CONN $fullnode_conf | cut -d '=' -f2)
+	get_browser_conn=$(grep BROWSER_CONN $fullnode_conf | cut -d '=' -f2)
 	###
 
-		echo "$showok FULLNODE_CONF found! TERM_CONN=$GREEN$get_term_conn$STAND | BROWSER_CONN=$GREEN$get_browser_conn$STAND"
+		echo "$showok FULLNODE_CONF found! TERM_CONN=$green$get_term_conn$stand | BROWSER_CONN=$green$get_browser_conn$stand"
 
-		read -e -p "$showinput How many $ports to you want to use for the full node (from 1 to 6 or $abortte): " nrofports
+		read -r -e -p "$showinput How many $ports to you want to use for the full node (1,2,3,4,5 and 10 or $abortte): " nrofports
 	else
 		if [[ ! -s $fullnode_conf ]]; then
 
 			echo "$showerror FULLNODE_CONF not found! Starting config..."
 
-			read -e -p "$showinput How many $terminalconn do you want to offer (e.g.: 350 or $abortte): " readtermconn # this is a max_term_connections global setting that will apply for every pm2 instance.
+			read -r -e -p "$showinput How many $terminalconn do you want to offer (e.g.: 350 or $abortte): " readtermconn # this is a max_term_connections global setting that will apply for every pm2 instance.
 
 			### Catch user input before anything - readtermconn
 			if [[ "$readtermconn" =~ ^[[:digit:]]+$ ]]; then
-				read -e -p "$showinput How many $browserconn do you want to offer (e.g.: 250 or $abortte): " readbrowserconn # if termconn is set ok, proceed to nr of browser_conn input # this is a max_browser_connections global setting that will apply for every pm2 instance.
+				read -r -e -p "$showinput How many $browserconn do you want to offer (e.g.: 250 or $abortte): " readbrowserconn # if termconn is set ok, proceed to nr of browser_conn input # this is a max_browser_connections global setting that will apply for every pm2 instance.
 
 				### Catch user input before anything - readbrowserconn
 				if [[ "$readbrowserconn" =~ ^[[:digit:]]+$ ]]; then
@@ -138,7 +138,7 @@ fi
 					echo -e "TERM_CONN=$readtermconn\\nBROWSER_CONN=$readbrowserconn" > $fullnode_conf
 					echo "$showok FULLNODE_CONF saved to $fullnode_conf"
 
-					read -e -p "$showinput How many $ports to you want to use for the full node (from 1 to 6 or $abortte): " nrofports # if browser_conn is set ok, proceed to number of ports to be used
+					read -r -e -p "$showinput How many $ports to you want to use for the full node (1,2,3,4,5 and 10 or $abortte): " nrofports # if browser_conn is set ok, proceed to number of ports to be used
 
 				elif [[ "$readbrowserconn" == "" ]]; then
 					echo "$showerror No empty space allowed."
@@ -177,19 +177,19 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_oneport(){
 
-		read -e -p "$showinput We'll use $nrofports port. Enter PORT number (e.g.: 8080 or $abortte): " readport
+		read -r -e -p "$showinput We'll use $nrofports port. Enter PORT number (e.g.: 8080 or $abortte): " readport
 
 		if [[ "$readport" =~ ^[[:digit:]]+$ ]]; then
 
 			echo "$showinfo Setting IP Table rule for PORT $readport"
-			if [[ $(sudo iptables -nL | grep -w $readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $readport ]]; then echo "$showok Port $readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $readport ]]; then echo "$showdone Setting Firewall rule for PORT $readport."; sudo iptables -A INPUT -p tcp --dport $readport -j ACCEPT; fi fi # set port firewall rule
+			if [[ $(sudo iptables -nL | grep -w "$readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$readport" ]]; then echo "$showok Port $readport is already accepted in Firewall!"; elif [[ ! $(sudo iptables -nL | grep -w "$readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$readport" ]]; then echo "$showdone Setting Firewall rule for PORT $readport."; sudo iptables -A INPUT -p tcp --dport "$readport" -j ACCEPT; fi # set port firewall rule
 
-			echo "$showinfo The system will use port $readport";
+			echo "$showinfo The system will use port $readport"
 
 			crnt_dir=$(pwd)
 			start_pm2node
 
-		elif [[ $readport == abort ]]; then
+		elif [[ "$readport" == abort ]]; then
 
 			echo "$showinfo Ok. Bye." && exit 0
 		else
@@ -203,7 +203,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_twoports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081): " readnrport2_0 readnrport2_1
+		read -r -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081): " readnrport2_0 readnrport2_1
 
 		if [[ $readnrport2_0 =~ ^[[:digit:]]+$ && $readnrport2_1 =~ ^[[:digit:]]+$ ]]; then
 
@@ -211,7 +211,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport2_0 $readnrport2_1;
 			do
-				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; elif [[ ! $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport "$fw_readport" -j ACCEPT; fi # set port firewall rule
 			done
 
 			for readport in $readnrport2_0 $readnrport2_1;
@@ -230,7 +230,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_threeports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082): " readnrport3_0 readnrport3_1 readnrport3_2
+		read -r -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082): " readnrport3_0 readnrport3_1 readnrport3_2
 
 		if [[ $readnrport3_0 =~ ^[[:digit:]]+$ && $readnrport3_1 =~ ^[[:digit:]]+$ && $readnrport3_2 =~ ^[[:digit:]]+$ ]]; then
 
@@ -238,7 +238,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport3_0 $readnrport3_1 $readnrport3_2;
 			do
-				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; elif [[ ! $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport "$fw_readport" -j ACCEPT; fi # set port firewall rule
 			done
 
 			for readport in $readnrport3_0 $readnrport3_1 $readnrport3_2;
@@ -257,7 +257,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_fourports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083): " readnrport4_0 readnrport4_1 readnrport4_2 readnrport4_3
+		read -r -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083): " readnrport4_0 readnrport4_1 readnrport4_2 readnrport4_3
 
 		if [[ $readnrport4_0 =~ ^[[:digit:]]+$ && $readnrport4_1 =~ ^[[:digit:]]+$ && $readnrport4_2 =~ ^[[:digit:]]+$ && $readnrport4_3 =~ ^[[:digit:]]+$ ]]; then
 
@@ -265,7 +265,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport4_0 $readnrport4_1 $readnrport4_2 $readnrport4_3;
 			do
-				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; elif [[ ! $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport "$fw_readport" -j ACCEPT; fi # set port firewall rule
 			done
 
 			for readport in $readnrport4_0 $readnrport4_1 $readnrport4_2 $readnrport4_3;
@@ -284,7 +284,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_fiveports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083 8084): " readnrport5_0 readnrport5_1 readnrport5_2 readnrport5_3 readnrport5_4
+		read -r -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083 8084): " readnrport5_0 readnrport5_1 readnrport5_2 readnrport5_3 readnrport5_4
 
 		if [[ $readnrport5_0 =~ ^[[:digit:]]+$ && $readnrport5_1 =~ ^[[:digit:]]+$ && $readnrport5_2 =~ ^[[:digit:]]+$ && $readnrport5_3 =~ ^[[:digit:]]+$ && $readnrport5_4 =~ ^[[:digit:]]+$ ]]; then
 
@@ -292,7 +292,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport5_0 $readnrport5_1 $readnrport5_2 $readnrport5_3 $readnrport5_4;
 			do
-				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; elif [[ ! $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport "$fw_readport" -j ACCEPT; fi # set port firewall rule
 			done
 
 			for readport in $readnrport5_0 $readnrport5_1 $readnrport5_2 $readnrport5_3 $readnrport5_4;
@@ -311,7 +311,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 	function f_tenports(){
 
-		read -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083 8084 8085 etc): " readnrport10_0 readnrport10_1 readnrport10_2 readnrport10_3 readnrport10_4 readnrport10_5 readnrport10_6 readnrport10_7 readnrport10_8 readnrport10_9
+		read -r -e -p "$showinput We'll use $nrofports ports. Enter PORT number (e.g.: 8080 8081 8082 8083 8084 8085 etc): " readnrport10_0 readnrport10_1 readnrport10_2 readnrport10_3 readnrport10_4 readnrport10_5 readnrport10_6 readnrport10_7 readnrport10_8 readnrport10_9
 
 		if [[ $readnrport10_0 =~ ^[[:digit:]]+$ && $readnrport10_1 =~ ^[[:digit:]]+$ && $readnrport10_2 =~ ^[[:digit:]]+$ && $readnrport10_3 =~ ^[[:digit:]]+$ && $readnrport10_4 =~ ^[[:digit:]]+$ && $readnrport10_5 =~ ^[[:digit:]]+$ && $readnrport10_6 =~ ^[[:digit:]]+$ && $readnrport10_7 =~ ^[[:digit:]]+$ && $readnrport10_8 =~ ^[[:digit:]]+$ && $readnrport10_9 =~ ^[[:digit:]]+$ ]]; then
 
@@ -319,7 +319,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 			for fw_readport in $readnrport10_0 $readnrport10_1 $readnrport10_2 $readnrport10_3 $readnrport10_4 $readnrport10_5 $readnrport10_6 $readnrport10_7 $readnrport10_8 $readnrport10_9;
 			do
-				if [[ $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; else if [[ ! $(sudo iptables -nL | grep -w $fw_readport | awk 'NR==1{print$7}' | cut -d ':' -f2) == $fw_readport ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport $fw_readport -j ACCEPT; fi fi # set port firewall rule
+				if [[ $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showok Port $fw_readport is already accepted in Firewall!"; elif [[ ! $(sudo iptables -nL | grep -w "$fw_readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$fw_readport" ]]; then echo "$showdone Setting Firewall rule for PORT $fw_readport."; sudo iptables -A INPUT -p tcp --dport "$fw_readport" -j ACCEPT; fi # set port firewall rule
 			done
 
 			for readport in $readnrport10_0 $readnrport10_1 $readnrport10_2 $readnrport10_3 $readnrport10_4 $readnrport10_5 $readnrport10_6 $readnrport10_7 $readnrport10_8 $readnrport10_9;
@@ -335,7 +335,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 	f_tenports # function ten ports pm2 start
 
 	elif [[ "$nrofports" -gt 5 ]]; then
-		echo "$showerror Sorry, max ports can be: 1,2,3,4,5 and 10."
+		echo "$showerror Sorry, max number of ports can be: 1,2,3,4,5 and 10."
 		echo "$showinfo You can always run the script again with a new set of ports."
 		exit 1
 	fi
@@ -349,8 +349,8 @@ elif [[ "$nrofports" == abort ]]; then
 	exit 0
 
 elif [[ "$nrofports" == * ]]; then
-	echo "$showerror Please enter a number from 1 to 6."
+	echo "$showerror Please enter a number from 1 to 5 or 10."
 	exit 1
 fi
 
-if [[ $(cat /etc/*release | grep -o -m 1 Ubuntu) ]]; then sudo iptables-save; else if [[ $(cat /etc/*release | grep -o -m 1 Debian) ]]; then sudo iptables-save; fi fi
+if grep -q -o -m 1 Ubuntu /etc/*release; then sudo iptables-save; elif grep -q -o -m 1 Debian /etc/*release; then sudo iptables-save; fi
