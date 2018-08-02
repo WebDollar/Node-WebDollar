@@ -223,9 +223,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 fork.forkChainLength = forkChainLength;
                 fork.forkChainWork = forkChainWork;
 
-                if ( fork.forkStartingHeight > fork.forkChainLength-1 ){
+                if ( fork.forkStartingHeight > fork.forkChainLength-1 )
                     throw {message: "FORK is empty"};
-                }
 
                 await fork.initializeFork(); //download the requirements and make it ready
 
