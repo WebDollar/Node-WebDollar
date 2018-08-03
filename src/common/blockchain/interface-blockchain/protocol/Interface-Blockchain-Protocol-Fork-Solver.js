@@ -106,10 +106,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         let fork, forkFound;
 
-        try{
-
-            if (!this.blockchain.agent.light  && currentBlockchainLength > forkChainLength)
-                throw {message: "discoverAndProcessFork - fork is smaller fork than mine"};
+        try {
 
             let answer = this.blockchain.forksAdministrator.findFork(socket, forkLastBlockHash, forkProof);
             if (answer !== null) return answer;
