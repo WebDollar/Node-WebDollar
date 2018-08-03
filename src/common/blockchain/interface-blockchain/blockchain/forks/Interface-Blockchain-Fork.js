@@ -416,7 +416,7 @@ class InterfaceBlockchainFork {
 
                 this.postFork(forkedSuccessfully);
 
-                if (this.downloadBlocksSleep){
+                if (this.downloadAllBlocks){
                     await this.sleep(30);
                     Blockchain.synchronizeBlockchain();
                 }
