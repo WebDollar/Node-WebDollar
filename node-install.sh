@@ -47,8 +47,8 @@ function checkroot(){
 #checkroot
 
 ### GENERAL VARS
-getiptpersist=$(if grep -q -o -m 1 Ubuntu /etc/*release; then sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}'; elif grep -q -o -m 1 Debian /etc/*release; then sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}'; elif grep -q -o -m 1 centos /etc/*release; then echo "1"; fi)
-getgit=$(if grep -q -o -m 1 Ubuntu /etc/*release; then sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}'; elif grep -q -o -m 1 Debian /etc/*release; then echo sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}'; elif grep -q -o -m 1 centos /etc/*release; then yum list git | grep -o Installed; fi)
+getiptpersist=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "1"; fi)
+getgit=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 centos; then yum list git | grep -o Installed; fi)
 ###
 
 #### Dependencies START
@@ -57,7 +57,7 @@ if [[ "$getiptpersist" == "(none)" ]]; then
 	echo "$showinfo We need to install IPtables Persistent"
 	echo "$showinfo When asked, press YES to save your current IPtables settings."
 	echo "$showinfo IPtables Persistent keeps your IPT rules after a REBOOT."
-	if grep -q -o -m 1 Ubuntu /etc/*release; then sudo apt install -y iptables-persistent; elif grep -q -o -m 1 Debian /etc/*release; then sudo apt-get install -y iptables-persistent; fi
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y iptables-persistent; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y iptables-persistent; fi
 else
 	if [[ "$getiptpersist" == 1 ]]; then
 		echo "$showok IPtables Persistent is not available for CentOS"
@@ -70,7 +70,7 @@ fi
 
 if [[ "$getgit" == "(none)" ]]; then
 	echo "$showinfo We need to install Git"
-if grep -q -o -m 1 Ubuntu /etc/*release; then sudo apt install -y git; elif grep -q -o -m 1 Debian /etc/*release; then sudo apt-get install -y git; elif grep -q -o -m 1 centos /etc/*release; then yum install -y git; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y git; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y git; elif cat /etc/*release | grep -q -o -m 1 centos; then yum install -y git; fi
 else
 
 	if [[ "$getgit" == Installed ]]; then
@@ -86,14 +86,14 @@ fi
 
 deps # call deps function
 
-if grep -q -o -m 1 Ubuntu /etc/*release; then sudo apt update; elif grep -q -o -m 1 Debian /etc/*release; then sudo apt-get update; elif grep -q -o -m 1 centos /etc/*release; then sudo yum update; fi
-if grep -q -o -m 1 Ubuntu /etc/*release; then sudo apt upgrade; elif grep -q -o -m 1 Debian /etc/*release; then sudo apt-get upgrade; elif grep -q -o -m 1 centos /etc/*release; then sudo yum upgrade; fi
-if grep -q -o -m 1 Ubuntu /etc/*release; then sudo apt install -y linuxbrew-wrapper; elif grep -q -o -m 1 Debian /etc/*release; then sudo apt-get install -y linuxbrew-wrapper; fi
-if grep -q -o -m 1 Ubuntu /etc/*release; then sudo apt install -y build-essential; elif grep -q -o -m 1 Debian /etc/*release; then sudo apt-get install -y build-essential; elif grep -q -o -m 1 centos /etc/*release; then sudo yum group install -y "Development Tools"; fi
-if grep -q -o -m 1 Ubuntu /etc/*release; then sudo apt install -y clang; elif grep -q -o -m 1 Debian /etc/*release; then sudo apt-get install -y clang; elif grep -w -o -m 1 centos /etc/*release; then sudo yum install -y clang; fi
-if grep -q -o -m 1 Ubuntu /etc/*release; then if [[ ! $(node -v) ]]; then curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && sudo apt install -y nodejs; elif [[ $(node -v) ]]; then echo "$showok node is already installed!"; fi elif grep -q -o -m 1 Debian /etc/*release; then if [[ ! $(node -v) ]]; then curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && sudo apt install -y nodejs; elif [[ $(node -v) ]]; then echo "$showok node is already installed!"; fi elif grep -q -o -m 1 centos /etc/*release; then curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash - && sudo yum -y install nodejs; fi
-if grep -q -o -m 1 Ubuntu /etc/*release; then sudo npm install -g node-gyp; elif grep -q -o -m 1 Debian /etc/*release; then sudo npm install -g node-gyp; elif grep -q -o -m 1 centos /etc/*release; then npm install -g node-gyp; fi 
-if grep -q -o -m 1 Ubuntu /etc/*release; then sudo npm install pm2 -g --unsafe-perm; elif grep -q -o -m 1 Debian /etc/*release; then sudo npm install pm2 -g --unsafe-perm; elif grep -q -o -m 1 centos /etc/*release; then sudo npm install pm2 -g --unsafe-perm ; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt update; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get update; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum update; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt upgrade; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get upgrade; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum upgrade; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y linuxbrew-wrapper; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y linuxbrew-wrapper; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y build-essential; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y build-essential; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum group install -y "Development Tools"; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y clang; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y clang; elif grep -w -o -m 1 centos /etc/*release; then sudo yum install -y clang; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ ! $(node -v) ]]; then curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && sudo apt install -y nodejs; elif [[ $(node -v) ]]; then echo "$showok node is already installed!"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ ! $(node -v) ]]; then curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && sudo apt install -y nodejs; elif [[ $(node -v) ]]; then echo "$showok node is already installed!"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash - && sudo yum -y install nodejs; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install -g node-gyp; fi 
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo npm install pm2 -g --unsafe-perm ; fi
 
 function ftconfig()
 {
