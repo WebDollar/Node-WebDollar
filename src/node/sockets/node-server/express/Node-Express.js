@@ -12,6 +12,8 @@ import NodeAPIRouter from "../API-router/Node-API-Router"
 import NODE_API_TYPE from "../API-router/NODE_API_TYPE";
 
 import NodeServerSocketAPI from "../sockets/Node-Server-Socket-API"; //required because it will process the SocketAPI
+import JsonRpcServer from '../../../jsonRpc/JsonRpcServer'
+import Blockchain from "main-blockchain/Blockchain"
 
 class NodeExpress{
 
@@ -174,6 +176,7 @@ class NodeExpress{
         NodeAPIRouter.initializeRouter( this.app.get.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
         NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', this.app, NODE_API_TYPE.NODE_API_TYPE_HTTP );
 
+        let oJsonRpcServer = new JsonRpcServer(app, Blockchain)
     }
 
 

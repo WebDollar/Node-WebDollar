@@ -14,7 +14,7 @@ argon2/
 
 dist_bundle/bundle_terminal\.js
 
-dist_bundle/terminal-menu-bundle\.js
+dist_bundle/terminal-menu-bundle\.js*
 
 dist_bundle/Node-WebDollar-bundle\.js
 
@@ -54,19 +54,23 @@ User-Interface-WebDollar/dist_bundle/WebDollar-Protocol-bundle\.js
 
 User-Interface-WebDollar/dist_bundle/WebDollar-Protocol-bundle\.js\.map
 
-blockchainDB/
+blockchainDB*/
 
-defaultDB/
+defaultDB*/
 
-poolDB/
+poolDB*/
 
-blockchainDB2/
+blockchainDB2*/
 
-blockchainDB3/
+blockchainDB3*/
 
-walletDB/
+walletDB*/
 
-transactionsDB/
+transactionsDB*/
+
+minerPoolDB*/
+
+serverPoolDB*/
 
 certificates/ca_bundle.crt
 certificates/certificate.crt
