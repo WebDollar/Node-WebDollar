@@ -202,7 +202,7 @@ class NodesWaitlist {
     async _deleteObsoleteFullNodesWaitlist(){
 
         for (let i=this.waitListFullNodes.length-1; i>=0; i--)
-            if (!this.waitListFullNodes.isFallback) {
+            if (!this.waitListFullNodes[i].isFallback) {
 
                 try {
 
