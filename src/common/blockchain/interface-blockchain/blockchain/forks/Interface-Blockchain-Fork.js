@@ -23,6 +23,9 @@ class InterfaceBlockchainFork {
         this._blocksCopy = [];
         this.forkIsSaving = false;
 
+        this.downloadBlocksSleep = false;
+        this.downloadAllBlocks = false;
+
     }
 
     destroyFork(){
@@ -46,7 +49,6 @@ class InterfaceBlockchainFork {
             this._blocksCopy = [];
             this._forkPromiseResolver = undefined;
             this.forkPromise = undefined;
-            this.downloadAllBlocks = false;
 
         } catch (exception){
             Log.error("destroy fork raised an exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS,  exception);
@@ -289,7 +291,7 @@ class InterfaceBlockchainFork {
                     return false
                 }
 
-                if (this.downloadAllBlocks) await this.sleep(30);
+                if (this.downloadBlocksSleep) await this.sleep(30);
 
                 try {
 
@@ -302,7 +304,7 @@ class InterfaceBlockchainFork {
                     return false;
                 }
 
-                if (this.downloadAllBlocks) await this.sleep(20);
+                if (this.downloadBlocksSleep) await this.sleep(20);
 
                 try {
 
@@ -325,7 +327,7 @@ class InterfaceBlockchainFork {
                     return false;
                 }
 
-                if (this.downloadAllBlocks) await this.sleep(20);
+                if (this.downloadBlocksSleep) await this.sleep(20);
 
                 this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
 
@@ -361,7 +363,7 @@ class InterfaceBlockchainFork {
                         this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
                         this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
 
-                        if (!this.downloadAllBlocks || (index > 0 && index % 10 !== 0))
+                        if (!this.downloadBlocksSleep || (index > 0 && index % 10 !== 0))
                             this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
 
                         if (! (await this.saveIncludeBlock(index, revertActions, false)) )
@@ -373,7 +375,7 @@ class InterfaceBlockchainFork {
 
                     await this.blockchain.saveBlockchain( this.forkStartingHeight );
 
-                    if (!this.downloadAllBlocks) await this.sleep(2);
+                    if (!this.downloadBlocksSleep) await this.sleep(2);
 
                     Log.log("FORK STATUS SUCCESS5: "+forkedSuccessfully+ " position "+this.forkStartingHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
 
@@ -410,11 +412,11 @@ class InterfaceBlockchainFork {
 
                 await this.postForkTransactions(forkedSuccessfully);
 
-                if (this.downloadAllBlocks) await this.sleep(30);
+                if (this.downloadBlocksSleep) await this.sleep(30);
 
                 this.postFork(forkedSuccessfully);
 
-                if (this.downloadAllBlocks){
+                if (this.downloadBlocksSleep){
                     await this.sleep(30);
                     Blockchain.synchronizeBlockchain();
                 }
