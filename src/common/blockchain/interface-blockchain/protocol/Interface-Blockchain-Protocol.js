@@ -43,6 +43,7 @@ class InterfaceBlockchainProtocol {
         NodesList.emitter.on("nodes-list/connected", (result) => {
             this._initializeNewSocket(result)
         });
+
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
             this._uninitializeSocket(result)
         });
@@ -110,7 +111,8 @@ class InterfaceBlockchainProtocol {
                         l: this.blockchain.blocks.length,
                         h: this.blockchain.blocks.last.hash,
                         s: this.blockchain.blocks.blocksStartingPoint,
-                        p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== undefined && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
+                        p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== undefined && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true,
+                        W: this.blockchain.blocks.chainWorkSerialized,
                     } );
                 }
 
@@ -125,16 +127,19 @@ class InterfaceBlockchainProtocol {
                         h hash
                         l chainLength
                         s chainStartingPoint
+                        p hasProof (boolean)
+                        W WorkChain
+
                      */
 
                     if (data === null || (data.l < 0) || ( data.s >= data.l )) return;
 
-                    if (Math.random() < 0.1)
+                    if ( Math.random() < 0.1 )
                         console.log("newForkTip", data.l );
 
                     await this.blockchain.sleep(15+Math.random()*20);
 
-                    this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
+                    this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p, data.W);
 
                 } catch (exception){
 
@@ -229,7 +234,7 @@ class InterfaceBlockchainProtocol {
 
             await this.blockchain.sleep(15+Math.random()*20);
 
-            return await this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p);
+            return await this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p, data.W);
 
         } catch (exception){
 

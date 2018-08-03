@@ -20,6 +20,10 @@ class Logger{
         console.log('\x1b[33m%s\x1b[0m', this.name, "\x1b[0m", this.convertArguments.apply(this, arguments) );
     }
 
+    log(){
+        console.log(this.name, this.convertArguments.apply(this, arguments) );
+    }
+
     convertArguments(){
 
         let s=  '';

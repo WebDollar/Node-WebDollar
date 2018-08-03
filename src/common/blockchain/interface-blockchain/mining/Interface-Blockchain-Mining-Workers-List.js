@@ -75,7 +75,7 @@ class InterfaceBlockchainMiningWorkersList {
 
     _initializeWorker(worker){
         worker.suspended = false;
-        worker.postMessage({message: "initialize", block: this.block, nonce: this.mining._nonce , count: this.mining.WORKER_NONCES_WORK });
+        worker.postMessage({message: "initialize", block: this.block, difficulty: this.difficultyTarget, nonce: this.mining._nonce , count: this.mining.WORKER_NONCES_WORK });
 
         this.mining._nonce += this.mining.WORKER_NONCES_WORK;
 

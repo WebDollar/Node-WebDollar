@@ -43,10 +43,11 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
                 transactionsList.forEach( (transaction)=>{
 
-                    if ( BufferExtended.safeCompare(transaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress))
+                    if ( transaction.from.addresses[0].unencodedAddress.equals( this.from.addresses[0].unencodedAddress ))
                         foundNonce[ transaction.nonce ] = true;
 
                 });
+
 
                 for (let i=nonce; i<this.nonce; i++)
                     if (!foundNonce[i])

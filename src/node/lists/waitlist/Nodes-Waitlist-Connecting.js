@@ -7,6 +7,8 @@ import Blockchain from "main-blockchain/Blockchain";
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 import NODE_TYPE from "node/lists/types/Node-Type"
+import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
+import Log from 'common/utils/logging/Log';
 
 let NodeExpress;
 
@@ -37,7 +39,7 @@ class NodesWaitlistConnecting {
             minimum_waitlist:0,
         };
 
-        setInterval(this._calculateNumberOfConnections.bind(this), 5000);
+        this._timeoutCalculateNumberOfConnections = setTimeout( this._calculateNumberOfConnections.bind(this), 10000);
 
         this._calculateNumberOfConnections();
 
@@ -50,6 +52,11 @@ class NodesWaitlistConnecting {
         this.started = true;
         this._connectNewNodesWaitlistInterval();
 
+    }
+
+    stopConnecting(){
+        if (this._connectingTimeout  !== undefined)
+            clearTimeout( this._connectingTimeout );
     }
 
     /*
@@ -65,9 +72,12 @@ class NodesWaitlistConnecting {
             // if ( Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && NodesWaitlist.waitListFullNodes[i].isFallback)  continue;
 
             // in case it needs to connect only to port 80
-            if (this._connectedOnlyTo80 && NodesWaitlist.waitListFullNodes[i].sckAddresses[0].port !== "80") continue;
 
-            this._tryToConnectNextNode(NodesWaitlist.waitListFullNodes[i]);
+            let pos = Math.floor ( Math.random() * NodesWaitlist.waitListFullNodes.length );
+
+            if (this._connectedOnlyTo80 && NodesWaitlist.waitListFullNodes[pos].sckAddresses[0].port !== "80") continue;
+
+            this._tryToConnectNextNode(NodesWaitlist.waitListFullNodes[pos]);
 
         }
 
@@ -77,25 +87,32 @@ class NodesWaitlistConnecting {
 
         this._connectNewNodesWaitlist();
 
-        setTimeout( this._connectNewNodesWaitlistInterval.bind(this), consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
+        this._connectingTimeout = setTimeout( this._connectNewNodesWaitlistInterval.bind(this), consts.SETTINGS.PARAMS.WAITLIST.INTERVAL);
     }
 
     _tryToConnectNextNode( nextWaitListObject){
 
-        if (nextWaitListObject.isFallback) {
+        if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER ].indexOf(nextWaitListObject.nodeConsensusType) < 0 ) return;
 
-            let fallbacks = this._countConnectingToFallbacks() + NodesList.countFallbacks();
-            if (fallbacks >= this.connectingMaximum.maximum_fallbacks) return true;
 
-        } else {
+        if (Blockchain.blockchain.agent.consensus) {
 
-            let simple = (this._connectingQueue.length - this._countConnectingToFallbacks()) + ( NodesList.nodes.length - NodesList.countFallbacks() );
-            if (simple >= this.connectingMaximum.maximum_waitlist) return true;
+            if (nextWaitListObject.isFallback) {
+
+                let fallbacks = this._countConnectingToFallbacks() + NodesList.countFallbacks();
+                if (fallbacks >= this.connectingMaximum.maximum_fallbacks) return true;
+
+            } else {
+
+                let simple = (this._connectingQueue.length - this._countConnectingToFallbacks()) + ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) - NodesList.countFallbacks() );
+                if (simple >= this.connectingMaximum.maximum_waitlist) return true;
+
+            }
 
         }
-
-        if (Blockchain.Agent.light && Blockchain.Agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES)
+        if ( Blockchain.Agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES )
             return;
+
 
         //connect only to TERMINAL NODES
         if ( nextWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) {
@@ -104,14 +121,15 @@ class NodesWaitlistConnecting {
                 nextWaitListObject.connecting === false && nextWaitListObject.checkIsConnected() === null) {
 
                 nextWaitListObject.blocked = true;
-                this._connectingQueue.push(nextWaitListObject);
+                nextWaitListObject.blockedLastTime = new Date().getTime();
 
-                this._connectNowToNewNode(nextWaitListObject).then((connected) => {
+                this._connectingQueue.push( nextWaitListObject );
+
+                this._connectNowToNewNode(nextWaitListObject).then( (connected) => {
 
                     for (let i=this._connectingQueue.length-1; i>=0; i--)
                         if (this._connectingQueue[i] === nextWaitListObject){
                             this._connectingQueue.splice(i,1);
-                            break;
                         }
 
                     nextWaitListObject.checked = true;
@@ -135,7 +153,7 @@ class NodesWaitlistConnecting {
         let index = Math.floor( Math.random() * nextWaitListObject.sckAddresses.length );
 
         //search if the new protocol was already connected in the past
-        let nodeClient = NodesList.searchNodeSocketByAddress(nextWaitListObject.sckAddresses[index], 'all', ["id","uuid"]);
+        let nodeClient = NodesList.searchNodeSocketByAddress( nextWaitListObject.sckAddresses[index], 'all', ["id","uuid"] );
         if (nodeClient !== null) return nodeClient;
 
         nodeClient = new NodeClient();
@@ -209,6 +227,25 @@ class NodesWaitlistConnecting {
             }
 
         }
+
+        if (Blockchain !== undefined && Blockchain.isPoolActivated){
+            this.connectingMaximum.maximum_fallbacks += 10;
+            this.connectingMaximum.maximum_waitlist += 20;
+        }
+
+        try {
+            let date = new Date().getTime();
+            for (let i = this._connectingQueue.length - 1; i >= 0; i--)
+                if (date - this._connectingQueue[i].blockedLastTime > 2 * 60 * 1000) {
+                    this._connectingQueue.splice(i, 1);
+                    Log.warn("Deleting OLD connectingQueue element " + i + " " + this._connectingQueue[i].sckAddresses[0].getAddress(), Log.LOG_TYPE.default);
+                }
+        } catch (exception){
+            console.error(exception)
+        }
+
+        this._timeoutCalculateNumberOfConnections = setTimeout( this._calculateNumberOfConnections.bind(this), 10000);
+
     }
 
 }

@@ -49,25 +49,16 @@ class MiniBlockchainBalances{
 
         if (address === null) return {result:false, message: "invalid address"};
 
-        let subscription = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(address),callback);
+        let unsubscribe = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(address),callback);
 
         return {
             result: true,
-            subscription: subscription,
+            subscription: unsubscribe,
             balances: this.listBalances(addressWIF),
             nonce: this.getNonce(addressWIF),
         }
     }
 
-    unsusbribeBalancesChanges(subscription){
-
-        if (subscription === undefined || subscription === null) return false;
-
-        if (typeof subscription === 'function')
-            subscription();
-
-        return true;
-    }
 
 }
 

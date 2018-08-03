@@ -128,20 +128,20 @@ class PoolDataBlockInformation {
     }
 
 
-    deserializeBlockInformation(buffer, offset = 0){
+    async deserializeBlockInformation(buffer, offset = 0){
 
-        let version = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
+        let version = Serialization.deserializeNumber1Bytes( buffer, offset, );
         offset += 1;
 
         if (version >= 0x01){
 
-            let height = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
+            let height = Serialization.deserializeNumber4Bytes( buffer, offset, );
             offset +=4;
 
             this.height = height;
         }
 
-        let length = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 4 )  );
+        let length = Serialization.deserializeNumber4Bytes( buffer, offset, );
         offset +=4;
 
         this.blockInformationMinersInstances = [];
@@ -162,19 +162,19 @@ class PoolDataBlockInformation {
         }
         this._calculateTimeRemaining();
 
-        let payout = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
+        let payout = Serialization.deserializeNumber1Bytes( buffer, offset, );
         offset += 1;
 
         this.payout = payout === 1;
 
-        let hasBlock = Serialization.deserializeNumber( BufferExtended.substr( buffer, offset, 1 )  );
+        let hasBlock = Serialization.deserializeNumber1Bytes( buffer, offset, );
         offset += 1;
 
         if (hasBlock === 1){
 
             this.block = this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
 
-            let height = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, 4));
+            let height = Serialization.deserializeNumber4Bytes( buffer, offset, );
             offset += 4;
 
             let difficultyTargetPrev = BufferExtended.substr(buffer, offset, 32);
@@ -185,6 +185,8 @@ class PoolDataBlockInformation {
 
                 offset = this.block.deserializeBlock(buffer, height, undefined, undefined, offset);
                 this.block.difficultyTargetPrev = difficultyTargetPrev;
+
+                await this.block.computeHash();
 
             } catch (exception){
 

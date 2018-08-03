@@ -6,6 +6,13 @@ class NodeAPICallbacks{
 
     constructor(){
 
+        /**
+         *
+         * {
+         *    name
+         *    callback
+         * }
+         */
         this._subscribers = [];
 
         NodesList.emitter.on("nodes-list/disconnected", (nodesListObject ) => { this._disconnectCallbacks(nodesListObject.socket, false ) });
@@ -33,11 +40,11 @@ class NodeAPICallbacks{
 
             if (data === null || !data.result) throw {message: "couldn't subscribe"};
 
-            let subscription = data.subscription;
+            let unsubscribe = data.subscription;
             let balances = data.balances;
             let nonce = data.nonce;
 
-            this._addSubscribedEvent(subscription, "addressBalancesSubscribe"+address, res, callback, nodeApiType);
+            this._addSubscribedEvent(unsubscribe, "addressBalancesSubscribe"+address, res, callback, nodeApiType);
 
             return {result: true, address: address, balances: balances, nonce: nonce,  _suffix: address};
 
@@ -50,10 +57,11 @@ class NodeAPICallbacks{
 
     addressBalanceUnsubscribe(req, res, callback, nodeApiType){
 
+        let address;
         try {
 
             if (typeof req.address !== "string")  throw {message: "address is invalid"};
-            let address = req.address;
+            address = req.address;
 
             this.removeCallback("addressBalancesSubscribe" + address, res);
 
@@ -92,7 +100,7 @@ class NodeAPICallbacks{
 
 
         } catch (exception){
-            return {result:false, message: exception.message, _suffix: address};
+            return {result:false, message: exception.message, _suffix: address || ''};
         }
 
 
@@ -100,9 +108,10 @@ class NodeAPICallbacks{
 
     addressTransactionsUnsubscribe(req, res, callback, nodeApiType){
 
+        let address;
         try {
             if (typeof req.address !== "string")  throw {message: "address is invalid"};
-            let address = req.address;
+            address = req.address;
 
             this.removeCallback("addressTransactionsSubscribe" + address, res);
 
@@ -114,10 +123,10 @@ class NodeAPICallbacks{
     }
 
 
-    _addSubscribedEvent(subscription, name, res, nodeApiType){
+    _addSubscribedEvent(unsubscribe, name, res, nodeApiType){
 
         let object = {
-            subscription: subscription,
+            unsubscribe: unsubscribe,
             name: name,
             nodeApiType: nodeApiType,
         };
@@ -129,19 +138,21 @@ class NodeAPICallbacks{
 
     }
 
-    removeCallback(name, res){
+    removeCallback(name, callback ){
+
         for (let i=this._subscribers.length-1; i>=0; i--)
-            if (this._subscribers[i].name === name && this._subscribers[i].res === res ){
-                this._subscribers[i].subscription();
+            if (this._subscribers[i].name === name && this._subscribers[i].res === callback  ){
+                this._subscribers[i].unsubscribe();
                 this._subscribers.splice(i,1);
             }
+
     }
 
     _disconnectCallbacks(socket){
 
         for (let i=this._subscribers.length-1; i>=0; i-- )
             if (this._subscribers[i].res === socket){
-                this._subscribers[i].subscription();
+                this._subscribers[i].unsubscribe();
                 this._subscribers.splice(i, 1);
             }
 

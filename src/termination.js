@@ -1,4 +1,6 @@
 import global from "consts/global";
+import NodesList from 'node/lists/Nodes-List'
+import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
 let alreadySaved = false;
 
@@ -10,6 +12,35 @@ export default async (Blockchain) => {
 
     if (alreadySaved) return;
     alreadySaved = true;
+
+    console.warn("Disconnecting All Nodes...");
+    NodesList.disconnectAllNodes("all");
+    NodesWaitlist.waitListFullNodes = [];
+    NodesWaitlist.waitListLightNodes = [];
+
+
+    console.log("Closing Express");
+    try {
+
+        let NodeExpress, NodeServer;
+        if (!process.env.BROWSER) {
+            NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+            NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+        }
+
+        NodeExpress.app.close();
+
+    } catch (exception){
+
+    }
+
+    Blockchain.Mining.stopMining();
+
+    try{
+        await Blockchain.blockchain.transactions.pendinQueue.pendingQueueSavingManager.savePendingTransactions();
+    } catch (exception){
+
+    }
 
     if (!global.INTERFACE_BLOCKCHAIN_LOADING)
         await Blockchain.blockchain.saveBlockchainTerminated();
@@ -32,19 +63,6 @@ export default async (Blockchain) => {
 
             if (!process.env.BROWSER) {
 
-                console.log("Closing Express");
-                try {
-
-                    let NodeExpress, NodeServer;
-                    if (!process.env.BROWSER) {
-                        NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
-                        NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
-                    }
-
-                    NodeExpress.app.close();
-                } catch (exception){
-
-                }
 
                 setTimeout(()=>{
 

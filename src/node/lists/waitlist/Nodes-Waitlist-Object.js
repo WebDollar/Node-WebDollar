@@ -15,7 +15,10 @@ class NodesWaitlistObject {
         this.socket = socket;
 
         this.connected = false;
+
         this.blocked = false;
+        this.blockedLastTime = 0;
+
         this.checked = false;
 
         if (backedBy === "fallback")
@@ -32,6 +35,8 @@ class NodesWaitlistObject {
 
         this.errorTrials = 0;
         this.lastTimeChecked = 0;
+
+        this.failsChecking = 0; //checking by downloading http request
 
         this.level = level||0;
 
@@ -64,9 +69,14 @@ class NodesWaitlistObject {
 
     socketErrorConnected(){
 
+        if (Blockchain.MinerPoolManagement.minerPoolStarted && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_POOL, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_POOL].indexOf(this.nodeConsensusType) >= 0){
+            this.errorTrials = 0;
+            return;
+        }
+
         this.errorTrials++;
 
-        if (this.isFallback === true) {
+        if (this.isFallback === true ) {
 
             if (process.env.BROWSER)
                 this.errorTrials = Math.min(this.errorTrials, 3 + Math.floor( Math.random() * 2) );

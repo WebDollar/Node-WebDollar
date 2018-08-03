@@ -4,17 +4,18 @@ import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-R
 import consts from 'consts/const_global'
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 import PoolPayouts from "./Payout/Pool-Payouts"
+import Log from 'common/utils/logging/Log';
 
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
-const VALIDATION_BLOCK_CONFIRMATIONS = 40; //blocks
+const VALIDATION_BLOCK_CONFIRMATIONS_FAILS_START = 40; //blocks
 
 const MAXIMUM_FAIL_CONFIRMATIONS = 20; //blocks
-
-const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : 10;
 
 const CONFIRMATIONS_REQUIRE_OTHER_MINERS = consts.DEBUG ? false : true;
 
 const CONFIRMATION_METHOD = 2; //1 is not working properly
+
+const CONFIRMATIONS_REQUIRED = consts.DEBUG ? 1 : (CONFIRMATION_METHOD === 2 ? 15 : 10);
 
 import Blockchain from 'main-blockchain/Blockchain';
 
@@ -54,9 +55,6 @@ class PoolRewardsManagement{
             return;
 
         this._lastTimeCheckHeight = this.blockchain.blocks.length-1;
-
-        let poolBlocksConfirmed = 0;
-        let poolBlocksUnconfirmed = 0;
 
         let confirmationsPool = 0;
         let confirmationsOthers = 0;
@@ -99,6 +97,10 @@ class PoolRewardsManagement{
 
             }
 
+        Log.info("BLocksInfo: "+this.poolData.blocksInfo.length, Log.LOG_TYPE.POOLS );
+
+        let poolBlocksBeingConfirmed = 0;
+
         //recalculate the confirmations
         for (let i = this.poolData.blocksInfo.length-1; i >= 0; i--  ){
 
@@ -106,19 +108,21 @@ class PoolRewardsManagement{
             if ( this.poolData.blocksInfo[i].payout){
 
                 //let's delete old payouts
-                if ( this.blockchain.blocks.length - this.poolData.blocksInfo[i].block.height > 40) {
+                if ( this.poolData.blocksInfo[i].block === undefined || (this.blockchain.blocks.length - this.poolData.blocksInfo[i].block.height > 40)) {
+
                     this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid++;
+                    this.poolManagement.poolStatistics.poolBlocksConfirmed--;
+                    
+                    Log.warn("BLOCK ALREADY PAID "+i, Log.LOG_TYPE.POOLS);
+
                     this.poolData.deleteBlockInformation(i);
                 }
 
-                poolBlocksConfirmed++;
                 continue;
-
             }
 
             //already confirmed
             if (this.poolData.blocksInfo[i].confirmed){
-                poolBlocksConfirmed++;
                 continue;
             }
 
@@ -128,6 +132,11 @@ class PoolRewardsManagement{
 
                 if (i === this.poolData.blocksInfo.length-1 ) continue;
                 else { //for some reasons, maybe save/load
+                    
+                    Log.warn("==========================================", Log.LOG_TYPE.POOLS);
+                    Log.warn("REDISTRIBUTION1 DONE 1 "+i, Log.LOG_TYPE.POOLS);
+                    Log.warn("==========================================", Log.LOG_TYPE.POOLS);
+                    
                     this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i], i );
                     continue;
                 }
@@ -136,8 +145,10 @@ class PoolRewardsManagement{
 
 
             //not ready at the moment
-            if (blockInfo.height > this.blockchain.blocks.length)
+            if (blockInfo.height > this.blockchain.blocks.length) {
+                poolBlocksBeingConfirmed++;
                 continue;
+            }
 
             //confirm using my own blockchain / light blockchain
             if (this.blockchain.blocks.blocksStartingPoint < blockInfo.height){ //i can confirm the block by myself
@@ -158,10 +169,11 @@ class PoolRewardsManagement{
                     } else if (CONFIRMATION_METHOD === 2)
                         this.poolData.blocksInfo[i].confirmations = (this.blockchain.blocks.length - blockInfo.height);
 
+                    this.poolData.blocksInfo[i].confirmationsFailsTrials = 0;
 
                 } else{
-                    
-                    if ( this.blockchain.blocks.length  > blockInfo.height + VALIDATION_BLOCK_CONFIRMATIONS )
+
+                    if ( this.blockchain.blocks.length  > blockInfo.height + VALIDATION_BLOCK_CONFIRMATIONS_FAILS_START )
                         this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
                 }
@@ -173,21 +185,26 @@ class PoolRewardsManagement{
                     continue;
 
                 found = await this._confirmUsingPoolServer(this.poolData.blocksInfo[i]);
-                
+
                 if (!found)
                     this.poolData.blocksInfo[i].confirmationsFailsTrials++;
 
             }
-            
+
             if (!found)
                 this.poolData.blocksInfo[i].confirmations = 0;
-            
+
             //to mail fail trials
-            if (this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS){
+            if ( this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS ){
+
+                this.poolManagement.poolStatistics.poolBlocksUnconfirmed++;
+
+                Log.warn("==========================================", Log.LOG_TYPE.POOLS);
+                Log.warn("REDISTRIBUTION1 DONE 2 "+ i, Log.LOG_TYPE.POOLS);
+                Log.warn("==========================================", Log.LOG_TYPE.POOLS);
 
                 this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i], i );
                 continue;
-
             }
 
             if (found && this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED){
@@ -210,15 +227,15 @@ class PoolRewardsManagement{
 
                 });
 
-                poolBlocksConfirmed++;
+                this.poolManagement.poolStatistics.poolBlocksConfirmed++;
 
-            } else {
-                poolBlocksUnconfirmed++;
-            }
+            } else
+                poolBlocksBeingConfirmed++;
 
         }
 
-        this.poolManagement.poolStatistics.addBlocksStatistics(poolBlocksConfirmed, poolBlocksUnconfirmed );
+        this.poolManagement.poolStatistics.poolBlocksBeingConfirmed = poolBlocksBeingConfirmed;
+
 
     }
 
@@ -342,11 +359,11 @@ class PoolRewardsManagement{
         else return this._serverBlocks[forkHeight-1].hash; // the fork
 
     }
-    
+
     redistributePoolDataBlockInformation(blockInformation, index){
 
         blockInformation.block = undefined; //cancel the block
-        
+
         //move the blockInformationMinerInstances to the latest non solved blockInformation
         let lastBlockInformation = this.poolData.lastBlockInformation;
 
@@ -363,7 +380,7 @@ class PoolRewardsManagement{
 
         //clear the blockInformation
         this.poolData.deleteBlockInformation(index);
-        
+
     }
 
 

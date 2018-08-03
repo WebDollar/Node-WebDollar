@@ -1,6 +1,5 @@
 import consts from 'consts/const_global';
 
-let BigInteger = require('big-integer');
 let BigNumber = require ('bignumber.js');
 
 

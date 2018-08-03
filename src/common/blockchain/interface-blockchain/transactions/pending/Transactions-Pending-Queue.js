@@ -1,20 +1,25 @@
 import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended"
 import TransactionsProtocol from "../protocol/Transactions-Protocol"
+import TransactionsPendingQueueSavingManager from "./Transactions-Pending-Queue-Saving-Manager";
 
-
-class InterfaceTransactionsPendingQueue {
+class TransactionsPendingQueue {
 
     constructor(transactions, blockchain, db){
 
         this.transactionsProtocol = new TransactionsProtocol(blockchain);
 
         this.transactions = transactions;
+        this.pendingQueueSavingManager = new TransactionsPendingQueueSavingManager(blockchain, this, db);
 
         this.blockchain = blockchain;
         this.list = [];
 
         this.db = db;
+
+
+        setTimeout( this._removeOldTransactions.bind(this), 20000 );
+
     }
 
     includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
@@ -45,7 +50,7 @@ class InterfaceTransactionsPendingQueue {
 
         let inserted = false;
 
-        for (let i=0; i<this.list.length; i++ ) {
+        for (let i=0; i<this.list.length && inserted === false; i++ ) {
             let compare = transaction.from.addresses[0].unencodedAddress.compare(this.list[i].from.addresses[0].unencodedAddress);
 
             if (compare < 0) // next
@@ -55,18 +60,20 @@ class InterfaceTransactionsPendingQueue {
 
 
                 if (transaction.nonce === this.list[i].nonce){
-                    this.list[i] = transaction;
-                    inserted = true;break;
+                    inserted = true;
+                    break;
                 } else if (transaction.nonce < this.list[i].nonce){
                     this.list.splice(i, 0, transaction);
-                    inserted = true;break;
+                    inserted = true;
+                    break;
                 }
 
             }
             else
             if (compare > 0) { // i will add it
                 this.list.splice(i, 0, transaction);
-                inserted = true;break;
+                inserted = true;
+                break;
             }
 
         }
@@ -113,12 +120,13 @@ class InterfaceTransactionsPendingQueue {
         if (index === -1)
             return true;
 
+        this.list[index].destroyTransaction();
         this.list.splice(index, 1);
 
         this.transactions.emitTransactionChangeEvent(transaction, true);
     }
 
-    removeOldTransactions (){
+    _removeOldTransactions (){
 
         let blockValidationType = {
             "take-transactions-list-in-consideration": {
@@ -128,21 +136,23 @@ class InterfaceTransactionsPendingQueue {
 
         for (let i=this.list.length-1; i >= 0; i--) {
 
+            if (this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
+
             try{
 
-                if ( this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION &&
-                     !this.list[i].validateTransactionEveryTime(undefined, blockValidationType ) &&
-                     ( this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length )
-                ) {
+                if ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION ||  !this.list[i].validateTransactionEveryTime(undefined, blockValidationType )) &&
+                     (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length )) {
                     this._removePendingTransaction(i);
                 }
 
             } catch (exception){
                 console.warn("Old Transaction removed because of exception ", exception);
-                this.list.splice(i, 1);
+                this._removePendingTransaction(i)
             }
 
         }
+
+        setTimeout( this._removeOldTransactions.bind(this), 20000 );
 
     }
 
@@ -153,4 +163,4 @@ class InterfaceTransactionsPendingQueue {
 
 }
 
-export default InterfaceTransactionsPendingQueue
+export default TransactionsPendingQueue

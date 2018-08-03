@@ -2,17 +2,19 @@ import consts from 'consts/const_global'
 import MiniBlockchainFork from "./../Mini-Blockchain-Fork"
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
+const BigInteger = require('big-integer');
 
 class MiniBlockchainLightFork extends MiniBlockchainFork {
 
-    constructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header) {
+    constructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header) {
 
-        super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, header)
+        super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header)
 
         this.forkPrevAccountantTree = null;
         this.forkPrevDifficultyTarget = null;
         this.forkPrevTimeStamp = null;
         this.forkPrevHashPrev = null;
+        this.forkPrevChainWork = null;
 
         this.forkDifficultyCalculation = {
             difficultyAdditionalBlocks: [],
@@ -20,6 +22,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         };
 
         this._blocksStartingPointClone = null;
+
+        this._lightChainWorkClone = new BigInteger(0);
         this._lightPrevDifficultyTargetClone = null;
         this._lightPrevTimeStampClone = null;
         this._lightPrevHashPrevClone = null;
@@ -120,6 +124,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
+            this._lightChainWorkClone = this.blockchain.blocks.chainWork;
             this._blocksStartingPointClone = this.blockchain.blocks.blocksStartingPoint;
             this._lightAccountantTreeSerializationsHeightClone = new Buffer(this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializations[diffIndex] : 0);
             this._lightPrevDifficultyTargetClone = new Buffer(this.blockchain.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.blockchain.lightPrevDifficultyTargets[diffIndex] : 0);
@@ -156,6 +161,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
                 throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: forkSum, rewardShould: BlockchainMiningReward.getSumReward(diffIndex-1)};
 
             this.blockchain.blocks.blocksStartingPoint = diffIndex;
+            this.blockchain.blocks.chainWork = this.forkPrevChainWork;
+
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;
             this.blockchain.lightPrevTimeStamps[diffIndex] = this.forkPrevTimeStamp;
             this.blockchain.lightPrevHashPrevs[diffIndex] = this.forkPrevHashPrev;
@@ -176,6 +183,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
+            this.blockchain.blocks.chainWork = this._lightChainWorkClone;
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this._lightPrevDifficultyTargetClone;
             this.blockchain.lightPrevTimeStamps[diffIndex] = this._lightPrevTimeStampClone;
             this.blockchain.lightPrevHashPrevs[diffIndex] = this._lightPrevHashPrevClone;
@@ -198,6 +206,34 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         return answer;
     }
+
+
+
+    _validateChainWork(){
+
+        //new chainWork must be greater
+        if (this.blockchain.blocks.chainWork.greater(0))
+            MiniBlockchainFork.prototype._validateChainWork.call(this);
+
+        if (this.forkChainStartingPoint === this.forkStartingHeight &&
+            this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
+
+            let chainWork = this.forkPrevChainWork;
+
+            let forkWork = new BigInteger(0);
+
+            for (let i=0; i< this.forkBlocks.length; i++ )
+                forkWork = forkWork.plus( this.forkBlocks[i].workDone );
+
+            //TODO just enable it
+            // TEMPORARY DISABLED for avoiding issues with the consensus by having a new way how to calculate the chainWork
+            // if (!chainWork.plus(forkWork).equals(this.forkChainWork))
+            //     throw {message: "chainWork doesn't match forkChain", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
+
+        }
+
+    }
+
 
 }
 

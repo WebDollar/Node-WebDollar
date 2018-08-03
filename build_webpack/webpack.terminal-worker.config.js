@@ -7,13 +7,14 @@ module.exports = {
 
     //define entry point
     entry: {
-        app: "./src/build_worker.js",
+        app: "./src/common/blockchain/interface-blockchain/mining/backbone/Build-Backbone-Worker.js",
     },
 
     // send to distribution
     output: {
         filename: 'dist_bundle/terminal_worker.js',
     },
+
     resolve: {
         alias: {
             // 'src': path.resolve(__dirname + '/../src'),

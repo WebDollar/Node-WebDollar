@@ -115,6 +115,8 @@ class NodeServer {
 
             server.on("connection", async (socket) => {
 
+                if (!this.loaded) return;
+
                 if (socket.request._query["msg"] !== "HelloNode"){
                     console.error("No Hello Msg");
                     socket.disconnect();
@@ -151,6 +153,26 @@ class NodeServer {
                     socket.disconnect();
                     return;
                 }
+
+
+                if ( (Blockchain.PoolManagement !== undefined && Blockchain.PoolManagement._poolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) ||
+                     (Blockchain.ServerPoolManagement !== undefined && Blockchain.ServerPoolManagement._serverPoolStarted  && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)){
+
+
+                    if (Math.random() < 0.1)
+                        console.error("disconnecting user for being simple node", nodeConsensusType);
+
+                    socket.disconnect();
+                    return;
+
+                }
+
+                //avoid allowing
+                if (!Blockchain.blockchain.agent.consensus){
+                    socket.disconnect();
+                    return;
+                }
+
 
                 if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
 

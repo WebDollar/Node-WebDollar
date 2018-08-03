@@ -43,6 +43,7 @@ class PoolProtocolList{
     deleteElement(socket){
 
         let pos = this.findElement(socket);
+
         if (pos !== -1)
             this.list.splice(pos, 1);
 

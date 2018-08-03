@@ -50,7 +50,7 @@ class NodeAPIPublicNodes{
                     height: block.height,
                     hash: block.hash.toString("hex").substr(0, 20),
                     minerAddress:  InterfaceBlockchainAddressHelper.generateAddressWIF( block.data.minerAddress, false, true),
-                    address: block._socketPropagatedBy !== undefined ? block._socketPropagatedBy.node.sckAddress.address: '',
+                    address: block._socketPropagatedBy !== undefined ? block._socketPropagatedBy.node.sckAddress.getAddress(true, true): '',
                     geoLocation: block._socketPropagatedBy !== undefined ? (block._socketPropagatedBy.node.sckAddress.geoLocation.isFulfilled() ? this._getCity ( await block._socketPropagatedBy.node.sckAddress.geoLocation) : "not ready" ) : 'na',
                 });
 

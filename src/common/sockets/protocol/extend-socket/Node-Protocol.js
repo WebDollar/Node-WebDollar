@@ -4,6 +4,7 @@ import NODE_TYPE from "node/lists/types/Node-Type"
 import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import Blockchain from "main-blockchain/Blockchain"
 import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
+import Serialization from "../../../utils/Serialization";
 
 let NodeExpress, NodeServer;
 
@@ -26,7 +27,7 @@ class NodeProtocol {
             nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
             domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
-        }, undefined, 4000);
+        }, undefined, 5000);
 
     }
 
@@ -169,7 +170,8 @@ class NodeProtocol {
             l: Blockchain.blockchain.blocks.length,
             h: Blockchain.blockchain.blocks.last.hash,
             s: Blockchain.blockchain.blocks.blocksStartingPoint,
-            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi !== undefined && Blockchain.blockchain.proofPi.validatesLastBlock() ? true : false ) : true // i also have the proof
+            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi !== undefined && Blockchain.blockchain.proofPi.validatesLastBlock() ? true : false ) : true, // i also have the proof
+            W: Blockchain.blockchain.blocks.chainWorkSerialized, // chain work
         }, callback);
     }
 

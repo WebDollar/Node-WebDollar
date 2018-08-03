@@ -11,7 +11,9 @@ class MinerPoolStatistics{
 
         this._poolHashes = 0;
         this._poolMinersOnline = 0;
+        this._poolBlocksBeingConfirmed = 0;
         this._poolBlocksConfirmed = 0;
+        this._poolBlocksConfirmedAndPaid = 0;
         this._poolBlocksUnconfirmed = 0;
         this._poolTimeRemaining = 0;
 
@@ -53,6 +55,30 @@ class MinerPoolStatistics{
         return this._poolBlocksConfirmed;
     }
 
+    set poolBlocksConfirmedAndPaid(newValue){
+
+        if (this._poolBlocksConfirmedAndPaid === newValue) return;
+
+        this._poolBlocksConfirmedAndPaid = newValue;
+        this._emitNotification();
+    }
+
+    get poolBlocksConfirmedAndPaid(){
+        return this._poolBlocksConfirmedAndPaid;
+    }
+
+    set poolBlocksBeingConfirmed(newValue){
+
+        if (this._poolBlocksBeingConfirmed === newValue) return;
+
+        this._poolBlocksBeingConfirmed = newValue;
+        this._emitNotification();
+    }
+
+    get poolBlocksBeingConfirmed(){
+        return this._poolBlocksBeingConfirmed;
+    }
+
     set poolBlocksUnconfirmed(newValue){
 
         if (this._poolBlocksUnconfirmed === newValue) return;
@@ -78,7 +104,16 @@ class MinerPoolStatistics{
     }
 
     _emitNotification(){
-        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes, poolMinersOnline: this._poolMinersOnline, poolBlocksConfirmed: this.poolBlocksConfirmed, poolBlocksUnconfirmed: this.poolBlocksUnconfirmed, poolTimeRemaining: this.poolTimeRemaining });
+
+        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes,
+            poolMinersOnline: this._poolMinersOnline,
+            poolBlocksBeingConfirmed: this._poolBlocksBeingConfirmed,
+            poolBlocksConfirmed: this._poolBlocksConfirmed,
+            poolBlocksConfirmedAndPaid: this._poolBlocksConfirmedAndPaid,
+            poolBlocksUnconfirmed: this._poolBlocksUnconfirmed,
+            poolTimeRemaining: this.poolTimeRemaining
+        });
+
     }
 
 }

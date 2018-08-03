@@ -1,5 +1,4 @@
-var BigInteger = require('big-integer');
-import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
+const BigInteger = require('big-integer');
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
@@ -64,6 +63,8 @@ class InterfaceBlockchainBlock {
         this.db = db;
 
         this._socketPropagatedBy = undefined;
+
+        this._workDone = undefined;
 
     }
 
@@ -344,7 +345,7 @@ class InterfaceBlockchainBlock {
             this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
-            this.nonce = Serialization.deserializeNumber4Bytes( BufferExtended.substr(buffer, offset, 4) );
+            this.nonce = Serialization.deserializeNumber4Bytes( buffer, offset, );
             offset += 4;
 
 
@@ -357,7 +358,7 @@ class InterfaceBlockchainBlock {
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
 
-            this.timeStamp = Serialization.deserializeNumber4Bytes( BufferExtended.substr(buffer, offset, 4) );
+            this.timeStamp = Serialization.deserializeNumber4Bytes( buffer, offset);
             offset += 4;
 
             offset = this.data.deserializeData(buffer, offset);
@@ -500,6 +501,19 @@ class InterfaceBlockchainBlock {
         socket.on("disconnect",()=>{
            this._socketPropagatedBy = undefined;
         });
+
+    }
+
+    /**
+     *
+     */
+    get workDone(){
+
+        if (this._workDone !== undefined) return this._workDone;
+
+        this._workDone = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.difficultyTargetPrev.toString("hex"), 16 ) );
+
+        return this._workDone;
 
     }
 

@@ -45,6 +45,9 @@ class MinerPoolMining extends InheritedPoolMining {
 
         this._isBeingMining = false;
 
+        if (this._workers !== undefined)
+            this._workers._in_pool = true;
+
     }
 
     _startMinerPoolMining(){
@@ -52,7 +55,7 @@ class MinerPoolMining extends InheritedPoolMining {
         if (this._checkForWorkInterval === undefined)
             this._checkForWorkInterval = this._checkForWorkIntervalCallback();
 
-        this._poolFailTrials = 0;
+        this._miningWork.date = new Date().getTime();
 
     }
 
@@ -99,12 +102,15 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.end = work.end;
 
         this._miningWork.resolved = false;
+        this._miningWork.date = new Date().getTime();
 
         this._miningWork.poolSocket = poolSocket;
 
         if (this._isBeingMining){
             this.resetForced = true;
         }
+
+        Log.info("New Work: "+ (work.end - work.start), Log.LOG_TYPE.POOLS );
 
     }
 
@@ -125,14 +131,20 @@ class MinerPoolMining extends InheritedPoolMining {
                     let timeInitial = new Date().getTime();
 
                     this._isBeingMining = true;
+                    let workHeight = this._miningWork.height;
                     let answer = await this._run();
                     this._isBeingMining = false;
+
+                    if (answer === null)
+                        continue;
 
                     answer.timeDiff = new Date().getTime() - timeInitial;
 
                     if (!this.resetForced ) {
                         this._miningWork.resolved = true;
-                        await this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket);
+                        answer.height = workHeight;
+                        answer.hashes = this._miningWork.end - this._miningWork.start;
+                        await this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket );
                     } else {
                         this.resetForced = false;
                     }
@@ -158,7 +170,7 @@ class MinerPoolMining extends InheritedPoolMining {
             if (this._miningWork.end === undefined) throw {message: "end is undefined"};
             if (this._miningWork.difficultyTarget === undefined) throw {message: "difficultyTarget is undefined"};
 
-            let answer = await this.mine(this._miningWork.block, this._miningWork.difficultyTarget, this._miningWork.start, this._miningWork.end, this._miningWork.difficultyTarget );
+            let answer = await this.mine(this._miningWork.block, this._miningWork.difficultyTarget, this._miningWork.start, this._miningWork.end, this._miningWork.height,  );
 
             return answer;
 
@@ -177,16 +189,14 @@ class MinerPoolMining extends InheritedPoolMining {
             if (this._miningWork.poolSocket !== null && this._miningWork.resolved)
                 await this.minerPoolManagement.minerPoolProtocol.requestWork();
 
-            if (!this.started) this._poolFailTrials = 0;
-            if (this.started && this._hashesPerSecond === 0 ){
-                this._poolFailTrials ++;
+            if (this.started && (new Date().getTime() - this._miningWork.date ) > 120000 ){
 
                 //in case I can not mine from this pool, show an error and disconnect
-                if (this._poolFailTrials > 8) {
-                    Log.error("Mining Pool is not working. Trying to reconnect", Log.LOG_TYPE.POOLS);
-                    NodesList.disconnectAllNodes();
-                    this._poolFailTrials = 0;
-                }
+                Log.error("Mining Pool is not working. Trying to reconnect", Log.LOG_TYPE.POOLS);
+                NodesList.disconnectAllNodes();
+                await this.minerPoolManagement.minerPoolProtocol.insertServersListWaitlist( this.minerPoolSettings.poolServers );
+
+                this._miningWork.date = new Date().getTime();
 
             }
 

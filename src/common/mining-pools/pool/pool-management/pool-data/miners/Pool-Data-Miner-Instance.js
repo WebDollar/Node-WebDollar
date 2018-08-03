@@ -15,6 +15,10 @@ class PoolDataMinerInstance {
         this.work = undefined;
         this.lastBlockInformation = undefined;
 
+
+        this._dateActivity = 0;
+
+
     }
 
     destroyPoolDataMinerInstance(){
@@ -34,6 +38,14 @@ class PoolDataMinerInstance {
 
     get hashesPerSecond(){
         return this._hashesPerSecond;
+    }
+
+    set dateActivity(newValue){
+        this._dateActivity = newValue;
+    }
+
+    get dateActivity(){
+        return this._dateActivity;
     }
 
 }
