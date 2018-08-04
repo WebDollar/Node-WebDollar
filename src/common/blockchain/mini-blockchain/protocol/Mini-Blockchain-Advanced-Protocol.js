@@ -105,7 +105,6 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                     difficultyTarget: difficultyTarget,
                     timeStamp: timestamp,
                     hashPrev: hashPrev,
-                    chainWork: this.blockchain.blocks.chainWorkSerialized
                 });
 
 
