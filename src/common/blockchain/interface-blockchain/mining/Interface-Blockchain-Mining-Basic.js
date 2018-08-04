@@ -32,7 +32,7 @@ class InterfaceBlockchainMiningBasic {
         this.useResetConsensus = true;
 
         this.resetForced = false;
-        this._avoidShowingZeroHashesPerSecond = false;
+        this._intervalPerMinute = false;
     }
 
     get minerAddress(){
@@ -154,13 +154,18 @@ class InterfaceBlockchainMiningBasic {
 
         StatusEvents.emit('mining/status-changed', true);
 
-        await this.mineNextBlock(true);
+        this._startMiningHashRateInterval();
+
+        await this.mineNextBlock();
+
     }
 
     stopMining(){
 
         this.started = false;
         StatusEvents.emit('mining/status-changed', false);
+
+        this._destroyMiningInterval();
     }
 
     resetMining(){
@@ -169,21 +174,34 @@ class InterfaceBlockchainMiningBasic {
         StatusEvents.emit('mining/reset', true);
     }
 
-    setMiningHashRateInterval(){
+    _startMiningHashRateInterval(){
 
         if (this._intervalMiningOutput !== undefined) return;
 
+        let count = 0;
         this._intervalMiningOutput = setInterval(() => {
 
-            if (typeof this._hashesPerSecond === "number") {
+            count ++;
 
-                if (! this._avoidShowingZeroHashesPerSecond || this._hashesPerSecond !== 0 )
-                    console.log(this._hashesPerSecond + " hashes/s");
+            if (!this._intervalPerMinute ){
+                console.log(this._hashesPerSecond + " hashes/s");
+                StatusEvents.emit("mining/hash-rate", this._hashesPerSecond);
+                this._hashesPerSecond = 0;
+            } if ( count % 30 === 0 ) {
+
+                console.info("-------------------------------------");
+                console.info("-------------------------------------");
+                console.info("-------------------------------------");
+                console.info(this._hashesPerSecond/30 + " hashes/s");
+                console.info("-------------------------------------");
+                console.info("-------------------------------------");
+                console.info("-------------------------------------");
+                StatusEvents.emit("mining/hash-rate", this._hashesPerSecond);
+                this._hashesPerSecond = 0;
+            } else {
+                if (this._hashesPerSecond > 0)
+                    console.log("mining....");
             }
-
-            StatusEvents.emit("mining/hash-rate", this._hashesPerSecond );
-
-            this._hashesPerSecond = 0;
 
         }, 1000);
     }
@@ -191,7 +209,7 @@ class InterfaceBlockchainMiningBasic {
 
 
 
-    async mineNextBlock(showMiningOutput, suspend){
+    async mineNextBlock(suspend){
         //overwritten
     }
 
