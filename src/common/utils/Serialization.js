@@ -184,6 +184,55 @@ class Serialization{
         return result;
     }
 
+    serializeHashOptimized(hash){
+
+        return Buffer.concat([
+            this.serializeBufferCountingLeadingZeros(hash), //1 Byte
+            this.serializeBufferRemovingLeadingZeros(hash)
+        ]);
+
+    }
+
+    deserializeHashOptimized(buffer,offset){
+
+        let hashPrefix = [];
+
+        let zeroCount = BufferExtended.substr(buffer, offset, 1);
+        offset += 1;
+
+        for (let i = 0; i < zeroCount; i++) hashPrefix.push(0);
+
+        let deserializedHash = Buffer.concat([
+            hashPrefix,
+            BufferExtended.substr(buffer, offset, 32 - zeroCount)
+        ]);
+
+        offset += 32 - zeroCount;
+
+        let result = {
+            hash: deserializedHash,
+            offset: offset
+        }
+
+        return result;
+    }
+
+    serializeBufferCountingLeadingZeros(buffer){
+
+        let count=0;
+        let stop=false;
+
+        while(!stop){
+
+            if( buffer[count] === 0 ) count++;
+            else stop = true;
+
+        }
+
+        return this.serializeNumber1Byte(count);
+
+    }
+
     serializeBufferRemovingLeadingZeros(buffer){
 
         let count = 0;
@@ -196,11 +245,11 @@ class Serialization{
         for (let i = count; i < buffer.length; i++)
             result[i-count+1] = buffer[i];
 
-
         return result;
 
     }
-    
+
+
     /**
      * Returns the position of most significant bit of 1
      * Eg: for n = 00000000000000000000000000001010 returns 3
