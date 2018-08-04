@@ -187,7 +187,7 @@ class InterfaceBlockchainMiningBasic {
                 console.log(this._hashesPerSecond + " hashes/s");
                 StatusEvents.emit("mining/hash-rate", this._hashesPerSecond);
                 this._hashesPerSecond = 0;
-            } if ( count % 30 === 0 ) {
+            } else if ( count % 30 === 0 ) {
 
                 console.info("-------------------------------------");
                 console.info("-------------------------------------");
