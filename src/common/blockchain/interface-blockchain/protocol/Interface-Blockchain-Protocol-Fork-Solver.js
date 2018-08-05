@@ -76,15 +76,15 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    async _calculateForkBinarySearch(socket, newChainStartingPoint, newChainLength, currentBlockchainLength){
+    async _calculateForkBinarySearch(socket, forkChainStartingPoint, forkChainLength, currentBlockchainLength){
 
-        if (newChainStartingPoint > currentBlockchainLength-1 || currentBlockchainLength === 0)
+        if (forkChainStartingPoint > currentBlockchainLength-1 || currentBlockchainLength === 0)
             return {position: -1, header: null};
         else {
-            let binarySearchResult = await this._discoverForkBinarySearch(socket, newChainStartingPoint, newChainStartingPoint, currentBlockchainLength - 1);
+            let binarySearchResult = await this._discoverForkBinarySearch(socket, forkChainStartingPoint, forkChainStartingPoint, currentBlockchainLength - 1);
 
             //forcing the binary search for download the next unmatching element
-            if (binarySearchResult.position !== -1 && binarySearchResult.position+1 < newChainLength)
+            if (binarySearchResult.position !== -1 && binarySearchResult.position+1 < forkChainLength)
                 binarySearchResult.position++;
 
             return binarySearchResult;
@@ -99,25 +99,19 @@ class InterfaceBlockchainProtocolForkSolver{
         may the fork be with you Otto
      */
 
-
-
-    //TODO it will not update positions
-    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof ){
+    async discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof, forkChainWork ){
 
         let binarySearchResult = {position: -1, header: null };
         let currentBlockchainLength = this.blockchain.blocks.length;
 
         let fork, forkFound;
 
-        try{
-
-            if (!this.blockchain.agent.light  && currentBlockchainLength > forkChainLength)
-                throw {message: "discoverAndProcessFork - fork is smaller fork than mine"};
+        try {
 
             let answer = this.blockchain.forksAdministrator.findFork(socket, forkLastBlockHash, forkProof);
             if (answer !== null) return answer;
 
-            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, [ forkLastBlockHash ], false );
+            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, undefined, [ forkLastBlockHash ], false );
 
             //veify last n elements
             const count = 6;
@@ -127,15 +121,12 @@ class InterfaceBlockchainProtocolForkSolver{
 
 
                     if (i === forkChainLength-1 && forkLastBlockHash !== undefined && forkLastBlockHash !== undefined) {
-                        answer = {hash: forkLastBlockHash};
+                        answer = { hash: forkLastBlockHash };
                     } else {
                         answer = await socket.node.sendRequestWaitOnce( "head/hash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                         if (answer === null || answer === undefined || answer.hash === undefined)
                             continue;
                     }
-
-
-                    console.log("_forkSolver_checking", i, currentBlockchainLength-1);
 
 
                     forkFound = this.blockchain.forksAdministrator._findForkyByHeader( answer.hash );
@@ -186,7 +177,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 binarySearchResult = await this._calculateForkBinarySearch(socket, forkChainStartingPoint, forkChainLength, currentBlockchainLength );
 
                 if (binarySearchResult.position === null)
-                    throw {message: "connection dropped discoverForkBinarySearch"}
+                    throw {message: "connection dropped discoverForkBinarySearch"};
 
                 forkFound = this.blockchain.forksAdministrator._findForkyByHeader(binarySearchResult.header);
 
@@ -223,10 +214,18 @@ class InterfaceBlockchainProtocolForkSolver{
                     forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
                 }
 
+                if ( (forkChainLength - binarySearchResult.position) >= consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD_TO_USE_SLEEP){
+                    fork.downloadBlocksSleep = true;
+                }
+
                 fork.forkStartingHeight = binarySearchResult.position;
                 fork.forkStartingHeightDownloading  = binarySearchResult.position;
                 fork.forkChainStartingPoint = forkChainStartingPoint;
                 fork.forkChainLength = forkChainLength;
+                fork.forkChainWork = forkChainWork;
+
+                if ( fork.forkStartingHeight > fork.forkChainLength-1 )
+                    throw {message: "FORK is empty"};
 
                 await fork.initializeFork(); //download the requirements and make it ready
 
@@ -259,7 +258,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if (bIncludeBan) {
                 console.warn("BANNNNNNNNNNNNNNNNN", socket.node.sckAddress.toString(), exception.message);
-                BansList.addBan(socket, 2000, exception.message);
+                BansList.addBan(socket, 60000, exception.message);
             }
 
             await this.blockchain.sleep(10);
@@ -339,7 +338,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             //console.log("block.hash", block.hash.toString("hex"));
 
-            if (fork.downloadAllBlocks && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
+            if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
 
             let result;
 
@@ -364,7 +363,7 @@ class InterfaceBlockchainProtocolForkSolver{
             else
                 throw {message: "Fork didn't work at height ", nextBlockHeight};
 
-            if (fork.downloadAllBlocks && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
+            if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
 
         }
 

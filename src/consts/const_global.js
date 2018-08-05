@@ -237,7 +237,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.166.0",
+        VERSION: "1.173",
         VERSION_COMPATIBILITY: "1.162.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
@@ -259,6 +259,7 @@ consts.SETTINGS = {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
             INTERVAL: 2 * 1000,                         //miliseconds
 
+            //banned nodes
             BLOCKED_NODES: [ ], //addresses that will be blocked example: "domain.com"
         },
 
@@ -301,7 +302,7 @@ consts.SETTINGS = {
 
                     SSL:{
                         MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL: 20,
-                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL: 8,
+                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL: 10,
                     },
                 },
 
@@ -347,6 +348,7 @@ consts.SETTINGS = {
 
             FORKS:{
                 MAXIMUM_BLOCKS_TO_DOWNLOAD: 100,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD_TO_USE_SLEEP: 30,
             },
 
             TIMEOUT: {
@@ -373,7 +375,7 @@ consts.TERMINAL_WORKERS = {
     // file gets created on build
     CPU_WORKER_NONCES_WORK: 700,  //per seconds
 
-    CPU_CPP_WORKER_NONCES_WORK: 20000,  //per second
+    CPU_CPP_WORKER_NONCES_WORK: 40000,  //per second
     CPU_CPP_WORKER_NONCES_WORK_BATCH: 500,  //per second
 
     //NONCES_WORK should be way bigger than WORK_BATCHES

@@ -115,12 +115,9 @@ class MinerPoolMining extends InheritedPoolMining {
     }
 
 
-    async mineNextBlock(showMiningOutput, suspend){
+    async mineNextBlock(suspend){
 
         while (this.started && !global.TERMINATED){
-
-            if (showMiningOutput)
-                this.setMiningHashRateInterval();
 
             if (this._miningWork.block === undefined || this._miningWork.resolved)
                 await Blockchain.blockchain.sleep(5);

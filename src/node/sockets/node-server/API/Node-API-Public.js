@@ -38,6 +38,7 @@ class NodeAPIPublic{
                 lastBlockHash: lastBlock !== undefined ? Blockchain.blockchain.blocks.last.hash.toString("hex") : '',
             },
             networkHashRate: Blockchain.blockchain.blocks.networkHashRate,
+            chainWork: Blockchain.blockchain.blocks.chainWork.toString(),
             sockets:{
                 clients: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET),
                 servers: NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET),
@@ -51,7 +52,6 @@ class NodeAPIPublic{
             waitlist:{
                 list: NodesWaitlist.getJSONList( NODE_TYPE.NODE_TERMINAL, false ),
             },
-            
             is_synchronized: is_synchronized,
             secondsBehind  : nSecondsBehind / 1000
 

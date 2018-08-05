@@ -2,7 +2,7 @@ import InterfaceBlockchainMining from "../Interface-Blockchain-Mining";
 import Workers from './Workers';
 import consts from 'consts/const_global'
 
-class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
+class BlockchainBackboneMining extends InterfaceBlockchainMining {
 
 
     //backbone mining is the same with InterfaceBlockchainMining
@@ -94,4 +94,4 @@ class InterfaceBlockchainBackboneMining extends InterfaceBlockchainMining {
 
 }
 
-export default InterfaceBlockchainBackboneMining;
+export default BlockchainBackboneMining;

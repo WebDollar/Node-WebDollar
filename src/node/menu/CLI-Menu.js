@@ -294,7 +294,8 @@ class CLI {
                     return;
                 }
 
-                console.log("Address successfully exported", addressString, '   to ', addressPath+fileNam);
+                console.log("Address successfully exported", addressString, '   to ', addressPath+fileName);
+
                 resolve(true);
                 return;
 

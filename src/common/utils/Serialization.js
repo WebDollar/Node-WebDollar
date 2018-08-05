@@ -1,5 +1,7 @@
 import BufferExtended from "./BufferExtended";
+
 const BigNumber = require('bignumber.js');
+const BigInteger = require('big-integer');
 
 class Serialization{
 
@@ -14,9 +16,10 @@ class Serialization{
 
             let division = bigInteger.divmod(256);
 
-            list.unshift ( division.remainder );
+            list.push ( division.remainder );
             bigInteger = division.quotient;
         }
+        list.reverse();
 
         let buffer = new Buffer( list.length );
 
@@ -24,6 +27,18 @@ class Serialization{
             buffer[i] = list[i];
 
         return buffer;
+    }
+
+    deserializeBigInteger(buffer){
+        let number = new BigInteger(0);
+
+        let power = new BigInteger(1);
+        for (let i=buffer.length-1; i>=0; i--) {
+            number = number.plus( power.multiply(buffer[i]) );
+            power = power.multiply(256);
+        }
+
+        return number;
     }
 
     convertBigNumber( bigNumber, length ){

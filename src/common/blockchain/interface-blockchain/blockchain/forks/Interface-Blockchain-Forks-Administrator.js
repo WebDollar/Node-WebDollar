@@ -71,7 +71,7 @@ class InterfaceBlockchainForksAdministrator {
 
     }
 
-    createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, headers, ready){
+    createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, headers, ready){
 
         if (!Array.isArray(sockets)) sockets = [sockets];
 
@@ -81,7 +81,7 @@ class InterfaceBlockchainForksAdministrator {
         fork = this.findForkByHeaders(headers);
         if ( fork !== null) return fork;
 
-        fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, headers, ready );
+        fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, headers, ready );
 
         this.forks.push(fork);
 

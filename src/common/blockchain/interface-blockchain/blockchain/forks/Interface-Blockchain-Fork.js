@@ -23,6 +23,9 @@ class InterfaceBlockchainFork {
         this._blocksCopy = [];
         this.forkIsSaving = false;
 
+        this.downloadBlocksSleep = false;
+        this.downloadAllBlocks = false;
+
     }
 
     destroyFork(){
@@ -46,7 +49,6 @@ class InterfaceBlockchainFork {
             this._blocksCopy = [];
             this._forkPromiseResolver = undefined;
             this.forkPromise = undefined;
-            this.downloadAllBlocks = false;
 
         } catch (exception){
             Log.error("destroy fork raised an exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS,  exception);
@@ -58,7 +60,7 @@ class InterfaceBlockchainFork {
      * initializeConstructor is used to initialize the constructor dynamically using .apply method externally passing the arguments
      */
 
-    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, newChainLength, headers, forkReady = false){
+    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, headers, forkReady = false){
 
         this.blockchain = blockchain;
 
@@ -76,8 +78,9 @@ class InterfaceBlockchainFork {
         this.forkStartingHeightDownloading = forkStartingHeight||0;
 
         this.forkChainStartingPoint = forkChainStartingPoint;
-        this.forkChainLength = newChainLength||0;
+        this.forkChainLength = forkChainLength||0;
         this.forkBlocks = [];
+        this.forkChainWork = forkChainWork;
 
         if (!Array.isArray(headers)) headers = [headers];
         this.forkHeaders = headers;
@@ -89,13 +92,12 @@ class InterfaceBlockchainFork {
         this._blocksCopy = [];
     }
 
-    async _validateFork(validateHashesAgain, firstValidation, validateChainWork = true ){
+    async _validateFork(validateHashesAgain, firstValidation){
 
         //forkStartingHeight is offseted by 1
 
-        if (this.blockchain.blocks.length > this.forkStartingHeight + this.forkBlocks.length )
-            throw {message: "my blockchain is larger than yours", position: this.forkStartingHeight + this.forkBlocks.length, blockchain: this.blockchain.blocks.length};
-        else
+        if (this.forkBlocks.length === 0) throw {message: "Fork doesn't have any block"};
+
         if (this.blockchain.blocks.length === this.forkStartingHeight + this.forkBlocks.length ) //I need to check
             if ( this.forkBlocks[0].hash.compare(this.blockchain.getHashPrev(this.forkStartingHeight + 1)) >= 0 )
                 throw { message: "blockchain has same length, but your block is not better than mine" };
@@ -108,24 +110,26 @@ class InterfaceBlockchainFork {
 
             }
 
-        if (validateChainWork){
-
-            let chainWork = new BigInteger(0);
-            for (let i = this.forkStartingHeight; i<this.blockchain.blocks.length; i++)
-                chainWork = chainWork.plus( this.blockchain.blocks[i].workDone );
-
-            let forkWork = new BigInteger(0);
-            for (let i=0; i< this.forkBlocks.length; i++ )
-                forkWork = forkWork.plus( this.forkBlocks[i].workDone );
-
-            let factor = 1;
-
-            if ( forkWork.lesser( chainWork.multiply(factor) ) )
-                throw {message: "forkWork is less than chainWork", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
-
-        }
+        this._validateChainWork();
 
         return true;
+    }
+
+    _validateChainWork(){
+
+        let chainWork = new BigInteger(0);
+        for (let i = this.forkStartingHeight; i<this.blockchain.blocks.length; i++)
+            chainWork = chainWork.plus( this.blockchain.blocks[i].workDone );
+
+        let forkWork = new BigInteger(0);
+        for (let i=0; i< this.forkBlocks.length; i++ )
+            forkWork = forkWork.plus( this.forkBlocks[i].workDone );
+
+        let factor = 1;
+
+        if ( forkWork.lesser( chainWork.multiply(factor) ) )
+            throw {message: "forkWork is less than chainWork", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
+
     }
 
     async includeForkBlock(block, ){
@@ -262,7 +266,7 @@ class InterfaceBlockchainFork {
         this.forkIsSaving = true; //marking it saved because we want to avoid the forksAdministrator to delete it
         if (this.blockchain === undefined) return false; //fork was already destroyed
 
-        if (! (await this._validateFork(false, true, true))) {
+        if (! (await this._validateFork(false, true))) {
             Log.error("validateFork was not passed", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
             return false
         }
@@ -284,7 +288,7 @@ class InterfaceBlockchainFork {
                     return false
                 }
 
-                if (this.downloadAllBlocks) await this.sleep(30);
+                if (this.downloadBlocksSleep) await this.sleep(30);
 
                 try {
 
@@ -297,7 +301,7 @@ class InterfaceBlockchainFork {
                     return false;
                 }
 
-                if (this.downloadAllBlocks) await this.sleep(20);
+                if (this.downloadBlocksSleep) await this.sleep(20);
 
                 try {
 
@@ -320,7 +324,7 @@ class InterfaceBlockchainFork {
                     return false;
                 }
 
-                if (this.downloadAllBlocks) await this.sleep(20);
+                if (this.downloadBlocksSleep) await this.sleep(20);
 
                 this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
 
@@ -356,7 +360,7 @@ class InterfaceBlockchainFork {
                         this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
                         this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
 
-                        if (!this.downloadAllBlocks || (index > 0 && index % 10 !== 0))
+                        if (!this.downloadBlocksSleep || (index > 0 && index % 10 !== 0))
                             this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
 
                         if (! (await this.saveIncludeBlock(index, revertActions, false)) )
@@ -368,7 +372,7 @@ class InterfaceBlockchainFork {
 
                     await this.blockchain.saveBlockchain( this.forkStartingHeight );
 
-                    if (!this.downloadAllBlocks) await this.sleep(2);
+                    if (!this.downloadBlocksSleep) await this.sleep(2);
 
                     Log.log("FORK STATUS SUCCESS5: "+forkedSuccessfully+ " position "+this.forkStartingHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
 
@@ -405,7 +409,7 @@ class InterfaceBlockchainFork {
 
                 await this.postForkTransactions(forkedSuccessfully);
 
-                if (this.downloadAllBlocks) await this.sleep(30);
+                if (this.downloadBlocksSleep) await this.sleep(30);
 
                 this.postFork(forkedSuccessfully);
 

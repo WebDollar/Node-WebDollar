@@ -1,4 +1,4 @@
-var BigInteger = require('big-integer');
+const BigInteger = require('big-integer');
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
@@ -509,7 +509,8 @@ class InterfaceBlockchainBlock {
 
         if (this._workDone !== undefined) return this._workDone;
 
-        this._workDone = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.hash.toString("hex"), 16 ) );
+        this._workDone = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.difficultyTargetPrev.toString("hex"), 16 ) );
+
         return this._workDone;
 
     }
