@@ -93,7 +93,7 @@ class Workers {
 
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu" )
             for (let i=0; i< this.workers_list.length; i++)
-                if ( (date  - this.workers_list[i].date ) > 80000 ){
+                if ( (date  - this.workers_list[i].date ) > 50000 ){
                     this.workers_list[i]._is_batching = false;
                     this.workers_list[i].date = new Date().getTime();
                 }
