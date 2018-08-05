@@ -107,11 +107,11 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
 
-                let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length, gzipped:knowGzip }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
                 if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
-                if(knowGzip){
+                if(answer.gzipped){
                     for (let i=0; i<answer.data.length; i++)
                         proofsList.push(answer.data[i]);
                 }else{
