@@ -5,6 +5,7 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
 import BansList from "common/utils/bans/BansList";
+import GZip from "../../../../utils/GZip";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -112,17 +113,42 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
                 if(answer.gzipped){
-                    for (let i=0; i<answer.data.length; i++)
-                        proofsList.push(answer.data[i]);
+
+                    knowGzip=true;
+                    proofsList.push(await GZip.unzip(answer.data));
+
                 }else{
+
+                    knowGzip=false;
+
                     for (let i=0; i<answer.length; i++)
                         proofsList.push(answer[i]);
+
                 }
-
-
 
                 i++;
             }
+
+            if(knowGzip){
+
+                let buffer = Buffer.concat(proofsList);
+                proofsList = [];
+
+                console.log("before gzip proofs")
+                console.log(proofsList.toString('hex'))
+
+                let offset = 0;
+                while(offset!=buffer.length){
+
+                    let result = this.forkProofPi.deserializeProof(buffer, offset);
+
+                    proofsList.push(result.data);
+                    offset = result.offset;
+
+                }
+
+            }
+
 
             if (proofsList.length === 0)
                 throw {message: "Proofs was not downloaded successfully"};
@@ -160,8 +186,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             StatusEvents.emit( "agent/status", {message: "Proofs Validated", blockHeight: this.forkStartingHeight } );
 
             return true;
-
-
 
         }
 
