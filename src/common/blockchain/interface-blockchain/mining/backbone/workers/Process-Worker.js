@@ -70,7 +70,7 @@ class ProcessWorker{
 
         });
 
-        await Blockchain.blockchain.sleep(2000);
+        await Blockchain.blockchain.sleep(1500);
 
         if (this._child.exitCode !== null)
             return false;
@@ -86,7 +86,7 @@ class ProcessWorker{
 
         this._prevHash = '';
 
-        await Blockchain.blockchain.sleep(3000);
+        await Blockchain.blockchain.sleep(1500);
 
         if (this._timeoutValidation === undefined)
             this._timeoutValidation = setTimeout(this._validateWork.bind(this), 1000);
