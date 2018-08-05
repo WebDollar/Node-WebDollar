@@ -1,5 +1,6 @@
 import InterfaceBlockchainProtocol from "common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol"
 import PPoWBlockchainProtocolForksManager from "./PPoW-Blockchain-Protocol-Forks-Manager"
+import GZip from "common/utils/GZip"
 
 class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
@@ -44,12 +45,13 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
         });
 
-        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi", (data)=>{
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi", async (data)=>{
 
             try {
 
                 if (data.starting === undefined) data.starting = 0;
                 if (data.length === undefined) data.length = 1000;
+                if (data.gzipped === undefined) data.gzipped = false;
 
                 if (typeof data.starting !== "number") throw "starting is not a number";
                 if (typeof data.length !== "number") throw "length is not a number";
@@ -57,11 +59,13 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
                 let proof;
 
                 if (this.blockchain.agent.light)
-                    proof = this.blockchain.proofPi.getProofHeaders(data.starting, data.length);
+                    proof = this.blockchain.proofPi.getProofHeaders(data.starting, data.length, data.gzipped);
                 else  // full node
-                    proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length);
+                    proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length, data.gzipped);
 
-                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", proof);
+                if (data.gzipped === true) proof = await GZip.zip(proof);
+
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", {result:true, data: proof, gzipped: data.gzipped});
 
             } catch (exception){
 
