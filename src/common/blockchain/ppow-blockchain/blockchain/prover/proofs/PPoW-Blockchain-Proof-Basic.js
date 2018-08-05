@@ -53,15 +53,18 @@ class PPoWBlockchainProofBasic{
 
     }
 
-
-
-    getProofHeaders(starting, length){
+    getProofHeaders(starting, length, gzipped){
 
         let list = [];
         for (let i=starting; i<Math.min( starting+length, this.blocks.length); i++) {
 
             try {
-                list.push(this.blocks[i].getBlockHeader())
+
+                if(gzipped)
+                    list.push(this.serializeProof(this.blocks[i].getBlockHeader()));
+                else
+                    list.push(this.blocks[i].getBlockHeader());
+
             } catch (exception){
 
                 console.error("Failed to retrieve block " , i, exception );
@@ -74,7 +77,11 @@ class PPoWBlockchainProofBasic{
             }
         }
 
-        return list
+        if(gzipped)
+            return Buffer.concat(list);
+        else
+            return list;
+
     }
 
     validateProof(startingPoint = 0){
