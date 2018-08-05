@@ -39,25 +39,20 @@ showport="$yellow[PORT]$stand"
 
 ### GENERAL_VARS
 which_certbot=$(which certbot)
-get_certbot=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then apt-cache policy certbot | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 Debian; then apt-cache policy certbot | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 centos; then yum list certbot | grep -o Available; fi)
+get_certbot=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy certbot | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy certbot | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(yum list certbot | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 is_port_80_used=$(sudo netstat -tanp | grep -w ":80" | awk '{print $4}' | cut -d ':' -f4)
 get_user=$(whoami)
 ###
 
 ### Check if certbot is installed
 function deps(){
-if [[ "$get_certbot" == "(none)" ]]; then
+if [[ "$get_certbot" == "none" ]]; then
         echo "$showinfo We need to Install CERTBOT"
-        if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y certbot; fi
+        if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y certbot; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt install -y certbot; elif cat /etc/*release | grep -q -o -m 1 centos; then yum install -y certbot; fi
 else
-        if [[ "$get_certbot" == Available ]]; then
-
-		if cat /etc/*release | grep -q -o -m 1 centos; then yum install -y certbot; fi
-	else
-	        if [[ "$get_certbot" == * ]]; then
-        	        echo "$showok CERTBOT is already installed!"
-	        fi
-	fi
+        if [[ "$get_certbot" == * ]]; then
+       	        echo "$showok CERTBOT is already installed!"
+        fi
 fi
 }
 deps

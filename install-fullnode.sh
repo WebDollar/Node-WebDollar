@@ -47,19 +47,19 @@ function checkroot(){
 #checkroot
 
 ### GENERAL VARS
-getiptpersist=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "1"; fi)
-getgit=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 centos; then yum list git | grep -o Installed; fi)
+getiptpersist=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "NA"; fi)
+getgit=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list git | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 ###
 
 #### Dependencies START
 function deps() {
-if [[ "$getiptpersist" == "(none)" ]]; then
+if [[ "$getiptpersist" == "none" ]]; then
 	echo "$showinfo We need to install IPtables Persistent"
 	echo "$showinfo When asked, press YES to save your current IPtables settings."
 	echo "$showinfo IPtables Persistent keeps your IPT rules after a REBOOT."
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y iptables-persistent; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y iptables-persistent; fi
 else
-	if [[ "$getiptpersist" == 1 ]]; then
+	if [[ "$getiptpersist" == NA ]]; then
 		echo "$showok IPtables Persistent is not available for CentOS"
 	else
 		if [[ "$getiptpersist" == * ]]; then
@@ -68,17 +68,14 @@ else
 	fi
 fi
 
-if [[ "$getgit" == "(none)" ]]; then
+if [[ "$getgit" == "none" ]]; then
 	echo "$showinfo We need to install Git"
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y git; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y git; elif cat /etc/*release | grep -q -o -m 1 centos; then yum install -y git; fi
 else
-
 	if [[ "$getgit" == Installed ]]; then
 		echo "$showok Git is already installed!"
-	else
-		if [[ "$getgit" == * ]]; then
-			echo "$showok Git is already installed!"
-		fi
+	elif [[ "$getgit" == * ]]; then
+		echo "$showok Git is already installed!"
 	fi
 fi
 }
