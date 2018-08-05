@@ -4,6 +4,7 @@ import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 import MiniBlockchain from "./Mini-Blockchain";
+import GZip from "../../../utils/GZip";
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -113,6 +114,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         }
 
         this.lightAccountantTreeSerializations[height+1] = serialization;
+        this.lightAccountantTreeSerializationsGzipped[height+1] = await GZip.zip(serialization);
 
         this._deleteOldLightSettings();
 
@@ -204,6 +206,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         if (numBlocks > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS) {
 
             this.lightAccountantTreeSerializations[diffIndex] = serializationAccountantTreeInitial;
+            this.lightAccountantTreeSerializationsGzipped[diffIndex] = await GZip.zip(serializationAccountantTreeInitial);
 
             this.lightPrevDifficultyTargets[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTarget");
             if (this.lightPrevDifficultyTargets[diffIndex] === null) {
@@ -374,6 +377,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         while (this.lightPrevDifficultyTargets.hasOwnProperty(index)){
 
             delete this.lightAccountantTreeSerializations[index];
+            delete this.lightAccountantTreeSerializationsGzipped[index];
             delete this.lightPrevDifficultyTargets[index];
             delete this.lightPrevHashPrevs[index];
             delete this.lightPrevTimeStamps[index];
