@@ -186,10 +186,7 @@ class Serialization{
 
     serializeHashOptimized(hash){
 
-        return Buffer.concat([
-            this.serializeBufferCountingLeadingZeros(hash), //1 Byte
-            this.serializeBufferRemovingLeadingZeros(hash)
-        ]);
+        return this.serializeBufferRemovingLeadingZeros(hash);
 
     }
 
@@ -197,40 +194,25 @@ class Serialization{
 
         let hashPrefix = [];
 
-        let zeroCount = BufferExtended.substr(buffer, offset, 1);
+        let hashLength = this.deserializeNumber1Bytes(buffer, offset);
         offset += 1;
 
-        for (let i = 0; i < zeroCount; i++) hashPrefix.push(0);
+        for (let i = 0; i < 32 - hashLength; i++) hashPrefix.push(0);
+
+        let hashLeadingZero = BufferExtended.substr(buffer, offset, hashLength);
+        offset += hashLength;
 
         let deserializedHash = Buffer.concat([
-            hashPrefix,
-            BufferExtended.substr(buffer, offset, 32 - zeroCount)
+            new Buffer(hashPrefix),
+            hashLeadingZero
         ]);
-
-        offset += 32 - zeroCount;
 
         let result = {
             hash: deserializedHash,
             offset: offset
-        }
+        };
 
         return result;
-    }
-
-    serializeBufferCountingLeadingZeros(buffer){
-
-        let count=0;
-        let stop=false;
-
-        while(!stop){
-
-            if( buffer[count] === 0 ) count++;
-            else stop = true;
-
-        }
-
-        return this.serializeNumber1Byte(count);
-
     }
 
     serializeBufferRemovingLeadingZeros(buffer){
