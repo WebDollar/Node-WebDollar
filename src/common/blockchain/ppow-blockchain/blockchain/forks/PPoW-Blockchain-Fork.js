@@ -103,7 +103,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             let i = 0, length = 100;
             let proofsList = [];
-            let gzipped = true;
+            let gzipped = false;
 
             while ( i*length < proofPiData.length && i < 100 ) {
 
@@ -113,8 +113,9 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
-                if(gzipped){
+                if(answer.gzipped){
 
+                    gzipped = true;
                     proofsList.push(await GZip.unzip(answer.data));
 
                 }else{
@@ -125,10 +126,12 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 i++;
             }
 
-            let buffer = Buffer.concat(proofsList)
-            proofsList = [];
+            let buffer = [];
 
-            // if(gzipped) buffer = await GZip.unzip(buffer);
+            if(gzipped){
+                buffer = Buffer.concat(proofsList);
+                proofsList = [];
+            }
 
             let offset = 0;
             while(offset!=buffer.length){
